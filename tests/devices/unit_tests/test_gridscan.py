@@ -4,14 +4,14 @@ from mockito import mock, unstub, verify, when
 from mockito.matchers import ANY, ARGS, KWARGS
 from ophyd.sim import make_fake_device
 
-from artemis.devices.fast_grid_scan import (
+from dodal.devices.fast_grid_scan import (
     FastGridScan,
     GridScanParams,
     set_fast_grid_scan_params,
     time,
 )
-from artemis.devices.motors import I03Smargon
-from artemis.utils import Point3D
+from dodal.devices.motors import I03Smargon
+from dodal.utils import Point3D
 
 
 @pytest.fixture

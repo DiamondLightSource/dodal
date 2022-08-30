@@ -1,5 +1,5 @@
-from src.artemis.devices.det_dim_constants import EIGER2_X_16M_SIZE
-from src.artemis.devices.detector import DetectorParams
+from dodal.devices.det_dim_constants import EIGER2_X_16M_SIZE
+from dodal.devices.detector import DetectorParams
 
 
 def create_detector_params_with_directory(directory):

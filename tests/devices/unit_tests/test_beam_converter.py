@@ -1,7 +1,7 @@
 import pytest
 from mockito import when
 
-from artemis.devices.det_dist_to_beam_converter import (
+from dodal.devices.det_dist_to_beam_converter import (
     Axis,
     DetectorDistanceToBeamXYConverter,
 )

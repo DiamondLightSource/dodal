@@ -1,7 +1,7 @@
 import pytest
 from ophyd.sim import make_fake_device
 
-from artemis.devices.aperture import Aperture
+from dodal.devices.aperture import Aperture
 
 
 @pytest.fixture

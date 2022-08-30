@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from artemis.devices.eiger import DetectorParams, EigerDetector
+from dodal.devices.eiger import DetectorParams, EigerDetector
 
 
 @pytest.fixture()
@@ -17,6 +17,7 @@ def eiger():
         omega_increment=0.1,
         num_images=50,
         use_roi_mode=False,
+        run_number=0
     )
     eiger = EigerDetector(
         detector_params=detector_params, name="eiger", prefix="BL03S-EA-EIGER-01:"

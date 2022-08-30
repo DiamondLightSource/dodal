@@ -1,6 +1,6 @@
 import pytest
 
-from artemis.devices.zebra import (
+from dodal.devices.zebra import (
     IN3_TTL,
     IN4_TTL,
     OR1,

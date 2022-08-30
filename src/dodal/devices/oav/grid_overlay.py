@@ -5,7 +5,7 @@ from pathlib import Path
 from ophyd import Component, Signal
 from PIL import Image, ImageDraw
 
-from artemis.devices.oav.snapshot import Snapshot
+from dodal.devices.oav.snapshot import Snapshot
 
 
 class Orientation(Enum):
