@@ -11,23 +11,23 @@ from dodal.devices.detector import DetectorParams
 BEAMLINE_PREFIX = "BL03I"
 INSERTION_PREFIX = "SR03I"
 
-def fast_grid_scan() -> FastGridScan: 
-    return FastGridScan(f"{BEAMLINE_PREFIX}-MO-SGON-01:FGS:")
+def fast_grid_scan() -> FastGridScan:
+    return FastGridScan(name="fast_grid_scan", prefix=f"{BEAMLINE_PREFIX}-MO-SGON-01:FGS:")
 
 def zebra() -> Zebra:
-    return Zebra(f"{BEAMLINE_PREFIX}-EA-ZEBRA-01:")
+    return Zebra(name="zebra", prefix=f"{BEAMLINE_PREFIX}-EA-ZEBRA-01:")
 
 def undulator() -> Undulator:
-    return Undulator(f"{INSERTION_PREFIX}-MO-SERVC-01:")
+    return Undulator(name="undulator", prefix=f"{INSERTION_PREFIX}-MO-SERVC-01:")
 
 def synchrotron() -> Synchrotron:
-    return Synchrotron()
+    return Synchrotron(name="synchrotron")
 
 def slit_gaps() -> SlitGaps:
-    return SlitGaps(f"{BEAMLINE_PREFIX}-AL-SLITS-04:")
+    return SlitGaps(name="slit_gaps", prefix=f"{BEAMLINE_PREFIX}-AL-SLITS-04:")
 
 def sample_motors() -> I03Smargon:
-    return I03Smargon(f"{BEAMLINE_PREFIX}-MO-SGON-01:")
+    return I03Smargon(name="sample_motors", prefix=f"{BEAMLINE_PREFIX}-MO-SGON-01:")
 
 def eiger(parameters: DetectorParams) -> EigerDetector:
     return EigerDetector(parameters, prefix=f"{BEAMLINE_PREFIX}-EA-EIGER-01:")
