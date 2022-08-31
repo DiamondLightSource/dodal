@@ -64,7 +64,7 @@ In the process of writing code in other DLS repos you may come to realise that i
 #. Remove the source remote and re-add origin::
 
     git remote rm source
-    git remote add origin https://github.com/DiamondLightSource/python-dodal
+    git remote add origin git@github.com:DiamondLightSource/python-dodal.git
 
 #. Tidy up the code so that it fits into the ``dodal`` repo e.g. in the Artemis case we had to change the tests to import from ``artemis`` to import from ``dodal`` and add some more dependencies.
 
