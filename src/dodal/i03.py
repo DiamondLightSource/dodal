@@ -7,6 +7,7 @@ from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.slit_gaps import SlitGaps
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.detector import DetectorParams
+from dodal.utils import skip_connection_test
 
 BEAMLINE_PREFIX = "BL03I"
 INSERTION_PREFIX = "SR03I"
@@ -29,5 +30,6 @@ def slit_gaps() -> SlitGaps:
 def sample_motors() -> I03Smargon:
     return I03Smargon(name="sample_motors", prefix=f"{BEAMLINE_PREFIX}-MO-SGON-01:")
 
+@skip_connection_test() # Currently eiger doesn't have all the expected PVs
 def eiger(parameters: DetectorParams) -> EigerDetector:
     return EigerDetector(parameters, prefix=f"{BEAMLINE_PREFIX}-EA-EIGER-01:")
