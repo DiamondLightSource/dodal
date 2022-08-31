@@ -57,7 +57,7 @@ In the process of writing code in other DLS repos you may come to realise that i
 
 #. Pull from the source repo::
 
-    git pull --rebase source main --allow-unrelated-histories
+    git pull --no-rebase source main --allow-unrelated-histories
 
 #. This is another point where it's a good idea to check the log ``git log`` and the general directory structure to ensure it looks mostly correct
 
