@@ -7,6 +7,9 @@ from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.slit_gaps import SlitGaps
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.detector import DetectorParams
+from dodal.devices.backlight import Backlight
+from dodal.devices.aperture import Aperture
+from dodal.devices.oav import OAV
 
 BEAMLINE_PREFIX = "BL03I"
 INSERTION_PREFIX = "SR03I"
@@ -31,3 +34,12 @@ def sample_motors() -> I03Smargon:
 
 def eiger(parameters: DetectorParams) -> EigerDetector:
     return EigerDetector(parameters, prefix=f"{BEAMLINE_PREFIX}-EA-EIGER-01:")
+
+def backlight() -> Backlight:
+    return Backlight(name="Backlight", prefix=f"{BEAMLINE_PREFIX}")
+
+def aperture() -> Aperture:
+    return Aperture(name="Aperture", prefix=f"{BEAMLINE_PREFIX}-MO-MAPT-01:")
+
+def oav() -> OAV:
+    return OAV(name="OAV", prefix=f"{BEAMLINE_PREFIX}-DI-OAV-01")
