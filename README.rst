@@ -25,8 +25,8 @@ In the process of writing code in other DLS repos you may come to realise that i
 
 #. Add a note to every commit message to mention it's been moved::
 
-    git filter-branch --msg-filter -f 'sed "$ a\
-    NOTE: Commit originally came from https://github.com/DiamondLightSource/python-artemis"' -- --all
+    git filter-branch --msg-filter 'sed "$ a \
+    NOTE: Commit originally came from https://github.com/DiamondLightSource/python-artemis"' -f -- --all
 
 #. If you have been using Github `issue references`_ in the old repository modify these to point to be more explicit (Note that this assumes the old repo uses ``#123`` notation and only ever references issues from it's own repo)::
 
