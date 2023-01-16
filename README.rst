@@ -12,9 +12,10 @@ In the process of writing code in other DLS repos you may come to realise that i
 
     git remote rm origin
 
-#. Filter out only the directory you want to move::
+#. Filter out only the directory/file you want to move::
 
-    git filter-branch --subdirectory-filter src/artemis/devices/ -- --all
+    pip install git-filter-repo
+    git-filter-repo --path file/to/move --path /other/file/to/move
 
 #. Clean everything up::
 
