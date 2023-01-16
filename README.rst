@@ -36,7 +36,7 @@ In the process of writing code in other DLS repos you may come to realise that i
 #. Prepare the code to be in the correct structure for dodal::
 
     mkdir -p src/dodal/devices
-    mv * src/dodal/devices/
+    mv path/to/device src/dodal/devices/
 
 #. At this point it's a good idea to check the log ``git log`` and the general directory structure to ensure it looks mostly correct
 
@@ -54,7 +54,7 @@ In the process of writing code in other DLS repos you may come to realise that i
 
 #. Add the source repo as a remote for ``dodal``::
 
-    git remote add source /path/to/source/folder
+    git remote add source /path/to/source/old_repo/.git
 
 #. Pull from the source repo::
 
