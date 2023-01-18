@@ -2,7 +2,7 @@ import pytest
 from mockito import when
 from ophyd.sim import make_fake_device
 
-from artemis.devices.eiger_odin import EigerOdin
+from dodal.devices.eiger_odin import EigerOdin
 
 
 @pytest.fixture

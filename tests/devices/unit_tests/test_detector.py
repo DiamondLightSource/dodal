@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
-from src.artemis.devices.det_dim_constants import EIGER2_X_16M_SIZE
-from src.artemis.devices.detector import DetectorParams
+from dodal.devices.det_dim_constants import EIGER2_X_16M_SIZE
+from dodal.devices.detector import DetectorParams
 
 
 def create_detector_params_with_directory(directory):
@@ -16,7 +16,7 @@ def create_detector_params_with_directory(directory):
         0.0,
         1,
         False,
-        "src/artemis/devices/unit_tests/test_lookup_table.txt",
+        "tests/devices/unit_tests/test_lookup_table.txt",
         detector_size_constants=EIGER2_X_16M_SIZE,
     )
 
@@ -32,7 +32,7 @@ def test_if_trailing_slash_provided_then_not_appended():
 
 
 @patch(
-    "src.artemis.devices.detector.DetectorDistanceToBeamXYConverter.parse_table",
+    "src.dodal.devices.detector.DetectorDistanceToBeamXYConverter.parse_table",
 )
 def test_correct_det_dist_to_beam_converter_path_passed_in(mocked_parse_table):
     params = DetectorParams(

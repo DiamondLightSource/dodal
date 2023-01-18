@@ -4,15 +4,15 @@ import pytest
 from bluesky.run_engine import RunEngine
 from ophyd.sim import make_fake_device
 
-from artemis.devices.backlight import Backlight
-from artemis.devices.I03Smargon import I03Smargon
-from artemis.devices.oav.oav_detector import OAV
-from artemis.devices.oav.oav_errors import OAVError_ZoomLevelNotFound
-from artemis.devices.oav.oav_parameters import OAVParameters
+from dodal.devices.backlight import Backlight
+from dodal.devices.smargon import Smargon
+from dodal.devices.oav.oav_detector import OAV
+from dodal.devices.oav.oav_errors import OAVError_ZoomLevelNotFound
+from dodal.devices.oav.oav_parameters import OAVParameters
 
-OAV_CENTRING_JSON = "src/artemis/devices/unit_tests/test_OAVCentring.json"
-DISPLAY_CONFIGURATION = "src/artemis/devices/unit_tests/test_display.configuration"
-ZOOM_LEVELS_XML = "src/artemis/devices/unit_tests/test_jCameraManZoomLevels.xml"
+OAV_CENTRING_JSON = "tests/devices/unit_tests/test_OAVCentring.json"
+DISPLAY_CONFIGURATION = "tests/devices/unit_tests/test_display.configuration"
+ZOOM_LEVELS_XML = "tests/devices/unit_tests/test_jCameraManZoomLevels.xml"
 
 
 def do_nothing(*args):
@@ -33,7 +33,7 @@ def mock_parameters():
 
 @pytest.fixture
 def mock_smargon():
-    smargon: I03Smargon = make_fake_device(I03Smargon)(name="smargon")
+    smargon: Smargon = make_fake_device(Smargon)(name="smargon")
     smargon.wait_for_connection = do_nothing
     return smargon
 
@@ -48,14 +48,14 @@ def mock_backlight():
 def test_can_make_fake_testing_devices_and_use_run_engine(
     mock_oav: OAV,
     mock_parameters: OAVParameters,
-    mock_smargon: I03Smargon,
+    mock_smargon: Smargon,
     mock_backlight: Backlight,
 ):
     @bpp.run_decorator()
     def fake_run(
         mock_oav: OAV,
         mock_parameters: OAVParameters,
-        mock_smargon: I03Smargon,
+        mock_smargon: Smargon,
         mock_backlight: Backlight,
     ):
         yield from bps.abs_set(mock_oav.cam.acquire_period, 5)

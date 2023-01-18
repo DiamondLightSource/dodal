@@ -1,7 +1,7 @@
 import pytest
 from mockito import when
 
-from artemis.devices.det_dist_to_beam_converter import (
+from dodal.devices.det_dist_to_beam_converter import (
     Axis,
     DetectorDistanceToBeamXYConverter,
 )
@@ -72,7 +72,7 @@ def test_get_beam_in_pixels(fake_converter: DetectorDistanceToBeamXYConverter):
 
 
 def test_parse_table():
-    test_file = "src/artemis/devices/unit_tests/test_lookup_table.txt"
+    test_file = "tests/devices/unit_tests/test_lookup_table.txt"
     test_converter = DetectorDistanceToBeamXYConverter(test_file)
 
     assert test_converter.lookup_file == test_file

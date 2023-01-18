@@ -1,7 +1,7 @@
 import pytest
 from ophyd.sim import make_fake_device
 
-from artemis.devices.backlight import Backlight
+from dodal.devices.backlight import Backlight
 
 
 @pytest.fixture

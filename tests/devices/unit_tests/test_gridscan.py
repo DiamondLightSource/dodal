@@ -6,13 +6,13 @@ from mockito import mock, verify, when
 from mockito.matchers import ANY, ARGS, KWARGS
 from ophyd.sim import make_fake_device
 
-from artemis.devices.fast_grid_scan import (
+from dodal.devices.fast_grid_scan import (
     FastGridScan,
     GridScanParams,
     set_fast_grid_scan_params,
 )
-from artemis.devices.I03Smargon import I03Smargon
-from artemis.utils import Point3D
+from dodal.devices.smargon import Smargon
+from dodal.utils import Point3D
 
 
 @pytest.fixture
@@ -126,9 +126,9 @@ def test_running_finished_with_all_images_done_then_complete_status_finishes_not
     assert complete_status.exception() is None
 
 
-def create_motor_bundle_with_limits(low_limit, high_limit) -> I03Smargon:
-    FakeI03Smargon = make_fake_device(I03Smargon)
-    grid_scan_motor_bundle: I03Smargon = FakeI03Smargon(name="test")
+def create_motor_bundle_with_limits(low_limit, high_limit) -> Smargon:
+    FakeSmargon = make_fake_device(Smargon)
+    grid_scan_motor_bundle: Smargon = FakeSmargon(name="test")
     grid_scan_motor_bundle.wait_for_connection()
     for axis in [
         grid_scan_motor_bundle.x,

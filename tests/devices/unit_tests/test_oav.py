@@ -6,9 +6,9 @@ import pytest
 from ophyd.sim import make_fake_device
 from requests import HTTPError, Response
 
-import artemis.devices.oav.utils as oav_utils
-from artemis.devices.oav.oav_detector import OAV
-from artemis.utils import Point2D
+import dodal.devices.oav.utils as oav_utils
+from dodal.devices.oav.oav_detector import OAV
+from dodal.utils import Point2D
 
 
 @pytest.fixture
@@ -41,7 +41,7 @@ def test_snapshot_trigger_handles_request_with_bad_status_code_correctly(
 
 
 @patch("requests.get")
-@patch("artemis.devices.oav.snapshot.Image")
+@patch("dodal.devices.oav.snapshot.Image")
 def test_snapshot_trigger_loads_correct_url(mock_image, mock_get: MagicMock, fake_oav):
     st = fake_oav.snapshot.trigger()
     st.wait()
@@ -49,7 +49,7 @@ def test_snapshot_trigger_loads_correct_url(mock_image, mock_get: MagicMock, fak
 
 
 @patch("requests.get")
-@patch("artemis.devices.oav.snapshot.Image.open")
+@patch("dodal.devices.oav.snapshot.Image.open")
 def test_snapshot_trigger_saves_to_correct_file(
     mock_open: MagicMock, mock_get, fake_oav
 ):
@@ -68,9 +68,9 @@ def test_snapshot_trigger_saves_to_correct_file(
 
 
 @patch("requests.get")
-@patch("artemis.devices.oav.snapshot.Image.open")
-@patch("artemis.devices.oav.grid_overlay.add_grid_overlay_to_image")
-@patch("artemis.devices.oav.grid_overlay.add_grid_border_overlay_to_image")
+@patch("dodal.devices.oav.snapshot.Image.open")
+@patch("dodal.devices.oav.grid_overlay.add_grid_overlay_to_image")
+@patch("dodal.devices.oav.grid_overlay.add_grid_border_overlay_to_image")
 def test_correct_grid_drawn_on_image(
     mock_border_overlay: MagicMock,
     mock_grid_overlay: MagicMock,
