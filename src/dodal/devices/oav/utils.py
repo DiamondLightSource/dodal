@@ -1,4 +1,4 @@
-from artemis.utils import Point2D
+from dodal.utils import Point2D
 
 
 def bottom_right_from_top_left(

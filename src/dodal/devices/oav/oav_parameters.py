@@ -1,7 +1,7 @@
 import json
 import xml.etree.cElementTree as et
 
-from artemis.devices.oav.oav_errors import OAVError_ZoomLevelNotFound
+from dodal.devices.oav.oav_errors import OAVError_ZoomLevelNotFound
 
 
 class OAVParameters:
