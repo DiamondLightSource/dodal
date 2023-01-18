@@ -2,7 +2,7 @@ from ophyd import Component as Cpt
 from ophyd import EpicsMotor, EpicsSignal
 from ophyd.epics_motor import MotorBundle
 
-from artemis.devices.motors import MotorLimitHelper, XYZLimitBundle
+from dodal.devices.motors import MotorLimitHelper, XYZLimitBundle
 
 
 class I03Smargon(MotorBundle):
