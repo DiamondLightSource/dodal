@@ -1,12 +1,12 @@
 from ophyd import Component, FormattedComponent
 
-from artemis.devices.fast_grid_scan import FastGridScan
-from artemis.devices.I03Smargon import I03Smargon
-from artemis.devices.logging_ophyd_device import InfoLoggingDevice
-from artemis.devices.slit_gaps import SlitGaps
-from artemis.devices.synchrotron import Synchrotron
-from artemis.devices.undulator import Undulator
-from artemis.devices.zebra import Zebra
+from dodal.devices.fast_grid_scan import FastGridScan
+from dodal.devices.smargon import Smargon
+from dodal.devices.logging_ophyd_device import InfoLoggingDevice
+from dodal.devices.slit_gaps import SlitGaps
+from dodal.devices.synchrotron import Synchrotron
+from dodal.devices.undulator import Undulator
+from dodal.devices.zebra import Zebra
 
 
 class FGSComposite(InfoLoggingDevice):
@@ -21,7 +21,7 @@ class FGSComposite(InfoLoggingDevice):
     synchrotron = FormattedComponent(Synchrotron)
     slit_gaps = Component(SlitGaps, "-AL-SLITS-04:")
 
-    sample_motors: I03Smargon = Component(I03Smargon, "")
+    sample_motors: Smargon = Component(Smargon, "")
 
     def __init__(self, insertion_prefix: str, *args, **kwargs):
         self.insertion_prefix = insertion_prefix
