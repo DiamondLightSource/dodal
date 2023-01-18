@@ -10,7 +10,7 @@ from ophyd import (
 )
 from ophyd.areadetector.plugins import HDF5Plugin_V22
 
-from artemis.devices.status import await_value
+from dodal.devices.status import await_value
 
 
 class EigerFan(Device):

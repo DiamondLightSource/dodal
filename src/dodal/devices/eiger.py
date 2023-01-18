@@ -4,9 +4,9 @@ from ophyd import Component, Device, EpicsSignalRO, StatusBase
 from ophyd.areadetector.cam import EigerDetectorCam
 from ophyd.status import Status
 
-from artemis.devices.detector import DetectorParams
-from artemis.devices.eiger_odin import EigerOdin
-from artemis.devices.status import await_value
+from dodal.devices.detector import DetectorParams
+from dodal.devices.eiger_odin import EigerOdin
+from dodal.devices.status import await_value
 from artemis.log import LOGGER
 
 

@@ -3,13 +3,13 @@ from typing import Optional, Tuple
 
 from dataclasses_json import config, dataclass_json
 
-from artemis.devices.det_dim_constants import (
+from dodal.devices.det_dim_constants import (
     EIGER2_X_16M_SIZE,
     DetectorSize,
     DetectorSizeConstants,
     constants_from_type,
 )
-from artemis.devices.det_dist_to_beam_converter import (
+from dodal.devices.det_dist_to_beam_converter import (
     Axis,
     DetectorDistanceToBeamXYConverter,
 )
