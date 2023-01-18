@@ -15,7 +15,7 @@ In the process of writing code in other DLS repos you may come to realise that i
 #. Filter out only the directory/file you want to move::
 
     pip install git-filter-repo
-    git-filter-repo --path file/to/move --path /other/file/to/move
+    git-filter-repo --path file/to/move --path /other/file/to/move -f
 
 #. Clean everything up::
 
