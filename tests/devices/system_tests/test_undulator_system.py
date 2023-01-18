@@ -1,6 +1,6 @@
 import pytest
 
-from src.artemis.devices.undulator import Undulator
+from dodal.devices.undulator import Undulator
 from src.artemis.parameters import SIM_INSERTION_PREFIX
 
 

@@ -1,6 +1,6 @@
 import pytest
 
-from artemis.devices.slit_gaps import SlitGaps
+from dodal.devices.slit_gaps import SlitGaps
 
 
 @pytest.mark.s03

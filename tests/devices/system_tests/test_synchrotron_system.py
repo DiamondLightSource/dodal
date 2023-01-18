@@ -1,6 +1,6 @@
 import pytest
 
-from artemis.devices.synchrotron import Synchrotron
+from dodal.devices.synchrotron import Synchrotron
 from artemis.parameters import SIM_BEAMLINE
 
 

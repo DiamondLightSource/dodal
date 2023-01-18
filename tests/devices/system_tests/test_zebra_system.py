@@ -1,6 +1,6 @@
 import pytest
 
-from artemis.devices.zebra import Zebra
+from dodal.devices.zebra import Zebra
 
 
 @pytest.fixture()
