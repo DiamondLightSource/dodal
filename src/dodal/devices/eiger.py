@@ -7,7 +7,7 @@ from ophyd.status import Status
 from dodal.devices.detector import DetectorParams
 from dodal.devices.eiger_odin import EigerOdin
 from dodal.devices.status import await_value
-from artemis.log import LOGGER
+from dodal.log import LOGGER
 
 
 class EigerTriggerMode(Enum):
