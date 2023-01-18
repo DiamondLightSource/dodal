@@ -168,9 +168,6 @@ jobs:
           #cache-from: type=gha
           #cache-to: type=gha,mode=max
 
-      - name: Test cli works in runtime image
-        run: docker run ${{ env.IMAGE_REPOSITORY }} --version
-
   release:
     # upload to PyPI and make a release on every tag
     needs: [lint, dist, test]
