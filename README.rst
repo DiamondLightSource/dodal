@@ -3,14 +3,8 @@ python-dodal
 
 |code_ci| |docs_ci| |coverage| |pypi_version| |license|
 
-.. note::
 
-    This project contains template code only. For documentation on how to
-    adopt this skeleton project see
-    https://DiamondLightSource.github.io/python-dodal-cli
-
-This is where you should write a short paragraph that describes what your module does,
-how it does it, and why people should use it.
+Ophyd devices and other utils that could be used across DLS beamlines
 
 ============== ==============================================================
 PyPI           ``pip install python-dodal``
@@ -19,19 +13,6 @@ Documentation  https://DiamondLightSource.github.io/python-dodal
 Releases       https://github.com/DiamondLightSource/python-dodal/releases
 ============== ==============================================================
 
-This is where you should put some images or code snippets that illustrate
-some relevant examples. If it is a library then you might put some
-introductory code here:
-
-.. code-block:: python
-
-    from dodal import __version__
-
-    print(f"Hello dodal {__version__}")
-
-Or if it is a commandline tool then you might put some example commands here::
-
-    $ python -m dodal --version
 
 .. |code_ci| image:: https://github.com/DiamondLightSource/python-dodal/actions/workflows/code.yml/badge.svg?branch=main
     :target: https://github.com/DiamondLightSource/python-dodal/actions/workflows/code.yml
