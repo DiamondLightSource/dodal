@@ -1,8 +1,8 @@
 import pytest
 
 from dodal.devices.synchrotron import Synchrotron
-from artemis.parameters import SIM_BEAMLINE
 
+SIM_BEAMLINE = "BL03S"
 
 @pytest.fixture
 def synchrotron():

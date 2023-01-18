@@ -1,7 +1,8 @@
 import pytest
 
 from dodal.devices.undulator import Undulator
-from src.artemis.parameters import SIM_INSERTION_PREFIX
+
+SIM_INSERTION_PREFIX = "SR03S"
 
 
 @pytest.fixture
