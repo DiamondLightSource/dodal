@@ -5,7 +5,7 @@ from ophyd.epics_motor import MotorBundle
 from dodal.devices.motors import MotorLimitHelper, XYZLimitBundle
 
 
-class I03Smargon(MotorBundle):
+class Smargon(MotorBundle):
     """
     Real motors added to allow stops following pin load (e.g. real_x1.stop() )
     X1 and X2 real motors provide compound chi motion as well as the compound X travel,
