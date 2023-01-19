@@ -1,1 +1,10 @@
-[]
+[
+  {
+    "version": "main",
+    "url": "https://DiamondLightSource.github.io/python-dodal/main/"
+  },
+  {
+    "version": "adopt-skeleton",
+    "url": "https://DiamondLightSource.github.io/python-dodal/adopt-skeleton/"
+  }
+]
