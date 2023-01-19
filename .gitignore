@@ -63,3 +63,7 @@ target/
 # likely venv names
 .venv*
 venv*
+
+# further build artifacts
+lockfiles/
+
