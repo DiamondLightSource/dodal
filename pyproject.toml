@@ -13,7 +13,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
 ]
 description = "Ophyd devices and other utils that could be used across DLS beamlines"
-dependencies = ["ophyd", "bluesky", "pyepics"]
+dependencies = ["ophyd", "bluesky", "pyepics", "dataclasses-json"]
 dynamic = ["version"]
 license.file = "LICENSE"
 readme = "README.rst"
@@ -25,6 +25,7 @@ dev = [
     "mypy",
     "flake8-isort",
     "Flake8-pyproject",
+    "mockito",
     "pipdeptree",
     "pre-commit",
     "pydata-sphinx-theme>=0.12",
@@ -66,6 +67,9 @@ exclude = [".tox", "venv"]
 
 [tool.pytest.ini_options]
 # Run pytest with all our checkers, and don't spam us with massive tracebacks on error
+markers = [
+    "s03: marks tests as requiring the s03 simulator running (deselect with '-m \"not s03\"')",
+]
 addopts = """
     --tb=native -vv --doctest-modules --doctest-glob="*.rst"
     --cov=dodal --cov-report term --cov-report xml:cov.xml
