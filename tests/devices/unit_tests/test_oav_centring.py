@@ -5,10 +5,10 @@ from bluesky.run_engine import RunEngine
 from ophyd.sim import make_fake_device
 
 from dodal.devices.backlight import Backlight
-from dodal.devices.smargon import Smargon
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.oav_errors import OAVError_ZoomLevelNotFound
 from dodal.devices.oav.oav_parameters import OAVParameters
+from dodal.devices.smargon import Smargon
 
 OAV_CENTRING_JSON = "tests/devices/unit_tests/test_OAVCentring.json"
 DISPLAY_CONFIGURATION = "tests/devices/unit_tests/test_display.configuration"

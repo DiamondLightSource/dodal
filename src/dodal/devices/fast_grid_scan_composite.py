@@ -1,9 +1,9 @@
 from ophyd import Component, FormattedComponent
 
 from dodal.devices.fast_grid_scan import FastGridScan
-from dodal.devices.smargon import Smargon
 from dodal.devices.logging_ophyd_device import InfoLoggingDevice
 from dodal.devices.slit_gaps import SlitGaps
+from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import Undulator
 from dodal.devices.zebra import Zebra

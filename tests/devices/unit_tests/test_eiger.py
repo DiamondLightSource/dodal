@@ -22,9 +22,7 @@ TEST_OMEGA_START = 0.0
 TEST_OMEGA_INCREMENT = 1.0
 TEST_NUM_IMAGES = 1
 TEST_USE_ROI_MODE = False
-TEST_DET_DIST_TO_BEAM_CONVERTER_PATH = (
-    "tests/devices/unit_tests/test_lookup_table.txt"
-)
+TEST_DET_DIST_TO_BEAM_CONVERTER_PATH = "tests/devices/unit_tests/test_lookup_table.txt"
 
 TEST_DETECTOR_PARAMS = DetectorParams(
     TEST_CURRENT_ENERGY,
