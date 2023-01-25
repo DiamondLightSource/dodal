@@ -102,12 +102,12 @@ def boolean_array_to_integer(values: List[bool]) -> int:
 
 
 class GateControl(Device):
-    enable: EpicsSignal = epics_signal_put_wait("_ENA", 30.0)
-    source_1: EpicsSignal = epics_signal_put_wait("_INP1", 30.0)
-    source_2: EpicsSignal = epics_signal_put_wait("_INP2", 30.0)
-    source_3: EpicsSignal = epics_signal_put_wait("_INP3", 30.0)
-    source_4: EpicsSignal = epics_signal_put_wait("_INP4", 30.0)
-    invert: EpicsSignal = epics_signal_put_wait("_INV", 30.0)
+    enable: EpicsSignal = epics_signal_put_wait("_ENA", "30.0")
+    source_1: EpicsSignal = epics_signal_put_wait("_INP1", "30.0")
+    source_2: EpicsSignal = epics_signal_put_wait("_INP2", "30.0")
+    source_3: EpicsSignal = epics_signal_put_wait("_INP3", "30.0")
+    source_4: EpicsSignal = epics_signal_put_wait("_INP4", "30.0")
+    invert: EpicsSignal = epics_signal_put_wait("_INV", "30.0")
 
     @property
     def sources(self):
