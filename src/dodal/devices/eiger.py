@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Optional
 
 from ophyd import Component, Device, EpicsSignalRO, StatusBase
 from ophyd.areadetector.cam import EigerDetectorCam
@@ -8,6 +9,20 @@ from dodal.devices.detector import DetectorParams
 from dodal.devices.eiger_odin import EigerOdin
 from dodal.devices.status import await_value
 from dodal.log import LOGGER
+
+DETECTOR_PARAM_DEFAULTS = {
+    "current_energy": 100,
+    "exposure_time": 0.1,
+    "directory": "/tmp",
+    "prefix": "file_name",
+    "run_number": 0,
+    "detector_distance": 100.0,
+    "omega_start": 0.0,
+    "omega_increment": 0.0,
+    "num_images": 2000,
+    "use_roi_mode": False,
+    "det_dist_to_beam_converter_path": "tests/devices/unit_tests/test_lookup_table.txt",
+}
 
 
 class EigerTriggerMode(Enum):
@@ -28,10 +43,21 @@ class EigerDetector(Device):
 
     filewriters_finished: StatusBase
 
-    def __init__(
-        self, detector_params: DetectorParams, name="Eiger Detector", *args, **kwargs
+    detector_params: Optional[DetectorParams] = None
+
+    @classmethod
+    def with_params(
+        cls,
+        params: DetectorParams = DetectorParams(**DETECTOR_PARAM_DEFAULTS),
+        name: str = "EigerDetector",
+        *args,
+        **kwargs,
     ):
-        super().__init__(name=name, *args, **kwargs)
+        det = cls(name=name, *args, **kwargs)
+        det.set_detector_parameters(params)
+        return det
+
+    def set_detector_parameters(self, detector_params: DetectorParams):
         self.detector_params = detector_params
         self.check_detector_variables_set()
 

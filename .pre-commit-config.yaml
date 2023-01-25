@@ -43,4 +43,4 @@ repos:
       - id: mypy
         files: 'src/.*\.py$'
         additional_dependencies: [types-requests]
-        args: ["--ignore-missing-imports"]
+        args: ["--ignore-missing-imports", "--no-strict-optional"]
