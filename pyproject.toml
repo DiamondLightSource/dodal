@@ -60,6 +60,8 @@ extend-ignore = [
     "E203", # See https://github.com/PyCQA/pycodestyle/issues/373
     "F811", # support typing.overload decorator
     "F722", # allow Annotated[typ, some_func("some string")]
+    "E501",
+    "W503",
 ]
 max-line-length = 88 # Respect black's line length (default 88),
 exclude = [".tox", "venv"]
