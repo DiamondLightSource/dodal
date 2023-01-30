@@ -21,4 +21,7 @@
             88
         ]
     },
+    "python.analysis.extraPaths": [
+        "./src"
+    ],
 }

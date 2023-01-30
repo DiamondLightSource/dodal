@@ -109,6 +109,7 @@ passenv = *
 allowlist_externals =
     pytest
     pre-commit
+    requests
     mypy
     sphinx-build
     sphinx-autobuild
