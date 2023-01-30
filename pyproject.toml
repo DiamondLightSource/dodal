@@ -94,28 +94,3 @@ data_file = "/tmp/dodal.coverage"
 [tool.coverage.paths]
 # Tests are run from installed location, map back to the src directory
 source = ["src", "**/site-packages/"]
-
-# tox must currently be configured via an embedded ini string
-# See: https://github.com/tox-dev/tox/issues/999
-[tool.tox]
-legacy_tox_ini = """
-[tox]
-skipsdist=True
-
-[testenv:{pre-commit,mypy,pytest,docs}]
-# Don't create a virtualenv for the command, requires tox-direct plugin
-direct = True
-passenv = *
-allowlist_externals =
-    pytest
-    pre-commit
-    requests
-    mypy
-    sphinx-build
-    sphinx-autobuild
-commands =
-    pytest: pytest -m 's03' {posargs}
-    mypy: mypy src tests --ignore-missing-imports {posargs}
-    pre-commit: pre-commit run --all-files {posargs}
-    docs: sphinx-{posargs:build -EW --keep-going} -T docs build/html
-"""
