@@ -19,11 +19,6 @@ class BeamlinePrefix:
     ixx: str
 
     def __post_init__(self):
-        if "i" in self.ixx.lower():
-            suffix = "I"
-        elif "b" in self.ixx.lower():
-            suffix = "B"
-        else:
-            suffix = "S"
+        suffix = self.ixx[0].upper()
         self.beamline_prefix = f"BL{self.ixx[1:]}{suffix}"
         self.insertion_prefix = f"SR{self.ixx[1:]}{suffix}"

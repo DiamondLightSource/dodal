@@ -1,24 +1,26 @@
-# from dodal.devices.aperture import Aperture
-# from dodal.devices.backlight import Backlight
+from dodal.devices.aperture import Aperture
+from dodal.devices.backlight import Backlight
 from dodal.devices.DCM import DCM
 from dodal.devices.detector import DetectorParams
 from dodal.devices.eiger import EigerDetector
-
-# from dodal.devices.fast_grid_scan import FastGridScan
-# from dodal.devices.oav import OAV
-# from dodal.devices.slit_gaps import SlitGaps
-from dodal.devices.smargon import Smargon
+from dodal.devices.fast_grid_scan_composite import FGSComposite
+from dodal.devices.oav.oav_detector import OAV
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
-# from dodal.devices.synchrotron import Synchrotron
-# from dodal.devices.undulator import Undulator
-# from dodal.devices.zebra import Zebra
-
-BL = get_beamline_name("i03")
+BL = get_beamline_name("s03")
 
 
 def dcm() -> DCM:
     return DCM(f"{BeamlinePrefix(BL).beamline_prefix}")
+
+
+def FGS() -> FGSComposite:
+    # fgs, zembra, undulator, synchrotron, slit_aps, smargon
+    return FGSComposite(
+        insertion_prefix=f"{BeamlinePrefix(BL).insertion_prefix}",
+        name="fgs",
+        prefix=f"{BeamlinePrefix(BL).beamline_prefix}",
+    )
 
 
 def eiger(params: DetectorParams) -> EigerDetector:
@@ -27,8 +29,15 @@ def eiger(params: DetectorParams) -> EigerDetector:
     )
 
 
-def sample_motors() -> Smargon:
-    return Smargon(
-        name="sample_motors",
-        prefix=f"{BeamlinePrefix(BL).beamline_prefix}-MO-SGON-01:",
+def backlight() -> Backlight:
+    return Backlight(name="Backlight", prefix=f"{BeamlinePrefix(BL).beamline_prefix}")
+
+
+def aperture() -> Aperture:
+    return Aperture(
+        name="Aperture", prefix=f"{BeamlinePrefix(BL).beamline_prefix}-MO-MAPT-01:"
     )
+
+
+def oav() -> OAV:
+    return OAV(name="OAV", prefix=f"{BeamlinePrefix(BL).beamline_prefix}-DI-OAV-01")
