@@ -52,6 +52,11 @@ GitHub = "https://github.com/DiamondLightSource/python-dodal"
 email = "dominic.oram@diamond.ac.uk"
 name = "Dominic Oram"
 
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+dodal = ["*.txt"]
 
 [tool.setuptools_scm]
 write_to = "src/dodal/_version.py"
