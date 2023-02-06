@@ -93,10 +93,10 @@ def test_detector_threshold(
 )
 def test_check_detector_variables(
     fake_eiger: EigerDetector,
-    detector_params: DetectorParams,
     detector_size_constants,
     beam_xy_converter,
     expected_error_number,
+    detector_params: DetectorParams = DetectorParams(**TEST_DETECTOR_PARAMS),
 ):
     fake_eiger.set_detector_parameters(detector_params)
 
