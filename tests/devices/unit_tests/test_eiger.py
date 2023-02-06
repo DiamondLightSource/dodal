@@ -98,7 +98,7 @@ def test_check_detector_variables(
     beam_xy_converter,
     expected_error_number,
 ):
-    # fake_eiger.set_detector_parameters(detector_params)
+    fake_eiger.set_detector_parameters(detector_params)
 
     if detector_params is not None:
         fake_eiger.detector_params.beam_xy_converter = beam_xy_converter
