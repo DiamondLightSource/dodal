@@ -56,7 +56,8 @@ name = "Dominic Oram"
 where = ["src"]
 
 [tool.setuptools.package-data]
-"*" = ["*.txt"] # dodal = ["*.txt"]
+dodal = ["*.txt"]
+tests.devices = ["*.txt"]
 
 [tool.setuptools_scm]
 write_to = "src/dodal/_version.py"
