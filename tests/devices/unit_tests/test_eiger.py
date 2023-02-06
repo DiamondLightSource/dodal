@@ -106,13 +106,13 @@ def test_check_detector_variables(
 
     if expected_error_number != 0:
         with pytest.raises(Exception) as e:
-            fake_eiger.set_detector_parameters()
+            fake_eiger.set_detector_parameters(detector_params)
         number_of_errors = str(e.value).count("\n") + 1
 
         assert number_of_errors == expected_error_number
     else:
         try:
-            fake_eiger.set_detector_parameters()
+            fake_eiger.set_detector_parameters(detector_params)
         except Exception as e:
             assert False, f"exception was raised {e}"
 
