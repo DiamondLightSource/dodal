@@ -57,6 +57,7 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 dodal = ["*.txt"]
+"tests" = ["*.txt"]
 
 [tool.setuptools_scm]
 write_to = "src/dodal/_version.py"
