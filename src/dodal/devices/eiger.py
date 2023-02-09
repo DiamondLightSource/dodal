@@ -21,7 +21,7 @@ DETECTOR_PARAM_DEFAULTS = {
     "omega_increment": 0.0,
     "num_images": 2000,
     "use_roi_mode": False,
-    "det_dist_to_beam_converter_path": "",
+    "det_dist_to_beam_converter_path": "tests/devices/unit_tests/test_lookup_table.txt",
 }
 
 
