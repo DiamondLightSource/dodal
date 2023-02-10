@@ -2,13 +2,12 @@ import threading
 from unittest.mock import MagicMock, patch
 
 import pytest
-from mockito import ANY, mock, verify, when
-from ophyd.sim import make_fake_device
-from ophyd.status import Status
-
 from artemis.devices.det_dim_constants import EIGER2_X_16M_SIZE
 from artemis.devices.detector import DetectorParams
 from artemis.devices.eiger import EigerDetector
+from mockito import ANY, mock, verify, when
+from ophyd.sim import make_fake_device
+from ophyd.status import Status
 
 TEST_DETECTOR_SIZE_CONSTANTS = EIGER2_X_16M_SIZE
 
