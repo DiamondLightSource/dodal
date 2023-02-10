@@ -59,9 +59,6 @@ class EigerDetector(Device):
 
     def set_detector_parameters(self, detector_params: DetectorParams):
         self.detector_params = detector_params
-        self.check_detector_variables_set()
-
-    def check_detector_variables_set(self):
         if self.detector_params is None:
             raise Exception("Parameters for scan must be specified")
 
