@@ -5,10 +5,10 @@ from ophyd import Component, Device, EpicsSignalRO
 from ophyd.areadetector.cam import EigerDetectorCam
 from ophyd.status import AndStatus, Status, SubscriptionStatus
 
-from artemis.devices.detector import DetectorParams
-from artemis.devices.eiger_odin import EigerOdin
-from artemis.devices.status import await_value
-from artemis.log import LOGGER
+from dodal.devices.detector import DetectorParams
+from dodal.devices.eiger_odin import EigerOdin
+from dodal.devices.status import await_value
+from dodal.log import LOGGER
 
 DETECTOR_PARAM_DEFAULTS = {
     "current_energy": 100,
@@ -21,7 +21,7 @@ DETECTOR_PARAM_DEFAULTS = {
     "omega_increment": 0.0,
     "num_images": 2000,
     "use_roi_mode": False,
-    "det_dist_to_beam_converter_path": "src/artemis/devices/unit_tests/test_lookup_table.txt",
+    "det_dist_to_beam_converter_path": "tests/devices/unit_tests/test_lookup_table.txt",
 }
 
 

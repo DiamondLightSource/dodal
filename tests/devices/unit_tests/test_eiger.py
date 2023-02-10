@@ -2,12 +2,13 @@ import threading
 from unittest.mock import MagicMock, patch
 
 import pytest
-from artemis.devices.det_dim_constants import EIGER2_X_16M_SIZE
-from artemis.devices.detector import DetectorParams
-from artemis.devices.eiger import EigerDetector
 from mockito import ANY, mock, verify, when
 from ophyd.sim import make_fake_device
 from ophyd.status import Status
+
+from dodal.devices.det_dim_constants import EIGER2_X_16M_SIZE
+from dodal.devices.detector import DetectorParams
+from dodal.devices.eiger import EigerDetector
 
 TEST_DETECTOR_SIZE_CONSTANTS = EIGER2_X_16M_SIZE
 
@@ -21,9 +22,7 @@ TEST_OMEGA_START = 0.0
 TEST_OMEGA_INCREMENT = 1.0
 TEST_NUM_IMAGES = 1
 TEST_USE_ROI_MODE = False
-TEST_DET_DIST_TO_BEAM_CONVERTER_PATH = (
-    "src/artemis/devices/unit_tests/test_lookup_table.txt"
-)
+TEST_DET_DIST_TO_BEAM_CONVERTER_PATH = "tests/devices/unit_tests/test_lookup_table.txt"
 
 TEST_DETECTOR_PARAMS = DetectorParams(
     TEST_CURRENT_ENERGY,
