@@ -138,7 +138,7 @@ def test_stage_raises_exception_if_odin_initialisation_status_not_ok(fake_eiger)
 @pytest.mark.parametrize(
     "roi_mode, expected_num_roi_enable_calls", [(True, 1), (False, 0)]
 )
-@patch("artemis.devices.eiger.await_value")
+@patch("dodal.devices.eiger.await_value")
 def test_stage_enables_roi_mode_correctly(
     mock_await, fake_eiger, roi_mode, expected_num_roi_enable_calls
 ):
