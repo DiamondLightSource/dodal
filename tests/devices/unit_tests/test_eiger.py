@@ -211,7 +211,7 @@ def test_unsuccessful_roi_mode_change_results_in_logged_error(mock_and, fake_eig
     fake_eiger.log.error.assert_called_once_with("Failed to switch to ROI mode")
 
 
-@patch("artemis.devices.eiger.EigerOdin.check_odin_state")
+@patch("dodal.devices.eiger.EigerOdin.check_odin_state")
 def test_bad_odin_state_results_in_unstage_returning_bad_status(
     mock_check_odin_state, fake_eiger: EigerDetector
 ):
@@ -233,7 +233,7 @@ def test_given_failing_odin_when_stage_then_exception_raised(fake_eiger):
         assert error_contents in e.value
 
 
-@patch("artemis.devices.eiger.await_value")
+@patch("dodal.devices.eiger.await_value")
 def test_stage_runs_successfully(mock_await, fake_eiger):
     fake_eiger.odin.nodes.clear_odin_errors = MagicMock()
     fake_eiger.odin.check_odin_initialised = MagicMock()
@@ -242,7 +242,7 @@ def test_stage_runs_successfully(mock_await, fake_eiger):
     fake_eiger.stage()
 
 
-@patch("artemis.devices.eiger.await_value")
+@patch("dodal.devices.eiger.await_value")
 def test_given_stale_parameters_goes_high_before_callbacks_then_stale_parameters_waited_on(
     mock_await,
     fake_eiger: EigerDetector,
