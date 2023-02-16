@@ -1,7 +1,3 @@
-#
-# Devices for the Diamond simulated AreaDetector
-#
-
 import socket
 
 from ophyd import Component, EpicsMotor, MotorBundle
