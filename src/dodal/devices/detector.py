@@ -31,7 +31,7 @@ class DetectorParams:
     det_dist_to_beam_converter_path: str
 
     detector_size_constants: DetectorSizeConstants = field(
-        default=EIGER2_X_16M_SIZE,
+        default_factory=EIGER2_X_16M_SIZE,
         metadata=config(
             encoder=lambda detector: detector.det_type_string,
             decoder=lambda det_type: constants_from_type(det_type),
