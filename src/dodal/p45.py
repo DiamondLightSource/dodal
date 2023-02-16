@@ -5,8 +5,6 @@ from pydantic import BaseSettings
 
 from dodal.devices.areadetector import AdAravisDetector
 
-from .util import device
-
 
 # Settings can be customized via environment variables
 class Settings(BaseSettings):
