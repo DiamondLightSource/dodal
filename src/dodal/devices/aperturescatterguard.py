@@ -1,12 +1,12 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Tuple
 
 from ophyd import Component as Cpt
 from ophyd.status import AndStatus
 
-from artemis.devices.aperture import Aperture
-from artemis.devices.logging_ophyd_device import InfoLoggingDevice
-from artemis.devices.scatterguard import Scatterguard
+from dodal.devices.aperture import Aperture
+from dodal.devices.logging_ophyd_device import InfoLoggingDevice
+from dodal.devices.scatterguard import Scatterguard
 
 
 @dataclass
@@ -15,10 +15,10 @@ class AperturePositions:
     representing the motor positions needed to select a particular aperture size.
     """
 
-    LARGE: tuple[float, float, float, float, float]
-    MEDIUM: tuple[float, float, float, float, float]
-    SMALL: tuple[float, float, float, float, float]
-    ROBOT_LOAD: tuple[float, float, float, float, float]
+    LARGE: Tuple[float, float, float, float, float]
+    MEDIUM: Tuple[float, float, float, float, float]
+    SMALL: Tuple[float, float, float, float, float]
+    ROBOT_LOAD: Tuple[float, float, float, float, float]
 
     @classmethod
     def from_gda_beamline_params(cls, params):
