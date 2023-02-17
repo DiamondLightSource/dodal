@@ -55,7 +55,7 @@ class Choppers(MotorBundle):
     y: EpicsMotor = Cpt(EpicsMotor, "BISS")
 
 
-def make_sample(name: str = "sample") -> TomoStageWithStretchAndSkew:
+def make_sample_sample(name: str = "sample_stage") -> TomoStageWithStretchAndSkew:
     return TomoStageWithStretchAndSkew(
         name=name, prefix=f"{_settings.pv_prefix}-MO-STAGE-01:"
     )
