@@ -1,8 +1,39 @@
+import time as ttime
+
 from ophyd import Component as Cpt
-from ophyd import EpicsSignal, EpicsSignalRO
+from ophyd import EpicsSignal, EpicsSignalRO, Staged
+from ophyd.areadetector import ADTriggerStatus, TriggerBase
 from ophyd.areadetector.cam import AreaDetectorCam
 from ophyd.areadetector.filestore_mixins import FileStoreHDF5, FileStoreIterativeWrite
 from ophyd.areadetector.plugins import HDF5Plugin
+
+
+class SingleTriggerV33(TriggerBase):
+    _status_type = ADTriggerStatus
+
+    def __init__(self, *args, image_name=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if image_name is None:
+            image_name = "_".join([self.name, "image"])
+        self._image_name = image_name
+
+    def trigger(self):
+        "Trigger one acquisition."
+        if self._staged != Staged.yes:
+            raise RuntimeError(
+                "This detector is not ready to trigger."
+                "Call the stage() method before triggering."
+            )
+
+        self._status = self._status_type(self)
+
+        def _acq_done(*args, **kwargs):
+            # TODO sort out if anything useful in here
+            self._status._finished()
+
+        self._acquisition_signal.put(1, use_complete=True, callback=_acq_done)
+        self.dispatch(self._image_name, ttime.time())
+        return self._status
 
 
 class SynchronisedAdDriverBase(AreaDetectorCam):

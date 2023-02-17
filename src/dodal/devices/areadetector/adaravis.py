@@ -1,10 +1,9 @@
-from nslsii.ad33 import SingleTriggerV33
 from ophyd import Component as Cpt
 from ophyd import DetectorBase
 from ophyd.areadetector.base import ADComponent as Cpt
 from ophyd.areadetector.detectors import DetectorBase
 
-from .adutils import Hdf5Writer, SynchronisedAdDriverBase
+from .adutils import Hdf5Writer, SingleTriggerV33, SynchronisedAdDriverBase
 
 _ACQUIRE_BUFFER_PERIOD = 0.2
 
