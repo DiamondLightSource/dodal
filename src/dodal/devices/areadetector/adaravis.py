@@ -4,13 +4,13 @@ from ophyd import DetectorBase
 from ophyd.areadetector.base import ADComponent as Cpt
 from ophyd.areadetector.detectors import DetectorBase
 
-from .adutils import Hdf5Writer, SyncrhonisedAdDriverBase
+from .adutils import Hdf5Writer, SynchronisedAdDriverBase
 
 _ACQUIRE_BUFFER_PERIOD = 0.2
 
 
 class AdAravisDetector(SingleTriggerV33, DetectorBase):
-    cam: SyncrhonisedAdDriverBase = Cpt(SyncrhonisedAdDriverBase, suffix="DET:")
+    cam: SynchronisedAdDriverBase = Cpt(SynchronisedAdDriverBase, suffix="DET:")
     hdf: Hdf5Writer = Cpt(
         Hdf5Writer,
         suffix="HDF5:",

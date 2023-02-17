@@ -12,19 +12,19 @@ class Settings(BaseSettings):
 _settings = Settings()
 
 
-def make_sample_sample(name: str = "sample_stage") -> TomoStageWithStretchAndSkew:
+def sample_sample(name: str = "sample_stage") -> TomoStageWithStretchAndSkew:
     return TomoStageWithStretchAndSkew(
         name=name, prefix=f"{_settings.pv_prefix}-MO-STAGE-01:"
     )
 
 
-def make_choppers(name: str = "chopper") -> Choppers:
+def choppers(name: str = "chopper") -> Choppers:
     return Choppers(name=name, prefix=f"{_settings.pv_prefix}-MO-CHOP-01:")
 
 
-def make_det(name: str = "det") -> AdAravisDetector:
+def det(name: str = "det") -> AdAravisDetector:
     return AdAravisDetector(name=name, prefix=f"{_settings.pv_prefix}-EA-MAP-01:")
 
 
-def make_diff(name: str = "diff") -> AdAravisDetector:
+def diff(name: str = "diff") -> AdAravisDetector:
     return AdAravisDetector(name=name, prefix=f"{_settings.pv_prefix}-EA-DIFF-01:")

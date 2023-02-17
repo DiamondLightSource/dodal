@@ -14,9 +14,9 @@ class Settings(BaseSettings):
 _settings = Settings()
 
 
-def make_stage(name: str = "sim_motors") -> SimStage:
+def stage(name: str = "sim_motors") -> SimStage:
     return SimStage(name=name, prefix=f"{_settings.pv_prefix}-MO-SIM-01:")
 
 
-def make_det(name: str = "adsim") -> AdSimDetector:
+def det(name: str = "adsim") -> AdSimDetector:
     return AdSimDetector(name=name, prefix=f"{_settings.pv_prefix}-AD-SIM-01:")

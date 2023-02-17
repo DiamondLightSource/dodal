@@ -3,12 +3,12 @@ from ophyd import Component as Cpt
 from ophyd.areadetector.base import ADComponent as Cpt
 from ophyd.areadetector.detectors import DetectorBase
 
-from .adutils import Hdf5Writer, SyncrhonisedAdDriverBase
+from .adutils import Hdf5Writer, SynchronisedAdDriverBase
 
 
 class AdSimDetector(SingleTriggerV33, DetectorBase):
-    cam: SyncrhonisedAdDriverBase = Cpt(
-        SyncrhonisedAdDriverBase, suffix="CAM:", lazy=True
+    cam: SynchronisedAdDriverBase = Cpt(
+        SynchronisedAdDriverBase, suffix="CAM:", lazy=True
     )
     hdf: Hdf5Writer = Cpt(
         Hdf5Writer,
