@@ -13,7 +13,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
 ]
 description = "Ophyd devices and other utils that could be used across DLS beamlines"
-dependencies = ["ophyd", "bluesky", "pyepics", "pydantic", "nslsii"]
+dependencies = ["ophyd", "bluesky", "pyepics", "pydantic"]
 dynamic = ["version"]
 license.file = "LICENSE"
 readme = "README.rst"
