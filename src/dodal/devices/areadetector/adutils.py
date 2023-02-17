@@ -4,7 +4,7 @@ from ophyd.areadetector.filestore_mixins import FileStoreHDF5, FileStoreIterativ
 from ophyd.areadetector.plugins import HDF5Plugin
 
 
-class SyncrhonisedAdDriverBase(AreaDetectorCam, CamV33Mixin):
+class SynchronisedAdDriverBase(AreaDetectorCam, CamV33Mixin):
     """
     Base Ophyd device to control an AreaDetector driver and
     syncrhonise it on other AreaDetector plugins, even non-blocking ones.
