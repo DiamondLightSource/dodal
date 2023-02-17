@@ -1,8 +1,8 @@
 import socket
 
-from ophyd import Component, EpicsMotor, MotorBundle
 from pydantic import BaseSettings
 
+from dodal.devices.adsim import SimStage
 from dodal.devices.areadetector import AdSimDetector
 
 
@@ -12,18 +12,6 @@ class Settings(BaseSettings):
 
 
 _settings = Settings()
-
-
-class SimStage(MotorBundle):
-    """
-    ADSIM EPICS motors
-    """
-
-    x: EpicsMotor = Component(EpicsMotor, "M1")
-    y: EpicsMotor = Component(EpicsMotor, "M2")
-    z: EpicsMotor = Component(EpicsMotor, "M3")
-    theta: EpicsMotor = Component(EpicsMotor, "M4")
-    load: EpicsMotor = Component(EpicsMotor, "M5")
 
 
 def make_stage(name: str = "sim_motors") -> SimStage:
