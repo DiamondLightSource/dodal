@@ -71,7 +71,9 @@ class ApertureScatterguard(InfoLoggingDevice):
         scatterguard_y: float,
     ) -> None:
         """
-        Move the aperture and scatterguard combo safely to a new position
+        Move the aperture and scatterguard combo safely to a new position.
+        See https://github.com/DiamondLightSource/python-artemis/wiki/Aperture-Scatterguard-Collisions
+        for why this is required.
         """
         assert isinstance(self.aperture_positions, AperturePositions)
 
