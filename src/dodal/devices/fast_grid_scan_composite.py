@@ -3,7 +3,7 @@ from ophyd import Component, FormattedComponent
 from dodal.devices.aperturescatterguard import AperturePositions, ApertureScatterguard
 from dodal.devices.fast_grid_scan import FastGridScan
 from dodal.devices.logging_ophyd_device import InfoLoggingDevice
-from dodal.devices.slit_gaps import SlitGaps
+from dodal.devices.s4_slit_gaps import S4SlitGaps
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import Undulator
@@ -20,7 +20,8 @@ class FGSComposite(InfoLoggingDevice):
     undulator = FormattedComponent(Undulator, "{insertion_prefix}-MO-SERVC-01:")
 
     synchrotron = FormattedComponent(Synchrotron)
-    slit_gaps = Component(SlitGaps, "-AL-SLITS-04:")
+
+    slit_gaps = Component(S4SlitGaps, "-AL-SLITS-04:")
 
     sample_motors: Smargon = Component(Smargon, "")
 
