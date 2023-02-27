@@ -9,6 +9,10 @@ from dodal.devices.logging_ophyd_device import InfoLoggingDevice
 from dodal.devices.scatterguard import Scatterguard
 
 
+class InvalidApertureMove(Exception):
+    pass
+
+
 @dataclass
 class AperturePositions:
     """Holds the tuple (miniap_x, miniap_y, miniap_z, scatterguard_x, scatterguard_y)
