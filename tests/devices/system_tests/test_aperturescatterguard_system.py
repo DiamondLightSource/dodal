@@ -1,4 +1,4 @@
-from typing import Any, Dict, Tuple, cast
+from typing import Any, Dict, List, Tuple, cast
 
 import bluesky.plan_stubs as bps
 import pytest
@@ -129,7 +129,7 @@ class MonitorCallback(CallbackBase):
 
     t_ap_y: float = 0
     t_sg_y: float = 0
-    event_docs: list[dict] = []
+    event_docs: List[Dict] = []
 
     def event(self, doc):
         self.event_docs.append(doc)
