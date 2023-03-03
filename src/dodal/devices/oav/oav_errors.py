@@ -1,8 +1,6 @@
 """
 Module for containing errors in operation of the OAV.
 """
-
-
 from dodal.log import LOGGER
 
 

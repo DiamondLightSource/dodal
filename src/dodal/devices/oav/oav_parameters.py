@@ -28,7 +28,7 @@ class OAVParameters:
 
     def load_json(self):
         """
-        Loads the json from the json file at self.centring_params_json
+        Loads the json from the json file at self.centring_params_json and save it as a dictionary in the parameters attribute.
         """
         with open(f"{self.centring_params_json}") as f:
             self.parameters = json.load(f)
@@ -37,8 +37,8 @@ class OAVParameters:
         self,
     ) -> None:
         """
-        Load all the parameters needed on initialisation as class variables. If a variable in the json is
-        liable to change throughout a run it is reloaded when needed.
+        Load required parameters on initialisation as an attribute variables. If a variable in the json is
+        liable to change throughout a run it can be reloaded when needed.
         """
 
         self.load_json()
@@ -112,7 +112,7 @@ class OAVParameters:
         if fallback_value:
             return fallback_value
 
-        # No fallback_value was given and the key wasn't found
+        # No fallback_value was given and the key wasn't found.
         raise KeyError(
             f"Searched in {self.centring_params_json} for key {key} in context {self.context} but no value was found. No fallback value was given."
         )
