@@ -57,7 +57,7 @@ class AperturePositions:
             ),
         )
 
-    def position_valid(self, pos: tuple[float, float, float, float, float]):
+    def position_valid(self, pos: Tuple[float, float, float, float, float]):
         """
         Check if argument 'pos' is a valid position in this AperturePositions object.
         """
@@ -74,10 +74,13 @@ class ApertureScatterguard(InfoLoggingDevice):
     def load_aperture_positions(self, positions: AperturePositions):
         self.aperture_positions = positions
 
-    def set(self, pos: tuple[float, float, float, float, float]):
-        assert isinstance(self.aperture_positions, AperturePositions)
-        assert self.aperture_positions.position_valid(pos)
-        self._safe_move_within_datacollection_range(*pos)
+    def set(self, pos: Tuple[float, float, float, float, float]) -> AndStatus:
+        try:
+            assert isinstance(self.aperture_positions, AperturePositions)
+            assert self.aperture_positions.position_valid(pos)
+        except AssertionError as e:
+            raise InvalidApertureMove(repr(e))
+        return self._safe_move_within_datacollection_range(*pos)
 
     def _safe_move_within_datacollection_range(
         self,
@@ -86,7 +89,7 @@ class ApertureScatterguard(InfoLoggingDevice):
         aperture_z: float,
         scatterguard_x: float,
         scatterguard_y: float,
-    ) -> None:
+    ) -> AndStatus:
         """
         Move the aperture and scatterguard combo safely to a new position.
         See https://github.com/DiamondLightSource/python-artemis/wiki/Aperture-Scatterguard-Collisions
@@ -100,7 +103,7 @@ class ApertureScatterguard(InfoLoggingDevice):
             return
         current_ap_z = self.aperture.z.user_setpoint.get()
         if current_ap_z != aperture_z:
-            raise Exception(
+            raise InvalidApertureMove(
                 "ApertureScatterguard safe move is not yet defined for positions "
                 "outside of LARGE, MEDIUM, SMALL, ROBOT_LOAD."
             )
@@ -111,9 +114,13 @@ class ApertureScatterguard(InfoLoggingDevice):
                 scatterguard_x
             ) & self.scatterguard.y.set(scatterguard_y)
             sg_status.wait()
-            self.aperture.x.set(aperture_x)
-            self.aperture.y.set(aperture_y)
-            self.aperture.z.set(aperture_z)
+            final_status = (
+                sg_status
+                & self.aperture.x.set(aperture_x)
+                & self.aperture.y.set(aperture_y)
+                & self.aperture.z.set(aperture_z)
+            )
+            return final_status
 
         else:
             ap_status: AndStatus = (
@@ -122,5 +129,9 @@ class ApertureScatterguard(InfoLoggingDevice):
                 & self.aperture.z.set(aperture_z)
             )
             ap_status.wait()
-            self.scatterguard.x.set(scatterguard_x)
-            self.scatterguard.y.set(scatterguard_y)
+            final_status = (
+                ap_status
+                & self.scatterguard.x.set(scatterguard_x)
+                & self.scatterguard.y.set(scatterguard_y)
+            )
+            return final_status
