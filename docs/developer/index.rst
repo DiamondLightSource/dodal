@@ -26,6 +26,7 @@ side-bar.
             :maxdepth: 1
 
             how-to/contribute
+            how-to/move-code
             how-to/build-docs
             how-to/run-tests
             how-to/static-analysis
