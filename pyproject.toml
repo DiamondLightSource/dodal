@@ -20,6 +20,7 @@ dependencies = [
     "dataclasses-json",
     "pillow",
     "requests",
+    "pydantic",
 ]
 dynamic = ["version"]
 license.file = "LICENSE"
