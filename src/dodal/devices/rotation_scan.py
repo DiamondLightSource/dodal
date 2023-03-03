@@ -3,7 +3,7 @@ from typing import Optional
 
 from dataclasses_json import DataClassJsonMixin
 
-from artemis.devices.motors import XYZLimitBundle
+from dodal.devices.motors import XYZLimitBundle
 
 
 @dataclass
