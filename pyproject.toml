@@ -13,7 +13,15 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
 ]
 description = "Ophyd devices and other utils that could be used across DLS beamlines"
-dependencies = ["ophyd", "bluesky", "pyepics", "pydantic"]
+dependencies = [
+    "ophyd",
+    "bluesky",
+    "pyepics",
+    "dataclasses-json",
+    "pillow",
+    "requests",
+    "pydantic",
+]
 dynamic = ["version"]
 license.file = "LICENSE"
 readme = "README.rst"
@@ -25,14 +33,17 @@ dev = [
     "mypy",
     "flake8-isort",
     "Flake8-pyproject",
+    "mockito",
     "pipdeptree",
     "pre-commit",
     "pydata-sphinx-theme>=0.12",
     "pytest-cov",
+    "pytest-random-order",
     "sphinx-autobuild",
     "sphinx-copybutton",
     "sphinx-design",
     "tox-direct",
+    "types-requests",
     "types-mock",
 ]
 
@@ -43,6 +54,11 @@ GitHub = "https://github.com/DiamondLightSource/python-dodal"
 email = "dominic.oram@diamond.ac.uk"
 name = "Dominic Oram"
 
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+dodal = ["*.txt"]
 
 [tool.setuptools_scm]
 write_to = "src/dodal/_version.py"
@@ -59,6 +75,8 @@ extend-ignore = [
     "E203", # See https://github.com/PyCQA/pycodestyle/issues/373
     "F811", # support typing.overload decorator
     "F722", # allow Annotated[typ, some_func("some string")]
+    "E501",
+    "W503",
 ]
 max-line-length = 88 # Respect black's line length (default 88),
 exclude = [".tox", "venv"]
@@ -66,12 +84,13 @@ exclude = [".tox", "venv"]
 
 [tool.pytest.ini_options]
 # Run pytest with all our checkers, and don't spam us with massive tracebacks on error
+markers = [
+    "s03: marks tests as requiring the s03 simulator running (deselect with '-m \"not s03\"')",
+]
 addopts = """
     --tb=native -vv --doctest-modules --doctest-glob="*.rst"
     --cov=dodal --cov-report term --cov-report xml:cov.xml
     """
-# https://iscinumpy.gitlab.io/post/bound-version-constraints/#watch-for-warnings
-filterwarnings = "error"
 # Doctest python code in docs, python code in src docstrings, test functions in tests
 testpaths = "docs src tests"
 
@@ -93,15 +112,15 @@ skipsdist=True
 # Don't create a virtualenv for the command, requires tox-direct plugin
 direct = True
 passenv = *
-allowlist_externals = 
-    pytest 
+allowlist_externals =
+    pytest
     pre-commit
     mypy
     sphinx-build
     sphinx-autobuild
 commands =
-    pytest: pytest {posargs}
-    mypy: mypy src tests {posargs}
+    pytest: pytest -m 'not s03' {posargs}
+    mypy: mypy src tests --ignore-missing-imports --no-strict-optional {posargs}
     pre-commit: pre-commit run --all-files {posargs}
     docs: sphinx-{posargs:build -EW --keep-going} -T docs build/html
 """

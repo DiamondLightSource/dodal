@@ -66,7 +66,7 @@ jobs:
         run: pipdeptree
 
       - name: Run tests
-        run: pytest
+        run: pytest --random-order -m "not s03"
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
@@ -108,7 +108,7 @@ jobs:
 
       - name: Test module --version works using the installed wheel
         # If more than one module in src/ replace with module name to test
-        run: python -m $(ls src | head -1) --version
+        run: python -m dodal --version
 
   container:
     needs: [lint, dist, test]
