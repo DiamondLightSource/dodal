@@ -1,7 +1,7 @@
 from ophyd import Component, EpicsSignal
 
 
-def epics_signal_put_wait(pv_name: str, wait: str = "1.0") -> EpicsSignal:
+def epics_signal_put_wait(pv_name: str, wait: float = 1.0) -> EpicsSignal:
     """Creates a `Component` around an `EpicsSignal` that waits for a callback on a put.
 
     Args:
