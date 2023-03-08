@@ -1,5 +1,4 @@
 import os
-import socket
 
 from dodal.devices.adsim import SimStage
 from dodal.devices.areadetector import AdSimDetector
