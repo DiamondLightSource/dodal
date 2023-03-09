@@ -80,16 +80,16 @@ def make_all_devices(module: Union[str, ModuleType, None] = None) -> Dict[str, A
 
 def collect_factories(module: ModuleType) -> Iterable[Callable[..., Any]]:
     for var in module.__dict__.values():
-        if callable(var) and is_device_factory(var):
+        if callable(var) and _is_device_factory(var):
             yield var
 
 
-def is_device_factory(func: Callable[..., Any]) -> bool:
+def _is_device_factory(func: Callable[..., Any]) -> bool:
     return_type = signature(func).return_annotation
-    return is_device_type(return_type)
+    return _is_device_type(return_type)
 
 
-def is_device_type(obj: Type[Any]) -> bool:
+def _is_device_type(obj: Type[Any]) -> bool:
     is_class = inspect.isclass(obj)
     follows_protocols = any(
         map(lambda protocol: isinstance(obj, protocol), BLUESKY_PROTOCOLS)
