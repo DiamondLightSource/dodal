@@ -10,7 +10,7 @@ Clone the repository
 First clone the repository locally using `Git
 <https://git-scm.com/downloads>`_::
 
-    $ git clone git://github.com/DiamondLightSource/python-dodal.git
+    $ git clone git://github.com/DiamondLightSource/dodal.git
 
 Install dependencies
 --------------------
@@ -25,7 +25,7 @@ requires python 3.8 or later) or to run in a container under `VSCode
 
         .. code::
 
-            $ cd python-dodal
+            $ cd dodal
             $ python3 -m venv venv
             $ source venv/bin/activate
             $ pip install -e .[dev]
@@ -34,7 +34,7 @@ requires python 3.8 or later) or to run in a container under `VSCode
 
         .. code::
 
-            $ vscode python-dodal
+            $ vscode dodal
             # Click on 'Reopen in Container' when prompted
             # Open a new terminal
 
