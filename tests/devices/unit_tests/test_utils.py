@@ -1,4 +1,7 @@
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
+
+from bluesky.protocols import Readable
+from ophyd import EpicsMotor
 
 from dodal.utils import collect_factories, get_hostname, make_all_devices
 
@@ -20,7 +23,20 @@ def test_makes_devices() -> None:
     assert {"readable", "motor", "cryo"} == devices.keys()
 
 
+def test_makes_devices_with_module_name() -> None:
+    devices = make_all_devices("tests.fake_beamline")
+    assert {"readable", "motor", "cryo"} == devices.keys()
+
+
 def test_get_hostname() -> None:
     with patch("dodal.utils.socket.gethostname") as mock:
         mock.return_value = "a.b.c"
         assert get_hostname() == "a"
+
+
+def device_a() -> Readable:
+    return MagicMock()
+
+
+def device_b() -> EpicsMotor:
+    return MagicMock()
