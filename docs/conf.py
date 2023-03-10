@@ -15,7 +15,7 @@ import dodal
 # -- General configuration ------------------------------------------------
 
 # General information about the project.
-project = "python-dodal"
+project = "dodal"
 
 # The full version, including alpha/beta/rc tags.
 release = dodal.__version__
