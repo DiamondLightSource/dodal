@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Moving code from another repo &#8212; python-dodal 0.1.dev838+g9177695 documentation</title>
+    <title>Moving code from another repo &#8212; dodal 0.1.dev840+ge9fba75 documentation</title>
   
   
   
@@ -49,7 +49,7 @@
     <script src="../../_static/design-tabs.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'developer/how-to/move-code';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://DiamondLightSource.github.io/python-dodal/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://DiamondLightSource.github.io/dodal/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'main';
         </script>
     <link rel="shortcut icon" href="../../_static/dls-favicon.ico"/>
@@ -126,7 +126,7 @@
     <script>document.write(`<img src="../../_static/dls-logo.svg" class="logo__image only-dark" alt="Logo image"/>`);</script>
   
   
-    <p class="title logo__title">python-dodal</p>
+    <p class="title logo__title">dodal</p>
   
 </a></div>
     
@@ -161,7 +161,7 @@
                 
 
                 <li class="nav-item">
-                  <a class="nav-link nav-external" href="https://github.com/DiamondLightSource/python-dodal/releases">
+                  <a class="nav-link nav-external" href="https://github.com/DiamondLightSource/dodal/releases">
                     Release Notes
                   </a>
                 </li>
@@ -208,7 +208,7 @@ document.write(`
           
           
           
-          <a href="https://github.com/DiamondLightSource/python-dodal" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github"></i></span>
+          <a href="https://github.com/DiamondLightSource/dodal" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github"></i></span>
             <label class="sr-only">GitHub</label></a>
         </li>
         <li class="nav-item">
@@ -220,7 +220,7 @@ document.write(`
           
           
           
-          <a href="https://pypi.org/project/python-dodal" title="PyPI" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fas fa-cube"></i></span>
+          <a href="https://pypi.org/project/dodal" title="PyPI" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fas fa-cube"></i></span>
             <label class="sr-only">PyPI</label></a>
         </li>
 </ul></div>
@@ -301,7 +301,7 @@ document.write(`
                 
 
                 <li class="nav-item">
-                  <a class="nav-link nav-external" href="https://github.com/DiamondLightSource/python-dodal/releases">
+                  <a class="nav-link nav-external" href="https://github.com/DiamondLightSource/dodal/releases">
                     Release Notes
                   </a>
                 </li>
@@ -337,7 +337,7 @@ document.write(`
           
           
           
-          <a href="https://github.com/DiamondLightSource/python-dodal" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github"></i></span>
+          <a href="https://github.com/DiamondLightSource/dodal" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github"></i></span>
             <label class="sr-only">GitHub</label></a>
         </li>
         <li class="nav-item">
@@ -349,7 +349,7 @@ document.write(`
           
           
           
-          <a href="https://pypi.org/project/python-dodal" title="PyPI" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fas fa-cube"></i></span>
+          <a href="https://pypi.org/project/dodal" title="PyPI" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fas fa-cube"></i></span>
             <label class="sr-only">PyPI</label></a>
         </li>
 </ul></div>
@@ -513,7 +513,7 @@ document.write(`
 </div>
 </li>
 <li><p>In a different folder clone <code class="docutils literal notranslate"><span class="pre">dodal</span></code>, remove the origin (for now) to be safe and create a branch:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="n">DiamondLightSource</span><span class="o">/</span><span class="n">python</span><span class="o">-</span><span class="n">dodal</span><span class="o">.</span><span class="n">git</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="n">DiamondLightSource</span><span class="o">/</span><span class="n">dodal</span><span class="o">.</span><span class="n">git</span>
 <span class="n">cd</span> <span class="n">dodal</span>
 <span class="n">git</span> <span class="n">remote</span> <span class="n">rm</span> <span class="n">origin</span>
 <span class="n">git</span> <span class="n">checkout</span> <span class="o">-</span><span class="n">b</span> <span class="n">add_code_from_artemis</span>
@@ -533,7 +533,7 @@ document.write(`
 <li><p>This is another point where it’s a good idea to check the log <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">log</span></code> and the general directory structure to ensure it looks mostly correct</p></li>
 <li><p>Remove the source remote and re-add origin:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">remote</span> <span class="n">rm</span> <span class="n">source</span>
-<span class="n">git</span> <span class="n">remote</span> <span class="n">add</span> <span class="n">origin</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="n">DiamondLightSource</span><span class="o">/</span><span class="n">python</span><span class="o">-</span><span class="n">dodal</span><span class="o">.</span><span class="n">git</span>
+<span class="n">git</span> <span class="n">remote</span> <span class="n">add</span> <span class="n">origin</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="n">DiamondLightSource</span><span class="o">/</span><span class="n">dodal</span><span class="o">.</span><span class="n">git</span>
 </pre></div>
 </div>
 </li>
@@ -579,7 +579,7 @@ document.write(`
   <div class="sidebar-secondary-item">
   
   <div class="tocsection editthispage">
-    <a href="https://github.com/DiamondLightSource/python-dodal/edit/main/docs/developer/how-to/move-code.rst">
+    <a href="https://github.com/DiamondLightSource/dodal/edit/main/docs/developer/how-to/move-code.rst">
       <i class="fa-solid fa-pencil"></i>
       
       
@@ -622,7 +622,7 @@ document.write(`
     <div class="footer-items__end">
       
         <div class="footer-item"><p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.1.
 </p></div>
       
     </div>
