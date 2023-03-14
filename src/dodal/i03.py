@@ -4,7 +4,7 @@ from dodal.devices.DCM import DCM
 from dodal.devices.detector import DetectorParams
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan_composite import FGSComposite
-from dodal.devices.oav.oav_detector import OAV
+from dodal.devices.oav.zoom_controller import OAV
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("s03")

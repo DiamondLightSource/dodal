@@ -7,7 +7,7 @@ from ophyd.sim import make_fake_device
 from requests import HTTPError, Response
 
 import dodal.devices.oav.utils as oav_utils
-from dodal.devices.oav.oav_detector import OAV
+from dodal.devices.oav.zoom_controller import OAV
 from dodal.utils import Point2D
 
 
@@ -19,11 +19,11 @@ def fake_oav() -> OAV:
     fake_oav.snapshot.url.sim_put("http://test.url")
     fake_oav.snapshot.filename.put("test filename")
     fake_oav.snapshot.directory.put("test directory")
-    fake_oav.snapshot.top_left_x_signal.put(100)
-    fake_oav.snapshot.top_left_y_signal.put(100)
-    fake_oav.snapshot.box_width_signal.put(50)
-    fake_oav.snapshot.num_boxes_x_signal.put(15)
-    fake_oav.snapshot.num_boxes_y_signal.put(10)
+    fake_oav.snapshot.top_left_x.put(100)
+    fake_oav.snapshot.top_left_y.put(100)
+    fake_oav.snapshot.box_width.put(50)
+    fake_oav.snapshot.num_boxes_x.put(15)
+    fake_oav.snapshot.num_boxes_y.put(10)
     return fake_oav
 
 
