@@ -5,7 +5,7 @@ from pathlib import Path
 from ophyd import Component, Signal
 from PIL import Image, ImageDraw
 
-from dodal.devices.areadetector.plugins.MJPG import MJPG as Snapshot
+from dodal.devices.areadetector.plugins.MJPG import MJPG
 
 
 class Orientation(Enum):
@@ -120,7 +120,7 @@ def add_grid_overlay_to_image(
     )
 
 
-class SnapshotWithGrid(Snapshot):
+class SnapshotWithGrid(MJPG):
     top_left_x: Signal = Component(Signal)
     top_left_y: Signal = Component(Signal)
     box_width: Signal = Component(Signal)

@@ -2,7 +2,7 @@ import bluesky.plan_stubs as bps
 import pytest
 from bluesky import RunEngine
 
-from dodal.devices.oav.zoom_controller import OAV, ZoomController
+from dodal.devices.oav.oav_detector import OAV, ZoomController
 
 TEST_GRID_TOP_LEFT_X = 100
 TEST_GRID_TOP_LEFT_Y = 100

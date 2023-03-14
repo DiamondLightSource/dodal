@@ -17,7 +17,7 @@ from dodal.devices.oav.oav_calculations import (
     get_rotation_increment,
     keep_inside_bounds,
 )
-from dodal.devices.oav.zoom_controller import OAV
+from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.oav_errors import (
     OAVError_MissingRotations,
     OAVError_NoRotationsPassValidityTest,

@@ -7,7 +7,7 @@ from ophyd.sim import make_fake_device
 from requests import HTTPError, Response
 
 import dodal.devices.oav.utils as oav_utils
-from dodal.devices.oav.zoom_controller import OAV
+from dodal.devices.oav.oav_detector import OAV
 from dodal.utils import Point2D
 
 
