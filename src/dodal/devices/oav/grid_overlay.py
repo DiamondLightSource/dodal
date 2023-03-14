@@ -2,10 +2,9 @@ from enum import Enum
 from functools import partial
 from pathlib import Path
 
+from dodal.devices.areadetector.plugins.MJPG import MJPG as Snapshot
 from ophyd import Component, Signal
 from PIL import Image, ImageDraw
-
-from dodal.devices.oav.snapshot import Snapshot
 
 
 class Orientation(Enum):
