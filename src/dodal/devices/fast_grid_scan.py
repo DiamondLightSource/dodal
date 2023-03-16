@@ -16,6 +16,7 @@ from ophyd.status import DeviceStatus, StatusBase
 
 from dodal.devices.motors import XYZLimitBundle
 from dodal.devices.status import await_value
+from dodal.parameters.experiment_parameter_base import AbstractExperimentParameterBase
 from dodal.utils import Point3D
 
 
@@ -37,7 +38,7 @@ class GridAxis:
 
 
 @dataclass
-class GridScanParams(DataClassJsonMixin):
+class GridScanParams(DataClassJsonMixin, AbstractExperimentParameterBase):
     """
     Holder class for the parameters of a grid scan in a similar
     layout to EPICS.

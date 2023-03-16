@@ -4,16 +4,18 @@ from typing import Optional
 from dataclasses_json import DataClassJsonMixin
 
 from dodal.devices.motors import XYZLimitBundle
+from dodal.parameters.experiment_parameter_base import AbstractExperimentParameterBase
 
 
 @dataclass
-class RotationScanParams(DataClassJsonMixin):
+class RotationScanParams(DataClassJsonMixin, AbstractExperimentParameterBase):
     """
     Holder class for the parameters of a rotation data collection.
     """
 
     rotation_axis: str = "omega"
     rotation_angle: float = 360.0
+    image_width: float = 0.1
     omega_start: float = 0.0
     phi_start: float = 0.0
     chi_start: Optional[float] = None
@@ -37,3 +39,6 @@ class RotationScanParams(DataClassJsonMixin):
         if not limits.z.is_within(self.z):
             return False
         return True
+
+    def get_num_images(self):
+        return int(self.rotation_angle / self.image_width)
