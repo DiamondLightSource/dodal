@@ -41,8 +41,10 @@ def test_snapshot_trigger_handles_request_with_bad_status_code_correctly(
 
 
 @patch("requests.get")
-@patch("dodal.devices.oav.snapshot.Image")
-def test_snapshot_trigger_loads_correct_url(mock_image, mock_get: MagicMock, fake_oav):
+@patch("dodal.devices.areadetector.plugins.MJPG.Image")
+def test_snapshot_trigger_loads_correct_url(
+    mock_image: MagicMock, mock_get: MagicMock, fake_oav: OAV
+):
     st = fake_oav.snapshot.trigger()
     st.wait()
     mock_get.assert_called_once_with("http://test.url", stream=True)
