@@ -94,6 +94,9 @@ class GridScanParams(DataClassJsonMixin):
 
         return first_grid_in_limits and second_grid_in_limits
 
+    def get_num_images(self):
+        return self.x_steps * self.y_steps + self.y_steps * self.z_steps
+
     @property
     def is_3d_grid_scan(self):
         return self.z_steps > 0
@@ -173,7 +176,6 @@ class GridScanCompleteStatus(DeviceStatus):
 
 
 class FastGridScan(Device):
-
     x_steps: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "X_NUM_STEPS")
     y_steps: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "Y_NUM_STEPS")
     z_steps: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "Z_NUM_STEPS")
