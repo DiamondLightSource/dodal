@@ -13,7 +13,7 @@ def eiger():
         detector_distance=100.0,
         omega_start=0.0,
         omega_increment=0.1,
-        num_images=50,
+        num_triggers=50,
         use_roi_mode=False,
         run_number=0,
         det_dist_to_beam_converter_path="src/dodal/devices/unit_tests/test_lookup_table.txt",

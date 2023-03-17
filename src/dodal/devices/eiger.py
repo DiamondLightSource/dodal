@@ -172,10 +172,16 @@ class EigerDetector(Device):
             return status
 
     def set_num_triggers_and_captures(self) -> Status:
+        """Sets the number of triggers and the number of images for the Eiger to capture
+        during the datacollection. The number of images is the number of images per
+        trigger.
+        """
         assert self.detector_params is not None
         status = self.cam.num_images.set(1)
-        status &= self.cam.num_triggers.set(self.detector_params.num_images)
-        status &= self.odin.file_writer.num_capture.set(self.detector_params.num_images)
+        status &= self.cam.num_triggers.set(self.detector_params.num_triggers)
+        status &= self.odin.file_writer.num_capture.set(
+            self.detector_params.num_triggers
+        )
         return status
 
     def wait_for_stale_parameters(self):
