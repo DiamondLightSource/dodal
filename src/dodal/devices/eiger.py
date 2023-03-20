@@ -177,7 +177,7 @@ class EigerDetector(Device):
         trigger.
         """
         assert self.detector_params is not None
-        status = self.cam.num_images.set(1)
+        status = self.cam.num_images.set(self.detector_params.num_images_per_trigger)
         status &= self.cam.num_triggers.set(self.detector_params.num_triggers)
         status &= self.odin.file_writer.num_capture.set(
             self.detector_params.num_triggers
