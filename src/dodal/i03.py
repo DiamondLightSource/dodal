@@ -94,7 +94,7 @@ def eiger(params: DetectorParams | None = None) -> EigerDetector:
 
 
 def fast_grid_scan() -> FastGridScan:
-    """Get the i03 Smargon device, instantiate it if it hasn't already been.
+    """Get the i03 fast_grid_scan device, instantiate it if it hasn't already been.
     If this is called when already instantiated, it will return the existing object.
     """
     fast_grid_scan = ACTIVE_DEVICES.get("fast_grid_scan")
@@ -108,6 +108,9 @@ def fast_grid_scan() -> FastGridScan:
 
 
 def oav() -> OAV:
+    """Get the i03 OAV device, instantiate it if it hasn't already been.
+    If this is called when already instantiated, it will return the existing object.
+    """
     oav = ACTIVE_DEVICES.get("oav")
     if oav is None:
         ACTIVE_DEVICES["oav"] = OAV(
