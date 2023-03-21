@@ -1,12 +1,17 @@
 from ophyd import Device
 
-from dodal.devices.aperturescatterguard import ApertureScatterguard
+from dodal.devices.aperturescatterguard import AperturePositions, ApertureScatterguard
 from dodal.devices.backlight import Backlight
 from dodal.devices.DCM import DCM
 from dodal.devices.detector import DetectorParams
 from dodal.devices.eiger import EigerDetector
-from dodal.devices.fast_grid_scan_composite import FGSComposite
+from dodal.devices.fast_grid_scan import FastGridScan
 from dodal.devices.oav.oav_detector import OAV
+from dodal.devices.s4_slit_gaps import S4SlitGaps
+from dodal.devices.smargon import Smargon
+from dodal.devices.synchrotron import Synchrotron
+from dodal.devices.undulator import Undulator
+from dodal.devices.zebra import Zebra
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("s03")
@@ -14,36 +19,33 @@ BL = get_beamline_name("s03")
 ACTIVE_DEVICES: dict[str, Device] = {}
 
 
-def dcm() -> DCM:
-    dcm = ACTIVE_DEVICES.get("dcm")
-    if dcm is None:
-        ACTIVE_DEVICES["dcm"] = DCM(f"{BeamlinePrefix(BL).beamline_prefix}")
-        return ACTIVE_DEVICES["dcm"]
-    else:
-        return dcm
-
-
-def FGS() -> FGSComposite:
-    # fgs, zembra, undulator, synchrotron, slit_aps, smargon
-    return FGSComposite(
-        insertion_prefix=f"{BeamlinePrefix(BL).insertion_prefix}",
-        name="fgs",
-        prefix=f"{BeamlinePrefix(BL).beamline_prefix}",
+def aperture_scatterguard(
+    aperture_positions: AperturePositions | None = None,
+) -> ApertureScatterguard:
+    """Get the i03 aperture and scatterguard device, instantiate it if it hasn't already
+    been. If this is called when already instantiated, it will return the existing
+    object. If aperture_positions is specified, it will update them.
+    """
+    aperture_scatterguard: ApertureScatterguard = ACTIVE_DEVICES.get(
+        "aperture_scatterguard"
     )
-
-
-def eiger(params: DetectorParams) -> EigerDetector:
-    eiger = ACTIVE_DEVICES.get("eiger")
-    if eiger is None:
-        ACTIVE_DEVICES["eiger"] = EigerDetector(
-            params, prefix=f"{BeamlinePrefix(BL).beamline_prefix}-EA-EIGER-01:"
+    if aperture_scatterguard is None:
+        ACTIVE_DEVICES["aperture_scatterguard"] = ApertureScatterguard(
+            name="ApertureScatterguard",
+            prefix=f"{BeamlinePrefix(BL).beamline_prefix}",
+            aperture_positions=aperture_positions,
         )
-        return ACTIVE_DEVICES["eiger"]
+        return ACTIVE_DEVICES["aperture_scatterguard"]
     else:
-        return eiger
+        if aperture_positions is not None:
+            aperture_scatterguard.load_aperture_positions(aperture_positions)
+        return aperture_scatterguard
 
 
 def backlight() -> Backlight:
+    """Get the i03 backlight device, instantiate it if it hasn't already been.
+    If this is called when already instantiated, it will return the existing object.
+    """
     backlight = ACTIVE_DEVICES.get("backlight")
     if backlight is None:
         ACTIVE_DEVICES["backlight"] = Backlight(
@@ -54,15 +56,55 @@ def backlight() -> Backlight:
         return backlight
 
 
-def aperture_scatterguard() -> ApertureScatterguard:
-    aperture_scatterguard = ACTIVE_DEVICES.get("aperture_scatterguard")
-    if aperture_scatterguard is None:
-        ACTIVE_DEVICES["aperture_scatterguard"] = ApertureScatterguard(
-            name="ApertureScatterguard", prefix=f"{BeamlinePrefix(BL).beamline_prefix}"
-        )
-        return ACTIVE_DEVICES["aperture_scatterguard"]
+def dcm() -> DCM:
+    """Get the i03 DCM device, instantiate it if it hasn't already been.
+    If this is called when already instantiated, it will return the existing object.
+    """
+    dcm = ACTIVE_DEVICES.get("dcm")
+    if dcm is None:
+        ACTIVE_DEVICES["dcm"] = DCM(f"{BeamlinePrefix(BL).beamline_prefix}")
+        return ACTIVE_DEVICES["dcm"]
     else:
-        return ApertureScatterguard
+        return dcm
+
+
+def eiger(params: DetectorParams | None = None) -> EigerDetector:
+    """Get the i03 Eiger device, instantiate it if it hasn't already been.
+    If this is called when already instantiated, it will return the existing object.
+    If called with params, will update those params to the Eiger object.
+    """
+    eiger: EigerDetector = ACTIVE_DEVICES.get("eiger")
+    if eiger is None:
+        if params is not None:
+            ACTIVE_DEVICES["eiger"] = EigerDetector.with_params(
+                params,
+                name="EigerDetector",
+                prefix=f"{BeamlinePrefix(BL).beamline_prefix}-EA-EIGER-01:",
+            )
+        else:
+            ACTIVE_DEVICES["eiger"] = EigerDetector(
+                name="EigerDetector",
+                prefix=f"{BeamlinePrefix(BL).beamline_prefix}-EA-EIGER-01:",
+            )
+        return ACTIVE_DEVICES["eiger"]
+    else:
+        if params is not None:
+            eiger.set_detector_parameters(params)
+        return eiger
+
+
+def fast_grid_scan() -> FastGridScan:
+    """Get the i03 Smargon device, instantiate it if it hasn't already been.
+    If this is called when already instantiated, it will return the existing object.
+    """
+    fast_grid_scan = ACTIVE_DEVICES.get("fast_grid_scan")
+    if fast_grid_scan is None:
+        ACTIVE_DEVICES["fast_grid_scan"] = Smargon(
+            f"{BeamlinePrefix(BL).beamline_prefix}-MO-SGON-01:FGS:"
+        )
+        return ACTIVE_DEVICES["fast_grid_scan"]
+    else:
+        return fast_grid_scan
 
 
 def oav() -> OAV:
@@ -74,3 +116,71 @@ def oav() -> OAV:
         return ACTIVE_DEVICES["oav"]
     else:
         return oav
+
+
+def smargon() -> Smargon:
+    """Get the i03 Smargon device, instantiate it if it hasn't already been.
+    If this is called when already instantiated, it will return the existing object.
+    """
+    smargon = ACTIVE_DEVICES.get("smargon")
+    if smargon is None:
+        ACTIVE_DEVICES["smargon"] = Smargon(
+            f"{BeamlinePrefix(BL).beamline_prefix}-MO-SGON-01:"
+        )
+        return ACTIVE_DEVICES["smargon"]
+    else:
+        return smargon
+
+
+def s4_slit_gaps() -> S4SlitGaps:
+    """Get the i03 s4_slit_gaps device, instantiate it if it hasn't already been.
+    If this is called when already instantiated, it will return the existing object.
+    """
+    s4_slit_gaps = ACTIVE_DEVICES.get("s4_slit_gaps")
+    if s4_slit_gaps is None:
+        ACTIVE_DEVICES["s4_slit_gaps"] = S4SlitGaps(
+            f"{BeamlinePrefix(BL).beamline_prefix}-AL-SLITS-04:"
+        )
+        return ACTIVE_DEVICES["s4_slit_gaps"]
+    else:
+        return s4_slit_gaps
+
+
+def synchrotron() -> Synchrotron:
+    """Get the i03 synchrotron device, instantiate it if it hasn't already been.
+    If this is called when already instantiated, it will return the existing object.
+    """
+    synchrotron = ACTIVE_DEVICES.get("synchrotron")
+    if synchrotron is None:
+        ACTIVE_DEVICES["synchrotron"] = Synchrotron()
+        return ACTIVE_DEVICES["synchrotron"]
+    else:
+        return synchrotron
+
+
+def undulator() -> Undulator:
+    """Get the i03 undulator device, instantiate it if it hasn't already been.
+    If this is called when already instantiated, it will return the existing object.
+    """
+    undulator = ACTIVE_DEVICES.get("undulator")
+    if undulator is None:
+        ACTIVE_DEVICES["undulator"] = Undulator(
+            f"{BeamlinePrefix(BL).beamline_prefix}-MO-SERVC-01:"
+        )
+        return ACTIVE_DEVICES["undulator"]
+    else:
+        return undulator
+
+
+def zebra() -> Zebra:
+    """Get the i03 zebra device, instantiate it if it hasn't already been.
+    If this is called when already instantiated, it will return the existing object.
+    """
+    zebra = ACTIVE_DEVICES.get("zebra")
+    if zebra is None:
+        ACTIVE_DEVICES["zebra"] = Smargon(
+            f"{BeamlinePrefix(BL).beamline_prefix}-EA-ZEBRA-01:"
+        )
+        return ACTIVE_DEVICES["zebra"]
+    else:
+        return zebra
