@@ -34,8 +34,11 @@ def aperture_scatterguard(
         ACTIVE_DEVICES["aperture_scatterguard"] = ApertureScatterguard(
             name="ApertureScatterguard",
             prefix=f"{BeamlinePrefix(BL).beamline_prefix}",
-            aperture_positions=aperture_positions,
         )
+        if aperture_positions is not None:
+            ACTIVE_DEVICES["aperture_scatterguard"].load_aperture_positions(
+                aperture_positions
+            )
         if wait_for_connection:
             ACTIVE_DEVICES["aperture_scatterguard"].wait_for_connection()
         return ACTIVE_DEVICES["aperture_scatterguard"]
@@ -52,7 +55,7 @@ def backlight(wait_for_connection: bool = True) -> Backlight:
     backlight = ACTIVE_DEVICES.get("backlight")
     if backlight is None:
         ACTIVE_DEVICES["backlight"] = Backlight(
-            name="Backlight", prefix=f"{BeamlinePrefix(BL).beamline_prefix}"
+            name="Backlight", prefix=f"{BeamlinePrefix(BL).beamline_prefix}-EA-BL-01:"
         )
         if wait_for_connection:
             ACTIVE_DEVICES["backlight"].wait_for_connection()
@@ -67,7 +70,9 @@ def dcm(wait_for_connection: bool = True) -> DCM:
     """
     dcm = ACTIVE_DEVICES.get("dcm")
     if dcm is None:
-        ACTIVE_DEVICES["dcm"] = DCM(f"{BeamlinePrefix(BL).beamline_prefix}")
+        ACTIVE_DEVICES["dcm"] = DCM(
+            name="dcm", prefix=f"{BeamlinePrefix(BL).beamline_prefix}"
+        )
         if wait_for_connection:
             ACTIVE_DEVICES["dcm"].wait_for_connection()
         return ACTIVE_DEVICES["dcm"]
@@ -97,7 +102,9 @@ def eiger(
                 prefix=f"{BeamlinePrefix(BL).beamline_prefix}-EA-EIGER-01:",
             )
         if wait_for_connection:
-            ACTIVE_DEVICES["eiger"].wait_for_connection()
+            # Eiger cannot currently be waited on, see #166
+            # ACTIVE_DEVICES["eiger"].wait_for_connection()
+            pass
         return ACTIVE_DEVICES["eiger"]
     else:
         if params is not None:
@@ -111,8 +118,9 @@ def fast_grid_scan(wait_for_connection: bool = True) -> FastGridScan:
     """
     fast_grid_scan = ACTIVE_DEVICES.get("fast_grid_scan")
     if fast_grid_scan is None:
-        ACTIVE_DEVICES["fast_grid_scan"] = Smargon(
-            f"{BeamlinePrefix(BL).beamline_prefix}-MO-SGON-01:FGS:"
+        ACTIVE_DEVICES["fast_grid_scan"] = FastGridScan(
+            name="fast_grid_scan",
+            prefix=f"{BeamlinePrefix(BL).beamline_prefix}-MO-SGON-01:FGS:",
         )
         if wait_for_connection:
             ACTIVE_DEVICES["fast_grid_scan"].wait_for_connection()
@@ -128,7 +136,7 @@ def oav(wait_for_connection: bool = True) -> OAV:
     oav = ACTIVE_DEVICES.get("oav")
     if oav is None:
         ACTIVE_DEVICES["oav"] = OAV(
-            name="OAV", prefix=f"{BeamlinePrefix(BL).beamline_prefix}-DI-OAV-01"
+            name="OAV", prefix=f"{BeamlinePrefix(BL).beamline_prefix}"
         )
         if wait_for_connection:
             ACTIVE_DEVICES["oav"].wait_for_connection()
@@ -144,7 +152,7 @@ def smargon(wait_for_connection: bool = True) -> Smargon:
     smargon = ACTIVE_DEVICES.get("smargon")
     if smargon is None:
         ACTIVE_DEVICES["smargon"] = Smargon(
-            f"{BeamlinePrefix(BL).beamline_prefix}-MO-SGON-01:"
+            name="smargon", prefix=f"{BeamlinePrefix(BL).beamline_prefix}"
         )
         if wait_for_connection:
             ACTIVE_DEVICES["smargon"].wait_for_connection()
@@ -160,7 +168,8 @@ def s4_slit_gaps(wait_for_connection: bool = True) -> S4SlitGaps:
     s4_slit_gaps = ACTIVE_DEVICES.get("s4_slit_gaps")
     if s4_slit_gaps is None:
         ACTIVE_DEVICES["s4_slit_gaps"] = S4SlitGaps(
-            f"{BeamlinePrefix(BL).beamline_prefix}-AL-SLITS-04:"
+            name="s4_slit_gaps",
+            prefix=f"{BeamlinePrefix(BL).beamline_prefix}-AL-SLITS-04:",
         )
         if wait_for_connection:
             ACTIVE_DEVICES["s4_slit_gaps"].wait_for_connection()
@@ -175,7 +184,7 @@ def synchrotron(wait_for_connection: bool = True) -> Synchrotron:
     """
     synchrotron = ACTIVE_DEVICES.get("synchrotron")
     if synchrotron is None:
-        ACTIVE_DEVICES["synchrotron"] = Synchrotron()
+        ACTIVE_DEVICES["synchrotron"] = Synchrotron(name="synchrotron")
         if wait_for_connection:
             ACTIVE_DEVICES["synchrotron"].wait_for_connection()
         return ACTIVE_DEVICES["synchrotron"]
@@ -190,7 +199,8 @@ def undulator(wait_for_connection: bool = True) -> Undulator:
     undulator = ACTIVE_DEVICES.get("undulator")
     if undulator is None:
         ACTIVE_DEVICES["undulator"] = Undulator(
-            f"{BeamlinePrefix(BL).beamline_prefix}-MO-SERVC-01:"
+            name="undulator",
+            prefix=f"{BeamlinePrefix(BL).beamline_prefix}-MO-SERVC-01:",
         )
         if wait_for_connection:
             ACTIVE_DEVICES["undulator"].wait_for_connection()
@@ -205,8 +215,8 @@ def zebra(wait_for_connection: bool = True) -> Zebra:
     """
     zebra = ACTIVE_DEVICES.get("zebra")
     if zebra is None:
-        ACTIVE_DEVICES["zebra"] = Smargon(
-            f"{BeamlinePrefix(BL).beamline_prefix}-EA-ZEBRA-01:"
+        ACTIVE_DEVICES["zebra"] = Zebra(
+            name="zebra", prefix=f"{BeamlinePrefix(BL).beamline_prefix}-EA-ZEBRA-01:"
         )
         if wait_for_connection:
             ACTIVE_DEVICES["zebra"].wait_for_connection()
