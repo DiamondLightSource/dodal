@@ -200,7 +200,7 @@ def undulator(wait_for_connection: bool = True) -> Undulator:
     if undulator is None:
         ACTIVE_DEVICES["undulator"] = Undulator(
             name="undulator",
-            prefix=f"{BeamlinePrefix(BL).beamline_prefix}-MO-SERVC-01:",
+            prefix=f"SR{BeamlinePrefix(BL).beamline_prefix[2:]}-MO-SERVC-01:",
         )
         if wait_for_connection:
             ACTIVE_DEVICES["undulator"].wait_for_connection()
