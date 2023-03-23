@@ -1,4 +1,8 @@
+from functools import partial
+from typing import Callable, Optional
+
 from ophyd import Device
+from ophyd.sim import make_fake_device
 
 from dodal.devices.aperturescatterguard import AperturePositions, ApertureScatterguard
 from dodal.devices.backlight import Backlight
@@ -19,33 +23,98 @@ BL = get_beamline_name("s03")
 ACTIVE_DEVICES: dict[str, Device] = {}
 
 
+def device_instantiation(
+    device: Callable,
+    name: str,
+    prefix: str,
+    wait: bool,
+    fake: bool,
+    post_create: Optional[Callable],
+) -> Device:
+    active_device = ACTIVE_DEVICES.get(name)
+    if active_device is None:
+        if fake:
+            device = make_fake_device(device)
+        ACTIVE_DEVICES[name] = device(
+            name=name, prefix=f"{BeamlinePrefix(BL).beamline_prefix}{prefix}"
+        )
+        if wait:
+            ACTIVE_DEVICES[name].wait_for_connection()
+        if post_create:
+            post_create(ACTIVE_DEVICES[name])
+        return ACTIVE_DEVICES[name]
+    else:
+        if post_create:
+            post_create(active_device)
+            return active_device
+
+
+def dcm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False):
+    """Get the i03 DCM device, instantiate it if it hasn't already been.
+    If this is called when already instantiated, it will return the existing object.
+    """
+    return partial(
+        device_instantiation,
+        device=DCM,
+        name="dcm",
+        prefix="",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+    )
+
+
 def aperture_scatterguard(
-    aperture_positions: AperturePositions | None = None,
     wait_for_connection: bool = True,
-) -> ApertureScatterguard:
+    fake_with_ophyd_sim: bool = False,
+    aperture_positions: AperturePositions | None = None,
+):
     """Get the i03 aperture and scatterguard device, instantiate it if it hasn't already
     been. If this is called when already instantiated, it will return the existing
     object. If aperture_positions is specified, it will update them.
     """
-    aperture_scatterguard: ApertureScatterguard = ACTIVE_DEVICES.get(
-        "aperture_scatterguard"
+
+    def load_positions(a_s: ApertureScatterguard):
+        a_s.load_aperture_positions(aperture_positions)
+
+    return partial(
+        device_instantiation,
+        device=ApertureScatterguard,
+        name="aperture_scatterguard",
+        prefix="",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+        post_create=load_positions,
     )
-    if aperture_scatterguard is None:
-        ACTIVE_DEVICES["aperture_scatterguard"] = ApertureScatterguard(
-            name="ApertureScatterguard",
-            prefix=f"{BeamlinePrefix(BL).beamline_prefix}",
-        )
-        if aperture_positions is not None:
-            ACTIVE_DEVICES["aperture_scatterguard"].load_aperture_positions(
-                aperture_positions
-            )
-        if wait_for_connection:
-            ACTIVE_DEVICES["aperture_scatterguard"].wait_for_connection()
-        return ACTIVE_DEVICES["aperture_scatterguard"]
-    else:
-        if aperture_positions is not None:
-            aperture_scatterguard.load_aperture_positions(aperture_positions)
-        return aperture_scatterguard
+
+
+# def aperture_scatterguard(
+#    aperture_positions: AperturePositions | None = None,
+#    wait_for_connection: bool = True,
+#    fake_with_ophyd_sim: bool = False,
+# ) -> ApertureScatterguard:
+#    """Get the i03 aperture and scatterguard device, instantiate it if it hasn't already
+#    been. If this is called when already instantiated, it will return the existing
+#    object. If aperture_positions is specified, it will update them.
+#    """
+#    aperture_scatterguard: ApertureScatterguard = ACTIVE_DEVICES.get(
+#        "aperture_scatterguard"
+#    )
+#    if aperture_scatterguard is None:
+#        ACTIVE_DEVICES["aperture_scatterguard"] = ApertureScatterguard(
+#            name="ApertureScatterguard",
+#            prefix=f"{BeamlinePrefix(BL).beamline_prefix}",
+#        )
+#        if aperture_positions is not None:
+#            ACTIVE_DEVICES["aperture_scatterguard"].load_aperture_positions(
+#                aperture_positions
+#            )
+#        if wait_for_connection:
+#            ACTIVE_DEVICES["aperture_scatterguard"].wait_for_connection()
+#        return ACTIVE_DEVICES["aperture_scatterguard"]
+#    else:
+#        if aperture_positions is not None:
+#            aperture_scatterguard.load_aperture_positions(aperture_positions)
+#        return aperture_scatterguard
 
 
 def backlight(wait_for_connection: bool = True) -> Backlight:
@@ -64,20 +133,21 @@ def backlight(wait_for_connection: bool = True) -> Backlight:
         return backlight
 
 
-def dcm(wait_for_connection: bool = True) -> DCM:
-    """Get the i03 DCM device, instantiate it if it hasn't already been.
-    If this is called when already instantiated, it will return the existing object.
-    """
-    dcm = ACTIVE_DEVICES.get("dcm")
-    if dcm is None:
-        ACTIVE_DEVICES["dcm"] = DCM(
-            name="dcm", prefix=f"{BeamlinePrefix(BL).beamline_prefix}"
-        )
-        if wait_for_connection:
-            ACTIVE_DEVICES["dcm"].wait_for_connection()
-        return ACTIVE_DEVICES["dcm"]
-    else:
-        return dcm
+# def dcm(wait_for_connection: bool = True) -> DCM:
+#     """Get the i03 DCM device, instantiate it if it hasn't already been.
+#     If this is called when already instantiated, it will return the existing object.
+#     """
+#     dcm = ACTIVE_DEVICES.get("dcm")
+#     if dcm is None:
+#         ACTIVE_DEVICES["dcm"] = DCM(
+#             name="dcm", prefix=f"{BeamlinePrefix(BL).beamline_prefix}"
+#         )
+#         if wait_for_connection:
+#             ACTIVE_DEVICES["dcm"].wait_for_connection()
+#         return ACTIVE_DEVICES["dcm"]
+#     else:
+#         return dcm
+#
 
 
 def eiger(
