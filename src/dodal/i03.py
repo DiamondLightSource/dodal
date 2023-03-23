@@ -1,4 +1,3 @@
-from functools import partial
 from typing import Callable, Optional
 
 from ophyd import Device
@@ -49,17 +48,17 @@ def device_instantiation(
             return active_device
 
 
-def dcm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False):
+def dcm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> DCM:
     """Get the i03 DCM device, instantiate it if it hasn't already been.
-    If this is called when already instantiated, it will return the existing object.
+    If this is called when already instantiated in i03, it will return the existing object.
     """
-    return partial(
-        device_instantiation,
+    return device_instantiation(
         device=DCM,
         name="dcm",
         prefix="",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
+        post_create=None,
     )
 
 
@@ -67,17 +66,16 @@ def aperture_scatterguard(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
     aperture_positions: AperturePositions | None = None,
-):
+) -> ApertureScatterguard:
     """Get the i03 aperture and scatterguard device, instantiate it if it hasn't already
-    been. If this is called when already instantiated, it will return the existing
+    been. If this is called when already instantiated in i03, it will return the existing
     object. If aperture_positions is specified, it will update them.
     """
 
     def load_positions(a_s: ApertureScatterguard):
         a_s.load_aperture_positions(aperture_positions)
 
-    return partial(
-        device_instantiation,
+    return device_instantiation(
         device=ApertureScatterguard,
         name="aperture_scatterguard",
         prefix="",
@@ -87,188 +85,135 @@ def aperture_scatterguard(
     )
 
 
-# def aperture_scatterguard(
-#    aperture_positions: AperturePositions | None = None,
-#    wait_for_connection: bool = True,
-#    fake_with_ophyd_sim: bool = False,
-# ) -> ApertureScatterguard:
-#    """Get the i03 aperture and scatterguard device, instantiate it if it hasn't already
-#    been. If this is called when already instantiated, it will return the existing
-#    object. If aperture_positions is specified, it will update them.
-#    """
-#    aperture_scatterguard: ApertureScatterguard = ACTIVE_DEVICES.get(
-#        "aperture_scatterguard"
-#    )
-#    if aperture_scatterguard is None:
-#        ACTIVE_DEVICES["aperture_scatterguard"] = ApertureScatterguard(
-#            name="ApertureScatterguard",
-#            prefix=f"{BeamlinePrefix(BL).beamline_prefix}",
-#        )
-#        if aperture_positions is not None:
-#            ACTIVE_DEVICES["aperture_scatterguard"].load_aperture_positions(
-#                aperture_positions
-#            )
-#        if wait_for_connection:
-#            ACTIVE_DEVICES["aperture_scatterguard"].wait_for_connection()
-#        return ACTIVE_DEVICES["aperture_scatterguard"]
-#    else:
-#        if aperture_positions is not None:
-#            aperture_scatterguard.load_aperture_positions(aperture_positions)
-#        return aperture_scatterguard
-
-
-def backlight(wait_for_connection: bool = True) -> Backlight:
+def backlight(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Backlight:
     """Get the i03 backlight device, instantiate it if it hasn't already been.
-    If this is called when already instantiated, it will return the existing object.
+    If this is called when already instantiated in i03, it will return the existing object.
     """
-    backlight = ACTIVE_DEVICES.get("backlight")
-    if backlight is None:
-        ACTIVE_DEVICES["backlight"] = Backlight(
-            name="Backlight", prefix=f"{BeamlinePrefix(BL).beamline_prefix}-EA-BL-01:"
-        )
-        if wait_for_connection:
-            ACTIVE_DEVICES["backlight"].wait_for_connection()
-        return ACTIVE_DEVICES["backlight"]
-    else:
-        return backlight
-
-
-# def dcm(wait_for_connection: bool = True) -> DCM:
-#     """Get the i03 DCM device, instantiate it if it hasn't already been.
-#     If this is called when already instantiated, it will return the existing object.
-#     """
-#     dcm = ACTIVE_DEVICES.get("dcm")
-#     if dcm is None:
-#         ACTIVE_DEVICES["dcm"] = DCM(
-#             name="dcm", prefix=f"{BeamlinePrefix(BL).beamline_prefix}"
-#         )
-#         if wait_for_connection:
-#             ACTIVE_DEVICES["dcm"].wait_for_connection()
-#         return ACTIVE_DEVICES["dcm"]
-#     else:
-#         return dcm
-#
+    return device_instantiation(
+        device=Backlight,
+        name="backlight",
+        prefix="-EA-BL-01:",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+        post_create=None,
+    )
 
 
 def eiger(
-    params: DetectorParams | None = None,
     wait_for_connection: bool = True,
+    fake_with_ophyd_sim: bool = False,
+    params: DetectorParams | None = None,
 ) -> EigerDetector:
     """Get the i03 Eiger device, instantiate it if it hasn't already been.
-    If this is called when already instantiated, it will return the existing object.
+    If this is called when already instantiated in i03, it will return the existing object.
     If called with params, will update those params to the Eiger object.
     """
-    eiger: EigerDetector = ACTIVE_DEVICES.get("eiger")
-    if eiger is None:
-        if params is not None:
-            ACTIVE_DEVICES["eiger"] = EigerDetector.with_params(
-                params,
-                name="EigerDetector",
-                prefix=f"{BeamlinePrefix(BL).beamline_prefix}-EA-EIGER-01:",
-            )
-        else:
-            ACTIVE_DEVICES["eiger"] = EigerDetector(
-                name="EigerDetector",
-                prefix=f"{BeamlinePrefix(BL).beamline_prefix}-EA-EIGER-01:",
-            )
-        if wait_for_connection:
-            # Eiger cannot currently be waited on, see #166
-            # ACTIVE_DEVICES["eiger"].wait_for_connection()
-            pass
-        return ACTIVE_DEVICES["eiger"]
-    else:
-        if params is not None:
-            eiger.set_detector_parameters(params)
-        return eiger
+
+    def set_params(eiger: EigerDetector):
+        eiger.set_detector_parameters(params)
+
+    return device_instantiation(
+        device=EigerDetector,
+        name="eiger",
+        prefix="-EA-EIGER-01:",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+        post_create=set_params,
+    )
 
 
-def fast_grid_scan(wait_for_connection: bool = True) -> FastGridScan:
+def fast_grid_scan(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> FastGridScan:
     """Get the i03 fast_grid_scan device, instantiate it if it hasn't already been.
-    If this is called when already instantiated, it will return the existing object.
+    If this is called when already instantiated in i03, it will return the existing object.
     """
-    fast_grid_scan = ACTIVE_DEVICES.get("fast_grid_scan")
-    if fast_grid_scan is None:
-        ACTIVE_DEVICES["fast_grid_scan"] = FastGridScan(
-            name="fast_grid_scan",
-            prefix=f"{BeamlinePrefix(BL).beamline_prefix}-MO-SGON-01:FGS:",
-        )
-        if wait_for_connection:
-            ACTIVE_DEVICES["fast_grid_scan"].wait_for_connection()
-        return ACTIVE_DEVICES["fast_grid_scan"]
-    else:
-        return fast_grid_scan
+    return device_instantiation(
+        device=FastGridScan,
+        name="fast_grid_scan",
+        prefix="-MO-SGON-01:FGS:",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+        post_create=None,
+    )
 
 
-def oav(wait_for_connection: bool = True) -> OAV:
+def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> OAV:
     """Get the i03 OAV device, instantiate it if it hasn't already been.
-    If this is called when already instantiated, it will return the existing object.
+    If this is called when already instantiated in i03, it will return the existing object.
     """
-    oav = ACTIVE_DEVICES.get("oav")
-    if oav is None:
-        ACTIVE_DEVICES["oav"] = OAV(
-            name="OAV", prefix=f"{BeamlinePrefix(BL).beamline_prefix}"
-        )
-        if wait_for_connection:
-            ACTIVE_DEVICES["oav"].wait_for_connection()
-        return ACTIVE_DEVICES["oav"]
-    else:
-        return oav
+    return device_instantiation(
+        OAV,
+        "oav",
+        "",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        None,
+    )
 
 
-def smargon(wait_for_connection: bool = True) -> Smargon:
+def smargon(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Smargon:
     """Get the i03 Smargon device, instantiate it if it hasn't already been.
-    If this is called when already instantiated, it will return the existing object.
+    If this is called when already instantiated in i03, it will return the existing object.
     """
-    smargon = ACTIVE_DEVICES.get("smargon")
-    if smargon is None:
-        ACTIVE_DEVICES["smargon"] = Smargon(
-            name="smargon", prefix=f"{BeamlinePrefix(BL).beamline_prefix}"
-        )
-        if wait_for_connection:
-            ACTIVE_DEVICES["smargon"].wait_for_connection()
-        return ACTIVE_DEVICES["smargon"]
-    else:
-        return smargon
+    return device_instantiation(
+        Smargon,
+        "smargon",
+        "",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        None,
+    )
 
 
-def s4_slit_gaps(wait_for_connection: bool = True) -> S4SlitGaps:
+def s4_slit_gaps(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> S4SlitGaps:
     """Get the i03 s4_slit_gaps device, instantiate it if it hasn't already been.
-    If this is called when already instantiated, it will return the existing object.
+    If this is called when already instantiated in i03, it will return the existing object.
     """
-    s4_slit_gaps = ACTIVE_DEVICES.get("s4_slit_gaps")
-    if s4_slit_gaps is None:
-        ACTIVE_DEVICES["s4_slit_gaps"] = S4SlitGaps(
-            name="s4_slit_gaps",
-            prefix=f"{BeamlinePrefix(BL).beamline_prefix}-AL-SLITS-04:",
-        )
-        if wait_for_connection:
-            ACTIVE_DEVICES["s4_slit_gaps"].wait_for_connection()
-        return ACTIVE_DEVICES["s4_slit_gaps"]
-    else:
-        return s4_slit_gaps
+    return device_instantiation(
+        S4SlitGaps,
+        "s4_slit_gaps",
+        "-AL-SLITS-04:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        None,
+    )
 
 
-def synchrotron(wait_for_connection: bool = True) -> Synchrotron:
+def synchrotron(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Synchrotron:
     """Get the i03 synchrotron device, instantiate it if it hasn't already been.
-    If this is called when already instantiated, it will return the existing object.
+    If this is called when already instantiated in i03, it will return the existing object.
     """
-    synchrotron = ACTIVE_DEVICES.get("synchrotron")
-    if synchrotron is None:
-        ACTIVE_DEVICES["synchrotron"] = Synchrotron(name="synchrotron")
-        if wait_for_connection:
-            ACTIVE_DEVICES["synchrotron"].wait_for_connection()
-        return ACTIVE_DEVICES["synchrotron"]
-    else:
-        return synchrotron
+    return device_instantiation(
+        Synchrotron,
+        "synchrotron",
+        "",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        None,
+    )
 
 
-def undulator(wait_for_connection: bool = True) -> Undulator:
+def undulator(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Undulator:
     """Get the i03 undulator device, instantiate it if it hasn't already been.
-    If this is called when already instantiated, it will return the existing object.
+    If this is called when already instantiated in i03, it will return the existing object.
     """
     undulator = ACTIVE_DEVICES.get("undulator")
     if undulator is None:
-        ACTIVE_DEVICES["undulator"] = Undulator(
+        device = Undulator
+        if fake_with_ophyd_sim:
+            device = make_fake_device(Undulator)
+        ACTIVE_DEVICES["undulator"] = device(
             name="undulator",
             prefix=f"SR{BeamlinePrefix(BL).beamline_prefix[2:]}-MO-SERVC-01:",
         )
@@ -279,17 +224,15 @@ def undulator(wait_for_connection: bool = True) -> Undulator:
         return undulator
 
 
-def zebra(wait_for_connection: bool = True) -> Zebra:
+def zebra(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> Zebra:
     """Get the i03 zebra device, instantiate it if it hasn't already been.
-    If this is called when already instantiated, it will return the existing object.
+    If this is called when already instantiated in i03, it will return the existing object.
     """
-    zebra = ACTIVE_DEVICES.get("zebra")
-    if zebra is None:
-        ACTIVE_DEVICES["zebra"] = Zebra(
-            name="zebra", prefix=f"{BeamlinePrefix(BL).beamline_prefix}-EA-ZEBRA-01:"
-        )
-        if wait_for_connection:
-            ACTIVE_DEVICES["zebra"].wait_for_connection()
-        return ACTIVE_DEVICES["zebra"]
-    else:
-        return zebra
+    return device_instantiation(
+        Zebra,
+        "zebra",
+        "-EA-ZEBRA-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        None,
+    )
