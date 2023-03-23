@@ -28,14 +28,18 @@ def device_instantiation(
     prefix: str,
     wait: bool,
     fake: bool,
-    post_create: Optional[Callable],
+    post_create: Optional[Callable] = None,
+    bl_prefix: bool = True,
 ) -> Device:
     active_device = ACTIVE_DEVICES.get(name)
     if active_device is None:
         if fake:
             device = make_fake_device(device)
         ACTIVE_DEVICES[name] = device(
-            name=name, prefix=f"{BeamlinePrefix(BL).beamline_prefix}{prefix}"
+            name=name,
+            prefix=f"{(BeamlinePrefix(BL).beamline_prefix)}{prefix}"
+            if bl_prefix
+            else prefix,
         )
         if wait:
             ACTIVE_DEVICES[name].wait_for_connection()
@@ -58,7 +62,6 @@ def dcm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
         prefix="",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
-        post_create=None,
     )
 
 
@@ -97,7 +100,6 @@ def backlight(
         prefix="-EA-BL-01:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
-        post_create=None,
     )
 
 
@@ -136,7 +138,6 @@ def fast_grid_scan(
         prefix="-MO-SGON-01:FGS:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
-        post_create=None,
     )
 
 
@@ -150,7 +151,6 @@ def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
         "",
         wait_for_connection,
         fake_with_ophyd_sim,
-        None,
     )
 
 
@@ -166,7 +166,6 @@ def smargon(
         "",
         wait_for_connection,
         fake_with_ophyd_sim,
-        None,
     )
 
 
@@ -182,7 +181,6 @@ def s4_slit_gaps(
         "-AL-SLITS-04:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        None,
     )
 
 
@@ -198,7 +196,7 @@ def synchrotron(
         "",
         wait_for_connection,
         fake_with_ophyd_sim,
-        None,
+        bl_prefix=False,
     )
 
 
@@ -208,20 +206,14 @@ def undulator(
     """Get the i03 undulator device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    undulator = ACTIVE_DEVICES.get("undulator")
-    if undulator is None:
-        device = Undulator
-        if fake_with_ophyd_sim:
-            device = make_fake_device(Undulator)
-        ACTIVE_DEVICES["undulator"] = device(
-            name="undulator",
-            prefix=f"SR{BeamlinePrefix(BL).beamline_prefix[2:]}-MO-SERVC-01:",
-        )
-        if wait_for_connection:
-            ACTIVE_DEVICES["undulator"].wait_for_connection()
-        return ACTIVE_DEVICES["undulator"]
-    else:
-        return undulator
+    return device_instantiation(
+        Undulator,
+        "undulator",
+        f"SR{BeamlinePrefix(BL).beamline_prefix[2:]}-MO-SERVC-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        bl_prefix=False,
+    )
 
 
 def zebra(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> Zebra:
@@ -234,5 +226,4 @@ def zebra(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -
         "-EA-ZEBRA-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        None,
     )
