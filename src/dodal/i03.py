@@ -45,7 +45,7 @@ def device_instantiation(
     else:
         if post_create:
             post_create(active_device)
-            return active_device
+        return active_device
 
 
 def dcm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> DCM:
