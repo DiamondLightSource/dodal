@@ -114,7 +114,8 @@ def eiger(
     """
 
     def set_params(eiger: EigerDetector):
-        eiger.set_detector_parameters(params)
+        if params is not None:
+            eiger.set_detector_parameters(params)
 
     return device_instantiation(
         device=EigerDetector,
