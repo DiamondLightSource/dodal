@@ -2,12 +2,10 @@ import pytest
 
 from dodal.devices.synchrotron import Synchrotron
 
-SIM_BEAMLINE = "BL03S"
-
 
 @pytest.fixture
 def synchrotron():
-    synchrotron = Synchrotron(f"{SIM_BEAMLINE}-", name="synchrotron")
+    synchrotron = Synchrotron("", name="synchrotron")
     return synchrotron
 
 
