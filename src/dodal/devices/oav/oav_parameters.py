@@ -8,19 +8,34 @@ from dodal.devices.oav.oav_errors import (
 )
 from dodal.log import LOGGER
 
+OAV_CONFIG_FILE_DEFAULTS = {
+    "zoom_params_file": "/dls_sw/i03/software/gda_versions/gda_9_27/workspace_git/gda-mx.git/configurations/i03-config/xml/jCameraManZoomLevels.xml",
+    "oav_json": "/dls_sw/i03/software/gda_versions/gda_9_27/workspace_git/gda-mx.git/configurations/i03-config/etc/OAVCentring.json",
+    "display_config": "/dls_sw/i03/software/gda_versions/var/display.configuration",
+}
+
 
 class OAVParameters:
+    zoom_params_file: str
+    oav_json: str
+    display_config: str
+
     def __init__(
         self,
         centring_params_json: str,
         camera_zoom_levels_file: str,
         display_configuration_file: str,
         context="loopCentring",
+        config_files: dict[str, str] = OAV_CONFIG_FILE_DEFAULTS,
     ):
         self.centring_params_json = centring_params_json
         self.camera_zoom_levels_file = camera_zoom_levels_file
         self.display_configuration_file = display_configuration_file
         self.context = context
+
+        self.zoom_params_file = config_files["zoom_params_file"]
+        self.oav_json = config_files["oav_json"]
+        self.display_config = config_files["display_config"]
 
         self.load_parameters_from_json()
         self.load_microns_per_pixel()

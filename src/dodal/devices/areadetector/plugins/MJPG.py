@@ -13,7 +13,7 @@ class MJPG(Device):
     x_size: EpicsSignalRO = Component(EpicsSignalRO, "ArraySize1_RBV")
     y_size: EpicsSignalRO = Component(EpicsSignalRO, "ArraySize2_RBV")
     input_rbpv: EpicsSignalRO = Component(EpicsSignalRO, "NDArrayPort_RBV")
-    input_plugin_pv: EpicsSignal = Component(EpicsSignal, "NDArrayPort")
+    input_plugin: EpicsSignal = Component(EpicsSignal, "NDArrayPort")
     KICKOFF_TIMEOUT: float = 10.0
 
     def trigger(self):

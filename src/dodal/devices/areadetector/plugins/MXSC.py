@@ -6,12 +6,12 @@ class MXSC(Device):
     Device for edge detection plugin.
     """
 
-    input_plugin_pv: EpicsSignal = Component(EpicsSignal, "NDArrayPort")
-    enable_callbacks_pv: EpicsSignal = Component(EpicsSignal, "EnableCallbacks")
-    min_callback_time_pv: EpicsSignal = Component(EpicsSignal, "MinCallbackTime")
-    blocking_callbacks_pv: EpicsSignal = Component(EpicsSignal, "BlockingCallbacks")
+    input_plugin: EpicsSignal = Component(EpicsSignal, "NDArrayPort")
+    enable_callbacks: EpicsSignal = Component(EpicsSignal, "EnableCallbacks")
+    min_callback_time: EpicsSignal = Component(EpicsSignal, "MinCallbackTime")
+    blocking_callbacks: EpicsSignal = Component(EpicsSignal, "BlockingCallbacks")
     read_file: EpicsSignal = Component(EpicsSignal, "ReadFile")
-    py_filename: EpicsSignal = Component(EpicsSignal, "Filename", string=True)
+    filename: EpicsSignal = Component(EpicsSignal, "Filename", string=True)
     preprocess_operation: EpicsSignal = Component(EpicsSignal, "Preprocess")
     preprocess_ksize: EpicsSignal = Component(EpicsSignal, "PpParam1")
     canny_upper_threshold: EpicsSignal = Component(EpicsSignal, "CannyUpper")
