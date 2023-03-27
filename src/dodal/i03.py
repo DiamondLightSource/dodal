@@ -22,6 +22,12 @@ BL = get_beamline_name("s03")
 ACTIVE_DEVICES: dict[str, Device] = {}
 
 
+def clear_devices():
+    global ACTIVE_DEVICES
+    for d in list(ACTIVE_DEVICES):
+        del ACTIVE_DEVICES[d]
+
+
 def device_instantiation(
     device: Callable,
     name: str,
