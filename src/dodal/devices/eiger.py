@@ -181,6 +181,7 @@ class EigerDetector(Device):
         status &= self.cam.num_triggers.set(self.detector_params.num_triggers)
         status &= self.odin.file_writer.num_capture.set(
             self.detector_params.num_triggers
+            * self.detector_params.num_images_per_trigger
         )
         return status
 
