@@ -3,6 +3,7 @@ from typing import Optional
 
 from dataclasses_json import DataClassJsonMixin
 
+from dodal.devices.eiger import EigerTriggerNumber
 from dodal.devices.motors import XYZLimitBundle
 from dodal.parameters.experiment_parameter_base import AbstractExperimentParameterBase
 
@@ -23,6 +24,7 @@ class RotationScanParams(DataClassJsonMixin, AbstractExperimentParameterBase):
     x: float = 0.0
     y: float = 0.0
     z: float = 0.0
+    trigger_number: str = EigerTriggerNumber.MANY_TRIGGERS
 
     def xyz_are_valid(self, limits: XYZLimitBundle) -> bool:
         """
