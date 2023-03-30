@@ -26,7 +26,8 @@ class DetectorParams:
     detector_distance: float
     omega_start: float
     omega_increment: float
-    num_images: int
+    num_images_per_trigger: int
+    num_triggers: int
     use_roi_mode: bool
     det_dist_to_beam_converter_path: str
 
@@ -98,7 +99,7 @@ class DetectorParams:
 
     @property
     def omega_end(self):
-        return self.omega_start + self.num_images * self.omega_increment
+        return self.omega_start + self.num_triggers * self.omega_increment
 
     @property
     def full_filename(self):
