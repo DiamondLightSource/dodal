@@ -70,7 +70,7 @@ def dcm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
 def aperture_scatterguard(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
-    aperture_positions: AperturePositions | None = None,
+    aperture_positions: Optional[AperturePositions] = None,
 ) -> ApertureScatterguard:
     """Get the i03 aperture and scatterguard device, instantiate it if it hasn't already
     been. If this is called when already instantiated in i03, it will return the existing
@@ -108,7 +108,7 @@ def backlight(
 def eiger(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
-    params: DetectorParams | None = None,
+    params: Optional[DetectorParams] = None,
 ) -> EigerDetector:
     """Get the i03 Eiger device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
