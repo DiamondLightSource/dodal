@@ -46,5 +46,49 @@ class AdAravisDetector(SingleTriggerV33, DetectorBase):
             acquire_time = self.cam.acquire_time.get()
         self.stage_sigs[self.cam.acquire_period] = acquire_time + _ACQUIRE_BUFFER_PERIOD
 
+        # Ensure detector warmed up
+        self._prime_hdf()
+
         # Now calling the super method should set the acquire period
         super(AdAravisDetector, self).stage(*args, **kwargs)
+
+    def _prime_hdf(self) -> None:
+        """
+        Take a single frame and pipe it through the HDF5 writer plugin
+        """
+
+        # TODO: It should be possible to work out when the detector does not need
+        # priming, but there are a few complex edge cases
+        settings = {
+            self.hdf.enable: 1,
+            self.hdf.nd_array_port: self.cam.port_name.get(),
+            self.cam.array_callbacks: 1,
+            self.cam.image_mode: "Single",
+            self.cam.trigger_mode: "Off",
+            # Take the quickest possible frame
+            self.cam.acquire_time: 6.3e-05,
+            self.cam.acquire_period: 0.003,
+        }
+        reset_to = {signal: signal.get() for signal in settings.keys()}
+        self.cam.acquire.put_complete = True
+        self.cam.acquire.set(0).wait(timeout=10)
+
+        # Apply all settings for acquisition
+        for signal, value in settings.items():
+            # Ensure that .wait really will wait until the PV is set including its RBV
+            signal.put_complete = True
+            signal.set(value).wait(timeout=10)
+
+        self.cam.acquire.set(1).wait(timeout=10)
+
+        # Revert settings to previous values
+        for signal, value in reversed(reset_to.items()):
+            signal.set(value).wait(timeout=10)
+
+    def _is_primed(self) -> bool:
+        """
+        Check if the HDF5 writer plugin has been primed with a single frame and that
+        no settings have changed since then
+        """
+
+        return self.cam.array_size.get() == self.hdf.array_size.get()
