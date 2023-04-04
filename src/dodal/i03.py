@@ -49,13 +49,9 @@ def device_instantiation(
         )
         if wait:
             ACTIVE_DEVICES[name].wait_for_connection()
-        if post_create:
-            post_create(ACTIVE_DEVICES[name])
-        return ACTIVE_DEVICES[name]
-    else:
-        if post_create:
-            post_create(active_device)
-        return active_device
+    if post_create:
+        post_create(ACTIVE_DEVICES[name])
+    return ACTIVE_DEVICES[name]
 
 
 def dcm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> DCM:
@@ -216,7 +212,7 @@ def undulator(
     return device_instantiation(
         Undulator,
         "undulator",
-        f"SR{BeamlinePrefix(BL).beamline_prefix[2:]}-MO-SERVC-01:",
+        f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
         bl_prefix=False,
