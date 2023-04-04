@@ -84,11 +84,3 @@ class AdAravisDetector(SingleTriggerV33, DetectorBase):
         # Revert settings to previous values
         for signal, value in reversed(reset_to.items()):
             signal.set(value).wait(timeout=10)
-
-    def _is_primed(self) -> bool:
-        """
-        Check if the HDF5 writer plugin has been primed with a single frame and that
-        no settings have changed since then
-        """
-
-        return self.cam.array_size.get() == self.hdf.array_size.get()
