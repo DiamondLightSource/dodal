@@ -1,10 +1,9 @@
 from typing import Any, Mapping
+
 from ophyd import Component as Cpt
-from ophyd import DetectorBase
+from ophyd import DetectorBase, EpicsSignal, Signal
 from ophyd.areadetector.base import ADComponent as Cpt
 from ophyd.areadetector.detectors import DetectorBase
-from ophyd import Signal, EpicsSignal
-
 
 from .adutils import Hdf5Writer, SingleTriggerV33, SynchronisedAdDriverBase
 
