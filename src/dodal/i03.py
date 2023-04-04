@@ -1,4 +1,4 @@
-from typing import Callable, Optional
+from typing import Callable, Dict, Optional
 
 from ophyd import Device
 from ophyd.sim import make_fake_device
@@ -19,7 +19,7 @@ from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("s03")
 
-ACTIVE_DEVICES: dict[str, Device] = {}
+ACTIVE_DEVICES: Dict[str, Device] = {}
 
 
 def clear_devices():
