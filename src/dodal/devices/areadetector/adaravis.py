@@ -1,7 +1,10 @@
+from typing import Any, Mapping
 from ophyd import Component as Cpt
 from ophyd import DetectorBase
 from ophyd.areadetector.base import ADComponent as Cpt
 from ophyd.areadetector.detectors import DetectorBase
+from ophyd import Signal, EpicsSignal
+
 
 from .adutils import Hdf5Writer, SingleTriggerV33, SynchronisedAdDriverBase
 
@@ -16,11 +19,13 @@ class AdAravisDetector(SingleTriggerV33, DetectorBase):
         root="",
         write_path_template="",
     )
+    _priming_settings: Mapping[Signal, Any]
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.hdf.kind = "normal"
 
+        # Values for staging
         self.stage_sigs = {
             # Get stage to wire up the plugins
             self.hdf.nd_array_port: self.cam.port_name.get(),
@@ -34,6 +39,27 @@ class AdAravisDetector(SingleTriggerV33, DetectorBase):
             self.cam.trigger_mode: "Off",
             **self.stage_sigs,  # type: ignore
         }
+
+        # Settings to apply when priming plugins during pre-stage
+        self._priming_settings = {
+            self.hdf.enable: 1,
+            self.hdf.nd_array_port: self.cam.port_name.get(),
+            self.cam.array_callbacks: 1,
+            self.cam.image_mode: "Single",
+            self.cam.trigger_mode: "Off",
+            # Take the quickest possible frame
+            self.cam.acquire_time: 6.3e-05,
+            self.cam.acquire_period: 0.003,
+        }
+
+        # Signals that control driver and hdf writer should be put_complete to
+        # avoid race conditions during priming
+        for signal in set(self.stage_sigs.keys()).union(
+            set(self._priming_settings.keys())
+        ):
+            if isinstance(signal, EpicsSignal):
+                signal.put_complete = True
+        self.cam.acquire.put_complete = True
 
     def stage(self, *args, **kwargs):
         # We have to manually set the acquire period bcause the EPICS driver
@@ -57,28 +83,16 @@ class AdAravisDetector(SingleTriggerV33, DetectorBase):
         Take a single frame and pipe it through the HDF5 writer plugin
         """
 
-        # TODO: It should be possible to work out when the detector does not need
-        # priming, but there are a few complex edge cases
-        settings = {
-            self.hdf.enable: 1,
-            self.hdf.nd_array_port: self.cam.port_name.get(),
-            self.cam.array_callbacks: 1,
-            self.cam.image_mode: "Single",
-            self.cam.trigger_mode: "Off",
-            # Take the quickest possible frame
-            self.cam.acquire_time: 6.3e-05,
-            self.cam.acquire_period: 0.003,
-        }
-        reset_to = {signal: signal.get() for signal in settings.keys()}
-        self.cam.acquire.put_complete = True
+        # Backup state and ensure we are not acquiring
+        reset_to = {signal: signal.get() for signal in self._priming_settings.keys()}
         self.cam.acquire.set(0).wait(timeout=10)
 
         # Apply all settings for acquisition
-        for signal, value in settings.items():
+        for signal, value in self._priming_settings.items():
             # Ensure that .wait really will wait until the PV is set including its RBV
-            signal.put_complete = True
             signal.set(value).wait(timeout=10)
 
+        # Acquire a frame
         self.cam.acquire.set(1).wait(timeout=10)
 
         # Revert settings to previous values
