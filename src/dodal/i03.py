@@ -1,4 +1,4 @@
-from typing import Callable, Dict, Optional
+from typing import Callable, Dict, List, Optional
 
 from ophyd import Device
 from ophyd.sim import make_fake_device
@@ -28,6 +28,16 @@ def clear_devices():
         del ACTIVE_DEVICES[d]
 
 
+def clear_device(name: str):
+    global ACTIVE_DEVICES
+    del ACTIVE_DEVICES[name]
+
+
+def list_active_devices() -> List[str]:
+    global ACTIVE_DEVICES
+    return list(ACTIVE_DEVICES.keys())
+
+
 def device_instantiation(
     device: Callable,
     name: str,
@@ -49,6 +59,12 @@ def device_instantiation(
         )
         if wait:
             ACTIVE_DEVICES[name].wait_for_connection()
+    else:
+        if type(active_device) != device:
+            raise TypeError(
+                f"Can't instantiate different type of device with the same name as an "
+                f"existing device. Device name '{name}' already used for a(n) {device}."
+            )
     if post_create:
         post_create(ACTIVE_DEVICES[name])
     return ACTIVE_DEVICES[name]

@@ -1,6 +1,11 @@
 import pytest
+from ophyd import Device
+from ophyd.sim import FakeEpicsSignal
 
 from dodal import i03
+from dodal.devices.aperturescatterguard import ApertureScatterguard
+from dodal.devices.smargon import Smargon
+from dodal.devices.zebra import Zebra
 
 
 @pytest.fixture
@@ -34,6 +39,41 @@ def i03_device_names():
         "synchrotron",
         "undulator",
         "zebra",
+    ]
+
+
+def test_instantiate_function_makes_supplied_device():
+    device_types = [Zebra, ApertureScatterguard, Smargon]
+    for device in device_types:
+        i03.clear_devices()
+        dev = i03.device_instantiation(device, "device", "", False, False, None)
+        assert isinstance(dev, device)
+
+
+def test_instantiating_different_device_with_same_name():
+    dev1 = i03.device_instantiation(Zebra, "device", "", False, False, None)  # noqa
+    with pytest.raises(TypeError):
+        dev2 = i03.device_instantiation(  # noqa
+            Smargon, "device", "", False, False, None
+        )
+    i03.clear_device("device")
+    dev2 = i03.device_instantiation(Smargon, "device", "", False, False, None)  # noqa
+
+
+def test_instantiate_function_fake_makes_fake():
+    fake_zeb: Zebra = i03.device_instantiation(i03.Zebra, "zebra", "", True, True, None)
+    assert isinstance(fake_zeb, Device)
+    assert isinstance(fake_zeb.pc.arm_source, FakeEpicsSignal)
+
+
+def test_list():
+    i03.zebra(wait_for_connection=False)
+    i03.synchrotron(wait_for_connection=False)
+    i03.aperture_scatterguard(wait_for_connection=False)
+    assert i03.list_active_devices() == [
+        "zebra",
+        "synchrotron",
+        "aperture_scatterguard",
     ]
 
 
