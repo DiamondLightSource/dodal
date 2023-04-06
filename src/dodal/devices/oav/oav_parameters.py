@@ -1,6 +1,6 @@
 import json
 import xml.etree.cElementTree as et
-from typing import Tuple
+from typing import Dict, Tuple
 
 from dodal.devices.oav.oav_errors import (
     OAVError_BeamPositionNotFound,
@@ -26,7 +26,7 @@ class OAVParameters:
         camera_zoom_levels_file: str,
         display_configuration_file: str,
         context="loopCentring",
-        config_files: dict[str, str] = OAV_CONFIG_FILE_DEFAULTS,
+        config_files: Dict[str, str] = OAV_CONFIG_FILE_DEFAULTS,
     ):
         self.centring_params_json = centring_params_json
         self.camera_zoom_levels_file = camera_zoom_levels_file
