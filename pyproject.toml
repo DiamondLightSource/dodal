@@ -20,7 +20,6 @@ dependencies = [
     "dataclasses-json",
     "pillow",
     "requests",
-    "pydantic",
 ]
 dynamic = ["version"]
 license.file = "LICENSE"
@@ -48,7 +47,7 @@ dev = [
 ]
 
 [project.urls]
-GitHub = "https://github.com/DiamondLightSource/python-dodal"
+GitHub = "https://github.com/DiamondLightSource/dodal"
 
 [[project.authors]] # Further authors may be added by duplicating this section
 email = "dominic.oram@diamond.ac.uk"

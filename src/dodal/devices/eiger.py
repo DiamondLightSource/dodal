@@ -18,6 +18,11 @@ class EigerTriggerMode(Enum):
     EXTERNAL_ENABLE = 3
 
 
+class EigerTriggerNumber(str, Enum):
+    MANY_TRIGGERS = "many_triggers"
+    ONE_TRIGGER = "one_trigger"
+
+
 class EigerDetector(Device):
     cam: EigerDetectorCam = Component(EigerDetectorCam, "CAM:")
     odin: EigerOdin = Component(EigerOdin, "")
@@ -172,10 +177,17 @@ class EigerDetector(Device):
             return status
 
     def set_num_triggers_and_captures(self) -> Status:
+        """Sets the number of triggers and the number of images for the Eiger to capture
+        during the datacollection. The number of images is the number of images per
+        trigger.
+        """
         assert self.detector_params is not None
-        status = self.cam.num_images.set(1)
-        status &= self.cam.num_triggers.set(self.detector_params.num_images)
-        status &= self.odin.file_writer.num_capture.set(self.detector_params.num_images)
+        status = self.cam.num_images.set(self.detector_params.num_images_per_trigger)
+        status &= self.cam.num_triggers.set(self.detector_params.num_triggers)
+        status &= self.odin.file_writer.num_capture.set(
+            self.detector_params.num_triggers
+            * self.detector_params.num_images_per_trigger
+        )
         return status
 
     def wait_for_stale_parameters(self):
