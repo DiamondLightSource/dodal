@@ -10,36 +10,12 @@ from dodal.devices.zebra import Zebra
 
 @pytest.fixture
 def i03_devices():
-    return [
-        i03.aperture_scatterguard,
-        i03.backlight,
-        i03.dcm,
-        i03.eiger,
-        i03.fast_grid_scan,
-        i03.oav,
-        i03.s4_slit_gaps,
-        i03.smargon,
-        i03.synchrotron,
-        i03.undulator,
-        i03.zebra,
-    ]
+    return i03.DEVICE_FUNCTIONS
 
 
 @pytest.fixture
 def i03_device_names():
-    return [
-        "aperture_scatterguard",
-        "backlight",
-        "dcm",
-        "eiger",
-        "fast_grid_scan",
-        "oav",
-        "s4_slit_gaps",
-        "smargon",
-        "synchrotron",
-        "undulator",
-        "zebra",
-    ]
+    return i03.DEVICE_NAMES
 
 
 def test_instantiate_function_makes_supplied_device():

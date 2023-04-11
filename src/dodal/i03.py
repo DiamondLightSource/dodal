@@ -17,6 +17,21 @@ from dodal.devices.undulator import Undulator
 from dodal.devices.zebra import Zebra
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
+DEVICE_NAMES = [
+    "aperture_scatterguard",
+    "backlight",
+    "dcm",
+    "eiger",
+    "fast_grid_scan",
+    "oav",
+    "s4_slit_gaps",
+    "smargon",
+    "synchrotron",
+    "undulator",
+    "zebra",
+]
+
+
 BL = get_beamline_name("s03")
 
 ACTIVE_DEVICES: Dict[str, Device] = {}
@@ -36,6 +51,10 @@ def clear_device(name: str):
 def list_active_devices() -> List[str]:
     global ACTIVE_DEVICES
     return list(ACTIVE_DEVICES.keys())
+
+
+def active_device_is_same_type(active_device, device):
+    return type(active_device) == device
 
 
 def device_instantiation(
@@ -60,10 +79,11 @@ def device_instantiation(
         if wait:
             ACTIVE_DEVICES[name].wait_for_connection()
     else:
-        if type(active_device) != device:
+        if not active_device_is_same_type(active_device, device):
             raise TypeError(
-                f"Can't instantiate different type of device with the same name as an "
-                f"existing device. Device name '{name}' already used for a(n) {device}."
+                f"Can't instantiate device of type {type(active_device)} with the same "
+                f"name as an existing device. Device name '{name}' already used for "
+                f"a(n) {device}."
             )
     if post_create:
         post_create(ACTIVE_DEVICES[name])
@@ -246,3 +266,18 @@ def zebra(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -
         wait_for_connection,
         fake_with_ophyd_sim,
     )
+
+
+DEVICE_FUNCTIONS = [
+    aperture_scatterguard,
+    backlight,
+    dcm,
+    eiger,
+    fast_grid_scan,
+    oav,
+    s4_slit_gaps,
+    smargon,
+    synchrotron,
+    undulator,
+    zebra,
+]
