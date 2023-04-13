@@ -9,8 +9,8 @@ from ophyd.status import SubscriptionStatus
 
 from dodal.devices.utils import epics_signal_put_wait
 
-PC_ARM_SOURCE_SOFT = 0
-PC_ARM_SOURCE_EXT = 1
+PC_ARM_SOURCE_SOFT = "Soft"
+PC_ARM_SOURCE_EXT = "External"
 
 PC_GATE_SOURCE_POSITION = 0
 PC_GATE_SOURCE_TIME = 1
