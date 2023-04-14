@@ -2,6 +2,7 @@ import inspect
 import socket
 from collections import namedtuple
 from dataclasses import dataclass
+from functools import wraps
 from importlib import import_module
 from inspect import signature
 from os import environ
@@ -71,17 +72,50 @@ class BeamlinePrefix:
         self.insertion_prefix = f"SR{self.ixx[1:3]}{self.suffix}"
 
 
-def make_all_devices(module: Union[str, ModuleType, None] = None) -> Dict[str, Any]:
+def skip_device(precondition=lambda: True):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwds):
+            return func(*args, **kwds)
+
+        if precondition:
+            wrapper.__skip__ = True
+        return wrapper
+
+    return decorator
+
+
+def make_all_devices(
+    module: Union[str, ModuleType, None] = None, **kwargs
+) -> Dict[str, Any]:
+    """Makes all devices in the given beamline module.
+
+    Args:
+        module (Union[str, ModuleType, None], optional): The module to make devices from.
+        **kwargs: Arguments passed on to every device.
+
+    Returns:
+        Dict[str, Any]: A dictionary of device name and device
+    """
     if isinstance(module, str) or module is None:
         module = import_module(module or __name__)
     factories = collect_factories(module)
-    return {device.name: device for device in map(lambda factory: factory(), factories)}
+    return {
+        device.name: device
+        for device in map(lambda factory: factory(**kwargs), factories)
+    }
 
 
 def collect_factories(module: ModuleType) -> Iterable[Callable[..., Any]]:
     for var in module.__dict__.values():
-        if callable(var) and _is_device_factory(var):
+        if callable(var) and _is_device_factory(var) and not _is_device_skipped(var):
             yield var
+
+
+def _is_device_skipped(func: Callable[..., Any]) -> bool:
+    if not hasattr(func, "__skip__"):
+        return False
+    return func.__skip__
 
 
 def _is_device_factory(func: Callable[..., Any]) -> bool:

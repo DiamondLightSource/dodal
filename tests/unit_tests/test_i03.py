@@ -6,16 +6,7 @@ from dodal import i03
 from dodal.devices.aperturescatterguard import ApertureScatterguard
 from dodal.devices.smargon import Smargon
 from dodal.devices.zebra import Zebra
-
-
-@pytest.fixture
-def i03_devices():
-    return i03.DEVICE_FUNCTIONS
-
-
-@pytest.fixture
-def i03_device_names():
-    return i03.DEVICE_NAMES
+from dodal.utils import make_all_devices
 
 
 def test_instantiate_function_makes_supplied_device():
@@ -53,38 +44,37 @@ def test_list():
     ]
 
 
-def test_device_creation(i03_devices, i03_device_names):
-    for device, name in zip(i03_devices, i03_device_names):
-        device(wait_for_connection=False)
-        assert name in i03.ACTIVE_DEVICES
-    assert len(i03.ACTIVE_DEVICES) == len(i03_device_names)
+def test_device_creation():
+    devices = make_all_devices(i03, fake_with_ophyd_sim=True)
+    for device_name in devices.keys():
+        assert device_name in i03.ACTIVE_DEVICES
+    assert len(i03.ACTIVE_DEVICES) == len(devices)
 
 
-def test_devices_are_identical(i03_devices):
-    for device in i03_devices:
-        a = device(wait_for_connection=False)
-        b = device(wait_for_connection=False)
-        assert a is b
+def test_devices_are_identical():
+    devices_a = make_all_devices(i03, fake_with_ophyd_sim=True)
+    devices_b = make_all_devices(i03, fake_with_ophyd_sim=True)
+    for device_name in devices_a.keys():
+        assert devices_a[device_name] is devices_b[device_name]
 
 
-def test_clear_devices(i03_devices):
-    for device in i03_devices:
-        device(wait_for_connection=False)
-    assert len(i03.ACTIVE_DEVICES) == len(i03_devices)
+def test_clear_devices():
+    devices = make_all_devices(i03, fake_with_ophyd_sim=True)
+    assert len(i03.ACTIVE_DEVICES) == len(devices.keys())
     i03.clear_devices()
     assert i03.ACTIVE_DEVICES == {}
 
 
-def test_device_is_new_after_clearing(i03_devices):
-    ids_1 = []
-    ids_2 = []
-    for device in i03_devices:
-        ids_1.append(id(device(wait_for_connection=False)))
-    for device in i03_devices:
-        ids_2.append(id(device(wait_for_connection=False)))
+def test_device_is_new_after_clearing():
+    def _make_devices_and_get_id():
+        return [
+            id(device)
+            for _, device in make_all_devices(i03, fake_with_ophyd_sim=True).items()
+        ]
+
+    ids_1 = [_make_devices_and_get_id()]
+    ids_2 = [_make_devices_and_get_id()]
     assert ids_1 == ids_2
     i03.clear_devices()
-    ids_3 = []
-    for device in i03_devices:
-        ids_3.append(id(device(wait_for_connection=False)))
+    ids_3 = [_make_devices_and_get_id()]
     assert ids_1 != ids_3

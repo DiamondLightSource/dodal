@@ -15,24 +15,9 @@ from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import Undulator
 from dodal.devices.zebra import Zebra
-from dodal.utils import BeamlinePrefix, get_beamline_name
+from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
 
-DEVICE_NAMES = [
-    "aperture_scatterguard",
-    "backlight",
-    "dcm",
-    "eiger",
-    "fast_grid_scan",
-    "oav",
-    "s4_slit_gaps",
-    "smargon",
-    "synchrotron",
-    "undulator",
-    "zebra",
-]
-
-
-BL = get_beamline_name("s03")
+BL = get_beamline_name("i03")
 
 ACTIVE_DEVICES: Dict[str, Device] = {}
 
@@ -57,6 +42,7 @@ def active_device_is_same_type(active_device, device):
     return type(active_device) == device
 
 
+@skip_device()
 def device_instantiation(
     device: Callable,
     name: str,
@@ -67,9 +53,9 @@ def device_instantiation(
     bl_prefix: bool = True,
 ) -> Device:
     active_device = ACTIVE_DEVICES.get(name)
+    if fake:
+        device = make_fake_device(device)
     if active_device is None:
-        if fake:
-            device = make_fake_device(device)
         ACTIVE_DEVICES[name] = device(
             name=name,
             prefix=f"{(BeamlinePrefix(BL).beamline_prefix)}{prefix}"
@@ -266,18 +252,3 @@ def zebra(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -
         wait_for_connection,
         fake_with_ophyd_sim,
     )
-
-
-DEVICE_FUNCTIONS = [
-    aperture_scatterguard,
-    backlight,
-    dcm,
-    eiger,
-    fast_grid_scan,
-    oav,
-    s4_slit_gaps,
-    smargon,
-    synchrotron,
-    undulator,
-    zebra,
-]
