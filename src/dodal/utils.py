@@ -73,13 +73,13 @@ class BeamlinePrefix:
 
 
 def skip_device(precondition=lambda: True):
-    def decorator(func):
+    def decorator(func: Callable[..., Any]):
         @wraps(func)
         def wrapper(*args, **kwds):
             return func(*args, **kwds)
 
         if precondition:
-            wrapper.__skip__ = True
+            wrapper.__skip__ = True  # type: ignore
         return wrapper
 
     return decorator
@@ -115,7 +115,7 @@ def collect_factories(module: ModuleType) -> Iterable[Callable[..., Any]]:
 def _is_device_skipped(func: Callable[..., Any]) -> bool:
     if not hasattr(func, "__skip__"):
         return False
-    return func.__skip__
+    return func.__skip__  # type: ignore
 
 
 def _is_device_factory(func: Callable[..., Any]) -> bool:
