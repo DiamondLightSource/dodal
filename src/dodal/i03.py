@@ -76,6 +76,7 @@ def device_instantiation(
     return ACTIVE_DEVICES[name]
 
 
+@skip_device(lambda: BL == "s03")
 def dcm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> DCM:
     """Get the i03 DCM device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
@@ -127,6 +128,7 @@ def backlight(
     )
 
 
+@skip_device(lambda: BL == "s03")
 def eiger(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
@@ -166,6 +168,7 @@ def fast_grid_scan(
     )
 
 
+@skip_device(lambda: BL == "s03")
 def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> OAV:
     """Get the i03 OAV device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
@@ -209,6 +212,7 @@ def s4_slit_gaps(
     )
 
 
+@skip_device(lambda: BL == "s03")
 def synchrotron(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> Synchrotron:
