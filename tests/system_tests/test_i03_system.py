@@ -12,4 +12,6 @@ if __name__ == "__main__":
     EPICS ports and switching ports at runtime is non-trivial
     """
     with patch("dodal.i03.BL", "i03"):
+        print("Making all i03 devices")
         make_all_devices(i03)
+        print("Successfully connected")
