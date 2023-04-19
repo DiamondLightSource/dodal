@@ -1,6 +1,7 @@
 import threading
 import time
 from dataclasses import dataclass
+from numpy import ndarray
 
 from bluesky.plan_stubs import mv
 from dataclasses_json import DataClassJsonMixin
@@ -18,7 +19,7 @@ from dodal.devices.eiger import EigerTriggerNumber
 from dodal.devices.motors import XYZLimitBundle
 from dodal.devices.status import await_value
 from dodal.parameters.experiment_parameter_base import AbstractExperimentParameterBase
-from dodal.utils import Point3D
+from dodal.utils import create_point
 
 
 @dataclass
@@ -104,7 +105,7 @@ class GridScanParams(DataClassJsonMixin, AbstractExperimentParameterBase):
     def is_3d_grid_scan(self):
         return self.z_steps > 0
 
-    def grid_position_to_motor_position(self, grid_position: Point3D) -> Point3D:
+    def grid_position_to_motor_position(self, grid_position: ndarray) -> ndarray:
         """Converts a grid position, given as steps in the x, y, z grid,
         to a real motor position.
 
@@ -115,10 +116,10 @@ class GridScanParams(DataClassJsonMixin, AbstractExperimentParameterBase):
             if not axis.is_within(position):
                 raise IndexError(f"{grid_position} is outside the bounds of the grid")
 
-        return Point3D(
-            self.x_axis.steps_to_motor_position(grid_position.x),
-            self.y_axis.steps_to_motor_position(grid_position.y),
-            self.z_axis.steps_to_motor_position(grid_position.z),
+        return create_point(
+            self.x_axis.steps_to_motor_position(grid_position[0]),
+            self.y_axis.steps_to_motor_position(grid_position[1]),
+            self.z_axis.steps_to_motor_position(grid_position[2]),
         )
 
 

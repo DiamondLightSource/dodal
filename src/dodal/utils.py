@@ -1,5 +1,6 @@
 import inspect
 import socket
+import numpy as np
 from collections import namedtuple
 from dataclasses import dataclass
 from functools import wraps
@@ -47,6 +48,19 @@ BLUESKY_PROTOCOLS = [
 
 Point2D = namedtuple("Point2D", ["x", "y"])
 Point3D = namedtuple("Point3D", ["x", "y", "z"])
+
+def create_point(*args):
+    args = list(args)
+    for index, arg in enumerate(args):
+        if args[index] is None:
+            args[index] = 0
+    
+    if len(args) == 2:
+        return np.array([args[0], args[1]], dtype=np.int8)
+    elif len(args) == 3:
+        return np.array([args[0], args[1], args[2]], dtype=np.int8)
+    else:
+        raise TypeError("Invalid number of arguments")
 
 
 def get_beamline_name(ixx: str) -> str:
