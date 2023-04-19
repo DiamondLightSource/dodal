@@ -12,7 +12,7 @@ from dodal.devices.fast_grid_scan import (
     set_fast_grid_scan_params,
 )
 from dodal.devices.smargon import Smargon
-from dodal.utils import Point3D
+from dodal.utils import create_point
 
 
 @pytest.fixture
@@ -283,10 +283,10 @@ def grid_scan_params():
 @pytest.mark.parametrize(
     "grid_position",
     [
-        (Point3D(-1, 2, 4)),
-        (Point3D(11, 2, 4)),
-        (Point3D(1, 17, 4)),
-        (Point3D(1, 5, 22)),
+        (create_point(-1, 2, 4)),
+        (create_point(11, 2, 4)),
+        (create_point(1, 17, 4)),
+        (create_point(1, 5, 22)),
     ],
 )
 def test_given_x_y_z_out_of_range_then_converting_to_motor_coords_raises(
@@ -299,7 +299,7 @@ def test_given_x_y_z_out_of_range_then_converting_to_motor_coords_raises(
 def test_given_x_y_z_of_origin_when_get_motor_positions_then_initial_positions_returned(
     grid_scan_params: GridScanParams,
 ):
-    motor_positions = grid_scan_params.grid_position_to_motor_position(Point3D(0, 0, 0))
+    motor_positions = grid_scan_params.grid_position_to_motor_position(create_point(0, 0, 0))
     assert motor_positions.x == 0
     assert motor_positions.y == 1
     assert motor_positions.z == 4
@@ -308,9 +308,9 @@ def test_given_x_y_z_of_origin_when_get_motor_positions_then_initial_positions_r
 @pytest.mark.parametrize(
     "grid_position, expected_x, expected_y, expected_z",
     [
-        (Point3D(1, 1, 1), 0.3, 1.2, 4.1),
-        (Point3D(2, 11, 16), 0.6, 3.2, 5.6),
-        (Point3D(7, 5, 5), 2.1, 2.0, 4.5),
+        (create_point(1, 1, 1), 0.3, 1.2, 4.1),
+        (create_point(2, 11, 16), 0.6, 3.2, 5.6),
+        (create_point(7, 5, 5), 2.1, 2.0, 4.5),
     ],
 )
 def test_given_various_x_y_z_when_get_motor_positions_then_expected_positions_returned(

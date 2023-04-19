@@ -45,10 +45,6 @@ BLUESKY_PROTOCOLS = [
     Triggerable,
 ]
 
-
-Point2D = namedtuple("Point2D", ["x", "y"])
-Point3D = namedtuple("Point3D", ["x", "y", "z"])
-
 def create_point(*args):
     args = list(args)
     for index, arg in enumerate(args):
