@@ -45,16 +45,16 @@ BLUESKY_PROTOCOLS = [
     Triggerable,
 ]
 
-def create_point(*args):
+def create_point(*args, dtype=np.float16):
     args = list(args)
     for index, arg in enumerate(args):
         if args[index] is None:
             args[index] = 0
-    
+
     if len(args) == 2:
-        return np.array([args[0], args[1]], dtype=np.float16)
+        return np.array([args[0], args[1]], dtype=dtype)
     elif len(args) == 3:
-        return np.array([args[0], args[1], args[2]], dtype=np.float16)
+        return np.array([args[0], args[1], args[2]], dtype=dtype)
     else:
         raise TypeError("Invalid number of arguments")
 
