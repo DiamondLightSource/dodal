@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky import preprocessors as bpp
@@ -299,10 +300,12 @@ def test_given_x_y_z_out_of_range_then_converting_to_motor_coords_raises(
 def test_given_x_y_z_of_origin_when_get_motor_positions_then_initial_positions_returned(
     grid_scan_params: GridScanParams,
 ):
-    motor_positions = grid_scan_params.grid_position_to_motor_position(create_point(0, 0, 0))
-    assert motor_positions.x == 0
-    assert motor_positions.y == 1
-    assert motor_positions.z == 4
+    motor_positions = grid_scan_params.grid_position_to_motor_position(
+        create_point(0, 0, 0)
+    )
+    assert motor_positions[0] == 0
+    assert motor_positions[1] == 1
+    assert motor_positions[2] == 4
 
 
 @pytest.mark.parametrize(
@@ -317,9 +320,10 @@ def test_given_various_x_y_z_when_get_motor_positions_then_expected_positions_re
     grid_scan_params: GridScanParams, grid_position, expected_x, expected_y, expected_z
 ):
     motor_positions = grid_scan_params.grid_position_to_motor_position(grid_position)
-    assert motor_positions.x == expected_x
-    assert motor_positions.y == expected_y
-    assert motor_positions.z == expected_z
+    np.testing.assert_array_equal(
+        motor_positions,
+        np.array([expected_x, expected_y, expected_z], dtype=np.float16),
+    )
 
 
 def test_can_run_fast_grid_scan_in_run_engine(fast_grid_scan):

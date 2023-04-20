@@ -1,7 +1,5 @@
 import inspect
 import socket
-import numpy as np
-from collections import namedtuple
 from dataclasses import dataclass
 from functools import wraps
 from importlib import import_module
@@ -10,6 +8,7 @@ from os import environ
 from types import ModuleType
 from typing import Any, Callable, Dict, Iterable, Optional, Type, Union
 
+import numpy as np
 from bluesky.protocols import (
     Checkable,
     Configurable,
@@ -44,6 +43,7 @@ BLUESKY_PROTOCOLS = [
     Configurable,
     Triggerable,
 ]
+
 
 def create_point(*args, dtype=np.float16):
     args = list(args)
