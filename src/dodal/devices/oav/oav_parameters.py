@@ -1,7 +1,7 @@
 import json
 import xml.etree.cElementTree as et
 from collections import ChainMap
-from typing import Any, Dict, Tuple
+from typing import Any, Tuple
 
 from dodal.devices.oav.oav_errors import (
     OAVError_BeamPositionNotFound,
@@ -44,11 +44,13 @@ class OAVParameters:
     def __init__(
         self,
         context="loopCentring",
-        config_files: Dict[str, str] = OAV_CONFIG_FILE_DEFAULTS,
+        zoom_params_file=OAV_CONFIG_FILE_DEFAULTS["zoom_params_file"],
+        oav_config_json=OAV_CONFIG_FILE_DEFAULTS["oav_json"],
+        display_config=OAV_CONFIG_FILE_DEFAULTS["display_config"],
     ):
-        self.zoom_params_file = config_files["zoom_params_file"]
-        self.oav_config_json = config_files["oav_json"]
-        self.display_config = config_files["display_config"]
+        self.zoom_params_file = zoom_params_file
+        self.oav_config_json = oav_config_json
+        self.display_config = display_config
         self.context = context
 
         self.global_params, self.context_dicts = self.load_json(self.oav_config_json)
