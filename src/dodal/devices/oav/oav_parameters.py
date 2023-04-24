@@ -1,6 +1,7 @@
 import json
 import xml.etree.cElementTree as et
-from typing import Dict, Tuple
+from collections import ChainMap
+from typing import Any, Dict, Tuple
 
 from dodal.devices.oav.oav_errors import (
     OAVError_BeamPositionNotFound,
@@ -19,6 +20,26 @@ class OAVParameters:
     zoom_params_file: str
     oav_json: str
     display_config: str
+    global_params: dict[str, Any]
+    context_dicts: dict[str, dict]
+    active_params: ChainMap
+
+    exposure: float
+    acquire_period: float
+    gain: float
+    canny_edge_upper_threshold: float
+    canny_edge_lower_threshold: float
+    minimum_height: int
+    zoom: int
+    preprocess: int  # gets blur type, e.g. 8 = gaussianBlur, 9 = medianBlur
+    preprocess_K_size: int  # length scale for blur preprocessing
+    detection_script_filename: str
+    close_ksize: int
+    input_plugin: str
+    mxsc_input: str
+    min_callback_time: float
+    direction: int
+    max_tip_distance: int
 
     def __init__(
         self,
@@ -33,104 +54,68 @@ class OAVParameters:
         self.display_configuration_file = display_configuration_file
         self.context = context
 
+        self.global_params, self.context_dicts = self.load_json(
+            self.centring_params_json
+        )
+        self.active_params = ChainMap(
+            {}, self.global_params, self.context_dicts[self.context]
+        )
+        self.update_self_from_current_context()
+
         self.zoom_params_file = config_files["zoom_params_file"]
         self.oav_json = config_files["oav_json"]
         self.display_config = config_files["display_config"]
 
-        self.load_parameters_from_json()
         self.load_microns_per_pixel()
         self._extract_beam_position()
 
-    def load_json(self):
+    @staticmethod
+    def load_json(filename: str) -> tuple[dict[str, Any], dict[str, dict]]:
         """
-        Loads the json from the json file at self.centring_params_json and save it as a dictionary in the parameters attribute.
+        Loads the json from the specified file, and returns a dict with all the
+        individual top-level k-v pairs, and one with all the subdicts.
         """
-        with open(f"{self.centring_params_json}") as f:
-            self.parameters = json.load(f)
+        with open(filename) as f:
+            raw_params: dict[str, Any] = json.load(f)
+        global_params = {k: raw_params.pop(v) for k, v in list(raw_params.items())}
+        context_dicts = raw_params
+        return global_params, context_dicts
 
-    def load_parameters_from_json(
-        self,
-    ) -> None:
-        """
-        Load required parameters on initialisation as an attribute variables. If a variable in the json is
-        liable to change throughout a run it can be reloaded when needed.
-        """
+    def update_context(self, context: str) -> None:
+        self.active_params.maps.pop()
+        self.active_params = self.active_params.new_child(self.context_dicts[context])
 
-        self.load_json()
+    def update_self_from_current_context(self) -> None:
+        def update(name, type, default=None):
+            try:
+                param = self.active_params.get(name, default)
+                assert isinstance(param, type)
+                return param
+            except AssertionError:
+                raise TypeError(
+                    f"OAV param {name} from the OAV centring params json file has the "
+                    f"wrong type, should be {type}."
+                )
 
-        self.exposure = self._extract_dict_parameter("exposure")
-        self.acquire_period = self._extract_dict_parameter("acqPeriod")
-        self.gain = self._extract_dict_parameter("gain")
-        self.canny_edge_upper_threshold = self._extract_dict_parameter(
-            "CannyEdgeUpperThreshold"
+        self.exposure = update("exposure", float)
+        self.acquire_period = update("acqPeriod", float)
+        self.gain = update("gain", float)
+        self.canny_edge_upper_threshold = update("CannyEdgeUpperThreshold", float)
+        self.canny_edge_lower_threshold = update(
+            "CannyEdgeLowerThreshold", float, default=5.0
         )
-        self.canny_edge_lower_threshold = self._extract_dict_parameter(
-            "CannyEdgeLowerThreshold", fallback_value=5.0
-        )
-        self.minimum_height = self._extract_dict_parameter("minheight")
-        self.zoom = self._extract_dict_parameter("zoom")
-        # gets blur type, e.g. 8 = gaussianBlur, 9 = medianBlur
-        self.preprocess = self._extract_dict_parameter("preprocess")
-        # length scale for blur preprocessing
-        self.preprocess_K_size = self._extract_dict_parameter("preProcessKSize")
-        self.filename = self._extract_dict_parameter("filename")
-        self.close_ksize = self._extract_dict_parameter(
-            "close_ksize", fallback_value=11
-        )
+        self.minimum_height = update("minheight", int)
+        self.zoom = update("zoom", int)
+        self.preprocess = update("preprocess", int)
+        self.preprocess_K_size = update("preProcessKSize", int)
+        self.detection_script_filename = update("filename", str)
+        self.close_ksize = update("close_ksize", int, default=11)
 
-        self.input_plugin = self._extract_dict_parameter("oav", fallback_value="OAV")
-        self.mxsc_input = self._extract_dict_parameter(
-            "mxsc_input", fallback_value="CAM"
-        )
-        self.min_callback_time = self._extract_dict_parameter(
-            "min_callback_time", fallback_value=0.08
-        )
-
-        self.direction = self._extract_dict_parameter("direction")
-
-        self.max_tip_distance = self._extract_dict_parameter("max_tip_distance")
-
-    def _extract_dict_parameter(self, key: str, fallback_value=None, reload_json=False):
-        """
-        Designed to extract parameters from the json OAVParameters.json. This will hopefully be changed in
-        future, but currently we have to use the json passed in from GDA.
-
-        The json is of the form:
-            {
-                "parameter1": value1,
-                "parameter2": value2,
-                "context_name": {
-                    "parameter1": value3
-            }
-        When we extract the parameters we want to check if the given context (stored as a class variable)
-        contains a parameter, if it does we return it, if not we return the global value. If a parameter
-        is not found at all then the passed in fallback_value is returned. If that isn't found then an
-        error is raised.
-        Args:
-            key: the key of the value being extracted
-            fallback_value: a value to be returned if the key is not found
-            reload_json: reload the json from the file before searching for it, needed because some
-                parameters can change mid operation.
-        Returns: The extracted value corresponding to the key, or the fallback_value if none is found.
-        """
-
-        if reload_json:
-            self.load_json()
-
-        if self.context in self.parameters:
-            if key in self.parameters[self.context]:
-                return self.parameters[self.context][key]
-
-        if key in self.parameters:
-            return self.parameters[key]
-
-        if fallback_value:
-            return fallback_value
-
-        # No fallback_value was given and the key wasn't found.
-        raise KeyError(
-            f"Searched in {self.centring_params_json} for key {key} in context {self.context} but no value was found. No fallback value was given."
-        )
+        self.input_plugin = update("oav", str, default="OAV")
+        self.mxsc_input = update("mxsc_input", str, default="CAM")
+        self.min_callback_time = update("min_callback_time", float, default=0.08)
+        self.direction = update("direction", int)
+        self.max_tip_distance = update("max_tip_distance", int)
 
     def load_microns_per_pixel(self, zoom=None):
         """
