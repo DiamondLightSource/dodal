@@ -82,15 +82,15 @@ class OAVParameters:
         self.active_params = self.active_params.new_child(self.context_dicts[context])
 
     def update_self_from_current_context(self) -> None:
-        def update(name, type, default=None):
+        def update(name, param_type, default=None):
+            param = self.active_params.get(name, default)
             try:
-                param = self.active_params.get(name, default)
-                assert isinstance(param, type)
+                param = param_type(param)
                 return param
             except AssertionError:
                 raise TypeError(
                     f"OAV param {name} from the OAV centring params json file has the "
-                    f"wrong type, should be {type}."
+                    f"wrong type, should be {param_type} but is {type(param)}."
                 )
 
         self.exposure = update("exposure", float)
