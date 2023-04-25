@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from os import environ
 from pathlib import Path
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple
 
 from bluesky.log import config_bluesky_logging
 from bluesky.log import logger as bluesky_logger
@@ -16,9 +16,13 @@ LOGGER.setLevel(logging.DEBUG)
 ophyd_logger.parent = LOGGER
 bluesky_logger.parent = LOGGER
 
+DEFAULT_FORMATTER = logging.Formatter(
+    "[%(asctime)s] %(name)s %(module)s %(levelname)s: %(message)s"
+)
+
 
 class BeamlineFilter(logging.Filter):
-    beamline: Union[str, None] = environ.get("BEAMLINE")
+    beamline: Optional[str] = environ.get("BEAMLINE")
 
     def filter(self, record):
         record.beamline = self.beamline if self.beamline else "dev"
@@ -33,44 +37,22 @@ def set_beamline(beamline_name: str):
     beamline_filter.beamline = beamline_name
 
 
-def set_up_logging_handlers(
-    logging_level: Optional[str] = "INFO",
-    dev_mode: bool = False,
-    logging_path: Optional[Path] = None,
-) -> List[logging.Handler]:
-    """Set up the logging level and instances for user chosen level of logging.
+def _add_handler(handler: logging.Handler, logging_level: str):
+    handler.setFormatter(DEFAULT_FORMATTER)
+    handler.setLevel(logging_level)
+    LOGGER.addHandler(handler)
+
+
+def set_up_graylog_handler(logging_level: str, dev_mode: bool = False):
+    """Set up a graylog handler for the logger
     Args:
-        logging_level: The level of logs that should be saved to file/graylog. Defaults to INFO.
-        dev_mode: True if in dev mode, will not log to graylog in dev. Defaults to False.
-        logging_path: The location to store log files, if left as None then puts them in the default location.
+        logging_level: The level of logs that should be saved to graylog. Defaults to INFO.
+        dev_mode: True if in dev mode, will log to a local graylog instance in dev. Defaults to False.
     """
-    if not logging_path:
-        logging_path = _get_logging_file_path()
-        print(f"Logging to {logging_path}")
-
-    logging_level = logging_level if logging_level else "INFO"
-    file_path = Path(logging_path)
     graylog_host, graylog_port = _get_graylog_configuration(dev_mode)
-    formatter = logging.Formatter(
-        "[%(asctime)s] %(name)s %(module)s %(levelname)s: %(message)s"
-    )
-    handlers: list[logging.Handler] = [
-        GELFTCPHandler(graylog_host, graylog_port),
-        logging.StreamHandler(),
-        logging.FileHandler(filename=file_path),
-    ]
-    for handler in handlers:
-        handler.setFormatter(formatter)
-        handler.setLevel(logging_level)
-        LOGGER.addHandler(handler)
-
+    graylog_handler = GELFTCPHandler(graylog_host, graylog_port)
+    _add_handler(graylog_handler, logging_level)
     LOGGER.addFilter(beamline_filter)
-
-    # for assistance in debugging
-    if dev_mode:
-        set_seperate_ophyd_bluesky_files(
-            logging_level=logging_level, logging_path=logging_path.parent
-        )
 
     # Warn users if trying to run in prod in debug mode
     if not dev_mode and logging_level == "DEBUG":
@@ -79,8 +61,51 @@ def set_up_logging_handlers(
             " WITH MESSAGES. If you really need debug messages, set up a"
             " local graylog instead!\n"
         )
+    return graylog_handler
 
-    return handlers
+
+def set_up_file_handler(
+    logging_level: str, dev_mode: bool = False, logging_path: Optional[Path] = None
+):
+    """Set up a file handler for the logger
+    Args:
+        logging_level: The level of logs that should be saved to file/graylog. Defaults to INFO.
+        dev_mode: True if in dev mode, will log separate ophyd/bluesky files in dev. Defaults to False.
+        logging_path: The location to store log files, if left as None then puts them in the default location.
+    """
+    if not logging_path:
+        logging_path = _get_logging_file_path()
+        print(f"Logging to {logging_path}")
+    file_handler = logging.FileHandler(filename=logging_path)
+    _add_handler(file_handler, logging_level)
+
+    # for assistance in debugging
+    if dev_mode:
+        set_seperate_ophyd_bluesky_files(
+            logging_level=logging_level, logging_path=logging_path.parent
+        )
+
+    return file_handler
+
+
+def set_up_logging_handlers(
+    logging_level: Optional[str] = "INFO",
+    dev_mode: bool = False,
+    logging_path: Optional[Path] = None,
+) -> List[logging.Handler]:
+    """Set up the default logging environment.
+    Args:
+        logging_level: The level of logs that should be saved to file/graylog. Defaults to INFO.
+        dev_mode: True if in dev mode, will not log to graylog in dev. Defaults to False.
+        logging_path: The location to store log files, if left as None then puts them in the default location.
+    """
+    logging_level = logging_level if logging_level else "INFO"
+    stream_handler = logging.StreamHandler()
+    _add_handler(stream_handler, logging_level)
+    graylog_handler = set_up_graylog_handler(logging_level, dev_mode)
+    file_handler = set_up_file_handler(logging_level, dev_mode, logging_path)
+
+    return [stream_handler, graylog_handler, file_handler]
 
 
 def _get_logging_file_path() -> Path:
