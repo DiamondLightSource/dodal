@@ -44,6 +44,8 @@ If you are on a beamline workstation this will save any logs to ``dls_sw/BEAMLIN
 push them to graylog_. If you are not on a beamline workstation logs will be saved next to you working directory
 and pushed to a local graylog instance.
 
+If you would like to only log to graylog/file exlusively there are helper functions in ``dodal.log`` that you can use. 
+
 
 .. _ophyd: https://nsls-ii.github.io/ophyd/
 .. _bluesky: https://blueskyproject.io/bluesky/
