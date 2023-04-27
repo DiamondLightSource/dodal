@@ -20,6 +20,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/artemis598_params_changes/"
   },
   {
+    "version": "artemis_191_fix-image-metadata",
+    "url": "https://DiamondLightSource.github.io/dodal/artemis_191_fix-image-metadata/"
+  },
+  {
     "version": "artemis_348_replace_point_3d_to_support_arithmetic",
     "url": "https://DiamondLightSource.github.io/dodal/artemis_348_replace_point_3d_to_support_arithmetic/"
   },
