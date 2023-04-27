@@ -28,7 +28,7 @@ class GridAxis:
     full_steps: int
 
     def steps_to_motor_position(self, steps):
-        return self.start + (steps * self.step_size)
+        return self.start + self.step_size * (steps - 1)
 
     @property
     def end(self):
