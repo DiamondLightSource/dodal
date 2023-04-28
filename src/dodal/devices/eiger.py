@@ -27,7 +27,7 @@ class EigerTriggerNumber(str, Enum):
 class EigerDetector(Device):
     class ArmingSignal(Signal):
         def set(self, value, *, timeout=None, settle_time=None, **kwargs):
-            return self.parent.temp_stage()
+            return self.parent.stage()
 
     cam: EigerDetectorCam = Component(EigerDetectorCam, "CAM:")
     odin: EigerOdin = Component(EigerOdin, "")
@@ -74,7 +74,7 @@ class EigerDetector(Device):
         if errors:
             raise Exception("\n".join(errors))
 
-    def temp_stage(self):
+    def stage(self):
         self.odin.nodes.clear_odin_errors()
         status_ok, error_message = self.odin.check_odin_initialised()
         if not status_ok:
