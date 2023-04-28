@@ -32,6 +32,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/artemis_191_fix-image-metadata/"
   },
   {
+    "version": "artemis_262_move_arming_out_of_stage",
+    "url": "https://DiamondLightSource.github.io/dodal/artemis_262_move_arming_out_of_stage/"
+  },
+  {
     "version": "artemis_348_replace_point_3d_to_support_arithmetic",
     "url": "https://DiamondLightSource.github.io/dodal/artemis_348_replace_point_3d_to_support_arithmetic/"
   },
