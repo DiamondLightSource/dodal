@@ -117,6 +117,11 @@ class EigerDetector(Device):
 
         status.wait(10)
 
+        def do_next_step():
+            ...
+
+        status.finished_cb = do_next_step
+
         if not status.success:
             self.log.error("Failed to switch to ROI mode")
 
