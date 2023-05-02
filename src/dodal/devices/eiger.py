@@ -205,6 +205,7 @@ class EigerDetector(Device):
     def wait_for_stale_parameters(self, statuses):
         # await_value(self.stale_params, 0).wait(self.STALE_PARAMS_TIMEOUT)
         statuses[0] = await_value(self.stale_params, 0)
+        self.forward_bit_depth_to_filewriter()
         statuses[0].add_callback(
             partial(self.wait_for_odin_status, statuses)
         )  # need to keep the timeouts?
@@ -220,6 +221,7 @@ class EigerDetector(Device):
         statuses[2].add_callback(partial(self.await_value, statuses))
 
     def await_value(self, statuses):
+        self.filewriters_finished = self.odin.create_finished_status()
         statuses[3] = await_value(self.odin.fan.ready, 1)
 
     def forward_bit_depth_to_filewriter(self):
@@ -231,10 +233,6 @@ class EigerDetector(Device):
 
         LOGGER.info("Waiting on stale parameters to go low")
         self.wait_for_stale_parameters(statuses)  # Starts the chain of arming functions
-
-        self.forward_bit_depth_to_filewriter()
-
-        self.filewriters_finished = self.odin.create_finished_status()
 
         return statuses[0] & statuses[1] & statuses[2] & statuses[3]
 
