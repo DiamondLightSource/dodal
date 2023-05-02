@@ -98,7 +98,7 @@ class GridScanParams(DataClassJsonMixin, AbstractExperimentParameterBase):
         return first_grid_in_limits and second_grid_in_limits
 
     def get_num_images(self):
-        return self.x_steps * self.y_steps + self.y_steps * self.z_steps
+        return self.x_steps * self.y_steps + self.x_steps * self.z_steps
 
     @property
     def is_3d_grid_scan(self):
