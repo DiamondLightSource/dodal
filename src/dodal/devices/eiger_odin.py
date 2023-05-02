@@ -25,6 +25,7 @@ class OdinMetaListener(Device):
     ready: EpicsSignalRO = Component(EpicsSignalRO, "Writing_RBV")
     # file_name should not be set. Set the filewriter file_name and this will be updated in EPICS
     file_name: EpicsSignalRO = Component(EpicsSignalRO, "FileName", string=True)
+    stop_writing: EpicsSignal = Component(EpicsSignal, "Stop")
 
 
 class OdinFileWriter(HDF5Plugin_V22):

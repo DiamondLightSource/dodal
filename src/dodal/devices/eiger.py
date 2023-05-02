@@ -88,8 +88,14 @@ class EigerDetector(Device):
         self.arm_detector()
 
     def unstage(self) -> bool:
+        LOGGER.info("Stopping filewriter")
+        status = self.odin.file_writer.capture.set(0)
+        status &= self.odin.meta.stop_writing.set(1)
+        status.wait(1)
         self.odin.file_writer.start_timeout.put(1)
+        LOGGER.info("Waiting on filewriter to finish")
         self.filewriters_finished.wait(30)
+        LOGGER.info("Disarming detector")
         self.disarm_detector()
         status_ok = self.odin.check_odin_state()
         self.disable_roi_mode()
@@ -183,11 +189,9 @@ class EigerDetector(Device):
         """
         assert self.detector_params is not None
         status = self.cam.num_images.set(self.detector_params.num_images_per_trigger)
-        status &= self.cam.num_triggers.set(self.detector_params.num_triggers)
-        status &= self.odin.file_writer.num_capture.set(
-            self.detector_params.num_triggers
-            * self.detector_params.num_images_per_trigger
-        )
+        fake_triggers = 10000
+        status &= self.cam.num_triggers.set(fake_triggers)
+        status &= self.odin.file_writer.num_capture.set(0)
         return status
 
     def wait_for_stale_parameters(self):
