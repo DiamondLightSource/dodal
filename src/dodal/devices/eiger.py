@@ -27,7 +27,7 @@ class EigerTriggerNumber(str, Enum):
 class EigerDetector(Device):
     class ArmingSignal(Signal):
         def set(self, value, *, timeout=None, settle_time=None, **kwargs):
-            return self.parent.stage()
+            return self.parent.async_stage()
 
     do_arm: ArmingSignal = Component(ArmingSignal)
     cam: EigerDetectorCam = Component(EigerDetectorCam, "CAM:")
