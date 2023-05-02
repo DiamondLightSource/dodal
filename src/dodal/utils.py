@@ -7,7 +7,17 @@ from importlib import import_module
 from inspect import signature
 from os import environ
 from types import ModuleType
-from typing import Any, Callable, Dict, Iterable, Optional, Type, TypeVar, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    Mapping,
+    Optional,
+    Type,
+    TypeVar,
+    Union,
+)
 
 from bluesky.protocols import (
     Checkable,
@@ -92,6 +102,9 @@ def make_all_devices(
 ) -> Dict[str, Any]:
     """Makes all devices in the given beamline module.
 
+    In cases of device interdependencies it ensures a device is created before any which
+    depend on it.
+
     Args:
         module (Union[str, ModuleType, None], optional): The module to make devices from.
         **kwargs: Arguments passed on to every device.
@@ -102,16 +115,45 @@ def make_all_devices(
     if isinstance(module, str) or module is None:
         module = import_module(module or __name__)
     factories = collect_factories(module)
-    return {
-        device.name: device
-        for device in map(lambda factory: factory(**kwargs), factories)
+    return invoke_factories(factories)
+
+
+def invoke_factories(
+    factories: Mapping[str, Callable[..., Any]],
+    **kwargs,
+) -> Dict[str, Any]:
+    devices: Dict[str, Any] = {}
+    dependencies = {
+        name: set(extract_dependencies(factories, name)) for name in factories.keys()
     }
+    while len(devices) < len(factories):
+        leaves = [
+            device
+            for device, device_dependencies in dependencies.items()
+            if device not in devices.keys()
+            and len(device_dependencies - set(devices.keys())) == 0
+        ]
+        dependent_name = leaves.pop()
+        params = {name: devices[name] for name in dependencies[dependent_name]}
+        devices[dependent_name] = factories[dependent_name](**params, **kwargs)
+
+    return devices
 
 
-def collect_factories(module: ModuleType) -> Iterable[Callable[..., Any]]:
+def extract_dependencies(
+    factories: Mapping[str, Callable[..., Any]], device_name: str
+) -> Iterable[str]:
+    for name, param in inspect.signature(factories[device_name]).parameters.items():
+        if param.default is inspect.Parameter.empty and name in factories:
+            yield name
+
+
+def collect_factories(module: ModuleType) -> Mapping[str, Callable[..., Any]]:
+    factories = {}
     for var in module.__dict__.values():
         if callable(var) and _is_device_factory(var) and not _is_device_skipped(var):
-            yield var
+            factories[var.__name__] = var
+    return factories
 
 
 def _is_device_skipped(func: Callable[..., Any]) -> bool:
