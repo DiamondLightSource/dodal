@@ -29,6 +29,7 @@ class EigerDetector(Device):
         def set(self, value, *, timeout=None, settle_time=None, **kwargs):
             return self.parent.stage()
 
+    do_arm: ArmingSignal = Component(ArmingSignal)
     cam: EigerDetectorCam = Component(EigerDetectorCam, "CAM:")
     odin: EigerOdin = Component(EigerOdin, "")
 
@@ -74,7 +75,7 @@ class EigerDetector(Device):
         if errors:
             raise Exception("\n".join(errors))
 
-    def stage(self):
+    def async_stage(self):
         self.odin.nodes.clear_odin_errors()
         status_ok, error_message = self.odin.check_odin_initialised()
         if not status_ok:
@@ -204,43 +205,38 @@ class EigerDetector(Device):
     def wait_for_stale_parameters(self, statuses):
         # await_value(self.stale_params, 0).wait(self.STALE_PARAMS_TIMEOUT)
         statuses[0] = await_value(self.stale_params, 0)
+        statuses[0].add_callback(
+            partial(self.wait_for_odin_status, statuses)
+        )  # need to keep the timeouts?
 
     def wait_for_odin_status(self, statuses):
         statuses[1] = self.odin.file_writer.capture.set(1)
         statuses[1] &= await_value(self.odin.meta.ready, 1)
+        statuses[1].add_callback(partial(self.wait_for_cam_acquire, statuses))
 
     def wait_for_cam_acquire(self, statuses):
         LOGGER.info("Setting aquire")
         statuses[2] = self.cam.acquire.set(1)
+        statuses[2].add_callback(partial(self.await_value, statuses))
 
     def await_value(self, statuses):
-        statuses[3] = await_value(self.odin.fan.ready, 1)  # timeout 10?
-        pass
+        statuses[3] = await_value(self.odin.fan.ready, 1)
 
     def forward_bit_depth_to_filewriter(self):
         bit_depth = self.bit_depth.get()
         self.odin.file_writer.data_type.put(f"UInt{bit_depth}")
 
     def arm_detector(self) -> Status:
-        statuses = [Status(1), Status(2), Status(3), Status(4)]
+        statuses: Status = [None] * 4
 
         LOGGER.info("Waiting on stale parameters to go low")
-        self.wait_for_stale_parameters(statuses)
+        self.wait_for_stale_parameters(statuses)  # Starts the chain of arming functions
 
         self.forward_bit_depth_to_filewriter()
 
-        statuses[0].add_callback(
-            partial(self.wait_for_odin_status, statuses)
-        )  # need to keep the timeouts?
-        statuses[1].add_callback(partial(self.wait_for_cam_acquire, statuses))
-
         self.filewriters_finished = self.odin.create_finished_status()
 
-        statuses[2].add_callback(partial(self.await_value, statuses))
-
-        # need to add timeouts here too
-
-        return statuses[0] & statuses[1] & statuses[2]
+        return statuses[0] & statuses[1] & statuses[2] & statuses[3]
 
     def disarm_detector(self):
         self.cam.acquire.put(0)
