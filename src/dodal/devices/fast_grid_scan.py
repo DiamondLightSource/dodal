@@ -1,10 +1,11 @@
 import threading
 import time
 from dataclasses import dataclass
-from numpy import ndarray
 
+import numpy as np
 from bluesky.plan_stubs import mv
 from dataclasses_json import DataClassJsonMixin
+from numpy import ndarray
 from ophyd import (
     Component,
     Device,
@@ -19,7 +20,6 @@ from dodal.devices.eiger import EigerTriggerNumber
 from dodal.devices.motors import XYZLimitBundle
 from dodal.devices.status import await_value
 from dodal.parameters.experiment_parameter_base import AbstractExperimentParameterBase
-from dodal.utils import create_point
 
 
 @dataclass
@@ -116,10 +116,12 @@ class GridScanParams(DataClassJsonMixin, AbstractExperimentParameterBase):
             if not axis.is_within(position):
                 raise IndexError(f"{grid_position} is outside the bounds of the grid")
 
-        return create_point(
-            self.x_axis.steps_to_motor_position(grid_position[0]),
-            self.y_axis.steps_to_motor_position(grid_position[1]),
-            self.z_axis.steps_to_motor_position(grid_position[2]),
+        return np.array(
+            [
+                self.x_axis.steps_to_motor_position(grid_position[0]),
+                self.y_axis.steps_to_motor_position(grid_position[1]),
+                self.z_axis.steps_to_motor_position(grid_position[2]),
+            ]
         )
 
 

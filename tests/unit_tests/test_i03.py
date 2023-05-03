@@ -7,7 +7,7 @@ from dodal import i03
 from dodal.devices.aperturescatterguard import ApertureScatterguard
 from dodal.devices.smargon import Smargon
 from dodal.devices.zebra import Zebra
-from dodal.utils import create_point, make_all_devices
+from dodal.utils import make_all_devices
 
 
 def test_instantiate_function_makes_supplied_device():
@@ -79,21 +79,3 @@ def test_device_is_new_after_clearing():
     i03.clear_devices()
     ids_3 = [_make_devices_and_get_id()]
     assert ids_1 != ids_3
-
-
-def test_create_point_on_invalid_number_of_args():
-    with pytest.raises(TypeError):
-        create_point(1)
-    with pytest.raises(TypeError):
-        create_point()
-    with pytest.raises(TypeError):
-        create_point(7, 45, 23, 2, 1, 4)
-
-
-def test_create_point_creates_zero_array_given_none_type_args():
-    np.testing.assert_equal(np.array([0, 0, 5]), create_point(None, None, 5))
-
-
-def test_create_point_returns_correct_array_size():
-    assert create_point(5, 2).shape == (2,)
-    assert create_point(5, 2, 4).shape == (3,)

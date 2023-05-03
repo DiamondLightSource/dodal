@@ -1,8 +1,8 @@
-from dodal.utils import create_point
 import numpy as np
 
+
 def bottom_right_from_top_left(
-    top_left: create_point,
+    top_left: np.ndarray,
     steps_x: int,
     steps_y: int,
     step_size_x: float,
@@ -10,9 +10,11 @@ def bottom_right_from_top_left(
     pix_per_um_x: float,
     pix_per_um_y: float,
 ) -> np.ndarray:
-    return create_point(
-        # step size is given in mm, pix in um
-        int(steps_x * step_size_x * 1000 * pix_per_um_x + top_left[0]),
-        int(steps_y * step_size_y * 1000 * pix_per_um_y + top_left[1]),
-        dtype = np.dtype(int)
+    return np.array(
+        [
+            # step size is given in mm, pix in um
+            int(steps_x * step_size_x * 1000 * pix_per_um_x + top_left[0]),
+            int(steps_y * step_size_y * 1000 * pix_per_um_y + top_left[1]),
+        ],
+        dtype=np.dtype(int),
     )
