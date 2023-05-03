@@ -8,7 +8,6 @@ from os import environ
 from types import ModuleType
 from typing import Any, Callable, Dict, Iterable, Optional, Type, Union
 
-import numpy as np
 from bluesky.protocols import (
     Checkable,
     Configurable,
