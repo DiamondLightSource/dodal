@@ -1,4 +1,3 @@
-import numpy as np
 import pytest
 from ophyd import Device
 from ophyd.sim import FakeEpicsSignal
