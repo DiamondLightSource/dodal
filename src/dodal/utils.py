@@ -16,6 +16,9 @@ from typing import (
     Optional,
     Type,
     TypeVar,
+    Protocol,
+    Set,
+    Type,
     Union,
 )
 
@@ -99,7 +102,7 @@ def skip_device(precondition=lambda: True):
 
 def make_all_devices(
     module: Union[str, ModuleType, None] = None, **kwargs
-) -> Dict[str, Any]:
+) -> Dict[str, HasName]:
     """Makes all devices in the given beamline module.
 
     In cases of device interdependencies it ensures a device is created before any which
@@ -121,10 +124,11 @@ def make_all_devices(
 def invoke_factories(
     factories: Mapping[str, Callable[..., Any]],
     **kwargs,
-) -> Dict[str, Any]:
+) -> Dict[str, HasName]:
     devices: Dict[str, Any] = {}
     dependencies = {
-        name: set(extract_dependencies(factories, name)) for name in factories.keys()
+        factory_name: set(extract_dependencies(factories, factory_name))
+        for factory_name in factories.keys()
     }
     while len(devices) < len(factories):
         leaves = [
@@ -137,13 +141,15 @@ def invoke_factories(
         params = {name: devices[name] for name in dependencies[dependent_name]}
         devices[dependent_name] = factories[dependent_name](**params, **kwargs)
 
-    return devices
+    all_devices = {device.name: device for device in devices.values()}
+
+    return all_devices
 
 
 def extract_dependencies(
-    factories: Mapping[str, Callable[..., Any]], device_name: str
+    factories: Mapping[str, Callable[..., Any]], factory_name: str
 ) -> Iterable[str]:
-    for name, param in inspect.signature(factories[device_name]).parameters.items():
+    for name, param in inspect.signature(factories[factory_name]).parameters.items():
         if param.default is inspect.Parameter.empty and name in factories:
             yield name
 
