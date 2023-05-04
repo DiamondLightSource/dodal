@@ -25,28 +25,30 @@ TEST_NUM_TRIGGERS = 2000
 TEST_USE_ROI_MODE = False
 TEST_DET_DIST_TO_BEAM_CONVERTER_PATH = "tests/devices/unit_tests/test_lookup_table.txt"
 
-TEST_DETECTOR_PARAMS = DetectorParams(
-    TEST_CURRENT_ENERGY,
-    TEST_EXPOSURE_TIME,
-    TEST_DIR,
-    TEST_PREFIX,
-    TEST_RUN_NUMBER,
-    TEST_DETECTOR_DISTANCE,
-    TEST_OMEGA_START,
-    TEST_OMEGA_INCREMENT,
-    TEST_NUM_IMAGES_PER_TRIGGER,
-    TEST_NUM_TRIGGERS,
-    TEST_USE_ROI_MODE,
-    TEST_DET_DIST_TO_BEAM_CONVERTER_PATH,
-    detector_size_constants=TEST_DETECTOR_SIZE_CONSTANTS,
-)
+
+def create_new_params() -> DetectorParams:
+    return DetectorParams(
+        TEST_CURRENT_ENERGY,
+        TEST_EXPOSURE_TIME,
+        TEST_DIR,
+        TEST_PREFIX,
+        TEST_RUN_NUMBER,
+        TEST_DETECTOR_DISTANCE,
+        TEST_OMEGA_START,
+        TEST_OMEGA_INCREMENT,
+        TEST_NUM_IMAGES_PER_TRIGGER,
+        TEST_NUM_TRIGGERS,
+        TEST_USE_ROI_MODE,
+        TEST_DET_DIST_TO_BEAM_CONVERTER_PATH,
+        detector_size_constants=TEST_DETECTOR_SIZE_CONSTANTS,
+    )
 
 
 @pytest.fixture
 def fake_eiger():
     FakeEigerDetector: EigerDetector = make_fake_device(EigerDetector)
     fake_eiger: EigerDetector = FakeEigerDetector.with_params(
-        params=TEST_DETECTOR_PARAMS, name="test"
+        params=create_new_params(), name="test"
     )
     return fake_eiger
 
