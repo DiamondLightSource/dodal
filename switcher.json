@@ -56,6 +56,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/artemis_569_dodal_logs/"
   },
   {
+    "version": "blueapi_import",
+    "url": "https://DiamondLightSource.github.io/dodal/blueapi_import/"
+  },
+  {
     "version": "p45AndAdsim",
     "url": "https://DiamondLightSource.github.io/dodal/p45AndAdsim/"
   }
