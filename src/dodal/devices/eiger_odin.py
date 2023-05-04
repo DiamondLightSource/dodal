@@ -9,7 +9,7 @@ from ophyd import (
     Signal,
 )
 from ophyd.areadetector.plugins import HDF5Plugin_V22
-from ophyd.status import SubscriptionStatus
+from ophyd.status import Status, SubscriptionStatus
 
 from dodal.devices.status import await_value
 
@@ -63,24 +63,9 @@ class OdinNodesStatus(Device):
     node_2: OdinNode = Component(OdinNode, "OD3:")
     node_3: OdinNode = Component(OdinNode, "OD4:")
 
-    total_frames_written: Signal = Component(Signal)
-
     @property
     def nodes(self) -> List[OdinNode]:
         return [self.node_0, self.node_1, self.node_2, self.node_3]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        def set_total_frames(*_, **__):
-            total = 0
-            for node in self.nodes:
-                total += node.num_captured.get()
-            self.total_frames_written.put(total)
-
-        for node in self.nodes:
-            node.num_captured.subscribe(set_total_frames)
-
 
     def check_node_frames_from_attr(
         self, node_get_func, error_message_verb: str
@@ -174,3 +159,9 @@ class EigerOdin(Device):
         errors = [message for check_result, message in to_check if check_result]
 
         return not errors, "\n".join(errors)
+
+    def stop(self) -> Status:
+        """Stop odin manually"""
+        status = self.odin.file_writer.capture.set(0)
+        status &= self.odin.meta.stop_writing.set(1)
+        return status
