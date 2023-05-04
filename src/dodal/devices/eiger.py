@@ -88,10 +88,13 @@ class EigerDetector(Device):
         self.arm_detector()
 
     def unstage(self) -> bool:
+        LOGGER.info("Waiting on frames")
+        await_value(self.odin.nodes.total_frames_written, self.detector_params.num_triggers).wait(30)
+        LOGGER.info(f"Got: {self.odin.nodes.total_frames_written} expected: {self.detector_params.num_triggers}")
         LOGGER.info("Stopping filewriter")
         status = self.odin.file_writer.capture.set(0)
         status &= self.odin.meta.stop_writing.set(1)
-        status.wait(1)
+        status.wait(5)
         self.odin.file_writer.start_timeout.put(1)
         LOGGER.info("Waiting on filewriter to finish")
         self.filewriters_finished.wait(30)

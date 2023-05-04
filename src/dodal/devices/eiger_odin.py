@@ -1,6 +1,13 @@
 from typing import List, Tuple
 
-from ophyd import Component, Device, EpicsSignal, EpicsSignalRO, EpicsSignalWithRBV
+from ophyd import (
+    Component,
+    Device,
+    EpicsSignal,
+    EpicsSignalRO,
+    EpicsSignalWithRBV,
+    Signal,
+)
 from ophyd.areadetector.plugins import HDF5Plugin_V22
 from ophyd.status import SubscriptionStatus
 
@@ -44,6 +51,7 @@ class OdinNode(Device):
     fp_initialised: EpicsSignalRO = Component(EpicsSignalRO, "FPProcessConnected_RBV")
     fr_initialised: EpicsSignalRO = Component(EpicsSignalRO, "FRProcessConnected_RBV")
     clear_errors: EpicsSignal = Component(EpicsSignal, "FPClearErrors")
+    num_captured: EpicsSignalRO = Component(EpicsSignalRO, "NumCaptured_RBV")
     error_message: EpicsSignalRO = Component(
         EpicsSignalRO, "FPErrorMessage_RBV", string=True
     )
@@ -55,9 +63,24 @@ class OdinNodesStatus(Device):
     node_2: OdinNode = Component(OdinNode, "OD3:")
     node_3: OdinNode = Component(OdinNode, "OD4:")
 
+    total_frames_written: Signal = Component(Signal)
+
     @property
     def nodes(self) -> List[OdinNode]:
         return [self.node_0, self.node_1, self.node_2, self.node_3]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        def set_total_frames(*_, **__):
+            total = 0
+            for node in self.nodes:
+                total += node.num_captured.get()
+            self.total_frames_written.put(total)
+
+        for node in self.nodes:
+            node.num_captured.subscribe(set_total_frames)
+
 
     def check_node_frames_from_attr(
         self, node_get_func, error_message_verb: str
