@@ -162,6 +162,6 @@ class EigerOdin(Device):
 
     def stop(self) -> Status:
         """Stop odin manually"""
-        status = self.odin.file_writer.capture.set(0)
-        status &= self.odin.meta.stop_writing.set(1)
+        status = self.file_writer.capture.set(0)
+        status &= self.meta.stop_writing.set(1)
         return status
