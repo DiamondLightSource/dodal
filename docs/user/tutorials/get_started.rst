@@ -41,7 +41,7 @@ instead using ``set_up_logging_handlers("DEBUG")``. You can also log more explic
 
 
 If you are on a beamline workstation this will save any logs to ``dls_sw/BEAMLINE/logs/bluesky/`` and will
-push them to graylog_. If you are not on a beamline workstation logs will be saved next to you working directory
+push them to graylog_. If you are not on a beamline workstation logs will be saved next to your working directory
 and pushed to a local graylog instance.
 
 If you would like to only log to graylog/file exlusively there are helper functions in ``dodal.log`` that you can use. 
