@@ -115,7 +115,7 @@ def make_all_devices(
     if isinstance(module, str) or module is None:
         module = import_module(module or __name__)
     factories = collect_factories(module)
-    return invoke_factories(factories)
+    return invoke_factories(factories, **kwargs)
 
 
 def invoke_factories(
