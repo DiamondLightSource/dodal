@@ -1,13 +1,6 @@
 from typing import List, Tuple
 
-from ophyd import (
-    Component,
-    Device,
-    EpicsSignal,
-    EpicsSignalRO,
-    EpicsSignalWithRBV,
-    Signal,
-)
+from ophyd import Component, Device, EpicsSignal, EpicsSignalRO, EpicsSignalWithRBV
 from ophyd.areadetector.plugins import HDF5Plugin_V22
 from ophyd.status import Status, SubscriptionStatus
 
