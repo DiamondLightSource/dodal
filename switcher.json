@@ -4,12 +4,12 @@
     "url": "https://DiamondLightSource.github.io/dodal/main/"
   },
   {
-    "version": "0.0.2",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.2/"
-  },
-  {
     "version": "0.0.1",
     "url": "https://DiamondLightSource.github.io/dodal/0.0.1/"
+  },
+  {
+    "version": "0.0.2",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.2/"
   },
   {
     "version": "0.0.2_hotfixes",
@@ -54,10 +54,6 @@
   {
     "version": "artemis_348_replace_point_3d_to_support_arithmetic",
     "url": "https://DiamondLightSource.github.io/dodal/artemis_348_replace_point_3d_to_support_arithmetic/"
-  },
-  {
-    "version": "artemis_569_dodal_logs",
-    "url": "https://DiamondLightSource.github.io/dodal/artemis_569_dodal_logs/"
   },
   {
     "version": "blueapi_import",
