@@ -122,7 +122,7 @@ def invoke_factories(
     factories: Mapping[str, Callable[..., Any]],
     **kwargs,
 ) -> Dict[str, HasName]:
-    devices: Dict[str, Any] = {}
+    devices: Dict[str, HasName] = {}
     dependencies = {
         factory_name: set(extract_dependencies(factories, factory_name))
         for factory_name in factories.keys()
