@@ -12,6 +12,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/0.0.1/"
   },
   {
+    "version": "0.0.2_async_arming",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.2_async_arming/"
+  },
+  {
     "version": "0.0.2_hotfixes",
     "url": "https://DiamondLightSource.github.io/dodal/0.0.2_hotfixes/"
   },
@@ -34,10 +38,6 @@
   {
     "version": "artemis598_params_changes",
     "url": "https://DiamondLightSource.github.io/dodal/artemis598_params_changes/"
-  },
-  {
-    "version": "artemis630_zocalo_issues",
-    "url": "https://DiamondLightSource.github.io/dodal/artemis630_zocalo_issues/"
   },
   {
     "version": "artemis_191_fix-image-metadata",
