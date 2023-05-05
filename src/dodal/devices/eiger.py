@@ -39,6 +39,7 @@ class EigerDetector(Device):
     STALE_PARAMS_TIMEOUT = 60
 
     filewriters_finished: SubscriptionStatus
+    arming_status: Status
 
     detector_params: Optional[DetectorParams] = None
 
@@ -202,39 +203,47 @@ class EigerDetector(Device):
         )
         return status
 
-    def wait_for_stale_parameters(self, statuses):
+    def wait_for_stale_parameters(self):
         # await_value(self.stale_params, 0).wait(self.STALE_PARAMS_TIMEOUT)
-        statuses[0] = await_value(self.stale_params, 0)
-        self.forward_bit_depth_to_filewriter()
-        statuses[0].add_callback(
-            partial(self.wait_for_odin_status, statuses)
+        this_status = await_value(self.stale_params, 0)
+        this_status.add_callback(
+            self.wait_for_odin_status
         )  # need to keep the timeouts?
+        return this_status
 
-    def wait_for_odin_status(self, statuses):
-        statuses[1] = self.odin.file_writer.capture.set(1)
-        statuses[1] &= await_value(self.odin.meta.ready, 1)
-        statuses[1].add_callback(partial(self.wait_for_cam_acquire, statuses))
+    def wait_for_odin_status(self):
+        self.forward_bit_depth_to_filewriter()
+        this_status = self.odin.file_writer.capture.set(1)
+        this_status &= await_value(self.odin.meta.ready, 1)
+        this_status.add_callback(self.wait_for_cam_acquire)
 
-    def wait_for_cam_acquire(self, statuses):
+    def wait_for_cam_acquire(self):
         LOGGER.info("Setting aquire")
-        statuses[2] = self.cam.acquire.set(1)
-        statuses[2].add_callback(partial(self.await_value, statuses))
+        this_status = self.cam.acquire.set(1)
+        this_status.add_callback(self.wait_fan_ready)
 
-    def await_value(self, statuses):
+    def wait_fan_ready(self):
+        LOGGER.info("Wait on fan ready")
         self.filewriters_finished = self.odin.create_finished_status()
-        statuses[3] = await_value(self.odin.fan.ready, 1)
+        this_status = await_value(self.odin.fan.ready, 1)
+        this_status.add_callback(self.finish_arm)
+
+    def finish_arm(self):
+        LOGGER.info("Finishing arm")
+        self.arming_status.set_finished()
 
     def forward_bit_depth_to_filewriter(self):
         bit_depth = self.bit_depth.get()
         self.odin.file_writer.data_type.put(f"UInt{bit_depth}")
 
     def arm_detector(self) -> Status:
-        statuses: Status = [None] * 4
+        self.arming_status = Status()
+        #statuses: Status = [Status(1), Status(2), Status(3), Status(4)]
 
         LOGGER.info("Waiting on stale parameters to go low")
-        self.wait_for_stale_parameters(statuses)  # Starts the chain of arming functions
+        self.wait_for_stale_parameters()  # Starts the chain of arming functions
 
-        return statuses[0] & statuses[1] & statuses[2] & statuses[3]
+        return self.arming_status
 
     def disarm_detector(self):
         self.cam.acquire.put(0)
