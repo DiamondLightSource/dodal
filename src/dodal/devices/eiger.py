@@ -32,6 +32,8 @@ class EigerDetector(Device):
     cam: EigerDetectorCam = Component(EigerDetectorCam, "CAM:")
     odin: EigerOdin = Component(EigerOdin, "")
 
+    armed: bool = False
+
     stale_params: EpicsSignalRO = Component(EpicsSignalRO, "CAM:StaleParameters_RBV")
     bit_depth: EpicsSignalRO = Component(EpicsSignalRO, "CAM:BitDepthImage_RBV")
 
@@ -97,7 +99,8 @@ class EigerDetector(Device):
     def unstage(self) -> bool:
         self.odin.file_writer.start_timeout.put(1)
         self.filewriters_finished.wait(30)
-        self.disarm_detector()
+        if not self.armed:
+            self.disarm_detector()
         status_ok = self.odin.check_odin_state()
         self.disable_roi_mode()
         return status_ok
@@ -124,12 +127,7 @@ class EigerDetector(Device):
 
         status.wait(10)
 
-        def do_next_step():
-            ...
-
-        status.finished_cb = do_next_step
-
-        if not status.success:
+        if not status.wait(10) is None:
             self.log.error("Failed to switch to ROI mode")
 
     def set_cam_pvs(self) -> AndStatus:
@@ -203,32 +201,31 @@ class EigerDetector(Device):
         return status
 
     def wait_for_stale_parameters(self):
-        # await_value(self.stale_params, 0).wait(self.STALE_PARAMS_TIMEOUT)
         this_status = await_value(self.stale_params, 0)
-        this_status.add_callback(
-            self.wait_for_odin_status
-        )  # need to keep the timeouts?
+        this_status.add_callback(self.wait_for_odin_status)
+
         return this_status
 
-    def wait_for_odin_status(self):
+    def wait_for_odin_status(self, old_status):
         self.forward_bit_depth_to_filewriter()
         this_status = self.odin.file_writer.capture.set(1)
         this_status &= await_value(self.odin.meta.ready, 1)
         this_status.add_callback(self.wait_for_cam_acquire)
 
-    def wait_for_cam_acquire(self):
+    def wait_for_cam_acquire(self, old_status):
         LOGGER.info("Setting aquire")
         this_status = self.cam.acquire.set(1)
         this_status.add_callback(self.wait_fan_ready)
 
-    def wait_fan_ready(self):
+    def wait_fan_ready(self, old_status):
         LOGGER.info("Wait on fan ready")
         self.filewriters_finished = self.odin.create_finished_status()
         this_status = await_value(self.odin.fan.ready, 1)
         this_status.add_callback(self.finish_arm)
 
-    def finish_arm(self):
+    def finish_arm(self, old_status):
         LOGGER.info("Finishing arm")
+        self.armed = True
         self.arming_status.set_finished()
 
     def forward_bit_depth_to_filewriter(self):
@@ -245,3 +242,4 @@ class EigerDetector(Device):
 
     def disarm_detector(self):
         self.cam.acquire.put(0)
+        self.armed = False

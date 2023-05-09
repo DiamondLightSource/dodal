@@ -1,5 +1,4 @@
 import threading
-from time import sleep
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -63,7 +62,9 @@ def mock_set_odin_filewriter(fake_eiger: EigerDetector):
     def do_set(val: str):
         fake_eiger.odin.meta.file_name.sim_put(val)
         fake_eiger.odin.file_writer.id.sim_put(val)
-        return Status(done=True, success=True)
+        stat = Status()
+        stat.set_finished()
+        return stat
 
     return do_set
 
@@ -342,7 +343,7 @@ def test_when_stage_called_then_finish_arm_on_fan_ready(
         side_effect=mock_set_odin_filewriter
     )
 
-    # this function needs to be skipped
+    # Mock this function so arming actually finishes
     fake_eiger.odin.create_finished_status = MagicMock()
 
     fake_eiger.odin.fan.ready.sim_put(1)
@@ -351,5 +352,4 @@ def test_when_stage_called_then_finish_arm_on_fan_ready(
     fake_eiger.async_stage()
     fake_eiger.odin.meta.ready.sim_put(1)
 
-    sleep(0.01)  # find better way to do this?
-    assert fake_eiger.arming_status.done
+    fake_eiger.arming_status.wait(1)
