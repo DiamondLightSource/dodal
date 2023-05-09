@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Architectural Decision Records &#8212; dodal 0.0.3.dev13+gf20e3c2 documentation</title>
+    <title>Getting Started &#8212; dodal 0.0.3.dev13+gf20e3c2 documentation</title>
   
   
   
@@ -44,7 +44,7 @@
     <script src="../../_static/clipboard.min.js"></script>
     <script src="../../_static/copybutton.js"></script>
     <script src="../../_static/design-tabs.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'developer/explanations/decisions';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'user/tutorials/get_started';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://DiamondLightSource.github.io/dodal/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'I23-Grid-Scans';
@@ -52,8 +52,8 @@
     <link rel="icon" href="../../_static/dls-favicon.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="1. Record architecture decisions" href="decisions/0001-record-architecture-decisions.html" />
-    <link rel="prev" title="Make a release" href="../how-to/make-release.html" />
+    <link rel="next" title="Run in a container" href="../how-to/run-container.html" />
+    <link rel="prev" title="Installation" href="installation.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -143,15 +143,15 @@
   </p>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../user/index.html">
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
                         User Guide
                       </a>
                     </li>
                 
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="../index.html">
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../developer/index.html">
                         Developer Guide
                       </a>
                     </li>
@@ -283,15 +283,15 @@ document.write(`
   </p>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../user/index.html">
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
                         User Guide
                       </a>
                     </li>
                 
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="../index.html">
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../developer/index.html">
                         Developer Guide
                       </a>
                     </li>
@@ -375,30 +375,22 @@ document.write(`
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/dev-install.html">Developer install</a></li>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Getting Started</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">How-to Guides</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../how-to/contribute.html">Contributing to the project</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../how-to/move-code.html">Moving code from another repo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../how-to/build-docs.html">Build the docs using sphinx</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../how-to/run-tests.html">Run the tests using pytest</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../how-to/static-analysis.html">Run static analysis using mypy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../how-to/lint.html">Run linting using pre-commit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../how-to/update-tools.html">Update the tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../how-to/make-release.html">Make a release</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../how-to/run-container.html">Run in a container</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Explanations</span></p>
-<ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">Architectural Decision Records</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="decisions/0001-record-architecture-decisions.html">1. Record architecture decisions</a></li>
-</ul>
-</li>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../explanations/docs-structure.html">About the documentation</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../reference/standards.html">Standards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../genindex.html">Index</a></li>
 </ul>
 </div>
 </nav></div>
@@ -437,9 +429,9 @@ document.write(`
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Developer Guide</a></li>
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">User Guide</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">Architectural Decision Records</li>
+    <li class="breadcrumb-item active" aria-current="page">Getting Started</li>
   </ul>
 </nav>
 </div>
@@ -456,16 +448,45 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="architectural-decision-records">
-<h1>Architectural Decision Records<a class="headerlink" href="#architectural-decision-records" title="Permalink to this heading">#</a></h1>
-<p>We record major architectural decisions in Architecture Decision Records (ADRs),
-as <a class="reference external" href="http://thinkrelevance.com/blog/2011/11/15/documenting-architecture-decisions">described by Michael Nygard</a>.
-Below is the list of our current ADRs.</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0001-record-architecture-decisions.html">1. Record architecture decisions</a></li>
-</ul>
+  <section id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this heading">#</a></h1>
+<section id="the-purpose-of-dodal">
+<h2>The Purpose of Dodal<a class="headerlink" href="#the-purpose-of-dodal" title="Permalink to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">dodal</span></code> provides set of <a class="reference external" href="https://nsls-ii.github.io/ophyd/">ophyd</a> devices and <a class="reference external" href="https://blueskyproject.io/bluesky/">bluesky</a> plans that are commonly useful across many beamlines at DLS.</p>
+<p>If you have some code that you think would be useful to be added please do so!</p>
+</section>
+<section id="using-devices">
+<h2>Using Devices<a class="headerlink" href="#using-devices" title="Permalink to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">dodal</span></code> contains devices to cover anything you would like to do using a beamline’s hardware.</p>
+<p>To use these devices you can do the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dodal</span> <span class="kn">import</span> <span class="n">i03</span>
+<span class="n">dcm</span> <span class="o">=</span> <span class="n">i03</span><span class="o">.</span><span class="n">dcm</span><span class="p">()</span>
+<span class="c1"># You can now use the DCM as you would any other device in Bluesky plans</span>
+</pre></div>
 </div>
+<p>If you are on a beamline workstation this will give you immediate access to the real hardware. If you are not on a
+beamline workstation it will default to connecting to a simulated instrument.</p>
+</section>
+<section id="adding-logging">
+<h2>Adding Logging<a class="headerlink" href="#adding-logging" title="Permalink to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">dodal</span></code> provides some helper functions to help you log what’s going on.</p>
+<p>You can set these up using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dodal</span> <span class="kn">import</span> <span class="n">i03</span>
+<span class="kn">from</span> <span class="nn">dodal.log</span> <span class="kn">import</span> <span class="n">set_up_logging_handlers</span><span class="p">,</span> <span class="n">LOGGER</span>
+
+<span class="n">set_up_logging_handlers</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Some logging will now occur when you are using devices/plans, you can increase the amount of logs by
+instead using <code class="docutils literal notranslate"><span class="pre">set_up_logging_handlers(&quot;DEBUG&quot;)</span></code>. You can also log more explicitly using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;I am a log message&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If you are on a beamline workstation this will save any logs to <code class="docutils literal notranslate"><span class="pre">dls_sw/BEAMLINE/logs/bluesky/</span></code> and will
+push them to <a class="reference external" href="https://graylog2.diamond.ac.uk/search">graylog</a>. If you are not on a beamline workstation logs will be saved next to your working directory
+and pushed to a local graylog instance.</p>
+<p>If you would like to only log to graylog/file exlusively there are helper functions in <code class="docutils literal notranslate"><span class="pre">dodal.log</span></code> that you can use.</p>
+</section>
 </section>
 
 
@@ -480,20 +501,20 @@ Below is the list of our current ADRs.</p>
     <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../how-to/make-release.html"
+       href="installation.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Make a release</p>
+        <p class="prev-next-title">Installation</p>
       </div>
     </a>
     <a class="right-next"
-       href="decisions/0001-record-architecture-decisions.html"
+       href="../how-to/run-container.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">1. Record architecture decisions</p>
+        <p class="prev-next-title">Run in a container</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -510,9 +531,21 @@ Below is the list of our current ADRs.</p>
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
   <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-purpose-of-dodal">The Purpose of Dodal</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-devices">Using Devices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-logging">Adding Logging</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
   
   <div class="tocsection editthispage">
-    <a href="https://github.com/DiamondLightSource/dodal/edit/I23-Grid-Scans/docs/developer/explanations/decisions.rst">
+    <a href="https://github.com/DiamondLightSource/dodal/edit/I23-Grid-Scans/docs/user/tutorials/get_started.rst">
       <i class="fa-solid fa-pencil"></i>
       
       
@@ -526,7 +559,7 @@ Below is the list of our current ADRs.</p>
 
   <div class="sidebar-secondary-item">
   <div class="tocsection sourcelink">
-    <a href="../../_sources/developer/explanations/decisions.rst.txt">
+    <a href="../../_sources/user/tutorials/get_started.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>
