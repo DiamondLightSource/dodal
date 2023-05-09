@@ -1,5 +1,4 @@
 from enum import Enum
-from functools import partial
 from typing import Optional
 
 from ophyd import Component, Device, EpicsSignalRO, Signal
@@ -238,7 +237,6 @@ class EigerDetector(Device):
 
     def arm_detector(self) -> Status:
         self.arming_status = Status()
-        #statuses: Status = [Status(1), Status(2), Status(3), Status(4)]
 
         LOGGER.info("Waiting on stale parameters to go low")
         self.wait_for_stale_parameters()  # Starts the chain of arming functions
