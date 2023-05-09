@@ -15,9 +15,12 @@ from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import Undulator
 from dodal.devices.zebra import Zebra
-from dodal.utils import BeamlinePrefix, get_beamline_name
+from dodal.log import set_beamline
+from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
 
-BL = get_beamline_name("s03")
+BL = get_beamline_name("i03")
+set_beamline(BL)
+
 
 ACTIVE_DEVICES: Dict[str, Device] = {}
 
@@ -38,6 +41,11 @@ def list_active_devices() -> List[str]:
     return list(ACTIVE_DEVICES.keys())
 
 
+def active_device_is_same_type(active_device, device):
+    return type(active_device) == device
+
+
+@skip_device()
 def device_instantiation(
     device: Callable,
     name: str,
@@ -48,9 +56,9 @@ def device_instantiation(
     bl_prefix: bool = True,
 ) -> Device:
     active_device = ACTIVE_DEVICES.get(name)
+    if fake:
+        device = make_fake_device(device)
     if active_device is None:
-        if fake:
-            device = make_fake_device(device)
         ACTIVE_DEVICES[name] = device(
             name=name,
             prefix=f"{(BeamlinePrefix(BL).beamline_prefix)}{prefix}"
@@ -60,16 +68,18 @@ def device_instantiation(
         if wait:
             ACTIVE_DEVICES[name].wait_for_connection()
     else:
-        if type(active_device) != device:
+        if not active_device_is_same_type(active_device, device):
             raise TypeError(
-                f"Can't instantiate different type of device with the same name as an "
-                f"existing device. Device name '{name}' already used for a(n) {device}."
+                f"Can't instantiate device of type {type(active_device)} with the same "
+                f"name as an existing device. Device name '{name}' already used for "
+                f"a(n) {device}."
             )
     if post_create:
         post_create(ACTIVE_DEVICES[name])
     return ACTIVE_DEVICES[name]
 
 
+@skip_device(lambda: BL == "s03")
 def dcm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> DCM:
     """Get the i03 DCM device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
@@ -121,6 +131,7 @@ def backlight(
     )
 
 
+@skip_device(lambda: BL == "s03")
 def eiger(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
@@ -160,6 +171,7 @@ def fast_grid_scan(
     )
 
 
+@skip_device(lambda: BL == "s03")
 def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> OAV:
     """Get the i03 OAV device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
@@ -203,6 +215,7 @@ def s4_slit_gaps(
     )
 
 
+@skip_device(lambda: BL == "s03")
 def synchrotron(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> Synchrotron:
