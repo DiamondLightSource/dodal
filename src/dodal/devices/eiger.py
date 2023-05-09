@@ -94,12 +94,13 @@ class EigerDetector(Device):
         LOGGER.info("Waiting on parameter callbacks")
         status.wait(self.STALE_PARAMS_TIMEOUT)
 
-        return self.arm_detector()
+        if not self.armed:
+            return self.arm_detector()
 
     def unstage(self) -> bool:
         self.odin.file_writer.start_timeout.put(1)
         self.filewriters_finished.wait(30)
-        if not self.armed:
+        if self.armed:
             self.disarm_detector()
         status_ok = self.odin.check_odin_state()
         self.disable_roi_mode()

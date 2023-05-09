@@ -353,3 +353,35 @@ def test_when_stage_called_then_finish_arm_on_fan_ready(
     fake_eiger.odin.meta.ready.sim_put(1)
 
     fake_eiger.arming_status.wait(1)
+
+
+def test_arming_not_called_when_already_armed(
+    fake_eiger: EigerDetector, mock_set_odin_filewriter
+):
+    def do_arm():
+        old_status = Status()
+        fake_eiger.finish_arm(old_status)
+
+    fake_eiger.odin.file_writer.file_name.set = MagicMock(
+        side_effect=mock_set_odin_filewriter
+    )
+    fake_eiger.arming_status = Status()
+    fake_eiger.arm_detector = MagicMock(side_effect=do_arm)
+    fake_eiger.async_stage()
+    fake_eiger.async_stage()
+    fake_eiger.arm_detector.assert_called_once()
+
+
+def test_disarming_not_called_when_already_armed(
+    fake_eiger: EigerDetector, mock_set_odin_filewriter
+):
+    fake_eiger.odin.file_writer.file_name.set = MagicMock(
+        side_effect=mock_set_odin_filewriter
+    )
+
+    fake_eiger.disarm_detector = MagicMock()
+    happy_status = Status()
+    happy_status.set_finished()
+    fake_eiger.filewriters_finished = happy_status
+    fake_eiger.unstage()
+    fake_eiger.disarm_detector.assert_not_called()
