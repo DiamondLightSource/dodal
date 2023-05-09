@@ -122,9 +122,9 @@ class SteppedGridScanParams(DataClassJsonMixin, AbstractExperimentParameterBase)
         )
 
 
-class SteppedGridScanCompleteStatus(DeviceStatus):
+class GridScanCompleteStatus(DeviceStatus):
     """
-    A Status for the stepped grid scan completion
+    A Status for the grid scan completion
     A special status object that notifies watchers (progress bars)
     based on comparing device.expected_images to device.position_counter.
     """
@@ -247,7 +247,7 @@ class SteppedGridScan(Device):
         return st
 
     def complete(self) -> DeviceStatus:
-        return SteppedGridScanCompleteStatus(self)
+        return GridScanCompleteStatus(self)
 
     def collect(self):
         return {}
