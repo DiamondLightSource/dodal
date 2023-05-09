@@ -18,11 +18,6 @@ class EigerTriggerMode(Enum):
     EXTERNAL_ENABLE = 3
 
 
-class EigerTriggerNumber(str, Enum):
-    MANY_TRIGGERS = "many_triggers"
-    ONE_TRIGGER = "one_trigger"
-
-
 class EigerDetector(Device):
     cam: EigerDetectorCam = Component(EigerDetectorCam, "CAM:")
     odin: EigerOdin = Component(EigerOdin, "")
