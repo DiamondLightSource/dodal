@@ -7,7 +7,7 @@ from ophyd.sim import make_fake_device
 from ophyd.status import Status
 
 from dodal.devices.det_dim_constants import EIGER2_X_16M_SIZE
-from dodal.devices.detector import DetectorParams
+from dodal.devices.detector import DetectorParams, TriggerMode
 from dodal.devices.eiger import EigerDetector
 
 TEST_DETECTOR_SIZE_CONSTANTS = EIGER2_X_16M_SIZE
@@ -25,28 +25,30 @@ TEST_NUM_TRIGGERS = 2000
 TEST_USE_ROI_MODE = False
 TEST_DET_DIST_TO_BEAM_CONVERTER_PATH = "tests/devices/unit_tests/test_lookup_table.txt"
 
-TEST_DETECTOR_PARAMS = DetectorParams(
-    TEST_CURRENT_ENERGY,
-    TEST_EXPOSURE_TIME,
-    TEST_DIR,
-    TEST_PREFIX,
-    TEST_RUN_NUMBER,
-    TEST_DETECTOR_DISTANCE,
-    TEST_OMEGA_START,
-    TEST_OMEGA_INCREMENT,
-    TEST_NUM_IMAGES_PER_TRIGGER,
-    TEST_NUM_TRIGGERS,
-    TEST_USE_ROI_MODE,
-    TEST_DET_DIST_TO_BEAM_CONVERTER_PATH,
-    detector_size_constants=TEST_DETECTOR_SIZE_CONSTANTS,
-)
+
+def create_new_params() -> DetectorParams:
+    return DetectorParams(
+        TEST_CURRENT_ENERGY,
+        TEST_EXPOSURE_TIME,
+        TEST_DIR,
+        TEST_PREFIX,
+        TEST_RUN_NUMBER,
+        TEST_DETECTOR_DISTANCE,
+        TEST_OMEGA_START,
+        TEST_OMEGA_INCREMENT,
+        TEST_NUM_IMAGES_PER_TRIGGER,
+        TEST_NUM_TRIGGERS,
+        TEST_USE_ROI_MODE,
+        TEST_DET_DIST_TO_BEAM_CONVERTER_PATH,
+        detector_size_constants=TEST_DETECTOR_SIZE_CONSTANTS,
+    )
 
 
 @pytest.fixture
 def fake_eiger():
     FakeEigerDetector: EigerDetector = make_fake_device(EigerDetector)
     fake_eiger: EigerDetector = FakeEigerDetector.with_params(
-        params=TEST_DETECTOR_PARAMS, name="test"
+        params=create_new_params(), name="test"
     )
     return fake_eiger
 
@@ -240,7 +242,7 @@ def test_given_failing_odin_when_stage_then_exception_raised(fake_eiger):
 
 
 @patch("dodal.devices.eiger.await_value")
-def test_stage_runs_successfully(mock_await, fake_eiger):
+def test_stage_runs_successfully(mock_await, fake_eiger: EigerDetector):
     fake_eiger.odin.nodes.clear_odin_errors = MagicMock()
     fake_eiger.odin.check_odin_initialised = MagicMock()
     fake_eiger.odin.check_odin_initialised.return_value = (True, "")
@@ -278,3 +280,37 @@ def test_given_stale_parameters_goes_high_before_callbacks_then_stale_parameters
 
     thread.join(0.2)
     assert not thread.is_alive()
+
+
+@patch("dodal.devices.eiger.await_value")
+def test_given_in_free_run_mode_when_staged_then_triggers_and_filewriter_set_correctly(
+    mock_await,
+    fake_eiger: EigerDetector,
+):
+    fake_eiger.odin.nodes.clear_odin_errors = MagicMock()
+    fake_eiger.odin.check_odin_initialised = MagicMock()
+    fake_eiger.odin.check_odin_initialised.return_value = (True, "")
+    fake_eiger.odin.file_writer.file_path.put(True)
+
+    fake_eiger.detector_params.trigger_mode = TriggerMode.FREE_RUN
+    fake_eiger.stage()
+    assert fake_eiger.cam.num_triggers.get() > fake_eiger.detector_params.num_triggers
+    assert fake_eiger.odin.file_writer.num_capture.get() == 0
+
+
+def test_given_in_free_run_mode_when_unstaged_then_waiting_on_file_writer_to_finish_correctly(
+    fake_eiger: EigerDetector,
+):
+    happy_status = Status()
+    happy_status.set_finished()
+    fake_eiger.filewriters_finished = happy_status
+
+    fake_eiger.odin.file_writer.capture.sim_put(1)
+    fake_eiger.odin.file_writer.num_captured.sim_put(2000)
+    fake_eiger.odin.check_odin_state = MagicMock(return_value=True)
+
+    fake_eiger.detector_params.trigger_mode = TriggerMode.FREE_RUN
+    fake_eiger.unstage()
+
+    assert fake_eiger.odin.meta.stop_writing.get() == 1
+    assert fake_eiger.odin.file_writer.capture.get() == 0
