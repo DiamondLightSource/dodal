@@ -16,9 +16,12 @@ from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import Undulator
 from dodal.devices.zebra import Zebra
+from dodal.log import set_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
 
 BL = get_beamline_name("i03")
+set_beamline(BL)
+
 
 ACTIVE_DEVICES: Dict[str, Device] = {}
 
