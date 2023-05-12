@@ -19,11 +19,11 @@ def fake_oav() -> OAV:
     fake_oav.snapshot.url.sim_put("http://test.url")
     fake_oav.snapshot.filename.put("test filename")
     fake_oav.snapshot.directory.put("test directory")
-    fake_oav.snapshot.top_left_x_signal.put(100)
-    fake_oav.snapshot.top_left_y_signal.put(100)
-    fake_oav.snapshot.box_width_signal.put(50)
-    fake_oav.snapshot.num_boxes_x_signal.put(15)
-    fake_oav.snapshot.num_boxes_y_signal.put(10)
+    fake_oav.snapshot.top_left_x.put(100)
+    fake_oav.snapshot.top_left_y.put(100)
+    fake_oav.snapshot.box_width.put(50)
+    fake_oav.snapshot.num_boxes_x.put(15)
+    fake_oav.snapshot.num_boxes_y.put(10)
     return fake_oav
 
 
@@ -41,15 +41,17 @@ def test_snapshot_trigger_handles_request_with_bad_status_code_correctly(
 
 
 @patch("requests.get")
-@patch("dodal.devices.oav.snapshot.Image")
-def test_snapshot_trigger_loads_correct_url(mock_image, mock_get: MagicMock, fake_oav):
+@patch("dodal.devices.areadetector.plugins.MJPG.Image")
+def test_snapshot_trigger_loads_correct_url(
+    mock_image: MagicMock, mock_get: MagicMock, fake_oav: OAV
+):
     st = fake_oav.snapshot.trigger()
     st.wait()
     mock_get.assert_called_once_with("http://test.url", stream=True)
 
 
 @patch("requests.get")
-@patch("dodal.devices.oav.snapshot.Image.open")
+@patch("dodal.devices.areadetector.plugins.MJPG.Image.open")
 def test_snapshot_trigger_saves_to_correct_file(
     mock_open: MagicMock, mock_get, fake_oav
 ):
@@ -68,7 +70,7 @@ def test_snapshot_trigger_saves_to_correct_file(
 
 
 @patch("requests.get")
-@patch("dodal.devices.oav.snapshot.Image.open")
+@patch("dodal.devices.areadetector.plugins.MJPG.Image.open")
 @patch("dodal.devices.oav.grid_overlay.add_grid_overlay_to_image")
 @patch("dodal.devices.oav.grid_overlay.add_grid_border_overlay_to_image")
 def test_correct_grid_drawn_on_image(

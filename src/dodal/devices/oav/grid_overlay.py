@@ -5,7 +5,7 @@ from pathlib import Path
 from ophyd import Component, Signal
 from PIL import Image, ImageDraw
 
-from dodal.devices.oav.snapshot import Snapshot
+from dodal.devices.areadetector.plugins.MJPG import MJPG
 
 
 class Orientation(Enum):
@@ -120,19 +120,19 @@ def add_grid_overlay_to_image(
     )
 
 
-class SnapshotWithGrid(Snapshot):
-    top_left_x_signal: Signal = Component(Signal)
-    top_left_y_signal: Signal = Component(Signal)
-    box_width_signal: Signal = Component(Signal)
-    num_boxes_x_signal: Signal = Component(Signal)
-    num_boxes_y_signal: Signal = Component(Signal)
+class SnapshotWithGrid(MJPG):
+    top_left_x: Signal = Component(Signal)
+    top_left_y: Signal = Component(Signal)
+    box_width: Signal = Component(Signal)
+    num_boxes_x: Signal = Component(Signal)
+    num_boxes_y: Signal = Component(Signal)
 
     def post_processing(self, image: Image.Image):
-        top_left_x = self.top_left_x_signal.get()
-        top_left_y = self.top_left_y_signal.get()
-        box_width = self.box_width_signal.get()
-        num_boxes_x = self.num_boxes_x_signal.get()
-        num_boxes_y = self.num_boxes_y_signal.get()
+        top_left_x = self.top_left_x.get()
+        top_left_y = self.top_left_y.get()
+        box_width = self.box_width.get()
+        num_boxes_x = self.num_boxes_x.get()
+        num_boxes_y = self.num_boxes_y.get()
         filename_str = self.filename.get()
         directory_str = self.directory.get()
         add_grid_border_overlay_to_image(

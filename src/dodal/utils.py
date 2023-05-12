@@ -7,7 +7,7 @@ from importlib import import_module
 from inspect import signature
 from os import environ
 from types import ModuleType
-from typing import Any, Callable, Dict, Iterable, Optional, Type, Union
+from typing import Any, Callable, Dict, Iterable, Optional, Type, TypeVar, Union
 
 from bluesky.protocols import (
     Checkable,
@@ -48,6 +48,8 @@ BLUESKY_PROTOCOLS = [
 Point2D = namedtuple("Point2D", ["x", "y"])
 Point3D = namedtuple("Point3D", ["x", "y", "z"])
 
+T = TypeVar("T")
+
 
 def get_beamline_name(ixx: str) -> str:
     bl = environ.get("BEAMLINE")
@@ -73,9 +75,9 @@ class BeamlinePrefix:
 
 
 def skip_device(precondition=lambda: True):
-    def decorator(func: Callable[..., Any]):
+    def decorator(func: Callable[..., T]) -> Callable[..., T]:
         @wraps(func)
-        def wrapper(*args, **kwds):
+        def wrapper(*args, **kwds) -> T:
             return func(*args, **kwds)
 
         if precondition:
