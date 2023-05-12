@@ -51,7 +51,7 @@ def test_snapshot_trigger_loads_correct_url(
 
 
 @patch("requests.get")
-@patch("dodal.devices.oav.snapshot.Image.open")
+@patch("dodal.devices.areadetector.plugins.MJPG.Image.open")
 def test_snapshot_trigger_saves_to_correct_file(
     mock_open: MagicMock, mock_get, fake_oav
 ):
@@ -70,7 +70,7 @@ def test_snapshot_trigger_saves_to_correct_file(
 
 
 @patch("requests.get")
-@patch("dodal.devices.oav.snapshot.Image.open")
+@patch("dodal.devices.areadetector.plugins.MJPG.Image.open")
 @patch("dodal.devices.oav.grid_overlay.add_grid_overlay_to_image")
 @patch("dodal.devices.oav.grid_overlay.add_grid_border_overlay_to_image")
 def test_correct_grid_drawn_on_image(
