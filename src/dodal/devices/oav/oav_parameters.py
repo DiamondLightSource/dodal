@@ -11,14 +11,14 @@ from dodal.log import LOGGER
 
 OAV_CONFIG_FILE_DEFAULTS = {
     "zoom_params_file": "/dls_sw/i03/software/gda_versions/gda_9_27/workspace_git/gda-mx.git/configurations/i03-config/xml/jCameraManZoomLevels.xml",
-    "oav_json": "/dls_sw/i03/software/gda_versions/gda_9_27/workspace_git/gda-mx.git/configurations/i03-config/etc/OAVCentring.json",
+    "oav_config_json": "/dls_sw/i03/software/gda_versions/gda_9_27/workspace_git/gda-mx.git/configurations/i03-config/etc/OAVCentring.json",
     "display_config": "/dls_sw/i03/software/gda_versions/var/display.configuration",
 }
 
 
 class OAVParameters:
     zoom_params_file: str
-    oav_json: str
+    oav_config_json: str
     display_config: str
     global_params: dict[str, Any]
     context_dicts: dict[str, dict]
@@ -45,7 +45,7 @@ class OAVParameters:
         self,
         context="loopCentring",
         zoom_params_file=OAV_CONFIG_FILE_DEFAULTS["zoom_params_file"],
-        oav_config_json=OAV_CONFIG_FILE_DEFAULTS["oav_json"],
+        oav_config_json=OAV_CONFIG_FILE_DEFAULTS["oav_config_json"],
         display_config=OAV_CONFIG_FILE_DEFAULTS["display_config"],
     ):
         self.zoom_params_file = zoom_params_file
