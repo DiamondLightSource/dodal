@@ -2,7 +2,7 @@ from typing import List, Tuple
 
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO, EpicsSignalWithRBV
 from ophyd.areadetector.plugins import HDF5Plugin_V22
-from ophyd.status import SubscriptionStatus
+from ophyd.status import Status, SubscriptionStatus
 
 from dodal.devices.status import await_value
 
@@ -25,6 +25,7 @@ class OdinMetaListener(Device):
     ready: EpicsSignalRO = Component(EpicsSignalRO, "Writing_RBV")
     # file_name should not be set. Set the filewriter file_name and this will be updated in EPICS
     file_name: EpicsSignalRO = Component(EpicsSignalRO, "FileName", string=True)
+    stop_writing: EpicsSignal = Component(EpicsSignal, "Stop")
 
 
 class OdinFileWriter(HDF5Plugin_V22):
@@ -43,6 +44,7 @@ class OdinNode(Device):
     fp_initialised: EpicsSignalRO = Component(EpicsSignalRO, "FPProcessConnected_RBV")
     fr_initialised: EpicsSignalRO = Component(EpicsSignalRO, "FRProcessConnected_RBV")
     clear_errors: EpicsSignal = Component(EpicsSignal, "FPClearErrors")
+    num_captured: EpicsSignalRO = Component(EpicsSignalRO, "NumCaptured_RBV")
     error_message: EpicsSignalRO = Component(
         EpicsSignalRO, "FPErrorMessage_RBV", string=True
     )
@@ -150,3 +152,9 @@ class EigerOdin(Device):
         errors = [message for check_result, message in to_check if check_result]
 
         return not errors, "\n".join(errors)
+
+    def stop(self) -> Status:
+        """Stop odin manually"""
+        status = self.file_writer.capture.set(0)
+        status &= self.meta.stop_writing.set(1)
+        return status
