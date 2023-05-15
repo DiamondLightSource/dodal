@@ -35,6 +35,6 @@ def test_grid_overlay():
 
 @pytest.mark.s03
 def test_get_zoom_levels():
-    my_zoom_controller = ZoomController("BL03I-EA-OAV-01:FZOOM:", name="test_zoom")
+    my_zoom_controller = ZoomController("BL03S-EA-OAV-01:FZOOM:", name="test_zoom")
     my_zoom_controller.wait_for_connection()
     assert my_zoom_controller.allowed_zoom_levels[0] == "1.0x"
