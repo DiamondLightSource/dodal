@@ -7,6 +7,7 @@ from ophyd.status import AndStatus
 from dodal.devices.aperture import Aperture
 from dodal.devices.logging_ophyd_device import InfoLoggingDevice
 from dodal.devices.scatterguard import Scatterguard
+from dodal.log import LOGGER
 
 
 class InvalidApertureMove(Exception):
@@ -72,6 +73,7 @@ class ApertureScatterguard(InfoLoggingDevice):
     aperture_positions: Optional[AperturePositions] = None
 
     def load_aperture_positions(self, positions: AperturePositions):
+        LOGGER.info(f"{self.name} loaded in {positions}")
         self.aperture_positions = positions
 
     def set(self, pos: Tuple[float, float, float, float, float]) -> AndStatus:
