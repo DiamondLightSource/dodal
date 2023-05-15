@@ -4,16 +4,12 @@
     "url": "https://DiamondLightSource.github.io/dodal/main/"
   },
   {
-    "version": "0.0.3",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.3/"
+    "version": "0.0.1",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.1/"
   },
   {
     "version": "0.0.2",
     "url": "https://DiamondLightSource.github.io/dodal/0.0.2/"
-  },
-  {
-    "version": "0.0.1",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.1/"
   },
   {
     "version": "0.0.2_async_arming",
@@ -22,6 +18,10 @@
   {
     "version": "0.0.2_hotfixes",
     "url": "https://DiamondLightSource.github.io/dodal/0.0.2_hotfixes/"
+  },
+  {
+    "version": "0.0.3",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.3/"
   },
   {
     "version": "41_add_zoom_to_s03",
@@ -34,10 +34,6 @@
   {
     "version": "artemis598_params_changes",
     "url": "https://DiamondLightSource.github.io/dodal/artemis598_params_changes/"
-  },
-  {
-    "version": "artemis_191_fix-image-metadata",
-    "url": "https://DiamondLightSource.github.io/dodal/artemis_191_fix-image-metadata/"
   },
   {
     "version": "artemis_262_move_arming_out_of_stage",
