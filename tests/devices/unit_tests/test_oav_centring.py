@@ -44,7 +44,9 @@ def mock_oav():
 
 @pytest.fixture
 def mock_parameters():
-    return OAVParameters(OAV_CENTRING_JSON, ZOOM_LEVELS_XML, DISPLAY_CONFIGURATION)
+    return OAVParameters(
+        "loopCentring", ZOOM_LEVELS_XML, OAV_CENTRING_JSON, DISPLAY_CONFIGURATION
+    )
 
 
 @pytest.fixture
@@ -91,29 +93,7 @@ def test_can_make_fake_testing_devices_and_use_run_engine(
 def test_oav_parameters_load_parameters_from_json(
     parameter_name, expected_value, mock_parameters: OAVParameters
 ):
-    mock_parameters.load_parameters_from_json()
-
     assert mock_parameters.__dict__[parameter_name] == expected_value
-
-
-def test_oav__extract_dict_parameter_not_found_fallback_value_present(
-    mock_parameters: OAVParameters,
-):
-    mock_parameters.load_json()
-    assert (
-        mock_parameters._extract_dict_parameter(
-            "a_key_not_in_the_json", fallback_value=1
-        )
-        == 1
-    )
-
-
-def test_oav__extract_dict_parameter_not_found_fallback_value_not_present(
-    mock_parameters: OAVParameters,
-):
-    mock_parameters.load_json()
-    with pytest.raises(KeyError):
-        mock_parameters._extract_dict_parameter("a_key_not_in_the_json")
 
 
 def test_find_midpoint_symmetric_pin():

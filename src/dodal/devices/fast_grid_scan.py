@@ -16,7 +16,6 @@ from ophyd import (
 )
 from ophyd.status import DeviceStatus, StatusBase
 
-from dodal.devices.eiger import EigerTriggerNumber
 from dodal.devices.motors import XYZLimitBundle
 from dodal.devices.status import await_value
 from dodal.parameters.experiment_parameter_base import AbstractExperimentParameterBase
@@ -61,7 +60,6 @@ class GridScanParams(DataClassJsonMixin, AbstractExperimentParameterBase):
     y2_start: float = 0.1
     z1_start: float = 0.1
     z2_start: float = 0.1
-    trigger_number: str = EigerTriggerNumber.MANY_TRIGGERS
 
     def __post_init__(self):
         self.x_axis = GridAxis(self.x_start, self.x_step_size, self.x_steps)
@@ -99,7 +97,7 @@ class GridScanParams(DataClassJsonMixin, AbstractExperimentParameterBase):
         return first_grid_in_limits and second_grid_in_limits
 
     def get_num_images(self):
-        return self.x_steps * self.y_steps + self.y_steps * self.z_steps
+        return self.x_steps * self.y_steps + self.x_steps * self.z_steps
 
     @property
     def is_3d_grid_scan(self):

@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from enum import Enum, auto
 from typing import Optional, Tuple
 
 from dataclasses_json import config, dataclass_json
@@ -13,6 +14,14 @@ from dodal.devices.det_dist_to_beam_converter import (
     Axis,
     DetectorDistanceToBeamXYConverter,
 )
+
+
+class TriggerMode(Enum):
+    """In set frames the number of frames is known at arm time. In free run they are
+    not known until the detector is unstaged."""
+
+    SET_FRAMES = auto()
+    FREE_RUN = auto()
 
 
 @dataclass_json
@@ -30,6 +39,7 @@ class DetectorParams:
     num_triggers: int
     use_roi_mode: bool
     det_dist_to_beam_converter_path: str
+    trigger_mode: TriggerMode = TriggerMode.SET_FRAMES
 
     detector_size_constants: DetectorSizeConstants = field(
         default_factory=lambda: EIGER2_X_16M_SIZE,
@@ -40,6 +50,7 @@ class DetectorParams:
     )
 
     # The following are optional from GDA as populated internally
+
     # Where the VDS start index should be in the Nexus file
     start_index: Optional[int] = 0
     nexus_file_run_number: Optional[int] = 0
@@ -108,3 +119,7 @@ class DetectorParams:
     @property
     def nexus_filename(self):
         return f"{self.prefix}_{self.nexus_file_run_number}"
+
+    @property
+    def full_number_of_images(self):
+        return self.num_triggers * self.num_images_per_trigger

@@ -20,6 +20,7 @@ dependencies = [
     "dataclasses-json",
     "pillow",
     "requests",
+    "graypy",
 ]
 dynamic = ["version"]
 license.file = "LICENSE"

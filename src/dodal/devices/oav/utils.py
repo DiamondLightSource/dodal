@@ -1,3 +1,5 @@
+from enum import IntEnum
+
 import numpy as np
 
 
@@ -18,3 +20,30 @@ def bottom_right_from_top_left(
         ],
         dtype=np.dtype(int),
     )
+
+
+class ColorMode(IntEnum):
+    """
+    Enum to store the various color modes of the camera. We use RGB1.
+    """
+
+    MONO = 0
+    BAYER = 1
+    RGB1 = 2
+    RGB2 = 3
+    RGB3 = 4
+    YUV444 = 5
+    YUV422 = 6
+    YUV421 = 7
+
+
+class EdgeOutputArrayImageType(IntEnum):
+    """
+    Enum to store the types of image to tweak the output array. We use Original.
+    """
+
+    ORIGINAL = 0
+    GREYSCALE = 1
+    PREPROCESSED = 2
+    CANNY_EDGES = 3
+    CLOSED_EDGES = 4
