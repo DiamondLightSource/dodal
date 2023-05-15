@@ -6,14 +6,14 @@ from ophyd import Component, Device, DeviceStatus, EpicsSignal, EpicsSignalRO, S
 from PIL import Image
 
 
-class Snapshot(Device):
+class MJPG(Device):
     filename: Signal = Component(Signal)
     directory: Signal = Component(Signal)
     url: EpicsSignal = Component(EpicsSignal, "JPG_URL_RBV", string=True)
-    x_size_pv: EpicsSignalRO = Component(EpicsSignalRO, "ArraySize1_RBV")
-    y_size_pv: EpicsSignalRO = Component(EpicsSignalRO, "ArraySize2_RBV")
+    x_size: EpicsSignalRO = Component(EpicsSignalRO, "ArraySize1_RBV")
+    y_size: EpicsSignalRO = Component(EpicsSignalRO, "ArraySize2_RBV")
     input_rbpv: EpicsSignalRO = Component(EpicsSignalRO, "NDArrayPort_RBV")
-    input_pv: EpicsSignal = Component(EpicsSignal, "NDArrayPort")
+    input_plugin: EpicsSignal = Component(EpicsSignal, "NDArrayPort")
     KICKOFF_TIMEOUT: float = 10.0
 
     def trigger(self):

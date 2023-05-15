@@ -7,6 +7,7 @@ from dodal.devices.aperturescatterguard import AperturePositions, ApertureScatte
 from dodal.devices.backlight import Backlight
 from dodal.devices.DCM import DCM
 from dodal.devices.detector import DetectorParams
+from dodal.devices.detector_motion import DetectorMotion
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import FastGridScan
 from dodal.devices.oav.oav_detector import OAV
@@ -15,9 +16,12 @@ from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import Undulator
 from dodal.devices.zebra import Zebra
+from dodal.log import set_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
 
 BL = get_beamline_name("i03")
+set_beamline(BL)
+
 
 ACTIVE_DEVICES: Dict[str, Device] = {}
 
@@ -123,6 +127,22 @@ def backlight(
         device=Backlight,
         name="backlight",
         prefix="-EA-BL-01:",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+    )
+
+
+@skip_device(lambda: BL == "s03")
+def detector_motion(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> DetectorMotion:
+    """Get the i03 detector motion device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        device=DetectorMotion,
+        name="detector_motion",
+        prefix="",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )

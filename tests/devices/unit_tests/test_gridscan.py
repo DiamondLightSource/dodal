@@ -331,3 +331,9 @@ def test_can_run_fast_grid_scan_in_run_engine(fast_grid_scan):
     RE = RunEngine()
     RE(kickoff_and_complete(fast_grid_scan))
     assert RE.state == "idle"
+
+
+def test_given_x_y_z_steps_when_full_number_calculated_then_answer_is_as_expected(
+    grid_scan_params: GridScanParams,
+):
+    assert grid_scan_params.get_num_images() == 350

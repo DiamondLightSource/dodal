@@ -5,22 +5,19 @@ from ophyd import Component, Device, EpicsSignalRO
 from ophyd.areadetector.cam import EigerDetectorCam
 from ophyd.status import AndStatus, Status, SubscriptionStatus
 
-from dodal.devices.detector import DetectorParams
+from dodal.devices.detector import DetectorParams, TriggerMode
 from dodal.devices.eiger_odin import EigerOdin
 from dodal.devices.status import await_value
 from dodal.log import LOGGER
 
+FREE_RUN_MAX_IMAGES = 1000000
 
-class EigerTriggerMode(Enum):
+
+class InternalEigerTriggerMode(Enum):
     INTERNAL_SERIES = 0
     INTERNAL_ENABLE = 1
     EXTERNAL_SERIES = 2
     EXTERNAL_ENABLE = 3
-
-
-class EigerTriggerNumber(str, Enum):
-    MANY_TRIGGERS = "many_triggers"
-    ONE_TRIGGER = "one_trigger"
 
 
 class EigerDetector(Device):
@@ -88,8 +85,20 @@ class EigerDetector(Device):
         self.arm_detector()
 
     def unstage(self) -> bool:
+        assert self.detector_params is not None
+        if self.detector_params.trigger_mode == TriggerMode.FREE_RUN:
+            # In free run mode we have to wait on all frames being complete and stop odin
+            LOGGER.info("Waiting on all frames")
+            await_value(
+                self.odin.file_writer.num_captured,
+                self.detector_params.full_number_of_images,
+            ).wait(30)
+            LOGGER.info("Stopping Odin")
+            self.odin.stop().wait(5)
         self.odin.file_writer.start_timeout.put(1)
+        LOGGER.info("Waiting on filewriter to finish")
         self.filewriters_finished.wait(30)
+        LOGGER.info("Disarming detector")
         self.disarm_detector()
         status_ok = self.odin.check_odin_state()
         self.disable_roi_mode()
@@ -126,7 +135,9 @@ class EigerDetector(Device):
         status &= self.cam.acquire_period.set(self.detector_params.exposure_time)
         status &= self.cam.num_exposures.set(1)
         status &= self.cam.image_mode.set(self.cam.ImageMode.MULTIPLE)
-        status &= self.cam.trigger_mode.set(EigerTriggerMode.EXTERNAL_SERIES.value)
+        status &= self.cam.trigger_mode.set(
+            InternalEigerTriggerMode.EXTERNAL_SERIES.value
+        )
         return status
 
     def set_odin_pvs(self) -> AndStatus:
@@ -183,11 +194,16 @@ class EigerDetector(Device):
         """
         assert self.detector_params is not None
         status = self.cam.num_images.set(self.detector_params.num_images_per_trigger)
-        status &= self.cam.num_triggers.set(self.detector_params.num_triggers)
-        status &= self.odin.file_writer.num_capture.set(
-            self.detector_params.num_triggers
-            * self.detector_params.num_images_per_trigger
-        )
+        if self.detector_params.trigger_mode == TriggerMode.FREE_RUN:
+            # The Eiger can't actually free run so we set a very large number of frames
+            status &= self.cam.num_triggers.set(FREE_RUN_MAX_IMAGES)
+            # Setting Odin to write 0 frames tells it to write until externally stopped
+            status &= self.odin.file_writer.num_capture.set(0)
+        elif self.detector_params.trigger_mode == TriggerMode.SET_FRAMES:
+            status &= self.cam.num_triggers.set(self.detector_params.num_triggers)
+            status &= self.odin.file_writer.num_capture.set(
+                self.detector_params.full_number_of_images
+            )
         return status
 
     def wait_for_stale_parameters(self):
