@@ -53,7 +53,7 @@ def device_instantiation(
     prefix: str,
     wait: bool,
     fake: bool,
-    post_create: Optional[Callable] = None,
+    creation_kwargs: Dict = dict(),
     bl_prefix: bool = True,
 ) -> Device:
     active_device = ACTIVE_DEVICES.get(name)
@@ -65,6 +65,7 @@ def device_instantiation(
             prefix=f"{(BeamlinePrefix(BL).beamline_prefix)}{prefix}"
             if bl_prefix
             else prefix,
+            **creation_kwargs,
         )
         if wait:
             ACTIVE_DEVICES[name].wait_for_connection()
@@ -75,8 +76,6 @@ def device_instantiation(
                 f"name as an existing device. Device name '{name}' already used for "
                 f"a(n) {device}."
             )
-    if post_create:
-        post_create(ACTIVE_DEVICES[name])
     return ACTIVE_DEVICES[name]
 
 
@@ -103,18 +102,23 @@ def aperture_scatterguard(
     been. If this is called when already instantiated in i03, it will return the existing
     object. If aperture_positions is specified, it will update them.
     """
+    creation_kwargs = (
+        {"aperture_positions": aperture_positions} if aperture_positions else dict()
+    )
 
-    def load_positions(a_s: ApertureScatterguard):
-        a_s.load_aperture_positions(aperture_positions)
-
-    return device_instantiation(
+    aperture_scatterguard_device: ApertureScatterguard = device_instantiation(
         device=ApertureScatterguard,
         name="aperture_scatterguard",
         prefix="",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
-        post_create=load_positions,
+        creation_kwargs=creation_kwargs,
     )
+
+    if aperture_positions is not None:
+        aperture_scatterguard_device.load_aperture_positions(aperture_positions)
+
+    return aperture_scatterguard_device
 
 
 def backlight(
@@ -159,18 +163,18 @@ def eiger(
     If called with params, will update those params to the Eiger object.
     """
 
-    def set_params(eiger: EigerDetector):
-        if params is not None:
-            eiger.set_detector_parameters(params)
-
-    return device_instantiation(
+    eiger: EigerDetector = device_instantiation(
         device=EigerDetector,
         name="eiger",
         prefix="-EA-EIGER-01:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
-        post_create=set_params,
     )
+
+    if params is not None:
+        eiger.set_detector_parameters(params)
+
+    return eiger
 
 
 def fast_grid_scan(

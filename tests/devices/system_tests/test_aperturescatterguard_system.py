@@ -58,11 +58,12 @@ class GDABeamlineParameters:
 
 @pytest.fixture
 def ap_sg():
-    ap_sg = ApertureScatterguard(prefix="BL03S", name="ap_sg")
-    ap_sg.load_aperture_positions(
-        AperturePositions.from_gda_beamline_params(
+    ap_sg = ApertureScatterguard(
+        prefix="BL03S",
+        name="ap_sg",
+        aperture_positions=AperturePositions.from_gda_beamline_params(
             GDABeamlineParameters.from_file(I03_BEAMLINE_PARAMETER_PATH)
-        )
+        ),
     )
     return ap_sg
 

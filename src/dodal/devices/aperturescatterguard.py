@@ -69,10 +69,25 @@ class AperturePositions:
 class ApertureScatterguard(InfoLoggingDevice):
     aperture: Aperture = Cpt(Aperture, "-MO-MAPT-01:")
     scatterguard: Scatterguard = Cpt(Scatterguard, "-MO-SCAT-01:")
-    aperture_positions: Optional[AperturePositions] = None
+    aperture_positions: AperturePositions
 
     def load_aperture_positions(self, positions: AperturePositions):
         self.aperture_positions = positions
+
+    def __init__(
+        self,
+        prefix,
+        *,
+        name,
+        aperture_positions: AperturePositions,
+        **kwargs,
+    ):
+        super().__init__(
+            prefix,
+            name=name,
+            **kwargs,
+        )
+        self.aperture_positions = aperture_positions
 
     def set(self, pos: Tuple[float, float, float, float, float]) -> AndStatus:
         try:

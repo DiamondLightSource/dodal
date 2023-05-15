@@ -3,7 +3,7 @@ from ophyd import Device
 from ophyd.sim import FakeEpicsSignal
 
 from dodal import i03
-from dodal.devices.aperturescatterguard import ApertureScatterguard
+from dodal.devices.aperturescatterguard import AperturePositions, ApertureScatterguard
 from dodal.devices.smargon import Smargon
 from dodal.devices.zebra import Zebra
 from dodal.utils import make_all_devices
@@ -78,3 +78,20 @@ def test_device_is_new_after_clearing():
     i03.clear_devices()
     ids_3 = [_make_devices_and_get_id()]
     assert ids_1 != ids_3
+
+
+def test_getting_aperture_scatterguard_twice_gives_valid_object():
+    dummy_aperture_positions = AperturePositions(
+        (1, 2, 3, 4, 5), (6, 7, 8, 9, 10), (11, 12, 13, 14, 15), (16, 17, 18, 19, 20)
+    )
+    ap_scatter = i03.aperture_scatterguard(
+        fake_with_ophyd_sim=True, aperture_positions=dummy_aperture_positions
+    )
+    assert ap_scatter.aperture_positions is not None
+    ap_scatter = i03.aperture_scatterguard(fake_with_ophyd_sim=True)
+    assert ap_scatter.aperture_positions is not None
+
+
+def test_aperture_scatterguard_cannot_be_created_with_invalid_positions():
+    with pytest.raises(TypeError):
+        i03.aperture_scatterguard(fake_with_ophyd_sim=True)
