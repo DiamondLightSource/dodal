@@ -253,7 +253,7 @@ def test_unsuccessful_roi_mode_change_results_in_logged_error(mock_and, fake_eig
         fake_eiger.change_roi_mode(True)
 
     fake_eiger.change_roi_mode(False)
-    fake_eiger.log.error.assert_called_once_with("Failed to switch to ROI mode")
+    fake_eiger.log.error.assert_called_once_with("Failed to disable ROI mode")
 
 
 @patch("dodal.devices.eiger.EigerOdin.check_odin_state")
@@ -347,8 +347,8 @@ def test_when_stage_called_then_cam_acquired_on_meta_ready(
         side_effect=mock_set_odin_filewriter
     )
 
-    fake_eiger.stale_params.sim_put(0)
     fake_eiger.odin.file_writer.capture.sim_put(0)
+    fake_eiger.stale_params.sim_put(0)
     fake_eiger.arming_status = MagicMock()
     fake_eiger.arm_detector(finished_status)
 

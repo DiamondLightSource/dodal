@@ -143,32 +143,35 @@ class EigerDetector(Device):
     def set_cam_pvs(self, old_status) -> AndStatus:
         self.check_callback_error(old_status)
         assert self.detector_params is not None
-        status = Status(timeout=10)
-        status &= self.cam.acquire_time.set(self.detector_params.exposure_time)
-        status &= self.cam.acquire_period.set(self.detector_params.exposure_time)
-        status &= self.cam.num_exposures.set(1)
-        status &= self.cam.image_mode.set(self.cam.ImageMode.MULTIPLE)
-        status &= self.cam.trigger_mode.set(EigerTriggerMode.EXTERNAL_SERIES.value)
+        status = self.cam.acquire_time.set(
+            self.detector_params.exposure_time, timeout=10
+        )
+        status &= self.cam.acquire_period.set(
+            self.detector_params.exposure_time, timeout=10
+        )
+        status &= self.cam.num_exposures.set(1, timeout=10)
+        status &= self.cam.image_mode.set(self.cam.ImageMode.MULTIPLE, timeout=10)
+        status &= self.cam.trigger_mode.set(
+            EigerTriggerMode.EXTERNAL_SERIES.value, timeout=10
+        )
         status.add_callback(self.set_odin_pvs)
 
     def set_odin_pvs(self, old_status):
         self.check_callback_error(old_status)
         assert self.detector_params is not None
-        status = Status(timeout=10)
-        status &= self.odin.file_writer.num_frames_chunks.set(1)
+        status = self.odin.file_writer.num_frames_chunks.set(1, timeout=10)
         status.add_callback(self.set_odin_pvs_after_file_writer_set)
 
     def set_odin_pvs_after_file_writer_set(self, old_status):
         self.check_callback_error(old_status)
         file_prefix = self.detector_params.full_filename
-        odin_status = Status(timeout=10)
         odin_status = self.odin.file_writer.file_path.set(
-            self.detector_params.directory
+            self.detector_params.directory, timeout=10
         )
-        odin_status &= self.odin.file_writer.file_name.set(file_prefix)
+        odin_status &= self.odin.file_writer.file_name.set(file_prefix, timeout=10)
 
-        odin_status &= await_value(self.odin.meta.file_name, file_prefix)
-        odin_status &= await_value(self.odin.file_writer.id, file_prefix)
+        odin_status &= await_value(self.odin.meta.file_name, file_prefix, 10)
+        odin_status &= await_value(self.odin.file_writer.id, file_prefix, 10)
 
         odin_status.add_callback(self.set_mx_settings_pvs)
 
@@ -215,42 +218,42 @@ class EigerDetector(Device):
 
         self.check_callback_error(old_status)
         assert self.detector_params is not None
-        status = Status(timeout=10)
-        status = self.cam.num_images.set(self.detector_params.num_images_per_trigger)
-        status &= self.cam.num_triggers.set(self.detector_params.num_triggers)
-        status &= self.odin.file_writer.num_capture.set(
+        this_status = self.cam.num_images.set(
+            self.detector_params.num_images_per_trigger, timeout=10
+        )
+        this_status &= self.cam.num_triggers.set(
+            self.detector_params.num_triggers, timeout=10
+        )
+        this_status &= self.odin.file_writer.num_capture.set(
             self.detector_params.num_triggers
-            * self.detector_params.num_images_per_trigger
+            * self.detector_params.num_images_per_trigger,
+            timeout=10,
         )
 
         if not self.armed:
-            status.add_callback(self.arm_detector)
+            this_status.add_callback(self.arm_detector)
 
     def wait_for_stale_parameters(self):
-        this_status = Status(timeout=10)
-        this_status &= await_value(self.stale_params, 0)
+        this_status = await_value(self.stale_params, 0, 10)
         this_status.add_callback(self.wait_for_odin_status)
 
     def wait_for_odin_status(self, old_status):
         self.check_callback_error(old_status)
         self.forward_bit_depth_to_filewriter()
-        this_status = Status(timeout=10)
-        this_status &= self.odin.file_writer.capture.set(1)
-        this_status &= await_value(self.odin.meta.ready, 1)
+        this_status = self.odin.file_writer.capture.set(1, timeout=10)
+        this_status &= await_value(self.odin.meta.ready, 1, 10)
         this_status.add_callback(self.wait_for_cam_acquire)
 
     def wait_for_cam_acquire(self, old_status):
         self.check_callback_error(old_status)
         LOGGER.info("Setting aquire")
-        this_status = Status(timeout=10)
-        this_status &= self.cam.acquire.set(1)
+        this_status = self.cam.acquire.set(1, timeout=10)
         this_status.add_callback(self.wait_fan_ready)
 
     def wait_fan_ready(self, old_status):
         LOGGER.info("Wait on fan ready")
         self.filewriters_finished = self.odin.create_finished_status()
-        this_status = Status(timeout=10)
-        this_status &= await_value(self.odin.fan.ready, 1)
+        this_status = await_value(self.odin.fan.ready, 1, 10)
         this_status.add_callback(self.finish_arm)
 
     def finish_arm(self, old_status):
