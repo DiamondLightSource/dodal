@@ -97,9 +97,11 @@ def test_detector_threshold(
     is_energy_change: bool,
     finished_status: Status,
 ):
-    status_obj = MagicMock()
     when(fake_eiger.cam.photon_energy).get().thenReturn(current_energy)
-    when(fake_eiger.cam.photon_energy).set(ANY).thenReturn(status_obj)
+    fake_eiger.cam.photon_energy.set = MagicMock()
+    # fake_eiger.cam.photon_energy.set.return_value = finished_status
+
+    when(fake_eiger.cam.photon_energy).set(ANY, timeout=ANY).thenReturn(finished_status)
 
     # set_detector_threshold completed successfully if this was called
     fake_eiger.cam.acquire_time.set = MagicMock()
@@ -107,7 +109,7 @@ def test_detector_threshold(
     fake_eiger.set_detector_threshold(finished_status, request_energy)
 
     if is_energy_change:
-        verify(fake_eiger.cam.photon_energy, times=1).set(request_energy)
+        verify(fake_eiger.cam.photon_energy, times=1).set(request_energy, timeout=10)
         # assert returned_status == status_obj TODO: replace this line?
     else:
         verify(fake_eiger.cam.photon_energy, times=0).set(ANY)
@@ -228,8 +230,12 @@ def test_change_roi_mode_sets_correct_detector_size_constants(
     fake_eiger.odin.file_writer.image_width.set = mock_odin_width_set
 
     fake_eiger.change_roi_mode(roi_mode)
-    mock_odin_height_set.assert_called_once_with(expected_detector_dimensions.height)
-    mock_odin_width_set.assert_called_once_with(expected_detector_dimensions.width)
+    mock_odin_height_set.assert_called_once_with(
+        expected_detector_dimensions.height, timeout=10
+    )
+    mock_odin_width_set.assert_called_once_with(
+        expected_detector_dimensions.width, timeout=10
+    )
 
 
 @pytest.mark.parametrize(
@@ -241,7 +247,9 @@ def test_change_roi_mode_sets_cam_roi_mode_correctly(
     mock_cam_roi_mode_set = MagicMock()
     fake_eiger.cam.roi_mode.set = mock_cam_roi_mode_set
     fake_eiger.change_roi_mode(roi_mode)
-    mock_cam_roi_mode_set.assert_called_once_with(expected_cam_roi_mode_call)
+    mock_cam_roi_mode_set.assert_called_once_with(
+        expected_cam_roi_mode_call, timeout=10
+    )
 
 
 @patch("ophyd.status.Status.__and__")
@@ -319,7 +327,6 @@ def test_given_stale_parameters_goes_high_before_callbacks_then_stale_parameters
 
     thread.join(0.2)
     assert not thread.is_alive()
-
 
 
 def test_when_stage_called_then_odin_started_after_stale_params_goes_low(
@@ -412,6 +419,7 @@ def test_disarming_not_called_when_already_armed(
     fake_eiger.disarm_detector.assert_not_called()
 
 
+@patch("dodal.devices.eiger.await_value")
 @patch("ophyd.status.Status.__and__")
 @pytest.mark.parametrize(
     "func",
@@ -429,45 +437,48 @@ def test_disarming_not_called_when_already_armed(
     ],
 )
 def test_check_callback_error(
-    mock_and, fake_eiger: EigerDetector, func, finished_status
+    mock_and, mock_await, fake_eiger: EigerDetector, func, finished_status
 ):
+    fake_eiger.odin.file_writer.num_frames_chunks.set = MagicMock()
+    fake_eiger.odin.file_writer.num_frames_chunks.set.return_value = Status(timeout=0)
+    fake_eiger.cam.acquire.set = MagicMock()
+    fake_eiger.cam.acquire.set.return_value = Status(timeout=0)
     dummy_status = Status(timeout=0)
     mock_and.return_value = dummy_status
     fake_eiger.cam.photon_energy.set = MagicMock()
     fake_eiger.cam.photon_energy.set.return_value = dummy_status
+    mock_await.return_value = Status(timeout=0)
     with pytest.raises(errors.StatusTimeoutError):
         eval(func)
 
-@patch("dodal.devices.eiger.await_value")
+
 def test_given_in_free_run_mode_when_staged_then_triggers_and_filewriter_set_correctly(
-    mock_await,
-    fake_eiger: EigerDetector,
+    fake_eiger: EigerDetector, finished_status
 ):
+    fake_eiger.filewriters_finished = finished_status
     fake_eiger.odin.nodes.clear_odin_errors = MagicMock()
     fake_eiger.odin.check_odin_initialised = MagicMock()
     fake_eiger.odin.check_odin_initialised.return_value = (True, "")
     fake_eiger.odin.file_writer.file_path.put(True)
-
     fake_eiger.detector_params.trigger_mode = TriggerMode.FREE_RUN
-    fake_eiger.stage()
+    # fake_eiger.async_stage()
+    fake_eiger.set_num_triggers_and_captures(finished_status)
     assert fake_eiger.cam.num_triggers.get() > fake_eiger.detector_params.num_triggers
     assert fake_eiger.odin.file_writer.num_capture.get() == 0
 
 
 def test_given_in_free_run_mode_when_unstaged_then_waiting_on_file_writer_to_finish_correctly(
-    fake_eiger: EigerDetector,
+    fake_eiger: EigerDetector, finished_status
 ):
-    happy_status = Status()
-    happy_status.set_finished()
-    fake_eiger.filewriters_finished = happy_status
+    fake_eiger.filewriters_finished = finished_status
 
     fake_eiger.odin.file_writer.capture.sim_put(1)
     fake_eiger.odin.file_writer.num_captured.sim_put(2000)
     fake_eiger.odin.check_odin_state = MagicMock(return_value=True)
 
     fake_eiger.detector_params.trigger_mode = TriggerMode.FREE_RUN
+    fake_eiger.armed = True
     fake_eiger.unstage()
 
     assert fake_eiger.odin.meta.stop_writing.get() == 1
     assert fake_eiger.odin.file_writer.capture.get() == 0
-
