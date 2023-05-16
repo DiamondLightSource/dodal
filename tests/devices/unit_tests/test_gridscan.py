@@ -300,17 +300,17 @@ def test_given_x_y_z_of_origin_when_get_motor_positions_then_initial_positions_r
     grid_scan_params: GridScanParams,
 ):
     motor_positions = grid_scan_params.grid_position_to_motor_position(Point3D(0, 0, 0))
-    assert motor_positions.x == 0
-    assert motor_positions.y == 1
-    assert motor_positions.z == 4
+    assert motor_positions.x == -0.3
+    assert motor_positions.y == 0.8
+    assert motor_positions.z == 3.9
 
 
 @pytest.mark.parametrize(
     "grid_position, expected_x, expected_y, expected_z",
     [
-        (Point3D(1, 1, 1), 0.3, 1.2, 4.1),
-        (Point3D(2, 11, 16), 0.6, 3.2, 5.6),
-        (Point3D(7, 5, 5), 2.1, 2.0, 4.5),
+        (Point3D(1, 1, 1), 0.0, 1.0, 4.0),
+        (Point3D(2, 11, 16), 0.3, 3.0, 5.5),
+        (Point3D(6, 5, 5), 1.5, 1.8, 4.4),
     ],
 )
 def test_given_various_x_y_z_when_get_motor_positions_then_expected_positions_returned(
@@ -331,3 +331,9 @@ def test_can_run_fast_grid_scan_in_run_engine(fast_grid_scan):
     RE = RunEngine()
     RE(kickoff_and_complete(fast_grid_scan))
     assert RE.state == "idle"
+
+
+def test_given_x_y_z_steps_when_full_number_calculated_then_answer_is_as_expected(
+    grid_scan_params: GridScanParams,
+):
+    assert grid_scan_params.get_num_images() == 350
