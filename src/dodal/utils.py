@@ -166,8 +166,11 @@ def _is_device_skipped(func: Callable[..., Any]) -> bool:
 
 
 def _is_device_factory(func: Callable[..., Any]) -> bool:
-    return_type = signature(func).return_annotation
-    return _is_device_type(return_type)
+    try:
+        return_type = signature(func).return_annotation
+        return _is_device_type(return_type)
+    except ValueError:  # e.g. built ins without a signature
+        return False
 
 
 def _is_device_type(obj: Type[Any]) -> bool:
