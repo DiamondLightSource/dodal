@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from logging.handlers import TimedRotatingFileHandler
 from os import environ
 from pathlib import Path
 from typing import List, Optional, Tuple
@@ -21,21 +22,21 @@ DEFAULT_FORMATTER = logging.Formatter(
 )
 
 
-class EnhancedRollingFileHandler(logging.handlers.TimedRotatingFileHandler):
+class EnhancedRollingFileHandler(TimedRotatingFileHandler):
     """Combines features of TimedRotatingFileHandler and RotatingFileHandler"""
 
     def __init__(
         self,
         filename,
-        when="D",
+        when="MIDNIGHT",
         interval=1,
-        backupCount=10,
+        backupCount=0,
         encoding=None,
-        delay=0,
-        utc=0,
+        delay=False,
+        utc=False,
         maxBytes=1e8,
     ):
-        logging.handlers.TimedRotatingFileHandler.__init__(
+        TimedRotatingFileHandler.__init__(
             self, filename, when, interval, backupCount, encoding, delay, utc
         )
         self.maxBytes = maxBytes
@@ -44,24 +45,14 @@ class EnhancedRollingFileHandler(logging.handlers.TimedRotatingFileHandler):
         """
         Check file size and times to see if rollover should occur
         """
-        time = super().shouldRollover(record)
-        if time:
-            return 1
-        else:
-            if self.stream is None:  # delay was set...
-                self.stream = self._open()
-            if self.maxBytes > 0:  # are we rolling over?
-                msg = "%s\n" % self.format(record)
-                self.stream.seek(0, 2)  # due to non-posix-compliant Windows feature
-                if self.stream.tell() + len(msg) >= self.maxBytes:
-                    return 1
-        return 0
-
-    def getFilesToDelete(self):
-        """
-        Override method to do nothing - we don't want logs to be deleted
-        """
-        return []
+        if self.stream is None:  # Stream may not have been created
+            self.stream = self._open()
+        if self.maxBytes > 0:  # are we rolling over?
+            msg = "%s\n" % self.format(record)
+            self.stream.seek(0, 2)  # due to non-posix-compliant Windows feature
+            if self.stream.tell() + len(msg) >= self.maxBytes:
+                return 1
+        return super().shouldRollover(record)
 
 
 class BeamlineFilter(logging.Filter):
@@ -119,13 +110,7 @@ def set_up_file_handler(
     if not logging_path:
         logging_path = _get_logging_file_path()
         print(f"Logging to {logging_path}")
-    file_handler = EnhancedRollingFileHandler(
-        filename=logging_path,
-        when="D",
-        interval=1,
-        backupCount=10,
-        maxBytes=1e8,
-    )
+    file_handler = EnhancedRollingFileHandler(filename=logging_path)
     _add_handler(file_handler, logging_level)
 
     # for assistance in debugging
