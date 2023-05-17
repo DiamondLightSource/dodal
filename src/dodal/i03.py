@@ -105,7 +105,8 @@ def aperture_scatterguard(
     """
 
     def load_positions(a_s: ApertureScatterguard):
-        a_s.load_aperture_positions(aperture_positions)
+        if aperture_positions is not None:
+            a_s.load_aperture_positions(aperture_positions)
 
     return device_instantiation(
         device=ApertureScatterguard,
