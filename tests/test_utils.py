@@ -9,15 +9,33 @@ from dodal.utils import collect_factories, get_hostname, make_all_devices
 def test_finds_device_factories() -> None:
     import tests.fake_beamline as fake_beamline
 
-    factories = set(collect_factories(fake_beamline))
+    factories = collect_factories(fake_beamline)
 
     from tests.fake_beamline import device_a, device_b, device_c
 
-    assert {device_a, device_b, device_c} == factories
+    assert {
+        "device_a": device_a,
+        "device_b": device_b,
+        "device_c": device_c,
+    } == factories
 
 
 def test_makes_devices() -> None:
     import tests.fake_beamline as fake_beamline
+
+    devices = make_all_devices(fake_beamline)
+    assert {"readable", "motor", "cryo"} == devices.keys()
+
+
+def test_makes_devices_with_dependencies() -> None:
+    import tests.fake_beamline_dependencies as fake_beamline
+
+    devices = make_all_devices(fake_beamline)
+    assert {"readable", "motor", "cryo"} == devices.keys()
+
+
+def test_makes_devices_with_disordered_dependencies() -> None:
+    import tests.fake_beamline_disordered_dependencies as fake_beamline
 
     devices = make_all_devices(fake_beamline)
     assert {"readable", "motor", "cryo"} == devices.keys()
