@@ -15,7 +15,9 @@ def mock_logger():
 
 @patch("dodal.log.GELFTCPHandler")
 @patch("dodal.log.logging")
+@patch("dodal.log.EnhancedRollingFileHandler")
 def test_handlers_set_at_correct_default_level(
+    mock_enhanced_log,
     mock_logging,
     mock_GELFTCPHandler,
     mock_logger: MagicMock,
@@ -29,7 +31,9 @@ def test_handlers_set_at_correct_default_level(
 
 @patch("dodal.log.GELFTCPHandler")
 @patch("dodal.log.logging")
+@patch("dodal.log.EnhancedRollingFileHandler")
 def test_handlers_set_at_correct_debug_level(
+    mock_enhanced_log,
     mock_logging,
     mock_GELFTCPHandler,
     mock_logger: MagicMock,
@@ -65,14 +69,20 @@ def test_prod_mode_sets_correct_graypy_handler(
 
 @patch("dodal.log.GELFTCPHandler")
 @patch("dodal.log.logging")
+@patch("dodal.log.EnhancedRollingFileHandler")
 def test_no_env_variable_sets_correct_file_handler(
+    mock_enhanced_log,
     mock_logging,
     mock_GELFTCPHandler,
     mock_logger: MagicMock,
 ):
     log.set_up_logging_handlers(None, True)
-    mock_logging.FileHandler.assert_called_once_with(
-        filename=Path("./tmp/dev/dodal.txt")
+    mock_enhanced_log.assert_called_once_with(
+        filename=Path("./tmp/dev/dodal.txt"),
+        when="D",
+        interval=1,
+        backupCount=10,
+        maxBytes=1e8,
     )
 
 

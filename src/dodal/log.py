@@ -21,6 +21,49 @@ DEFAULT_FORMATTER = logging.Formatter(
 )
 
 
+class EnhancedRollingFileHandler(logging.handlers.TimedRotatingFileHandler):
+    """Combines features of TimedRotatingFileHandler and RotatingFileHandler"""
+
+    def __init__(
+        self,
+        filename,
+        when="D",
+        interval=1,
+        backupCount=10,
+        encoding=None,
+        delay=0,
+        utc=0,
+        maxBytes=1e8,
+    ):
+        logging.handlers.TimedRotatingFileHandler.__init__(
+            self, filename, when, interval, backupCount, encoding, delay, utc
+        )
+        self.maxBytes = maxBytes
+
+    def shouldRollover(self, record):
+        """
+        Check file size and times to see if rollover should occur
+        """
+        time = super().shouldRollover(record)
+        if time:
+            return 1
+        else:
+            if self.stream is None:  # delay was set...
+                self.stream = self._open()
+            if self.maxBytes > 0:  # are we rolling over?
+                msg = "%s\n" % self.format(record)
+                self.stream.seek(0, 2)  # due to non-posix-compliant Windows feature
+                if self.stream.tell() + len(msg) >= self.maxBytes:
+                    return 1
+        return 0
+
+    def getFilesToDelete(self):
+        """
+        Override method to do nothing - we don't want logs to be deleted
+        """
+        return []
+
+
 class BeamlineFilter(logging.Filter):
     beamline: Optional[str] = environ.get("BEAMLINE")
 
@@ -76,7 +119,13 @@ def set_up_file_handler(
     if not logging_path:
         logging_path = _get_logging_file_path()
         print(f"Logging to {logging_path}")
-    file_handler = logging.FileHandler(filename=logging_path)
+    file_handler = EnhancedRollingFileHandler(
+        filename=logging_path,
+        when="D",
+        interval=1,
+        backupCount=10,
+        maxBytes=1e8,
+    )
     _add_handler(file_handler, logging_level)
 
     # for assistance in debugging
