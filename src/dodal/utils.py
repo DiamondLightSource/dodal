@@ -35,6 +35,7 @@ from bluesky.protocols import (
     Triggerable,
     WritesExternalAssets,
 )
+from ophyd.utils import ExceptionBundle
 
 #: Protocols defining interface to hardware
 BLUESKY_PROTOCOLS = [
@@ -53,6 +54,15 @@ BLUESKY_PROTOCOLS = [
     Configurable,
     Triggerable,
 ]
+
+DeviceDict = Dict[str, HasName]
+ExceptionDict = Dict[str, Exception]
+
+
+@dataclass
+class DevicesAndExceptions:
+    devices: DeviceDict
+    exceptions: ExceptionDict
 
 
 Point2D = namedtuple("Point2D", ["x", "y"])
@@ -99,11 +109,39 @@ def skip_device(precondition=lambda: True):
 
 def make_all_devices(
     module: Union[str, ModuleType, None] = None, **kwargs
-) -> Dict[str, HasName]:
+) -> DeviceDict:
     """Makes all devices in the given beamline module.
 
     In cases of device interdependencies it ensures a device is created before any which
     depend on it.
+
+    Args:
+        module (Union[str, ModuleType, None], optional): The module to make devices from.
+        **kwargs: Arguments passed on to every device.
+
+    Returns:
+        Dict[str, Any]: A dictionary of device name and device
+    """
+    devices_and_exceptions = make_all_devices_without_throwing(module, **kwargs)
+    if devices_and_exceptions.exceptions:
+        raise ExceptionBundle(
+            msg=f"Multiple exceptions while executing device factories: {list(devices_and_exceptions.exceptions.keys())}",
+            exceptions=devices_and_exceptions.exceptions,
+        )
+    return devices_and_exceptions.devices
+
+
+def make_all_devices_without_throwing(
+    module: Union[str, ModuleType, None] = None, **kwargs
+) -> DevicesAndExceptions:
+    """Makes all devices in the given beamline module.
+
+    In cases of device interdependencies it ensures a device is created before any which
+    depend on it.
+    In cases of devices failing to instantiate, a reference to the device with the
+    exception is stored to allow other devices to instantiate.
+    If a failing device is a dependency of other devices, the dependent devices do not
+    attempt to instantiate.
 
     Args:
         module (Union[str, ModuleType, None], optional): The module to make devices from.
@@ -121,26 +159,46 @@ def make_all_devices(
 def invoke_factories(
     factories: Mapping[str, Callable[..., Any]],
     **kwargs,
-) -> Dict[str, HasName]:
+) -> DevicesAndExceptions:
     devices: Dict[str, HasName] = {}
+    exceptions: Dict[str, Exception] = {}
     dependencies = {
         factory_name: set(extract_dependencies(factories, factory_name))
         for factory_name in factories.keys()
     }
-    while len(devices) < len(factories):
+    while len(devices) + len(exceptions) < len(factories):
         leaves = [
             device
             for device, device_dependencies in dependencies.items()
-            if device not in devices.keys()
-            and len(device_dependencies - set(devices.keys())) == 0
+            if device not in devices
+            and device not in exceptions
+            and all(
+                dependency in devices or
+                dependency in exceptions
+                for dependency in device_dependencies
+            )
         ]
         dependent_name = leaves.pop()
-        params = {name: devices[name] for name in dependencies[dependent_name]}
-        devices[dependent_name] = factories[dependent_name](**params, **kwargs)
+        failed_dependencies = {
+            name: exception
+            for name, exception in exceptions.items()
+            if name in dependencies[dependent_name]
+        }
+        if failed_dependencies:
+            exceptions[dependent_name] = ExceptionBundle(
+                msg=f"Exception(s) prevented executing device factory: {dependent_name}",
+                exceptions=failed_dependencies,
+            )
+        else:
+            params = {name: devices[name] for name in dependencies[dependent_name]}
+            try:
+                devices[dependent_name] = factories[dependent_name](**params, **kwargs)
+            except Exception as e:
+                exceptions[dependent_name] = e
 
     all_devices = {device.name: device for device in devices.values()}
 
-    return all_devices
+    return DevicesAndExceptions(all_devices, exceptions)
 
 
 def extract_dependencies(

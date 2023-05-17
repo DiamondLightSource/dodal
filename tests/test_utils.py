@@ -1,9 +1,16 @@
 from unittest.mock import MagicMock, patch
 
+import pytest
 from bluesky.protocols import Readable
 from ophyd import EpicsMotor
+from ophyd.utils import DisconnectedError, ExceptionBundle
 
-from dodal.utils import collect_factories, get_hostname, make_all_devices
+from dodal.utils import (
+    collect_factories,
+    get_hostname,
+    make_all_devices,
+    make_all_devices_without_throwing,
+)
 
 
 def test_finds_device_factories() -> None:
@@ -44,6 +51,39 @@ def test_makes_devices_with_disordered_dependencies() -> None:
 def test_makes_devices_with_module_name() -> None:
     devices = make_all_devices("tests.fake_beamline")
     assert {"readable", "motor", "cryo"} == devices.keys()
+
+
+def test_makes_other_devices_when_device_fails() -> None:
+    import tests.test_beamline_disordered_and_broken as fake_beamline
+
+    devices = make_all_devices_without_throwing(fake_beamline).devices
+    assert "motor" in devices
+    assert "readable" not in devices
+    assert "cryo" not in devices
+
+
+def test_dependent_devices_not_instantiated_when_dependency_fails() -> None:
+    import tests.test_beamline_disordered_and_broken as fake_beamline
+
+    devices_and_exceptions = make_all_devices_without_throwing(fake_beamline)
+    devices = devices_and_exceptions.devices
+    exceptions = devices_and_exceptions.exceptions
+    assert "cryo" not in devices
+    assert "device_x" in exceptions  # root exception
+    x_exception = exceptions["device_x"]
+    assert isinstance(exceptions["device_x"], DisconnectedError)
+    assert "device_z" in exceptions
+    z_exception = exceptions["device_z"]
+    assert isinstance(z_exception, ExceptionBundle)
+    assert "device_x" in z_exception.exceptions
+    assert z_exception.exceptions["device_x"] is x_exception
+
+
+def test_exception_propagates_if_requested() -> None:
+    import tests.test_beamline_disordered_and_broken as fake_beamline
+
+    with pytest.raises(ExceptionBundle):
+        make_all_devices(fake_beamline)
 
 
 def test_get_hostname() -> None:
