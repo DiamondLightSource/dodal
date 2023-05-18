@@ -8,6 +8,7 @@ from ophyd.status import AndStatus, Status, SubscriptionStatus
 from dodal.devices.detector import DetectorParams, TriggerMode
 from dodal.devices.eiger_odin import EigerOdin
 from dodal.devices.status import await_value
+from dodal.devices.utils import wrap_and_do_funcs  # TODO make neater
 from dodal.log import LOGGER
 
 FREE_RUN_MAX_IMAGES = 1000000
@@ -75,22 +76,13 @@ class EigerDetector(Device):
             raise Exception("\n".join(errors))
 
     def async_stage(self):
-        self.arming_status = Status()
+        self.arming_status = Status(timeout=30)
         self.odin.nodes.clear_odin_errors()
         status_ok, error_message = self.odin.check_odin_initialised()
         if not status_ok:
             raise Exception(f"Odin not initialised: {error_message}")
 
-        if self.detector_params.use_roi_mode:
-            self.enable_roi_mode()  # Chain starts here if using roi mode
-        else:
-            # So no callback error is raised (probably a neater way to do this)
-            finished_status = Status()
-            finished_status.set_finished()
-
-            self.set_detector_threshold(
-                energy=self.detector_params.current_energy, old_status=finished_status
-            )  # Chain starts here if not using roi mode
+        self.arming_status = self.make_chained_functions()
 
     def unstage(self) -> bool:
         assert self.detector_params is not None
@@ -115,13 +107,14 @@ class EigerDetector(Device):
         self.disable_roi_mode()
         return status_ok
 
+    # this is no longer used TODO clean up
     def enable_roi_mode(self):
         self.change_roi_mode(True)
 
     def disable_roi_mode(self):
         self.change_roi_mode(False)
 
-    def change_roi_mode(self, enable: bool):
+    def change_roi_mode(self, enable: bool) -> Status:
         assert self.detector_params is not None
         detector_dimensions = (
             self.detector_params.detector_size_constants.roi_size_pixels
@@ -142,27 +135,12 @@ class EigerDetector(Device):
         status &= self.odin.file_writer.num_col_chunks.set(
             detector_dimensions.width, timeout=10
         )
-        if enable:
-            status.add_callback(
-                lambda: self.set_detector_threshold(
-                    energy=self.detector_params.current_energy,
-                    old_status=status,
-                )
-            )
 
-        else:
-            # This part means unstaging is still blocking for now
-            try:
-                status.wait()
-            except Exception:
-                # Less specific logging message is currently read when enable = True, see check_callback_error()
-                self.log.error("Failed to disable ROI mode")
+        return status
 
-    def set_cam_pvs(self, old_status) -> AndStatus:
-        self.check_callback_error(old_status)
+    def set_cam_pvs(self) -> AndStatus:
         assert self.detector_params is not None
 
-        self.check_callback_error(old_status)
         status = self.cam.acquire_time.set(
             self.detector_params.exposure_time, timeout=10
         )
@@ -174,29 +152,24 @@ class EigerDetector(Device):
         status &= self.cam.trigger_mode.set(
             InternalEigerTriggerMode.EXTERNAL_SERIES.value, timeout=10
         )
-        status.add_callback(self.set_odin_pvs)
+        return status
 
-    def set_odin_pvs(self, old_status):
-        self.check_callback_error(old_status)
+    def set_odin_pvs(self):
         assert self.detector_params is not None
         status = self.odin.file_writer.num_frames_chunks.set(1, timeout=10)
-        status.add_callback(self.set_odin_pvs_after_file_writer_set)
+        return status
 
-    def set_odin_pvs_after_file_writer_set(self, old_status):
-        self.check_callback_error(old_status)
+    def set_odin_pvs_after_file_writer_set(self):
         file_prefix = self.detector_params.full_filename
-        odin_status = self.odin.file_writer.file_path.set(
+        status = self.odin.file_writer.file_path.set(
             self.detector_params.directory, timeout=10
         )
-        odin_status &= self.odin.file_writer.file_name.set(file_prefix, timeout=10)
+        status &= self.odin.file_writer.file_name.set(file_prefix, timeout=10)
+        status &= await_value(self.odin.meta.file_name, file_prefix, 10)
+        status &= await_value(self.odin.file_writer.id, file_prefix, 10)
+        return status
 
-        odin_status &= await_value(self.odin.meta.file_name, file_prefix, 10)
-        odin_status &= await_value(self.odin.file_writer.id, file_prefix, 10)
-
-        odin_status.add_callback(self.set_mx_settings_pvs)
-
-    def set_mx_settings_pvs(self, old_status):
-        self.check_callback_error(old_status)
+    def set_mx_settings_pvs(self):
         assert self.detector_params is not None
         beam_x_pixels, beam_y_pixels = self.detector_params.get_beam_position_pixels(
             self.detector_params.detector_distance
@@ -210,11 +183,9 @@ class EigerDetector(Device):
         status &= self.cam.omega_incr.set(
             self.detector_params.omega_increment, timeout=10
         )
-        status.add_callback(self.set_num_triggers_and_captures)
+        return status
 
-    def set_detector_threshold(
-        self, old_status: Status, energy: float, tolerance: float = 0.1
-    ):
+    def set_detector_threshold(self, energy: float, tolerance: float = 0.1):
         """Ensures the energy threshold on the detector is set to the specified energy (in eV),
         within the specified tolerance.
         Args:
@@ -223,23 +194,21 @@ class EigerDetector(Device):
                 this tolerance it is not set again. Defaults to 0.1eV.
         """
 
-        self.check_callback_error(old_status)
         current_energy = self.cam.photon_energy.get()
 
         if abs(current_energy - energy) > tolerance:
-            status = self.cam.photon_energy.set(energy, timeout=10)
+            return self.cam.photon_energy.set(energy, timeout=10)
         else:
             status = Status()
             status.set_finished()
-        status.add_callback(self.set_cam_pvs)
+            return status
 
-    def set_num_triggers_and_captures(self, old_status):
+    def set_num_triggers_and_captures(self):
         """Sets the number of triggers and the number of images for the Eiger to capture
         during the datacollection. The number of images is the number of images per
         trigger.
         """
 
-        self.check_callback_error(old_status)
         assert self.detector_params is not None
         status = self.cam.num_images.set(
             self.detector_params.num_images_per_trigger, timeout=10
@@ -257,46 +226,36 @@ class EigerDetector(Device):
                 self.detector_params.full_number_of_images, timeout=10
             )
 
-        status.add_callback(self.arm_detector)
+        return status
 
-    def wait_for_stale_parameters(self):
-        this_status = await_value(self.stale_params, 0, 10)
-        this_status.add_callback(self.wait_for_odin_status)
-
-    def wait_for_odin_status(self, old_status):
-        self.check_callback_error(old_status)
+    def _wait_for_odin_status(self):
         self.forward_bit_depth_to_filewriter()
         this_status = self.odin.file_writer.capture.set(1, timeout=10)
         this_status &= await_value(self.odin.meta.ready, 1, 10)
-        this_status.add_callback(self.wait_for_cam_acquire)
+        return this_status
 
-    def wait_for_cam_acquire(self, old_status):
-        self.check_callback_error(old_status)
+    def _wait_for_cam_acquire(self):
         LOGGER.info("Setting aquire")
         this_status = self.cam.acquire.set(1, timeout=10)
-        this_status.add_callback(self.wait_fan_ready)
+        return this_status
 
-    def wait_fan_ready(self, old_status):
-        self.check_callback_error(old_status)
+    def _wait_fan_ready(self):
         LOGGER.info("Wait on fan ready")
         self.filewriters_finished = self.odin.create_finished_status()
         this_status = await_value(self.odin.fan.ready, 1, 10)
-        this_status.add_callback(self.finish_arm)
+        return this_status
 
-    def finish_arm(self, old_status):
-        self.check_callback_error(old_status)
+    def _finish_arm(self):
         LOGGER.info("Finishing arm")
         self.armed = True
-        self.arming_status.set_finished()
+        # TODO: clean this bit (dont need self.armed_status)
+        dummy_status = Status()
+        dummy_status.set_finished()
+        return dummy_status
 
     def forward_bit_depth_to_filewriter(self):
         bit_depth = self.bit_depth.get()
         self.odin.file_writer.data_type.put(f"UInt{bit_depth}")
-
-    def arm_detector(self, old_status) -> Status:
-        self.check_callback_error(old_status)
-        LOGGER.info("Waiting on stale parameters to go low")
-        self.wait_for_stale_parameters()  # Starts the chain of arming functions
 
         return self.arming_status
 
@@ -304,8 +263,33 @@ class EigerDetector(Device):
         self.cam.acquire.put(0)
         self.armed = False
 
-    def check_callback_error(self, status: Status):
-        error = status.exception()
-        if error is not None:
-            LOGGER.error(f"{status} has failed with error {error}")
-            raise error
+    def make_chained_functions(self) -> Status:
+        unwrapped_funcs = list()
+        detector_params: DetectorParams = self.detector_params
+        if detector_params.use_roi_mode:
+            unwrapped_funcs.append(lambda: self.change_roi_mode(enable=True))
+
+        unwrapped_funcs.extend(
+            [
+                lambda: self.set_detector_threshold(
+                    energy=detector_params.current_energy
+                ),
+                self.set_cam_pvs,
+                self.set_odin_pvs,
+                self.set_mx_settings_pvs,
+                self.set_num_triggers_and_captures,
+            ]
+        )
+
+        if not self.armed:
+            unwrapped_funcs.extend(
+                [
+                    lambda: await_value(self.stale_params, 0, 60),
+                    self._wait_for_odin_status,
+                    self._wait_for_cam_acquire,
+                    self._wait_fan_ready,
+                    self._finish_arm,
+                ]
+            )
+
+        return wrap_and_do_funcs(unwrapped_funcs)
