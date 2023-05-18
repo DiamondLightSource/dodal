@@ -5,7 +5,9 @@ from bluesky.protocols import Readable
 from ophyd import EpicsMotor
 from ophyd.utils import DisconnectedError, ExceptionBundle
 
+from dodal.devices.cryostream import Cryo
 from dodal.utils import (
+    ExceptionInformation,
     _collect_factories,
     get_hostname,
     make_all_devices,
@@ -71,12 +73,17 @@ def test_dependent_devices_not_instantiated_when_dependency_fails() -> None:
     assert "cryo" not in devices
     assert "device_x" in exceptions  # root exception
     x_exception = exceptions["device_x"]
-    assert isinstance(exceptions["device_x"], DisconnectedError)
+    assert isinstance(x_exception, ExceptionInformation)
+    assert x_exception.return_type is Readable
+    assert x_exception.call_args == {}
+    assert isinstance(x_exception.exception, DisconnectedError)
     assert "device_z" in exceptions
     z_exception = exceptions["device_z"]
-    assert isinstance(z_exception, ExceptionBundle)
-    assert "device_x" in z_exception.exceptions
-    assert z_exception.exceptions["device_x"] is x_exception
+    assert isinstance(z_exception, ExceptionInformation)
+    assert z_exception.return_type is Cryo
+    assert z_exception.call_args == {"device_y": devices["motor"]}
+    assert isinstance(z_exception.exception, ExceptionBundle)
+    assert x_exception.exception in z_exception.exception.exceptions.values()
 
 
 def test_exception_propagates_if_requested() -> None:

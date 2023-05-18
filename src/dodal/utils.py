@@ -56,13 +56,19 @@ BLUESKY_PROTOCOLS = [
 ]
 
 DeviceDict = Dict[str, HasName]
-ExceptionDict = Dict[str, Exception]
+
+
+@dataclass
+class ExceptionInformation:
+    call_args: Dict[str, Any]
+    exception: Exception
+    return_type: type
 
 
 @dataclass
 class DevicesAndExceptions:
     devices: DeviceDict
-    exceptions: ExceptionDict
+    exceptions: Dict[str, ExceptionInformation]
 
 
 Point2D = namedtuple("Point2D", ["x", "y"])
@@ -161,7 +167,7 @@ def _invoke_factories(
     **kwargs,
 ) -> DevicesAndExceptions:
     devices: Dict[str, HasName] = {}
-    exceptions: Dict[str, Exception] = {}
+    exceptions: Dict[str, ExceptionInformation] = {}
     dependencies = {
         factory_name: set(_extract_dependencies(factories, factory_name))
         for factory_name in factories.keys()
@@ -173,28 +179,40 @@ def _invoke_factories(
             if device not in devices
             and device not in exceptions
             and all(
-                dependency in devices or
-                dependency in exceptions
+                dependency in devices or dependency in exceptions
                 for dependency in device_dependencies
             )
         ]
         dependent_name = leaves.pop()
+        factory = factories[dependent_name]
+        return_type = signature(factory).return_annotation
+        params = {
+            name: devices[name]
+            for name in dependencies[dependent_name]
+            if name in devices
+        }
+        params.update(**kwargs)
         failed_dependencies = {
             name: exception
             for name, exception in exceptions.items()
             if name in dependencies[dependent_name]
         }
         if failed_dependencies:
-            exceptions[dependent_name] = ExceptionBundle(
-                msg=f"Exception(s) prevented executing device factory: {dependent_name}",
-                exceptions=failed_dependencies,
+            exceptions[dependent_name] = ExceptionInformation(
+                return_type=return_type,
+                exception=ExceptionBundle(
+                    msg=f"Exception(s) prevented executing device factory: {dependent_name}",
+                    exceptions=failed_dependencies,
+                ),
+                call_args=params,
             )
         else:
-            params = {name: devices[name] for name in dependencies[dependent_name]}
             try:
-                devices[dependent_name] = factories[dependent_name](**params, **kwargs)
+                devices[dependent_name] = factory(**params, **kwargs)
             except Exception as e:
-                exceptions[dependent_name] = e
+                exceptions[dependent_name] = ExceptionInformation(
+                    return_type=return_type, exception=e, call_args=params
+                )
 
     all_devices = {device.name: device for device in devices.values()}
 
