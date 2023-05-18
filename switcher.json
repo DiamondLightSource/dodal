@@ -32,6 +32,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/51_aperture_scatterguard_no_positions/"
   },
   {
+    "version": "52_allow_aperture_movement_when_close",
+    "url": "https://DiamondLightSource.github.io/dodal/52_allow_aperture_movement_when_close/"
+  },
+  {
     "version": "I23-Grid-Scans",
     "url": "https://DiamondLightSource.github.io/dodal/I23-Grid-Scans/"
   },
