@@ -152,18 +152,18 @@ def make_all_devices_without_throwing(
     """
     if isinstance(module, str) or module is None:
         module = import_module(module or __name__)
-    factories = collect_factories(module)
-    return invoke_factories(factories, **kwargs)
+    factories = _collect_factories(module)
+    return _invoke_factories(factories, **kwargs)
 
 
-def invoke_factories(
+def _invoke_factories(
     factories: Mapping[str, Callable[..., Any]],
     **kwargs,
 ) -> DevicesAndExceptions:
     devices: Dict[str, HasName] = {}
     exceptions: Dict[str, Exception] = {}
     dependencies = {
-        factory_name: set(extract_dependencies(factories, factory_name))
+        factory_name: set(_extract_dependencies(factories, factory_name))
         for factory_name in factories.keys()
     }
     while len(devices) + len(exceptions) < len(factories):
@@ -201,7 +201,7 @@ def invoke_factories(
     return DevicesAndExceptions(all_devices, exceptions)
 
 
-def extract_dependencies(
+def _extract_dependencies(
     factories: Mapping[str, Callable[..., Any]], factory_name: str
 ) -> Iterable[str]:
     for name, param in inspect.signature(factories[factory_name]).parameters.items():
@@ -209,7 +209,7 @@ def extract_dependencies(
             yield name
 
 
-def collect_factories(module: ModuleType) -> Mapping[str, Callable[..., Any]]:
+def _collect_factories(module: ModuleType) -> Mapping[str, Callable[..., Any]]:
     factories = {}
     for var in module.__dict__.values():
         if callable(var) and _is_device_factory(var) and not _is_device_skipped(var):

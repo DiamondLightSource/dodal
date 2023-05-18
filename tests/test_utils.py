@@ -6,7 +6,7 @@ from ophyd import EpicsMotor
 from ophyd.utils import DisconnectedError, ExceptionBundle
 
 from dodal.utils import (
-    collect_factories,
+    _collect_factories,
     get_hostname,
     make_all_devices,
     make_all_devices_without_throwing,
@@ -16,7 +16,7 @@ from dodal.utils import (
 def test_finds_device_factories() -> None:
     import tests.fake_beamline as fake_beamline
 
-    factories = collect_factories(fake_beamline)
+    factories = _collect_factories(fake_beamline)
 
     from tests.fake_beamline import device_a, device_b, device_c
 
