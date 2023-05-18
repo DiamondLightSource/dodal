@@ -12,6 +12,7 @@ from dodal.devices.detector import DetectorParams, TriggerMode
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.status import await_value
 from dodal.devices.utils import wrap_and_do_funcs
+from dodal.log import LOGGER
 
 TEST_DETECTOR_SIZE_CONSTANTS = EIGER2_X_16M_SIZE
 
@@ -146,20 +147,43 @@ def test_check_detector_variables(
             assert False, f"exception was raised {e}"
 
 
-def test_when_set_odin_pvs_called_then_full_filename_written(fake_eiger: EigerDetector):
+# Tests transition from set_odin_pvs_after_file_writer_set to set_mx_settings_pvs
+def test_when_set_odin_pvs_called_then_full_filename_written_and_set_mx_settings_runs(
+    fake_eiger: EigerDetector,
+):
     expected_full_filename = f"{TEST_PREFIX}_{TEST_RUN_NUMBER}"
 
-    status = fake_eiger.set_odin_pvs()
-    status &= fake_eiger.set_odin_pvs_after_file_writer_set()
+    unwrapped_funcs = [
+        fake_eiger.set_odin_pvs,
+        fake_eiger.set_odin_pvs_after_file_writer_set,
+        fake_eiger.set_mx_settings_pvs,
+    ]
+
+    status = wrap_and_do_funcs(unwrapped_funcs)
 
     fake_eiger.odin.file_writer.num_frames_chunks.sim_put(1)
     assert fake_eiger.detector_params is not None
     # Logic for propagating filename is not in fake eiger
     fake_eiger.odin.meta.file_name.sim_put(expected_full_filename)
     fake_eiger.odin.file_writer.id.sim_put(expected_full_filename)
+
+    assert (
+        fake_eiger.cam.beam_center_x.get()
+        != fake_eiger.detector_params.get_beam_position_pixels(
+            fake_eiger.detector_params.detector_distance
+        )[0]
+    )
+
     status.wait()
 
     assert fake_eiger.odin.file_writer.file_name.get() == expected_full_filename
+
+    assert (
+        fake_eiger.cam.beam_center_x.get()
+        == fake_eiger.detector_params.get_beam_position_pixels(
+            fake_eiger.detector_params.detector_distance
+        )[0]
+    )
 
 
 def test_stage_raises_exception_if_odin_initialisation_status_not_ok(fake_eiger):
@@ -245,6 +269,7 @@ def test_change_roi_mode_sets_cam_roi_mode_correctly(
     )
 
 
+# Tests transition from change ROI to set_detector_threshold
 @patch("ophyd.status.Status.__and__")
 def test_unsuccessful_roi_mode_change_results_in_callback_error(mock_and, fake_eiger):
     dummy_status = Status(timeout=0)
@@ -263,15 +288,6 @@ def test_unsuccessful_roi_mode_change_results_in_callback_error(mock_and, fake_e
     # Test false
     with pytest.raises(errors.StatusTimeoutError):
         fake_eiger.change_roi_mode(enable=False).wait()
-
-    # fake_eiger.log.error = MagicMock()
-
-    # with pytest.raises(errors.StatusTimeoutError):
-    #     fake_eiger.change_roi_mode(True)
-
-    # fake_eiger.change_roi_mode(False)
-
-    # fake_eiger.log.error.assert_called_once_with("Failed to disable ROI mode")
 
 
 @patch("dodal.devices.eiger.EigerOdin.check_odin_state")
@@ -350,7 +366,12 @@ def test_when_stage_called_then_odin_started_after_stale_params_goes_low(
 
     fake_eiger.arming_status = MagicMock()
 
-    fake_eiger.async_stage()
+    unwrapped_funcs = [
+        lambda: await_value(fake_eiger.stale_params, 0, 60),
+        fake_eiger._wait_for_odin_status,
+    ]
+
+    wrap_and_do_funcs(unwrapped_funcs)
 
     assert fake_eiger.odin.file_writer.capture.get() == 0
 
@@ -370,7 +391,13 @@ def test_when_stage_called_then_cam_acquired_on_meta_ready(
     fake_eiger.odin.file_writer.capture.sim_put(0)
     fake_eiger.stale_params.sim_put(0)
     fake_eiger.arming_status = MagicMock()
-    fake_eiger.async_stage()
+
+    unwrapped_funcs = [
+        fake_eiger._wait_for_odin_status,
+        fake_eiger._wait_for_cam_acquire,
+    ]
+
+    wrap_and_do_funcs(unwrapped_funcs)
 
     assert fake_eiger.cam.acquire.get() == 0
 
@@ -426,38 +453,33 @@ def test_disarming_not_called_when_already_armed(
     fake_eiger.disarm_detector.assert_not_called()
 
 
-# @patch("dodal.devices.eiger.await_value")
-# @patch("ophyd.status.Status.__and__")
-# @pytest.mark.parametrize(
-#     "func",
-#     [
-#         ("fake_eiger.set_detector_threshold(finished_status, 200.0)"),
-#         ("fake_eiger.set_cam_pvs(finished_status)"),
-#         ("fake_eiger.set_odin_pvs(finished_status)"),
-#         ("fake_eiger.set_odin_pvs_after_file_writer_set(finished_status)"),
-#         ("fake_eiger.set_mx_settings_pvs(finished_status)"),
-#         ("fake_eiger.set_num_triggers_and_captures(finished_status)"),
-#         ("fake_eiger.wait_for_odin_status(finished_status)"),
-#         ("fake_eiger.wait_for_cam_acquire(finished_status)"),
-#         ("fake_eiger.wait_fan_ready(finished_status)"),
-#         ("fake_eiger.wait_for_stale_parameters()"),
-#     ],
-# )
-# def test_check_callback_error(
-#     mock_and, mock_await, fake_eiger: EigerDetector, func, finished_status
-# ):
-#     fake_eiger.odin.file_writer.num_frames_chunks.set = MagicMock()
-#     fake_eiger.odin.file_writer.num_frames_chunks.set.return_value = Status(timeout=0)
-#     fake_eiger.cam.acquire.set = MagicMock()
-#     fake_eiger.cam.acquire.set.return_value = Status(timeout=0)
-#     dummy_status = Status(timeout=0)
-#     mock_and.return_value = dummy_status
-#     fake_eiger.cam.photon_energy.set = MagicMock()
-#     fake_eiger.cam.photon_energy.set.return_value = dummy_status
-#     fake_eiger.stale_params.sim_put(1)
-#     mock_await.return_value = Status(timeout=0)
-#     with pytest.raises(errors.StatusTimeoutError):
-#         eval(func)
+@pytest.mark.parametrize(
+    "func",
+    [
+        ("lambda: self.set_detector_threshold(energy=detector_params.current_energy)"),
+        ("fake_eiger.set_cam_pvs"),
+        ("fake_eiger.set_odin_pvs"),
+        ("fake_eiger.set_odin_pvs_after_file_writer_set"),
+        ("fake_eiger.set_mx_settings_pvs"),
+        ("fake_eiger.set_num_triggers_and_captures"),
+        ("fake_eiger._wait_for_odin_status"),
+        ("fake_eiger._wait_for_cam_acquire"),
+        ("fake_eiger._wait_fan_ready"),
+        ("fake_eiger._finish_arm"),
+    ],
+)
+def test_check_callback_error(fake_eiger: EigerDetector, func):
+    def dummy_bad_status_function():
+        status = Status()
+        status.set_exception(Exception)
+        return status
+
+    LOGGER.error = MagicMock()
+
+    unwrapped_funcs = [dummy_bad_status_function, eval(func)]
+
+    wrap_and_do_funcs(unwrapped_funcs)
+    LOGGER.error.assert_called_once
 
 
 def test_given_in_free_run_mode_when_staged_then_triggers_and_filewriter_set_correctly(

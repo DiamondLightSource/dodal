@@ -154,12 +154,12 @@ class EigerDetector(Device):
         )
         return status
 
-    def set_odin_pvs(self):
+    def set_odin_pvs(self) -> Status:
         assert self.detector_params is not None
         status = self.odin.file_writer.num_frames_chunks.set(1, timeout=10)
         return status
 
-    def set_odin_pvs_after_file_writer_set(self):
+    def set_odin_pvs_after_file_writer_set(self) -> Status:
         file_prefix = self.detector_params.full_filename
         status = self.odin.file_writer.file_path.set(
             self.detector_params.directory, timeout=10
@@ -185,7 +185,7 @@ class EigerDetector(Device):
         )
         return status
 
-    def set_detector_threshold(self, energy: float, tolerance: float = 0.1):
+    def set_detector_threshold(self, energy: float, tolerance: float = 0.1) -> Status:
         """Ensures the energy threshold on the detector is set to the specified energy (in eV),
         within the specified tolerance.
         Args:
@@ -203,7 +203,7 @@ class EigerDetector(Device):
             status.set_finished()
             return status
 
-    def set_num_triggers_and_captures(self):
+    def set_num_triggers_and_captures(self) -> Status:
         """Sets the number of triggers and the number of images for the Eiger to capture
         during the datacollection. The number of images is the number of images per
         trigger.
@@ -228,24 +228,24 @@ class EigerDetector(Device):
 
         return status
 
-    def _wait_for_odin_status(self):
+    def _wait_for_odin_status(self) -> Status:
         self.forward_bit_depth_to_filewriter()
         this_status = self.odin.file_writer.capture.set(1, timeout=10)
         this_status &= await_value(self.odin.meta.ready, 1, 10)
         return this_status
 
-    def _wait_for_cam_acquire(self):
+    def _wait_for_cam_acquire(self) -> Status:
         LOGGER.info("Setting aquire")
         this_status = self.cam.acquire.set(1, timeout=10)
         return this_status
 
-    def _wait_fan_ready(self):
+    def _wait_fan_ready(self) -> Status:
         LOGGER.info("Wait on fan ready")
         self.filewriters_finished = self.odin.create_finished_status()
         this_status = await_value(self.odin.fan.ready, 1, 10)
         return this_status
 
-    def _finish_arm(self):
+    def _finish_arm(self) -> Status:
         LOGGER.info("Finishing arm")
         self.armed = True
         # TODO: clean this bit (dont need self.armed_status)
@@ -275,7 +275,7 @@ class EigerDetector(Device):
                     energy=detector_params.current_energy
                 ),
                 self.set_cam_pvs,
-                self.set_odin_pvs,
+                self.set_odin_pvs_after_file_writer_set,
                 self.set_mx_settings_pvs,
                 self.set_num_triggers_and_captures,
             ]
