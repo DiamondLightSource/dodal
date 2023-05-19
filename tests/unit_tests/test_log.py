@@ -128,7 +128,7 @@ def test_when_EnhancedRollingFileHandler_reaches_max_size_then_rolls_over():
     )
 
 
-def test_when_EnhancedRollingFileHandler_not_at_max_size_then_rolls_over():
+def test_when_EnhancedRollingFileHandler_not_at_max_size_then_no_roll_over():
     rolling_file_handler = log.EnhancedRollingFileHandler("test", delay=True)
     mock_stream = MagicMock()
     mock_stream.tell.return_value = 0
