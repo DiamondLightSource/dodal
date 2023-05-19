@@ -60,7 +60,6 @@ DeviceDict = Dict[str, HasName]
 
 @dataclass
 class ExceptionInformation:
-    call_args: Dict[str, Any]
     exception: Exception
     return_type: type
 
@@ -186,12 +185,6 @@ def _invoke_factories(
         dependent_name = leaves.pop()
         factory = factories[dependent_name]
         return_type = signature(factory).return_annotation
-        params = {
-            name: devices[name]
-            for name in dependencies[dependent_name]
-            if name in devices
-        }
-        params.update(**kwargs)
         failed_dependencies = {
             name: exception
             for name, exception in exceptions.items()
@@ -204,14 +197,19 @@ def _invoke_factories(
                     msg=f"Exception(s) prevented executing device factory: {dependent_name}",
                     exceptions=failed_dependencies,
                 ),
-                call_args=params,
             )
         else:
             try:
+                params = {
+                    name: devices[name]
+                    for name in dependencies[dependent_name]
+                    if name in devices
+                }
+                params.update(**kwargs)
                 devices[dependent_name] = factory(**params, **kwargs)
             except Exception as e:
                 exceptions[dependent_name] = ExceptionInformation(
-                    return_type=return_type, exception=e, call_args=params
+                    return_type=return_type, exception=e
                 )
 
     all_devices = {device.name: device for device in devices.values()}
