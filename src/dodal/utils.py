@@ -130,7 +130,7 @@ def make_all_devices(
     devices_and_exceptions = make_all_devices_without_throwing(module, **kwargs)
     if devices_and_exceptions.exceptions:
         raise ExceptionBundle(
-            msg=f"Multiple exceptions while executing device factories: {list(devices_and_exceptions.exceptions.keys())}",
+            msg=f"Exception(s) while executing device factories: {list(devices_and_exceptions.exceptions.keys())}",
             exceptions=devices_and_exceptions.exceptions,
         )
     return devices_and_exceptions.devices
