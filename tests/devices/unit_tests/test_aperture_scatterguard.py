@@ -34,9 +34,6 @@ def test_aperture_scatterguard_returns_status_if_within_tolerance(
     fake_aperture_scatterguard.aperture.z.user_setpoint.sim_put(1)
     fake_aperture_scatterguard.aperture.z.motor_done_move.sim_put(1)
 
-    completed_status = Status()
-    completed_status.set_finished()
-
     mock_set = MagicMock(return_value=Status(done=True, success=True))
 
     fake_aperture_scatterguard.aperture.x.set = mock_set

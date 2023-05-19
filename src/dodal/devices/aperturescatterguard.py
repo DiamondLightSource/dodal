@@ -110,7 +110,7 @@ class ApertureScatterguard(InfoLoggingDevice):
             raise InvalidApertureMove(
                 "ApertureScatterguard safe move is not yet defined for positions "
                 "outside of LARGE, MEDIUM, SMALL, ROBOT_LOAD. "
-                f"Current aperture z: {current_ap_z}, target: {aperture_z}."
+                f"Current aperture z ({current_ap_z}), outside of tolerance ({tolerance}) from target ({aperture_z})."
             )
 
         current_ap_y = self.aperture.y.user_readback.get()
