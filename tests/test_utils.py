@@ -75,13 +75,11 @@ def test_dependent_devices_not_instantiated_when_dependency_fails() -> None:
     x_exception = exceptions["device_x"]
     assert isinstance(x_exception, ExceptionInformation)
     assert x_exception.return_type is Readable
-    assert x_exception.call_args == {}
     assert isinstance(x_exception.exception, DisconnectedError)
     assert "device_z" in exceptions
     z_exception = exceptions["device_z"]
     assert isinstance(z_exception, ExceptionInformation)
     assert z_exception.return_type is Cryo
-    assert z_exception.call_args == {"device_y": devices["motor"]}
     assert isinstance(z_exception.exception, ExceptionBundle)
     assert x_exception.exception in z_exception.exception.exceptions.values()
 

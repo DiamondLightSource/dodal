@@ -58,6 +58,13 @@ BLUESKY_PROTOCOLS = [
 DeviceDict = Dict[str, HasName]
 
 
+class DependentDeviceInstantiationException(Exception):
+    """One or more exceptions was raised while instantiating devices this device depends on"""
+
+    def __init__(self, exceptions: Mapping[str, Exception]):
+        self.exceptions = exceptions
+
+
 @dataclass
 class ExceptionInformation:
     exception: Exception
@@ -129,8 +136,10 @@ def make_all_devices(
     """
     devices_and_exceptions = make_all_devices_without_throwing(module, **kwargs)
     if devices_and_exceptions.exceptions:
+        if len(devices_and_exceptions.exceptions) == 1:
+            raise devices_and_exceptions.exceptions.popitem()[1].exception
         raise ExceptionBundle(
-            msg=f"Exception(s) while executing device factories: {list(devices_and_exceptions.exceptions.keys())}",
+            msg=f"Exceptions while executing device factories: {list(devices_and_exceptions.exceptions.keys())}",
             exceptions=devices_and_exceptions.exceptions,
         )
     return devices_and_exceptions.devices
@@ -186,15 +195,14 @@ def _invoke_factories(
         factory = factories[dependent_name]
         return_type = signature(factory).return_annotation
         failed_dependencies = {
-            name: exception
+            name: exception.exception
             for name, exception in exceptions.items()
             if name in dependencies[dependent_name]
         }
         if failed_dependencies:
             exceptions[dependent_name] = ExceptionInformation(
                 return_type=return_type,
-                exception=ExceptionBundle(
-                    msg=f"Exception(s) prevented executing device factory: {dependent_name}",
+                exception=DependentDeviceInstantiationException(
                     exceptions=failed_dependencies,
                 ),
             )
@@ -205,7 +213,6 @@ def _invoke_factories(
                     for name in dependencies[dependent_name]
                     if name in devices
                 }
-                params.update(**kwargs)
                 devices[dependent_name] = factory(**params, **kwargs)
             except Exception as e:
                 exceptions[dependent_name] = ExceptionInformation(
