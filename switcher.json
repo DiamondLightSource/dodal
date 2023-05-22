@@ -4,12 +4,16 @@
     "url": "https://DiamondLightSource.github.io/dodal/main/"
   },
   {
-    "version": "0.0.1",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.1/"
+    "version": "0.0.3",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.3/"
   },
   {
     "version": "0.0.2",
     "url": "https://DiamondLightSource.github.io/dodal/0.0.2/"
+  },
+  {
+    "version": "0.0.1",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.1/"
   },
   {
     "version": "0.0.2_async_arming",
@@ -18,10 +22,6 @@
   {
     "version": "0.0.2_hotfixes",
     "url": "https://DiamondLightSource.github.io/dodal/0.0.2_hotfixes/"
-  },
-  {
-    "version": "0.0.3",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.3/"
   },
   {
     "version": "262_make_arming_eiger_asynchronous",
@@ -54,5 +54,9 @@
   {
     "version": "p45AndAdsim",
     "url": "https://DiamondLightSource.github.io/dodal/p45AndAdsim/"
+  },
+  {
+    "version": "update-gitignore",
+    "url": "https://DiamondLightSource.github.io/dodal/update-gitignore/"
   }
 ]
