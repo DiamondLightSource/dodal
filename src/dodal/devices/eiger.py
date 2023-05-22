@@ -154,12 +154,12 @@ class EigerDetector(Device):
         )
         return status
 
-    def set_odin_pvs(self) -> Status:
+    def set_odin_number_of_frame_chunks(self) -> Status:
         assert self.detector_params is not None
         status = self.odin.file_writer.num_frames_chunks.set(1, timeout=10)
         return status
 
-    def set_odin_pvs_after_file_writer_set(self) -> Status:
+    def set_odin_pvs(self) -> Status:
         file_prefix = self.detector_params.full_filename
         status = self.odin.file_writer.file_path.set(
             self.detector_params.directory, timeout=10
@@ -275,7 +275,8 @@ class EigerDetector(Device):
                     energy=detector_params.current_energy
                 ),
                 self.set_cam_pvs,
-                self.set_odin_pvs_after_file_writer_set,
+                self.set_odin_number_of_frame_chunks,
+                self.set_odin_pvs,
                 self.set_mx_settings_pvs,
                 self.set_num_triggers_and_captures,
             ]

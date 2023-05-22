@@ -154,8 +154,8 @@ def test_when_set_odin_pvs_called_then_full_filename_written_and_set_mx_settings
     expected_full_filename = f"{TEST_PREFIX}_{TEST_RUN_NUMBER}"
 
     unwrapped_funcs = [
+        fake_eiger.set_odin_number_of_frame_chunks,
         fake_eiger.set_odin_pvs,
-        fake_eiger.set_odin_pvs_after_file_writer_set,
         fake_eiger.set_mx_settings_pvs,
     ]
 
@@ -458,8 +458,8 @@ def test_disarming_not_called_when_already_armed(
     [
         ("lambda: self.set_detector_threshold(energy=detector_params.current_energy)"),
         ("fake_eiger.set_cam_pvs"),
+        ("fake_eiger.set_odin_number_of_frame_chunks"),
         ("fake_eiger.set_odin_pvs"),
-        ("fake_eiger.set_odin_pvs_after_file_writer_set"),
         ("fake_eiger.set_mx_settings_pvs"),
         ("fake_eiger.set_num_triggers_and_captures"),
         ("fake_eiger._wait_for_odin_status"),
