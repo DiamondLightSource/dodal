@@ -1,3 +1,4 @@
+from logging import LogRecord
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -15,7 +16,9 @@ def mock_logger():
 
 @patch("dodal.log.GELFTCPHandler")
 @patch("dodal.log.logging")
+@patch("dodal.log.EnhancedRollingFileHandler")
 def test_handlers_set_at_correct_default_level(
+    mock_enhanced_log,
     mock_logging,
     mock_GELFTCPHandler,
     mock_logger: MagicMock,
@@ -29,7 +32,9 @@ def test_handlers_set_at_correct_default_level(
 
 @patch("dodal.log.GELFTCPHandler")
 @patch("dodal.log.logging")
+@patch("dodal.log.EnhancedRollingFileHandler")
 def test_handlers_set_at_correct_debug_level(
+    mock_enhanced_log,
     mock_logging,
     mock_GELFTCPHandler,
     mock_logger: MagicMock,
@@ -65,15 +70,15 @@ def test_prod_mode_sets_correct_graypy_handler(
 
 @patch("dodal.log.GELFTCPHandler")
 @patch("dodal.log.logging")
+@patch("dodal.log.EnhancedRollingFileHandler")
 def test_no_env_variable_sets_correct_file_handler(
+    mock_enhanced_log,
     mock_logging,
     mock_GELFTCPHandler,
     mock_logger: MagicMock,
 ):
     log.set_up_logging_handlers(None, True)
-    mock_logging.FileHandler.assert_called_once_with(
-        filename=Path("./tmp/dev/dodal.txt")
-    )
+    mock_enhanced_log.assert_called_once_with(filename=Path("./tmp/dev/dodal.txt"))
 
 
 @patch("dodal.log.GELFTCPHandler")
@@ -110,3 +115,25 @@ def test_messages_logged_from_dodal_get_sent_to_graylog_and_file(
     logger.info("test")
     mock_filehandler_emit.assert_called()
     mock_GELFTCPHandler_emit.assert_called_once()
+
+
+def test_when_EnhancedRollingFileHandler_reaches_max_size_then_rolls_over():
+    rolling_file_handler = log.EnhancedRollingFileHandler("test", delay=True)
+    mock_stream = MagicMock()
+    mock_stream.tell.return_value = 1e8
+    rolling_file_handler._open = MagicMock(return_value=mock_stream)
+
+    assert rolling_file_handler.shouldRollover(
+        LogRecord("test", 0, "", 0, None, None, None)
+    )
+
+
+def test_when_EnhancedRollingFileHandler_not_at_max_size_then_no_roll_over():
+    rolling_file_handler = log.EnhancedRollingFileHandler("test", delay=True)
+    mock_stream = MagicMock()
+    mock_stream.tell.return_value = 0
+    rolling_file_handler._open = MagicMock(return_value=mock_stream)
+
+    assert not rolling_file_handler.shouldRollover(
+        LogRecord("test", 0, "", 0, None, None, None)
+    )

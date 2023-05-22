@@ -19,7 +19,7 @@ from dodal.devices.zebra import Zebra
 from dodal.log import set_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
 
-BL = get_beamline_name("i03")
+BL = get_beamline_name("s03")
 set_beamline(BL)
 
 
@@ -105,7 +105,8 @@ def aperture_scatterguard(
     """
 
     def load_positions(a_s: ApertureScatterguard):
-        a_s.load_aperture_positions(aperture_positions)
+        if aperture_positions is not None:
+            a_s.load_aperture_positions(aperture_positions)
 
     return device_instantiation(
         device=ApertureScatterguard,

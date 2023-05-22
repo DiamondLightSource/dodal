@@ -3,7 +3,7 @@ from ophyd import Device
 from ophyd.sim import FakeEpicsSignal
 
 from dodal import i03
-from dodal.devices.aperturescatterguard import ApertureScatterguard
+from dodal.devices.aperturescatterguard import AperturePositions, ApertureScatterguard
 from dodal.devices.smargon import Smargon
 from dodal.devices.zebra import Zebra
 from dodal.utils import make_all_devices
@@ -78,3 +78,15 @@ def test_device_is_new_after_clearing():
     i03.clear_devices()
     ids_3 = [_make_devices_and_get_id()]
     assert ids_1 != ids_3
+
+
+def test_getting_second_aperture_scatterguard_gives_valid_device():
+    test_positions = AperturePositions(
+        (0, 1, 2, 3, 4), (5, 6, 7, 8, 9), (10, 11, 12, 13, 14), (15, 16, 17, 18, 19)
+    )
+    ap_sg: ApertureScatterguard = i03.aperture_scatterguard(
+        fake_with_ophyd_sim=True, aperture_positions=test_positions
+    )
+    assert ap_sg.aperture_positions is not None
+    ap_sg = i03.aperture_scatterguard(fake_with_ophyd_sim=True)
+    assert ap_sg.aperture_positions is not None
