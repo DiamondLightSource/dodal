@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from enum import Enum
+from enum import Enum, IntEnum
 from functools import partialmethod
 from typing import List
 
@@ -41,11 +41,16 @@ TTL_SHUTTER = 2
 TTL_XSPRESS3 = 3
 
 
-class I03_axes(Enum):
+class I03Axes(Enum):
     SMARGON_X1 = "Enc1"
     SMARGON_Y = "Enc2"
     SMARGON_Z = "Enc3"
     OMEGA = "Enc4"
+
+
+class RotationDirection(IntEnum):
+    POSITIVE = 1
+    NEGATIVE = -1
 
 
 class PositionCompare(Device):
