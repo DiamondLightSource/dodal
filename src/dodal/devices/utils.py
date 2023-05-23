@@ -20,7 +20,10 @@ def epics_signal_put_wait(pv_name: str, wait: float = 1.0) -> EpicsSignal:
     return Component(EpicsSignal, pv_name, put_complete=True, write_timeout=wait)
 
 
-def wrap_and_do_funcs(unwrapped_funcs, timeout=60):
+def wrap_and_do_funcs(
+    unwrapped_funcs: list[Callable[[], Status]],
+    timeout: float = 60.0,
+) -> Status:
     """Creates and initiates an asynchronous chaining of functions which return a status.
 
     Usage:
