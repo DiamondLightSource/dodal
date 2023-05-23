@@ -234,11 +234,6 @@ class EigerDetector(Device):
         this_status &= await_value(self.odin.meta.ready, 1, 10)
         return this_status
 
-    def _wait_for_cam_acquire(self) -> Status:
-        LOGGER.info("Setting aquire")
-        this_status = self.cam.acquire.set(1, timeout=10)
-        return this_status
-
     def _wait_fan_ready(self) -> Status:
         LOGGER.info("Wait on fan ready")
         self.filewriters_finished = self.odin.create_finished_status()
@@ -249,9 +244,7 @@ class EigerDetector(Device):
         LOGGER.info("Finishing arm")
         self.armed = True
         # TODO: clean this bit (dont need self.armed_status)
-        dummy_status = Status()
-        dummy_status.set_finished()
-        return dummy_status
+        return Status(done=True, success=True)
 
     def forward_bit_depth_to_filewriter(self):
         bit_depth = self.bit_depth.get()
@@ -287,7 +280,7 @@ class EigerDetector(Device):
                 [
                     lambda: await_value(self.stale_params, 0, 60),
                     self._wait_for_odin_status,
-                    self._wait_for_cam_acquire,
+                    lambda: self.cam.acquire.set(1, timeout=10),
                     self._wait_fan_ready,
                     self._finish_arm,
                 ]

@@ -380,7 +380,7 @@ def test_when_stage_called_then_odin_started_after_stale_params_goes_low(
     await_value(fake_eiger.odin.file_writer.capture, 1).wait(1)
 
 
-# Tests transition from _wait_for_odin_status to _wait_for_cam_acquire
+# Tests transition from _wait_for_odin_status to cam_acquire_set
 def test_when_stage_called_then_cam_acquired_on_meta_ready(
     fake_eiger: EigerDetector, mock_set_odin_filewriter, finished_status
 ):
@@ -394,7 +394,7 @@ def test_when_stage_called_then_cam_acquired_on_meta_ready(
 
     unwrapped_funcs = [
         fake_eiger._wait_for_odin_status,
-        fake_eiger._wait_for_cam_acquire,
+        lambda: fake_eiger.cam.acquire.set(1, timeout=10),
     ]
 
     wrap_and_do_funcs(unwrapped_funcs)
@@ -463,7 +463,7 @@ def test_disarming_not_called_when_already_armed(
         ("fake_eiger.set_mx_settings_pvs"),
         ("fake_eiger.set_num_triggers_and_captures"),
         ("fake_eiger._wait_for_odin_status"),
-        ("fake_eiger._wait_for_cam_acquire"),
+        ("lambda: fake_eiger.cam.acquire.set(1, timeout=10)"),
         ("fake_eiger._wait_fan_ready"),
         ("fake_eiger._finish_arm"),
     ],
