@@ -82,7 +82,7 @@ class EigerDetector(Device):
         if not status_ok:
             raise Exception(f"Odin not initialised: {error_message}")
 
-        self.arming_status = self.make_chained_functions()
+        return self.make_chained_functions()
 
     def unstage(self) -> bool:
         assert self.detector_params is not None
@@ -249,8 +249,6 @@ class EigerDetector(Device):
     def forward_bit_depth_to_filewriter(self):
         bit_depth = self.bit_depth.get()
         self.odin.file_writer.data_type.put(f"UInt{bit_depth}")
-
-        return self.arming_status
 
     def disarm_detector(self):
         self.cam.acquire.put(0)
