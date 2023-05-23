@@ -1,5 +1,6 @@
-from dataclasses import dataclass
 from typing import Dict, Union
+
+from pydantic.dataclasses import dataclass
 
 
 @dataclass
