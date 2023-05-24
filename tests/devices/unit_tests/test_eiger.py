@@ -28,19 +28,19 @@ TEST_DET_DIST_TO_BEAM_CONVERTER_PATH = "tests/devices/unit_tests/test_lookup_tab
 
 def create_new_params() -> DetectorParams:
     return DetectorParams(
-        TEST_CURRENT_ENERGY,
-        TEST_EXPOSURE_TIME,
-        TEST_DIR,
-        TEST_PREFIX,
-        TEST_RUN_NUMBER,
-        TEST_DETECTOR_DISTANCE,
-        TEST_OMEGA_START,
-        TEST_OMEGA_INCREMENT,
-        TEST_NUM_IMAGES_PER_TRIGGER,
-        TEST_NUM_TRIGGERS,
-        TEST_USE_ROI_MODE,
-        TEST_DET_DIST_TO_BEAM_CONVERTER_PATH,
-        detector_size_constants=TEST_DETECTOR_SIZE_CONSTANTS,
+        current_energy=TEST_CURRENT_ENERGY,
+        exposure_time=TEST_EXPOSURE_TIME,
+        directory=TEST_DIR,
+        prefix=TEST_PREFIX,
+        run_number=TEST_RUN_NUMBER,
+        detector_distance=TEST_DETECTOR_DISTANCE,
+        omega_start=TEST_OMEGA_START,
+        omega_increment=TEST_OMEGA_INCREMENT,
+        num_images_per_trigger=TEST_NUM_IMAGES_PER_TRIGGER,
+        num_triggers=TEST_NUM_TRIGGERS,
+        use_roi_mode=TEST_USE_ROI_MODE,
+        det_dist_to_beam_converter_path=TEST_DET_DIST_TO_BEAM_CONVERTER_PATH,
+        detector_size_constants=TEST_DETECTOR_SIZE_CONSTANTS.det_type_string,
     )
 
 

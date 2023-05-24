@@ -1,6 +1,5 @@
 from unittest.mock import patch
 
-from dodal.devices.det_dim_constants import EIGER2_X_16M_SIZE
 from dodal.devices.detector import DetectorParams
 
 
