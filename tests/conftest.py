@@ -3,8 +3,8 @@ from os import environ, getenv
 
 
 def pytest_runtest_teardown():
-    if "dodal.i03" in sys.modules:
-        sys.modules["dodal.i03"].clear_devices()
+    if "dodal.beamline_utils" in sys.modules:
+        sys.modules["dodal.beamline_utils"].clear_devices()
 
 
 s03_epics_server_port = getenv("S03_EPICS_CA_SERVER_PORT")
