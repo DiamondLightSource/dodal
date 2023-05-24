@@ -1,8 +1,7 @@
-from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Optional, Tuple
+from typing import Any, Optional, Tuple
 
-from dataclasses_json import config, dataclass_json
+from pydantic import BaseModel, validator
 
 from dodal.devices.det_dim_constants import (
     EIGER2_X_16M_SIZE,
@@ -24,9 +23,10 @@ class TriggerMode(Enum):
     FREE_RUN = auto()
 
 
-@dataclass_json
-@dataclass
-class DetectorParams:
+class DetectorParams(BaseModel):
+    """Holds parameters for the detector. Provides access to a list of Dectris detector
+    sizes and a converter for distance to beam centre."""
+
     current_energy: float
     exposure_time: float
     directory: str
@@ -40,25 +40,43 @@ class DetectorParams:
     use_roi_mode: bool
     det_dist_to_beam_converter_path: str
     trigger_mode: TriggerMode = TriggerMode.SET_FRAMES
+    detector_size_constants: DetectorSizeConstants = EIGER2_X_16M_SIZE
+    beam_xy_converter: DetectorDistanceToBeamXYConverter = None
 
-    detector_size_constants: DetectorSizeConstants = field(
-        default_factory=lambda: EIGER2_X_16M_SIZE,
-        metadata=config(
-            encoder=lambda detector: detector.det_type_string,
-            decoder=lambda det_type: constants_from_type(det_type),
-        ),
-    )
+    class Config:
+        arbitrary_types_allowed = True
+        json_encoders = {
+            DetectorDistanceToBeamXYConverter: lambda d: d.lookup_file,
+        }
+
+    @validator("detector_size_constants", pre=True)
+    def _parse_detector_size_constants(
+        cls, det_type: str, values: dict[str, Any]
+    ) -> DetectorSizeConstants:
+        return constants_from_type(det_type)
+
+    @validator("directory", pre=True)
+    def _parse_directory(cls, directory: str, values: dict[str, Any]) -> str:
+        if not directory.endswith("/"):
+            directory += "/"
+        return directory
+
+    @validator("beam_xy_converter", always=True)
+    def _parse_beam_xy_converter(
+        cls,
+        beam_xy_converter: DetectorDistanceToBeamXYConverter,
+        values: dict[str, Any],
+    ) -> DetectorDistanceToBeamXYConverter:
+        return DetectorDistanceToBeamXYConverter(
+            values["det_dist_to_beam_converter_path"]
+        )
 
     # The following are optional from GDA as populated internally
-
     # Where the VDS start index should be in the Nexus file
     start_index: Optional[int] = 0
     nexus_file_run_number: Optional[int] = 0
 
     def __post_init__(self):
-        if not self.directory.endswith("/"):
-            self.directory += "/"
-
         self.beam_xy_converter = DetectorDistanceToBeamXYConverter(
             self.det_dist_to_beam_converter_path
         )

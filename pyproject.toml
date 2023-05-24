@@ -21,6 +21,7 @@ dependencies = [
     "pillow",
     "requests",
     "graypy",
+    "pydantic",
 ]
 dynamic = ["version"]
 license.file = "LICENSE"
@@ -64,6 +65,7 @@ dodal = ["*.txt"]
 write_to = "src/dodal/_version.py"
 
 [tool.mypy]
+plugins = ["pydantic.mypy"]
 ignore_missing_imports = true # Ignore missing stubs in imported modules
 
 [tool.isort]
