@@ -1,8 +1,7 @@
+from math import hypot, log
 from typing import TypedDict
 
 from ophyd.utils import DisconnectedError
-from math import hypot, log
-
 
 """
     Some builtins (e.g. dict, Exception), types that extend
@@ -44,4 +43,5 @@ class B(TypedDict):
     """
     Causes issue only if a class that extends TypedDict exists.
     """
+
     foo: int

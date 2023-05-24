@@ -54,6 +54,7 @@ def test_get_hostname() -> None:
 
 def test_no_signature_builtins_not_devices() -> None:
     import tests.fake_beamline_misbehaving_builtins as fake_beamline
+
     devices = make_all_devices(fake_beamline)
     assert not devices
 
