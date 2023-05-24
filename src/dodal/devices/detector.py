@@ -24,6 +24,9 @@ class TriggerMode(Enum):
 
 
 class DetectorParams(BaseModel):
+    """Holds parameters for the detector. Provides access to a list of Dectris detector
+    sizes and a converter for distance to beam centre."""
+
     current_energy: float
     exposure_time: float
     directory: str
@@ -42,6 +45,9 @@ class DetectorParams(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True
+        json_encoders = {
+            DetectorDistanceToBeamXYConverter: lambda d: d.lookup_file,
+        }
 
     @validator("detector_size_constants", pre=True)
     def _parse_detector_size_constants(
