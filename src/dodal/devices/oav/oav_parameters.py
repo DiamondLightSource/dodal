@@ -110,7 +110,7 @@ class OAVParameters:
         self.mxsc_input = update("mxsc_input", str, default="CAM")
         self.min_callback_time = update("min_callback_time", float, default=0.08)
         self.direction = update("direction", int)
-        self.max_tip_distance = update("max_tip_distance", float)
+        self.max_tip_distance = update("max_tip_distance", float, default=300)
 
     def load_microns_per_pixel(self, zoom=None):
         """

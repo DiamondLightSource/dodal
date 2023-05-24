@@ -7,6 +7,7 @@ from ophyd.status import AndStatus
 from dodal.devices.aperture import Aperture
 from dodal.devices.logging_ophyd_device import InfoLoggingDevice
 from dodal.devices.scatterguard import Scatterguard
+from dodal.log import LOGGER
 
 
 class InvalidApertureMove(Exception):
@@ -70,8 +71,10 @@ class ApertureScatterguard(InfoLoggingDevice):
     aperture: Aperture = Cpt(Aperture, "-MO-MAPT-01:")
     scatterguard: Scatterguard = Cpt(Scatterguard, "-MO-SCAT-01:")
     aperture_positions: Optional[AperturePositions] = None
+    APERTURE_Z_TOLERANCE = 3  # Number of MRES steps
 
     def load_aperture_positions(self, positions: AperturePositions):
+        LOGGER.info(f"{self.name} loaded in {positions}")
         self.aperture_positions = positions
 
     def set(self, pos: Tuple[float, float, float, float, float]) -> AndStatus:
@@ -102,10 +105,12 @@ class ApertureScatterguard(InfoLoggingDevice):
         if not ap_z_in_position:
             return
         current_ap_z = self.aperture.z.user_setpoint.get()
-        if current_ap_z != aperture_z:
+        tolerance = self.APERTURE_Z_TOLERANCE * self.aperture.z.motor_resolution.get()
+        if abs(current_ap_z - aperture_z) > tolerance:
             raise InvalidApertureMove(
                 "ApertureScatterguard safe move is not yet defined for positions "
-                "outside of LARGE, MEDIUM, SMALL, ROBOT_LOAD."
+                "outside of LARGE, MEDIUM, SMALL, ROBOT_LOAD. "
+                f"Current aperture z ({current_ap_z}), outside of tolerance ({tolerance}) from target ({aperture_z})."
             )
 
         current_ap_y = self.aperture.y.user_readback.get()
