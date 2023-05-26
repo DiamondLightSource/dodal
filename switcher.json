@@ -56,10 +56,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/artemis_348_replace_point_3d_to_support_arithmetic/"
   },
   {
-    "version": "artemis_526",
-    "url": "https://DiamondLightSource.github.io/dodal/artemis_526/"
-  },
-  {
     "version": "fix_broken_dependent_test",
     "url": "https://DiamondLightSource.github.io/dodal/fix_broken_dependent_test/"
   },
