@@ -27,11 +27,12 @@ def test_converter_eq():
     assert test_converter == test_converter_dupe
     assert test_converter != test_converter_2
 
+    previous_value = test_converter_dupe.lookup_table_values[0]
     test_converter_dupe.lookup_table_values[0] = (7.5, 23.5)
 
     assert test_converter != test_converter_2
 
-    test_converter_dupe.lookup_table_values[0] = (100.0, 200.0)
+    test_converter_dupe.lookup_table_values[0] = previous_value
 
 
 @pytest.mark.parametrize(
