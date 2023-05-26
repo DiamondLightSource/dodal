@@ -25,7 +25,7 @@ Installing the library
 
 You can now use ``pip`` to install the library and its dependencies::
 
-    $ python3 -m pip install dodal
+    $ python3 -m pip install dodal-dls
 
 If you require a feature that is not currently released you can also install
 from github::

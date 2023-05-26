@@ -7,7 +7,7 @@ dodal
 Ophyd devices and other utils that could be used across DLS beamlines
 
 ============== ==============================================================
-PyPI           ``pip install dodal``
+PyPI           ``pip install dodal-dls``
 Source code    https://github.com/DiamondLightSource/dodal
 Documentation  https://DiamondLightSource.github.io/dodal
 Releases       https://github.com/DiamondLightSource/dodal/releases

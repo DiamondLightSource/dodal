@@ -176,6 +176,10 @@ jobs:
     env:
       HAS_PYPI_TOKEN: ${{ secrets.PYPI_TOKEN != '' }}
 
+    environment:
+      name: pypi
+      url: https://pypi.org/p/dodal-dls
+
     steps:
       - uses: actions/download-artifact@v3
 
