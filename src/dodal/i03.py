@@ -55,7 +55,25 @@ def device_instantiation(
     fake: bool,
     post_create: Optional[Callable] = None,
     bl_prefix: bool = True,
+    **kwargs,
 ) -> Device:
+    """Method to allow generic creation of singleton devices. Meant to be used to easily
+    define lists of devices in beamline files. Additional keyword arguments are passed
+    directly to the device constructor.
+
+    Arguments:
+        device: Callable        the device class
+        name: str               the name for ophyd
+        prefix: str             the PV prefix for the most (usually all) components
+        wait: bool              whether to run .wait_for_connection()
+        fake: bool              whether to fake with ophyd.sim
+        post_create: Callable   (optional) a function to be run on the device after
+                                creation
+        bl_prefix: bool         if true, add the beamline prefix when instantiating, if
+                                false the complete PV prefix must be supplied.
+    Returns:
+        The instance of the device.
+    """
     active_device = ACTIVE_DEVICES.get(name)
     if fake:
         device = make_fake_device(device)
@@ -65,6 +83,7 @@ def device_instantiation(
             prefix=f"{(BeamlinePrefix(BL).beamline_prefix)}{prefix}"
             if bl_prefix
             else prefix,
+            **kwargs,
         )
         if wait:
             ACTIVE_DEVICES[name].wait_for_connection()
