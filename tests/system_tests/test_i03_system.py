@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-from dodal import i03
+from dodal.beamlines import i03
 from dodal.utils import make_all_devices
 
 if __name__ == "__main__":
