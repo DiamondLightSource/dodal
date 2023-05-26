@@ -231,7 +231,7 @@ def smargon(
     return device_instantiation(
         Smargon,
         "smargon",
-        "",
+        "-MO-SGON-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
