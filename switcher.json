@@ -60,6 +60,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/fix_broken_dependent_test/"
   },
   {
+    "version": "new-pypi-name",
+    "url": "https://DiamondLightSource.github.io/dodal/new-pypi-name/"
+  },
+  {
     "version": "p45AndAdsim",
     "url": "https://DiamondLightSource.github.io/dodal/p45AndAdsim/"
   }
