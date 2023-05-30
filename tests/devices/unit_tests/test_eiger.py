@@ -210,7 +210,7 @@ def test_stage_enables_roi_mode_correctly(
 
     fake_eiger.detector_params.use_roi_mode = roi_mode
 
-    fake_eiger.change_roi_mode = MagicMock()
+    fake_eiger.change_roi_mode = MagicMock(return_value=Status())
 
     fake_eiger.async_stage()
 
@@ -364,8 +364,6 @@ def test_when_stage_called_then_odin_started_after_stale_params_goes_low(
     fake_eiger.stale_params.sim_put(1)
     fake_eiger.odin.file_writer.capture.sim_put(0)
 
-    fake_eiger.arming_status = MagicMock()
-
     unwrapped_funcs = [
         lambda: await_value(fake_eiger.stale_params, 0, 60),
         fake_eiger._wait_for_odin_status,
@@ -390,7 +388,6 @@ def test_when_stage_called_then_cam_acquired_on_meta_ready(
 
     fake_eiger.odin.file_writer.capture.sim_put(0)
     fake_eiger.stale_params.sim_put(0)
-    fake_eiger.arming_status = MagicMock()
 
     unwrapped_funcs = [
         fake_eiger._wait_for_odin_status,
@@ -419,7 +416,6 @@ def test_when_stage_called_then_finish_arm_on_fan_ready(
 
     fake_eiger.odin.fan.ready.sim_put(1)
     fake_eiger.odin.file_writer.capture.sim_put(0)
-    fake_eiger.arming_status = MagicMock()
 
     unwrapped_funcs = [fake_eiger._wait_fan_ready, fake_eiger._finish_arm]
     status = wrap_and_do_funcs(unwrapped_funcs)
