@@ -52,6 +52,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/artemis_348_replace_point_3d_to_support_arithmetic/"
   },
   {
+    "version": "artemis_681_pydantic_internal_params",
+    "url": "https://DiamondLightSource.github.io/dodal/artemis_681_pydantic_internal_params/"
+  },
+  {
     "version": "p45AndAdsim",
     "url": "https://DiamondLightSource.github.io/dodal/p45AndAdsim/"
   },
