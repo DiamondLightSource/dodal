@@ -424,31 +424,6 @@ def test_when_stage_called_then_finish_arm_on_fan_ready(
     status.wait(5)
 
 
-def test_arming_not_called_when_already_armed(fake_eiger: EigerDetector):
-    finished = MagicMock()
-
-    def finish_arm():
-        if not fake_eiger.armed:
-            fake_eiger._finish_arm()
-            finished()
-
-    fake_eiger.armed = False
-    fake_eiger.make_chained_functions = MagicMock(side_effect=finish_arm)
-    fake_eiger.async_stage = MagicMock(side_effect=fake_eiger.make_chained_functions)
-    fake_eiger.async_stage()
-    fake_eiger.async_stage()
-    finished.assert_called_once()
-
-
-def test_disarming_not_called_when_already_armed(
-    fake_eiger: EigerDetector, mock_set_odin_filewriter, finished_status
-):
-    fake_eiger.disarm_detector = MagicMock()
-    fake_eiger.filewriters_finished = finished_status
-    fake_eiger.unstage()
-    fake_eiger.disarm_detector.assert_not_called()
-
-
 @pytest.mark.parametrize(
     "func",
     [

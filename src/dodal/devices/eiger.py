@@ -30,8 +30,6 @@ class EigerDetector(Device):
     cam: EigerDetectorCam = Component(EigerDetectorCam, "CAM:")
     odin: EigerOdin = Component(EigerOdin, "")
 
-    armed: bool = False
-
     stale_params: EpicsSignalRO = Component(EpicsSignalRO, "CAM:StaleParameters_RBV")
     bit_depth: EpicsSignalRO = Component(EpicsSignalRO, "CAM:BitDepthImage_RBV")
 
@@ -82,7 +80,7 @@ class EigerDetector(Device):
         if not status_ok:
             raise Exception(f"Odin not initialised: {error_message}")
 
-        return self.make_chained_functions(self.armed)
+        return self.make_chained_functions()
 
     def unstage(self) -> bool:
         assert self.detector_params is not None
@@ -99,9 +97,8 @@ class EigerDetector(Device):
         LOGGER.info("Waiting on filewriter to finish")
         self.filewriters_finished.wait(30)
 
-        if self.armed:
-            LOGGER.info("Disarming detector")
-            self.disarm_detector()
+        LOGGER.info("Disarming detector")
+        self.disarm_detector()
 
         status_ok = self.odin.check_odin_state()
         self.disable_roi_mode()
@@ -272,7 +269,6 @@ class EigerDetector(Device):
 
     def _finish_arm(self) -> Status:
         LOGGER.info("Eiger staging: Finishing arming")
-        self.armed = True
         return Status(done=True, success=True)
 
     def forward_bit_depth_to_filewriter(self):
@@ -281,9 +277,8 @@ class EigerDetector(Device):
 
     def disarm_detector(self):
         self.cam.acquire.put(0)
-        self.armed = False
 
-    def make_chained_functions(self, is_armed: bool) -> Status:
+    def make_chained_functions(self) -> Status:
         unwrapped_funcs = list()
         detector_params: DetectorParams = self.detector_params
         if detector_params.use_roi_mode:
@@ -302,17 +297,14 @@ class EigerDetector(Device):
             ]
         )
 
-        if not is_armed:
-            unwrapped_funcs.extend(
-                [
-                    lambda: await_value(self.STALE_PARAMS_TIMEOUT, 0, 60),
-                    self._wait_for_odin_status,
-                    lambda: self.cam.acquire.set(
-                        1, timeout=self.GENERAL_STATUS_TIMEOUT
-                    ),
-                    self._wait_fan_ready,
-                    self._finish_arm,
-                ]
-            )
+        unwrapped_funcs.extend(
+            [
+                lambda: await_value(self.STALE_PARAMS_TIMEOUT, 0, 60),
+                self._wait_for_odin_status,
+                lambda: self.cam.acquire.set(1, timeout=self.GENERAL_STATUS_TIMEOUT),
+                self._wait_fan_ready,
+                self._finish_arm,
+            ]
+        )
 
         return wrap_and_do_funcs(unwrapped_funcs)
