@@ -6,4 +6,12 @@ def test_all_i03_devices_connect_to_s03():
     from dodal.beamlines import i03
     from dodal.utils import make_all_devices
 
-    make_all_devices(i03)
+    devices = make_all_devices(i03)
+    for device in [
+        "smargon",
+        "zebra",
+        "backlight",
+        "undulator",
+        "aperture_scatterguard",
+    ]:
+        assert device in devices
