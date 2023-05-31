@@ -16,6 +16,7 @@ def test_list():
 
 
 def test_device_creation():
+    beamline_utils.clear_devices()
     devices = make_all_devices(i03, fake_with_ophyd_sim=True)
     for device_name in devices.keys():
         assert device_name in beamline_utils.ACTIVE_DEVICES
@@ -23,6 +24,7 @@ def test_device_creation():
 
 
 def test_devices_are_identical():
+    beamline_utils.clear_devices()
     devices_a = make_all_devices(i03, fake_with_ophyd_sim=True)
     devices_b = make_all_devices(i03, fake_with_ophyd_sim=True)
     for device_name in devices_a.keys():

@@ -21,6 +21,7 @@ def test_device_creation():
 
 
 def teardown_module():
+    beamline_utils.BL = "i03"
     for module in list(sys.modules):
         if module.endswith("beamline_utils"):
             del sys.modules[module]

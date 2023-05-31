@@ -20,6 +20,7 @@ def test_instantiate_function_makes_supplied_device():
 
 
 def test_instantiating_different_device_with_same_name():
+    beamline_utils.clear_devices()
     dev1 = beamline_utils.device_instantiation(  # noqa
         Zebra, "device", "", False, False, None
     )
@@ -46,6 +47,7 @@ def test_instantiate_function_fake_makes_fake():
 
 
 def test_clear_devices():
+    beamline_utils.clear_devices()
     devices = make_all_devices(i03, fake_with_ophyd_sim=True)
     assert len(beamline_utils.ACTIVE_DEVICES) == len(devices.keys())
     beamline_utils.clear_devices()
@@ -53,6 +55,8 @@ def test_clear_devices():
 
 
 def test_device_is_new_after_clearing():
+    beamline_utils.clear_devices()
+
     def _make_devices_and_get_id():
         return [
             id(device)
