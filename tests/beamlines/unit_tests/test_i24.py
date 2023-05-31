@@ -1,3 +1,4 @@
+import sys
 from unittest.mock import patch
 
 from dodal.devices.i24.i24_vgonio import VGonio
@@ -17,3 +18,9 @@ def test_device_creation():
     vgonio: VGonio = beamline_utils.ACTIVE_DEVICES["vgonio"]
     assert vgonio.prefix == "BL24I-MO-VGON-01:"
     assert vgonio.kappa.prefix == "BL24I-MO-VGON-01:KAPPA"
+
+
+def teardown_module():
+    for module in list(sys.modules):
+        if module.endswith("beamline_utils"):
+            del sys.modules[module]
