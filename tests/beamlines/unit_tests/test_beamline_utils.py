@@ -20,18 +20,21 @@ def test_instantiate_function_makes_supplied_device():
 
 
 def test_instantiating_different_device_with_same_name():
-    dev1 = beamline_utils.device_instantiation(
+    dev1 = beamline_utils.device_instantiation(  # noqa
         Zebra, "device", "", False, False, None
-    )  # noqa
+    )
     with pytest.raises(TypeError):
-        dev2 = beamline_utils.device_instantiation(  # noqa
+        dev2 = beamline_utils.device_instantiation(
             Smargon, "device", "", False, False, None
         )
     beamline_utils.clear_device("device")
-    dev2 = beamline_utils.device_instantiation(
+    dev2 = beamline_utils.device_instantiation(  # noqa
         Smargon, "device", "", False, False, None
-    )  # noqa
-    assert dev1 is dev2
+    )
+    assert dev1.name == dev2.name
+    assert type(dev1) != type(dev2)
+    assert dev1 not in beamline_utils.ACTIVE_DEVICES.values()
+    assert dev2 in beamline_utils.ACTIVE_DEVICES.values()
 
 
 def test_instantiate_function_fake_makes_fake():
