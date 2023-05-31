@@ -44,6 +44,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/71_implement_fluorescent_detector/"
   },
   {
+    "version": "76_make_stage_synchronous_if_arming_not_started",
+    "url": "https://DiamondLightSource.github.io/dodal/76_make_stage_synchronous_if_arming_not_started/"
+  },
+  {
     "version": "78_fix_skip_decorator",
     "url": "https://DiamondLightSource.github.io/dodal/78_fix_skip_decorator/"
   },
