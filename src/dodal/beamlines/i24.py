@@ -3,16 +3,11 @@ from typing import Optional
 from dodal.beamlines.beamline_utils import BL, device_instantiation
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.backlight import Backlight
-from dodal.devices.DCM import DCM
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector_motion import DetectorMotion
 from dodal.devices.eiger import EigerDetector
-from dodal.devices.fast_grid_scan import FastGridScan
 from dodal.devices.i24.i24_vgonio import VGonio
 from dodal.devices.oav.oav_detector import OAV
-from dodal.devices.s4_slit_gaps import S4SlitGaps
-from dodal.devices.synchrotron import Synchrotron
-from dodal.devices.undulator import Undulator
 from dodal.devices.zebra import Zebra
 from dodal.log import set_beamline
 from dodal.utils import get_beamline_name, skip_device
@@ -25,13 +20,29 @@ set_utils_beamline(BL)
 def backlight(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> Backlight:
-    """Get the i03 backlight device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i03, it will return the existing object.
+    """Get the i24 backlight device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i24, it will return the existing object.
     """
     return device_instantiation(
         device=Backlight,
         name="backlight",
         prefix="-MO-BL-01:",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+    )
+
+
+@skip_device(lambda: BL == "s24")
+def detector_motion(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> DetectorMotion:
+    """Get the i24 detector motion device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i24, it will return the existing object.
+    """
+    return device_instantiation(
+        device=DetectorMotion,
+        name="detector_motion",
+        prefix="-MO-DET-01:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )
@@ -63,6 +74,20 @@ def eiger(
 
 
 @skip_device(lambda: BL == "s24")
+def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> OAV:
+    """Get the i24 OAV device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i24, it will return the existing object.
+    """
+    return device_instantiation(
+        OAV,
+        "oav",
+        "",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+@skip_device(lambda: BL == "s24")
 def vgonio(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> OAV:
     """Get the i24 vgonio device, instantiate it if it hasn't already been.
     If this is called when already instantiated, it will return the existing object.
@@ -71,6 +96,19 @@ def vgonio(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) 
         VGonio,
         "vgonio",
         "-MO-VGON-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+def zebra(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> Zebra:
+    """Get the i24 zebra device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i24, it will return the existing object.
+    """
+    return device_instantiation(
+        Zebra,
+        "zebra",
+        "-EA-ZEBRA-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
     )

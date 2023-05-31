@@ -86,7 +86,7 @@ def detector_motion(
     return device_instantiation(
         device=DetectorMotion,
         name="detector_motion",
-        prefix="",
+        prefix="-MO-DET-01:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )
@@ -140,7 +140,7 @@ def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
     return device_instantiation(
         OAV,
         "oav",
-        "",
+        "-DI-OAV-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
