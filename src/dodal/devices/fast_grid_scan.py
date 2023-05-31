@@ -1,10 +1,9 @@
 import threading
 import time
-from dataclasses import dataclass
+from typing import Any
 
 import numpy as np
 from bluesky.plan_stubs import mv
-from dataclasses_json import DataClassJsonMixin
 from numpy import ndarray
 from ophyd import (
     Component,
@@ -15,6 +14,8 @@ from ophyd import (
     Signal,
 )
 from ophyd.status import DeviceStatus, StatusBase
+from pydantic import BaseModel, validator
+from pydantic.dataclasses import dataclass
 
 from dodal.devices.motors import XYZLimitBundle
 from dodal.devices.status import await_value
@@ -28,7 +29,7 @@ class GridAxis:
     full_steps: int
 
     def steps_to_motor_position(self, steps):
-        return self.start + (steps * self.step_size)
+        return self.start + self.step_size * (steps - 1)
 
     @property
     def end(self):
@@ -38,8 +39,7 @@ class GridAxis:
         return 0 <= steps <= self.full_steps
 
 
-@dataclass
-class GridScanParams(DataClassJsonMixin, AbstractExperimentParameterBase):
+class GridScanParams(BaseModel, AbstractExperimentParameterBase):
     """
     Holder class for the parameters of a grid scan in a similar
     layout to EPICS.
@@ -60,12 +60,21 @@ class GridScanParams(DataClassJsonMixin, AbstractExperimentParameterBase):
     y2_start: float = 0.1
     z1_start: float = 0.1
     z2_start: float = 0.1
+    x_axis: GridAxis = GridAxis(0, 0, 0)
+    y_axis: GridAxis = GridAxis(0, 0, 0)
+    z_axis: GridAxis = GridAxis(0, 0, 0)
 
-    def __post_init__(self):
-        self.x_axis = GridAxis(self.x_start, self.x_step_size, self.x_steps)
-        self.y_axis = GridAxis(self.y1_start, self.y_step_size, self.y_steps)
-        self.z_axis = GridAxis(self.z2_start, self.z_step_size, self.z_steps)
-        self.axes = [self.x_axis, self.y_axis, self.z_axis]
+    @validator("x_axis", always=True)
+    def _get_x_axis(cls, x_axis: GridAxis, values: dict[str, Any]) -> GridAxis:
+        return GridAxis(values["x_start"], values["x_step_size"], values["x_steps"])
+
+    @validator("y_axis", always=True)
+    def _get_y_axis(cls, y_axis: GridAxis, values: dict[str, Any]) -> GridAxis:
+        return GridAxis(values["y1_start"], values["y_step_size"], values["y_steps"])
+
+    @validator("z_axis", always=True)
+    def _get_z_axis(cls, z_axis: GridAxis, values: dict[str, Any]) -> GridAxis:
+        return GridAxis(values["z2_start"], values["z_step_size"], values["z_steps"])
 
     def is_valid(self, limits: XYZLimitBundle) -> bool:
         """
@@ -110,7 +119,9 @@ class GridScanParams(DataClassJsonMixin, AbstractExperimentParameterBase):
         :param grid_position: The x, y, z position in grid steps
         :return: The motor position this corresponds to.
         :raises: IndexError if the desired position is outside the grid."""
-        for position, axis in zip(grid_position, self.axes):
+        for position, axis in zip(
+            grid_position, [self.x_axis, self.y_axis, self.z_axis]
+        ):
             if not axis.is_within(position):
                 raise IndexError(f"{grid_position} is outside the bounds of the grid")
 

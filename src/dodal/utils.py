@@ -57,12 +57,8 @@ BLUESKY_PROTOCOLS = [
 T = TypeVar("T")
 
 
-def get_beamline_name(ixx: str) -> str:
-    bl = environ.get("BEAMLINE")
-    if bl is None:
-        return f"s{ixx[1:]}"
-    else:
-        return bl
+def get_beamline_name(default: str) -> str:
+    return environ.get("BEAMLINE") or default
 
 
 def get_hostname() -> str:
