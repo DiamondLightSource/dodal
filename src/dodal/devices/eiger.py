@@ -26,6 +26,13 @@ class EigerDetector(Device):
         def set(self, value, *, timeout=None, settle_time=None, **kwargs):
             return self.parent.async_stage()
 
+    class ArmedState(Enum):
+        UNARMED = "unarmed"
+        ARMING = "arming"
+        ARMED = "armed"
+
+    armed_state = ArmedState.UNARMED
+
     do_arm: ArmingSignal = Component(ArmingSignal)
     cam: EigerDetectorCam = Component(EigerDetectorCam, "CAM:")
     odin: EigerOdin = Component(EigerOdin, "")
@@ -79,8 +86,19 @@ class EigerDetector(Device):
         status_ok, error_message = self.odin.check_odin_initialised()
         if not status_ok:
             raise Exception(f"Odin not initialised: {error_message}")
+        self.armed_state = self.ArmedState.ARMING
+        self.arming_status = self.do_arming_chain()
+        return self.arming_status
 
-        return self.do_arming_chain()
+    def stage(self):
+        if self.armed_state.value == "unarmed":
+            self.async_stage().wait(60)
+
+        elif self.armed_state.value == "arming":
+            self.arming_status.wait(60)
+
+        else:
+            return None
 
     def unstage(self) -> bool:
         assert self.detector_params is not None
@@ -99,10 +117,14 @@ class EigerDetector(Device):
 
         LOGGER.info("Disarming detector")
         self.disarm_detector()
-
+        self.armed_state = self.ArmedState.UNARMED
         status_ok = self.odin.check_odin_state()
         self.disable_roi_mode()
         return status_ok
+
+    # This is no longer used by staging
+    def enable_roi_mode(self):
+        self.change_roi_mode(True)
 
     def disable_roi_mode(self):
         self.change_roi_mode(False)
@@ -265,6 +287,7 @@ class EigerDetector(Device):
 
     def _finish_arm(self) -> Status:
         LOGGER.info("Eiger staging: Finishing arming")
+        self.armed_state = self.ArmedState.ARMED
         return Status(done=True, success=True)
 
     def forward_bit_depth_to_filewriter(self):
