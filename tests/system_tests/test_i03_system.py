@@ -11,7 +11,7 @@ if __name__ == "__main__":
     This is not implemented as a normal pytest test as those tests run using the S03
     EPICS ports and switching ports at runtime is non-trivial
     """
-    with patch("dodal.i03.BL", "i03"):
+    with patch("dodal.beamlines.i03.BL", "i03"):
         print("Making all i03 devices")
         make_all_devices(i03)
         print("Successfully connected")
