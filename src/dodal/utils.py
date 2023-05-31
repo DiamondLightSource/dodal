@@ -86,7 +86,7 @@ def skip_device(precondition=lambda: True):
         def wrapper(*args, **kwds) -> T:
             return func(*args, **kwds)
 
-        if precondition:
+        if precondition():
             wrapper.__skip__ = True  # type: ignore
         return wrapper
 

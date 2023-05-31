@@ -1,6 +1,7 @@
 from typing import Optional
 
 from dodal.beamlines.beamline_utils import device_instantiation
+from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.aperturescatterguard import AperturePositions, ApertureScatterguard
 from dodal.devices.backlight import Backlight
 from dodal.devices.DCM import DCM
@@ -14,11 +15,12 @@ from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import Undulator
 from dodal.devices.zebra import Zebra
-from dodal.log import set_beamline
+from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
 
 BL = get_beamline_name("s03")
-set_beamline(BL)
+set_log_beamline(BL)
+set_utils_beamline(BL)
 
 
 @skip_device(lambda: BL == "s03")

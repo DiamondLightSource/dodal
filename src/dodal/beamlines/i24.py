@@ -1,6 +1,7 @@
 from typing import Optional
 
 from dodal.beamlines.beamline_utils import BL, device_instantiation
+from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.backlight import Backlight
 from dodal.devices.DCM import DCM
 from dodal.devices.detector import DetectorParams
@@ -16,8 +17,9 @@ from dodal.devices.zebra import Zebra
 from dodal.log import set_beamline
 from dodal.utils import get_beamline_name, skip_device
 
-BL = get_beamline_name("s03")
+BL = get_beamline_name("s24")
 set_beamline(BL)
+set_utils_beamline(BL)
 
 
 def backlight(
@@ -35,7 +37,7 @@ def backlight(
     )
 
 
-@skip_device(lambda: BL == "s03")
+@skip_device(lambda: BL == "s24")
 def eiger(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
@@ -60,7 +62,7 @@ def eiger(
     )
 
 
-@skip_device(lambda: BL == "s03")
+@skip_device(lambda: BL == "s24")
 def vgonio(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> OAV:
     """Get the i24 vgonio device, instantiate it if it hasn't already been.
     If this is called when already instantiated, it will return the existing object.
@@ -68,7 +70,7 @@ def vgonio(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) 
     return device_instantiation(
         VGonio,
         "vgonio",
-        "",
+        "-MO-VGON-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
     )

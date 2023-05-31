@@ -3,14 +3,15 @@ from typing import Callable, Dict, List, Optional
 from ophyd import Device
 from ophyd.sim import make_fake_device
 
-from dodal.log import set_beamline
-from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
-
-BL = get_beamline_name("s03")
-set_beamline(BL)
-
+from dodal.utils import BeamlinePrefix, skip_device
 
 ACTIVE_DEVICES: Dict[str, Device] = {}
+BL = ""
+
+
+def set_beamline(beamline: str):
+    global BL
+    BL = beamline
 
 
 def clear_devices():
