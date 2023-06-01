@@ -48,6 +48,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/78_fix_skip_decorator/"
   },
   {
+    "version": "82_add_sixteen_filter_attenuator",
+    "url": "https://DiamondLightSource.github.io/dodal/82_add_sixteen_filter_attenuator/"
+  },
+  {
     "version": "I23-Grid-Scans",
     "url": "https://DiamondLightSource.github.io/dodal/I23-Grid-Scans/"
   },
@@ -62,10 +66,6 @@
   {
     "version": "artemis_348_replace_point_3d_to_support_arithmetic",
     "url": "https://DiamondLightSource.github.io/dodal/artemis_348_replace_point_3d_to_support_arithmetic/"
-  },
-  {
-    "version": "artemis_681_pydantic_internal_params",
-    "url": "https://DiamondLightSource.github.io/dodal/artemis_681_pydantic_internal_params/"
   },
   {
     "version": "p45AndAdsim",
