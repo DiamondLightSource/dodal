@@ -1,7 +1,6 @@
 from dodal.devices.areadetector import AdAravisDetector
 from dodal.devices.p45 import Choppers, TomoStageWithStretchAndSkew
-
-from .utils import BeamlinePrefix
+from dodal.utils import BeamlinePrefix
 
 PREFIX: str = BeamlinePrefix("p45").beamline_prefix
 
