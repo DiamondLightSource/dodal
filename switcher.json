@@ -68,6 +68,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/artemis_348_replace_point_3d_to_support_arithmetic/"
   },
   {
+    "version": "artemis_683_wait_on_pin_tip",
+    "url": "https://DiamondLightSource.github.io/dodal/artemis_683_wait_on_pin_tip/"
+  },
+  {
     "version": "p45AndAdsim",
     "url": "https://DiamondLightSource.github.io/dodal/p45AndAdsim/"
   },
