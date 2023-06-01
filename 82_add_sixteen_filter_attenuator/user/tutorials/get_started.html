@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Getting Started &#8212; dodal 0.0.4.dev35+g4fec37e9 documentation</title>
+    <title>Getting Started &#8212; dodal 0.0.4.dev58+gef57229e documentation</title>
   
   
   
@@ -459,7 +459,7 @@ document.write(`
 <h2>Using Devices<a class="headerlink" href="#using-devices" title="Permalink to this heading">#</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">dodal</span></code> contains devices to cover anything you would like to do using a beamline’s hardware.</p>
 <p>To use these devices you can do the following:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dodal</span> <span class="kn">import</span> <span class="n">i03</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dodal.beamlines</span> <span class="kn">import</span> <span class="n">i03</span>
 <span class="n">dcm</span> <span class="o">=</span> <span class="n">i03</span><span class="o">.</span><span class="n">dcm</span><span class="p">()</span>
 <span class="c1"># You can now use the DCM as you would any other device in Bluesky plans</span>
 </pre></div>
@@ -471,7 +471,7 @@ beamline workstation it will default to connecting to a simulated instrument.</p
 <h2>Adding Logging<a class="headerlink" href="#adding-logging" title="Permalink to this heading">#</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">dodal</span></code> provides some helper functions to help you log what’s going on.</p>
 <p>You can set these up using:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dodal</span> <span class="kn">import</span> <span class="n">i03</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dodal.beamlines</span> <span class="kn">import</span> <span class="n">i03</span>
 <span class="kn">from</span> <span class="nn">dodal.log</span> <span class="kn">import</span> <span class="n">set_up_logging_handlers</span><span class="p">,</span> <span class="n">LOGGER</span>
 
 <span class="n">set_up_logging_handlers</span><span class="p">()</span>
