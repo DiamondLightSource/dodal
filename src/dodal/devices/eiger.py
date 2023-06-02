@@ -73,7 +73,7 @@ class EigerDetector(Device):
             raise Exception(f"Odin not initialised: {error_message}")
         if self.detector_params.use_roi_mode:
             self.enable_roi_mode()
-        status = self.set_detector_threshold(self.detector_params.current_energy)
+        status = self.set_detector_threshold(self.detector_params.current_energy_ev)
         status &= self.set_cam_pvs()
         status &= self.set_odin_pvs()
         status &= self.set_mx_settings_pvs()
@@ -178,9 +178,9 @@ class EigerDetector(Device):
         Returns:
             status object that is Done when the threshold has been set correctly
         """
-        current_energy = self.cam.photon_energy.get()
+        current_energy_ev = self.cam.photon_energy.get()
 
-        if abs(current_energy - energy) > tolerance:
+        if abs(current_energy_ev - energy) > tolerance:
             return self.cam.photon_energy.set(energy)
         else:
             status = Status(self)

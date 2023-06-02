@@ -28,7 +28,7 @@ TEST_DET_DIST_TO_BEAM_CONVERTER_PATH = "tests/devices/unit_tests/test_lookup_tab
 
 def create_new_params() -> DetectorParams:
     return DetectorParams(
-        current_energy=TEST_CURRENT_ENERGY,
+        current_energy_ev=TEST_CURRENT_ENERGY,
         exposure_time=TEST_EXPOSURE_TIME,
         directory=TEST_DIR,
         prefix=TEST_PREFIX,
@@ -54,7 +54,7 @@ def fake_eiger():
 
 
 @pytest.mark.parametrize(
-    "current_energy, request_energy, is_energy_change",
+    "current_energy_ev, request_energy, is_energy_change",
     [
         (100.0, 100.0, False),
         (100.0, 200.0, True),
@@ -65,12 +65,12 @@ def fake_eiger():
 )
 def test_detector_threshold(
     fake_eiger: EigerDetector,
-    current_energy: float,
+    current_energy_ev: float,
     request_energy: float,
     is_energy_change: bool,
 ):
     status_obj = MagicMock()
-    when(fake_eiger.cam.photon_energy).get().thenReturn(current_energy)
+    when(fake_eiger.cam.photon_energy).get().thenReturn(current_energy_ev)
     when(fake_eiger.cam.photon_energy).set(ANY).thenReturn(status_obj)
 
     returned_status = fake_eiger.set_detector_threshold(request_energy)
