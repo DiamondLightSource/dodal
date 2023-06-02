@@ -4,20 +4,12 @@
     "url": "https://DiamondLightSource.github.io/dodal/main/"
   },
   {
-    "version": "0.0.4",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.4/"
-  },
-  {
-    "version": "0.0.3",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.3/"
+    "version": "0.0.1",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.1/"
   },
   {
     "version": "0.0.2",
     "url": "https://DiamondLightSource.github.io/dodal/0.0.2/"
-  },
-  {
-    "version": "0.0.1",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.1/"
   },
   {
     "version": "0.0.2_async_arming",
@@ -26,6 +18,14 @@
   {
     "version": "0.0.2_hotfixes",
     "url": "https://DiamondLightSource.github.io/dodal/0.0.2_hotfixes/"
+  },
+  {
+    "version": "0.0.3",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.3/"
+  },
+  {
+    "version": "0.0.4",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.4/"
   },
   {
     "version": "262_make_arming_eiger_asynchronous",
@@ -62,10 +62,6 @@
   {
     "version": "artemis_262_move_arming_out_of_stage",
     "url": "https://DiamondLightSource.github.io/dodal/artemis_262_move_arming_out_of_stage/"
-  },
-  {
-    "version": "artemis_683_wait_on_pin_tip",
-    "url": "https://DiamondLightSource.github.io/dodal/artemis_683_wait_on_pin_tip/"
   },
   {
     "version": "p45AndAdsim",
