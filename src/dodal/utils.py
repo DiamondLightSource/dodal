@@ -1,6 +1,5 @@
 import inspect
 import socket
-from collections import namedtuple
 from dataclasses import dataclass
 from functools import wraps
 from importlib import import_module
@@ -54,9 +53,6 @@ BLUESKY_PROTOCOLS = [
     Triggerable,
 ]
 
-
-Point2D = namedtuple("Point2D", ["x", "y"])
-Point3D = namedtuple("Point3D", ["x", "y", "z"])
 
 T = TypeVar("T")
 

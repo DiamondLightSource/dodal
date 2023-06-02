@@ -2,7 +2,9 @@ import threading
 import time
 from typing import Any
 
+import numpy as np
 from bluesky.plan_stubs import mv
+from numpy import ndarray
 from ophyd import (
     Component,
     Device,
@@ -18,7 +20,6 @@ from pydantic.dataclasses import dataclass
 from dodal.devices.motors import XYZLimitBundle
 from dodal.devices.status import await_value
 from dodal.parameters.experiment_parameter_base import AbstractExperimentParameterBase
-from dodal.utils import Point3D
 
 
 @dataclass
@@ -117,7 +118,7 @@ class GridScanParams(BaseModel, AbstractExperimentParameterBase):
     def is_3d_grid_scan(self):
         return self.z_steps > 0
 
-    def grid_position_to_motor_position(self, grid_position: Point3D) -> Point3D:
+    def grid_position_to_motor_position(self, grid_position: ndarray) -> ndarray:
         """Converts a grid position, given as steps in the x, y, z grid,
         to a real motor position.
 
@@ -130,10 +131,12 @@ class GridScanParams(BaseModel, AbstractExperimentParameterBase):
             if not axis.is_within(position):
                 raise IndexError(f"{grid_position} is outside the bounds of the grid")
 
-        return Point3D(
-            self.x_axis.steps_to_motor_position(grid_position.x),
-            self.y_axis.steps_to_motor_position(grid_position.y),
-            self.z_axis.steps_to_motor_position(grid_position.z),
+        return np.array(
+            [
+                self.x_axis.steps_to_motor_position(grid_position[0]),
+                self.y_axis.steps_to_motor_position(grid_position[1]),
+                self.z_axis.steps_to_motor_position(grid_position[2]),
+            ]
         )
 
 
