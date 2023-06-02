@@ -46,7 +46,8 @@ class DetectorParams(BaseModel):
     class Config:
         arbitrary_types_allowed = True
         json_encoders = {
-            DetectorDistanceToBeamXYConverter: lambda d: d.lookup_file,
+            DetectorDistanceToBeamXYConverter: lambda _: None,
+            DetectorSizeConstants: lambda d: d.det_type_string,
         }
 
     @validator("detector_size_constants", pre=True)

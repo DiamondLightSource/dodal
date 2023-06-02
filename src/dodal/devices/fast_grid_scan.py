@@ -64,6 +64,12 @@ class GridScanParams(BaseModel, AbstractExperimentParameterBase):
     y_axis: GridAxis = GridAxis(0, 0, 0)
     z_axis: GridAxis = GridAxis(0, 0, 0)
 
+    class Config:
+        arbitrary_types_allowed = True
+        json_encoders = {
+            GridAxis: lambda ga: [ga.start, ga.step_size, ga.full_steps],
+        }
+
     @validator("x_axis", always=True)
     def _get_x_axis(cls, x_axis: GridAxis, values: dict[str, Any]) -> GridAxis:
         return GridAxis(values["x_start"], values["x_step_size"], values["x_steps"])
