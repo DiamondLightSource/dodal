@@ -15,7 +15,7 @@ Using Devices
 
 To use these devices you can do the following::
 
-    from dodal import i03
+    from dodal.beamlines import i03
     dcm = i03.dcm()
     # You can now use the DCM as you would any other device in Bluesky plans
 
@@ -29,7 +29,7 @@ Adding Logging
 
 You can set these up using::
     
-    from dodal import i03
+    from dodal.beamlines import i03
     from dodal.log import set_up_logging_handlers, LOGGER
 
     set_up_logging_handlers()
