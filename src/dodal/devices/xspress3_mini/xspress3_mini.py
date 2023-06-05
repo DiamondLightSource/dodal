@@ -15,6 +15,10 @@ from dodal.devices.xspress3_mini.xspress3_mini_channel import Xspress3MiniChanne
 from dodal.log import LOGGER
 
 
+class AttenuationOptimisationFailedException(Exception):
+    pass
+
+
 class TriggerMode(Enum):
     SOFTWARE = "Software"
     HARDWARE = "Hardware"
@@ -62,6 +66,11 @@ class Xspress3Mini(Device):
             return self.parent.arm()
 
     do_arm: ArmingSignal = Component(ArmingSignal)
+
+    zebra: Zebra = Component(
+        Zebra, ""
+    )  # TODO: these two devices won't work because prefixes don't start with
+    # ~Xspress3mini  - move to bluesky plan?
 
     # Assume only one channel for now
     channel_1 = Component(Xspress3MiniChannel, "C1_")
