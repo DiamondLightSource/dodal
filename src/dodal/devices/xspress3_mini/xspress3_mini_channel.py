@@ -22,6 +22,9 @@ class Xspress3MiniChannel(Device):
 
     pv_sca5_update_mini: EpicsSignal = Component(EpicsSignal, "SCAS:TS:TSAcquire")
 
+    # Number here would change on each channel
+    pv_latest_mca: EpicsSignalRO = Component(EpicsSignalRO, f":ARR{1}:ArrayData")
+
     pv_roi_size: EpicsSignal = Component(
         EpicsSignal, "SCA5_HLM"
     )  # Strange as it doesn't use roi variable, but this does happen in gda code.

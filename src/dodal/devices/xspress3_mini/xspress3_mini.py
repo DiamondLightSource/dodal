@@ -9,9 +9,14 @@ from dodal.devices.xspress3_mini.xspress3_mini_channel import (
     TimeSeriesValues,
     Xspress3MiniChannel,
 )
+from dodal.devices.zebra import Zebra
 from dodal.log import LOGGER
 
 # VERSION_3(SCA_UPDATE_TIME_SERIES_TEMPLATE, "Acquire", "Done", ""),
+
+
+class AttenuationOptimisationFailedException(Exception):
+    pass
 
 
 class TriggerMode(Enum):
@@ -43,6 +48,11 @@ class AcquireState(Enum):
 
 class Xspress3Mini(Device):
     attenuator: Attenuator = Component(Attenuator, "-ATTN-01")
+
+    zebra: Zebra = Component(
+        Zebra, ""
+    )  # TODO: these two devices won't work because prefixes don't start with
+    # ~Xspress3mini  - move to bluesky plan?
 
     # Assume only one channel for now
     channel_1 = Component(Xspress3MiniChannel, "C1_")
@@ -136,15 +146,14 @@ class Xspress3Mini(Device):
 
         self.pv_squash_aux_dim.put(
             UpdateRBV.ENABLED.value
-        )  # In GDA this is blocking, but can make asynchronous like with eiger
+        )  # In GDA this is blocking, but we can make asynchronous like with eiger
 
         status &= self.pv_acquire.set(AcquireState.ACQUIRE.value)
 
         return status
 
-    # Might as well make everything here asynchronous eventually using stuff from eiger arming
-
     def run_optimisation(self, low_roi=0, high_roi=0):
+        # Might as well make everything here asynchronous eventually using stuff from eiger arming
         LOGGER.info("Starting Xspress3Mini optimisation routine")
         optimisation_type = self.detector_params.optimisation_type
         if low_roi == 0:
@@ -167,6 +176,9 @@ class Xspress3Mini(Device):
             # Get transmission, target, lower limit, upper limit, max cycles, optimised transmission from beamline_params
             max_cycles: int
             transmission: float
+            lower_limit: int
+            upper_limit: int
+            target: int
 
         for cycle in range(0, max_cycles):
             LOGGER.info(
@@ -183,7 +195,7 @@ class Xspress3Mini(Device):
                     1, timeout=10
                 )  # TODO: check when we should wait for this status to complete
 
-            # ------------------------armXpress3mini--------------------------
+            # ------------------------arm Xpress3mini--------------------------
             LOGGER.info("Arming Xspress3Mini detector...")
             self.trigger_mode.BURST
             self.pv_set_trigger_mode_mini.put(
@@ -195,9 +207,57 @@ class Xspress3Mini(Device):
 
             do_start_status = self.do_start()
 
-            # final part of arming is waitForDetector()
-        # ----------------arming done---------------------
+            do_start_status.wait(10)  # TODO use async function for this instead
 
-        # self.zebraBoxPin.armXspress3MiniFluo_detector
-        # self.zebraBoxPin.arm_zebra()
-        # self.detector.waitUntilDetectorStateIsNotBusy()
+            # ----------------arming detector done--------------------------------
+
+            # reset zebra first
+            LOGGER.info("Resetting Zebra")
+            self.zebra.pc.put(1)
+
+            LOGGER.info("Arming Zebra")
+            self.zebra.pc.arm().wait(30)
+
+            data = self.channel_1.pv_latest_mca.get()  # this should return an array
+            total_count = sum(data[low_roi:high_roi])
+
+            LOGGER.info(f"Total count is {total_count}")
+
+            if lower_limit <= total_count <= upper_limit:
+                optimised_transmission = transmission
+                LOGGER.info(
+                    f"Total count is within accepted limits: {lower_limit}, {total_count}, {upper_limit}"
+                )
+                break
+
+            old_transmission = transmission
+            transmission = target / (total_count * old_transmission)
+
+            if cycle == max_cycles - 1:
+                raise AttenuationOptimisationFailedException(
+                    f"Unable to optimise attenuation after maximum cycles.\
+                                                             Total count is not within limits: {lower_limit} <= {total_count}\
+                                                                  <= {upper_limit}"
+                )
+
+            self.attenuator.set_transmission(transmission)
+            optimised_transmission = transmission
+
+            LOGGER.info(f"Optimum transmission is {optimised_transmission}")
+
+        """For dead time calc
+        
+        # Read-out scaler values: Meant to do this a loop per channel, but there's only one channel right now
+            total_time = self.channel_1.pv_time.get()
+            reset_ticks = self.channel_1.pv_reset_ticks.get()
+
+            LOGGER.info(
+                f"Current total time = {total_time} \nCurrent reset ticks = {reset_ticks}"
+            )
+
+            deadtime = 0.0
+            if reset_ticks != total_time:
+                deadtime = 1 - (
+                    abs(float(total_time - reset_ticks)) / float(total_time)
+                )
+        """

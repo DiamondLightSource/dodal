@@ -69,6 +69,7 @@ class PositionCompare(Device):
     arm_demand: EpicsSignal = Component(EpicsSignal, "PC_ARM")
     disarm_demand: EpicsSignal = Component(EpicsSignal, "PC_DISARM")
     armed: EpicsSignal = Component(EpicsSignal, "PC_ARM_OUT")
+    reset: EpicsSignal = Component(EpicsSignal, "SYS_RESET.PROC")
 
     def arm(self) -> StatusBase:
         status = self.arm_status(1)
