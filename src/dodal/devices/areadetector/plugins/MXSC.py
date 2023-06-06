@@ -1,13 +1,23 @@
-from ophyd import Component, Device, EpicsSignal, Kind, Signal
+from ophyd import Component, Device, EpicsSignal, EpicsSignalRO, Kind, Signal, SignalRO
 from ophyd.status import Status, SubscriptionStatus
 
 
 class PinTipDetect(Device):
-    INVALID_POSITION = (-1, -1)
-    tip_x: EpicsSignal = Component(EpicsSignal, "TipX")
-    tip_y: EpicsSignal = Component(EpicsSignal, "TipY")
+    """This will read the pin tip location from the MXSC plugin.
 
-    triggered_tip: Signal = Component(Signal, kind=Kind.hinted)
+    If the plugin finds no tip it will return {INVALID_POSITION}. However, it will also
+    occassionally give false negatives and return this value when there is a pin tip
+    there. Therefore, it is recommended that you trigger this device, which will cause a
+    subsequent read to return a valid pin immediatedly if one is found or wait
+    {validity_timeout} seconds if one is not, at which point a subsequent read will give
+    you {INVALID_POSITION}.
+    """
+
+    INVALID_POSITION = (-1, -1)
+    tip_x: EpicsSignalRO = Component(EpicsSignalRO, "TipX")
+    tip_y: EpicsSignalRO = Component(EpicsSignalRO, "TipY")
+
+    triggered_tip: Signal = Component(Signal, kind=Kind.hinted, value=INVALID_POSITION)
     validity_timeout: Signal = Component(Signal, value=1)
 
     def __init__(self, **kwargs):
@@ -23,9 +33,14 @@ class PinTipDetect(Device):
         subscription_status = SubscriptionStatus(self.tip_x, self.update_tip_if_valid)
 
         def set_to_default_and_finish(_):
-            self.triggered_tip.set(self.INVALID_POSITION)
-            subscription_status.set_finished()
+            try:
+                self.triggered_tip.set(self.INVALID_POSITION)
+                subscription_status.set_finished()
+            except Exception as e:
+                subscription_status.set_exception(e)
 
+        # We use a separate status for measuring the timeout as we don't want an error
+        # on the returned status
         Status(self, timeout=self.validity_timeout.get()).add_callback(
             set_to_default_and_finish
         )
