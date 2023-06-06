@@ -194,7 +194,7 @@ def test_stage_raises_exception_if_odin_initialisation_status_not_ok(fake_eiger)
     with pytest.raises(
         Exception, match=f"Odin not initialised: {expected_error_message}"
     ):
-        fake_eiger.async_stage()
+        fake_eiger.async_stage().wait()
 
 
 @pytest.mark.parametrize(
@@ -286,7 +286,7 @@ def test_unsuccessful_true_roi_mode_change_results_in_callback_error(
         ),
     ]
     with pytest.raises(Exception):
-        wrap_and_do_funcs(unwrapped_funcs)
+        wrap_and_do_funcs(unwrapped_funcs).wait()
         LOGGER.error.assert_called_once()
 
 
@@ -306,7 +306,7 @@ def test_unsuccessful_false_roi_mode_change_results_in_callback_error(
         ),
     ]
     with pytest.raises(Exception):
-        wrap_and_do_funcs(unwrapped_funcs)
+        wrap_and_do_funcs(unwrapped_funcs).wait()
         LOGGER.error.assert_called_once()
 
 
@@ -328,7 +328,7 @@ def test_given_failing_odin_when_stage_then_exception_raised(fake_eiger):
     fake_eiger.odin.check_odin_initialised = MagicMock()
     fake_eiger.odin.check_odin_initialised.return_value = (False, error_contents)
     with pytest.raises(Exception) as e:
-        fake_eiger.async_stage()
+        fake_eiger.async_stage().wait()
         assert error_contents in e.value
 
 
@@ -470,7 +470,7 @@ def test_check_callback_error(fake_eiger: EigerDetector, func):
     unwrapped_funcs = [dummy_bad_status_function, eval(func)]
 
     with pytest.raises(Exception):
-        wrap_and_do_funcs(unwrapped_funcs)
+        wrap_and_do_funcs(unwrapped_funcs).wait()
         LOGGER.error.assert_called_once()
 
 

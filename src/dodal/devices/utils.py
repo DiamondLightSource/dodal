@@ -68,11 +68,9 @@ def wrap_and_do_funcs(
     def check_callback_error(status: Status):
         error = status.exception()
         if error is not None:
-            full_status.set_exception(
-                StatusException(f"Status {status} has failed with exception {error}")
-            )  # So full_status can also be checked for any errors
+            full_status.set_exception(error)
+            # So full_status can also be checked for any errors
             LOGGER.error(f"Status {status} has failed with error {error}")
-            raise error  # This raised error is caught within status.py so doesn't stop the code
 
     # Each wrapped function needs to attach its callback to the subsequent wrapped function, therefore
     # wrapped_funcs list needs to be created in reverse order
