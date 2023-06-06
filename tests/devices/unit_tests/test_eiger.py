@@ -286,8 +286,14 @@ def test_unsuccessful_roi_mode_change_results_in_callback_error(mock_and, fake_e
         wrap_and_do_funcs(unwrapped_funcs)
 
     # Test false
+    unwrapped_funcs = [
+        lambda: fake_eiger.change_roi_mode(enable=False),
+        lambda: fake_eiger.set_detector_threshold(
+            energy=fake_eiger.detector_params.current_energy
+        ),
+    ]
     with pytest.raises(errors.StatusTimeoutError):
-        fake_eiger.change_roi_mode(enable=False).wait()
+        wrap_and_do_funcs(unwrapped_funcs)
 
 
 @patch("dodal.devices.eiger.EigerOdin.check_odin_state")
