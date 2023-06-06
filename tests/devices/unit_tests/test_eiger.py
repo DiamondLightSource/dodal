@@ -269,13 +269,13 @@ def test_change_roi_mode_sets_cam_roi_mode_correctly(
     )
 
 
-# Tests transition from change ROI to set_detector_threshold
+# Also tests transition from change ROI to set_detector_threshold
 @patch("ophyd.status.Status.__and__")
 def test_unsuccessful_true_roi_mode_change_results_in_callback_error(
     mock_and, fake_eiger
 ):
-    dummy_status = Status(timeout=0)
-    mock_and.return_value = dummy_status
+    mock_and.return_value = Status(success=False, done=True)
+    LOGGER.error = MagicMock()
 
     # Test true
     unwrapped_funcs = [
@@ -284,16 +284,18 @@ def test_unsuccessful_true_roi_mode_change_results_in_callback_error(
             energy=fake_eiger.detector_params.current_energy
         ),
     ]
-    with pytest.raises(errors.StatusTimeoutError):
+    with pytest.raises(Exception):
         wrap_and_do_funcs(unwrapped_funcs)
+
+    LOGGER.error.assert_called_once()
 
 
 @patch("ophyd.status.Status.__and__")
 def test_unsuccessful_false_roi_mode_change_results_in_callback_error(
     mock_and, fake_eiger
 ):
-    dummy_status = Status(timeout=0)
-    mock_and.return_value = dummy_status
+    mock_and.return_value = Status(success=False, done=True)
+    LOGGER.error = MagicMock()
 
     unwrapped_funcs = [
         lambda: fake_eiger.change_roi_mode(enable=False),
@@ -301,8 +303,10 @@ def test_unsuccessful_false_roi_mode_change_results_in_callback_error(
             energy=fake_eiger.detector_params.current_energy
         ),
     ]
-    with pytest.raises(errors.StatusTimeoutError):
+    with pytest.raises(Exception):
         wrap_and_do_funcs(unwrapped_funcs)
+
+    LOGGER.error.assert_called_once()
 
 
 @patch("dodal.devices.eiger.EigerOdin.check_odin_state")
