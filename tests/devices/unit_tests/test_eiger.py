@@ -5,7 +5,6 @@ import pytest
 from mockito import ANY, mock, verify, when
 from ophyd.sim import make_fake_device
 from ophyd.status import Status
-from ophyd.utils import errors
 
 from dodal.devices.det_dim_constants import EIGER2_X_16M_SIZE
 from dodal.devices.detector import DetectorParams, TriggerMode
@@ -274,7 +273,9 @@ def test_change_roi_mode_sets_cam_roi_mode_correctly(
 def test_unsuccessful_true_roi_mode_change_results_in_callback_error(
     mock_and, fake_eiger
 ):
-    mock_and.return_value = Status(success=False, done=True)
+    bad_status = Status()
+    bad_status.set_exception(Exception("Fail"))
+    mock_and.return_value = bad_status
     LOGGER.error = MagicMock()
 
     # Test true
@@ -286,15 +287,16 @@ def test_unsuccessful_true_roi_mode_change_results_in_callback_error(
     ]
     with pytest.raises(Exception):
         wrap_and_do_funcs(unwrapped_funcs)
-
-    LOGGER.error.assert_called_once()
+        LOGGER.error.assert_called_once()
 
 
 @patch("ophyd.status.Status.__and__")
 def test_unsuccessful_false_roi_mode_change_results_in_callback_error(
     mock_and, fake_eiger
 ):
-    mock_and.return_value = Status(success=False, done=True)
+    bad_status = Status()
+    bad_status.set_exception(Exception("Fail"))
+    mock_and.return_value = bad_status
     LOGGER.error = MagicMock()
 
     unwrapped_funcs = [
@@ -305,8 +307,7 @@ def test_unsuccessful_false_roi_mode_change_results_in_callback_error(
     ]
     with pytest.raises(Exception):
         wrap_and_do_funcs(unwrapped_funcs)
-
-    LOGGER.error.assert_called_once()
+        LOGGER.error.assert_called_once()
 
 
 @patch("dodal.devices.eiger.EigerOdin.check_odin_state")
@@ -468,8 +469,9 @@ def test_check_callback_error(fake_eiger: EigerDetector, func):
 
     unwrapped_funcs = [dummy_bad_status_function, eval(func)]
 
-    wrap_and_do_funcs(unwrapped_funcs)
-    LOGGER.error.assert_called_once
+    with pytest.raises(Exception):
+        wrap_and_do_funcs(unwrapped_funcs)
+        LOGGER.error.assert_called_once()
 
 
 def test_given_in_free_run_mode_when_staged_then_triggers_and_filewriter_set_correctly(
