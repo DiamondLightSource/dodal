@@ -257,7 +257,7 @@ class EigerDetector(Device):
         this_status = self.odin.file_writer.capture.set(
             1, timeout=self.GENERAL_STATUS_TIMEOUT
         )
-        LOGGER.info(f"Eiger staging: awaiting odin metadata")
+        LOGGER.info("Eiger staging: awaiting odin metadata")
         this_status &= await_value(self.odin.meta.ready, 1, self.GENERAL_STATUS_TIMEOUT)
         return this_status
 
