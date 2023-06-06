@@ -33,6 +33,7 @@ def test_grid_overlay():
     RE(take_snapshot_with_grid(oav, snapshot_filename, snapshot_directory))
 
 
+@pytest.mark.skip(reason="No OAV in S03")
 @pytest.mark.s03
 def test_get_zoom_levels():
     my_zoom_controller = ZoomController("BL03S-EA-OAV-01:FZOOM:", name="test_zoom")

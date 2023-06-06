@@ -1,6 +1,5 @@
 import inspect
 import socket
-from collections import namedtuple
 from dataclasses import dataclass
 from functools import wraps
 from importlib import import_module
@@ -55,9 +54,6 @@ BLUESKY_PROTOCOLS = [
 ]
 
 
-Point2D = namedtuple("Point2D", ["x", "y"])
-Point3D = namedtuple("Point3D", ["x", "y", "z"])
-
 T = TypeVar("T")
 
 
@@ -86,7 +82,7 @@ def skip_device(precondition=lambda: True):
         def wrapper(*args, **kwds) -> T:
             return func(*args, **kwds)
 
-        if precondition:
+        if precondition():
             wrapper.__skip__ = True  # type: ignore
         return wrapper
 
