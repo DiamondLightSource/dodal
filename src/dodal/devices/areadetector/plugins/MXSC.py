@@ -1,4 +1,4 @@
-from ophyd import Component, Device, EpicsSignal, EpicsSignalRO, Kind, Signal, SignalRO
+from ophyd import Component, Device, EpicsSignal, EpicsSignalRO, Kind, Signal
 from ophyd.status import Status, SubscriptionStatus
 
 
