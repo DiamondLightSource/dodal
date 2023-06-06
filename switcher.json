@@ -40,6 +40,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/51_aperture_scatterguard_no_positions/"
   },
   {
+    "version": "699_fix_pin_detect",
+    "url": "https://DiamondLightSource.github.io/dodal/699_fix_pin_detect/"
+  },
+  {
     "version": "71_implement_fluorescent_detector",
     "url": "https://DiamondLightSource.github.io/dodal/71_implement_fluorescent_detector/"
   },
