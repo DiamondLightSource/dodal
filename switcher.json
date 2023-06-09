@@ -72,6 +72,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/artemis_370_implement_rotation_nexus/"
   },
   {
+    "version": "artemis_695_nexus_writer_get_documents_from_plan",
+    "url": "https://DiamondLightSource.github.io/dodal/artemis_695_nexus_writer_get_documents_from_plan/"
+  },
+  {
     "version": "artemis_701_do_optimise_attenuation_scan",
     "url": "https://DiamondLightSource.github.io/dodal/artemis_701_do_optimise_attenuation_scan/"
   },
