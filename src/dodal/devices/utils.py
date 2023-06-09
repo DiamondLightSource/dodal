@@ -33,8 +33,7 @@ def wrap_and_do_funcs(
     """Creates and initiates an asynchronous chaining of functions which return a status.
 
     Usage:
-    This function can be used to convert a series of blocking, status-returning functions to a series of sequential, asynchronous,
-    status-returning functions by making use of callbacks. It also checks for exceptions on each returned status
+    This function can be used to take a series of status-returning functions and run them all sequentially and in the background by making use of callbacks. It also ensures exceptions on each returned status are propagated
 
     Args:
     unwrapped_funcs( list(function - > StatusBase) ): A list of functions which each return a status object
