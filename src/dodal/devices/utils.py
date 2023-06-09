@@ -20,14 +20,8 @@ def epics_signal_put_wait(pv_name: str, wait: float = 1.0) -> EpicsSignal:
     return Component(EpicsSignal, pv_name, put_complete=True, write_timeout=wait)
 
 
-class StatusException(Exception):
-    """For general status failures"""
-
-    pass
-
-
-def wrap_and_do_funcs(
-    unwrapped_funcs: list[Callable[[], StatusBase]],
+def run_functions_without_blocking(
+    functions_to_chain: list[Callable[[], StatusBase]],
     timeout: float = 60.0,
 ) -> Status:
     """Creates and initiates an asynchronous chaining of functions which return a status.
@@ -37,7 +31,7 @@ def wrap_and_do_funcs(
     status-returning functions by making use of callbacks. It also checks for exceptions on each returned status
 
     Args:
-    unwrapped_funcs( list(function - > StatusBase) ): A list of functions which each return a status object
+    functions_to_chain( list(function - > StatusBase) ): A list of functions which each return a status object
 
     Returns:
     Status: A status object which is marked as complete once all of the Status objects returned by the
@@ -79,13 +73,13 @@ def wrap_and_do_funcs(
     wrapped_funcs.append(
         partial(
             wrap_func,
-            current_func=unwrapped_funcs[-1],
+            current_func=functions_to_chain[-1],
             next_func=closing_func,
         )
     )
 
     # Wrap each function in reverse
-    for num, func in enumerate(list(reversed(unwrapped_funcs))[1:-1]):
+    for num, func in enumerate(list(reversed(functions_to_chain))[1:-1]):
         wrapped_funcs.append(
             partial(
                 wrap_func,
@@ -97,5 +91,5 @@ def wrap_and_do_funcs(
     starting_status = Status(done=True, success=True)
 
     # Initiate the chain of functions
-    wrap_func(starting_status, unwrapped_funcs[0], wrapped_funcs[-1])
+    wrap_func(starting_status, functions_to_chain[0], wrapped_funcs[-1])
     return full_status
