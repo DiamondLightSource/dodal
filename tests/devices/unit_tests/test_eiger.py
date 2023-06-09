@@ -238,8 +238,12 @@ def test_change_roi_mode_sets_correct_detector_size_constants(
     fake_eiger.odin.file_writer.image_width.set = mock_odin_width_set
 
     fake_eiger.change_roi_mode(roi_mode)
-    mock_odin_height_set.assert_called_once_with(expected_detector_dimensions.height, timeout=10)
-    mock_odin_width_set.assert_called_once_with(expected_detector_dimensions.width, timeout=10)
+    mock_odin_height_set.assert_called_once_with(
+        expected_detector_dimensions.height, timeout=10
+    )
+    mock_odin_width_set.assert_called_once_with(
+        expected_detector_dimensions.width, timeout=10
+    )
 
 
 @pytest.mark.parametrize(
