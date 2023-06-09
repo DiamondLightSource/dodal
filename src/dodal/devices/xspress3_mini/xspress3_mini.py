@@ -1,6 +1,6 @@
 from enum import Enum
+from ophyd import Component, Device, EpicsSignal, EpicsSignalRO, EpicsSignalWithRBV
 
-from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
 from ophyd.status import Status
 
 from dodal.devices.attenuator.attenuator import Attenuator
@@ -57,30 +57,28 @@ class Xspress3Mini(Device):
     # Assume only one channel for now
     channel_1 = Component(Xspress3MiniChannel, "C1_")
 
-    pv_erase: EpicsSignal = Component(EpicsSignal, "ERASE")
-    pv_get_max_num_channels = Component(EpicsSignalRO, "MAX_NUM_CHANNELS_RBV")
+    erase: EpicsSignal = Component(EpicsSignal, "ERASE")
+    get_max_num_channels = Component(EpicsSignalRO, "MAX_NUM_CHANNELS_RBV")
 
-    pv_acquire: EpicsSignal = (Component(EpicsSignal, "Acquire"),)  #
+    acquire: EpicsSignal = Component(EpicsSignal, "Acquire")
 
-    pv_get_roi_calc_mini: EpicsSignal = Component(EpicsSignal, "MCA1:Enable_RBV")
+    get_roi_calc_mini: EpicsSignal = Component(EpicsSignal, "MCA1:Enable_RBV")
 
     NUMBER_ROIS_DEFAULT = 6
 
-    pv_set_trigger_mode_mini: EpicsSignal = Component(EpicsSignal, "TriggerMode")
+    trigger_mode_mini: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "TriggerMode")
 
-    pv_get_trig_mode_mini: EpicsSignalRO = Component(EpicsSignalRO, "TriggerMode_RBV")
+    roi_start_x: EpicsSignal = Component(EpicsSignal, "ROISUM1:MinX")
+    roi_size_x: EpicsSignal = Component(EpicsSignal, "ROISUM1:SizeX")
+    acquire_time: EpicsSignal = Component(EpicsSignal, "AcquireTime")
 
-    pv_roi_start_x: EpicsSignal = Component(EpicsSignal, "ROISUM1:MinX")
-    pv_roi_size_x: EpicsSignal = Component(EpicsSignal, "ROISUM1:SizeX")
-    pv_acquire_time: EpicsSignal = Component(EpicsSignal, "AcquireTime")
+    set_num_images: EpicsSignal = Component(EpicsSignal, ":NumImages")
 
-    pv_set_num_images: EpicsSignal = Component(EpicsSignal, ":NumImages")
+    hdf_num_capture: EpicsSignal = Component(EpicsSignal, ":HDF5:NumCapture")
 
-    pv_hdf_num_capture: EpicsSignal = Component(EpicsSignal, ":HDF5:NumCapture")
+    squash_aux_dim: EpicsSignal = Component(EpicsSignal, ":DTC:SquashAuxDim")
 
-    pv_squash_aux_dim: EpicsSignal = Component(EpicsSignal, ":DTC:SquashAuxDim")
-
-    pv_status_rbv: EpicsSignalRO = Component(EpicsSignalRO, ":DetectorState_RBV")
+    status_rbv: EpicsSignalRO = Component(EpicsSignalRO, ":DetectorState_RBV")
 
     writeHDF5Files = (
         False  # Not sure if this can ever be set true for attenuation optimising
