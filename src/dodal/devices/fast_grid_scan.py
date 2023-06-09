@@ -66,8 +66,10 @@ class GridScanParams(BaseModel, AbstractExperimentParameterBase):
 
     class Config:
         arbitrary_types_allowed = True
-        json_encoders = {
-            GridAxis: lambda ga: [ga.start, ga.step_size, ga.full_steps],
+        fields = {
+            "x_axis": {"exclude": True},
+            "y_axis": {"exclude": True},
+            "z_axis": {"exclude": True},
         }
 
     @validator("x_axis", always=True)
