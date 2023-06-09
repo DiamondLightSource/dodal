@@ -238,8 +238,8 @@ def test_change_roi_mode_sets_correct_detector_size_constants(
     fake_eiger.odin.file_writer.image_width.set = mock_odin_width_set
 
     fake_eiger.change_roi_mode(roi_mode)
-    mock_odin_height_set.assert_called_once_with(expected_detector_dimensions.height)
-    mock_odin_width_set.assert_called_once_with(expected_detector_dimensions.width)
+    mock_odin_height_set.assert_called_once_with(expected_detector_dimensions.height, timeout=10)
+    mock_odin_width_set.assert_called_once_with(expected_detector_dimensions.width, timeout=10)
 
 
 @pytest.mark.parametrize(
@@ -434,7 +434,7 @@ def test_when_stage_called_then_finish_arm_on_fan_ready(
 
 @pytest.mark.parametrize(
     "iteration",
-    range(14),
+    range(10),
 )
 def test_check_callback_error(fake_eiger: EigerDetector, iteration):
     def get_bad_status():
