@@ -1,7 +1,5 @@
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
 
-from dodal.devices.xspress3_mini.xspress3_mini_roi import Xspress3MiniROI
-
 
 class Xspress3MiniChannel(Device):
     sca5_update_arrays_mini = Component(EpicsSignalRO, "SCAS:TS:TSAcquire")
