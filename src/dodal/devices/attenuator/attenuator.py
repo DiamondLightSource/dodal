@@ -1,7 +1,7 @@
 from typing import Optional
 
-from ophyd import Arming, Component, Device, EpicsSignal, Signal
-from ophyd.status import SubscriptionStatus
+from ophyd import Component, Device, EpicsSignal, EpicsSignalRO, Signal
+from ophyd.status import Status, SubscriptionStatus
 
 from dodal.devices.attenuator.filter import AtteunatorFilter
 from dodal.devices.detector import DetectorParams
@@ -16,22 +16,36 @@ class Attenuator(Device):
 
     do_set_transmission: TransmissionSignal = Component(TransmissionSignal)
 
-    calulated_filter_state_1: EpicsSignal = Component(EpicsSignal, ":DEC_TO_BIN.B0")
-    calulated_filter_state_2: EpicsSignal = Component(EpicsSignal, ":DEC_TO_BIN.B1")
-    calulated_filter_state_3: EpicsSignal = Component(EpicsSignal, ":DEC_TO_BIN.B2")
-    calulated_filter_state_4: EpicsSignal = Component(EpicsSignal, ":DEC_TO_BIN.B3")
-    calulated_filter_state_5: EpicsSignal = Component(EpicsSignal, ":DEC_TO_BIN.B4")
-    calulated_filter_state_6: EpicsSignal = Component(EpicsSignal, ":DEC_TO_BIN.B5")
-    calulated_filter_state_7: EpicsSignal = Component(EpicsSignal, ":DEC_TO_BIN.B6")
-    calulated_filter_state_8: EpicsSignal = Component(EpicsSignal, ":DEC_TO_BIN.B7")
-    calulated_filter_state_9: EpicsSignal = Component(EpicsSignal, ":DEC_TO_BIN.B8")
-    calulated_filter_state_10: EpicsSignal = Component(EpicsSignal, ":DEC_TO_BIN.B9")
-    calulated_filter_state_11: EpicsSignal = Component(EpicsSignal, ":DEC_TO_BIN.BA")
-    calulated_filter_state_12: EpicsSignal = Component(EpicsSignal, ":DEC_TO_BIN.BB")
-    calulated_filter_state_13: EpicsSignal = Component(EpicsSignal, ":DEC_TO_BIN.BC")
-    calulated_filter_state_14: EpicsSignal = Component(EpicsSignal, ":DEC_TO_BIN.BD")
-    calulated_filter_state_15: EpicsSignal = Component(EpicsSignal, ":DEC_TO_BIN.BE")
-    calulated_filter_state_16: EpicsSignal = Component(EpicsSignal, ":DEC_TO_BIN.BF")
+    calulated_filter_state_1: EpicsSignalRO = Component(EpicsSignalRO, ":DEC_TO_BIN.B0")
+    calulated_filter_state_2: EpicsSignalRO = Component(EpicsSignalRO, ":DEC_TO_BIN.B1")
+    calulated_filter_state_3: EpicsSignalRO = Component(EpicsSignalRO, ":DEC_TO_BIN.B2")
+    calulated_filter_state_4: EpicsSignalRO = Component(EpicsSignalRO, ":DEC_TO_BIN.B3")
+    calulated_filter_state_5: EpicsSignalRO = Component(EpicsSignalRO, ":DEC_TO_BIN.B4")
+    calulated_filter_state_6: EpicsSignalRO = Component(EpicsSignalRO, ":DEC_TO_BIN.B5")
+    calulated_filter_state_7: EpicsSignalRO = Component(EpicsSignalRO, ":DEC_TO_BIN.B6")
+    calulated_filter_state_8: EpicsSignalRO = Component(EpicsSignalRO, ":DEC_TO_BIN.B7")
+    calulated_filter_state_9: EpicsSignalRO = Component(EpicsSignalRO, ":DEC_TO_BIN.B8")
+    calulated_filter_state_10: EpicsSignalRO = Component(
+        EpicsSignalRO, ":DEC_TO_BIN.B9"
+    )
+    calulated_filter_state_11: EpicsSignalRO = Component(
+        EpicsSignalRO, ":DEC_TO_BIN.BA"
+    )
+    calulated_filter_state_12: EpicsSignalRO = Component(
+        EpicsSignalRO, ":DEC_TO_BIN.BB"
+    )
+    calulated_filter_state_13: EpicsSignalRO = Component(
+        EpicsSignalRO, ":DEC_TO_BIN.BC"
+    )
+    calulated_filter_state_14: EpicsSignalRO = Component(
+        EpicsSignalRO, ":DEC_TO_BIN.BD"
+    )
+    calulated_filter_state_15: EpicsSignalRO = Component(
+        EpicsSignalRO, ":DEC_TO_BIN.BE"
+    )
+    calulated_filter_state_16: EpicsSignalRO = Component(
+        EpicsSignalRO, ":DEC_TO_BIN.BF"
+    )
 
     filter_1: AtteunatorFilter = Component(AtteunatorFilter, ":FILTER1")
     filter_2: AtteunatorFilter = Component(AtteunatorFilter, ":FILTER2")
@@ -52,7 +66,7 @@ class Attenuator(Device):
 
     desired_transmission: EpicsSignal = Component(EpicsSignal, ":T2A:SETVAL1")
     use_current_energy: EpicsSignal = Component(
-        EpicsSignal, ":E2WL:USECURRENTENERGY.PROC"
+        EpicsSignal, ":E2WL:USECURRENTENERY.PROC"
     )
     change: EpicsSignal = Component(EpicsSignal, ":FANOUT")
     actual_transmission: EpicsSignal = Component(EpicsSignal, ":MATCH")
@@ -103,24 +117,20 @@ class Attenuator(Device):
         """Get desired states and calculated states, return a status which is complete once they are equal"""
 
         LOGGER.info("Using current energy")
-        self.use_current_energy.put(1)
+        self.use_current_energy.set(1).wait()
         LOGGER.info(f"Setting desired transmission to {transmission}")
-        self.desired_transmission.put(transmission)
+        self.desired_transmission.set(transmission).wait()
         LOGGER.info("Sending change filter command")
-        self.change.put(1)
+        self.change.set(1).wait()
 
-        # Get desired filter positions (16phase)
-        desired_states = []
-        for calculated_state in self.get_calculated_filter_state_list():
-            value = int(calculated_state.get(timeout=10))
-            desired_states.append(value == 1)
+        # At some point we need to check how and when the calculated states are set, since if this is ran beforehand
+        # ,the function won't work
+        status = Status(done=True, success=True)
+        actual_states = self.get_actual_filter_state_list()
+        calculated_states = self.get_calculated_filter_state_list()
+        for i in range(16):
+            status &= await_value(
+                actual_states[i], calculated_states[i].get(), timeout=10
+            )
 
-        actual_states = []
-
-        # Get the boolean actual state of each of the 16 filters
-        for actual_state in self.get_actual_filter_state_list():
-            value = actual_state.get(timeout=10)
-            actual_states.append(value == "In")
-
-        # Transmission is set when all actual and desired states are equal
-        return await_value(actual_states, desired_states, timeout=30)
+        return status

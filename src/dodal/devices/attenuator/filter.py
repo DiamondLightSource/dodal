@@ -1,7 +1,5 @@
-from ophyd import Component, Device, EpicsSignal
-
-from dodal.devices.attenuator.attenuator import Attenuator
+from ophyd import Component, Device, EpicsSignalRO
 
 
 class AtteunatorFilter(Device):
-    actual_filter_state: EpicsSignal = Component(EpicsSignal, ":INLIM")
+    actual_filter_state: EpicsSignalRO = Component(EpicsSignalRO, ":INLIM")
