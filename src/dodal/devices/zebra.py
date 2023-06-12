@@ -48,6 +48,13 @@ class I03Axes(Enum):
     OMEGA = "Enc4"
 
 
+class I24Axes(Enum):
+    VGON_Z = "Enc1"
+    OMEGA = "Enc2"
+    VGON_X = "Enc3"
+    VGON_YH = "Enc4"
+
+
 class RotationDirection(IntEnum):
     POSITIVE = 1
     NEGATIVE = -1
