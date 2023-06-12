@@ -60,6 +60,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/artemis598_params_changes/"
   },
   {
+    "version": "artemis_262_move_arming_out_of_stage",
+    "url": "https://DiamondLightSource.github.io/dodal/artemis_262_move_arming_out_of_stage/"
+  },
+  {
     "version": "artemis_370_implement_rotation_nexus",
     "url": "https://DiamondLightSource.github.io/dodal/artemis_370_implement_rotation_nexus/"
   },
