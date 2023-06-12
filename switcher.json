@@ -52,16 +52,16 @@
     "url": "https://DiamondLightSource.github.io/dodal/78_fix_skip_decorator/"
   },
   {
+    "version": "82_add_attenuator",
+    "url": "https://DiamondLightSource.github.io/dodal/82_add_attenuator/"
+  },
+  {
     "version": "I23-Grid-Scans",
     "url": "https://DiamondLightSource.github.io/dodal/I23-Grid-Scans/"
   },
   {
     "version": "artemis598_params_changes",
     "url": "https://DiamondLightSource.github.io/dodal/artemis598_params_changes/"
-  },
-  {
-    "version": "artemis_262_move_arming_out_of_stage",
-    "url": "https://DiamondLightSource.github.io/dodal/artemis_262_move_arming_out_of_stage/"
   },
   {
     "version": "artemis_370_implement_rotation_nexus",
