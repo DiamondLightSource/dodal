@@ -87,7 +87,7 @@ class EigerDetector(Device):
         if not status_ok:
             raise Exception(f"Odin not initialised: {error_message}")
         self.armed_state = self.ArmedState.ARMING
-        self.arming_status = self.do_async_staging()
+        self.arming_status = self.do_arming_chain()
         return self.arming_status
 
     def stage(self):
