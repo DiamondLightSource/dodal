@@ -1,8 +1,7 @@
-from typing import Callable, Dict, List, Optional
+from typing import Optional
 
-from ophyd import Device
-from ophyd.sim import make_fake_device
-
+from dodal.beamlines.beamline_utils import device_instantiation
+from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.aperturescatterguard import AperturePositions, ApertureScatterguard
 from dodal.devices.backlight import Backlight
 from dodal.devices.DCM import DCM
@@ -16,68 +15,12 @@ from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import Undulator
 from dodal.devices.zebra import Zebra
-from dodal.log import set_beamline
+from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
 
 BL = get_beamline_name("s03")
-set_beamline(BL)
-
-
-ACTIVE_DEVICES: Dict[str, Device] = {}
-
-
-def clear_devices():
-    global ACTIVE_DEVICES
-    for d in list(ACTIVE_DEVICES):
-        del ACTIVE_DEVICES[d]
-
-
-def clear_device(name: str):
-    global ACTIVE_DEVICES
-    del ACTIVE_DEVICES[name]
-
-
-def list_active_devices() -> List[str]:
-    global ACTIVE_DEVICES
-    return list(ACTIVE_DEVICES.keys())
-
-
-def active_device_is_same_type(active_device, device):
-    return type(active_device) == device
-
-
-@skip_device()
-def device_instantiation(
-    device: Callable,
-    name: str,
-    prefix: str,
-    wait: bool,
-    fake: bool,
-    post_create: Optional[Callable] = None,
-    bl_prefix: bool = True,
-) -> Device:
-    active_device = ACTIVE_DEVICES.get(name)
-    if fake:
-        device = make_fake_device(device)
-    if active_device is None:
-        ACTIVE_DEVICES[name] = device(
-            name=name,
-            prefix=f"{(BeamlinePrefix(BL).beamline_prefix)}{prefix}"
-            if bl_prefix
-            else prefix,
-        )
-        if wait:
-            ACTIVE_DEVICES[name].wait_for_connection()
-    else:
-        if not active_device_is_same_type(active_device, device):
-            raise TypeError(
-                f"Can't instantiate device of type {type(active_device)} with the same "
-                f"name as an existing device. Device name '{name}' already used for "
-                f"a(n) {device}."
-            )
-    if post_create:
-        post_create(ACTIVE_DEVICES[name])
-    return ACTIVE_DEVICES[name]
+set_log_beamline(BL)
+set_utils_beamline(BL)
 
 
 @skip_device(lambda: BL == "s03")
@@ -143,7 +86,7 @@ def detector_motion(
     return device_instantiation(
         device=DetectorMotion,
         name="detector_motion",
-        prefix="",
+        prefix="-MO-DET-01:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )
@@ -197,7 +140,7 @@ def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
     return device_instantiation(
         OAV,
         "oav",
-        "",
+        "-DI-OAV-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
@@ -212,7 +155,7 @@ def smargon(
     return device_instantiation(
         Smargon,
         "smargon",
-        "",
+        "-MO-SGON-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
     )

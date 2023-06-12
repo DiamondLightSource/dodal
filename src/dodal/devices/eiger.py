@@ -8,7 +8,7 @@ from ophyd.status import AndStatus, Status, SubscriptionStatus
 from dodal.devices.detector import DetectorParams, TriggerMode
 from dodal.devices.eiger_odin import EigerOdin
 from dodal.devices.status import await_value
-from dodal.devices.utils import wrap_and_do_funcs
+from dodal.devices.utils import run_functions_without_blocking
 from dodal.log import LOGGER
 
 FREE_RUN_MAX_IMAGES = 1000000
@@ -122,10 +122,6 @@ class EigerDetector(Device):
         self.disable_roi_mode()
         return status_ok
 
-    # This is no longer used by staging
-    def enable_roi_mode(self):
-        self.change_roi_mode(True)
-
     def disable_roi_mode(self):
         self.change_roi_mode(False)
 
@@ -157,7 +153,6 @@ class EigerDetector(Device):
 
     def set_cam_pvs(self) -> AndStatus:
         assert self.detector_params is not None
-
         status = self.cam.acquire_time.set(
             self.detector_params.exposure_time, timeout=self.GENERAL_STATUS_TIMEOUT
         )
@@ -190,10 +185,10 @@ class EigerDetector(Device):
             file_prefix, timeout=self.GENERAL_STATUS_TIMEOUT
         )
         status &= await_value(
-            self.odin.meta.file_name, file_prefix, self.GENERAL_STATUS_TIMEOUT
+            self.odin.meta.file_name, file_prefix, timeout=self.GENERAL_STATUS_TIMEOUT
         )
         status &= await_value(
-            self.odin.file_writer.id, file_prefix, self.GENERAL_STATUS_TIMEOUT
+            self.odin.file_writer.id, file_prefix, timeout=self.GENERAL_STATUS_TIMEOUT
         )
         return status
 
@@ -272,18 +267,19 @@ class EigerDetector(Device):
 
     def _wait_for_odin_status(self) -> Status:
         self.forward_bit_depth_to_filewriter()
-        this_status = self.odin.file_writer.capture.set(
+        status = self.odin.file_writer.capture.set(
             1, timeout=self.GENERAL_STATUS_TIMEOUT
         )
-        LOGGER.info(f"Eiger staging: awaiting odin metadata")
-        this_status &= await_value(self.odin.meta.ready, 1, self.GENERAL_STATUS_TIMEOUT)
-        return this_status
+        LOGGER.info("Eiger staging: awaiting odin metadata")
+        status &= await_value(
+            self.odin.meta.ready, 1, timeout=self.GENERAL_STATUS_TIMEOUT
+        )
+        return status
 
     def _wait_fan_ready(self) -> Status:
         self.filewriters_finished = self.odin.create_finished_status()
         LOGGER.info("Eiger staging: awaiting odin fan ready")
-        this_status = await_value(self.odin.fan.ready, 1, self.GENERAL_STATUS_TIMEOUT)
-        return this_status
+        return await_value(self.odin.fan.ready, 1, self.GENERAL_STATUS_TIMEOUT)
 
     def _finish_arm(self) -> Status:
         LOGGER.info("Eiger staging: Finishing arming")
@@ -297,13 +293,13 @@ class EigerDetector(Device):
     def disarm_detector(self):
         self.cam.acquire.put(0)
 
-    def do_async_staging(self) -> Status:
-        unwrapped_funcs = list()
+    def do_arming_chain(self) -> Status:
+        functions_to_do_arm = list()
         detector_params: DetectorParams = self.detector_params
         if detector_params.use_roi_mode:
-            unwrapped_funcs.append(lambda: self.change_roi_mode(enable=True))
+            functions_to_do_arm.append(lambda: self.change_roi_mode(enable=True))
 
-        unwrapped_funcs.extend(
+        functions_to_do_arm.extend(
             [
                 lambda: self.set_detector_threshold(
                     energy=detector_params.current_energy
@@ -313,11 +309,6 @@ class EigerDetector(Device):
                 self.set_odin_pvs,
                 self.set_mx_settings_pvs,
                 self.set_num_triggers_and_captures,
-            ]
-        )
-
-        unwrapped_funcs.extend(
-            [
                 lambda: await_value(self.STALE_PARAMS_TIMEOUT, 0, 60),
                 self._wait_for_odin_status,
                 lambda: self.cam.acquire.set(1, timeout=self.GENERAL_STATUS_TIMEOUT),
@@ -326,4 +317,4 @@ class EigerDetector(Device):
             ]
         )
 
-        return wrap_and_do_funcs(unwrapped_funcs)
+        return run_functions_without_blocking(functions_to_do_arm)
