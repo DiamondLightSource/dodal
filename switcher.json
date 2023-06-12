@@ -40,10 +40,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/51_aperture_scatterguard_no_positions/"
   },
   {
-    "version": "71_implement_fluorescent_detector",
-    "url": "https://DiamondLightSource.github.io/dodal/71_implement_fluorescent_detector/"
-  },
-  {
     "version": "76_make_stage_synchronous_if_arming_not_started",
     "url": "https://DiamondLightSource.github.io/dodal/76_make_stage_synchronous_if_arming_not_started/"
   },
@@ -74,6 +70,10 @@
   {
     "version": "artemis_701_do_optimise_attenuation_scan",
     "url": "https://DiamondLightSource.github.io/dodal/artemis_701_do_optimise_attenuation_scan/"
+  },
+  {
+    "version": "jungfrau_commissioning",
+    "url": "https://DiamondLightSource.github.io/dodal/jungfrau_commissioning/"
   },
   {
     "version": "p45AndAdsim",
