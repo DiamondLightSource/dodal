@@ -1,6 +1,6 @@
 from typing import Optional
 
-from ophyd import Component, Device, EpicsSignal
+from ophyd import Arming, Component, Device, EpicsSignal, Signal
 from ophyd.status import SubscriptionStatus
 
 from dodal.devices.detector import DetectorParams
@@ -9,6 +9,12 @@ from dodal.log import LOGGER
 
 
 class Attenuator(Device):
+    class TransmissionSignal(Signal):
+        def set(self, value, *, timeout=None, settle_time=None, **kwargs):
+            return self.parent.set_transmission()
+
+    do_set_transmission: TransmissionSignal = Component(TransmissionSignal)
+
     # Could make a separate class for these, but that's potentially pointless as this is the only PV for it
     calulated_filter_state_0: EpicsSignal = Component(EpicsSignal, ":DEC_TO_BIN.B0")
     calulated_filter_state_1: EpicsSignal = Component(EpicsSignal, ":DEC_TO_BIN.B1")

@@ -1,6 +1,13 @@
 from enum import Enum
-from ophyd import Component, Device, EpicsSignal, EpicsSignalRO, EpicsSignalWithRBV
 
+from ophyd import (
+    Component,
+    Device,
+    EpicsSignal,
+    EpicsSignalRO,
+    EpicsSignalWithRBV,
+    Signal,
+)
 from ophyd.status import Status
 
 from dodal.devices.attenuator.attenuator import Attenuator
@@ -47,6 +54,12 @@ class AcquireState(Enum):
 
 
 class Xspress3Mini(Device):
+    class ArmingSignal(Signal):
+        def set(self, value, *, timeout=None, settle_time=None, **kwargs):
+            return self.parent.arm()
+
+    do_arm: ArmingSignal = Component(ArmingSignal)
+
     attenuator: Attenuator = Component(Attenuator, "-ATTN-01")
 
     zebra: Zebra = Component(
@@ -84,8 +97,19 @@ class Xspress3Mini(Device):
         False  # Not sure if this can ever be set true for attenuation optimising
     )
 
-    def attenuation_optimisation(self):
-        pass
+    def arm(self):  # do the arming logic here
+        LOGGER.info("Arming Xspress3Mini detector...")
+        self.trigger_mode.BURST
+        self.pv_set_trigger_mode_mini.put(
+            TriggerMode.BURST.value
+        )  # TODO: decide if the trigger mode enum should be kept
+
+        # Do erase (TODO: decide if this should be put into separate function)
+        self.pv_erase.put(EraseState.Erase.value)
+
+        do_start_status = self.do_start()
+
+        do_start_status.wait(10)
 
     # TODO: Make a DetectorParams thing with the correct parameters needed that matches the gda beamline_parameters.Parameters()
     def set_detector_parameters(self, detector_params: DetectorParams):
@@ -150,10 +174,21 @@ class Xspress3Mini(Device):
 
         return status
 
-    def run_optimisation(self, low_roi=0, high_roi=0):
+    def run_optimisation(
+        self,
+        optimisation_type,
+        transmission,
+        target,
+        lower_limit,
+        upper_limit,
+        max_cycles,
+        increment,
+        low_roi=0,
+        high_roi=0,
+    ):
         # Might as well make everything here asynchronous eventually using stuff from eiger arming
         LOGGER.info("Starting Xspress3Mini optimisation routine")
-        optimisation_type = self.detector_params.optimisation_type
+
         if low_roi == 0:
             low_roi = self.detector_params.default_low_oi
         if high_roi == 0:
@@ -205,7 +240,7 @@ class Xspress3Mini(Device):
 
             do_start_status = self.do_start()
 
-            do_start_status.wait(10)  # TODO use async function for this instead
+            do_start_status.wait(10)
 
             # ----------------arming detector done--------------------------------
 
@@ -243,7 +278,7 @@ class Xspress3Mini(Device):
 
             LOGGER.info(f"Optimum transmission is {optimised_transmission}")
 
-        """For dead time calc
+        """For dead time calc (do this once first part is working)
         
         # Read-out scaler values: Meant to do this a loop per channel, but there's only one channel right now
             total_time = self.channel_1.pv_time.get()
