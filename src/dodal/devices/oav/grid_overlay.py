@@ -1,7 +1,7 @@
 from enum import Enum
 from functools import partial
-from pathlib import Path
 from os.path import join as path_join
+
 from ophyd import Component, Signal
 from PIL import Image, ImageDraw
 
