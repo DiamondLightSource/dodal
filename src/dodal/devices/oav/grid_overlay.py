@@ -141,14 +141,14 @@ class SnapshotWithGrid(MJPG):
         add_grid_border_overlay_to_image(
             image, top_left_x, top_left_y, box_width, num_boxes_x, num_boxes_y
         )
-        self.last_path_outer.set(
+        self.last_path_outer.put(
             path_join(directory_str, f"{filename_str}_outer_overlay.png")
         )
         image.save(self.last_path_outer.get())
         add_grid_overlay_to_image(
             image, top_left_x, top_left_y, box_width, num_boxes_x, num_boxes_y
         )
-        self.last_path_full_overlay.set(
+        self.last_path_full_overlay.put(
             path_join(directory_str, f"{filename_str}_grid_overlay.png")
         )
         image.save(self.last_path_full_overlay.get())

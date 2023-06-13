@@ -28,10 +28,10 @@ class MJPG(Device):
                 response = requests.get(url_str, stream=True)
                 response.raise_for_status()
                 image = Image.open(response.raw)
-                self.last_saved_path.set(
+                self.last_saved_path.put(
                     Path(f"{directory_str}/{filename_str}.png").as_posix()
                 )
-                image.save(self.last_saved_path)
+                image.save(self.last_saved_path.get())
                 self.post_processing(image)
                 st.set_finished()
             except requests.HTTPError as e:
