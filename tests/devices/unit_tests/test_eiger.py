@@ -274,7 +274,7 @@ def test_unsuccessful_true_roi_mode_change_results_in_callback_error(
     unwrapped_funcs = [
         lambda: fake_eiger.change_roi_mode(enable=True),
         lambda: fake_eiger.set_detector_threshold(
-            energy=fake_eiger.detector_params.current_energy
+            energy=fake_eiger.detector_params.current_energy_ev
         ),
     ]
     with pytest.raises(Exception):
@@ -294,7 +294,7 @@ def test_unsuccessful_false_roi_mode_change_results_in_callback_error(
     unwrapped_funcs = [
         lambda: fake_eiger.change_roi_mode(enable=False),
         lambda: fake_eiger.set_detector_threshold(
-            energy=fake_eiger.detector_params.current_energy
+            energy=fake_eiger.detector_params.current_energy_ev
         ),
     ]
     with pytest.raises(Exception):
@@ -451,7 +451,7 @@ def test_check_callback_error(fake_eiger: EigerDetector, iteration):
     unwrapped_funcs = [
         (
             lambda: fake_eiger.set_detector_threshold(
-                energy=fake_eiger.detector_params.current_energy
+                energy=fake_eiger.detector_params.current_energy_ev
             )
         ),
         (fake_eiger.set_cam_pvs),
