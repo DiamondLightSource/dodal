@@ -122,10 +122,6 @@ class EigerDetector(Device):
         self.disable_roi_mode()
         return status_ok
 
-    # This is no longer used by staging
-    def enable_roi_mode(self):
-        self.change_roi_mode(True)
-
     def disable_roi_mode(self):
         self.change_roi_mode(False)
 
