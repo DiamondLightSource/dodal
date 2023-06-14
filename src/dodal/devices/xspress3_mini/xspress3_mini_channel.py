@@ -10,7 +10,7 @@ class TimeSeriesValues(Enum):  # assuming IOC version 3
 
 
 class Xspress3MiniChannel(Device):
-    sca5_update_arrays_mini = Component(EpicsSignalRO, "SCAS:TS:TSAcquire")
+    sca5_update_arrays_mini = Component(EpicsSignal, "SCAS:TS:TSAcquire")
 
     roi_high_limit = Component(EpicsSignal, "SCA5_HLM")
     roi_llm = Component(EpicsSignal, "SCA5_LLM")

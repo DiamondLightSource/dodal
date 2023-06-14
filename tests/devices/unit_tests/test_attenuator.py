@@ -12,7 +12,7 @@ CALCULATED_VALUE = 10
 @pytest.fixture
 def fake_attenuator():
     FakeAttenuator: Attenuator = make_fake_device(Attenuator)
-    fake_attenuator: Attenuator = FakeAttenuator(name="aperture")
+    fake_attenuator: Attenuator = FakeAttenuator(name="attenuator")
 
     def mock_apply_values(val: int):
         actual_states = fake_attenuator.get_actual_filter_state_list()

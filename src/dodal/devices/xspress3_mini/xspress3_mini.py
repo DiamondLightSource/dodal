@@ -12,10 +12,8 @@ from ophyd.status import Status
 
 from dodal.devices.attenuator.attenuator import Attenuator
 from dodal.devices.detector import DetectorParams
-from dodal.devices.xspress3_mini.xspress3_mini_channel import (
-    TimeSeriesValues,
-    Xspress3MiniChannel,
-)
+from dodal.devices.status import await_value
+from dodal.devices.xspress3_mini.xspress3_mini_channel import Xspress3MiniChannel
 from dodal.devices.zebra import Zebra
 from dodal.log import LOGGER
 
@@ -51,6 +49,20 @@ class EraseState(Enum):
 class AcquireState(Enum):
     DONE = "Done"
     ACQUIRE = "Acquire"
+
+
+class DetectorState(Enum):
+    ACQUIRE = "Acquire"
+    CORRECT = "Correct"
+    READOUT = "Readout"
+    ABORTING = "Aborting"
+
+    IDLE = "Idle"
+    SAVING = "Saving"
+    ERROR = "Error"
+    INTILTIALIZING = "Initializing"
+    DISCONNECTED = "Disconnected"
+    ABORTED = "Aborted"
 
 
 class Xspress3Mini(Device):
@@ -91,25 +103,24 @@ class Xspress3Mini(Device):
 
     squash_aux_dim: EpicsSignal = Component(EpicsSignal, ":DTC:SquashAuxDim")
 
-    status_rbv: EpicsSignalRO = Component(EpicsSignalRO, ":DetectorState_RBV")
+    detector_state: EpicsSignalRO = Component(EpicsSignalRO, ":DetectorState_RBV")
 
     writeHDF5Files = (
         False  # Not sure if this can ever be set true for attenuation optimising
     )
 
-    def arm(self):  # do the arming logic here
+    detector_busy_states = [
+        DetectorState.ACQUIRE.value,
+        DetectorState.CORRECT.value,
+        DetectorState.ABORTING.value,
+    ]
+
+    def arm(self):
         LOGGER.info("Arming Xspress3Mini detector...")
-        self.trigger_mode.BURST
-        self.pv_set_trigger_mode_mini.put(
-            TriggerMode.BURST.value
-        )  # TODO: decide if the trigger mode enum should be kept
-
-        # Do erase (TODO: decide if this should be put into separate function)
-        self.pv_erase.put(EraseState.Erase.value)
-
-        do_start_status = self.do_start()
-
-        do_start_status.wait(10)
+        self.trigger_mode_mini.put(TriggerMode.BURST.value)
+        arm_status = self.do_start()
+        arm_status &= await_value(self.detector_state, self.detector_busy_states)
+        return arm_status
 
     # TODO: Make a DetectorParams thing with the correct parameters needed that matches the gda beamline_parameters.Parameters()
     def set_detector_parameters(self, detector_params: DetectorParams):
@@ -141,37 +152,17 @@ class Xspress3Mini(Device):
         if witehdf5Files:
             controller.sethdfnumframestoacquire(num_frames)
         """
-
+        self.pv_erase.put(EraseState.ERASE.value)
         pass
 
     """Other parameters that should be set somewhere (plan or ophyd?):
     deadtime threshold, collection time, transmission limits.
     """
 
-    deadtime_threshold: float
-    collection_time: float
-    transmission_limits: float
-    optimisation_type: str
-
     def do_start(self) -> Status:
-        # In GDA, doStart() calls doerase even though we call it just before
-
-        #   Start time series (need to double check this bit is right)
-        LOGGER.debug(
-            f"Trying to set time series array control to {TimeSeriesValues.START_VALUE.value}"
-        )
-        # For each of the channels, we should fill its pv_sca5_update_mini with this value. But we only have one channel right now
-        # Could generalise this for multiple channels if this is likely to ever occur
-        status = self.channel_1.pv_sca5_update_mini.set(
-            TimeSeriesValues.START_VALUE.value
-        )
-
-        self.pv_squash_aux_dim.put(
-            UpdateRBV.ENABLED.value
-        )  # In GDA this is blocking, but we can make asynchronous like with eiger
-
-        status &= self.pv_acquire.set(AcquireState.ACQUIRE.value)
-
+        self.erase.put(EraseState.ERASE.value)
+        status = self.channel_1.sca5_update_arrays_mini.set(AcquireState.DONE.value)
+        status &= self.acquire.set(AcquireState.ACQUIRE.value)
         return status
 
     def run_optimisation(
@@ -231,15 +222,10 @@ class Xspress3Mini(Device):
             # ------------------------arm Xpress3mini--------------------------
             LOGGER.info("Arming Xspress3Mini detector...")
             self.trigger_mode.BURST
-            self.pv_set_trigger_mode_mini.put(
-                TriggerMode.BURST.value
-            )  # TODO: decide if the trigger mode enum should be kept
+            self.pv_set_trigger_mode_mini.put(TriggerMode.BURST.value)
 
-            # Do erase (TODO: decide if this should be put into separate function)
             self.pv_erase.put(EraseState.Erase.value)
-
             do_start_status = self.do_start()
-
             do_start_status.wait(10)
 
             # ----------------arming detector done--------------------------------
