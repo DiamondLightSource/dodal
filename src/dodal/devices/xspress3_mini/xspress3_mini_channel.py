@@ -9,12 +9,6 @@ class TimeSeriesValues(Enum):
     UPDATE_VALUE = ""
 
 
-class TimeSeriesValues(Enum):  # assuming IOC version 3
-    START_VALUE = "Acquire"
-    STOP_VALUE = "Done"
-    UPDATE_VALUE = ""
-
-
 class Xspress3MiniChannel(Device):
     update_arrays = Component(EpicsSignal, "SCAS:TS:TSAcquire")
 

@@ -9,7 +9,10 @@ def await_value(
     subscribable: Any, expected_value: T, timeout: Union[None, int] = None
 ) -> SubscriptionStatus:
     def value_is(value, **_):
-        return value == expected_value
+        if type(expected_value) == list:
+            return value in expected_value
+        else:
+            return value == expected_value
 
     return SubscriptionStatus(subscribable, value_is, timeout=timeout)
 
