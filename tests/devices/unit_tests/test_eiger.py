@@ -29,6 +29,10 @@ TEST_USE_ROI_MODE = False
 TEST_DET_DIST_TO_BEAM_CONVERTER_PATH = "tests/devices/unit_tests/test_lookup_table.txt"
 
 
+class StatusException(Exception):
+    pass
+
+
 def create_new_params() -> DetectorParams:
     return DetectorParams(
         current_energy=TEST_CURRENT_ENERGY,
@@ -443,10 +447,23 @@ def test_when_stage_called_then_finish_arm_on_fan_ready(
 def test_check_callback_error(fake_eiger: EigerDetector, iteration):
     def get_bad_status():
         status = Status()
-        status.set_exception(Exception)
+        status.set_exception(StatusException)
+        return status
+
+    def get_good_status():
+        status = Status()
+        status.set_finished()
         return status
 
     LOGGER.error = MagicMock()
+
+    # These functions timeout without extra tweaking rather than give us the specific status error for the test
+    fake_eiger.set_odin_pvs = MagicMock()
+    fake_eiger.set_odin_pvs.return_value = get_good_status()
+    fake_eiger._wait_for_odin_status = MagicMock()
+    fake_eiger._wait_for_odin_status.return_value = get_good_status()
+    fake_eiger._wait_fan_ready = MagicMock()
+    fake_eiger._wait_fan_ready.return_value = get_good_status()
 
     unwrapped_funcs = [
         (
@@ -467,8 +484,8 @@ def test_check_callback_error(fake_eiger: EigerDetector, iteration):
 
     unwrapped_funcs[iteration] = get_bad_status
 
-    with pytest.raises(Exception):
-        run_functions_without_blocking(unwrapped_funcs).wait()
+    with pytest.raises(StatusException):
+        run_functions_without_blocking(unwrapped_funcs).wait(timeout=10)
         LOGGER.error.assert_called_once()
 
 

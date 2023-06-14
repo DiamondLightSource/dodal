@@ -41,7 +41,8 @@ def run_functions_without_blocking(
     # intermediate statuses have an exception, the full_status will timeout.
     full_status = Status(timeout=timeout)
 
-    def closing_func():
+    def closing_func(old_status):
+        check_callback_error(old_status)
         full_status.set_finished()
 
     # Wrap each function by first checking the previous status and attaching a callback to the next
