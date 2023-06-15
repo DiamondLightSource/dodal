@@ -11,7 +11,7 @@ from dodal.log import LOGGER
 class Attenuator(Device):
     class TransmissionSignal(Signal):
         def set(self, value, *, timeout=None, settle_time=None, **kwargs):
-            return self.parent.set_transmission()
+            return self.parent.set_transmission(value)
 
     do_set_transmission: TransmissionSignal = Component(TransmissionSignal)
 
