@@ -231,7 +231,7 @@ def xspress3mini(
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return device_instantiation(
-        Zebra,
+        Xspress3Mini,
         "xspress3mini",
         "-EA-XSP3-01:",
         wait_for_connection,
