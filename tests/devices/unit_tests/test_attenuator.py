@@ -1,13 +1,14 @@
 from unittest.mock import MagicMock
 
-import numpy as np
 import pytest
+from bluesky import RunEngine
+from bluesky import plan_stubs as bps
 from ophyd.sim import make_fake_device
 from ophyd.status import Status
 
 from dodal.devices.attenuator import Attenuator
 
-CALCULATED_VALUE = np.random.randint(0, 10, size=16)
+CALCULATED_VALUE = range(0, 17)
 
 
 @pytest.fixture
@@ -31,5 +32,8 @@ def fake_attenuator():
 
 
 def test_set_transmission_success(fake_attenuator: Attenuator):
-    fake_attenuator.calulated_filter_state_10.sim_put(1)
-    fake_attenuator.set_transmission(1.0).wait(10)
+    fake_attenuator.set_transmission(1.0).wait(1)
+
+
+def test_set_transmission_in_run_engine(fake_attenuator: Attenuator, RE: RunEngine):
+    yield from bps.abs_set(fake_attenuator.transmission, 1, wait=True)

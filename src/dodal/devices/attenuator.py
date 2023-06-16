@@ -127,8 +127,6 @@ class Attenuator(Device):
         LOGGER.info("Sending change filter command")
         self.change.set(1).wait()
 
-        # At some point we need to check how and when the calculated states are set, since if this is ran beforehand
-        # ,the function won't work
         status = Status(done=True, success=True)
         actual_states = self.get_actual_filter_state_list()
         calculated_states = self.get_calculated_filter_state_list()
