@@ -1,12 +1,13 @@
 from unittest.mock import MagicMock
 
+import numpy as np
 import pytest
 from ophyd.sim import make_fake_device
 from ophyd.status import Status
 
-from dodal.devices.attenuator.attenuator import Attenuator
+from dodal.devices.attenuator import Attenuator
 
-CALCULATED_VALUE = 10
+CALCULATED_VALUE = np.random.randint(0, 10, size=16)
 
 
 @pytest.fixture
@@ -19,7 +20,7 @@ def fake_attenuator():
         calculated_states = fake_attenuator.get_calculated_filter_state_list()
         for i in range(16):
             calculated_states[i].sim_put(
-                CALCULATED_VALUE
+                CALCULATED_VALUE[i]
             )  # Ignore the actual calculation as this is EPICS layer
             actual_states[i].sim_put(calculated_states[i].get())
         return Status(done=True, success=True)
