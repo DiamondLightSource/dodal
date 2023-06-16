@@ -4,8 +4,7 @@ from enum import Enum, IntEnum
 from functools import partialmethod
 from typing import List
 
-from ophyd import Component, Device, EpicsSignal, Signal, StatusBase
-from ophyd.status import SubscriptionStatus
+from ophyd import Component, Device, EpicsSignal, StatusBase
 
 from dodal.devices.status import await_value
 from dodal.devices.utils import epics_signal_put_wait
