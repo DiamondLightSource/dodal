@@ -1,6 +1,6 @@
 from enum import Enum
 from functools import partial
-from pathlib import Path
+from os.path import join as path_join
 
 from ophyd import Component, Signal
 from PIL import Image, ImageDraw
@@ -127,6 +127,9 @@ class SnapshotWithGrid(MJPG):
     num_boxes_x: Signal = Component(Signal)
     num_boxes_y: Signal = Component(Signal)
 
+    last_path_outer: Signal = Component(Signal)
+    last_path_full_overlay: Signal = Component(Signal)
+
     def post_processing(self, image: Image.Image):
         top_left_x = self.top_left_x.get()
         top_left_y = self.top_left_y.get()
@@ -138,10 +141,14 @@ class SnapshotWithGrid(MJPG):
         add_grid_border_overlay_to_image(
             image, top_left_x, top_left_y, box_width, num_boxes_x, num_boxes_y
         )
-        outer_overlay_path = Path(f"{directory_str}/{filename_str}_outer_overlay.png")
-        image.save(outer_overlay_path)
+        self.last_path_outer.put(
+            path_join(directory_str, f"{filename_str}_outer_overlay.png")
+        )
+        image.save(self.last_path_outer.get())
         add_grid_overlay_to_image(
             image, top_left_x, top_left_y, box_width, num_boxes_x, num_boxes_y
         )
-        grid_overlay_path = Path(f"{directory_str}/{filename_str}_grid_overlay.png")
-        image.save(grid_overlay_path)
+        self.last_path_full_overlay.put(
+            path_join(directory_str, f"{filename_str}_grid_overlay.png")
+        )
+        image.save(self.last_path_full_overlay.get())

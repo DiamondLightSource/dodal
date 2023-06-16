@@ -9,6 +9,7 @@ from PIL import Image
 class MJPG(Device):
     filename: Signal = Component(Signal)
     directory: Signal = Component(Signal)
+    last_saved_path: Signal = Component(Signal)
     url: EpicsSignal = Component(EpicsSignal, "JPG_URL_RBV", string=True)
     x_size: EpicsSignalRO = Component(EpicsSignalRO, "ArraySize1_RBV")
     y_size: EpicsSignalRO = Component(EpicsSignalRO, "ArraySize2_RBV")
@@ -27,8 +28,10 @@ class MJPG(Device):
                 response = requests.get(url_str, stream=True)
                 response.raise_for_status()
                 image = Image.open(response.raw)
-                image_path = Path(f"{directory_str}/{filename_str}.png")
-                image.save(image_path)
+                self.last_saved_path.put(
+                    Path(f"{directory_str}/{filename_str}.png").as_posix()
+                )
+                image.save(self.last_saved_path.get())
                 self.post_processing(image)
                 st.set_finished()
             except requests.HTTPError as e:
