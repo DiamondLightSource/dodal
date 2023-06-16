@@ -76,6 +76,7 @@ class Xspress3Mini(Device):
     acquire_time: EpicsSignal = Component(EpicsSignal, "AcquireTime")
     detector_state: EpicsSignalRO = Component(EpicsSignalRO, ":DetectorState_RBV")
     NUMBER_ROIS_DEFAULT = 6
+    acquire_status: Status = None
 
     detector_busy_states = [
         DetectorState.ACQUIRE.value,
@@ -83,17 +84,18 @@ class Xspress3Mini(Device):
         DetectorState.ABORTING.value,
     ]
 
+    def stage(self):
+        self.arm().wait()
+
     def do_start(self) -> Status:
         self.erase.put(EraseState.ERASE.value)
-        status = self.channel_1.sca5_update_arrays_mini.set(AcquireState.DONE.value)
-        status &= self.acquire.set(AcquireState.ACQUIRE.value)
+        status = self.channel_1.update_arrays.set(AcquireState.DONE.value)
+        self.acquire_status = self.acquire.set(AcquireState.ACQUIRE.value)
         return status
 
     def arm(self) -> Status:
         LOGGER.info("Arming Xspress3Mini detector...")
         self.trigger_mode_mini.put(TriggerMode.BURST.value)
-        arm_status = self.do_start()
-        arm_status &= await_value_in_list(
-            self.detector_state, self.detector_busy_states
-        )
+        self.do_start().wait()
+        arm_status = await_value_in_list(self.detector_state, self.detector_busy_states)
         return arm_status
