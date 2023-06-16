@@ -10,7 +10,7 @@ from ophyd import (
 )
 from ophyd.status import Status
 
-from dodal.devices.status import await_value
+from dodal.devices.status import await_value_in_list
 from dodal.devices.xspress3_mini.xspress3_mini_channel import Xspress3MiniChannel
 from dodal.log import LOGGER
 
@@ -93,5 +93,7 @@ class Xspress3Mini(Device):
         LOGGER.info("Arming Xspress3Mini detector...")
         self.trigger_mode_mini.put(TriggerMode.BURST.value)
         arm_status = self.do_start()
-        arm_status &= await_value(self.detector_state, self.detector_busy_states)
+        arm_status &= await_value_in_list(
+            self.detector_state, self.detector_busy_states
+        )
         return arm_status
