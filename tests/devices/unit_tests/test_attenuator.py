@@ -32,8 +32,8 @@ def fake_attenuator():
 
 
 def test_set_transmission_success(fake_attenuator: Attenuator):
-    fake_attenuator.set_transmission(1.0).wait(1)
+    fake_attenuator.set(1.0).wait(1)
 
 
 def test_set_transmission_in_run_engine(fake_attenuator: Attenuator, RE: RunEngine):
-    yield from bps.abs_set(fake_attenuator.transmission, 1, wait=True)
+    yield from bps.abs_set(fake_attenuator, 1, wait=True)
