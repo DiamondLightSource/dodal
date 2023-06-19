@@ -12,6 +12,6 @@ class JungfrauM1(Device):
     clear_error: EpicsSignal = Cpt(EpicsSignal, "ClearError")
     frames_written_rbv: EpicsSignalRO = Cpt(EpicsSignal, "FramesWritten_RBV")
     frame_count: EpicsSignal = Cpt(EpicsSignal, "FrameCount")
-    gain_mode: EpicsSignal = Cpt(EpicsSignal, "GainMode")
+    gain_mode: EpicsSignal = Cpt(EpicsSignal, "GainMode", string=True)
     error_rbv: EpicsSignalRO = Cpt(EpicsSignal, "Error_RBV", string=True)
     file_directory: EpicsSignal = Cpt(EpicsSignal, "FileDirectory", string=True)
