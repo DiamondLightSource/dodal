@@ -100,7 +100,7 @@ def jungfrau(
     return device_instantiation(
         device=JungfrauM1,
         name="jungfrau_m1",
-        prefix="",
+        prefix="-EA-JNGFR-01:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )
