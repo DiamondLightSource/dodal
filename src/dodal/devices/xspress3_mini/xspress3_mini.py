@@ -18,8 +18,6 @@ from dodal.devices.xspress3_mini.xspress3_mini_channel import Xspress3MiniChanne
 from dodal.devices.zebra import Zebra
 from dodal.log import LOGGER
 
-# VERSION_3(SCA_UPDATE_TIME_SERIES_TEMPLATE, "Acquire", "Done", ""),
-
 
 class AttenuationOptimisationFailedException(Exception):
     pass
@@ -93,9 +91,7 @@ class Xspress3Mini(Device):
 
     erase: EpicsSignal = Component(EpicsSignal, "ERASE")
     get_max_num_channels = Component(EpicsSignalRO, "MAX_NUM_CHANNELS_RBV")
-
     acquire: EpicsSignal = Component(EpicsSignal, "Acquire")
-
     get_roi_calc_mini: EpicsSignal = Component(EpicsSignal, "MCA1:Enable_RBV")
 
     NUMBER_ROIS_DEFAULT = 6
@@ -104,7 +100,6 @@ class Xspress3Mini(Device):
     dt_corrected_latest_mca: EpicsSignalRO = Component(EpicsSignalRO, ":ARR1:ArrayData")
 
     trigger_mode_mini: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "TriggerMode")
-
     roi_start_x: EpicsSignal = Component(EpicsSignal, "ROISUM1:MinX")
     roi_size_x: EpicsSignal = Component(EpicsSignal, "ROISUM1:SizeX")
     acquire_time: EpicsSignal = Component(EpicsSignal, "AcquireTime")
@@ -123,21 +118,12 @@ class Xspress3Mini(Device):
         False  # Not sure if this can ever be set true for attenuation optimising
     )
 
+    acquire_status: Status = None
     detector_busy_states = [
         DetectorState.ACQUIRE.value,
         DetectorState.CORRECT.value,
         DetectorState.ABORTING.value,
     ]
-
-    def arm(self) -> Status:
-        LOGGER.info("Arming Xspress3Mini detector...")
-        self.trigger_mode_mini.put(TriggerMode.BURST.value)
-        arm_status = self.do_start()
-        arm_status &= await_value_in_list(
-            self.detector_state, self.detector_busy_states
-        )
-
-        return arm_status
 
     def read_mca_dt_corrected_latest_mca(self):
         data = self.dt_corrected_latest_mca.get()
@@ -180,8 +166,18 @@ class Xspress3Mini(Device):
     deadtime threshold, collection time, transmission limits.
     """
 
+    def stage(self):
+        self.arm().wait(timeout=10)
+
     def do_start(self) -> Status:
         self.erase.put(EraseState.ERASE.value)
-        status = self.channel_1.sca5_update_arrays_mini.set(AcquireState.DONE.value)
-        status &= self.acquire.set(AcquireState.ACQUIRE.value)
+        status = self.channel_1.update_arrays.set(AcquireState.DONE.value)
+        self.acquire_status = self.acquire.set(AcquireState.ACQUIRE.value)
         return status
+
+    def arm(self) -> Status:
+        LOGGER.info("Arming Xspress3Mini detector...")
+        self.trigger_mode_mini.put(TriggerMode.BURST.value)
+        self.do_start().wait(timeout=10)
+        arm_status = await_value_in_list(self.detector_state, self.detector_busy_states)
+        return arm_status
