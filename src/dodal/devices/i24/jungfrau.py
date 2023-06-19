@@ -15,3 +15,4 @@ class JungfrauM1(Device):
     gain_mode: EpicsSignal = Cpt(EpicsSignal, "GainMode", string=True)
     error_rbv: EpicsSignalRO = Cpt(EpicsSignal, "Error_RBV", string=True)
     file_directory: EpicsSignal = Cpt(EpicsSignal, "FileDirectory", string=True)
+    file_name: EpicsSignal = Cpt(EpicsSignal, "FileName", string=True)
