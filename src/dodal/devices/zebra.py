@@ -70,6 +70,9 @@ class PositionCompare(Device):
 
     pulse_source: EpicsSignal = epics_signal_put_wait("PC_PULSE_SEL")
     pulse_input: EpicsSignal = epics_signal_put_wait("PC_PULSE_INP")
+    pulse_start: EpicsSignal = epics_signal_put_wait("PC_PULSE_START")
+    pulse_width: EpicsSignal = epics_signal_put_wait("PC_PULSE_WID")
+    pulse_step: EpicsSignal = epics_signal_put_wait("PC_PULSE_STEP")
 
     dir: EpicsSignal = Component(EpicsSignal, "PC_DIR")
     arm_source: EpicsSignal = epics_signal_put_wait("PC_ARM_SEL")
