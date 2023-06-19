@@ -1,13 +1,13 @@
 from typing import Any, Collection, TypeVar, Union
 
-from ophyd.status import Status, SubscriptionStatus
+from ophyd.status import SubscriptionStatus
 
 T = TypeVar("T")
 
 
 def await_value(
     subscribable: Any, expected_value: T, timeout: Union[None, int] = None
-) -> Union[Status, SubscriptionStatus]:
+) -> SubscriptionStatus:
     def value_is(value, **_):
         if type(expected_value) == list:
             return value in expected_value
@@ -26,10 +26,5 @@ def await_value_in_list(
             return value in expected_value
         else:
             raise TypeError(f"{expected_value} is not a Collection type")
-
-    if subscribable.get() == expected_value:
-        status = Status()
-        status.set_finished()
-        return status
 
     return SubscriptionStatus(subscribable, value_is, timeout=timeout)
