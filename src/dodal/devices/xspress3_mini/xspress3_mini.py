@@ -85,7 +85,7 @@ class Xspress3Mini(Device):
     ]
 
     def stage(self):
-        self.arm().wait()
+        self.arm().wait(timeout=10)
 
     def do_start(self) -> Status:
         self.erase.put(EraseState.ERASE.value)
@@ -96,6 +96,6 @@ class Xspress3Mini(Device):
     def arm(self) -> Status:
         LOGGER.info("Arming Xspress3Mini detector...")
         self.trigger_mode_mini.put(TriggerMode.BURST.value)
-        self.do_start().wait()
+        self.do_start().wait(timeout=10)
         arm_status = await_value_in_list(self.detector_state, self.detector_busy_states)
         return arm_status

@@ -21,7 +21,8 @@ def test_arm_success_on_busy_state(fake_xspress3mini):
     status.wait(timeout=1)
 
 
-def test_arm_success_in_run_engine(fake_xspress3mini):
+def test_stage_in_busy_state(fake_xspress3mini):
     fake_xspress3mini.detector_state.sim_put(DetectorState.ACQUIRE.value)
     RE = RunEngine()
     RE(bps.stage(fake_xspress3mini))
+    fake_xspress3mini.acquire_status.wait(timeout=5)
