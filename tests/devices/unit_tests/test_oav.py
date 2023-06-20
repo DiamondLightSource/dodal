@@ -1,4 +1,3 @@
-from pathlib import Path
 from unittest.mock import MagicMock, call, patch
 
 import numpy as np
@@ -62,7 +61,7 @@ def test_snapshot_trigger_saves_to_correct_file(
     st = fake_oav.snapshot.trigger()
     st.wait()
     expected_calls_to_save = [
-        call(Path(f"test directory/test filename{addition}.png"))
+        call(f"test directory/test filename{addition}.png")
         for addition in ["", "_outer_overlay", "_grid_overlay"]
     ]
     calls_to_save = mock_save.mock_calls
