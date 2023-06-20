@@ -1,8 +1,17 @@
+from enum import IntEnum
+
 from ophyd import Component as Cpt
 from ophyd import Device, EpicsSignal, EpicsSignalRO
 
 
+class TriggerMode(IntEnum):
+    SOFTWARE = 0
+    HARDWARE = 1
+
+
 class JungfrauM1(Device):
+    trigger_mode: EpicsSignal = Cpt(EpicsSignal, "Timing")
+    trigger_count: EpicsSignal = Cpt(EpicsSignal, "TriggerCount")
     acquire_period_s: EpicsSignal = Cpt(EpicsSignal, "AcquirePeriod")
     exposure_time_s: EpicsSignal = Cpt(EpicsSignal, "ExposureTime")
     acquire_rbv: EpicsSignalRO = Cpt(EpicsSignal, "Acquire_RBV")
