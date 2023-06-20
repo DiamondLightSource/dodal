@@ -5,7 +5,6 @@ from bluesky import RunEngine
 from bluesky import plan_stubs as bps
 from ophyd.sim import make_fake_device
 from ophyd.status import Status
-from ophyd.utils.errors import WaitTimeoutError
 
 from dodal.devices.xspress3_mini.xspress3_mini import DetectorState, Xspress3Mini
 
