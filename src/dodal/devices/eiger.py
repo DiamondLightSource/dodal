@@ -31,8 +31,6 @@ class EigerDetector(Device):
         ARMING = "arming"
         ARMED = "armed"
 
-    armed_state = ArmedState.UNARMED
-
     do_arm: ArmingSignal = Component(ArmingSignal)
     cam: EigerDetectorCam = Component(EigerDetectorCam, "CAM:")
     odin: EigerOdin = Component(EigerOdin, "")
@@ -47,6 +45,9 @@ class EigerDetector(Device):
     filewriters_finished: SubscriptionStatus
 
     detector_params: Optional[DetectorParams] = None
+
+    arming_status = Status()
+    arming_status.set_finished()
 
     @classmethod
     def with_params(
@@ -86,19 +87,17 @@ class EigerDetector(Device):
         status_ok, error_message = self.odin.check_odin_initialised()
         if not status_ok:
             raise Exception(f"Odin not initialised: {error_message}")
-        self.armed_state = self.ArmedState.ARMING
         self.arming_status = self.do_arming_chain()
         return self.arming_status
 
     def stage(self):
-        if self.armed_state.value == "unarmed":
-            self.async_stage().wait(60)
-
-        elif self.armed_state.value == "arming":
+        if self.arming_status.done is False:
+            # Arming has started so wait for it to finish
             self.arming_status.wait(60)
-
         else:
-            return None
+            if self.odin.fan.ready.get() != 1:
+                # Arming hasn't started, do it asynchronously
+                self.async_stage().wait(60)
 
     def unstage(self) -> bool:
         assert self.detector_params is not None
@@ -117,7 +116,6 @@ class EigerDetector(Device):
 
         LOGGER.info("Disarming detector")
         self.disarm_detector()
-        self.armed_state = self.ArmedState.UNARMED
         status_ok = self.odin.check_odin_state()
         self.disable_roi_mode()
         return status_ok
@@ -283,7 +281,6 @@ class EigerDetector(Device):
 
     def _finish_arm(self) -> Status:
         LOGGER.info("Eiger staging: Finishing arming")
-        self.armed_state = self.ArmedState.ARMED
         return Status(done=True, success=True)
 
     def forward_bit_depth_to_filewriter(self):

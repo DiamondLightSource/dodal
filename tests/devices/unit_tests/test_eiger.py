@@ -66,6 +66,12 @@ def finished_status():
     return status
 
 
+def get_bad_status(exception=Exception):
+    status = Status()
+    status.set_exception(Exception)
+    return status
+
+
 @pytest.fixture
 def mock_set_odin_filewriter(fake_eiger: EigerDetector):
     fake_eiger.odin.nodes.clear_odin_errors = MagicMock()
@@ -521,43 +527,25 @@ def test_given_in_free_run_mode_when_unstaged_then_waiting_on_file_writer_to_fin
 def test_if_arming_in_progress_then_stage_waits_for_completion(
     fake_eiger: EigerDetector, mock_set_odin_filewriter
 ):
-    assert fake_eiger.armed_state.value == "unarmed"
-    fake_eiger.do_async_staging = MagicMock(return_value=Status(timeout=0))
-    fake_eiger.async_stage()
-    assert fake_eiger.armed_state.value == "arming"
+    def set_bad_arming_status():
+        fake_eiger.arming_status = get_bad_status()
 
-    # Should do .wait and error on timeout
+    assert fake_eiger.arming_status.done is True
+    fake_eiger.arming_status = get_bad_status()
+    # Should do .wait and error
     with pytest.raises(Exception):
         fake_eiger.stage()
 
-    # State still in arming, but now wait should be done successfully
-    fake_eiger.arming_status = Status(done=True, success=True)
-    assert fake_eiger.stage() is None
-
 
 def test_if_eiger_isnt_armed_then_stage_calls_async_stage(fake_eiger: EigerDetector):
-    assert fake_eiger.armed_state.value == "unarmed"
     fake_eiger.async_stage = MagicMock()
+    fake_eiger.odin.fan.ready.sim_put(0)
     fake_eiger.stage()
     fake_eiger.async_stage.assert_called_once()
 
 
 def test_if_eiger_is_armed_then_stage_does_nothing(fake_eiger: EigerDetector):
-    fake_eiger.armed_state = fake_eiger.ArmedState.ARMED
+    fake_eiger.odin.fan.ready.sim_put(1)
     fake_eiger.async_stage = MagicMock()
-    assert fake_eiger.stage() is None
+    fake_eiger.stage()
     fake_eiger.async_stage.assert_not_called()
-
-
-def test_armed_state_goes_to_armed_upon_stage_completion(fake_eiger: EigerDetector):
-    fake_eiger._finish_arm()
-    assert fake_eiger.armed_state.value == "armed"
-
-
-def test_armed_state_goes_to_unarmed_after_unstage(
-    fake_eiger: EigerDetector, mock_set_odin_filewriter
-):
-    fake_eiger.armed_state = fake_eiger.ArmedState.ARMED
-    fake_eiger.filewriters_finished = MagicMock()
-    fake_eiger.unstage()
-    assert fake_eiger.armed_state.value == "unarmed"
