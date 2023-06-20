@@ -1,6 +1,6 @@
 from typing import Optional
 
-from ophyd import Component, Device, EpicsSignal, EpicsSignalRO, Signal
+from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
 from ophyd.status import Status, SubscriptionStatus
 
 from dodal.devices.attenuator.filter import AtteunatorFilter
