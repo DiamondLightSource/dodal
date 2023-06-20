@@ -10,11 +10,8 @@ from dodal.log import LOGGER
 
 
 class Attenuator(Device):
-    class TransmissionSignal(Signal):
-        def set(self, value, *, timeout=None, settle_time=None, **kwargs):
-            return self.parent.set_transmission(value)
-
-    do_set_transmission: TransmissionSignal = Component(TransmissionSignal)
+    def set(self, value, *, timeout=None, settle_time=None, **kwargs):
+        return self.set_transmission(value)
 
     calulated_filter_state_1: EpicsSignalRO = Component(EpicsSignalRO, ":DEC_TO_BIN.B0")
     calulated_filter_state_2: EpicsSignalRO = Component(EpicsSignalRO, ":DEC_TO_BIN.B1")
