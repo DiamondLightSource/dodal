@@ -1,4 +1,4 @@
-from typing import Any, Collection, TypeVar, Union
+from typing import Any, TypeVar, Union
 
 from ophyd.status import SubscriptionStatus
 
