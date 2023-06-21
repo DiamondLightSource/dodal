@@ -26,6 +26,11 @@ class EigerDetector(Device):
         def set(self, value, *, timeout=None, settle_time=None, **kwargs):
             return self.parent.async_stage()
 
+    class ArmedState(Enum):
+        UNARMED = "unarmed"
+        ARMING = "arming"
+        ARMED = "armed"
+
     do_arm: ArmingSignal = Component(ArmingSignal)
     cam: EigerDetectorCam = Component(EigerDetectorCam, "CAM:")
     odin: EigerOdin = Component(EigerOdin, "")
