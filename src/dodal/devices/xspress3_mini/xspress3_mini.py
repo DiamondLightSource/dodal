@@ -11,7 +11,7 @@ from ophyd import (
 )
 from ophyd.status import Status
 
-from dodal.devices.attenuator.attenuator import Attenuator
+from dodal.devices.attenuator import Attenuator
 from dodal.devices.detector import DetectorParams
 from dodal.devices.status import await_value_in_list
 from dodal.devices.xspress3_mini.xspress3_mini_channel import Xspress3MiniChannel
