@@ -1,6 +1,6 @@
 import pytest
 
-from dodal.devices.zebra import Zebra
+from dodal.devices.zebra import ArmDemand, Zebra
 
 
 @pytest.fixture()
@@ -12,15 +12,16 @@ def zebra():
 
 @pytest.mark.s03
 def test_arm(zebra: Zebra):
+    arming_status = zebra.pc.arm.set(ArmDemand.ARM)
     assert not zebra.pc.is_armed()
-    zebra.pc.arm().wait(10.0)
+    arming_status.wait(10.0)
     assert zebra.pc.is_armed()
-    zebra.pc.disarm().wait(10.0)
+    zebra.pc.arm.set(ArmDemand.DISARM).wait(10.0)
 
 
 @pytest.mark.s03
 def test_disarm(zebra: Zebra):
-    zebra.pc.arm().wait(10.0)
+    zebra.pc.arm.set(ArmDemand.ARM).wait(10.0)
     assert zebra.pc.is_armed()
-    zebra.pc.disarm().wait(10.0)
+    zebra.pc.arm.set(ArmDemand.DISARM).wait(10.0)
     assert not zebra.pc.is_armed()
