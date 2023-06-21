@@ -3,15 +3,35 @@ from typing import Optional
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
 from ophyd.status import Status, SubscriptionStatus
 
-from dodal.devices.attenuator.filter import AtteunatorFilter
 from dodal.devices.detector import DetectorParams
 from dodal.devices.status import await_value
 from dodal.log import LOGGER
 
 
+class AtteunatorFilter(Device):
+    actual_filter_state: EpicsSignalRO = Component(EpicsSignalRO, ":INLIM")
+
+
 class Attenuator(Device):
-    def set(self, value, *, timeout=None, settle_time=None, **kwargs):
-        return self.set_transmission(value)
+    # Sets transmission - range 0-1
+    def set(self, transmission) -> SubscriptionStatus:
+        """Get desired states and calculated states, return a status which is complete once they are equal"""
+
+        LOGGER.info("Using current energy")
+        self.use_current_energy.set(1).wait()
+        LOGGER.info(f"Setting desired transmission to {transmission}")
+        self.desired_transmission.set(transmission).wait()
+        LOGGER.info("Sending change filter command")
+        self.change.set(1).wait()
+
+        status = Status(done=True, success=True)
+        actual_states = self.get_actual_filter_state_list()
+        calculated_states = self.get_calculated_filter_state_list()
+        for i in range(16):
+            status &= await_value(
+                actual_states[i], calculated_states[i].get(), timeout=10
+            )
+        return status
 
     calulated_filter_state_1: EpicsSignalRO = Component(EpicsSignalRO, ":DEC_TO_BIN.B0")
     calulated_filter_state_2: EpicsSignalRO = Component(EpicsSignalRO, ":DEC_TO_BIN.B1")
@@ -109,25 +129,3 @@ class Attenuator(Device):
             self.filter_15.actual_filter_state,
             self.filter_16.actual_filter_state,
         ]
-
-    def set_transmission(self, transmission) -> SubscriptionStatus:
-        """Get desired states and calculated states, return a status which is complete once they are equal"""
-
-        LOGGER.info("Using current energy")
-        self.use_current_energy.set(1).wait()
-        LOGGER.info(f"Setting desired transmission to {transmission}")
-        self.desired_transmission.set(transmission).wait()
-        LOGGER.info("Sending change filter command")
-        self.change.set(1).wait()
-
-        # At some point we need to check how and when the calculated states are set, since if this is ran beforehand
-        # ,the function won't work
-        status = Status(done=True, success=True)
-        actual_states = self.get_actual_filter_state_list()
-        calculated_states = self.get_calculated_filter_state_list()
-        for i in range(16):
-            status &= await_value(
-                actual_states[i], calculated_states[i].get(), timeout=10
-            )
-
-        return status
