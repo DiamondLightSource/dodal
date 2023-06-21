@@ -26,11 +26,6 @@ class EigerDetector(Device):
         def set(self, value, *, timeout=None, settle_time=None, **kwargs):
             return self.parent.async_stage()
 
-    class ArmedState(Enum):
-        UNARMED = "unarmed"
-        ARMING = "arming"
-        ARMED = "armed"
-
     do_arm: ArmingSignal = Component(ArmingSignal)
     cam: EigerDetectorCam = Component(EigerDetectorCam, "CAM:")
     odin: EigerOdin = Component(EigerOdin, "")
@@ -97,7 +92,7 @@ class EigerDetector(Device):
         else:
             if self.odin.fan.ready.get() != 1:
                 # Arming hasn't started, do it asynchronously
-                self.async_stage().wait(60)
+                self.async_stage()
 
     def unstage(self) -> bool:
         assert self.detector_params is not None
@@ -306,7 +301,7 @@ class EigerDetector(Device):
                 self.set_odin_pvs,
                 self.set_mx_settings_pvs,
                 self.set_num_triggers_and_captures,
-                lambda: await_value(self.STALE_PARAMS_TIMEOUT, 0, 60),
+                lambda: await_value(self.stale_params, 0, 60),
                 self._wait_for_odin_status,
                 lambda: self.cam.acquire.set(1, timeout=self.GENERAL_STATUS_TIMEOUT),
                 self._wait_fan_ready,
