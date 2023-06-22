@@ -84,6 +84,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/artemis_701_do_optimise_attenuation_scan/"
   },
   {
+    "version": "artemis_754_add_deadtime_optimisation",
+    "url": "https://DiamondLightSource.github.io/dodal/artemis_754_add_deadtime_optimisation/"
+  },
+  {
     "version": "jungfrau_commissioning",
     "url": "https://DiamondLightSource.github.io/dodal/jungfrau_commissioning/"
   },
