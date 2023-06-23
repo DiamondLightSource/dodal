@@ -17,7 +17,7 @@ class Attenuator(Device):
     def set(self, transmission) -> SubscriptionStatus:
         """Get desired states and calculated states, return a status which is complete once they are equal"""
 
-        LOGGER.info("Using current energy")
+        LOGGER.info("Setting current energy ")
         self.use_current_energy.set(1).wait()
         LOGGER.info(f"Setting desired transmission to {transmission}")
         self.desired_transmission.set(transmission).wait()
