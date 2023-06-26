@@ -22,6 +22,7 @@ class ZoomController(Device):
     Device to control the zoom level. This should be set like
         >>> z = ZoomController(name="zoom")
         >>> z.set("1.0x")
+        Status...
     """
 
     percentage: EpicsSignal = Component(EpicsSignal, "ZOOMPOSCMD")
