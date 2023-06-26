@@ -32,6 +32,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/0.0.2_hotfixes/"
   },
   {
+    "version": "103_apply_flatfield_on_zoom_change",
+    "url": "https://DiamondLightSource.github.io/dodal/103_apply_flatfield_on_zoom_change/"
+  },
+  {
     "version": "262_make_arming_eiger_asynchronous",
     "url": "https://DiamondLightSource.github.io/dodal/262_make_arming_eiger_asynchronous/"
   },
@@ -52,10 +56,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/78_fix_skip_decorator/"
   },
   {
-    "version": "82_add_attenuator",
-    "url": "https://DiamondLightSource.github.io/dodal/82_add_attenuator/"
-  },
-  {
     "version": "93_add_arming_to_xspress3mini",
     "url": "https://DiamondLightSource.github.io/dodal/93_add_arming_to_xspress3mini/"
   },
@@ -74,10 +74,6 @@
   {
     "version": "artemis_262_move_arming_out_of_stage",
     "url": "https://DiamondLightSource.github.io/dodal/artemis_262_move_arming_out_of_stage/"
-  },
-  {
-    "version": "artemis_370_implement_rotation_nexus",
-    "url": "https://DiamondLightSource.github.io/dodal/artemis_370_implement_rotation_nexus/"
   },
   {
     "version": "artemis_701_do_optimise_attenuation_scan",
