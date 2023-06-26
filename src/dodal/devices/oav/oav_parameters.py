@@ -35,8 +35,6 @@ class OAVParameters:
     preprocess_K_size: int  # length scale for blur preprocessing
     detection_script_filename: str
     close_ksize: int
-    input_plugin: str
-    mxsc_input: str
     min_callback_time: float
     direction: int
     max_tip_distance: float
@@ -106,8 +104,6 @@ class OAVParameters:
         self.preprocess_K_size = update("preProcessKSize", int)
         self.detection_script_filename = update("filename", str)
         self.close_ksize = update("close_ksize", int, default=11)
-        self.input_plugin = update("oav", str, default="OAV")
-        self.mxsc_input = update("mxsc_input", str, default="CAM")
         self.min_callback_time = update("min_callback_time", float, default=0.08)
         self.direction = update("direction", int)
         self.max_tip_distance = update("max_tip_distance", float, default=300)
