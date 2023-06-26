@@ -27,7 +27,7 @@ class DetectorParams(BaseModel):
     """Holds parameters for the detector. Provides access to a list of Dectris detector
     sizes and a converter for distance to beam centre."""
 
-    current_energy: float
+    current_energy_ev: float
     exposure_time: float
     directory: str
     prefix: str

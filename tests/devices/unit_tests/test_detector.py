@@ -5,7 +5,7 @@ from dodal.devices.detector import DetectorParams
 
 def create_detector_params_with_directory(directory):
     return DetectorParams(
-        current_energy=100,
+        current_energy_ev=100,
         exposure_time=1.0,
         directory=directory,
         prefix="test",
@@ -36,7 +36,7 @@ def test_if_trailing_slash_provided_then_not_appended():
 )
 def test_correct_det_dist_to_beam_converter_path_passed_in(mocked_parse_table):
     params = DetectorParams(
-        current_energy=100,
+        current_energy_ev=100,
         exposure_time=1.0,
         directory="directory",
         prefix="test",
