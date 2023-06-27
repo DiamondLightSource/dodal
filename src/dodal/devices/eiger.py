@@ -85,14 +85,19 @@ class EigerDetector(Device):
         self.arming_status = self.do_arming_chain()
         return self.arming_status
 
+    def is_armed(self):
+        if self.odin.fan.ready.get() == 1 and self.cam.acquire.get() == 1:
+            return True
+        else:
+            return False
+
     def stage(self):
         if self.arming_status.done is False:
             # Arming has started so wait for it to finish
             self.arming_status.wait(60)
-        else:
-            if self.odin.fan.ready.get() != 1:
-                # Arming hasn't started, do it asynchronously
-                self.async_stage()
+        elif not self.is_armed():
+            # Arming hasn't started, do it asynchronously
+            self.async_stage().wait(timeout=self.GENERAL_STATUS_TIMEOUT)
 
     def unstage(self) -> bool:
         assert self.detector_params is not None
