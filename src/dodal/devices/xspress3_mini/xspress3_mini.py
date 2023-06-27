@@ -67,11 +67,6 @@ class Xspress3Mini(Device):
 
     do_arm: ArmingSignal = Component(ArmingSignal)
 
-    zebra: Zebra = Component(
-        Zebra, ""
-    )  # TODO: these two devices won't work because prefixes don't start with
-    # ~Xspress3mini  - move to bluesky plan?
-
     # Assume only one channel for now
     channel_1 = Component(Xspress3MiniChannel, "C1_")
 
