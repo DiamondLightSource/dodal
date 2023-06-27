@@ -98,5 +98,4 @@ class Xspress3Mini(Device):
         self.trigger_mode_mini.put(TriggerMode.BURST.value)
         self.do_start().wait(timeout=10)
         arm_status = await_value_in_list(self.detector_state, self.detector_busy_states)
-        arm_status &= self.acquire_status
         return arm_status
