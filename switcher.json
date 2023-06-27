@@ -4,36 +4,32 @@
     "url": "https://DiamondLightSource.github.io/dodal/main/"
   },
   {
-    "version": "1.0.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.0.0/"
-  },
-  {
-    "version": "0.0.5",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.5/"
-  },
-  {
-    "version": "0.0.4",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.4/"
-  },
-  {
-    "version": "0.0.3",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.3/"
+    "version": "0.0.1",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.1/"
   },
   {
     "version": "0.0.2",
     "url": "https://DiamondLightSource.github.io/dodal/0.0.2/"
   },
   {
-    "version": "0.0.1",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.1/"
-  },
-  {
     "version": "0.0.2_async_arming",
     "url": "https://DiamondLightSource.github.io/dodal/0.0.2_async_arming/"
   },
   {
-    "version": "0.0.2_hotfixes",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.2_hotfixes/"
+    "version": "0.0.3",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.3/"
+  },
+  {
+    "version": "0.0.4",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.4/"
+  },
+  {
+    "version": "0.0.5",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.5/"
+  },
+  {
+    "version": "1.0.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.0.0/"
   },
   {
     "version": "103_apply_flatfield_on_zoom_change",
