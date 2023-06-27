@@ -86,7 +86,7 @@ class EigerDetector(Device):
         return self.arming_status
 
     def stage(self):
-        if self.arming_status.done is False:
+        if not self.arming_status.done:
             # Arming has started so wait for it to finish
             self.arming_status.wait(60)
         else:
