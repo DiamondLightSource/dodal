@@ -546,6 +546,7 @@ def test_if_eiger_isnt_armed_then_stage_calls_async_stage(fake_eiger: EigerDetec
 
 def test_if_eiger_is_armed_then_stage_does_nothing(fake_eiger: EigerDetector):
     fake_eiger.odin.fan.ready.sim_put(1)
+    fake_eiger.cam.acquire.sim_put(1)
     fake_eiger.async_stage = MagicMock()
     fake_eiger.stage()
     fake_eiger.async_stage.assert_not_called()
