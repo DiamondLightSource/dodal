@@ -86,10 +86,7 @@ class EigerDetector(Device):
         return self.arming_status
 
     def is_armed(self):
-        if self.odin.fan.ready.get() == 1 and self.cam.acquire.get() == 1:
-            return True
-        else:
-            return False
+        return self.odin.fan.ready.get() == 1 and self.cam.acquire.get() == 1
 
     def stage(self):
         if not self.arming_status.done:
