@@ -41,6 +41,9 @@ class EigerDetector(Device):
 
     detector_params: Optional[DetectorParams] = None
 
+    arming_status = Status()
+    arming_status.set_finished()
+
     @classmethod
     def with_params(
         cls,
@@ -79,7 +82,20 @@ class EigerDetector(Device):
         status_ok, error_message = self.odin.check_odin_initialised()
         if not status_ok:
             raise Exception(f"Odin not initialised: {error_message}")
-        return self.do_arming_chain()
+
+        self.arming_status = self.do_arming_chain()
+        return self.arming_status
+
+    def is_armed(self):
+        return self.odin.fan.ready.get() == 1 and self.cam.acquire.get() == 1
+
+    def stage(self):
+        if not self.arming_status.done:
+            # Arming has started so wait for it to finish
+            self.arming_status.wait(60)
+        elif not self.is_armed():
+            # Arming hasn't started, do it asynchronously
+            self.async_stage().wait(timeout=self.GENERAL_STATUS_TIMEOUT)
 
     def unstage(self) -> bool:
         assert self.detector_params is not None
@@ -98,7 +114,6 @@ class EigerDetector(Device):
 
         LOGGER.info("Disarming detector")
         self.disarm_detector()
-
         status_ok = self.odin.check_odin_state()
         self.disable_roi_mode()
         return status_ok
@@ -289,7 +304,7 @@ class EigerDetector(Device):
                 self.set_odin_pvs,
                 self.set_mx_settings_pvs,
                 self.set_num_triggers_and_captures,
-                lambda: await_value(self.STALE_PARAMS_TIMEOUT, 0, 60),
+                lambda: await_value(self.stale_params, 0, 60),
                 self._wait_for_odin_status,
                 lambda: self.cam.acquire.set(1, timeout=self.GENERAL_STATUS_TIMEOUT),
                 self._wait_fan_ready,
