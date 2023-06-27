@@ -1,7 +1,7 @@
 from typing import List, Tuple
 
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO, EpicsSignalWithRBV
-from ophyd.areadetector.plugins import FilePlugin_V26
+from ophyd.areadetector.plugins import HDF5Plugin_V22
 from ophyd.status import Status, SubscriptionStatus
 
 from dodal.devices.status import await_value
@@ -28,7 +28,7 @@ class OdinMetaListener(Device):
     stop_writing: EpicsSignal = Component(EpicsSignal, "Stop")
 
 
-class OdinFileWriter(FilePlugin_V26):
+class OdinFileWriter(HDF5Plugin_V22):
     start_timeout: EpicsSignal = Component(EpicsSignal, "StartTimeout")
     # id should not be set. Set the filewriter file_name and this will be updated in EPICS
     id: EpicsSignalRO = Component(EpicsSignalRO, "AcquisitionID_RBV", string=True)
