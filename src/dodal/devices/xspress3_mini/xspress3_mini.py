@@ -81,6 +81,8 @@ class Xspress3Mini(Device):
     detector_state: EpicsSignalRO = Component(EpicsSignalRO, ":DetectorState_RBV")
     NUMBER_ROIS_DEFAULT = 6
     acquire_status: Status = None
+    dt_corrected_latest_mca: EpicsSignalRO = Component(EpicsSignalRO, ":ARR1:ArrayData")
+    set_num_images: EpicsSignal = Component(EpicsSignal, ":NumImages")
 
     detector_busy_states = [
         DetectorState.ACQUIRE.value,
@@ -94,6 +96,7 @@ class Xspress3Mini(Device):
     def do_start(self) -> Status:
         self.erase.put(EraseState.ERASE.value)
         status = self.channel_1.update_arrays.set(AcquireState.DONE.value)
+        # GDA code suggests acquire status
         self.acquire_status = self.acquire.set(AcquireState.ACQUIRE.value)
         return status
 

@@ -3,7 +3,7 @@ from typing import Optional
 from dodal.beamlines.beamline_utils import device_instantiation
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.aperturescatterguard import AperturePositions, ApertureScatterguard
-from dodal.devices.attenuator.attenuator import Attenuator
+from dodal.devices.attenuator import Attenuator
 from dodal.devices.backlight import Backlight
 from dodal.devices.DCM import DCM
 from dodal.devices.detector import DetectorParams
@@ -231,7 +231,7 @@ def xspress3mini(
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return device_instantiation(
-        Zebra,
+        Xspress3Mini,
         "xspress3mini",
         "-EA-XSP3-01:",
         wait_for_connection,
