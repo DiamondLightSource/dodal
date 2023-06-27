@@ -11,7 +11,9 @@ class DetectorMotion(Device):
     y: EpicsMotor = Cpt(EpicsMotor, "-MO-DET-01:Y")
     z: EpicsMotor = Cpt(EpicsMotor, "-MO-DET-01:Z")
     yaw: EpicsMotor = Cpt(EpicsMotor, "-MO-DET-01:YAW")
-    shutter: EpicsSignal = Cpt(EpicsSignal, "-MO-DET-01:SET_SHUTTER_STATE")  # 0=closed, 1=open
+    shutter: EpicsSignal = Cpt(
+        EpicsSignal, "-MO-DET-01:SET_SHUTTER_STATE"
+    )  # 0=closed, 1=open
     #   monitors
     shutter_closed_lim: EpicsSignalRO = Cpt(
         EpicsSignalRO, "-MO-DET-01:CLOSE_LIMIT"
