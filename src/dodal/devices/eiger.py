@@ -82,6 +82,7 @@ class EigerDetector(Device):
         status_ok, error_message = self.odin.check_odin_initialised()
         if not status_ok:
             raise Exception(f"Odin not initialised: {error_message}")
+
         self.arming_status = self.do_arming_chain()
         return self.arming_status
 
@@ -172,6 +173,7 @@ class EigerDetector(Device):
         return status
 
     def set_odin_pvs(self) -> Status:
+        assert self.detector_params is not None
         file_prefix = self.detector_params.full_filename
         status = self.odin.file_writer.file_path.set(
             self.detector_params.directory, timeout=self.GENERAL_STATUS_TIMEOUT
@@ -219,7 +221,6 @@ class EigerDetector(Device):
         """
 
         current_energy = self.cam.photon_energy.get()
-
         if abs(current_energy - energy) > tolerance:
             return self.cam.photon_energy.set(
                 energy, timeout=self.GENERAL_STATUS_TIMEOUT
@@ -296,7 +297,7 @@ class EigerDetector(Device):
         functions_to_do_arm.extend(
             [
                 lambda: self.set_detector_threshold(
-                    energy=detector_params.current_energy
+                    energy=detector_params.current_energy_ev
                 ),
                 self.set_cam_pvs,
                 self.set_odin_number_of_frame_chunks,

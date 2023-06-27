@@ -35,7 +35,7 @@ class StatusException(Exception):
 
 def create_new_params() -> DetectorParams:
     return DetectorParams(
-        current_energy=TEST_CURRENT_ENERGY,
+        current_energy_ev=TEST_CURRENT_ENERGY,
         exposure_time=TEST_EXPOSURE_TIME,
         directory=TEST_DIR,
         prefix=TEST_PREFIX,
@@ -90,7 +90,7 @@ def mock_set_odin_filewriter(fake_eiger: EigerDetector):
 
 
 @pytest.mark.parametrize(
-    "current_energy, request_energy, is_energy_change",
+    "current_energy_ev, request_energy, is_energy_change",
     [
         (100.0, 100.0, False),
         (100.0, 200.0, True),
@@ -101,12 +101,12 @@ def mock_set_odin_filewriter(fake_eiger: EigerDetector):
 )
 def test_detector_threshold(
     fake_eiger: EigerDetector,
-    current_energy: float,
+    current_energy_ev: float,
     request_energy: float,
     is_energy_change: bool,
 ):
     status_obj = MagicMock()
-    when(fake_eiger.cam.photon_energy).get().thenReturn(current_energy)
+    when(fake_eiger.cam.photon_energy).get().thenReturn(current_energy_ev)
     when(fake_eiger.cam.photon_energy).set(ANY, timeout=ANY).thenReturn(status_obj)
 
     returned_status = fake_eiger.set_detector_threshold(request_energy)
@@ -284,7 +284,7 @@ def test_unsuccessful_true_roi_mode_change_results_in_callback_error(
     unwrapped_funcs = [
         lambda: fake_eiger.change_roi_mode(enable=True),
         lambda: fake_eiger.set_detector_threshold(
-            energy=fake_eiger.detector_params.current_energy
+            energy=fake_eiger.detector_params.current_energy_ev
         ),
     ]
     with pytest.raises(Exception):
@@ -304,7 +304,7 @@ def test_unsuccessful_false_roi_mode_change_results_in_callback_error(
     unwrapped_funcs = [
         lambda: fake_eiger.change_roi_mode(enable=False),
         lambda: fake_eiger.set_detector_threshold(
-            energy=fake_eiger.detector_params.current_energy
+            energy=fake_eiger.detector_params.current_energy_ev
         ),
     ]
     with pytest.raises(Exception):
@@ -474,7 +474,7 @@ def test_check_callback_error(fake_eiger: EigerDetector, iteration):
     unwrapped_funcs = [
         (
             lambda: fake_eiger.set_detector_threshold(
-                energy=fake_eiger.detector_params.current_energy
+                energy=fake_eiger.detector_params.current_energy_ev
             )
         ),
         (fake_eiger.set_cam_pvs),
