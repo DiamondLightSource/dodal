@@ -56,10 +56,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/78_fix_skip_decorator/"
   },
   {
-    "version": "93_add_arming_to_xspress3mini",
-    "url": "https://DiamondLightSource.github.io/dodal/93_add_arming_to_xspress3mini/"
-  },
-  {
     "version": "96_fix_await_value",
     "url": "https://DiamondLightSource.github.io/dodal/96_fix_await_value/"
   },
