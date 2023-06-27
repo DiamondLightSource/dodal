@@ -5,22 +5,22 @@ from ophyd import Device, EpicsMotor, EpicsSignal, EpicsSignalRO
 class DetectorMotion(Device):
     """Physical motion and interlocks for detector travel"""
 
-    upstream_x: EpicsMotor = Cpt(EpicsMotor, "UPSTREAMX")
-    downstream_x: EpicsMotor = Cpt(EpicsMotor, "i24DOWNSTREAMX")
-    x: EpicsMotor = Cpt(EpicsMotor, "i24X")
-    y: EpicsMotor = Cpt(EpicsMotor, "i24Y")
-    z: EpicsMotor = Cpt(EpicsMotor, "i24Z")
-    yaw: EpicsMotor = Cpt(EpicsMotor, "i24YAW")
-    shutter: EpicsSignal = Cpt(EpicsSignal, "i24SET_SHUTTER_STATE")  # 0=closed, 1=open
+    upstream_x: EpicsMotor = Cpt(EpicsMotor, "-MO-DET-01:UPSTREAMX")
+    downstream_x: EpicsMotor = Cpt(EpicsMotor, "-MO-DET-01:DOWNSTREAMX")
+    x: EpicsMotor = Cpt(EpicsMotor, "-MO-DET-01:X")
+    y: EpicsMotor = Cpt(EpicsMotor, "-MO-DET-01:Y")
+    z: EpicsMotor = Cpt(EpicsMotor, "-MO-DET-01:Z")
+    yaw: EpicsMotor = Cpt(EpicsMotor, "-MO-DET-01:YAW")
+    shutter: EpicsSignal = Cpt(EpicsSignal, "-MO-DET-01:SET_SHUTTER_STATE")  # 0=closed, 1=open
     #   monitors
     shutter_closed_lim: EpicsSignalRO = Cpt(
-        EpicsSignalRO, "i24CLOSE_LIMIT"
+        EpicsSignalRO, "-MO-DET-01:CLOSE_LIMIT"
     )  # on limit = 1, off = 0
     shutter_open_lim: EpicsSignalRO = Cpt(
-        EpicsSignalRO, "i24OPEN_LIMIT"
+        EpicsSignalRO, "-MO-DET-01:OPEN_LIMIT"
     )  # on limit = 1, off = 0
     z_disabled: EpicsSignalRO = Cpt(
-        EpicsSignalRO, "i24Z:DISABLED"
+        EpicsSignalRO, "-MO-DET-01:Z:DISABLED"
     )  # robot interlock, 0=ok to move, 1=blocked
     crate_power: EpicsSignalRO = Cpt(
         EpicsSignalRO, "-MO-PMAC-02:CRATE2_HEALTHY"

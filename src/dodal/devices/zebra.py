@@ -89,7 +89,7 @@ class PositionCompare(Device):
     dir: EpicsSignal = Component(EpicsSignal, "PC_DIR")
     arm_source: EpicsSignal = epics_signal_put_wait("PC_ARM_SEL")
 
-    arm: ArmingDevice = Component(ArmingDevice)
+    arm: ArmingDevice = Component(ArmingDevice, "")
 
     def is_armed(self) -> bool:
         return self.arm.armed.get() == 1
