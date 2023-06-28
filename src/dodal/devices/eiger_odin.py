@@ -34,6 +34,7 @@ class OdinFileWriter(HDF5Plugin_V22):
     id: EpicsSignalRO = Component(EpicsSignalRO, "AcquisitionID_RBV", string=True)
     image_height: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "ImageHeight")
     image_width: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "ImageWidth")
+    plugin_type = None
 
 
 class OdinNode(Device):
