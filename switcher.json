@@ -4,32 +4,32 @@
     "url": "https://DiamondLightSource.github.io/dodal/main/"
   },
   {
-    "version": "0.0.1",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.1/"
-  },
-  {
-    "version": "0.0.2",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.2/"
-  },
-  {
-    "version": "0.0.2_async_arming",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.2_async_arming/"
-  },
-  {
-    "version": "0.0.3",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.3/"
-  },
-  {
-    "version": "0.0.4",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.4/"
+    "version": "1.0.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.0.0/"
   },
   {
     "version": "0.0.5",
     "url": "https://DiamondLightSource.github.io/dodal/0.0.5/"
   },
   {
-    "version": "1.0.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.0.0/"
+    "version": "0.0.4",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.4/"
+  },
+  {
+    "version": "0.0.3",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.3/"
+  },
+  {
+    "version": "0.0.2",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.2/"
+  },
+  {
+    "version": "0.0.1",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.1/"
+  },
+  {
+    "version": "0.0.2_async_arming",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.2_async_arming/"
   },
   {
     "version": "103_apply_flatfield_on_zoom_change",
@@ -78,6 +78,10 @@
   {
     "version": "artemis_754_add_deadtime_optimisation",
     "url": "https://DiamondLightSource.github.io/dodal/artemis_754_add_deadtime_optimisation/"
+  },
+  {
+    "version": "artemis_759_fixes_for_v1",
+    "url": "https://DiamondLightSource.github.io/dodal/artemis_759_fixes_for_v1/"
   },
   {
     "version": "jungfrau_commissioning",
