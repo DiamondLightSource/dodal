@@ -66,12 +66,6 @@ class Xspress3Mini(Device):
         def set(self, value, *, timeout=None, settle_time=None, **kwargs):
             return self.parent.arm()
 
-    class ReadArraySignal(Signal):
-        """This signal is to allow array PVs to be read within Bluesky plans"""
-
-        def set(self, value: Callable, *, timeout=None, settle_time=None, **kwargs):
-            return value()
-
     do_arm: ArmingSignal = Component(ArmingSignal)
 
     # Assume only one channel for now
