@@ -3,7 +3,7 @@ from enum import Enum
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
 
 
-class TimeSeriesValues(Enum):  # assuming IOC version 3
+class TimeSeriesValues(Enum):
     START_VALUE = "Acquire"
     STOP_VALUE = "Done"
     UPDATE_VALUE = ""

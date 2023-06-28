@@ -96,7 +96,7 @@ class Xspress3Mini(Device):
     def do_start(self) -> Status:
         self.erase.put(EraseState.ERASE.value)
         status = self.channel_1.update_arrays.set(AcquireState.DONE.value)
-        # GDA code suggests acquire status
+        # GDA code suggests this put does not callback until collection finished, for now just hold on to it
         self.acquire_status = self.acquire.set(AcquireState.ACQUIRE.value)
         return status
 
