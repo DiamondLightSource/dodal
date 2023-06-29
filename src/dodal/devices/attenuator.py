@@ -17,7 +17,7 @@ class Attenuator(Device):
     def set(self, transmission) -> SubscriptionStatus:
         """Get desired states and calculated states, return a status which is complete once they are equal"""
 
-        LOGGER.info("Setting current energy ")
+        LOGGER.info("Using current energy ")
         self.use_current_energy.set(1).wait()
         LOGGER.info(f"Setting desired transmission to {transmission}")
         self.desired_transmission.set(transmission).wait()
@@ -69,7 +69,7 @@ class Attenuator(Device):
 
     desired_transmission: EpicsSignal = Component(EpicsSignal, "T2A:SETVAL1")
     use_current_energy: EpicsSignal = Component(
-        EpicsSignal, "E2WL:USECURRENTENERY.PROC"
+        EpicsSignal, "E2WL:USECURRENTENERGY.PROC"
     )
     change: EpicsSignal = Component(EpicsSignal, "FANOUT")
     actual_transmission: EpicsSignal = Component(EpicsSignal, "MATCH")
