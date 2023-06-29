@@ -78,11 +78,11 @@ class Xspress3Mini(Device):
     roi_start_x: EpicsSignal = Component(EpicsSignal, "ROISUM1:MinX")
     roi_size_x: EpicsSignal = Component(EpicsSignal, "ROISUM1:SizeX")
     acquire_time: EpicsSignal = Component(EpicsSignal, "AcquireTime")
-    detector_state: EpicsSignalRO = Component(EpicsSignalRO, ":DetectorState_RBV")
+    detector_state: EpicsSignalRO = Component(EpicsSignalRO, "DetectorState_RBV")
     NUMBER_ROIS_DEFAULT = 6
     acquire_status: Status = None
-    dt_corrected_latest_mca: EpicsSignalRO = Component(EpicsSignalRO, ":ARR1:ArrayData")
-    set_num_images: EpicsSignal = Component(EpicsSignal, ":NumImages")
+    dt_corrected_latest_mca: EpicsSignalRO = Component(EpicsSignalRO, "ARR1:ArrayData")
+    set_num_images: EpicsSignal = Component(EpicsSignal, "NumImages")
 
     detector_busy_states = [
         DetectorState.ACQUIRE.value,
