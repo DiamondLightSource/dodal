@@ -29,6 +29,10 @@ TEST_USE_ROI_MODE = False
 TEST_DET_DIST_TO_BEAM_CONVERTER_PATH = "tests/devices/unit_tests/test_lookup_table.txt"
 
 
+class StatusException(Exception):
+    pass
+
+
 def create_new_params() -> DetectorParams:
     return DetectorParams(
         current_energy_ev=TEST_CURRENT_ENERGY,
@@ -59,6 +63,12 @@ def fake_eiger():
 def finished_status():
     status = Status()
     status.set_finished()
+    return status
+
+
+def get_bad_status(exception=Exception):
+    status = Status()
+    status.set_exception(Exception)
     return status
 
 
@@ -443,10 +453,23 @@ def test_when_stage_called_then_finish_arm_on_fan_ready(
 def test_check_callback_error(fake_eiger: EigerDetector, iteration):
     def get_bad_status():
         status = Status()
-        status.set_exception(Exception)
+        status.set_exception(StatusException)
+        return status
+
+    def get_good_status():
+        status = Status()
+        status.set_finished()
         return status
 
     LOGGER.error = MagicMock()
+
+    # These functions timeout without extra tweaking rather than give us the specific status error for the test
+    fake_eiger.set_odin_pvs = MagicMock()
+    fake_eiger.set_odin_pvs.return_value = get_good_status()
+    fake_eiger._wait_for_odin_status = MagicMock()
+    fake_eiger._wait_for_odin_status.return_value = get_good_status()
+    fake_eiger._wait_fan_ready = MagicMock()
+    fake_eiger._wait_fan_ready.return_value = get_good_status()
 
     unwrapped_funcs = [
         (
@@ -467,8 +490,8 @@ def test_check_callback_error(fake_eiger: EigerDetector, iteration):
 
     unwrapped_funcs[iteration] = get_bad_status
 
-    with pytest.raises(Exception):
-        run_functions_without_blocking(unwrapped_funcs).wait()
+    with pytest.raises(StatusException):
+        run_functions_without_blocking(unwrapped_funcs).wait(timeout=10)
         LOGGER.error.assert_called_once()
 
 
@@ -499,3 +522,31 @@ def test_given_in_free_run_mode_when_unstaged_then_waiting_on_file_writer_to_fin
 
     assert fake_eiger.odin.meta.stop_writing.get() == 1
     assert fake_eiger.odin.file_writer.capture.get() == 0
+
+
+def test_if_arming_in_progress_then_stage_waits_for_completion(
+    fake_eiger: EigerDetector, mock_set_odin_filewriter
+):
+    def set_bad_arming_status():
+        fake_eiger.arming_status = get_bad_status()
+
+    assert fake_eiger.arming_status.done is True
+    fake_eiger.arming_status = get_bad_status()
+    # Should do .wait and error
+    with pytest.raises(Exception):
+        fake_eiger.stage()
+
+
+def test_if_eiger_isnt_armed_then_stage_calls_async_stage(fake_eiger: EigerDetector):
+    fake_eiger.async_stage = MagicMock()
+    fake_eiger.odin.fan.ready.sim_put(0)
+    fake_eiger.stage()
+    fake_eiger.async_stage.assert_called_once()
+
+
+def test_if_eiger_is_armed_then_stage_does_nothing(fake_eiger: EigerDetector):
+    fake_eiger.odin.fan.ready.sim_put(1)
+    fake_eiger.cam.acquire.sim_put(1)
+    fake_eiger.async_stage = MagicMock()
+    fake_eiger.stage()
+    fake_eiger.async_stage.assert_not_called()

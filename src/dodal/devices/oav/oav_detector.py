@@ -56,15 +56,15 @@ class ZoomController(Device):
 
 
 class OAV(AreaDetector):
-    cam: CamBase = ADC(CamBase, "CAM:")
-    roi: ADC = ADC(ROIPlugin, "ROI:")
-    proc: ProcessPlugin = ADC(ProcessPlugin, "PROC:")
-    over: ADC = ADC(OverlayPlugin, "OVER:")
-    tiff: ADC = ADC(OverlayPlugin, "TIFF:")
-    hdf5: ADC = ADC(HDF5Plugin, "HDF5:")
-    snapshot: SnapshotWithGrid = Component(SnapshotWithGrid, "MJPG:")
-    mxsc: MXSC = ADC(MXSC, "MXSC:")
-    zoom: ZoomController = Component(ZoomController, "FZOOM:")
+    cam: CamBase = ADC(CamBase, "-DI-OAV-01:CAM:")
+    roi: ADC = ADC(ROIPlugin, "-DI-OAV-01:ROI:")
+    proc: ADC = ADC(ProcessPlugin, "-DI-OAV-01:PROC:")
+    over: ADC = ADC(OverlayPlugin, "-DI-OAV-01:OVER:")
+    tiff: ADC = ADC(OverlayPlugin, "-DI-OAV-01:TIFF:")
+    hdf5: ADC = ADC(HDF5Plugin, "-DI-OAV-01:HDF5:")
+    snapshot: SnapshotWithGrid = Component(SnapshotWithGrid, "-DI-OAV-01:MJPG:")
+    mxsc: MXSC = ADC(MXSC, "-DI-OAV-01:MXSC:")
+    zoom_controller: ZoomController = Component(ZoomController, "-EA-OAV-01:FZOOM:")
 
     def set_flatfield_on_zoom_level_one(self, value=None, old_value=None, **kwargs):
         flat_applied = self.proc.port_name.get()

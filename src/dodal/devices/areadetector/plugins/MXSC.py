@@ -20,9 +20,6 @@ class PinTipDetect(Device):
     triggered_tip: Signal = Component(Signal, kind=Kind.hinted, value=INVALID_POSITION)
     validity_timeout: Signal = Component(Signal, value=1)
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
     def update_tip_if_valid(self, value, **_):
         current_value = (value, self.tip_y.get())
         if current_value != self.INVALID_POSITION:
@@ -79,4 +76,4 @@ class MXSC(Device):
     waveform_size_x: EpicsSignal = Component(EpicsSignal, "ArraySize1_RBV")
     waveform_size_y: EpicsSignal = Component(EpicsSignal, "ArraySize2_RBV")
 
-    pin_tip: PinTipDetect = Component(PinTipDetect)
+    pin_tip: PinTipDetect = Component(PinTipDetect, "")
