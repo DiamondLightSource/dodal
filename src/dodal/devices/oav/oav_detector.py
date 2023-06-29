@@ -57,11 +57,11 @@ class ZoomController(Device):
 
 class OAV(AreaDetector):
     cam: CamBase = ADC(CamBase, "-DI-OAV-01:CAM:")
-    roi: ADC = ADC(ROIPlugin, "-DI-OAV-01:ROI:")
-    proc: ADC = ADC(ProcessPlugin, "-DI-OAV-01:PROC:")
-    over: ADC = ADC(OverlayPlugin, "-DI-OAV-01:OVER:")
-    tiff: ADC = ADC(OverlayPlugin, "-DI-OAV-01:TIFF:")
-    hdf5: ADC = ADC(HDF5Plugin, "-DI-OAV-01:HDF5:")
+    roi: ROIPlugin = ADC(ROIPlugin, "-DI-OAV-01:ROI:")
+    proc: ProcessPlugin = ADC(ProcessPlugin, "-DI-OAV-01:PROC:")
+    over: OverlayPlugin = ADC(OverlayPlugin, "-DI-OAV-01:OVER:")
+    tiff: OverlayPlugin = ADC(OverlayPlugin, "-DI-OAV-01:TIFF:")
+    hdf5: HDF5Plugin = ADC(HDF5Plugin, "-DI-OAV-01:HDF5:")
     snapshot: SnapshotWithGrid = Component(SnapshotWithGrid, "-DI-OAV-01:MJPG:")
     mxsc: MXSC = ADC(MXSC, "-DI-OAV-01:MXSC:")
     zoom_controller: ZoomController = Component(ZoomController, "-EA-OAV-01:FZOOM:")
@@ -78,6 +78,6 @@ class OAV(AreaDetector):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.zoom._level_sp.subscribe(
+        self.zoom_controller._level_sp.subscribe(
             self.set_flatfield_on_zoom_level_one,
         )
