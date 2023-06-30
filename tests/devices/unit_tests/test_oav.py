@@ -124,6 +124,8 @@ def test_when_zoom_not_1_then_flat_field_removed(fake_oav: OAV):
 def test_when_zoom_is_externally_changed_to_1_then_flat_field_not_changed(
     fake_oav: OAV,
 ):
+    """This test is required to ensure that Artemis doesn't cause unexpected behaviour
+    e.g. change the flatfield when the zoom level is changed through the synoptic"""
     fake_oav.mxsc.input_plugin.sim_put("CAM")
     fake_oav.snapshot.input_plugin.sim_put("CAM")
 
