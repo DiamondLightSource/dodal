@@ -35,7 +35,7 @@ class GridAxis:
     @property
     def end(self):
         """Gives the point where the final frame is taken"""
-        # Not that full_steps is one indexed e.g. if there is one step then the end is
+        # Note that full_steps is one indexed e.g. if there is one step then the end is
         # refering to the first position
         return self.steps_to_motor_position(self.full_steps - 1)
 
