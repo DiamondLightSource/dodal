@@ -44,6 +44,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/51_aperture_scatterguard_no_positions/"
   },
   {
+    "version": "767_centre_one_box_out",
+    "url": "https://DiamondLightSource.github.io/dodal/767_centre_one_box_out/"
+  },
+  {
     "version": "76_make_stage_synchronous_if_arming_not_started",
     "url": "https://DiamondLightSource.github.io/dodal/76_make_stage_synchronous_if_arming_not_started/"
   },
