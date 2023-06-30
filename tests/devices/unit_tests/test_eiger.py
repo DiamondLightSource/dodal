@@ -524,6 +524,24 @@ def test_given_in_free_run_mode_when_unstaged_then_waiting_on_file_writer_to_fin
     assert fake_eiger.odin.file_writer.capture.get() == 0
 
 
+def test_given_in_free_run_mode_and_not_all_frames_collected_in_time_when_unstaged_then_odin_stopped_and_exception_thrown(
+    fake_eiger: EigerDetector,
+):
+    fake_eiger.filewriters_finished = finished_status()
+
+    fake_eiger.odin.file_writer.capture.sim_put(1)
+    fake_eiger.odin.file_writer.num_captured.sim_put(1000)
+    fake_eiger.odin.check_odin_state = MagicMock(return_value=True)
+
+    fake_eiger.detector_params.trigger_mode = TriggerMode.FREE_RUN
+    fake_eiger.ALL_FRAMES_TIMEOUT = 0.1
+    with pytest.raises(Exception):
+        fake_eiger.unstage()
+
+    assert fake_eiger.odin.meta.stop_writing.get() == 1
+    assert fake_eiger.odin.file_writer.capture.get() == 0
+
+
 def test_if_arming_in_progress_then_stage_waits_for_completion(
     fake_eiger: EigerDetector, mock_set_odin_filewriter
 ):
@@ -550,3 +568,30 @@ def test_if_eiger_is_armed_then_stage_does_nothing(fake_eiger: EigerDetector):
     fake_eiger.async_stage = MagicMock()
     fake_eiger.stage()
     fake_eiger.async_stage.assert_not_called()
+
+
+def test_given_detector_arming_when_unstage_then_wait_for_arming_to_finish(
+    fake_eiger: EigerDetector,
+):
+    fake_eiger.filewriters_finished = finished_status()
+
+    fake_eiger.odin.file_writer.capture.sim_put(1)
+    fake_eiger.odin.file_writer.num_captured.sim_put(2000)
+    fake_eiger.odin.check_odin_state = MagicMock(return_value=True)
+
+    fake_eiger.arming_status = Status()
+    fake_eiger.arming_status.wait = MagicMock()
+    fake_eiger.unstage()
+    fake_eiger.arming_status.wait.assert_called_once()
+
+
+def test_given_detector_arming_status_failed_when_unstage_then_detector_still_disarmed(
+    fake_eiger: EigerDetector,
+):
+    fake_eiger.cam.acquire.sim_put(1)
+
+    fake_eiger.arming_status = get_bad_status()
+    with pytest.raises(Exception):
+        fake_eiger.unstage()
+
+    assert fake_eiger.cam.acquire.get() == 0
