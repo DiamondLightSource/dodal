@@ -29,11 +29,15 @@ class GridAxis:
     full_steps: int
 
     def steps_to_motor_position(self, steps):
-        return self.start + self.step_size * (steps - 1)
+        """Gives the motor position based on steps, where steps are 0 indexed"""
+        return self.start + self.step_size * steps
 
     @property
     def end(self):
-        return self.steps_to_motor_position(self.full_steps)
+        """Gives the point where the final frame is taken"""
+        # Note that full_steps is one indexed e.g. if there is one step then the end is
+        # refering to the first position
+        return self.steps_to_motor_position(self.full_steps - 1)
 
     def is_within(self, steps):
         return 0 <= steps <= self.full_steps
@@ -45,7 +49,10 @@ class GridScanParams(BaseModel, AbstractExperimentParameterBase):
     layout to EPICS.
 
     Motion program will do a grid in x-y then rotate omega +90 and perform
-    a grid in x-z
+    a grid in x-z.
+
+    The grid specified is where data is taken e.g. it can be assumed the first frame is
+    at x_start, y1_start, z1_start and subsequent frames are N*step_size away.
     """
 
     x_steps: int = 1
