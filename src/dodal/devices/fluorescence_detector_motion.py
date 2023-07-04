@@ -3,7 +3,6 @@ from ophyd import Device, EpicsSignal
 
 
 class FluorescenceDetector(Device):
-
     OUT = 0
     IN = 1
 

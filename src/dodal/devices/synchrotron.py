@@ -13,7 +13,6 @@ class SynchrotronTopUp(Device):
 
 
 class Synchrotron(Device):
-
     machine_status: SynchrotoronMachineStatus = Component(
         SynchrotoronMachineStatus, "CS-CS-MSTAT-01:"
     )
