@@ -21,7 +21,7 @@ dependencies = [
     "pillow",
     "requests",
     "graypy",
-    "pydantic",
+    "pydantic<2.0",
 ]
 dynamic = ["version"]
 license.file = "LICENSE"
