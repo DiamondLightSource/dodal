@@ -302,22 +302,22 @@ def test_given_x_y_z_of_origin_when_get_motor_positions_then_initial_positions_r
     motor_positions = grid_scan_params.grid_position_to_motor_position(
         np.array([0, 0, 0])
     )
-    assert np.allclose(motor_positions, np.array([-0.3, 0.8, 3.9]))
+    assert np.allclose(motor_positions, np.array([0, 1, 4]))
 
 
 @pytest.mark.parametrize(
     "grid_position, expected_x, expected_y, expected_z",
     [
-        (np.array([1, 1, 1]), 0.0, 1.0, 4.0),
-        (np.array([2, 11, 16]), 0.3, 3.0, 5.5),
-        (np.array([6, 5, 5]), 1.5, 1.8, 4.4),
+        (np.array([1, 1, 1]), 0.3, 1.2, 4.1),
+        (np.array([2, 11, 16]), 0.6, 3.2, 5.6),
+        (np.array([6, 5, 5]), 1.8, 2.0, 4.5),
     ],
 )
 def test_given_various_x_y_z_when_get_motor_positions_then_expected_positions_returned(
     grid_scan_params: GridScanParams, grid_position, expected_x, expected_y, expected_z
 ):
     motor_positions = grid_scan_params.grid_position_to_motor_position(grid_position)
-    np.testing.assert_array_equal(
+    np.testing.assert_allclose(
         motor_positions, np.array([expected_x, expected_y, expected_z])
     )
 
