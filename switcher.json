@@ -40,10 +40,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/108_unstage_eiger_should_be_more_robust/"
   },
   {
-    "version": "110_precommit_broken",
-    "url": "https://DiamondLightSource.github.io/dodal/110_precommit_broken/"
-  },
-  {
     "version": "262_make_arming_eiger_asynchronous",
     "url": "https://DiamondLightSource.github.io/dodal/262_make_arming_eiger_asynchronous/"
   },
