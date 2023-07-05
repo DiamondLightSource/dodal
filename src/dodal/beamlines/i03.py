@@ -12,6 +12,7 @@ from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import FastGridScan
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.s4_slit_gaps import S4SlitGaps
+from dodal.devices.sample_shutter import SampleShutter
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import Undulator
@@ -249,6 +250,17 @@ def attenuator(
         Attenuator,
         "attenuator",
         "-EA-ATTN-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+def sample_shutter(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Attenuator:
+    return device_instantiation(
+        SampleShutter,
+        "sample_shutter",
+        "-EA-SHTR-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
