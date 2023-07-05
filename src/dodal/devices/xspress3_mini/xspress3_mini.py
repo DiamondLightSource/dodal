@@ -10,7 +10,7 @@ from ophyd import (
 )
 from ophyd.status import Status
 
-from dodal.devices.status import await_value_in_list
+from dodal.devices.status import await_value, await_value_in_list
 from dodal.devices.xspress3_mini.xspress3_mini_channel import Xspress3MiniChannel
 from dodal.log import LOGGER
 
@@ -37,13 +37,13 @@ class UpdateRBV(Enum):
 
 
 class EraseState(Enum):
-    DONE = "Done"
-    ERASE = "Erase"
+    DONE = 0
+    ERASE = 1
 
 
 class AcquireState(Enum):
-    DONE = "Done"
-    ACQUIRE = "Acquire"
+    DONE = 0
+    ACQUIRE = 1
 
 
 class DetectorState(Enum):
@@ -70,15 +70,16 @@ class Xspress3Mini(Device):
     # Assume only one channel for now
     channel_1 = Component(Xspress3MiniChannel, "C1_")
 
-    erase: EpicsSignal = Component(EpicsSignal, "ERASE")
+    erase: EpicsSignal = Component(EpicsSignal, "ERASE", string=True)
     get_max_num_channels = Component(EpicsSignalRO, "MAX_NUM_CHANNELS_RBV")
     acquire: EpicsSignal = Component(EpicsSignal, "Acquire")
+    acquire_rbv: EpicsSignalRO = Component(EpicsSignal, "Acquire_RBV")
     get_roi_calc_mini: EpicsSignal = Component(EpicsSignal, "MCA1:Enable_RBV")
     trigger_mode_mini: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "TriggerMode")
     roi_start_x: EpicsSignal = Component(EpicsSignal, "ROISUM1:MinX")
     roi_size_x: EpicsSignal = Component(EpicsSignal, "ROISUM1:SizeX")
     acquire_time: EpicsSignal = Component(EpicsSignal, "AcquireTime")
-    detector_state: EpicsSignalRO = Component(EpicsSignalRO, "DetectorState_RBV")
+    detector_state: EpicsSignalRO = Component(EpicsSignalRO, "DetectorState_RBV", string=True)
     NUMBER_ROIS_DEFAULT = 6
     acquire_status: Status = None
     dt_corrected_latest_mca: EpicsSignalRO = Component(EpicsSignalRO, "ARR1:ArrayData")
@@ -95,14 +96,15 @@ class Xspress3Mini(Device):
 
     def do_start(self) -> Status:
         self.erase.put(EraseState.ERASE.value)
-        status = self.channel_1.update_arrays.set(AcquireState.DONE.value)
+        #status = self.channel_1.update_arrays.set(AcquireState.DONE.value)
         # GDA code suggests this put does not callback until collection finished, for now just hold on to it
-        self.acquire_status = self.acquire.set(AcquireState.ACQUIRE.value)
-        return status
+        return self.acquire.set(AcquireState.ACQUIRE.value)
 
     def arm(self) -> Status:
         LOGGER.info("Arming Xspress3Mini detector...")
         self.trigger_mode_mini.put(TriggerMode.BURST.value)
-        self.do_start().wait(timeout=10)
+        #self.do_start().wait(timeout=10)
         arm_status = await_value_in_list(self.detector_state, self.detector_busy_states)
-        return arm_status
+        arm_status &= self.do_start()
+        arm_status.wait(1)
+        return await_value(self.acquire_rbv, 0)
