@@ -34,8 +34,8 @@ class EigerDetector(Device):
     bit_depth: EpicsSignalRO = Component(EpicsSignalRO, "CAM:BitDepthImage_RBV")
 
     STALE_PARAMS_TIMEOUT = 60
-
     GENERAL_STATUS_TIMEOUT = 10
+    ALL_FRAMES_TIMEOUT = 30
 
     filewriters_finished: SubscriptionStatus
 
@@ -89,33 +89,45 @@ class EigerDetector(Device):
     def is_armed(self):
         return self.odin.fan.ready.get() == 1 and self.cam.acquire.get() == 1
 
-    def stage(self):
+    def wait_on_arming_if_started(self):
         if not self.arming_status.done:
             # Arming has started so wait for it to finish
             self.arming_status.wait(60)
-        elif not self.is_armed():
+
+    def stage(self):
+        self.wait_on_arming_if_started()
+        if not self.is_armed():
             # Arming hasn't started, do it asynchronously
             self.async_stage().wait(timeout=self.GENERAL_STATUS_TIMEOUT)
 
-    def unstage(self) -> bool:
-        assert self.detector_params is not None
-        if self.detector_params.trigger_mode == TriggerMode.FREE_RUN:
-            # In free run mode we have to wait on all frames being complete and stop odin
-            LOGGER.info("Waiting on all frames")
+    def stop_odin_when_all_frames_collected(self):
+        LOGGER.info("Waiting on all frames")
+        try:
             await_value(
                 self.odin.file_writer.num_captured,
                 self.detector_params.full_number_of_images,
-            ).wait(30)
+            ).wait(self.ALL_FRAMES_TIMEOUT)
+        finally:
             LOGGER.info("Stopping Odin")
             self.odin.stop().wait(5)
-        self.odin.file_writer.start_timeout.put(1)
-        LOGGER.info("Waiting on filewriter to finish")
-        self.filewriters_finished.wait(30)
 
-        LOGGER.info("Disarming detector")
-        self.disarm_detector()
-        status_ok = self.odin.check_odin_state()
-        self.disable_roi_mode()
+    def unstage(self) -> bool:
+        assert self.detector_params is not None
+        try:
+            self.wait_on_arming_if_started()
+            if self.detector_params.trigger_mode == TriggerMode.FREE_RUN:
+                # In free run mode we have to manually stop odin
+                self.stop_odin_when_all_frames_collected()
+
+            self.odin.file_writer.start_timeout.put(1)
+            LOGGER.info("Waiting on filewriter to finish")
+            self.filewriters_finished.wait(30)
+
+            LOGGER.info("Disarming detector")
+        finally:
+            self.disarm_detector()
+            status_ok = self.odin.check_odin_state()
+            self.disable_roi_mode()
         return status_ok
 
     def disable_roi_mode(self):
