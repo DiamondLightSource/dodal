@@ -254,6 +254,7 @@ def attenuator(
         fake_with_ophyd_sim,
     )
 
+
 def sample_shutter(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> Attenuator:
