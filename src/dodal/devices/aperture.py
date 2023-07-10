@@ -9,3 +9,7 @@ class Aperture(Device):
     x: EpicsMotor = Component(EpicsMotor, "X")
     y: EpicsMotor = Component(EpicsMotor, "Y")
     z: EpicsMotorWithMRES = Component(EpicsMotorWithMRES, "Z")
+
+
+class Flux(EpicsSignalRO):
+    flux_reading: EpicsSignalRO = Component(EpicsSignalRO, "-MO-MAPT-01:Y:FLUX")
