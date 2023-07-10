@@ -28,20 +28,25 @@ def fake_xspress3mini():
     return fake_xspress3mini
 
 
-def test_arm_success_on_busy_state(fake_xspress3mini):
-    fake_xspress3mini.detector_state.sim_put(DetectorState.IDLE.value)
-    status = fake_xspress3mini.arm()
-    assert status.done is False
+@pytest.fixture
+def status_finished() -> MagicMock:
+    return MagicMock()
+
+
+def test_arm_success_on_busy_state(fake_xspress3mini, status_finished: MagicMock):
     fake_xspress3mini.detector_state.sim_put(DetectorState.ACQUIRE.value)
+    status = fake_xspress3mini.arm()
+    status.add_callback(status_finished)
+    status_finished.assert_not_called()
+    fake_xspress3mini.acquire_rbv.sim_put(0)
     status.wait(timeout=1)
-    fake_xspress3mini.acquire_status.wait(timeout=1)
 
 
 def test_stage_in_busy_state(fake_xspress3mini):
     fake_xspress3mini.detector_state.sim_put(DetectorState.ACQUIRE.value)
+    fake_xspress3mini.acquire_rbv.sim_put(0)
     RE = RunEngine()
     RE(bps.stage(fake_xspress3mini))
-    fake_xspress3mini.acquire_status.wait(timeout=1)
 
 
 def test_stage_fails_in_failed_acquire_state(fake_xspress3mini):
@@ -49,6 +54,5 @@ def test_stage_fails_in_failed_acquire_state(fake_xspress3mini):
     bad_status.set_exception(Exception)
     RE = RunEngine()
     fake_xspress3mini.do_start = MagicMock(return_value=get_good_status())
-    fake_xspress3mini.acquire_status = get_bad_status()
     with pytest.raises(Exception):
         RE(bps.stage(fake_xspress3mini))
