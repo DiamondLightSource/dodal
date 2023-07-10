@@ -83,7 +83,6 @@ class Xspress3Mini(Device):
         EpicsSignalRO, "DetectorState_RBV", string=True
     )
     NUMBER_ROIS_DEFAULT = 6
-    acquire_status: Status = None
     dt_corrected_latest_mca: EpicsSignalRO = Component(EpicsSignalRO, "ARR1:ArrayData")
     set_num_images: EpicsSignal = Component(EpicsSignal, "NumImages")
 
@@ -105,7 +104,6 @@ class Xspress3Mini(Device):
     def arm(self) -> Status:
         LOGGER.info("Arming Xspress3Mini detector...")
         self.trigger_mode_mini.put(TriggerMode.BURST.value)
-        # self.do_start().wait(timeout=10)
         arm_status = await_value_in_list(self.detector_state, self.detector_busy_states)
         arm_status &= self.do_start()
         arm_status.wait(1)
