@@ -64,6 +64,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/adsim-fixes/"
   },
   {
+    "version": "artemis-632-get-flux-from-pv",
+    "url": "https://DiamondLightSource.github.io/dodal/artemis-632-get-flux-from-pv/"
+  },
+  {
     "version": "artemis598_params_changes",
     "url": "https://DiamondLightSource.github.io/dodal/artemis598_params_changes/"
   },
