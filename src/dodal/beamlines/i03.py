@@ -10,6 +10,7 @@ from dodal.devices.detector import DetectorParams
 from dodal.devices.detector_motion import DetectorMotion
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import FastGridScan
+from dodal.devices.flux import Flux
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.s4_slit_gaps import S4SlitGaps
 from dodal.devices.sample_shutter import SampleShutter
@@ -255,16 +256,15 @@ def attenuator(
     )
 
 
-def sample_shutter(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> SampleShutter:
-    """Get the i03 sample shutter device, instantiate it if it hasn't already been.
+@skip_device(lambda: BL == "s03")
+def flux(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> Flux:
+    """Get the i03 synchrotron device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return device_instantiation(
-        SampleShutter,
-        "sample_shutter",
-        "-EA-SHTR-01:",
+        Flux,
+        "flux",
+        "",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
