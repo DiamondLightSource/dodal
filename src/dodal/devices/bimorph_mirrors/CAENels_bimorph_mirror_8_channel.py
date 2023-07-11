@@ -2,9 +2,11 @@ from enum import Enum
 
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
 
+
 class OnOff(Enum):
     ON = "ON",
     OFF = "OFF"
+
 
 class OperationMode(Enum):
     HI = "HI",
