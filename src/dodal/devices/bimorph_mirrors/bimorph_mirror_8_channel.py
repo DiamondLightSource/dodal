@@ -6,6 +6,7 @@ class BimorphMirror8Channel(Device):
     all_volt: EpicsSignal = Component(EpicsSignal, "ALLVOLT")
     # Basically just the number of channels:
     channels: EpicsSignalRO = Component(EpicsSignalRO, "CHANNELS")
+    status: EpicsSignalRO = Component(EpicsSignalRO, "STATUS")
 
     channel_1_voltage_target: EpicsSignal = Component(EpicsSignal, "C1:VTRGT")
     channel_2_voltage_target: EpicsSignal = Component(EpicsSignal, "C2:VTRGT")
