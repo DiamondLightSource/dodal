@@ -15,6 +15,17 @@ class OperationMode(Enum):
 
 
 class CAENelsBimorphMirror8Channel(Device):
+    """
+    Class representing a CAENels 8-Channel Bimorph Mirror.
+
+    Not implemented:
+        TARGETLISTCMD.PROC
+        HYSTERESISLISTCMD.PROC
+        TARGETWIPE.PROC
+        HYSTERESISWIPE.PROC
+        TARGETLIST (Component?)
+        HYSTERESISLIST (Component?)
+    """
     # Uses OnOff Enum:
     on_off: EpicsSignal = Component(EpicsSignal, "ONOFF")
     all_target_proc: EpicsSignal = Component(EpicsSignal, "ALLTRGT.PROC")
