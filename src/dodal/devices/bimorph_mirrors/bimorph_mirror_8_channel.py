@@ -1,56 +1,42 @@
-from ophyd import (
-    Component,
-    Device,
-    EpicsSignal,
-    EpicsSignalRO
-)
+from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
 
 
 class BimorphMirror8Channel(Device):
-    
-    channel_1_voltage_target: EpicsSignal = Component(EpicsSignal,
-                                                      "C1:VTRGT")
-    channel_2_voltage_target: EpicsSignal = Component(EpicsSignal,
-                                                      "C2:VTRGT")
-    channel_3_voltage_target: EpicsSignal = Component(EpicsSignal,
-                                                      "C3:VTRGT")
-    channel_4_voltage_target: EpicsSignal = Component(EpicsSignal,
-                                                      "C4:VTRGT")
-    channel_5_voltage_target: EpicsSignal = Component(EpicsSignal,
-                                                      "C5:VTRGT")
-    channel_6_voltage_target: EpicsSignal = Component(EpicsSignal,
-                                                      "C6:VTRGT")
-    channel_7_voltage_target: EpicsSignal = Component(EpicsSignal,
-                                                      "C7:VTRGT")
-    channel_8_voltage_target: EpicsSignal = Component(EpicsSignal,
-                                                      "C8:VTRGT")
+    channel_1_voltage_target: EpicsSignal = Component(EpicsSignal, "C1:VTRGT")
+    channel_2_voltage_target: EpicsSignal = Component(EpicsSignal, "C2:VTRGT")
+    channel_3_voltage_target: EpicsSignal = Component(EpicsSignal, "C3:VTRGT")
+    channel_4_voltage_target: EpicsSignal = Component(EpicsSignal, "C4:VTRGT")
+    channel_5_voltage_target: EpicsSignal = Component(EpicsSignal, "C5:VTRGT")
+    channel_6_voltage_target: EpicsSignal = Component(EpicsSignal, "C6:VTRGT")
+    channel_7_voltage_target: EpicsSignal = Component(EpicsSignal, "C7:VTRGT")
+    channel_8_voltage_target: EpicsSignal = Component(EpicsSignal, "C8:VTRGT")
 
     channel_1_voltage_target_readback_value: EpicsSignalRO = Component(
-        EpicsSignalRO,
-        "C1:VTRGT_RBV")
+        EpicsSignalRO, "C1:VTRGT_RBV"
+    )
     channel_2_voltage_target_readback_value: EpicsSignalRO = Component(
-        EpicsSignalRO,
-        "C2:VTRGT_RBV")                                                                
+        EpicsSignalRO, "C2:VTRGT_RBV"
+    )
     channel_3_voltage_target_readback_value: EpicsSignalRO = Component(
-        EpicsSignalRO,
-        "C3:VTRGT_RBV")
+        EpicsSignalRO, "C3:VTRGT_RBV"
+    )
     channel_4_voltage_target_readback_value: EpicsSignalRO = Component(
-        EpicsSignalRO,
-        "C4:VTRGT_RBV")
+        EpicsSignalRO, "C4:VTRGT_RBV"
+    )
     channel_5_voltage_target_readback_value: EpicsSignalRO = Component(
-        EpicsSignalRO,
-        "C5:VTRGT_RBV")
+        EpicsSignalRO, "C5:VTRGT_RBV"
+    )
     channel_6_voltage_target_readback_value: EpicsSignalRO = Component(
-        EpicsSignalRO,
-        "C6:VTRGT_RBV")
+        EpicsSignalRO, "C6:VTRGT_RBV"
+    )
     channel_7_voltage_target_readback_value: EpicsSignalRO = Component(
-        EpicsSignalRO,
-        "C7:VTRGT_RBV")
+        EpicsSignalRO, "C7:VTRGT_RBV"
+    )
     channel_8_voltage_target_readback_value: EpicsSignalRO = Component(
-        EpicsSignalRO,
-        "C8:VTRGT_RBV")
-                                                       
-    channel_1_shift: EpicsSignal = Component(EpicsSignal, "C1:SHIFT")    
+        EpicsSignalRO, "C8:VTRGT_RBV"
+    )
+
+    channel_1_shift: EpicsSignal = Component(EpicsSignal, "C1:SHIFT")
     channel_2_shift: EpicsSignal = Component(EpicsSignal, "C2:SHIFT")
     channel_3_shift: EpicsSignal = Component(EpicsSignal, "C3:SHIFT")
     channel_4_shift: EpicsSignal = Component(EpicsSignal, "C4:SHIFT")
@@ -69,35 +55,35 @@ class BimorphMirror8Channel(Device):
     channel_8_voltage_out: EpicsSignal = Component(EpicsSignal, "C8:VOUT")
 
     channel_1_voltage_out_readback_value: EpicsSignalRO = Component(
-        EpicsSignalRO,
-        "C1:VOUT_RBV")
+        EpicsSignalRO, "C1:VOUT_RBV"
+    )
     channel_2_voltage_out_readback_value: EpicsSignalRO = Component(
-        EpicsSignalRO,
-        "C2:VOUT_RBV")
+        EpicsSignalRO, "C2:VOUT_RBV"
+    )
     channel_3_voltage_out_readback_value: EpicsSignalRO = Component(
-        EpicsSignalRO,
-        "C3:VOUT_RBV")
+        EpicsSignalRO, "C3:VOUT_RBV"
+    )
     channel_4_voltage_out_readback_value: EpicsSignalRO = Component(
-        EpicsSignalRO,
-        "C4:VOUT_RBV")
+        EpicsSignalRO, "C4:VOUT_RBV"
+    )
     channel_5_voltage_out_readback_value: EpicsSignalRO = Component(
-        EpicsSignalRO,
-        "C5:VOUT_RBV")
+        EpicsSignalRO, "C5:VOUT_RBV"
+    )
     channel_6_voltage_out_readback_value: EpicsSignalRO = Component(
-        EpicsSignalRO,
-        "C6:VOUT_RBV")
+        EpicsSignalRO, "C6:VOUT_RBV"
+    )
     channel_7_voltage_out_readback_value: EpicsSignalRO = Component(
-        EpicsSignalRO,
-        "C7:VOUT_RBV")
+        EpicsSignalRO, "C7:VOUT_RBV"
+    )
     channel_8_voltage_out_readback_value: EpicsSignalRO = Component(
-        EpicsSignalRO,
-        "C8:VOUT_RBV")
+        EpicsSignalRO, "C8:VOUT_RBV"
+    )
 
-    channel_1_status: EpicsSignal = Component(EpicsSignal, "C1:STATUS")
-    channel_2_status: EpicsSignal = Component(EpicsSignal, "C2:STATUS")
-    channel_3_status: EpicsSignal = Component(EpicsSignal, "C3:STATUS")
-    channel_4_status: EpicsSignal = Component(EpicsSignal, "C4:STATUS")
-    channel_5_status: EpicsSignal = Component(EpicsSignal, "C5:STATUS")
-    channel_6_status: EpicsSignal = Component(EpicsSignal, "C6:STATUS")
-    channel_7_status: EpicsSignal = Component(EpicsSignal, "C7:STATUS")
-    channel_8_status: EpicsSignal = Component(EpicsSignal, "C8:STATUS")
+    channel_1_status: EpicsSignalRO = Component(EpicsSignalRO, "C1:STATUS")
+    channel_2_status: EpicsSignalRO = Component(EpicsSignalRO, "C2:STATUS")
+    channel_3_status: EpicsSignalRO = Component(EpicsSignalRO, "C3:STATUS")
+    channel_4_status: EpicsSignalRO = Component(EpicsSignalRO, "C4:STATUS")
+    channel_5_status: EpicsSignalRO = Component(EpicsSignalRO, "C5:STATUS")
+    channel_6_status: EpicsSignalRO = Component(EpicsSignalRO, "C6:STATUS")
+    channel_7_status: EpicsSignalRO = Component(EpicsSignalRO, "C7:STATUS")
+    channel_8_status: EpicsSignalRO = Component(EpicsSignalRO, "C8:STATUS")
