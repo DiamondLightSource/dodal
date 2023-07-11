@@ -2,6 +2,8 @@ from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
 
 
 class BimorphMirror8Channel(Device):
+    all_shift: EpicsSignal = Component(EpicsSignal, "ALLSHIFT")
+
     channel_1_voltage_target: EpicsSignal = Component(EpicsSignal, "C1:VTRGT")
     channel_2_voltage_target: EpicsSignal = Component(EpicsSignal, "C2:VTRGT")
     channel_3_voltage_target: EpicsSignal = Component(EpicsSignal, "C3:VTRGT")
