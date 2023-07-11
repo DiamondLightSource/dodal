@@ -2,6 +2,9 @@ from enum import Enum
 
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
 
+class OnOff(Enum):
+    ON = "ON",
+    OFF = "OFF"
 
 class OperationMode(Enum):
     HI = "HI",
@@ -10,6 +13,8 @@ class OperationMode(Enum):
 
 
 class BimorphMirror8Channel(Device):
+    # Uses OnOff Enum:
+    on_off: EpicsSignal = Component(EpicsSignal, "ONOFF")
     all_target_proc: EpicsSignal = Component(EpicsSignal, "ALLTRGT.PROC")
     # Uses OperationMode Enum:
     operation_mode: EpicsSignal = Component(EpicsSignal, "OPMODE")
