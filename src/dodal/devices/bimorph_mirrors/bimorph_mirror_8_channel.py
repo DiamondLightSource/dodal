@@ -4,6 +4,9 @@ from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
 class BimorphMirror8Channel(Device):
     all_shift: EpicsSignal = Component(EpicsSignal, "ALLSHIFT")
     all_volt: EpicsSignal = Component(EpicsSignal, "ALLVOLT")
+    operation_mode_readback_value: EpicsSignalRO = Component(
+        EpicsSignalRO, "OPMODE_RBV"
+    )
     # Basically just the number of channels:
     channels: EpicsSignalRO = Component(EpicsSignalRO, "CHANNELS")
     status: EpicsSignalRO = Component(EpicsSignalRO, "STATUS")
