@@ -10,6 +10,8 @@ class BimorphMirror8Channel(Device):
     # Basically just the number of channels:
     channels: EpicsSignalRO = Component(EpicsSignalRO, "CHANNELS")
     status: EpicsSignalRO = Component(EpicsSignalRO, "STATUS")
+    # PV suffix ERR, might be confusing:
+    alarm_status: EpicsSignalRO = Component(EpicsSignalRO, "ERR")
 
     channel_1_voltage_target: EpicsSignal = Component(EpicsSignal, "C1:VTRGT")
     channel_2_voltage_target: EpicsSignal = Component(EpicsSignal, "C2:VTRGT")
