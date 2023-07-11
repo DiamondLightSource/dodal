@@ -12,7 +12,9 @@ class BimorphMirror8Channel(Device):
     channels: EpicsSignalRO = Component(EpicsSignalRO, "CHANNELS")
     status: EpicsSignalRO = Component(EpicsSignalRO, "STATUS")
     board_temperature: EpicsSignalRO = Component(EpicsSignalRO, "TEMPS")
-    # PV suffix ERR, might be confusing. Errors come through ..:BUSY kinda:
+    # PV suffix RESETERR.PROC, ERR, might be confusing. Errors come through
+    # ..:BUSY kinda:
+    reset_alarms: EpicsSignal = Component(EpicsSignal, "RESETERR.PROC")
     alarm_status: EpicsSignalRO = Component(EpicsSignalRO, "ERR")
 
     channel_1_voltage_target: EpicsSignal = Component(EpicsSignal, "C1:VTRGT")
