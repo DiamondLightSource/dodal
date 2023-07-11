@@ -1,3 +1,5 @@
+from enum import Enum
+
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
 
 
