@@ -3,8 +3,16 @@ from enum import Enum
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
 
 
+class OperationMode(Enum):
+    HI = "HI",
+    NORMAL = "NORMAL",
+    FAST = "FAST"
+
+
 class BimorphMirror8Channel(Device):
     all_target_proc: EpicsSignal = Component(EpicsSignal, "ALLTRGT.PROC")
+    # Uses OperationMode Enum:
+    operation_mode: EpicsSignal = Component(EpicsSignal, "OPMODE")
     all_shift: EpicsSignal = Component(EpicsSignal, "ALLSHIFT")
     all_volt: EpicsSignal = Component(EpicsSignal, "ALLVOLT")
     operation_mode_readback_value: EpicsSignalRO = Component(
