@@ -1,4 +1,4 @@
-from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
+from ophyd import Component, Device, EpicsSignalRO
 
 
 class CAENelsBimorphMirrorController(Device):
