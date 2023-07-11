@@ -2,6 +2,7 @@ from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
 
 
 class BimorphMirror8Channel(Device):
+    all_target_proc: EpicsSignal = Component(EpicsSignal, "ALLTRGT.PROC")
     all_shift: EpicsSignal = Component(EpicsSignal, "ALLSHIFT")
     all_volt: EpicsSignal = Component(EpicsSignal, "ALLVOLT")
     operation_mode_readback_value: EpicsSignalRO = Component(
