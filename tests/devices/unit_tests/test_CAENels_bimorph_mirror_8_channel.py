@@ -105,7 +105,7 @@ def test_basic_read_write():
     bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
     bimorph.wait_for_connection()
 
-    # test OnOff:
+    # test ONOFF:
     bimorph.on_off.set(OnOff.OFF).wait()
     res = bimorph.on_off.read()
     assert pbcv("on_off", res) == OnOff.OFF
