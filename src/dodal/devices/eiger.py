@@ -91,13 +91,13 @@ class EigerDetector(Device):
 
     def wait_on_arming_if_started(self):
         if not self.arming_status.done:
-            # Arming has started so wait for it to finish
+            LOGGER.info("Waiting for arming to finish")
             self.arming_status.wait(60)
 
     def stage(self):
         self.wait_on_arming_if_started()
         if not self.is_armed():
-            # Arming hasn't started, do it asynchronously
+            LOGGER.info("Eiger not armed, arming")
             self.async_stage().wait(timeout=self.GENERAL_STATUS_TIMEOUT)
 
     def stop_odin_when_all_frames_collected(self):
