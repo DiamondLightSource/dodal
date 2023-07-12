@@ -88,6 +88,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/jungfrau_commissioning/"
   },
   {
+    "version": "p38",
+    "url": "https://DiamondLightSource.github.io/dodal/p38/"
+  },
+  {
     "version": "p45AndAdsim",
     "url": "https://DiamondLightSource.github.io/dodal/p45AndAdsim/"
   },
