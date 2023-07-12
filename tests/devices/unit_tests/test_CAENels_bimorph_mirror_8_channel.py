@@ -90,36 +90,28 @@ def get_channels(bimorph8, channel_type):
         ]
 
 
-def parse_component_value(device_name, component_name, res):
-    """
-    Parses ophyd Component.read output
-    """
-    return res[device_name+'_'+component_name]['value']
-
-
-from functools import partial
-pbcv = partial(parse_component_value, "bimorph")
+def parsed_read(device):
+    res = device.read()
+    return res[device.name]['value']
 
 
 def test_basic_read_write():
     bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
     bimorph.wait_for_connection()
 
-    # test ONOFF:
+    # test ONOFF (make sure to leave on...):
     bimorph.on_off.set(OnOff.OFF).wait()
-    res = bimorph.on_off.read()
-    assert pbcv("on_off", res) == OnOff.OFF
+    assert parsed_read(bimorph.on_off) == OnOff.OFF
     bimorph.on_off.set(OnOff.ON).wait()
-    res = bimorph.on_off.read()
-    assert pbcv('on_off', res) == OnOff.ON
+    assert parsed_read(bimorph.on_off) == OnOff.ON
 
     # test OPMODE:
+    bimorph.on_off.set(OnOff.ON).wait()
+
     bimorph.operation_mode.set(OperationMode.HI).wait()
-    res = bimorph.operation_mode.read()
-    assert pbcv("operation_mode", res) == OperationMode.HI
+    assert parsed_read(bimorph.operation_mode) == OperationMode.HI
     bimorph.operation_mode.set(OperationMode.NORMAL).wait()
-    res = bimorph.operation_mode.read()
-    assert pbcv("operation_mode", res) == OperationMode.NORMAL
+    assert parsed_read(bimorph.operation_mode) == OperationMode.NORMAL
     bimorph.operation_mode.set(OperationMode.FAST).wait()
-    res = bimorph.operation_mode.read()
-    assert pbcv("operation_mode", res) == OperationMode.FAST
+    assert parsed_read(bimorph.operation_mode) == OperationMode.FAST
+
