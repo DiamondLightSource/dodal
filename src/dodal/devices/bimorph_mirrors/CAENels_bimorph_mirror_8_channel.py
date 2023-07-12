@@ -1,17 +1,17 @@
-from enum import Enum
+from enum import IntEnum
 
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
 
 
-class OnOff(Enum):
-    ON = "ON",
-    OFF = "OFF"
+class OnOff(IntEnum):
+    ON = 1,
+    OFF = 0
 
 
-class OperationMode(Enum):
-    HI = "HI",
-    NORMAL = "NORMAL",
-    FAST = "FAST"
+class OperationMode(IntEnum):
+    HI = 0,
+    NORMAL = 1,
+    FAST = 2
 
 
 class CAENelsBimorphMirror8Channel(Device):
