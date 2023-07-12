@@ -258,7 +258,7 @@ def attenuator(
 
 @skip_device(lambda: BL == "s03")
 def flux(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> Flux:
-    """Get the i03 synchrotron device, instantiate it if it hasn't already been.
+    """Get the i03 flux device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return device_instantiation(
