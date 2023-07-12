@@ -263,7 +263,7 @@ def flux(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) ->
     return device_instantiation(
         Flux,
         "flux",
-        "",
+        "-MO-MAPT-01:Y:",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
