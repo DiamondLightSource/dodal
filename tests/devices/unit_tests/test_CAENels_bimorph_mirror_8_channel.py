@@ -88,11 +88,74 @@ def get_channels(bimorph8, channel_type):
             bimorph8.channel_7_status,
             bimorph8.channel_8_status
         ]
+def wait_till_idle(wait_signal):
+    """
+    Waits for wait_signal to be Idle.
+
+    Interprets wait_signal as
+        0: Idle
+        1: Busy
+        2: Error
+    """
+    import time
+    while wait_signal.read()[wait_signal.name]['value'] !=0:
+        print("waiting till idle...")
+        time.sleep(0.1)
+
+def wait_till_busy(wait_signal):
+    """
+    Waits for wait_signal to be Busy.
+    
+    This is because EPICS is slow enough that we need to wait for things to show as busy
+    to be able to then wait for them to be Idle.
+
+    Interprets wait_signal as
+        0: Idle
+        1: Busy
+        2: Error
+    """
+    import time
+    while wait_signal.read()[wait_signal.name]['value'] !=1:
+        print("waiting till busy...")
+        time.sleep(0.1)
 
 
-def parsed_read(device):
-    res = device.read()
+
+def protected_read(wait_signal, device):
+    """
+    Reads from device, but safely...
+    """
+    wait_till_idle(wait_signal)
+    return device.read()
+
+def parsed_read(wait_signal, device):
+    """
+    Writes to device, but safely...
+    """
+    res = protected_read(wait_signal, device)
     return res[device.name]['value']
+
+def protected_set(wait_signal, component, value):
+    """
+    Parses dict from Device.read to get value
+    """
+    print(f"Write {value} to {component}")
+    wait_till_idle(wait_signal)
+    component.set(value).wait()
+    wait_till_busy(wait_signal)
+
+
+from functools import partial
+from ophyd import Component, Device, EpicsSignal
+
+# Stupid ugly class to get the "Device Busy" signal from the bimorph controller
+# Workaround because the architecture for this is weird and hard to implement
+# in a unit test:
+class BusySignalGetter(Device):
+    device_busy: EpicsSignal = Component(EpicsSignal, "BUSY")
+busy_signal = BusySignalGetter(name="busy_signal", prefix="BL02J-EA-IOC-97:")
+parsed_read = partial(parsed_read, busy_signal.device_busy)
+protected_set = partial(protected_set, busy_signal.device_busy)
 
 
 def test_on_off_read_write():
@@ -100,9 +163,9 @@ def test_on_off_read_write():
     bimorph.wait_for_connection()
 
     # test ONOFF (make sure to leave on...):
-    bimorph.on_off.set(OnOff.OFF).wait()
+    protected_set(bimorph.on_off, OnOff.OFF)
     assert parsed_read(bimorph.on_off) == OnOff.OFF
-    bimorph.on_off.set(OnOff.ON).wait()
+    protected_set(bimorph.on_off, OnOff.ON)
     assert parsed_read(bimorph.on_off) == OnOff.ON
 
 def test_operation_mode_read_write():
@@ -110,13 +173,13 @@ def test_operation_mode_read_write():
     bimorph.wait_for_connection()
 
     # test OPMODE:
-    bimorph.on_off.set(OnOff.ON).wait()
+    protected_set(bimorph.on_off, OnOff.ON)
 
-    bimorph.operation_mode.set(OperationMode.HI).wait()
+    protected_set(bimorph.operation_mode, OperationMode.HI)
     assert parsed_read(bimorph.operation_mode) == OperationMode.HI
-    bimorph.operation_mode.set(OperationMode.NORMAL).wait()
+    protected_set(bimorph.operation_mode, OperationMode.NORMAL)
     assert parsed_read(bimorph.operation_mode) == OperationMode.NORMAL
-    bimorph.operation_mode.set(OperationMode.FAST).wait()
+    protected_set(bimorph.operation_mode, OperationMode.FAST)
     assert parsed_read(bimorph.operation_mode) == OperationMode.FAST
 
 def test_all_shift():
@@ -124,7 +187,8 @@ def test_all_shift():
     bimorph.wait_for_connection()
 
     # test ALLSHIFT:
-    test_shift = 20
+    import random
+    test_shift = random.randint(1,30) 
 
     def get_voltages(bimorph):
         current_voltages = []
@@ -134,9 +198,8 @@ def test_all_shift():
         return current_voltages
 
     current_voltages = get_voltages(bimorph)
-    bimorph.all_shift.set(test_shift).wait()
+    protected_set(bimorph.all_shift, test_shift)
     assert parsed_read(bimorph.all_shift) == test_shift 
-
     new_voltages = get_voltages(bimorph)
     assert all([voltpair[1] == voltpair[0]+test_shift for
                 voltpair in zip(current_voltages, new_voltages)])
