@@ -176,11 +176,11 @@ def test_operation_mode_read_write():
 
     # test OPMODE:
     protected_set(bimorph.operation_mode, OperationMode.HI)
-    assert parsed_read(bimorph.operation_mode) == OperationMode.HI
+    assert parsed_read(bimorph.operation_mode_readback_value) == OperationMode.HI
     protected_set(bimorph.operation_mode, OperationMode.NORMAL)
-    assert parsed_read(bimorph.operation_mode) == OperationMode.NORMAL
+    assert parsed_read(bimorph.operation_mode_readback_value) == OperationMode.NORMAL
     protected_set(bimorph.operation_mode, OperationMode.FAST)
-    assert parsed_read(bimorph.operation_mode) == OperationMode.FAST
+    assert parsed_read(bimorph.operation_mode_readback_value) == OperationMode.FAST
 
 def test_all_shift():
     bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
