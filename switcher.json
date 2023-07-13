@@ -84,6 +84,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/artemis_779_test_fluo/"
   },
   {
+    "version": "artemis_798_fix_oav_parameter_lookup",
+    "url": "https://DiamondLightSource.github.io/dodal/artemis_798_fix_oav_parameter_lookup/"
+  },
+  {
     "version": "jungfrau_commissioning",
     "url": "https://DiamondLightSource.github.io/dodal/jungfrau_commissioning/"
   },
