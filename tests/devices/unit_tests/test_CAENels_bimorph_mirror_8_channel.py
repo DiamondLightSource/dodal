@@ -158,6 +158,10 @@ parsed_read = partial(parsed_read, busy_signal.device_busy)
 protected_set = partial(protected_set, busy_signal.device_busy)
 
 
+# ACTUAL TEST CASES:
+
+
+
 def test_on_off_read_write():
     bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
     bimorph.wait_for_connection()
