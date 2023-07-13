@@ -97,37 +97,25 @@ def get_voltages(bimorph):
     return current_voltages
 
 
-def wait_till_idle(wait_signal):
-    """
-    Waits for wait_signal to be Idle.
-
-    Interprets wait_signal as
-        0: Idle
-        1: Busy
-        2: Error
-    """
+def wait_for_signal(signal, value, timeout=10.0, sleep_time=0.1, signal_range = None, wait_message = None):
     import time
-    while wait_signal.read()[wait_signal.name]['value'] !=0:
-        print("waiting till idle...")
-        time.sleep(0.1)
+    stamp=time.time()
+    res = signal.read()[signal.name]['value']
+    while res != value:
+        if wait_message is not None:
+            print(wait_message)
+        res = signal.read()[signal.name]['value']
+        if signal_range is not None:
+            if res not in signal_range:
+                raise Exception(f"Out of range: {signal} showing {res} out or range {signal_range}")
+        if time.time() - stamp > timeout:
+            raise Exception(f"Timeout: waiting for {signal} to show {value}")
+        time.sleep(sleep_time)
 
-def wait_till_busy(wait_signal):
-    """
-    Waits for wait_signal to be Busy.
-    
-    This is because EPICS is slow enough that we need to wait for things to show as busy
-    to be able to then wait for them to be Idle.
 
-    Interprets wait_signal as
-        0: Idle
-        1: Busy
-        2: Error
-    """
-    import time
-    while wait_signal.read()[wait_signal.name]['value'] !=1:
-        print("waiting till busy...")
-        time.sleep(0.1)
-
+from functools import partial
+wait_till_idle = partial(wait_for_signal, value=0, signal_range={0,1}, wait_message = "Waiting till idle...")
+wait_till_busy = partial(wait_for_signal, value=1, signal_range={0,1}, wait_message = "Waiting till busy...")
 
 
 def protected_read(wait_signal, device):
@@ -150,6 +138,7 @@ def protected_set(wait_signal, component, value):
     """
     print(f"Write {value} to {component}")
     wait_till_idle(wait_signal)
+    print(f"Written {value} to {component}")
     component.set(value).wait()
     wait_till_busy(wait_signal)
 
@@ -186,8 +175,6 @@ def test_operation_mode_read_write():
     bimorph.wait_for_connection()
 
     # test OPMODE:
-    protected_set(bimorph.on_off, OnOff.ON)
-
     protected_set(bimorph.operation_mode, OperationMode.HI)
     assert parsed_read(bimorph.operation_mode) == OperationMode.HI
     protected_set(bimorph.operation_mode, OperationMode.NORMAL)
@@ -209,3 +196,4 @@ def test_all_shift():
     new_voltages = get_voltages(bimorph)
     assert all([voltpair[1] == voltpair[0]+test_shift for
                 voltpair in zip(current_voltages, new_voltages)])
+
