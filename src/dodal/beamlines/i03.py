@@ -257,7 +257,10 @@ def attenuator(
 
 def sample_shutter(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Attenuator:
+) -> SampleShutter:
+    """Get the i03 sample shutter device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
     return device_instantiation(
         SampleShutter,
         "sample_shutter",

@@ -65,6 +65,8 @@ class Xspress3Mini(Device):
         def set(self, value, *, timeout=None, settle_time=None, **kwargs):
             return self.parent.arm()
 
+    ARM_STATUS_WAIT = 1
+
     do_arm: ArmingSignal = Component(ArmingSignal)
 
     # Assume only one channel for now
@@ -72,8 +74,7 @@ class Xspress3Mini(Device):
 
     erase: EpicsSignal = Component(EpicsSignal, "ERASE", string=True)
     get_max_num_channels = Component(EpicsSignalRO, "MAX_NUM_CHANNELS_RBV")
-    acquire: EpicsSignal = Component(EpicsSignal, "Acquire")
-    acquire_rbv: EpicsSignalRO = Component(EpicsSignal, "Acquire_RBV")
+    acquire: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "Acquire")
     get_roi_calc_mini: EpicsSignal = Component(EpicsSignal, "MCA1:Enable_RBV")
     trigger_mode_mini: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "TriggerMode")
     roi_start_x: EpicsSignal = Component(EpicsSignal, "ROISUM1:MinX")
@@ -82,7 +83,6 @@ class Xspress3Mini(Device):
     detector_state: EpicsSignalRO = Component(
         EpicsSignalRO, "DetectorState_RBV", string=True
     )
-    NUMBER_ROIS_DEFAULT = 6
     dt_corrected_latest_mca: EpicsSignalRO = Component(EpicsSignalRO, "ARR1:ArrayData")
     set_num_images: EpicsSignal = Component(EpicsSignal, "NumImages")
 
@@ -95,16 +95,11 @@ class Xspress3Mini(Device):
     def stage(self):
         self.arm().wait(timeout=10)
 
-    def do_start(self) -> Status:
-        self.erase.put(EraseState.ERASE.value)
-        # status = self.channel_1.update_arrays.set(AcquireState.DONE.value)
-        # GDA code suggests this put does not callback until collection finished, for now just hold on to it
-        return self.acquire.set(AcquireState.ACQUIRE.value)
-
     def arm(self) -> Status:
         LOGGER.info("Arming Xspress3Mini detector...")
         self.trigger_mode_mini.put(TriggerMode.BURST.value)
         arm_status = await_value_in_list(self.detector_state, self.detector_busy_states)
-        arm_status &= self.do_start()
-        arm_status.wait(1)
-        return await_value(self.acquire_rbv, 0)
+        self.erase.put(EraseState.ERASE.value)
+        arm_status &= self.acquire.set(AcquireState.ACQUIRE.value)
+        arm_status.wait(self.ARM_STATUS_WAIT)
+        return await_value(self.acquire, 0)
