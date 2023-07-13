@@ -197,3 +197,14 @@ def test_all_shift():
     assert all([voltpair[1] == voltpair[0]+test_shift for
                 voltpair in zip(current_voltages, new_voltages)])
 
+def test_all_volt():
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph.wait_for_connection()
+
+    # test ALLVOLT:
+    import random
+    for i in range(3): 
+        # do it a few times in case the random number was the preexisting voltages:
+        test_all_volt_value = random.randint(1,30)
+        protected_set(bimorph.all_volt, test_all_volt_value)
+        assert all([voltage == test_all_volt_value for voltage in get_voltages(bimorph)])
