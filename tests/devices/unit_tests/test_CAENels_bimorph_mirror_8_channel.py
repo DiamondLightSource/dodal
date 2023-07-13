@@ -88,6 +88,15 @@ def get_channels(bimorph8, channel_type):
             bimorph8.channel_7_status,
             bimorph8.channel_8_status
         ]
+    
+def get_voltages(bimorph):
+    current_voltages = []
+    for channel in get_channels(bimorph, ChannelTypes.VOUT_RBV):
+        voltage = parsed_read(channel)
+        current_voltages.append(voltage)
+    return current_voltages
+
+
 def wait_till_idle(wait_signal):
     """
     Waits for wait_signal to be Idle.
@@ -193,13 +202,6 @@ def test_all_shift():
     # test ALLSHIFT:
     import random
     test_shift = random.randint(1,30) 
-
-    def get_voltages(bimorph):
-        current_voltages = []
-        for channel in get_channels(bimorph, ChannelTypes.VOUT_RBV):
-            voltage = parsed_read(channel)
-            current_voltages.append(voltage)
-        return current_voltages
 
     current_voltages = get_voltages(bimorph)
     protected_set(bimorph.all_shift, test_shift)
