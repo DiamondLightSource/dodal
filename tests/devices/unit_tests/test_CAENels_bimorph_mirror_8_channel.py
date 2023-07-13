@@ -95,7 +95,7 @@ def parsed_read(device):
     return res[device.name]['value']
 
 
-def test_basic_read_write():
+def test_on_off_read_write():
     bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
     bimorph.wait_for_connection()
 
@@ -104,6 +104,10 @@ def test_basic_read_write():
     assert parsed_read(bimorph.on_off) == OnOff.OFF
     bimorph.on_off.set(OnOff.ON).wait()
     assert parsed_read(bimorph.on_off) == OnOff.ON
+
+def test_operation_mode_read_write():
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph.wait_for_connection()
 
     # test OPMODE:
     bimorph.on_off.set(OnOff.ON).wait()
@@ -114,6 +118,10 @@ def test_basic_read_write():
     assert parsed_read(bimorph.operation_mode) == OperationMode.NORMAL
     bimorph.operation_mode.set(OperationMode.FAST).wait()
     assert parsed_read(bimorph.operation_mode) == OperationMode.FAST
+
+def test_all_shift():
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph.wait_for_connection()
 
     # test ALLSHIFT:
     test_shift = 20
