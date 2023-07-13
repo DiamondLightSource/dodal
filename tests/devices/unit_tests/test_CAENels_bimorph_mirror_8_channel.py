@@ -115,3 +115,20 @@ def test_basic_read_write():
     bimorph.operation_mode.set(OperationMode.FAST).wait()
     assert parsed_read(bimorph.operation_mode) == OperationMode.FAST
 
+    # test ALLSHIFT:
+    test_shift = 20
+
+    def get_voltages(bimorph):
+        current_voltages = []
+        for channel in get_channels(bimorph, ChannelTypes.VOUT_RBV):
+            voltage = parsed_read(channel)
+            current_voltages.append(voltage)
+        return current_voltages
+
+    current_voltages = get_voltages(bimorph)
+    bimorph.all_shift.set(test_shift).wait()
+    assert parsed_read(bimorph.all_shift) == test_shift 
+
+    new_voltages = get_voltages(bimorph)
+    assert all([voltpair[1] == voltpair[0]+test_shift for
+                voltpair in zip(current_voltages, new_voltages)])
