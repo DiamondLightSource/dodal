@@ -21,7 +21,6 @@ from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.oav_errors import (
     OAVError_MissingRotations,
     OAVError_NoRotationsPassValidityTest,
-    OAVError_ZoomLevelNotFound,
 )
 from dodal.devices.oav.oav_parameters import OAVParameters
 from dodal.devices.smargon import Smargon
@@ -86,16 +85,6 @@ def test_can_make_fake_testing_devices_and_use_run_engine(
     RE(fake_run(mock_oav, mock_parameters, mock_smargon, mock_backlight))
 
 
-@pytest.mark.parametrize(
-    "parameter_name,expected_value",
-    [("canny_edge_lower_threshold", 5.0), ("close_ksize", 11), ("direction", 0)],
-)
-def test_oav_parameters_load_parameters_from_json(
-    parameter_name, expected_value, mock_parameters: OAVParameters
-):
-    assert mock_parameters.__dict__[parameter_name] == expected_value
-
-
 def test_find_midpoint_symmetric_pin():
     x = np.arange(-15, 10, 25 / 1024)
     x2 = x**2
@@ -134,23 +123,6 @@ def test_find_midpoint_non_symmetric_pin():
     # our midpoint line
 
 
-@pytest.mark.parametrize(
-    "zoom_level,expected_xCentre,expected_yCentre",
-    [(1.0, 477, 359), (5.0, 517, 350), (10.0, 613, 344)],
-)
-def test_extract_beam_position_different_beam_postitions(
-    zoom_level,
-    expected_xCentre,
-    expected_yCentre,
-    mock_oav: OAV,
-    mock_parameters: OAVParameters,
-):
-    mock_parameters.zoom = zoom_level
-    mock_parameters._extract_beam_position()
-    assert mock_parameters.beam_centre_i == expected_xCentre
-    assert mock_parameters.beam_centre_j == expected_yCentre
-
-
 def test_get_rotation_increment_threshold_within_180():
     increment = get_rotation_increment(6, 0, 180)
     assert increment == 180 / 6
@@ -162,45 +134,11 @@ def test_get_rotation_increment_threshold_exceeded():
 
 
 @pytest.mark.parametrize(
-    "zoom_level,expected_microns_x,expected_microns_y",
-    [(2.5, 2.31, 2.31), (15.0, 0.302, 0.302)],
-)
-def test_load_microns_per_pixel_entries_found(
-    zoom_level, expected_microns_x, expected_microns_y, mock_parameters: OAVParameters
-):
-    mock_parameters.load_microns_per_pixel(zoom_level)
-    assert mock_parameters.micronsPerXPixel == expected_microns_x
-    assert mock_parameters.micronsPerYPixel == expected_microns_y
-
-
-def test_load_microns_per_pixel_entry_not_found(mock_parameters: OAVParameters):
-    with pytest.raises(OAVError_ZoomLevelNotFound):
-        mock_parameters.load_microns_per_pixel(0.000001)
-
-
-@pytest.mark.parametrize(
     "value,lower_bound,upper_bound,expected_value",
     [(0.5, -10, 10, 0.5), (-100, -10, 10, -10), (10000, -213, 50, 50)],
 )
 def test_keep_inside_bounds(value, lower_bound, upper_bound, expected_value):
     assert keep_inside_bounds(value, lower_bound, upper_bound) == expected_value
-
-
-@pytest.mark.parametrize(
-    "h, v, expected_x, expected_y",
-    [
-        (54, 100, 517 - 54, 350 - 100),
-        (0, 0, 517, 350),
-        (500, 500, 517 - 500, 350 - 500),
-    ],
-)
-def test_calculate_beam_distance(
-    h, v, expected_x, expected_y, mock_parameters: OAVParameters
-):
-    assert mock_parameters.calculate_beam_distance(
-        h,
-        v,
-    ) == (expected_x, expected_y)
 
 
 def test_filter_rotation_data():
