@@ -18,7 +18,7 @@ class PinTipDetect(Device):
     tip_y: EpicsSignalRO = Component(EpicsSignalRO, "TipY")
 
     triggered_tip: Signal = Component(Signal, kind=Kind.hinted, value=INVALID_POSITION)
-    validity_timeout: Signal = Component(Signal, value=1)
+    validity_timeout: Signal = Component(Signal, value=5)
 
     def update_tip_if_valid(self, value, **_):
         current_value = (value, self.tip_y.get())
