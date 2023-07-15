@@ -84,6 +84,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/artemis_779_test_fluo/"
   },
   {
+    "version": "artemis_788_ensure_eiger_disarmed_on_failed_grid_scan",
+    "url": "https://DiamondLightSource.github.io/dodal/artemis_788_ensure_eiger_disarmed_on_failed_grid_scan/"
+  },
+  {
     "version": "artemis_789_reduce_timeout_errors",
     "url": "https://DiamondLightSource.github.io/dodal/artemis_789_reduce_timeout_errors/"
   },
