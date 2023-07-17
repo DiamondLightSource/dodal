@@ -130,6 +130,14 @@ class EigerDetector(Device):
             self.disable_roi_mode()
         return status_ok
 
+    def stop(self, *args):
+        """Emergency stop the device, mainly used to clean up after error."""
+        self.wait_on_arming_if_started()
+        self.odin.stop()
+        self.odin.file_writer.start_timeout.put(1)
+        self.disarm_detector()
+        self.disable_roi_mode()
+
     def disable_roi_mode(self):
         self.change_roi_mode(False)
 
