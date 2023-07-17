@@ -91,13 +91,13 @@ class EigerDetector(Device):
 
     def wait_on_arming_if_started(self):
         if not self.arming_status.done:
-            # Arming has started so wait for it to finish
+            LOGGER.info("Waiting for arming to finish")
             self.arming_status.wait(60)
 
     def stage(self):
         self.wait_on_arming_if_started()
         if not self.is_armed():
-            # Arming hasn't started, do it asynchronously
+            LOGGER.info("Eiger not armed, arming")
             self.async_stage().wait(timeout=self.GENERAL_STATUS_TIMEOUT)
 
     def stop_odin_when_all_frames_collected(self):
@@ -129,6 +129,14 @@ class EigerDetector(Device):
             status_ok = self.odin.check_odin_state()
             self.disable_roi_mode()
         return status_ok
+
+    def stop(self, *args):
+        """Emergency stop the device, mainly used to clean up after error."""
+        self.wait_on_arming_if_started()
+        self.odin.stop()
+        self.odin.file_writer.start_timeout.put(1)
+        self.disarm_detector()
+        self.disable_roi_mode()
 
     def disable_roi_mode(self):
         self.change_roi_mode(False)

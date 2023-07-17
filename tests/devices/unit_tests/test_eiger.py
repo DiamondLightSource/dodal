@@ -595,3 +595,15 @@ def test_given_detector_arming_status_failed_when_unstage_then_detector_still_di
         fake_eiger.unstage()
 
     assert fake_eiger.cam.acquire.get() == 0
+
+
+def test_given_not_all_frames_done_when_eiger_stopped_then_do_not_wait_for_frames_but_disarm(
+    fake_eiger: EigerDetector,
+):
+    fake_eiger.disarm_detector = MagicMock()
+    fake_eiger.detector_params.trigger_mode = TriggerMode.FREE_RUN
+    fake_eiger.odin.file_writer.num_captured.sim_put(10)
+
+    fake_eiger.stop()
+
+    fake_eiger.disarm_detector.assert_called()
