@@ -89,7 +89,7 @@ def get_channels(bimorph8, channel_type):
             bimorph8.channel_8_status
         ]
     
-def get_voltages(bimorph):
+def get_all_voltage_out_readback_values(bimorph):
     current_voltages = []
     for channel in get_channels(bimorph, ChannelTypes.VOUT_RBV):
         voltage = parsed_read(channel)
@@ -114,8 +114,8 @@ def wait_for_signal(signal, value, timeout=10.0, sleep_time=0.1, signal_range = 
 
 
 from functools import partial
-wait_till_idle = partial(wait_for_signal, value=0, signal_range={0,1}, wait_message = "Waiting till idle...")
-wait_till_busy = partial(wait_for_signal, value=1, signal_range={0,1}, wait_message = "Waiting till busy...")
+wait_till_idle = partial(wait_for_signal, value=0, signal_range={0,1})
+wait_till_busy = partial(wait_for_signal, value=1, signal_range={0,1})
 
 
 def protected_read(wait_signal, device):
@@ -190,10 +190,10 @@ def test_all_shift():
     import random
     test_shift = random.randint(1,30) 
 
-    current_voltages = get_voltages(bimorph)
+    current_voltages = get_all_voltage_out_readback_values(bimorph)
     protected_set(bimorph.all_shift, test_shift)
     assert parsed_read(bimorph.all_shift) == test_shift 
-    new_voltages = get_voltages(bimorph)
+    new_voltages = get_all_voltage_out_readback_values(bimorph)
     assert all([voltpair[1] == voltpair[0]+test_shift for
                 voltpair in zip(current_voltages, new_voltages)])
 
@@ -207,4 +207,4 @@ def test_all_volt():
         # do it a few times in case the random number was the preexisting voltages:
         test_all_volt_value = random.randint(1,30)
         protected_set(bimorph.all_volt, test_all_volt_value)
-        assert all([voltage == test_all_volt_value for voltage in get_voltages(bimorph)])
+        assert all([voltage == test_all_volt_value for voltage in get_all_voltage_out_readback_values(bimorph)])
