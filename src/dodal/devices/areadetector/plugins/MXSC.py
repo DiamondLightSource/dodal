@@ -23,13 +23,13 @@ class PinTipDetect(Device):
     def update_tip_if_valid(self, value, **_):
         current_value = (value, self.tip_y.get())
         if current_value != self.INVALID_POSITION:
-            self.triggered_tip.set(current_value)
+            self.triggered_tip.put(current_value)
             return True
 
     def trigger(self) -> Status:
         subscription_status = SubscriptionStatus(
-            self.tip_x, self.update_tip_if_valid, run=False
-        )  # Do not run on creation as the PV updates often and can cause race conditions
+            self.tip_x, self.update_tip_if_valid, run=True
+        )
 
         def set_to_default_and_finish(timeout_status: Status):
             try:
