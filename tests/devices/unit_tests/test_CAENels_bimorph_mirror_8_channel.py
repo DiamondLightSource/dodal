@@ -1,5 +1,6 @@
 import pytest
 from bluesky import RunEngine
+from ophyd import EpicsSignal
 
 from dodal.devices.bimorph_mirrors.CAENels_bimorph_mirror_8_channel import (
     CAENelsBimorphMirror8Channel,
@@ -16,7 +17,7 @@ class ChannelTypes(Enum):
     VOUT_RBV = "VOUT_RBV",
     STATUS = "STATUS"
 
-def get_channels(bimorph8, channel_type):
+def get_channels(bimorph8: CAENelsBimorphMirror8Channel, channel_type: ChannelTypes) -> list:
     """
     Just takes an 8-chanel bimorph and returns a list of relevant the channel components
     """
@@ -89,7 +90,7 @@ def get_channels(bimorph8, channel_type):
             bimorph8.channel_8_status
         ]
     
-def get_all_voltage_out_readback_values(bimorph):
+def get_all_voltage_out_readback_values(bimorph: CAENelsBimorphMirror8Channel) -> list[float]:
     """
     Function to returning all VOUT_RBV values from given bimorph as a list
     """
@@ -100,7 +101,7 @@ def get_all_voltage_out_readback_values(bimorph):
     return current_voltages
 
 
-def wait_for_signal(signal, value, timeout=10.0, sleep_time=0.1, signal_range = None, wait_message = None):
+def wait_for_signal(signal: EpicsSignal, value, timeout: float=10.0, sleep_time: float=0.1, signal_range: list = None, wait_message: str = None):
     import time
     stamp=time.time()
     res = signal.read()[signal.name]['value']
@@ -121,21 +122,21 @@ wait_till_idle = partial(wait_for_signal, value=0, signal_range={0,1})
 wait_till_busy = partial(wait_for_signal, value=1, signal_range={0,1})
 
 
-def protected_read(wait_signal, device):
+def protected_read(wait_signal: EpicsSignal, device: EpicsSignal):
     """
     Reads from device, but safely...
     """
     wait_till_idle(wait_signal)
     return device.read()
 
-def parsed_read(wait_signal, device):
+def parsed_read(wait_signal: EpicsSignal, device: EpicsSignal):
     """
     Writes to device, but safely...
     """
     res = protected_read(wait_signal, device)
     return res[device.name]['value']
 
-def protected_set(wait_signal, component, value):
+def protected_set(wait_signal: EpicsSignal, component: EpicsSignal, value) -> None:
     """
     Parses dict from Device.read to get value
     """
