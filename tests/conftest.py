@@ -2,9 +2,15 @@ import sys
 from os import environ, getenv
 
 
+def pytest_runtest_setup(item):
+    if "dodal.beamlines.beamline_utils" in sys.modules:
+        sys.modules["dodal.beamlines.beamline_utils"].clear_devices()
+        assert sys.modules["dodal.beamlines.beamline_utils"].ACTIVE_DEVICES == {}
+
+
 def pytest_runtest_teardown():
-    if "dodal.i03" in sys.modules:
-        sys.modules["dodal.i03"].clear_devices()
+    if "dodal.beamlines.beamline_utils" in sys.modules:
+        sys.modules["dodal.beamlines.beamline_utils"].clear_devices()
 
 
 s03_epics_server_port = getenv("S03_EPICS_CA_SERVER_PORT")

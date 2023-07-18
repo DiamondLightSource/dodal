@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from enum import Enum
+from enum import Enum, IntEnum
 from functools import partialmethod
 from typing import List
 
 from ophyd import Component, Device, EpicsSignal, StatusBase
-from ophyd.status import SubscriptionStatus
 
+from dodal.devices.status import await_value
 from dodal.devices.utils import epics_signal_put_wait
 
 PC_ARM_SOURCE_SOFT = "Soft"
@@ -41,11 +41,38 @@ TTL_SHUTTER = 2
 TTL_XSPRESS3 = 3
 
 
-class I03_axes(Enum):
+class I03Axes(Enum):
     SMARGON_X1 = "Enc1"
     SMARGON_Y = "Enc2"
     SMARGON_Z = "Enc3"
     OMEGA = "Enc4"
+
+
+class RotationDirection(IntEnum):
+    POSITIVE = 1
+    NEGATIVE = -1
+
+
+class ArmDemand(IntEnum):
+    ARM = 1
+    DISARM = 0
+
+
+class ArmingDevice(Device):
+    """A useful device that can abstract some of the logic of arming.
+    Allows a user to just call arm.set(ArmDemand.ARM)"""
+
+    TIMEOUT = 3
+
+    arm_set: EpicsSignal = Component(EpicsSignal, "PC_ARM")
+    disarm_set: EpicsSignal = Component(EpicsSignal, "PC_DISARM")
+    armed: EpicsSignal = Component(EpicsSignal, "PC_ARM_OUT")
+
+    def set(self, demand: ArmDemand) -> StatusBase:
+        status = await_value(self.armed, demand.value, timeout=self.TIMEOUT)
+        signal_to_set = self.arm_set if demand == ArmDemand.ARM else self.disarm_set
+        status &= signal_to_set.set(1)
+        return status
 
 
 class PositionCompare(Device):
@@ -61,25 +88,12 @@ class PositionCompare(Device):
 
     dir: EpicsSignal = Component(EpicsSignal, "PC_DIR")
     arm_source: EpicsSignal = epics_signal_put_wait("PC_ARM_SEL")
-    arm_demand: EpicsSignal = Component(EpicsSignal, "PC_ARM")
-    disarm_demand: EpicsSignal = Component(EpicsSignal, "PC_DISARM")
-    armed: EpicsSignal = Component(EpicsSignal, "PC_ARM_OUT")
+    reset: EpicsSignal = Component(EpicsSignal, "SYS_RESET.PROC")
 
-    def arm(self) -> StatusBase:
-        status = self.arm_status(1)
-        self.arm_demand.put(1)
-        return status
-
-    def disarm(self) -> StatusBase:
-        status = self.arm_status(0)
-        self.disarm_demand.put(1)
-        return status
+    arm: ArmingDevice = Component(ArmingDevice, "")
 
     def is_armed(self) -> bool:
-        return self.armed.get() == 1
-
-    def arm_status(self, armed: int) -> SubscriptionStatus:
-        return SubscriptionStatus(self.armed, lambda value, **_: value == armed)
+        return self.arm.armed.get() == 1
 
 
 class ZebraOutputPanel(Device):
@@ -223,7 +237,15 @@ class LogicGateConfiguration:
         return ", ".join(input_strings)
 
 
+class SoftInputs(Device):
+    soft_in_1: EpicsSignal = Component(EpicsSignal, "SOFT_IN:B0")
+    soft_in_2: EpicsSignal = Component(EpicsSignal, "SOFT_IN:B1")
+    soft_in_3: EpicsSignal = Component(EpicsSignal, "SOFT_IN:B2")
+    soft_in_4: EpicsSignal = Component(EpicsSignal, "SOFT_IN:B3")
+
+
 class Zebra(Device):
     pc: PositionCompare = Component(PositionCompare, "")
     output: ZebraOutputPanel = Component(ZebraOutputPanel, "")
+    inputs: SoftInputs = Component(SoftInputs, "")
     logic_gates: LogicGateConfigurer = Component(LogicGateConfigurer, "")

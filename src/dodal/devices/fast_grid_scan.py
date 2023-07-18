@@ -1,9 +1,10 @@
 import threading
 import time
-from dataclasses import dataclass
+from typing import Any
 
+import numpy as np
 from bluesky.plan_stubs import mv
-from dataclasses_json import DataClassJsonMixin
+from numpy import ndarray
 from ophyd import (
     Component,
     Device,
@@ -13,11 +14,12 @@ from ophyd import (
     Signal,
 )
 from ophyd.status import DeviceStatus, StatusBase
+from pydantic import BaseModel, validator
+from pydantic.dataclasses import dataclass
 
 from dodal.devices.motors import XYZLimitBundle
 from dodal.devices.status import await_value
 from dodal.parameters.experiment_parameter_base import AbstractExperimentParameterBase
-from dodal.utils import Point3D
 
 
 @dataclass
@@ -27,24 +29,30 @@ class GridAxis:
     full_steps: int
 
     def steps_to_motor_position(self, steps):
-        return self.start + self.step_size * (steps - 1)
+        """Gives the motor position based on steps, where steps are 0 indexed"""
+        return self.start + self.step_size * steps
 
     @property
     def end(self):
-        return self.steps_to_motor_position(self.full_steps)
+        """Gives the point where the final frame is taken"""
+        # Note that full_steps is one indexed e.g. if there is one step then the end is
+        # refering to the first position
+        return self.steps_to_motor_position(self.full_steps - 1)
 
     def is_within(self, steps):
         return 0 <= steps <= self.full_steps
 
 
-@dataclass
-class GridScanParams(DataClassJsonMixin, AbstractExperimentParameterBase):
+class GridScanParams(BaseModel, AbstractExperimentParameterBase):
     """
     Holder class for the parameters of a grid scan in a similar
     layout to EPICS.
 
     Motion program will do a grid in x-y then rotate omega +90 and perform
-    a grid in x-z
+    a grid in x-z.
+
+    The grid specified is where data is taken e.g. it can be assumed the first frame is
+    at x_start, y1_start, z1_start and subsequent frames are N*step_size away.
     """
 
     x_steps: int = 1
@@ -59,12 +67,29 @@ class GridScanParams(DataClassJsonMixin, AbstractExperimentParameterBase):
     y2_start: float = 0.1
     z1_start: float = 0.1
     z2_start: float = 0.1
+    x_axis: GridAxis = GridAxis(0, 0, 0)
+    y_axis: GridAxis = GridAxis(0, 0, 0)
+    z_axis: GridAxis = GridAxis(0, 0, 0)
 
-    def __post_init__(self):
-        self.x_axis = GridAxis(self.x_start, self.x_step_size, self.x_steps)
-        self.y_axis = GridAxis(self.y1_start, self.y_step_size, self.y_steps)
-        self.z_axis = GridAxis(self.z2_start, self.z_step_size, self.z_steps)
-        self.axes = [self.x_axis, self.y_axis, self.z_axis]
+    class Config:
+        arbitrary_types_allowed = True
+        fields = {
+            "x_axis": {"exclude": True},
+            "y_axis": {"exclude": True},
+            "z_axis": {"exclude": True},
+        }
+
+    @validator("x_axis", always=True)
+    def _get_x_axis(cls, x_axis: GridAxis, values: dict[str, Any]) -> GridAxis:
+        return GridAxis(values["x_start"], values["x_step_size"], values["x_steps"])
+
+    @validator("y_axis", always=True)
+    def _get_y_axis(cls, y_axis: GridAxis, values: dict[str, Any]) -> GridAxis:
+        return GridAxis(values["y1_start"], values["y_step_size"], values["y_steps"])
+
+    @validator("z_axis", always=True)
+    def _get_z_axis(cls, z_axis: GridAxis, values: dict[str, Any]) -> GridAxis:
+        return GridAxis(values["z2_start"], values["z_step_size"], values["z_steps"])
 
     def is_valid(self, limits: XYZLimitBundle) -> bool:
         """
@@ -102,21 +127,25 @@ class GridScanParams(DataClassJsonMixin, AbstractExperimentParameterBase):
     def is_3d_grid_scan(self):
         return self.z_steps > 0
 
-    def grid_position_to_motor_position(self, grid_position: Point3D) -> Point3D:
+    def grid_position_to_motor_position(self, grid_position: ndarray) -> ndarray:
         """Converts a grid position, given as steps in the x, y, z grid,
         to a real motor position.
 
         :param grid_position: The x, y, z position in grid steps
         :return: The motor position this corresponds to.
         :raises: IndexError if the desired position is outside the grid."""
-        for position, axis in zip(grid_position, self.axes):
+        for position, axis in zip(
+            grid_position, [self.x_axis, self.y_axis, self.z_axis]
+        ):
             if not axis.is_within(position):
                 raise IndexError(f"{grid_position} is outside the bounds of the grid")
 
-        return Point3D(
-            self.x_axis.steps_to_motor_position(grid_position.x),
-            self.y_axis.steps_to_motor_position(grid_position.y),
-            self.z_axis.steps_to_motor_position(grid_position.z),
+        return np.array(
+            [
+                self.x_axis.steps_to_motor_position(grid_position[0]),
+                self.y_axis.steps_to_motor_position(grid_position[1]),
+                self.z_axis.steps_to_motor_position(grid_position[2]),
+            ]
         )
 
 

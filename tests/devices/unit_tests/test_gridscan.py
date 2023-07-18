@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky import preprocessors as bpp
@@ -12,7 +13,6 @@ from dodal.devices.fast_grid_scan import (
     set_fast_grid_scan_params,
 )
 from dodal.devices.smargon import Smargon
-from dodal.utils import Point3D
 
 
 @pytest.fixture
@@ -48,7 +48,7 @@ def run_test_on_complete_watcher(
     RE = RunEngine()
     RE(
         set_fast_grid_scan_params(
-            fast_grid_scan, GridScanParams(num_pos_1d, num_pos_1d)
+            fast_grid_scan, GridScanParams(x_steps=num_pos_1d, y_steps=num_pos_1d)
         )
     )
 
@@ -109,7 +109,7 @@ def test_running_finished_with_all_images_done_then_complete_status_finishes_not
     RE = RunEngine()
     RE(
         set_fast_grid_scan_params(
-            fast_grid_scan, GridScanParams(num_pos_1d, num_pos_1d)
+            fast_grid_scan, GridScanParams(x_steps=num_pos_1d, y_steps=num_pos_1d)
         )
     )
 
@@ -266,12 +266,12 @@ def test_scan_within_limits_3d(
 @pytest.fixture
 def grid_scan_params():
     yield GridScanParams(
-        10,
-        15,
-        20,
-        0.3,
-        0.2,
-        0.1,
+        x_steps=10,
+        y_steps=15,
+        z_steps=20,
+        x_step_size=0.3,
+        y_step_size=0.2,
+        z_step_size=0.1,
         x_start=0,
         y1_start=1,
         y2_start=2,
@@ -283,10 +283,10 @@ def grid_scan_params():
 @pytest.mark.parametrize(
     "grid_position",
     [
-        (Point3D(-1, 2, 4)),
-        (Point3D(11, 2, 4)),
-        (Point3D(1, 17, 4)),
-        (Point3D(1, 5, 22)),
+        (np.array([-1, 2, 4])),
+        (np.array([11, 2, 4])),
+        (np.array([1, 17, 4])),
+        (np.array([1, 5, 22])),
     ],
 )
 def test_given_x_y_z_out_of_range_then_converting_to_motor_coords_raises(
@@ -299,27 +299,27 @@ def test_given_x_y_z_out_of_range_then_converting_to_motor_coords_raises(
 def test_given_x_y_z_of_origin_when_get_motor_positions_then_initial_positions_returned(
     grid_scan_params: GridScanParams,
 ):
-    motor_positions = grid_scan_params.grid_position_to_motor_position(Point3D(0, 0, 0))
-    assert motor_positions.x == -0.3
-    assert motor_positions.y == 0.8
-    assert motor_positions.z == 3.9
+    motor_positions = grid_scan_params.grid_position_to_motor_position(
+        np.array([0, 0, 0])
+    )
+    assert np.allclose(motor_positions, np.array([0, 1, 4]))
 
 
 @pytest.mark.parametrize(
     "grid_position, expected_x, expected_y, expected_z",
     [
-        (Point3D(1, 1, 1), 0.0, 1.0, 4.0),
-        (Point3D(2, 11, 16), 0.3, 3.0, 5.5),
-        (Point3D(6, 5, 5), 1.5, 1.8, 4.4),
+        (np.array([1, 1, 1]), 0.3, 1.2, 4.1),
+        (np.array([2, 11, 16]), 0.6, 3.2, 5.6),
+        (np.array([6, 5, 5]), 1.8, 2.0, 4.5),
     ],
 )
 def test_given_various_x_y_z_when_get_motor_positions_then_expected_positions_returned(
     grid_scan_params: GridScanParams, grid_position, expected_x, expected_y, expected_z
 ):
     motor_positions = grid_scan_params.grid_position_to_motor_position(grid_position)
-    assert motor_positions.x == expected_x
-    assert motor_positions.y == expected_y
-    assert motor_positions.z == expected_z
+    np.testing.assert_allclose(
+        motor_positions, np.array([expected_x, expected_y, expected_z])
+    )
 
 
 def test_can_run_fast_grid_scan_in_run_engine(fast_grid_scan):

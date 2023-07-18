@@ -10,8 +10,8 @@ from dodal.devices.oav.oav_errors import (
 from dodal.log import LOGGER
 
 OAV_CONFIG_FILE_DEFAULTS = {
-    "zoom_params_file": "/dls_sw/i03/software/gda_versions/gda_9_27/workspace_git/gda-mx.git/configurations/i03-config/xml/jCameraManZoomLevels.xml",
-    "oav_config_json": "/dls_sw/i03/software/gda_versions/gda_9_27/workspace_git/gda-mx.git/configurations/i03-config/etc/OAVCentring.json",
+    "zoom_params_file": "/dls_sw/i03/software/gda/configurations/i03-config/xml/jCameraManZoomLevels.xml",
+    "oav_config_json": "/dls_sw/i03/software/gda/configurations/i03-config/etc/OAVCentring.json",
     "display_config": "/dls_sw/i03/software/gda_versions/var/display.configuration",
 }
 
@@ -35,8 +35,6 @@ class OAVParameters:
     preprocess_K_size: int  # length scale for blur preprocessing
     detection_script_filename: str
     close_ksize: int
-    input_plugin: str
-    mxsc_input: str
     min_callback_time: float
     direction: int
     max_tip_distance: float
@@ -55,7 +53,7 @@ class OAVParameters:
 
         self.global_params, self.context_dicts = self.load_json(self.oav_config_json)
         self.active_params = ChainMap(
-            {}, self.global_params, self.context_dicts[self.context]
+            self.context_dicts[self.context], self.global_params
         )
         self.update_self_from_current_context()
         self.load_microns_per_pixel()
@@ -106,11 +104,9 @@ class OAVParameters:
         self.preprocess_K_size = update("preProcessKSize", int)
         self.detection_script_filename = update("filename", str)
         self.close_ksize = update("close_ksize", int, default=11)
-        self.input_plugin = update("oav", str, default="OAV")
-        self.mxsc_input = update("mxsc_input", str, default="CAM")
         self.min_callback_time = update("min_callback_time", float, default=0.08)
         self.direction = update("direction", int)
-        self.max_tip_distance = update("max_tip_distance", float)
+        self.max_tip_distance = update("max_tip_distance", float, default=300)
 
     def load_microns_per_pixel(self, zoom=None):
         """

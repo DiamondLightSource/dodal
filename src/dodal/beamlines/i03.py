@@ -1,83 +1,30 @@
-from typing import Callable, Dict, List, Optional
+from typing import Optional
 
-from ophyd import Device
-from ophyd.sim import make_fake_device
-
+from dodal.beamlines.beamline_utils import device_instantiation
+from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.aperturescatterguard import AperturePositions, ApertureScatterguard
+from dodal.devices.attenuator import Attenuator
 from dodal.devices.backlight import Backlight
 from dodal.devices.DCM import DCM
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector_motion import DetectorMotion
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import FastGridScan
+from dodal.devices.flux import Flux
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.s4_slit_gaps import S4SlitGaps
+from dodal.devices.sample_shutter import SampleShutter
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import Undulator
+from dodal.devices.xspress3_mini.xspress3_mini import Xspress3Mini
 from dodal.devices.zebra import Zebra
-from dodal.log import set_beamline
+from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
 
-BL = get_beamline_name("i03")
-set_beamline(BL)
-
-
-ACTIVE_DEVICES: Dict[str, Device] = {}
-
-
-def clear_devices():
-    global ACTIVE_DEVICES
-    for d in list(ACTIVE_DEVICES):
-        del ACTIVE_DEVICES[d]
-
-
-def clear_device(name: str):
-    global ACTIVE_DEVICES
-    del ACTIVE_DEVICES[name]
-
-
-def list_active_devices() -> List[str]:
-    global ACTIVE_DEVICES
-    return list(ACTIVE_DEVICES.keys())
-
-
-def active_device_is_same_type(active_device, device):
-    return type(active_device) == device
-
-
-@skip_device()
-def device_instantiation(
-    device: Callable,
-    name: str,
-    prefix: str,
-    wait: bool,
-    fake: bool,
-    post_create: Optional[Callable] = None,
-    bl_prefix: bool = True,
-) -> Device:
-    active_device = ACTIVE_DEVICES.get(name)
-    if fake:
-        device = make_fake_device(device)
-    if active_device is None:
-        ACTIVE_DEVICES[name] = device(
-            name=name,
-            prefix=f"{(BeamlinePrefix(BL).beamline_prefix)}{prefix}"
-            if bl_prefix
-            else prefix,
-        )
-        if wait:
-            ACTIVE_DEVICES[name].wait_for_connection()
-    else:
-        if not active_device_is_same_type(active_device, device):
-            raise TypeError(
-                f"Can't instantiate device of type {type(active_device)} with the same "
-                f"name as an existing device. Device name '{name}' already used for "
-                f"a(n) {device}."
-            )
-    if post_create:
-        post_create(ACTIVE_DEVICES[name])
-    return ACTIVE_DEVICES[name]
+BL = get_beamline_name("s03")
+set_log_beamline(BL)
+set_utils_beamline(BL)
 
 
 @skip_device(lambda: BL == "s03")
@@ -105,7 +52,8 @@ def aperture_scatterguard(
     """
 
     def load_positions(a_s: ApertureScatterguard):
-        a_s.load_aperture_positions(aperture_positions)
+        if aperture_positions is not None:
+            a_s.load_aperture_positions(aperture_positions)
 
     return device_instantiation(
         device=ApertureScatterguard,
@@ -211,7 +159,7 @@ def smargon(
     return device_instantiation(
         Smargon,
         "smargon",
-        "",
+        "-MO-SGON-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
@@ -273,6 +221,66 @@ def zebra(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -
         Zebra,
         "zebra",
         "-EA-ZEBRA-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+def xspress3mini(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Xspress3Mini:
+    """Get the i03 Xspress3Mini device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        Xspress3Mini,
+        "xspress3mini",
+        "-EA-XSP3-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+def attenuator(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Attenuator:
+    """Get the i03 attenuator device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        Attenuator,
+        "attenuator",
+        "-EA-ATTN-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+@skip_device(lambda: BL == "s03")
+def sample_shutter(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> SampleShutter:
+    """Get the i03 sample shutter device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        SampleShutter,
+        "sample_shutter",
+        "-EA-SHTR-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+@skip_device(lambda: BL == "s03")
+def flux(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> Flux:
+    """Get the i03 flux device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        Flux,
+        "flux",
+        "-MO-MAPT-01:Y:",
         wait_for_connection,
         fake_with_ophyd_sim,
     )

@@ -53,3 +53,12 @@ class DetectorDistanceToBeamXYConverter:
         columns = list(zip(*rows))
 
         return columns
+
+    def __eq__(self, other):
+        if not isinstance(other, DetectorDistanceToBeamXYConverter):
+            return NotImplemented
+        if self.lookup_file != other.lookup_file:
+            return False
+        if self.lookup_table_values != other.lookup_table_values:
+            return False
+        return True
