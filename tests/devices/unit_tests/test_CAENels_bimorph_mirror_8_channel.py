@@ -129,19 +129,19 @@ wait_till_idle = partial(wait_for_signal, value=0, signal_range={0,1})
 wait_till_busy = partial(wait_for_signal, value=1, signal_range={0,1})
 
 
-def protected_read(wait_signal: EpicsSignal, device: EpicsSignal):
+def protected_read(wait_signal: EpicsSignal, signal: EpicsSignal):
     """
-    Reads from device, but safely...
+    Reads from signal, but safely...
     """
     wait_till_idle(wait_signal)
-    return device.read()
+    return signal.read()
 
-def parsed_read(wait_signal: EpicsSignal, device: EpicsSignal):
+def parsed_read(wait_signal: EpicsSignal, signal: EpicsSignal):
     """
-    Writes to device, but safely...
+    Writes to signal, but safely...
     """
-    res = protected_read(wait_signal, device)
-    return res[device.name]['value']
+    res = protected_read(wait_signal, signal)
+    return res[signal.name]['value']
 
 def protected_set(wait_signal: EpicsSignal, component: EpicsSignal, value) -> None:
     """
