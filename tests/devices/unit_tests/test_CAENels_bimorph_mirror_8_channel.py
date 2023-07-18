@@ -143,14 +143,14 @@ def parsed_read(wait_signal: EpicsSignal, signal: EpicsSignal):
     res = protected_read(wait_signal, signal)
     return res[signal.name]['value']
 
-def protected_set(wait_signal: EpicsSignal, component: EpicsSignal, value) -> None:
+def protected_set(wait_signal: EpicsSignal, signal: EpicsSignal, value) -> None:
     """
     Parses dict from Device.read to get value
     """
-    print(f"Write {value} to {component}")
+    print(f"Write {value} to {signal}")
     wait_till_idle(wait_signal)
-    print(f"Written {value} to {component}")
-    component.set(value).wait()
+    print(f"Written {value} to {signal}")
+    signal.set(value).wait()
     wait_till_busy(wait_signal)
 
 
