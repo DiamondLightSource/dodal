@@ -90,6 +90,9 @@ def get_channels(bimorph8, channel_type):
         ]
     
 def get_all_voltage_out_readback_values(bimorph):
+    """
+    Function to returning all VOUT_RBV values from given bimorph as a list
+    """
     current_voltages = []
     for channel in get_channels(bimorph, ChannelTypes.VOUT_RBV):
         voltage = parsed_read(channel)
