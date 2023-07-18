@@ -101,7 +101,14 @@ def get_all_voltage_out_readback_values(bimorph: CAENelsBimorphMirror8Channel) -
     return current_voltages
 
 
-def wait_for_signal(signal: EpicsSignal, value, timeout: float=10.0, sleep_time: float=0.1, signal_range: list = None, wait_message: str = None):
+def wait_for_signal(signal: EpicsSignal, value, timeout: float=10.0, sleep_time: float=0.1, signal_range: list = None, wait_message: str = None) -> None:
+    """
+    Waits for signal to display given value. By default, times out after 10.0 seconds.
+
+    If signal_range is given, an exception will be raised if currently read value from signal is outside of this.
+
+    If a wait_message is given, this will be printed every time the function waits.
+    """
     import time
     stamp=time.time()
     res = signal.read()[signal.name]['value']
