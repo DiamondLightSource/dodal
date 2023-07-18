@@ -76,8 +76,8 @@
     "url": "https://DiamondLightSource.github.io/dodal/artemis_701_do_optimise_attenuation_scan/"
   },
   {
-    "version": "artemis_808_pin_failing_in_tests",
-    "url": "https://DiamondLightSource.github.io/dodal/artemis_808_pin_failing_in_tests/"
+    "version": "artemis_810_ensure_use_of_dataclasses_are_correct",
+    "url": "https://DiamondLightSource.github.io/dodal/artemis_810_ensure_use_of_dataclasses_are_correct/"
   },
   {
     "version": "jungfrau_commissioning",
