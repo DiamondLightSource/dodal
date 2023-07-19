@@ -216,7 +216,7 @@ def test_all_shift():
     bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
     bimorph.wait_for_connection()
 
-    test_shift = random.randint(1,30) 
+    test_shift = random.random()*30 + 1 
 
     current_voltages = get_all_voltage_out_readback_values(bimorph)
     protected_set(bimorph.all_shift, test_shift)
