@@ -1,3 +1,12 @@
+"""
+Stuff that isn't tested:
+    CHANNELS
+    STATUS
+    TEMPS
+    RESETERR.PROC
+    ERR
+"""
+
 import pytest
 from bluesky import RunEngine
 from ophyd import EpicsSignal
@@ -219,3 +228,30 @@ def test_all_volt():
         test_all_volt_value = random.randint(1,30)
         protected_set(bimorph.all_volt, test_all_volt_value)
         assert all([voltage == test_all_volt_value for voltage in get_all_voltage_out_readback_values(bimorph)])
+
+def test_voltage_target():
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph.wait_for_connection()
+
+    voltage_target_list = get_channels(bimorph, ChannelTypes.VTRGT)
+    voltage_target_readback_list = get_channels(bimorph, ChannelTypes.VTRGT_RBV)
+    voltage_out_rbv_list = get_channels(bimorph, ChannelTypes.VOUT_RBV)
+
+    #test C1:VTRGT ... C8:VTRGT:
+    import random
+    # To make sure we don't happen to choose the current voltages, do twice:
+    for i in range(2):
+        target_voltages = [round(random.random()*10, 1) for i in range(8)]
+
+        for index, voltage_target_signal in enumerate(voltage_target_list):
+            protected_set(voltage_target_signal, target_voltages[index])
+        #breakpoint()
+
+        assert all([parsed_read(voltage_target_readback_list[i]) ==
+            target_voltages[i] for i in range(len(target_voltages))])
+        
+        protected_set(bimorph.all_target_proc, 1)
+        
+        assert all([parsed_read(voltage_out_rbv_list[i]) == 
+            target_voltages[i] for i in range(len(target_voltages))])
+
