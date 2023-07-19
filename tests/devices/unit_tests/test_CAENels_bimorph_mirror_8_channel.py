@@ -156,9 +156,7 @@ def protected_set(wait_signal: EpicsSignal, signal: EpicsSignal, value) -> None:
     """
     Parses dict from Device.read to get value
     """
-    print(f"Write {value} to {signal}")
     wait_till_idle(wait_signal)
-    print(f"Written {value} to {signal}")
     signal.set(value).wait()
     wait_till_busy(wait_signal)
 
@@ -181,20 +179,26 @@ protected_set = partial(protected_set, busy_signal.device_busy)
 
 
 def test_on_off_read_write():
+    """
+    Tests that ONOFF is correctly setup to be read and set to.
+    """
     bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
     bimorph.wait_for_connection()
 
-    # test ONOFF (make sure to leave on...):
     protected_set(bimorph.on_off, OnOff.OFF)
     assert parsed_read(bimorph.on_off) == OnOff.OFF
     protected_set(bimorph.on_off, OnOff.ON)
     assert parsed_read(bimorph.on_off) == OnOff.ON
 
 def test_operation_mode_read_write():
+    """
+    Tests that OPMODE is correctly setup to be read and set to.
+    Tests that the OnOff Enum has correct values corresponding to op modes.
+    Tests that all three opmodes can be accessed.
+    """
     bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
     bimorph.wait_for_connection()
 
-    # test OPMODE:
     protected_set(bimorph.operation_mode, OperationMode.HI)
     assert parsed_read(bimorph.operation_mode_readback_value) == OperationMode.HI
     protected_set(bimorph.operation_mode, OperationMode.NORMAL)
@@ -203,10 +207,13 @@ def test_operation_mode_read_write():
     assert parsed_read(bimorph.operation_mode_readback_value) == OperationMode.FAST
 
 def test_all_shift():
+    """
+    Tests that ALLSHIFT is correctly setup to be read and set to.
+    Tests VOUT is correctly setup to be read from.
+    """
     bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
     bimorph.wait_for_connection()
 
-    # test ALLSHIFT:
     import random
     test_shift = random.randint(1,30) 
 
@@ -218,10 +225,13 @@ def test_all_shift():
                 voltpair in zip(current_voltages, new_voltages)])
 
 def test_all_volt():
+    """
+    Tests that ALLVOLT is correctly set up to be read and set to.
+    Tests that VOUT_RBV is correctly set up to beread from.
+    """
     bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
     bimorph.wait_for_connection()
 
-    # test ALLVOLT:
     import random
     for i in range(3): 
         # do it a few times in case the random number was the preexisting voltages:
@@ -230,6 +240,11 @@ def test_all_volt():
         assert all([voltage == test_all_volt_value for voltage in get_all_voltage_out_readback_values(bimorph)])
 
 def test_voltage_target():
+    """
+    Tests that VTRGT is correctly set up to be read and set to.
+    Tests that VTRGT_RBV is correctly set up to be read and set to.
+    Tests that VOUT_RBV is set up correctly to be read and set to.
+    """
     bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
     bimorph.wait_for_connection()
 
@@ -237,7 +252,6 @@ def test_voltage_target():
     voltage_target_readback_list = get_channels(bimorph, ChannelTypes.VTRGT_RBV)
     voltage_out_rbv_list = get_channels(bimorph, ChannelTypes.VOUT_RBV)
 
-    #test C1:VTRGT ... C8:VTRGT:
     import random
     # To make sure we don't happen to choose the current voltages, do twice:
     for i in range(2):
