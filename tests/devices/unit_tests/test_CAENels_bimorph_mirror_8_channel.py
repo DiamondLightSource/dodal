@@ -17,6 +17,8 @@ from dodal.devices.bimorph_mirrors.CAENels_bimorph_mirror_8_channel import (
     OperationMode,
 )
 
+import random
+
 from enum import Enum
 class ChannelTypes(Enum):
     VTRGT = "VTRGT",
@@ -214,7 +216,6 @@ def test_all_shift():
     bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
     bimorph.wait_for_connection()
 
-    import random
     test_shift = random.randint(1,30) 
 
     current_voltages = get_all_voltage_out_readback_values(bimorph)
@@ -232,7 +233,6 @@ def test_all_volt():
     bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
     bimorph.wait_for_connection()
 
-    import random
     for i in range(3): 
         # do it a few times in case the random number was the preexisting voltages:
         test_all_volt_value = random.randint(1,30)
@@ -252,7 +252,6 @@ def test_voltage_target():
     voltage_target_readback_list = get_channels(bimorph, ChannelTypes.VTRGT_RBV)
     voltage_out_rbv_list = get_channels(bimorph, ChannelTypes.VOUT_RBV)
 
-    import random
     # To make sure we don't happen to choose the current voltages, do twice:
     for i in range(2):
         target_voltages = [round(random.random()*10, 1) for i in range(8)]
@@ -275,7 +274,6 @@ def test_voltage_out():
     """
     bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
     bimorph.wait_for_connection()
-    import random
 
     voltage_out_list = get_channels(bimorph, ChannelTypes.VOUT)
     voltage_out_rbv_list = get_channels(bimorph, ChannelTypes.VOUT_RBV)
