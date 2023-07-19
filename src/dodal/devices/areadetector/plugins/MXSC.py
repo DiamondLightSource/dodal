@@ -18,32 +18,32 @@ class PinTipDetect(Device):
     tip_y: EpicsSignalRO = Component(EpicsSignalRO, "TipY")
 
     triggered_tip: Signal = Component(Signal, kind=Kind.hinted, value=INVALID_POSITION)
-    validity_timeout: Signal = Component(Signal, value=1)
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    validity_timeout: Signal = Component(Signal, value=5)
 
     def update_tip_if_valid(self, value, **_):
         current_value = (value, self.tip_y.get())
         if current_value != self.INVALID_POSITION:
-            self.triggered_tip.set(current_value)
+            self.triggered_tip.put(current_value)
             return True
 
     def trigger(self) -> Status:
-        subscription_status = SubscriptionStatus(self.tip_x, self.update_tip_if_valid)
+        subscription_status = SubscriptionStatus(
+            self.tip_x, self.update_tip_if_valid, run=True
+        )
 
-        def set_to_default_and_finish(_):
+        def set_to_default_and_finish(timeout_status: Status):
             try:
-                self.triggered_tip.set(self.INVALID_POSITION)
-                subscription_status.set_finished()
+                if not timeout_status.success:
+                    self.triggered_tip.set(self.INVALID_POSITION)
+                    subscription_status.set_finished()
             except Exception as e:
                 subscription_status.set_exception(e)
 
         # We use a separate status for measuring the timeout as we don't want an error
         # on the returned status
-        Status(self, timeout=self.validity_timeout.get()).add_callback(
-            set_to_default_and_finish
-        )
+        self._timeout_status = Status(self, timeout=self.validity_timeout.get())
+        self._timeout_status.add_callback(set_to_default_and_finish)
+        subscription_status.add_callback(lambda _: self._timeout_status.set_finished())
 
         return subscription_status
 
@@ -79,4 +79,4 @@ class MXSC(Device):
     waveform_size_x: EpicsSignal = Component(EpicsSignal, "ArraySize1_RBV")
     waveform_size_y: EpicsSignal = Component(EpicsSignal, "ArraySize2_RBV")
 
-    pin_tip: PinTipDetect = Component(PinTipDetect)
+    pin_tip: PinTipDetect = Component(PinTipDetect, "")

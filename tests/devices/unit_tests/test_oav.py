@@ -1,9 +1,10 @@
-from pathlib import Path
 from unittest.mock import MagicMock, call, patch
 
 import numpy as np
 import PIL
 import pytest
+from bluesky import plan_stubs as bps
+from bluesky.run_engine import RunEngine
 from ophyd.sim import make_fake_device
 from requests import HTTPError, Response
 
@@ -24,6 +25,10 @@ def fake_oav() -> OAV:
     fake_oav.snapshot.box_width.put(50)
     fake_oav.snapshot.num_boxes_x.put(15)
     fake_oav.snapshot.num_boxes_y.put(10)
+
+    fake_oav.cam.port_name.sim_put("CAM")
+    fake_oav.proc.port_name.sim_put("PROC")
+
     return fake_oav
 
 
@@ -62,7 +67,7 @@ def test_snapshot_trigger_saves_to_correct_file(
     st = fake_oav.snapshot.trigger()
     st.wait()
     expected_calls_to_save = [
-        call(Path(f"test directory/test filename{addition}.png"))
+        call(f"test directory/test filename{addition}.png")
         for addition in ["", "_outer_overlay", "_grid_overlay"]
     ]
     calls_to_save = mock_save.mock_calls
@@ -100,3 +105,30 @@ def test_bottom_right_from_top_left():
         top_left, 15, 20, 0.005, 0.007, 1, 1
     )
     assert bottom_right[0] == 198 and bottom_right[1] == 263
+
+
+def test_when_zoom_1_then_flat_field_applied(fake_oav: OAV):
+    RE = RunEngine()
+    RE(bps.abs_set(fake_oav.zoom_controller, "1.0x"))
+    assert fake_oav.mxsc.input_plugin.get() == "PROC"
+    assert fake_oav.snapshot.input_plugin.get() == "PROC"
+
+
+def test_when_zoom_not_1_then_flat_field_removed(fake_oav: OAV):
+    RE = RunEngine()
+    RE(bps.abs_set(fake_oav.zoom_controller, "10.0x"))
+    assert fake_oav.mxsc.input_plugin.get() == "CAM"
+    assert fake_oav.snapshot.input_plugin.get() == "CAM"
+
+
+def test_when_zoom_is_externally_changed_to_1_then_flat_field_not_changed(
+    fake_oav: OAV,
+):
+    """This test is required to ensure that Artemis doesn't cause unexpected behaviour
+    e.g. change the flatfield when the zoom level is changed through the synoptic"""
+    fake_oav.mxsc.input_plugin.sim_put("CAM")
+    fake_oav.snapshot.input_plugin.sim_put("CAM")
+
+    fake_oav.zoom_controller.level.sim_put("1.0X")
+    assert fake_oav.mxsc.input_plugin.get() == "CAM"
+    assert fake_oav.snapshot.input_plugin.get() == "CAM"

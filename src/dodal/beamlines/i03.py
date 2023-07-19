@@ -3,17 +3,21 @@ from typing import Optional
 from dodal.beamlines.beamline_utils import device_instantiation
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.aperturescatterguard import AperturePositions, ApertureScatterguard
+from dodal.devices.attenuator import Attenuator
 from dodal.devices.backlight import Backlight
 from dodal.devices.DCM import DCM
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector_motion import DetectorMotion
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import FastGridScan
+from dodal.devices.flux import Flux
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.s4_slit_gaps import S4SlitGaps
+from dodal.devices.sample_shutter import SampleShutter
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import Undulator
+from dodal.devices.xspress3_mini.xspress3_mini import Xspress3Mini
 from dodal.devices.zebra import Zebra
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
@@ -86,7 +90,7 @@ def detector_motion(
     return device_instantiation(
         device=DetectorMotion,
         name="detector_motion",
-        prefix="-MO-DET-01:",
+        prefix="",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )
@@ -140,7 +144,7 @@ def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
     return device_instantiation(
         OAV,
         "oav",
-        "-DI-OAV-01:",
+        "",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
@@ -217,6 +221,66 @@ def zebra(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -
         Zebra,
         "zebra",
         "-EA-ZEBRA-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+def xspress3mini(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Xspress3Mini:
+    """Get the i03 Xspress3Mini device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        Xspress3Mini,
+        "xspress3mini",
+        "-EA-XSP3-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+def attenuator(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Attenuator:
+    """Get the i03 attenuator device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        Attenuator,
+        "attenuator",
+        "-EA-ATTN-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+@skip_device(lambda: BL == "s03")
+def sample_shutter(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> SampleShutter:
+    """Get the i03 sample shutter device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        SampleShutter,
+        "sample_shutter",
+        "-EA-SHTR-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+@skip_device(lambda: BL == "s03")
+def flux(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> Flux:
+    """Get the i03 flux device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        Flux,
+        "flux",
+        "-MO-MAPT-01:Y:",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
