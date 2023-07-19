@@ -268,6 +268,27 @@ def test_voltage_target():
         assert all([parsed_read(voltage_out_rbv_list[i]) == 
             target_voltages[i] for i in range(len(target_voltages))])
 
+def test_shift():
+    """
+    Test SHIFT if set up correctly to read and set to.
+    """
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph.wait_for_connection()
+
+    shift_list = get_channels(bimorph, ChannelTypes.SHIFT)
+    voltage_out_rbv_list = get_channels(bimorph, ChannelTypes.VOUT_RBV)
+
+    shifts = [round(random.random()*30+1) for i in range(8)]
+
+    current_voltages =  get_all_voltage_out_readback_values(bimorph)
+
+    for shift, shift_signal in zip(shifts, shift_list):
+        protected_set(shift_signal, shift)
+    
+    new_voltages = get_all_voltage_out_readback_values(bimorph) 
+
+    assert all([new_voltage == old_voltage + shift for new_voltage, old_voltage, shift in zip(new_voltages, current_voltages, shifts)])
+
 def test_voltage_out():
     """
     Tests VOUT is set up correctly to read and set to.
