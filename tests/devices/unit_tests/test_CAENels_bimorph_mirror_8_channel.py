@@ -236,11 +236,12 @@ def test_all_shift():
     bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
     bimorph.wait_for_connection()
 
-    test_shift = random.random()*30 + 1 
-
+    test_shift = round(random.random()*30,1) + 1 
     current_voltages = get_all_voltage_out_readback_values(bimorph)
+
     protected_set(bimorph.all_shift, test_shift)
     assert parsed_read(bimorph.all_shift) == test_shift 
+
     new_voltages = get_all_voltage_out_readback_values(bimorph)
     assert all([voltpair[1] == voltpair[0]+test_shift for
                 voltpair in zip(current_voltages, new_voltages)])
