@@ -327,3 +327,21 @@ def test_voltage_out():
 
         assert all([voltage == target_voltage for
             voltage, target_voltage in zip(new_voltages, target_voltages)])
+
+
+
+def test_get_channel():
+    """
+    Tests the bimorph's get_channel method.
+    """
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph.wait_for_connection()
+
+    for channel_type in list(ChannelType):
+        channel1_list = bimorph.get_channel(channel_type)
+        channel2_list = get_channels(bimorph, channel_type)
+
+        print(f"channel1_list: {channel1_list}\nchannel2_list: {channel2_list}")
+
+        assert all([channel_1 == channel_2 for channel_1, channel_2 in
+            zip(channel1_list, channel2_list)])
