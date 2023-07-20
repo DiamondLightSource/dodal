@@ -3,6 +3,12 @@ from .CAENels_bimorph_mirror_0_channel import CAENelsBimorphMirror0Channel
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
 
 class CAENelsBimorphMirror7Channel(CAENelsBimorphMirror0Channel):
+    """
+    Class representing a CAENels 7-Channel Bimorph Mirror.
+
+    Adds 7 channels to 0 inherited.
+
+    """
     channel_1_voltage_target: EpicsSignal = Component(EpicsSignal, "C1:VTRGT")
     channel_2_voltage_target: EpicsSignal = Component(EpicsSignal, "C2:VTRGT")
     channel_3_voltage_target: EpicsSignal = Component(EpicsSignal, "C3:VTRGT")

@@ -7,13 +7,8 @@ class CAENelsBimorphMirror8Channel(CAENelsBimorphMirror7Channel):
     """
     Class representing a CAENels 8-Channel Bimorph Mirror.
 
-    Not implemented:
-        TARGETLISTCMD.PROC
-        HYSTERESISLISTCMD.PROC
-        TARGETWIPE.PROC
-        HYSTERESISWIPE.PROC
-        TARGETLIST (Component?)
-        HYSTERESISLIST (Component?)
+    Adds 8th channel to 7 inherited.
+
     """
 
 
