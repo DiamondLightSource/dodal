@@ -1,10 +1,10 @@
 """
 Stuff that isn't tested:
     CHANNELS
-    STATUS
     TEMPS
     RESETERR.PROC
     ERR
+    C1:STATUS ... C8:STATUS
 """
 
 import pytest
@@ -15,6 +15,7 @@ from dodal.devices.bimorph_mirrors.CAENels_bimorph_mirror_8_channel import (
     CAENelsBimorphMirror8Channel,
     OnOff,
     OperationMode,
+    Status,
 )
 
 import random
@@ -209,6 +210,21 @@ def test_operation_mode_read_write():
     assert parsed_read(bimorph.operation_mode_readback_value) == OperationMode.NORMAL
     protected_set(bimorph.operation_mode, OperationMode.FAST)
     assert parsed_read(bimorph.operation_mode_readback_value) == OperationMode.FAST
+
+def test_status():
+    """
+    Tests G0:STATUS is correctly set up to read from.
+
+    I don't actually know if the way I'm testing this really works...
+    """
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph.wait_for_connection()
+
+    assert bimorph.status.read()[bimorph.status.name]['value'] == Status.IDLE
+
+    protected_set(bimorph.channel_1_voltage_out, 10.0)
+
+    assert bimorph.status.read()[bimorph.status.name]['value'] == Status.BUSY
 
 def test_all_shift():
     """
