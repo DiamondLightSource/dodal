@@ -58,10 +58,31 @@ class CAENelsBimorphMirror0Channel(Device):
     reset_alarms: EpicsSignal = Component(EpicsSignal, "RESETERR.PROC")
     alarm_status: EpicsSignalRO = Component(EpicsSignalRO, "ERR")
 
-    # Lists of channels for easy access:
-    _voltage_target_channels: list = []
-    _voltage_target_readback_value_channels: list = []
-    _shift_channels: list = []
-    _voltage_out_channels: list = []
-    _voltage_out_readback_value_channels: list = []
-    _status_channels: list = []
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Lists of channels for easy access:
+        self._voltage_target_channels: list = []
+        self._voltage_target_readback_value_channels: list = []
+        self._shift_channels: list = []
+        self._voltage_out_channels: list = []
+        self._voltage_out_readback_value_channels: list = []
+        self._status_channels: list = []
+
+    def get_channel(self, channel_type: ChannelType) -> list:
+        if channel_type == ChannelType.VTRGT:
+            return self._voltage_target_channels
+        
+        elif channel_type == ChannelType.VTRGT_RBV:
+            return self._voltage_target_readback_value_channels
+        
+        elif channel_type == ChannelType.SHIFT:
+            return self._shift_channels
+        
+        elif channel_type == ChannelType.VOUT:
+            return self._voltage_out_channels
+        
+        elif channel_type == ChannelType.VOUT_RBV:
+            return self._voltage_out_readback_value_channels
+        
+        elif channel_type == ChannelType.STATUS:
+            return self._status_channels

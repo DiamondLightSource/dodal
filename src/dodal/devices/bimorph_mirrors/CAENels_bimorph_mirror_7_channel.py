@@ -85,76 +85,70 @@ class CAENelsBimorphMirror7Channel(CAENelsBimorphMirror0Channel):
     channel_6_status: EpicsSignalRO = Component(EpicsSignalRO, "C6:STATUS")
     channel_7_status: EpicsSignalRO = Component(EpicsSignalRO, "C7:STATUS")
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(
+            *args,
+            **kwargs
+        )
+        # lists of channels for easy access
+        # there must be a nicer way to do this:
+        
+        self._voltage_target_channels.extend([
+            self.channel_1_voltage_target,
+            self.channel_2_voltage_target,
+            self.channel_3_voltage_target,
+            self.channel_4_voltage_target,
+            self.channel_5_voltage_target,
+            self.channel_6_voltage_target,
+            self.channel_7_voltage_target,
+        ])
 
-    # lists of channels for easy access
-    # there must be a nicer way to do this:
-    _voltage_target_channels = CAENelsBimorphMirror0Channel._voltage_target_channels.copy()
-    
-    _voltage_target_channels.extend([
-        channel_1_voltage_target,
-        channel_2_voltage_target,
-        channel_3_voltage_target,
-        channel_4_voltage_target,
-        channel_5_voltage_target,
-        channel_6_voltage_target,
-        channel_7_voltage_target,
-    ])
+        self._voltage_target_readback_value_channels.extend([
+            self.channel_1_voltage_target_readback_value,
+            self.channel_2_voltage_target_readback_value,
+            self.channel_3_voltage_target_readback_value,
+            self.channel_4_voltage_target_readback_value,
+            self.channel_5_voltage_target_readback_value,
+            self.channel_6_voltage_target_readback_value,
+            self.channel_7_voltage_target_readback_value,
+        ])
 
-    _voltage_target_readback_value_channels = CAENelsBimorphMirror0Channel._voltage_target_readback_value_channels.copy()
-    
-    _voltage_target_readback_value_channels.extend([
-        channel_1_voltage_target_readback_value,
-        channel_2_voltage_target_readback_value,
-        channel_3_voltage_target_readback_value,
-        channel_4_voltage_target_readback_value,
-        channel_5_voltage_target_readback_value,
-        channel_6_voltage_target_readback_value,
-        channel_7_voltage_target_readback_value,
-    ])
+        self._shift_channels.extend([
+            self.channel_1_shift,
+            self.channel_2_shift,
+            self.channel_3_shift,
+            self.channel_4_shift,
+            self.channel_5_shift,
+            self.channel_6_shift,
+            self.channel_7_shift,
+        ])
 
-    _shift_channels = CAENelsBimorphMirror0Channel._shift_channels.copy()
+        self._voltage_out_channels.extend([
+            self.channel_1_voltage_out,
+            self.channel_2_voltage_out,
+            self.channel_3_voltage_out,
+            self.channel_4_voltage_out,
+            self.channel_5_voltage_out,
+            self.channel_6_voltage_out,
+            self.channel_7_voltage_out,
+        ])
 
-    _shift_channels.extend([
-        channel_1_shift,
-        channel_2_shift,
-        channel_3_shift,
-        channel_4_shift,
-        channel_5_shift,
-        channel_6_shift,
-        channel_7_shift,
-    ])
-
-    _voltage_out_channels = CAENelsBimorphMirror0Channel._voltage_out_channels.copy()
-
-    _voltage_out_channels.extend([
-        channel_1_voltage_out,
-        channel_2_voltage_out,
-        channel_3_voltage_out,
-        channel_4_voltage_out,
-        channel_5_voltage_out,
-        channel_6_voltage_out,
-        channel_7_voltage_out,
-    ])
-
-    _voltage_out_readback_value_channels = CAENelsBimorphMirror0Channel._voltage_out_readback_value_channels.copy()
-    
-    _voltage_out_readback_value_channels.extend([
-        channel_1_voltage_out_readback_value,
-        channel_2_voltage_out_readback_value,
-        channel_3_voltage_out_readback_value,
-        channel_4_voltage_out_readback_value,
-        channel_5_voltage_out_readback_value,
-        channel_6_voltage_out_readback_value,
-        channel_7_voltage_out_readback_value,
-    ])
-    _status_channels = CAENelsBimorphMirror0Channel._status_channels
-    
-    _status_channels.extend([
-        channel_1_status,
-        channel_2_status,
-        channel_3_status,
-        channel_4_status,
-        channel_5_status,
-        channel_6_status,
-        channel_7_status,
-    ])
+        self._voltage_out_readback_value_channels.extend([
+            self.channel_1_voltage_out_readback_value,
+            self.channel_2_voltage_out_readback_value,
+            self.channel_3_voltage_out_readback_value,
+            self.channel_4_voltage_out_readback_value,
+            self.channel_5_voltage_out_readback_value,
+            self.channel_6_voltage_out_readback_value,
+            self.channel_7_voltage_out_readback_value,
+        ])
+        
+        self._status_channels.extend([
+            self.channel_1_status,
+            self.channel_2_status,
+            self.channel_3_status,
+            self.channel_4_status,
+            self.channel_5_status,
+            self.channel_6_status,
+            self.channel_7_status,
+        ])

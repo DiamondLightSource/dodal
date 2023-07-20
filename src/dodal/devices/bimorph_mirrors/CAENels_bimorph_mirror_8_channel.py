@@ -30,40 +30,35 @@ class CAENelsBimorphMirror8Channel(CAENelsBimorphMirror7Channel):
     channel_8_status: EpicsSignalRO = Component(EpicsSignalRO, "C8:STATUS")
 
 
-    # lists of channels for easy access
-    # there must be a nicer way to do this:
-    _voltage_target_channels = CAENelsBimorphMirror7Channel._voltage_target_channels.copy()
-    
-    _voltage_target_channels.extend([
-        channel_8_voltage_target,
-    ])
+    def __init__(self, *args, **kwargs):
+        super().__init__(
+            *args,
+            **kwargs
+        )
 
-    _voltage_target_readback_value_channels = CAENelsBimorphMirror7Channel._voltage_target_readback_value_channels.copy()
-    
-    _voltage_target_readback_value_channels.extend([
-        channel_8_voltage_target_readback_value,
-    ])
+        # lists of channels for easy access
+        # there must be a nicer way to do this:
+        
+        self._voltage_target_channels.extend([
+            self.channel_8_voltage_target,
+        ])
 
-    _shift_channels = CAENelsBimorphMirror7Channel._shift_channels.copy()
+        self._voltage_target_readback_value_channels.extend([
+            self.channel_8_voltage_target_readback_value,
+        ])
 
-    _shift_channels.extend([
-        channel_8_shift,
-    ])
+        self._shift_channels.extend([
+            self.channel_8_shift,
+        ])
 
-    _voltage_out_channels = CAENelsBimorphMirror7Channel._voltage_out_channels.copy()
-    
-    _voltage_out_channels.extend([
-        channel_8_voltage_out,
-    ])
+        self._voltage_out_channels.extend([
+            self.channel_8_voltage_out,
+        ])
 
-    _voltage_out_readback_value_channels = CAENelsBimorphMirror7Channel._voltage_out_readback_value_channels.copy()
-    
-    _voltage_out_readback_value_channels.extend([
-        channel_8_voltage_out_readback_value,
-    ])
-    
-    _status_channels = CAENelsBimorphMirror7Channel._status_channels.copy()
-    
-    _status_channels.extend([
-        channel_8_status,
-    ])
+        self._voltage_out_readback_value_channels.extend([
+            self.channel_8_voltage_out_readback_value,
+        ])
+        
+        self._status_channels.extend([
+            self.channel_8_status,
+        ])
