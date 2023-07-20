@@ -1,25 +1,9 @@
-from enum import IntEnum
+from .CAENels_bimorph_mirror_0_channel import CAENelsBimorphMirror0Channel
 
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
 
 
-class OnOff(IntEnum):
-    ON = 1,
-    OFF = 0
-
-
-class OperationMode(IntEnum):
-    HI = 0,
-    NORMAL = 1,
-    FAST = 2
-
-class Status(IntEnum):
-    IDLE = 0,
-    BUSY = 1,
-    ERR = 2
-
-
-class CAENelsBimorphMirror8Channel(Device):
+class CAENelsBimorphMirror8Channel(CAENelsBimorphMirror0Channel):
     """
     Class representing a CAENels 8-Channel Bimorph Mirror.
 
@@ -31,24 +15,6 @@ class CAENelsBimorphMirror8Channel(Device):
         TARGETLIST (Component?)
         HYSTERESISLIST (Component?)
     """
-    # Uses OnOff Enum:
-    on_off: EpicsSignal = Component(EpicsSignal, "ONOFF")
-    all_target_proc: EpicsSignal = Component(EpicsSignal, "ALLTRGT.PROC")
-    # Uses OperationMode Enum:
-    operation_mode: EpicsSignal = Component(EpicsSignal, "OPMODE")
-    all_shift: EpicsSignal = Component(EpicsSignal, "ALLSHIFT")
-    all_volt: EpicsSignal = Component(EpicsSignal, "ALLVOLT")
-    operation_mode_readback_value: EpicsSignalRO = Component(
-        EpicsSignalRO, "OPMODE_RBV"
-    )
-    # Basically just the number of channels:
-    channels: EpicsSignalRO = Component(EpicsSignalRO, "CHANNELS")
-    status: EpicsSignalRO = Component(EpicsSignalRO, "STATUS")
-    board_temperature: EpicsSignalRO = Component(EpicsSignalRO, "TEMPS")
-    # PV suffix RESETERR.PROC, ERR, might be confusing. Errors come through
-    # ..:BUSY kinda:
-    reset_alarms: EpicsSignal = Component(EpicsSignal, "RESETERR.PROC")
-    alarm_status: EpicsSignalRO = Component(EpicsSignalRO, "ERR")
 
     channel_1_voltage_target: EpicsSignal = Component(EpicsSignal, "C1:VTRGT")
     channel_2_voltage_target: EpicsSignal = Component(EpicsSignal, "C2:VTRGT")
