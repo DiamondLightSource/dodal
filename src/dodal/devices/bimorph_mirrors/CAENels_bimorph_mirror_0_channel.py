@@ -1,6 +1,14 @@
-from enum import IntEnum
+from enum import Enum, IntEnum
 
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
+
+class ChannelTypes(Enum):
+    VTRGT = "VTRGT",
+    VTRGT_RBV = "VTRGT_RBV",
+    SHIFT = "SHIFT",
+    VOUT = "VOUT",
+    VOUT_RBV = "VOUT_RBV",
+    STATUS = "STATUS"
 
 class OnOff(IntEnum):
     ON = 1,

@@ -15,6 +15,7 @@ from dodal.devices.bimorph_mirrors.CAENels_bimorph_mirror_8_channel import (
     CAENelsBimorphMirror8Channel,
 )
 from dodal.devices.bimorph_mirrors.CAENels_bimorph_mirror_0_channel import (
+    ChannelTypes,
     OnOff,
     OperationMode,
     Status,
@@ -23,14 +24,6 @@ from dodal.devices.bimorph_mirrors.CAENels_bimorph_mirror_0_channel import (
 import random
 from functools import partial
 
-from enum import Enum
-class ChannelTypes(Enum):
-    VTRGT = "VTRGT",
-    VTRGT_RBV = "VTRGT_RBV",
-    SHIFT = "SHIFT",
-    VOUT = "VOUT",
-    VOUT_RBV = "VOUT_RBV",
-    STATUS = "STATUS"
 
 def get_channels(bimorph8: CAENelsBimorphMirror8Channel, channel_type: ChannelTypes) -> list:
     """
