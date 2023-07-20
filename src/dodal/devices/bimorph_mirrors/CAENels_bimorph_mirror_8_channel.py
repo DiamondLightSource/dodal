@@ -13,6 +13,11 @@ class OperationMode(IntEnum):
     NORMAL = 1,
     FAST = 2
 
+class Status(IntEnum):
+    IDLE = 0,
+    BUSY = 1,
+    ERR = 2
+
 
 class CAENelsBimorphMirror8Channel(Device):
     """
