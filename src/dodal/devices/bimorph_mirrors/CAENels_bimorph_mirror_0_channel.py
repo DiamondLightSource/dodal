@@ -2,7 +2,7 @@ from enum import Enum, IntEnum
 
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
 
-class ChannelTypes(Enum):
+class ChannelType(Enum):
     VTRGT = "VTRGT",
     VTRGT_RBV = "VTRGT_RBV",
     SHIFT = "SHIFT",
