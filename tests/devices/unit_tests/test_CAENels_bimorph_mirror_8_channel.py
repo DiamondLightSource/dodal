@@ -18,6 +18,7 @@ from dodal.devices.bimorph_mirrors.CAENels_bimorph_mirror_8_channel import (
 )
 
 import random
+from functools import partial
 
 from enum import Enum
 class ChannelTypes(Enum):
@@ -100,17 +101,19 @@ def get_channels(bimorph8: CAENelsBimorphMirror8Channel, channel_type: ChannelTy
             bimorph8.channel_7_status,
             bimorph8.channel_8_status
         ]
-    
-def get_all_voltage_out_readback_values(bimorph: CAENelsBimorphMirror8Channel) -> list[float]:
-    """
-    Function to returning all VOUT_RBV values from given bimorph as a list
-    """
-    current_voltages = []
-    for channel in get_channels(bimorph, ChannelTypes.VOUT_RBV):
-        voltage = parsed_read(channel)
-        current_voltages.append(voltage)
-    return current_voltages
 
+def get_8_channel_values(bimorph: CAENelsBimorphMirror8Channel, channel_type: ChannelTypes) -> list:
+    """
+    Reads al 8 channels from bimorph of specifical channel type.
+    """
+    values = []
+    for channel in get_channels(bimorph, channel_type):
+        values.append(parsed_read(channel))
+    return values
+    
+get_all_voltage_out_readback_values = partial(
+    get_8_channel_values, channel_type=ChannelTypes.VOUT_RBV
+)
 
 def wait_for_signal(signal: EpicsSignal, value, timeout: float=10.0, sleep_time: float=0.1, signal_range: list = None, wait_message: str = None) -> None:
     """
@@ -135,7 +138,6 @@ def wait_for_signal(signal: EpicsSignal, value, timeout: float=10.0, sleep_time:
         time.sleep(sleep_time)
 
 
-from functools import partial
 wait_till_idle = partial(wait_for_signal, value=0, signal_range={0,1})
 wait_till_busy = partial(wait_for_signal, value=1, signal_range={0,1})
 
