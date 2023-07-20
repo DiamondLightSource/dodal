@@ -252,7 +252,6 @@ def test_voltage_target():
 
     voltage_target_list = get_channels(bimorph, ChannelTypes.VTRGT)
     voltage_target_readback_list = get_channels(bimorph, ChannelTypes.VTRGT_RBV)
-    voltage_out_rbv_list = get_channels(bimorph, ChannelTypes.VOUT_RBV)
 
     # To make sure we don't happen to choose the current voltages, do twice:
     for i in range(2):
@@ -265,10 +264,13 @@ def test_voltage_target():
         assert all([parsed_read(voltage_target_readback_list[i]) ==
             target_voltages[i] for i in range(len(target_voltages))])
         
+        
         protected_set(bimorph.all_target_proc, 1)
         
-        assert all([parsed_read(voltage_out_rbv_list[i]) == 
-            target_voltages[i] for i in range(len(target_voltages))])
+        new_voltages = get_all_voltage_out_readback_values(bimorph)
+
+        assert all([voltage == target_voltage for 
+            voltage, target_voltage in zip(new_voltages, target_voltages)])
 
 def test_shift():
     """
@@ -299,7 +301,6 @@ def test_voltage_out():
     bimorph.wait_for_connection()
 
     voltage_out_list = get_channels(bimorph, ChannelTypes.VOUT)
-    voltage_out_rbv_list = get_channels(bimorph, ChannelTypes.VOUT_RBV)
 
     for i in range(2):
         target_voltages = [round(random.random()*10,1) for i in range(8)]
@@ -310,5 +311,7 @@ def test_voltage_out():
         assert all([parsed_read(voltage_out_list[i]) == 
             target_voltages[i] for i in range(len(target_voltages))])
         
-        assert all([parsed_read(voltage_out_rbv_list[i]) == 
-            target_voltages[i] for i in range(len(target_voltages))])
+        new_voltages = get_all_voltage_out_readback_values(bimorph)
+
+        assert all([voltage == target_voltage for
+            voltage, target_voltage in zip(new_voltages, target_voltages)])
