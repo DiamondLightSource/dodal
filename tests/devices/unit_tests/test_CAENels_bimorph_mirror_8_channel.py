@@ -13,6 +13,8 @@ from ophyd import EpicsSignal
 
 from dodal.devices.bimorph_mirrors.CAENels_bimorph_mirror_8_channel import (
     CAENelsBimorphMirror8Channel,
+)
+from dodal.devices.bimorph_mirrors.CAENels_bimorph_mirror_0_channel import (
     OnOff,
     OperationMode,
     Status,
