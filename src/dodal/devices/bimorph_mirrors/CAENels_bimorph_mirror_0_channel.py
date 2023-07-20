@@ -49,3 +49,11 @@ class CAENelsBimorphMirror0Channel(Device):
     # ..:BUSY kinda:
     reset_alarms: EpicsSignal = Component(EpicsSignal, "RESETERR.PROC")
     alarm_status: EpicsSignalRO = Component(EpicsSignalRO, "ERR")
+
+    # Lists of channels for easy access:
+    _voltage_target_channels: list = []
+    _voltage_target_readback_value_channels: list = []
+    _shift_channels: list = []
+    _voltage_out_channels: list = []
+    _voltage_out_readback_value_channels: list = []
+    _status_channels: list = []
