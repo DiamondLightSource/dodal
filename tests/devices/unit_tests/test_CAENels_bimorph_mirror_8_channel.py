@@ -294,7 +294,9 @@ def test_voltage_target():
     bimorph.wait_for_connection()
 
     voltage_target_list = get_channels_by_attributes(bimorph, ChannelAttribute.VTRGT)
-    voltage_target_readback_list = get_channels_by_attributes(bimorph, ChannelAttribute.VTRGT_RBV)
+    voltage_target_readback_list = get_channels_by_attributes(
+        bimorph, ChannelAttribute.VTRGT_RBV
+    )
 
     # To make sure we don't happen to choose the current voltages, do twice:
     for i in range(2):
@@ -402,3 +404,26 @@ def test_get_channels_by_attribute():
                 for channel_1, channel_2 in zip(channel1_list, channel2_list)
             ]
         )
+
+
+def test_wait_for_signal_value():
+    """
+    Tests that bimorph's wait_for_signal_value works.
+
+    I don't really know that these tests proves much...
+    """
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph.wait_for_connection()
+
+    protected_set(bimorph.channel_1_voltage_out, 10)
+    bimorph.wait_for_signal_value(bimorph.status, 0)
+    assert bimorph.status.read()[bimorph.status.name]["value"] == 0
+
+    protected_set(bimorph.channel_1_voltage_out, 20)
+    bimorph.wait_for_signal_value(bimorph.channel_1_voltage_out_readback_value, 20)
+    assert (
+        bimorph.channel_1_voltage_out_readback_value.read()[
+            bimorph.channel_1_voltage_out_readback_value.name
+        ]["value"]
+        == 20
+    )
