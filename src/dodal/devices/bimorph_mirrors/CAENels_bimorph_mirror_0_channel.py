@@ -142,6 +142,18 @@ class CAENelsBimorphMirror0Channel(Device):
         signal.set(value)
         self.wait_till_busy()
 
+    def parsed_protected_read(self, signal: EpicsSignal):
+        """Calls waits till idle then reads from signal and parses output for value.
+
+        Args:
+            signal: The signal to be read from
+
+        Returns:
+            A value read from the signal
+        """
+        res = self.protected_read(signal)
+        return res[signal.name]["value"]
+
     def get_channels_by_attribute(self, channel_attribute: ChannelAttribute) -> list:
         """Takes an attribute and returns a list of Signals that share that attribute across all channels.
 

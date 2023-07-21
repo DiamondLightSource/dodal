@@ -479,3 +479,21 @@ def test_protected_set():
 
     assert bimorph.status.read()[bimorph.status.name]["value"] == Status.BUSY
     assert parsed_read(bimorph.channel_1_voltage_out_readback_value) == test_voltage
+
+
+def test_parsed_protected_read():
+    """
+    Tests CAENelsBimorphMirror0Channel.parsed_protected_read
+    """
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph.wait_for_connection()
+
+    test_voltage = round(random.random() * 30, 1) + 1
+
+    protected_set(bimorph.channel_1_voltage_out, test_voltage)
+    assert (
+        bimorph.parsed_protected_read(bimorph.channel_1_voltage_out_readback_value)
+        == test_voltage
+    )
+
+    assert bimorph.status.read()[bimorph.status.name]["value"] == Status.IDLE
