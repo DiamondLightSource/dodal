@@ -25,7 +25,7 @@ Stuff that isn't tested:
 """
 
 
-def get_channels(
+def get_channels_by_attributes(
     bimorph8: CAENelsBimorphMirror8Channel, channel_attribute: ChannelAttribute
 ) -> list:
     """
@@ -108,7 +108,7 @@ def get_8_channel_values(
     Reads al 8 channels from bimorph of specifical channel type.
     """
     values = []
-    for channel in get_channels(bimorph, channel_attribute):
+    for channel in get_channels_by_attributes(bimorph, channel_attribute):
         values.append(parsed_read(channel))
     return values
 
@@ -293,8 +293,8 @@ def test_voltage_target():
     bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
     bimorph.wait_for_connection()
 
-    voltage_target_list = get_channels(bimorph, ChannelAttribute.VTRGT)
-    voltage_target_readback_list = get_channels(bimorph, ChannelAttribute.VTRGT_RBV)
+    voltage_target_list = get_channels_by_attributes(bimorph, ChannelAttribute.VTRGT)
+    voltage_target_readback_list = get_channels_by_attributes(bimorph, ChannelAttribute.VTRGT_RBV)
 
     # To make sure we don't happen to choose the current voltages, do twice:
     for i in range(2):
@@ -330,7 +330,7 @@ def test_shift():
     bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
     bimorph.wait_for_connection()
 
-    shift_list = get_channels(bimorph, ChannelAttribute.SHIFT)
+    shift_list = get_channels_by_attributes(bimorph, ChannelAttribute.SHIFT)
 
     shifts = [round(random.random() * 30 + 1) for i in range(8)]
 
@@ -358,7 +358,7 @@ def test_voltage_out():
     bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
     bimorph.wait_for_connection()
 
-    voltage_out_list = get_channels(bimorph, ChannelAttribute.VOUT)
+    voltage_out_list = get_channels_by_attributes(bimorph, ChannelAttribute.VOUT)
 
     for i in range(2):
         target_voltages = [round(random.random() * 10, 1) for i in range(8)]
@@ -383,16 +383,16 @@ def test_voltage_out():
         )
 
 
-def test_get_channel():
+def test_get_channels_by_attribute():
     """
-    Tests the bimorph's get_channel method.
+    Tests the bimorph's get_channels_by_attribute method.
     """
     bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
     bimorph.wait_for_connection()
 
     for channel_attribute in list(ChannelAttribute):
-        channel1_list = bimorph.get_channel(channel_attribute)
-        channel2_list = get_channels(bimorph, channel_attribute)
+        channel1_list = bimorph.get_channels_by_attribute(channel_attribute)
+        channel2_list = get_channels_by_attributes(bimorph, channel_attribute)
 
         print(f"channel1_list: {channel1_list}\nchannel2_list: {channel2_list}")
 
