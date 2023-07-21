@@ -438,8 +438,27 @@ def test_wait_till_idle_and_busy():
     bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
     bimorph.wait_for_connection()
 
-    bimorph.channel_1_voltage_out.set(40)
+    test_voltage = round(random.random() * 30, 1) + 1
+    bimorph.channel_1_voltage_out.set(test_voltage)
     bimorph.wait_till_busy()
     assert bimorph.status.read()[bimorph.status.name]["value"] == Status.BUSY
     bimorph.wait_till_idle()
     assert bimorph.status.read()[bimorph.status.name]["value"] == Status.IDLE
+
+
+def test_protected_read():
+    """
+    Tests if CAENelsBimorphMirror0Channel.protected_read works
+    """
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph.wait_for_connection()
+
+    test_voltage = round(random.random() * 30, 1) + 1
+
+    protected_set(bimorph.channel_1_voltage_out, test_voltage)
+    assert (
+        bimorph.protected_read(bimorph.channel_1_voltage_out_readback_value)[
+            bimorph.channel_1_voltage_out_readback_value.name
+        ]["value"]
+        == test_voltage
+    )
