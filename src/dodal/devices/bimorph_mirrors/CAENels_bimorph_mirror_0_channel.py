@@ -72,6 +72,16 @@ class CAENelsBimorphMirror0Channel(Device):
         self._status_channels: list = []
 
     def get_channel(self, channel_type: ChannelType) -> list:
+        """Takes an attribute and returns a list of Signals that share that attribute across all channels.
+
+        Args:
+            channel_type: A ChannelType enum representing the grouping of signals to be returned.
+                eg: ChannelType.VOUT would yield a list of objects representing [C1:VOUT, C2:VOUT, ..., CX:VOUT]
+                for an X-channel bimorph
+
+        Returns:
+            A list containing X Signals where X is the number of channels of the bimorph.
+        """
         if channel_type == ChannelType.VTRGT:
             return self._voltage_target_channels
 
