@@ -3,7 +3,7 @@ from enum import Enum, IntEnum
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
 
 
-class ChannelType(Enum):
+class ChannelAttribute(Enum):
     VTRGT = ("VTRGT",)
     VTRGT_RBV = ("VTRGT_RBV",)
     SHIFT = ("SHIFT",)
@@ -71,31 +71,31 @@ class CAENelsBimorphMirror0Channel(Device):
         self._voltage_out_readback_value_channels: list = []
         self._status_channels: list = []
 
-    def get_channel(self, channel_type: ChannelType) -> list:
+    def get_channels_by_attribute(self, channel_attribute: ChannelAttribute) -> list:
         """Takes an attribute and returns a list of Signals that share that attribute across all channels.
 
         Args:
-            channel_type: A ChannelType enum representing the grouping of signals to be returned.
-                eg: ChannelType.VOUT would yield a list of objects representing [C1:VOUT, C2:VOUT, ..., CX:VOUT]
+            channel_attribute: A ChannelAttribute enum representing the grouping of signals to be returned.
+                eg: ChannelAttribute.VOUT would yield a list of objects representing [C1:VOUT, C2:VOUT, ..., CX:VOUT]
                 for an X-channel bimorph
 
         Returns:
             A list containing X Signals where X is the number of channels of the bimorph.
         """
-        if channel_type == ChannelType.VTRGT:
+        if channel_attribute == ChannelAttribute.VTRGT:
             return self._voltage_target_channels
 
-        elif channel_type == ChannelType.VTRGT_RBV:
+        elif channel_attribute == ChannelAttribute.VTRGT_RBV:
             return self._voltage_target_readback_value_channels
 
-        elif channel_type == ChannelType.SHIFT:
+        elif channel_attribute == ChannelAttribute.SHIFT:
             return self._shift_channels
 
-        elif channel_type == ChannelType.VOUT:
+        elif channel_attribute == ChannelAttribute.VOUT:
             return self._voltage_out_channels
 
-        elif channel_type == ChannelType.VOUT_RBV:
+        elif channel_attribute == ChannelAttribute.VOUT_RBV:
             return self._voltage_out_readback_value_channels
 
-        elif channel_type == ChannelType.STATUS:
+        elif channel_attribute == ChannelAttribute.STATUS:
             return self._status_channels
