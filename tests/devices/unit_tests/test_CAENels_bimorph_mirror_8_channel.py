@@ -462,4 +462,5 @@ def test_protected_read():
         ]["value"]
         == test_voltage
     )
-    assert(bimorph.status.read()[bimorph.status.name]['value'] == Status.IDLE)
+
+    assert bimorph.status.read()[bimorph.status.name]["value"] == Status.IDLE
