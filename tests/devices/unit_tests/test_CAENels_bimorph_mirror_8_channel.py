@@ -427,3 +427,19 @@ def test_wait_for_signal_value():
         ]["value"]
         == 20
     )
+
+
+def test_wait_till_idle_and_busy():
+    """
+    Test to see if CAENelsBimorphMirror0Channel.wait_till_idle and .wait_till_busy work...
+
+    I feel like to do this properly I need to do some clever async stuff, so this is fairly light.
+    """
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph.wait_for_connection()
+
+    bimorph.channel_1_voltage_out.set(40)
+    bimorph.wait_till_busy()
+    assert bimorph.status.read()[bimorph.status.name]["value"] == Status.BUSY
+    bimorph.wait_till_idle()
+    assert bimorph.status.read()[bimorph.status.name]["value"] == Status.IDLE
