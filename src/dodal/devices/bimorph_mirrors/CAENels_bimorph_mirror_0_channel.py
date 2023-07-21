@@ -2,27 +2,30 @@ from enum import Enum, IntEnum
 
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
 
+
 class ChannelType(Enum):
-    VTRGT = "VTRGT",
-    VTRGT_RBV = "VTRGT_RBV",
-    SHIFT = "SHIFT",
-    VOUT = "VOUT",
-    VOUT_RBV = "VOUT_RBV",
+    VTRGT = ("VTRGT",)
+    VTRGT_RBV = ("VTRGT_RBV",)
+    SHIFT = ("SHIFT",)
+    VOUT = ("VOUT",)
+    VOUT_RBV = ("VOUT_RBV",)
     STATUS = "STATUS"
 
+
 class OnOff(IntEnum):
-    ON = 1,
+    ON = (1,)
     OFF = 0
 
 
 class OperationMode(IntEnum):
-    HI = 0,
-    NORMAL = 1,
+    HI = (0,)
+    NORMAL = (1,)
     FAST = 2
 
+
 class Status(IntEnum):
-    IDLE = 0,
-    BUSY = 1,
+    IDLE = (0,)
+    BUSY = (1,)
     ERR = 2
 
 
@@ -71,18 +74,18 @@ class CAENelsBimorphMirror0Channel(Device):
     def get_channel(self, channel_type: ChannelType) -> list:
         if channel_type == ChannelType.VTRGT:
             return self._voltage_target_channels
-        
+
         elif channel_type == ChannelType.VTRGT_RBV:
             return self._voltage_target_readback_value_channels
-        
+
         elif channel_type == ChannelType.SHIFT:
             return self._shift_channels
-        
+
         elif channel_type == ChannelType.VOUT:
             return self._voltage_out_channels
-        
+
         elif channel_type == ChannelType.VOUT_RBV:
             return self._voltage_out_readback_value_channels
-        
+
         elif channel_type == ChannelType.STATUS:
             return self._status_channels
