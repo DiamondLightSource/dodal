@@ -5,6 +5,8 @@ from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
 import time
 from typing import Union
 
+from functools import partial
+
 
 class ChannelAttribute(Enum):
     VTRGT = ("VTRGT",)
@@ -73,6 +75,20 @@ class CAENelsBimorphMirror0Channel(Device):
         self._voltage_out_channels: list = []
         self._voltage_out_readback_value_channels: list = []
         self._status_channels: list = []
+
+        # because self.status is compiled in a signal at instantiation, these have to be define in __init__:
+        self.wait_till_idle = partial(
+            self.wait_for_signal_value,
+            self.status,
+            Status.IDLE,
+            signal_range=[Status.IDLE, Status.BUSY],
+        )
+        self.wait_till_busy = partial(
+            self.wait_for_signal_value,
+            self.status,
+            Status.BUSY,
+            signal_range=[Status.IDLE, Status.BUSY],
+        )
 
     def wait_for_signal_value(
         self,
