@@ -13,6 +13,7 @@ from dodal.devices.bimorph_mirrors.CAENels_bimorph_mirror_0_channel import (
 import random
 from functools import partial
 from ophyd import Component, Device, EpicsSignal
+from typing import Union
 
 """
 Stuff that isn't tested:
@@ -122,8 +123,8 @@ def wait_for_signal(
     value,
     timeout: float = 10.0,
     sleep_time: float = 0.1,
-    signal_range: list = None,
-    wait_message: str = None,
+    signal_range: Union[list, None] = None,
+    wait_message: Union[str, None] = None,
 ) -> None:
     """
     Waits for signal to display given value. By default, times out after 10.0 seconds.
