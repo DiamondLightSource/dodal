@@ -99,3 +99,19 @@ class CAENelsBimorphMirror0Channel(Device):
 
         elif channel_attribute == ChannelAttribute.STATUS:
             return self._status_channels
+
+    def read_from_all_channels_by_attribute(
+        self, channel_attribute: ChannelAttribute
+    ) -> list:
+        """Takes an attribuet and returns a list of values read from all signals sharing that attribute.
+
+        Args:
+            channel_attribute: A ChannelAttribute enum representing the grouping of signals to be returned.
+                eg: ChannelAttribute.VOUT would yield a list of objects representing [C1:VOUT, C2:VOUT, ..., CX:VOUT]
+                for an X-channel bimorph            channel_attribute: attribute grouping
+
+
+        Returns:
+            A list of values read from X signals related to the given attribute, where X is the numebr of channels in the bimorph.
+        """
+        pass
