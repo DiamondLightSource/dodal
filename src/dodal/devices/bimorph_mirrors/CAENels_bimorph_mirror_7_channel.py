@@ -1,6 +1,7 @@
 from .CAENels_bimorph_mirror_0_channel import CAENelsBimorphMirror0Channel
 
-from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
+from ophyd import Component, EpicsSignal, EpicsSignalRO
+
 
 class CAENelsBimorphMirror7Channel(CAENelsBimorphMirror0Channel):
     """
@@ -9,6 +10,7 @@ class CAENelsBimorphMirror7Channel(CAENelsBimorphMirror0Channel):
     Adds 7 channels to 0 inherited.
 
     """
+
     channel_1_voltage_target: EpicsSignal = Component(EpicsSignal, "C1:VTRGT")
     channel_2_voltage_target: EpicsSignal = Component(EpicsSignal, "C2:VTRGT")
     channel_3_voltage_target: EpicsSignal = Component(EpicsSignal, "C3:VTRGT")
@@ -86,69 +88,78 @@ class CAENelsBimorphMirror7Channel(CAENelsBimorphMirror0Channel):
     channel_7_status: EpicsSignalRO = Component(EpicsSignalRO, "C7:STATUS")
 
     def __init__(self, *args, **kwargs):
-        super().__init__(
-            *args,
-            **kwargs
-        )
+        super().__init__(*args, **kwargs)
         # lists of channels for easy access
         # there must be a nicer way to do this:
-        
-        self._voltage_target_channels.extend([
-            self.channel_1_voltage_target,
-            self.channel_2_voltage_target,
-            self.channel_3_voltage_target,
-            self.channel_4_voltage_target,
-            self.channel_5_voltage_target,
-            self.channel_6_voltage_target,
-            self.channel_7_voltage_target,
-        ])
 
-        self._voltage_target_readback_value_channels.extend([
-            self.channel_1_voltage_target_readback_value,
-            self.channel_2_voltage_target_readback_value,
-            self.channel_3_voltage_target_readback_value,
-            self.channel_4_voltage_target_readback_value,
-            self.channel_5_voltage_target_readback_value,
-            self.channel_6_voltage_target_readback_value,
-            self.channel_7_voltage_target_readback_value,
-        ])
+        self._voltage_target_channels.extend(
+            [
+                self.channel_1_voltage_target,
+                self.channel_2_voltage_target,
+                self.channel_3_voltage_target,
+                self.channel_4_voltage_target,
+                self.channel_5_voltage_target,
+                self.channel_6_voltage_target,
+                self.channel_7_voltage_target,
+            ]
+        )
 
-        self._shift_channels.extend([
-            self.channel_1_shift,
-            self.channel_2_shift,
-            self.channel_3_shift,
-            self.channel_4_shift,
-            self.channel_5_shift,
-            self.channel_6_shift,
-            self.channel_7_shift,
-        ])
+        self._voltage_target_readback_value_channels.extend(
+            [
+                self.channel_1_voltage_target_readback_value,
+                self.channel_2_voltage_target_readback_value,
+                self.channel_3_voltage_target_readback_value,
+                self.channel_4_voltage_target_readback_value,
+                self.channel_5_voltage_target_readback_value,
+                self.channel_6_voltage_target_readback_value,
+                self.channel_7_voltage_target_readback_value,
+            ]
+        )
 
-        self._voltage_out_channels.extend([
-            self.channel_1_voltage_out,
-            self.channel_2_voltage_out,
-            self.channel_3_voltage_out,
-            self.channel_4_voltage_out,
-            self.channel_5_voltage_out,
-            self.channel_6_voltage_out,
-            self.channel_7_voltage_out,
-        ])
+        self._shift_channels.extend(
+            [
+                self.channel_1_shift,
+                self.channel_2_shift,
+                self.channel_3_shift,
+                self.channel_4_shift,
+                self.channel_5_shift,
+                self.channel_6_shift,
+                self.channel_7_shift,
+            ]
+        )
 
-        self._voltage_out_readback_value_channels.extend([
-            self.channel_1_voltage_out_readback_value,
-            self.channel_2_voltage_out_readback_value,
-            self.channel_3_voltage_out_readback_value,
-            self.channel_4_voltage_out_readback_value,
-            self.channel_5_voltage_out_readback_value,
-            self.channel_6_voltage_out_readback_value,
-            self.channel_7_voltage_out_readback_value,
-        ])
-        
-        self._status_channels.extend([
-            self.channel_1_status,
-            self.channel_2_status,
-            self.channel_3_status,
-            self.channel_4_status,
-            self.channel_5_status,
-            self.channel_6_status,
-            self.channel_7_status,
-        ])
+        self._voltage_out_channels.extend(
+            [
+                self.channel_1_voltage_out,
+                self.channel_2_voltage_out,
+                self.channel_3_voltage_out,
+                self.channel_4_voltage_out,
+                self.channel_5_voltage_out,
+                self.channel_6_voltage_out,
+                self.channel_7_voltage_out,
+            ]
+        )
+
+        self._voltage_out_readback_value_channels.extend(
+            [
+                self.channel_1_voltage_out_readback_value,
+                self.channel_2_voltage_out_readback_value,
+                self.channel_3_voltage_out_readback_value,
+                self.channel_4_voltage_out_readback_value,
+                self.channel_5_voltage_out_readback_value,
+                self.channel_6_voltage_out_readback_value,
+                self.channel_7_voltage_out_readback_value,
+            ]
+        )
+
+        self._status_channels.extend(
+            [
+                self.channel_1_status,
+                self.channel_2_status,
+                self.channel_3_status,
+                self.channel_4_status,
+                self.channel_5_status,
+                self.channel_6_status,
+                self.channel_7_status,
+            ]
+        )
