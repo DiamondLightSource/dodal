@@ -4,7 +4,7 @@ from dodal.devices.bimorph_mirrors.CAENels_bimorph_mirror_8_channel import (
     CAENelsBimorphMirror8Channel,
 )
 from dodal.devices.bimorph_mirrors.CAENels_bimorph_mirror_0_channel import (
-    ChannelType,
+    ChannelAttribute,
     OnOff,
     OperationMode,
     Status,
@@ -26,12 +26,12 @@ Stuff that isn't tested:
 
 
 def get_channels(
-    bimorph8: CAENelsBimorphMirror8Channel, channel_type: ChannelType
+    bimorph8: CAENelsBimorphMirror8Channel, channel_attribute: ChannelAttribute
 ) -> list:
     """
     Just takes an 8-chanel bimorph and returns a list of relevant the channel components
     """
-    if channel_type == ChannelType.VTRGT:
+    if channel_attribute == ChannelAttribute.VTRGT:
         return [
             bimorph8.channel_1_voltage_target,
             bimorph8.channel_2_voltage_target,
@@ -42,7 +42,7 @@ def get_channels(
             bimorph8.channel_7_voltage_target,
             bimorph8.channel_8_voltage_target,
         ]
-    elif channel_type == ChannelType.VTRGT_RBV:
+    elif channel_attribute == ChannelAttribute.VTRGT_RBV:
         return [
             bimorph8.channel_1_voltage_target_readback_value,
             bimorph8.channel_2_voltage_target_readback_value,
@@ -54,7 +54,7 @@ def get_channels(
             bimorph8.channel_8_voltage_target_readback_value,
         ]
 
-    elif channel_type == ChannelType.SHIFT:
+    elif channel_attribute == ChannelAttribute.SHIFT:
         return [
             bimorph8.channel_1_shift,
             bimorph8.channel_2_shift,
@@ -66,7 +66,7 @@ def get_channels(
             bimorph8.channel_8_shift,
         ]
 
-    elif channel_type == ChannelType.VOUT:
+    elif channel_attribute == ChannelAttribute.VOUT:
         return [
             bimorph8.channel_1_voltage_out,
             bimorph8.channel_2_voltage_out,
@@ -77,7 +77,7 @@ def get_channels(
             bimorph8.channel_7_voltage_out,
             bimorph8.channel_8_voltage_out,
         ]
-    elif channel_type == ChannelType.VOUT_RBV:
+    elif channel_attribute == ChannelAttribute.VOUT_RBV:
         return [
             bimorph8.channel_1_voltage_out_readback_value,
             bimorph8.channel_2_voltage_out_readback_value,
@@ -88,7 +88,7 @@ def get_channels(
             bimorph8.channel_7_voltage_out_readback_value,
             bimorph8.channel_8_voltage_out_readback_value,
         ]
-    elif channel_type == ChannelType.STATUS:
+    elif channel_attribute == ChannelAttribute.STATUS:
         return [
             bimorph8.channel_1_status,
             bimorph8.channel_2_status,
@@ -102,19 +102,19 @@ def get_channels(
 
 
 def get_8_channel_values(
-    bimorph: CAENelsBimorphMirror8Channel, channel_type: ChannelType
+    bimorph: CAENelsBimorphMirror8Channel, channel_attribute: ChannelAttribute
 ) -> list:
     """
     Reads al 8 channels from bimorph of specifical channel type.
     """
     values = []
-    for channel in get_channels(bimorph, channel_type):
+    for channel in get_channels(bimorph, channel_attribute):
         values.append(parsed_read(channel))
     return values
 
 
 get_all_voltage_out_readback_values = partial(
-    get_8_channel_values, channel_type=ChannelType.VOUT_RBV
+    get_8_channel_values, channel_attribute=ChannelAttribute.VOUT_RBV
 )
 
 
@@ -293,8 +293,8 @@ def test_voltage_target():
     bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
     bimorph.wait_for_connection()
 
-    voltage_target_list = get_channels(bimorph, ChannelType.VTRGT)
-    voltage_target_readback_list = get_channels(bimorph, ChannelType.VTRGT_RBV)
+    voltage_target_list = get_channels(bimorph, ChannelAttribute.VTRGT)
+    voltage_target_readback_list = get_channels(bimorph, ChannelAttribute.VTRGT_RBV)
 
     # To make sure we don't happen to choose the current voltages, do twice:
     for i in range(2):
@@ -330,7 +330,7 @@ def test_shift():
     bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
     bimorph.wait_for_connection()
 
-    shift_list = get_channels(bimorph, ChannelType.SHIFT)
+    shift_list = get_channels(bimorph, ChannelAttribute.SHIFT)
 
     shifts = [round(random.random() * 30 + 1) for i in range(8)]
 
@@ -358,7 +358,7 @@ def test_voltage_out():
     bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
     bimorph.wait_for_connection()
 
-    voltage_out_list = get_channels(bimorph, ChannelType.VOUT)
+    voltage_out_list = get_channels(bimorph, ChannelAttribute.VOUT)
 
     for i in range(2):
         target_voltages = [round(random.random() * 10, 1) for i in range(8)]
@@ -390,9 +390,9 @@ def test_get_channel():
     bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
     bimorph.wait_for_connection()
 
-    for channel_type in list(ChannelType):
-        channel1_list = bimorph.get_channel(channel_type)
-        channel2_list = get_channels(bimorph, channel_type)
+    for channel_attribute in list(ChannelAttribute):
+        channel1_list = bimorph.get_channel(channel_attribute)
+        channel2_list = get_channels(bimorph, channel_attribute)
 
         print(f"channel1_list: {channel1_list}\nchannel2_list: {channel2_list}")
 
