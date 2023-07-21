@@ -2,6 +2,9 @@ from enum import Enum, IntEnum
 
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
 
+import time
+from typing import Union
+
 
 class ChannelAttribute(Enum):
     VTRGT = ("VTRGT",)
@@ -70,6 +73,35 @@ class CAENelsBimorphMirror0Channel(Device):
         self._voltage_out_channels: list = []
         self._voltage_out_readback_value_channels: list = []
         self._status_channels: list = []
+
+    def wait_for_signal_value(
+        self,
+        signal: EpicsSignal,
+        value,
+        timeout: float = 10.0,
+        sleep_time: float = 0.1,
+        signal_range: Union[list, None] = None,
+    ):
+        """Wait for a signal to display given value. Default to polling time of 0.1 seconds, and timeout after 10.0.
+
+        If signal_range is non-none, an exception will be raised if the signal value does not exist in signal_range list.
+        """
+        stamp = time.time()
+        res = signal.read()[signal.name]["value"]
+
+        while res != value:
+            if signal_range is not None:
+                if res not in signal_range:
+                    raise Exception(
+                        f"Out of range: {signal} showing {res} not in {signal_range}"
+                    )
+
+            if time.time() - stamp > timeout:
+                raise Exception(f"Timeout waiting for {signal} to show {value}")
+
+            time.sleep(sleep_time)
+
+            res = signal.read()[signal.name]["value"]
 
     def get_channels_by_attribute(self, channel_attribute: ChannelAttribute) -> list:
         """Takes an attribute and returns a list of Signals that share that attribute across all channels.
