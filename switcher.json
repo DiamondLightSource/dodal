@@ -40,6 +40,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/0.0.2_async_arming/"
   },
   {
+    "version": "124_implement_i23_gonio",
+    "url": "https://DiamondLightSource.github.io/dodal/124_implement_i23_gonio/"
+  },
+  {
     "version": "262_make_arming_eiger_asynchronous",
     "url": "https://DiamondLightSource.github.io/dodal/262_make_arming_eiger_asynchronous/"
   },
