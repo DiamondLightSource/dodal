@@ -521,3 +521,32 @@ def test_read_from_all_channels_by_attribute():
             vout_rbv_value == target_voltage for vout_rbv_value, target_voltage in zip(voltage_out_rbv_values, target_voltages)
         ]
     )
+
+def test_write_to_all_channels_by_attribute():
+    """
+    Tests CAENelsBimorphMirror8Channel.write_to_all_channels_by_attribute
+    """
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph.wait_for_connection()
+
+    voltage_out_list = get_channels_by_attributes(bimorph, ChannelAttribute.VOUT)
+
+    target_voltages = [round(random.random() * 10, 1) for i in range(8)]
+
+    bimorph.write_to_all_channels_by_attribute(ChannelAttribute.VOUT, target_voltages)
+
+    assert all(
+        [
+            parsed_read(voltage_out) == target_voltage
+            for voltage_out, target_voltage in zip(voltage_out_list, target_voltages)
+        ]
+    )
+
+    new_voltages = get_all_voltage_out_readback_values(bimorph)
+
+    assert all(
+        [
+            voltage == target_voltage
+            for voltage, target_voltage in zip(new_voltages, target_voltages)
+        ]
+    )
