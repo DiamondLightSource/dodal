@@ -2,7 +2,6 @@ import os
 
 from dodal.utils import make_all_devices
 
-
 if __name__ == "__main__":
     """This test runs against the real beamline and confirms that all the devices connect
     i.e. that we match the beamline PVs. Obviously this must be run on the DLS network
