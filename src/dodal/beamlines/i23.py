@@ -1,7 +1,7 @@
 from dodal.beamlines.beamline_utils import device_instantiation
 from dodal.devices.i23.gonio import Gonio
 from dodal.log import set_beamline as set_log_beamline
-from dodal.utils import BeamlinePrefix, get_beamline_name
+from dodal.utils import get_beamline_name
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
 
 
