@@ -499,6 +499,9 @@ def test_parsed_protected_read():
     assert bimorph.status.read()[bimorph.status.name]["value"] == Status.IDLE
 
 def test_read_from_all_channels_by_attribute():
+    """
+    Tests CAENelsBimorphMirror8Channel.read_from_all_channels_by_attribute
+    """
     bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
     bimorph.wait_for_connection()
 
