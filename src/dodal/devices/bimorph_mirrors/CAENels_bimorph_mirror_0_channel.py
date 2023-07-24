@@ -200,3 +200,15 @@ class CAENelsBimorphMirror0Channel(Device):
         channels = self.get_channels_by_attribute(channel_attribute)
 
         return [self.parsed_protected_read(channel) for channel in channels]
+    
+    def write_to_all_channels_by_attribute(self, channel_attribute: ChannelAttribute, values: list):
+        """Writes given values to signals grouped by given attribute.
+        
+        Args:
+            channel_attribute: A ChannelAttribute enum representing the grouping of signals to be written to.
+            values: A list of values of length equal to the number of channels of the bimorph
+        """
+        channels = self.get_channels_by_attribute(channel_attribute)
+
+        for channel, value in zip(channels, values):
+            self.protected_set(channel, value)
