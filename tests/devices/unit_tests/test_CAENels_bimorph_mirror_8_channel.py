@@ -497,3 +497,24 @@ def test_parsed_protected_read():
     )
 
     assert bimorph.status.read()[bimorph.status.name]["value"] == Status.IDLE
+
+def test_read_from_all_channels_by_attribute():
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph.wait_for_connection()
+
+    voltage_out_list = get_channels_by_attributes(bimorph, ChannelAttribute.VOUT)
+
+    target_voltages = [round(random.random() * 10, 1) for i in range(8)]
+
+    for index, voltage_out_signal in enumerate(voltage_out_list):
+        protected_set(voltage_out_signal, target_voltages[index])
+    
+    voltage_out_rbv_values = bimorph.read_from_all_channels_by_attribute(
+        ChannelAttribute.VOUT_RBV
+    )
+
+    assert all(
+        [
+            vout_rbv_value == target_voltage for vout_rbv_value, target_voltage in zip(voltage_out_rbv_values, target_voltages)
+        ]
+    )

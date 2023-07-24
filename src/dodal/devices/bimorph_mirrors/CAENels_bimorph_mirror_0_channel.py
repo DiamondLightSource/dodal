@@ -197,4 +197,6 @@ class CAENelsBimorphMirror0Channel(Device):
         Returns:
             A list of values read from X signals related to the given attribute, where X is the numebr of channels in the bimorph.
         """
-        pass
+        channels = self.get_channels_by_attribute(channel_attribute)
+
+        return [self.parsed_protected_read(channel) for channel in channels]
