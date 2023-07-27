@@ -84,6 +84,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/artemis_701_do_optimise_attenuation_scan/"
   },
   {
+    "version": "artemis_756_fold_rotation_improvements_back",
+    "url": "https://DiamondLightSource.github.io/dodal/artemis_756_fold_rotation_improvements_back/"
+  },
+  {
     "version": "artemis_810_ensure_use_of_dataclasses_are_correct",
     "url": "https://DiamondLightSource.github.io/dodal/artemis_810_ensure_use_of_dataclasses_are_correct/"
   },
@@ -98,10 +102,6 @@
   {
     "version": "p38",
     "url": "https://DiamondLightSource.github.io/dodal/p38/"
-  },
-  {
-    "version": "p38def",
-    "url": "https://DiamondLightSource.github.io/dodal/p38def/"
   },
   {
     "version": "p38fix",
