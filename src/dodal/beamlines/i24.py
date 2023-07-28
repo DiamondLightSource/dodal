@@ -6,9 +6,7 @@ from dodal.devices.backlight import Backlight
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector_motion import DetectorMotion
 from dodal.devices.eiger import EigerDetector
-from dodal.devices.i24.jungfrau import JungfrauM1
-from dodal.devices.i24.read_only_attenuator import ReadOnlyEnergyAndAttenuator
-from dodal.devices.i24.vgonio import VGonio
+from dodal.devices.i24.i24_vgonio import VGonio
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.zebra import Zebra
 from dodal.log import set_beamline
@@ -29,21 +27,6 @@ def backlight(
         device=Backlight,
         name="backlight",
         prefix="-MO-BL-01:",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
-    )
-
-
-def beam_params(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> ReadOnlyEnergyAndAttenuator:
-    """Get the i24 backlight device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i24, it will return the existing object.
-    """
-    return device_instantiation(
-        device=ReadOnlyEnergyAndAttenuator,
-        name="beam_params",
-        prefix="",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )
@@ -87,22 +70,6 @@ def eiger(
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
         post_create=set_params,
-    )
-
-
-@skip_device(lambda: BL == "s24")
-def jungfrau(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> JungfrauM1:
-    """Get the i24 detector motion device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i24, it will return the existing object.
-    """
-    return device_instantiation(
-        device=JungfrauM1,
-        name="jungfrau_m1",
-        prefix="-EA-JNGFR-01:",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
     )
 
 
