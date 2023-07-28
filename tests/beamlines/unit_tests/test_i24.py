@@ -1,7 +1,7 @@
 import sys
 from unittest.mock import patch
 
-from dodal.devices.i24.vgonio import VGonio
+from dodal.devices.i24.i24_vgonio import VGonio
 
 with patch.dict("os.environ", {"BEAMLINE": "i24"}, clear=True):
     from dodal.beamlines import beamline_utils, i24
