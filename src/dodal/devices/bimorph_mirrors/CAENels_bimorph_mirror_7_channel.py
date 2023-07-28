@@ -1,9 +1,9 @@
-from .CAENels_bimorph_mirror_0_channel import CAENelsBimorphMirror0Channel
+from .CAENels_bimorph_mirror_interface import CAENelsBimorphMirrorInterface
 
 from ophyd import Component, EpicsSignal, EpicsSignalRO
 
 
-class CAENelsBimorphMirror7Channel(CAENelsBimorphMirror0Channel):
+class CAENelsBimorphMirror7Channel(CAENelsBimorphMirrorInterface):
     """
     Class representing a CAENels 7-Channel Bimorph Mirror.
 
