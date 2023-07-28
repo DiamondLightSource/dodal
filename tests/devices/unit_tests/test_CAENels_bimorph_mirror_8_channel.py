@@ -3,7 +3,7 @@ from ophyd import EpicsSignal
 from dodal.devices.bimorph_mirrors.CAENels_bimorph_mirror_8_channel import (
     CAENelsBimorphMirror8Channel,
 )
-from dodal.devices.bimorph_mirrors.CAENels_bimorph_mirror_0_channel import (
+from dodal.devices.bimorph_mirrors.CAENels_bimorph_mirror_interface import (
     ChannelAttribute,
     OnOff,
     OperationMode,
@@ -431,7 +431,7 @@ def test_wait_for_signal_value():
 
 def test_wait_till_idle_and_busy():
     """
-    Test to see if CAENelsBimorphMirror0Channel.wait_till_idle and .wait_till_busy work...
+    Test to see if CAENelsBimorphMirrorInterface.wait_till_idle and .wait_till_busy work...
 
     I feel like to do this properly I need to do some clever async stuff, so this is fairly light.
     """
@@ -448,7 +448,7 @@ def test_wait_till_idle_and_busy():
 
 def test_protected_read():
     """
-    Tests if CAENelsBimorphMirror0Channel.protected_read works
+    Tests if CAENelsBimorphMirrorInterface.protected_read works
     """
     bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
     bimorph.wait_for_connection()
@@ -468,7 +468,7 @@ def test_protected_read():
 
 def test_protected_set():
     """
-    Tests CAENelsBimorphMirror0Channel.protected_set
+    Tests CAENelsBimorphMirrorInterface.protected_set
     """
     bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
     bimorph.wait_for_connection()
@@ -483,7 +483,7 @@ def test_protected_set():
 
 def test_parsed_protected_read():
     """
-    Tests CAENelsBimorphMirror0Channel.parsed_protected_read
+    Tests CAENelsBimorphMirrorInterface.parsed_protected_read
     """
     bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
     bimorph.wait_for_connection()

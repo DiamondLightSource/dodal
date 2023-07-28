@@ -34,9 +34,9 @@ class Status(IntEnum):
     ERR = 2
 
 
-class CAENelsBimorphMirror0Channel(Device):
+class CAENelsBimorphMirrorInterface(Device):
     """
-    Class representing a CAENels 0-Channel Bimorph Mirror. Base class of X-channel bimorphs.
+    Class defining interface for Bimorph Mirrors. Base class of X-channel bimorphs.
 
     Not implemented:
         TARGETLISTCMD.PROC
