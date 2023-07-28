@@ -213,7 +213,7 @@ class CAENelsBimorphMirrorInterface(Device):
         for channel, value in zip(channels, values):
             self.protected_set(channel, value)
 
-    def set_and_proc_target_voltages(self, target_voltages: list[int]):
+    def set_and_proc_target_voltages(self, target_voltages: list[float]):
         """Sets VTRGT channels ot values in target_voltages, and sets off ALLTRGT.PROC
         
         Args:
