@@ -23,6 +23,7 @@ dependencies = [
     "requests",
     "graypy",
     "pydantic<2.0",
+    "pyfiglet",
     "opencv-python-headless", # For pin-tip detection.
     "aioca",                  # Required for CA support with ophyd-async.
     "p4p",                    # Required for PVA support with ophyd-async.
@@ -120,7 +121,7 @@ commands =
 src = ["src", "tests"]
 line-length = 88
 extend-ignore = [
-    "E501",  # Line too long
+    "E501", # Line too long
     "F811", # support typing.overload decorator
 ]
 select = [
