@@ -96,6 +96,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/artemis_810_ensure_use_of_dataclasses_are_correct/"
   },
   {
+    "version": "artemis_830_correctly_wait_on_zoom",
+    "url": "https://DiamondLightSource.github.io/dodal/artemis_830_correctly_wait_on_zoom/"
+  },
+  {
     "version": "i04_1",
     "url": "https://DiamondLightSource.github.io/dodal/i04_1/"
   },
