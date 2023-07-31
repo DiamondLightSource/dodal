@@ -3,6 +3,7 @@ from unittest.mock import MagicMock
 import pytest
 from ophyd.sim import instantiate_fake_device
 from ophyd.status import Status
+from ophyd.utils.errors import WaitTimeoutError
 
 from dodal.devices.oav.oav_detector import OAV
 
@@ -34,18 +35,19 @@ def test_when_zoom_level_changed_then_oav_rewired(zoom, expected_plugin, oav: OA
     oav.zoom_controller.set(zoom).wait()
 
     assert oav.mxsc.input_plugin.get() == expected_plugin
-    assert oav.snapshot.input_plugin.get() == "OAV.MXSC"
+    assert oav.snapshot.input_plugin.get() == expected_plugin
 
 
 def test_when_zoom_level_changed_then_status_waits_for_all_plugins_to_be_updated(
     oav: OAV,
 ):
-    expected_exception = Exception()
-    plugin_status = Status()
-    # We're using an exception as a proxy to tell that we're waiting on this set too
-    plugin_status.set_exception(expected_exception)
-    oav.mxsc.input_plugin.set = MagicMock(return_value=plugin_status)
+    mxsc_status = Status()
+    oav.mxsc.input_plugin.set = MagicMock(return_value=mxsc_status)
+
+    mjpg_status = Status()
+    oav.snapshot.input_plugin.set = MagicMock(return_value=mjpg_status)
 
     full_status = oav.zoom_controller.set("1.0x")
 
-    assert full_status.exception == expected_exception
+    assert mxsc_status in full_status
+    assert mjpg_status in full_status
