@@ -3,7 +3,6 @@ from unittest.mock import MagicMock
 import pytest
 from ophyd.sim import instantiate_fake_device
 from ophyd.status import Status
-from ophyd.utils.errors import WaitTimeoutError
 
 from dodal.devices.oav.oav_detector import OAV
 

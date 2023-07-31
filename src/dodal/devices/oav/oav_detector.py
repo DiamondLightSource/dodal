@@ -21,9 +21,8 @@ from dodal.devices.oav.grid_overlay import SnapshotWithGrid
 class ZoomController(Device):
     """
     Device to control the zoom level. This should be set like
-        >>> z = ZoomController(name="zoom")
-        >>> z.set("1.0x")
-        Status...
+        o = OAV(name="oav")
+        oav.zoom_controller.set("1.0x")
 
     Note that changing the zoom may change the AD wiring on the associated OAV, as such
     you should wait on any zoom changs to finish before changing the OAV wiring.
