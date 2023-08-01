@@ -4,6 +4,7 @@ from ophyd import (
     CamBase,
     Component,
     Device,
+    DeviceStatus,
     EpicsSignal,
     HDF5Plugin,
     OverlayPlugin,
@@ -20,9 +21,11 @@ from dodal.devices.oav.grid_overlay import SnapshotWithGrid
 class ZoomController(Device):
     """
     Device to control the zoom level. This should be set like
-        >>> z = ZoomController(name="zoom")
-        >>> z.set("1.0x")
-        Status...
+        o = OAV(name="oav")
+        oav.zoom_controller.set("1.0x")
+
+    Note that changing the zoom may change the AD wiring on the associated OAV, as such
+    you should wait on any zoom changs to finish before changing the OAV wiring.
     """
 
     percentage: EpicsSignal = Component(EpicsSignal, "ZOOMPOSCMD")
@@ -39,6 +42,20 @@ class ZoomController(Device):
     frst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.FRST")
     fvst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.FVST")
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.flat_field_status = DeviceStatus(self, timeout=10)
+
+    def set_flatfield_on_zoom_level_one(self, value):
+        flat_applied = self.parent.proc.port_name.get()
+        no_flat_applied = self.parent.cam.port_name.get()
+
+        input_plugin = flat_applied if value == "1.0x" else no_flat_applied
+
+        flat_field_status = self.parent.mxsc.input_plugin.set(input_plugin)
+        return flat_field_status & self.parent.snapshot.input_plugin.set(input_plugin)
+
     @property
     def allowed_zoom_levels(self):
         return [
@@ -51,8 +68,10 @@ class ZoomController(Device):
         ]
 
     def set(self, level_to_set: str) -> StatusBase:
-        self._level_sp.set(level_to_set)
-        return self.level.set(level_to_set)
+        return_status = self._level_sp.set(level_to_set)
+        return_status &= self.level.set(level_to_set)
+        return_status &= self.set_flatfield_on_zoom_level_one(level_to_set)
+        return return_status
 
 
 class OAV(AreaDetector):
@@ -65,19 +84,3 @@ class OAV(AreaDetector):
     snapshot: SnapshotWithGrid = Component(SnapshotWithGrid, "-DI-OAV-01:MJPG:")
     mxsc: MXSC = ADC(MXSC, "-DI-OAV-01:MXSC:")
     zoom_controller: ZoomController = Component(ZoomController, "-EA-OAV-01:FZOOM:")
-
-    def set_flatfield_on_zoom_level_one(self, value=None, old_value=None, **kwargs):
-        flat_applied = self.proc.port_name.get()
-        no_flat_applied = self.cam.port_name.get()
-
-        input_plugin = flat_applied if value == "1.0x" else no_flat_applied
-
-        self.mxsc.input_plugin.put(input_plugin)
-        self.snapshot.input_plugin.put(input_plugin)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.zoom_controller._level_sp.subscribe(
-            self.set_flatfield_on_zoom_level_one,
-        )
