@@ -1,6 +1,7 @@
 from enum import Enum, IntEnum
 
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
+from ophyd.status import SubscriptionStatus
 
 import time
 from typing import Union
@@ -133,16 +134,20 @@ class CAENelsBimorphMirrorInterface(Device):
         await_value(self.status, Status.IDLE).wait()
         return signal.read()
 
-    def protected_set(self, signal: EpicsSignal, value):
+    def protected_set(self, signal: EpicsSignal, value) -> SubscriptionStatus:
         """Waits for bimorph to be idle, writes to signal, then waits for busy signal
 
         Args:
             signal: Signal to be written to
             value: Value to be written to signal
+        
+        Returns:
+            A SubscriptionStatus to track that the bimorph has entered its
+                post-operation busy state (avoids awaiting false idols.)
         """
-        self.wait_till_idle()
+        await_value(self.status, Status.IDLE).wait()
         signal.set(value)
-        self.wait_till_busy()
+        return await_value(self.status, Status.BUSY)
 
     def parsed_protected_read(self, signal: EpicsSignal):
         """Calls waits till idle then reads from signal and parses output for value.
