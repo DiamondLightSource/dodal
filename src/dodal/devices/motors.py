@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+import numpy as np
 from ophyd import EpicsMotor
 
 
@@ -31,3 +32,14 @@ class XYZLimitBundle:
     x: MotorLimitHelper
     y: MotorLimitHelper
     z: MotorLimitHelper
+
+    def position_valid(self, position: np.ndarray):
+        if len(position) != 3:
+            raise ValueError(
+                f"Position valid expects a 3-vector, got {position} instead"
+            )
+        return (
+            self.x.is_within(position[0])
+            & self.y.is_within(position[1])
+            & self.z.is_within(position[2])
+        )
