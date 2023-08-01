@@ -84,6 +84,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/artemis_262_move_arming_out_of_stage/"
   },
   {
+    "version": "artemis_499_limit_helper_func",
+    "url": "https://DiamondLightSource.github.io/dodal/artemis_499_limit_helper_func/"
+  },
+  {
     "version": "artemis_701_do_optimise_attenuation_scan",
     "url": "https://DiamondLightSource.github.io/dodal/artemis_701_do_optimise_attenuation_scan/"
   },
