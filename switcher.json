@@ -4,40 +4,40 @@
     "url": "https://DiamondLightSource.github.io/dodal/main/"
   },
   {
-    "version": "1.2.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.2.0/"
-  },
-  {
-    "version": "1.1.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.1.0/"
-  },
-  {
-    "version": "1.0.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.0.0/"
-  },
-  {
-    "version": "0.0.5",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.5/"
-  },
-  {
-    "version": "0.0.4",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.4/"
-  },
-  {
-    "version": "0.0.3",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.3/"
+    "version": "0.0.1",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.1/"
   },
   {
     "version": "0.0.2",
     "url": "https://DiamondLightSource.github.io/dodal/0.0.2/"
   },
   {
-    "version": "0.0.1",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.1/"
-  },
-  {
     "version": "0.0.2_async_arming",
     "url": "https://DiamondLightSource.github.io/dodal/0.0.2_async_arming/"
+  },
+  {
+    "version": "0.0.3",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.3/"
+  },
+  {
+    "version": "0.0.4",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.4/"
+  },
+  {
+    "version": "0.0.5",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.5/"
+  },
+  {
+    "version": "1.0.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.0.0/"
+  },
+  {
+    "version": "1.1.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.1.0/"
+  },
+  {
+    "version": "1.2.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.2.0/"
   },
   {
     "version": "124_implement_i23_gonio",
@@ -84,10 +84,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/artemis_262_move_arming_out_of_stage/"
   },
   {
-    "version": "artemis_499_limit_helper_func",
-    "url": "https://DiamondLightSource.github.io/dodal/artemis_499_limit_helper_func/"
-  },
-  {
     "version": "artemis_701_do_optimise_attenuation_scan",
     "url": "https://DiamondLightSource.github.io/dodal/artemis_701_do_optimise_attenuation_scan/"
   },
@@ -98,10 +94,6 @@
   {
     "version": "artemis_810_ensure_use_of_dataclasses_are_correct",
     "url": "https://DiamondLightSource.github.io/dodal/artemis_810_ensure_use_of_dataclasses_are_correct/"
-  },
-  {
-    "version": "artemis_830_correctly_wait_on_zoom",
-    "url": "https://DiamondLightSource.github.io/dodal/artemis_830_correctly_wait_on_zoom/"
   },
   {
     "version": "artemis_835_trans_docs",
