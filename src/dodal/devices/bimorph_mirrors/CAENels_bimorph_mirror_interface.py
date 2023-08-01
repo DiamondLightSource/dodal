@@ -7,6 +7,8 @@ from typing import Union
 
 from functools import partial
 
+from ..status import await_value
+
 
 class ChannelAttribute(Enum):
     VTRGT = ("VTRGT",)
@@ -128,7 +130,7 @@ class CAENelsBimorphMirrorInterface(Device):
         Returns:
             A dictionary contaning value(s) read and other relevant data
         """
-        self.wait_till_idle()
+        await_value(self.status, Status.IDLE).wait()
         return signal.read()
 
     def protected_set(self, signal: EpicsSignal, value):
