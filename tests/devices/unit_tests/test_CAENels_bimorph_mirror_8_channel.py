@@ -184,10 +184,10 @@ def protected_set(wait_signal: EpicsSignal, signal: EpicsSignal, value) -> None:
 # Workaround because the architecture for this is weird and hard to implement
 # in a unit test:
 class BusySignalGetter(Device):
-    device_busy: EpicsSignal = Component(EpicsSignal, "BUSY")
+    device_busy: EpicsSignal = Component(EpicsSignal, "STATUS")
 
 
-busy_signal = BusySignalGetter(name="busy_signal", prefix="BL02J-EA-IOC-97:")
+busy_signal = BusySignalGetter(name="busy_signal", prefix="BL02J-EA-IOC-97:G0:")
 parsed_read = partial(parsed_read, busy_signal.device_busy)
 protected_set = partial(protected_set, busy_signal.device_busy)
 
@@ -475,7 +475,8 @@ def test_protected_set():
 
     test_voltage = round(random.random() * 30, 1) + 1
 
-    bimorph.protected_set(bimorph.channel_1_voltage_out, test_voltage)
+    status = bimorph.protected_set(bimorph.channel_1_voltage_out, test_voltage)
+    status.wait()
 
     assert bimorph.status.read()[bimorph.status.name]["value"] == Status.BUSY
     assert parsed_read(bimorph.channel_1_voltage_out_readback_value) == test_voltage
