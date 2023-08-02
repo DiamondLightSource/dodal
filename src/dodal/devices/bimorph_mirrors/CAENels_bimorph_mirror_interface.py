@@ -3,6 +3,8 @@ from enum import Enum, IntEnum
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
 from ophyd.status import SubscriptionStatus, StatusBase
 
+from bluesky.protocols import Movable
+
 import time
 from typing import Union
 
@@ -37,7 +39,7 @@ class Status(IntEnum):
     ERR = 2
 
 
-class CAENelsBimorphMirrorInterface(Device):
+class CAENelsBimorphMirrorInterface(Device, Movable):
     """
     Class defining interface for Bimorph Mirrors. Base class of X-channel bimorphs.
 
@@ -248,3 +250,14 @@ class CAENelsBimorphMirrorInterface(Device):
         status.wait()
 
         return status & self.protected_set(self.all_target_proc, 1)
+    
+    def set(self, target_voltages: list[float]) -> SubscriptionStatus:
+        """Sets each voltage channel to equivalent value in target_voltages.
+
+        Args:
+            target_voltages: An array of length equal to number of channels
+        Returns:
+            A SubscriptionStatus object tracking completion of operations
+        """
+
+        return self.set_and_proc_target_voltages(target_voltages)
