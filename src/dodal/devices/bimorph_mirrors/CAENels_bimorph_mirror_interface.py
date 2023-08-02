@@ -1,7 +1,7 @@
 from enum import Enum, IntEnum
 
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
-from ophyd.status import SubscriptionStatus
+from ophyd.status import SubscriptionStatus, StatusBase
 
 import time
 from typing import Union
@@ -208,26 +208,43 @@ class CAENelsBimorphMirrorInterface(Device):
 
         return [self.parsed_protected_read(channel) for channel in channels]
     
-    def write_to_all_channels_by_attribute(self, channel_attribute: ChannelAttribute, values: list):
+    def write_to_all_channels_by_attribute(self, channel_attribute: ChannelAttribute, values: list) -> SubscriptionStatus:
         """Writes given values to signals grouped by given attribute.
         
         Args:
             channel_attribute: A ChannelAttribute enum representing the grouping of signals to be written to.
             values: A list of values of length equal to the number of channels of the bimorph
+        
+        Returns:
+            A SubscriptionStatus object tracking completion of operations
         """
         channels = self.get_channels_by_attribute(channel_attribute)
 
-        for channel, value in zip(channels, values):
-            self.protected_set(channel, value)
+        status = StatusBase() 
+        status.set_finished()
 
-    def set_and_proc_target_voltages(self, target_voltages: list[float]):
+        for i, (channel, value) in enumerate(zip(channels, values)):
+            status &= self.protected_set(channel, value)
+
+            if i >= len(channels) - 1:
+                return status
+
+            status.wait()
+        return status
+
+    def set_and_proc_target_voltages(self, target_voltages: list[float]) -> SubscriptionStatus:
         """Sets VTRGT channels ot values in target_voltages, and sets off ALLTRGT.PROC
         
         Args:
             target_voltages: An array of length equal to number of channels, with 
-                target_voltages[X] being set for channel_X_target_volage"""
+                target_voltages[X] being set for channel_X_target_volage
+                
+        Returns:
+            A SubscriptionStatus object tracking completion of operations
+        """
         
-        self.write_to_all_channels_by_attribute(ChannelAttribute.VTRGT,
-                                                target_voltages)
-        
-        self.protected_set(self.all_target_proc, 1)
+        status = self.write_to_all_channels_by_attribute(ChannelAttribute.VTRGT, target_voltages)
+
+        status.wait()
+
+        return status & self.protected_set(self.all_target_proc, 1)

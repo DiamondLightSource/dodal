@@ -523,6 +523,7 @@ def test_read_from_all_channels_by_attribute():
         ]
     )
 
+
 def test_write_to_all_channels_by_attribute():
     """
     Tests CAENelsBimorphMirror8Channel.write_to_all_channels_by_attribute
@@ -534,7 +535,8 @@ def test_write_to_all_channels_by_attribute():
 
     target_voltages = [round(random.random() * 10, 1) for i in range(8)]
 
-    bimorph.write_to_all_channels_by_attribute(ChannelAttribute.VOUT, target_voltages)
+    status = bimorph.write_to_all_channels_by_attribute(ChannelAttribute.VOUT, target_voltages)
+    status.wait()
 
     assert all(
         [
@@ -561,13 +563,13 @@ def test_set_and_proc_target_voltages():
     bimorph.wait_for_connection()
 
     target_voltages = [round(random.random() * 10, 1) for i in range(8)]
-    print(f"target_voltages: {target_voltages}")
  
     vout_rbv_list = get_channels_by_attributes(bimorph, ChannelAttribute.VOUT_RBV)
 
     voltage_target_rbv_list = get_channels_by_attributes(bimorph, ChannelAttribute.VTRGT_RBV)
 
-    bimorph.set_and_proc_target_voltages(target_voltages)
+    status = bimorph.set_and_proc_target_voltages(target_voltages)
+    status.wait()
 
     assert all([
         parsed_read(vtrgt_rbv) == voltage for vtrgt_rbv, voltage in
