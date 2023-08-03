@@ -607,3 +607,30 @@ def test_set():
         parsed_read(vout) == voltage for vout, voltage in
         zip(vout_rbv_list, target_voltages)
     ])
+
+# This section test the bimorph in Bluesky plan contexts:
+from bluesky import RunEngine
+from bluesky.plan_stubs import mv, rd
+RE = RunEngine({})
+
+
+def test_move_plan():
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph.wait_for_connection()
+
+    target_voltages = [round(random.random() * 10, 1) for i in range(8)]
+
+    def move_plan(bimorph, target_voltages):
+        yield from mv(bimorph, target_voltages)
+
+    RE(move_plan(bimorph, target_voltages), print)
+
+    new_voltages = get_all_voltage_out_readback_values(bimorph)
+
+    assert all(
+        [
+            voltage == target_voltage
+            for voltage, target_voltage in zip(new_voltages, target_voltages)
+        ]
+    )
+
