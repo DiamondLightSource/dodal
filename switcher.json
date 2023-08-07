@@ -52,6 +52,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/129_edge_detection/"
   },
   {
+    "version": "137_remove_unused_status",
+    "url": "https://DiamondLightSource.github.io/dodal/137_remove_unused_status/"
+  },
+  {
     "version": "262_make_arming_eiger_asynchronous",
     "url": "https://DiamondLightSource.github.io/dodal/262_make_arming_eiger_asynchronous/"
   },
