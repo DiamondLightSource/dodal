@@ -42,11 +42,6 @@ class ZoomController(Device):
     frst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.FRST")
     fvst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.FVST")
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.flat_field_status = DeviceStatus(self, timeout=10)
-
     def set_flatfield_on_zoom_level_one(self, value):
         flat_applied = self.parent.proc.port_name.get()
         no_flat_applied = self.parent.cam.port_name.get()
