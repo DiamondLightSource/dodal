@@ -126,6 +126,7 @@ def set_up_logging_handlers(
     logging_level: Optional[str] = "INFO",
     dev_mode: bool = False,
     logging_path: Optional[Path] = None,
+    file_handler_logging_level: Optional[str] = None,
 ) -> List[logging.Handler]:
     """Set up the default logging environment.
     Args:
@@ -137,7 +138,12 @@ def set_up_logging_handlers(
     stream_handler = logging.StreamHandler()
     _add_handler(stream_handler, logging_level)
     graylog_handler = set_up_graylog_handler(logging_level, dev_mode)
-    file_handler = set_up_file_handler(logging_level, dev_mode, logging_path)
+    file_handler_logging_level = (
+        file_handler_logging_level if file_handler_logging_level else logging_level
+    )
+    file_handler = set_up_file_handler(
+        file_handler_logging_level, dev_mode, logging_path
+    )
 
     return [stream_handler, graylog_handler, file_handler]
 

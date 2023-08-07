@@ -14,7 +14,7 @@ classifiers = [
 ]
 description = "Ophyd devices and other utils that could be used across DLS beamlines"
 dependencies = [
-    "ophyd",
+    "ophyd @ git+https://github.com/bluesky/ophyd@58d6fadb632fa2e49273e9097c7deb57f6b34c68",
     "bluesky",
     "pyepics",
     "dataclasses-json",
