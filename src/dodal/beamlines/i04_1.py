@@ -2,20 +2,26 @@ from typing import Optional
 
 from dodal.beamlines.beamline_utils import device_instantiation
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
-
+from dodal.devices.backlight import Backlight
+from dodal.devices.detector import DetectorParams
+from dodal.devices.eiger import EigerDetector
+from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.s4_slit_gaps import S4SlitGaps
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import Undulator
-
+from dodal.devices.zebra import Zebra
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
-
 
 _simulator_beamline_fallback = "s04_1"
 BL = get_beamline_name(_simulator_beamline_fallback)
 set_log_beamline(BL)
 set_utils_beamline(BL)
-_check_for_simulation = lambda: BL == _simulator_beamline_fallback
+
+
+def _check_for_simulation():
+    return BL == _simulator_beamline_fallback
+
 
 def backlight(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
@@ -130,4 +136,3 @@ def zebra(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -
         wait_for_connection,
         fake_with_ophyd_sim,
     )
-
