@@ -1,6 +1,9 @@
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
+from ophyd.status import SubscriptionStatus
 from bluesky.protocols import Movable
 from enum import IntEnum
+
+from ..status import await_value
 
 
 class MoveStatus(IntEnum):
@@ -28,3 +31,8 @@ class SlitMotor(Device, Movable):
     alarm_severity: EpicsSignalRO = Component(EpicsSignalRO, "SEVR")
 
     stop: EpicsSignal = Component(EpicsSignal, "STOP")
+
+    def set(self, target_value) -> SubscriptionStatus:
+        await_value(self.done_moving, MoveStatus.Stationary)
+
+        return self.value.set(target_value)
