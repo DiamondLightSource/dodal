@@ -1,5 +1,11 @@
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
 from bluesky.protocols import Movable
+from enum import IntEnum
+
+
+class MoveStatus(IntEnum):
+    Moving = 0,
+    Stationary = 1
 
 
 class SlitMotor(Device, Movable):
