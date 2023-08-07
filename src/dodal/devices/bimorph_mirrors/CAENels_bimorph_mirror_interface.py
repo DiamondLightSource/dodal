@@ -251,6 +251,7 @@ class CAENelsBimorphMirrorInterface(Device, Movable):
 
         return status & self.protected_set(self.all_target_proc, 1)
     
+
     def set(self, target_voltages: list[float]) -> SubscriptionStatus:
         """Sets each voltage channel to equivalent value in target_voltages.
 
