@@ -149,8 +149,7 @@ class CAENelsBimorphMirrorInterface(Device, Movable):
         """
         await_value(self.status, Status.IDLE).wait()
         status = signal.set(value)
-        await_value(self.status, Status.BUSY).wait()
-        return status & await_value(self.status, Status.IDLE)
+        return status & await_value(self.status, Status.BUSY)
 
     def parsed_protected_read(self, signal: EpicsSignal):
         """Calls waits till idle then reads from signal and parses output for value.
