@@ -91,8 +91,8 @@ def test_locate_sample_no_edges():
         np.broadcast_to(np.array([NONE_VALUE], dtype=np.int32), (5,)),
     )
 
-    assert location.tip_x == -1
-    assert location.tip_y == -1
+    assert location.tip_x is None
+    assert location.tip_y is None
 
 
 @pytest.mark.parametrize("direction,x_centre", [(1, 0), (-1, 4)])
