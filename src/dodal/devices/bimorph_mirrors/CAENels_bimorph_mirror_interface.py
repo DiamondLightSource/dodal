@@ -148,8 +148,8 @@ class CAENelsBimorphMirrorInterface(Device, Movable):
                 post-operation busy state (avoids awaiting false idols.)
         """
         await_value(self.status, Status.IDLE).wait()
-        signal.set(value)
-        return await_value(self.status, Status.BUSY)
+        status = signal.set(value)
+        return status & await_value(self.status, Status.BUSY)
 
     def parsed_protected_read(self, signal: EpicsSignal):
         """Calls waits till idle then reads from signal and parses output for value.
