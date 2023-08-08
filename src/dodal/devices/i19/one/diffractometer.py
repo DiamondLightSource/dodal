@@ -3,14 +3,17 @@ from ophyd import Device, EpicsMotor
 
 
 class Diffractometer(Device):
+    @staticmethod
     def suffix_of(type: str, axis: str, index: int) -> str:
         _common_template: str = "-%s-%02d:%s"
         return _common_template % (type, axis, index)
 
+    @staticmethod
     def centring_motor(axis: str) -> EpicsMotor:
         centring_suffix = Diffractometer.suffix_of("CENT", axis, 1)
         return Cpt(EpicsMotor, suffix=centring_suffix)
 
+    @staticmethod
     def goniometer(axis: str, index: int) -> EpicsMotor:
         gonio_suffix = Diffractometer.suffix_of("GONIO", axis, index)
         return Cpt(EpicsMotor, suffix=gonio_suffix)
