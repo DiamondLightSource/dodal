@@ -137,7 +137,7 @@ class CAENelsBimorphMirrorInterface(Device, Movable):
         return signal.read()
 
     def protected_set(self, signal: EpicsSignal, value) -> SubscriptionStatus:
-        """Waits for bimorph to be idle, writes to signal, then waits for busy signal
+        """Waits for bimorph to be idle, writes to signal.
 
         Args:
             signal: Signal to be written to
