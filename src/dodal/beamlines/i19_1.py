@@ -23,8 +23,8 @@ def diffractometer(
         device=Diffractometer,
         name="eh1_diffractometer",
         prefix="-MO",
-        wait_for_connection=wait_for_connection,
-        fake_with_ophyd_sim=fake_with_ophyd_sim,
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
     )
 
 
