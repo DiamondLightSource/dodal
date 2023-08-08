@@ -1,14 +1,16 @@
 from dataclasses import dataclass
-from typing import Callable, Optional, Final
-import numpy as np
+from typing import Callable, Final, Optional, Tuple
+
 import cv2
+import numpy as np
 
 
-class ArrayProcessingFunctions():
+class ArrayProcessingFunctions:
     """
-    Utility class for creating array preprocessing functions (arr -> arr with no additional parameters) 
+    Utility class for creating array preprocessing functions (arr -> arr with no additional parameters)
     for some common operations.
     """
+
     @staticmethod
     def erode(ksize: int, iterations: int) -> Callable[[np.ndarray], np.ndarray]:
         element = cv2.getStructuringElement(cv2.MORPH_RECT, (ksize, ksize))
@@ -18,61 +20,74 @@ class ArrayProcessingFunctions():
     def dilate(ksize: int, iterations: int) -> Callable[[np.ndarray], np.ndarray]:
         element = cv2.getStructuringElement(cv2.MORPH_RECT, (ksize, ksize))
         return lambda arr: cv2.dilate(arr, element, iterations=iterations)
-    
+
     @staticmethod
-    def _morph(ksize: int, iterations: int, morph_type: int) -> Callable[[np.ndarray], np.ndarray]:
+    def _morph(
+        ksize: int, iterations: int, morph_type: int
+    ) -> Callable[[np.ndarray], np.ndarray]:
         element = cv2.getStructuringElement(cv2.MORPH_RECT, (ksize, ksize))
         return lambda arr: cv2.morphologyEx(
-            arr, morph_type, element, iterations=iterations)
+            arr, morph_type, element, iterations=iterations
+        )
 
     @staticmethod
     def open_morph(ksize: int, iterations: int) -> Callable[[np.ndarray], np.ndarray]:
-        return ArrayProcessingFunctions._morph(ksize=ksize, iterations=iterations, morph_type=cv2.MORPH_OPEN)
+        return ArrayProcessingFunctions._morph(
+            ksize=ksize, iterations=iterations, morph_type=cv2.MORPH_OPEN
+        )
 
     @staticmethod
     def close(ksize: int, iterations: int) -> Callable[[np.ndarray], np.ndarray]:
-        return ArrayProcessingFunctions._morph(ksize=ksize, iterations=iterations, morph_type=cv2.MORPH_CLOSE)
+        return ArrayProcessingFunctions._morph(
+            ksize=ksize, iterations=iterations, morph_type=cv2.MORPH_CLOSE
+        )
 
     @staticmethod
     def gradient(ksize: int, iterations: int) -> Callable[[np.ndarray], np.ndarray]:
-        return ArrayProcessingFunctions._morph(ksize=ksize, iterations=iterations, morph_type=cv2.MORPH_GRADIENT)
+        return ArrayProcessingFunctions._morph(
+            ksize=ksize, iterations=iterations, morph_type=cv2.MORPH_GRADIENT
+        )
 
     @staticmethod
     def top_hat(ksize: int, iterations: int) -> Callable[[np.ndarray], np.ndarray]:
-        return ArrayProcessingFunctions._morph(ksize=ksize, iterations=iterations, morph_type=cv2.MORPH_TOPHAT)
+        return ArrayProcessingFunctions._morph(
+            ksize=ksize, iterations=iterations, morph_type=cv2.MORPH_TOPHAT
+        )
 
     @staticmethod
     def black_hat(ksize: int, iterations: int) -> Callable[[np.ndarray], np.ndarray]:
-        return ArrayProcessingFunctions._morph(ksize=ksize, iterations=iterations, morph_type=cv2.MORPH_BLACKHAT)
+        return ArrayProcessingFunctions._morph(
+            ksize=ksize, iterations=iterations, morph_type=cv2.MORPH_BLACKHAT
+        )
 
     @staticmethod
     def blur(ksize: int) -> Callable[[np.ndarray], np.ndarray]:
         return lambda arr: cv2.blur(arr, ksize=(ksize, ksize))
-    
+
     @staticmethod
     def gaussian_blur(ksize: int) -> Callable[[np.ndarray], np.ndarray]:
         # Kernel size should be odd.
-        if not ksize % 2: 
+        if not ksize % 2:
             ksize += 1
         return lambda arr: cv2.GaussianBlur(arr, (ksize, ksize), 0)
-    
+
     @staticmethod
     def median_blur(ksize: int) -> Callable[[np.ndarray], np.ndarray]:
-        if not ksize % 2: 
+        if not ksize % 2:
             ksize += 1
         return lambda arr: cv2.medianBlur(arr, ksize)
 
 
-# A substitute for "None" which can fit into an np.int32 array/waveform record.
-# EDM plot can't handle negative integers, so best to use 0 rather than -1.
-NONE_VALUE: Final[int] = 0
+# A substitute for "None" which can fit into an np.int32 array.
+NONE_VALUE: Final[int] = -1
 
 
 @dataclass
-class SampleLocation():
+class SampleLocation:
     """
     Holder type for results from sample detection.
     """
+
     tip_y: Optional[int]
     tip_x: Optional[int]
     edge_top: Optional[np.ndarray]
@@ -80,7 +95,6 @@ class SampleLocation():
 
 
 class MxSampleDetect(object):
-
     def __init__(
         self,
         *,
@@ -96,7 +110,7 @@ class MxSampleDetect(object):
         Configures sample detection parameters.
 
         Args:
-            preprocess: A preprocessing function applied to the array after conversion to grayscale. 
+            preprocess: A preprocessing function applied to the array after conversion to grayscale.
                 See implementations of common functions in ArrayProcessingFunctions for predefined conversions
                 Defaults to a no-op (i.e. no preprocessing)
             canny_upper: upper threshold for canny edge detection
@@ -114,7 +128,9 @@ class MxSampleDetect(object):
         self.close_iterations = close_iterations
 
         if scan_direction not in [1, -1]:
-            raise ValueError("Invalid scan direction, expected +1 for left-to-right or -1 for right-to-left")
+            raise ValueError(
+                "Invalid scan direction, expected +1 for left-to-right or -1 for right-to-left"
+            )
         self.scan_direction = scan_direction
 
         self.min_tip_height = min_tip_height
@@ -136,66 +152,87 @@ class MxSampleDetect(object):
         edge_arr = cv2.Canny(pp_arr, self.canny_upper, self.canny_lower)
 
         # Do a "close" image operation. (Add other options?)
-        closed_arr = ArrayProcessingFunctions.close(self.close_ksize, self.close_iterations)(edge_arr)
+        closed_arr = ArrayProcessingFunctions.close(
+            self.close_ksize, self.close_iterations
+        )(edge_arr)
 
         # Find the sample.
         return self._locate_sample(closed_arr)
-    
-    def _locate_sample(self, edge_arr: np.ndarray) -> SampleLocation:
-        # Straight port of Tom Cobb's algorithm from the original (adOpenCV) 
-        # mxSampleDetect.
 
-        # Index into edges_arr like [y, x], not [x, y]!
+    @staticmethod
+    def _first_and_last_nonzero_by_columns(
+        arr: np.ndarray,
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Finds the indexes of the first & last non-zero values by column in a 2d array.
+
+        Outputs will contain NONE_VALUE if no non-zero values exist in a column.
+
+        i.e. for input:
+        [
+            [0, 0, 0, 1],
+            [1, 1, 0, 0],
+            [0, 1, 0, 1],
+        ]
+
+        first_nonzero will be: [1, 1, NONE_VALUE, 0]
+        last_nonzero will be [1, 2, NONE_VALUE, 2]
+        """
+        mask = arr != 0
+        first_nonzero = np.where(mask.any(axis=0), mask.argmax(axis=0), NONE_VALUE)
+
+        flipped = arr.shape[0] - np.flip(mask, axis=0).argmax(axis=0) - 1
+        last_nonzero = np.where(mask.any(axis=0), flipped, NONE_VALUE)
+        return first_nonzero, last_nonzero
+
+    def _locate_sample(self, edge_arr: np.ndarray) -> SampleLocation:
         height, width = edge_arr.shape
 
-        tip_y, tip_x = None, None
+        top, bottom = MxSampleDetect._first_and_last_nonzero_by_columns(edge_arr)
 
-        # TODO: use np instead?
-        top = [None]*width
-        bottom = [None]*width
+        # Calculate widths. In general if bottom == top this has width 1.
+        # special case for bottom == top == NONE_VALUE (i.e. no edge at all), that has width 0.
+        widths = np.where(top != NONE_VALUE, bottom - top + 1, 0)
 
-        columns = range(width)[::self.scan_direction]
+        # Generate the indices of columns with widths larger than the specified min tip height.
+        column_indices_with_non_narrow_widths = np.nonzero(
+            widths >= self.min_tip_height
+        )[0]
 
-        n: np.ndarray = np.transpose(np.nonzero(edge_arr))
-        
-        # TODO: inefficient
-        for y, x in n:
-            if top[x] is None:
-                top[x] = y
-            bottom[x] = y
+        if column_indices_with_non_narrow_widths.shape[0] == 0:
+            # No non-narrow locations - sample not in picture?
+            # Or wrong parameters etc.
+            return SampleLocation(
+                tip_y=NONE_VALUE, tip_x=NONE_VALUE, edge_bottom=bottom, edge_top=top
+            )
 
-        for x in columns:
-            # Look for the first non-narrow region between top and bottom edges.
-            if tip_x is None and top[x] is not None and abs(top[x] - bottom[x]) > self.min_tip_height:
-                
-                # Move backwards to where there were no edges at all...
-                while top[x] is not None:
-                    x += -self.scan_direction
-                    if x == -1 or x == width:
-                        # (In this case the sample is off the edge of the picture.)
-                        break
-                x += self.scan_direction # ...and forward one step. x is now at the tip.
+        # Choose our starting point - i.e. first column with non-narrow width for positive scan, last one for negative scan.
+        if self.scan_direction == 1:
+            start_column = int(column_indices_with_non_narrow_widths[0])
+        else:
+            start_column = int(column_indices_with_non_narrow_widths[-1])
 
-                tip_x = x
-                tip_y = int(round(0.5*(top[x] + bottom[x])))
+        x = start_column
 
-                # Zero the edge arrays to the left (right) of the tip.
-                # TODO: inefficient
-                if self.scan_direction == 1:
-                    top[:x] = [None for _ in range(x)]
-                    bottom[:x] = [None for _ in range(x)]
-                else:
-                    top[x+1:] = [None for _ in range(len(columns) - x - 1)]
-                    bottom[x+1:] = [None for _ in range(len(columns) - x - 1)]
+        # Move backwards to where there were no edges at all...
+        while top[x] != NONE_VALUE:
+            x += -self.scan_direction
+            if x == -1 or x == width:
+                # (In this case the sample is off the edge of the picture.)
+                break
+        x += self.scan_direction  # ...and forward one step. x is now at the tip.
 
-        # Prepare for export to PVs.
-        # TODO: inefficient
-        edge_top = np.asarray(
-            [NONE_VALUE if t is None else t for t in top], dtype=np.int32)
-        edge_bottom = np.asarray(
-            [NONE_VALUE if b is None else b for b in bottom], dtype=np.int32)
-        
-        if tip_y is None or tip_x is None:
-            tip_y, tip_x = -1, -1
+        tip_x = x
+        tip_y = int(round(0.5 * (top[x] + bottom[x])))
 
-        return SampleLocation(tip_y=tip_y, tip_x=tip_x, edge_bottom=edge_bottom, edge_top=edge_top)
+        # clear edges to the left (right) of the tip.
+        if self.scan_direction == 1:
+            top[:x] = NONE_VALUE
+            bottom[:x] = NONE_VALUE
+        else:
+            top[x + 1 :] = NONE_VALUE
+            bottom[x + 1 :] = NONE_VALUE
+
+        return SampleLocation(
+            tip_y=tip_y, tip_x=tip_x, edge_bottom=bottom, edge_top=top
+        )
