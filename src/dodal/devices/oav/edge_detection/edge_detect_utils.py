@@ -79,6 +79,7 @@ class ArrayProcessingFunctions:
 
 
 # A substitute for "None" which can fit into an np.int32 array.
+# Also used as a substitute for a not-found sample position.
 NONE_VALUE: Final[int] = -1
 
 
@@ -87,11 +88,10 @@ class SampleLocation:
     """
     Holder type for results from sample detection.
     """
-
     tip_y: Optional[int]
     tip_x: Optional[int]
-    edge_top: Optional[np.ndarray]
-    edge_bottom: Optional[np.ndarray]
+    edge_top: np.ndarray
+    edge_bottom: np.ndarray
 
 
 class MxSampleDetect(object):
@@ -201,9 +201,9 @@ class MxSampleDetect(object):
 
         if column_indices_with_non_narrow_widths.shape[0] == 0:
             # No non-narrow locations - sample not in picture?
-            # Or wrong parameters etc.
+            # Or wrong parameters for edge-finding, ...
             return SampleLocation(
-                tip_y=NONE_VALUE, tip_x=NONE_VALUE, edge_bottom=bottom, edge_top=top
+                tip_y=None, tip_x=None, edge_bottom=bottom, edge_top=top
             )
 
         # Choose our starting point - i.e. first column with non-narrow width for positive scan, last one for negative scan.
