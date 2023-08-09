@@ -1,7 +1,7 @@
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.edge_detection.edge_detect_utils import MxSampleDetect, ArrayProcessingFunctions, NONE_VALUE as INVALID_POSITION_VALUE, SampleLocation
 from dodal.log import LOGGER
-from typing import TYPE_CHECKING, Callable, Final, Tuple, TypeVar, Optional
+from typing import TYPE_CHECKING, Callable, Final, Tuple, TypeVar, Optional, Type, Dict, Any
 
 from ophyd.v2.core import AsyncStatus, StandardReadable, DeviceCollector
 from ophyd.v2.epics import epics_signal_r, SignalR, SignalRW
@@ -10,6 +10,48 @@ import numpy as np
 from numpy.typing import NDArray
 
 import asyncio
+
+from ophyd.v2 import _p4p
+from ophyd.v2._p4p import make_converter as default_make_converter, get_unique, PvaConverter, PvaArrayConverter, get_dtype
+
+
+class PvaNDArrayConverter(PvaConverter):
+    def write_value(self, value):
+        return value
+
+    def value(self, value):
+        return value["value"]
+
+    def reading(self, value):
+        return dict(
+            value=self.value(value),
+            timestamp=0,
+            alarm_severity=0,
+        )
+
+# TODO: HACK!
+def make_converter(datatype: Optional[Type], values: Dict[str, Any]) -> PvaConverter:
+    pv = list(values)[0]
+    typeid = get_unique({k: v.getID() for k, v in values.items()}, "typeids")
+    typ = get_unique({k: type(v["value"]) for k, v in values.items()}, "value types")
+
+    if "NTNDArray" in typeid:
+        pv_dtype = get_unique(
+            {k: v["value"].dtype for k, v in values.items()}, "dtypes"
+        )
+        # This is an array
+        if datatype:
+            # Check we wanted an array of this type
+            dtype = get_dtype(datatype)
+            if not dtype:
+                raise TypeError(f"{pv} has type [{pv_dtype}] not {datatype.__name__}")
+            if dtype != pv_dtype:
+                raise TypeError(f"{pv} has type [{pv_dtype}] not [{dtype}]")
+        return PvaNDArrayConverter()
+
+    return default_make_converter(datatype, values)
+
+_p4p.make_converter = make_converter
 
 
 T = TypeVar('T')
@@ -36,10 +78,9 @@ class EdgeDetection(StandardReadable):
     INVALID_POSITION: Final[Tuple[int, int]] = (INVALID_POSITION_VALUE, INVALID_POSITION_VALUE)
 
     def __init__(self, prefix, name: str = ""):
+        self.array_data: SignalR[NDArray] = epics_signal_r(NDArray[np.uint8], "pva://{}PVA:ARRAY".format(prefix))
 
-        self.array_data: SignalR[NDArray] = epics_signal_r(NDArray, "pva://{}ARR:ArrayData".format(prefix))
-
-        self.triggered_tip: SignalRW[Tuple[int | None, int | None]] = _SoftSignal(initial_value=EdgeDetection.INVALID_POSITION)
+        # self.triggered_tip: SignalRW[Tuple[int | None, int | None]] = _SoftSignal(initial_value=EdgeDetection.INVALID_POSITION)
 
         self.oav_width: int = 1024
         self.oav_height: int = 768
@@ -59,7 +100,7 @@ class EdgeDetection(StandardReadable):
                 self.array_data
             ],
             config=[
-                self.triggered_tip
+                # self.triggered_tip
             ],
         )
 
@@ -112,6 +153,12 @@ if __name__ == "__main__":
     # with DeviceCollector():
     x = EdgeDetection(prefix="BL03I-DI-OAV-01:")
 
-    img = asyncio.get_event_loop().run_until_complete(x.array_data.read())
+    async def doit():
+        await x.connect()
+        data = await x.array_data.read()
+        print(data)
+        return data
+
+    img = asyncio.get_event_loop().run_until_complete(doit())
 
     print(img)
