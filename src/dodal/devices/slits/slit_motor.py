@@ -31,7 +31,7 @@ class SlitMotor(Device, Movable):
     done_moving: EpicsSignalRO = Component(EpicsSignalRO, ".DMOV")
     alarm_severity: EpicsSignalRO = Component(EpicsSignalRO, ".SEVR")
 
-    stop: EpicsSignal = Component(EpicsSignal, ".STOP")
+    stop_motor: EpicsSignal = Component(EpicsSignal, ".STOP")
 
     def set(self, target_value) -> SubscriptionStatus:
         await_value(self.done_moving, MoveStatus.Stationary)
