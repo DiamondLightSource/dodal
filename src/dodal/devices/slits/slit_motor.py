@@ -12,12 +12,13 @@ class MoveStatus(IntEnum):
 
 
 class SlitMotor(Device, Movable):
-    """A class representing a slip motor.
+    """A class representing a slit motor.
     
     This could be gap, centre, x, y, etc...
     
     Unimplemented signals:
         SPMG
+        KILL
         Anything under "More"
     """
     value: EpicsSignal = Component(EpicsSignal, "VAL")
