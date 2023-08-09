@@ -21,17 +21,17 @@ class SlitMotor(Device, Movable):
         KILL
         Anything under "More"
     """
-    value: EpicsSignal = Component(EpicsSignal, "VAL")
-    readback_value: EpicsSignalRO = Component(EpicsSignalRO, "RBV")
+    value: EpicsSignal = Component(EpicsSignal, ".VAL")
+    readback_value: EpicsSignalRO = Component(EpicsSignalRO, ".RBV")
     
-    tweak_forward: EpicsSignal = Component(EpicsSignal, "TWF")
-    tweak_reverse: EpicsSignal = Component(EpicsSignal, "TWR")
-    tweak_value: EpicsSignal = Component(EpicsSignal, "TWV")
+    tweak_forward: EpicsSignal = Component(EpicsSignal, ".TWF")
+    tweak_reverse: EpicsSignal = Component(EpicsSignal, ".TWR")
+    tweak_value: EpicsSignal = Component(EpicsSignal, ".TWV")
 
-    done_moving: EpicsSignalRO = Component(EpicsSignalRO, "DMOV")
-    alarm_severity: EpicsSignalRO = Component(EpicsSignalRO, "SEVR")
+    done_moving: EpicsSignalRO = Component(EpicsSignalRO, ".DMOV")
+    alarm_severity: EpicsSignalRO = Component(EpicsSignalRO, ".SEVR")
 
-    stop: EpicsSignal = Component(EpicsSignal, "STOP")
+    stop: EpicsSignal = Component(EpicsSignal, ".STOP")
 
     def set(self, target_value) -> SubscriptionStatus:
         await_value(self.done_moving, MoveStatus.Stationary)
