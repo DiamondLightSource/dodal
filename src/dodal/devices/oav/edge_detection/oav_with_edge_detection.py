@@ -1,32 +1,34 @@
 from dodal.devices.oav.oav_detector import OAV
-from ophyd.signal import EpicsSignalRO, Signal, Kind
-from ophyd.status import SubscriptionStatus
-from ophyd import Component, Device
 from dodal.devices.oav.edge_detection.edge_detect_utils import MxSampleDetect, ArrayProcessingFunctions, NONE_VALUE as INVALID_POSITION_VALUE, SampleLocation
 from dodal.log import LOGGER
-from typing import TYPE_CHECKING, Callable, Final, Tuple
+from typing import TYPE_CHECKING, Callable, Final, Tuple, TypeVar, Optional
 
-from ophyd.v2.core import StandardReadable, DeviceCollector
-from ophyd.v2.epics import epics_signal_r
+from ophyd.v2.core import AsyncStatus, StandardReadable, DeviceCollector
+from ophyd.v2.epics import epics_signal_r, SignalR, SignalRW
 
 import numpy as np
-import numpy.typing
+from numpy.typing import NDArray
+
+import asyncio
 
 
-class AreaDetectorPvaPluginArray(StandardReadable):
-    """
-    An Ophyd v2 device wrapping the areadetector PVA plugin. Will fetch array data via PVA. 
-    """
+T = TypeVar('T')
+
+class _SoftSignal(SignalRW[T]):
+    def __init__(self, initial_value: T):
+        self.value: T = initial_value
+
+    async def _set(self, value: T):
+        self.value = value
+
+    def set(self, value: T, wait=True, timeout=None) -> AsyncStatus:
+        coro = self._set(value)
+        return AsyncStatus(coro)
     
-    def __init__(self, prefix: str, name: str = ""):
-
-        self.array_data = epics_signal_r(numpy.typing.NDArray, "pva://{}ARR:ArrayData".format(prefix))
-
-        self.set_readable_signals(
-            read=[self.array_data],
-            config=[],
-        )
-        super().__init__(name=name)
+    def read(self) -> T:
+        if self.value is None:
+            raise ValueError("Soft signal read before being set")
+        return self.value
 
 
 class EdgeDetection(StandardReadable):
@@ -34,13 +36,10 @@ class EdgeDetection(StandardReadable):
     INVALID_POSITION: Final[Tuple[int, int]] = (INVALID_POSITION_VALUE, INVALID_POSITION_VALUE)
 
     def __init__(self, prefix, name: str = ""):
-        
-        self.array_data = epics_signal_r(numpy.typing.NDArray, "pva://{}ARR:ArrayData".format(prefix))
 
-        with DeviceCollector():
-            self.pva_array_data: StandardReadable = AreaDetectorPvaPluginArray(prefix=prefix)
+        self.array_data: SignalR[NDArray] = epics_signal_r(NDArray, "pva://{}ARR:ArrayData".format(prefix))
 
-        self.triggered_tip: Signal = Component(Signal, kind=Kind.hinted, value=INVALID_POSITION)  # type: ignore
+        self.triggered_tip: SignalRW[Tuple[int | None, int | None]] = _SoftSignal(initial_value=EdgeDetection.INVALID_POSITION)
 
         self.oav_width: int = 1024
         self.oav_height: int = 768
@@ -54,6 +53,15 @@ class EdgeDetection(StandardReadable):
         self.close_iterations: int = 5
         self.scan_direction: int = 1
         self.min_tip_height: int = 5
+
+        self.set_readable_signals(
+            read=[
+                self.array_data
+            ],
+            config=[
+                self.triggered_tip
+            ],
+        )
 
         super().__init__(name=name)
 
@@ -87,32 +95,23 @@ class EdgeDetection(StandardReadable):
             tip_y = location.tip_y
         except Exception as e:
             LOGGER.error("Failed to detect sample position: ", e)
-            tip_x = INVALID_POSITION_VALUE
-            tip_y = INVALID_POSITION_VALUE
+            tip_x = None
+            tip_y = None
 
-        self.triggered_tip.put((tip_x, tip_y))
+        self.triggered_tip.set((tip_x, tip_y))
 
-    def trigger(self) -> SubscriptionStatus:
+    async def read(self) -> Tuple[int | None, int | None]:
         # Clear last value
-        self.triggered_tip.put(INVALID_POSITION_VALUE)
+        self.triggered_tip.set(EdgeDetection.INVALID_POSITION)
 
-        subscription_status = SubscriptionStatus(
-            self.pva_array_data, self.update_tip_position, run=True, timeout=self.timeout
-        )
-        return subscription_status
-
-
-class OAVWithEdgeDetection(OAV):
-    edge_detect: Component[EdgeDetection] = Component(EdgeDetection, "-DI-OAV-01:")
+        self.update_tip_position(value=self.array_data.get_value())
+        return await self.triggered_tip.get_value()
 
     
 if __name__ == "__main__":
-    x = OAVWithEdgeDetection(name="oav", prefix="BL03I")
-    x.wait_for_connection()
-    img = x.edge_detect.array_data.get()
-    with open("/scratch/beamline_i03_oav_image_temp", "wb") as f:
-        np.save(f, img)
+    # with DeviceCollector():
+    x = EdgeDetection(prefix="BL03I-DI-OAV-01:")
 
-    import matplotlib.pyplot as plt
-    plt.imshow(np.transpose(img.reshape(80, 80, 3), axes=[0, 1, 2]))
-    plt.show()
+    img = asyncio.get_event_loop().run_until_complete(x.array_data.read())
+
+    print(img)
