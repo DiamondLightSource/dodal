@@ -56,6 +56,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/137_remove_unused_status/"
   },
   {
+    "version": "141_i04_devices",
+    "url": "https://DiamondLightSource.github.io/dodal/141_i04_devices/"
+  },
+  {
     "version": "262_make_arming_eiger_asynchronous",
     "url": "https://DiamondLightSource.github.io/dodal/262_make_arming_eiger_asynchronous/"
   },
