@@ -31,8 +31,8 @@ class SlitMotor(Device, Movable, Readable):
     tweak_reverse: EpicsSignal = Component(EpicsSignal, ".TWR")
     tweak_value: EpicsSignal = Component(EpicsSignal, ".TWV")
 
-    done_moving: EpicsSignalRO = Component(EpicsSignalRO, "DMOV")
-    alarm_severity: EpicsSignalRO = Component(EpicsSignalRO, "SEVR")
+    done_moving: EpicsSignalRO = Component(EpicsSignalRO, ".DMOV")
+    alarm_severity: EpicsSignalRO = Component(EpicsSignalRO, ".SEVR")
 
     stop_motor: EpicsSignal = Component(EpicsSignal, ".STOP")
 
