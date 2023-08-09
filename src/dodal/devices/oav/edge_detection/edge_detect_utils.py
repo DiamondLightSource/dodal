@@ -10,6 +10,9 @@ class ArrayProcessingFunctions:
     Utility class for creating array preprocessing functions (arr -> arr with no additional parameters)
     for some common operations.
     """
+    @staticmethod
+    def identity() -> Callable[[np.ndarray], np.ndarray]:
+        return lambda arr: arr
 
     @staticmethod
     def erode(ksize: int, iterations: int) -> Callable[[np.ndarray], np.ndarray]:
