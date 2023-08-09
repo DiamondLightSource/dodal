@@ -1,7 +1,13 @@
 from dataclasses import dataclass
 
 import numpy as np
-from ophyd import EpicsMotor
+from ophyd import Component, Device, EpicsMotor
+
+
+class XYZPositioner(Device):
+    x: EpicsMotor = Component(EpicsMotor, "X")
+    y: EpicsMotor = Component(EpicsMotor, "Y")
+    z: EpicsMotor = Component(EpicsMotor, "Z")
 
 
 @dataclass
