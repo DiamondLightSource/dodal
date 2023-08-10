@@ -2,6 +2,7 @@ from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
 from ophyd.status import SubscriptionStatus
 from bluesky.protocols import Movable
 from enum import IntEnum
+from collections import OrderedDict
 
 from ..status import await_value
 
@@ -56,3 +57,14 @@ class SlitMotor(Device, Movable):
         await_value(self.done_moving, MoveStatus.Stationary).wait()
 
         return self.readback_value.read()
+
+    def describe(self) -> OrderedDict:
+        od = OrderedDict()
+
+        od["value"] = {
+            "source": self.readback_value.name,
+            "dtype": "number",
+            "shape": [],
+        }
+
+        return od
