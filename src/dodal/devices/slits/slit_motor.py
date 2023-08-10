@@ -16,6 +16,7 @@ class SlitMotor(Device, Movable, Readable):
     """A class representing a slit motor.
 
     This could be gap, centre, x, y, etc...
+    By default sets to .VAL and reads from .RBV
 
     Unimplemented signals:
         SPMG
