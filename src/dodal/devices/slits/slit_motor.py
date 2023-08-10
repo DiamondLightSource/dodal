@@ -53,7 +53,7 @@ class SlitMotor(Device, Movable, Readable):
 
         return status
 
-    def read(self) -> float:
+    def read(self):
         await_value(self.done_moving, MoveStatus.Stationary).wait()
 
         return self.readback_value.read()
