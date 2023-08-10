@@ -9,9 +9,6 @@ def parsed_read(component):
     return res[description["value"]["source"]]["value"]
 
 
-import pdb
-
-
 def test_set():
     slit = Slit(name="slit", prefix="BL02J-AL-SLITS-95:")
     slit.wait_for_connection()
@@ -31,3 +28,5 @@ def test_set():
     assert all(
         [target == round(value, 3) for target, value in zip(target_values, results)]
     )
+
+    # probably good enough...
