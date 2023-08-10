@@ -1,6 +1,5 @@
 from ophyd import Device, Component
 from ophyd.status import StatusBase
-from bluesky.protocols import Movable
 
 from .slit_motor import SlitMotor
 from .gap_and_centre_slit_base_classes import GapAndCentreSlit2d
