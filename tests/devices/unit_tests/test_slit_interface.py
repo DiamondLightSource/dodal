@@ -4,24 +4,30 @@ import random
 
 
 def parsed_read(component):
+    description = component.describe()
     res = component.read()
-    return res
+    return res[description["value"]["source"]]["value"]
 
 
 import pdb
 
 
 def test_set():
-    pdb.set_trace()
     slit = Slit(name="slit", prefix="BL02J-AL-SLITS-95:")
     slit.wait_for_connection()
 
-    target_values = [round(random.random() * 3, 3) for i in range(4)]
+    target_values = [round(random.random(), 3) for i in range(4)]
 
     status = slit.set(*target_values)
     status.wait()
 
-    res = parsed_read(slit.x_size)
-    breakpoint()
+    results = [
+        parsed_read(slit.x_centre),
+        parsed_read(slit.x_size),
+        parsed_read(slit.y_centre),
+        parsed_read(slit.y_size),
+    ]
 
-    # assert False
+    assert all(
+        [target == round(value, 3) for target, value in zip(target_values, results)]
+    )
