@@ -1,4 +1,5 @@
 from ophyd import Device, Component
+from ophyd.status import StatusBase
 from bluesky.protocols import Movable
 
 from .slit_motor import SlitMotor
@@ -22,3 +23,22 @@ class S5_BL02J_AL_SLITS_95(GapAndCentreSlit2d):
 
     x_size: Device = Component(SlitMotor, "X:SIZE")
     x_centre: Device = Component(SlitMotor, "X:CENTRE")
+
+    def set(self, x_centre_value, x_size_value, y_centre_value, y_size_value):
+        """Method to set position of slit.
+
+        Parameters:
+            x_centre_value: Central x-coordinate of gap
+            x_size_value: Width of gap in x-dimension
+            y_centre_value: Central y-coordinate of gap
+            y_size_value: Width of gap in y-dimension
+        """
+        status = StatusBase()
+        status.set_finished()
+
+        status &= self.x_centre.set(x_centre_value)
+        status &= self.x_size.set(x_size_value)
+        status &= self.y_centre.set(y_centre_value)
+        status &= self.y_size.set(y_size_value)
+
+        return status
