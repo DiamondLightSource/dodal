@@ -142,14 +142,15 @@ class CAENelsBimorphMirrorInterface(Device, Movable):
         Args:
             signal: Signal to be written to
             value: Value to be written to signal
-        
+
         Returns:
             A SubscriptionStatus to track that the bimorph has entered its
-                post-operation busy state (avoids awaiting false idols.)
+                post-operation idle state.
         """
         await_value(self.status, Status.IDLE).wait()
         status = signal.set(value)
-        return status & await_value(self.status, Status.BUSY)
+        await_value(self.status, Status.BUSY).wait()
+        return status & await_value(self.status, Status.IDLE)
 
     def parsed_protected_read(self, signal: EpicsSignal):
         """Calls waits till idle then reads from signal and parses output for value.
@@ -209,20 +210,22 @@ class CAENelsBimorphMirrorInterface(Device, Movable):
         channels = self.get_channels_by_attribute(channel_attribute)
 
         return [self.parsed_protected_read(channel) for channel in channels]
-    
-    def write_to_all_channels_by_attribute(self, channel_attribute: ChannelAttribute, values: list) -> SubscriptionStatus:
+
+    def write_to_all_channels_by_attribute(
+        self, channel_attribute: ChannelAttribute, values: list
+    ) -> SubscriptionStatus:
         """Writes given values to signals grouped by given attribute.
-        
+
         Args:
             channel_attribute: A ChannelAttribute enum representing the grouping of signals to be written to.
             values: A list of values of length equal to the number of channels of the bimorph
-        
+
         Returns:
             A SubscriptionStatus object tracking completion of operations
         """
         channels = self.get_channels_by_attribute(channel_attribute)
 
-        status = StatusBase() 
+        status = StatusBase()
         status.set_finished()
 
         for i, (channel, value) in enumerate(zip(channels, values)):
@@ -234,23 +237,27 @@ class CAENelsBimorphMirrorInterface(Device, Movable):
             status.wait()
         return status
 
-    def set_and_proc_target_voltages(self, target_voltages: list[float]) -> SubscriptionStatus:
+    def set_and_proc_target_voltages(
+        self, target_voltages: list[float]
+    ) -> SubscriptionStatus:
         """Sets VTRGT channels ot values in target_voltages, and sets off ALLTRGT.PROC
-        
+
         Args:
-            target_voltages: An array of length equal to number of channels, with 
+            target_voltages: An array of length equal to number of channels, with
                 target_voltages[X] being set for channel_X_target_volage
-                
+
         Returns:
             A SubscriptionStatus object tracking completion of operations
         """
-        
-        status = self.write_to_all_channels_by_attribute(ChannelAttribute.VTRGT, target_voltages)
+
+        status = self.write_to_all_channels_by_attribute(
+            ChannelAttribute.VTRGT, target_voltages
+        )
 
         status.wait()
 
         return status & self.protected_set(self.all_target_proc, 1)
-    
+
     def set(self, target_voltages: list[float]) -> SubscriptionStatus:
         """Sets each voltage channel to equivalent value in target_voltages.
 
