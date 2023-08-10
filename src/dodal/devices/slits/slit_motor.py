@@ -35,6 +35,13 @@ class SlitMotor(Device, Movable):
     stop_motor: EpicsSignal = Component(EpicsSignal, ".STOP")
 
     def set(self, target_value) -> SubscriptionStatus:
+        """Set .VAL to target_value, making sure motor is idle at start of operation.
+
+        Parameters:
+            target_value: Value written to .VAL
+
+        Returns:
+            A SubscriptionStatus marked complete when motor is idle after operation."""
         await_value(self.done_moving, MoveStatus.Stationary).wait()
 
         status = self.value.set(target_value)
