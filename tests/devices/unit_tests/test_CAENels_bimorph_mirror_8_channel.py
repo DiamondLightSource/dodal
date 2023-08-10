@@ -478,7 +478,7 @@ def test_protected_set():
     status = bimorph.protected_set(bimorph.channel_1_voltage_out, test_voltage)
     status.wait()
 
-    assert bimorph.status.read()[bimorph.status.name]["value"] == Status.BUSY
+    assert bimorph.status.read()[bimorph.status.name]["value"] == Status.IDLE
     assert parsed_read(bimorph.channel_1_voltage_out_readback_value) == test_voltage
 
 
@@ -499,6 +499,7 @@ def test_parsed_protected_read():
 
     assert bimorph.status.read()[bimorph.status.name]["value"] == Status.IDLE
 
+
 def test_read_from_all_channels_by_attribute():
     """
     Tests CAENelsBimorphMirror8Channel.read_from_all_channels_by_attribute
@@ -512,14 +513,17 @@ def test_read_from_all_channels_by_attribute():
 
     for index, voltage_out_signal in enumerate(voltage_out_list):
         protected_set(voltage_out_signal, target_voltages[index])
-    
+
     voltage_out_rbv_values = bimorph.read_from_all_channels_by_attribute(
         ChannelAttribute.VOUT_RBV
     )
 
     assert all(
         [
-            vout_rbv_value == target_voltage for vout_rbv_value, target_voltage in zip(voltage_out_rbv_values, target_voltages)
+            vout_rbv_value == target_voltage
+            for vout_rbv_value, target_voltage in zip(
+                voltage_out_rbv_values, target_voltages
+            )
         ]
     )
 
@@ -535,7 +539,9 @@ def test_write_to_all_channels_by_attribute():
 
     target_voltages = [round(random.random() * 10, 1) for i in range(8)]
 
-    status = bimorph.write_to_all_channels_by_attribute(ChannelAttribute.VOUT, target_voltages)
+    status = bimorph.write_to_all_channels_by_attribute(
+        ChannelAttribute.VOUT, target_voltages
+    )
     status.wait()
 
     assert all(
@@ -563,23 +569,29 @@ def test_set_and_proc_target_voltages():
     bimorph.wait_for_connection()
 
     target_voltages = [round(random.random() * 10, 1) for i in range(8)]
- 
+
     vout_rbv_list = get_channels_by_attributes(bimorph, ChannelAttribute.VOUT_RBV)
 
-    voltage_target_rbv_list = get_channels_by_attributes(bimorph, ChannelAttribute.VTRGT_RBV)
+    voltage_target_rbv_list = get_channels_by_attributes(
+        bimorph, ChannelAttribute.VTRGT_RBV
+    )
 
     status = bimorph.set_and_proc_target_voltages(target_voltages)
     status.wait()
 
-    assert all([
-        parsed_read(vtrgt_rbv) == voltage for vtrgt_rbv, voltage in
-        zip(voltage_target_rbv_list, target_voltages)
-    ])
+    assert all(
+        [
+            parsed_read(vtrgt_rbv) == voltage
+            for vtrgt_rbv, voltage in zip(voltage_target_rbv_list, target_voltages)
+        ]
+    )
 
-    assert all([
-        parsed_read(vout) == voltage for vout, voltage in
-        zip(vout_rbv_list, target_voltages)
-    ])
+    assert all(
+        [
+            parsed_read(vout) == voltage
+            for vout, voltage in zip(vout_rbv_list, target_voltages)
+        ]
+    )
 
 
 def test_set():
@@ -590,27 +602,35 @@ def test_set():
     bimorph.wait_for_connection()
 
     target_voltages = [round(random.random() * 10, 1) for i in range(8)]
- 
+
     vout_rbv_list = get_channels_by_attributes(bimorph, ChannelAttribute.VOUT_RBV)
 
-    voltage_target_rbv_list = get_channels_by_attributes(bimorph, ChannelAttribute.VTRGT_RBV)
+    voltage_target_rbv_list = get_channels_by_attributes(
+        bimorph, ChannelAttribute.VTRGT_RBV
+    )
 
     status = bimorph.set(target_voltages)
     status.wait()
 
-    assert all([
-        parsed_read(vtrgt_rbv) == voltage for vtrgt_rbv, voltage in
-        zip(voltage_target_rbv_list, target_voltages)
-    ])
+    assert all(
+        [
+            parsed_read(vtrgt_rbv) == voltage
+            for vtrgt_rbv, voltage in zip(voltage_target_rbv_list, target_voltages)
+        ]
+    )
 
-    assert all([
-        parsed_read(vout) == voltage for vout, voltage in
-        zip(vout_rbv_list, target_voltages)
-    ])
+    assert all(
+        [
+            parsed_read(vout) == voltage
+            for vout, voltage in zip(vout_rbv_list, target_voltages)
+        ]
+    )
+
 
 # This section test the bimorph in Bluesky plan contexts:
 from bluesky import RunEngine
 from bluesky.plan_stubs import mv, rd
+
 RE = RunEngine({})
 
 
@@ -633,4 +653,3 @@ def test_move_plan():
             for voltage, target_voltage in zip(new_voltages, target_voltages)
         ]
     )
-
