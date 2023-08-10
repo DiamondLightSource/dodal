@@ -37,4 +37,10 @@ class SlitMotor(Device, Movable):
     def set(self, target_value) -> SubscriptionStatus:
         await_value(self.done_moving, MoveStatus.Stationary).wait()
 
-        return self.value.set(target_value)
+        status = self.value.set(target_value)
+
+        await_value(self.done_moving, MoveStatus.Moving).wait()
+
+        status &= await_value(self.done_moving, MoveStatus.Stationary)
+
+        return status
