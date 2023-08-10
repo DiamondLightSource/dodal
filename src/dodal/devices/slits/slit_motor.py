@@ -1,6 +1,6 @@
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
 from ophyd.status import SubscriptionStatus
-from bluesky.protocols import Movable
+from bluesky.protocols import Movable, Readable
 from enum import IntEnum
 from collections import OrderedDict
 
@@ -12,7 +12,7 @@ class MoveStatus(IntEnum):
     Stationary = 1
 
 
-class SlitMotor(Device, Movable):
+class SlitMotor(Device, Movable, Readable):
     """A class representing a slit motor.
 
     This could be gap, centre, x, y, etc...
