@@ -3,6 +3,7 @@ from typing import Callable, Final, Optional, Tuple
 
 import cv2
 import numpy as np
+from dodal.log import LOGGER
 
 
 class ArrayProcessingFunctions:
@@ -205,6 +206,7 @@ class MxSampleDetect(object):
         if column_indices_with_non_narrow_widths.shape[0] == 0:
             # No non-narrow locations - sample not in picture?
             # Or wrong parameters for edge-finding, ...
+            LOGGER.warn("pin-tip detection: No non-narrow edges found - cannot locate pin tip")
             return SampleLocation(
                 tip_y=None, tip_x=None, edge_bottom=bottom, edge_top=top
             )
@@ -222,6 +224,7 @@ class MxSampleDetect(object):
             x += -self.scan_direction
             if x == -1 or x == width:
                 # (In this case the sample is off the edge of the picture.)
+                LOGGER.warn("pin-tip detection: Pin tip may be outside image area - assuming at edge.")
                 break
         x += self.scan_direction  # ...and forward one step. x is now at the tip.
 
@@ -236,6 +239,7 @@ class MxSampleDetect(object):
             top[x + 1 :] = NONE_VALUE
             bottom[x + 1 :] = NONE_VALUE
 
+        LOGGER.debug("Successfully located pin tip at (x={}, y={})".format(tip_x, tip_y))
         return SampleLocation(
             tip_y=tip_y, tip_x=tip_x, edge_bottom=bottom, edge_top=top
         )

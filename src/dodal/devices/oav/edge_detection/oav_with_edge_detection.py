@@ -95,14 +95,14 @@ class EdgeDetection(StandardReadable):
             tip_x = location.tip_x
             tip_y = location.tip_y
         except Exception as e:
-            LOGGER.error("Failed to detect sample position: ", e)
+            LOGGER.error("Failed to detect pin-tip location due to exception: ", e)
             tip_x = None
             tip_y = None
 
         return (tip_x, tip_y)
 
     async def read(self) -> Tuple[int | None, int | None]:
-        return await self._get_tip_position()
+        return await asyncio.wait_for(self._get_tip_position(), timeout=self.timeout)
 
     
 if __name__ == "__main__":
@@ -115,7 +115,7 @@ if __name__ == "__main__":
         tip = await x.read()
         return img, tip
 
-    img, tip = asyncio.get_event_loop().run_until_complete(acquire())
+    img, tip = asyncio.get_event_loop().run_until_complete(asyncio.wait_for(acquire(), timeout=10))
     print("Tip: {}".format(tip))
     import matplotlib.pyplot as plt
     plt.imshow(img[""]["value"].reshape(768, 1024, 3))
