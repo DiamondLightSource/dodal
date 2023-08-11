@@ -1,57 +1,14 @@
-from dodal.devices.oav.oav_detector import OAV
-from dodal.devices.oav.edge_detection.edge_detect_utils import MxSampleDetect, ArrayProcessingFunctions, NONE_VALUE as INVALID_POSITION_VALUE, SampleLocation
+from dodal.devices.oav.edge_detection.edge_detect_utils import MxSampleDetect, ArrayProcessingFunctions, NONE_VALUE as INVALID_POSITION_VALUE
 from dodal.log import LOGGER
-from typing import TYPE_CHECKING, Callable, Final, Tuple, TypeVar, Optional, Type, Dict, Any
+from typing import Callable, Final, Tuple, TypeVar, Optional
 
-from ophyd.v2.core import AsyncStatus, StandardReadable, DeviceCollector
+from ophyd.v2.core import AsyncStatus, StandardReadable, Reading
 from ophyd.v2.epics import epics_signal_r, SignalR, SignalRW
 
 import numpy as np
 from numpy.typing import NDArray
 
 import asyncio
-
-from ophyd.v2 import _p4p
-from ophyd.v2._p4p import make_converter as default_make_converter, get_unique, PvaConverter, PvaArrayConverter, get_dtype
-
-
-class PvaNDArrayConverter(PvaConverter):
-    def write_value(self, value):
-        return value
-
-    def value(self, value):
-        return value["value"]
-
-    def reading(self, value):
-        return dict(
-            value=self.value(value),
-            timestamp=0,
-            alarm_severity=0,
-        )
-
-# TODO: HACK!
-def make_converter(datatype: Optional[Type], values: Dict[str, Any]) -> PvaConverter:
-    pv = list(values)[0]
-    typeid = get_unique({k: v.getID() for k, v in values.items()}, "typeids")
-    typ = get_unique({k: type(v["value"]) for k, v in values.items()}, "value types")
-
-    if "NTNDArray" in typeid:
-        pv_dtype = get_unique(
-            {k: v["value"].dtype for k, v in values.items()}, "dtypes"
-        )
-        # This is an array
-        if datatype:
-            # Check we wanted an array of this type
-            dtype = get_dtype(datatype)
-            if not dtype:
-                raise TypeError(f"{pv} has type [{pv_dtype}] not {datatype.__name__}")
-            if dtype != pv_dtype:
-                raise TypeError(f"{pv} has type [{pv_dtype}] not [{dtype}]")
-        return PvaNDArrayConverter()
-
-    return default_make_converter(datatype, values)
-
-_p4p.make_converter = make_converter
 
 
 T = TypeVar('T')
@@ -78,12 +35,10 @@ class EdgeDetection(StandardReadable):
     INVALID_POSITION: Final[Tuple[int, int]] = (INVALID_POSITION_VALUE, INVALID_POSITION_VALUE)
 
     def __init__(self, prefix, name: str = ""):
-        self.array_data: SignalR[NDArray] = epics_signal_r(NDArray[np.uint8], "pva://{}PVA:ARRAY".format(prefix))
+        self.array_data: SignalR[NDArray[np.uint8]] = epics_signal_r(NDArray[np.uint8], "pva://{}PVA:ARRAY".format(prefix))
 
-        # self.triggered_tip: SignalRW[Tuple[int | None, int | None]] = _SoftSignal(initial_value=EdgeDetection.INVALID_POSITION)
-
-        self.oav_width: int = 1024
-        self.oav_height: int = 768
+        self.oav_width: SignalR[int] = epics_signal_r(int, "{}PVA:ArraySize1_RBV".format(prefix))
+        self.oav_height: SignalR[int] = epics_signal_r(int, "{}PVA:ArraySize2_RBV".format(prefix))
 
         self.timeout: float = 10.0
 
@@ -97,16 +52,17 @@ class EdgeDetection(StandardReadable):
 
         self.set_readable_signals(
             read=[
-                self.array_data
+                self.array_data,
+                self.oav_width,
+                self.oav_height,
             ],
             config=[
-                # self.triggered_tip
             ],
         )
 
         super().__init__(name=name)
 
-    def update_tip_position(self, *, value, **_):
+    async def _get_tip_position(self) -> Tuple[Optional[int], Optional[int]]:
 
         sample_detection = MxSampleDetect(
             preprocess=self.preprocess,
@@ -119,14 +75,18 @@ class EdgeDetection(StandardReadable):
         )
 
         try:
-            num_pixels = self.oav_height * self.oav_width
-            value_len = value.shape[0]
+            array_data: NDArray[np.uint8] = await self.array_data.get_value()
+            height: int = await self.oav_height.get_value()
+            width: int = await self.oav_width.get_value()
+
+            num_pixels: int = height * width  # type: ignore
+            value_len = array_data.shape[0]
             if value_len == num_pixels * 3:
                 # RGB data
-                value = value.reshape(self.oav_height, self.oav_width, 3)
+                value = array_data.reshape(height, width, 3)
             elif value_len == num_pixels:
                 # Grayscale data
-                value = value.reshape(self.oav_height, self.oav_width)
+                value = array_data.reshape(height, width)
             else:
                 # Something else?
                 raise ValueError("Unexpected data array size: expected {} (grayscale data) or {} (rgb data), got {}", num_pixels, num_pixels * 3, value_len)
@@ -139,26 +99,24 @@ class EdgeDetection(StandardReadable):
             tip_x = None
             tip_y = None
 
-        self.triggered_tip.set((tip_x, tip_y))
+        return (tip_x, tip_y)
 
     async def read(self) -> Tuple[int | None, int | None]:
-        # Clear last value
-        self.triggered_tip.set(EdgeDetection.INVALID_POSITION)
-
-        self.update_tip_position(value=self.array_data.get_value())
-        return await self.triggered_tip.get_value()
+        return await self._get_tip_position()
 
     
 if __name__ == "__main__":
     # with DeviceCollector():
     x = EdgeDetection(prefix="BL03I-DI-OAV-01:")
 
-    async def doit():
+    async def acquire():
         await x.connect()
-        data = await x.array_data.read()
-        print(data)
-        return data
+        img = await x.array_data.read()
+        tip = await x.read()
+        return img, tip
 
-    img = asyncio.get_event_loop().run_until_complete(doit())
-
-    print(img)
+    img, tip = asyncio.get_event_loop().run_until_complete(acquire())
+    print("Tip: {}".format(tip))
+    import matplotlib.pyplot as plt
+    plt.imshow(img[""]["value"].reshape(768, 1024, 3))
+    plt.show()

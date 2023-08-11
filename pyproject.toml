@@ -23,6 +23,8 @@ dependencies = [
     "graypy",
     "pydantic<2.0",
     "opencv-python-headless",
+    "aioca",
+    "p4p",
 ]
 dynamic = ["version"]
 license.file = "LICENSE"
