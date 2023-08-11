@@ -3,6 +3,7 @@ from typing import Callable, Final, Optional, Tuple
 
 import cv2
 import numpy as np
+
 from dodal.log import LOGGER
 
 
@@ -11,6 +12,7 @@ class ArrayProcessingFunctions:
     Utility class for creating array preprocessing functions (arr -> arr with no additional parameters)
     for some common operations.
     """
+
     @staticmethod
     def identity() -> Callable[[np.ndarray], np.ndarray]:
         return lambda arr: arr
@@ -82,7 +84,7 @@ class ArrayProcessingFunctions:
         return lambda arr: cv2.medianBlur(arr, ksize)
 
 
-# A substitute for "None" which can fit into an np.int32 array.
+# A substitute for "None" which can fit into an numpy int array.
 # Also used as a substitute for a not-found sample position.
 NONE_VALUE: Final[int] = -1
 
@@ -92,6 +94,7 @@ class SampleLocation:
     """
     Holder type for results from sample detection.
     """
+
     tip_y: Optional[int]
     tip_x: Optional[int]
     edge_top: np.ndarray
@@ -182,11 +185,14 @@ class MxSampleDetect(object):
         first_nonzero will be: [1, 1, NONE_VALUE, 0]
         last_nonzero will be [1, 2, NONE_VALUE, 2]
         """
-        mask = arr != 0
-        first_nonzero = np.where(mask.any(axis=0), mask.argmax(axis=0), NONE_VALUE)
+        nonzero = arr.astype(dtype=bool, copy=False)
+        any_nonzero_in_column = nonzero.any(axis=0)
 
-        flipped = arr.shape[0] - np.flip(mask, axis=0).argmax(axis=0) - 1
-        last_nonzero = np.where(mask.any(axis=0), flipped, NONE_VALUE)
+        first_nonzero = np.where(any_nonzero_in_column, nonzero.argmax(axis=0), NONE_VALUE)
+
+        flipped = nonzero.shape[0] - np.flip(nonzero, axis=0).argmax(axis=0) - 1
+        last_nonzero = np.where(any_nonzero_in_column, flipped, NONE_VALUE)
+
         return first_nonzero, last_nonzero
 
     def _locate_sample(self, edge_arr: np.ndarray) -> SampleLocation:
@@ -199,14 +205,15 @@ class MxSampleDetect(object):
         widths = np.where(top != NONE_VALUE, bottom - top + 1, 0)
 
         # Generate the indices of columns with widths larger than the specified min tip height.
-        column_indices_with_non_narrow_widths = np.nonzero(
-            widths >= self.min_tip_height
-        )[0]
+        non_narrow_widths = widths >= self.min_tip_height
+        column_indices_with_non_narrow_widths = np.flatnonzero(non_narrow_widths)
 
         if column_indices_with_non_narrow_widths.shape[0] == 0:
             # No non-narrow locations - sample not in picture?
             # Or wrong parameters for edge-finding, ...
-            LOGGER.warn("pin-tip detection: No non-narrow edges found - cannot locate pin tip")
+            LOGGER.warning(
+                "pin-tip detection: No non-narrow edges found - cannot locate pin tip"
+            )
             return SampleLocation(
                 tip_y=None, tip_x=None, edge_bottom=bottom, edge_top=top
             )
@@ -224,7 +231,9 @@ class MxSampleDetect(object):
             x += -self.scan_direction
             if x == -1 or x == width:
                 # (In this case the sample is off the edge of the picture.)
-                LOGGER.warn("pin-tip detection: Pin tip may be outside image area - assuming at edge.")
+                LOGGER.warning(
+                    "pin-tip detection: Pin tip may be outside image area - assuming at edge."
+                )
                 break
         x += self.scan_direction  # ...and forward one step. x is now at the tip.
 
@@ -239,7 +248,9 @@ class MxSampleDetect(object):
             top[x + 1 :] = NONE_VALUE
             bottom[x + 1 :] = NONE_VALUE
 
-        LOGGER.debug("Successfully located pin tip at (x={}, y={})".format(tip_x, tip_y))
+        LOGGER.info(
+            "pin-tip detection: Successfully located pin tip at (x={}, y={})".format(tip_x, tip_y)
+        )
         return SampleLocation(
             tip_y=tip_y, tip_x=tip_x, edge_bottom=bottom, edge_top=top
         )
