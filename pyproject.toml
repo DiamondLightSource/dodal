@@ -14,7 +14,7 @@ classifiers = [
 ]
 description = "Ophyd devices and other utils that could be used across DLS beamlines"
 dependencies = [
-    "ophyd",
+    "ophyd@git+https://github.com/Tom-Willemsen/ophyd#ntndarray",  # Switch back to just "ophyd" once <relevant PR> merged.
     "bluesky",
     "pyepics",
     "dataclasses-json",
@@ -22,9 +22,9 @@ dependencies = [
     "requests",
     "graypy",
     "pydantic<2.0",
-    "opencv-python-headless",
-    "aioca",
-    "p4p",
+    "opencv-python-headless",  # For pin-tip detection.
+    "aioca",  # Required for CA support with Ophyd V2.
+    "p4p",  # Required for PVA support with Ophyd V2.
 ]
 dynamic = ["version"]
 license.file = "LICENSE"

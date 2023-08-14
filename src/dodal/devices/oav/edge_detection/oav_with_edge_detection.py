@@ -1,11 +1,12 @@
 import asyncio
 import time
-from typing import Callable, Final, Optional, Tuple, TypeVar
+from typing import Callable, Dict, Final, Optional, Tuple, TypeVar
+from bluesky.protocols import Descriptor, SyncOrAsync
 
 import numpy as np
 from numpy.typing import NDArray
-from ophyd.v2.core import AsyncStatus, StandardReadable
-from ophyd.v2.epics import SignalR, SignalRW, epics_signal_r
+from ophyd.v2.core import Readable, Reading
+from ophyd.v2.epics import SignalR, epics_signal_r
 
 from dodal.devices.oav.edge_detection.edge_detect_utils import (
     NONE_VALUE as INVALID_POSITION_VALUE,
@@ -15,17 +16,18 @@ from dodal.devices.oav.edge_detection.edge_detect_utils import (
     MxSampleDetect,
 )
 from dodal.log import LOGGER
+from collections import OrderedDict
 
 T = TypeVar("T")
 
 
-class EdgeDetection(StandardReadable):
-    INVALID_POSITION: Final[Tuple[int, int]] = (
-        INVALID_POSITION_VALUE,
-        INVALID_POSITION_VALUE,
-    )
+class EdgeDetection(Readable):
 
-    def __init__(self, prefix, name: str = ""):
+    def __init__(self, prefix: str, name: str = ""):
+
+        self._name: str = name
+        self._prefix: str = prefix
+
         self.array_data: SignalR[NDArray[np.uint8]] = epics_signal_r(
             NDArray[np.uint8], "pva://{}PVA:ARRAY".format(prefix)
         )
@@ -49,18 +51,20 @@ class EdgeDetection(StandardReadable):
         self.scan_direction: int = 1
         self.min_tip_height: int = 5
 
-        self.set_readable_signals(
-            read=[
-                self.array_data,
-                self.oav_width,
-                self.oav_height,
-            ],
-            config=[],
-        )
+    async def connect(self):
+        for signal in [self.array_data, self.oav_width, self.oav_height]:
+            await signal.connect()
 
-        super().__init__(name=name)
+    def name(self) -> str:
+        return self._name
 
-    async def _get_tip_position(self) -> Tuple[Optional[int], Optional[int]]:
+    async def _get_tip_position(self) -> Tuple[Tuple[Optional[int], Optional[int]], float]:
+        """
+        Gets the location of the pin tip.
+
+        Returns tuple of:
+            ((tip_x, tip_y), timestamp)
+        """
         sample_detection = MxSampleDetect(
             preprocess=self.preprocess,
             canny_lower=self.canny_lower,
@@ -72,7 +76,10 @@ class EdgeDetection(StandardReadable):
         )
 
         try:
-            array_data: NDArray[np.uint8] = await self.array_data.get_value()
+            array_reading: dict[str, Reading] = await self.array_data.read()
+            array_data: NDArray[np.uint8] = array_reading[""]["value"]
+            timestamp: float = array_reading[""]["timestamp"]
+
             height: int = await self.oav_height.get_value()
             width: int = await self.oav_width.get_value()
 
@@ -96,7 +103,7 @@ class EdgeDetection(StandardReadable):
             start_time = time.time()
             location = sample_detection.processArray(value)
             end_time = time.time()
-            LOGGER.warning(
+            LOGGER.debug(
                 "Sample location detection took {}ms".format(
                     (end_time - start_time) * 1000.0
                 )
@@ -107,16 +114,33 @@ class EdgeDetection(StandardReadable):
             LOGGER.error("Failed to detect pin-tip location due to exception: ", e)
             tip_x = None
             tip_y = None
+            timestamp = time.time()  # Fallback only.
 
-        return (tip_x, tip_y)
+        return (tip_x, tip_y), timestamp
 
-    async def read(self) -> Tuple[int | None, int | None]:
-        return await asyncio.wait_for(self._get_tip_position(), timeout=self.timeout)
+    async def read(self) -> dict[str, Reading]:
+        tip_pos, timestamp = await asyncio.wait_for(self._get_tip_position(), timeout=self.timeout)
+
+        return OrderedDict([
+            (self._name, {
+                "value": tip_pos,
+                "timestamp": timestamp
+            }),
+        ])
+    
+    async def describe(self) -> dict[str, Descriptor]:
+        return OrderedDict(
+            [(self._name,
+             {
+                 'source': "pva://{}PVA:ARRAY".format(self._prefix),
+                 'dtype': "number",
+                 'shape': [2],  # Tuple of (x, y) tip position
+             })],
+        )
 
 
 if __name__ == "__main__":
-    # with DeviceCollector():
-    x = EdgeDetection(prefix="BL02J-DI-OAV-01:")
+    x = EdgeDetection(prefix="BL02J-DI-OAV-01:", name="edgeDetect")
 
     async def acquire():
         await x.connect()
@@ -127,8 +151,12 @@ if __name__ == "__main__":
     img, tip = asyncio.get_event_loop().run_until_complete(
         asyncio.wait_for(acquire(), timeout=10)
     )
-    print("Tip: {}".format(tip))
-    import matplotlib.pyplot as plt
+    print("Tip: {}".format(tip["edgeDetect"]["value"]))
 
-    plt.imshow(img[""]["value"].reshape(2176, 2112, 3))
-    plt.show()
+    try:
+        import matplotlib.pyplot as plt
+
+        plt.imshow(img[""]["value"].reshape(2176, 2112, 3))
+        plt.show()
+    except ImportError as e:
+        print("matplotlib not available; cannot show acquired image")
