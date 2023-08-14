@@ -1,30 +1,25 @@
 import asyncio
 import time
-from typing import Callable, Dict, Final, Optional, Tuple, TypeVar
-from bluesky.protocols import Descriptor, SyncOrAsync
+from collections import OrderedDict
+from typing import Callable, Optional, Tuple, TypeVar
 
 import numpy as np
+from bluesky.protocols import Descriptor
 from numpy.typing import NDArray
 from ophyd.v2.core import Readable, Reading
 from ophyd.v2.epics import SignalR, epics_signal_r
 
 from dodal.devices.oav.edge_detection.edge_detect_utils import (
-    NONE_VALUE as INVALID_POSITION_VALUE,
-)
-from dodal.devices.oav.edge_detection.edge_detect_utils import (
     ArrayProcessingFunctions,
     MxSampleDetect,
 )
 from dodal.log import LOGGER
-from collections import OrderedDict
 
 T = TypeVar("T")
 
 
 class EdgeDetection(Readable):
-
     def __init__(self, prefix: str, name: str = ""):
-
         self._name: str = name
         self._prefix: str = prefix
 
@@ -58,7 +53,9 @@ class EdgeDetection(Readable):
     def name(self) -> str:
         return self._name
 
-    async def _get_tip_position(self) -> Tuple[Tuple[Optional[int], Optional[int]], float]:
+    async def _get_tip_position(
+        self,
+    ) -> Tuple[Tuple[Optional[int], Optional[int]], float]:
         """
         Gets the location of the pin tip.
 
@@ -119,23 +116,28 @@ class EdgeDetection(Readable):
         return (tip_x, tip_y), timestamp
 
     async def read(self) -> dict[str, Reading]:
-        tip_pos, timestamp = await asyncio.wait_for(self._get_tip_position(), timeout=self.timeout)
+        tip_pos, timestamp = await asyncio.wait_for(
+            self._get_tip_position(), timeout=self.timeout
+        )
 
-        return OrderedDict([
-            (self._name, {
-                "value": tip_pos,
-                "timestamp": timestamp
-            }),
-        ])
-    
+        return OrderedDict(
+            [
+                (self._name, {"value": tip_pos, "timestamp": timestamp}),
+            ]
+        )
+
     async def describe(self) -> dict[str, Descriptor]:
         return OrderedDict(
-            [(self._name,
-             {
-                 'source': "pva://{}PVA:ARRAY".format(self._prefix),
-                 'dtype': "number",
-                 'shape': [2],  # Tuple of (x, y) tip position
-             })],
+            [
+                (
+                    self._name,
+                    {
+                        "source": "pva://{}PVA:ARRAY".format(self._prefix),
+                        "dtype": "number",
+                        "shape": [2],  # Tuple of (x, y) tip position
+                    },
+                )
+            ],
         )
 
 
@@ -158,5 +160,5 @@ if __name__ == "__main__":
 
         plt.imshow(img[""]["value"].reshape(2176, 2112, 3))
         plt.show()
-    except ImportError as e:
+    except ImportError:
         print("matplotlib not available; cannot show acquired image")
