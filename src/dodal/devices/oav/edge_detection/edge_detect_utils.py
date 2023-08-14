@@ -188,7 +188,9 @@ class MxSampleDetect(object):
         nonzero = arr.astype(dtype=bool, copy=False)
         any_nonzero_in_column = nonzero.any(axis=0)
 
-        first_nonzero = np.where(any_nonzero_in_column, nonzero.argmax(axis=0), NONE_VALUE)
+        first_nonzero = np.where(
+            any_nonzero_in_column, nonzero.argmax(axis=0), NONE_VALUE
+        )
 
         flipped = nonzero.shape[0] - np.flip(nonzero, axis=0).argmax(axis=0) - 1
         last_nonzero = np.where(any_nonzero_in_column, flipped, NONE_VALUE)
@@ -249,7 +251,9 @@ class MxSampleDetect(object):
             bottom[x + 1 :] = NONE_VALUE
 
         LOGGER.info(
-            "pin-tip detection: Successfully located pin tip at (x={}, y={})".format(tip_x, tip_y)
+            "pin-tip detection: Successfully located pin tip at (x={}, y={})".format(
+                tip_x, tip_y
+            )
         )
         return SampleLocation(
             tip_y=tip_y, tip_x=tip_x, edge_bottom=bottom, edge_top=top
