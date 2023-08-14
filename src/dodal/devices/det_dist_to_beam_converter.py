@@ -9,12 +9,9 @@ class Axis(Enum):
 
 
 class DetectorDistanceToBeamXYConverter:
-    lookup_file: str
-    lookup_table_values: list
-
     def __init__(self, lookup_file: str):
-        self.lookup_file = lookup_file
-        self.lookup_table_values = self.parse_table()
+        self.lookup_file: str = lookup_file
+        self.lookup_table_values: list = self.parse_table()
 
     def get_beam_xy_from_det_dist(self, det_dist_mm: float, beam_axis: Axis) -> float:
         beam_axis_values = self.lookup_table_values[beam_axis.value]
