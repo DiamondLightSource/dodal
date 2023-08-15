@@ -44,10 +44,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/0.0.2_async_arming/"
   },
   {
-    "version": "124_implement_i23_gonio",
-    "url": "https://DiamondLightSource.github.io/dodal/124_implement_i23_gonio/"
-  },
-  {
     "version": "129_edge_detection",
     "url": "https://DiamondLightSource.github.io/dodal/129_edge_detection/"
   },
@@ -82,6 +78,10 @@
   {
     "version": "adsim-fixes",
     "url": "https://DiamondLightSource.github.io/dodal/adsim-fixes/"
+  },
+  {
+    "version": "allow_both_v1_and_v2_ophyd_devices",
+    "url": "https://DiamondLightSource.github.io/dodal/allow_both_v1_and_v2_ophyd_devices/"
   },
   {
     "version": "artemis598_params_changes",
