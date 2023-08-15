@@ -17,28 +17,6 @@ OAV_CONFIG_FILE_DEFAULTS = {
 
 
 class OAVParameters:
-    zoom_params_file: str
-    oav_config_json: str
-    display_config: str
-    global_params: dict[str, Any]
-    context_dicts: dict[str, dict]
-    active_params: ChainMap
-
-    exposure: float
-    acquire_period: float
-    gain: float
-    canny_edge_upper_threshold: float
-    canny_edge_lower_threshold: float
-    minimum_height: int
-    zoom: float
-    preprocess: int  # gets blur type, e.g. 8 = gaussianBlur, 9 = medianBlur
-    preprocess_K_size: int  # length scale for blur preprocessing
-    detection_script_filename: str
-    close_ksize: int
-    min_callback_time: float
-    direction: int
-    max_tip_distance: float
-
     def __init__(
         self,
         context="loopCentring",
@@ -46,13 +24,13 @@ class OAVParameters:
         oav_config_json=OAV_CONFIG_FILE_DEFAULTS["oav_config_json"],
         display_config=OAV_CONFIG_FILE_DEFAULTS["display_config"],
     ):
-        self.zoom_params_file = zoom_params_file
-        self.oav_config_json = oav_config_json
-        self.display_config = display_config
+        self.zoom_params_file: str = zoom_params_file
+        self.oav_config_json: str = oav_config_json
+        self.display_config: str = display_config
         self.context = context
 
         self.global_params, self.context_dicts = self.load_json(self.oav_config_json)
-        self.active_params = ChainMap(
+        self.active_params: ChainMap = ChainMap(
             self.context_dicts[self.context], self.global_params
         )
         self.update_self_from_current_context()
@@ -91,22 +69,28 @@ class OAVParameters:
                     f"wrong type, should be {param_type} but is {type(param)}."
                 )
 
-        self.exposure = update("exposure", float)
-        self.acquire_period = update("acqPeriod", float)
-        self.gain = update("gain", float)
-        self.canny_edge_upper_threshold = update("CannyEdgeUpperThreshold", float)
-        self.canny_edge_lower_threshold = update(
+        self.exposure: float = update("exposure", float)
+        self.acquire_period: float = update("acqPeriod", float)
+        self.gain: float = update("gain", float)
+        self.canny_edge_upper_threshold: float = update(
+            "CannyEdgeUpperThreshold", float
+        )
+        self.canny_edge_lower_threshold: float = update(
             "CannyEdgeLowerThreshold", float, default=5.0
         )
-        self.minimum_height = update("minheight", int)
-        self.zoom = update("zoom", float)
-        self.preprocess = update("preprocess", int)
-        self.preprocess_K_size = update("preProcessKSize", int)
-        self.detection_script_filename = update("filename", str)
-        self.close_ksize = update("close_ksize", int, default=11)
-        self.min_callback_time = update("min_callback_time", float, default=0.08)
-        self.direction = update("direction", int)
-        self.max_tip_distance = update("max_tip_distance", float, default=300)
+        self.minimum_height: int = update("minheight", int)
+        self.zoom: float = update("zoom", float)
+        self.preprocess: int = update(
+            "preprocess", int
+        )  # gets blur type, e.g. 8 = gaussianBlur, 9 = medianBlur
+        self.preprocess_K_size: int = update(
+            "preProcessKSize", int
+        )  # length scale for blur preprocessing
+        self.detection_script_filename: str = update("filename", str)
+        self.close_ksize: int = update("close_ksize", int, default=11)
+        self.min_callback_time: float = update("min_callback_time", float, default=0.08)
+        self.direction: int = update("direction", int)
+        self.max_tip_distance: float = update("max_tip_distance", float, default=300)
 
     def load_microns_per_pixel(self, zoom=None):
         """

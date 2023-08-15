@@ -9,8 +9,8 @@ from ophyd import Component, Device, EpicsSignal, StatusBase
 from dodal.devices.status import await_value
 from dodal.devices.utils import epics_signal_put_wait
 
-PC_ARM_SOURCE_SOFT = 0
-PC_ARM_SOURCE_EXT = 1
+PC_ARM_SOURCE_SOFT = "Soft"
+PC_ARM_SOURCE_EXT = "External"
 
 PC_GATE_SOURCE_POSITION = 0
 PC_GATE_SOURCE_TIME = 1
@@ -46,6 +46,13 @@ class I03Axes(Enum):
     SMARGON_Y = "Enc2"
     SMARGON_Z = "Enc3"
     OMEGA = "Enc4"
+
+
+class I24Axes(Enum):
+    VGON_Z = "Enc1"
+    OMEGA = "Enc2"
+    VGON_X = "Enc3"
+    VGON_YH = "Enc4"
 
 
 class RotationDirection(IntEnum):
@@ -85,6 +92,9 @@ class PositionCompare(Device):
 
     pulse_source: EpicsSignal = epics_signal_put_wait("PC_PULSE_SEL")
     pulse_input: EpicsSignal = epics_signal_put_wait("PC_PULSE_INP")
+    pulse_start: EpicsSignal = epics_signal_put_wait("PC_PULSE_START")
+    pulse_width: EpicsSignal = epics_signal_put_wait("PC_PULSE_WID")
+    pulse_step: EpicsSignal = epics_signal_put_wait("PC_PULSE_STEP")
 
     dir: EpicsSignal = Component(EpicsSignal, "PC_DIR")
     arm_source: EpicsSignal = epics_signal_put_wait("PC_ARM_SEL")
