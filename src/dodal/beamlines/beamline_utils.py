@@ -1,11 +1,16 @@
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Dict, List, Optional, TypeVar, cast
 
 from ophyd import Device
+from ophyd.v2.core import Device as OphydV2Device, wait_for_connection as v2_device_wait_for_connection
 from ophyd.sim import make_fake_device
 
 from dodal.utils import BeamlinePrefix, skip_device
 
-ACTIVE_DEVICES: Dict[str, Device] = {}
+from bluesky.run_engine import call_in_bluesky_event_loop
+import asyncio
+
+
+ACTIVE_DEVICES: Dict[str, Device | OphydV2Device] = {}
 BL = ""
 
 
@@ -34,17 +39,30 @@ def active_device_is_same_type(active_device, device):
     return type(active_device) == device
 
 
+T = TypeVar("T", bound=Device | OphydV2Device)
+
+
+def _wait_for_connection(device: Device | OphydV2Device) -> None:
+    match device:
+        case Device():
+            device.wait_for_connection()
+        case OphydV2Device():
+            call_in_bluesky_event_loop(asyncio.wait_for(v2_device_wait_for_connection(coros=device.connect()), timeout=30))
+        case _:
+            raise TypeError("Invalid type {} in _wait_for_connection".format(device.__class__.__name__))
+
+
 @skip_device()
 def device_instantiation(
-    device: Callable,
+    device: Callable[..., T],
     name: str,
     prefix: str,
     wait: bool,
     fake: bool,
-    post_create: Optional[Callable] = None,
+    post_create: Optional[Callable[[T], None]] = None,
     bl_prefix: bool = True,
     **kwargs,
-) -> Device:
+) -> T:
     """Method to allow generic creation of singleton devices. Meant to be used to easily
     define lists of devices in beamline files. Additional keyword arguments are passed
     directly to the device constructor.
@@ -66,15 +84,17 @@ def device_instantiation(
     if fake:
         device = make_fake_device(device)
     if active_device is None:
-        ACTIVE_DEVICES[name] = device(
+        device_instance: T = device(
             name=name,
             prefix=f"{(BeamlinePrefix(BL).beamline_prefix)}{prefix}"
             if bl_prefix
             else prefix,
             **kwargs,
         )
+        ACTIVE_DEVICES[name] = device_instance
         if wait:
-            ACTIVE_DEVICES[name].wait_for_connection()
+            _wait_for_connection(device_instance)
+
     else:
         if not active_device_is_same_type(active_device, device):
             raise TypeError(
@@ -82,6 +102,9 @@ def device_instantiation(
                 f"name as an existing device. Device name '{name}' already used for "
                 f"a(n) {device}."
             )
+        else:
+            # We have manually checked types
+            device_instance: T = cast(T, ACTIVE_DEVICES[name])
     if post_create:
-        post_create(ACTIVE_DEVICES[name])
-    return ACTIVE_DEVICES[name]
+        post_create(device_instance)
+    return device_instance
