@@ -9,7 +9,7 @@ from numpy.typing import NDArray
 from ophyd.v2.core import Readable, Reading, Device
 from ophyd.v2.epics import SignalR, epics_signal_r
 
-from dodal.devices.oav.edge_detection.edge_detect_utils import (
+from dodal.devices.oav.pin_tip_detection.pin_tip_detect_utils import (
     ArrayProcessingFunctions,
     MxSampleDetect,
 )
@@ -18,7 +18,7 @@ from dodal.log import LOGGER
 T = TypeVar("T")
 
 
-class EdgeDetection(Readable, Device):
+class PinTipDetection(Readable, Device):
     def __init__(self, prefix: str, name: str = ""):
         self._prefix: str = prefix
         self._name = name
@@ -137,7 +137,7 @@ class EdgeDetection(Readable, Device):
 
 
 if __name__ == "__main__":
-    x = EdgeDetection(prefix="BL03I-DI-OAV-01:", name="edgeDetect")
+    x = PinTipDetection(prefix="BL03I-DI-OAV-01:", name="edgeDetect")
 
     async def acquire():
         await x.connect()

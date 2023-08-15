@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from dodal.devices.oav.edge_detection.edge_detect_utils import (
+from dodal.devices.oav.pin_tip_detection.pin_tip_detect_utils import (
     NONE_VALUE,
     MxSampleDetect,
 )

@@ -1,7 +1,8 @@
 import os
 
-from dodal.utils import make_all_devices
 from bluesky.run_engine import RunEngine
+
+from dodal.utils import make_all_devices
 
 if __name__ == "__main__":
     """This test runs against the real beamline and confirms that all the devices connect
