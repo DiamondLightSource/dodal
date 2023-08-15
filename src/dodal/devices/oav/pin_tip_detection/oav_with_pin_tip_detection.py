@@ -1,12 +1,12 @@
 import asyncio
 import time
 from collections import OrderedDict
-from typing import Callable, Optional, Tuple, TypeVar, Type
+from typing import Callable, Optional, Tuple, Type, TypeVar
 
 import numpy as np
 from bluesky.protocols import Descriptor
 from numpy.typing import NDArray
-from ophyd.v2.core import Readable, Reading, Device
+from ophyd.v2.core import Device, Readable, Reading
 from ophyd.v2.epics import SignalR, epics_signal_r
 
 from dodal.devices.oav.pin_tip_detection.pin_tip_detect_utils import (
@@ -92,7 +92,7 @@ class PinTipDetection(Readable, Device):
                     num_pixels * 3,
                     value_len,
                 )
-            
+
             start_time = time.time()
             location = sample_detection.processArray(value)
             end_time = time.time()

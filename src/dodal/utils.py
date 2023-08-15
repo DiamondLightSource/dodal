@@ -175,7 +175,7 @@ def _is_device_skipped(func: AnyDeviceFactory) -> bool:
     return func.__skip__  # type: ignore
 
 
-def _is_v1_device_factory(func: AnyDeviceFactory) -> bool:
+def _is_v1_device_factory(func: Callable) -> bool:
     try:
         return_type = signature(func).return_annotation
         return _is_v1_device_type(return_type)
@@ -183,7 +183,7 @@ def _is_v1_device_factory(func: AnyDeviceFactory) -> bool:
         return False
 
 
-def _is_v2_device_factory(func: AnyDeviceFactory) -> bool:
+def _is_v2_device_factory(func: Callable) -> bool:
     try:
         return_type = signature(func).return_annotation
         return _is_v2_device_type(return_type)
@@ -191,7 +191,7 @@ def _is_v2_device_factory(func: AnyDeviceFactory) -> bool:
         return False
 
 
-def _is_any_device_factory(func: AnyDeviceFactory) -> bool:
+def _is_any_device_factory(func: Callable) -> bool:
     return _is_v1_device_factory(func) or _is_v2_device_factory(func)
 
 
