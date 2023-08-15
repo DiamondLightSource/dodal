@@ -1,12 +1,12 @@
 import asyncio
 import time
 from collections import OrderedDict
-from typing import Callable, Optional, Tuple, TypeVar
+from typing import Callable, Optional, Tuple, TypeVar, Type
 
 import numpy as np
 from bluesky.protocols import Descriptor
 from numpy.typing import NDArray
-from ophyd.v2.core import Readable, Reading
+from ophyd.v2.core import Readable, Reading, Device
 from ophyd.v2.epics import SignalR, epics_signal_r
 
 from dodal.devices.oav.edge_detection.edge_detect_utils import (
@@ -18,20 +18,20 @@ from dodal.log import LOGGER
 T = TypeVar("T")
 
 
-class EdgeDetection(Readable):
+class EdgeDetection(Readable, Device):
     def __init__(self, prefix: str, name: str = ""):
-        self._name: str = name
         self._prefix: str = prefix
+        self._name = name
 
         self.array_data: SignalR[NDArray[np.uint8]] = epics_signal_r(
-            NDArray[np.uint8], "pva://{}PVA:ARRAY".format(prefix)
+            NDArray[np.uint8], f"pva://{prefix}PVA:ARRAY"
         )
 
         self.oav_width: SignalR[int] = epics_signal_r(
-            int, "{}PVA:ArraySize1_RBV".format(prefix)
+            int, f"{prefix}PVA:ArraySize1_RBV"
         )
         self.oav_height: SignalR[int] = epics_signal_r(
-            int, "{}PVA:ArraySize2_RBV".format(prefix)
+            int, f"{prefix}PVA:ArraySize2_RBV"
         )
 
         self.timeout: float = 10.0
@@ -46,12 +46,7 @@ class EdgeDetection(Readable):
         self.scan_direction: int = 1
         self.min_tip_height: int = 5
 
-    async def connect(self):
-        for signal in [self.array_data, self.oav_width, self.oav_height]:
-            await signal.connect()
-
-    def name(self) -> str:
-        return self._name
+        super().__init__(name=name)
 
     async def _get_tip_position(
         self,
@@ -72,16 +67,17 @@ class EdgeDetection(Readable):
             min_tip_height=self.min_tip_height,
         )
 
+        array_reading: dict[str, Reading] = await self.array_data.read()
+        array_data: NDArray[np.uint8] = array_reading[""]["value"]
+        timestamp: float = array_reading[""]["timestamp"]
+
+        height: int = await self.oav_height.get_value()
+        width: int = await self.oav_width.get_value()
+
+        num_pixels: int = height * width  # type: ignore
+        value_len = array_data.shape[0]
+
         try:
-            array_reading: dict[str, Reading] = await self.array_data.read()
-            array_data: NDArray[np.uint8] = array_reading[""]["value"]
-            timestamp: float = array_reading[""]["timestamp"]
-
-            height: int = await self.oav_height.get_value()
-            width: int = await self.oav_width.get_value()
-
-            num_pixels: int = height * width  # type: ignore
-            value_len = array_data.shape[0]
             if value_len == num_pixels * 3:
                 # RGB data
                 value = array_data.reshape(height, width, 3)
@@ -96,7 +92,7 @@ class EdgeDetection(Readable):
                     num_pixels * 3,
                     value_len,
                 )
-
+            
             start_time = time.time()
             location = sample_detection.processArray(value)
             end_time = time.time()
@@ -111,7 +107,6 @@ class EdgeDetection(Readable):
             LOGGER.error("Failed to detect pin-tip location due to exception: ", e)
             tip_x = None
             tip_y = None
-            timestamp = time.time()  # Fallback only.
 
         return (tip_x, tip_y), timestamp
 
@@ -142,7 +137,7 @@ class EdgeDetection(Readable):
 
 
 if __name__ == "__main__":
-    x = EdgeDetection(prefix="BL02J-DI-OAV-01:", name="edgeDetect")
+    x = EdgeDetection(prefix="BL03I-DI-OAV-01:", name="edgeDetect")
 
     async def acquire():
         await x.connect()
@@ -153,12 +148,13 @@ if __name__ == "__main__":
     img, tip = asyncio.get_event_loop().run_until_complete(
         asyncio.wait_for(acquire(), timeout=10)
     )
+    print(tip)
     print("Tip: {}".format(tip["edgeDetect"]["value"]))
 
     try:
         import matplotlib.pyplot as plt
 
-        plt.imshow(img[""]["value"].reshape(2176, 2112, 3))
+        plt.imshow(img[""]["value"].reshape(768, 1024, 3))
         plt.show()
     except ImportError:
         print("matplotlib not available; cannot show acquired image")

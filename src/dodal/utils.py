@@ -11,6 +11,7 @@ from typing import (
     Callable,
     Dict,
     Iterable,
+    Final,
     Mapping,
     Optional,
     Type,
@@ -34,6 +35,8 @@ from bluesky.protocols import (
     Triggerable,
     WritesExternalAssets,
 )
+
+from ophyd.v2.core import Device as OphydV2Device
 
 #: Protocols defining interface to hardware
 BLUESKY_PROTOCOLS = [
@@ -106,8 +109,14 @@ def make_all_devices(
     """
     if isinstance(module, str) or module is None:
         module = import_module(module or __name__)
-    factories = collect_factories(module)
-    return invoke_factories(factories, **kwargs)
+    v1_factories, v2_factories = collect_factories(module)
+    print(f"v1: {v1_factories}, v2: {v2_factories}")
+    devices = invoke_factories(v1_factories, **kwargs)
+
+    for name, factory in v2_factories.items():
+        devices[name] = factory(**kwargs)
+
+    return devices
 
 
 def invoke_factories(
@@ -143,12 +152,17 @@ def extract_dependencies(
             yield name
 
 
-def collect_factories(module: ModuleType) -> Mapping[str, Callable[..., Any]]:
-    factories = {}
+def collect_factories(module: ModuleType) -> tuple[Mapping[str, Callable[..., Any]], Mapping[str, Callable[..., OphydV2Device]]]:
+    v1_factories = {}
+    v2_factories = {}
     for var in module.__dict__.values():
-        if callable(var) and _is_device_factory(var) and not _is_device_skipped(var):
-            factories[var.__name__] = var
-    return factories
+        if callable(var) and not _is_device_skipped(var):
+            if _is_v1_device_factory(var):
+                v1_factories[var.__name__] = var
+            elif _is_v2_device_factory(var):
+                v2_factories[var.__name__] = var
+
+    return v1_factories, v2_factories
 
 
 def _is_device_skipped(func: Callable[..., Any]) -> bool:
@@ -157,17 +171,29 @@ def _is_device_skipped(func: Callable[..., Any]) -> bool:
     return func.__skip__  # type: ignore
 
 
-def _is_device_factory(func: Callable[..., Any]) -> bool:
+def _is_v1_device_factory(func: Callable[..., Any]) -> bool:
     try:
         return_type = signature(func).return_annotation
-        return _is_device_type(return_type)
+        return _is_v1_device_type(return_type)
     except ValueError:
         return False
+    
+
+def _is_v2_device_factory(func: Callable[..., Any]) -> bool:
+    try:
+        return_type = signature(func).return_annotation
+        return _is_v2_device_type(return_type)
+    except ValueError:
+        return False
+    
+
+def _is_v2_device_type(obj: Type[Any]) -> bool:
+    return issubclass(obj, OphydV2Device)
 
 
-def _is_device_type(obj: Type[Any]) -> bool:
+def _is_v1_device_type(obj: Type[Any]) -> bool:
     is_class = inspect.isclass(obj)
     follows_protocols = any(
         map(lambda protocol: isinstance(obj, protocol), BLUESKY_PROTOCOLS)
     )
-    return is_class and follows_protocols
+    return is_class and follows_protocols and not _is_v2_device_type(obj)
