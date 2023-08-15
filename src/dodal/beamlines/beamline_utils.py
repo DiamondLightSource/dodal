@@ -1,16 +1,17 @@
-from typing import Callable, Dict, List, Optional, TypeVar, cast
-
-from ophyd import Device
-from ophyd.v2.core import Device as OphydV2Device, wait_for_connection as v2_device_wait_for_connection
-from ophyd.sim import make_fake_device
-
-from dodal.utils import BeamlinePrefix, skip_device
+import asyncio
+from typing import Callable, Dict, Final, List, Optional, TypeVar, cast
 
 from bluesky.run_engine import call_in_bluesky_event_loop
-import asyncio
+from ophyd import Device as OphydV1Device
+from ophyd.sim import make_fake_device
+from ophyd.v2.core import Device as OphydV2Device
+from ophyd.v2.core import wait_for_connection as v2_device_wait_for_connection
 
+from dodal.utils import AnyDevice, BeamlinePrefix, skip_device
 
-ACTIVE_DEVICES: Dict[str, Device | OphydV2Device] = {}
+DEFAULT_CONNECTION_TIMEOUT: Final[float] = 5.0
+
+ACTIVE_DEVICES: Dict[str, AnyDevice] = {}
 BL = ""
 
 
@@ -35,21 +36,31 @@ def list_active_devices() -> List[str]:
     return list(ACTIVE_DEVICES.keys())
 
 
-def active_device_is_same_type(active_device, device):
+def active_device_is_same_type(
+    active_device: AnyDevice, device: Callable[..., AnyDevice]
+) -> bool:
     return type(active_device) == device
 
 
-T = TypeVar("T", bound=Device | OphydV2Device)
+def _wait_for_connection(
+    device: AnyDevice, timeout: float = DEFAULT_CONNECTION_TIMEOUT
+) -> None:
+    if isinstance(device, OphydV1Device):
+        device.wait_for_connection(timeout=timeout)
+    elif isinstance(device, OphydV2Device):
+        call_in_bluesky_event_loop(
+            asyncio.wait_for(
+                v2_device_wait_for_connection(coros=device.connect()),
+                timeout=timeout,
+            )
+        )
+    else:
+        raise TypeError(
+            "Invalid type {} in _wait_for_connection".format(device.__class__.__name__)
+        )
 
 
-def _wait_for_connection(device: Device | OphydV2Device) -> None:
-    match device:
-        case Device():
-            device.wait_for_connection()
-        case OphydV2Device():
-            call_in_bluesky_event_loop(asyncio.wait_for(v2_device_wait_for_connection(coros=device.connect()), timeout=30))
-        case _:
-            raise TypeError("Invalid type {} in _wait_for_connection".format(device.__class__.__name__))
+T = TypeVar("T", bound=AnyDevice)
 
 
 @skip_device()
@@ -80,11 +91,12 @@ def device_instantiation(
     Returns:
         The instance of the device.
     """
-    active_device = ACTIVE_DEVICES.get(name)
+    device_instance: T
+    active_device: Optional[AnyDevice] = ACTIVE_DEVICES.get(name)
     if fake:
         device = make_fake_device(device)
     if active_device is None:
-        device_instance: T = device(
+        device_instance = device(
             name=name,
             prefix=f"{(BeamlinePrefix(BL).beamline_prefix)}{prefix}"
             if bl_prefix
@@ -104,7 +116,7 @@ def device_instantiation(
             )
         else:
             # We have manually checked types
-            device_instance: T = cast(T, ACTIVE_DEVICES[name])
+            device_instance = cast(T, ACTIVE_DEVICES[name])
     if post_create:
         post_create(device_instance)
     return device_instance
