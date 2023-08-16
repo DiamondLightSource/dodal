@@ -1,7 +1,7 @@
 import asyncio
 import time
 from collections import OrderedDict
-from typing import Callable, Optional, Tuple, Type, TypeVar
+from typing import Callable, Optional, Tuple, TypeVar
 
 import numpy as np
 from bluesky.protocols import Descriptor
