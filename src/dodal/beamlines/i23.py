@@ -30,8 +30,7 @@ def oav_pin_tip_detection(
     return device_instantiation(
         PinTipDetection,
         "PinTipDetection",
-        "BL03I-DI-OAV-01:",  # TODO: FIXME - pointing at i03 for test, should point at i23
+        "-DI-OAV-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        bl_prefix=False,  # TODO: FIXME
     )
