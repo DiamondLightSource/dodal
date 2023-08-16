@@ -1,13 +1,13 @@
 import asyncio
 import time
 from collections import OrderedDict
-from typing import Callable, Optional, Tuple, TypeVar
+from typing import Callable, Optional, Tuple, Type, TypeVar
 
 import numpy as np
 from bluesky.protocols import Descriptor
 from numpy.typing import NDArray
-from ophyd.v2.core import Device, Readable, Reading
-from ophyd.v2.epics import SignalR, epics_signal_r
+from ophyd.v2.core import Device, Readable, Reading, SimConverter, SimSignalBackend
+from ophyd.v2.epics import SignalR, SignalRW, epics_signal_r
 
 from dodal.devices.oav.pin_tip_detection.pin_tip_detect_utils import (
     ArrayProcessingFunctions,
@@ -16,6 +16,28 @@ from dodal.devices.oav.pin_tip_detection.pin_tip_detect_utils import (
 from dodal.log import LOGGER
 
 T = TypeVar("T")
+
+
+def _create_soft_signal(
+    name: str, datatype: T | Type[T], initial_value: T
+) -> SignalRW[T]:
+    class _Converter(SimConverter):
+        def make_initial_value(self, *args, **kwargs) -> T:
+            return initial_value
+
+    class _SimSignalBackend(SimSignalBackend):
+        async def connect(self) -> None:
+            self.converter = _Converter()
+            self._initial_value = self.converter.make_initial_value()
+            self._severity = 0
+
+            await self.put(None)
+
+    backend = _SimSignalBackend(
+        datatype, f"sim://oav_with_pin_tip_detection_soft_params:{name}"
+    )
+    signal: SignalRW[T] = SignalRW(backend)
+    return signal
 
 
 class PinTipDetection(Readable, Device):
@@ -34,17 +56,27 @@ class PinTipDetection(Readable, Device):
             int, f"{prefix}PVA:ArraySize2_RBV"
         )
 
-        self.timeout: float = 10.0
-
-        self.preprocess: Callable[
-            [np.ndarray], np.ndarray
-        ] = ArrayProcessingFunctions.identity()
-        self.canny_upper: int = 100
-        self.canny_lower: int = 50
-        self.close_ksize: int = 5
-        self.close_iterations: int = 5
-        self.scan_direction: int = 1
-        self.min_tip_height: int = 5
+        # Soft parameters for pin-tip detection.
+        self.timeout: SignalRW[float] = _create_soft_signal("timeout", float, 10.0)
+        self.preprocess: SignalRW[
+            Callable[[np.ndarray], np.ndarray]
+        ] = _create_soft_signal(
+            "preprocess",
+            Callable[[np.ndarray], np.ndarray],
+            ArrayProcessingFunctions.identity(),
+        )
+        self.canny_upper: SignalRW[int] = _create_soft_signal("canny_upper", int, 100)
+        self.canny_lower: SignalRW[int] = _create_soft_signal("canny_lower", int, 50)
+        self.close_ksize: SignalRW[int] = _create_soft_signal("close_ksize", int, 5)
+        self.close_iterations: SignalRW[int] = _create_soft_signal(
+            "close_iterations", int, 5
+        )
+        self.scan_direction: SignalRW[int] = _create_soft_signal(
+            "scan_direction", int, 1
+        )
+        self.min_tip_height: SignalRW[int] = _create_soft_signal(
+            "min_tip_height", int, 5
+        )
 
         super().__init__(name=name)
 
@@ -58,13 +90,13 @@ class PinTipDetection(Readable, Device):
             ((tip_x, tip_y), timestamp)
         """
         sample_detection = MxSampleDetect(
-            preprocess=self.preprocess,
-            canny_lower=self.canny_lower,
-            canny_upper=self.canny_upper,
-            close_ksize=self.close_ksize,
-            close_iterations=self.close_iterations,
-            scan_direction=self.scan_direction,
-            min_tip_height=self.min_tip_height,
+            preprocess=await self.preprocess.get_value(),
+            canny_lower=await self.canny_lower.get_value(),
+            canny_upper=await self.canny_upper.get_value(),
+            close_ksize=await self.close_ksize.get_value(),
+            close_iterations=await self.close_iterations.get_value(),
+            scan_direction=await self.scan_direction.get_value(),
+            min_tip_height=await self.min_tip_height.get_value(),
         )
 
         array_reading: dict[str, Reading] = await self.array_data.read()
@@ -112,7 +144,7 @@ class PinTipDetection(Readable, Device):
 
     async def read(self) -> dict[str, Reading]:
         tip_pos, timestamp = await asyncio.wait_for(
-            self._get_tip_position(), timeout=self.timeout
+            self._get_tip_position(), timeout=await self.timeout.get_value()
         )
 
         return OrderedDict(
