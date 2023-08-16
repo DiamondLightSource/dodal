@@ -84,7 +84,16 @@ class PinTipDetection(Readable, Device):
         for signal in [self.array_data, self.oav_width, self.oav_height]:
             await signal.connect(sim=sim)
 
-        for soft_signal in [self.timeout, self.preprocess, self.canny_upper, self.canny_lower, self.close_ksize, self.close_iterations, self.scan_direction, self.min_tip_height]:
+        for soft_signal in [
+            self.timeout,
+            self.preprocess,
+            self.canny_upper,
+            self.canny_lower,
+            self.close_ksize,
+            self.close_iterations,
+            self.scan_direction,
+            self.min_tip_height,
+        ]:
             await soft_signal.connect(sim=False)  # Soft signals don't need simulating.
 
     async def _get_tip_position(
