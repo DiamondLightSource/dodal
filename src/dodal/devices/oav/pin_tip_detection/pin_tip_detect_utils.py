@@ -1,10 +1,16 @@
 from dataclasses import dataclass
+from enum import Enum
 from typing import Callable, Final, Optional, Tuple
 
 import cv2
 import numpy as np
 
 from dodal.log import LOGGER
+
+
+class ScanDirections(Enum):
+    FORWARD = 1
+    REVERSE = -1
 
 
 class ArrayProcessingFunctions:
@@ -151,7 +157,10 @@ class MxSampleDetect(object):
         self.close_ksize = close_ksize
         self.close_iterations = close_iterations
 
-        if scan_direction not in [1, -1]:
+        if scan_direction not in [
+            ScanDirections.FORWARD.value,
+            ScanDirections.REVERSE.value,
+        ]:
             raise ValueError(
                 "Invalid scan direction, expected +1 for left-to-right or -1 for right-to-left"
             )
@@ -235,7 +244,7 @@ class MxSampleDetect(object):
             )
 
         # Choose our starting point - i.e. first column with non-narrow width for positive scan, last one for negative scan.
-        if self.scan_direction == 1:
+        if self.scan_direction == ScanDirections.FORWARD.value:
             start_column = int(column_indices_with_non_narrow_widths[0])
         else:
             start_column = int(column_indices_with_non_narrow_widths[-1])
