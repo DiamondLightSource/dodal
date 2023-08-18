@@ -13,6 +13,7 @@ from dodal.devices.oav.pin_tip_detection.pin_tip_detect_utils import (
     ARRAY_PROCESSING_FUNCTIONS_MAP,
     ArrayProcessingFunctions,
     MxSampleDetect,
+    ScanDirections,
 )
 from dodal.log import LOGGER
 
@@ -157,7 +158,7 @@ class PinTipDetection(Readable, Device):
         await self.canny_lower.set(50)
         await self.close_iterations.set(5)
         await self.close_ksize.set(5)
-        await self.scan_direction.set(1)
+        await self.scan_direction.set(ScanDirections.FORWARD.value)
         await self.min_tip_height.set(5)
         await self.preprocess.set(10)  # Identity function
         await self.preprocess_iterations.set(5)
