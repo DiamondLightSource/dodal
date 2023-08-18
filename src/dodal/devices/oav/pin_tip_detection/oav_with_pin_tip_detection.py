@@ -1,15 +1,16 @@
 import asyncio
 import time
 from collections import OrderedDict
-from typing import Callable, Optional, Tuple, Type, TypeVar
+from typing import Optional, Tuple, Type, TypeVar
 
 import numpy as np
 from bluesky.protocols import Descriptor
 from numpy.typing import NDArray
-from ophyd.v2.core import Device, Readable, Reading, SimConverter, SimSignalBackend
+from ophyd.v2.core import Device, Readable, Reading, SimSignalBackend
 from ophyd.v2.epics import SignalR, SignalRW, epics_signal_r
 
 from dodal.devices.oav.pin_tip_detection.pin_tip_detect_utils import (
+    ARRAY_PROCESSING_FUNCTIONS_MAP,
     ArrayProcessingFunctions,
     MxSampleDetect,
 )
@@ -18,29 +19,25 @@ from dodal.log import LOGGER
 T = TypeVar("T")
 
 
-def _create_soft_signal(
-    name: str, datatype: T | Type[T], initial_value: T
-) -> SignalRW[T]:
-    class _Converter(SimConverter):
-        def make_initial_value(self, *args, **kwargs) -> T:
-            return initial_value
-
-    class _SimSignalBackend(SimSignalBackend):
-        async def connect(self) -> None:
-            self.converter = _Converter()
-            self._initial_value = self.converter.make_initial_value()
-            self._severity = 0
-
-            await self.put(None)
-
-    backend = _SimSignalBackend(
-        datatype, f"sim://oav_with_pin_tip_detection_soft_params:{name}"
+def _create_soft_signal(name: str, datatype: Type[T]) -> SignalRW[T]:
+    return SignalRW(
+        SimSignalBackend(
+            datatype, f"sim://oav_with_pin_tip_detection_soft_params:{name}"
+        )
     )
-    signal: SignalRW[T] = SignalRW(backend)
-    return signal
 
 
 class PinTipDetection(Readable, Device):
+    """
+    A device which will read a single frame from an on-axis view and use that frame
+    to calculate the pin-tip offset (in pixels) of that frame.
+
+    Used for pin tip centring workflow.
+
+    Note that if the sample is off-screen, this class will return the centre as the "edge"
+    of the image.
+    """
+
     def __init__(self, prefix: str, name: str = ""):
         self._prefix: str = prefix
         self._name = name
@@ -57,44 +54,24 @@ class PinTipDetection(Readable, Device):
         )
 
         # Soft parameters for pin-tip detection.
-        self.timeout: SignalRW[float] = _create_soft_signal("timeout", float, 10.0)
-        self.preprocess: SignalRW[
-            Callable[[np.ndarray], np.ndarray]
-        ] = _create_soft_signal(
-            "preprocess",
-            Callable[[np.ndarray], np.ndarray],
-            ArrayProcessingFunctions.identity(),
+        self.timeout: SignalRW[float] = _create_soft_signal("timeout", float)
+        self.preprocess: SignalRW[int] = _create_soft_signal("preprocess", int)
+        self.preprocess_ksize: SignalRW[int] = _create_soft_signal(
+            "preprocess_ksize", int
         )
-        self.canny_upper: SignalRW[int] = _create_soft_signal("canny_upper", int, 100)
-        self.canny_lower: SignalRW[int] = _create_soft_signal("canny_lower", int, 50)
-        self.close_ksize: SignalRW[int] = _create_soft_signal("close_ksize", int, 5)
+        self.preprocess_iterations: SignalRW[int] = _create_soft_signal(
+            "preprocess_iterations", int
+        )
+        self.canny_upper: SignalRW[int] = _create_soft_signal("canny_upper", int)
+        self.canny_lower: SignalRW[int] = _create_soft_signal("canny_lower", int)
+        self.close_ksize: SignalRW[int] = _create_soft_signal("close_ksize", int)
         self.close_iterations: SignalRW[int] = _create_soft_signal(
-            "close_iterations", int, 5
+            "close_iterations", int
         )
-        self.scan_direction: SignalRW[int] = _create_soft_signal(
-            "scan_direction", int, 1
-        )
-        self.min_tip_height: SignalRW[int] = _create_soft_signal(
-            "min_tip_height", int, 5
-        )
+        self.scan_direction: SignalRW[int] = _create_soft_signal("scan_direction", int)
+        self.min_tip_height: SignalRW[int] = _create_soft_signal("min_tip_height", int)
 
         super().__init__(name=name)
-
-    async def connect(self, sim: bool = False):
-        for signal in [self.array_data, self.oav_width, self.oav_height]:
-            await signal.connect(sim=sim)
-
-        for soft_signal in [
-            self.timeout,
-            self.preprocess,
-            self.canny_upper,
-            self.canny_lower,
-            self.close_ksize,
-            self.close_iterations,
-            self.scan_direction,
-            self.min_tip_height,
-        ]:
-            await soft_signal.connect(sim=False)  # Soft signals don't need simulating.
 
     async def _get_tip_position(
         self,
@@ -105,8 +82,21 @@ class PinTipDetection(Readable, Device):
         Returns tuple of:
             ((tip_x, tip_y), timestamp)
         """
+
+        preprocess_key = await self.preprocess.get_value()
+        preprocess_iter = await self.preprocess_iterations.get_value()
+        preprocess_ksize = await self.preprocess_ksize.get_value()
+
+        try:
+            preprocess_func = ARRAY_PROCESSING_FUNCTIONS_MAP[preprocess_key](
+                iter=preprocess_iter, ksize=preprocess_ksize
+            )
+        except KeyError:
+            LOGGER.error("Invalid preprocessing function, using identity")
+            preprocess_func = ArrayProcessingFunctions.identity()
+
         sample_detection = MxSampleDetect(
-            preprocess=await self.preprocess.get_value(),
+            preprocess=preprocess_func,
             canny_lower=await self.canny_lower.get_value(),
             canny_upper=await self.canny_upper.get_value(),
             close_ksize=await self.close_ksize.get_value(),
@@ -157,6 +147,21 @@ class PinTipDetection(Readable, Device):
             tip_y = None
 
         return (tip_x, tip_y), timestamp
+
+    async def connect(self, sim: bool = False):
+        await super().connect(sim)
+
+        # Set defaults for soft parameters
+        await self.timeout.set(10.0)
+        await self.canny_upper.set(100)
+        await self.canny_lower.set(50)
+        await self.close_iterations.set(5)
+        await self.close_ksize.set(5)
+        await self.scan_direction.set(1)
+        await self.min_tip_height.set(5)
+        await self.preprocess.set(10)  # Identity function
+        await self.preprocess_iterations.set(5)
+        await self.preprocess_ksize.set(5)
 
     async def read(self) -> dict[str, Reading]:
         tip_pos, timestamp = await asyncio.wait_for(

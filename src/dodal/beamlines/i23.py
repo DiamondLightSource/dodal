@@ -4,6 +4,7 @@ from dodal.devices.i23.gonio import Gonio
 from dodal.devices.oav.pin_tip_detection.oav_with_pin_tip_detection import (
     PinTipDetection,
 )
+from dodal.log import LOGGER
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import get_beamline_name
 
@@ -27,9 +28,16 @@ def oav_pin_tip_detection(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> PinTipDetection:
     """Get the i23 OAV pin-tip detection device"""
+
+    if get_beamline_name("") != "i23":
+        LOGGER.warning(
+            "Not running on i23 - forcing pin tip detection into simulation mode"
+        )
+        fake_with_ophyd_sim = True
+
     return device_instantiation(
         PinTipDetection,
-        "PinTipDetection",
+        "pin_tip_detection",
         "-DI-OAV-01:",
         wait_for_connection,
         fake_with_ophyd_sim,

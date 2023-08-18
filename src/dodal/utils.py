@@ -159,11 +159,7 @@ def collect_factories(module: ModuleType) -> dict[str, AnyDeviceFactory]:
     factories: dict[str, AnyDeviceFactory] = {}
 
     for var in module.__dict__.values():
-        if (
-            callable(var)
-            and _is_any_device_factory(var)
-            and not _is_device_skipped(var)
-        ):
+        if callable(var) and is_any_device_factory(var) and not _is_device_skipped(var):
             factories[var.__name__] = var
 
     return factories
@@ -175,33 +171,33 @@ def _is_device_skipped(func: AnyDeviceFactory) -> bool:
     return func.__skip__  # type: ignore
 
 
-def _is_v1_device_factory(func: Callable) -> bool:
+def is_v1_device_factory(func: Callable) -> bool:
     try:
         return_type = signature(func).return_annotation
-        return _is_v1_device_type(return_type)
+        return is_v1_device_type(return_type)
     except ValueError:
         return False
 
 
-def _is_v2_device_factory(func: Callable) -> bool:
+def is_v2_device_factory(func: Callable) -> bool:
     try:
         return_type = signature(func).return_annotation
-        return _is_v2_device_type(return_type)
+        return is_v2_device_type(return_type)
     except ValueError:
         return False
 
 
-def _is_any_device_factory(func: Callable) -> bool:
-    return _is_v1_device_factory(func) or _is_v2_device_factory(func)
+def is_any_device_factory(func: Callable) -> bool:
+    return is_v1_device_factory(func) or is_v2_device_factory(func)
 
 
-def _is_v2_device_type(obj: Type[Any]) -> bool:
+def is_v2_device_type(obj: Type[Any]) -> bool:
     return inspect.isclass(obj) and issubclass(obj, OphydV2Device)
 
 
-def _is_v1_device_type(obj: Type[Any]) -> bool:
+def is_v1_device_type(obj: Type[Any]) -> bool:
     is_class = inspect.isclass(obj)
     follows_protocols = any(
         map(lambda protocol: isinstance(obj, protocol), BLUESKY_PROTOCOLS)
     )
-    return is_class and follows_protocols and not _is_v2_device_type(obj)
+    return is_class and follows_protocols and not is_v2_device_type(obj)

@@ -41,6 +41,9 @@ async def test_soft_parameter_defaults_are_correct():
     assert await device.close_iterations.get_value() == 5
     assert await device.min_tip_height.get_value() == 5
     assert await device.scan_direction.get_value() == 1
+    assert await device.preprocess.get_value() == 10
+    assert await device.preprocess_iterations.get_value() == 5
+    assert await device.preprocess_ksize.get_value() == 5
 
 
 @pytest.mark.asyncio
@@ -62,26 +65,6 @@ async def test_numeric_soft_parameters_can_be_changed():
     assert await device.close_iterations.get_value() == 20
     assert await device.min_tip_height.get_value() == 25
     assert await device.scan_direction.get_value() == -1
-
-
-@pytest.mark.asyncio
-async def test_preprocessing_soft_parameter_can_be_changed():
-    device = await _get_pin_tip_detection_device()
-
-    my_func_called = False
-
-    def my_preprocessing_func(arr: NDArray) -> NDArray:
-        nonlocal my_func_called
-        my_func_called = True
-        return arr
-
-    await device.preprocess.set(my_preprocessing_func)
-
-    f = (await device.preprocess.read())[""]["value"]
-
-    f(None)
-
-    assert my_func_called
 
 
 @pytest.mark.parametrize(

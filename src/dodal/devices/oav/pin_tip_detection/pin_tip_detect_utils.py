@@ -14,7 +14,7 @@ class ArrayProcessingFunctions:
     """
 
     @staticmethod
-    def identity() -> Callable[[np.ndarray], np.ndarray]:
+    def identity(*args, **kwargs) -> Callable[[np.ndarray], np.ndarray]:
         return lambda arr: arr
 
     @staticmethod
@@ -67,21 +67,38 @@ class ArrayProcessingFunctions:
         )
 
     @staticmethod
-    def blur(ksize: int) -> Callable[[np.ndarray], np.ndarray]:
+    def blur(ksize: int, *args, **kwargs) -> Callable[[np.ndarray], np.ndarray]:
         return lambda arr: cv2.blur(arr, ksize=(ksize, ksize))
 
     @staticmethod
-    def gaussian_blur(ksize: int) -> Callable[[np.ndarray], np.ndarray]:
+    def gaussian_blur(
+        ksize: int, *args, **kwargs
+    ) -> Callable[[np.ndarray], np.ndarray]:
         # Kernel size should be odd.
         if not ksize % 2:
             ksize += 1
         return lambda arr: cv2.GaussianBlur(arr, (ksize, ksize), 0)
 
     @staticmethod
-    def median_blur(ksize: int) -> Callable[[np.ndarray], np.ndarray]:
+    def median_blur(ksize: int, *args, **kwargs) -> Callable[[np.ndarray], np.ndarray]:
         if not ksize % 2:
             ksize += 1
         return lambda arr: cv2.medianBlur(arr, ksize)
+
+
+ARRAY_PROCESSING_FUNCTIONS_MAP = {
+    0: ArrayProcessingFunctions.erode,
+    1: ArrayProcessingFunctions.dilate,
+    2: ArrayProcessingFunctions.open_morph,
+    3: ArrayProcessingFunctions.close,
+    4: ArrayProcessingFunctions.gradient,
+    5: ArrayProcessingFunctions.top_hat,
+    6: ArrayProcessingFunctions.black_hat,
+    7: ArrayProcessingFunctions.blur,
+    8: ArrayProcessingFunctions.gaussian_blur,
+    9: ArrayProcessingFunctions.median_blur,
+    10: ArrayProcessingFunctions.identity,
+}
 
 
 # A substitute for "None" which can fit into an numpy int array.
@@ -153,12 +170,9 @@ class MxSampleDetect(object):
         # Preprocess the array. (Use the greyscale one.)
         pp_arr = self.preprocess(gray_arr)
 
-        # (Could do a remove_dirt step here if wanted.)
-
         # Find some edges.
         edge_arr = cv2.Canny(pp_arr, self.canny_upper, self.canny_lower)
 
-        # Do a "close" image operation. (Add other options?)
         closed_arr = ArrayProcessingFunctions.close(
             self.close_ksize, self.close_iterations
         )(edge_arr)
