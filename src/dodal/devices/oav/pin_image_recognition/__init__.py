@@ -11,9 +11,9 @@ from ophyd.v2.epics import SignalR, SignalRW, epics_signal_r
 
 from dodal.devices.oav.pin_image_recognition.utils import (
     ARRAY_PROCESSING_FUNCTIONS_MAP,
-    identity,
     MxSampleDetect,
     ScanDirections,
+    identity,
 )
 from dodal.log import LOGGER
 

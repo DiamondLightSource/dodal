@@ -31,48 +31,34 @@ def _morph(
     ksize: int, iterations: int, morph_type: int
 ) -> Callable[[np.ndarray], np.ndarray]:
     element = cv2.getStructuringElement(cv2.MORPH_RECT, (ksize, ksize))
-    return lambda arr: cv2.morphologyEx(
-        arr, morph_type, element, iterations=iterations
-    )
+    return lambda arr: cv2.morphologyEx(arr, morph_type, element, iterations=iterations)
 
 
 def open_morph(ksize: int, iterations: int) -> Callable[[np.ndarray], np.ndarray]:
-    return _morph(
-        ksize=ksize, iterations=iterations, morph_type=cv2.MORPH_OPEN
-    )
+    return _morph(ksize=ksize, iterations=iterations, morph_type=cv2.MORPH_OPEN)
 
 
 def close(ksize: int, iterations: int) -> Callable[[np.ndarray], np.ndarray]:
-    return _morph(
-        ksize=ksize, iterations=iterations, morph_type=cv2.MORPH_CLOSE
-    )
+    return _morph(ksize=ksize, iterations=iterations, morph_type=cv2.MORPH_CLOSE)
 
 
 def gradient(ksize: int, iterations: int) -> Callable[[np.ndarray], np.ndarray]:
-    return _morph(
-        ksize=ksize, iterations=iterations, morph_type=cv2.MORPH_GRADIENT
-    )
+    return _morph(ksize=ksize, iterations=iterations, morph_type=cv2.MORPH_GRADIENT)
 
 
 def top_hat(ksize: int, iterations: int) -> Callable[[np.ndarray], np.ndarray]:
-    return _morph(
-        ksize=ksize, iterations=iterations, morph_type=cv2.MORPH_TOPHAT
-    )
+    return _morph(ksize=ksize, iterations=iterations, morph_type=cv2.MORPH_TOPHAT)
 
 
 def black_hat(ksize: int, iterations: int) -> Callable[[np.ndarray], np.ndarray]:
-    return _morph(
-        ksize=ksize, iterations=iterations, morph_type=cv2.MORPH_BLACKHAT
-    )
+    return _morph(ksize=ksize, iterations=iterations, morph_type=cv2.MORPH_BLACKHAT)
 
 
 def blur(ksize: int, *args, **kwargs) -> Callable[[np.ndarray], np.ndarray]:
     return lambda arr: cv2.blur(arr, ksize=(ksize, ksize))
 
 
-def gaussian_blur(
-    ksize: int, *args, **kwargs
-) -> Callable[[np.ndarray], np.ndarray]:
+def gaussian_blur(ksize: int, *args, **kwargs) -> Callable[[np.ndarray], np.ndarray]:
     # Kernel size should be odd.
     if not ksize % 2:
         ksize += 1
@@ -175,9 +161,7 @@ class MxSampleDetect(object):
         # Find some edges.
         edge_arr = cv2.Canny(pp_arr, self.canny_upper, self.canny_lower)
 
-        closed_arr = close(
-            self.close_ksize, self.close_iterations
-        )(edge_arr)
+        closed_arr = close(self.close_ksize, self.close_iterations)(edge_arr)
 
         # Find the sample.
         return self._locate_sample(closed_arr)
