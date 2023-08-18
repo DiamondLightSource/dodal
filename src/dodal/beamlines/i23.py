@@ -1,9 +1,7 @@
 from dodal.beamlines.beamline_utils import device_instantiation
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.i23.gonio import Gonio
-from dodal.devices.oav.pin_tip_detection.oav_with_pin_tip_detection import (
-    PinTipDetection,
-)
+from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.log import LOGGER
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import get_beamline_name

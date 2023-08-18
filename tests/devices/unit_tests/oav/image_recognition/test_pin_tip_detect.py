@@ -6,11 +6,11 @@ import pytest
 from numpy.typing import NDArray
 from ophyd.v2.core import set_sim_value
 
-from dodal.devices.oav.pin_tip_detection.oav_with_pin_tip_detection import (
+from dodal.devices.oav.pin_image_recognition import (
     MxSampleDetect,
     PinTipDetection,
 )
-from dodal.devices.oav.pin_tip_detection.pin_tip_detect_utils import SampleLocation
+from dodal.devices.oav.pin_image_recognition.utils import SampleLocation
 
 EVENT_LOOP = asyncio.new_event_loop()
 
