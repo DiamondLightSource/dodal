@@ -6,6 +6,7 @@ bluesky infrastructure.
 It is otherwise unused.
 """
 import asyncio
+
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 
 if __name__ == "__main__":
