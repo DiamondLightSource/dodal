@@ -143,7 +143,7 @@ class PinTipDetection(Readable, Device):
             tip_x = location.tip_x
             tip_y = location.tip_y
         except Exception as e:
-            LOGGER.error("Failed to detect pin-tip location due to exception: ", e)
+            LOGGER.error("Failed to detect pin-tip location due to exception: {}", e)
             tip_x = None
             tip_y = None
 
