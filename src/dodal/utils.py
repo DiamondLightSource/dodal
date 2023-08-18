@@ -14,7 +14,6 @@ from typing import (
     Mapping,
     Optional,
     Type,
-    TypeAlias,
     TypeVar,
     Union,
 )
@@ -37,6 +36,12 @@ from bluesky.protocols import (
 )
 from ophyd.device import Device as OphydV1Device
 from ophyd.v2.core import Device as OphydV2Device
+
+try:
+    from typing import TypeAlias
+except ImportError:
+    from typing_extensions import TypeAlias
+
 
 #: Protocols defining interface to hardware
 BLUESKY_PROTOCOLS = [
