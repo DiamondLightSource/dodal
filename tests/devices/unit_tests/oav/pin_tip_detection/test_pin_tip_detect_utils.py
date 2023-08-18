@@ -123,7 +123,6 @@ def test_locate_sample_tip_off_screen(direction, x_centre):
     )
 
     # Currently sample "off screen" is not considered an error so a centre is still returned.
-    # Maybe it should be?
     assert location.tip_x == x_centre
     assert location.tip_y == 2
 

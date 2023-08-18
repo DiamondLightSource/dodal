@@ -33,7 +33,7 @@ def dcm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return device_instantiation(
-        device=DCM,
+        device_factory=DCM,
         name="dcm",
         prefix="",
         wait=wait_for_connection,
@@ -56,7 +56,7 @@ def aperture_scatterguard(
             a_s.load_aperture_positions(aperture_positions)
 
     return device_instantiation(
-        device=ApertureScatterguard,
+        device_factory=ApertureScatterguard,
         name="aperture_scatterguard",
         prefix="",
         wait=wait_for_connection,
@@ -72,7 +72,7 @@ def backlight(
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return device_instantiation(
-        device=Backlight,
+        device_factory=Backlight,
         name="backlight",
         prefix="-EA-BL-01:",
         wait=wait_for_connection,
@@ -88,7 +88,7 @@ def detector_motion(
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return device_instantiation(
-        device=DetectorMotion,
+        device_factory=DetectorMotion,
         name="detector_motion",
         prefix="",
         wait=wait_for_connection,
@@ -112,7 +112,7 @@ def eiger(
             eiger.set_detector_parameters(params)
 
     return device_instantiation(
-        device=EigerDetector,
+        device_factory=EigerDetector,
         name="eiger",
         prefix="-EA-EIGER-01:",
         wait=wait_for_connection,
@@ -128,7 +128,7 @@ def fast_grid_scan(
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return device_instantiation(
-        device=FastGridScan,
+        device_factory=FastGridScan,
         name="fast_grid_scan",
         prefix="-MO-SGON-01:FGS:",
         wait=wait_for_connection,
