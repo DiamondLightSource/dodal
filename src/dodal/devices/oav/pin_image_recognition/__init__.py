@@ -9,9 +9,9 @@ from numpy.typing import NDArray
 from ophyd.v2.core import Device, Readable, Reading, SimSignalBackend
 from ophyd.v2.epics import SignalR, SignalRW, epics_signal_r
 
-from dodal.devices.oav.pin_tip_detection.pin_tip_detect_utils import (
+from dodal.devices.oav.pin_image_recognition.utils import (
     ARRAY_PROCESSING_FUNCTIONS_MAP,
-    ArrayProcessingFunctions,
+    identity,
     MxSampleDetect,
     ScanDirections,
 )
@@ -20,7 +20,7 @@ from dodal.log import LOGGER
 T = TypeVar("T")
 
 
-def _create_soft_signal(name: str, datatype: Type[T]) -> SignalRW[T]:
+def _create_soft_signal(datatype: Type[T], name: str) -> SignalRW[T]:
     return SignalRW(
         SimSignalBackend(
             datatype, f"sim://oav_with_pin_tip_detection_soft_params:{name}"
@@ -55,22 +55,22 @@ class PinTipDetection(Readable, Device):
         )
 
         # Soft parameters for pin-tip detection.
-        self.timeout: SignalRW[float] = _create_soft_signal("timeout", float)
-        self.preprocess: SignalRW[int] = _create_soft_signal("preprocess", int)
+        self.timeout: SignalRW[float] = _create_soft_signal(float, "timeout")
+        self.preprocess: SignalRW[int] = _create_soft_signal(int, "preprocess")
         self.preprocess_ksize: SignalRW[int] = _create_soft_signal(
-            "preprocess_ksize", int
+            int, "preprocess_ksize"
         )
         self.preprocess_iterations: SignalRW[int] = _create_soft_signal(
-            "preprocess_iterations", int
+            int, "preprocess_iterations"
         )
-        self.canny_upper: SignalRW[int] = _create_soft_signal("canny_upper", int)
-        self.canny_lower: SignalRW[int] = _create_soft_signal("canny_lower", int)
-        self.close_ksize: SignalRW[int] = _create_soft_signal("close_ksize", int)
+        self.canny_upper: SignalRW[int] = _create_soft_signal(int, "canny_upper")
+        self.canny_lower: SignalRW[int] = _create_soft_signal(int, "canny_lower")
+        self.close_ksize: SignalRW[int] = _create_soft_signal(int, "close_ksize")
         self.close_iterations: SignalRW[int] = _create_soft_signal(
-            "close_iterations", int
+            int, "close_iterations"
         )
-        self.scan_direction: SignalRW[int] = _create_soft_signal("scan_direction", int)
-        self.min_tip_height: SignalRW[int] = _create_soft_signal("min_tip_height", int)
+        self.scan_direction: SignalRW[int] = _create_soft_signal(int, "scan_direction")
+        self.min_tip_height: SignalRW[int] = _create_soft_signal(int, "min_tip_height")
 
         super().__init__(name=name)
 
@@ -94,7 +94,7 @@ class PinTipDetection(Readable, Device):
             )
         except KeyError:
             LOGGER.error("Invalid preprocessing function, using identity")
-            preprocess_func = ArrayProcessingFunctions.identity()
+            preprocess_func = identity()
 
         sample_detection = MxSampleDetect(
             preprocess=preprocess_func,
@@ -181,34 +181,10 @@ class PinTipDetection(Readable, Device):
                 (
                     self._name,
                     {
-                        "source": "pva://{}PVA:ARRAY".format(self._prefix),
+                        "source": f"pva://{self._prefix}PVA:ARRAY",
                         "dtype": "number",
                         "shape": [2],  # Tuple of (x, y) tip position
                     },
                 )
             ],
         )
-
-
-if __name__ == "__main__":
-    x = PinTipDetection(prefix="BL03I-DI-OAV-01:", name="edgeDetect")
-
-    async def acquire():
-        await x.connect()
-        img = await x.array_data.read()
-        tip = await x.read()
-        return img, tip
-
-    img, tip = asyncio.get_event_loop().run_until_complete(
-        asyncio.wait_for(acquire(), timeout=10)
-    )
-    print(tip)
-    print("Tip: {}".format(tip["edgeDetect"]["value"]))
-
-    try:
-        import matplotlib.pyplot as plt
-
-        plt.imshow(img[""]["value"].reshape(768, 1024, 3))
-        plt.show()
-    except ImportError:
-        print("matplotlib not available; cannot show acquired image")

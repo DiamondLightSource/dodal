@@ -1,4 +1,5 @@
 import asyncio
+import inspect
 from typing import Callable, Dict, Final, List, Optional, TypeVar, cast
 
 from bluesky.run_engine import call_in_bluesky_event_loop
@@ -39,7 +40,7 @@ def list_active_devices() -> List[str]:
 def active_device_is_same_type(
     active_device: AnyDevice, device: Callable[..., AnyDevice]
 ) -> bool:
-    return type(active_device) == device
+    return inspect.isclass(device) and isinstance(active_device, device)
 
 
 def _wait_for_connection(
@@ -91,10 +92,9 @@ def device_instantiation(
     Returns:
         The instance of the device.
     """
-    device_instance: T
     already_existing_device: Optional[AnyDevice] = ACTIVE_DEVICES.get(name)
     if fake:
-        device_factory = make_fake_device(device_factory)
+        device_factory = cast(Callable[..., T], make_fake_device(device_factory))
     if already_existing_device is None:
         device_instance = device_factory(
             name=name,
@@ -114,9 +114,7 @@ def device_instantiation(
                 f"name as an existing device. Device name '{name}' already used for "
                 f"a(n) {type(already_existing_device)}."
             )
-        else:
-            # We have manually checked types
-            device_instance = cast(T, ACTIVE_DEVICES[name])
+        device_instance = cast(T, already_existing_device)
     if post_create:
         post_create(device_instance)
     return device_instance

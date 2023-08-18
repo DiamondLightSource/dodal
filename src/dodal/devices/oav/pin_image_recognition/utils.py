@@ -13,97 +13,90 @@ class ScanDirections(Enum):
     REVERSE = -1
 
 
-class ArrayProcessingFunctions:
-    """
-    Utility class for creating array preprocessing functions (arr -> arr with no additional parameters)
-    for some common operations.
-    """
+def identity(*args, **kwargs) -> Callable[[np.ndarray], np.ndarray]:
+    return lambda arr: arr
 
-    @staticmethod
-    def identity(*args, **kwargs) -> Callable[[np.ndarray], np.ndarray]:
-        return lambda arr: arr
 
-    @staticmethod
-    def erode(ksize: int, iterations: int) -> Callable[[np.ndarray], np.ndarray]:
-        element = cv2.getStructuringElement(cv2.MORPH_RECT, (ksize, ksize))
-        return lambda arr: cv2.erode(arr, element, iterations=iterations)
+def erode(ksize: int, iterations: int) -> Callable[[np.ndarray], np.ndarray]:
+    element = cv2.getStructuringElement(cv2.MORPH_RECT, (ksize, ksize))
+    return lambda arr: cv2.erode(arr, element, iterations=iterations)
 
-    @staticmethod
-    def dilate(ksize: int, iterations: int) -> Callable[[np.ndarray], np.ndarray]:
-        element = cv2.getStructuringElement(cv2.MORPH_RECT, (ksize, ksize))
-        return lambda arr: cv2.dilate(arr, element, iterations=iterations)
 
-    @staticmethod
-    def _morph(
-        ksize: int, iterations: int, morph_type: int
-    ) -> Callable[[np.ndarray], np.ndarray]:
-        element = cv2.getStructuringElement(cv2.MORPH_RECT, (ksize, ksize))
-        return lambda arr: cv2.morphologyEx(
-            arr, morph_type, element, iterations=iterations
-        )
+def dilate(ksize: int, iterations: int) -> Callable[[np.ndarray], np.ndarray]:
+    element = cv2.getStructuringElement(cv2.MORPH_RECT, (ksize, ksize))
+    return lambda arr: cv2.dilate(arr, element, iterations=iterations)
 
-    @staticmethod
-    def open_morph(ksize: int, iterations: int) -> Callable[[np.ndarray], np.ndarray]:
-        return ArrayProcessingFunctions._morph(
-            ksize=ksize, iterations=iterations, morph_type=cv2.MORPH_OPEN
-        )
 
-    @staticmethod
-    def close(ksize: int, iterations: int) -> Callable[[np.ndarray], np.ndarray]:
-        return ArrayProcessingFunctions._morph(
-            ksize=ksize, iterations=iterations, morph_type=cv2.MORPH_CLOSE
-        )
+def _morph(
+    ksize: int, iterations: int, morph_type: int
+) -> Callable[[np.ndarray], np.ndarray]:
+    element = cv2.getStructuringElement(cv2.MORPH_RECT, (ksize, ksize))
+    return lambda arr: cv2.morphologyEx(
+        arr, morph_type, element, iterations=iterations
+    )
 
-    @staticmethod
-    def gradient(ksize: int, iterations: int) -> Callable[[np.ndarray], np.ndarray]:
-        return ArrayProcessingFunctions._morph(
-            ksize=ksize, iterations=iterations, morph_type=cv2.MORPH_GRADIENT
-        )
 
-    @staticmethod
-    def top_hat(ksize: int, iterations: int) -> Callable[[np.ndarray], np.ndarray]:
-        return ArrayProcessingFunctions._morph(
-            ksize=ksize, iterations=iterations, morph_type=cv2.MORPH_TOPHAT
-        )
+def open_morph(ksize: int, iterations: int) -> Callable[[np.ndarray], np.ndarray]:
+    return _morph(
+        ksize=ksize, iterations=iterations, morph_type=cv2.MORPH_OPEN
+    )
 
-    @staticmethod
-    def black_hat(ksize: int, iterations: int) -> Callable[[np.ndarray], np.ndarray]:
-        return ArrayProcessingFunctions._morph(
-            ksize=ksize, iterations=iterations, morph_type=cv2.MORPH_BLACKHAT
-        )
 
-    @staticmethod
-    def blur(ksize: int, *args, **kwargs) -> Callable[[np.ndarray], np.ndarray]:
-        return lambda arr: cv2.blur(arr, ksize=(ksize, ksize))
+def close(ksize: int, iterations: int) -> Callable[[np.ndarray], np.ndarray]:
+    return _morph(
+        ksize=ksize, iterations=iterations, morph_type=cv2.MORPH_CLOSE
+    )
 
-    @staticmethod
-    def gaussian_blur(
-        ksize: int, *args, **kwargs
-    ) -> Callable[[np.ndarray], np.ndarray]:
-        # Kernel size should be odd.
-        if not ksize % 2:
-            ksize += 1
-        return lambda arr: cv2.GaussianBlur(arr, (ksize, ksize), 0)
 
-    @staticmethod
-    def median_blur(ksize: int, *args, **kwargs) -> Callable[[np.ndarray], np.ndarray]:
-        if not ksize % 2:
-            ksize += 1
-        return lambda arr: cv2.medianBlur(arr, ksize)
+def gradient(ksize: int, iterations: int) -> Callable[[np.ndarray], np.ndarray]:
+    return _morph(
+        ksize=ksize, iterations=iterations, morph_type=cv2.MORPH_GRADIENT
+    )
+
+
+def top_hat(ksize: int, iterations: int) -> Callable[[np.ndarray], np.ndarray]:
+    return _morph(
+        ksize=ksize, iterations=iterations, morph_type=cv2.MORPH_TOPHAT
+    )
+
+
+def black_hat(ksize: int, iterations: int) -> Callable[[np.ndarray], np.ndarray]:
+    return _morph(
+        ksize=ksize, iterations=iterations, morph_type=cv2.MORPH_BLACKHAT
+    )
+
+
+def blur(ksize: int, *args, **kwargs) -> Callable[[np.ndarray], np.ndarray]:
+    return lambda arr: cv2.blur(arr, ksize=(ksize, ksize))
+
+
+def gaussian_blur(
+    ksize: int, *args, **kwargs
+) -> Callable[[np.ndarray], np.ndarray]:
+    # Kernel size should be odd.
+    if not ksize % 2:
+        ksize += 1
+    return lambda arr: cv2.GaussianBlur(arr, (ksize, ksize), 0)
+
+
+def median_blur(ksize: int, *args, **kwargs) -> Callable[[np.ndarray], np.ndarray]:
+    if not ksize % 2:
+        ksize += 1
+    return lambda arr: cv2.medianBlur(arr, ksize)
 
 
 ARRAY_PROCESSING_FUNCTIONS_MAP = {
-    0: ArrayProcessingFunctions.erode,
-    1: ArrayProcessingFunctions.dilate,
-    2: ArrayProcessingFunctions.open_morph,
-    3: ArrayProcessingFunctions.close,
-    4: ArrayProcessingFunctions.gradient,
-    5: ArrayProcessingFunctions.top_hat,
-    6: ArrayProcessingFunctions.black_hat,
-    7: ArrayProcessingFunctions.blur,
-    8: ArrayProcessingFunctions.gaussian_blur,
-    9: ArrayProcessingFunctions.median_blur,
-    10: ArrayProcessingFunctions.identity,
+    0: erode,
+    1: dilate,
+    2: open_morph,
+    3: close,
+    4: gradient,
+    5: top_hat,
+    6: black_hat,
+    7: blur,
+    8: gaussian_blur,
+    9: median_blur,
+    10: identity,
 }
 
 
@@ -141,7 +134,7 @@ class MxSampleDetect(object):
 
         Args:
             preprocess: A preprocessing function applied to the array after conversion to grayscale.
-                See implementations of common functions in ArrayProcessingFunctions for predefined conversions
+                See implementations of common functions above for predefined conversions
                 Defaults to a no-op (i.e. no preprocessing)
             canny_upper: upper threshold for canny edge detection
             canny_lower: lower threshold for canny edge detection
@@ -182,7 +175,7 @@ class MxSampleDetect(object):
         # Find some edges.
         edge_arr = cv2.Canny(pp_arr, self.canny_upper, self.canny_lower)
 
-        closed_arr = ArrayProcessingFunctions.close(
+        closed_arr = close(
             self.close_ksize, self.close_iterations
         )(edge_arr)
 

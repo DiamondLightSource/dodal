@@ -56,10 +56,10 @@ BLUESKY_PROTOCOLS = [
     Triggerable,
 ]
 
-AnyDevice: TypeAlias = OphydV1Device | OphydV2Device
+AnyDevice: TypeAlias = Union[OphydV1Device, OphydV2Device]
 V1DeviceFactory: TypeAlias = Callable[..., OphydV1Device]
 V2DeviceFactory: TypeAlias = Callable[..., OphydV2Device]
-AnyDeviceFactory: TypeAlias = V1DeviceFactory | V2DeviceFactory
+AnyDeviceFactory: TypeAlias = Union[V1DeviceFactory, V2DeviceFactory]
 
 
 def get_beamline_name(default: str) -> str:
@@ -99,7 +99,7 @@ def skip_device(precondition=lambda: True):
 
 def make_all_devices(
     module: Union[str, ModuleType, None] = None, **kwargs
-) -> dict[str, AnyDevice]:
+) -> Dict[str, AnyDevice]:
     """Makes all devices in the given beamline module.
 
     In cases of device interdependencies it ensures a device is created before any which
