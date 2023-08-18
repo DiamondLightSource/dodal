@@ -1,10 +1,7 @@
 import numpy as np
 import pytest
 
-from dodal.devices.oav.pin_image_recognition.utils import (
-    NONE_VALUE,
-    MxSampleDetect,
-)
+from dodal.devices.oav.pin_image_recognition.utils import NONE_VALUE, MxSampleDetect
 
 
 def test_locate_sample_simple_forward():
