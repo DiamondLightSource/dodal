@@ -89,7 +89,7 @@ def test_setting_debug_in_prod_gives_warning(
     mock_logger: MagicMock,
 ):
     warning_string = (
-        'STARTING ARTEMIS IN DEBUG WITHOUT "--dev" WILL FLOOD PRODUCTION '
+        'STARTING HYPERION IN DEBUG WITHOUT "--dev" WILL FLOOD PRODUCTION '
         "GRAYLOG WITH MESSAGES. If you really need debug messages, set up a local "
         "graylog instead!\n"
     )

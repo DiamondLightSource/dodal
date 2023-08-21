@@ -91,7 +91,7 @@ def set_up_graylog_handler(logging_level: str, dev_mode: bool = False):
     # Warn users if trying to run in prod in debug mode
     if not dev_mode and logging_level == "DEBUG":
         LOGGER.warning(
-            'STARTING ARTEMIS IN DEBUG WITHOUT "--dev" WILL FLOOD PRODUCTION GRAYLOG'
+            'STARTING HYPERION IN DEBUG WITHOUT "--dev" WILL FLOOD PRODUCTION GRAYLOG'
             " WITH MESSAGES. If you really need debug messages, set up a"
             " local graylog instead!\n"
         )
@@ -149,7 +149,7 @@ def set_up_logging_handlers(
 
 
 def _get_logging_file_path() -> Path:
-    """Get the path to write the artemis log files to.
+    """Get the path to write the hyperion log files to.
 
     If on a beamline, this will be written to the according area depending on the
     BEAMLINE envrionment variable. If no envrionment variable is found it will default
