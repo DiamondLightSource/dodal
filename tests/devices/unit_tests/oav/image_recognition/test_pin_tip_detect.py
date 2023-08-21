@@ -1,5 +1,5 @@
 import asyncio
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pytest
@@ -54,6 +54,9 @@ async def test_numeric_soft_parameters_can_be_changed():
     await device.close_iterations.set(20)
     await device.min_tip_height.set(25)
     await device.scan_direction.set(-1)
+    await device.preprocess.set(2)
+    await device.preprocess_ksize.set(3)
+    await device.preprocess_iterations.set(4)
 
     assert await device.timeout.get_value() == 100.0
     assert await device.canny_lower.get_value() == 5
@@ -62,6 +65,31 @@ async def test_numeric_soft_parameters_can_be_changed():
     assert await device.close_iterations.get_value() == 20
     assert await device.min_tip_height.get_value() == 25
     assert await device.scan_direction.get_value() == -1
+    assert await device.preprocess.get_value() == 2
+    assert await device.preprocess_ksize.get_value() == 3
+    assert await device.preprocess_iterations.get_value() == 4
+
+
+@pytest.mark.asyncio
+async def test_invalid_processing_func_uses_identity_function():
+    device = await _get_pin_tip_detection_device()
+
+    set_sim_value(device.preprocess, 50)  # Invalid index
+
+    with patch.object(
+        MxSampleDetect, "__init__", return_value=None
+    ) as mock_init, patch.object(
+        MxSampleDetect, "processArray", return_value=((None, None), None)
+    ):
+        await device.read()
+
+        mock_init.assert_called_once()
+
+        captured_func = mock_init.call_args[1]["preprocess"]
+
+    # Assert captured preprocess function is the identitiy function
+    arg = object()
+    assert arg == captured_func(arg)
 
 
 @pytest.mark.parametrize(
