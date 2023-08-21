@@ -35,8 +35,9 @@ class PinTipDetection(Readable, Device):
 
     Used for pin tip centring workflow.
 
-    Note that if the sample is off-screen, this class will return the centre as the "edge"
-    of the image.
+    Note that if the tip of the sample is off-screen, this class will return the centre as the "edge"
+    of the image. If the entire sample if off-screen (i.e. no suitable edges were detected at all)
+    then it will return (None, None).
     """
 
     def __init__(self, prefix: str, name: str = ""):
