@@ -24,7 +24,7 @@ def backlight(
     If this is called when already instantiated in i24, it will return the existing object.
     """
     return device_instantiation(
-        device=Backlight,
+        device_factory=Backlight,
         name="backlight",
         prefix="-MO-BL-01:",
         wait=wait_for_connection,
@@ -40,7 +40,7 @@ def detector_motion(
     If this is called when already instantiated in i24, it will return the existing object.
     """
     return device_instantiation(
-        device=DetectorMotion,
+        device_factory=DetectorMotion,
         name="detector_motion",
         prefix="-MO-DET-01:",
         wait=wait_for_connection,
@@ -64,7 +64,7 @@ def eiger(
             eiger.set_detector_parameters(params)
 
     return device_instantiation(
-        device=EigerDetector,
+        device_factory=EigerDetector,
         name="eiger",
         prefix="-EA-EIGER-01:",
         wait=wait_for_connection,
