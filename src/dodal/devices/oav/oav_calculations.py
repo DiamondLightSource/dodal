@@ -233,7 +233,7 @@ def camera_coordinates_to_xyz(
 ) -> np.ndarray:
     """
     Converts from (horizontal,vertical) pixel measurements from the OAV camera into to (x, y, z) motor coordinates in millmeters.
-    For an overview of the coordinate system for I03 see https://github.com/DiamondLightSource/python-artemis/wiki/Gridscan-Coordinate-System.
+    For an overview of the coordinate system for I03 see https://github.com/DiamondLightSource/hyperion/wiki/Gridscan-Coordinate-System.
 
     Args:
         horizontal (float): A i value from the camera in pixels.
