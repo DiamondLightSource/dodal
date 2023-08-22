@@ -1,6 +1,7 @@
-from dodal.devices.i04.transfocator import Transfocator
 import pytest
 from ophyd.sim import make_fake_device
+
+from dodal.devices.i04.transfocator import Transfocator
 
 
 @pytest.fixture
