@@ -1,6 +1,7 @@
 from unittest.mock import ANY, MagicMock, patch
 
 import pytest
+from bluesky.run_engine import RunEngine as RE
 from ophyd import Device
 from ophyd.device import Device as OphydV1Device
 from ophyd.sim import FakeEpicsSignal
@@ -95,6 +96,7 @@ def test_wait_for_v1_device_connection_passes_through_timeout(kwargs, expected_t
 def test_wait_for_v2_device_connection_passes_through_timeout(
     wait_for, call_in_bluesky_el, kwargs, expected_timeout
 ):
+    RE()
     device = OphydV2Device()
 
     beamline_utils._wait_for_connection(device, **kwargs)
