@@ -4,7 +4,6 @@ from ophyd import (
     CamBase,
     Component,
     Device,
-    DeviceStatus,
     EpicsSignal,
     HDF5Plugin,
     OverlayPlugin,
