@@ -44,10 +44,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/0.0.2_async_arming/"
   },
   {
-    "version": "129_edge_detection",
-    "url": "https://DiamondLightSource.github.io/dodal/129_edge_detection/"
-  },
-  {
     "version": "137_remove_unused_status",
     "url": "https://DiamondLightSource.github.io/dodal/137_remove_unused_status/"
   },
