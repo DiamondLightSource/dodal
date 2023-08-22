@@ -16,7 +16,9 @@ class SampleShutter(Device):
     pos: EpicsSignal = Component(EpicsSignal, "CTRL2")
     pos_rbv: EpicsSignalRO = Component(EpicsSignalRO, "STA")
 
-    def set(self, open: int):
-        sp_status = self.pos.set(open)
-        rbv_status = await_value(self.pos_rbv, open)
+    def set(self, open_val: int | OpenState):
+        if isinstance(open_val, OpenState):
+            open_val = open_val.value
+        sp_status = self.pos.set(open_val)
+        rbv_status = await_value(self.pos_rbv, open_val)
         return sp_status & rbv_status
