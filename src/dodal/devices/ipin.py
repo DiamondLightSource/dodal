@@ -1,8 +1,8 @@
 from ophyd import Component as Cpt
-from ophyd import Device, EpicsSignalRO
+from ophyd import Device, EpicsSignalRO, Kind
 
 
-def IPin(Device):
+class IPin(Device):
     """Simple device to get the ipin reading"""
 
-    reading: EpicsSignalRO = Cpt(EpicsSignalRO, "I")
+    reading: EpicsSignalRO = Cpt(EpicsSignalRO, "I", kind=Kind.hinted)

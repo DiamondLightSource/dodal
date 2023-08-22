@@ -1,6 +1,6 @@
 from typing import Optional
 
-from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
+from ophyd import Component, Device, EpicsSignal, EpicsSignalRO, Kind
 from ophyd.status import Status, SubscriptionStatus
 
 from dodal.devices.detector import DetectorParams
@@ -78,7 +78,7 @@ class Attenuator(Device):
         EpicsSignal, "E2WL:USECURRENTENERGY.PROC"
     )
     change: EpicsSignal = Component(EpicsSignal, "FANOUT")
-    actual_transmission: EpicsSignal = Component(EpicsSignal, "MATCH")
+    actual_transmission: EpicsSignal = Component(EpicsSignal, "MATCH", kind=Kind.hinted)
 
     detector_params: Optional[DetectorParams] = None
 
