@@ -5,7 +5,6 @@ bluesky infrastructure.
 
 It is otherwise unused.
 """
-# pragma: no cover
 import asyncio
 
 from dodal.devices.oav.pin_image_recognition import PinTipDetection

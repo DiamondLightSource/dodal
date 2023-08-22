@@ -10,6 +10,15 @@ set_log_beamline(BL)
 set_utils_beamline(BL)
 
 
+def _is_i23_machine():
+    """
+    Devices using PVA can only connect from i23 machines, due to the absence of
+    PVA gateways at present.
+    """
+    hostname = get_hostname()
+    return hostname.startswith("i23-ws") or hostname.startswith("i23-control")
+
+
 def gonio(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> Gonio:
     """Get the i23 goniometer device"""
     return device_instantiation(
@@ -21,7 +30,7 @@ def gonio(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -
     )
 
 
-@skip_device(lambda: not get_hostname().startswith("i23-ws"))
+@skip_device(lambda: not _is_i23_machine())
 def oav_pin_tip_detection(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> PinTipDetection:
