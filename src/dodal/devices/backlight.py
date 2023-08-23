@@ -8,3 +8,12 @@ class Backlight(Device):
     IN = 1
 
     pos: EpicsSignal = Component(EpicsSignal, "CTRL")
+
+
+class BacklightSwitch(Device):
+    """Device to switch backlight on/off"""
+
+    OFF = "Off"
+    ON = "On"
+
+    toggle: EpicsSignal = Component(EpicsSignal, "TOGGLE")
