@@ -52,6 +52,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/141_i04_devices/"
   },
   {
+    "version": "151_turn-off-backlight",
+    "url": "https://DiamondLightSource.github.io/dodal/151_turn-off-backlight/"
+  },
+  {
     "version": "262_make_arming_eiger_asynchronous",
     "url": "https://DiamondLightSource.github.io/dodal/262_make_arming_eiger_asynchronous/"
   },
