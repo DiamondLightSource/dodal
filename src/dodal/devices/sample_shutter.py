@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Union
 
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
 
@@ -16,7 +17,7 @@ class SampleShutter(Device):
     pos: EpicsSignal = Component(EpicsSignal, "CTRL2")
     pos_rbv: EpicsSignalRO = Component(EpicsSignalRO, "STA")
 
-    def set(self, open_val: int | OpenState):
+    def set(self, open_val: Union[int, OpenState]):
         if isinstance(open_val, OpenState):
             open_val = open_val.value
         sp_status = self.pos.set(open_val)
