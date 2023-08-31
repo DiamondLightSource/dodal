@@ -23,15 +23,19 @@ class S5_BL02J_AL_SLITS_95(GapAndCentreSlit2d):
     x_size: Device = Component(SlitMotor, "X:SIZE")
     x_centre: Device = Component(SlitMotor, "X:CENTRE")
 
-    def set(self, x_centre_value, x_size_value, y_centre_value, y_size_value):
+    def set(self, position_tuple):
         """Method to set position of slit.
 
         Parameters:
-            x_centre_value: Central x-coordinate of gap
-            x_size_value: Width of gap in x-dimension
-            y_centre_value: Central y-coordinate of gap
-            y_size_value: Width of gap in y-dimension
+            position_tuple: A 4-tuple containing:
+                x_centre_value: Central x-coordinate of gap
+                x_size_value: Width of gap in x-dimension
+                y_centre_value: Central y-coordinate of gap
+                y_size_value: Width of gap in y-dimension
         """
+        breakpoint()
+        x_centre_value, x_size_value, y_centre_value, y_size_value = position_tuple
+
         status = StatusBase()
         status.set_finished()
 
