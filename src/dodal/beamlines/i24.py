@@ -26,7 +26,7 @@ def detector_motion(
     return device_instantiation(
         device_factory=DetectorMotion,
         name="detector_motion",
-        prefix="-MO-DET-01:",
+        prefix="",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )
