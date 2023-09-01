@@ -56,6 +56,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/151_turn-off-backlight/"
   },
   {
+    "version": "157_I24-system-tests",
+    "url": "https://DiamondLightSource.github.io/dodal/157_I24-system-tests/"
+  },
+  {
     "version": "262_make_arming_eiger_asynchronous",
     "url": "https://DiamondLightSource.github.io/dodal/262_make_arming_eiger_asynchronous/"
   },
