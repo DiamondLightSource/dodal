@@ -1,4 +1,4 @@
-from ophyd import Component, Device, EpicsSignal
+from ophyd import Component, Device, EpicsSignal, StatusBase
 
 
 class Backlight(Device):
@@ -11,9 +11,10 @@ class Backlight(Device):
     # Toggle to switch it On or Off
     toggle: EpicsSignal = Component(EpicsSignal, "-EA-BLIT-01:TOGGLE")
 
-    def set(self, position: int):
-        self.pos.set(position)
+    def set(self, position: int) -> StatusBase:
+        status = self.pos.set(position)
         if self.pos.get() == self.OUT:
-            self.toggle.set("Off")
+            status &= self.toggle.set("Off")
         else:
-            self.toggle.set("On")
+            status &= self.toggle.set("On")
+        return status
