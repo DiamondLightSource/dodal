@@ -3,7 +3,7 @@ from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.attenuator import Attenuator
 from dodal.devices.beamstop import BeamStop
 from dodal.devices.DCM import DCM
-from dodal.devices.i04.flux import Flux
+from dodal.devices.flux import Flux
 from dodal.devices.i04.transfocator import Transfocator
 from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZPositioner
