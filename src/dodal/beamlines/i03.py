@@ -74,7 +74,7 @@ def backlight(
     return device_instantiation(
         device=Backlight,
         name="backlight",
-        prefix="-EA-BL-01:",
+        prefix="",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )
