@@ -3,8 +3,8 @@ from typing import Optional
 from dodal.beamlines.beamline_utils import BL, device_instantiation
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.detector import DetectorParams
-from dodal.devices.detector_motion import DetectorMotion
 from dodal.devices.eiger import EigerDetector
+from dodal.devices.i24.I24_detector_motion import DetectorMotion
 from dodal.devices.i24.i24_vgonio import VGonio
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.zebra import Zebra
@@ -26,7 +26,7 @@ def detector_motion(
     return device_instantiation(
         device_factory=DetectorMotion,
         name="detector_motion",
-        prefix="",
+        prefix="-EA-DET-01:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )
