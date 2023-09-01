@@ -22,3 +22,9 @@ def test_when_backlight_out_it_switches_off(fake_backlight: Backlight):
     RE = RunEngine()
     RE(bps.abs_set(fake_backlight, fake_backlight.OUT))
     assert fake_backlight.toggle.get() == "Off"
+
+
+def test_when_backlight_in_it_switches_on(fake_backlight: Backlight):
+    RE = RunEngine()
+    RE(bps.abs_set(fake_backlight, fake_backlight.IN))
+    assert fake_backlight.toggle.get() == "On"
