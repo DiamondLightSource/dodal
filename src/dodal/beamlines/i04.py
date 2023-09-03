@@ -9,7 +9,7 @@ from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZPositioner
 from dodal.devices.sample_shutter import SampleShutter
 from dodal.devices.smargon import Smargon
-from dodal.devices.xpbm_feedback import XBPMFeedback
+from dodal.devices.xbpm_feedback import XBPMFeedback
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import get_beamline_name
 
