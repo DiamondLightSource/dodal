@@ -34,6 +34,14 @@ from bluesky.protocols import (
     Triggerable,
     WritesExternalAssets,
 )
+from ophyd.device import Device as OphydV1Device
+from ophyd.v2.core import Device as OphydV2Device
+
+try:
+    from typing import TypeAlias
+except ImportError:
+    from typing_extensions import TypeAlias
+
 
 #: Protocols defining interface to hardware
 BLUESKY_PROTOCOLS = [
@@ -53,8 +61,10 @@ BLUESKY_PROTOCOLS = [
     Triggerable,
 ]
 
-
-T = TypeVar("T")
+AnyDevice: TypeAlias = Union[OphydV1Device, OphydV2Device]
+V1DeviceFactory: TypeAlias = Callable[..., OphydV1Device]
+V2DeviceFactory: TypeAlias = Callable[..., OphydV2Device]
+AnyDeviceFactory: TypeAlias = Union[V1DeviceFactory, V2DeviceFactory]
 
 
 def get_beamline_name(default: str) -> str:
@@ -76,6 +86,9 @@ class BeamlinePrefix:
         self.insertion_prefix = f"SR{self.ixx[1:3]}{self.suffix}"
 
 
+T = TypeVar("T", bound=AnyDevice)
+
+
 def skip_device(precondition=lambda: True):
     def decorator(func: Callable[..., T]) -> Callable[..., T]:
         @wraps(func)
@@ -91,7 +104,7 @@ def skip_device(precondition=lambda: True):
 
 def make_all_devices(
     module: Union[str, ModuleType, None] = None, **kwargs
-) -> Dict[str, HasName]:
+) -> Dict[str, AnyDevice]:
     """Makes all devices in the given beamline module.
 
     In cases of device interdependencies it ensures a device is created before any which
@@ -107,18 +120,22 @@ def make_all_devices(
     if isinstance(module, str) or module is None:
         module = import_module(module or __name__)
     factories = collect_factories(module)
-    return invoke_factories(factories, **kwargs)
+    devices: dict[str, AnyDevice] = invoke_factories(factories, **kwargs)
+
+    return devices
 
 
 def invoke_factories(
-    factories: Mapping[str, Callable[..., Any]],
+    factories: Mapping[str, AnyDeviceFactory],
     **kwargs,
-) -> Dict[str, HasName]:
-    devices: Dict[str, HasName] = {}
+) -> Dict[str, AnyDevice]:
+    devices: dict[str, AnyDevice] = {}
+
     dependencies = {
         factory_name: set(extract_dependencies(factories, factory_name))
         for factory_name in factories.keys()
     }
+
     while len(devices) < len(factories):
         leaves = [
             device
@@ -136,38 +153,56 @@ def invoke_factories(
 
 
 def extract_dependencies(
-    factories: Mapping[str, Callable[..., Any]], factory_name: str
+    factories: Mapping[str, AnyDeviceFactory], factory_name: str
 ) -> Iterable[str]:
     for name, param in inspect.signature(factories[factory_name]).parameters.items():
         if param.default is inspect.Parameter.empty and name in factories:
             yield name
 
 
-def collect_factories(module: ModuleType) -> Mapping[str, Callable[..., Any]]:
-    factories = {}
+def collect_factories(module: ModuleType) -> dict[str, AnyDeviceFactory]:
+    factories: dict[str, AnyDeviceFactory] = {}
+
     for var in module.__dict__.values():
-        if callable(var) and _is_device_factory(var) and not _is_device_skipped(var):
+        if callable(var) and is_any_device_factory(var) and not _is_device_skipped(var):
             factories[var.__name__] = var
+
     return factories
 
 
-def _is_device_skipped(func: Callable[..., Any]) -> bool:
+def _is_device_skipped(func: AnyDeviceFactory) -> bool:
     if not hasattr(func, "__skip__"):
         return False
     return func.__skip__  # type: ignore
 
 
-def _is_device_factory(func: Callable[..., Any]) -> bool:
+def is_v1_device_factory(func: Callable) -> bool:
     try:
         return_type = signature(func).return_annotation
-        return _is_device_type(return_type)
+        return is_v1_device_type(return_type)
     except ValueError:
         return False
 
 
-def _is_device_type(obj: Type[Any]) -> bool:
+def is_v2_device_factory(func: Callable) -> bool:
+    try:
+        return_type = signature(func).return_annotation
+        return is_v2_device_type(return_type)
+    except ValueError:
+        return False
+
+
+def is_any_device_factory(func: Callable) -> bool:
+    return is_v1_device_factory(func) or is_v2_device_factory(func)
+
+
+def is_v2_device_type(obj: Type[Any]) -> bool:
+    return inspect.isclass(obj) and issubclass(obj, OphydV2Device)
+
+
+def is_v1_device_type(obj: Type[Any]) -> bool:
     is_class = inspect.isclass(obj)
     follows_protocols = any(
         map(lambda protocol: isinstance(obj, protocol), BLUESKY_PROTOCOLS)
     )
-    return is_class and follows_protocols
+    return is_class and follows_protocols and not is_v2_device_type(obj)

@@ -4,7 +4,6 @@ from ophyd import (
     CamBase,
     Component,
     Device,
-    DeviceStatus,
     EpicsSignal,
     HDF5Plugin,
     OverlayPlugin,
@@ -41,11 +40,6 @@ class ZoomController(Device):
     thst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.THST")
     frst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.FRST")
     fvst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.FVST")
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.flat_field_status = DeviceStatus(self, timeout=10)
 
     def set_flatfield_on_zoom_level_one(self, value):
         flat_applied = self.parent.proc.port_name.get()

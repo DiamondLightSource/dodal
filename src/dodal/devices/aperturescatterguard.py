@@ -95,7 +95,7 @@ class ApertureScatterguard(InfoLoggingDevice):
     ) -> AndStatus:
         """
         Move the aperture and scatterguard combo safely to a new position.
-        See https://github.com/DiamondLightSource/python-artemis/wiki/Aperture-Scatterguard-Collisions
+        See https://github.com/DiamondLightSource/hyperion/wiki/Aperture-Scatterguard-Collisions
         for why this is required.
         """
         # EpicsMotor does not have deadband/MRES field, so the way to check if we are
