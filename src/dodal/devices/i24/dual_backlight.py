@@ -5,7 +5,7 @@ class BacklightPositioner(Device):
     """Device to control the backlight position."""
 
     # String description of the backlight position e.g. "In", "OAV2"
-    position: EpicsSignal = Component(EpicsSignal, "MP:SELECT")
+    pos: EpicsSignal = Component(EpicsSignal, "MP:SELECT")
 
     OUT: EpicsSignal = Component(EpicsSignal, "MP:SELECT.ZRST")
     IN: EpicsSignal = Component(EpicsSignal, "MP:SELECT.ONST")
@@ -38,8 +38,8 @@ class DualBacklight(Device):
     led2: EpicsSignal = Component(EpicsSignal, "-DI-LED-02:TOGGLE")
 
     def set(self, position: str) -> StatusBase:
-        status = self.pos1.position.set(position)
-        if self.pos1.position.get() == self.pos1.OUT:
+        status = self.pos1.pos.set(position)
+        if self.pos1.pos.get() == self.pos1.OUT:
             status &= self.led1.set("OFF")
         else:
             status &= self.led1.set("ON")
