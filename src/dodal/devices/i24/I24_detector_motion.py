@@ -3,7 +3,7 @@ from ophyd import Device, EpicsMotor
 
 
 class DetectorMotion(Device):
-    """Physical motion and interlocks for detector travel"""
+    """Physical motion for detector travel"""
 
     y: EpicsMotor = Cpt(EpicsMotor, "Y")  # Vertical
     z: EpicsMotor = Cpt(EpicsMotor, "Z")  # Beam
