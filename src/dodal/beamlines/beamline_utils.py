@@ -50,10 +50,8 @@ def _wait_for_connection(
         device.wait_for_connection(timeout=timeout)
     elif isinstance(device, OphydV2Device):
         call_in_bluesky_event_loop(
-            asyncio.wait_for(
-                v2_device_wait_for_connection(coros=device.connect(sim=sim)),
-                timeout=timeout,
-            )
+            v2_device_wait_for_connection(coros=device.connect(sim=sim)),
+            timeout=timeout
         )
     else:
         raise TypeError(
