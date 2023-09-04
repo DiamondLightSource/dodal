@@ -7,20 +7,20 @@ class BacklightPositioner(Device):
     # String description of the backlight position e.g. "In", "OAV2"
     pos: EpicsSignal = Component(EpicsSignal, "MP:SELECT")
 
-    OUT: EpicsSignal = Component(EpicsSignal, "MP:SELECT.ZRST")
-    IN: EpicsSignal = Component(EpicsSignal, "MP:SELECT.ONST")
-    LoadCheck: EpicsSignal = Component(EpicsSignal, "MP:SELECT.TWST")
-    OAV2: EpicsSignal = Component(EpicsSignal, "MP:SELECT.THST")
-    Diode: EpicsSignal = Component(EpicsSignal, "MP:SELECT.FRST")
+    zrst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.ZRST")  # Out
+    onst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.ONST")  # In
+    twst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.TWST")
+    thst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.THST")
+    frst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.FRST")
 
     @property
     def allowed_backlight_positions(self):
         return [
-            self.OUT.get(),
-            self.IN.get(),
-            self.LoadCheck.get(),
-            self.OAV2.get(),
-            self.Diode.get(),
+            self.zrst.get(),
+            self.onst.get(),
+            self.twst.get(),
+            self.thst.get(),
+            self.frst.get(),
         ]
 
 
@@ -32,6 +32,9 @@ class DualBacklight(Device):
         - LED2 is a "frontlight", it does not move, just switches on and off.
     """
 
+    OUT = 0
+    IN = 1
+
     led1: EpicsSignal = Component(EpicsSignal, "-DI-LED-01:TOGGLE")
     pos1: BacklightPositioner = Component(BacklightPositioner, "-MO-BL-01:")
 
@@ -39,7 +42,7 @@ class DualBacklight(Device):
 
     def set(self, position: str) -> StatusBase:
         status = self.pos1.pos.set(position)
-        if self.pos1.pos.get() == self.pos1.OUT:
+        if self.pos1.pos.get() == self.pos1.zrst.get():
             status &= self.led1.set("OFF")
         else:
             status &= self.led1.set("ON")

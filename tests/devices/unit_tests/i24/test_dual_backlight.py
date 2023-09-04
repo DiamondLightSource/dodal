@@ -8,6 +8,12 @@ from dodal.devices.i24.dual_backlight import DualBacklight
 def fake_backlight() -> DualBacklight:
     FakeBacklight = make_fake_device(DualBacklight)
     fake_backlight: DualBacklight = FakeBacklight(name="backlight")
+
+    fake_backlight.pos1.zrst.set("Out")
+    fake_backlight.pos1.onst.set("In")
+    fake_backlight.pos1.twst.set("LoadCheck")
+    fake_backlight.pos1.thst.set("OAV2")
+    fake_backlight.pos1.frst.set("Diode")
     return fake_backlight
 
 
