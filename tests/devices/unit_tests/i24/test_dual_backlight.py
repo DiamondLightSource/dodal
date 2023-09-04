@@ -41,7 +41,23 @@ def test_when_led1_not_out_it_switches_on(fake_backlight: DualBacklight):
     assert fake_backlight.led1.get() == "ON"
 
 
+def test_led2_independent_from_led1_position(fake_backlight: DualBacklight):
+    fake_backlight.led2.sim_put("OFF")
+    RE = RunEngine()
+    RE(bps.abs_set(fake_backlight, fake_backlight.IN))
+    assert fake_backlight.led1.get() == "ON"
+    assert fake_backlight.led2.get() == "OFF"
+
+
 def test_allowed_positions(fake_backlight: DualBacklight):
     p = fake_backlight.pos1.allowed_backlight_positions
     assert type(p) is list
     assert len(p) == 5
+    assert fake_backlight.pos1.zrst.get() == "Out"
+    assert fake_backlight.pos1.onst.get() == "In"
+
+
+def test_set_raises_error_if_unknown_position_requested(fake_backlight: DualBacklight):
+    RE = RunEngine()
+    with pytest.raises(ValueError):
+        RE(bps.abs_set(fake_backlight, "aaa"))
