@@ -51,9 +51,6 @@ class DualBacklight(Device):
     led2: EpicsSignal = Component(EpicsSignal, "-DI-LED-02:TOGGLE")
 
     def set(self, position: str) -> StatusBase:
-        if position not in self.pos1.allowed_backlight_positions:
-            raise ValueError()
-
         status = self.pos1.pos_level.set(position)
         if self.pos1.pos_level.get() == self.pos1.zrst.get():
             status &= self.led1.set("OFF")
