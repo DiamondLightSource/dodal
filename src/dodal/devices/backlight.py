@@ -13,7 +13,7 @@ class Backlight(Device):
 
     def set(self, position: int) -> StatusBase:
         status = self.pos.set(position)
-        if self.pos.get() == self.OUT:
+        if position == self.OUT:
             status &= self.toggle.set("Off")
         else:
             status &= self.toggle.set("On")

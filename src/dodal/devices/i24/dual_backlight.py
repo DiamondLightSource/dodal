@@ -60,7 +60,7 @@ class DualBacklight(Device):
             )
 
         status = self.pos1.pos_level.set(position)
-        if self.pos1.pos_level.get() == self.pos1.zrst.get():
+        if position == self.pos1.zrst.get():
             status &= self.led1.set("OFF")
         else:
             status &= self.led1.set("ON")
