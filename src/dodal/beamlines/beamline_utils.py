@@ -51,7 +51,7 @@ def _wait_for_connection(
     elif isinstance(device, OphydV2Device):
         call_in_bluesky_event_loop(
             v2_device_wait_for_connection(coros=device.connect(sim=sim)),
-            timeout=timeout
+            timeout=timeout,
         )
     else:
         raise TypeError(
