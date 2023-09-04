@@ -25,7 +25,7 @@ def test_dual_backlight_can_be_written_and_read_from(fake_backlight: DualBacklig
 
 
 def test_backlight_position(fake_backlight: DualBacklight):
-    fake_backlight.pos1.pos_level.sim_put(fake_backlight.IN)
+    fake_backlight.pos1.pos_level.set(fake_backlight.IN)
     assert fake_backlight.pos1.pos_level.get() == "In"
 
 
