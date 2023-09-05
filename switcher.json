@@ -142,5 +142,9 @@
   {
     "version": "reshape_in_ophyd",
     "url": "https://DiamondLightSource.github.io/dodal/reshape_in_ophyd/"
+  },
+  {
+    "version": "tom_testing",
+    "url": "https://DiamondLightSource.github.io/dodal/tom_testing/"
   }
 ]
