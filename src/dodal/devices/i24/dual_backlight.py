@@ -7,7 +7,7 @@ class BacklightPositioner(Device):
     # String description of the backlight position e.g. "In", "OAV2"
     pos_level: EpicsSignal = Component(EpicsSignal, "MP:SELECT")
 
-    zrst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.ZRST")  # Out
+    pos_level_zrst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.ZRST")  # Out
     onst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.ONST")  # In
     twst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.TWST")
     thst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.THST")
