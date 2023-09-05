@@ -11,11 +11,11 @@ def fake_backlight() -> DualBacklight:
     FakeBacklight = make_fake_device(DualBacklight)
     fake_backlight: DualBacklight = FakeBacklight(name="backlight")
 
-    fake_backlight.pos1.zrst.set("Out")
-    fake_backlight.pos1.onst.set("In")
-    fake_backlight.pos1.twst.set("LoadCheck")
-    fake_backlight.pos1.thst.set("OAV2")
-    fake_backlight.pos1.frst.set("Diode")
+    fake_backlight.pos1.pos_level_zrst.set("Out")
+    fake_backlight.pos1.pos_level_onst.set("In")
+    fake_backlight.pos1.pos_level_twst.set("LoadCheck")
+    fake_backlight.pos1.pos_level_thst.set("OAV2")
+    fake_backlight.pos1.pos_level_frst.set("Diode")
     return fake_backlight
 
 
@@ -53,8 +53,8 @@ def test_allowed_positions(fake_backlight: DualBacklight):
     p = fake_backlight.pos1.allowed_backlight_positions
     assert type(p) is list
     assert len(p) == 5
-    assert fake_backlight.pos1.zrst.get() == "Out"
-    assert fake_backlight.pos1.onst.get() == "In"
+    assert fake_backlight.pos1.pos_level_zrst.get() == "Out"
+    assert fake_backlight.pos1.pos_level_onst.get() == "In"
 
 
 def test_set_raises_error_if_unknown_position_requested(fake_backlight: DualBacklight):

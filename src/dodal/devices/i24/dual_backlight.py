@@ -8,19 +8,19 @@ class BacklightPositioner(Device):
     pos_level: EpicsSignal = Component(EpicsSignal, "MP:SELECT")
 
     pos_level_zrst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.ZRST")  # Out
-    onst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.ONST")  # In
-    twst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.TWST")
-    thst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.THST")
-    frst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.FRST")
+    pos_level_onst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.ONST")  # In
+    pos_level_twst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.TWST")
+    pos_level_thst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.THST")
+    pos_level_frst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.FRST")
 
     @property
     def allowed_backlight_positions(self):
         return [
-            self.zrst.get(),
-            self.onst.get(),
-            self.twst.get(),
-            self.thst.get(),
-            self.frst.get(),
+            self.pos_level_zrst.get(),
+            self.pos_level_onst.get(),
+            self.pos_level_twst.get(),
+            self.pos_level_thst.get(),
+            self.pos_level_frst.get(),
         ]
 
 
@@ -60,7 +60,7 @@ class DualBacklight(Device):
             )
 
         status = self.pos1.pos_level.set(position)
-        if position == self.pos1.zrst.get():
+        if position == self.pos1.pos_level_zrst.get():
             status &= self.led1.set("OFF")
         else:
             status &= self.led1.set("ON")
