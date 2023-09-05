@@ -7,22 +7,6 @@ class BacklightPositioner(Device):
     # String description of the backlight position e.g. "In", "OAV2"
     pos_level: EpicsSignal = Component(EpicsSignal, "MP:SELECT")
 
-    pos_level_zrst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.ZRST")  # Out
-    pos_level_onst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.ONST")  # In
-    pos_level_twst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.TWST")
-    pos_level_thst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.THST")
-    pos_level_frst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.FRST")
-
-    @property
-    def allowed_backlight_positions(self):
-        return [
-            self.pos_level_zrst.get(),
-            self.pos_level_onst.get(),
-            self.pos_level_twst.get(),
-            self.pos_level_thst.get(),
-            self.pos_level_frst.get(),
-        ]
-
 
 class DualBacklight(Device):
     """
@@ -51,14 +35,6 @@ class DualBacklight(Device):
     led2: EpicsSignal = Component(EpicsSignal, "-DI-LED-02:TOGGLE")
 
     def set(self, position: str) -> StatusBase:
-        if position not in self.pos1.allowed_backlight_positions:
-            raise ValueError(
-                f"""
-                Unknown requested position for LED1.
-                Allowed values: {self.pos1.allowed_backlight_positions}.
-            """
-            )
-
         status = self.pos1.pos_level.set(position)
         if position == self.OUT:
             status &= self.led1.set("OFF")

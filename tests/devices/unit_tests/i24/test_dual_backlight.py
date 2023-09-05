@@ -10,12 +10,6 @@ from dodal.devices.i24.dual_backlight import DualBacklight
 def fake_backlight() -> DualBacklight:
     FakeBacklight = make_fake_device(DualBacklight)
     fake_backlight: DualBacklight = FakeBacklight(name="backlight")
-
-    fake_backlight.pos1.pos_level_zrst.set("Out")
-    fake_backlight.pos1.pos_level_onst.set("In")
-    fake_backlight.pos1.pos_level_twst.set("LoadCheck")
-    fake_backlight.pos1.pos_level_thst.set("OAV2")
-    fake_backlight.pos1.pos_level_frst.set("Diode")
     return fake_backlight
 
 
@@ -47,17 +41,3 @@ def test_led2_independent_from_led1_position(fake_backlight: DualBacklight):
     RE(bps.abs_set(fake_backlight, fake_backlight.IN))
     assert fake_backlight.led1.get() == "ON"
     assert fake_backlight.led2.get() == "OFF"
-
-
-def test_allowed_positions(fake_backlight: DualBacklight):
-    p = fake_backlight.pos1.allowed_backlight_positions
-    assert type(p) is list
-    assert len(p) == 5
-    assert fake_backlight.pos1.pos_level_zrst.get() == "Out"
-    assert fake_backlight.pos1.pos_level_onst.get() == "In"
-
-
-def test_set_raises_error_if_unknown_position_requested(fake_backlight: DualBacklight):
-    RE = RunEngine()
-    with pytest.raises(ValueError):
-        RE(bps.abs_set(fake_backlight, "aaa"))
