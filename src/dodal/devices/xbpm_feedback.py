@@ -6,7 +6,8 @@ class XBPMFeedback(Device):
     """The XBPM feedback device is an IOC that moves the DCM, HFM and VFM to automatically
     hold the beam into place, as measured by the XBPM sensor."""
 
-    # The time that the feedback needs to be high to be considered stable
+    # We need to wait for the beam to be locked into position for this amount of time
+    # until we are certain that it is stable.
     STABILITY_TIME = 3
 
     pos_ok: EpicsSignalRO = Component(EpicsSignalRO, "-EA-FDBK-01:XBPM2POSITION_OK")
