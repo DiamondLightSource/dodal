@@ -33,7 +33,6 @@ class S5_BL02J_AL_SLITS_95(GapAndCentreSlit2d):
                 y_centre_value: Central y-coordinate of gap
                 y_size_value: Width of gap in y-dimension
         """
-        breakpoint()
         x_centre_value, x_size_value, y_centre_value, y_size_value = position_tuple
 
         status = StatusBase()
