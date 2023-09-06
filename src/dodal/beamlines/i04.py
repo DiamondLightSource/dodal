@@ -152,7 +152,7 @@ def xbpm_feedback(
 
 
 def flux(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> Flux:
-    """Get the i04 xbpm_feedback device, instantiate it if it hasn't already been.
+    """Get the i04 flux device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
     return device_instantiation(
