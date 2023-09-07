@@ -92,14 +92,12 @@ def test_wait_for_v1_device_connection_passes_through_timeout(kwargs, expected_t
     "kwargs,expected_timeout", [({}, 5.0), ({"timeout": 15.0}, 15.0)]
 )
 @patch("dodal.beamlines.beamline_utils.call_in_bluesky_event_loop", autospec=True)
-@patch("asyncio.wait_for", autospec=True)
 def test_wait_for_v2_device_connection_passes_through_timeout(
-    wait_for, call_in_bluesky_el, kwargs, expected_timeout
+    call_in_bluesky_el, kwargs, expected_timeout
 ):
     RE()
     device = OphydV2Device()
 
     beamline_utils._wait_for_connection(device, **kwargs)
 
-    wait_for.assert_called_once_with(ANY, expected_timeout)
-    call_in_bluesky_el.assert_called_once()
+    call_in_bluesky_el.assert_called_once_with(ANY, expected_timeout)
