@@ -46,7 +46,7 @@ class Transfocator(Device):
             raise TimeoutError()
 
     def set(self, beamsize_microns: float) -> DeviceStatus:
-        """To set the beamsiz on the transfocator we must:
+        """To set the beamsize on the transfocator we must:
         1. Set the beamsize in the calculator part of the transfocator
         2. Get the predicted number of lenses needed from this calculator
         3. Enter this back into the device
