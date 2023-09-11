@@ -1,9 +1,17 @@
+import os
 from unittest.mock import MagicMock, patch
 
+import pytest
 from bluesky.protocols import Readable
 from ophyd import EpicsMotor
 
-from dodal.utils import collect_factories, get_hostname, make_all_devices
+from dodal.beamlines import i03, i23
+from dodal.utils import (
+    collect_factories,
+    get_beamline_based_on_environment_variable,
+    get_hostname,
+    make_all_devices,
+)
 
 
 def test_finds_device_factories() -> None:
@@ -65,3 +73,15 @@ def device_a() -> Readable:
 
 def device_b() -> EpicsMotor:
     return MagicMock()
+
+
+@pytest.mark.parametrize("bl", ["", "$%^&*", "nonexistent"])
+def test_invalid_beamline_variable_causes_get_device_module_to_raise(bl):
+    with patch.dict(os.environ, {"BEAMLINE": bl}), pytest.raises(ValueError):
+        get_beamline_based_on_environment_variable()
+
+
+@pytest.mark.parametrize("bl,module", [("i03", i03), ("i23", i23)])
+def test_valid_beamline_variable_causes_get_device_module_to_return_module(bl, module):
+    with patch.dict(os.environ, {"BEAMLINE": bl}):
+        assert get_beamline_based_on_environment_variable() == module

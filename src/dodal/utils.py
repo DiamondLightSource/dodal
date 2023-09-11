@@ -1,5 +1,7 @@
+import importlib
 import inspect
 import socket
+import string
 from dataclasses import dataclass
 from functools import wraps
 from importlib import import_module
@@ -206,3 +208,38 @@ def is_v1_device_type(obj: Type[Any]) -> bool:
         map(lambda protocol: isinstance(obj, protocol), BLUESKY_PROTOCOLS)
     )
     return is_class and follows_protocols and not is_v2_device_type(obj)
+
+
+def get_beamline_based_on_environment_variable() -> ModuleType:
+    """
+    Gets the dodal module for the current beamline, as specified by the
+    BEAMLINE environment variable.
+    """
+    beamline = get_beamline_name("")
+
+    if beamline == "":
+        raise ValueError(
+            "Cannot determine beamline - BEAMLINE environment variable not set."
+        )
+
+    beamline = beamline.replace("-", "_")
+    valid_characters = string.ascii_letters + string.digits + "_"
+
+    if (
+        len(beamline) == 0
+        or beamline[0] not in string.ascii_letters
+        or not all(c in valid_characters for c in beamline)
+    ):
+        raise ValueError(
+            "Invalid BEAMLINE variable - module name is not a permissible python module name, got '{}'".format(
+                beamline
+            )
+        )
+
+    try:
+        return importlib.import_module("dodal.beamlines.{}".format(beamline))
+    except ImportError as e:
+        raise ValueError(
+            f"Failed to import beamline-specific dodal module 'dodal.beamlines.{beamline}'."
+            " Ensure your BEAMLINE environment variable is set to a known instrument."
+        ) from e
