@@ -240,7 +240,6 @@ def get_beamline_based_on_environment_variable() -> ModuleType:
         return importlib.import_module("dodal.beamlines.{}".format(beamline))
     except ImportError as e:
         raise ValueError(
-            "Failed to import beamline-specific dodal module 'dodal.beamlines.{}'".format(
-                beamline
-            )
+            f"Failed to import beamline-specific dodal module 'dodal.beamlines.{beamline}'."
+            " Ensure your BEAMLINE environment variable is set to a known instrument."
         ) from e
