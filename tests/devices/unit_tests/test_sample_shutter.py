@@ -1,5 +1,3 @@
-from unittest.mock import MagicMock
-
 import pytest
 from ophyd.sim import make_fake_device
 
@@ -26,8 +24,6 @@ def set_pos_rbv(fake_sample_shutter: SampleShutter, value):
 )
 def test_set_opens_and_closes_shutter(state, fake_sample_shutter):
     status = fake_sample_shutter.set(state)
-    status_finished = MagicMock()
-    status.add_callback(status_finished)
-    status_finished.assert_not_called()
-    set_pos_rbv(fake_sample_shutter, state)
+    assert not status.done
+    set_pos_rbv(fake_sample_shutter, state.value)
     status.wait(1)
