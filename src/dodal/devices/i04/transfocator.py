@@ -68,7 +68,8 @@ class Transfocator(Device):
                 self.start.set(1).wait()
                 self.polling_wait_on_start_rbv(1)
                 self.polling_wait_on_start_rbv(0)
-                status.set_finished()
+            # The value hasn't changed so assume the device is already set up correctly
+            status.set_finished()
 
         LOGGER.info(f"Transfocator setting {beamsize_microns} beamsize")
         if self.beamsize_set_microns.get() != beamsize_microns:
