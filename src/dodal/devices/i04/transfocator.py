@@ -46,7 +46,7 @@ class Transfocator(Device):
             raise TimeoutError()
 
     def set(self, beamsize_microns: float) -> DeviceStatus:
-        """To set the beamsiz on the transfocator we must:
+        """To set the beamsize on the transfocator we must:
         1. Set the beamsize in the calculator part of the transfocator
         2. Get the predicted number of lenses needed from this calculator
         3. Enter this back into the device
@@ -68,7 +68,8 @@ class Transfocator(Device):
                 self.start.set(1).wait()
                 self.polling_wait_on_start_rbv(1)
                 self.polling_wait_on_start_rbv(0)
-                status.set_finished()
+            # The value hasn't changed so assume the device is already set up correctly
+            status.set_finished()
 
         LOGGER.info(f"Transfocator setting {beamsize_microns} beamsize")
         if self.beamsize_set_microns.get() != beamsize_microns:
