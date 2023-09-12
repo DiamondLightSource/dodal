@@ -1,6 +1,11 @@
+from unittest.mock import ANY, MagicMock, patch
+
 import pytest
+from bluesky.run_engine import RunEngine as RE
 from ophyd import Device
+from ophyd.device import Device as OphydV1Device
 from ophyd.sim import FakeEpicsSignal
+from ophyd.v2.core import Device as OphydV2Device
 
 from dodal.beamlines import beamline_utils, i03
 from dodal.devices.aperturescatterguard import ApertureScatterguard
@@ -69,3 +74,30 @@ def test_device_is_new_after_clearing():
     beamline_utils.clear_devices()
     ids_3 = [_make_devices_and_get_id()]
     assert ids_1 != ids_3
+
+
+@pytest.mark.parametrize(
+    "kwargs,expected_timeout", [({}, 5.0), ({"timeout": 15.0}, 15.0)]
+)
+def test_wait_for_v1_device_connection_passes_through_timeout(kwargs, expected_timeout):
+    device = OphydV1Device(name="")
+    device.wait_for_connection = MagicMock()
+
+    beamline_utils._wait_for_connection(device, **kwargs)
+
+    device.wait_for_connection.assert_called_once_with(timeout=expected_timeout)
+
+
+@pytest.mark.parametrize(
+    "kwargs,expected_timeout", [({}, 5.0), ({"timeout": 15.0}, 15.0)]
+)
+@patch("dodal.beamlines.beamline_utils.call_in_bluesky_event_loop", autospec=True)
+def test_wait_for_v2_device_connection_passes_through_timeout(
+    call_in_bluesky_el, kwargs, expected_timeout
+):
+    RE()
+    device = OphydV2Device()
+
+    beamline_utils._wait_for_connection(device, **kwargs)
+
+    call_in_bluesky_el.assert_called_once_with(ANY, expected_timeout)

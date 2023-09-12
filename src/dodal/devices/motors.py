@@ -1,6 +1,13 @@
 from dataclasses import dataclass
 
-from ophyd import EpicsMotor
+import numpy as np
+from ophyd import Component, Device, EpicsMotor
+
+
+class XYZPositioner(Device):
+    x: EpicsMotor = Component(EpicsMotor, "X")
+    y: EpicsMotor = Component(EpicsMotor, "Y")
+    z: EpicsMotor = Component(EpicsMotor, "Z")
 
 
 @dataclass
@@ -31,3 +38,14 @@ class XYZLimitBundle:
     x: MotorLimitHelper
     y: MotorLimitHelper
     z: MotorLimitHelper
+
+    def position_valid(self, position: np.ndarray):
+        if len(position) != 3:
+            raise ValueError(
+                f"Position valid expects a 3-vector, got {position} instead"
+            )
+        return (
+            self.x.is_within(position[0])
+            & self.y.is_within(position[1])
+            & self.z.is_within(position[2])
+        )
