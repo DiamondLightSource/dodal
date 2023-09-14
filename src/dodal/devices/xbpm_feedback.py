@@ -19,6 +19,6 @@ class XBPMFeedback(Device):
     def trigger(self) -> StatusBase:
         return SubscriptionStatus(
             self.pos_stable,
-            lambda value, *args, **kwargs: value == 1,
+            lambda *, old_value, value, **kwargs: value == 1,
             timeout=60,
         )
