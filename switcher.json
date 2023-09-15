@@ -60,6 +60,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/145_test_pypi/"
   },
   {
+    "version": "171_increase_zebra_timeout",
+    "url": "https://DiamondLightSource.github.io/dodal/171_increase_zebra_timeout/"
+  },
+  {
     "version": "262_make_arming_eiger_asynchronous",
     "url": "https://DiamondLightSource.github.io/dodal/262_make_arming_eiger_asynchronous/"
   },
@@ -106,10 +110,6 @@
   {
     "version": "fix_wrong_return_type",
     "url": "https://DiamondLightSource.github.io/dodal/fix_wrong_return_type/"
-  },
-  {
-    "version": "hyperion_796_xbpm_feedback",
-    "url": "https://DiamondLightSource.github.io/dodal/hyperion_796_xbpm_feedback/"
   },
   {
     "version": "i04_1",
