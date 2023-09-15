@@ -64,6 +64,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/171_increase_zebra_timeout/"
   },
   {
+    "version": "174_increase_OAV_snapshot_timeout",
+    "url": "https://DiamondLightSource.github.io/dodal/174_increase_OAV_snapshot_timeout/"
+  },
+  {
     "version": "262_make_arming_eiger_asynchronous",
     "url": "https://DiamondLightSource.github.io/dodal/262_make_arming_eiger_asynchronous/"
   },
