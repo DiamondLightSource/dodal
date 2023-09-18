@@ -7,12 +7,12 @@ from ophyd.status import Status, StatusBase
 from dodal.log import LOGGER
 
 
-def epics_signal_put_wait(pv_name: str, wait: float = 1.0) -> EpicsSignal:
+def epics_signal_put_wait(pv_name: str, wait: float = 3.0) -> EpicsSignal:
     """Creates a `Component` around an `EpicsSignal` that waits for a callback on a put.
 
     Args:
         pv_name (str): The name of the PV for the `EpicsSignal`
-        wait (str, optional): The timeout to wait for a callback. Defaults to 1.0.
+        wait (str, optional): The timeout to wait for a callback. Defaults to 3.0.
 
     Returns:
         EpicsSignal: An EpicsSignal that will wait for a callback.
@@ -24,17 +24,20 @@ def run_functions_without_blocking(
     functions_to_chain: list[Callable[[], StatusBase]],
     timeout: float = 60.0,
 ) -> Status:
-    """Creates and initiates an asynchronous chaining of functions which return a status.
+    """Creates and initiates an asynchronous chaining of functions which return a status
 
     Usage:
-    This function can be used to take a series of status-returning functions and run them all sequentially and in the background by making use of callbacks. It also ensures exceptions on each returned status are propagated
+    This function can be used to take a series of status-returning functions and run
+    them all sequentially and in the background by making use of callbacks. It also
+    ensures exceptions on each returned status are propagated
 
     Args:
-    functions_to_chain( list(function - > StatusBase) ): A list of functions which each return a status object
+    functions_to_chain( list(function - > StatusBase) ): A list of functions which each
+                                                            return a status object
 
     Returns:
-    Status: A status object which is marked as complete once all of the Status objects returned by the
-    unwrapped functions have completed.
+    Status: A status object which is marked as complete once all of the Status objects
+    returned by the unwrapped functions have completed.
     """
 
     # The returned status - marked as finished at the end of the callback chain. If any
@@ -45,8 +48,8 @@ def run_functions_without_blocking(
         check_callback_error(old_status)
         full_status.set_finished()
 
-    # Wrap each function by first checking the previous status and attaching a callback to the next
-    # function in the chain
+    # Wrap each function by first checking the previous status and attaching a callback
+    # to the next function in the chain
     def wrap_func(old_status, current_func: Callable[[], StatusBase], next_func):
         check_callback_error(old_status)
         status = current_func()
@@ -66,8 +69,8 @@ def run_functions_without_blocking(
             # So full_status can also be checked for any errors
             LOGGER.error(f"Status {status} has failed with error {error}")
 
-    # Each wrapped function needs to attach its callback to the subsequent wrapped function, therefore
-    # wrapped_funcs list needs to be created in reverse order
+    # Each wrapped function needs to attach its callback to the subsequent wrapped
+    # function, therefore wrapped_funcs list needs to be created in reverse order
 
     wrapped_funcs = list()
     wrapped_funcs.append(
