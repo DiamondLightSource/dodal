@@ -205,7 +205,7 @@ def is_v2_device_type(obj: Type[Any]) -> bool:
 def is_v1_device_type(obj: Type[Any]) -> bool:
     is_class = inspect.isclass(obj)
     follows_protocols = any(
-        map(lambda protocol: isinstance(obj, protocol), BLUESKY_PROTOCOLS)
+        (isinstance(obj, protocol) for protocol in BLUESKY_PROTOCOLS)
     )
     return is_class and follows_protocols and not is_v2_device_type(obj)
 

@@ -72,7 +72,7 @@ def run_functions_without_blocking(
     # Each wrapped function needs to attach its callback to the subsequent wrapped
     # function, therefore wrapped_funcs list needs to be created in reverse order
 
-    wrapped_funcs = list()
+    wrapped_funcs = []
     wrapped_funcs.append(
         partial(
             wrap_func,
