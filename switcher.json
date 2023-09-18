@@ -64,10 +64,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/171_increase_zebra_timeout/"
   },
   {
-    "version": "176_eiger_timeout",
-    "url": "https://DiamondLightSource.github.io/dodal/176_eiger_timeout/"
-  },
-  {
     "version": "262_make_arming_eiger_asynchronous",
     "url": "https://DiamondLightSource.github.io/dodal/262_make_arming_eiger_asynchronous/"
   },
