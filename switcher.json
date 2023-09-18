@@ -60,10 +60,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/145_test_pypi/"
   },
   {
-    "version": "171_increase_zebra_timeout",
-    "url": "https://DiamondLightSource.github.io/dodal/171_increase_zebra_timeout/"
-  },
-  {
     "version": "262_make_arming_eiger_asynchronous",
     "url": "https://DiamondLightSource.github.io/dodal/262_make_arming_eiger_asynchronous/"
   },
@@ -142,6 +138,10 @@
   {
     "version": "release-004-retroactive",
     "url": "https://DiamondLightSource.github.io/dodal/release-004-retroactive/"
+  },
+  {
+    "version": "remove_ophyd_dependency_pin",
+    "url": "https://DiamondLightSource.github.io/dodal/remove_ophyd_dependency_pin/"
   },
   {
     "version": "reshape_in_ophyd",
