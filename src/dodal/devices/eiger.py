@@ -35,7 +35,7 @@ class EigerDetector(Device):
 
     STALE_PARAMS_TIMEOUT = 60
     GENERAL_STATUS_TIMEOUT = 10
-    ALL_FRAMES_TIMEOUT = 30
+    ALL_FRAMES_TIMEOUT = 120
 
     filewriters_finished: SubscriptionStatus
 
