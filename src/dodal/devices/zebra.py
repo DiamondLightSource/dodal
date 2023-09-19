@@ -69,7 +69,7 @@ class ArmingDevice(Device):
     """A useful device that can abstract some of the logic of arming.
     Allows a user to just call arm.set(ArmDemand.ARM)"""
 
-    TIMEOUT = 3
+    TIMEOUT: float = 3
 
     arm_set: EpicsSignal = Component(EpicsSignal, "PC_ARM")
     disarm_set: EpicsSignal = Component(EpicsSignal, "PC_DISARM")

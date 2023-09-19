@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from logging import Logger
 from logging.handlers import TimedRotatingFileHandler
 from os import environ
 from pathlib import Path
@@ -16,6 +17,8 @@ LOGGER = logging.getLogger("Dodal")
 LOGGER.setLevel(logging.DEBUG)
 ophyd_logger.parent = LOGGER
 bluesky_logger.parent = LOGGER
+DEVICE_DEBUG_OVERRIDE_LOGGER = logging.getLogger("Device debug override")
+DEVICE_DEBUG_OVERRIDE_LOGGER.parent = LOGGER
 
 DEFAULT_FORMATTER = logging.Formatter(
     "[%(asctime)s] %(name)s %(module)s %(levelname)s: %(message)s"
@@ -71,10 +74,10 @@ def set_beamline(beamline_name: str):
     beamline_filter.beamline = beamline_name
 
 
-def _add_handler(handler: logging.Handler, logging_level: str):
+def _add_handler(handler: logging.Handler, logging_level: str, logger: Logger = LOGGER):
     handler.setFormatter(DEFAULT_FORMATTER)
     handler.setLevel(logging_level)
-    LOGGER.addHandler(handler)
+    logger.addHandler(handler)
 
 
 def set_up_graylog_handler(logging_level: str, dev_mode: bool = False):
@@ -99,7 +102,10 @@ def set_up_graylog_handler(logging_level: str, dev_mode: bool = False):
 
 
 def set_up_file_handler(
-    logging_level: str, dev_mode: bool = False, logging_path: Optional[Path] = None
+    logging_level: str,
+    dev_mode: bool = False,
+    logging_path: Optional[Path] = None,
+    logger: Logger = LOGGER,
 ):
     """Set up a file handler for the logger
     Args:
@@ -111,7 +117,7 @@ def set_up_file_handler(
         logging_path = _get_logging_file_path()
         print(f"Logging to {logging_path}")
     file_handler = EnhancedRollingFileHandler(filename=logging_path)
-    _add_handler(file_handler, logging_level)
+    _add_handler(file_handler, logging_level, logger)
 
     # for assistance in debugging
     if dev_mode:
@@ -144,8 +150,19 @@ def set_up_logging_handlers(
     file_handler = set_up_file_handler(
         file_handler_logging_level, dev_mode, logging_path
     )
+    device_debug_override_file_handler = set_up_file_handler(
+        "DEBUG",
+        dev_mode,
+        Path(_get_logging_file_path().stem + "_device_debug_override.txt"),
+        DEVICE_DEBUG_OVERRIDE_LOGGER,
+    )
 
-    return [stream_handler, graylog_handler, file_handler]
+    return [
+        stream_handler,
+        graylog_handler,
+        file_handler,
+        device_debug_override_file_handler,
+    ]
 
 
 def _get_logging_file_path() -> Path:

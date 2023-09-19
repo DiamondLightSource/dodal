@@ -2,10 +2,12 @@ import pytest
 from mockito import mock, verify
 from ophyd.sim import make_fake_device
 
+from dodal.beamlines.i03 import zebra
 from dodal.devices.zebra import (
     GateType,
     LogicGateConfiguration,
     LogicGateConfigurer,
+    Zebra,
     boolean_array_to_integer,
 )
 
@@ -99,3 +101,15 @@ def test_logic_gate_configuration_with_too_many_sources_then_error():
 
     with pytest.raises(AssertionError):
         config.add_input(5)
+
+
+def test_logging_override():
+    zeb: Zebra = zebra(fake_with_ophyd_sim=True, wait_for_connection=False)
+    from dodal.log import set_up_logging_handlers
+
+    set_up_logging_handlers(dev_mode=True)
+    zeb.pc.gate_input.set(1)
+    zeb.pc.gate_input.put(1)
+    zeb.read()
+    zeb.log.debug(zeb.read())
+    zeb.log

@@ -218,12 +218,23 @@ def zebra(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -
     """Get the i03 zebra device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
+
+    def setup_logging_override(zeb: Zebra):
+        import logging
+
+        from dodal.log import DEVICE_DEBUG_OVERRIDE_LOGGER
+
+        zeb.log = logging.LoggerAdapter(
+            DEVICE_DEBUG_OVERRIDE_LOGGER, {"ophyd_object_name": zeb._name}
+        )
+
     return device_instantiation(
         Zebra,
         "zebra",
         "-EA-ZEBRA-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        post_create=setup_logging_override,
     )
 
 
