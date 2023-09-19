@@ -153,7 +153,7 @@ def set_up_logging_handlers(
     device_debug_override_file_handler = set_up_file_handler(
         "DEBUG",
         dev_mode,
-        Path(_get_logging_file_path().stem + "_device_debug_override.txt"),
+        _get_logging_file_path().with_suffix("").with_suffix(".debug_override_log"),
         DEVICE_DEBUG_OVERRIDE_LOGGER,
     )
 

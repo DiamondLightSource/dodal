@@ -112,4 +112,3 @@ def test_logging_override():
     zeb.pc.gate_input.put(1)
     zeb.read()
     zeb.log.debug(zeb.read())
-    zeb.log
