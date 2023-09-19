@@ -60,6 +60,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/145_test_pypi/"
   },
   {
+    "version": "184_per_device_log_level",
+    "url": "https://DiamondLightSource.github.io/dodal/184_per_device_log_level/"
+  },
+  {
     "version": "262_make_arming_eiger_asynchronous",
     "url": "https://DiamondLightSource.github.io/dodal/262_make_arming_eiger_asynchronous/"
   },
@@ -154,9 +158,5 @@
   {
     "version": "tom_testing",
     "url": "https://DiamondLightSource.github.io/dodal/tom_testing/"
-  },
-  {
-    "version": "use_ruff",
-    "url": "https://DiamondLightSource.github.io/dodal/use_ruff/"
   }
 ]
