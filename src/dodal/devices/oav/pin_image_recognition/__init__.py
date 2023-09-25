@@ -4,10 +4,9 @@ from collections import OrderedDict
 from typing import Optional, Tuple, Type, TypeVar
 
 import numpy as np
-from bluesky.protocols import Descriptor
+from bluesky.protocols import Descriptor, Readable, Reading
 from numpy.typing import NDArray
-from bluesky.protocols import Readable, Reading
-from ophyd_async.core import Device, SimSignalBackend, SignalR, SignalRW
+from ophyd_async.core import Device, SignalR, SignalRW, SimSignalBackend
 from ophyd_async.epics.signal import epics_signal_r
 
 from dodal.devices.oav.pin_image_recognition.utils import (
