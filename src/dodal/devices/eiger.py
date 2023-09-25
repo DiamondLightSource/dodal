@@ -35,7 +35,7 @@ class EigerDetector(Device):
 
     STALE_PARAMS_TIMEOUT = 60
     GENERAL_STATUS_TIMEOUT = 10
-    ALL_FRAMES_TIMEOUT = 30
+    ALL_FRAMES_TIMEOUT = 120
 
     filewriters_finished: SubscriptionStatus
 
@@ -309,7 +309,7 @@ class EigerDetector(Device):
         self.cam.acquire.put(0)
 
     def do_arming_chain(self) -> Status:
-        functions_to_do_arm = list()
+        functions_to_do_arm = []
         detector_params: DetectorParams = self.detector_params
         if detector_params.use_roi_mode:
             functions_to_do_arm.append(lambda: self.change_roi_mode(enable=True))

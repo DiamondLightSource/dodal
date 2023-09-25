@@ -17,6 +17,7 @@ from dodal.devices.sample_shutter import SampleShutter
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import Undulator
+from dodal.devices.xbpm_feedback import XBPMFeedback
 from dodal.devices.xspress3_mini.xspress3_mini import Xspress3Mini
 from dodal.devices.zebra import Zebra
 from dodal.log import set_beamline as set_log_beamline
@@ -74,7 +75,7 @@ def backlight(
     return device_instantiation(
         device_factory=Backlight,
         name="backlight",
-        prefix="-EA-BL-01:",
+        prefix="",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )
@@ -280,7 +281,22 @@ def flux(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) ->
     return device_instantiation(
         Flux,
         "flux",
-        "-MO-MAPT-01:Y:",
+        "-MO-FLUX-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+def xbpm_feedback(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Flux:
+    """Get the i03 XBPM feeback device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        XBPMFeedback,
+        "xbpm_feedback",
+        "",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
