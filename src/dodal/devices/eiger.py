@@ -316,9 +316,7 @@ class EigerDetector(Device):
 
         functions_to_do_arm.extend(
             [
-                lambda: self.set_detector_threshold(
-                    energy=detector_params.current_energy_ev
-                ),
+                lambda: self.set_detector_threshold(energy=detector_params.energy_eV),
                 self.set_cam_pvs,
                 self.set_odin_number_of_frame_chunks,
                 self.set_odin_pvs,
