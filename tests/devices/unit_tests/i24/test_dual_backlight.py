@@ -39,5 +39,6 @@ def test_led2_independent_from_led1_position(fake_backlight: DualBacklight):
     fake_backlight.led2.sim_put("OFF")
     RE = RunEngine()
     RE(bps.abs_set(fake_backlight, fake_backlight.IN))
+    RE(bps.sleep(0.1))
     assert fake_backlight.led1.get() == "ON"
     assert fake_backlight.led2.get() == "OFF"
