@@ -112,6 +112,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/artemis_905_851_rotation_scan_improvements/"
   },
   {
+    "version": "artemis_911_improve_logging",
+    "url": "https://DiamondLightSource.github.io/dodal/artemis_911_improve_logging/"
+  },
+  {
     "version": "fix_wrong_return_type",
     "url": "https://DiamondLightSource.github.io/dodal/fix_wrong_return_type/"
   },
