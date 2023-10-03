@@ -1,5 +1,7 @@
 from typing import Optional
 
+from ophyd_async.devices.panda import PandA
+
 from dodal.beamlines.beamline_utils import device_instantiation
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.aperturescatterguard import AperturePositions, ApertureScatterguard
@@ -338,6 +340,21 @@ def attenuator(
         Attenuator,
         "attenuator",
         "-EA-ATTN-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+def panda(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> PandA:
+    """Get the i03 panda device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        PandA,
+        "panda",
+        "i03-panda",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
