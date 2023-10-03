@@ -14,6 +14,7 @@ classifiers = [
 ]
 description = "Ophyd devices and other utils that could be used across DLS beamlines"
 dependencies = [
+    "ophyd-async@git+https://github.com/bluesky/ophyd-async.git",
     "ophyd@git+https://github.com/DominicOram/ophyd@31a1762435bcb275d2555068233549885eab02e7", # Switch back to just "ophyd" once ophyd#1148, ophyd#1155, ophyd#1140 merged.
     "bluesky",
     "pyepics",
@@ -119,7 +120,7 @@ commands =
 src = ["src", "tests"]
 line-length = 88
 extend-ignore = [
-    "E501",  # Line too long
+    "E501", # Line too long
     "F811", # support typing.overload decorator
 ]
 select = [
