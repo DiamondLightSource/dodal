@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 import numpy as np
 import pytest
 from numpy.typing import NDArray
-from ophyd.v2.core import set_sim_value
+from ophyd_async.core import set_sim_value
 
 from dodal.devices.oav.pin_image_recognition import MxSampleDetect, PinTipDetection
 from dodal.devices.oav.pin_image_recognition.utils import SampleLocation
