@@ -24,8 +24,8 @@ dependencies = [
     "graypy",
     "pydantic<2.0",
     "opencv-python-headless", # For pin-tip detection.
-    "aioca",                  # Required for CA support with Ophyd V2.
-    "p4p",                    # Required for PVA support with Ophyd V2.
+    "aioca",                  # Required for CA support with ophyd-async.
+    "p4p",                    # Required for PVA support with ophyd-async.
 ]
 dynamic = ["version"]
 license.file = "LICENSE"
