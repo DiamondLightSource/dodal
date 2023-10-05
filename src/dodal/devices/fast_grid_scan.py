@@ -1,5 +1,6 @@
 import threading
 import time
+from math import isclose
 from typing import Any
 
 import numpy as np
@@ -91,6 +92,15 @@ class GridScanParams(BaseModel, AbstractExperimentParameterBase):
     def _get_z_axis(cls, z_axis: GridAxis, values: dict[str, Any]) -> GridAxis:
         return GridAxis(values["z2_start"], values["z_step_size"], values["z_steps"])
 
+    @validator("dwell_time", always=True)
+    def non_ineger_dwell_time(cls, dwell_time: float):
+        nums_a = dwell_time * 1000
+        nums_b = np.floor(dwell_time * 1000)
+        num_is_close = np.isclose(nums_a, nums_b, rtol=1e-1)
+        if not num_is_close:
+            raise ValueError("Non integer value")
+        return dwell_time
+
     def is_valid(self, limits: XYZLimitBundle) -> bool:
         """
         Validates scan parameters
@@ -99,6 +109,7 @@ class GridScanParams(BaseModel, AbstractExperimentParameterBase):
                        the parameters
         :return: True if the scan is valid
         """
+
         x_in_limits = limits.x.is_within(self.x_axis.start) and limits.x.is_within(
             self.x_axis.end
         )
