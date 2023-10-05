@@ -1,6 +1,5 @@
 import threading
 import time
-from math import isclose
 from typing import Any
 
 import numpy as np
@@ -109,7 +108,6 @@ class GridScanParams(BaseModel, AbstractExperimentParameterBase):
                        the parameters
         :return: True if the scan is valid
         """
-
         x_in_limits = limits.x.is_within(self.x_axis.start) and limits.x.is_within(
             self.x_axis.end
         )
