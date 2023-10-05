@@ -2,7 +2,7 @@ import asyncio
 from unittest.mock import patch
 
 import pytest
-from ophyd.v2.core import set_sim_value
+from ophyd_async.core import set_sim_value
 
 from dodal.devices.oav.pin_image_recognition import MxSampleDetect, PinTipDetection
 

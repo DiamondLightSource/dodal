@@ -37,7 +37,7 @@ from bluesky.protocols import (
     WritesExternalAssets,
 )
 from ophyd.device import Device as OphydV1Device
-from ophyd.v2.core import Device as OphydV2Device
+from ophyd_async.core import Device as OphydV2Device
 
 try:
     from typing import TypeAlias

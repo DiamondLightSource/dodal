@@ -5,7 +5,7 @@ from bluesky.run_engine import RunEngine as RE
 from ophyd import Device
 from ophyd.device import Device as OphydV1Device
 from ophyd.sim import FakeEpicsSignal
-from ophyd.v2.core import Device as OphydV2Device
+from ophyd_async.core import Device as OphydV2Device
 
 from dodal.beamlines import beamline_utils, i03
 from dodal.devices.aperturescatterguard import ApertureScatterguard
