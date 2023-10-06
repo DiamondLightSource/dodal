@@ -27,7 +27,7 @@ if __name__ == "__main__":
     try:
         import matplotlib.pyplot as plt
 
-        plt.imshow(img[""]["value"].reshape(768, 1024, 3))
+        plt.imshow(img[""]["value"])
         plt.show()
     except ImportError:
         print("matplotlib not available; cannot show acquired image")
