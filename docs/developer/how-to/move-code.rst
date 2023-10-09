@@ -2,11 +2,11 @@
 Moving code from another repo
 =============================
 
-In the process of writing code in other DLS repos you may come to realise that it makes more sense to be in ``dodal``. It is a good idea to keep the history for this code, you can do this by doing the following (we will be using moving devices from https://github.com/DiamondLightSource/python-artemis as an example):
+In the process of writing code in other DLS repos you may come to realise that it makes more sense to be in ``dodal``. It is a good idea to keep the history for this code, you can do this by doing the following (we will be using moving devices from https://github.com/DiamondLightSource/hyperion as an example):
 
 #. Clone the codebase you are copying from::
 
-    git clone git@github.com:DiamondLightSource/python-artemis.git clone_for_history
+    git clone git@github.com:DiamondLightSource/hyperion.git clone_for_history
     cd clone_for_history/
 
 #. Remove the remote to avoid any mistaken pushes::
@@ -28,11 +28,11 @@ In the process of writing code in other DLS repos you may come to realise that i
 #. Add a note to every commit message to mention it's been moved::
 
     git filter-branch --msg-filter 'sed "$ a \
-    NOTE: Commit originally came from https://github.com/DiamondLightSource/python-artemis"' -f -- --all
+    NOTE: Commit originally came from https://github.com/DiamondLightSource/hyperion"' -f -- --all
 
 #. If you have been using Github `issue references`_ in the old repository modify these to point to be more explicit (Note that this assumes the old repo uses ``#123`` notation and only ever references issues from it's own repo)::
 
-    git filter-branch -f --msg-filter 'sed "s|#[0-9]\+|DiamondLightSource/python-artemis&|g"' -- --all
+    git filter-branch -f --msg-filter 'sed "s|#[0-9]\+|DiamondLightSource/hyperion&|g"' -- --all
 
 #. Prepare the code to be in the correct structure for dodal::
 
@@ -51,7 +51,7 @@ In the process of writing code in other DLS repos you may come to realise that i
     git clone git@github.com:DiamondLightSource/dodal.git
     cd dodal
     git remote rm origin
-    git checkout -b add_code_from_artemis
+    git checkout -b add_code_from_hyperion
 
 #. Add the source repo as a remote for ``dodal``::
 
@@ -68,6 +68,6 @@ In the process of writing code in other DLS repos you may come to realise that i
     git remote rm source
     git remote add origin git@github.com:DiamondLightSource/dodal.git
 
-#. Tidy up the code so that it fits into the ``dodal`` repo e.g. in the Artemis case we had to change the tests to import from ``artemis`` to import from ``dodal`` and add some more dependencies.
+#. Tidy up the code so that it fits into the ``dodal`` repo e.g. in the Hyperion case we had to change the tests to import from ``hyperion`` to import from ``dodal`` and add some more dependencies.
 
 .. _issue references: https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/autolinked-references-and-urls#issues-and-pull-requests

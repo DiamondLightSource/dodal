@@ -21,7 +21,7 @@ def await_value_in_list(
     def value_is(value, **_):
         return value in expected_value
 
-    if type(expected_value) != list:
+    if not isinstance(expected_value, list):
         raise TypeError(f"expected value {expected_value} is not a list")
     else:
         return SubscriptionStatus(subscribable, value_is, timeout=timeout)
