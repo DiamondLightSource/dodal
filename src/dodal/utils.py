@@ -37,7 +37,7 @@ from bluesky.protocols import (
     WritesExternalAssets,
 )
 from ophyd.device import Device as OphydV1Device
-from ophyd.v2.core import Device as OphydV2Device
+from ophyd_async.core import Device as OphydV2Device
 
 try:
     from typing import TypeAlias
@@ -205,7 +205,7 @@ def is_v2_device_type(obj: Type[Any]) -> bool:
 def is_v1_device_type(obj: Type[Any]) -> bool:
     is_class = inspect.isclass(obj)
     follows_protocols = any(
-        map(lambda protocol: isinstance(obj, protocol), BLUESKY_PROTOCOLS)
+        (isinstance(obj, protocol) for protocol in BLUESKY_PROTOCOLS)
     )
     return is_class and follows_protocols and not is_v2_device_type(obj)
 

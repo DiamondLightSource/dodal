@@ -1,13 +1,10 @@
 import asyncio
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
-import numpy as np
 import pytest
-from numpy.typing import NDArray
-from ophyd.v2.core import set_sim_value
+from ophyd_async.core import set_sim_value
 
 from dodal.devices.oav.pin_image_recognition import MxSampleDetect, PinTipDetection
-from dodal.devices.oav.pin_image_recognition.utils import SampleLocation
 
 EVENT_LOOP = asyncio.new_event_loop()
 
@@ -90,68 +87,3 @@ async def test_invalid_processing_func_uses_identity_function():
     # Assert captured preprocess function is the identitiy function
     arg = object()
     assert arg == captured_func(arg)
-
-
-@pytest.mark.parametrize(
-    "input_array,height,width,reshaped",
-    [
-        (np.zeros(shape=(1,)), 1, 1, np.zeros(shape=(1, 1))),
-        (np.zeros(shape=(3,)), 1, 1, np.zeros(shape=(1, 1, 3))),
-        (np.zeros(shape=(1920 * 1080)), 1080, 1920, np.zeros(shape=(1080, 1920))),
-        (
-            np.zeros(shape=(1920 * 1080 * 3)),
-            1080,
-            1920,
-            np.zeros(shape=(1080, 1920, 3)),
-        ),
-    ],
-)
-def test_when_data_supplied_THEN_reshaped_correctly_before_call_to_process_array(
-    input_array: NDArray, height: int, width: int, reshaped: NDArray
-):
-    device = EVENT_LOOP.run_until_complete(_get_pin_tip_detection_device())
-
-    device.array_data._backend._set_value(input_array)  # type: ignore
-    set_sim_value(device.oav_height, height)
-    set_sim_value(device.oav_width, width)
-
-    MxSampleDetect.processArray = MagicMock(
-        autospec=True,
-        return_value=SampleLocation(
-            tip_x=10, tip_y=20, edge_bottom=np.array([]), edge_top=np.array([])
-        ),
-    )
-
-    result = EVENT_LOOP.run_until_complete(device.read())
-
-    MxSampleDetect.processArray.assert_called_once()
-    np.testing.assert_array_equal(MxSampleDetect.processArray.call_args[0][0], reshaped)
-
-    assert result[""]["value"] == (10, 20)
-
-
-@pytest.mark.parametrize(
-    "input_array,height,width",
-    [
-        (np.zeros(shape=(0,)), 1080, 1920),
-        (np.zeros(shape=(1920 * 1080 * 2)), 1080, 1920),
-    ],
-)
-def test_when_invalid_data_length_supplied_THEN_no_call_to_process_array(
-    input_array: NDArray, height: int, width: int
-):
-    device = EVENT_LOOP.run_until_complete(_get_pin_tip_detection_device())
-
-    set_sim_value(device.array_data, input_array)
-    set_sim_value(device.oav_height, height)
-    set_sim_value(device.oav_width, width)
-
-    MxSampleDetect.processArray = MagicMock(
-        autospec=True,
-    )
-
-    result = EVENT_LOOP.run_until_complete(device.read())
-
-    MxSampleDetect.processArray.assert_not_called()
-
-    assert result[""]["value"] == (None, None)

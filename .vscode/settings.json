@@ -1,6 +1,6 @@
 {
     "python.linting.pylintEnabled": false,
-    "python.linting.flake8Enabled": true,
+    "python.linting.flake8Enabled": false,
     "python.linting.mypyEnabled": true,
     "python.linting.enabled": true,
     "python.testing.pytestArgs": [],
@@ -9,17 +9,14 @@
     "python.formatting.provider": "black",
     "python.languageServer": "Pylance",
     "editor.formatOnSave": true,
-    "editor.codeActionsOnSave": {
-        "source.organizeImports": true
-    },
-    "python.sortImports.args": [
-        "--profile",
-        "black"
-    ],
     "[python]": {
         "editor.rulers": [
             88
-        ]
+        ],
+        "editor.codeActionsOnSave": {
+            "source.fixAll.ruff": false,
+            "source.organizeImports.ruff": true
+        }
     },
     "python.analysis.extraPaths": [
         "./src"

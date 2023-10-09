@@ -4,10 +4,10 @@ from collections import OrderedDict
 from typing import Optional, Tuple, Type, TypeVar
 
 import numpy as np
-from bluesky.protocols import Descriptor
+from bluesky.protocols import Descriptor, Readable, Reading
 from numpy.typing import NDArray
-from ophyd.v2.core import Device, Readable, Reading, SimSignalBackend
-from ophyd.v2.epics import SignalR, SignalRW, epics_signal_r
+from ophyd_async.core import Device, SignalR, SignalRW, SimSignalBackend
+from ophyd_async.epics.signal import epics_signal_r
 
 from dodal.devices.oav.pin_image_recognition.utils import (
     ARRAY_PROCESSING_FUNCTIONS_MAP,
@@ -48,13 +48,6 @@ class PinTipDetection(Readable, Device):
             NDArray[np.uint8], f"pva://{prefix}PVA:ARRAY"
         )
 
-        self.oav_width: SignalR[int] = epics_signal_r(
-            int, f"{prefix}PVA:ArraySize1_RBV"
-        )
-        self.oav_height: SignalR[int] = epics_signal_r(
-            int, f"{prefix}PVA:ArraySize2_RBV"
-        )
-
         # Soft parameters for pin-tip detection.
         self.timeout: SignalRW[float] = _create_soft_signal(float, "timeout")
         self.preprocess: SignalRW[int] = _create_soft_signal(int, "preprocess")
@@ -84,7 +77,6 @@ class PinTipDetection(Readable, Device):
         Returns tuple of:
             ((tip_x, tip_y), timestamp)
         """
-
         preprocess_key = await self.preprocess.get_value()
         preprocess_iter = await self.preprocess_iterations.get_value()
         preprocess_ksize = await self.preprocess_ksize.get_value()
@@ -111,30 +103,9 @@ class PinTipDetection(Readable, Device):
         array_data: NDArray[np.uint8] = array_reading[""]["value"]
         timestamp: float = array_reading[""]["timestamp"]
 
-        height: int = await self.oav_height.get_value()
-        width: int = await self.oav_width.get_value()
-
-        num_pixels: int = height * width  # type: ignore
-        value_len = array_data.shape[0]
-
         try:
-            if value_len == num_pixels * 3:
-                # RGB data
-                value = array_data.reshape(height, width, 3)
-            elif value_len == num_pixels:
-                # Grayscale data
-                value = array_data.reshape(height, width)
-            else:
-                # Something else?
-                raise ValueError(
-                    "Unexpected data array size: expected {} (grayscale data) or {} (rgb data), got {}",
-                    num_pixels,
-                    num_pixels * 3,
-                    value_len,
-                )
-
             start_time = time.time()
-            location = sample_detection.processArray(value)
+            location = sample_detection.processArray(array_data)
             end_time = time.time()
             LOGGER.debug(
                 "Sample location detection took {}ms".format(

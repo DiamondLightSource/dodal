@@ -5,6 +5,8 @@ import requests
 from ophyd import Component, Device, DeviceStatus, EpicsSignal, EpicsSignalRO, Signal
 from PIL import Image
 
+from dodal.log import LOGGER
+
 
 class MJPG(Device):
     filename: Signal = Component(Signal)
@@ -15,7 +17,7 @@ class MJPG(Device):
     y_size: EpicsSignalRO = Component(EpicsSignalRO, "ArraySize2_RBV")
     input_rbpv: EpicsSignalRO = Component(EpicsSignalRO, "NDArrayPort_RBV")
     input_plugin: EpicsSignal = Component(EpicsSignal, "NDArrayPort")
-    KICKOFF_TIMEOUT: float = 10.0
+    KICKOFF_TIMEOUT: float = 30.0
 
     def trigger(self):
         st = DeviceStatus(device=self, timeout=self.KICKOFF_TIMEOUT)
@@ -28,10 +30,10 @@ class MJPG(Device):
                 response = requests.get(url_str, stream=True)
                 response.raise_for_status()
                 image = Image.open(response.raw)
-                self.last_saved_path.put(
-                    Path(f"{directory_str}/{filename_str}.png").as_posix()
-                )
-                image.save(self.last_saved_path.get())
+                path = Path(f"{directory_str}/{filename_str}.png").as_posix()
+                self.last_saved_path.put(path)
+                LOGGER.info(f"Saving {path}")
+                image.save(path)
                 self.post_processing(image)
                 st.set_finished()
             except requests.HTTPError as e:
