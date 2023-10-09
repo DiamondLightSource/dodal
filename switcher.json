@@ -64,6 +64,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/184_per_device_log_level/"
   },
   {
+    "version": "191_update_build_deps",
+    "url": "https://DiamondLightSource.github.io/dodal/191_update_build_deps/"
+  },
+  {
     "version": "262_make_arming_eiger_asynchronous",
     "url": "https://DiamondLightSource.github.io/dodal/262_make_arming_eiger_asynchronous/"
   },
