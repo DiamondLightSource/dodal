@@ -164,10 +164,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/remove_ophyd_dependency_pin/"
   },
   {
-    "version": "reshape_in_ophyd",
-    "url": "https://DiamondLightSource.github.io/dodal/reshape_in_ophyd/"
-  },
-  {
     "version": "tom_testing",
     "url": "https://DiamondLightSource.github.io/dodal/tom_testing/"
   }
