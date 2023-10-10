@@ -23,7 +23,6 @@ dependencies = [
     "requests",
     "graypy",
     "pydantic<2.0",
-    "pyfiglet",
     "opencv-python-headless", # For pin-tip detection.
     "aioca",                  # Required for CA support with ophyd-async.
     "p4p",                    # Required for PVA support with ophyd-async.

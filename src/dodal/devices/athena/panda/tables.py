@@ -4,7 +4,6 @@ from itertools import cycle
 import numpy as np
 from ophyd_async.core import observe_value
 from ophyd_async.panda import SeqTable
-from pyfiglet import Figlet
 
 Frame = namedtuple(
     "Frame",
@@ -28,12 +27,6 @@ Frame = namedtuple(
         "outf2",
     ),
 )
-
-
-def frames(text):
-    """Convert the given text into 6x6 block format"""
-    lines = Figlet(font="clr6x6", width=10 * len(text)).renderText(text).splitlines()
-    return zip(*[[0 if c == " " else 1 for c in line] for line in lines][::-1])
 
 
 def table_frames(frames, width, posn=600, step=6):
@@ -156,77 +149,3 @@ def build_table(
     table["oute2"] = np.array(oute2, np.uint8)
     table["outf2"] = np.array(outf2, np.uint8)
     return table
-
-
-async def display(pnd, text, limit=50, posn=600, step=6, window=30, chunk=100):
-    src = seq_tables(
-        table_chunks(table_frames(cycle(frames(text)), window, posn, step), chunk)
-    )
-    await pnd.seq[1].table.set(next(src))
-    await pnd.seq[1].enable.set("ONE")
-    async for ready in observe_value(pnd.seq[1].can_write_next):
-        if ready == 1:
-            print("New table time")
-            active = await pnd.seq[1].bita.get_value()
-            if (
-                limit == 0 or active == "ONE"
-            ):  # intentionally == to allow -1 to be infinite
-                print("Limit reached: " + active)
-                await pnd.seq[1].table.set(
-                    build_table([1], ["Immediate"], *([[0]] * 15))
-                )
-                await pnd.seq[1].enable.set("ZERO")
-                break
-            await pnd.seq[1].table.set(next(src))
-
-            limit -= 1
-
-
-def test_frames():
-    exp = [
-        (0, 0, 0, 0, 0, 0),
-        (0, 0, 1, 1, 0, 0),
-        (0, 1, 0, 0, 1, 0),
-        (0, 1, 0, 0, 1, 0),
-        (0, 0, 1, 0, 1, 0),
-        (0, 1, 1, 1, 1, 0),
-        (0, 0, 0, 0, 0, 0),
-        (0, 0, 0, 0, 0, 0),
-        (0, 1, 1, 1, 1, 1),
-        (0, 1, 0, 0, 1, 0),
-        (0, 1, 0, 0, 1, 0),
-        (0, 1, 0, 0, 1, 0),
-        (0, 0, 1, 1, 0, 0),
-        (0, 0, 0, 0, 0, 0),
-        (0, 0, 0, 0, 0, 0),
-        (0, 0, 1, 1, 0, 0),
-        (0, 1, 0, 0, 1, 0),
-        (0, 1, 0, 0, 1, 0),
-        (0, 1, 0, 0, 1, 0),
-        (0, 0, 0, 0, 0, 0),
-        (0, 0, 0, 0, 0, 0),
-    ]
-    act = list(frames("abc"))
-    assert exp == act
-
-
-def test_table_frames():
-    tf = table_frames(frames("abcd"), 12)
-    full = list(tf)
-    print(full[1])
-    print(full[14])
-    for i in range(12):
-        left = full[i + 1]
-        right = full[i + 14]
-        assert left.outa2 == right.outa2
-        assert left.outb2 == right.outb2
-        assert left.outc2 == right.outc2
-        assert left.outd2 == right.outd2
-        assert left.oute2 == right.oute2
-        assert left.outf2 == right.outf2
-
-
-def test_table_chunks():
-    tc = table_chunks(range(100), 12)
-    first = next(tc)
-    assert len(first) == 13
