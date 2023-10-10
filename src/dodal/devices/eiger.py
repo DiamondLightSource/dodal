@@ -334,4 +334,4 @@ class EigerDetector(Device):
             ]
         )
 
-        return run_functions_without_blocking(functions_to_do_arm)
+        return run_functions_without_blocking(functions_to_do_arm, associated_obj=self)
