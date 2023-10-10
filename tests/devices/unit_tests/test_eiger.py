@@ -289,7 +289,7 @@ def test_unsuccessful_true_roi_mode_change_results_in_callback_error(
     ]
     with pytest.raises(Exception):
         run_functions_without_blocking(unwrapped_funcs).wait()
-        LOGGER.error.assert_called_once()
+    LOGGER.error.assert_called_once()
 
 
 @patch("ophyd.status.Status.__and__")
@@ -309,7 +309,7 @@ def test_unsuccessful_false_roi_mode_change_results_in_callback_error(
     ]
     with pytest.raises(Exception):
         run_functions_without_blocking(unwrapped_funcs).wait()
-        LOGGER.error.assert_called_once()
+    LOGGER.error.assert_called_once()
 
 
 @patch("dodal.devices.eiger.EigerOdin.check_odin_state")

@@ -1,7 +1,7 @@
 from functools import partial
-from typing import Callable
+from typing import Callable, Optional
 
-from ophyd import Component, EpicsSignal
+from ophyd import Component, Device, EpicsSignal
 from ophyd.status import Status, StatusBase
 
 from dodal.log import LOGGER
@@ -23,6 +23,7 @@ def epics_signal_put_wait(pv_name: str, wait: float = 3.0) -> EpicsSignal:
 def run_functions_without_blocking(
     functions_to_chain: list[Callable[[], StatusBase]],
     timeout: float = 60.0,
+    associated_obj: Optional[Device] = None,
 ) -> Status:
     """Creates and initiates an asynchronous chaining of functions which return a status
 
@@ -34,6 +35,8 @@ def run_functions_without_blocking(
     Args:
     functions_to_chain( list(function - > StatusBase) ): A list of functions which each
                                                             return a status object
+    associated_obj (Optional[Device]): The device that should be associated with the
+                                        returned status
 
     Returns:
     Status: A status object which is marked as complete once all of the Status objects
@@ -42,7 +45,7 @@ def run_functions_without_blocking(
 
     # The returned status - marked as finished at the end of the callback chain. If any
     # intermediate statuses have an exception, the full_status will timeout.
-    full_status = Status(timeout=timeout)
+    full_status = Status(obj=associated_obj, timeout=timeout)
 
     def closing_func(old_status):
         check_callback_error(old_status)
