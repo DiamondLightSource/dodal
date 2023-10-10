@@ -1,8 +1,6 @@
 from collections import deque, namedtuple
-from itertools import cycle
 
 import numpy as np
-from ophyd_async.core import observe_value
 from ophyd_async.panda import SeqTable
 
 Frame = namedtuple(

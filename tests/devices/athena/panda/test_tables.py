@@ -1,4 +1,4 @@
-from dodal.devices.athena.panda.tables import Frame, frame, table_chunks, table_frames
+from dodal.devices.athena.panda.tables import table_chunks, table_frames
 
 testframes = iter(
     [

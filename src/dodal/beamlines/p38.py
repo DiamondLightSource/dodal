@@ -13,8 +13,8 @@ from dodal.devices.athena.panda import FlyingPanda
 from dodal.utils import BeamlinePrefix
 
 BEAMLINE = "p38"
-PREFIX: str = BeamlinePrefix(f"{BEAMLINE}").beamline_prefix
-VISIT = "2023/cm33874-3"  # TODO will need to be derived from visit service
+PREFIX: str = BeamlinePrefix(BEAMLINE).beamline_prefix
+VISIT = "2023/cm33874-3"
 D11_PV = "DI-DCAM-03"
 D12_PV = "DI-DCAM-04"
 
