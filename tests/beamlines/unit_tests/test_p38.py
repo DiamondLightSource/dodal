@@ -1,5 +1,4 @@
 import asyncio
-import sys
 from unittest.mock import patch
 
 import pytest
@@ -8,7 +7,7 @@ from bluesky.run_engine import RunEngine, TransitionError
 EXPECTED_DEVICES = ["PANDA", "D12", "D11"]
 
 with patch.dict("os.environ", {"BEAMLINE": "p38"}, clear=True):
-    from dodal.beamlines import beamline_utils, p38
+    from dodal.beamlines import p38
     from dodal.utils import make_all_devices
 
 
