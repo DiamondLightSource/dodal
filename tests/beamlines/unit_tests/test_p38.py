@@ -38,10 +38,3 @@ def test_device_creation(RE):
     for device_name in devices.keys():
         assert device_name in EXPECTED_DEVICES
     assert len(EXPECTED_DEVICES) == len(devices)
-
-
-def teardown_module():
-    beamline_utils.BL = "p38"
-    for module in list(sys.modules):
-        if module.endswith("beamline_utils"):
-            del sys.modules[module]
