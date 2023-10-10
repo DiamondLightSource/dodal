@@ -36,6 +36,7 @@ class EigerDetector(Device):
     STALE_PARAMS_TIMEOUT = 60
     GENERAL_STATUS_TIMEOUT = 10
     ALL_FRAMES_TIMEOUT = 120
+    ARMING_TIMEOUT = 60
 
     filewriters_finished: SubscriptionStatus
 
@@ -92,13 +93,14 @@ class EigerDetector(Device):
     def wait_on_arming_if_started(self):
         if not self.arming_status.done:
             LOGGER.info("Waiting for arming to finish")
-            self.arming_status.wait(60)
+            self.arming_status.wait(self.ARMING_TIMEOUT)
 
     def stage(self):
         self.wait_on_arming_if_started()
         if not self.is_armed():
             LOGGER.info("Eiger not armed, arming")
-            self.async_stage().wait(timeout=self.GENERAL_STATUS_TIMEOUT)
+
+            self.async_stage().wait(timeout=self.ARMING_TIMEOUT)
 
     def stop_odin_when_all_frames_collected(self):
         LOGGER.info("Waiting on all frames")
