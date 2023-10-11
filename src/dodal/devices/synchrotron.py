@@ -8,8 +8,8 @@ class SynchrotronMode(Enum):
     INJECTION = "Injection"
     NOBEAM = "Injection"
     DEV = "Mach. Dev."
-    USER = "Mach. Dev."
-    SPECIAL = "Mach. Dev."
+    USER = "User"
+    SPECIAL = "Special"
     STARTUP = "BL Startup"
     UNKNOWN = "Unknown"
 
