@@ -15,7 +15,7 @@ classifiers = [
 description = "Ophyd devices and other utils that could be used across DLS beamlines"
 dependencies = [
     "ophyd",
-    "ophyd-async",
+    "ophyd-async @ git+ssh://git@github.com/bluesky/ophyd-async@add-detector-logic",  # TODO: Get merged
     "bluesky",
     "pyepics",
     "dataclasses-json",
