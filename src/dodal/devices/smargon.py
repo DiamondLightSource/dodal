@@ -1,8 +1,21 @@
 from ophyd import Component as Cpt
-from ophyd import EpicsMotor, EpicsSignal
+from ophyd import Device, EpicsMotor, EpicsSignal
 from ophyd.epics_motor import MotorBundle
 
 from dodal.devices.motors import MotorLimitHelper, XYZLimitBundle
+
+
+class StubOffsets(Device):
+    """Stub offsets are used to change the internal co-ordinate system of the smargon by
+    adding an offset to x, y, z.
+    This is useful as the smargon's centre of rotation is around (0, 0, 0). As such
+    changing stub offsets will change the centre of rotation.
+    In practice we don't need to change them manually, instead there are helper PVs to
+    set them so that the current position is zero or to pre-defined positions.
+    """
+
+    center_at_current_position: EpicsSignal = Cpt(EpicsSignal, "CENTER_CS.PROC")
+    to_robot_load: EpicsSignal = Cpt(EpicsSignal, "SET_STUBS_TO_RL.PROC")
 
 
 class Smargon(MotorBundle):
@@ -20,16 +33,14 @@ class Smargon(MotorBundle):
     phi: EpicsMotor = Cpt(EpicsMotor, "PHI")
     omega: EpicsMotor = Cpt(EpicsMotor, "OMEGA")
 
-    stub_offset_set: EpicsSignal = Cpt(EpicsSignal, "SET_STUBS_TO_RL.PROC")
-    """Stub offsets are calibration values that are required to move between calibration
-    pin position and spine pins. These are set in EPICS and applied via the proc."""
-
     real_x1: EpicsMotor = Cpt(EpicsMotor, "MOTOR_3")
     real_x2: EpicsMotor = Cpt(EpicsMotor, "MOTOR_4")
     real_y: EpicsMotor = Cpt(EpicsMotor, "MOTOR_1")
     real_z: EpicsMotor = Cpt(EpicsMotor, "MOTOR_2")
     real_phi: EpicsMotor = Cpt(EpicsMotor, "MOTOR_5")
     real_chi: EpicsMotor = Cpt(EpicsMotor, "MOTOR_6")
+
+    stub_offsets: StubOffsets = Cpt(StubOffsets, "")
 
     def get_xyz_limits(self) -> XYZLimitBundle:
         """Get the limits for the x, y and z axes.
