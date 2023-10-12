@@ -91,7 +91,7 @@ def test_wait_for_v1_device_connection_passes_through_timeout(kwargs, expected_t
 @pytest.mark.parametrize(
     "kwargs,expected_timeout", [({}, 5.0), ({"timeout": 15.0}, 15.0)]
 )
-@patch("dodal.beamlines.beamline_utils.call_in_bluesky_event_loop", autospec=True)
+@patch.object(beamline_utils, "call_in_bluesky_event_loop", spec=callable)
 def test_wait_for_v2_device_connection_passes_through_timeout(
     call_in_bluesky_el, kwargs, expected_timeout
 ):
@@ -100,4 +100,4 @@ def test_wait_for_v2_device_connection_passes_through_timeout(
 
     beamline_utils._wait_for_connection(device, **kwargs)
 
-    call_in_bluesky_el.assert_called_once_with(ANY, expected_timeout)
+    call_in_bluesky_el.assert_called_once_with(ANY, timeout=expected_timeout)
