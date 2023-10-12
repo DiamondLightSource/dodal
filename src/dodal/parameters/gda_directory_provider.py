@@ -20,6 +20,7 @@ class VisitDataSchema(BaseModel):
     rootDirectoryPath: str
     processedDirectoryPath: str
 
+
 class InstrumentVisit(BaseModel):
     visitId: str
     title: str
@@ -31,7 +32,9 @@ class InstrumentVisit(BaseModel):
 def make_directory_provider(url: str, visit_id: str):
     return GDADirectoryProvider(url, visit_id)
 
+
 T = TypeVar("T", bound=BaseModel)
+
 
 class GDADirectoryProvider(DirectoryProvider):
     _current_collection: Optional[DirectoryInfo]
@@ -42,12 +45,22 @@ class GDADirectoryProvider(DirectoryProvider):
         """url to the GDA visit service rest root endpoint"""
         self.url = url
         self.visit_id = visit_id
-        
-        try:
-            asyncio.run(asyncio.wait_for(self.connect("visits", response_type=InstrumentVisit, params={"visitId": self.visit_id}), timeout=15))
-        except TimeoutError:
-            raise Exception(f"Timeout trying to contact {self.url}/visits. Is GDA running?")
 
+        try:
+            asyncio.run(
+                asyncio.wait_for(
+                    self.connect(
+                        "visits",
+                        response_type=InstrumentVisit,
+                        params={"visitId": self.visit_id},
+                    ),
+                    timeout=15,
+                )
+            )
+        except TimeoutError:
+            raise Exception(
+                f"Timeout trying to contact {self.url}/visits. Is GDA running?"
+            )
 
     def __call__(self) -> DirectoryInfo:
         if self._current_collection:
@@ -58,19 +71,28 @@ class GDADirectoryProvider(DirectoryProvider):
     async def update(self) -> None:
         """Create new data collection"""
 
-        collection = await self.connect("collections", DataCollection, "post", {"visitId": self.visit_id})
+        collection = await self.connect(
+            "collections", DataCollection, "post", {"visitId": self.visit_id}
+        )
         self._current_collection = f"{collection.visitId}-{collection.collectionId}"
 
     # dont need params here...
-    async def connect(self, endpoint: str, response_type: Type[T], method="get", params: Optional[Mapping[str, str]] = None, body: Optional[Dict[str, str]] = None) -> T:
+    async def connect(
+        self,
+        endpoint: str,
+        response_type: Type[T],
+        method="get",
+        params: Optional[Mapping[str, str]] = None,
+        body: Optional[Dict[str, str]] = None,
+    ) -> T:
         async with ClientSession() as session:
-            async with session.request(method=method, url=str(Path(self.url) / endpoint), json=body) as response:
+            async with session.request(
+                method=method, url=str(Path(self.url) / endpoint), json=body
+            ) as response:
                 if response.status == 200:
                     json = await response.json()
                     result = response_type.parse_obj(json)
                 else:
                     raise Exception(response.status)
-        
-        return result
 
-            
+        return result

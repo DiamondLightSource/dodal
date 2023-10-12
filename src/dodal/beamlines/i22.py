@@ -1,7 +1,8 @@
-from ..devices.linkam import Linkam
-from ..parameters.gda_directory_provider import GDADirectoryProvider
 from ophyd_async.epics.areadetector import HDFStatsPilatus
 from ophyd_async.panda import PandA
+
+from ..devices.linkam import Linkam
+from ..parameters.gda_directory_provider import GDADirectoryProvider
 
 
 def saxs(directory_provider: GDADirectoryProvider) -> HDFStatsPilatus:
