@@ -128,6 +128,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/directory_provider/"
   },
   {
+    "version": "fix_flaky_test",
+    "url": "https://DiamondLightSource.github.io/dodal/fix_flaky_test/"
+  },
+  {
     "version": "fix_wrong_return_type",
     "url": "https://DiamondLightSource.github.io/dodal/fix_wrong_return_type/"
   },
