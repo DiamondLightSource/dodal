@@ -6,7 +6,7 @@ from ophyd import Component, Device, EpicsSignal
 class SynchrotronMode(Enum):
     SHUTDOWN = "Shutdown"
     INJECTION = "Injection"
-    NOBEAM = "Injection"
+    NOBEAM = "No Beam"
     DEV = "Mach. Dev."
     USER = "User"
     SPECIAL = "Special"
