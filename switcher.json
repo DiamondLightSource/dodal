@@ -68,6 +68,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/184_per_device_log_level/"
   },
   {
+    "version": "199_issue_and_PR_template",
+    "url": "https://DiamondLightSource.github.io/dodal/199_issue_and_PR_template/"
+  },
+  {
     "version": "262_make_arming_eiger_asynchronous",
     "url": "https://DiamondLightSource.github.io/dodal/262_make_arming_eiger_asynchronous/"
   },
