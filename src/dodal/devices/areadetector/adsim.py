@@ -5,7 +5,7 @@ from ophyd.areadetector.detectors import DetectorBase
 from .adutils import Hdf5Writer, SingleTriggerV33, SynchronisedAdDriverBase
 
 
-class AdSimDetector(SingleTriggerV33, DetectorBase):
+class AdSimDetectorOld(SingleTriggerV33, DetectorBase):
     cam: SynchronisedAdDriverBase = Cpt(
         SynchronisedAdDriverBase, suffix="CAM:", lazy=True
     )
@@ -48,3 +48,44 @@ class AdSimDetector(SingleTriggerV33, DetectorBase):
 
         # Now calling the super method should set the acquire period
         super(AdSimDetector, self).stage(*args, **kwargs)
+
+
+from ophyd_async.epics.areadetector.writers.hdf_writer import HDFWriter
+from ophyd_async.core import DirectoryProvider, StandardDetector
+from ophyd_async.epics.areadetector.controllers import ADController
+from ophyd_async.epics.areadetector.drivers import ADDriver
+from ophyd_async.epics.areadetector.writers.nd_file_hdf import NDFileHDF
+from ophyd_async.epics.areadetector.writers.nd_plugin import NDPluginStats
+from ophyd_async.epics.areadetector.drivers import ADDriverShapeProvider
+
+from bluesky.protocols import HasHints, Hints
+
+
+class AdSimDetector(StandardDetector, HasHints):
+    def __init__(
+        self,
+        name: str,
+        prefix: str,
+        directory_provider: DirectoryProvider,
+    ):
+        drv = ADDriver(prefix + "CAM:")
+        hdf = NDFileHDF(prefix + "HDF5:")
+
+        super().__init__(
+            ADController(drv),
+            HDFWriter(
+                hdf,
+                directory_provider,
+                lambda: name,
+                ADDriverShapeProvider(drv),
+                sum="NDStatsSum",
+            ),
+            config_sigs=[drv.acquire_time, drv.acquire],
+        )
+        self.stats = NDPluginStats(prefix + "STAT:")
+        self.drv = drv
+        self.hdf = hdf
+
+    @property
+    def hints(self) -> Hints:
+        return {"fields": ["adsim"]}
