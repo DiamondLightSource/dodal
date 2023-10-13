@@ -1,15 +1,15 @@
+from ophyd_async.core import DirectoryProvider
 from ophyd_async.epics.areadetector import HDFStatsPilatus
 from ophyd_async.panda import PandA
 
 from ..devices.linkam import Linkam
-from ..parameters.gda_directory_provider import GDADirectoryProvider
 
 
-def saxs(directory_provider: GDADirectoryProvider) -> HDFStatsPilatus:
+def saxs(directory_provider: DirectoryProvider) -> HDFStatsPilatus:
     return HDFStatsPilatus("BL22I-EA-DET-01:", directory_provider)
 
 
-def waxs(directory_provider: GDADirectoryProvider) -> HDFStatsPilatus:
+def waxs(directory_provider: DirectoryProvider) -> HDFStatsPilatus:
     return HDFStatsPilatus("BL22I-EA-DET-02:", directory_provider)
 
 
