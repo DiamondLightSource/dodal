@@ -6,5 +6,6 @@ __all__ = [
     "AdSimDetector",
     "SynchronisedAdDriverBase",
     "Hdf5Writer",
+    "HDFStatusPilatus",
     "AdAravisDetector",
 ]

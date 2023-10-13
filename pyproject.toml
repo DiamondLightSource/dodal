@@ -15,8 +15,8 @@ classifiers = [
 description = "Ophyd devices and other utils that could be used across DLS beamlines"
 dependencies = [
     "ophyd",
-    "ophyd-async",
-    "bluesky",
+    "ophyd-async @ git+https://github.com/bluesky/ophyd-async.git@add-detector-logic",
+    "bluesky @ git+https://github.com/coretl/bluesky.git@async-stage",
     "pyepics",
     "dataclasses-json",
     "pillow",
@@ -83,6 +83,7 @@ addopts = """
     """
 # Doctest python code in docs, python code in src docstrings, test functions in tests
 testpaths = "docs src tests"
+asyncio_mode = "auto"
 
 [tool.coverage.run]
 data_file = "/tmp/dodal.coverage"
