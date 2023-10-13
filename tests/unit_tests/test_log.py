@@ -1,3 +1,4 @@
+import logging
 from logging import LogRecord
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -104,17 +105,19 @@ def test_beamline_filter_adds_dev_if_no_beamline():
     assert record.beamline == "dev"
 
 
-@patch("dodal.log.GELFTCPHandler.emit")
+@patch("dodal.log.GELFTCPHandler", spec=log.GELFTCPHandler)
 @patch("dodal.log.logging.FileHandler.emit")
 def test_messages_logged_from_dodal_get_sent_to_graylog_and_file(
     mock_filehandler_emit: MagicMock,
-    mock_GELFTCPHandler_emit: MagicMock,
+    mock_GELFTCPHandler: MagicMock,
 ):
     log.set_up_logging_handlers()
+    mock_GELFTCPHandler.return_value.level = logging.DEBUG
     logger = log.LOGGER
     logger.info("test")
     mock_filehandler_emit.assert_called()
-    mock_GELFTCPHandler_emit.assert_called_once()
+    mock_GELFTCPHandler.assert_called_once_with("graylog2.diamond.ac.uk", 12218)
+    mock_GELFTCPHandler.return_value.handle.assert_called_once()
 
 
 def test_when_EnhancedRollingFileHandler_reaches_max_size_then_rolls_over():
