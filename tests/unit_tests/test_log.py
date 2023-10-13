@@ -116,7 +116,7 @@ def test_messages_logged_from_dodal_get_sent_to_graylog_and_file(
     logger = log.LOGGER
     logger.info("test")
     mock_filehandler_emit.assert_called()
-    mock_GELFTCPHandler.assert_called_once_with('graylog2.diamond.ac.uk', 12218)
+    mock_GELFTCPHandler.assert_called_once_with("graylog2.diamond.ac.uk", 12218)
     mock_GELFTCPHandler.return_value.handle.assert_called_once()
 
 
