@@ -132,12 +132,12 @@
     "url": "https://DiamondLightSource.github.io/dodal/artemis_911_improve_logging/"
   },
   {
-    "version": "directory_provider",
-    "url": "https://DiamondLightSource.github.io/dodal/directory_provider/"
+    "version": "async-ad-sim",
+    "url": "https://DiamondLightSource.github.io/dodal/async-ad-sim/"
   },
   {
-    "version": "fix_logging_to_real_graylog",
-    "url": "https://DiamondLightSource.github.io/dodal/fix_logging_to_real_graylog/"
+    "version": "directory_provider",
+    "url": "https://DiamondLightSource.github.io/dodal/directory_provider/"
   },
   {
     "version": "fix_wrong_return_type",
