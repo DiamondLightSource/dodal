@@ -2,7 +2,7 @@ from ophyd_async.core import DirectoryProvider
 from ophyd_async.epics.areadetector import HDFStatsPilatus
 from ophyd_async.panda import PandA
 
-from ..devices.linkam import Linkam
+from dodal.devices.linkam import Linkam
 
 
 def saxs(directory_provider: DirectoryProvider) -> HDFStatsPilatus:
