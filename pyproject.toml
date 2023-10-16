@@ -16,7 +16,7 @@ description = "Ophyd devices and other utils that could be used across DLS beaml
 dependencies = [
     "ophyd",
     "ophyd_async @ git+https://github.com/bluesky/ophyd-async.git@add-detector-logic",  # TODO: Get merged
-    "bluesky @ git+ssh://git@github.com/coretl/bluesky@async-stage",  # TODO: Get merged
+    "bluesky",
     "pyepics",
     "dataclasses-json",
     "pillow",
