@@ -72,6 +72,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/199_issue_and_PR_template/"
   },
   {
+    "version": "207_vmxm_fast_grid_scan_devices",
+    "url": "https://DiamondLightSource.github.io/dodal/207_vmxm_fast_grid_scan_devices/"
+  },
+  {
     "version": "262_make_arming_eiger_asynchronous",
     "url": "https://DiamondLightSource.github.io/dodal/262_make_arming_eiger_asynchronous/"
   },
