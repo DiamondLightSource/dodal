@@ -153,7 +153,9 @@ def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
 
 
 @skip_device(lambda: BL == "s03")
-def pin_tip_detection(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> PinTipDetection:
+def pin_tip_detection(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> PinTipDetection:
     """Get the i03 pin tip detection device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
