@@ -13,11 +13,23 @@ DEFAULT_CONNECTION_TIMEOUT: Final[float] = 5.0
 
 ACTIVE_DEVICES: Dict[str, AnyDevice] = {}
 BL = ""
+PREFIX: BeamlinePrefix = None  # type: ignore
 
 
-def set_beamline(beamline: str):
-    global BL
+def set_beamline(
+    beamline: str,
+    suffix: Optional[str] = None,
+    beamline_prefix: Optional[str] = None,
+    insertion_prefix: Optional[str] = None,
+):
+    global BL, PREFIX
     BL = beamline
+    PREFIX = BeamlinePrefix(
+        ixx=beamline,
+        suffix=suffix,
+        beamline_prefix=beamline_prefix,
+        insertion_prefix=insertion_prefix,
+    )
 
 
 def clear_devices():
@@ -95,9 +107,7 @@ def device_instantiation(
     if already_existing_device is None:
         device_instance = device_factory(
             name=name,
-            prefix=f"{(BeamlinePrefix(BL).beamline_prefix)}{prefix}"
-            if bl_prefix
-            else prefix,
+            prefix=f"{PREFIX.beamline_prefix}{prefix}" if bl_prefix else prefix,
             **kwargs,
         )
         ACTIVE_DEVICES[name] = device_instance

@@ -81,11 +81,21 @@ def get_hostname() -> str:
 class BeamlinePrefix:
     ixx: str
     suffix: Optional[str] = None
+    beamline_prefix: Optional[str] = None
+    insertion_prefix: Optional[str] = None
 
     def __post_init__(self):
-        self.suffix = self.ixx[0].upper() if not self.suffix else self.suffix
-        self.beamline_prefix = f"BL{self.ixx[1:3]}{self.suffix}"
-        self.insertion_prefix = f"SR{self.ixx[1:3]}{self.suffix}"
+        self.suffix = self.ixx[0].upper() if self.suffix is None else self.suffix
+        self.beamline_prefix = (
+            f"BL{self.ixx[1:3]}{self.suffix}"
+            if self.beamline_prefix is None
+            else self.beamline_prefix
+        )
+        self.insertion_prefix = (
+            f"SR{self.ixx[1:3]}{self.suffix}"
+            if self.insertion_prefix is None
+            else self.insertion_prefix
+        )
 
 
 T = TypeVar("T", bound=AnyDevice)
