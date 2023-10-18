@@ -10,7 +10,9 @@ SIM_BEAMLINE_NAME = "S02-1"
 
 BL = get_beamline_name(SIM_BEAMLINE_NAME)
 set_log_beamline(BL)
-set_utils_beamline(BL, suffix="J", beamline_prefix="BL02J", insertion_prefix="SR-DI-J02")
+set_utils_beamline(
+    BL, suffix="J", beamline_prefix="BL02J", insertion_prefix="SR-DI-J02"
+)
 
 
 @skip_device(lambda: BL == SIM_BEAMLINE_NAME)
