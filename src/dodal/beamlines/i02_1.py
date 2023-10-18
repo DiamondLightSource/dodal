@@ -6,7 +6,7 @@ from dodal.devices.zebra import Zebra
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import get_beamline_name, skip_device
 
-SIM_BEAMLINE_NAME = "svmxm"
+SIM_BEAMLINE_NAME = "S02-2"
 
 BL = get_beamline_name(SIM_BEAMLINE_NAME)
 set_log_beamline(BL)
@@ -14,7 +14,9 @@ set_utils_beamline(BL)
 
 
 @skip_device(lambda: BL == SIM_BEAMLINE_NAME)
-def eiger(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> EigerDetector:
+def eiger(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> EigerDetector:
     """Get the vmxm eiger device, instantiate it if it hasn't already been.
     If this is called when already instantiated in vmxm, it will return the existing object.
     """
