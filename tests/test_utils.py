@@ -5,7 +5,7 @@ import pytest
 from bluesky.protocols import Readable
 from ophyd import EpicsMotor
 
-from dodal.beamlines import i03, i23
+from dodal.beamlines import i03, i23, vmxm
 from dodal.utils import (
     collect_factories,
     get_beamline_based_on_environment_variable,
@@ -81,7 +81,7 @@ def test_invalid_beamline_variable_causes_get_device_module_to_raise(bl):
         get_beamline_based_on_environment_variable()
 
 
-@pytest.mark.parametrize("bl,module", [("i03", i03), ("i23", i23)])
+@pytest.mark.parametrize("bl,module", [("i03", i03), ("i23", i23), ("i02-1", vmxm)])
 def test_valid_beamline_variable_causes_get_device_module_to_return_module(bl, module):
     with patch.dict(os.environ, {"BEAMLINE": bl}):
         assert get_beamline_based_on_environment_variable() == module

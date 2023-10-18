@@ -220,12 +220,20 @@ def is_v1_device_type(obj: Type[Any]) -> bool:
     return is_class and follows_protocols and not is_v2_device_type(obj)
 
 
+# Special case for i02-1 -> VMXm
+# Scientists refer to it as VMXm but $BEAMLINE env var is i02-1
+BEAMLINE_NAME_TO_MODULE_NAME_OVERRIDES = {
+    "i02-1": "vmxm",
+}
+
+
 def get_beamline_based_on_environment_variable() -> ModuleType:
     """
     Gets the dodal module for the current beamline, as specified by the
     BEAMLINE environment variable.
     """
     beamline = get_beamline_name("")
+    beamline = BEAMLINE_NAME_TO_MODULE_NAME_OVERRIDES.get(beamline, beamline)
 
     if beamline == "":
         raise ValueError(
