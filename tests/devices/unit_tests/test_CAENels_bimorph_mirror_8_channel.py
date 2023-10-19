@@ -14,6 +14,7 @@ import random
 from functools import partial
 from ophyd import Component, Device, EpicsSignal
 from typing import Union
+import pytest
 
 """
 Stuff that isn't tested:
@@ -195,6 +196,7 @@ protected_set = partial(protected_set, busy_signal.device_busy)
 # ACTUAL TEST CASES:
 
 
+@pytest.mark.bimorph
 def test_on_off_read_write():
     """
     Tests that ONOFF is correctly setup to be read and set to.
@@ -208,6 +210,7 @@ def test_on_off_read_write():
     assert parsed_read(bimorph.on_off) == OnOff.ON
 
 
+@pytest.mark.bimorph
 def test_operation_mode_read_write():
     """
     Tests that OPMODE is correctly setup to be read and set to.
@@ -225,6 +228,7 @@ def test_operation_mode_read_write():
     assert parsed_read(bimorph.operation_mode_readback_value) == OperationMode.FAST
 
 
+@pytest.mark.bimorph
 def test_status():
     """
     Tests G0:STATUS is correctly set up to read from.
@@ -241,6 +245,7 @@ def test_status():
     assert bimorph.status.read()[bimorph.status.name]["value"] == Status.BUSY
 
 
+@pytest.mark.bimorph
 def test_all_shift():
     """
     Tests that ALLSHIFT is correctly setup to be read and set to.
@@ -264,6 +269,7 @@ def test_all_shift():
     )
 
 
+@pytest.mark.bimorph
 def test_all_volt():
     """
     Tests that ALLVOLT is correctly set up to be read and set to.
@@ -284,6 +290,7 @@ def test_all_volt():
         )
 
 
+@pytest.mark.bimorph
 def test_voltage_target():
     """
     Tests that VTRGT is correctly set up to be read and set to.
@@ -325,6 +332,7 @@ def test_voltage_target():
         )
 
 
+@pytest.mark.bimorph
 def test_shift():
     """
     Test SHIFT if set up correctly to read and set to.
@@ -353,6 +361,7 @@ def test_shift():
     )
 
 
+@pytest.mark.bimorph
 def test_voltage_out():
     """
     Tests VOUT is set up correctly to read and set to.
@@ -385,6 +394,7 @@ def test_voltage_out():
         )
 
 
+@pytest.mark.bimorph
 def test_get_channels_by_attribute():
     """
     Tests the bimorph's get_channels_by_attribute method.
@@ -406,6 +416,7 @@ def test_get_channels_by_attribute():
         )
 
 
+@pytest.mark.bimorph
 def test_wait_for_signal_value():
     """
     Tests that bimorph's wait_for_signal_value works.
@@ -429,6 +440,7 @@ def test_wait_for_signal_value():
     )
 
 
+@pytest.mark.bimorph
 def test_wait_till_idle_and_busy():
     """
     Test to see if CAENelsBimorphMirrorInterface.wait_till_idle and .wait_till_busy work...
@@ -446,6 +458,7 @@ def test_wait_till_idle_and_busy():
     assert bimorph.status.read()[bimorph.status.name]["value"] == Status.IDLE
 
 
+@pytest.mark.bimorph
 def test_protected_read():
     """
     Tests if CAENelsBimorphMirrorInterface.protected_read works
@@ -466,6 +479,7 @@ def test_protected_read():
     assert bimorph.status.read()[bimorph.status.name]["value"] == Status.IDLE
 
 
+@pytest.mark.bimorph
 def test_protected_set():
     """
     Tests CAENelsBimorphMirrorInterface.protected_set
@@ -482,6 +496,7 @@ def test_protected_set():
     assert parsed_read(bimorph.channel_1_voltage_out_readback_value) == test_voltage
 
 
+@pytest.mark.bimorph
 def test_parsed_protected_read():
     """
     Tests CAENelsBimorphMirrorInterface.parsed_protected_read
@@ -500,6 +515,7 @@ def test_parsed_protected_read():
     assert bimorph.status.read()[bimorph.status.name]["value"] == Status.IDLE
 
 
+@pytest.mark.bimorph
 def test_read_from_all_channels_by_attribute():
     """
     Tests CAENelsBimorphMirror8Channel.read_from_all_channels_by_attribute
@@ -528,6 +544,7 @@ def test_read_from_all_channels_by_attribute():
     )
 
 
+@pytest.mark.bimorph
 def test_write_to_all_channels_by_attribute():
     """
     Tests CAENelsBimorphMirror8Channel.write_to_all_channels_by_attribute
@@ -561,6 +578,7 @@ def test_write_to_all_channels_by_attribute():
     )
 
 
+@pytest.mark.bimorph
 def test_set_and_proc_target_voltages():
     """
     Tests CAENelsBimorphMirror8Channel.set_and_proc_target_voltages
@@ -594,6 +612,7 @@ def test_set_and_proc_target_voltages():
     )
 
 
+@pytest.mark.bimorph
 def test_set():
     """
     Tests CAENelsBimorphMirror8Channel.set
@@ -634,6 +653,7 @@ from bluesky.plan_stubs import mv, rd
 RE = RunEngine({})
 
 
+@pytest.mark.bimorph
 def test_move_plan():
     bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
     bimorph.wait_for_connection()
