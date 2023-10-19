@@ -76,6 +76,7 @@ ignore_missing_imports = true # Ignore missing stubs in imported modules
 # Run pytest with all our checkers, and don't spam us with massive tracebacks on error
 markers = [
     "s03: marks tests as requiring the s03 simulator running (deselect with '-m \"not s03\"')",
+    "slits: marks tests as requiring the slits simulator running (deselect with '-m \"not slits\" ')",
 ]
 addopts = """
     --tb=native -vv --doctest-modules --doctest-glob="*.rst"
@@ -120,7 +121,7 @@ commands =
 src = ["src", "tests"]
 line-length = 88
 extend-ignore = [
-    "E501",  # Line too long
+    "E501", # Line too long
     "F811", # support typing.overload decorator
 ]
 select = [
