@@ -121,11 +121,11 @@ class AdAravisDetector(SingleTriggerV33, DetectorBase):
 class TriggerSourceMako(Enum):
     freerun = "Freerun"
     line_1 = "Line1"
-    # line_2 = "Line2"
+    line_2 = "Line2"
     fixed_rate = "FixedRate"
     software = "Software"
-    action_0 = "Action0"
-    action_1 = "Action1"
+    # action_0 = "Action0"
+    # action_1 = "Action1"
 
 
 class TriggerModeMako(Enum):
@@ -207,7 +207,7 @@ class SumHDFAravisDetector(StandardDetector, HasHints):
                 directory_provider,
                 lambda: self.name,
                 ADDriverShapeProvider(drv),
-                sum="NDStatsSum",
+                sum="StatsSum"
             ),
             config_sigs=[drv.acquire_time, drv.acquire],
             name=name,

@@ -11,15 +11,15 @@ from i22_bluesky.plans.linkam import linkam_plan
 
 from dodal.devices.areadetector.adaravis import SumHDFAravisDetector
 
-dp = StaticDirectoryProvider("/exports/mybeamline/data", "sometest")  # for training rig
-# dp = StaticDirectoryProvider("/dls/p38/data/2023/cm33874-3", "tmp")  # for panda
+# dp = StaticDirectoryProvider("/exports/mybeamline/data", "sometest")  # for training rig
+dp = StaticDirectoryProvider("/dls/p38/data/2023/cm33874-3", "tmp")  # for p38
 
 RE = RunEngine()
 # pv_prefix = start_ioc_subprocess()
 
 with DeviceCollector():
-    saxs = SumHDFAravisDetector("BL49P-EA-DET-01:", dp)  # mako
-    # saxs = SumHDFAravisDetector("BL38P-DI-DCAM-03:", dp)  # was BL49P-EA-DET-01 #manta
+    # saxs = SumHDFAravisDetector("BL49P-EA-DET-01:", dp)  # mako
+    saxs = SumHDFAravisDetector("BL38P-DI-DCAM-03:", dp)  # was BL49P-EA-DET-01 #manta
     # panda = PandA("BL38P-EA-PANDA-01")
     # mover = Mover(pv_prefix + "X:")
 
