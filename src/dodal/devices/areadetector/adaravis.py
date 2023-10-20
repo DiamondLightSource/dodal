@@ -167,6 +167,8 @@ class AdAravisMakoController(DetectorControl):
             image_mode = ImageMode.continuous
         else:
             image_mode = ImageMode.multiple
+        if exposure is not None:
+            await self.driver.acquire_time.set(exposure)
 
         # trigger mode must be set first and on it's own!
         await self.driver.trigger_mode.set(TriggerModeMako.on)
@@ -178,7 +180,6 @@ class AdAravisMakoController(DetectorControl):
         )
 
         status = await set_and_wait_for_value(self.driver.acquire, True)
-        await asyncio.sleep(0.5)
         return status
 
     async def disarm(self):
