@@ -2,7 +2,7 @@ from typing import Sequence, Tuple, cast
 
 from ophyd_async.core import DirectoryProvider, SignalR, StandardDetector
 from ophyd_async.epics.areadetector.controllers import PilatusController
-from ophyd_async.epics.areadetector.drivers import ADDriverShapeProvider, PilatusDriver
+from ophyd_async.epics.areadetector.drivers import ADBaseShapeProvider, PilatusDriver
 from ophyd_async.epics.areadetector.writers import HDFWriter, NDFileHDF, NDPluginStats
 
 
@@ -27,7 +27,7 @@ class HDFStatsPilatus(StandardDetector):
                 self.hdf,
                 directory_provider,
                 lambda: self.name,
-                ADDriverShapeProvider(self.drv),
+                ADBaseShapeProvider(self.drv),
                 sum="NDStatsSum",
             ),
             config_sigs=config_sigs,

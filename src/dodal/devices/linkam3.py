@@ -9,7 +9,7 @@ from ophyd_async.core import AsyncStatus, StandardReadable, observe_value
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
 logger = logging.getLogger("linkam3")
-
+logger.setLevel(logging.INFO)
 
 class PumpControl(Enum):
     Manual = "Manual"
@@ -17,35 +17,35 @@ class PumpControl(Enum):
 
 
 class Linkam3(StandardReadable):
-    tolerance: float = 1
+    tolerance: float = 0.1
 
-    def __init__(self, name: str, base_pv: str):
-        self.temp = epics_signal_r(float, base_pv + ":TEMP")
-        self.dsc = epics_signal_r(float, base_pv + ":DSC")
-        self.start_heat = epics_signal_rw(bool, base_pv + ":STARTHEAT")
+    def __init__(self, prefix: str, name: str = ""):
+        self.temp = epics_signal_r(float, prefix + ":TEMP")
+        self.dsc = epics_signal_r(float, prefix + ":DSC")
+        self.start_heat = epics_signal_rw(bool, prefix + ":STARTHEAT")
 
         self.ramp_rate = epics_signal_rw(
-            float, base_pv + ":RAMPRATE", base_pv + ":RAMPRATE:SET"
+            float, prefix + ":RAMPRATE", prefix + ":RAMPRATE:SET"
         )
-        self.ramp_time = epics_signal_r(float, base_pv + ":RAMPTIME")
+        self.ramp_time = epics_signal_r(float, prefix + ":RAMPTIME")
         self.set_point = epics_signal_rw(
-            float, base_pv + ":SETPOINT", base_pv + ":SETPOINT:SET"
+            float, prefix + ":SETPOINT", prefix + ":SETPOINT:SET"
         )
         self.pump_control = epics_signal_r(
             PumpControl,
-            base_pv + ":LNP_MODE:SET",
+            prefix + ":LNP_MODE:SET",
         )
         self.speed = epics_signal_rw(
-            float, base_pv + ":LNP_SPEED", base_pv + ":LNP_SPEED:SET"
+            float, prefix + ":LNP_SPEED", prefix + ":LNP_SPEED:SET"
         )
 
-        self.chamber_vac = epics_signal_r(float, base_pv + ":VAC_CHAMBER")
-        self.sensor_vac = epics_signal_r(float, base_pv + ":VAC_DATA1")
+        self.chamber_vac = epics_signal_r(float, prefix + ":VAC_CHAMBER")
+        self.sensor_vac = epics_signal_r(float, prefix + ":VAC_DATA1")
 
-        self.error = epics_signal_r(str, base_pv + ":CTRLLR:ERR")
+        self.error = epics_signal_r(str, prefix + ":CTRLLR:ERR")
 
         # status is a bitfield stored in a double?
-        self.status = epics_signal_r(float, base_pv + ":STATUS")
+        self.status = epics_signal_r(float, prefix + ":STATUS")
 
         self.set_readable_signals(
             read=(self.temp,), config=(self.ramp_rate, self.speed, self.set_point)

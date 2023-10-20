@@ -14,7 +14,7 @@ from ophyd_async.core import (
     StandardDetector,
     set_and_wait_for_value,
 )
-from ophyd_async.epics.areadetector.drivers import ADDriver, ADDriverShapeProvider
+from ophyd_async.epics.areadetector.drivers import ADBase, ADBaseShapeProvider
 from ophyd_async.epics.areadetector.utils import ImageMode, ad_rw, stop_busy_record
 from ophyd_async.epics.areadetector.writers import HDFWriter, NDFileHDF, NDPluginStats
 
@@ -133,11 +133,11 @@ class TriggerModeMako(Enum):
     off = "Off"
 
 
-class AdAravisMakoDriver(ADDriver):
-    def __init__(self, prefix: str) -> None:
+class AdAravisMakoDriver(ADBase):
+    def __init__(self, prefix: str, name="") -> None:
         self.trigger_mode = ad_rw(TriggerModeMako, prefix + "TriggerMode")
         self.trigger_source = ad_rw(TriggerSourceMako, prefix + "TriggerSource")
-        super().__init__(prefix)
+        super().__init__(prefix, name=name)
 
 
 class AdAravisMakoController(DetectorControl):
@@ -194,12 +194,12 @@ class SumHDFAravisDetector(StandardDetector, HasHints):
         gpio_number: int = 1,
         name: str = "",
     ):
-        drv = AdAravisMakoDriver(prefix + "DET:")
-        hdf = NDFileHDF(prefix + "HDF5:")
+        drv = AdAravisMakoDriver(prefix + ":DET:")
+        hdf = NDFileHDF(prefix + ":HDF5:")
 
         self.drv = drv
         self.hdf = hdf
-        self.stats = NDPluginStats(prefix + "STAT:")
+        self.stats = NDPluginStats(prefix + ":STAT:")
 
         super().__init__(
             AdAravisMakoController(drv, gpio_number=gpio_number),
@@ -207,8 +207,10 @@ class SumHDFAravisDetector(StandardDetector, HasHints):
                 hdf,
                 directory_provider,
                 lambda: self.name,
-                ADDriverShapeProvider(drv),
-                sum="StatsSum"
+                ADBaseShapeProvider(drv),
+                sum="StatsTotal",
+                temp="Temperature",
+
             ),
             config_sigs=[drv.acquire_time, drv.acquire],
             name=name,
@@ -216,4 +218,4 @@ class SumHDFAravisDetector(StandardDetector, HasHints):
 
     @property
     def hints(self) -> Hints:
-        return {"fields": [self.name]}
+        return self.writer.hints
