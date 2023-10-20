@@ -15,13 +15,12 @@ class HDFStatsPilatus(StandardDetector):
         prefix: str,
         directory_provider: DirectoryProvider,
         name: str = "",
-        config_sigs: Sequence[Tuple[str, SignalR]] = (),
+        config_sigs: Sequence[SignalR] = (),
     ):
         self.drv = PilatusDriver(prefix + "DRV:")
         self.hdf = NDFileHDF(prefix + "HDF:")
         self.stats = NDPluginStats(prefix + "STATS:")
 
-        self._config_sigs = list(config_sigs)
         super().__init__(
             PilatusController(self.drv),
             HDFWriter(
@@ -31,16 +30,6 @@ class HDFStatsPilatus(StandardDetector):
                 ADDriverShapeProvider(self.drv),
                 sum="NDStatsSum",
             ),
+            config_sigs=config_sigs,
             name=name,
         )
-
-    async def connect(self, sim: bool = False):
-        await super().connect(sim=sim)
-        driver = self._controller.driver
-        self._config_sigs = [
-            *self._config_sigs,
-            *[
-                (getattr(signal, "name"), cast(SignalR, signal))
-                for signal in [driver.acquire_time, driver.acquire]
-            ],
-        ]
