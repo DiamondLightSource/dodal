@@ -337,3 +337,16 @@ def test_given_x_y_z_steps_when_full_number_calculated_then_answer_is_as_expecte
     grid_scan_params: GridScanParams,
 ):
     assert grid_scan_params.get_num_images() == 350
+
+
+def test_given_non_integer_dwell_time_then_creating_FGSParams_fails_1():
+    with pytest.raises(ValueError):
+        GridScanParams(dwell_time=0.0004)
+
+def test_given_non_integer_dwell_time_then_creating_FGSParams_fails_abc_2():
+    with pytest.raises(ValueError):
+        GridScanParams(dwell_time=0.00001)
+
+def test_given_non_integer_dwell_time_then_creating_FGSParams_fails_abc_3():
+        with pytest.raises(ValueError):
+            GridScanParams(dwell_time=0.000009)
