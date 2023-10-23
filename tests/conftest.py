@@ -1,7 +1,8 @@
+import asyncio
 import sys
 from os import environ, getenv
+
 import pytest
-import asyncio
 from bluesky.run_engine import RunEngine, TransitionError
 
 

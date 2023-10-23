@@ -11,6 +11,7 @@ from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 logger = logging.getLogger("linkam3")
 logger.setLevel(logging.INFO)
 
+
 class PumpControl(Enum):
     Manual = "Manual"
     Auto = "Auto"

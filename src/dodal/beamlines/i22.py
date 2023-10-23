@@ -1,9 +1,8 @@
-from dodal.parameters.gda_directory_provider import get_directory_provider
-
 from ophyd_async.epics.areadetector import HDFStatsPilatus
 from ophyd_async.panda import PandA
 
 from dodal.devices.linkam import Linkam
+from dodal.parameters.gda_directory_provider import get_directory_provider
 
 
 def saxs() -> HDFStatsPilatus:

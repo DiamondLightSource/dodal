@@ -4,10 +4,12 @@ import pytest
 from ophyd_async.core import DetectorTrigger, DeviceCollector
 from ophyd_async.epics.areadetector.utils import ImageMode
 
-from dodal.devices.areadetector.adaravis import (AdAravisMakoController,
-                                                 AdAravisMakoDriver,
-                                                 TriggerModeMako,
-                                                 TriggerSourceMako)
+from dodal.devices.areadetector.adaravis import (
+    AdAravisMakoController,
+    AdAravisMakoDriver,
+    TriggerModeMako,
+    TriggerSourceMako,
+)
 
 
 @pytest.fixture

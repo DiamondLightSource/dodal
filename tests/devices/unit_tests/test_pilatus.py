@@ -5,6 +5,7 @@ import pytest
 from bluesky import RunEngine
 from bluesky.utils import new_uid
 from ophyd_async.core import DeviceCollector, StaticDirectoryProvider, set_sim_value
+
 from dodal.devices.areadetector.pilatus import HDFStatsPilatus
 
 CURRENT_DIRECTORY = str(Path(__file__).parent)

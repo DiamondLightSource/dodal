@@ -2,6 +2,7 @@ import asyncio
 from enum import Enum
 from typing import Any, Mapping, Optional
 
+from bluesky.protocols import HasHints, Hints
 from ophyd import Component as Cpt
 from ophyd import DetectorBase, EpicsSignal, Signal
 from ophyd.areadetector.base import ADComponent as Cpt
@@ -19,7 +20,6 @@ from ophyd_async.epics.areadetector.utils import ImageMode, ad_rw, stop_busy_rec
 from ophyd_async.epics.areadetector.writers import HDFWriter, NDFileHDF, NDPluginStats
 
 from .adutils import Hdf5Writer, SingleTriggerV33, SynchronisedAdDriverBase
-from bluesky.protocols import HasHints, Hints
 
 _ACQUIRE_BUFFER_PERIOD = 0.2
 
@@ -210,7 +210,6 @@ class SumHDFAravisDetector(StandardDetector, HasHints):
                 ADBaseShapeProvider(drv),
                 sum="StatsTotal",
                 temp="Temperature",
-
             ),
             config_sigs=[drv.acquire_time, drv.acquire],
             name=name,

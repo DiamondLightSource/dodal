@@ -1,4 +1,4 @@
-from typing import Sequence, Tuple, cast
+from typing import Sequence
 
 from ophyd_async.core import DirectoryProvider, SignalR, StandardDetector
 from ophyd_async.epics.areadetector.controllers import PilatusController

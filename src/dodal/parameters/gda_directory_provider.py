@@ -1,13 +1,12 @@
-import logging
 import tempfile
-from functools import lru_cache
 from pathlib import Path
 from typing import Optional
 
 from aiohttp import ClientSession
-from dodal.log import LOGGER
 from ophyd_async.core import DirectoryInfo, DirectoryProvider, StaticDirectoryProvider
 from pydantic import BaseModel
+
+from dodal.log import LOGGER
 
 
 class DataCollectionIdentifier(BaseModel):

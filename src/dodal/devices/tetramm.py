@@ -1,18 +1,19 @@
 import asyncio
 from enum import Enum
-from typing import Optional, Sequence
+from typing import Optional
 
+from bluesky.protocols import Hints
 from ophyd_async.core import (
     AsyncStatus,
     DetectorControl,
     DetectorTrigger,
     Device,
+    DirectoryProvider,
+    StandardDetector,
 )
-from ophyd_async.core import SignalR, StandardDetector, DirectoryProvider
-from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
-from ophyd_async.epics.areadetector.writers import HDFWriter, NDFileHDF
 from ophyd_async.epics.areadetector.drivers import ADBaseShapeProvider
-from bluesky.protocols import HasHints, Hints
+from ophyd_async.epics.areadetector.writers import HDFWriter, NDFileHDF
+from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
 
 class TetrammAcquire(Enum):
@@ -171,7 +172,7 @@ class TetrammController(DetectorControl):
         await self._drv.acquire.set(TetrammAcquire.Stop)
         await self.set_frame_time(exposure)
         await self._drv.trigger_mode.set(TetrammTrigger.ExtTrigger)
-        await self._drv.acquire.set(TetrammAcquire.Stop) #remove?
+        await self._drv.acquire.set(TetrammAcquire.Stop)  # remove?
         asyncio.gather(
             self._drv.resolution.set(self.collection_resolution),
             self._drv.range.set(self.collection_range),
