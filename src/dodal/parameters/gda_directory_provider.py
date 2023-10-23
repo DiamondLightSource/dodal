@@ -13,28 +13,53 @@ class DataCollectionIdentifier(BaseModel):
     collectionNumber: int
 
 
+class VisitServiceClient:
+    _url: str
+
+    def __init__(self, url: str) -> None:
+        self._url = url
+
+    async def create_new_collection(self) -> DataCollectionIdentifier:
+        async with ClientSession() as session:
+            async with session.post(f"{self._url}/numtracker") as response:
+                if response.status == 200:
+                    json = await response.json()
+                    return DataCollectionIdentifier.parse_obj(json)
+                else:
+                    raise Exception(response.status)
+
+    async def get_current_collection(self) -> DataCollectionIdentifier:
+        async with ClientSession() as session:
+            async with session.get(f"{self._url}/numtracker") as response:
+                if response.status == 200:
+                    json = await response.json()
+                    return DataCollectionIdentifier.parse_obj(json)
+                else:
+                    raise Exception(response.status)
+
+
 class VisitDirectoryProvider(DirectoryProvider):
     """
     Gets information from a remote service to construct the path that detectors should write to,
     and determine how their files should be named.
     """
 
-    _url: str
     _data_group_name: str
     _data_directory: Path
 
+    _client: VisitServiceClient
     _current_collection: Optional[DirectoryInfo]
     _session: Optional[ClientSession]
 
     def __init__(
         self,
-        url: str,
         data_group_name: str,
         data_directory: Path,
+        client: VisitServiceClient,
     ):
-        self._url = url
         self._data_group_name = data_group_name
         self._data_directory = data_directory
+        self._client = client
 
         self._current_collection = None
         self._session = None
@@ -50,7 +75,7 @@ class VisitDirectoryProvider(DirectoryProvider):
         # TODO: Use AuthN information as part of verification with visit service
 
         try:
-            collection_id_info = await self._get_latest_identifier()
+            collection_id_info = await self._client.create_new_collection()
             self._current_collection = self._generate_directory_info(collection_id_info)
         except Exception as ex:
             # TODO: The catch all is needed because the RunEngine will not
@@ -66,17 +91,6 @@ class VisitDirectoryProvider(DirectoryProvider):
         collection_id = collection_id_info.collectionNumber
         file_prefix = f"{self._data_group_name}-{collection_id}"
         return DirectoryInfo(str(self._data_directory), file_prefix)
-
-    async def _get_latest_identifier(  # TODO: Generify when required.
-        self,
-    ) -> DataCollectionIdentifier:
-        async with ClientSession() as session:
-            async with session.get(f"{self._url}/numtracker") as response:
-                if response.status == 200:
-                    json = await response.json()
-                    return DataCollectionIdentifier.parse_obj(json)
-                else:
-                    raise Exception(response.status)
 
     def __call__(self) -> DirectoryInfo:
         if self._current_collection is not None:
