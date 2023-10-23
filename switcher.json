@@ -68,6 +68,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/184_per_device_log_level/"
   },
   {
+    "version": "202_flaky_tests",
+    "url": "https://DiamondLightSource.github.io/dodal/202_flaky_tests/"
+  },
+  {
     "version": "207_vmxm_fast_grid_scan_devices",
     "url": "https://DiamondLightSource.github.io/dodal/207_vmxm_fast_grid_scan_devices/"
   },
@@ -106,10 +110,6 @@
   {
     "version": "allow_both_v1_and_v2_ophyd_devices",
     "url": "https://DiamondLightSource.github.io/dodal/allow_both_v1_and_v2_ophyd_devices/"
-  },
-  {
-    "version": "allow_using_ophyd_pin_tip_centring",
-    "url": "https://DiamondLightSource.github.io/dodal/allow_using_ophyd_pin_tip_centring/"
   },
   {
     "version": "artemis598_params_changes",
