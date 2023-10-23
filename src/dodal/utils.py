@@ -148,10 +148,18 @@ def invoke_factories(
         dependent_name = leaves.pop()
         params = {name: devices[name] for name in dependencies[dependent_name]}
         devices[dependent_name] = factories[dependent_name](**params, **kwargs)
+        _verify_device_has_a_name(devices[dependent_name], dependent_name)
 
     all_devices = {device.name: device for device in devices.values()}
 
     return all_devices
+
+
+def _verify_device_has_a_name(device: AnyDevice, factory_name: str) -> None:
+    if device.name is None or device.name == "":
+        raise ValueError(
+            f"Device {device} was created from {factory_name} without a name"
+        )
 
 
 def extract_dependencies(

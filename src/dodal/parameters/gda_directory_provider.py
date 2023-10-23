@@ -1,22 +1,17 @@
+import logging
+import tempfile
 from functools import lru_cache
+from pathlib import Path
 from typing import Optional
 
 from aiohttp import ClientSession
+from dodal.log import LOGGER
 from ophyd_async.core import DirectoryInfo, DirectoryProvider, StaticDirectoryProvider
 from pydantic import BaseModel
 
 
-import tempfile
-
-
 class DataCollectionIdentifier(BaseModel):
-    collectionId: int
-
-
-class VisitDirectoryProviderConfig(BaseModel, frozen=True):
-    url: str
-    beamline: str
-    base_path: str
+    collectionNumber: int
 
 
 class VisitDirectoryProvider(DirectoryProvider):
@@ -25,13 +20,27 @@ class VisitDirectoryProvider(DirectoryProvider):
     and determine how their files should be named.
     """
 
+    _url: str
+    _data_group_name: str
+    _data_directory: Path
+
     _current_collection: Optional[DirectoryInfo]
-    _session: ClientSession
+    _session: Optional[ClientSession]
 
-    def __init__(self, config: VisitDirectoryProviderConfig):
-        self.config = config
+    def __init__(
+        self,
+        url: str,
+        data_group_name: str,
+        data_directory: Path,
+    ):
+        self._url = url
+        self._data_group_name = data_group_name
+        self._data_directory = data_directory
 
-    async def update(self):
+        self._current_collection = None
+        self._session = None
+
+    async def update(self) -> None:
         """
         Calls the visit service to create a new data collection in the current visit.
         """
@@ -40,34 +49,43 @@ class VisitDirectoryProvider(DirectoryProvider):
         # TODO: Consume visit information from BlueAPI and pass down to this class
         # TODO: Query visit service to get information about visit and data collection
         # TODO: Use AuthN information as part of verification with visit service
-        data_collection = await self.connect("/numtracker")
-        collection_id = data_collection.collectionId
-        path = f"{self.config.base_path}/{collection_id}"
-        prefix = f"{self.config.beamline}_{collection_id}"
-        self._current_collection = DirectoryInfo(path, prefix)
 
-    def __call__(self) -> DirectoryInfo:
-        if self._current_collection:
-            return self._current_collection
+        try:
+            collection_id_info = await self._get_latest_identifier()
+            self._current_collection = self._generate_directory_info(collection_id_info)
+        except Exception as ex:
+            # TODO: The catch all is needed because the RunEngine will not
+            # currently handle it, see
+            # https://github.com/bluesky/bluesky/pull/1623
+            self._current_collection = None
+            LOGGER.exception(ex)
 
-        raise Exception("No current collection as update() has not been called")
-
-    def _ensure_connected(self) -> ClientSession:
-        if self._session is None or self._session.closed:
-            self._session = ClientSession(self.config.url)
-        return self._session
-
-    async def connect(  # TODO: Generify when required.
+    def _generate_directory_info(
         self,
-        endpoint: str,
+        collection_id_info: DataCollectionIdentifier,
+    ) -> DirectoryInfo:
+        collection_id = collection_id_info.collectionNumber
+        file_prefix = f"{self._data_group_name}-{collection_id}"
+        return DirectoryInfo(str(self._data_directory), file_prefix)
+
+    async def _get_latest_identifier(  # TODO: Generify when required.
+        self,
     ) -> DataCollectionIdentifier:
-        async with self._ensure_connected() as session:
-            async with session.get(endpoint) as response:
+        async with ClientSession() as session:
+            async with session.get(f"{self._url}/numtracker") as response:
                 if response.status == 200:
                     json = await response.json()
                     return DataCollectionIdentifier.parse_obj(json)
                 else:
                     raise Exception(response.status)
+
+    def __call__(self) -> DirectoryInfo:
+        if self._current_collection is not None:
+            return self._current_collection
+        else:
+            raise ValueError(
+                "No current collection, update() needs to be called at least once"
+            )
 
 
 _SINGLETON: Optional[VisitDirectoryProvider] = None
