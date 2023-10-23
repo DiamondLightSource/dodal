@@ -2,8 +2,11 @@ from functools import lru_cache
 from typing import Optional
 
 from aiohttp import ClientSession
-from ophyd_async.core import DirectoryInfo, DirectoryProvider
+from ophyd_async.core import DirectoryInfo, DirectoryProvider, StaticDirectoryProvider
 from pydantic import BaseModel
+
+
+import tempfile
 
 
 class DataCollectionIdentifier(BaseModel):
@@ -16,16 +19,12 @@ class VisitDirectoryProviderConfig(BaseModel, frozen=True):
     base_path: str
 
 
-@lru_cache(maxsize=1)
-def make_directory_provider(config: VisitDirectoryProviderConfig):
-    return VisitDirectoryProvider(config)
-
-
 class VisitDirectoryProvider(DirectoryProvider):
     """
     Gets information from a remote service to construct the path that detectors should write to,
     and determine how their files should be named.
     """
+
     _current_collection: Optional[DirectoryInfo]
     _session: ClientSession
 
@@ -59,8 +58,8 @@ class VisitDirectoryProvider(DirectoryProvider):
         return self._session
 
     async def connect(  # TODO: Generify when required.
-            self,
-            endpoint: str,
+        self,
+        endpoint: str,
     ) -> DataCollectionIdentifier:
         async with self._ensure_connected() as session:
             async with session.get(endpoint) as response:
@@ -69,3 +68,19 @@ class VisitDirectoryProvider(DirectoryProvider):
                     return DataCollectionIdentifier.parse_obj(json)
                 else:
                     raise Exception(response.status)
+
+
+_SINGLETON: Optional[VisitDirectoryProvider] = None
+
+
+def set_directory_provider_singleton(provider: VisitDirectoryProvider):
+    global _SINGLETON
+
+    _SINGLETON = provider
+
+
+def get_directory_provider() -> DirectoryProvider:
+    if _SINGLETON is not None:
+        return _SINGLETON
+    else:
+        return StaticDirectoryProvider(tempfile.TemporaryFile(), "")
