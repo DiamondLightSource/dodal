@@ -2,6 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from ophyd.sim import make_fake_device
+from ophyd.status import SubscriptionStatus
 
 from dodal.devices.i04.transfocator import Transfocator
 
@@ -36,19 +37,25 @@ def test_when_beamsize_set_then_set_correctly_on_device_and_waited_on(
 ):
     given_predicted_lenses_is_half_of_beamsize(fake_transfocator)
 
+    transfocator_statuses = SubscriptionStatus(
+        fake_transfocator.predicted_vertical_num_lenses,
+        lambda *, old_value, value, **kwargs: value == 157,
+    )
+    transfocator_statuses &= SubscriptionStatus(
+        fake_transfocator.number_filters_sp,
+        lambda *, old_value, value, **kwargs: value == 157,
+    )
+    transfocator_statuses &= SubscriptionStatus(
+        fake_transfocator.start,
+        lambda *, old_value, value, **kwargs: value == 1,
+    )
+
     set_status = fake_transfocator.set(315)
 
-    from time import sleep
-
-    sleep(0.01)
-
-    assert fake_transfocator.predicted_vertical_num_lenses.get() == 157
-    assert fake_transfocator.number_filters_sp.get() == 157
-    assert fake_transfocator.start.get() == 1
-
+    transfocator_statuses.wait(0.1)
     assert not set_status.done
 
     fake_transfocator.start_rbv.get = MagicMock(side_effect=[1, 0])
 
-    set_status.wait(0.01)
+    set_status.wait(0.1)
     assert set_status.done and set_status.success

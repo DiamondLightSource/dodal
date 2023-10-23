@@ -66,9 +66,9 @@ def finished_status():
     return status
 
 
-def get_bad_status(exception=Exception):
+def get_bad_status(exception=StatusException):
     status = Status()
-    status.set_exception(Exception)
+    status.set_exception(exception)
     return status
 
 
@@ -218,11 +218,17 @@ def test_stage_enables_roi_mode_correctly(
 
     fake_eiger.detector_params.use_roi_mode = roi_mode
 
-    fake_eiger.change_roi_mode = MagicMock(return_value=Status())
+    change_roi_mode_status = Status()
+    fake_eiger.change_roi_mode = MagicMock(return_value=change_roi_mode_status)
 
-    fake_eiger.async_stage()
+    returned_status = fake_eiger.async_stage()
 
     assert fake_eiger.change_roi_mode.call_count == expected_num_change_roi_calls
+
+    # Tidy up async staging
+    change_roi_mode_status.set_exception(Exception)
+    with pytest.raises(Exception):
+        returned_status.wait(0.1)
 
 
 def test_disable_roi_mode_sets_correct_roi_mode(fake_eiger):
@@ -276,20 +282,19 @@ def test_unsuccessful_true_roi_mode_change_results_in_callback_error(
     mock_and, fake_eiger
 ):
     bad_status = Status()
-    bad_status.set_exception(Exception("Fail"))
+    bad_status.set_exception(StatusException("Fail"))
     mock_and.return_value = bad_status
     LOGGER.error = MagicMock()
 
-    # Test true
     unwrapped_funcs = [
         lambda: fake_eiger.change_roi_mode(enable=True),
         lambda: fake_eiger.set_detector_threshold(
             energy=fake_eiger.detector_params.current_energy_ev
         ),
     ]
-    with pytest.raises(Exception):
+    with pytest.raises(StatusException):
         run_functions_without_blocking(unwrapped_funcs).wait()
-    LOGGER.error.assert_called_once()
+    LOGGER.error.assert_called()
 
 
 @patch("ophyd.status.Status.__and__")
@@ -297,7 +302,7 @@ def test_unsuccessful_false_roi_mode_change_results_in_callback_error(
     mock_and, fake_eiger
 ):
     bad_status = Status()
-    bad_status.set_exception(Exception("Fail"))
+    bad_status.set_exception(StatusException("Fail"))
     mock_and.return_value = bad_status
     LOGGER.error = MagicMock()
 
@@ -307,7 +312,7 @@ def test_unsuccessful_false_roi_mode_change_results_in_callback_error(
             energy=fake_eiger.detector_params.current_energy_ev
         ),
     ]
-    with pytest.raises(Exception):
+    with pytest.raises(StatusException):
         run_functions_without_blocking(unwrapped_funcs).wait()
 
 
@@ -335,11 +340,12 @@ def test_given_failing_odin_when_stage_then_exception_raised(fake_eiger):
 
 @patch("dodal.devices.eiger.await_value")
 def test_stage_runs_successfully(mock_await, fake_eiger: EigerDetector):
+    mock_await.return_value = finished_status()
     fake_eiger.odin.nodes.clear_odin_errors = MagicMock()
     fake_eiger.odin.check_odin_initialised = MagicMock()
     fake_eiger.odin.check_odin_initialised.return_value = (True, "")
     fake_eiger.odin.file_writer.file_path.put(True)
-    fake_eiger.async_stage()
+    fake_eiger.stage()
 
 
 @patch("dodal.devices.eiger.await_value")
@@ -390,13 +396,16 @@ def test_when_stage_called_then_odin_started_after_stale_params_goes_low(
         fake_eiger._wait_for_odin_status,
     ]
 
-    run_functions_without_blocking(unwrapped_funcs)
+    returned_status = run_functions_without_blocking(unwrapped_funcs)
 
     assert fake_eiger.odin.file_writer.capture.get() == 0
 
     fake_eiger.stale_params.sim_put(0)
 
     await_value(fake_eiger.odin.file_writer.capture, 1).wait(1)
+    fake_eiger.odin.meta.ready.sim_put(1)
+
+    returned_status.wait(0.1)
 
 
 # Tests transition from _wait_for_odin_status to cam_acquire_set
@@ -415,13 +424,14 @@ def test_when_stage_called_then_cam_acquired_on_meta_ready(
         lambda: fake_eiger.cam.acquire.set(1, timeout=10),
     ]
 
-    run_functions_without_blocking(unwrapped_funcs)
+    returned_status = run_functions_without_blocking(unwrapped_funcs)
 
     assert fake_eiger.cam.acquire.get() == 0
 
     fake_eiger.odin.meta.ready.sim_put(1)
 
     await_value(fake_eiger.cam.acquire, 1).wait(1)
+    returned_status.wait(1)
 
 
 # Tests transition from _wait_fan_ready to _finish_arm
@@ -450,11 +460,6 @@ def test_when_stage_called_then_finish_arm_on_fan_ready(
     range(10),
 )
 def test_check_callback_error(fake_eiger: EigerDetector, iteration):
-    def get_bad_status():
-        status = Status()
-        status.set_exception(StatusException)
-        return status
-
     def get_good_status():
         status = Status()
         status.set_finished()
@@ -544,14 +549,19 @@ def test_given_in_free_run_mode_and_not_all_frames_collected_in_time_when_unstag
 def test_if_arming_in_progress_then_stage_waits_for_completion(
     fake_eiger: EigerDetector, mock_set_odin_filewriter
 ):
-    def set_bad_arming_status():
-        fake_eiger.arming_status = get_bad_status()
+    fake_eiger.arming_status = Status()
 
-    assert fake_eiger.arming_status.done is True
-    fake_eiger.arming_status = get_bad_status()
-    # Should do .wait and error
-    with pytest.raises(Exception):
-        fake_eiger.stage()
+    thread = threading.Thread(target=fake_eiger.stage, daemon=True)
+    thread.start()
+
+    assert thread.is_alive()
+
+    fake_eiger.odin.fan.ready.sim_put(1)
+    fake_eiger.cam.acquire.sim_put(1)
+
+    fake_eiger.arming_status.set_finished()
+
+    thread.join(0.01)
 
 
 def test_if_eiger_isnt_armed_then_stage_calls_async_stage(fake_eiger: EigerDetector):

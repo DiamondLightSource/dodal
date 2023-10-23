@@ -7,9 +7,13 @@ from dodal.devices.utils import run_functions_without_blocking
 from dodal.log import LOGGER
 
 
+class StatusException(Exception):
+    pass
+
+
 def get_bad_status():
     status = Status()
-    status.set_exception(Exception)
+    status.set_exception(StatusException())
     return status
 
 
@@ -35,10 +39,14 @@ def test_full_status_gives_error_if_intermediate_status_fails():
 
 def test_check_call_back_error_gives_correct_error():
     LOGGER.error = MagicMock()
-    run_functions_without_blocking([get_bad_status])
 
-    run_functions_without_blocking([get_good_status])
-    LOGGER.error.assert_called_once()
+    with pytest.raises(StatusException):
+        returned_status = run_functions_without_blocking([get_bad_status])
+        returned_status.wait(0.1)
+
+    assert isinstance(returned_status.exception(), StatusException)
+
+    LOGGER.error.assert_called()
 
 
 def test_wrap_function_callback():
@@ -52,4 +60,5 @@ def test_status_points_to_provided_device_object():
     returned_status = run_functions_without_blocking(
         [get_good_status], associated_obj=expected_obj
     )
+    returned_status.wait(0.1)
     assert returned_status.obj == expected_obj
