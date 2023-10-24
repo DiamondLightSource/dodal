@@ -48,11 +48,16 @@ class Linkam3(StandardReadable):
         self.status = epics_signal_r(float, base_pv + ":STATUS")
 
         self.set_readable_signals(
-            read=(self.temp,), config=(self.ramp_rate, self.speed, self.set_point)
+            read=(self.temp,),
+            config=(self.ramp_rate, self.speed, self.set_point),
         )
         super().__init__(name=name)
 
-    async def _move(self, new_position: float, watchers: List[Callable] = []):
+    async def _move(
+        self,
+        new_position: float,
+        watchers: List[Callable] = [],
+    ) -> None:
         logger.info("Moving to %f", new_position)
         # time.monotonic won't go backwards in case of NTP corrections
         start = time.monotonic()
@@ -74,24 +79,27 @@ class Linkam3(StandardReadable):
 
     def set(self, new_position: float, timeout: Optional[float] = None) -> AsyncStatus:
         watchers: List[Callable] = []
-        coro = asyncio.wait_for(self._move(new_position, watchers), timeout=timeout)
+        coro = asyncio.wait_for(
+            self._move(new_position, watchers),
+            timeout=timeout,
+        )
         return AsyncStatus(coro, watchers)
 
     # TODO: Check bitshift order
     async def in_error(self) -> bool:
-        return int(await self.status.get_value()) & 1
+        return bool(int(await self.status.get_value()) & 1)
 
     async def at_setpoint(self) -> bool:
-        return int(await self.status.get_value()) & 1 << 1
+        return bool(int(await self.status.get_value()) & 1 << 1)
 
     async def heater_on(self) -> bool:
-        return int(await self.status.get_value()) & 1 << 2
+        return bool(int(await self.status.get_value()) & 1 << 2)
 
     async def pump_on(self) -> bool:
-        return int(await self.status.get_value()) & 1 << 3
+        return bool(int(await self.status.get_value()) & 1 << 3)
 
     async def pump_auto(self) -> bool:
-        return int(await self.status.get_value()) & 1 << 4
+        return bool(int(await self.status.get_value()) & 1 << 4)
 
     async def locate(self) -> Location:
         return {
