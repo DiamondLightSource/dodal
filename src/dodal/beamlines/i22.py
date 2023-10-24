@@ -1,7 +1,7 @@
 from ophyd_async.epics.areadetector import HDFStatsPilatus
 from ophyd_async.panda import PandA
 
-from dodal.devices.linkam import Linkam
+from dodal.devices.linkam3 import Linkam3
 from dodal.parameters.gda_directory_provider import get_directory_provider
 
 
@@ -17,5 +17,5 @@ def panda() -> PandA:
     return PandA("BL22I-MO-PANDA-01:")
 
 
-def linkam() -> Linkam:
-    return Linkam("BL22I-EA-TEMPC-01:")
+def linkam() -> Linkam3:
+    return Linkam3("BL22I-EA-TEMPC-01:", name="linkam")

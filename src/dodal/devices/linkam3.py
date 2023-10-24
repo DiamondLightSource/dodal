@@ -80,19 +80,19 @@ class Linkam3(StandardReadable):
 
     # TODO: Check bitshift order
     async def in_error(self) -> bool:
-        return int(await self.status.get_value()) & 1
+        return bool(int(await self.status.get_value()) & 1)
 
     async def at_setpoint(self) -> bool:
-        return int(await self.status.get_value()) & 1 << 1
+        return bool(int(await self.status.get_value()) & 1 << 1)
 
     async def heater_on(self) -> bool:
-        return int(await self.status.get_value()) & 1 << 2
+        return bool(int(await self.status.get_value()) & 1 << 2)
 
     async def pump_on(self) -> bool:
-        return int(await self.status.get_value()) & 1 << 3
+        return bool(int(await self.status.get_value()) & 1 << 3)
 
     async def pump_auto(self) -> bool:
-        return int(await self.status.get_value()) & 1 << 4
+        return bool(int(await self.status.get_value()) & 1 << 4)
 
     async def locate(self) -> Location:
         return {
