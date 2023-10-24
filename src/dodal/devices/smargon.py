@@ -1,8 +1,18 @@
+from enum import Enum
+
 from ophyd import Component as Cpt
 from ophyd import Device, EpicsMotor, EpicsSignal
 from ophyd.epics_motor import MotorBundle
+from ophyd.status import Status
 
 from dodal.devices.motors import MotorLimitHelper, XYZLimitBundle
+from dodal.devices.status import await_value
+from dodal.devices.utils import run_functions_without_blocking
+
+
+class StubPosition(Enum):
+    CURRENT_AS_CENTER = 0
+    RESEET_TO_ROBOT_LOAD = 1
 
 
 class StubOffsets(Device):
@@ -15,7 +25,27 @@ class StubOffsets(Device):
     """
 
     center_at_current_position: EpicsSignal = Cpt(EpicsSignal, "CENTER_CS.PROC")
+    center_at_current_position_enabled: EpicsSignal = Cpt(EpicsSignal, "CENTER_CS.DISP")
+
     to_robot_load: EpicsSignal = Cpt(EpicsSignal, "SET_STUBS_TO_RL.PROC")
+    to_robot_load_enabled: EpicsSignal = Cpt(EpicsSignal, "SET_STUBS_TO_RL.DISP")
+
+    def set(self, pos: StubPosition) -> Status:
+        if pos == StubPosition.CURRENT_AS_CENTER:
+            status = run_functions_without_blocking(
+                [
+                    lambda: await_value(self.center_at_current_position_enabled, 0),
+                    lambda: self.center_at_current_position.set(1),
+                ]
+            )
+        else:
+            status = run_functions_without_blocking(
+                [
+                    lambda: await_value(self.to_robot_load_enabled, 0),
+                    lambda: self.to_robot_load.set(1),
+                ]
+            )
+        return status
 
 
 class Smargon(MotorBundle):
