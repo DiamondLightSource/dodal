@@ -1,10 +1,15 @@
+from typing import Optional
+
 from dodal.beamlines.beamline_utils import device_instantiation
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.devices.aperturescatterguard import AperturePositions, ApertureScatterguard
 from dodal.devices.attenuator import Attenuator
+from dodal.devices.backlight import Backlight
 from dodal.devices.beamstop import BeamStop
 from dodal.devices.DCM import DCM
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector_motion import DetectorMotion
+from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import FastGridScan
 from dodal.devices.flux import Flux
 from dodal.devices.i04.transfocator import Transfocator
@@ -17,13 +22,9 @@ from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import Undulator
 from dodal.devices.xbpm_feedback import XBPMFeedback
-from dodal.devices.backlight import Backlight
-from dodal.devices.aperturescatterguard import ApertureScatterguard, AperturePositions
-from dodal.devices.eiger import EigerDetector
 from dodal.devices.zebra import Zebra
 from dodal.log import set_beamline as set_log_beamline
-from dodal.utils import get_beamline_name, skip_device, BeamlinePrefix
-from typing import Optional
+from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
 
 BL = get_beamline_name("s04")
 set_log_beamline(BL)
@@ -60,19 +61,19 @@ def gonio_positioner(
     )
 
 
-# def sample_delivery_system(
-#     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-# ) -> XYZPositioner:
-#     """Get the i04 sample_delivery_system device, instantiate it if it hasn't already been.
-#     If this is called when already instantiated in i04, it will return the existing object.
-#     """
-#     return device_instantiation(
-#         XYZPositioner,
-#         "sample_delivery_system",
-#         "-MO-SDE-01:",
-#         wait_for_connection,
-#         fake_with_ophyd_sim,
-#     )
+def sample_delivery_system(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> XYZPositioner:
+    """Get the i04 sample_delivery_system device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i04, it will return the existing object.
+    """
+    return device_instantiation(
+        XYZPositioner,
+        "sample_delivery_system",
+        "-MO-SDE-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
 
 
 def ipin(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> IPin:
@@ -198,7 +199,7 @@ def backlight(
     return device_instantiation(
         Backlight,
         "backlight",
-        "-BL-01",
+        "",
         wait_for_connection,
         fake_with_ophyd_sim,
     )

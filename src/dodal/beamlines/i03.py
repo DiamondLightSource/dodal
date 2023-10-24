@@ -18,7 +18,7 @@ from dodal.devices.sample_shutter import SampleShutter
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import Undulator
-from dodal.devices.xbpm_feedback import XBPMFeedback
+from dodal.devices.xbpm_feedback import XBPMFeedbackI03
 from dodal.devices.xspress3_mini.xspress3_mini import Xspress3Mini
 from dodal.devices.zebra import Zebra
 from dodal.log import set_beamline as set_log_beamline
@@ -311,7 +311,7 @@ def xbpm_feedback(
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return device_instantiation(
-        XBPMFeedback,
+        XBPMFeedbackI03,
         "xbpm_feedback",
         "",
         wait_for_connection,

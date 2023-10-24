@@ -1,5 +1,7 @@
 import os
 
+from bluesky.run_engine import RunEngine
+
 from dodal.utils import make_all_devices
 
 if __name__ == "__main__":
@@ -12,6 +14,10 @@ if __name__ == "__main__":
     """
     os.environ["BEAMLINE"] = "i03"
     from dodal.beamlines import i03
+
+    # Ophyd-async devices need a bluesky
+    # event loop started in order to connect.
+    RE = RunEngine()
 
     print("Making all i03 devices")
     make_all_devices(i03)
