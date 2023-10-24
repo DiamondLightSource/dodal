@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 import tempfile
 from pathlib import Path
 from typing import Optional
@@ -13,7 +14,21 @@ class DataCollectionIdentifier(BaseModel):
     collectionNumber: int
 
 
-class VisitServiceClient:
+class VisitServiceClientBase(ABC):
+    """
+    Object responsible for I/O in determining collection number
+    """
+
+    @abstractmethod
+    async def create_new_collection(self) -> DataCollectionIdentifier:
+        ...
+
+    @abstractmethod
+    async def get_current_collection(self) -> DataCollectionIdentifier:
+        ...
+
+
+class VisitServiceClient(VisitServiceClientBase):
     _url: str
 
     def __init__(self, url: str) -> None:
@@ -38,6 +53,21 @@ class VisitServiceClient:
                     raise Exception(response.status)
 
 
+class LocalVisitServiceClient(VisitServiceClientBase):
+    _count: int
+
+    def __init__(self) -> None:
+        self._count = 0
+
+    async def create_new_collection(self) -> DataCollectionIdentifier:
+        count = self._count
+        self._count += 1
+        return DataCollectionIdentifier(collectionNumber=count)
+
+    async def get_current_collection(self) -> DataCollectionIdentifier:
+        return DataCollectionIdentifier(collectionNumber=self._count)
+
+
 class VisitDirectoryProvider(DirectoryProvider):
     """
     Gets information from a remote service to construct the path that detectors should write to,
@@ -47,7 +77,7 @@ class VisitDirectoryProvider(DirectoryProvider):
     _data_group_name: str
     _data_directory: Path
 
-    _client: VisitServiceClient
+    _client: VisitServiceClientBase
     _current_collection: Optional[DirectoryInfo]
     _session: Optional[ClientSession]
 
@@ -55,7 +85,7 @@ class VisitDirectoryProvider(DirectoryProvider):
         self,
         data_group_name: str,
         data_directory: Path,
-        client: VisitServiceClient,
+        client: VisitServiceClientBase,
     ):
         self._data_group_name = data_group_name
         self._data_directory = data_directory
