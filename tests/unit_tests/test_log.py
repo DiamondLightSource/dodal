@@ -111,6 +111,8 @@ def test_messages_logged_from_dodal_get_sent_to_graylog_and_file(
     mock_filehandler_emit: MagicMock,
     mock_GELFTCPHandler: MagicMock,
 ):
+    for handler in log.LOGGER.handlers:
+        handler.close()
     log.set_up_logging_handlers()
     mock_GELFTCPHandler.return_value.level = logging.DEBUG
     logger = log.LOGGER
