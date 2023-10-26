@@ -80,6 +80,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/207_vmxm_fast_grid_scan_devices/"
   },
   {
+    "version": "218_fix_doc_build",
+    "url": "https://DiamondLightSource.github.io/dodal/218_fix_doc_build/"
+  },
+  {
     "version": "262_make_arming_eiger_asynchronous",
     "url": "https://DiamondLightSource.github.io/dodal/262_make_arming_eiger_asynchronous/"
   },
