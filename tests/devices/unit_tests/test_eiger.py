@@ -299,7 +299,7 @@ def test_unsuccessful_true_roi_mode_change_results_in_callback_error(
 
 @patch("ophyd.status.Status.__and__")
 def test_unsuccessful_false_roi_mode_change_results_in_callback_error(
-    mock_and, fake_eiger
+    mock_and, fake_eiger: EigerDetector
 ):
     bad_status = Status()
     bad_status.set_exception(StatusException("Fail"))
@@ -346,6 +346,8 @@ def test_stage_runs_successfully(mock_await, fake_eiger: EigerDetector):
     fake_eiger.odin.check_odin_initialised.return_value = (True, "")
     fake_eiger.odin.file_writer.file_path.put(True)
     fake_eiger.stage()
+    fake_eiger.arming_status.wait(1) # This should complete long before 1s
+    
 
 
 @patch("dodal.devices.eiger.await_value")
@@ -353,6 +355,7 @@ def test_given_stale_parameters_goes_high_before_callbacks_then_stale_parameters
     mock_await,
     fake_eiger: EigerDetector,
 ):
+    mock_await.return_value = Status(done=True)
     fake_eiger.odin.nodes.clear_odin_errors = MagicMock()
     fake_eiger.odin.check_odin_initialised = MagicMock()
     fake_eiger.odin.check_odin_initialised.return_value = (True, "")

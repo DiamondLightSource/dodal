@@ -1,7 +1,9 @@
+import logging
 import sys
 from os import environ, getenv
+from unittest.mock import MagicMock, patch
 
-from dodal.log import LOGGER, set_up_logging_handlers
+from dodal.log import LOGGER, GELFTCPHandler, set_up_logging_handlers
 
 
 def pytest_runtest_setup(item):
@@ -9,7 +11,11 @@ def pytest_runtest_setup(item):
         sys.modules["dodal.beamlines.beamline_utils"].clear_devices()
         assert sys.modules["dodal.beamlines.beamline_utils"].ACTIVE_DEVICES == {}
     if LOGGER.handlers == []:
-        set_up_logging_handlers(None, False)
+        mock_graylog_handler = MagicMock(spec=GELFTCPHandler)
+        mock_graylog_handler.return_value.level = logging.DEBUG
+
+        with patch("dodal.log.GELFTCPHandler", mock_graylog_handler):
+            set_up_logging_handlers(None, False)
 
 
 def pytest_runtest_teardown():
