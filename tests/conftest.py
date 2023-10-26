@@ -1,11 +1,15 @@
 import sys
 from os import environ, getenv
 
+from dodal.log import LOGGER, set_up_logging_handlers
+
 
 def pytest_runtest_setup(item):
     if "dodal.beamlines.beamline_utils" in sys.modules:
         sys.modules["dodal.beamlines.beamline_utils"].clear_devices()
         assert sys.modules["dodal.beamlines.beamline_utils"].ACTIVE_DEVICES == {}
+    if LOGGER.handlers == []:
+        set_up_logging_handlers(None, False)
 
 
 def pytest_runtest_teardown():
