@@ -1,6 +1,6 @@
-import asyncio
 from enum import Enum
-from typing import Optional
+from math import floor
+from typing import Generator, Optional
 
 from bluesky.protocols import Hints
 from ophyd_async.core import (
@@ -10,7 +10,10 @@ from ophyd_async.core import (
     Device,
     DirectoryProvider,
     StandardDetector,
+    set_signal_values,
+    walk_rw_signals,
 )
+from ophyd_async.core.device_save_loader import Msg
 from ophyd_async.epics.areadetector.drivers import ADBaseShapeProvider
 from ophyd_async.epics.areadetector.writers import HDFWriter, NDFileHDF
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
@@ -59,34 +62,20 @@ class TetrammGeometry(Enum):
 
 class TetrammDriver(Device):
     base_sample_rate: int
-    """base rate"""
+    """base rate - fixed in hardware"""
 
-    maximum_readings_per_frame: int
-    """An upper limit on the dimension of frames collected during a collection"""
+    maximum_readings_per_frame: int = 1000
+    """
+    Maximum number of readings per frame
 
-    minimum_values_per_reading: int
+    Actual readings may be lower if higher frame rate is required
+    """
+
+    readings_per_frame: int = 1000
+    """The number of readings per frame"""
+
+    minimum_values_per_reading: int = 5
     """A lower bound on the values that will be averaged to create a single reading"""
-
-    idle_acquire: bool
-    """Whether the tetramm should be left acquiring after a collection"""
-
-    idle_trigger_state: TetrammTrigger
-    """The state the trigger should be left in when no collection is running"""
-
-    idle_averaging_time: float
-    """Time that readings should be averaged over then no collection is running"""
-
-    idle_values_per_reading: int
-    """The values to be averaged for each sample when no collection is running"""
-
-    collection_resolution: TetrammResolution = TetrammResolution.TwentyFourBits
-    """Default resolution to be used for collections"""
-
-    collection_geometry: TetrammGeometry = TetrammGeometry.Square
-    """Default geometry to be used for collections"""
-
-    collection_range: TetrammRange = TetrammRange.uA
-    """Default range to be used for collections"""
 
     def __init__(
         self,
@@ -121,6 +110,27 @@ class TetrammDriver(Device):
 
         super().__init__(name=name)
 
+    @property
+    def max_frame_rate(self) -> float:
+        """Max frame rate in Hz for the current configuration"""
+        return 1 / self.minimum_frame_time
+
+    @max_frame_rate.setter
+    def max_frame_rate(self, mfr: float):
+        self.minimum_frame_time = 1 / mfr
+
+    @property
+    def minimum_frame_time(self) -> float:
+        sample_time = self.minimum_values_per_reading / self.base_sample_rate
+        return self.readings_per_frame * sample_time
+
+    @minimum_frame_time.setter
+    def minimum_frame_time(self, frame: float):
+        sample_time = self.minimum_values_per_reading / self.base_sample_rate
+        self.readings_per_frame = min(
+            self.maximum_readings_per_frame, int(floor(frame / sample_time))
+        )
+
 
 class TetrammController(DetectorControl):
     def __init__(
@@ -128,14 +138,7 @@ class TetrammController(DetectorControl):
         drv: TetrammDriver,
         minimum_values_per_reading=5,
         maximum_readings_per_frame=1_000,
-        collection_resolution=TetrammResolution.TwentyFourBits,
-        collection_geometry=TetrammGeometry.Square,
-        collection_range=TetrammRange.uA,
         base_sample_rate=100_000,
-        idle_acquire=True,
-        idle_trigger_state=TetrammTrigger.FreeRun,
-        idle_averaging_time=0.1,
-        idle_values_per_reading=10,
     ):
         self._drv = drv
 
@@ -143,17 +146,8 @@ class TetrammController(DetectorControl):
         self.maximum_readings_per_frame = maximum_readings_per_frame
         self.minimum_values_per_reading = minimum_values_per_reading
 
-        self.idle_acquire = idle_acquire
-        self.idle_trigger_state = idle_trigger_state
-        self.idle_averaging_time = idle_averaging_time
-        self.idle_values_per_reading = idle_values_per_reading
-
-        self.collection_resolution = collection_resolution
-        self.collection_geometry = collection_geometry
-        self.collection_range = collection_range
-
     def get_deadtime(self, _exposure: float) -> float:
-        return 0.01  # Picked from a hat
+        return 0.001  # Picked from a hat
 
     @AsyncStatus.wrap
     async def arm(
@@ -166,36 +160,72 @@ class TetrammController(DetectorControl):
             raise Exception("Tetramm has no concept of setting a number of exposures.")
         if exposure is None:
             raise ValueError("Exposure time is required")
-        if trigger != DetectorTrigger.constant_gate:
-            raise ValueError("Only constant gate triggers are supported")
+        if trigger != DetectorTrigger.edge_trigger:
+            raise ValueError("Only edge triggers are supported")
 
-        await self._drv.acquire.set(TetrammAcquire.Stop)
         await self.set_frame_time(exposure)
-        await self._drv.trigger_mode.set(TetrammTrigger.ExtTrigger)
-        await self._drv.acquire.set(TetrammAcquire.Stop)  # remove?
-        asyncio.gather(
-            self._drv.resolution.set(self.collection_resolution),
-            self._drv.range.set(self.collection_range),
-            self._drv.geometry.set(self.collection_geometry),
-        )
         await self._drv.acquire.set(TetrammAcquire.Acquire)
 
     async def disarm(self):
         await self._drv.acquire.set(TetrammAcquire.Stop)
-        asyncio.gather(
-            self._drv.averaging_time.set(self.idle_averaging_time),
-            self._drv.values_per_reading.set(self.idle_values_per_reading),
-            self._drv.trigger_mode.set(self.idle_trigger_state),
-        )
 
     async def set_frame_time(self, seconds):
-        await self._drv.averaging_time.set(seconds / 1_000)
-        values_per_reading = (
-            seconds * self._drv.base_sample_rate / self._drv.maximum_readings_per_frame
+        # It may not always be possible to set the exact collection time if the
+        # exposure is not a multiple of the base sample rate. In this case it
+        # will always be the closest collection time *below* the requested time
+        # to ensure that triggers are not missed.
+        values_per_reading = int(
+            floor(seconds * self._drv.base_sample_rate / self._drv.readings_per_frame)
         )
         if values_per_reading < self._drv.minimum_values_per_reading:
-            values_per_reading = self._drv.minimum_values_per_reading
+            raise ValueError(
+                f"Exposure ({seconds}) too short to collect required number of readings {self._drv.readings_per_frame}"
+            )
+        await self._drv.averaging_time.set(seconds / 1_000)
         await self._drv.values_per_reading.set(values_per_reading)
+
+
+IDLE_TETRAMM = {
+    "acquire": TetrammAcquire.Stop,
+}
+
+COMMON_TETRAMM = {
+    "range": TetrammRange.uA,
+    "channels": 4,
+    "resolution": TetrammResolution.TwentyFourBits,
+    "bias": False,
+    "bias_volts": 0,
+    "geometry": TetrammGeometry.Square,
+}
+
+TRIGGERED_TETRAMM = {
+    **COMMON_TETRAMM,
+    "trigger_mode": TetrammTrigger.ExtTrigger,
+}
+
+FREE_TETRAMM = {
+    **COMMON_TETRAMM,
+    "sample_time": 0.1,
+    "values_per_reading": 10,
+    "acquire": TetrammAcquire.Acquire,
+    "trigger_mode": TetrammTrigger.FreeRun,
+}
+
+
+def triggered_tetramm(dev: TetrammDriver) -> Generator[Msg, None, None]:
+    sigs = walk_rw_signals(dev)
+    yield from set_signal_values(
+        sigs,
+        [
+            IDLE_TETRAMM,
+            TRIGGERED_TETRAMM,
+        ],
+    )
+
+
+def free_tetramm(dev: TetrammDriver) -> Generator[Msg, None, None]:
+    sigs = walk_rw_signals(dev)
+    yield from set_signal_values(sigs, [IDLE_TETRAMM, FREE_TETRAMM])
 
 
 class TetrammDetector(StandardDetector):
