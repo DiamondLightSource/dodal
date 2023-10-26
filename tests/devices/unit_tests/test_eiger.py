@@ -217,7 +217,7 @@ def test_stage_enables_roi_mode_correctly(
     when(fake_eiger.odin).check_odin_initialised().thenReturn((True, ""))
 
     fake_eiger.detector_params.use_roi_mode = roi_mode
-
+    mock_await.return_value = Status(done=True)
     change_roi_mode_status = Status()
     fake_eiger.change_roi_mode = MagicMock(return_value=change_roi_mode_status)
 

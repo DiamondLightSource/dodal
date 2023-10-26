@@ -12,13 +12,13 @@ class StatusException(Exception):
 
 
 def get_bad_status():
-    status = Status()
+    status = Status(obj="Dodal test utils - get good status")
     status.set_exception(StatusException())
     return status
 
 
 def get_good_status():
-    status = Status()
+    status = Status(obj="Dodal test utils - get good status")
     status.set_finished()
     return status
 
@@ -50,8 +50,19 @@ def test_check_call_back_error_gives_correct_error():
 
 
 def test_wrap_function_callback():
-    dummy_func = MagicMock(return_value=Status)
-    run_functions_without_blocking([lambda: get_good_status(), dummy_func])
+    dummy_func = MagicMock(return_value=Status())
+    returned_status = run_functions_without_blocking([lambda: get_good_status(), dummy_func])
+    dummy_func.assert_called_once
+    try:
+        returned_status.wait(0.1)
+    except:
+        pass
+
+
+def test_wrap_function_callback_errors_on_wrong_return_type():
+    dummy_func = MagicMock(return_value=3)
+    with pytest.raises(ValueError):
+        run_functions_without_blocking([lambda: get_good_status(), dummy_func])
     dummy_func.assert_called_once
 
 

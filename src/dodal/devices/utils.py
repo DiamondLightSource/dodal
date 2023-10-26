@@ -48,6 +48,7 @@ def run_functions_without_blocking(
     full_status = Status(obj=associated_obj, timeout=timeout)
 
     def closing_func(old_status: Status):
+        LOGGER.info(f"Status closing_func got {old_status}")
         if old_status.exception() is not None:
             set_global_exception_and_log(old_status)
         else:
@@ -69,6 +70,8 @@ def run_functions_without_blocking(
                 f"wrap_func attempted to wrap {current_func} when it does not return a Status"
             )
             raise ValueError(f"{current_func} does not return a Status")
+
+        LOGGER.info(f"Status of run func {status}")
 
         status.add_callback(next_func)
 
