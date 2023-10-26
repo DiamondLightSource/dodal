@@ -55,7 +55,7 @@ def test_wrap_function_callback():
     dummy_func.assert_called_once
     try:
         returned_status.wait(0.1)
-    except:
+    except(BaseException):
         pass
 
 
