@@ -61,7 +61,7 @@ class GridScanParams(BaseModel, AbstractExperimentParameterBase):
     x_step_size: float = 0.1
     y_step_size: float = 0.1
     z_step_size: float = 0.1
-    dwell_time: float = 0.1
+    dwell_time_ms: float = 0.1
     x_start: float = 0.1
     y1_start: float = 0.1
     y2_start: float = 0.1
@@ -214,7 +214,7 @@ class FastGridScan(Device):
     y_step_size: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "Y_STEP_SIZE")
     z_step_size: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "Z_STEP_SIZE")
 
-    dwell_time: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "DWELL_TIME")
+    dwell_time_ms: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "DWELL_TIME")
 
     x_start: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "X_START")
     y1_start: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "Y_START")
@@ -297,8 +297,8 @@ def set_fast_grid_scan_params(scan: FastGridScan, params: GridScanParams):
         params.y_step_size,
         scan.z_step_size,
         params.z_step_size,
-        scan.dwell_time,
-        params.dwell_time,
+        scan.dwell_time_ms,
+        params.dwell_time_ms,
         scan.x_start,
         params.x_start,
         scan.y1_start,

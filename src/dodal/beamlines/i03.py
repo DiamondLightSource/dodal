@@ -12,6 +12,7 @@ from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import FastGridScan
 from dodal.devices.flux import Flux
 from dodal.devices.oav.oav_detector import OAV
+from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.s4_slit_gaps import S4SlitGaps
 from dodal.devices.sample_shutter import SampleShutter
 from dodal.devices.smargon import Smargon
@@ -146,6 +147,22 @@ def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
         OAV,
         "oav",
         "",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+@skip_device(lambda: BL == "s03")
+def pin_tip_detection(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> PinTipDetection:
+    """Get the i03 pin tip detection device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        PinTipDetection,
+        "pin_tip_detection",
+        "-DI-OAV-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
     )

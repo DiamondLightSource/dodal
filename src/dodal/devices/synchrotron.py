@@ -1,4 +1,17 @@
+from enum import Enum
+
 from ophyd import Component, Device, EpicsSignal
+
+
+class SynchrotronMode(Enum):
+    SHUTDOWN = "Shutdown"
+    INJECTION = "Injection"
+    NOBEAM = "No Beam"
+    DEV = "Mach. Dev."
+    USER = "User"
+    SPECIAL = "Special"
+    STARTUP = "BL Startup"
+    UNKNOWN = "Unknown"
 
 
 class SynchrotoronMachineStatus(Device):
