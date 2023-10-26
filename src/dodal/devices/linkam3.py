@@ -19,6 +19,13 @@ class PumpControl(Enum):
 
 class Linkam3(StandardReadable):
     tolerance: float = 0.1
+    """
+    The deadband around the setpoint within which the position is assumed to
+    have been reached
+    """
+
+    settle_time: int = 10
+    """The delay between reaching the setpoint and the move being considered complete"""
 
     def __init__(self, prefix: str, name: str = ""):
         self.temp = epics_signal_r(float, prefix + ":TEMP")
@@ -51,6 +58,7 @@ class Linkam3(StandardReadable):
         self.set_readable_signals(
             read=(self.temp,), config=(self.ramp_rate, self.speed, self.set_point)
         )
+
         super().__init__(name=name)
 
     async def _move(self, new_position: float, watchers: List[Callable] = []):
@@ -71,6 +79,7 @@ class Linkam3(StandardReadable):
                 )
             if abs(current_position - new_position) < self.tolerance:
                 logger.info("At set point")
+                await asyncio.sleep(self.settle_time)
                 break
 
     def set(self, new_position: float, timeout: Optional[float] = None) -> AsyncStatus:
