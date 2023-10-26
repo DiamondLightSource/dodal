@@ -118,7 +118,7 @@ class AdAravisDetector(SingleTriggerV33, DetectorBase):
 ## Ophyd Async
 
 
-class TriggerSourceMako(Enum):
+class TriggerSourceMako(str, Enum):
     freerun = "Freerun"
     line_1 = "Line1"
     line_2 = "Line2"
@@ -128,7 +128,7 @@ class TriggerSourceMako(Enum):
     # action_1 = "Action1"
 
 
-class TriggerModeMako(Enum):
+class TriggerModeMako(str, Enum):
     on = "On"
     off = "Off"
 
