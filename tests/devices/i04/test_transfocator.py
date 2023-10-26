@@ -62,5 +62,5 @@ def test_when_beamsize_set_then_set_correctly_on_device_and_waited_on(
 
     try:
         transfocator_statuses.wait(0.1)
-    except(BaseException):
+    except BaseException:
         pass
