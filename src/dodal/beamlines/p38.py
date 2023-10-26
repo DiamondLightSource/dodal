@@ -7,7 +7,7 @@ PREFIX: str = BeamlinePrefix("p38").beamline_prefix
 
 def d11() -> SumHDFAravisDetector:
     return SumHDFAravisDetector(
-        f"{PREFIX}-DI-DCAM-03:",
+        f"{PREFIX}-DI-DCAM-03",
         directory_provider=get_directory_provider(),
         name="d11",
     )
@@ -15,7 +15,7 @@ def d11() -> SumHDFAravisDetector:
 
 def d12() -> SumHDFAravisDetector:
     return SumHDFAravisDetector(
-        f"{PREFIX}-DI-DCAM-04:",
+        f"{PREFIX}-DI-DCAM-04",
         directory_provider=get_directory_provider(),
         name="d12",
     )
