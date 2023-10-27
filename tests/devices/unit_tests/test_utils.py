@@ -50,15 +50,15 @@ def test_check_call_back_error_gives_correct_error():
 
 
 def test_wrap_function_callback():
-    dummy_func = MagicMock(return_value=Status(done=True, success=True))
+    dummy_func = MagicMock(return_value=Status())
     returned_status = run_functions_without_blocking(
         [lambda: get_good_status(), dummy_func]
     )
-    dummy_func.assert_called_once()
     try:
         returned_status.wait(0.1)
     except BaseException:
         pass
+    dummy_func.assert_called_once()
 
 
 def test_wrap_function_callback_errors_on_wrong_return_type():
