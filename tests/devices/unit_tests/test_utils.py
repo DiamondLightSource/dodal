@@ -28,7 +28,7 @@ def test_run_functions_without_blocking_errors_on_invalid_func():
         return 5
 
     with pytest.raises(ValueError):
-        run_functions_without_blocking([bad_func], 5)
+        run_functions_without_blocking([bad_func], 5)  # type: ignore
 
 
 def test_full_status_gives_error_if_intermediate_status_fails():
@@ -39,7 +39,7 @@ def test_full_status_gives_error_if_intermediate_status_fails():
 
 def test_check_call_back_error_gives_correct_error():
     LOGGER.error = MagicMock()
-
+    returned_status = Status(done=True, success=True)
     with pytest.raises(StatusException):
         returned_status = run_functions_without_blocking([get_bad_status])
         returned_status.wait(0.1)
@@ -50,11 +50,11 @@ def test_check_call_back_error_gives_correct_error():
 
 
 def test_wrap_function_callback():
-    dummy_func = MagicMock(return_value=Status())
+    dummy_func = MagicMock(return_value=Status(done=True, success=True))
     returned_status = run_functions_without_blocking(
         [lambda: get_good_status(), dummy_func]
     )
-    dummy_func.assert_called_once
+    dummy_func.assert_called_once()
     try:
         returned_status.wait(0.1)
     except BaseException:
@@ -63,9 +63,16 @@ def test_wrap_function_callback():
 
 def test_wrap_function_callback_errors_on_wrong_return_type():
     dummy_func = MagicMock(return_value=3)
+    returned_status = Status(done=True, success=True)
     with pytest.raises(ValueError):
-        run_functions_without_blocking([lambda: get_good_status(), dummy_func])
-    dummy_func.assert_called_once
+        returned_status = run_functions_without_blocking(
+            [lambda: get_good_status(), dummy_func]
+        )
+    dummy_func.assert_called_once()
+    try:
+        returned_status.wait(0.1)
+    except BaseException:
+        pass
 
 
 def test_status_points_to_provided_device_object():
