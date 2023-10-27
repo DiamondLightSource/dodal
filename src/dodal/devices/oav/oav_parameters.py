@@ -17,6 +17,9 @@ OAV_CONFIG_FILE_DEFAULTS = {
 
 
 class OAVParameters:
+    # The zoom level as a float e.g. 2.0
+    zoom: float
+
     def __init__(
         self,
         context="loopCentring",
