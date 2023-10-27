@@ -4,6 +4,8 @@ from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import FastGridScan
 from dodal.devices.vmxm.vmxm_attenuator import VmxmAttenuator
 from dodal.devices.zebra import Zebra
+from dodal.devices.backlight import Backlight
+from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import get_beamline_name, skip_device
 
@@ -75,4 +77,38 @@ def attenuator(
         "-OP-ATTN-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+    )
+
+
+
+@skip_device(lambda: BL == SIM_BEAMLINE_NAME)
+def backlight(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Backlight:
+    """Get the i03 backlight device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        device_factory=Backlight,
+        name="backlight",
+        prefix="",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+    )
+
+
+@skip_device(lambda: BL == SIM_BEAMLINE_NAME)
+def synchrotron(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Synchrotron:
+    """Get the i03 synchrotron device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        Synchrotron,
+        "synchrotron",
+        "",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        bl_prefix=False,
     )

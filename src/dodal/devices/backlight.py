@@ -7,9 +7,9 @@ class Backlight(Device):
     OUT = 0
     IN = 1
 
-    pos: EpicsSignal = Component(EpicsSignal, "-EA-BL-01:CTRL")
+    pos: EpicsSignal = Component(EpicsSignal, "-DI-IOC-02:LED:INOUT")
     # Toggle to switch it On or Off
-    toggle: EpicsSignal = Component(EpicsSignal, "-EA-BLIT-01:TOGGLE")
+    toggle: EpicsSignal = Component(EpicsSignal, "-EA-OAV-01:FZOOM:TOGGLE")
 
     def set(self, position: int) -> StatusBase:
         status = self.pos.set(position)

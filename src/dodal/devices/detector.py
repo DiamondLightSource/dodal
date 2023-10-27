@@ -4,7 +4,7 @@ from typing import Any, Optional, Tuple
 from pydantic import BaseModel, validator
 
 from dodal.devices.det_dim_constants import (
-    EIGER2_X_16M_SIZE,
+    EIGER2_X_9M_SIZE,
     DetectorSize,
     DetectorSizeConstants,
     constants_from_type,
@@ -40,7 +40,7 @@ class DetectorParams(BaseModel):
     use_roi_mode: bool
     det_dist_to_beam_converter_path: str
     trigger_mode: TriggerMode = TriggerMode.SET_FRAMES
-    detector_size_constants: DetectorSizeConstants = EIGER2_X_16M_SIZE
+    detector_size_constants: DetectorSizeConstants = EIGER2_X_9M_SIZE # This looks like it's always using the default and not taken from the json
     beam_xy_converter: DetectorDistanceToBeamXYConverter = None
 
     class Config:

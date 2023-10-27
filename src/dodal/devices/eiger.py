@@ -58,6 +58,8 @@ class EigerDetector(Device):
         return det
 
     def set_detector_parameters(self, detector_params: DetectorParams):
+        LOGGER.info(f"Exposure time {detector_params.exposure_time}")
+
         self.detector_params = detector_params
         if self.detector_params is None:
             raise Exception("Parameters for scan must be specified")
@@ -103,7 +105,7 @@ class EigerDetector(Device):
             self.async_stage().wait(timeout=self.ARMING_TIMEOUT)
 
     def stop_odin_when_all_frames_collected(self):
-        LOGGER.info("Waiting on all frames")
+        LOGGER.info(f"Waiting on all frames, expected {self.detector_params.full_number_of_images}")
         try:
             await_value(
                 self.odin.file_writer.num_captured,
@@ -151,6 +153,8 @@ class EigerDetector(Device):
             else self.detector_params.detector_size_constants.det_size_pixels
         )
 
+        LOGGER.info(f"Setting height and width on odin to {detector_dimensions.height}, {detector_dimensions.width}")
+
         status = self.cam.roi_mode.set(
             1 if enable else 0, timeout=self.GENERAL_STATUS_TIMEOUT
         )
@@ -170,6 +174,7 @@ class EigerDetector(Device):
         return status
 
     def set_cam_pvs(self) -> AndStatus:
+        LOGGER.info("Setting cam pvs")
         assert self.detector_params is not None
         status = self.cam.acquire_time.set(
             self.detector_params.exposure_time, timeout=self.GENERAL_STATUS_TIMEOUT
@@ -188,6 +193,7 @@ class EigerDetector(Device):
         return status
 
     def set_odin_number_of_frame_chunks(self) -> Status:
+        LOGGER.info("Setting num frames")
         assert self.detector_params is not None
         status = self.odin.file_writer.num_frames_chunks.set(
             1, timeout=self.GENERAL_STATUS_TIMEOUT
@@ -195,6 +201,7 @@ class EigerDetector(Device):
         return status
 
     def set_odin_pvs(self) -> Status:
+        LOGGER.info("Setting odin PVs")
         assert self.detector_params is not None
         file_prefix = self.detector_params.full_filename
         status = self.odin.file_writer.file_path.set(
@@ -212,6 +219,7 @@ class EigerDetector(Device):
         return status
 
     def set_mx_settings_pvs(self):
+        LOGGER.info("Setting mx settings")
         assert self.detector_params is not None
         beam_x_pixels, beam_y_pixels = self.detector_params.get_beam_position_pixels(
             self.detector_params.detector_distance
@@ -241,7 +249,7 @@ class EigerDetector(Device):
             tolerance (float, optional): If the energy is already set to within
                 this tolerance it is not set again. Defaults to 0.1eV.
         """
-
+        LOGGER.info("Setting threshold energy")
         current_energy = self.cam.photon_energy.get()
         if abs(current_energy - energy) > tolerance:
             return self.cam.photon_energy.set(
@@ -257,7 +265,7 @@ class EigerDetector(Device):
         during the datacollection. The number of images is the number of images per
         trigger.
         """
-
+        LOGGER.info("Num triggers")
         assert self.detector_params is not None
         status = self.cam.num_images.set(
             self.detector_params.num_images_per_trigger,
@@ -284,6 +292,7 @@ class EigerDetector(Device):
         return status
 
     def _wait_for_odin_status(self) -> Status:
+        LOGGER.info("Wait for odin status")
         self.forward_bit_depth_to_filewriter()
         status = self.odin.file_writer.capture.set(
             1, timeout=self.GENERAL_STATUS_TIMEOUT
@@ -313,8 +322,9 @@ class EigerDetector(Device):
     def do_arming_chain(self) -> Status:
         functions_to_do_arm = []
         detector_params: DetectorParams = self.detector_params
-        if detector_params.use_roi_mode:
-            functions_to_do_arm.append(lambda: self.change_roi_mode(enable=True))
+        # Default is no ROI on i03 so we only switych one way
+        #if detector_params.use_roi_mode:
+        functions_to_do_arm.append(lambda: self.change_roi_mode(detector_params.use_roi_mode))
 
         functions_to_do_arm.extend(
             [

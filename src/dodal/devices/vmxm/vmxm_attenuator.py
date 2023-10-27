@@ -23,8 +23,6 @@ class VmxmAttenuator(Device):
         self.use_current_energy.set(1).wait()
         LOGGER.info(f"Setting desired transmission to {transmission}")
         self.desired_transmission.set(transmission).wait()
-        LOGGER.info("Sending change filter command")
-        self.change.set(1).wait()
 
         status = Status(done=True, success=True)
         status &= await_value(self.filter1_inpos, 1, timeout=10)
