@@ -1,6 +1,6 @@
 from typing import Optional
 
-from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
+from ophyd import Component, Device, EpicsSignal, EpicsSignalRO, Kind
 from ophyd.status import Status, SubscriptionStatus
 
 from dodal.devices.detector import DetectorParams
@@ -13,9 +13,15 @@ class AtteunatorFilter(Device):
 
 
 class Attenuator(Device):
-    # Sets transmission - range 0-1
-    def set(self, transmission) -> SubscriptionStatus:
-        """Get desired states and calculated states, return a status which is complete once they are equal"""
+    """Any reference to transmission (both read and write) in this Device is fraction
+    e.g. 0-1"""
+
+    def set(self, transmission: float) -> SubscriptionStatus:
+        """Set the transmission to the fractional value given.
+        Args:
+            transmission (float): A fraction to set transmission to between 0-1
+        Get desired states and calculated states, return a status which is complete once they are equal
+        """
 
         LOGGER.info("Using current energy ")
         self.use_current_energy.set(1).wait()
@@ -72,7 +78,7 @@ class Attenuator(Device):
         EpicsSignal, "E2WL:USECURRENTENERGY.PROC"
     )
     change: EpicsSignal = Component(EpicsSignal, "FANOUT")
-    actual_transmission: EpicsSignal = Component(EpicsSignal, "MATCH")
+    actual_transmission: EpicsSignal = Component(EpicsSignal, "MATCH", kind=Kind.hinted)
 
     detector_params: Optional[DetectorParams] = None
 

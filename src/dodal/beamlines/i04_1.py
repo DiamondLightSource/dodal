@@ -30,9 +30,9 @@ def backlight(
     If this is called when already instantiated in i04_1, it will return the existing object.
     """
     return device_instantiation(
-        device=Backlight,
+        device_factory=Backlight,
         name="backlight",
-        prefix="-EA-BL-01:",
+        prefix="",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )
@@ -54,7 +54,7 @@ def eiger(
             eiger.set_detector_parameters(params)
 
     return device_instantiation(
-        device=EigerDetector,
+        device_factory=EigerDetector,
         name="eiger",
         prefix="-EA-EIGER-01:",
         wait=wait_for_connection,

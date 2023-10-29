@@ -50,8 +50,8 @@ def test_interpolate_beam_xy_from_det_distance(
     axis: Axis,
     expected_value: float,
 ):
-    assert (
-        type(fake_converter.get_beam_xy_from_det_dist(detector_distance, axis)) == float
+    assert isinstance(
+        fake_converter.get_beam_xy_from_det_dist(detector_distance, axis), float
     )
 
     assert (

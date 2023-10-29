@@ -16,9 +16,7 @@ if __name__ == "__main__":
     os.environ["BEAMLINE"] = _beamline_environment_variable
     from dodal.beamlines import i04_1
 
-    message_template = "Making all %s devices"
-    making_all_message = message_template % _beamline_environment_variable
-    print(making_all_message)
+    print(f"Making all {_beamline_environment_variable} devices")
 
     make_all_devices(i04_1)
     print("Successfully connected")

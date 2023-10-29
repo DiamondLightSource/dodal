@@ -12,11 +12,13 @@ from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import FastGridScan
 from dodal.devices.flux import Flux
 from dodal.devices.oav.oav_detector import OAV
+from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.s4_slit_gaps import S4SlitGaps
 from dodal.devices.sample_shutter import SampleShutter
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import Undulator
+from dodal.devices.xbpm_feedback import XBPMFeedback
 from dodal.devices.xspress3_mini.xspress3_mini import Xspress3Mini
 from dodal.devices.zebra import Zebra
 from dodal.log import set_beamline as set_log_beamline
@@ -33,7 +35,7 @@ def dcm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return device_instantiation(
-        device=DCM,
+        device_factory=DCM,
         name="dcm",
         prefix="",
         wait=wait_for_connection,
@@ -56,7 +58,7 @@ def aperture_scatterguard(
             a_s.load_aperture_positions(aperture_positions)
 
     return device_instantiation(
-        device=ApertureScatterguard,
+        device_factory=ApertureScatterguard,
         name="aperture_scatterguard",
         prefix="",
         wait=wait_for_connection,
@@ -72,9 +74,9 @@ def backlight(
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return device_instantiation(
-        device=Backlight,
+        device_factory=Backlight,
         name="backlight",
-        prefix="-EA-BL-01:",
+        prefix="",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )
@@ -88,7 +90,7 @@ def detector_motion(
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return device_instantiation(
-        device=DetectorMotion,
+        device_factory=DetectorMotion,
         name="detector_motion",
         prefix="",
         wait=wait_for_connection,
@@ -112,7 +114,7 @@ def eiger(
             eiger.set_detector_parameters(params)
 
     return device_instantiation(
-        device=EigerDetector,
+        device_factory=EigerDetector,
         name="eiger",
         prefix="-EA-EIGER-01:",
         wait=wait_for_connection,
@@ -128,7 +130,7 @@ def fast_grid_scan(
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return device_instantiation(
-        device=FastGridScan,
+        device_factory=FastGridScan,
         name="fast_grid_scan",
         prefix="-MO-SGON-01:FGS:",
         wait=wait_for_connection,
@@ -145,6 +147,22 @@ def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
         OAV,
         "oav",
         "",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+@skip_device(lambda: BL == "s03")
+def pin_tip_detection(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> PinTipDetection:
+    """Get the i03 pin tip detection device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        PinTipDetection,
+        "pin_tip_detection",
+        "-DI-OAV-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
@@ -280,7 +298,22 @@ def flux(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) ->
     return device_instantiation(
         Flux,
         "flux",
-        "-MO-MAPT-01:Y:",
+        "-MO-FLUX-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+def xbpm_feedback(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Flux:
+    """Get the i03 XBPM feeback device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        XBPMFeedback,
+        "xbpm_feedback",
+        "",
         wait_for_connection,
         fake_with_ophyd_sim,
     )

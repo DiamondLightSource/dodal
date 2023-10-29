@@ -2,10 +2,10 @@ from typing import Optional
 
 from dodal.beamlines.beamline_utils import BL, device_instantiation
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.backlight import Backlight
 from dodal.devices.detector import DetectorParams
-from dodal.devices.detector_motion import DetectorMotion
 from dodal.devices.eiger import EigerDetector
+from dodal.devices.i24.dual_backlight import DualBacklight
+from dodal.devices.i24.I24_detector_motion import DetectorMotion
 from dodal.devices.i24.i24_vgonio import VGonio
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.zebra import Zebra
@@ -19,14 +19,14 @@ set_utils_beamline(BL)
 
 def backlight(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Backlight:
+) -> DualBacklight:
     """Get the i24 backlight device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i24, it will return the existing object.
     """
     return device_instantiation(
-        device=Backlight,
+        device_factory=DualBacklight,
         name="backlight",
-        prefix="-MO-BL-01:",
+        prefix="",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )
@@ -40,9 +40,9 @@ def detector_motion(
     If this is called when already instantiated in i24, it will return the existing object.
     """
     return device_instantiation(
-        device=DetectorMotion,
+        device_factory=DetectorMotion,
         name="detector_motion",
-        prefix="-MO-DET-01:",
+        prefix="-EA-DET-01:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )
@@ -64,7 +64,7 @@ def eiger(
             eiger.set_detector_parameters(params)
 
     return device_instantiation(
-        device=EigerDetector,
+        device_factory=EigerDetector,
         name="eiger",
         prefix="-EA-EIGER-01:",
         wait=wait_for_connection,
