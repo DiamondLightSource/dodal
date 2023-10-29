@@ -29,6 +29,7 @@ jobs:
         with:
           requirements_file: requirements-dev-3.x.txt
           install_options: -e .[dev]
+          python_version: "3.11"
 
       - name: Build docs
         run: tox -e docs
