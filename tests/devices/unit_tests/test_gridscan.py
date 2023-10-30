@@ -12,7 +12,7 @@ from dodal.devices.fast_grid_scan import (
     GridScanParams,
     set_fast_grid_scan_params,
 )
-from dodal.devices.smargon import Smargon
+from dodal.devices.i23.gonio import Gonio
 
 
 @pytest.fixture
@@ -126,9 +126,9 @@ def test_running_finished_with_all_images_done_then_complete_status_finishes_not
     assert complete_status.exception() is None
 
 
-def create_motor_bundle_with_limits(low_limit, high_limit) -> Smargon:
-    FakeSmargon = make_fake_device(Smargon)
-    grid_scan_motor_bundle: Smargon = FakeSmargon(name="test")
+def create_motor_bundle_with_limits(low_limit, high_limit) -> Gonio:
+    FakeGonio = make_fake_device(Gonio)
+    grid_scan_motor_bundle: Gonio = FakeGonio(name="test")
     grid_scan_motor_bundle.wait_for_connection()
     for axis in [
         grid_scan_motor_bundle.x,

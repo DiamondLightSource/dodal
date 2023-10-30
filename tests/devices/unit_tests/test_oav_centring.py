@@ -49,9 +49,9 @@ def mock_parameters():
 
 
 @pytest.fixture
-def mock_smargon():
-    smargon: Smargon = make_fake_device(Smargon)(name="smargon")
-    smargon.wait_for_connection = do_nothing
+async def mock_smargon():
+    smargon: Smargon = make_fake_device(Smargon)(prefix="", name="smargon")
+    await smargon.connect(sim=True)
     return smargon
 
 

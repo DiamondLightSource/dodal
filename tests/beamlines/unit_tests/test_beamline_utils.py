@@ -52,6 +52,8 @@ def test_instantiate_function_fake_makes_fake():
 
 
 def test_clear_devices():
+    # Bluesky RE needed for ophyd_async
+    RE()
     beamline_utils.clear_devices()
     devices = make_all_devices(i03, fake_with_ophyd_sim=True)
     assert len(beamline_utils.ACTIVE_DEVICES) == len(devices.keys())
@@ -60,6 +62,8 @@ def test_clear_devices():
 
 
 def test_device_is_new_after_clearing():
+    # Bluesky RE needed for ophyd_async
+    RE()
     beamline_utils.clear_devices()
 
     def _make_devices_and_get_id():

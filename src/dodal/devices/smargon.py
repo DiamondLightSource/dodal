@@ -1,13 +1,13 @@
+from asyncio import wait_for
 from enum import Enum
+from typing import Iterator, Optional, Tuple
 
-from ophyd import Component as Cpt
-from ophyd import Device, EpicsMotor, EpicsSignal
-from ophyd.epics_motor import MotorBundle
-from ophyd.status import Status
+import numpy as np
+from ophyd_async.core import AsyncStatus, Device
+from ophyd_async.epics.motion.motor import Motor
+from ophyd_async.epics.signal import epics_signal_r
 
-from dodal.devices.motors import MotorLimitHelper, XYZLimitBundle
-from dodal.devices.status import await_value
-from dodal.devices.utils import run_functions_without_blocking
+from dodal.devices.ophyd_async_utils import SetProcWhenEnabledSignal
 
 
 class StubPosition(Enum):
@@ -24,31 +24,58 @@ class StubOffsets(Device):
     set them so that the current position is zero or to pre-defined positions.
     """
 
-    center_at_current_position: EpicsSignal = Cpt(EpicsSignal, "CENTER_CS.PROC")
-    center_at_current_position_enabled: EpicsSignal = Cpt(EpicsSignal, "CENTER_CS.DISP")
+    def __init__(self, prefix: str) -> None:
+        self.center_at_current_position = SetProcWhenEnabledSignal(f"{prefix}CENTER_CS")
+        self.to_robot_load = SetProcWhenEnabledSignal(f"{prefix}SET_STUBS_TO_RL")
+        super().__init__()
 
-    to_robot_load: EpicsSignal = Cpt(EpicsSignal, "SET_STUBS_TO_RL.PROC")
-    to_robot_load_enabled: EpicsSignal = Cpt(EpicsSignal, "SET_STUBS_TO_RL.DISP")
+    def set(
+        self, new_position: StubPosition, timeout: Optional[float] = None
+    ) -> AsyncStatus:
+        if new_position == StubPosition.CURRENT_AS_CENTER:
+            return self.center_at_current_position.set(1)
+        elif new_position == StubPosition.RESEET_TO_ROBOT_LOAD:
+            return self.to_robot_load.set(1)
 
-    def set(self, pos: StubPosition) -> Status:
-        if pos == StubPosition.CURRENT_AS_CENTER:
-            status = run_functions_without_blocking(
-                [
-                    lambda: await_value(self.center_at_current_position_enabled, 0),
-                    lambda: self.center_at_current_position.set(1),
-                ]
+
+class XYZLimitsChecker(Device):
+    """Checks that a position is within the XYZ limits of the motor.
+    To use set the x, y, z vector to the device and read check `within_limits`
+    """
+
+    def __init__(self, prefix: str) -> None:
+        self.within_limits = False
+
+        axes = ["X", "Y", "Z"]
+        self.limit_signals = {
+            axis: (
+                epics_signal_r(float, f"{prefix}{axis}.LLM"),
+                epics_signal_r(float, f"{prefix}{axis}.HLM"),
             )
-        else:
-            status = run_functions_without_blocking(
-                [
-                    lambda: await_value(self.to_robot_load_enabled, 0),
-                    lambda: self.to_robot_load.set(1),
-                ]
+            for axis in axes
+        }
+
+    def children(self) -> Iterator[Tuple[str, Device]]:
+        for attr, signals in self.limit_signals.items():
+            yield attr + "low_lim", signals[0]
+            yield attr + "high_lim", signals[1]
+        return super().children()
+
+    async def _check_limits(self, position: np.ndarray):
+        check_within_limits = True
+        for i, axis_limits in enumerate(self.limit_signals.values()):
+            check_within_limits &= (
+                (await axis_limits[0].get_value())
+                < position[i]
+                < (await axis_limits[1].get_value())
             )
-        return status
+        self.within_limits = check_within_limits
+
+    def set(self, position: np.ndarray) -> AsyncStatus:
+        return AsyncStatus(wait_for(self._check_limits(position), None))
 
 
-class Smargon(MotorBundle):
+class Smargon(Device):
     """
     Real motors added to allow stops following pin load (e.g. real_x1.stop() )
     X1 and X2 real motors provide compound chi motion as well as the compound X travel,
@@ -56,33 +83,27 @@ class Smargon(MotorBundle):
     Robot loading can nudge these and lead to errors.
     """
 
-    x: EpicsMotor = Cpt(EpicsMotor, "X")
-    y: EpicsMotor = Cpt(EpicsMotor, "Y")
-    z: EpicsMotor = Cpt(EpicsMotor, "Z")
-    chi: EpicsMotor = Cpt(EpicsMotor, "CHI")
-    phi: EpicsMotor = Cpt(EpicsMotor, "PHI")
-    omega: EpicsMotor = Cpt(EpicsMotor, "OMEGA")
+    def __init__(self, prefix: str, name: str) -> None:
+        self.prefix = prefix
 
-    real_x1: EpicsMotor = Cpt(EpicsMotor, "MOTOR_3")
-    real_x2: EpicsMotor = Cpt(EpicsMotor, "MOTOR_4")
-    real_y: EpicsMotor = Cpt(EpicsMotor, "MOTOR_1")
-    real_z: EpicsMotor = Cpt(EpicsMotor, "MOTOR_2")
-    real_phi: EpicsMotor = Cpt(EpicsMotor, "MOTOR_5")
-    real_chi: EpicsMotor = Cpt(EpicsMotor, "MOTOR_6")
+        self.x = Motor(f"{prefix}X")
+        self.x_low_lim = epics_signal_r(float, f"{prefix}X.LLM")
+        self.x_high_lim = epics_signal_r(float, f"{prefix}X.HLM")
 
-    stub_offsets: StubOffsets = Cpt(StubOffsets, "")
+        self.y = Motor(f"{prefix}Y")
+        self.z = Motor(f"{prefix}Z")
 
-    def get_xyz_limits(self) -> XYZLimitBundle:
-        """Get the limits for the x, y and z axes.
+        self.chi = Motor(f"{prefix}CHI")
+        self.phi = Motor(f"{prefix}PHI")
+        self.omega = Motor(f"{prefix}OMEGA")
 
-        Note that these limits may not yet be valid until wait_for_connection is called
-        on this MotorBundle.
+        self.real_x1 = Motor(f"{prefix}MOTOR_3")
+        self.real_x2 = Motor(f"{prefix}MOTOR_4")
+        self.real_y = Motor(f"{prefix}MOTOR_1")
+        self.real_z = Motor(f"{prefix}MOTOR_2")
+        self.real_phi = Motor(f"{prefix}MOTOR_5")
+        self.real_chi = Motor(f"{prefix}MOTOR_6")
 
-        Returns:
-            XYZLimitBundle: The limits for the underlying motors.
-        """
-        return XYZLimitBundle(
-            MotorLimitHelper(self.x),
-            MotorLimitHelper(self.y),
-            MotorLimitHelper(self.z),
-        )
+        self.stub_offsets = StubOffsets(prefix)
+        self.limit_checker = XYZLimitsChecker(prefix)
+        super().__init__(name)
