@@ -17,9 +17,9 @@ class HDFStatsPilatus(StandardDetector):
         name: str = "",
         config_sigs: Sequence[SignalR] = (),
     ):
-        self.drv = PilatusDriver(prefix + "DRV:")
-        self.hdf = NDFileHDF(prefix + "HDF:")
-        self.stats = NDPluginStats(prefix + "STATS:")
+        self.drv = PilatusDriver(prefix + "CAM:")
+        self.hdf = NDFileHDF(prefix + "HDF5:")
+        self.stats = NDPluginStats(prefix + "STAT:")
 
         super().__init__(
             PilatusController(self.drv),
