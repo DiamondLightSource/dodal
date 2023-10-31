@@ -1,10 +1,11 @@
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 from ophyd.status import Status
 
+from dodal import log
 from dodal.devices.utils import run_functions_without_blocking
-from dodal.log import LOGGER
+from dodal.log import LOGGER, GELFTCPHandler, logging, set_up_logging_handlers
 
 
 class StatusException(Exception):
@@ -66,6 +67,13 @@ def test_wrap_function_callback():
 
 
 def test_wrap_function_callback_errors_on_wrong_return_type():
+    for handler in LOGGER.handlers:
+        handler.close()
+    LOGGER.handlers = []
+    mock_graylog_handler_class = MagicMock(spec=GELFTCPHandler)
+    mock_graylog_handler_class.return_value.level = logging.DEBUG
+    with patch("dodal.log.GELFTCPHandler", mock_graylog_handler_class):
+        set_up_logging_handlers(None, False)
     dummy_func = MagicMock(return_value=3)
     returned_status = Status(done=True, success=True)
     returned_status = run_functions_without_blocking(
