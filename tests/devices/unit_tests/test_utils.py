@@ -3,7 +3,6 @@ from unittest.mock import MagicMock, patch
 import pytest
 from ophyd.status import Status
 
-from dodal import log
 from dodal.devices.utils import run_functions_without_blocking
 from dodal.log import LOGGER, GELFTCPHandler, logging, set_up_logging_handlers
 
@@ -82,18 +81,12 @@ def test_wrap_function_callback_errors_on_wrong_return_type():
     discard_status(returned_status)
     assert returned_status.success is False
     dummy_func.assert_called_once()
-    assert (
-        "wrap_func attempted to wrap"
-        in LOGGER.handlers[1].handle.call_args_list[1].args[0].message
+    log_messages = "".join(
+        [call.args[0].message for call in LOGGER.handlers[1].handle.call_args_list]
     )
-    assert (
-        " when it does not return a Status"
-        in LOGGER.handlers[1].handle.call_args_list[1].args[0].message
-    )
-    assert (
-        "An error was raised on a background thread"
-        in LOGGER.handlers[1].handle.call_args_list[2].args[0].message
-    )
+    assert "wrap_func attempted to wrap" in log_messages
+    assert " when it does not return a Status" in log_messages
+    assert "An error was raised on a background thread" in log_messages
 
 
 def test_status_points_to_provided_device_object():
