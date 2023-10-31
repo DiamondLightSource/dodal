@@ -16,4 +16,4 @@ def get_directory_provider() -> DirectoryProvider:
     if _SINGLETON is not None:
         return _SINGLETON
     else:
-        return StaticDirectoryProvider(tempfile.TemporaryFile(), "")
+        return StaticDirectoryProvider(tempfile.NamedTemporaryFile().name, "")
