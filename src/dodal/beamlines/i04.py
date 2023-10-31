@@ -61,19 +61,19 @@ def gonio_positioner(
     )
 
 
-# def sample_delivery_system(
-#     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-# ) -> XYZPositioner:
-#     """Get the i04 sample_delivery_system device, instantiate it if it hasn't already been.
-#     If this is called when already instantiated in i04, it will return the existing object.
-#     """
-#     return device_instantiation(
-#         XYZPositioner,
-#         "sample_delivery_system",
-#         "-MO-SDE-01:",
-#         wait_for_connection,
-#         fake_with_ophyd_sim,
-#     )
+def sample_delivery_system(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> XYZPositioner:
+    """Get the i04 sample_delivery_system device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i04, it will return the existing object.
+    """
+    return device_instantiation(
+        XYZPositioner,
+        "sample_delivery_system",
+        "-MO-SDE-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
 
 
 def ipin(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> IPin:
