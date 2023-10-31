@@ -115,11 +115,14 @@ def test_messages_logged_from_dodal_get_sent_to_graylog_and_file(
         handler.close()
     log.set_up_logging_handlers()
     mock_GELFTCPHandler.return_value.level = logging.DEBUG
+    log.set_up_logging_handlers()  # This logs once
     logger = log.LOGGER
     logger.info("test")
-    mock_filehandler_emit.assert_called()
+
     mock_GELFTCPHandler.assert_called_once_with("graylog2.diamond.ac.uk", 12218)
-    mock_GELFTCPHandler.return_value.handle.assert_called_once()
+
+    mock_GELFTCPHandler.return_value.handle.assert_called()
+    mock_filehandler_emit.assert_called()
 
 
 def test_when_EnhancedRollingFileHandler_reaches_max_size_then_rolls_over():
