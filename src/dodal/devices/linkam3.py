@@ -1,5 +1,4 @@
 import asyncio
-import logging
 import time
 from enum import Enum
 from typing import Callable, List, Optional
@@ -8,11 +7,8 @@ from bluesky.protocols import Location
 from ophyd_async.core import AsyncStatus, StandardReadable, observe_value
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
-logger = logging.getLogger("linkam3")
-logger.setLevel(logging.INFO)
 
-
-class PumpControl(Enum):
+class PumpControl(str, Enum):
     Manual = "Manual"
     Auto = "Auto"
 
@@ -62,13 +58,11 @@ class Linkam3(StandardReadable):
         super().__init__(name=name)
 
     async def _move(self, new_position: float, watchers: List[Callable] = []):
-        logger.info("Moving to %f", new_position)
         # time.monotonic won't go backwards in case of NTP corrections
         start = time.monotonic()
         old_position = await self.set_point.get_value()
         await self.set_point.set(new_position, wait=True)
         async for current_position in observe_value(self.temp):
-            logger.info("Currently %f", current_position)
             for watcher in watchers:
                 watcher(
                     name=self.name,
@@ -78,7 +72,6 @@ class Linkam3(StandardReadable):
                     time_elapsed=time.monotonic() - start,
                 )
             if abs(current_position - new_position) < self.tolerance:
-                logger.info("At set point")
                 await asyncio.sleep(self.settle_time)
                 break
 

@@ -19,30 +19,30 @@ from ophyd_async.epics.areadetector.writers import HDFWriter, NDFileHDF
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
 
-class TetrammAcquire(Enum):
+class TetrammAcquire(str, Enum):
     Acquire = "Acquire"
     Stop = "Stop"
 
 
-class TetrammRange(Enum):
+class TetrammRange(str, Enum):
     uA = "+- 120 uA"
     nA = "+- 120 nA"
 
 
-class TetrammTrigger(Enum):
+class TetrammTrigger(str, Enum):
     FreeRun = "Free run"
     ExtTrigger = "Ext. trig."
     ExtBulb = "Ext. bulb"
     ExtGate = "Ext. gate"
 
 
-class TetrammChannels(Enum):
+class TetrammChannels(str, Enum):
     One = "1"
     Two = "2"
     Four = "4"
 
 
-class TetrammResolution(Enum):
+class TetrammResolution(str, Enum):
     SixteenBits = "16 bits"
     TwentyFourBits = "24 bits"
 
@@ -55,7 +55,7 @@ class TetrammResolution(Enum):
             return "Unknown"
 
 
-class TetrammGeometry(Enum):
+class TetrammGeometry(str, Enum):
     Diamond = "Diamond"
     Square = "Square"
 
