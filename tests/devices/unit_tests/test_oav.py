@@ -15,7 +15,7 @@ from dodal.devices.oav.oav_detector import OAV
 @pytest.fixture
 def fake_oav() -> OAV:
     FakeOAV = make_fake_device(OAV)
-    fake_oav: OAV = FakeOAV(name="test")
+    fake_oav: OAV = FakeOAV(name="test fake OAV")
 
     fake_oav.snapshot.url.sim_put("http://test.url")
     fake_oav.snapshot.filename.put("test filename")

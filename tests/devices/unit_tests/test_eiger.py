@@ -55,7 +55,7 @@ def create_new_params() -> DetectorParams:
 def fake_eiger():
     FakeEigerDetector: EigerDetector = make_fake_device(EigerDetector)
     fake_eiger: EigerDetector = FakeEigerDetector.with_params(
-        params=create_new_params(), name="test"
+        params=create_new_params(), name="test fake Eiger"
     )
     return fake_eiger
 
