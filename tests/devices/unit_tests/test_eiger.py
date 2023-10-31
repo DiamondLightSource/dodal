@@ -279,10 +279,10 @@ def test_change_roi_mode_sets_cam_roi_mode_correctly(
 # Also tests transition from change ROI to set_detector_threshold
 @patch("ophyd.status.Status.__and__")
 def test_unsuccessful_true_roi_mode_change_results_in_callback_error(
-    mock_and, fake_eiger
+    mock_and, fake_eiger: EigerDetector
 ):
     bad_status = Status()
-    bad_status.set_exception(StatusException("Fail"))
+    bad_status.set_exception(StatusException("Failed setting ROI mode True"))
     mock_and.return_value = bad_status
     LOGGER.error = MagicMock()
 
@@ -302,7 +302,7 @@ def test_unsuccessful_false_roi_mode_change_results_in_callback_error(
     mock_and, fake_eiger: EigerDetector
 ):
     bad_status = Status()
-    bad_status.set_exception(StatusException("Fail"))
+    bad_status.set_exception(StatusException("Failed setting ROI mode False"))
     mock_and.return_value = bad_status
     LOGGER.error = MagicMock()
 
