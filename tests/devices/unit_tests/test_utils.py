@@ -11,6 +11,13 @@ class StatusException(Exception):
     pass
 
 
+def discard_status(status: Status):
+    try:
+        status.wait(0.1)
+    except BaseException:
+        pass
+
+
 def get_bad_status():
     status = Status(obj="Dodal test utils - get good status")
     status.set_exception(StatusException())
@@ -54,25 +61,31 @@ def test_wrap_function_callback():
     returned_status = run_functions_without_blocking(
         [lambda: get_good_status(), dummy_func]
     )
-    try:
-        returned_status.wait(0.1)
-    except BaseException:
-        pass
+    discard_status(returned_status)
     dummy_func.assert_called_once()
 
 
 def test_wrap_function_callback_errors_on_wrong_return_type():
     dummy_func = MagicMock(return_value=3)
     returned_status = Status(done=True, success=True)
-    with pytest.raises(ValueError):
-        returned_status = run_functions_without_blocking(
-            [lambda: get_good_status(), dummy_func]
-        )
+    returned_status = run_functions_without_blocking(
+        [lambda: get_good_status(), dummy_func]
+    )
+    discard_status(returned_status)
+    assert returned_status.success is False
     dummy_func.assert_called_once()
-    try:
-        returned_status.wait(0.1)
-    except BaseException:
-        pass
+    assert (
+        "wrap_func attempted to wrap"
+        in LOGGER.handlers[1].handle.call_args_list[1].args[0].message
+    )
+    assert (
+        " when it does not return a Status"
+        in LOGGER.handlers[1].handle.call_args_list[1].args[0].message
+    )
+    assert (
+        "An error was raised on a background thread"
+        in LOGGER.handlers[1].handle.call_args_list[2].args[0].message
+    )
 
 
 def test_status_points_to_provided_device_object():
