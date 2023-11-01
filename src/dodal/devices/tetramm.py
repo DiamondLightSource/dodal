@@ -1,6 +1,6 @@
 from enum import Enum
 from math import floor
-from typing import Generator, Optional
+from typing import Generator, Optional, Sequence
 
 from bluesky.protocols import Hints
 from ophyd_async.core import (
@@ -12,12 +12,14 @@ from ophyd_async.core import (
     StandardDetector,
     set_signal_values,
     walk_rw_signals,
+    ShapeProvider,
+    set_and_wait_for_value,
 )
 from ophyd_async.core.device_save_loader import Msg
-from ophyd_async.epics.areadetector.drivers import ADBaseShapeProvider
 from ophyd_async.epics.areadetector.writers import HDFWriter, NDFileHDF
+from ophyd_async.epics.areadetector.utils import stop_busy_record
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
-
+import asyncio 
 
 class TetrammAcquire(str, Enum):
     Acquire = "Acquire"
@@ -61,21 +63,7 @@ class TetrammGeometry(str, Enum):
 
 
 class TetrammDriver(Device):
-    base_sample_rate: int
-    """base rate - fixed in hardware"""
-
-    maximum_readings_per_frame: int = 1000
-    """
-    Maximum number of readings per frame
-
-    Actual readings may be lower if higher frame rate is required
-    """
-
-    readings_per_frame: int = 1000
-    """The number of readings per frame"""
-
-    minimum_values_per_reading: int = 5
-    """A lower bound on the values that will be averaged to create a single reading"""
+    
 
     def __init__(
         self,
@@ -99,7 +87,7 @@ class TetrammDriver(Device):
 
         self.overflows = epics_signal_r(int, prefix + "RingOverflows")
 
-        self.channels = epics_signal_rw(TetrammChannels, prefix + "NumChannels")
+        self.num_channels = epics_signal_rw(TetrammChannels, prefix + "NumChannels")
         self.resolution = epics_signal_rw(TetrammResolution, prefix + "Resolution")
         self.trigger_mode = epics_signal_rw(TetrammTrigger, prefix + "TriggerMode")
         self.bias = epics_signal_rw(bool, prefix + "BiasState")
@@ -109,6 +97,81 @@ class TetrammDriver(Device):
         self.geometry = epics_signal_rw(TetrammGeometry, prefix + "Geometry")
 
         super().__init__(name=name)
+
+
+class TetrammController(DetectorControl):
+    def __init__(
+        self,
+        drv: TetrammDriver,
+        minimum_values_per_reading=5,
+        maximum_readings_per_frame=1_000,
+        base_sample_rate=100_000,
+        readings_per_frame=1_000
+    ):
+        self._drv = drv
+
+        self.base_sample_rate = base_sample_rate
+        """base rate - fixed in hardware"""
+
+        self.maximum_readings_per_frame = maximum_readings_per_frame
+        """
+        Maximum number of readings per frame
+
+        Actual readings may be lower if higher frame rate is required
+        """
+
+        self.minimum_values_per_reading = minimum_values_per_reading
+        """A lower bound on the values that will be averaged to create a single reading"""
+
+        self.readings_per_frame = readings_per_frame
+        """The number of readings per frame"""
+
+    def get_deadtime(self, _exposure: float) -> float:
+        return 0.001  # Picked from a hat
+
+    async def arm(
+        self,
+        trigger: DetectorTrigger = DetectorTrigger.internal,
+        num: int = 0,
+        exposure: Optional[float] = None,
+    ) -> AsyncStatus:
+        if num != 0:
+            raise Exception("Tetramm has no concept of setting a number of exposures.")
+        if exposure is None:
+            raise ValueError("Exposure time is required")
+        if trigger not in {DetectorTrigger.edge_trigger, DetectorTrigger.constant_gate}:
+            raise ValueError("Only edge triggers are supported")
+
+        # trigger mode must be set first and on it's own!
+        await self._drv.trigger_mode.set(TetrammTrigger.ExtTrigger)
+
+        await asyncio.gather(
+            self._drv.averaging_time.set(exposure),
+            self.set_frame_time(exposure)
+        )
+
+        status = await set_and_wait_for_value(
+            self._drv.acquire, TetrammAcquire.Acquire
+        )
+
+        return status
+
+    async def disarm(self):
+        await stop_busy_record(self._drv.acquire, TetrammAcquire.Stop, timeout=1)
+
+    async def set_frame_time(self, seconds):
+        # It may not always be possible to set the exact collection time if the
+        # exposure is not a multiple of the base sample rate. In this case it
+        # will always be the closest collection time *below* the requested time
+        # to ensure that triggers are not missed.
+        values_per_reading = int(
+            floor(seconds * self.base_sample_rate / self.readings_per_frame)
+        )
+        if values_per_reading < self.minimum_values_per_reading:
+            raise ValueError(
+                f"Exposure ({seconds}) too short to collect required number of readings {self.readings_per_frame}"
+            )
+        await self._drv.values_per_reading.set(values_per_reading)
 
     @property
     def max_frame_rate(self) -> float:
@@ -132,58 +195,8 @@ class TetrammDriver(Device):
         )
 
 
-class TetrammController(DetectorControl):
-    def __init__(
-        self,
-        drv: TetrammDriver,
-        minimum_values_per_reading=5,
-        maximum_readings_per_frame=1_000,
-        base_sample_rate=100_000,
-    ):
-        self._drv = drv
-
-        self.base_sample_rate = base_sample_rate
-        self.maximum_readings_per_frame = maximum_readings_per_frame
-        self.minimum_values_per_reading = minimum_values_per_reading
-
-    def get_deadtime(self, _exposure: float) -> float:
-        return 0.001  # Picked from a hat
-
-    @AsyncStatus.wrap
-    async def arm(
-        self,
-        trigger: DetectorTrigger = DetectorTrigger.constant_gate,
-        num: int = 0,  # the tetramm has no concept of setting number of exposures
-        exposure: Optional[float] = None,
-    ):
-        if num != 0:
-            raise Exception("Tetramm has no concept of setting a number of exposures.")
-        if exposure is None:
-            raise ValueError("Exposure time is required")
-        if trigger != DetectorTrigger.edge_trigger:
-            raise ValueError("Only edge triggers are supported")
-
-        await self.set_frame_time(exposure)
-        await self._drv.acquire.set(TetrammAcquire.Acquire)
-
-    async def disarm(self):
-        await self._drv.acquire.set(TetrammAcquire.Stop)
-
-    async def set_frame_time(self, seconds):
-        # It may not always be possible to set the exact collection time if the
-        # exposure is not a multiple of the base sample rate. In this case it
-        # will always be the closest collection time *below* the requested time
-        # to ensure that triggers are not missed.
-        values_per_reading = int(
-            floor(seconds * self._drv.base_sample_rate / self._drv.readings_per_frame)
-        )
-        if values_per_reading < self._drv.minimum_values_per_reading:
-            raise ValueError(
-                f"Exposure ({seconds}) too short to collect required number of readings {self._drv.readings_per_frame}"
-            )
-        await self._drv.averaging_time.set(seconds / 1_000)
-        await self._drv.values_per_reading.set(values_per_reading)
-
+#TODO: need to change this name.
+MAX_CHANNELS = 11
 
 IDLE_TETRAMM = {
     "acquire": TetrammAcquire.Stop,
@@ -228,6 +241,14 @@ def free_tetramm(dev: TetrammDriver) -> Generator[Msg, None, None]:
     yield from set_signal_values(sigs, [IDLE_TETRAMM, FREE_TETRAMM])
 
 
+class TetrammShapeProvider(ShapeProvider):
+    def __init__(self, controller: TetrammController) -> None:
+        self.controller = controller
+
+    async def __call__(self) -> Sequence[int]:
+        return [MAX_CHANNELS, self.controller.readings_per_frame]
+
+
 class TetrammDetector(StandardDetector):
     def __init__(
         self, prefix: str, directory_provider: DirectoryProvider, name: str = ""
@@ -246,11 +267,11 @@ class TetrammDetector(StandardDetector):
 
         # self.position_x = epics_signal_r(float, prefix + ":PosX:MeanValue_RBV")
         # self.position_y = epics_signal_r(float, prefix + ":PosY:MeanValue_RBV")
-
+        controller = TetrammController(drv)
         super().__init__(
-            TetrammController(drv),
+            controller,
             HDFWriter(
-                hdf, directory_provider, lambda: self.name, ADBaseShapeProvider(drv)
+                hdf, directory_provider, lambda: self.name, TetrammShapeProvider(controller)
             ),
             [drv.values_per_reading, drv.averaging_time, drv.sample_time],
             name,
