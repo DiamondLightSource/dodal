@@ -3,7 +3,7 @@ from enum import Enum
 from typing import Iterator, List, Optional, Tuple
 
 import numpy as np
-from ophyd_async.core import AsyncStatus, Device
+from ophyd_async.core import AsyncStatus, Device, StandardReadable
 from ophyd_async.epics.motion.motor import Motor
 from ophyd_async.epics.signal import epics_signal_r
 
@@ -62,7 +62,7 @@ class LimitsChecker(Device):
         return AsyncStatus(wait_for(self._check_limits(position), None))
 
 
-class Smargon(Device):
+class Smargon(StandardReadable):
     """
     Real motors added to allow stops following pin load (e.g. real_x1.stop() )
     X1 and X2 real motors provide compound chi motion as well as the compound X travel,
@@ -74,9 +74,6 @@ class Smargon(Device):
         self.prefix = prefix
 
         self.x = Motor(f"{prefix}X")
-        self.x_low_lim = epics_signal_r(float, f"{prefix}X.LLM")
-        self.x_high_lim = epics_signal_r(float, f"{prefix}X.HLM")
-
         self.y = Motor(f"{prefix}Y")
         self.z = Motor(f"{prefix}Z")
 
@@ -93,4 +90,15 @@ class Smargon(Device):
 
         self.stub_offsets = StubOffsets(prefix)
         self.limit_checker = LimitsChecker([self.x, self.y, self.z])
+
+        self.set_readable_signals(
+            read=[
+                self.x.readback,
+                self.y.readback,
+                self.z.readback,
+                self.chi.readback,
+                self.phi.readback,
+                self.omega.readback,
+            ],
+        )
         super().__init__(name)
