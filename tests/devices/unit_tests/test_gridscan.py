@@ -339,34 +339,29 @@ def test_given_x_y_z_steps_when_full_number_calculated_then_answer_is_as_expecte
     assert grid_scan_params.get_num_images() == 350
 
 @pytest.mark.parametrize(
-    "dwell_time",
+    "test_dwell_time, expected_num_is_close",
     [
-        (0.0004),
-        (0.0009),
-        (0.00001),
-        (0.00009),
-        (0.000001),
-        (0.000009),
+        (0.001, True),
+        (0.009, True),
+        (0.005, True),
+        (0.0011, True),
+        (0.0051, True),
+        (0.0099, True),
+        (0.0059, False),
+        (0.0004, False),
+        (0.0009, False),
+        (0.00044, False),
+        (0.00099, False),
+        (0.00001, False),
+        (0.00009, False),
+        (0.000001, False),
+        (0.000009, False),
     ],
 )
-def test_given_non_integer_dwell_time_then_creating_FGSParams_fails(dwell_time):
-        nums_a = dwell_time * 1000
-        nums_b = np.floor(dwell_time * 1000)
-        num_is_close = np.isclose(nums_a, nums_b, rtol=1e-1)
-        if not num_is_close:
-            raise ValueError("Non integer value")
-        return dwell_time
-    # with pytest.raises(ValueError):
-    #     GridScanParams(dwell_time)
-
-def test_given_non_integer_dwell_time_then_creating_FGSParams_fails_1():
-    with pytest.raises(ValueError):
-        GridScanParams(dwell_time=0.0004)
-
-def test_given_non_integer_dwell_time_then_creating_FGSParams_fails_abc_2():
-    with pytest.raises(ValueError):
-        GridScanParams(dwell_time=0.00001)
-
-def test_given_non_integer_dwell_time_then_creating_FGSParams_fails_abc_3():
+def test_integer_dwell_time(test_dwell_time, expected_num_is_close):
+    if expected_num_is_close:
+        params = GridScanParams(dwell_time=test_dwell_time)
+        assert params.dwell_time == test_dwell_time
+    else:
         with pytest.raises(ValueError):
-            GridScanParams(dwell_time=0.000009)
+            GridScanParams(dwell_time=test_dwell_time)
