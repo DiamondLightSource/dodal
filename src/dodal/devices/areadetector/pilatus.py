@@ -1,4 +1,5 @@
 from typing import Sequence
+from bluesky.protocols import HasHints, Hints
 
 from ophyd_async.core import DirectoryProvider, SignalR, StandardDetector
 from ophyd_async.epics.areadetector.controllers import PilatusController
@@ -33,3 +34,8 @@ class HDFStatsPilatus(StandardDetector):
             config_sigs=config_sigs,
             name=name,
         )
+
+    @property
+    def hints(self) -> Hints:
+        return self.writer.hints
+
