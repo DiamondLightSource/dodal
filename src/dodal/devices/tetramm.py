@@ -1,6 +1,6 @@
 from enum import Enum
 from math import floor
-from typing import Generator, Optional
+from typing import Generator, Optional, Sequence
 
 from bluesky.protocols import Hints
 from ophyd_async.core import (
@@ -12,12 +12,12 @@ from ophyd_async.core import (
     StandardDetector,
     set_signal_values,
     walk_rw_signals,
+    ShapeProvider,
 )
 from ophyd_async.core.device_save_loader import Msg
 from ophyd_async.epics.areadetector.drivers import ADBaseShapeProvider
 from ophyd_async.epics.areadetector.writers import HDFWriter, NDFileHDF
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
-
 
 class TetrammAcquire(str, Enum):
     Acquire = "Acquire"
@@ -99,7 +99,7 @@ class TetrammDriver(Device):
 
         self.overflows = epics_signal_r(int, prefix + "RingOverflows")
 
-        self.channels = epics_signal_rw(TetrammChannels, prefix + "NumChannels")
+        self.num_channels = epics_signal_rw(TetrammChannels, prefix + "NumChannels")
         self.resolution = epics_signal_rw(TetrammResolution, prefix + "Resolution")
         self.trigger_mode = epics_signal_rw(TetrammTrigger, prefix + "TriggerMode")
         self.bias = epics_signal_rw(bool, prefix + "BiasState")
@@ -149,13 +149,12 @@ class TetrammController(DetectorControl):
     def get_deadtime(self, _exposure: float) -> float:
         return 0.001  # Picked from a hat
 
-    @AsyncStatus.wrap
     async def arm(
         self,
         trigger: DetectorTrigger = DetectorTrigger.constant_gate,
         num: int = 0,  # the tetramm has no concept of setting number of exposures
         exposure: Optional[float] = None,
-    ):
+    ) -> AsyncStatus:
         if num != 0:
             raise Exception("Tetramm has no concept of setting a number of exposures.")
         if exposure is None:
@@ -164,7 +163,7 @@ class TetrammController(DetectorControl):
             raise ValueError("Only edge triggers are supported")
 
         await self.set_frame_time(exposure)
-        await self._drv.acquire.set(TetrammAcquire.Acquire)
+        return self._drv.acquire.set(TetrammAcquire.Acquire)
 
     async def disarm(self):
         await self._drv.acquire.set(TetrammAcquire.Stop)
@@ -184,6 +183,9 @@ class TetrammController(DetectorControl):
         await self._drv.averaging_time.set(seconds / 1_000)
         await self._drv.values_per_reading.set(values_per_reading)
 
+
+#TODO: need to change this name.
+MAX_CHANNELS = 11
 
 IDLE_TETRAMM = {
     "acquire": TetrammAcquire.Stop,
@@ -228,6 +230,14 @@ def free_tetramm(dev: TetrammDriver) -> Generator[Msg, None, None]:
     yield from set_signal_values(sigs, [IDLE_TETRAMM, FREE_TETRAMM])
 
 
+class TetrammShapeProvider(ShapeProvider):
+    def __init__(self, driver: TetrammDriver) -> None:
+        self.drv = driver
+
+    async def __call__(self) -> Sequence[int]:
+        return [MAX_CHANNELS, self.drv.readings_per_frame]
+
+
 class TetrammDetector(StandardDetector):
     def __init__(
         self, prefix: str, directory_provider: DirectoryProvider, name: str = ""
@@ -250,7 +260,7 @@ class TetrammDetector(StandardDetector):
         super().__init__(
             TetrammController(drv),
             HDFWriter(
-                hdf, directory_provider, lambda: self.name, ADBaseShapeProvider(drv)
+                hdf, directory_provider, lambda: self.name, TetrammShapeProvider(drv)
             ),
             [drv.values_per_reading, drv.averaging_time, drv.sample_time],
             name,
