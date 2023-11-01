@@ -1,7 +1,7 @@
 import pytest
 from ophyd_async.core import set_sim_value
 
-from dodal.devices.smargon import Smargon, StubOffsets, StubPosition, XYZLimitsChecker
+from dodal.devices.smargon import LimitsChecker, Smargon, StubOffsets, StubPosition
 
 
 async def _get_smargon() -> Smargon:
@@ -14,7 +14,7 @@ async def _get_stub_offsets_device() -> StubOffsets:
     return (await _get_smargon()).stub_offsets
 
 
-async def _get_limit_check_device() -> XYZLimitsChecker:
+async def _get_limit_check_device() -> LimitsChecker:
     return (await _get_smargon()).limit_checker
 
 
@@ -96,9 +96,9 @@ async def test_given_x_y_z_limits_set_when_in_limits_checker_then_expected(
 ):
     xyz_limit_checker = await _get_limit_check_device()
 
-    for lower, upper in xyz_limit_checker.limit_signals.values():
-        set_sim_value(lower, 0)
-        set_sim_value(upper, 1)
+    for axis in xyz_limit_checker.axes:
+        set_sim_value(axis.low_limit_travel, 0)
+        set_sim_value(axis.high_limit_travel, 1)
 
     await xyz_limit_checker.set(position)
     assert xyz_limit_checker.within_limits == expected_within

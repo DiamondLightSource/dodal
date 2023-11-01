@@ -1,6 +1,6 @@
 from asyncio import wait_for
 from enum import Enum
-from typing import Iterator, Optional, Tuple
+from typing import Iterator, List, Optional, Tuple
 
 import numpy as np
 from ophyd_async.core import AsyncStatus, Device
@@ -38,36 +38,23 @@ class StubOffsets(Device):
             return self.to_robot_load.set(1)
 
 
-class XYZLimitsChecker(Device):
-    """Checks that a position is within the XYZ limits of the motor.
-    To use set the x, y, z vector to the device and read check `within_limits`
+class LimitsChecker(Device):
+    """Checks that a position is within the limits of a set of motors.
+    To use set the x, y, z vector to the device and check `within_limits`
     """
 
-    def __init__(self, prefix: str) -> None:
+    def __init__(self, axes: List[Motor]) -> None:
         self.within_limits = False
-
-        axes = ["X", "Y", "Z"]
-        self.limit_signals = {
-            axis: (
-                epics_signal_r(float, f"{prefix}{axis}.LLM"),
-                epics_signal_r(float, f"{prefix}{axis}.HLM"),
-            )
-            for axis in axes
-        }
-
-    def children(self) -> Iterator[Tuple[str, Device]]:
-        for attr, signals in self.limit_signals.items():
-            yield attr + "low_lim", signals[0]
-            yield attr + "high_lim", signals[1]
-        return super().children()
+        self.axes = axes
 
     async def _check_limits(self, position: np.ndarray):
+        assert len(position) == len(self.axes)
         check_within_limits = True
-        for i, axis_limits in enumerate(self.limit_signals.values()):
+        for i, axis in enumerate(self.axes):
             check_within_limits &= (
-                (await axis_limits[0].get_value())
+                (await axis.low_limit_travel.get_value())
                 < position[i]
-                < (await axis_limits[1].get_value())
+                < (await axis.high_limit_travel.get_value())
             )
         self.within_limits = check_within_limits
 
@@ -105,5 +92,5 @@ class Smargon(Device):
         self.real_chi = Motor(f"{prefix}MOTOR_6")
 
         self.stub_offsets = StubOffsets(prefix)
-        self.limit_checker = XYZLimitsChecker(prefix)
+        self.limit_checker = LimitsChecker([self.x, self.y, self.z])
         super().__init__(name)
