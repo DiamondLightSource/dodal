@@ -45,3 +45,11 @@ def test_wrap_function_callback():
     dummy_func = MagicMock(return_value=Status)
     run_functions_without_blocking([lambda: get_good_status(), dummy_func])
     dummy_func.assert_called_once
+
+
+def test_status_points_to_provided_device_object():
+    expected_obj = MagicMock()
+    returned_status = run_functions_without_blocking(
+        [get_good_status], associated_obj=expected_obj
+    )
+    assert returned_status.obj == expected_obj

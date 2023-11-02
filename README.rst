@@ -26,8 +26,8 @@ Releases       https://github.com/DiamondLightSource/dodal/releases
     :target: https://codecov.io/gh/DiamondLightSource/dodal
     :alt: Test Coverage
 
-.. |pypi_version| image:: https://img.shields.io/pypi/v/dodal.svg
-    :target: https://pypi.org/project/dodal
+.. |pypi_version| image:: https://img.shields.io/pypi/v/dls-dodal.svg
+    :target: https://pypi.org/project/dls-dodal
     :alt: Latest PyPI version
 
 .. |license| image:: https://img.shields.io/badge/License-Apache%202.0-blue.svg
