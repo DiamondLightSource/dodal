@@ -1,4 +1,5 @@
 import logging
+from functools import partial
 from logging import LogRecord
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -6,6 +7,13 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from dodal import log
+from dodal.log import EnhancedRollingFileHandler, GELFTCPHandler
+
+
+def get_mock_streamhandler(level=20):
+    sh = MagicMock(spec=logging.StreamHandler)
+    sh.level = level
+    return sh
 
 
 @pytest.fixture()
@@ -15,57 +23,63 @@ def mock_logger():
         log.beamline = None
 
 
-@patch("dodal.log.GELFTCPHandler")
+@patch("dodal.log.GELFTCPHandler", spec=GELFTCPHandler)
 @patch("dodal.log.logging")
-@patch("dodal.log.EnhancedRollingFileHandler")
+@patch("dodal.log.EnhancedRollingFileHandler", spec=EnhancedRollingFileHandler)
 def test_handlers_set_at_correct_default_level(
     mock_enhanced_log,
     mock_logging,
     mock_GELFTCPHandler,
     mock_logger: MagicMock,
 ):
-    handlers = log.set_up_logging_handlers(None, False)
+    mock_logging.StreamHandler = get_mock_streamhandler
+    mock_GELFTCPHandler.return_value.level = 20
+    mock_enhanced_log.return_value.level = 20
+    handlers = log.set_up_logging_handlers(None, False, logger=mock_logger)
 
     for handler in handlers:
         mock_logger.addHandler.assert_any_call(handler)
         handler.setLevel.assert_called_once_with("INFO")
 
 
-@patch("dodal.log.GELFTCPHandler")
+@patch("dodal.log.GELFTCPHandler", spec=GELFTCPHandler)
 @patch("dodal.log.logging")
-@patch("dodal.log.EnhancedRollingFileHandler")
+@patch("dodal.log.EnhancedRollingFileHandler", spec=EnhancedRollingFileHandler)
 def test_handlers_set_at_correct_debug_level(
     mock_enhanced_log,
     mock_logging,
     mock_GELFTCPHandler,
     mock_logger: MagicMock,
 ):
-    handlers = log.set_up_logging_handlers("DEBUG", True)
+    mock_logging.StreamHandler = partial(get_mock_streamhandler, 10)
+    mock_GELFTCPHandler.return_value.level = 10
+    mock_enhanced_log.return_value.level = 10
+    handlers = log.set_up_logging_handlers("DEBUG", True, logger=mock_logger)
 
     for handler in handlers:
         mock_logger.addHandler.assert_any_call(handler)
         handler.setLevel.assert_called_once_with("DEBUG")
 
 
-@patch("dodal.log.GELFTCPHandler")
+@patch("dodal.log.GELFTCPHandler", spec=GELFTCPHandler)
 @patch("dodal.log.logging")
 def test_dev_mode_sets_correct_graypy_handler(
     mock_logging,
     mock_GELFTCPHandler,
     mock_logger: MagicMock,
 ):
-    log.set_up_logging_handlers(None, True)
+    log.set_up_logging_handlers(None, True, logger=mock_logger)
     mock_GELFTCPHandler.assert_called_once_with("localhost", 5555)
 
 
-@patch("dodal.log.GELFTCPHandler")
+@patch("dodal.log.GELFTCPHandler", spec=GELFTCPHandler)
 @patch("dodal.log.logging")
 def test_prod_mode_sets_correct_graypy_handler(
     mock_logging,
     mock_GELFTCPHandler,
     mock_logger: MagicMock,
 ):
-    log.set_up_logging_handlers(None, False)
+    log.set_up_logging_handlers(None, False, logger=mock_logger)
     mock_GELFTCPHandler.assert_called_once_with("graylog2.diamond.ac.uk", 12218)
 
 
@@ -78,7 +92,7 @@ def test_no_env_variable_sets_correct_file_handler(
     mock_GELFTCPHandler,
     mock_logger: MagicMock,
 ):
-    log.set_up_logging_handlers(None, True)
+    log.set_up_logging_handlers(None, True, logger=mock_logger)
     mock_enhanced_log.assert_called_once_with(filename=Path("./tmp/dev/dodal.txt"))
 
 
@@ -94,7 +108,7 @@ def test_setting_debug_in_prod_gives_warning(
         "GRAYLOG WITH MESSAGES. If you really need debug messages, set up a local "
         "graylog instead!\n"
     )
-    log.set_up_logging_handlers("DEBUG", False)
+    log.set_up_logging_handlers("DEBUG", False, logger=mock_logger)
     mock_logger.warning.assert_any_call(warning_string)
 
 
