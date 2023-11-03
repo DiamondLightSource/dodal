@@ -100,7 +100,7 @@ class GridScanParams(BaseModel, AbstractExperimentParameterBase):
         )
         if not num_is_close:
             raise ValueError(
-                f"Dwell time of {dwell_time_integer} is not an integer value "
+                f"Dwell time of {dwell_time_integer}s is not an integer value "
             )
         return dwell_time_ms
 
