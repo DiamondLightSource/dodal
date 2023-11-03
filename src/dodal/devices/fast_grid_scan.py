@@ -91,14 +91,14 @@ class GridScanParams(BaseModel, AbstractExperimentParameterBase):
     def _get_z_axis(cls, z_axis: GridAxis, values: dict[str, Any]) -> GridAxis:
         return GridAxis(values["z2_start"], values["z_step_size"], values["z_steps"])
 
-    @validator("dwell_time", always=True)
-    def non_ineger_dwell_time(cls, dwell_time: float):
-        nums_a = dwell_time * 1000
-        nums_b = np.floor(dwell_time * 1000)
-        num_is_close = np.isclose(nums_a, nums_b, rtol=1e-1)
+    @validator("dwell_time_ms", always=True, check_fields=True)
+    def non_integer_dwell_time(cls, dwell_time_ms: float) -> float:
+        dwell_time_integer = dwell_time_ms * 1000
+        dwell_time_floor_rounded = np.floor(dwell_time_ms * 1000)
+        num_is_close = np.isclose(dwell_time_integer, dwell_time_floor_rounded, rtol=1e-1)
         if not num_is_close:
-            raise ValueError("Non integer value")
-        return dwell_time
+            raise ValueError(f"Dwell time of {dwell_time_integer} is not an integer value ")
+        return dwell_time_ms
 
     def is_valid(self, limits: XYZLimitBundle) -> bool:
         """

@@ -339,7 +339,7 @@ def test_given_x_y_z_steps_when_full_number_calculated_then_answer_is_as_expecte
     assert grid_scan_params.get_num_images() == 350
 
 @pytest.mark.parametrize(
-    "test_dwell_time, expected_num_is_close",
+    "test_dwell_times, expected_dwell_time_is_integer",
     [
         (0.001, True),
         (0.009, True),
@@ -358,10 +358,10 @@ def test_given_x_y_z_steps_when_full_number_calculated_then_answer_is_as_expecte
         (0.000009, False),
     ],
 )
-def test_integer_dwell_time(test_dwell_time, expected_num_is_close):
-    if expected_num_is_close:
-        params = GridScanParams(dwell_time=test_dwell_time)
-        assert params.dwell_time == test_dwell_time
+def test_non_test_integer_dwell_time(test_dwell_times, expected_dwell_time_is_integer):
+    if expected_dwell_time_is_integer:
+        params = GridScanParams(dwell_time_ms=test_dwell_times)
+        assert params.dwell_time_ms == test_dwell_times
     else:
         with pytest.raises(ValueError):
-            GridScanParams(dwell_time=test_dwell_time)
+            GridScanParams(dwell_time_ms=test_dwell_times)
