@@ -338,6 +338,7 @@ def test_given_x_y_z_steps_when_full_number_calculated_then_answer_is_as_expecte
 ):
     assert grid_scan_params.get_num_images() == 350
 
+
 @pytest.mark.parametrize(
     "test_dwell_times, expected_dwell_time_is_integer",
     [

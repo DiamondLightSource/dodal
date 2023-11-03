@@ -95,9 +95,13 @@ class GridScanParams(BaseModel, AbstractExperimentParameterBase):
     def non_integer_dwell_time(cls, dwell_time_ms: float) -> float:
         dwell_time_integer = dwell_time_ms * 1000
         dwell_time_floor_rounded = np.floor(dwell_time_ms * 1000)
-        num_is_close = np.isclose(dwell_time_integer, dwell_time_floor_rounded, rtol=1e-1)
+        num_is_close = np.isclose(
+            dwell_time_integer, dwell_time_floor_rounded, rtol=1e-1
+        )
         if not num_is_close:
-            raise ValueError(f"Dwell time of {dwell_time_integer} is not an integer value ")
+            raise ValueError(
+                f"Dwell time of {dwell_time_integer} is not an integer value "
+            )
         return dwell_time_ms
 
     def is_valid(self, limits: XYZLimitBundle) -> bool:
