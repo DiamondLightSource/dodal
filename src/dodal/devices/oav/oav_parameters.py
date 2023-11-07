@@ -39,7 +39,6 @@ class OAVParameters:
         self.update_self_from_current_context()
         self.load_microns_per_pixel()
         self.beam_centre_i, self.beam_centre_j = self.get_beam_position_from_zoom()
-        # self._extract_beam_position()
 
     @staticmethod
     def load_json(filename: str) -> tuple[dict[str, Any], dict[str, dict]]:
@@ -140,7 +139,7 @@ class OAVParameters:
 
         if crosshair_x_line is None or crosshair_y_line is None:
             raise OAVError_BeamPositionNotFound(
-                f"Could not extract beam position at zoom level {self.zoom}"
+                f"Could not extract beam position at zoom level {zoom}"
             )
 
         beam_centre_i = int(crosshair_x_line.split(" = ")[1])
