@@ -12,7 +12,7 @@ class FakeDevice(Device):
 @pytest.fixture
 def fake_device():
     MyFakeDevice = make_fake_device(FakeDevice)
-    fake_device = MyFakeDevice(name="test")
+    fake_device = MyFakeDevice(name="test fake_device")
     return fake_device
 
 

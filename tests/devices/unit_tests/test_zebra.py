@@ -47,7 +47,7 @@ def test_logic_gate_configuration_62_and_34_inv_and_15_inv():
 
 def run_configurer_test(gate_type: GateType, gate_num, config, expected_pv_values):
     FakeLogicConfigurer = make_fake_device(LogicGateConfigurer)
-    configurer = FakeLogicConfigurer(name="test")
+    configurer = FakeLogicConfigurer(name="test fake logicconfigurer")
 
     mock_gate_control = mock()
     mock_pvs = [mock() for i in range(6)]

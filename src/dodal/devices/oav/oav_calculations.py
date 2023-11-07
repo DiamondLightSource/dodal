@@ -161,7 +161,7 @@ def check_i_within_bounds(
 
     tip_distance_pixels = i_pixels - tip_i
     if tip_distance_pixels > max_tip_distance_pixels:
-        LOGGER.warn(
+        LOGGER.warning(
             f"x_pixels={i_pixels} exceeds maximum tip distance {max_tip_distance_pixels}, using setting x_pixels within the max tip distance"
         )
         i_pixels = max_tip_distance_pixels + tip_i

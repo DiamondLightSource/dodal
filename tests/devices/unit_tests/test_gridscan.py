@@ -18,7 +18,7 @@ from dodal.devices.smargon import Smargon
 @pytest.fixture
 def fast_grid_scan():
     FakeFastGridScan = make_fake_device(FastGridScan)
-    fast_grid_scan: FastGridScan = FakeFastGridScan(name="test")
+    fast_grid_scan: FastGridScan = FakeFastGridScan(name="test fake FGS")
     fast_grid_scan.scan_invalid.pvname = ""
 
     yield fast_grid_scan
@@ -128,7 +128,7 @@ def test_running_finished_with_all_images_done_then_complete_status_finishes_not
 
 def create_motor_bundle_with_limits(low_limit, high_limit) -> Smargon:
     FakeSmargon = make_fake_device(Smargon)
-    grid_scan_motor_bundle: Smargon = FakeSmargon(name="test")
+    grid_scan_motor_bundle: Smargon = FakeSmargon(name="test fake Smargon")
     grid_scan_motor_bundle.wait_for_connection()
     for axis in [
         grid_scan_motor_bundle.x,
