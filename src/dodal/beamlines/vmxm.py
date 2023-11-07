@@ -1,6 +1,9 @@
+from typing import Optional
+
 from dodal.beamlines.beamline_utils import device_instantiation
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.backlight import VmxmBacklight
+from dodal.devices.detector import DetectorParams
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan_2d import FastGridScan2D
 from dodal.devices.synchrotron import Synchrotron
@@ -20,17 +23,26 @@ set_utils_beamline(
 
 @skip_device(lambda: BL == SIM_BEAMLINE_NAME)
 def eiger(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+    wait_for_connection: bool = True,
+    fake_with_ophyd_sim: bool = False,
+    params: Optional[DetectorParams] = None,
 ) -> EigerDetector:
-    """Get the vmxm eiger device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in vmxm, it will return the existing object.
+    """Get the i24 Eiger device, instantiate it if it hasn't already been.
+    If this is called when already instantiated, it will return the existing object.
+    If called with params, will update those params to the Eiger object.
     """
+
+    def set_params(eiger: EigerDetector):
+        if params is not None:
+            eiger.set_detector_parameters(params)
+
     return device_instantiation(
         device_factory=EigerDetector,
         name="eiger",
         prefix="-EA-EIGER-01:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
+        post_create=set_params,
     )
 
 
