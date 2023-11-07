@@ -1,6 +1,7 @@
 import sys
 from unittest.mock import patch
 
+from dodal.beamlines import beamline_utils
 from dodal.devices.i24.i24_vgonio import VGonio
 
 with patch.dict("os.environ", {"BEAMLINE": "i24"}, clear=True):
@@ -9,6 +10,7 @@ with patch.dict("os.environ", {"BEAMLINE": "i24"}, clear=True):
 
 
 def test_device_creation():
+    beamline_utils.set_beamline("i24")
     devices = make_all_devices(i24, fake_with_ophyd_sim=True)
     assert len(devices) > 0
     for device_name in devices.keys():

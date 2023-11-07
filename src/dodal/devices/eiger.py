@@ -103,7 +103,9 @@ class EigerDetector(Device):
             self.async_stage().wait(timeout=self.ARMING_TIMEOUT)
 
     def stop_odin_when_all_frames_collected(self):
-        LOGGER.info("Waiting on all frames")
+        LOGGER.info(
+            f"Waiting on all frames, expected {self.detector_params.full_number_of_images}"
+        )
         try:
             await_value(
                 self.odin.file_writer.num_captured,
@@ -150,6 +152,10 @@ class EigerDetector(Device):
             self.detector_params.detector_size_constants.roi_size_pixels
             if enable
             else self.detector_params.detector_size_constants.det_size_pixels
+        )
+
+        LOGGER.info(
+            f"Setting height and width on odin to {detector_dimensions.height}, {detector_dimensions.width}"
         )
 
         status = self.cam.roi_mode.set(
@@ -242,7 +248,6 @@ class EigerDetector(Device):
             tolerance (float, optional): If the energy is already set to within
                 this tolerance it is not set again. Defaults to 0.1eV.
         """
-
         current_energy = self.cam.photon_energy.get()
         if abs(current_energy - energy) > tolerance:
             return self.cam.photon_energy.set(
@@ -258,7 +263,6 @@ class EigerDetector(Device):
         during the datacollection. The number of images is the number of images per
         trigger.
         """
-
         assert self.detector_params is not None
         status = self.cam.num_images.set(
             self.detector_params.num_images_per_trigger,
@@ -314,8 +318,10 @@ class EigerDetector(Device):
     def do_arming_chain(self) -> Status:
         functions_to_do_arm = []
         detector_params: DetectorParams = self.detector_params
-        if detector_params.use_roi_mode:
-            functions_to_do_arm.append(lambda: self.change_roi_mode(enable=True))
+
+        functions_to_do_arm.append(
+            lambda: self.change_roi_mode(detector_params.use_roi_mode)
+        )
 
         functions_to_do_arm.extend(
             [

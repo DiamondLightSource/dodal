@@ -81,11 +81,21 @@ def get_hostname() -> str:
 class BeamlinePrefix:
     ixx: str
     suffix: Optional[str] = None
+    beamline_prefix: Optional[str] = None
+    insertion_prefix: Optional[str] = None
 
     def __post_init__(self):
-        self.suffix = self.ixx[0].upper() if not self.suffix else self.suffix
-        self.beamline_prefix = f"BL{self.ixx[1:3]}{self.suffix}"
-        self.insertion_prefix = f"SR{self.ixx[1:3]}{self.suffix}"
+        self.suffix = self.ixx[0].upper() if self.suffix is None else self.suffix
+        self.beamline_prefix = (
+            f"BL{self.ixx[1:3]}{self.suffix}"
+            if self.beamline_prefix is None
+            else self.beamline_prefix
+        )
+        self.insertion_prefix = (
+            f"SR{self.ixx[1:3]}{self.suffix}"
+            if self.insertion_prefix is None
+            else self.insertion_prefix
+        )
 
 
 T = TypeVar("T", bound=AnyDevice)
@@ -210,12 +220,21 @@ def is_v1_device_type(obj: Type[Any]) -> bool:
     return is_class and follows_protocols and not is_v2_device_type(obj)
 
 
+# Special case for i02-1 -> VMXm
+# Scientists refer to it as VMXm but $BEAMLINE env var is i02-1
+BEAMLINE_NAME_TO_MODULE_NAME_OVERRIDES = {
+    "i02-1": "vmxm",
+    "i02-2": "vmxi",
+}
+
+
 def get_beamline_based_on_environment_variable() -> ModuleType:
     """
     Gets the dodal module for the current beamline, as specified by the
     BEAMLINE environment variable.
     """
     beamline = get_beamline_name("")
+    beamline = BEAMLINE_NAME_TO_MODULE_NAME_OVERRIDES.get(beamline, beamline)
 
     if beamline == "":
         raise ValueError(
