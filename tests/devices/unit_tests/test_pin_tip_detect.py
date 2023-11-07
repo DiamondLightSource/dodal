@@ -49,5 +49,7 @@ def test_given_pin_tip_found_before_timeout_then_timeout_status_cleaned_up_and_t
 ):
     RE = RunEngine(call_returns_result=True)
     RE(trigger_and_read(fake_pin_tip_detect, (100, 200)))
-    assert fake_pin_tip_detect._timeout_status.done
+    # A success should clear up the timeout status but it may clear it up slightly later
+    # so we need the small timeout to avoid the race condition
+    fake_pin_tip_detect._timeout_status.wait(0.01)
     assert fake_pin_tip_detect.triggered_tip.get() == (100, 200)

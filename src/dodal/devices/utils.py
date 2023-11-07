@@ -47,14 +47,21 @@ def run_functions_without_blocking(
     # intermediate statuses have an exception, the full_status will timeout.
     full_status = Status(obj=associated_obj, timeout=timeout)
 
-    def closing_func(old_status):
-        check_callback_error(old_status)
-        full_status.set_finished()
+    def closing_func(old_status: Status):
+        if old_status.exception() is not None:
+            set_global_exception_and_log(old_status)
+        else:
+            full_status.set_finished()
 
     # Wrap each function by first checking the previous status and attaching a callback
     # to the next function in the chain
-    def wrap_func(old_status, current_func: Callable[[], StatusBase], next_func):
-        check_callback_error(old_status)
+    def wrap_func(
+        old_status: Status, current_func: Callable[[], StatusBase], next_func
+    ):
+        if old_status.exception() is not None:
+            set_global_exception_and_log(old_status)
+            return
+
         status = current_func()
 
         if not isinstance(status, StatusBase):
@@ -65,12 +72,11 @@ def run_functions_without_blocking(
 
         status.add_callback(next_func)
 
-    def check_callback_error(status: Status):
+    def set_global_exception_and_log(status: Status):
         error = status.exception()
-        if error is not None:
-            full_status.set_exception(error)
-            # So full_status can also be checked for any errors
-            LOGGER.error(f"Status {status} has failed with error {error}")
+        full_status.set_exception(error)
+        # So full_status can also be checked for any errors
+        LOGGER.error(f"Status {status} has failed with error {error}")
 
     # Each wrapped function needs to attach its callback to the subsequent wrapped
     # function, therefore wrapped_funcs list needs to be created in reverse order

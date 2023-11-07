@@ -50,7 +50,7 @@ class GridScanParams(BaseModel, AbstractExperimentParameterBase):
     x_step_size: float = 0.1
     y_step_size: float = 0.1
     z_step_size: float = 0.1
-    dwell_time: float = 0.1
+    dwell_time_ms: float = 0.1
     x_start: float = 0.1
     y1_start: float = 0.1
     y2_start: float = 0.1

@@ -23,7 +23,7 @@ class FastGridScan2D(Device):
     x_step_size: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "X_STEP_SIZE")
     y_step_size: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "Y_STEP_SIZE")
 
-    dwell_time: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "EXPOSURE_TIME")
+    dwell_time_ms: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "EXPOSURE_TIME")
 
     x_start: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "X_START")
     y1_start: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "Y_START")
@@ -98,8 +98,8 @@ def set_fast_grid_scan_params(scan: FastGridScan2D, params: GridScanParams):
         params.x_step_size,
         scan.y_step_size,
         params.y_step_size,
-        scan.dwell_time,
-        params.dwell_time,
+        scan.dwell_time_ms,
+        params.dwell_time_ms,
         scan.x_start,
         params.x_start,
         scan.y1_start,

@@ -145,6 +145,9 @@ def set_up_logging_handlers(
         file_handler_logging_level, dev_mode, logging_path
     )
 
+    LOGGER.info(
+        f"Set up logger and handlers. Logging files to {logging_path} in {file_handler_logging_level}"
+    )
     return [stream_handler, graylog_handler, file_handler]
 
 

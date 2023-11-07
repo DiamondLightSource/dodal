@@ -136,6 +136,7 @@ class EigerDetector(Device):
 
     def stop(self, *args):
         """Emergency stop the device, mainly used to clean up after error."""
+        LOGGER.info("Eiger stop() called - cleaning up...")
         self.wait_on_arming_if_started()
         self.odin.stop()
         self.odin.file_writer.start_timeout.put(1)
