@@ -2,7 +2,7 @@ from functools import partial
 from typing import Callable, Optional
 
 from ophyd import Component, Device, EpicsSignal
-from ophyd.status import AndStatus, Status, StatusBase
+from ophyd.status import Status, StatusBase
 
 from dodal.log import LOGGER
 

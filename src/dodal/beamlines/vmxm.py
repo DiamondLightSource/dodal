@@ -1,11 +1,11 @@
 from dodal.beamlines.beamline_utils import device_instantiation
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.devices.backlight import VmxmBacklight
 from dodal.devices.eiger import EigerDetector
-from dodal.devices.fast_grid_scan import FastGridScan
+from dodal.devices.fast_grid_scan_2d import FastGridScan2D
+from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.vmxm.vmxm_attenuator import VmxmAttenuator
 from dodal.devices.zebra import Zebra
-from dodal.devices.backlight import Backlight
-from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import get_beamline_name, skip_device
 
@@ -37,12 +37,12 @@ def eiger(
 @skip_device(lambda: BL == SIM_BEAMLINE_NAME)
 def fast_grid_scan(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> FastGridScan:
+) -> FastGridScan2D:
     """Get the vmxm fast_grid_scan device, instantiate it if it hasn't already been.
     If this is called when already instantiated in vmxm, it will return the existing object.
     """
     return device_instantiation(
-        device_factory=FastGridScan,
+        device_factory=FastGridScan2D,
         name="fast_grid_scan",
         prefix="-MO-SAMP-11:FGS:",
         wait=wait_for_connection,
@@ -80,16 +80,15 @@ def attenuator(
     )
 
 
-
 @skip_device(lambda: BL == SIM_BEAMLINE_NAME)
 def backlight(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Backlight:
-    """Get the i03 backlight device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i03, it will return the existing object.
+) -> VmxmBacklight:
+    """Get the VMXm backlight device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in VMXm, it will return the existing object.
     """
     return device_instantiation(
-        device_factory=Backlight,
+        device_factory=VmxmBacklight,
         name="backlight",
         prefix="",
         wait=wait_for_connection,
@@ -101,8 +100,8 @@ def backlight(
 def synchrotron(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> Synchrotron:
-    """Get the i03 synchrotron device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i03, it will return the existing object.
+    """Get the VMXm synchrotron device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in VMXm, it will return the existing object.
     """
     return device_instantiation(
         Synchrotron,

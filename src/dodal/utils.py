@@ -224,6 +224,7 @@ def is_v1_device_type(obj: Type[Any]) -> bool:
 # Scientists refer to it as VMXm but $BEAMLINE env var is i02-1
 BEAMLINE_NAME_TO_MODULE_NAME_OVERRIDES = {
     "i02-1": "vmxm",
+    "i02-2": "vmxi",
 }
 
 
