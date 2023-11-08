@@ -40,6 +40,7 @@ class ZoomController(Device):
     thst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.THST")
     frst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.FRST")
     fvst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.FVST")
+    sxst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.SXST")
 
     def set_flatfield_on_zoom_level_one(self, value):
         flat_applied = self.parent.proc.port_name.get()
@@ -59,6 +60,7 @@ class ZoomController(Device):
             self.thst.get(),
             self.frst.get(),
             self.fvst.get(),
+            self.sxst.get(),
         ]
 
     def set(self, level_to_set: str) -> StatusBase:
