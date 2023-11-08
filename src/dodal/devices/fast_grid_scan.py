@@ -61,7 +61,7 @@ class GridScanParams(BaseModel, AbstractExperimentParameterBase):
     x_step_size: float = 0.1
     y_step_size: float = 0.1
     z_step_size: float = 0.1
-    dwell_time_ms: float = 0.1
+    dwell_time_ms: float = 10
     x_start: float = 0.1
     y1_start: float = 0.1
     y2_start: float = 0.1
@@ -90,6 +90,18 @@ class GridScanParams(BaseModel, AbstractExperimentParameterBase):
     @validator("z_axis", always=True)
     def _get_z_axis(cls, z_axis: GridAxis, values: dict[str, Any]) -> GridAxis:
         return GridAxis(values["z2_start"], values["z_step_size"], values["z_steps"])
+
+    @validator("dwell_time_ms", always=True, check_fields=True)
+    def non_integer_dwell_time(cls, dwell_time_ms: float) -> float:
+        dwell_time_floor_rounded = np.floor(dwell_time_ms)
+        dwell_time_is_close = np.isclose(
+            dwell_time_ms, dwell_time_floor_rounded, rtol=1e-3
+        )
+        if not dwell_time_is_close:
+            raise ValueError(
+                f"Dwell time of {dwell_time_ms}ms is not an integer value. Fast Grid Scan only accepts integer values"
+            )
+        return dwell_time_ms
 
     def is_valid(self, limits: XYZLimitBundle) -> bool:
         """
