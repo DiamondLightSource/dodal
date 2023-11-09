@@ -1,18 +1,18 @@
 from enum import Enum
 
 from ophyd import Component as Cpt
-from ophyd import Device, EpicsMotor, EpicsSignal
+from ophyd import Device, EpicsMotor
 from ophyd.epics_motor import MotorBundle
-from ophyd.status import Status
+from ophyd.status import StatusBase
 
 from dodal.devices.motors import MotorLimitHelper, XYZLimitBundle
-from dodal.devices.status import await_value
-from dodal.devices.utils import run_functions_without_blocking
+from dodal.devices.status import await_approx_value
+from dodal.devices.utils import SetWhenEnabled
 
 
 class StubPosition(Enum):
     CURRENT_AS_CENTER = 0
-    RESEET_TO_ROBOT_LOAD = 1
+    RESET_TO_ROBOT_LOAD = 1
 
 
 class StubOffsets(Device):
@@ -24,28 +24,20 @@ class StubOffsets(Device):
     set them so that the current position is zero or to pre-defined positions.
     """
 
-    center_at_current_position: EpicsSignal = Cpt(EpicsSignal, "CENTER_CS.PROC")
-    center_at_current_position_enabled: EpicsSignal = Cpt(EpicsSignal, "CENTER_CS.DISP")
+    parent: "Smargon"
 
-    to_robot_load: EpicsSignal = Cpt(EpicsSignal, "SET_STUBS_TO_RL.PROC")
-    to_robot_load_enabled: EpicsSignal = Cpt(EpicsSignal, "SET_STUBS_TO_RL.DISP")
+    center_at_current_position: SetWhenEnabled = Cpt(SetWhenEnabled, "CENTER_CS")
+    to_robot_load: SetWhenEnabled = Cpt(SetWhenEnabled, "SET_STUBS_TO_RL")
 
-    def set(self, pos: StubPosition) -> Status:
+    def set(self, pos: StubPosition) -> StatusBase:
         if pos == StubPosition.CURRENT_AS_CENTER:
-            status = run_functions_without_blocking(
-                [
-                    lambda: await_value(self.center_at_current_position_enabled, 0),
-                    lambda: self.center_at_current_position.set(1),
-                ]
-            )
+            status = self.center_at_current_position.set(1)
+            status &= await_approx_value(self.parent.x, 0.0, deadband=0.1)
+            status &= await_approx_value(self.parent.y, 0.0, deadband=0.1)
+            status &= await_approx_value(self.parent.z, 0.0, deadband=0.1)
+            return status
         else:
-            status = run_functions_without_blocking(
-                [
-                    lambda: await_value(self.to_robot_load_enabled, 0),
-                    lambda: self.to_robot_load.set(1),
-                ]
-            )
-        return status
+            return self.to_robot_load.set(1)
 
 
 class Smargon(MotorBundle):
