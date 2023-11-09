@@ -10,7 +10,7 @@ from dodal import log
 from dodal.log import EnhancedRollingFileHandler, GELFTCPHandler
 
 
-def get_mock_streamhandler(level=20):
+def get_mock_streamhandler(level=logging.INFO):
     sh = MagicMock(spec=logging.StreamHandler)
     sh.level = level
     return sh
