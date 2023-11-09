@@ -25,13 +25,13 @@ def test_backlight_position(fake_backlight: DualBacklight):
 
 def test_when_led1_out_it_switches_off(fake_backlight: DualBacklight):
     RE = RunEngine()
-    RE(bps.abs_set(fake_backlight, fake_backlight.OUT))
+    RE(bps.mv(fake_backlight, fake_backlight.OUT))
     assert fake_backlight.led1.get() == "OFF"
 
 
 def test_when_led1_not_out_it_switches_on(fake_backlight: DualBacklight):
     RE = RunEngine()
-    RE(bps.abs_set(fake_backlight, "OAV2"))
+    RE(bps.mv(fake_backlight, "OAV2"))
     assert fake_backlight.led1.get() == "ON"
 
 

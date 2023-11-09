@@ -33,20 +33,25 @@ def test_given_key_in_context_and_default_when_load_parameters_then_value_found_
     assert mock_parameters.minimum_height == 10
 
 
+def test_extract_beam_position_from_context(mock_parameters: OAVParameters):
+    expected_beam_position = (517, 350)
+    assert mock_parameters.beam_centre_i == expected_beam_position[0]
+    assert mock_parameters.beam_centre_j == expected_beam_position[1]
+
+
 @pytest.mark.parametrize(
     "zoom_level,expected_xCentre,expected_yCentre",
     [(1.0, 477, 359), (5.0, 517, 350), (10.0, 613, 344)],
 )
-def test_extract_beam_position_different_beam_postitions(
+def test_extract_beam_position_given_different_zoom_levels(
     zoom_level,
     expected_xCentre,
     expected_yCentre,
     mock_parameters: OAVParameters,
 ):
-    mock_parameters.zoom = zoom_level
-    mock_parameters._extract_beam_position()
-    assert mock_parameters.beam_centre_i == expected_xCentre
-    assert mock_parameters.beam_centre_j == expected_yCentre
+    beam_centre = mock_parameters.get_beam_position_from_zoom(zoom_level)
+    assert beam_centre[0] == expected_xCentre
+    assert beam_centre[1] == expected_yCentre
 
 
 @pytest.mark.parametrize(

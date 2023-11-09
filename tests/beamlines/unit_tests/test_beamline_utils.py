@@ -44,6 +44,7 @@ def test_instantiating_different_device_with_same_name():
 
 
 def test_instantiate_function_fake_makes_fake():
+    beamline_utils.clear_devices()
     fake_zeb: Zebra = beamline_utils.device_instantiation(
         i03.Zebra, "zebra", "", True, True, None
     )

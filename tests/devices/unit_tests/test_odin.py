@@ -8,7 +8,7 @@ from dodal.devices.eiger_odin import EigerOdin
 @pytest.fixture
 def fake_odin():
     FakeOdin = make_fake_device(EigerOdin)
-    fake_odin: EigerOdin = FakeOdin(name="test")
+    fake_odin: EigerOdin = FakeOdin(name="test fake odin")
 
     return fake_odin
 
