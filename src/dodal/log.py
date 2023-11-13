@@ -126,7 +126,7 @@ def set_up_file_handler(
 
 def set_up_logging_handlers(
     logging_level: Optional[str] = "INFO",
-    dev_mode: Optional[bool] = False,
+    dev_mode: bool = False,
     logging_path: Optional[Path] = None,
     file_handler_logging_level: Optional[str] = None,
     logger=LOGGER,
