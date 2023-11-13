@@ -19,11 +19,7 @@ from ophyd_async.core.device_save_loader import Msg
 from ophyd_async.epics.areadetector.writers import HDFWriter, NDFileHDF
 from ophyd_async.epics.areadetector.utils import stop_busy_record
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
-import asyncio 
-
-class TetrammAcquire(str, Enum):
-    Acquire = "Acquire"
-    Stop = "Stop"
+import asyncio
 
 
 class TetrammRange(str, Enum):
@@ -63,8 +59,6 @@ class TetrammGeometry(str, Enum):
 
 
 class TetrammDriver(Device):
-    
-
     def __init__(
         self,
         prefix,
@@ -83,7 +77,7 @@ class TetrammDriver(Device):
         self.to_average = epics_signal_r(int, prefix + "NumAverage_RBV")
         self.averaged = epics_signal_r(int, prefix + "NumAveraged_RBV")
 
-        self.acquire = epics_signal_rw(TetrammAcquire, prefix + "Acquire")
+        self.acquire = epics_signal_rw(bool, prefix + "Acquire")
 
         self.overflows = epics_signal_r(int, prefix + "RingOverflows")
 
@@ -106,7 +100,7 @@ class TetrammController(DetectorControl):
         minimum_values_per_reading=5,
         maximum_readings_per_frame=1_000,
         base_sample_rate=100_000,
-        readings_per_frame=1_000
+        readings_per_frame=1_000,
     ):
         self._drv = drv
 
@@ -146,18 +140,15 @@ class TetrammController(DetectorControl):
         await self._drv.trigger_mode.set(TetrammTrigger.ExtTrigger)
 
         await asyncio.gather(
-            self._drv.averaging_time.set(exposure),
-            self.set_frame_time(exposure)
+            self._drv.averaging_time.set(exposure), self.set_frame_time(exposure)
         )
 
-        status = await set_and_wait_for_value(
-            self._drv.acquire, TetrammAcquire.Acquire
-        )
+        status = await set_and_wait_for_value(self._drv.acquire, 1)
 
         return status
 
     async def disarm(self):
-        await stop_busy_record(self._drv.acquire, TetrammAcquire.Stop, timeout=1)
+        await stop_busy_record(self._drv.acquire, 0, timeout=1)
 
     async def set_frame_time(self, seconds):
         # It may not always be possible to set the exact collection time if the
@@ -195,11 +186,11 @@ class TetrammController(DetectorControl):
         )
 
 
-#TODO: need to change this name.
+# TODO: need to change this name.
 MAX_CHANNELS = 11
 
 IDLE_TETRAMM = {
-    "acquire": TetrammAcquire.Stop,
+    "acquire": 0,
 }
 
 COMMON_TETRAMM = {
@@ -220,7 +211,7 @@ FREE_TETRAMM = {
     **COMMON_TETRAMM,
     "sample_time": 0.1,
     "values_per_reading": 10,
-    "acquire": TetrammAcquire.Acquire,
+    "acquire": 1,
     "trigger_mode": TetrammTrigger.FreeRun,
 }
 
@@ -271,7 +262,10 @@ class TetrammDetector(StandardDetector):
         super().__init__(
             controller,
             HDFWriter(
-                hdf, directory_provider, lambda: self.name, TetrammShapeProvider(controller)
+                hdf,
+                directory_provider,
+                lambda: self.name,
+                TetrammShapeProvider(controller),
             ),
             [drv.values_per_reading, drv.averaging_time, drv.sample_time],
             name,

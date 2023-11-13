@@ -4,7 +4,12 @@ from bluesky.protocols import HasHints, Hints
 from ophyd_async.core import DirectoryProvider, SignalR, StandardDetector
 from ophyd_async.epics.areadetector.controllers import PilatusController
 from ophyd_async.epics.areadetector.drivers import ADBaseShapeProvider, PilatusDriver
-from ophyd_async.epics.areadetector.writers import HDFWriter, NDFileHDF, NDPluginStats
+from ophyd_async.epics.areadetector.writers import (
+    HDFWriter,
+    NDFileHDF,
+    NDPluginStats,
+)
+from ophyd_async.epics.areadetector.drivers.ad_base import DetectorState
 
 
 class HDFStatsPilatus(StandardDetector):
@@ -17,10 +22,11 @@ class HDFStatsPilatus(StandardDetector):
         directory_provider: DirectoryProvider,
         name: str = "",
         config_sigs: Sequence[SignalR] = (),
+        **scalar_sigs: str,
     ):
-        self.drv = PilatusDriver(prefix + "CAM:")
-        self.hdf = NDFileHDF(prefix + "HDF5:")
-        self.stats = NDPluginStats(prefix + "STAT:")
+        self.drv = PilatusDriver(prefix + ":CAM:")
+        self.hdf = NDFileHDF(prefix + ":HDF5:")
+        self.stats = NDPluginStats(prefix + ":STAT:")
 
         super().__init__(
             PilatusController(self.drv),
@@ -30,6 +36,7 @@ class HDFStatsPilatus(StandardDetector):
                 lambda: self.name,
                 ADBaseShapeProvider(self.drv),
                 sum="NDStatsSum",
+                **scalar_sigs,
             ),
             config_sigs=config_sigs,
             name=name,
@@ -38,4 +45,3 @@ class HDFStatsPilatus(StandardDetector):
     @property
     def hints(self) -> Hints:
         return self.writer.hints
-
