@@ -35,7 +35,7 @@ class HDFStatsPilatus(StandardDetector):
                 directory_provider,
                 lambda: self.name,
                 ADBaseShapeProvider(self.drv),
-                sum="NDStatsSum",
+                sum="StatsTotal",
                 **scalar_sigs,
             ),
             config_sigs=config_sigs,
