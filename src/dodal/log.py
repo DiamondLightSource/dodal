@@ -138,8 +138,6 @@ def set_up_logging_handlers(
         logging_path: The location to store log files, if left as None then puts them in the default location.
     """
     logging_level = logging_level or "INFO"
-    if dev_mode is None:
-        dev_mode = True
     stream_handler = logging.StreamHandler()
     _add_handler(logger, stream_handler, logging_level)
     graylog_handler = set_up_graylog_handler(logging_level, dev_mode, logger)
