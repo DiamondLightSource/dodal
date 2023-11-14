@@ -185,29 +185,27 @@ class TetrammController(DetectorControl):
 MAX_CHANNELS = 11
 
 IDLE_TETRAMM = {
-    "acquire": 0,
+    "drv.acquire": 0,
 }
 
 COMMON_TETRAMM = {
-    "range": TetrammRange.uA,
-    "channels": 4,
-    "resolution": TetrammResolution.TwentyFourBits,
-    "bias": False,
-    "bias_volts": 0,
-    "geometry": TetrammGeometry.Square,
+    "drv.range": TetrammRange.uA,
+    "drv.num_channels": "4",
+    "drv.resolution": TetrammResolution.TwentyFourBits,
+    "drv.bias": False,
+    "drv.bias_volts": 0,
+    "drv.geometry": TetrammGeometry.Square,
 }
 
 TRIGGERED_TETRAMM = {
     **COMMON_TETRAMM,
-    "trigger_mode": TetrammTrigger.ExtTrigger,
+    "drv.trigger_mode": TetrammTrigger.ExtTrigger,
 }
 
 FREE_TETRAMM = {
     **COMMON_TETRAMM,
-    "sample_time": 0.1,
-    "values_per_reading": 10,
-    "acquire": 1,
-    "trigger_mode": TetrammTrigger.FreeRun,
+    "drv.values_per_reading": 10,
+    "drv.trigger_mode": TetrammTrigger.FreeRun,
 }
 
 
