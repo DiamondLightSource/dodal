@@ -16,7 +16,9 @@ class DCM(Device):
     roll: EpicsMotor = Cpt(EpicsMotor, "-MO-DCM-01:ROLL")
     offset: EpicsMotor = Cpt(EpicsMotor, "-MO-DCM-01:OFFSET")
     perp: EpicsMotor = Cpt(EpicsMotor, "-MO-DCM-01:PERP")
-    energy: EpicsMotor = Cpt(EpicsMotor, "-MO-DCM-01:ENERGY", kind=Kind.hinted)
+    energy_in_kev: EpicsMotor = Cpt(
+        EpicsMotor, "-MO-DCM-01:ENERGY", kind=Kind.hinted
+    )  # is this actually kev?
     pitch: EpicsMotor = Cpt(EpicsMotor, "-MO-DCM-01:PITCH")
     wavelength: EpicsMotor = Cpt(EpicsMotor, "-MO-DCM-01:WAVELENGTH")
 
