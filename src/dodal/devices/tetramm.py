@@ -17,8 +17,8 @@ from ophyd_async.core import (
 )
 from ophyd_async.core.device_save_loader import Msg
 from ophyd_async.epics.areadetector.writers import HDFWriter, NDFileHDF
-from ophyd_async.epics.areadetector.utils import stop_busy_record
-from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
+from ophyd_async.epics.signal import epics_signal_r
+from ophyd_async.epics.areadetector.utils import stop_busy_record, ad_rw, ad_r
 import asyncio
 
 
@@ -65,30 +65,25 @@ class TetrammDriver(Device):
         name="",
     ):
         self._prefix = prefix
-        self.range = epics_signal_rw(TetrammRange, prefix + "Range")
-        self.sample_time = epics_signal_r(float, prefix + "SampleTime_RBV")
+        self.range = ad_rw(TetrammRange, prefix + "Range")
+        self.sample_time = ad_r(float, prefix + "SampleTime")
 
-        self.values_per_reading = epics_signal_rw(
-            int, prefix + "ValuesPerRead_RBV", prefix + "ValuesPerRead"
-        )
-        self.averaging_time = epics_signal_rw(
-            float, prefix + "AveragingTime_RBV", prefix + "AveragingTime"
-        )
-        self.to_average = epics_signal_r(int, prefix + "NumAverage_RBV")
-        self.averaged = epics_signal_r(int, prefix + "NumAveraged_RBV")
+        self.values_per_reading = ad_rw(int, prefix + "ValuesPerRead")
+        self.averaging_time = ad_rw(float, prefix + "AveragingTime")
+        self.to_average = ad_r(int, prefix + "NumAverage")
+        self.averaged = ad_r(int, prefix + "NumAveraged")
 
-        self.acquire = epics_signal_rw(bool, prefix + "Acquire")
+        self.acquire = ad_rw(bool, prefix + "Acquire")
 
+        # this PV is special, for some reason it doesn't have a _RBV suffix...
         self.overflows = epics_signal_r(int, prefix + "RingOverflows")
 
-        self.num_channels = epics_signal_rw(TetrammChannels, prefix + "NumChannels")
-        self.resolution = epics_signal_rw(TetrammResolution, prefix + "Resolution")
-        self.trigger_mode = epics_signal_rw(TetrammTrigger, prefix + "TriggerMode")
-        self.bias = epics_signal_rw(bool, prefix + "BiasState")
-        self.bias_volts = epics_signal_rw(
-            float, prefix + "BiasVoltage", prefix + "BiasVoltage_RBV"
-        )
-        self.geometry = epics_signal_rw(TetrammGeometry, prefix + "Geometry")
+        self.num_channels = ad_rw(TetrammChannels, prefix + "NumChannels")
+        self.resolution = ad_rw(TetrammResolution, prefix + "Resolution")
+        self.trigger_mode = ad_rw(TetrammTrigger, prefix + "TriggerMode")
+        self.bias = ad_rw(bool, prefix + "BiasState")
+        self.bias_volts = ad_rw(float, prefix + "BiasVoltage")
+        self.geometry = ad_rw(TetrammGeometry, prefix + "Geometry")
 
         super().__init__(name=name)
 
@@ -251,13 +246,13 @@ class TetrammDetector(StandardDetector):
         self.hdf = hdf
 
         # TODO: how to make the below, readable signals?
-        # self.current_1 = epics_signal_r(float, prefix + ":Cur1:MeanValue_RBV")
-        # self.current_2 = epics_signal_r(float, prefix + ":Cur2:MeanValue_RBV")
-        # self.current_3 = epics_signal_r(float, prefix + ":Cur3:MeanValue_RBV")
-        # self.current_4 = epics_signal_r(float, prefix + ":Cur4:MeanValue_RBV")
+        # self.current_1 = ad_r(float, prefix + ":Cur1:MeanValue")
+        # self.current_2 = ad_r(float, prefix + ":Cur2:MeanValue")
+        # self.current_3 = ad_r(float, prefix + ":Cur3:MeanValue")
+        # self.current_4 = ad_r(float, prefix + ":Cur4:MeanValue")
 
-        # self.position_x = epics_signal_r(float, prefix + ":PosX:MeanValue_RBV")
-        # self.position_y = epics_signal_r(float, prefix + ":PosY:MeanValue_RBV")
+        # self.position_x = ad_r(float, prefix + ":PosX:MeanValue")
+        # self.position_y = ad_r(float, prefix + ":PosY:MeanValue")
         controller = TetrammController(drv)
         super().__init__(
             controller,
