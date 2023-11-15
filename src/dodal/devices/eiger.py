@@ -173,10 +173,10 @@ class EigerDetector(Device):
     def set_cam_pvs(self) -> AndStatus:
         assert self.detector_params is not None
         status = self.cam.acquire_time.set(
-            self.detector_params.exposure_time_ms, timeout=self.GENERAL_STATUS_TIMEOUT
+            self.detector_params.exposure_time_s, timeout=self.GENERAL_STATUS_TIMEOUT
         )
         status &= self.cam.acquire_period.set(
-            self.detector_params.exposure_time_ms, timeout=self.GENERAL_STATUS_TIMEOUT
+            self.detector_params.exposure_time_s, timeout=self.GENERAL_STATUS_TIMEOUT
         )
         status &= self.cam.num_exposures.set(1, timeout=self.GENERAL_STATUS_TIMEOUT)
         status &= self.cam.image_mode.set(

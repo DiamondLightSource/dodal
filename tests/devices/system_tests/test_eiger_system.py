@@ -7,7 +7,7 @@ from dodal.devices.eiger import DetectorParams, EigerDetector
 def eiger():
     detector_params: DetectorParams = DetectorParams(
         current_energy_ev=100,
-        exposure_time_ms=0.1,
+        exposure_time_s=0.1,
         directory="/tmp",
         prefix="file_name",
         detector_distance_mm=100.0,

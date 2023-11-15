@@ -28,15 +28,15 @@ class DetectorParams(BaseModel):
     sizes and a converter for distance to beam centre."""
 
     current_energy_ev: float
-    exposure_time_ms: float
+    exposure_time_s: float
     directory: str
     prefix: str
     run_number: int
     detector_distance_mm: float
     omega_start_deg: float
     omega_increment_deg: float
-    num_images_per_trigger: int
-    num_triggers: int
+    num_images_per_trigger: int = 1
+    num_triggers: int = 1
     use_roi_mode: bool
     det_dist_to_beam_converter_path: str
     trigger_mode: TriggerMode = TriggerMode.SET_FRAMES
@@ -63,7 +63,7 @@ class DetectorParams(BaseModel):
         return directory
 
     @validator("trigger_mode", pre=True)
-    def _parse_direction(cls, trigger_mode: str | int | TriggerMode):
+    def _parse_trigger_mode(cls, trigger_mode: str | int | TriggerMode):
         if isinstance(trigger_mode, TriggerMode):
             return trigger_mode
         if isinstance(trigger_mode, str):
