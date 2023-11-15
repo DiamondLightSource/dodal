@@ -36,7 +36,7 @@ def test_converter_eq():
 
 
 @pytest.mark.parametrize(
-    "detector_distance, axis, expected_value",
+    "detector_distance_mm, axis, expected_value",
     [
         (100.0, Axis.Y_AXIS, 160.0),
         (200.0, Axis.X_AXIS, 151.0),
@@ -46,22 +46,22 @@ def test_converter_eq():
 )
 def test_interpolate_beam_xy_from_det_distance(
     fake_converter: DetectorDistanceToBeamXYConverter,
-    detector_distance: float,
+    detector_distance_mm: float,
     axis: Axis,
     expected_value: float,
 ):
     assert isinstance(
-        fake_converter.get_beam_xy_from_det_dist(detector_distance, axis), float
+        fake_converter.get_beam_xy_from_det_dist(detector_distance_mm, axis), float
     )
 
     assert (
-        fake_converter.get_beam_xy_from_det_dist(detector_distance, axis)
+        fake_converter.get_beam_xy_from_det_dist(detector_distance_mm, axis)
         == expected_value
     )
 
 
 def test_get_beam_in_pixels(fake_converter: DetectorDistanceToBeamXYConverter):
-    detector_distance = 100.0
+    detector_distance_mm = 100.0
     image_size_pixels = 100
     detector_dimensions = 200.0
     interpolated_x_value = 150.0
@@ -77,13 +77,13 @@ def test_get_beam_in_pixels(fake_converter: DetectorDistanceToBeamXYConverter):
     expected_x_value = interpolated_x_value * image_size_pixels / detector_dimensions
 
     calculated_y_value = fake_converter.get_beam_y_pixels(
-        detector_distance, image_size_pixels, detector_dimensions
+        detector_distance_mm, image_size_pixels, detector_dimensions
     )
 
     assert calculated_y_value == expected_y_value
     assert (
         fake_converter.get_beam_x_pixels(
-            detector_distance, image_size_pixels, detector_dimensions
+            detector_distance_mm, image_size_pixels, detector_dimensions
         )
         == expected_x_value
     )

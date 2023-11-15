@@ -173,10 +173,10 @@ class EigerDetector(Device):
     def set_cam_pvs(self) -> AndStatus:
         assert self.detector_params is not None
         status = self.cam.acquire_time.set(
-            self.detector_params.exposure_time, timeout=self.GENERAL_STATUS_TIMEOUT
+            self.detector_params.exposure_time_ms, timeout=self.GENERAL_STATUS_TIMEOUT
         )
         status &= self.cam.acquire_period.set(
-            self.detector_params.exposure_time, timeout=self.GENERAL_STATUS_TIMEOUT
+            self.detector_params.exposure_time_ms, timeout=self.GENERAL_STATUS_TIMEOUT
         )
         status &= self.cam.num_exposures.set(1, timeout=self.GENERAL_STATUS_TIMEOUT)
         status &= self.cam.image_mode.set(
@@ -215,7 +215,7 @@ class EigerDetector(Device):
     def set_mx_settings_pvs(self):
         assert self.detector_params is not None
         beam_x_pixels, beam_y_pixels = self.detector_params.get_beam_position_pixels(
-            self.detector_params.detector_distance
+            self.detector_params.detector_distance_mm
         )
         status = self.cam.beam_center_x.set(
             beam_x_pixels, timeout=self.GENERAL_STATUS_TIMEOUT
@@ -224,13 +224,15 @@ class EigerDetector(Device):
             beam_y_pixels, timeout=self.GENERAL_STATUS_TIMEOUT
         )
         status &= self.cam.det_distance.set(
-            self.detector_params.detector_distance, timeout=self.GENERAL_STATUS_TIMEOUT
+            self.detector_params.detector_distance_mm,
+            timeout=self.GENERAL_STATUS_TIMEOUT,
         )
-        status &= self.cam.omega_start.set(
-            self.detector_params.omega_start, timeout=self.GENERAL_STATUS_TIMEOUT
+        status &= self.cam.omega_start_deg.set(
+            self.detector_params.omega_start_deg, timeout=self.GENERAL_STATUS_TIMEOUT
         )
         status &= self.cam.omega_incr.set(
-            self.detector_params.omega_increment, timeout=self.GENERAL_STATUS_TIMEOUT
+            self.detector_params.omega_increment_deg,
+            timeout=self.GENERAL_STATUS_TIMEOUT,
         )
         return status
 

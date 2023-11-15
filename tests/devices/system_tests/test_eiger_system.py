@@ -7,12 +7,12 @@ from dodal.devices.eiger import DetectorParams, EigerDetector
 def eiger():
     detector_params: DetectorParams = DetectorParams(
         current_energy_ev=100,
-        exposure_time=0.1,
+        exposure_time_ms=0.1,
         directory="/tmp",
         prefix="file_name",
-        detector_distance=100.0,
-        omega_start=0.0,
-        omega_increment=0.1,
+        detector_distance_mm=100.0,
+        omega_start_deg=0.0,
+        omega_increment_deg=0.1,
         num_triggers=50,
         use_roi_mode=False,
         run_number=0,

@@ -36,13 +36,13 @@ class StatusException(Exception):
 def create_new_params() -> DetectorParams:
     return DetectorParams(
         current_energy_ev=TEST_CURRENT_ENERGY,
-        exposure_time=TEST_EXPOSURE_TIME,
+        exposure_time_ms=TEST_EXPOSURE_TIME,
         directory=TEST_DIR,
         prefix=TEST_PREFIX,
         run_number=TEST_RUN_NUMBER,
-        detector_distance=TEST_DETECTOR_DISTANCE,
-        omega_start=TEST_OMEGA_START,
-        omega_increment=TEST_OMEGA_INCREMENT,
+        detector_distance_mm=TEST_DETECTOR_DISTANCE,
+        omega_start_deg=TEST_OMEGA_START,
+        omega_increment_deg=TEST_OMEGA_INCREMENT,
         num_images_per_trigger=TEST_NUM_IMAGES_PER_TRIGGER,
         num_triggers=TEST_NUM_TRIGGERS,
         use_roi_mode=TEST_USE_ROI_MODE,
@@ -178,7 +178,7 @@ def test_when_set_odin_pvs_called_then_full_filename_written_and_set_mx_settings
     assert (
         fake_eiger.cam.beam_center_x.get()
         != fake_eiger.detector_params.get_beam_position_pixels(
-            fake_eiger.detector_params.detector_distance
+            fake_eiger.detector_params.detector_distance_mm
         )[0]
     )
 
@@ -189,7 +189,7 @@ def test_when_set_odin_pvs_called_then_full_filename_written_and_set_mx_settings
     assert (
         fake_eiger.cam.beam_center_x.get()
         == fake_eiger.detector_params.get_beam_position_pixels(
-            fake_eiger.detector_params.detector_distance
+            fake_eiger.detector_params.detector_distance_mm
         )[0]
     )
 
