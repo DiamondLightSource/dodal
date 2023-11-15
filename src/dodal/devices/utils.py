@@ -4,6 +4,7 @@ from typing import Callable, Optional
 from ophyd import Component, Device, EpicsSignal
 from ophyd.status import Status, StatusBase
 
+from dodal.devices.status import await_value
 from dodal.log import LOGGER
 
 
@@ -105,3 +106,18 @@ def run_functions_without_blocking(
     # Initiate the chain of functions
     wrap_func(starting_status, functions_to_chain[0], wrapped_funcs[-1])
     return full_status
+
+
+class SetWhenEnabled(Device):
+    """A device that sets the proc field of a PV when it becomes enabled."""
+
+    proc: EpicsSignal = Component(EpicsSignal, ".PROC")
+    disp: EpicsSignal = Component(EpicsSignal, ".DISP")
+
+    def set(self, proc: int) -> Status:
+        return run_functions_without_blocking(
+            [
+                lambda: await_value(self.disp, 0),
+                lambda: self.proc.set(proc),
+            ]
+        )

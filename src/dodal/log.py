@@ -16,7 +16,6 @@ LOGGER = logging.getLogger("Dodal")
 LOGGER.setLevel(logging.DEBUG)
 ophyd_logger.parent = LOGGER
 bluesky_logger.parent = LOGGER
-
 DEFAULT_FORMATTER = logging.Formatter(
     "[%(asctime)s] %(name)s %(module)s %(levelname)s: %(message)s"
 )
@@ -71,13 +70,13 @@ def set_beamline(beamline_name: str):
     beamline_filter.beamline = beamline_name
 
 
-def _add_handler(handler: logging.Handler, logging_level: str):
+def _add_handler(logger: logging.Logger, handler: logging.Handler, logging_level: str):
     handler.setFormatter(DEFAULT_FORMATTER)
     handler.setLevel(logging_level)
-    LOGGER.addHandler(handler)
+    logger.addHandler(handler)
 
 
-def set_up_graylog_handler(logging_level: str, dev_mode: bool = False):
+def set_up_graylog_handler(logging_level: str, dev_mode: bool = False, logger=LOGGER):
     """Set up a graylog handler for the logger
     Args:
         logging_level: The level of logs that should be saved to graylog. Defaults to INFO.
@@ -85,12 +84,12 @@ def set_up_graylog_handler(logging_level: str, dev_mode: bool = False):
     """
     graylog_host, graylog_port = _get_graylog_configuration(dev_mode)
     graylog_handler = GELFTCPHandler(graylog_host, graylog_port)
-    _add_handler(graylog_handler, logging_level)
-    LOGGER.addFilter(beamline_filter)
+    _add_handler(logger, graylog_handler, logging_level)
+    logger.addFilter(beamline_filter)
 
     # Warn users if trying to run in prod in debug mode
     if not dev_mode and logging_level == "DEBUG":
-        LOGGER.warning(
+        logger.warning(
             'STARTING HYPERION IN DEBUG WITHOUT "--dev" WILL FLOOD PRODUCTION GRAYLOG'
             " WITH MESSAGES. If you really need debug messages, set up a"
             " local graylog instead!\n"
@@ -99,7 +98,10 @@ def set_up_graylog_handler(logging_level: str, dev_mode: bool = False):
 
 
 def set_up_file_handler(
-    logging_level: str, dev_mode: bool = False, logging_path: Optional[Path] = None
+    logging_level: str,
+    dev_mode: bool = False,
+    logging_path: Optional[Path] = None,
+    logger=LOGGER,
 ):
     """Set up a file handler for the logger
     Args:
@@ -111,7 +113,7 @@ def set_up_file_handler(
         logging_path = _get_logging_file_path()
         print(f"Logging to {logging_path}")
     file_handler = EnhancedRollingFileHandler(filename=logging_path)
-    _add_handler(file_handler, logging_level)
+    _add_handler(logger, file_handler, logging_level)
 
     # for assistance in debugging
     if dev_mode:
@@ -127,6 +129,7 @@ def set_up_logging_handlers(
     dev_mode: bool = False,
     logging_path: Optional[Path] = None,
     file_handler_logging_level: Optional[str] = None,
+    logger=LOGGER,
 ) -> List[logging.Handler]:
     """Set up the default logging environment.
     Args:
@@ -134,18 +137,18 @@ def set_up_logging_handlers(
         dev_mode: True if in dev mode, will not log to graylog in dev. Defaults to False.
         logging_path: The location to store log files, if left as None then puts them in the default location.
     """
-    logging_level = logging_level if logging_level else "INFO"
+    logging_level = logging_level or "INFO"
     stream_handler = logging.StreamHandler()
-    _add_handler(stream_handler, logging_level)
-    graylog_handler = set_up_graylog_handler(logging_level, dev_mode)
+    _add_handler(logger, stream_handler, logging_level)
+    graylog_handler = set_up_graylog_handler(logging_level, dev_mode, logger)
     file_handler_logging_level = (
         file_handler_logging_level if file_handler_logging_level else logging_level
     )
     file_handler = set_up_file_handler(
-        file_handler_logging_level, dev_mode, logging_path
+        file_handler_logging_level, dev_mode, logging_path, logger
     )
 
-    LOGGER.info(
+    logger.info(
         f"Set up logger and handlers. Logging files to {logging_path} in {file_handler_logging_level}"
     )
     return [stream_handler, graylog_handler, file_handler]

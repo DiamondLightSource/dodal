@@ -1,9 +1,10 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+from ophyd.sim import make_fake_device
 from ophyd.status import Status
 
-from dodal.devices.utils import run_functions_without_blocking
+from dodal.devices.utils import SetWhenEnabled, run_functions_without_blocking
 from dodal.log import LOGGER, GELFTCPHandler, logging, set_up_logging_handlers
 
 
@@ -105,3 +106,15 @@ def test_status_points_to_provided_device_object():
     )
     returned_status.wait(0.1)
     assert returned_status.obj == expected_obj
+
+
+def test_given_disp_high_when_set_SetWhenEnabled_then_proc_not_set_until_disp_low():
+    signal: SetWhenEnabled = make_fake_device(SetWhenEnabled)(name="test")
+    signal.disp.sim_put(1)
+    signal.proc.set = MagicMock(return_value=Status(done=True, success=True))
+
+    status = signal.set(1)
+    signal.proc.set.assert_not_called()
+    signal.disp.sim_put(0)
+    status.wait()
+    signal.proc.set.assert_called_once()
