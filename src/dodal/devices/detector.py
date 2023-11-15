@@ -5,7 +5,7 @@ from pydantic import BaseModel, validator
 
 from dodal.devices.det_dim_constants import (
     EIGER2_X_16M_SIZE,
-    DetectorSize,
+    DetectorSize_pixels,
     DetectorSizeConstants,
     constants_from_type,
 )
@@ -41,7 +41,7 @@ class DetectorParams(BaseModel):
     det_dist_to_beam_converter_path: str
     trigger_mode: TriggerMode = TriggerMode.SET_FRAMES
     detector_size_constants: DetectorSizeConstants = EIGER2_X_16M_SIZE
-    beam_xy_converter: DetectorDistanceToBeamXYConverter = None
+    beam_xy_converter: DetectorDistanceToBeamXYConverter
 
     class Config:
         arbitrary_types_allowed = True
@@ -102,14 +102,14 @@ class DetectorParams(BaseModel):
 
         return x_beam_mm - offset_x, y_beam_mm - offset_y
 
-    def get_detector_size_pizels(self) -> DetectorSize:
+    def get_detector_size_pixels(self) -> DetectorSize_pixels:
         full_size = self.detector_size_constants.det_size_pixels
         roi_size = self.detector_size_constants.roi_size_pixels
         return roi_size if self.use_roi_mode else full_size
 
     def get_beam_position_pixels(self, detector_distance: float) -> Tuple[float, float]:
         full_size_pixels = self.detector_size_constants.det_size_pixels
-        roi_size_pixels = self.get_detector_size_pizels()
+        roi_size_pixels = self.get_detector_size_pixels()
 
         x_beam_pixels = self.beam_xy_converter.get_beam_x_pixels(
             detector_distance,
