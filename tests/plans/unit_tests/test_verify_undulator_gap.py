@@ -30,10 +30,7 @@ def test_when_gap_access_is_disabled_function_returns_false_and_logger_gives_war
     mock_logger, fake_dcm: DCM, fake_undulator: Undulator
 ):
     fake_undulator.gap_access.sim_put(UndulatorGapAccess.DISABLED.value)
-    assert (
-        verify_undulator_gap(fake_undulator, fake_dcm, fake_undulator.lookup_table_path)
-        is False
-    )
+    assert verify_undulator_gap(fake_undulator, fake_dcm) is False
     mock_logger.warning.assert_called_once()
 
 
