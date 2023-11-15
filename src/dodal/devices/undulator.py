@@ -11,7 +11,8 @@ class UndulatorGapAccess(Enum):
 
 
 class Undulator(Device):
-    gap: EpicsMotor = Component(EpicsMotor, "BLGAPMTR")
+    gap_motor: EpicsMotor = Component(EpicsMotor, "BLGAPMTR")
+    current_gap: EpicsSignalRO = Component(EpicsSignalRO, "CURRGAPD")
     gap_access: EpicsSignalRO = Component(EpicsSignalRO, "IDBLENA")
     lookup_table_path: str = (
         "/dls_sw/i03/software/daq_configuration/lookup/BeamLine_Undulator_toGap.txt"

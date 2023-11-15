@@ -82,13 +82,13 @@ def test_if_gap_is_wrong_then_logger_warning_and_gap_is_set(
 
     fake_undulator.lookup_table_path = path
     create_energy_distance_table(path)
-    fake_undulator.gap.user_readback.sim_put(2)
-    fake_undulator.gap.set = MagicMock()
+    fake_undulator.current_gap.sim_put(2)
+    fake_undulator.gap_motor.set = MagicMock()
     fake_dcm.energy_in_kev.user_readback.sim_put(14000)
 
     assert verify_undulator_gap(fake_undulator, fake_dcm) is True
     mock_logger.warning.assert_called_once()
-    fake_undulator.gap.set.assert_called_once_with(5.674)
+    fake_undulator.gap_motor.set.assert_called_once_with(5.674)
 
 
 @patch("dodal.plans.verify_undulator_gap.LOGGER")
@@ -98,9 +98,9 @@ def test_if_gap_is_correct_then_return_true_with_no_warnings(
     path = f"{tmp_path}/lookup.txt"
     fake_undulator.lookup_table_path = path
     create_energy_distance_table(path)
-    fake_undulator.gap.user_readback.sim_put(5.6815)
-    fake_undulator.gap.set = MagicMock()
+    fake_undulator.current_gap.sim_put(5.6815)
+    fake_undulator.gap_motor.set = MagicMock()
     fake_dcm.energy_in_kev.user_readback.sim_put(6000)
     assert verify_undulator_gap(fake_undulator, fake_dcm) is True
     mock_logger.warning.assert_not_called()
-    fake_undulator.gap.set.assert_not_called()
+    fake_undulator.gap_motor.set.assert_not_called()

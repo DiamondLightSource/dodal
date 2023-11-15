@@ -58,13 +58,13 @@ def verify_undulator_gap(undulator: Undulator, DCM: DCM) -> bool:
     )
 
     # Check if undulator gap is close enough to the value from the DCM
-    current_gap = undulator.gap.user_readback.get()
+    current_gap = undulator.current_gap.get()
 
     if abs(gap_to_match_dcm_energy - current_gap) > undulator.gap_discrepancy_tolerance:
         LOGGER.warning(
             f"Undulator gap mismatch. {abs(gap_to_match_dcm_energy-current_gap):.3f} is outside tolerance.\
             Restoring gap to nominal value, {gap_to_match_dcm_energy}"
         )
-        undulator.gap.set(gap_to_match_dcm_energy).wait(10)
+        undulator.gap_motor.set(gap_to_match_dcm_energy).wait(10)
 
     return True
