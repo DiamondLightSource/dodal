@@ -1,10 +1,15 @@
+from enum import IntEnum
+
 from ophyd import Component as Cpt
 from ophyd import Device, EpicsMotor, EpicsSignal, EpicsSignalRO
+
+class ShutterState(IntEnum):
+    CLOSED = 0
+    OPEN = 1
 
 
 class DetectorMotion(Device):
     """Physical motion and interlocks for detector travel"""
-
     upstream_x: EpicsMotor = Cpt(EpicsMotor, "-MO-DET-01:UPSTREAMX")
     downstream_x: EpicsMotor = Cpt(EpicsMotor, "-MO-DET-01:DOWNSTREAMX")
     x: EpicsMotor = Cpt(EpicsMotor, "-MO-DET-01:X")
