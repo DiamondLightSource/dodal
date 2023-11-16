@@ -41,7 +41,12 @@ class DetectorParams(BaseModel):
     det_dist_to_beam_converter_path: str
     trigger_mode: TriggerMode = TriggerMode.SET_FRAMES
     detector_size_constants: DetectorSizeConstants = EIGER2_X_16M_SIZE
-    beam_xy_converter: DetectorDistanceToBeamXYConverter
+    beam_xy_converter: DetectorDistanceToBeamXYConverter = None
+
+    # The following are optional from GDA as populated internally
+    # Where the VDS start index should be in the Nexus file
+    start_index: Optional[int] = 0
+    nexus_file_run_number: Optional[int] = 0
 
     class Config:
         arbitrary_types_allowed = True
@@ -79,16 +84,6 @@ class DetectorParams(BaseModel):
     ) -> DetectorDistanceToBeamXYConverter:
         return DetectorDistanceToBeamXYConverter(
             values["det_dist_to_beam_converter_path"]
-        )
-
-    # The following are optional from GDA as populated internally
-    # Where the VDS start index should be in the Nexus file
-    start_index: Optional[int] = 0
-    nexus_file_run_number: Optional[int] = 0
-
-    def __post_init__(self):
-        self.beam_xy_converter = DetectorDistanceToBeamXYConverter(
-            self.det_dist_to_beam_converter_path
         )
 
     def get_beam_position_mm(self, detector_distance_mm: float) -> Tuple[float, float]:

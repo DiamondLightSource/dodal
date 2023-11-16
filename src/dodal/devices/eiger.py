@@ -227,7 +227,7 @@ class EigerDetector(Device):
             self.detector_params.detector_distance_mm,
             timeout=self.GENERAL_STATUS_TIMEOUT,
         )
-        status &= self.cam.omega_start_deg.set(
+        status &= self.cam.omega_start.set(
             self.detector_params.omega_start_deg, timeout=self.GENERAL_STATUS_TIMEOUT
         )
         status &= self.cam.omega_incr.set(
