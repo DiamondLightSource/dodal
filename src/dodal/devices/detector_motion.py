@@ -1,5 +1,12 @@
+from enum import IntEnum
+
 from ophyd import Component as Cpt
 from ophyd import Device, EpicsMotor, EpicsSignal, EpicsSignalRO
+
+
+class ShutterState(IntEnum):
+    CLOSED = 0
+    OPEN = 1
 
 
 class DetectorMotion(Device):
