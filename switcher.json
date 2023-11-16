@@ -144,6 +144,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/fix_wrong_return_type/"
   },
   {
+    "version": "hyperion_698_refactor_parameters",
+    "url": "https://DiamondLightSource.github.io/dodal/hyperion_698_refactor_parameters/"
+  },
+  {
     "version": "hyperion_795_check_undulator_gap",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_795_check_undulator_gap/"
   },
