@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from typing import Any, Optional, Tuple
+from typing import Any, Optional, Tuple, Union
 
 from pydantic import BaseModel, validator
 
@@ -68,7 +68,7 @@ class DetectorParams(BaseModel):
         return directory
 
     @validator("trigger_mode", pre=True)
-    def _parse_trigger_mode(cls, trigger_mode: str | int | TriggerMode):
+    def _parse_trigger_mode(cls, trigger_mode: Union[str, int, TriggerMode]):
         if isinstance(trigger_mode, TriggerMode):
             return trigger_mode
         if isinstance(trigger_mode, str):
