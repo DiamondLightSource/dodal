@@ -200,7 +200,7 @@ def panda_fast_grid_scan(
     """
     return device_instantiation(
         device_factory=PandAFastGridScan,
-        name="fast_grid_scan",
+        name="panda_fast_grid_scan",
         prefix="-MO-SGON-01:PGS:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
@@ -368,7 +368,7 @@ def panda(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -
     return device_instantiation(
         PandA,
         "panda",
-        "i03-panda",
+        "-EA-PANDA-01",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
