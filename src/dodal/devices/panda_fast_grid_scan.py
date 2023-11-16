@@ -220,7 +220,7 @@ class PandAFastGridScan(Device):
     # dwell_time: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "DWELL_TIME")
     # Dwell time shouldn't be used for panda scan
 
-    runup_distance: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "RUNUP_DISTANCE")
+    runup_distance: EpicsSignalWithRBV = Component(EpicsSignal, "RUNUP_DISTANCE")
 
     x_start: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "X_START")
     y1_start: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "Y_START")
@@ -303,8 +303,6 @@ def set_fast_grid_scan_params(scan: PandAFastGridScan, params: PandaGridScanPara
         params.y_step_size,
         scan.z_step_size,
         params.z_step_size,
-        scan.dwell_time,
-        params.dwell_time,
         scan.x_start,
         params.x_start,
         scan.y1_start,
@@ -318,5 +316,5 @@ def set_fast_grid_scan_params(scan: PandAFastGridScan, params: PandaGridScanPara
         scan.position_counter,
         0,
         scan.runup_distance,
-        params.dwell_time_ms,
+        params.runnup_distance_mm,
     )
