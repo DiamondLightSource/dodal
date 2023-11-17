@@ -11,7 +11,7 @@ from dodal.devices.detector_motion import DetectorMotion
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import FastGridScan
 from dodal.devices.flux import Flux
-from dodal.devices.oav.oav_detector import OAV, OAVParams
+from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.s4_slit_gaps import S4SlitGaps
 from dodal.devices.sample_shutter import SampleShutter
@@ -149,7 +149,7 @@ def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
         "",
         wait_for_connection,
         fake_with_ophyd_sim,
-        params=OAVParams,
+        params=OAVConfigParams,
     )
 
 

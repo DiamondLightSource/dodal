@@ -4,7 +4,7 @@ import pytest
 from ophyd.sim import instantiate_fake_device
 from ophyd.status import Status
 
-from dodal.devices.oav.oav_detector import OAV, OAVParams
+from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
 from dodal.devices.oav.oav_errors import (
     OAVError_BeamPositionNotFound,
     OAVError_ZoomLevelNotFound,
@@ -16,7 +16,7 @@ ZOOM_LEVELS_XML = "tests/devices/unit_tests/test_jCameraManZoomLevels.xml"
 
 @pytest.fixture
 def oav() -> OAV:
-    oav_params = OAVParams(ZOOM_LEVELS_XML, DISPLAY_CONFIGURATION)
+    oav_params = OAVConfigParams(ZOOM_LEVELS_XML, DISPLAY_CONFIGURATION)
     oav: OAV = instantiate_fake_device(OAV, params=oav_params)
     oav.proc.port_name.sim_put("proc")
     oav.cam.port_name.sim_put("CAM")
@@ -88,6 +88,14 @@ def test_beam_position_not_found_for_wrong_entry(oav: OAV):
         oav.parameters.get_beam_position_from_zoom(2.0)
 
 
+def test_get_beam_position(oav: OAV):
+    expected_beam_position = (493, 355)
+    beam_position = oav.parameters.get_beam_position_from_zoom(2.5)
+
+    assert beam_position[0] == expected_beam_position[0]
+    assert beam_position[1] == expected_beam_position[1]
+
+
 @pytest.mark.parametrize(
     "zoom_level,expected_xCentre,expected_yCentre",
     [("1.0", 477, 359), ("5.0", 517, 350), ("10.0x", 613, 344)],
@@ -102,3 +110,20 @@ def test_extract_beam_position_given_different_zoom_levels(
 
     assert oav.parameters.beam_centre_i == expected_xCentre
     assert oav.parameters.beam_centre_j == expected_yCentre
+
+
+@pytest.mark.parametrize(
+    "h, v, expected_x, expected_y",
+    [
+        (54, 100, 517 - 54, 350 - 100),
+        (0, 0, 517, 350),
+        (500, 500, 517 - 500, 350 - 500),
+    ],
+)
+def test_calculate_beam_distance(h, v, expected_x, expected_y, oav: OAV):
+    oav.zoom_controller.level.sim_put("5.0x")
+
+    assert oav.parameters.calculate_beam_distance(
+        h,
+        v,
+    ) == (expected_x, expected_y)

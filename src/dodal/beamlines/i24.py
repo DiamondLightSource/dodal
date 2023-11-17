@@ -7,7 +7,7 @@ from dodal.devices.eiger import EigerDetector
 from dodal.devices.i24.dual_backlight import DualBacklight
 from dodal.devices.i24.I24_detector_motion import DetectorMotion
 from dodal.devices.i24.i24_vgonio import VGonio
-from dodal.devices.oav.oav_detector import OAV
+from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
 from dodal.devices.zebra import Zebra
 from dodal.log import set_beamline
 from dodal.utils import get_beamline_name, skip_device
@@ -84,6 +84,7 @@ def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
         "",
         wait_for_connection,
         fake_with_ophyd_sim,
+        params=OAVConfigParams,
     )
 
 

@@ -15,7 +15,7 @@ from dodal.devices.flux import Flux
 from dodal.devices.i04.transfocator import Transfocator
 from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZPositioner
-from dodal.devices.oav.oav_detector import OAV
+from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
 from dodal.devices.s4_slit_gaps import S4SlitGaps
 from dodal.devices.sample_shutter import SampleShutter
 from dodal.devices.smargon import Smargon
@@ -341,6 +341,7 @@ def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
         "",
         wait_for_connection,
         fake_with_ophyd_sim,
+        params=OAVConfigParams,
     )
 
 

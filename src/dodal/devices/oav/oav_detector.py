@@ -22,8 +22,12 @@ from dodal.devices.oav.oav_errors import (
     OAVError_BeamPositionNotFound,
     OAVError_ZoomLevelNotFound,
 )
-from dodal.devices.oav.oav_parameters import OAV_CONFIG_FILE_DEFAULTS
 from dodal.log import LOGGER
+
+ZOOM_PARAMS_FILE = (
+    "/dls_sw/i03/software/gda/configurations/i03-config/xml/jCameraManZoomLevels.xml"
+)
+DISPLAY_CONFIG = "/dls_sw/i03/software/gda_versions/var/display.configuration"
 
 
 class ZoomController(Device):
@@ -79,13 +83,17 @@ class ZoomController(Device):
         return return_status
 
 
-class OAVParams:
+class OAVConfigParams:
+    """
+    The OAV parameters which may update depending on settings such as the zoom level.
+    """
+
     zoom: float = 1.0
 
     def __init__(
         self,
-        zoom_params_file=OAV_CONFIG_FILE_DEFAULTS["zoom_params_file"],
-        display_config=OAV_CONFIG_FILE_DEFAULTS["display_config"],
+        zoom_params_file=ZOOM_PARAMS_FILE,
+        display_config=DISPLAY_CONFIG,
     ):
         self.zoom_params_file: str = zoom_params_file
         self.display_config: str = display_config
@@ -182,7 +190,7 @@ class OAV(AreaDetector):
     mxsc: MXSC = ADC(MXSC, "-DI-OAV-01:MXSC:")
     zoom_controller: ZoomController = Component(ZoomController, "-EA-OAV-01:FZOOM:")
 
-    def __init__(self, *args, params: OAVParams, **kwargs):
+    def __init__(self, *args, params: OAVConfigParams, **kwargs):
         super().__init__(*args, **kwargs)
         self.parameters = params
         self.zoom_controller.level.subscribe(self.parameters.update_on_zoom)
