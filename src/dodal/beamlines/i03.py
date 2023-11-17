@@ -149,7 +149,7 @@ def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
         "",
         wait_for_connection,
         fake_with_ophyd_sim,
-        params=OAVParams(),
+        params=OAVParams,
     )
 
 

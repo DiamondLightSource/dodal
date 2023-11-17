@@ -56,12 +56,15 @@ def test_when_zoom_level_changed_then_status_waits_for_all_plugins_to_be_updated
     assert mjpg_status in full_status
 
 
-# def test_get_micronsperpixel_from_oav(oav: OAV):
-#     oav.zoom_controller.level.sim_put("1.0x")
+def test_get_micronsperpixel_from_oav(oav: OAV):
+    oav.zoom_controller.level.sim_put("1.0x")
+    # Update call failing with
+    # File
+    # "/scratch/uhz96441/workspaces/dodal/.venv/lib/python3.11/site-packages/ophyd/ophydobj.py",
+    # line 492, in inner
+    #   cb(*args, **kwargs)
+    # TypeError: OAVParams.update_on_zoom() missing 1 required positional argument: 'zoom_level'
+    print(oav.zoom_controller.level.get())
 
-#     assert oav.parameters.micronsPerXPixel == 2.87
-#     """^
-#   File "/scratch/uhz96441/workspaces/dodal/.venv/lib/python3.11/site-packages/ophyd/sim.py", line 1307, in instantiate_fake_device
-#     return dev_cls(**kwargs)
-#            ^^^^^^^^^^^^^^^^^
-# TypeError: OAV.__init__() got an unexpected keyword argument 'name'"""
+    # print(oav.parameters.update_on_zoom(zoom_level=oav.zoom_controller.level))
+    assert oav.parameters.micronsPerXPixel == 2.87
