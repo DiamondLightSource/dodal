@@ -1,13 +1,14 @@
 from unittest.mock import MagicMock
 
 import pytest
+from ophyd.sim import make_fake_device
+from ophyd.status import Status, StatusBase
+
 from dodal.devices.aperturescatterguard import (
     AperturePositions,
     ApertureScatterguard,
     InvalidApertureMove,
 )
-from ophyd.sim import make_fake_device
-from ophyd.status import Status, StatusBase
 
 
 @pytest.fixture
