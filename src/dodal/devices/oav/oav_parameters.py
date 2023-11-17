@@ -12,9 +12,6 @@ class OAVParameters:
     The parameters to set up the OAV depending on the context.
     """
 
-    # The zoom level as a float e.g. 2.0
-    zoom: float
-
     def __init__(
         self,
         context="loopCentring",
