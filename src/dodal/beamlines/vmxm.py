@@ -8,6 +8,7 @@ from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan_2d import FastGridScan2D
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.vmxm.vmxm_attenuator import VmxmAttenuator
+from dodal.devices.vmxm.vmxm_sample_motors import VmxmSampleMotors
 from dodal.devices.zebra import Zebra
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import get_beamline_name, skip_device
@@ -119,6 +120,23 @@ def synchrotron(
         Synchrotron,
         "synchrotron",
         "",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        bl_prefix=False,
+    )
+
+
+@skip_device(lambda: BL == SIM_BEAMLINE_NAME)
+def sample_motors(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> VmxmSampleMotors:
+    """Get the VMXm sample_motors device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in VMXm, it will return the existing object.
+    """
+    return device_instantiation(
+        VmxmSampleMotors,
+        "sample_motors",
+        "-MO-SAMP-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
         bl_prefix=False,
