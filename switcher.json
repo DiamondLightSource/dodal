@@ -84,6 +84,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/224_refactor-oavparams/"
   },
   {
+    "version": "231_improve_tests_for_aperturescatterguard",
+    "url": "https://DiamondLightSource.github.io/dodal/231_improve_tests_for_aperturescatterguard/"
+  },
+  {
     "version": "262_make_arming_eiger_asynchronous",
     "url": "https://DiamondLightSource.github.io/dodal/262_make_arming_eiger_asynchronous/"
   },
