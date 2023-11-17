@@ -95,6 +95,12 @@ class OAVParameters:
         self.direction: int = update("direction", int)
         self.max_tip_distance: float = update("max_tip_distance", float, default=300)
 
+    def get_max_tip_distance_in_pixels(self, micronsPerPixel: float) -> float:
+        """
+        Get the maximum tip distance in pixels.
+        """
+        return self.max_tip_distance / micronsPerPixel
+
     def load_microns_per_pixel(self, zoom=None):
         """
         Loads the microns per x pixel and y pixel for a given zoom level. These are

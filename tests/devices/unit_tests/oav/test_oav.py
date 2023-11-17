@@ -5,6 +5,10 @@ from ophyd.sim import instantiate_fake_device
 from ophyd.status import Status
 
 from dodal.devices.oav.oav_detector import OAV, OAVParams
+from dodal.devices.oav.oav_errors import (
+    OAVError_BeamPositionNotFound,
+    OAVError_ZoomLevelNotFound,
+)
 
 DISPLAY_CONFIGURATION = "tests/devices/unit_tests/test_display.configuration"
 ZOOM_LEVELS_XML = "tests/devices/unit_tests/test_jCameraManZoomLevels.xml"
@@ -56,15 +60,45 @@ def test_when_zoom_level_changed_then_status_waits_for_all_plugins_to_be_updated
     assert mjpg_status in full_status
 
 
-def test_get_micronsperpixel_from_oav(oav: OAV):
-    oav.zoom_controller.level.sim_put("1.0x")
-    # Update call failing with
-    # File
-    # "/scratch/uhz96441/workspaces/dodal/.venv/lib/python3.11/site-packages/ophyd/ophydobj.py",
-    # line 492, in inner
-    #   cb(*args, **kwargs)
-    # TypeError: OAVParams.update_on_zoom() missing 1 required positional argument: 'zoom_level'
-    print(oav.zoom_controller.level.get())
+def test_load_microns_per_pixel_entry_not_found(oav: OAV):
+    with pytest.raises(OAVError_ZoomLevelNotFound):
+        oav.parameters.load_microns_per_pixel(0.000001)
 
-    # print(oav.parameters.update_on_zoom(zoom_level=oav.zoom_controller.level))
-    assert oav.parameters.micronsPerXPixel == 2.87
+
+@pytest.mark.parametrize(
+    "zoom_level,expected_microns_x,expected_microns_y",
+    [
+        ("1.0x", 2.87, 2.87),
+        ("2.5", 2.31, 2.31),
+        ("5.0x", 1.58, 1.58),
+        ("15.0", 0.302, 0.302),
+    ],
+)
+def test_get_micronsperpixel_from_oav(
+    zoom_level, expected_microns_x, expected_microns_y, oav: OAV
+):
+    oav.zoom_controller.level.sim_put(zoom_level)
+
+    assert oav.parameters.micronsPerXPixel == expected_microns_x
+    assert oav.parameters.micronsPerYPixel == expected_microns_y
+
+
+def test_beam_position_not_found_for_wrong_entry(oav: OAV):
+    with pytest.raises(OAVError_BeamPositionNotFound):
+        oav.parameters.get_beam_position_from_zoom(2.0)
+
+
+@pytest.mark.parametrize(
+    "zoom_level,expected_xCentre,expected_yCentre",
+    [("1.0", 477, 359), ("5.0", 517, 350), ("10.0x", 613, 344)],
+)
+def test_extract_beam_position_given_different_zoom_levels(
+    zoom_level,
+    expected_xCentre,
+    expected_yCentre,
+    oav: OAV,
+):
+    oav.zoom_controller.level.sim_put(zoom_level)
+
+    assert oav.parameters.beam_centre_i == expected_xCentre
+    assert oav.parameters.beam_centre_j == expected_yCentre
