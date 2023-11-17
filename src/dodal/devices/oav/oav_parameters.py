@@ -17,6 +17,9 @@ OAV_CONFIG_FILE_DEFAULTS = {
 
 
 class OAVParameters:
+    # The zoom level as a float e.g. 2.0
+    zoom: float
+
     def __init__(
         self,
         context="loopCentring",
@@ -35,7 +38,7 @@ class OAVParameters:
         )
         self.update_self_from_current_context()
         self.load_microns_per_pixel()
-        self._extract_beam_position()
+        self.beam_centre_i, self.beam_centre_j = self.get_beam_position_from_zoom()
 
     @staticmethod
     def load_json(filename: str) -> tuple[dict[str, Any], dict[str, dict]]:
@@ -116,31 +119,33 @@ class OAVParameters:
         # get the max tip distance in pixels
         self.max_tip_distance_pixels = self.max_tip_distance / self.micronsPerXPixel
 
-    def _extract_beam_position(self):
+    def get_beam_position_from_zoom(self, zoom: float = None) -> Tuple[int, int]:
         """
-        Extracts the beam location in pixels `xCentre` `yCentre`. The beam location is
-        stored in the file display.configuration. The beam location is manually inputted
-        by the beamline operator GDA by clicking where on screen a scintillator ligths up.
+        Extracts the beam location in pixels `xCentre` `yCentre`, for a requested zoom \
+        level. The beam location is manually inputted by the beamline operator on GDA \
+        by clicking where on screen a scintillator ligths up and stored in the \
+        display.configuration file.
         """
+        if not zoom:
+            zoom = self.zoom
+
         with open(self.display_config, "r") as f:
             file_lines = f.readlines()
             for i in range(len(file_lines)):
-                if file_lines[i].startswith("zoomLevel = " + str(self.zoom)):
+                if file_lines[i].startswith("zoomLevel = " + str(zoom)):
                     crosshair_x_line = file_lines[i + 1]
                     crosshair_y_line = file_lines[i + 2]
                     break
 
-            if crosshair_x_line is None or crosshair_y_line is None:
-                raise OAVError_BeamPositionNotFound(
-                    f"Could not extract beam position at zoom level {self.zoom}"
-                )
+        if crosshair_x_line is None or crosshair_y_line is None:
+            raise OAVError_BeamPositionNotFound(
+                f"Could not extract beam position at zoom level {zoom}"
+            )
 
-            self.beam_centre_i = int(crosshair_x_line.split(" = ")[1])
-            self.beam_centre_j = int(crosshair_y_line.split(" = ")[1])
-
-            self.beam_centre_x = int(crosshair_x_line.split(" = ")[1])
-            self.beam_centre_y = int(crosshair_y_line.split(" = ")[1])
-            LOGGER.info(f"Beam centre: {self.beam_centre_i, self.beam_centre_j}")
+        beam_centre_i = int(crosshair_x_line.split(" = ")[1])
+        beam_centre_j = int(crosshair_y_line.split(" = ")[1])
+        LOGGER.info(f"Beam centre: {beam_centre_i, beam_centre_j}")
+        return beam_centre_i, beam_centre_j
 
     def calculate_beam_distance(
         self, horizontal_pixels: int, vertical_pixels: int
