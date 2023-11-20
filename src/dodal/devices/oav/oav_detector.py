@@ -88,7 +88,7 @@ class OAVConfigParams:
     The OAV parameters which may update depending on settings such as the zoom level.
     """
 
-    zoom: float = 1.0
+    zoom: float
 
     def __init__(
         self,
@@ -98,11 +98,11 @@ class OAVConfigParams:
         self.zoom_params_file: str = zoom_params_file
         self.display_config: str = display_config
 
-        self.load_microns_per_pixel(self.zoom)
-        self.beam_centre_i, self.beam_centre_j = self.get_beam_position_from_zoom()
+        # self.load_microns_per_pixel(self.zoom)
+        # self.beam_centre_i, self.beam_centre_j = self.get_beam_position_from_zoom()
 
     def update_on_zoom(self, value, *args, **kwargs):
-        if value.endswith("x"):
+        if isinstance(value, str) and value.endswith("x"):
             value = value.strip("x")
         self.zoom = float(value)
         self.load_microns_per_pixel(self.zoom)
