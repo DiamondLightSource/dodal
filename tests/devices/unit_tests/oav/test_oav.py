@@ -65,6 +65,13 @@ def test_load_microns_per_pixel_entry_not_found(oav: OAV):
         oav.parameters.load_microns_per_pixel(0.000001)
 
 
+def test_when_zoom_level_changed_it_also_updates_in_oav_parameters(oav: OAV):
+    oav.zoom_controller.set("5.0x").wait()
+    assert oav.parameters.zoom == 5.0
+    oav.zoom_controller.set("1.0").wait()
+    assert oav.parameters.zoom == 1.0
+
+
 @pytest.mark.parametrize(
     "zoom_level,expected_microns_x,expected_microns_y",
     [
