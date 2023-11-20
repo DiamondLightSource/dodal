@@ -29,13 +29,13 @@ class MJPG(Device):
             try:
                 response = requests.get(url_str, stream=True)
                 response.raise_for_status()
-                image = Image.open(response.raw)
-                path = Path(f"{directory_str}/{filename_str}.png").as_posix()
-                self.last_saved_path.put(path)
-                LOGGER.info(f"Saving {path}")
-                image.save(path)
-                self.post_processing(image)
-                st.set_finished()
+                with Image.open(response.raw) as image:
+                    path = Path(f"{directory_str}/{filename_str}.png").as_posix()
+                    self.last_saved_path.put(path)
+                    LOGGER.info(f"Saving {path}")
+                    image.save(path)
+                    self.post_processing(image)
+                    st.set_finished()
             except requests.HTTPError as e:
                 st.set_exception(e)
 
