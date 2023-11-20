@@ -14,13 +14,13 @@ class PumpControl(str, Enum):
 
 
 class Linkam3(StandardReadable):
-    tolerance: float = 0.1
+    tolerance: float = 0.5
     """
     The deadband around the setpoint within which the position is assumed to
     have been reached
     """
 
-    settle_time: int = 10
+    settle_time: int = 0
     """The delay between reaching the setpoint and the move being considered complete"""
 
     def __init__(self, prefix: str, name: str = ""):

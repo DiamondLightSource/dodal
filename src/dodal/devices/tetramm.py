@@ -17,9 +17,11 @@ from ophyd_async.core import (
 )
 from ophyd_async.core.device_save_loader import Msg
 from ophyd_async.epics.areadetector.writers import HDFWriter, NDFileHDF
-from ophyd_async.epics.signal import epics_signal_r
+from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 from ophyd_async.epics.areadetector.utils import stop_busy_record, ad_rw, ad_r
 import asyncio
+
+import bluesky.plan_stubs as bps
 
 
 class TetrammRange(str, Enum):
@@ -84,6 +86,7 @@ class TetrammDriver(Device):
         self.bias = ad_rw(bool, prefix + "BiasState")
         self.bias_volts = ad_rw(float, prefix + "BiasVoltage")
         self.geometry = ad_rw(TetrammGeometry, prefix + "Geometry")
+        self.nd_attributes_file = epics_signal_rw(str, prefix + "NDAttributesFile")
 
         super().__init__(name=name)
 
@@ -155,7 +158,7 @@ class TetrammController(DetectorControl):
         )
         if values_per_reading < self.minimum_values_per_reading:
             raise ValueError(
-                f"Exposure ({seconds}) too short to collect required number of readings {self.readings_per_frame}"
+                f"Exposure ({seconds}) too short to collect required number of readings {self.readings_per_frame}. Values per reading is {values_per_reading}, seconds is : {seconds}"
             )
         await self._drv.values_per_reading.set(values_per_reading)
 
@@ -192,8 +195,6 @@ COMMON_TETRAMM = {
     "drv.range": TetrammRange.uA,
     "drv.num_channels": "4",
     "drv.resolution": TetrammResolution.TwentyFourBits,
-    "drv.bias": False,
-    "drv.bias_volts": 0,
     "drv.geometry": TetrammGeometry.Square,
 }
 
@@ -205,6 +206,7 @@ TRIGGERED_TETRAMM = {
 FREE_TETRAMM = {
     **COMMON_TETRAMM,
     "drv.values_per_reading": 10,
+    "drv.averaging_time": 0.1,
     "drv.trigger_mode": TetrammTrigger.FreeRun,
 }
 
@@ -221,8 +223,10 @@ def triggered_tetramm(dev: TetrammDriver) -> Generator[Msg, None, None]:
 
 
 def free_tetramm(dev: TetrammDriver) -> Generator[Msg, None, None]:
+    """Freerun the tetramm, setting it to acquire so diodes update."""
     sigs = walk_rw_signals(dev)
     yield from set_signal_values(sigs, [IDLE_TETRAMM, FREE_TETRAMM])
+    yield from bps.abs_set(dev.drv.acquire, 1)
 
 
 class TetrammShapeProvider(ShapeProvider):
@@ -235,7 +239,7 @@ class TetrammShapeProvider(ShapeProvider):
 
 class TetrammDetector(StandardDetector):
     def __init__(
-        self, prefix: str, directory_provider: DirectoryProvider, name: str = ""
+        self, prefix: str, directory_provider: DirectoryProvider, name: str = "", **scalar_sigs: str,
     ) -> None:
         drv = TetrammDriver(prefix + ":DRV:")
         hdf = NDFileHDF(prefix + ":HDF5:")
@@ -259,6 +263,7 @@ class TetrammDetector(StandardDetector):
                 directory_provider,
                 lambda: self.name,
                 TetrammShapeProvider(controller),
+                **scalar_sigs
             ),
             [drv.values_per_reading, drv.averaging_time, drv.sample_time],
             name,

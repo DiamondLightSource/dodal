@@ -11,7 +11,6 @@ def saxs() -> I22HDFStatsPilatus:
         "BL22I-EA-PILAT-01",
         get_directory_provider(),
         name="saxs",
-        temperature="Temperature",
     )
 
 
@@ -32,7 +31,7 @@ def linkam() -> Linkam3:
 
 
 def tetramm1() -> TetrammDetector:
-    return TetrammDetector("BL22I-EA-XBPM-02", get_directory_provider(), name="i0")
+    return TetrammDetector("BL22I-EA-XBPM-02", get_directory_provider(), name="i0", temperature="Temperature")
 
 
 def tetramm2() -> TetrammDetector:
