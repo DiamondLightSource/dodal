@@ -201,7 +201,6 @@ def test_distance_from_beam_centre_to_motor_coords_returns_the_same_values_as_GD
 ):
     mock_parameters.zoom = 5.0
     mock_oav.zoom_controller.level.sim_put(mock_parameters.zoom)
-    # mock_parameters.load_microns_per_pixel()
     results = camera_coordinates_to_xyz(
         h,
         v,
