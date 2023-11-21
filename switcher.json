@@ -88,10 +88,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/231_improve_tests_for_aperturescatterguard/"
   },
   {
-    "version": "240_close_image",
-    "url": "https://DiamondLightSource.github.io/dodal/240_close_image/"
-  },
-  {
     "version": "262_make_arming_eiger_asynchronous",
     "url": "https://DiamondLightSource.github.io/dodal/262_make_arming_eiger_asynchronous/"
   },
