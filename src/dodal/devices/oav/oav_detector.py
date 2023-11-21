@@ -88,8 +88,6 @@ class OAVConfigParams:
     The OAV parameters which may update depending on settings such as the zoom level.
     """
 
-    zoom: float
-
     def __init__(
         self,
         zoom_params_file=ZOOM_PARAMS_FILE,
@@ -98,15 +96,12 @@ class OAVConfigParams:
         self.zoom_params_file: str = zoom_params_file
         self.display_config: str = display_config
 
-        # self.load_microns_per_pixel(self.zoom)
-        # self.beam_centre_i, self.beam_centre_j = self.get_beam_position_from_zoom()
-
     def update_on_zoom(self, value, *args, **kwargs):
         if isinstance(value, str) and value.endswith("x"):
             value = value.strip("x")
-        self.zoom = float(value)
-        self.load_microns_per_pixel(self.zoom)
-        self.beam_centre_i, self.beam_centre_j = self.get_beam_position_from_zoom()
+        zoom = float(value)
+        self.load_microns_per_pixel(zoom)
+        self.beam_centre_i, self.beam_centre_j = self.get_beam_position_from_zoom(zoom)
 
     def load_microns_per_pixel(self, zoom: float):
         """
@@ -129,16 +124,13 @@ class OAVConfigParams:
                 """
             )
 
-    def get_beam_position_from_zoom(self, zoom: float = None) -> Tuple[int, int]:
+    def get_beam_position_from_zoom(self, zoom: float) -> Tuple[int, int]:
         """
         Extracts the beam location in pixels `xCentre` `yCentre`, for a requested zoom \
         level. The beam location is manually inputted by the beamline operator on GDA \
-        by clicking where on screen a scintillator ligths up and stored in the \
+        by clicking where on screen a scintillator lights up, and stored in the \
         display.configuration file.
         """
-        if not zoom:
-            zoom = self.zoom
-
         crosshair_x_line = None
         crosshair_y_line = None
         with open(self.display_config, "r") as f:
