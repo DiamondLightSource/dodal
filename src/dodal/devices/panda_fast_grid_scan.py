@@ -209,7 +209,6 @@ class GridScanCompleteStatus(DeviceStatus):
 class PandAFastGridScan(Device):
     # This is almost identical to the regular FastGridScan device. It has one extra PV for runup distance, and doesnt use dwell time
 
-    x_steps: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "X_NUM_STEPS")
     y_steps: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "Y_NUM_STEPS")
     z_steps: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "Z_NUM_STEPS")
 
@@ -228,11 +227,7 @@ class PandAFastGridScan(Device):
     z1_start: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "Z_START")
     z2_start: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "Z2_START")
 
-    position_counter: EpicsSignal = Component(
-        EpicsSignal, "POS_COUNTER", write_pv="POS_COUNTER_WRITE"
-    )
-    x_counter: EpicsSignalRO = Component(EpicsSignalRO, "X_COUNTER")
-    y_counter: EpicsSignalRO = Component(EpicsSignalRO, "Y_COUNTER")
+    position_counter: EpicsSignalRO = Component(EpicsSignalRO, "Y_COUNTER")
     scan_invalid: EpicsSignalRO = Component(EpicsSignalRO, "SCAN_INVALID")
 
     run_cmd: EpicsSignal = Component(EpicsSignal, "RUN.PROC")
@@ -248,12 +243,8 @@ class PandAFastGridScan(Device):
         super().__init__(*args, **kwargs)
 
         def set_expected_images(*_, **__):
-            x, y, z = self.x_steps.get(), self.y_steps.get(), self.z_steps.get()
-            first_grid = x * y
-            second_grid = x * z
-            self.expected_images.put(first_grid + second_grid)
+            self.expected_images.put(120)
 
-        self.x_steps.subscribe(set_expected_images)
         self.y_steps.subscribe(set_expected_images)
         self.z_steps.subscribe(set_expected_images)
 
@@ -291,8 +282,6 @@ class PandAFastGridScan(Device):
 
 def set_fast_grid_scan_params(scan: PandAFastGridScan, params: PandaGridScanParams):
     yield from mv(
-        scan.x_steps,
-        params.x_steps,
         scan.y_steps,
         params.y_steps,
         scan.z_steps,
@@ -313,8 +302,6 @@ def set_fast_grid_scan_params(scan: PandAFastGridScan, params: PandaGridScanPara
         params.z1_start,
         scan.z2_start,
         params.z2_start,
-        scan.position_counter,
-        0,
         scan.runup_distance,
         params.runnup_distance_mm,
     )
