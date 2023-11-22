@@ -11,13 +11,17 @@ from dodal.devices.detector_motion import DetectorMotion
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import FastGridScan
 from dodal.devices.flux import Flux
+from dodal.devices.hfm import HFM
+from dodal.devices.i0 import I0
 from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
+from dodal.devices.qbpm1 import QBPM1
 from dodal.devices.s4_slit_gaps import S4SlitGaps
 from dodal.devices.sample_shutter import SampleShutter
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import Undulator
+from dodal.devices.vfm import VFM
 from dodal.devices.xbpm_feedback import XBPMFeedback
 from dodal.devices.xspress3_mini.xspress3_mini import Xspress3Mini
 from dodal.devices.zebra import Zebra
@@ -42,6 +46,51 @@ def dcm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
     return device_instantiation(
         device_factory=DCM,
         name="dcm",
+        prefix="",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+    )
+
+
+# XXX is this the right pattern to follow
+@skip_device(lambda: BL == "s03")
+def qbpm1(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> QBPM1:
+    return device_instantiation(
+        device_factory=QBPM1,
+        name="qbpm1",
+        prefix="",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+    )
+
+
+@skip_device(lambda: BL == "s03")
+def vfm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> VFM:
+    return device_instantiation(
+        device_factory=VFM,
+        name="vfm",
+        prefix="",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+    )
+
+
+@skip_device(lambda: BL == "s03")
+def hfm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> HFM:
+    return device_instantiation(
+        device_factory=HFM,
+        name="hfm",
+        prefix="",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+    )
+
+
+@skip_device(lambda: BL == "s03")
+def i0(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> I0:
+    return device_instantiation(
+        device_factory=I0,
+        name="i0",
         prefix="",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,

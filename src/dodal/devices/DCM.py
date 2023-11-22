@@ -12,8 +12,8 @@ class DCM(Device):
     offset ensures that the beam exits the DCM at the same point, regardless of energy.
     """
 
-    bragg: EpicsMotor = Cpt(EpicsMotor, "-MO-DCM-01:BRAGG")
-    roll: EpicsMotor = Cpt(EpicsMotor, "-MO-DCM-01:ROLL")
+    bragg_in_degrees: EpicsMotor = Cpt(EpicsMotor, "-MO-DCM-01:BRAGG")
+    roll_in_mrad: EpicsMotor = Cpt(EpicsMotor, "-MO-DCM-01:ROLL")
     offset: EpicsMotor = Cpt(EpicsMotor, "-MO-DCM-01:OFFSET")
     perp: EpicsMotor = Cpt(EpicsMotor, "-MO-DCM-01:PERP")
     energy_in_kev: EpicsMotor = Cpt(EpicsMotor, "-MO-DCM-01:ENERGY", kind=Kind.hinted)
@@ -28,3 +28,5 @@ class DCM(Device):
     backplate_temp: EpicsSignalRO = Cpt(EpicsSignalRO, "-MO-DCM-01:TEMP5")
     perp_temp: EpicsSignalRO = Cpt(EpicsSignalRO, "-MO-DCM-01:TEMP6")
     perp_sub_assembly_temp: EpicsSignalRO = Cpt(EpicsSignalRO, "-MO-DCM-01:TEMP7")
+
+    dcm_roll_converter_lookup_table_path: str = "/dls_sw/i03/software/daq_configuration/lookup/BeamLineEnergy_DCM_Roll_converter.txt"
