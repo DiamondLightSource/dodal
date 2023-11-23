@@ -67,7 +67,7 @@ def test_snapshot_trigger_saves_to_correct_file(
     image = PIL.Image.open("test")
     mock_save = MagicMock()
     image.save = mock_save
-    mock_open.return_value = image
+    mock_open.return_value.__enter__.return_value = image
     st = fake_oav.snapshot.trigger()
     st.wait()
     expected_calls_to_save = [
@@ -91,8 +91,12 @@ def test_correct_grid_drawn_on_image(
 ):
     st = fake_oav.snapshot.trigger()
     st.wait()
-    expected_border_calls = [call(mock_open.return_value, 100, 100, 50, 15, 10)]
-    expected_grid_calls = [call(mock_open.return_value, 100, 100, 50, 15, 10)]
+    expected_border_calls = [
+        call(mock_open.return_value.__enter__.return_value, 100, 100, 50, 15, 10)
+    ]
+    expected_grid_calls = [
+        call(mock_open.return_value.__enter__.return_value, 100, 100, 50, 15, 10)
+    ]
     actual_border_calls = mock_border_overlay.mock_calls
     actual_grid_calls = mock_grid_overlay.mock_calls
     assert actual_border_calls == expected_border_calls
