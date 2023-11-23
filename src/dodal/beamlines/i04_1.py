@@ -13,6 +13,9 @@ from dodal.devices.zebra import Zebra
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
 
+ZOOM_PARAMS_FILE = "/dls_sw/i04-1/software/gda/config/xml/jCameraManZoomLevels.xml"
+DISPLAY_CONFIG = "/dls_sw/i04-1/software/gda_versions/var/display.configuration"
+
 _simulator_beamline_fallback = "s04_1"
 BL = get_beamline_name(_simulator_beamline_fallback)
 set_log_beamline(BL)
@@ -74,7 +77,7 @@ def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
         "",
         wait_for_connection,
         fake_with_ophyd_sim,
-        params=OAVConfigParams(),
+        params=OAVConfigParams(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
     )
 
 

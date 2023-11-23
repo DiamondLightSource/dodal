@@ -24,11 +24,6 @@ from dodal.devices.oav.oav_errors import (
 )
 from dodal.log import LOGGER
 
-ZOOM_PARAMS_FILE = (
-    "/dls_sw/i03/software/gda/configurations/i03-config/xml/jCameraManZoomLevels.xml"
-)
-DISPLAY_CONFIG = "/dls_sw/i03/software/gda_versions/var/display.configuration"
-
 
 class ZoomController(Device):
     """
@@ -90,8 +85,8 @@ class OAVConfigParams:
 
     def __init__(
         self,
-        zoom_params_file=ZOOM_PARAMS_FILE,
-        display_config=DISPLAY_CONFIG,
+        zoom_params_file,
+        display_config,
     ):
         self.zoom_params_file: str = zoom_params_file
         self.display_config: str = display_config
