@@ -139,5 +139,4 @@ def sample_motors(
         "-MO-SAMP-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        bl_prefix=False,
     )

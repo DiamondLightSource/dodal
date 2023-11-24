@@ -1,4 +1,5 @@
 from enum import Enum
+from time import sleep
 from typing import Optional
 
 from ophyd import Component, Device, EpicsSignalRO, Signal
@@ -35,7 +36,9 @@ class EigerDetector(Device):
 
     STALE_PARAMS_TIMEOUT = 60
     GENERAL_STATUS_TIMEOUT = 10
-    ALL_FRAMES_TIMEOUT = 120
+    ALL_FRAMES_TIMEOUT = (
+        600  # FIXME: VMXm hack - we need to get this passed in a a param probably?
+    )
     ARMING_TIMEOUT = 60
 
     filewriters_finished: SubscriptionStatus
@@ -290,6 +293,9 @@ class EigerDetector(Device):
 
     def _wait_for_odin_status(self) -> Status:
         self.forward_bit_depth_to_filewriter()
+        sleep(
+            2
+        )  # FIXME - VMXm hack - on VMXm ODIN will *occasionally* fail to start without this sleep. Need a better solution.
         status = self.odin.file_writer.capture.set(
             1, timeout=self.GENERAL_STATUS_TIMEOUT
         )
@@ -310,7 +316,9 @@ class EigerDetector(Device):
 
     def forward_bit_depth_to_filewriter(self):
         bit_depth = self.bit_depth.get()
-        self.odin.file_writer.data_type.put(f"UInt{bit_depth}")
+        self.odin.file_writer.data_type.set(f"UInt{bit_depth}").wait(
+            self.GENERAL_STATUS_TIMEOUT
+        )
 
     def disarm_detector(self):
         self.cam.acquire.put(0)
