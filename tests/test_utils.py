@@ -12,7 +12,6 @@ from dodal.utils import (
     get_beamline_based_on_environment_variable,
     get_hostname,
     make_all_devices,
-    parse_table_as_array,
 )
 
 LOOKUP_TABLE_TEST_VALUES = np.array([[100, 150, 160], [200, 151, 165]])
