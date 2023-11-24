@@ -3,7 +3,10 @@ import pytest
 from bluesky import RunEngine
 from ophyd.sim import make_fake_device
 
-from dodal.devices.areadetector.plugins.MXSC import PinTipDetect
+from dodal.devices.areadetector.plugins.MXSC import (
+    PinTipDetect,
+    statistics_of_positions,
+)
 
 
 @pytest.fixture
@@ -53,3 +56,19 @@ def test_given_pin_tip_found_before_timeout_then_timeout_status_cleaned_up_and_t
     # so we need the small timeout to avoid the race condition
     fake_pin_tip_detect._timeout_status.wait(0.01)
     assert fake_pin_tip_detect.triggered_tip.get() == (100, 200)
+
+
+def test_take_median_of_tuples():
+    test = [(1, 2), (1, 5), (3, 3)]
+
+    actual_med, _ = statistics_of_positions(test)
+
+    assert actual_med == (1, 3)
+
+
+def test_take_std_of_tuples():
+    test = [(1, 2), (1, 3)]
+
+    _, actual_std = statistics_of_positions(test)
+
+    assert actual_std == (0, 0.5)

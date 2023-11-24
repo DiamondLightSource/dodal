@@ -1,5 +1,20 @@
+from datetime import datetime, timedelta
+from typing import List, Tuple
+
+import numpy as np
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO, Kind, Signal
 from ophyd.status import Status, SubscriptionStatus
+
+from dodal.log import LOGGER
+
+
+def statistics_of_positions(positions: List[Tuple]):
+    x_coords, y_coords = np.array(positions).T
+
+    median = (np.median(x_coords), np.median(y_coords))
+    std = (np.std(x_coords), np.std(y_coords))
+
+    return median, std
 
 
 class PinTipDetect(Device):
@@ -19,14 +34,38 @@ class PinTipDetect(Device):
 
     triggered_tip: Signal = Component(Signal, kind=Kind.hinted, value=INVALID_POSITION)
     validity_timeout: Signal = Component(Signal, value=5)
+    settle_time: Signal = Component(Signal, value=1)
+
+    start_reading_tip_start_time = None
+    tip_positions: List[Tuple] = []
 
     def update_tip_if_valid(self, value, **_):
+        if self.start_reading_tip_start_time is None:
+            self.start_reading_tip_start_time = datetime.now()
+
         current_value = (value, self.tip_y.get())
         if current_value != self.INVALID_POSITION:
-            self.triggered_tip.put(current_value)
-            return True
+            self.tip_positions.append(current_value)
+            LOGGER.info(f"Found tip {current_value}")
+
+            if self.start_reading_tip_start_time - datetime.now() >= timedelta(
+                seconds=self.settle_time.get()
+            ):
+                LOGGER.info("Taking median of tip positions")
+
+                (
+                    median_tip_location,
+                    tip_std,
+                ) = statistics_of_positions(self.tip_positions)
+                LOGGER.info(f"Standard deviation was {tip_std}")
+
+                self.triggered_tip.put(median_tip_location)
+                return True
 
     def trigger(self) -> Status:
+        self.start_reading_tip = None
+        self.tip_positions: List[Tuple] = []
+
         subscription_status = SubscriptionStatus(
             self.tip_x, self.update_tip_if_valid, run=True
         )
