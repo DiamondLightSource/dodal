@@ -15,7 +15,7 @@ from dodal.devices.areadetector.plugins.MXSC import (
 def fake_pin_tip_detect() -> PinTipDetect:
     FakePinTipDetect = make_fake_device(PinTipDetect)
     pin_tip_detect: PinTipDetect = FakePinTipDetect(name="pin_tip")
-    pin_tip_detect.settle_time.set(0).wait()
+    pin_tip_detect.settle_time_s.set(0).wait()
     yield pin_tip_detect
 
 
@@ -83,7 +83,7 @@ def test_standard_dev_of_positions_calculated_correctly():
 def test_given_multiple_tips_found_then_running_median_calculated(
     fake_pin_tip_detect: PinTipDetect,
 ):
-    fake_pin_tip_detect.settle_time.set(0.1).wait()
+    fake_pin_tip_detect.settle_time_s.set(0.1).wait()
 
     RE = RunEngine(call_returns_result=True)
     RE(trigger_and_read(fake_pin_tip_detect, [(100, 200), (50, 60), (400, 800)]))
@@ -94,7 +94,7 @@ def test_given_multiple_tips_found_then_running_median_calculated(
 def test_given_median_previously_calculated_when_triggered_again_then_only_calculated_on_new_values(
     fake_pin_tip_detect: PinTipDetect,
 ):
-    fake_pin_tip_detect.settle_time.set(0.1).wait()
+    fake_pin_tip_detect.settle_time_s.set(0.1).wait()
 
     RE = RunEngine(call_returns_result=True)
 
