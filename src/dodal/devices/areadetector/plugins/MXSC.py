@@ -1,9 +1,8 @@
-from datetime import datetime, timedelta
 from typing import List, Tuple
 
 import numpy as np
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO, Kind, Signal
-from ophyd.status import Status, SubscriptionStatus
+from ophyd.status import StableSubscriptionStatus, Status
 
 from dodal.log import LOGGER
 
@@ -11,7 +10,7 @@ from dodal.log import LOGGER
 def statistics_of_positions(positions: List[Tuple]):
     x_coords, y_coords = np.array(positions).T
 
-    median = (np.median(x_coords), np.median(y_coords))
+    median = (int(np.median(x_coords)), int(np.median(y_coords)))
     std = (np.std(x_coords), np.std(y_coords))
 
     return median, std
@@ -21,11 +20,12 @@ class PinTipDetect(Device):
     """This will read the pin tip location from the MXSC plugin.
 
     If the plugin finds no tip it will return {INVALID_POSITION}. However, it will also
-    occassionally give false negatives and return this value when there is a pin tip
-    there. Therefore, it is recommended that you trigger this device, which will cause a
-    subsequent read to return a valid pin immediatedly if one is found or wait
-    {validity_timeout} seconds if one is not, at which point a subsequent read will give
-    you {INVALID_POSITION}.
+    occassionally give incorrect data. Therefore, it is recommended that you trigger
+    this device, which will set {triggered_tip} to a median of the valid points taken
+    for {settle_time_s} seconds.
+
+    If no valid points are found within {validity_timeout} seconds a {triggered_tip}
+    will be set to {INVALID_POSITION}.
     """
 
     INVALID_POSITION = (-1, -1)
@@ -34,40 +34,37 @@ class PinTipDetect(Device):
 
     triggered_tip: Signal = Component(Signal, kind=Kind.hinted, value=INVALID_POSITION)
     validity_timeout: Signal = Component(Signal, value=5)
-    settle_time: Signal = Component(Signal, value=1)
+    settle_time_s: Signal = Component(Signal, value=0.5)
 
-    start_reading_tip_start_time = None
     tip_positions: List[Tuple] = []
 
-    def update_tip_if_valid(self, value, **_):
-        if self.start_reading_tip_start_time is None:
-            self.start_reading_tip_start_time = datetime.now()
+    def log_tips_and_statistics(self, _):
+        median, standard_deviation = statistics_of_positions(self.tip_positions)
+        LOGGER.info(
+            f"Found tips {self.tip_positions} with median {median} and standard deviation {standard_deviation}"
+        )
 
+    def update_tip_if_valid(self, value, **_):
         current_value = (value, self.tip_y.get())
         if current_value != self.INVALID_POSITION:
             self.tip_positions.append(current_value)
-            LOGGER.info(f"Found tip {current_value}")
 
-            if self.start_reading_tip_start_time - datetime.now() >= timedelta(
-                seconds=self.settle_time.get()
-            ):
-                LOGGER.info("Taking median of tip positions")
+            (
+                median_tip_location,
+                _,
+            ) = statistics_of_positions(self.tip_positions)
 
-                (
-                    median_tip_location,
-                    tip_std,
-                ) = statistics_of_positions(self.tip_positions)
-                LOGGER.info(f"Standard deviation was {tip_std}")
-
-                self.triggered_tip.put(median_tip_location)
-                return True
+            self.triggered_tip.put(median_tip_location)
+            return True
 
     def trigger(self) -> Status:
-        self.start_reading_tip = None
         self.tip_positions: List[Tuple] = []
 
-        subscription_status = SubscriptionStatus(
-            self.tip_x, self.update_tip_if_valid, run=True
+        subscription_status = StableSubscriptionStatus(
+            self.tip_x,
+            self.update_tip_if_valid,
+            stability_time=self.settle_time_s.get(),
+            run=True,
         )
 
         def set_to_default_and_finish(timeout_status: Status):
@@ -83,6 +80,7 @@ class PinTipDetect(Device):
         self._timeout_status = Status(self, timeout=self.validity_timeout.get())
         self._timeout_status.add_callback(set_to_default_and_finish)
         subscription_status.add_callback(lambda _: self._timeout_status.set_finished())
+        subscription_status.add_callback(self.log_tips_and_standard_deviation)
 
         return subscription_status
 
