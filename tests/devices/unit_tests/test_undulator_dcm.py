@@ -81,6 +81,6 @@ def test_if_gap_is_already_correct_then_dont_move_gap(
     fake_undulator_dcm.dcm.energy_in_kev.move = MagicMock()
     mock_load.return_value = np.array([[5700, 5.4606], [7000, 6.045], [9700, 6.404]])
     fake_undulator_dcm.undulator.current_gap.sim_put(5.4605)
-    fake_undulator_dcm.energy.set(5800)
+    fake_undulator_dcm.energy.set(5800).wait(timeout=0.01)
     fake_undulator_dcm.undulator.gap_motor.move.assert_not_called()
     mock_logger.info.assert_called_once()

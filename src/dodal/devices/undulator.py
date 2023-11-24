@@ -17,6 +17,11 @@ class Undulator(Device):
     gap_access: EpicsSignalRO = Component(EpicsSignalRO, "IDBLENA")
     gap_discrepancy_tolerance_mm: float = UNDULATOR_DISCREPANCY_THRESHOLD_MM
 
-    def __init__(self, lookup_table_path, *args, **kwargs):
+    def __init__(
+        self,
+        lookup_table_path="/dls_sw/i03/software/daq_configuration/lookup/BeamLine_Undulator_toGap.txt",
+        *args,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self.lookup_table_path = lookup_table_path

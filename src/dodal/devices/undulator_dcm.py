@@ -1,6 +1,6 @@
 import numpy as np
 from numpy import argmin, loadtxt, ndarray
-from ophyd import Component, Device, EpicsMotor, EpicsSignalRO, Signal
+from ophyd import Component, Device, Signal
 from ophyd.status import Status
 
 from dodal.devices.DCM import DCM

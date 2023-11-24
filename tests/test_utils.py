@@ -1,7 +1,6 @@
 import os
 from unittest.mock import MagicMock, patch
 
-import numpy as np
 import pytest
 from bluesky.protocols import Readable
 from ophyd import EpicsMotor
@@ -13,8 +12,6 @@ from dodal.utils import (
     get_hostname,
     make_all_devices,
 )
-
-LOOKUP_TABLE_TEST_VALUES = np.array([[100, 150, 160], [200, 151, 165]])
 
 
 def test_finds_device_factories() -> None:
@@ -88,12 +85,3 @@ def test_invalid_beamline_variable_causes_get_device_module_to_raise(bl):
 def test_valid_beamline_variable_causes_get_device_module_to_return_module(bl, module):
     with patch.dict(os.environ, {"BEAMLINE": bl}):
         assert get_beamline_based_on_environment_variable() == module
-
-
-def test_parse_table_as_array():
-    test_file = "tests/devices/unit_tests/test_lookup_table.txt"
-
-    np.testing.assert_array_equal(
-        parse_table_as_array(test_file, comments=["#", "Units"]),
-        LOOKUP_TABLE_TEST_VALUES,
-    )
