@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
 import numpy as np
 import pytest
 from ophyd.sim import make_fake_device
+from ophyd.status import AndStatus, Status
 
 from dodal.devices.DCM import DCM
 from dodal.devices.undulator import Undulator, UndulatorGapAccess
@@ -83,3 +84,24 @@ def test_if_gap_is_already_correct_then_dont_move_gap(
     fake_undulator_dcm.energy_kev.set(5800).wait(timeout=0.01)
     fake_undulator_dcm.undulator.gap_motor.move.assert_not_called()
     mock_logger.info.assert_called_once()
+
+
+def test_energy_set_only_complete_when_all_statuses_are_finished(fake_undulator_dcm):
+    dcm_energy_move_status = Status()
+    undulator_gap_move_status = Status()
+
+    fake_undulator_dcm.dcm.energy_in_kev.move = MagicMock(
+        return_value=dcm_energy_move_status
+    )
+    fake_undulator_dcm.undulator.gap_motor.move = MagicMock(
+        return_value=undulator_gap_move_status
+    )
+    _get_energy_distance_table = MagicMock()
+    gap_to_match_dcm_energy = MagicMock(return_value=10)
+    fake_undulator_dcm.undulator.current_gap.sim_put(5)
+    status: Status = fake_undulator_dcm.energy_kev.set(5800)
+    assert not status.success
+    dcm_energy_move_status.set_finished()
+    assert not status.success
+    undulator_gap_move_status.set_finished()
+    status.wait(timeout=0.01)
