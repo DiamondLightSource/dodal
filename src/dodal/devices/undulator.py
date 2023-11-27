@@ -2,8 +2,9 @@ from enum import Enum
 
 from ophyd import Component, Device, EpicsMotor, EpicsSignalRO
 
-UNDULATOR_DISCREPANCY_THRESHOLD_MM = 2e-3  # The acceptable difference, in mm, between the undulator gap and the DCM energy,
-# when the latter is converted to mm using lookup tables
+# The acceptable difference, in mm, between the undulator gap and the DCM
+# energy, when the latter is converted to mm using lookup tables
+UNDULATOR_DISCREPANCY_THRESHOLD_MM = 2e-3
 
 
 class UndulatorGapAccess(Enum):
