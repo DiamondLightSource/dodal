@@ -148,10 +148,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_698_refactor_parameters/"
   },
   {
-    "version": "hyperion_795_check_undulator_gap",
-    "url": "https://DiamondLightSource.github.io/dodal/hyperion_795_check_undulator_gap/"
-  },
-  {
     "version": "hyperion_986_set_energy_apply_lookup_table_value_for_pitch_roll",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_986_set_energy_apply_lookup_table_value_for_pitch_roll/"
   },
@@ -170,6 +166,10 @@
   {
     "version": "linkam3",
     "url": "https://DiamondLightSource.github.io/dodal/linkam3/"
+  },
+  {
+    "version": "mx-54_pmac-device-for-i24",
+    "url": "https://DiamondLightSource.github.io/dodal/mx-54_pmac-device-for-i24/"
   },
   {
     "version": "p38",
