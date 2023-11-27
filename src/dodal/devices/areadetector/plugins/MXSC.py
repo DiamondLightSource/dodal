@@ -6,12 +6,28 @@ from ophyd.status import StableSubscriptionStatus, Status
 
 from dodal.log import LOGGER
 
+Pixel = Tuple[int, int]
 
-def statistics_of_positions(positions: List[Tuple]):
+
+def statistics_of_positions(
+    positions: List[Pixel],
+) -> Tuple[Pixel, Tuple[float, float]]:
+    """Get the median and standard deviation from a list of readings.
+
+    Note that x/y are treated separately so the median position is not guaranteed to be
+    a position that was actually read.
+
+    Args:
+        positions (List[Pixel]): A list of tip positions.
+
+    Returns:
+        Tuple[Pixel, Tuple[float, float]]: The median tip position and the standard
+                                           deviation in x/y
+    """
     x_coords, y_coords = np.array(positions).T
 
     median = (int(np.median(x_coords)), int(np.median(y_coords)))
-    std = (np.std(x_coords), np.std(y_coords))
+    std = (np.std(x_coords, dtype=float), np.std(y_coords, dtype=float))
 
     return median, std
 
@@ -36,7 +52,7 @@ class PinTipDetect(Device):
     validity_timeout: Signal = Component(Signal, value=5)
     settle_time_s: Signal = Component(Signal, value=0.5)
 
-    tip_positions: List[Tuple] = []
+    tip_positions: List[Pixel] = []
 
     def log_tips_and_statistics(self, _):
         median, standard_deviation = statistics_of_positions(self.tip_positions)
@@ -44,8 +60,8 @@ class PinTipDetect(Device):
             f"Found tips {self.tip_positions} with median {median} and standard deviation {standard_deviation}"
         )
 
-    def update_tip_if_valid(self, value, **_):
-        current_value = (value, self.tip_y.get())
+    def update_tip_if_valid(self, value: int, **_):
+        current_value = (value, int(self.tip_y.get()))
         if current_value != self.INVALID_POSITION:
             self.tip_positions.append(current_value)
 
@@ -58,7 +74,7 @@ class PinTipDetect(Device):
             return True
 
     def trigger(self) -> Status:
-        self.tip_positions: List[Tuple] = []
+        self.tip_positions = []
 
         subscription_status = StableSubscriptionStatus(
             self.tip_x,
