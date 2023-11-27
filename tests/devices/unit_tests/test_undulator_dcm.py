@@ -97,7 +97,7 @@ def test_energy_set_only_complete_when_all_statuses_are_finished(fake_undulator_
         return_value=undulator_gap_move_status
     )
     _get_energy_distance_table = MagicMock()
-    gap_to_match_dcm_energy = MagicMock(return_value=10)
+    _get_closest_gap_for_energy = MagicMock(return_value=10)
     fake_undulator_dcm.undulator.current_gap.sim_put(5)
     status: Status = fake_undulator_dcm.energy_kev.set(5800)
     assert not status.success
