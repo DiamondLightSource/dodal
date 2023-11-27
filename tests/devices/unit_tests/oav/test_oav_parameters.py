@@ -1,6 +1,6 @@
 import pytest
 
-from dodal.devices.oav.oav_errors import OAVError_ZoomLevelNotFound
+from dodal.devices.oav.oav_detector import OAVConfigParams
 from dodal.devices.oav.oav_parameters import OAVParameters
 
 OAV_CENTRING_JSON = "tests/devices/unit_tests/test_OAVCentring.json"
@@ -11,7 +11,8 @@ ZOOM_LEVELS_XML = "tests/devices/unit_tests/test_jCameraManZoomLevels.xml"
 @pytest.fixture
 def mock_parameters():
     return OAVParameters(
-        "loopCentring", ZOOM_LEVELS_XML, OAV_CENTRING_JSON, DISPLAY_CONFIGURATION
+        "loopCentring",
+        OAV_CENTRING_JSON,
     )
 
 
@@ -33,56 +34,14 @@ def test_given_key_in_context_and_default_when_load_parameters_then_value_found_
     assert mock_parameters.minimum_height == 10
 
 
-def test_extract_beam_position_from_context(mock_parameters: OAVParameters):
-    expected_beam_position = (517, 350)
-    assert mock_parameters.beam_centre_i == expected_beam_position[0]
-    assert mock_parameters.beam_centre_j == expected_beam_position[1]
-
-
-@pytest.mark.parametrize(
-    "zoom_level,expected_xCentre,expected_yCentre",
-    [(1.0, 477, 359), (5.0, 517, 350), (10.0, 613, 344)],
-)
-def test_extract_beam_position_given_different_zoom_levels(
-    zoom_level,
-    expected_xCentre,
-    expected_yCentre,
+def test_given_context_and_microns_per_pixel_get_max_tip_distance_in_pixels(
     mock_parameters: OAVParameters,
 ):
-    beam_centre = mock_parameters.get_beam_position_from_zoom(zoom_level)
-    assert beam_centre[0] == expected_xCentre
-    assert beam_centre[1] == expected_yCentre
+    zoom_level = mock_parameters.zoom
+    config_params = OAVConfigParams(ZOOM_LEVELS_XML, DISPLAY_CONFIGURATION)
+    config_params.update_on_zoom(str(zoom_level))
 
-
-@pytest.mark.parametrize(
-    "zoom_level,expected_microns_x,expected_microns_y",
-    [(2.5, 2.31, 2.31), (15.0, 0.302, 0.302)],
-)
-def test_load_microns_per_pixel_entries_found(
-    zoom_level, expected_microns_x, expected_microns_y, mock_parameters: OAVParameters
-):
-    mock_parameters.load_microns_per_pixel(zoom_level)
-    assert mock_parameters.micronsPerXPixel == expected_microns_x
-    assert mock_parameters.micronsPerYPixel == expected_microns_y
-
-
-def test_load_microns_per_pixel_entry_not_found(mock_parameters: OAVParameters):
-    with pytest.raises(OAVError_ZoomLevelNotFound):
-        mock_parameters.load_microns_per_pixel(0.000001)
-
-
-@pytest.mark.parametrize(
-    "h, v, expected_x, expected_y",
-    [
-        (54, 100, 517 - 54, 350 - 100),
-        (0, 0, 517, 350),
-        (500, 500, 517 - 500, 350 - 500),
-    ],
-)
-def test_calculate_beam_distance(
-    h, v, expected_x, expected_y, mock_parameters: OAVParameters
-):
-    assert mock_parameters.calculate_beam_distance(
-        h,
-        v,
-    ) == (expected_x, expected_y)
+    assert mock_parameters.max_tip_distance == 300
+    assert mock_parameters.get_max_tip_distance_in_pixels(
+        config_params.micronsPerXPixel
+    ) == pytest.approx(189.873, abs=1e-3)
