@@ -17,7 +17,7 @@ from dodal.devices.oav.oav_calculations import (
     get_rotation_increment,
     keep_inside_bounds,
 )
-from dodal.devices.oav.oav_detector import OAV
+from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
 from dodal.devices.oav.oav_errors import (
     OAVError_MissingRotations,
     OAVError_NoRotationsPassValidityTest,
@@ -36,7 +36,10 @@ def do_nothing(*args):
 
 @pytest.fixture
 def mock_oav():
-    oav: OAV = make_fake_device(OAV)(name="oav", prefix="a fake beamline")
+    oav_params = OAVConfigParams(ZOOM_LEVELS_XML, DISPLAY_CONFIGURATION)
+    oav: OAV = make_fake_device(OAV)(
+        name="oav", prefix="a fake beamline", params=oav_params
+    )
     oav.wait_for_connection = do_nothing
     return oav
 
@@ -44,7 +47,8 @@ def mock_oav():
 @pytest.fixture
 def mock_parameters():
     return OAVParameters(
-        "loopCentring", ZOOM_LEVELS_XML, OAV_CENTRING_JSON, DISPLAY_CONFIGURATION
+        "loopCentring",
+        OAV_CENTRING_JSON,
     )
 
 
@@ -193,21 +197,21 @@ def test_keep_x_within_bounds(max_tip_distance, tip_x, x, expected_return):
     ],
 )
 def test_distance_from_beam_centre_to_motor_coords_returns_the_same_values_as_GDA(
-    h, v, omega, expected_values, mock_parameters: OAVParameters
+    h, v, omega, expected_values, mock_oav: OAV, mock_parameters: OAVParameters
 ):
     mock_parameters.zoom = 5.0
-    mock_parameters.load_microns_per_pixel()
+    mock_oav.zoom_controller.level.sim_put(mock_parameters.zoom)
     results = camera_coordinates_to_xyz(
         h,
         v,
         omega,
-        mock_parameters.micronsPerXPixel,
-        mock_parameters.micronsPerYPixel,
+        mock_oav.parameters.micronsPerXPixel,
+        mock_oav.parameters.micronsPerYPixel,
     )
     expected_values = expected_values * 1e-3
-    expected_values[0] *= mock_parameters.micronsPerXPixel
-    expected_values[1] *= mock_parameters.micronsPerYPixel
-    expected_values[2] *= mock_parameters.micronsPerYPixel
+    expected_values[0] *= mock_oav.parameters.micronsPerXPixel
+    expected_values[1] *= mock_oav.parameters.micronsPerYPixel
+    expected_values[2] *= mock_oav.parameters.micronsPerYPixel
     expected_values = np.around(expected_values, decimals=3)
 
     assert np.array_equal(np.around(results, decimals=3), expected_values)
