@@ -52,8 +52,6 @@ class PinTipDetect(Device):
     validity_timeout: Signal = Component(Signal, value=5)
     settle_time_s: Signal = Component(Signal, value=0.5)
 
-    tip_positions: List[Pixel] = []
-
     def log_tips_and_statistics(self, _):
         median, standard_deviation = statistics_of_positions(self.tip_positions)
         LOGGER.info(
@@ -67,14 +65,15 @@ class PinTipDetect(Device):
 
             (
                 median_tip_location,
-                _,
+                __,
             ) = statistics_of_positions(self.tip_positions)
 
             self.triggered_tip.put(median_tip_location)
             return True
+        return False
 
     def trigger(self) -> Status:
-        self.tip_positions = []
+        self.tip_positions: List[Pixel] = []
 
         subscription_status = StableSubscriptionStatus(
             self.tip_x,
