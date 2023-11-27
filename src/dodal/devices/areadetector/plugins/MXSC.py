@@ -80,7 +80,7 @@ class PinTipDetect(Device):
         self._timeout_status = Status(self, timeout=self.validity_timeout.get())
         self._timeout_status.add_callback(set_to_default_and_finish)
         subscription_status.add_callback(lambda _: self._timeout_status.set_finished())
-        subscription_status.add_callback(self.log_tips_and_standard_deviation)
+        subscription_status.add_callback(self.log_tips_and_statistics)
 
         return subscription_status
 

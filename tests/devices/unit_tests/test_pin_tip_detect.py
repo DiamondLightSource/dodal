@@ -91,6 +91,15 @@ def test_given_multiple_tips_found_then_running_median_calculated(
     assert fake_pin_tip_detect.triggered_tip.get() == (100, 200)
 
 
+def trigger_and_read_twice(
+    fake_pin_tip_detect: PinTipDetect, first_values: List[Tuple], second_value: Tuple
+):
+    yield from trigger_and_read(fake_pin_tip_detect, first_values)
+    fake_pin_tip_detect.tip_y.sim_put(second_value[1])
+    fake_pin_tip_detect.tip_x.sim_put(second_value[0])
+    return (yield from trigger_and_read(fake_pin_tip_detect, []))
+
+
 def test_given_median_previously_calculated_when_triggered_again_then_only_calculated_on_new_values(
     fake_pin_tip_detect: PinTipDetect,
 ):
@@ -99,10 +108,26 @@ def test_given_median_previously_calculated_when_triggered_again_then_only_calcu
     RE = RunEngine(call_returns_result=True)
 
     def my_plan():
-        yield from trigger_and_read(fake_pin_tip_detect, [(10, 20), (1, 3), (4, 8)])
-        fake_pin_tip_detect.tip_y.sim_put(200)
-        fake_pin_tip_detect.tip_x.sim_put(100)
-        tip_pos = yield from trigger_and_read(fake_pin_tip_detect, [(100, 200)])
+        tip_pos = yield from trigger_and_read_twice(
+            fake_pin_tip_detect, [(10, 20), (1, 3), (4, 8)], (100, 200)
+        )
         assert tip_pos == (100, 200)
+
+    RE(my_plan())
+
+
+def test_given_previous_tip_found_when_this_tip_not_found_then_returns_invalid(
+    fake_pin_tip_detect: PinTipDetect,
+):
+    fake_pin_tip_detect.settle_time_s.set(0.1).wait()
+    fake_pin_tip_detect.validity_timeout.set(0.5).wait()
+
+    RE = RunEngine(call_returns_result=True)
+
+    def my_plan():
+        tip_pos = yield from trigger_and_read_twice(
+            fake_pin_tip_detect, [(10, 20), (1, 3), (4, 8)], (-1, -1)
+        )
+        assert tip_pos == (-1, -1)
 
     RE(my_plan())
