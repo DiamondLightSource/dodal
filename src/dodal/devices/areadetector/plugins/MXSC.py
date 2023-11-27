@@ -1,16 +1,47 @@
+from typing import List, Tuple
+
+import numpy as np
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO, Kind, Signal
-from ophyd.status import Status, SubscriptionStatus
+from ophyd.status import StableSubscriptionStatus, Status
+
+from dodal.log import LOGGER
+
+Pixel = Tuple[int, int]
+
+
+def statistics_of_positions(
+    positions: List[Pixel],
+) -> Tuple[Pixel, Tuple[float, float]]:
+    """Get the median and standard deviation from a list of readings.
+
+    Note that x/y are treated separately so the median position is not guaranteed to be
+    a position that was actually read.
+
+    Args:
+        positions (List[Pixel]): A list of tip positions.
+
+    Returns:
+        Tuple[Pixel, Tuple[float, float]]: The median tip position and the standard
+                                           deviation in x/y
+    """
+    x_coords, y_coords = np.array(positions).T
+
+    median = (int(np.median(x_coords)), int(np.median(y_coords)))
+    std = (np.std(x_coords, dtype=float), np.std(y_coords, dtype=float))
+
+    return median, std
 
 
 class PinTipDetect(Device):
     """This will read the pin tip location from the MXSC plugin.
 
     If the plugin finds no tip it will return {INVALID_POSITION}. However, it will also
-    occassionally give false negatives and return this value when there is a pin tip
-    there. Therefore, it is recommended that you trigger this device, which will cause a
-    subsequent read to return a valid pin immediatedly if one is found or wait
-    {validity_timeout} seconds if one is not, at which point a subsequent read will give
-    you {INVALID_POSITION}.
+    occassionally give incorrect data. Therefore, it is recommended that you trigger
+    this device, which will set {triggered_tip} to a median of the valid points taken
+    for {settle_time_s} seconds.
+
+    If no valid points are found within {validity_timeout} seconds a {triggered_tip}
+    will be set to {INVALID_POSITION}.
     """
 
     INVALID_POSITION = (-1, -1)
@@ -19,16 +50,36 @@ class PinTipDetect(Device):
 
     triggered_tip: Signal = Component(Signal, kind=Kind.hinted, value=INVALID_POSITION)
     validity_timeout: Signal = Component(Signal, value=5)
+    settle_time_s: Signal = Component(Signal, value=0.5)
 
-    def update_tip_if_valid(self, value, **_):
-        current_value = (value, self.tip_y.get())
+    def log_tips_and_statistics(self, _):
+        median, standard_deviation = statistics_of_positions(self.tip_positions)
+        LOGGER.info(
+            f"Found tips {self.tip_positions} with median {median} and standard deviation {standard_deviation}"
+        )
+
+    def update_tip_if_valid(self, value: int, **_):
+        current_value = (value, int(self.tip_y.get()))
         if current_value != self.INVALID_POSITION:
-            self.triggered_tip.put(current_value)
+            self.tip_positions.append(current_value)
+
+            (
+                median_tip_location,
+                __,
+            ) = statistics_of_positions(self.tip_positions)
+
+            self.triggered_tip.put(median_tip_location)
             return True
+        return False
 
     def trigger(self) -> Status:
-        subscription_status = SubscriptionStatus(
-            self.tip_x, self.update_tip_if_valid, run=True
+        self.tip_positions: List[Pixel] = []
+
+        subscription_status = StableSubscriptionStatus(
+            self.tip_x,
+            self.update_tip_if_valid,
+            stability_time=self.settle_time_s.get(),
+            run=True,
         )
 
         def set_to_default_and_finish(timeout_status: Status):
@@ -44,6 +95,7 @@ class PinTipDetect(Device):
         self._timeout_status = Status(self, timeout=self.validity_timeout.get())
         self._timeout_status.add_callback(set_to_default_and_finish)
         subscription_status.add_callback(lambda _: self._timeout_status.set_finished())
+        subscription_status.add_callback(self.log_tips_and_statistics)
 
         return subscription_status
 
