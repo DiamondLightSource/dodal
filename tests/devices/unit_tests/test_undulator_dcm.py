@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import numpy as np
 import pytest
 from ophyd.sim import make_fake_device
-from ophyd.status import AndStatus, Status
+from ophyd.status import Status
 
 from dodal.devices.DCM import DCM
 from dodal.devices.undulator import Undulator, UndulatorGapAccess
