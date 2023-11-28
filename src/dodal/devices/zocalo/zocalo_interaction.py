@@ -13,7 +13,7 @@ from hyperion.exceptions import WarningException
 from numpy import ndarray
 from workflows.transport import lookup
 
-TIMEOUT = 180
+DEFAULT_TIMEOUT = 180
 
 
 class NoDiffractionFound(WarningException):
@@ -108,7 +108,7 @@ class ZocaloInteractor:
         """
         # Set timeout default like this so that we can modify TIMEOUT during tests
         if timeout is None:
-            timeout = TIMEOUT
+            timeout = DEFAULT_TIMEOUT
         transport = self._get_zocalo_connection()
         result_received: queue.Queue = queue.Queue()
         exception: Optional[Exception] = None

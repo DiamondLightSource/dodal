@@ -2,22 +2,21 @@ import queue
 from collections import deque
 from datetime import datetime, timedelta
 from time import sleep
-from typing import Any, Optional, Sequence, TypedDict
+from typing import Optional, Sequence, TypedDict
 
-import numpy as np
 import workflows.recipe
 import workflows.transport
 import zocalo.configuration
-from bluesky.protocols import Status, Triggerable
-from numpy.typing import NDArray
+from bluesky.protocols import Triggerable
+from ophyd.status import Status
 from ophyd_async.core import StandardReadable
 from workflows.transport import lookup
 
 from dodal.devices.ophyd_async_utils import create_soft_signal_r
 from dodal.log import LOGGER
 
-SORT_KEY = "max_count"
-TIMEOUT = 15
+DEFAULT_SORT_KEY = "max_count"
+DEFAULT_TIMEOUT = 15
 
 
 class XrcResult(TypedDict):
@@ -47,7 +46,7 @@ class ZocaloResults(StandardReadable, Triggerable):
         zocalo_environment: str,
         channel: str = "xrc.i03",
         name: str = "zocalo_results",
-        sort_key: str = SORT_KEY,
+        sort_key: str = DEFAULT_SORT_KEY,
     ) -> None:
         self.zocalo_environment = zocalo_environment
         self.sort_key = sort_key
@@ -66,7 +65,7 @@ class ZocaloResults(StandardReadable, Triggerable):
 
     async def trigger(self) -> Status:
         await self._put_results(self._wait_for_results())
-        return super().trigger()
+        return Status(done=True, success=True)
 
     def _get_zocalo_connection(self):
         zc = zocalo.configuration.from_file()
@@ -105,7 +104,7 @@ class ZocaloResults(StandardReadable, Triggerable):
         """
         # Set timeout default like this so that we can modify TIMEOUT during tests
         if timeout is None:
-            timeout = TIMEOUT
+            timeout = DEFAULT_TIMEOUT
         transport = self._get_zocalo_connection()
         result_received: queue.Queue = queue.Queue()
         exception: Optional[Exception] = None

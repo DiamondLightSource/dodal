@@ -69,6 +69,7 @@ def get_dcgid_and_prefix(dcid: int, Session) -> Tuple[int, str]:
     except Exception as e:
         print("Exception occured when reading from ISPyB database:\n")
         print(e)
+        print("This is probably because you are using mock dcid/dcgid values...")
         dcgid = 4
         prefix = ""
     return dcgid, prefix

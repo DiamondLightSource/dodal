@@ -1,6 +1,6 @@
 from collections import deque
-from typing import Any, Awaitable, Callable, Sequence
-from unittest.mock import MagicMock, patch
+from typing import Awaitable, Callable, Sequence
+from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
@@ -86,7 +86,10 @@ async def mocked_zocalo_device():
 
 
 @pytest.mark.asyncio
-async def test_put_result(zocalo_device: ZocaloResults):
+async def test_put_result(
+    mocked_zocalo_device: Callable[[Sequence[XrcResult]], Awaitable[ZocaloResults]]
+):
+    zocalo_device = await mocked_zocalo_device([])
     await zocalo_device._put_results(TEST_RESULTS)
 
 
@@ -99,8 +102,8 @@ async def test_read_gets_results(
     data: deque[XrcResult] = results["zocalo_results-results"]["value"]
 
     assert data[0] == TEST_RESULTS[0]
-    assert data[1] == TEST_RESULTS[2]
-    assert data[2] == TEST_RESULTS[1]
+    assert data[1] == TEST_RESULTS[1]
+    assert data[2] == TEST_RESULTS[2]
 
 
 @pytest.mark.asyncio
