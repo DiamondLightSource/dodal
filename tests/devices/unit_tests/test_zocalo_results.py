@@ -1,9 +1,15 @@
 from typing import Any
+from unittest.mock import patch
 
 import numpy as np
 import pytest
 
-from dodal.devices.zocalo_results_device import XrcResult, ZocaloResults, parse_reading
+from dodal.devices.zocalo_results_device import (
+    NULL_RESULT,
+    XrcResult,
+    ZocaloResults,
+    parse_reading,
+)
 
 TEST_RESULTS: list[XrcResult] = [
     {
@@ -83,8 +89,34 @@ def test_parse_reading():
 
 @pytest.mark.asyncio
 async def test_put_result():
-    zocalo_device = ZocaloResults()
+    zocalo_device = ZocaloResults("test_env")
     await zocalo_device.connect()
     await zocalo_device._put_result(TEST_RESULTS[0])
+
+
+@pytest.mark.asyncio
+@patch(
+    "dodal.devices.zocalo_results_device.ZocaloResults._wait_for_results",
+    return_value=TEST_RESULTS,
+)
+async def test_read_gets_results(wait_for_results):
+    zocalo_device = ZocaloResults("test_env")
+    await zocalo_device.connect()
     result = await zocalo_device.read()
     assert_reading_equals_xrcresult(result, TEST_RESULTS[0])
+    result = await zocalo_device.read()
+    assert_reading_equals_xrcresult(result, TEST_RESULTS[1])
+    result = await zocalo_device.read()
+    assert_reading_equals_xrcresult(result, TEST_RESULTS[2])
+
+
+@pytest.mark.asyncio
+@patch(
+    "dodal.devices.zocalo_results_device.ZocaloResults._wait_for_results",
+    return_value=[],
+)
+async def test_failed_read_gets_null_result(wait_for_results):
+    zocalo_device = ZocaloResults("test_env")
+    await zocalo_device.connect()
+    result = await zocalo_device.read()
+    assert_reading_equals_xrcresult(result, NULL_RESULT)
