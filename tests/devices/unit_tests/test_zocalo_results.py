@@ -1,10 +1,12 @@
+from collections import deque
 from typing import Any
 from unittest.mock import patch
 
 import numpy as np
 import pytest
+import pytest_asyncio
 
-from dodal.devices.zocalo_results_device import (
+from dodal.devices.zocalo import (
     NULL_RESULT,
     XrcResult,
     ZocaloResults,
@@ -83,25 +85,28 @@ def assert_reading_equals_xrcresult(read_result: dict[str, Any], expected: XrcRe
     assert parsed_reading["bounding_box"] == expected["bounding_box"]
 
 
+@pytest_asyncio.fixture
+async def zocalo_device():
+    zd = ZocaloResults("test_env")
+    await zd.connect()
+    return zd
+
+
 def test_parse_reading():
     assert_reading_equals_xrcresult(TEST_READING, TEST_RESULTS[1])
 
 
 @pytest.mark.asyncio
-async def test_put_result():
-    zocalo_device = ZocaloResults("test_env")
-    await zocalo_device.connect()
+async def test_put_result(zocalo_device):
     await zocalo_device._put_result(TEST_RESULTS[0])
 
 
 @pytest.mark.asyncio
 @patch(
     "dodal.devices.zocalo_results_device.ZocaloResults._wait_for_results",
-    return_value=TEST_RESULTS,
+    return_value=deque(TEST_RESULTS),
 )
-async def test_read_gets_results(wait_for_results):
-    zocalo_device = ZocaloResults("test_env")
-    await zocalo_device.connect()
+async def test_read_gets_results(wait_for_results, zocalo_device):
     result = await zocalo_device.read()
     assert_reading_equals_xrcresult(result, TEST_RESULTS[0])
     result = await zocalo_device.read()
@@ -113,10 +118,8 @@ async def test_read_gets_results(wait_for_results):
 @pytest.mark.asyncio
 @patch(
     "dodal.devices.zocalo_results_device.ZocaloResults._wait_for_results",
-    return_value=[],
+    return_value=deque(),
 )
-async def test_failed_read_gets_null_result(wait_for_results):
-    zocalo_device = ZocaloResults("test_env")
-    await zocalo_device.connect()
+async def test_failed_read_gets_null_result(wait_for_results, zocalo_device):
     result = await zocalo_device.read()
     assert_reading_equals_xrcresult(result, NULL_RESULT)

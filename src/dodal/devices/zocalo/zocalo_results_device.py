@@ -1,5 +1,5 @@
 import queue
-from collections import OrderedDict
+from collections import deque
 from datetime import datetime, timedelta
 from time import sleep
 from typing import Any, Optional, TypedDict
@@ -63,7 +63,7 @@ class ZocaloResults(StandardReadable):
         self.zocalo_environment = zocalo_environment
         self.sort_key = sort_key
         self.channel = channel
-        self.results: list[XrcResult] = []
+        self.results: deque[XrcResult] = deque()
 
         self.centre_of_mass = create_soft_signal_r(
             NDArray[np.uint], "centre_of_mass", self.name
@@ -88,10 +88,10 @@ class ZocaloResults(StandardReadable):
         super().__init__(name)
 
     async def read(self) -> dict[str, Reading]:
-        if self.results == []:
+        if len(self.results) == 0:
             self.results = self._wait_for_results()
         await self._put_result(
-            self.results.pop(0) if self.results != [] else NULL_RESULT
+            self.results.popleft() if len(self.results) != 0 else NULL_RESULT
         )
         return await super().read()
 
@@ -111,7 +111,7 @@ class ZocaloResults(StandardReadable):
         transport.connect()
         return transport
 
-    def _wait_for_results(self, timeout: int | None = None) -> list[XrcResult]:
+    def _wait_for_results(self, timeout: int | None = None) -> deque[XrcResult]:
         """Block until a result is received from Zocalo.
         Args:
             data_collection_group_id (int): The ID of the data collection group representing
@@ -181,8 +181,10 @@ class ZocaloResults(StandardReadable):
                     raw_results = result_received.get_nowait()
                     LOGGER.info(f"Zocalo: found {len(raw_results)} crystals.")
                     # Sort from strongest to weakest in case of multiple crystals
-                    return sorted(
-                        raw_results, key=lambda d: d[self.sort_key], reverse=True
+                    return deque(
+                        sorted(
+                            raw_results, key=lambda d: d[self.sort_key], reverse=True
+                        )
                     )
             raise TimeoutError(
                 f"No results returned by Zocalo within timeout of {timeout} s"
