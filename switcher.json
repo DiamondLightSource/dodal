@@ -4,6 +4,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/main/"
   },
   {
+    "version": "1.7.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.7.0/"
+  },
+  {
     "version": "1.6.0",
     "url": "https://DiamondLightSource.github.io/dodal/1.6.0/"
   },
@@ -194,10 +198,6 @@
   {
     "version": "release-004-retroactive",
     "url": "https://DiamondLightSource.github.io/dodal/release-004-retroactive/"
-  },
-  {
-    "version": "remove_i03_xbpm_timeout",
-    "url": "https://DiamondLightSource.github.io/dodal/remove_i03_xbpm_timeout/"
   },
   {
     "version": "remove_ophyd_dependency_pin",
