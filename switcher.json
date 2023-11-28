@@ -148,6 +148,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/fix_wrong_return_type/"
   },
   {
+    "version": "hyperion_1007_reset_stub_offsets_if_required",
+    "url": "https://DiamondLightSource.github.io/dodal/hyperion_1007_reset_stub_offsets_if_required/"
+  },
+  {
     "version": "hyperion_698_refactor_parameters",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_698_refactor_parameters/"
   },
@@ -174,10 +178,6 @@
   {
     "version": "mx-54_pmac-device-for-i24",
     "url": "https://DiamondLightSource.github.io/dodal/mx-54_pmac-device-for-i24/"
-  },
-  {
-    "version": "mx_i24-test-oav-fix",
-    "url": "https://DiamondLightSource.github.io/dodal/mx_i24-test-oav-fix/"
   },
   {
     "version": "p38",
