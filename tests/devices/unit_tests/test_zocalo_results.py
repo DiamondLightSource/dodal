@@ -1,6 +1,6 @@
 from collections import deque
-from typing import Any
-from unittest.mock import patch
+from typing import Any, Awaitable, Callable, Sequence
+from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pytest
@@ -10,7 +10,6 @@ from dodal.devices.zocalo import (
     NULL_RESULT,
     XrcResult,
     ZocaloResults,
-    parse_reading,
 )
 
 TEST_RESULTS: list[XrcResult] = [
@@ -74,52 +73,41 @@ TEST_READING = {
 }
 
 
-def assert_reading_equals_xrcresult(read_result: dict[str, Any], expected: XrcResult):
-    parsed_reading = parse_reading(read_result)
-
-    assert parsed_reading["centre_of_mass"] == expected["centre_of_mass"]
-    assert parsed_reading["max_voxel"] == expected["max_voxel"]
-    assert parsed_reading["max_count"] == expected["max_count"]
-    assert parsed_reading["n_voxels"] == expected["n_voxels"]
-    assert parsed_reading["total_count"] == expected["total_count"]
-    assert parsed_reading["bounding_box"] == expected["bounding_box"]
-
-
 @pytest_asyncio.fixture
-async def zocalo_device():
-    zd = ZocaloResults("test_env")
-    await zd.connect()
-    return zd
+async def mocked_zocalo_device():
+    async def device(results):
+        zd = ZocaloResults("test_env")
+        zd._wait_for_results = MagicMock(return_value=results)
+        await zd.connect()
+        await zd.trigger()
+        return zd
 
-
-def test_parse_reading():
-    assert_reading_equals_xrcresult(TEST_READING, TEST_RESULTS[1])
-
-
-@pytest.mark.asyncio
-async def test_put_result(zocalo_device):
-    await zocalo_device._put_result(TEST_RESULTS[0])
+    return device
 
 
 @pytest.mark.asyncio
-@patch(
-    "dodal.devices.zocalo_results_device.ZocaloResults._wait_for_results",
-    return_value=deque(TEST_RESULTS),
-)
-async def test_read_gets_results(wait_for_results, zocalo_device):
-    result = await zocalo_device.read()
-    assert_reading_equals_xrcresult(result, TEST_RESULTS[0])
-    result = await zocalo_device.read()
-    assert_reading_equals_xrcresult(result, TEST_RESULTS[1])
-    result = await zocalo_device.read()
-    assert_reading_equals_xrcresult(result, TEST_RESULTS[2])
+async def test_put_result(zocalo_device: ZocaloResults):
+    await zocalo_device._put_results(TEST_RESULTS)
 
 
 @pytest.mark.asyncio
-@patch(
-    "dodal.devices.zocalo_results_device.ZocaloResults._wait_for_results",
-    return_value=deque(),
-)
-async def test_failed_read_gets_null_result(wait_for_results, zocalo_device):
-    result = await zocalo_device.read()
-    assert_reading_equals_xrcresult(result, NULL_RESULT)
+async def test_read_gets_results(
+    mocked_zocalo_device: Callable[[Sequence[XrcResult]], Awaitable[ZocaloResults]],
+):
+    zocalo_device = await mocked_zocalo_device(TEST_RESULTS)
+    results = await zocalo_device.read()
+    data: deque[XrcResult] = results["zocalo_results-results"]["value"]
+
+    assert data[0] == TEST_RESULTS[0]
+    assert data[1] == TEST_RESULTS[2]
+    assert data[2] == TEST_RESULTS[1]
+
+
+@pytest.mark.asyncio
+async def test_failed_read_gets_null_result(
+    mocked_zocalo_device: Callable[[Sequence[XrcResult]], Awaitable[ZocaloResults]],
+):
+    zocalo_device = await mocked_zocalo_device([])
+    results = await zocalo_device.read()
+    data: deque[XrcResult] = results["zocalo_results-results"]["value"]
+    assert data[0] == NULL_RESULT

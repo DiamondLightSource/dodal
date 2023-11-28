@@ -5,14 +5,13 @@ from datetime import datetime, timedelta
 from time import sleep
 from typing import Optional
 
+import hyperion.log
 import workflows.recipe
 import workflows.transport
 import zocalo.configuration
+from hyperion.exceptions import WarningException
 from numpy import ndarray
 from workflows.transport import lookup
-
-import hyperion.log
-from hyperion.exceptions import WarningException
 
 TIMEOUT = 180
 

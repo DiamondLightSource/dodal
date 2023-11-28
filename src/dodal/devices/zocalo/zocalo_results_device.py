@@ -2,13 +2,13 @@ import queue
 from collections import deque
 from datetime import datetime, timedelta
 from time import sleep
-from typing import Any, Optional, TypedDict
+from typing import Any, Optional, Sequence, TypedDict
 
 import numpy as np
 import workflows.recipe
 import workflows.transport
 import zocalo.configuration
-from bluesky.protocols import Reading
+from bluesky.protocols import Status, Triggerable
 from numpy.typing import NDArray
 from ophyd_async.core import StandardReadable
 from workflows.transport import lookup
@@ -39,18 +39,7 @@ NULL_RESULT: XrcResult = {
 }
 
 
-def parse_reading(reading: dict[str, Any], name: str = "zocalo_results") -> XrcResult:
-    return {
-        "centre_of_mass": list(reading[f"{name}-centre_of_mass"]["value"]),
-        "max_voxel": list(reading[f"{name}-max_voxel"]["value"]),
-        "max_count": reading[f"{name}-max_count"]["value"],
-        "n_voxels": reading[f"{name}-n_voxels"]["value"],
-        "total_count": reading[f"{name}-total_count"]["value"],
-        "bounding_box": [list(p) for p in reading[f"{name}-bounding_box"]["value"]],
-    }
-
-
-class ZocaloResults(StandardReadable):
+class ZocaloResults(StandardReadable, Triggerable):
     """An ophyd device which can wait for results from a Zocalo job"""
 
     def __init__(
@@ -63,45 +52,21 @@ class ZocaloResults(StandardReadable):
         self.zocalo_environment = zocalo_environment
         self.sort_key = sort_key
         self.channel = channel
-        self.results: deque[XrcResult] = deque()
 
-        self.centre_of_mass = create_soft_signal_r(
-            NDArray[np.uint], "centre_of_mass", self.name
-        )
-        self.max_voxel = create_soft_signal_r(NDArray[np.uint], "max_voxel", self.name)
-        self.max_count = create_soft_signal_r(int, "max_count", self.name)
-        self.n_voxels = create_soft_signal_r(int, "n_voxels", self.name)
-        self.total_count = create_soft_signal_r(int, "total_count", self.name)
-        self.bounding_box = create_soft_signal_r(
-            NDArray[np.uint], "bounding_box", self.name
-        )
+        self.results = create_soft_signal_r(deque[XrcResult], "results", self.name)
         self.set_readable_signals(
             read=[
-                self.centre_of_mass,
-                self.max_voxel,
-                self.max_count,
-                self.n_voxels,
-                self.total_count,
-                self.bounding_box,
+                self.results,
             ]
         )
         super().__init__(name)
 
-    async def read(self) -> dict[str, Reading]:
-        if len(self.results) == 0:
-            self.results = self._wait_for_results()
-        await self._put_result(
-            self.results.popleft() if len(self.results) != 0 else NULL_RESULT
-        )
-        return await super().read()
+    async def _put_results(self, results: Sequence[XrcResult]):
+        await self.results._backend.put(deque(results))
 
-    async def _put_result(self, result: XrcResult):
-        await self.centre_of_mass._backend.put(np.array(result["centre_of_mass"]))
-        await self.max_voxel._backend.put(np.array(result["max_voxel"]))
-        await self.max_count._backend.put(result["max_count"])
-        await self.n_voxels._backend.put(result["n_voxels"])
-        await self.total_count._backend.put(result["total_count"])
-        await self.bounding_box._backend.put(np.array(result["bounding_box"]))
+    async def trigger(self) -> Status:
+        await self._put_results(self._wait_for_results())
+        return super().trigger()
 
     def _get_zocalo_connection(self):
         zc = zocalo.configuration.from_file()
