@@ -38,7 +38,7 @@ class ZoomController(Device):
     percentage: EpicsSignal = Component(EpicsSignal, "ZOOMPOSCMD")
 
     # Level is the string description of the zoom level e.g. "1.0x"
-    level: EpicsSignal = Component(EpicsSignal, "MP:SELECT")
+    level: EpicsSignal = Component(EpicsSignal, "MP:SELECT", string=True)
     # Used by OAV to work out if we're changing the setpoint
     _level_sp: Signal = Component(Signal)
 
@@ -180,4 +180,8 @@ class OAV(AreaDetector):
     def __init__(self, *args, params: OAVConfigParams, **kwargs):
         super().__init__(*args, **kwargs)
         self.parameters = params
+
+    def wait_for_connection(self, all_signals=False, timeout=2):
+        connected = super().wait_for_connection(all_signals, timeout)
         self.zoom_controller.level.subscribe(self.parameters.update_on_zoom)
+        return connected
