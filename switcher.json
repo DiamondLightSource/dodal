@@ -4,60 +4,60 @@
     "url": "https://DiamondLightSource.github.io/dodal/main/"
   },
   {
-    "version": "1.7.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.7.0/"
-  },
-  {
-    "version": "1.6.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.6.0/"
-  },
-  {
-    "version": "1.5.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.5.0/"
-  },
-  {
-    "version": "1.4.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.4.0/"
-  },
-  {
-    "version": "1.3.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.3.0/"
-  },
-  {
-    "version": "1.2.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.2.0/"
-  },
-  {
-    "version": "1.1.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.1.0/"
-  },
-  {
-    "version": "1.0.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.0.0/"
-  },
-  {
-    "version": "0.0.5",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.5/"
-  },
-  {
-    "version": "0.0.4",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.4/"
-  },
-  {
-    "version": "0.0.3",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.3/"
+    "version": "0.0.1",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.1/"
   },
   {
     "version": "0.0.2",
     "url": "https://DiamondLightSource.github.io/dodal/0.0.2/"
   },
   {
-    "version": "0.0.1",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.1/"
-  },
-  {
     "version": "0.0.2_async_arming",
     "url": "https://DiamondLightSource.github.io/dodal/0.0.2_async_arming/"
+  },
+  {
+    "version": "0.0.3",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.3/"
+  },
+  {
+    "version": "0.0.4",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.4/"
+  },
+  {
+    "version": "0.0.5",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.5/"
+  },
+  {
+    "version": "1.0.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.0.0/"
+  },
+  {
+    "version": "1.1.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.1.0/"
+  },
+  {
+    "version": "1.2.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.2.0/"
+  },
+  {
+    "version": "1.3.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.3.0/"
+  },
+  {
+    "version": "1.4.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.4.0/"
+  },
+  {
+    "version": "1.5.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.5.0/"
+  },
+  {
+    "version": "1.6.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.6.0/"
+  },
+  {
+    "version": "1.7.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.7.0/"
   },
   {
     "version": "117_add_panda",
@@ -174,10 +174,6 @@
   {
     "version": "mx-54_pmac-device-for-i24",
     "url": "https://DiamondLightSource.github.io/dodal/mx-54_pmac-device-for-i24/"
-  },
-  {
-    "version": "mx_i24-test-oav-fix",
-    "url": "https://DiamondLightSource.github.io/dodal/mx_i24-test-oav-fix/"
   },
   {
     "version": "p38",
