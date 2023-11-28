@@ -14,11 +14,36 @@ from pika.spec import BasicProperties
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from ..system_tests.external_interaction.conftest import (
-    TEST_RESULT_LARGE,
-    TEST_RESULT_SMALL,
-)
-
+TEST_RESULT_LARGE = [
+    {
+        "centre_of_mass": [1, 2, 3],
+        "max_voxel": [1, 2, 3],
+        "max_count": 105062,
+        "n_voxels": 35,
+        "total_count": 2387574,
+        "bounding_box": [[2, 2, 2], [8, 8, 7]],
+    }
+]
+TEST_RESULT_MEDIUM = [
+    {
+        "centre_of_mass": [1, 2, 3],
+        "max_voxel": [2, 4, 5],
+        "max_count": 105062,
+        "n_voxels": 35,
+        "total_count": 2387574,
+        "bounding_box": [[1, 2, 3], [3, 4, 4]],
+    }
+]
+TEST_RESULT_SMALL = [
+    {
+        "centre_of_mass": [1, 2, 3],
+        "max_voxel": [1, 2, 3],
+        "max_count": 105062,
+        "n_voxels": 35,
+        "total_count": 1387574,
+        "bounding_box": [[2, 2, 2], [3, 3, 3]],
+    }
+]
 NO_DIFFRACTION_PREFIX = "NO_DIFF"
 
 MULTIPLE_CRYSTAL_PREFIX = "MULTI_X"
