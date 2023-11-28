@@ -3,7 +3,7 @@ from collections import ChainMap
 from typing import Any
 
 OAV_CONFIG_JSON = (
-    "/dls_sw/i03/software/gda/configurations/i03-config/etc/OAVCentring.json"
+    "/dls_sw/i03/software/daq_configuration/json/OAVCentring_hyperion.json"
 )
 
 
