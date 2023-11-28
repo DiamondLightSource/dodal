@@ -40,7 +40,7 @@ def mock_oav():
     oav: OAV = make_fake_device(OAV)(
         name="oav", prefix="a fake beamline", params=oav_params
     )
-    oav.wait_for_connection = do_nothing
+    oav.wait_for_connection()
     return oav
 
 
@@ -199,7 +199,7 @@ def test_keep_x_within_bounds(max_tip_distance, tip_x, x, expected_return):
 def test_distance_from_beam_centre_to_motor_coords_returns_the_same_values_as_GDA(
     h, v, omega, expected_values, mock_oav: OAV, mock_parameters: OAVParameters
 ):
-    mock_parameters.zoom = 5.0
+    mock_parameters.zoom = "5.0"
     mock_oav.zoom_controller.level.sim_put(mock_parameters.zoom)
     results = camera_coordinates_to_xyz(
         h,

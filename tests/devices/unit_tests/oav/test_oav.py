@@ -28,6 +28,8 @@ def oav() -> OAV:
     oav.zoom_controller.frst.set("7.0x")
     oav.zoom_controller.fvst.set("9.0x")
 
+    oav.wait_for_connection()
+
     return oav
 
 

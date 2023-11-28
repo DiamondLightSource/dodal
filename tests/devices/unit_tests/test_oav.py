@@ -33,6 +33,8 @@ def fake_oav() -> OAV:
     fake_oav.cam.port_name.sim_put("CAM")
     fake_oav.proc.port_name.sim_put("PROC")
 
+    fake_oav.wait_for_connection()
+
     return fake_oav
 
 
