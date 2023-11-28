@@ -1,18 +1,24 @@
 from enum import Enum
+from functools import partial
 
 from ophyd import Component as Cpt
-from ophyd import Device, EpicsMotor
+from ophyd import Device, EpicsMotor, EpicsSignalRO
 from ophyd.epics_motor import MotorBundle
-from ophyd.status import StatusBase
+from ophyd.status import Status, StatusBase
 
 from dodal.devices.motors import MotorLimitHelper, XYZLimitBundle
 from dodal.devices.status import await_approx_value
-from dodal.devices.utils import SetWhenEnabled
+from dodal.devices.utils import SetWhenEnabled, run_functions_without_blocking
 
 
 class StubPosition(Enum):
     CURRENT_AS_CENTER = 0
     RESET_TO_ROBOT_LOAD = 1
+
+
+class StubApplied(Enum):
+    NOT_APPLIED = 0
+    APPLIED = 1
 
 
 class StubOffsets(Device):
@@ -26,18 +32,41 @@ class StubOffsets(Device):
 
     parent: "Smargon"
 
+    stub_applied: EpicsSignalRO = Cpt(EpicsSignalRO, "NEW_CS_CENTER")
+
     center_at_current_position: SetWhenEnabled = Cpt(SetWhenEnabled, "CENTER_CS")
     to_robot_load: SetWhenEnabled = Cpt(SetWhenEnabled, "SET_STUBS_TO_RL")
 
+    def _center_to_current(self) -> StatusBase:
+        status = self.center_at_current_position.set(1)
+        status &= await_approx_value(self.parent.x, 0.0, deadband=0.1)
+        status &= await_approx_value(self.parent.y, 0.0, deadband=0.1)
+        status &= await_approx_value(self.parent.z, 0.0, deadband=0.1)
+        return status
+
     def set(self, pos: StubPosition) -> StatusBase:
+        """Sets stub offsets to either current position as center or to robot load
+        position.
+
+        If current position is already the center it will first reset to robot load.
+        If robot load position is requested and we are already there then do nothing.
+        """
         if pos == StubPosition.CURRENT_AS_CENTER:
-            status = self.center_at_current_position.set(1)
-            status &= await_approx_value(self.parent.x, 0.0, deadband=0.1)
-            status &= await_approx_value(self.parent.y, 0.0, deadband=0.1)
-            status &= await_approx_value(self.parent.z, 0.0, deadband=0.1)
-            return status
+            if self.stub_applied.get() == StubApplied.APPLIED.value:
+                reset_position = [
+                    partial(self.to_robot_load.set, 1),
+                    self._center_to_current,
+                ]
+                return run_functions_without_blocking(reset_position)
+            else:
+                return self._center_to_current()
         else:
-            return self.to_robot_load.set(1)
+            if self.stub_applied.get() == StubApplied.APPLIED.value:
+                return self.to_robot_load.set(1)
+            else:
+                do_nothing_status = Status()
+                do_nothing_status.set_finished()
+                return do_nothing_status
 
 
 class Smargon(MotorBundle):
