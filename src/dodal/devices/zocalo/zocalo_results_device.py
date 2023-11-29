@@ -53,10 +53,11 @@ class ZocaloResults(StandardReadable, Triggerable):
         self.channel = channel
 
         self.results = create_soft_signal_r(deque[XrcResult], "results", self.name)
+        self.x_position = create_soft_signal_r(float, "x_position", self.name)
+        self.y_position = create_soft_signal_r(float, "y_position", self.name)
+        self.z_position = create_soft_signal_r(float, "z_position", self.name)
         self.set_readable_signals(
-            read=[
-                self.results,
-            ]
+            read=[self.results, self.x_position, self.y_position, self.z_position]
         )
         super().__init__(name)
 
