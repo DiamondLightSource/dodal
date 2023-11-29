@@ -118,6 +118,7 @@ class ZocaloInteractor:
         ) -> None:
             try:
                 hyperion.log.LOGGER.info(f"Received {message}")
+                assert rw.recipe_step is not None
                 recipe_parameters = rw.recipe_step["parameters"]
                 hyperion.log.LOGGER.info(f"Recipe step parameters: {recipe_parameters}")
                 transport.ack(header)
@@ -150,7 +151,7 @@ class ZocaloInteractor:
             while datetime.now() - start_time < timedelta(seconds=timeout):
                 if result_received.empty():
                     if exception is not None:
-                        raise exception
+                        raise exception  # type: ignore # exception is not Never because it can be set in receive_result()
                     else:
                         sleep(0.1)
                 else:
