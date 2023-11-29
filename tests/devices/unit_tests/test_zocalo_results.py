@@ -79,7 +79,6 @@ async def mocked_zocalo_device():
         zd = ZocaloResults("test_env")
         zd._wait_for_results = MagicMock(return_value=results)
         await zd.connect()
-        await zd.trigger()
         return zd
 
     return device
@@ -107,10 +106,11 @@ async def test_read_gets_results(
 
 
 @pytest.mark.asyncio
-async def test_failed_read_gets_null_result(
+async def test_failed_read_gets_empty_deque(
     mocked_zocalo_device: Callable[[Sequence[XrcResult]], Awaitable[ZocaloResults]],
 ):
     zocalo_device = await mocked_zocalo_device([])
     results = await zocalo_device.read()
     data: deque[XrcResult] = results["zocalo_results-results"]["value"]
-    assert data[0] == NULL_RESULT
+    assert len(data) == 0
+    assert isinstance(data, deque)

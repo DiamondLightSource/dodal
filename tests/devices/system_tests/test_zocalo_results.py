@@ -1,9 +1,12 @@
-from unittest.mock import MagicMock
+import asyncio
+import time
 
+import bluesky.plan_stubs as bps
 import pytest
 import pytest_asyncio
+from bluesky.run_engine import RunEngine
 
-from dodal.devices.zocalo import NULL_RESULT, XrcResult, ZocaloInteractor, ZocaloResults
+from dodal.devices.zocalo import XrcResult, ZocaloInteractor, ZocaloResults
 
 TEST_RESULT_LARGE: XrcResult = {
     "centre_of_mass": [1, 2, 3],
@@ -28,6 +31,16 @@ async def test_read_results_from_fake_zocalo(zocalo_device: ZocaloResults):
     zc = ZocaloInteractor("dev_artemis")
     zc.run_start(0)
     zc.run_end(0)
-    await zocalo_device.trigger()
+    zocalo_device.timeout_s = 5
+
+    def plan():
+        yield from bps.open_run()
+        yield from bps.kickoff(zocalo_device, wait=True)
+        yield from bps.complete(zocalo_device, wait=True)
+        yield from bps.close_run()
+
+    RE = RunEngine()
+    RE(plan())
+
     results = await zocalo_device.read()
     assert results["zocalo_results-results"]["value"][0] == TEST_RESULT_LARGE

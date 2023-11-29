@@ -1,22 +1,23 @@
-import queue
+import asyncio
 from collections import deque
-from datetime import datetime, timedelta
-from time import sleep
-from typing import Optional, Sequence, TypedDict
+from datetime import datetime
+from typing import Sequence, TypedDict
 
 import workflows.recipe
 import workflows.transport
 import zocalo.configuration
-from bluesky.protocols import Triggerable
+from bluesky.protocols import Flyable
+from bluesky.run_engine import call_in_bluesky_event_loop
 from ophyd.status import Status
 from ophyd_async.core import StandardReadable
+from ophyd_async.core.async_status import AsyncStatus
 from workflows.transport import lookup
 
 from dodal.devices.ophyd_async_utils import create_soft_signal_r
 from dodal.log import LOGGER
 
 DEFAULT_SORT_KEY = "max_count"
-DEFAULT_TIMEOUT = 15
+DEFAULT_TIMEOUT = 180
 
 
 class XrcResult(TypedDict):
@@ -38,7 +39,7 @@ NULL_RESULT: XrcResult = {
 }
 
 
-class ZocaloResults(StandardReadable, Triggerable):
+class ZocaloResults(StandardReadable, Flyable):
     """An ophyd device which can wait for results from a Zocalo job"""
 
     def __init__(
@@ -47,10 +48,15 @@ class ZocaloResults(StandardReadable, Triggerable):
         channel: str = "xrc.i03",
         name: str = "zocalo_results",
         sort_key: str = DEFAULT_SORT_KEY,
+        timeout_s: float = DEFAULT_TIMEOUT,
     ) -> None:
         self.zocalo_environment = zocalo_environment
         self.sort_key = sort_key
         self.channel = channel
+        self.timeout_s = timeout_s
+
+        self._kickoff_run: datetime
+        self._raw_results_received: asyncio.Queue = asyncio.Queue()
 
         self.results = create_soft_signal_r(deque[XrcResult], "results", self.name)
         self.x_position = create_soft_signal_r(float, "x_position", self.name)
@@ -63,10 +69,42 @@ class ZocaloResults(StandardReadable, Triggerable):
 
     async def _put_results(self, results: Sequence[XrcResult]):
         await self.results._backend.put(deque(results))
+        c_o_m = results[0]["centre_of_mass"] if len(results) > 0 else [0, 0, 0]
+        await self.x_position._backend.put(c_o_m[0])
+        await self.y_position._backend.put(c_o_m[1])
+        await self.z_position._backend.put(c_o_m[2])
 
-    async def trigger(self) -> Status:
-        await self._put_results(self._wait_for_results())
-        return Status(done=True, success=True)
+    def kickoff(self) -> Status:
+        """Subscribes to Zocalo rabbitmq queue and starts a timeout counter for results,
+        by default 180 s. The returned status represents only that the subscription was
+        successfully processed, not that processing results have been recieved."""
+
+        status = Status(obj=self.kickoff)
+        self._kickoff_run = True
+        try:
+            self._subscribe_to_results()
+            status.set_finished()
+        except Exception as e:
+            status.set_exception(e)
+        return status
+
+    @AsyncStatus.wrap
+    async def complete(self):
+        """Returns an AsyncStatus waiting for results to be received from Zocalo."""
+
+        assert self._kickoff_run, f"{self} kickoff was never run!"
+        try:
+            raw_results = await asyncio.wait_for(
+                self._raw_results_received.get(), self.timeout_s
+            )
+            LOGGER.info(f"Zocalo: found {len(raw_results)} crystals.")
+            # Sort from strongest to weakest in case of multiple crystals
+            sorted_results = deque(
+                sorted(raw_results, key=lambda d: d[self.sort_key], reverse=True)
+            )
+            await self._put_results(sorted_results)
+        finally:
+            self._kickoff_run = False
 
     def _get_zocalo_connection(self):
         zc = zocalo.configuration.from_file()
@@ -76,55 +114,19 @@ class ZocaloResults(StandardReadable, Triggerable):
         transport.connect()
         return transport
 
-    def _wait_for_results(self, timeout: int | None = None) -> deque[XrcResult]:
-        """Block until a result is received from Zocalo.
-        Args:
-            data_collection_group_id (int): The ID of the data collection group representing
-                                            the gridscan in ISPyB
-
-            timeout (float): The time in seconds to wait for the result to be received.
-        Returns:
-            Returns the message from zocalo, as a list of dicts describing each crystal
-            which zocalo found:
-            {
-                "results": [
-                    {
-                        "centre_of_mass": [1, 2, 3],
-                        "max_voxel": [2, 4, 5],
-                        "max_count": 105062,
-                        "n_voxels": 35,
-                        "total_count": 2387574,
-                        "bounding_box": [[1, 2, 3], [3, 4, 4]],
-                    },
-                    {
-                        result 2
-                    },
-                    ...
-                ]
-            }
-        """
-        # Set timeout default like this so that we can modify TIMEOUT during tests
-        if timeout is None:
-            timeout = DEFAULT_TIMEOUT
+    def _subscribe_to_results(self):
         transport = self._get_zocalo_connection()
-        result_received: queue.Queue = queue.Queue()
-        exception: Optional[Exception] = None
 
         def _receive_result(
             rw: workflows.recipe.RecipeWrapper, header: dict, message: dict
         ) -> None:
-            try:
-                LOGGER.info(f"Received {message}")
-                recipe_parameters = rw.recipe_step["parameters"]  # type: ignore # this rw is initialised with a message so recipe step is not None
-                LOGGER.info(f"Recipe step parameters: {recipe_parameters}")
-                transport.ack(header)
+            LOGGER.info(f"Received {message}")
+            recipe_parameters = rw.recipe_step["parameters"]  # type: ignore # this rw is initialised with a message so recipe step is not None
+            LOGGER.info(f"Recipe step parameters: {recipe_parameters}")
+            transport.ack(header)
 
-                results = message.get("results", [])
-                result_received.put(results)
-            except Exception as e:
-                nonlocal exception
-                exception = e
-                raise e
+            results = message.get("results", [])
+            call_in_bluesky_event_loop(self._raw_results_received.put(results))
 
         workflows.recipe.wrap_subscribe(
             transport,
@@ -133,26 +135,3 @@ class ZocaloResults(StandardReadable, Triggerable):
             acknowledgement=True,
             allow_non_recipe_messages=False,
         )
-
-        try:
-            start_time = datetime.now()
-            while datetime.now() - start_time < timedelta(seconds=timeout):
-                if result_received.empty():
-                    if exception is not None:
-                        raise exception  # type: ignore # exception is not Never, it can be set in receive_result
-                    else:
-                        sleep(0.1)
-                else:
-                    raw_results = result_received.get_nowait()
-                    LOGGER.info(f"Zocalo: found {len(raw_results)} crystals.")
-                    # Sort from strongest to weakest in case of multiple crystals
-                    return deque(
-                        sorted(
-                            raw_results, key=lambda d: d[self.sort_key], reverse=True
-                        )
-                    )
-            raise TimeoutError(
-                f"No results returned by Zocalo within timeout of {timeout} s"
-            )
-        finally:
-            transport.disconnect()
