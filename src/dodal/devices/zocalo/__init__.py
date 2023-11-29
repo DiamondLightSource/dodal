@@ -1,6 +1,6 @@
 from dodal.devices.zocalo.zocalo_interaction import (
     NoDiffractionFound,
-    ZocaloInteractor,
+    ZocaloTrigger,
 )
 from dodal.devices.zocalo.zocalo_results_device import (
     NULL_RESULT,
@@ -15,7 +15,7 @@ __all__ = [
     "NULL_RESULT",
     "XrcResult",
     "NoDiffractionFound",
-    "ZocaloInteractor",
+    "ZocaloTrigger",
     "trigger_zocalo",
     "get_processing_results",
 ]

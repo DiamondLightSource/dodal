@@ -31,16 +31,6 @@ class XrcResult(TypedDict):
     bounding_box: list[list[int]]
 
 
-NULL_RESULT: XrcResult = {
-    "centre_of_mass": [0],
-    "max_voxel": [0],
-    "max_count": 0,
-    "n_voxels": 0,
-    "total_count": 0,
-    "bounding_box": [[0]],
-}
-
-
 def bbox_size(result: XrcResult):
     return [
         abs(result["bounding_box"][i] - result["bounding_box"][i]) for i in range(3)
@@ -182,18 +172,24 @@ def get_processing_results(
     box size from the zocalo results."""
     results_recieved = yield from bps.rd(zocalo.results_valid)
     if results_recieved:
-        return np.array(
-            [
-                (yield from bps.rd(zocalo.x_position)),
-                (yield from bps.rd(zocalo.y_position)),
-                (yield from bps.rd(zocalo.z_position)),
-            ]
-        ), np.array(
-            [
-                (yield from bps.rd(zocalo.bbox_size_x)),
-                (yield from bps.rd(zocalo.bbox_size_y)),
-                (yield from bps.rd(zocalo.bbox_size_z)),
-            ]
+        return (
+            np.array(
+                [
+                    (yield from bps.rd(zocalo.x_position)),
+                    (yield from bps.rd(zocalo.y_position)),
+                    (yield from bps.rd(zocalo.z_position)),
+                ]
+            )
+            - np.array(
+                [0.5, 0.5, 0.5]
+            ),  # zocalo returns the centre of the grid box, but we want the corner
+            np.array(
+                [
+                    (yield from bps.rd(zocalo.bbox_size_x)),
+                    (yield from bps.rd(zocalo.bbox_size_y)),
+                    (yield from bps.rd(zocalo.bbox_size_z)),
+                ]
+            ),
         )
     else:
         return None, None

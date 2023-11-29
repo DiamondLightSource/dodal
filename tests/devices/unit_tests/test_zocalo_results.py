@@ -7,7 +7,6 @@ import pytest
 import pytest_asyncio
 
 from dodal.devices.zocalo import (
-    NULL_RESULT,
     XrcResult,
     ZocaloResults,
 )

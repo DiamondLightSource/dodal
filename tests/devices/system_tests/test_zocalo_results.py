@@ -3,7 +3,7 @@ import pytest
 import pytest_asyncio
 from bluesky.run_engine import RunEngine
 
-from dodal.devices.zocalo import XrcResult, ZocaloInteractor, ZocaloResults
+from dodal.devices.zocalo import XrcResult, ZocaloResults, ZocaloTrigger
 
 TEST_RESULT_LARGE: XrcResult = {
     "centre_of_mass": [1, 2, 3],
@@ -25,7 +25,7 @@ async def zocalo_device():
 @pytest.mark.s03
 @pytest.mark.asyncio
 async def test_read_results_from_fake_zocalo(zocalo_device: ZocaloResults):
-    zc = ZocaloInteractor("dev_artemis")
+    zc = ZocaloTrigger("dev_artemis")
     zc.run_start(0)
     zc.run_end(0)
     zocalo_device.timeout_s = 5

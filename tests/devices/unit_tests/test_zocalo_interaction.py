@@ -13,7 +13,7 @@ from zocalo.configuration import Configuration
 
 from dodal.devices.zocalo.zocalo_interaction import (
     NoDiffractionFound,
-    ZocaloInteractor,
+    ZocaloTrigger,
 )
 
 SIM_ZOCALO_ENV = "dev_artemis"
@@ -67,7 +67,7 @@ def with_exception(function_to_run, mock_transport):
         function_to_run()
 
 
-zc = ZocaloInteractor(environment=SIM_ZOCALO_ENV)
+zc = ZocaloTrigger(environment=SIM_ZOCALO_ENV)
 
 
 @mark.parametrize(
@@ -103,7 +103,7 @@ def test__run_start_and_end(
 def test_when_message_recieved_from_zocalo_then_point_returned(
     mock_transport_lookup, mock_from_file, mock_wrap_subscribe
 ):
-    zc = ZocaloInteractor(environment=SIM_ZOCALO_ENV)
+    zc = ZocaloTrigger(environment=SIM_ZOCALO_ENV)
     centre_of_mass_coords = [2.942925659754348, 7.142683401382778, 6.79110544979448]
 
     message = {
@@ -152,7 +152,7 @@ def test_when_message_recieved_from_zocalo_then_point_returned(
 def test_when_exception_caused_by_zocalo_message_then_exception_propagated(
     mock_transport_lookup, mock_from_file, mock_wrap_subscribe
 ):
-    zc = ZocaloInteractor(environment=SIM_ZOCALO_ENV)
+    zc = ZocaloTrigger(environment=SIM_ZOCALO_ENV)
 
     mock_zc: Configuration = MagicMock()
     mock_from_file.return_value = mock_zc
@@ -189,7 +189,7 @@ def test_when_exception_caused_by_zocalo_message_then_exception_propagated(
 def test_when_no_results_returned_then_no_diffraction_exception_raised(
     mock_transport_lookup, mock_from_file, mock_wrap_subscribe
 ):
-    zc = ZocaloInteractor(environment=SIM_ZOCALO_ENV)
+    zc = ZocaloTrigger(environment=SIM_ZOCALO_ENV)
 
     message = {}
     datacollection_grid_id = 7263143
