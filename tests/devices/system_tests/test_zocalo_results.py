@@ -1,6 +1,3 @@
-import asyncio
-import time
-
 import bluesky.plan_stubs as bps
 import pytest
 import pytest_asyncio

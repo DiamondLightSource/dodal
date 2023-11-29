@@ -1,8 +1,10 @@
 import asyncio
 from collections import deque
 from datetime import datetime
-from typing import Sequence, TypedDict
+from typing import Sequence, Tuple, TypedDict, Union
 
+import bluesky.plan_stubs as bps
+import numpy as np
 import workflows.recipe
 import workflows.transport
 import zocalo.configuration
@@ -39,6 +41,12 @@ NULL_RESULT: XrcResult = {
 }
 
 
+def bbox_size(result: XrcResult):
+    return [
+        abs(result["bounding_box"][i] - result["bounding_box"][i]) for i in range(3)
+    ]
+
+
 class ZocaloResults(StandardReadable, Flyable):
     """An ophyd device which can wait for results from a Zocalo job"""
 
@@ -62,17 +70,36 @@ class ZocaloResults(StandardReadable, Flyable):
         self.x_position = create_soft_signal_r(float, "x_position", self.name)
         self.y_position = create_soft_signal_r(float, "y_position", self.name)
         self.z_position = create_soft_signal_r(float, "z_position", self.name)
+        self.bbox_size_x = create_soft_signal_r(float, "bbox_size_x", self.name)
+        self.bbox_size_y = create_soft_signal_r(float, "bbox_size_y", self.name)
+        self.bbox_size_z = create_soft_signal_r(float, "bbox_size_z", self.name)
+        self.results_valid = create_soft_signal_r(bool, "results_valid", self.name)
         self.set_readable_signals(
-            read=[self.results, self.x_position, self.y_position, self.z_position]
+            read=[
+                self.results,
+                self.x_position,
+                self.y_position,
+                self.z_position,
+                self.bbox_size_x,
+                self.bbox_size_y,
+                self.bbox_size_z,
+                self.results_valid,
+            ]
         )
         super().__init__(name)
 
     async def _put_results(self, results: Sequence[XrcResult]):
         await self.results._backend.put(deque(results))
-        c_o_m = results[0]["centre_of_mass"] if len(results) > 0 else [0, 0, 0]
+        results_recieved = len(results) > 0
+        await self.results_valid._backend.put(results_recieved)
+        c_o_m = results[0]["centre_of_mass"] if results_recieved else [0, 0, 0]
+        bbox = bbox_size(results) if results_recieved else [0, 0, 0]
         await self.x_position._backend.put(c_o_m[0])
         await self.y_position._backend.put(c_o_m[1])
         await self.z_position._backend.put(c_o_m[2])
+        await self.bbox_size_x._backend.put(bbox[0])
+        await self.bbox_size_y._backend.put(bbox[1])
+        await self.bbox_size_z._backend.put(bbox[2])
 
     def kickoff(self) -> Status:
         """Subscribes to Zocalo rabbitmq queue and starts a timeout counter for results,
@@ -135,3 +162,38 @@ class ZocaloResults(StandardReadable, Flyable):
             acknowledgement=True,
             allow_non_recipe_messages=False,
         )
+
+
+def trigger_zocalo(zocalo: ZocaloResults):
+    """A minimal utility plan which will wait for analysis results to be returned from
+    Zocalo, and bundle them in a reading."""
+
+    yield from bps.create()
+    yield from bps.kickoff(zocalo, wait=True)
+    yield from bps.complete(zocalo, wait=True)
+    yield from bps.read(zocalo)
+    yield from bps.save()
+
+
+def get_processing_results(
+    zocalo: ZocaloResults,
+) -> Union[Tuple[np.ndarray, np.ndarray], Tuple[None, None]]:
+    """A minimal plan which will extract an xray centring result and crystal bounding
+    box size from the zocalo results."""
+    results_recieved = yield from bps.rd(zocalo.results_valid)
+    if results_recieved:
+        return np.array(
+            [
+                (yield from bps.rd(zocalo.x_position)),
+                (yield from bps.rd(zocalo.y_position)),
+                (yield from bps.rd(zocalo.z_position)),
+            ]
+        ), np.array(
+            [
+                (yield from bps.rd(zocalo.bbox_size_x)),
+                (yield from bps.rd(zocalo.bbox_size_y)),
+                (yield from bps.rd(zocalo.bbox_size_z)),
+            ]
+        )
+    else:
+        return None, None
