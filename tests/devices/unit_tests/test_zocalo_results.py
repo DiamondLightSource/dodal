@@ -96,33 +96,33 @@ async def mocked_zocalo_device(RE):
 
 
 @pytest.mark.asyncio
-async def test_put_result(
-    mocked_zocalo_device: Callable[[Sequence[XrcResult]], Awaitable[ZocaloResults]]
+async def test_put_result_read_results(
+    mocked_zocalo_device: Callable[[Sequence[XrcResult]], Awaitable[ZocaloResults]], RE
 ):
     zocalo_device = await mocked_zocalo_device([])
     await zocalo_device._put_results(TEST_RESULTS)
-    # TODO add some asserts
+    reading = await zocalo_device.read()
+    results: list[XrcResult] = reading["zocalo_results-results"]["value"]
+    centres: list[XrcResult] = reading["zocalo_results-centres_of_mass"]["value"]
+    bboxes: list[XrcResult] = reading["zocalo_results-bbox_sizes"]["value"]
+    assert results == TEST_RESULTS
+    assert np.all(centres == np.array([[1, 2, 3], [2, 3, 4], [4, 5, 6]]))
+    assert np.all(bboxes[0] == [2, 2, 1])
 
 
 @pytest.mark.asyncio
-async def test_read_gets_results(
+async def test_rd_top_results(
     mocked_zocalo_device: Callable[[Sequence[XrcResult]], Awaitable[ZocaloResults]], RE
 ):
-    zocalo_device = await mocked_zocalo_device(TEST_RESULTS)
-    results = await zocalo_device.read()
-    data: list[XrcResult] = results["zocalo_results-results"]["value"]
-
-    assert data[0] == TEST_RESULTS[0]
-    assert data[1] == TEST_RESULTS[1]
-    assert data[2] == TEST_RESULTS[2]
-
-
-@pytest.mark.asyncio
-async def test_failed_read_gets_empty_list(
-    mocked_zocalo_device: Callable[[Sequence[XrcResult]], Awaitable[ZocaloResults]],
-):
     zocalo_device = await mocked_zocalo_device([])
-    results = await zocalo_device.read()
-    data: list[XrcResult] = results["zocalo_results-results"]["value"]
-    assert len(data) == 0
-    assert isinstance(data, list)
+    await zocalo_device._put_results(TEST_RESULTS)
+
+    def test_plan():
+        bbox_size = yield from bps.rd(zocalo_device.bbox_sizes)
+        assert len(bbox_size[0]) == 3
+        assert np.all(bbox_size[0] == np.array([2, 2, 1]))
+        centres_of_mass = yield from bps.rd(zocalo_device.centres_of_mass)
+        assert len(centres_of_mass[0]) == 3
+        assert np.all(centres_of_mass[0] == np.array([1, 2, 3]))
+
+    RE(test_plan())

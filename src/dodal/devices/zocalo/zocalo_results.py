@@ -9,6 +9,7 @@ import workflows.transport
 import zocalo.configuration
 from bluesky.protocols import Descriptor, Flyable
 from bluesky.run_engine import call_in_bluesky_event_loop
+from numpy.typing import NDArray
 from ophyd.status import Status
 from ophyd_async.core import StandardReadable
 from ophyd_async.core.async_status import AsyncStatus
@@ -59,39 +60,27 @@ class ZocaloResults(StandardReadable, Flyable):
         self._raw_results_received: asyncio.Queue = asyncio.Queue()
 
         self.results = create_soft_signal_r(list[XrcResult], "results", self.name)
-        self.x_position = create_soft_signal_r(float, "x_position", self.name)
-        self.y_position = create_soft_signal_r(float, "y_position", self.name)
-        self.z_position = create_soft_signal_r(float, "z_position", self.name)
-        self.bbox_size_x = create_soft_signal_r(float, "bbox_size_x", self.name)
-        self.bbox_size_y = create_soft_signal_r(float, "bbox_size_y", self.name)
-        self.bbox_size_z = create_soft_signal_r(float, "bbox_size_z", self.name)
-        self.results_valid = create_soft_signal_r(bool, "results_valid", self.name)
+        self.centres_of_mass = create_soft_signal_r(
+            NDArray[np.uint64], "centres_of_mass", self.name
+        )
+        self.bbox_sizes = create_soft_signal_r(
+            NDArray[np.uint64], "bbox_sizes", self.name
+        )
         self.set_readable_signals(
             read=[
                 self.results,
-                self.x_position,
-                self.y_position,
-                self.z_position,
-                self.bbox_size_x,
-                self.bbox_size_y,
-                self.bbox_size_z,
-                self.results_valid,
+                self.centres_of_mass,
+                self.bbox_sizes,
             ]
         )
         super().__init__(name)
 
     async def _put_results(self, results: Sequence[XrcResult]):
         await self.results._backend.put(list(results))
-        results_recieved = len(results) > 0
-        await self.results_valid._backend.put(results_recieved)
-        c_o_m = results[0]["centre_of_mass"] if results_recieved else [0, 0, 0]
-        bbox = bbox_size(results[0]) if results_recieved else [0, 0, 0]
-        await self.x_position._backend.put(c_o_m[0])
-        await self.y_position._backend.put(c_o_m[1])
-        await self.z_position._backend.put(c_o_m[2])
-        await self.bbox_size_x._backend.put(bbox[0])
-        await self.bbox_size_y._backend.put(bbox[1])
-        await self.bbox_size_z._backend.put(bbox[2])
+        centres_of_mass = np.array([r["centre_of_mass"] for r in results])
+        bbox_sizes = np.array([bbox_size(r) for r in results])
+        await self.centres_of_mass._backend.put(centres_of_mass)
+        await self.bbox_sizes._backend.put(bbox_sizes)
 
     def kickoff(self) -> Status:
         """Subscribes to Zocalo rabbitmq queue and starts a timeout counter for results,
@@ -138,59 +127,19 @@ class ZocaloResults(StandardReadable, Flyable):
                     },
                 ),
                 (
-                    self._name + "-x_position",
+                    self._name + "-centres_of_mass",
                     {
                         "source": f"sim://{self._prefix}",
-                        "dtype": "number",
-                        "shape": [],
+                        "dtype": "array",
+                        "shape": [-1, 3],
                     },
                 ),
                 (
-                    self._name + "-y_position",
+                    self._name + "-bbox_sizes",
                     {
                         "source": f"sim://{self._prefix}",
                         "dtype": "number",
-                        "shape": [],
-                    },
-                ),
-                (
-                    self._name + "-z_position",
-                    {
-                        "source": f"sim://{self._prefix}",
-                        "dtype": "number",
-                        "shape": [],
-                    },
-                ),
-                (
-                    self._name + "-bbox_size_x",
-                    {
-                        "source": f"sim://{self._prefix}",
-                        "dtype": "number",
-                        "shape": [],
-                    },
-                ),
-                (
-                    self._name + "-bbox_size_y",
-                    {
-                        "source": f"sim://{self._prefix}",
-                        "dtype": "number",
-                        "shape": [],
-                    },
-                ),
-                (
-                    self._name + "-bbox_size_z",
-                    {
-                        "source": f"sim://{self._prefix}",
-                        "dtype": "number",
-                        "shape": [],
-                    },
-                ),
-                (
-                    self._name + "-results_valid",
-                    {
-                        "source": f"sim://{self._prefix}",
-                        "dtype": "boolean",
-                        "shape": [],
+                        "shape": [-1, 3],
                     },
                 ),
             ],
@@ -244,28 +193,14 @@ def trigger_zocalo(zocalo: ZocaloResults):
 def get_processing_results(
     zocalo: ZocaloResults,
 ) -> Generator[Any, Any, Union[Tuple[np.ndarray, np.ndarray], Tuple[None, None]]]:
-    """A minimal plan which will extract an xray centring result and crystal bounding
+    """A minimal plan which will extract the top ranked xray centre and crystal bounding
     box size from the zocalo results."""
-    results_recieved = yield from bps.rd(zocalo.results_valid)
-    if results_recieved:
-        return (
-            np.array(
-                [
-                    (yield from bps.rd(zocalo.x_position)),
-                    (yield from bps.rd(zocalo.y_position)),
-                    (yield from bps.rd(zocalo.z_position)),
-                ]
-            )
-            - np.array(
-                [0.5, 0.5, 0.5]
-            ),  # zocalo returns the centre of the grid box, but we want the corner
-            np.array(
-                [
-                    (yield from bps.rd(zocalo.bbox_size_x)),
-                    (yield from bps.rd(zocalo.bbox_size_y)),
-                    (yield from bps.rd(zocalo.bbox_size_z)),
-                ]
-            ),
-        )
-    else:
-        return (None, None)
+    centres_of_mass = yield from bps.rd(zocalo.centres_of_mass, default_value=[])
+    centre_of_mass = (
+        None
+        if len(centres_of_mass) == 0
+        else centres_of_mass[0] - np.array([0.5, 0.5, 0.5])
+    )
+    bbox_sizes = yield from bps.rd(zocalo.bbox_sizes, default_value=[])
+    bbox_size = None if len(bbox_sizes) == 0 else bbox_sizes[0]
+    return centre_of_mass, bbox_size
