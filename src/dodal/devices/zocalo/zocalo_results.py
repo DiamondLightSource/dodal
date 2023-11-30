@@ -31,15 +31,15 @@ class XrcResult(TypedDict):
     bounding_box: list[list[int]]
 
 
-class XrcResultDevice(StandardReadable):
-    def __init__(self, name: str = "results") -> None:
-        self.centre_of_mass = create_soft_signal_r(NDArray[np.int64], "name", self.name)
-        self.max_voxel = create_soft_signal_r(NDArray[np.int64], "name", self.name)
-        self.max_count = create_soft_signal_r(int, "name", self.name)
-        self.n_voxels = create_soft_signal_r(int, "name", self.name)
-        self.total_count = create_soft_signal_r(int, "name", self.name)
-        self.bounding_box = create_soft_signal_r(NDArray[np.int64], "name", self.name)
-        super().__init__(name)
+# class XrcResultDevice(StandardReadable):
+#     def __init__(self, name: str = "results") -> None:
+#         self.centre_of_mass = create_soft_signal_r(NDArray[np.int64], "name", self.name)
+#         self.max_voxel = create_soft_signal_r(NDArray[np.int64], "name", self.name)
+#         self.max_count = create_soft_signal_r(int, "name", self.name)
+#         self.n_voxels = create_soft_signal_r(int, "name", self.name)
+#         self.total_count = create_soft_signal_r(int, "name", self.name)
+#         self.bounding_box = create_soft_signal_r(NDArray[np.int64], "name", self.name)
+#         super().__init__(name)
 
 
 def bbox_size(result: XrcResult):
@@ -140,13 +140,71 @@ class ZocaloResults(StandardReadable, Flyable):
         return OrderedDict(
             [
                 (
-                    self._name,
+                    self._name + "-results",
                     {
                         "source": f"sim://{self._prefix}",
-                        "dtype": "string",
-                        "shape": [],  # TODO describe properly
+                        "dtype": "array",
+                        "shape": [
+                            -1,
+                        ],  # TODO describe properly - https://github.com/bluesky/event-model/issues/214
                     },
-                )
+                ),
+                (
+                    self._name + "-x_position",
+                    {
+                        "source": f"sim://{self._prefix}",
+                        "dtype": "number",
+                        "shape": [],
+                    },
+                ),
+                (
+                    self._name + "-y_position",
+                    {
+                        "source": f"sim://{self._prefix}",
+                        "dtype": "number",
+                        "shape": [],
+                    },
+                ),
+                (
+                    self._name + "-z_position",
+                    {
+                        "source": f"sim://{self._prefix}",
+                        "dtype": "number",
+                        "shape": [],
+                    },
+                ),
+                (
+                    self._name + "-bbox_size_x",
+                    {
+                        "source": f"sim://{self._prefix}",
+                        "dtype": "number",
+                        "shape": [],
+                    },
+                ),
+                (
+                    self._name + "-bbox_size_y",
+                    {
+                        "source": f"sim://{self._prefix}",
+                        "dtype": "number",
+                        "shape": [],
+                    },
+                ),
+                (
+                    self._name + "-bbox_size_z",
+                    {
+                        "source": f"sim://{self._prefix}",
+                        "dtype": "number",
+                        "shape": [],
+                    },
+                ),
+                (
+                    self._name + "-results_valid",
+                    {
+                        "source": f"sim://{self._prefix}",
+                        "dtype": "boolean",
+                        "shape": [],
+                    },
+                ),
             ],
         )
 
