@@ -81,12 +81,14 @@ def pmac(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) ->
     """Get the i24 PMAC device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i24, it will return the existing object.
     """
+    # prefix not BL but ME14E
     return device_instantiation(
         PMAC,
         "pmac",
-        "-MO-CHIP-01:",
+        "ME14E-MO-CHIP-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        bl_prefix=False,
     )
 
 
