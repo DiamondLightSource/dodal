@@ -30,17 +30,6 @@ class XrcResult(TypedDict):
     bounding_box: list[list[int]]
 
 
-# class XrcResultDevice(StandardReadable):
-#     def __init__(self, name: str = "results") -> None:
-#         self.centre_of_mass = create_soft_signal_r(NDArray[np.int64], "name", self.name)
-#         self.max_voxel = create_soft_signal_r(NDArray[np.int64], "name", self.name)
-#         self.max_count = create_soft_signal_r(int, "name", self.name)
-#         self.n_voxels = create_soft_signal_r(int, "name", self.name)
-#         self.total_count = create_soft_signal_r(int, "name", self.name)
-#         self.bounding_box = create_soft_signal_r(NDArray[np.int64], "name", self.name)
-#         super().__init__(name)
-
-
 def bbox_size(result: XrcResult):
     return [
         abs(result["bounding_box"][1][i] - result["bounding_box"][0][i])
@@ -145,7 +134,7 @@ class ZocaloResults(StandardReadable, Flyable):
                         "dtype": "array",
                         "shape": [
                             -1,
-                        ],  # TODO describe properly - https://github.com/bluesky/event-model/issues/214
+                        ],  # TODO describe properly - see https://github.com/bluesky/event-model/issues/214
                     },
                 ),
                 (
@@ -227,9 +216,7 @@ class ZocaloResults(StandardReadable, Flyable):
             transport.ack(header)
 
             results = message.get("results", [])
-            call_in_bluesky_event_loop(
-                self._raw_results_received.put(results)
-            )  # TODO is this the right way to do this? this means these devices can't be used outside plans
+            call_in_bluesky_event_loop(self._raw_results_received.put(results))
 
         workflows.recipe.wrap_subscribe(
             transport,
@@ -240,11 +227,14 @@ class ZocaloResults(StandardReadable, Flyable):
         )
 
 
+ZOCALO_READING_PLAN_NAME = "zocalo reading"
+
+
 def trigger_zocalo(zocalo: ZocaloResults):
     """A minimal utility plan which will wait for analysis results to be returned from
     Zocalo, and bundle them in a reading."""
 
-    yield from bps.create()
+    yield from bps.create(ZOCALO_READING_PLAN_NAME)
     yield from bps.kickoff(zocalo, wait=True)
     yield from bps.complete(zocalo, wait=True)
     yield from bps.read(zocalo)
