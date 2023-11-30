@@ -1,15 +1,14 @@
-from collections import deque
+from functools import partial
 from typing import Awaitable, Callable, Sequence
 from unittest.mock import MagicMock
 
+import bluesky.plan_stubs as bps
 import numpy as np
 import pytest
 import pytest_asyncio
+from ophyd_async.core.async_status import AsyncStatus
 
-from dodal.devices.zocalo import (
-    XrcResult,
-    ZocaloResults,
-)
+from dodal.devices.zocalo import XrcResult, ZocaloResults, trigger_zocalo
 
 TEST_RESULTS: list[XrcResult] = [
     {
@@ -73,11 +72,24 @@ TEST_READING = {
 
 
 @pytest_asyncio.fixture
-async def mocked_zocalo_device():
+async def mocked_zocalo_device(RE):
     async def device(results):
-        zd = ZocaloResults("test_env")
-        zd._wait_for_results = MagicMock(return_value=results)
+        zd = ZocaloResults(zocalo_environment="test_env")
+        zd._get_zocalo_connection = MagicMock()
+
+        @AsyncStatus.wrap
+        async def mock_complete(results):
+            await zd._put_results(results)
+
+        zd.complete = MagicMock(side_effect=partial(mock_complete, results))  # type: ignore
         await zd.connect()
+
+        def plan():
+            yield from bps.open_run()
+            yield from trigger_zocalo(zd)
+            yield from bps.close_run()
+
+        RE(plan())
         return zd
 
     return device
@@ -89,15 +101,16 @@ async def test_put_result(
 ):
     zocalo_device = await mocked_zocalo_device([])
     await zocalo_device._put_results(TEST_RESULTS)
+    # TODO add some asserts
 
 
 @pytest.mark.asyncio
 async def test_read_gets_results(
-    mocked_zocalo_device: Callable[[Sequence[XrcResult]], Awaitable[ZocaloResults]],
+    mocked_zocalo_device: Callable[[Sequence[XrcResult]], Awaitable[ZocaloResults]], RE
 ):
     zocalo_device = await mocked_zocalo_device(TEST_RESULTS)
     results = await zocalo_device.read()
-    data: deque[XrcResult] = results["zocalo_results-results"]["value"]
+    data: list[XrcResult] = results["zocalo_results-results"]["value"]
 
     assert data[0] == TEST_RESULTS[0]
     assert data[1] == TEST_RESULTS[1]
@@ -105,11 +118,11 @@ async def test_read_gets_results(
 
 
 @pytest.mark.asyncio
-async def test_failed_read_gets_empty_deque(
+async def test_failed_read_gets_empty_list(
     mocked_zocalo_device: Callable[[Sequence[XrcResult]], Awaitable[ZocaloResults]],
 ):
     zocalo_device = await mocked_zocalo_device([])
     results = await zocalo_device.read()
-    data: deque[XrcResult] = results["zocalo_results-results"]["value"]
+    data: list[XrcResult] = results["zocalo_results-results"]["value"]
     assert len(data) == 0
-    assert isinstance(data, deque)
+    assert isinstance(data, list)

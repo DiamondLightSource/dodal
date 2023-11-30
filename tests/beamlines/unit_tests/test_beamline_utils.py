@@ -52,7 +52,7 @@ def test_instantiate_function_fake_makes_fake():
     assert isinstance(fake_zeb.pc.arm_source, FakeEpicsSignal)
 
 
-def test_clear_devices():
+def test_clear_devices(RE):
     beamline_utils.clear_devices()
     devices = make_all_devices(i03, fake_with_ophyd_sim=True)
     assert len(beamline_utils.ACTIVE_DEVICES) == len(devices.keys())
@@ -60,7 +60,7 @@ def test_clear_devices():
     assert beamline_utils.ACTIVE_DEVICES == {}
 
 
-def test_device_is_new_after_clearing():
+def test_device_is_new_after_clearing(RE):
     beamline_utils.clear_devices()
 
     def _make_devices_and_get_id():

@@ -9,7 +9,6 @@ import workflows.transport
 import zocalo.configuration
 from bluesky.protocols import Descriptor, Flyable
 from bluesky.run_engine import call_in_bluesky_event_loop
-from numpy.typing import NDArray
 from ophyd.status import Status
 from ophyd_async.core import StandardReadable
 from ophyd_async.core.async_status import AsyncStatus
