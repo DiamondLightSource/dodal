@@ -279,4 +279,4 @@ def get_processing_results(
             ),
         )
     else:
-        return None, None
+        return (None, None)
