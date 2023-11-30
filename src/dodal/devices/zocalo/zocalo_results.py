@@ -1,15 +1,15 @@
 import asyncio
-from collections import deque
-from datetime import datetime
-from typing import Sequence, Tuple, TypedDict, Union
+from collections import OrderedDict
+from typing import Any, Generator, Sequence, Tuple, TypedDict, Union
 
 import bluesky.plan_stubs as bps
 import numpy as np
 import workflows.recipe
 import workflows.transport
 import zocalo.configuration
-from bluesky.protocols import Flyable
+from bluesky.protocols import Descriptor, Flyable
 from bluesky.run_engine import call_in_bluesky_event_loop
+from numpy.typing import NDArray
 from ophyd.status import Status
 from ophyd_async.core import StandardReadable
 from ophyd_async.core.async_status import AsyncStatus
@@ -31,9 +31,21 @@ class XrcResult(TypedDict):
     bounding_box: list[list[int]]
 
 
+class XrcResultDevice(StandardReadable):
+    def __init__(self, name: str = "results") -> None:
+        self.centre_of_mass = create_soft_signal_r(NDArray[np.int64], "name", self.name)
+        self.max_voxel = create_soft_signal_r(NDArray[np.int64], "name", self.name)
+        self.max_count = create_soft_signal_r(int, "name", self.name)
+        self.n_voxels = create_soft_signal_r(int, "name", self.name)
+        self.total_count = create_soft_signal_r(int, "name", self.name)
+        self.bounding_box = create_soft_signal_r(NDArray[np.int64], "name", self.name)
+        super().__init__(name)
+
+
 def bbox_size(result: XrcResult):
     return [
-        abs(result["bounding_box"][i] - result["bounding_box"][i]) for i in range(3)
+        abs(result["bounding_box"][1][i] - result["bounding_box"][0][i])
+        for i in range(3)
     ]
 
 
@@ -42,21 +54,23 @@ class ZocaloResults(StandardReadable, Flyable):
 
     def __init__(
         self,
-        zocalo_environment: str,
-        channel: str = "xrc.i03",
         name: str = "zocalo_results",
+        zocalo_environment: str = "dev_artemis",
+        channel: str = "xrc.i03",
         sort_key: str = DEFAULT_SORT_KEY,
         timeout_s: float = DEFAULT_TIMEOUT,
+        prefix: str = "",
     ) -> None:
         self.zocalo_environment = zocalo_environment
         self.sort_key = sort_key
         self.channel = channel
         self.timeout_s = timeout_s
+        self._prefix = prefix
 
-        self._kickoff_run: datetime
+        self._kickoff_run: bool
         self._raw_results_received: asyncio.Queue = asyncio.Queue()
 
-        self.results = create_soft_signal_r(deque[XrcResult], "results", self.name)
+        self.results = create_soft_signal_r(list[XrcResult], "results", self.name)
         self.x_position = create_soft_signal_r(float, "x_position", self.name)
         self.y_position = create_soft_signal_r(float, "y_position", self.name)
         self.z_position = create_soft_signal_r(float, "z_position", self.name)
@@ -79,11 +93,11 @@ class ZocaloResults(StandardReadable, Flyable):
         super().__init__(name)
 
     async def _put_results(self, results: Sequence[XrcResult]):
-        await self.results._backend.put(deque(results))
+        await self.results._backend.put(list(results))
         results_recieved = len(results) > 0
         await self.results_valid._backend.put(results_recieved)
         c_o_m = results[0]["centre_of_mass"] if results_recieved else [0, 0, 0]
-        bbox = bbox_size(results) if results_recieved else [0, 0, 0]
+        bbox = bbox_size(results[0]) if results_recieved else [0, 0, 0]
         await self.x_position._backend.put(c_o_m[0])
         await self.y_position._backend.put(c_o_m[1])
         await self.z_position._backend.put(c_o_m[2])
@@ -116,12 +130,25 @@ class ZocaloResults(StandardReadable, Flyable):
             )
             LOGGER.info(f"Zocalo: found {len(raw_results)} crystals.")
             # Sort from strongest to weakest in case of multiple crystals
-            sorted_results = deque(
+            await self._put_results(
                 sorted(raw_results, key=lambda d: d[self.sort_key], reverse=True)
             )
-            await self._put_results(sorted_results)
         finally:
             self._kickoff_run = False
+
+    async def describe(self) -> dict[str, Descriptor]:
+        return OrderedDict(
+            [
+                (
+                    self._name,
+                    {
+                        "source": f"sim://{self._prefix}",
+                        "dtype": "string",
+                        "shape": [],  # TODO describe properly
+                    },
+                )
+            ],
+        )
 
     def _get_zocalo_connection(self):
         zc = zocalo.configuration.from_file()
@@ -143,7 +170,9 @@ class ZocaloResults(StandardReadable, Flyable):
             transport.ack(header)
 
             results = message.get("results", [])
-            call_in_bluesky_event_loop(self._raw_results_received.put(results))
+            call_in_bluesky_event_loop(
+                self._raw_results_received.put(results)
+            )  # TODO is this the right way to do this? this means these devices can't be used outside plans
 
         workflows.recipe.wrap_subscribe(
             transport,
@@ -167,7 +196,7 @@ def trigger_zocalo(zocalo: ZocaloResults):
 
 def get_processing_results(
     zocalo: ZocaloResults,
-) -> Union[Tuple[np.ndarray, np.ndarray], Tuple[None, None]]:
+) -> Generator[Any, Any, Union[Tuple[np.ndarray, np.ndarray], Tuple[None, None]]]:
     """A minimal plan which will extract an xray centring result and crystal bounding
     box size from the zocalo results."""
     results_recieved = yield from bps.rd(zocalo.results_valid)
