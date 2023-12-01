@@ -78,10 +78,10 @@ async def mocked_zocalo_device(RE):
         zd._get_zocalo_connection = MagicMock()
 
         @AsyncStatus.wrap
-        async def mock_complete(results):
+        async def mock_trigger(results):
             await zd._put_results(results)
 
-        zd.complete = MagicMock(side_effect=partial(mock_complete, results))  # type: ignore
+        zd.trigger = MagicMock(side_effect=partial(mock_trigger, results))  # type: ignore
         await zd.connect()
 
         def plan():
