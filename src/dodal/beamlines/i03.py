@@ -328,7 +328,7 @@ def zocalo(
     """
     return device_instantiation(
         ZocaloResults,
-        "zocalo_results",
+        "zocalo",
         "",
         wait_for_connection,
         fake_with_ophyd_sim,
