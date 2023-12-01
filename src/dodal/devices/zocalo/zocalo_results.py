@@ -11,7 +11,6 @@ import zocalo.configuration
 from bluesky.protocols import Descriptor, Triggerable
 from bluesky.run_engine import call_in_bluesky_event_loop
 from numpy.typing import NDArray
-from ophyd.status import Status
 from ophyd_async.core import StandardReadable
 from ophyd_async.core.async_status import AsyncStatus
 from workflows.transport import lookup
@@ -19,7 +18,7 @@ from workflows.transport import lookup
 from dodal.devices.ophyd_async_utils import create_soft_signal_r
 from dodal.log import LOGGER
 
-DEFAULT_TIMEOUT = 15
+DEFAULT_TIMEOUT = 180
 
 
 class SortKeys(str, Enum):
