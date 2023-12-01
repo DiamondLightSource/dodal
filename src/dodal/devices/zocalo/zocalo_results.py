@@ -23,9 +23,9 @@ DEFAULT_TIMEOUT = 180
 
 
 class SortKeys(str, Enum):
-    max_count = auto
-    total_count = auto
-    n_voxels = auto
+    max_count = "max_count"
+    total_count = "total_count"
+    n_voxels = "n_voxels"
 
 
 DEFAULT_SORT_KEY = SortKeys.max_count
@@ -55,7 +55,7 @@ class ZocaloResults(StandardReadable, Flyable):
         name: str = "zocalo_results",
         zocalo_environment: str = "dev_artemis",
         channel: str = "xrc.i03",
-        sort_key: str = DEFAULT_SORT_KEY,
+        sort_key: str = DEFAULT_SORT_KEY.value,
         timeout_s: float = DEFAULT_TIMEOUT,
         prefix: str = "",
     ) -> None:
@@ -117,7 +117,7 @@ class ZocaloResults(StandardReadable, Flyable):
             LOGGER.info(f"Zocalo: found {len(raw_results)} crystals.")
             # Sort from strongest to weakest in case of multiple crystals
             await self._put_results(
-                sorted(raw_results, key=lambda d: d[self.sort_key], reverse=True)  # type: ignore
+                sorted(raw_results, key=lambda d: d[self.sort_key.value], reverse=True)
             )
         finally:
             self._kickoff_run = False
