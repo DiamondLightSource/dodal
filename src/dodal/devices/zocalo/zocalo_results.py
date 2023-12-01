@@ -101,7 +101,8 @@ class ZocaloResults(StandardReadable, Triggerable):
 
         try:
             LOGGER.info("waiting for results in queue")
-            async with asyncio.timeout(self.timeout_s):
+
+            async def _get_results():
                 raw_results = await self._raw_results_received.get()
                 LOGGER.info(f"Zocalo: found {len(raw_results)} crystals.")
                 # Sort from strongest to weakest in case of multiple crystals
@@ -110,6 +111,9 @@ class ZocaloResults(StandardReadable, Triggerable):
                         raw_results, key=lambda d: d[self.sort_key.value], reverse=True
                     )
                 )
+
+            await asyncio.wait_for(_get_results(), self.timeout_s)
+
         except TimeoutError:
             LOGGER.warning("Timed out waiting for zocalo results!")
         finally:
