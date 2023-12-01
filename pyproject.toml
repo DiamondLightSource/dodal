@@ -50,6 +50,7 @@ dev = [
     "tox-direct",
     "types-requests",
     "types-mock",
+    "types-PyYAML",
 ]
 
 [project.urls]
