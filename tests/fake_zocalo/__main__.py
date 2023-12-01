@@ -3,7 +3,7 @@ import os
 import time
 from collections import defaultdict
 from pathlib import Path
-from typing import Tuple
+from typing import Any, Tuple
 
 import ispyb.sqlalchemy
 import pika
@@ -94,7 +94,7 @@ def make_result(payload):
     return res
 
 
-def main():
+def main() -> None:
     url = ispyb.sqlalchemy.url(DEV_ISPYB_CONFIG)
     engine = create_engine(url, connect_args={"use_pure": True})
     Session = sessionmaker(engine)
@@ -107,7 +107,7 @@ def main():
         config["host"], config["port"], config["vhost"], creds
     )
 
-    results = defaultdict(lambda: make_result(TEST_RESULT_LARGE))
+    results: dict[str, Any] = defaultdict(lambda: make_result(TEST_RESULT_LARGE))
     results[NO_DIFFRACTION_PREFIX] = make_result([])
     results[MULTIPLE_CRYSTAL_PREFIX] = make_result(
         [*TEST_RESULT_LARGE, *TEST_RESULT_SMALL]

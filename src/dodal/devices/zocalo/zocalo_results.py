@@ -1,5 +1,6 @@
 import asyncio
 from collections import OrderedDict
+from enum import Enum, auto
 from typing import Any, Generator, Sequence, Tuple, TypedDict, Union
 
 import bluesky.plan_stubs as bps
@@ -18,8 +19,16 @@ from workflows.transport import lookup
 from dodal.devices.ophyd_async_utils import create_soft_signal_r
 from dodal.log import LOGGER
 
-DEFAULT_SORT_KEY = "max_count"
 DEFAULT_TIMEOUT = 180
+
+
+class SortKeys(str, Enum):
+    max_count = auto
+    total_count = auto
+    n_voxels = auto
+
+
+DEFAULT_SORT_KEY = SortKeys.max_count
 
 
 class XrcResult(TypedDict):
@@ -51,7 +60,7 @@ class ZocaloResults(StandardReadable, Flyable):
         prefix: str = "",
     ) -> None:
         self.zocalo_environment = zocalo_environment
-        self.sort_key = sort_key
+        self.sort_key = SortKeys[sort_key]
         self.channel = channel
         self.timeout_s = timeout_s
         self._prefix = prefix
@@ -108,7 +117,7 @@ class ZocaloResults(StandardReadable, Flyable):
             LOGGER.info(f"Zocalo: found {len(raw_results)} crystals.")
             # Sort from strongest to weakest in case of multiple crystals
             await self._put_results(
-                sorted(raw_results, key=lambda d: d[self.sort_key], reverse=True)
+                sorted(raw_results, key=lambda d: d[self.sort_key], reverse=True)  # type: ignore
             )
         finally:
             self._kickoff_run = False
@@ -195,12 +204,12 @@ def get_processing_results(
 ) -> Generator[Any, Any, Union[Tuple[np.ndarray, np.ndarray], Tuple[None, None]]]:
     """A minimal plan which will extract the top ranked xray centre and crystal bounding
     box size from the zocalo results."""
-    centres_of_mass = yield from bps.rd(zocalo.centres_of_mass, default_value=[])
+    centres_of_mass = yield from bps.rd(zocalo.centres_of_mass, default_value=[])  # type: ignore
     centre_of_mass = (
         None
-        if len(centres_of_mass) == 0
-        else centres_of_mass[0] - np.array([0.5, 0.5, 0.5])
+        if len(centres_of_mass) == 0  # type: ignore
+        else centres_of_mass[0] - np.array([0.5, 0.5, 0.5])  # type: ignore
     )
-    bbox_sizes = yield from bps.rd(zocalo.bbox_sizes, default_value=[])
-    bbox_size = None if len(bbox_sizes) == 0 else bbox_sizes[0]
+    bbox_sizes = yield from bps.rd(zocalo.bbox_sizes, default_value=[])  # type: ignore
+    bbox_size = None if len(bbox_sizes) == 0 else bbox_sizes[0]  # type: ignore
     return centre_of_mass, bbox_size
