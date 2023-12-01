@@ -9,13 +9,17 @@ from ophyd.sim import make_fake_device
 from requests import HTTPError, Response
 
 import dodal.devices.oav.utils as oav_utils
-from dodal.devices.oav.oav_detector import OAV
+from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
+
+DISPLAY_CONFIGURATION = "tests/devices/unit_tests/test_display.configuration"
+ZOOM_LEVELS_XML = "tests/devices/unit_tests/test_jCameraManZoomLevels.xml"
 
 
 @pytest.fixture
 def fake_oav() -> OAV:
+    oav_params = OAVConfigParams(ZOOM_LEVELS_XML, DISPLAY_CONFIGURATION)
     FakeOAV = make_fake_device(OAV)
-    fake_oav: OAV = FakeOAV(name="test fake OAV")
+    fake_oav: OAV = FakeOAV(name="test fake OAV", params=oav_params)
 
     fake_oav.snapshot.url.sim_put("http://test.url")
     fake_oav.snapshot.filename.put("test filename")
@@ -28,6 +32,8 @@ def fake_oav() -> OAV:
 
     fake_oav.cam.port_name.sim_put("CAM")
     fake_oav.proc.port_name.sim_put("PROC")
+
+    fake_oav.wait_for_connection()
 
     return fake_oav
 

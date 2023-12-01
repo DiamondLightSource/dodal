@@ -11,7 +11,7 @@ from dodal.devices.detector_motion import DetectorMotion
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import FastGridScan
 from dodal.devices.flux import Flux
-from dodal.devices.oav.oav_detector import OAV
+from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.s4_slit_gaps import S4SlitGaps
 from dodal.devices.sample_shutter import SampleShutter
@@ -24,6 +24,11 @@ from dodal.devices.zebra import Zebra
 from dodal.devices.zocalo import ZocaloResults
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
+
+ZOOM_PARAMS_FILE = (
+    "/dls_sw/i03/software/gda/configurations/i03-config/xml/jCameraManZoomLevels.xml"
+)
+DISPLAY_CONFIG = "/dls_sw/i03/software/gda_versions/var/display.configuration"
 
 BL = get_beamline_name("s03")
 set_log_beamline(BL)
@@ -150,6 +155,7 @@ def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
         "",
         wait_for_connection,
         fake_with_ophyd_sim,
+        params=OAVConfigParams(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
     )
 
 
