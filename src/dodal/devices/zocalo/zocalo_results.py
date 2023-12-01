@@ -204,12 +204,17 @@ def get_processing_results(
 ) -> Generator[Any, Any, Union[Tuple[np.ndarray, np.ndarray], Tuple[None, None]]]:
     """A minimal plan which will extract the top ranked xray centre and crystal bounding
     box size from the zocalo results."""
+    LOGGER.info(f"Getting zocalo processing results.")
     centres_of_mass = yield from bps.rd(zocalo.centres_of_mass, default_value=[])  # type: ignore
+    LOGGER.info(f"Centres of mass: {centres_of_mass}")
     centre_of_mass = (
         None
         if len(centres_of_mass) == 0  # type: ignore
         else centres_of_mass[0] - np.array([0.5, 0.5, 0.5])  # type: ignore
     )
+    LOGGER.info(f"Adjusted top centring result: {centre_of_mass}")
     bbox_sizes = yield from bps.rd(zocalo.bbox_sizes, default_value=[])  # type: ignore
+    LOGGER.info(f"Bounding box sizes: {centres_of_mass}")
     bbox_size = None if len(bbox_sizes) == 0 else bbox_sizes[0]  # type: ignore
+    LOGGER.info(f"Top bbox size: {bbox_size}")
     return centre_of_mass, bbox_size
