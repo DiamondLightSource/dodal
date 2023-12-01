@@ -179,7 +179,7 @@ class ZocaloResults(StandardReadable, Flyable):
 ZOCALO_READING_PLAN_NAME = "zocalo reading"
 
 
-def trigger_zocalo(zocalo: ZocaloResults):
+def trigger_wait_and_read_zocalo(zocalo: ZocaloResults):
     """A minimal utility plan which will wait for analysis results to be returned from
     Zocalo, and bundle them in a reading."""
 

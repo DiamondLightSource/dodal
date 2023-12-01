@@ -8,7 +8,7 @@ import pytest
 import pytest_asyncio
 from ophyd_async.core.async_status import AsyncStatus
 
-from dodal.devices.zocalo import XrcResult, ZocaloResults, trigger_zocalo
+from dodal.devices.zocalo import XrcResult, ZocaloResults, trigger_wait_and_read_zocalo
 
 TEST_RESULTS: list[XrcResult] = [
     {
@@ -86,7 +86,7 @@ async def mocked_zocalo_device(RE):
 
         def plan():
             yield from bps.open_run()
-            yield from trigger_zocalo(zd)
+            yield from trigger_wait_and_read_zocalo(zd)
             yield from bps.close_run()
 
         RE(plan())
