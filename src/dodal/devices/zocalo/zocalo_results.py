@@ -1,6 +1,6 @@
 import asyncio
 from collections import OrderedDict
-from enum import Enum, auto
+from enum import Enum
 from typing import Any, Generator, Sequence, Tuple, TypedDict, Union
 
 import bluesky.plan_stubs as bps
