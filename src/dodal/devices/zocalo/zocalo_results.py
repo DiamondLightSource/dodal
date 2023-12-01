@@ -132,7 +132,7 @@ class ZocaloResults(StandardReadable, Flyable):
                         "dtype": "array",
                         "shape": [
                             -1,
-                        ],  # TODO describe properly - see https://github.com/bluesky/event-model/issues/214
+                        ],  # TODO describe properly - see https://github.com/DiamondLightSource/dodal/issues/253
                     },
                 ),
                 (
