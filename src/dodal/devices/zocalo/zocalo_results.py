@@ -8,7 +8,7 @@ import numpy as np
 import workflows.recipe
 import workflows.transport
 import zocalo.configuration
-from bluesky.protocols import Descriptor, Flyable
+from bluesky.protocols import Descriptor, Triggerable
 from bluesky.run_engine import call_in_bluesky_event_loop
 from numpy.typing import NDArray
 from ophyd.status import Status
@@ -19,7 +19,7 @@ from workflows.transport import lookup
 from dodal.devices.ophyd_async_utils import create_soft_signal_r
 from dodal.log import LOGGER
 
-DEFAULT_TIMEOUT = 180
+DEFAULT_TIMEOUT = 15
 
 
 class SortKeys(str, Enum):
@@ -47,7 +47,7 @@ def bbox_size(result: XrcResult):
     ]
 
 
-class ZocaloResults(StandardReadable, Flyable):
+class ZocaloResults(StandardReadable, Triggerable):
     """An ophyd device which can wait for results from a Zocalo job"""
 
     def __init__(
@@ -65,7 +65,7 @@ class ZocaloResults(StandardReadable, Flyable):
         self.timeout_s = timeout_s
         self._prefix = prefix
 
-        self._kickoff_run: bool
+        self._subscription_run: bool = False
         self._raw_results_received: asyncio.Queue = asyncio.Queue()
 
         self.results = create_soft_signal_r(list[XrcResult], "results", self.name)
@@ -91,34 +91,28 @@ class ZocaloResults(StandardReadable, Flyable):
         await self.centres_of_mass._backend.put(centres_of_mass)
         await self.bbox_sizes._backend.put(bbox_sizes)
 
-    def kickoff(self) -> Status:
-        """Subscribes to Zocalo rabbitmq queue and starts a timeout counter for results,
-        by default 180 s. The returned status represents only that the subscription was
-        successfully processed, not that processing results have been recieved."""
-
-        status = Status(obj=self.kickoff)
-        self._kickoff_run = True
-        try:
-            self._subscribe_to_results()
-            status.set_finished()
-        except Exception as e:
-            status.set_exception(e)
-        return status
-
     @AsyncStatus.wrap
-    async def complete(self):
+    async def trigger(self):
         """Returns an AsyncStatus waiting for results to be received from Zocalo."""
+        LOGGER.info("Zocalo trigger called")
+        if not self._subscription_run:
+            LOGGER.info("subscription not initialised, subscribing to queue")
+            self._subscribe_to_results()
+            self._subscription_run = True
 
-        assert self._kickoff_run, f"{self} kickoff was never run!"
         try:
-            raw_results = await asyncio.wait_for(
-                self._raw_results_received.get(), self.timeout_s
-            )
-            LOGGER.info(f"Zocalo: found {len(raw_results)} crystals.")
-            # Sort from strongest to weakest in case of multiple crystals
-            await self._put_results(
-                sorted(raw_results, key=lambda d: d[self.sort_key.value], reverse=True)
-            )
+            LOGGER.info("waiting for results in queue")
+            async with asyncio.timeout(self.timeout_s):
+                raw_results = await self._raw_results_received.get()
+                LOGGER.info(f"Zocalo: found {len(raw_results)} crystals.")
+                # Sort from strongest to weakest in case of multiple crystals
+                await self._put_results(
+                    sorted(
+                        raw_results, key=lambda d: d[self.sort_key.value], reverse=True
+                    )
+                )
+        except TimeoutError:
+            LOGGER.warning("Timed out waiting for zocalo results!")
         finally:
             self._kickoff_run = False
 
@@ -176,13 +170,14 @@ class ZocaloResults(StandardReadable, Flyable):
             results = message.get("results", [])
             call_in_bluesky_event_loop(self._raw_results_received.put(results))
 
-        workflows.recipe.wrap_subscribe(
+        subscription = workflows.recipe.wrap_subscribe(
             transport,
             self.channel,
             _receive_result,
             acknowledgement=True,
             allow_non_recipe_messages=False,
         )
+        LOGGER.info(f"Made zocalo queue subscription: {bool(subscription)}.")
 
 
 ZOCALO_READING_PLAN_NAME = "zocalo reading"
@@ -193,8 +188,8 @@ def trigger_wait_and_read_zocalo(zocalo: ZocaloResults):
     Zocalo, and bundle them in a reading."""
 
     yield from bps.create(ZOCALO_READING_PLAN_NAME)
-    yield from bps.kickoff(zocalo, wait=True)
-    yield from bps.complete(zocalo, wait=True)
+    LOGGER.info("Running zocalo device .trigger()")
+    yield from bps.trigger(zocalo, wait=True)
     yield from bps.read(zocalo)
     yield from bps.save()
 
@@ -204,7 +199,7 @@ def get_processing_results(
 ) -> Generator[Any, Any, Union[Tuple[np.ndarray, np.ndarray], Tuple[None, None]]]:
     """A minimal plan which will extract the top ranked xray centre and crystal bounding
     box size from the zocalo results."""
-    LOGGER.info(f"Getting zocalo processing results.")
+    LOGGER.info("Getting zocalo processing results.")
     centres_of_mass = yield from bps.rd(zocalo.centres_of_mass, default_value=[])  # type: ignore
     LOGGER.info(f"Centres of mass: {centres_of_mass}")
     centre_of_mass = (
