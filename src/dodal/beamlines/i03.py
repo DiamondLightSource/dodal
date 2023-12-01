@@ -11,7 +11,7 @@ from dodal.devices.detector_motion import DetectorMotion
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import FastGridScan
 from dodal.devices.flux import Flux
-from dodal.devices.hfm import HFM
+from dodal.devices.focusing_mirror import FocusingMirror, VFMMirrorVoltages
 from dodal.devices.i0 import I0
 from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
@@ -21,7 +21,6 @@ from dodal.devices.sample_shutter import SampleShutter
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import Undulator
-from dodal.devices.vfm import VFM
 from dodal.devices.xbpm_feedback import XBPMFeedback
 from dodal.devices.xspress3_mini.xspress3_mini import Xspress3Mini
 from dodal.devices.zebra import Zebra
@@ -65,22 +64,36 @@ def qbpm1(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -
 
 
 @skip_device(lambda: BL == "s03")
-def vfm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> VFM:
-    return device_instantiation(
-        device_factory=VFM,
-        name="vfm",
-        prefix="",
+def vfm(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> FocusingMirror:
+    voltage_channels = device_instantiation(
+        device_instantiation=VFMMirrorVoltages,
+        name="vfm_voltages",
+        prefix="-MO-PSU-01:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )
 
+    mirror = device_instantiation(
+        device_factory=FocusingMirror,
+        name="vfm",
+        prefix="-OP-VFM-01:",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+    )
+    mirror.voltage_channels = voltage_channels
+    return mirror
+
 
 @skip_device(lambda: BL == "s03")
-def hfm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> HFM:
+def hfm(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> FocusingMirror:
     return device_instantiation(
-        device_factory=HFM,
+        device_factory=FocusingMirror,
         name="hfm",
-        prefix="",
+        prefix="-OP-HFM-01:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )
