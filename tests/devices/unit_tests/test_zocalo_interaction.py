@@ -6,7 +6,8 @@ from unittest.mock import MagicMock, patch
 
 from pytest import mark, raises
 
-from dodal.devices.zocalo.zocalo_interaction import (
+from dodal.devices.zocalo import (
+    ZocaloResults,
     ZocaloTrigger,
 )
 
@@ -89,23 +90,3 @@ def test__run_start_and_end(
     function_to_run = partial(function_to_test, EXPECTED_DCID)
     function_to_run = partial(function_wrapper, function_to_run)
     _test_zocalo(function_to_run, expected_message)
-
-
-@patch("workflows.recipe.wrap_subscribe", autospec=True)
-@patch("zocalo.configuration.from_file", autospec=True)
-@patch("dodal.devices.zocalo.zocalo_interaction.lookup", autospec=True)
-def test_when_message_recieved_from_zocalo_then_point_returned(
-    mock_transport_lookup, mock_from_file, mock_wrap_subscribe
-):
-    # TODO reimplement
-    pass
-
-
-@patch("workflows.recipe.wrap_subscribe", autospec=True)
-@patch("zocalo.configuration.from_file", autospec=True)
-@patch("dodal.devices.zocalo.zocalo_interaction.lookup", autospec=True)
-def test_when_exception_caused_by_zocalo_message_then_exception_propagated(
-    mock_transport_lookup, mock_from_file, mock_wrap_subscribe
-):
-    # TODO reimplement
-    pass

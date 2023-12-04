@@ -1,11 +1,14 @@
+import asyncio
 from functools import partial
 from typing import Awaitable, Callable, Sequence
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import bluesky.plan_stubs as bps
 import numpy as np
 import pytest
 import pytest_asyncio
+from bluesky.run_engine import RunEngine
+from bluesky.utils import FailedStatus
 from ophyd_async.core.async_status import AsyncStatus
 
 from dodal.devices.zocalo import XrcResult, ZocaloResults, trigger_wait_and_read_zocalo
@@ -126,3 +129,43 @@ async def test_rd_top_results(
         assert np.all(centres_of_mass[0] == np.array([1, 2, 3]))
 
     RE(test_plan())
+
+
+@patch("workflows.recipe.wrap_subscribe", autospec=True)
+@patch("zocalo.configuration.from_file", autospec=True)
+@patch("dodal.devices.zocalo.zocalo_interaction.lookup", autospec=True)
+def test_subscribe_only_called_once_on_first_trigger(
+    mock_transport_lookup,
+    mock_from_file,
+    mock_wrap_subscribe: MagicMock,
+):
+    RE = RunEngine()
+    zocalo_results = ZocaloResults(
+        name="zocalo", zocalo_environment="dev_artemis", timeout_s=2
+    )
+    mock_wrap_subscribe.assert_not_called()
+    RE(bps.trigger(zocalo_results))
+    mock_wrap_subscribe.assert_called_once()
+    RE(bps.trigger(zocalo_results))
+    RE(bps.trigger(zocalo_results))
+    mock_wrap_subscribe.assert_called_once()
+
+
+@patch("workflows.recipe.wrap_subscribe", autospec=True)
+@patch("zocalo.configuration.from_file", autospec=True)
+@patch("dodal.devices.zocalo.zocalo_interaction.lookup", autospec=True)
+def test_when_exception_caused_by_zocalo_message_then_exception_propagated(
+    mock_transport_lookup,
+    mock_from_file,
+    mock_wrap_subscribe,
+):
+    RE = RunEngine()
+    zocalo_results = ZocaloResults(
+        name="zocalo", zocalo_environment="dev_artemis", timeout_s=2
+    )
+    with pytest.raises(FailedStatus) as e:
+        RE(bps.trigger(zocalo_results, wait=True))
+
+    tb = str(e.getrepr())
+    assert "asyncio.exceptions.CancelledError" in tb
+    assert "TimeoutError" in tb
