@@ -1,4 +1,3 @@
-import asyncio
 from functools import partial
 from typing import Awaitable, Callable, Sequence
 from unittest.mock import MagicMock, patch

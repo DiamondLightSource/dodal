@@ -7,7 +7,6 @@ from unittest.mock import MagicMock, patch
 from pytest import mark, raises
 
 from dodal.devices.zocalo import (
-    ZocaloResults,
     ZocaloTrigger,
 )
 
