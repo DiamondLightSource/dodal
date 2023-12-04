@@ -106,7 +106,8 @@ async def mocked_zocalo_device(RE):
 
 @pytest.mark.asyncio
 async def test_put_result_read_results(
-    mocked_zocalo_device: Callable[[Sequence[XrcResult]], Awaitable[ZocaloResults]], RE
+    mocked_zocalo_device,
+    RE,
 ):
     zocalo_device = await mocked_zocalo_device([], run_setup=True)
     await zocalo_device._put_results(TEST_RESULTS)
@@ -121,7 +122,8 @@ async def test_put_result_read_results(
 
 @pytest.mark.asyncio
 async def test_rd_top_results(
-    mocked_zocalo_device: Callable[[Sequence[XrcResult]], Awaitable[ZocaloResults]], RE
+    mocked_zocalo_device,
+    RE,
 ):
     zocalo_device = await mocked_zocalo_device([], run_setup=True)
     await zocalo_device._put_results(TEST_RESULTS)
@@ -139,7 +141,8 @@ async def test_rd_top_results(
 
 @pytest.mark.asyncio
 async def test_trigger_and_wait_puts_results(
-    mocked_zocalo_device: Callable[[Sequence[XrcResult]], Awaitable[ZocaloResults]], RE
+    mocked_zocalo_device,
+    RE,
 ):
     zocalo_device = await mocked_zocalo_device(TEST_RESULTS)
     zocalo_device._put_results = AsyncMock()
@@ -155,9 +158,7 @@ async def test_trigger_and_wait_puts_results(
 
 
 @pytest.mark.asyncio
-async def test_extraction_plan(
-    mocked_zocalo_device: Callable[[Sequence[XrcResult]], Awaitable[ZocaloResults]], RE
-):
+async def test_extraction_plan(mocked_zocalo_device, RE):
     zocalo_device: ZocaloResults = await mocked_zocalo_device(
         TEST_RESULTS, run_setup=False
     )
