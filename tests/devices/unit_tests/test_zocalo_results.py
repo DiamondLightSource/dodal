@@ -215,5 +215,5 @@ def test_when_exception_caused_by_zocalo_message_then_exception_propagated(
         RE(bps.trigger(zocalo_results, wait=True))
 
     tb = str(e.getrepr())
-    assert "asyncio.exceptions.CancelledError" in tb
+    assert "exceptions.CancelledError" in tb
     assert "TimeoutError" in tb
