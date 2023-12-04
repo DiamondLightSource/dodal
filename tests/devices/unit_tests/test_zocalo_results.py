@@ -178,10 +178,12 @@ async def test_extraction_plan(mocked_zocalo_device, RE):
 )
 @patch("dodal.devices.zocalo.zocalo_results.workflows.transport", autospec=True)
 @patch("dodal.devices.zocalo.zocalo_results.zocalo.configuration", autospec=True)
+@patch("dodal.devices.zocalo.zocalo_results.lookup", autospec=True)
 def test_subscribe_only_called_once_on_first_trigger(
+    mock_lookup,
     mock_zocalo,
     mock_transport,
-    mock_wrap_subscribe,
+    mock_wrap_subscribe: MagicMock,
 ):
     RE = RunEngine()
     zocalo_results = ZocaloResults(
@@ -198,7 +200,9 @@ def test_subscribe_only_called_once_on_first_trigger(
 @patch("dodal.devices.zocalo.zocalo_results.workflows.recipe", autospec=True)
 @patch("dodal.devices.zocalo.zocalo_results.workflows.transport", autospec=True)
 @patch("dodal.devices.zocalo.zocalo_results.zocalo.configuration", autospec=True)
+@patch("dodal.devices.zocalo.zocalo_results.lookup", autospec=True)
 def test_when_exception_caused_by_zocalo_message_then_exception_propagated(
+    mock_lookup,
     mock_zocalo,
     mock_transport,
     mock_recipe,
