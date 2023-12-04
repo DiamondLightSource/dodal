@@ -71,6 +71,9 @@ class GridScanParams(BaseModel, AbstractExperimentParameterBase):
     y_axis: GridAxis = GridAxis(0, 0, 0)
     z_axis: GridAxis = GridAxis(0, 0, 0)
 
+    # Whether to set the stub offsets after centering
+    set_stub_offsets: bool = False
+
     class Config:
         arbitrary_types_allowed = True
         fields = {
