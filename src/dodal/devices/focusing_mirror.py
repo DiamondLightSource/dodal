@@ -1,6 +1,17 @@
+import time
 from enum import Enum
 
 from ophyd import Component, Device, EpicsMotor, EpicsSignal, Signal
+from ophyd.status import Status
+
+from dodal.log import LOGGER
+
+VOLTAGE_POLLING_DELAY_S = 0.5
+
+# The default timeout is 60 seconds as voltage slew rate is typically ~2V/s
+DEFAULT_SETTLE_TIME_S = 60
+
+DEMAND_ACCEPTED_OK = 1
 
 
 class MirrorStripe(Enum):
@@ -10,15 +21,49 @@ class MirrorStripe(Enum):
 
 
 class MirrorVoltageSignal(Signal):
-    def set(self, value, *, timeout=None, settle_time=None, **kwargs):
+    def set(self, value, *, timeout=None, settle_time=0, **kwargs):
+        actual_v: EpicsSignal = None
+        demand_accepted_v: EpicsSignal = None
         actual_v, setpoint_v, demand_accepted_v = self.parent.components_for_channel(
-            self.name
+            self.attr_name
         )
-        print(actual_v)
 
+        LOGGER.debug(f"setting {setpoint_v.name} to {value}")
+        setpoint_status = setpoint_v.set(value)
+        demand_accepted_status = Status(self, DEFAULT_SETTLE_TIME_S)
 
-class VoltageDevice(Device):
-    voltage_signal: MirrorVoltageSignal = Component(MirrorVoltageSignal)
+        def demand_check_callback(expiry_time_s):
+            accepted = demand_accepted_v.get()
+            if accepted == DEMAND_ACCEPTED_OK:
+                LOGGER.debug(f"Demand accepted for {setpoint_v.name}")
+                demand_accepted_status.set_finished()
+            elif time.time() < expiry_time_s:
+                check_timer = Status(self, VOLTAGE_POLLING_DELAY_S)
+                check_timer.add_callback(lambda _: demand_check_callback(expiry_time_s))
+            # else timeout handled by parent demand_accepted_status
+
+        def setpoint_callback(status: Status):
+            if status.success:
+                try:
+                    accepted = demand_accepted_v.get()
+                    if accepted == DEMAND_ACCEPTED_OK:
+                        LOGGER.debug(f"Demand accepted for {setpoint_v.name}")
+                        demand_accepted_status.set_finished()
+                    else:
+                        expiry_time_s = time.time() + DEFAULT_SETTLE_TIME_S
+                        check_timer = Status(self, VOLTAGE_POLLING_DELAY_S)
+                        check_timer.add_callback(
+                            lambda _: demand_check_callback(expiry_time_s)
+                        )
+                except Exception as e:
+                    LOGGER.warn(
+                        f"Failed to fetch {setpoint_v.name} Demand Accepted", exc_info=e
+                    )
+                    demand_accepted_status.set_exception(e)
+
+        setpoint_status.add_callback(setpoint_callback)
+        status = setpoint_status & demand_accepted_status
+        return status
 
 
 class VFMMirrorVoltages(Device):
@@ -47,39 +92,43 @@ class VFMMirrorVoltages(Device):
     _channel21_setpoint_v: EpicsSignal = Component(EpicsSignal, "BM:V21D")
     _channel21_demand_accepted: EpicsSignal = Component(EpicsSignal, "BM:V21DSEV")
 
-    channel14_voltage = Component(MirrorVoltageSignal, "V14")
-    channel15_voltage = Component(MirrorVoltageSignal, "V15")
-    channel16_voltage = Component(MirrorVoltageSignal, "V16")
-    channel17_voltage = Component(MirrorVoltageSignal, "V17")
-    channel18_voltage = Component(MirrorVoltageSignal, "V18")
-    channel19_voltage = Component(MirrorVoltageSignal, "V19")
-    channel20_voltage = Component(MirrorVoltageSignal, "V20")
-    channel21_voltage = Component(MirrorVoltageSignal, "V21")
+    channel14 = Component(MirrorVoltageSignal)
+    channel15 = Component(MirrorVoltageSignal)
+    channel16 = Component(MirrorVoltageSignal)
+    channel17 = Component(MirrorVoltageSignal)
+    channel18 = Component(MirrorVoltageSignal)
+    channel19 = Component(MirrorVoltageSignal)
+    channel20 = Component(MirrorVoltageSignal)
+    channel21 = Component(MirrorVoltageSignal)
 
-    voltage_channels: list[MirrorVoltageSignal] = [
-        channel14_voltage,
-        channel15_voltage,
-        channel16_voltage,
-        channel17_voltage,
-        channel18_voltage,
-        channel19_voltage,
-        channel20_voltage,
-        channel21_voltage,
-    ]
+    voltage_lookup_table_path: str = (
+        "/dls_sw/i03/software/daq_configuration/json/mirrorFocus.json"
+    )
 
-    _components_for_channel = {
-        "V14": (_channel14_actual_v, _channel14_setpoint_v, _channel14_demand_accepted),
-        "V15": (_channel15_actual_v, _channel15_setpoint_v, _channel15_demand_accepted),
-        "V16": (_channel16_actual_v, _channel16_setpoint_v, _channel16_demand_accepted),
-        "V17": (_channel17_actual_v, _channel17_setpoint_v, _channel17_demand_accepted),
-        "V18": (_channel18_actual_v, _channel18_setpoint_v, _channel18_demand_accepted),
-        "V19": (_channel19_actual_v, _channel19_setpoint_v, _channel19_demand_accepted),
-        "V20": (_channel20_actual_v, _channel20_setpoint_v, _channel20_demand_accepted),
-        "V21": (_channel21_actual_v, _channel21_setpoint_v, _channel21_demand_accepted),
-    }
+    def components_for_channel(
+        self, name
+    ) -> tuple[EpicsSignal, EpicsSignal, EpicsSignal]:
+        return (
+            getattr(self, f"_{name}_actual_v"),
+            getattr(self, f"_{name}_setpoint_v"),
+            getattr(self, f"_{name}_demand_accepted"),
+        )
 
-    def components_for_channel(self, name) -> tuple[Signal, Signal, Signal]:
-        return self._components_for_channel[name]
+    @property
+    def voltage_channels(self) -> list[MirrorVoltageSignal]:
+        return [
+            getattr(self, name)
+            for name in [
+                "channel14",
+                "channel15",
+                "channel16",
+                "channel17",
+                "channel18",
+                "channel19",
+                "channel20",
+                "channel21",
+            ]
+        ]
 
 
 class FocusingMirror(Device):
@@ -100,9 +149,14 @@ class FocusingMirror(Device):
     stripe: EpicsSignal = Component(EpicsSignal, "STRP:DVAL", string=True)
     # apply the current set stripe setting
     apply_stripe: EpicsSignal = Component(EpicsSignal, "CHANGE.PROC")
-    voltage_lookup_table_path: str = (
-        "/dls_sw/i03/software/daq_configuration/json/mirrorFocus.json"
+
+    bragg_to_lat_lookup_table_path: str = (
+        "CONFIGURE_ME"  # configured in per-mirror beamline-specific setup
     )
 
-    # This needs to be configured in beamline setup as differs between mirrors
-    voltage_channels: list[MirrorVoltageSignal] = []
+    def energy_to_stripe(self, energy_kev):
+        # In future, this should be configurable per-mirror
+        if energy_kev < 7:
+            return MirrorStripe.BARE
+        else:
+            return MirrorStripe.RHODIUM

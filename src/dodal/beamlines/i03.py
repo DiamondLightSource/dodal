@@ -67,14 +67,6 @@ def qbpm1(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -
 def vfm(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> FocusingMirror:
-    voltage_channels = device_instantiation(
-        device_instantiation=VFMMirrorVoltages,
-        name="vfm_voltages",
-        prefix="-MO-PSU-01:",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
-    )
-
     mirror = device_instantiation(
         device_factory=FocusingMirror,
         name="vfm",
@@ -82,8 +74,21 @@ def vfm(
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )
-    mirror.voltage_channels = voltage_channels
+    mirror.bragg_to_lat_lookup_table_path = "/dls_sw/i03/software/daq_configuration/lookup/BeamLineEnergy_DCM_VFM_x_converter.txt"
     return mirror
+
+
+@skip_device(lambda: BL == "s03")
+def vfm_mirror_voltages(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> VFMMirrorVoltages:
+    return device_instantiation(
+        device_factory=VFMMirrorVoltages,
+        name="vfm_mirror_voltages",
+        prefix="-MO-PSU-01:",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+    )
 
 
 @skip_device(lambda: BL == "s03")
