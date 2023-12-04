@@ -1,7 +1,7 @@
 from ophyd import Component as Cpt
 from ophyd import (
     Device,
-    EpicsSignal,  # EpicsMotor
+    EpicsSignal,
 )
 
 
