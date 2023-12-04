@@ -7,6 +7,7 @@ from dodal.devices.eiger import EigerDetector
 from dodal.devices.i24.dual_backlight import DualBacklight
 from dodal.devices.i24.I24_detector_motion import DetectorMotion
 from dodal.devices.i24.i24_vgonio import VGonio
+from dodal.devices.i24.pmac import PMAC
 from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
 from dodal.devices.zebra import Zebra
 from dodal.log import set_beamline
@@ -73,6 +74,21 @@ def eiger(
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
         post_create=set_params,
+    )
+
+
+def pmac(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> PMAC:
+    """Get the i24 PMAC device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i24, it will return the existing object.
+    """
+    # prefix not BL but ME14E
+    return device_instantiation(
+        PMAC,
+        "pmac",
+        "ME14E-MO-CHIP-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        bl_prefix=False,
     )
 
 
