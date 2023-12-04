@@ -121,6 +121,7 @@ class ZocaloResults(StandardReadable, Triggerable):
 
         except TimeoutError:
             LOGGER.warning("Timed out waiting for zocalo results!")
+            raise
         finally:
             self._kickoff_run = False
 
