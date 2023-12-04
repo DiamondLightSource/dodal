@@ -112,7 +112,12 @@ class ZocaloResults(StandardReadable, Triggerable):
                     )
                 )
 
-            await asyncio.wait_for(_get_results(), self.timeout_s)
+            task = asyncio.create_task(_get_results())
+            # wait for half the timeout at a time, with one retry
+            try:
+                await asyncio.wait_for(asyncio.shield(task), self.timeout_s / 2)
+            except TimeoutError:
+                await asyncio.wait_for(task, self.timeout_s / 2)
 
         except TimeoutError:
             LOGGER.warning("Timed out waiting for zocalo results!")
