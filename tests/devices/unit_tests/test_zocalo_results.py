@@ -1,5 +1,4 @@
 from functools import partial
-from typing import Awaitable, Callable, Sequence
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import bluesky.plan_stubs as bps
