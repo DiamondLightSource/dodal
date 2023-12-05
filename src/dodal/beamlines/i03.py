@@ -12,7 +12,6 @@ from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import FastGridScan
 from dodal.devices.flux import Flux
 from dodal.devices.focusing_mirror import FocusingMirror, VFMMirrorVoltages
-from dodal.devices.i0 import I0
 from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.qbpm1 import QBPM1
@@ -51,7 +50,6 @@ def dcm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
     )
 
 
-# XXX is this the right pattern to follow
 @skip_device(lambda: BL == "s03")
 def qbpm1(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> QBPM1:
     return device_instantiation(
@@ -99,17 +97,6 @@ def hfm(
         device_factory=FocusingMirror,
         name="hfm",
         prefix="-OP-HFM-01:",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
-    )
-
-
-@skip_device(lambda: BL == "s03")
-def i0(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> I0:
-    return device_instantiation(
-        device_factory=I0,
-        name="i0",
-        prefix="",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )
