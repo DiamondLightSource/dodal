@@ -92,6 +92,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/231_improve_tests_for_aperturescatterguard/"
   },
   {
+    "version": "249_add-beam-position-logic",
+    "url": "https://DiamondLightSource.github.io/dodal/249_add-beam-position-logic/"
+  },
+  {
     "version": "262_make_arming_eiger_asynchronous",
     "url": "https://DiamondLightSource.github.io/dodal/262_make_arming_eiger_asynchronous/"
   },
