@@ -264,7 +264,7 @@ class FastGridScan(Device):
             second_grid = x * z
             self.expected_images.put(first_grid + second_grid)
 
-        # self.x_steps.subscribe(set_expected_images)
+        self.x_steps.subscribe(set_expected_images)
         self.y_steps.subscribe(set_expected_images)
         self.z_steps.subscribe(set_expected_images)
 
@@ -302,6 +302,8 @@ class FastGridScan(Device):
 
 def set_fast_grid_scan_params(scan: FastGridScan, params: GridScanParams):
     yield from mv(
+        scan.x_steps,
+        params.x_steps,
         scan.y_steps,
         params.y_steps,
         scan.z_steps,

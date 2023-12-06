@@ -161,12 +161,15 @@ class GridScanCompleteStatus(DeviceStatus):
         super().__init__(*args, **kwargs)
         self.start_ts = time.time()
 
-        self.device.position_counter.subscribe(self._notify_watchers)
+        # Progress bar not used for now
+        # self.device.position_counter.subscribe(self._notify_watchers)
         self.device.status.subscribe(self._running_changed)
 
         self._name = self.device.name
-        self._target_count = self.device.expected_images.get()
 
+        self._target_count = self.device.y_steps.get()
+
+    # Function currently not used
     def _notify_watchers(self, value, *args, **kwargs):
         if not self._watchers:
             return
@@ -202,13 +205,13 @@ class GridScanCompleteStatus(DeviceStatus):
             self.clean_up()
 
     def clean_up(self):
-        self.device.position_counter.clear_sub(self._notify_watchers)
         self.device.status.clear_sub(self._running_changed)
 
 
 class PandAFastGridScan(Device):
     # This is almost identical to the regular FastGridScan device. It has one extra PV for runup distance, and doesnt use dwell time
 
+    x_steps: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "X_NUM_STEPS")
     y_steps: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "Y_NUM_STEPS")
     z_steps: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "Z_NUM_STEPS")
 
@@ -243,8 +246,12 @@ class PandAFastGridScan(Device):
         super().__init__(*args, **kwargs)
 
         def set_expected_images(*_, **__):
-            self.expected_images.put(120)
+            x, y, z = self.x_steps.get(), self.y_steps.get(), self.z_steps.get()
+            first_grid = x * y
+            second_grid = x * z
+            self.expected_images.put(first_grid + second_grid)
 
+        self.x_steps.subscribe(set_expected_images)
         self.y_steps.subscribe(set_expected_images)
         self.z_steps.subscribe(set_expected_images)
 
@@ -282,6 +289,8 @@ class PandAFastGridScan(Device):
 
 def set_fast_grid_scan_params(scan: PandAFastGridScan, params: PandaGridScanParams):
     yield from mv(
+        scan.x_steps,
+        params.x_steps,
         scan.y_steps,
         params.y_steps,
         scan.z_steps,
