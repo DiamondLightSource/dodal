@@ -21,6 +21,9 @@ def oav() -> OAV:
     oav.proc.port_name.sim_put("proc")
     oav.cam.port_name.sim_put("CAM")
 
+    oav.snapshot.x_size.sim_put("1024")
+    oav.snapshot.y_size.sim_put("768")
+
     oav.zoom_controller.zrst.set("1.0x")
     oav.zoom_controller.onst.set("2.0x")
     oav.zoom_controller.twst.set("3.0x")
@@ -87,12 +90,12 @@ def test_get_micronsperpixel_from_oav(
 
 def test_beam_position_not_found_for_wrong_entry(oav: OAV):
     with pytest.raises(OAVError_BeamPositionNotFound):
-        oav.parameters.get_beam_position_from_zoom(2.0)
+        oav.parameters.get_beam_position_from_zoom(2.0, 0, 0)
 
 
 def test_get_beam_position(oav: OAV):
     expected_beam_position = (493, 355)
-    beam_position = oav.parameters.get_beam_position_from_zoom(2.5)
+    beam_position = oav.parameters.get_beam_position_from_zoom(2.5, 1024, 768)
 
     assert beam_position[0] == expected_beam_position[0]
     assert beam_position[1] == expected_beam_position[1]
