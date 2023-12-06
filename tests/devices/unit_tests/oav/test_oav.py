@@ -117,6 +117,17 @@ def test_extract_beam_position_given_different_zoom_levels(
     assert oav.parameters.beam_centre_j == expected_yCentre
 
 
+def test_extract_rescaled_beam_position(oav: OAV):
+    oav.snapshot.x_size.sim_put("1292")
+    oav.snapshot.y_size.sim_put("964")
+    oav.wait_for_connection()
+
+    oav.zoom_controller.level.sim_put("1.0")
+
+    assert oav.parameters.beam_centre_i == 601
+    assert oav.parameters.beam_centre_j == 450
+
+
 @pytest.mark.parametrize(
     "h, v, expected_x, expected_y",
     [

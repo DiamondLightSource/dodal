@@ -147,7 +147,7 @@ class OAVConfigParams:
         beam_centre_i = int(crosshair_x_line.split(" = ")[1]) * xsize / 1024
         beam_centre_j = int(crosshair_y_line.split(" = ")[1]) * ysize / 768
         LOGGER.info(f"Beam centre: {beam_centre_i, beam_centre_j}")
-        return beam_centre_i, beam_centre_j
+        return int(beam_centre_i), int(beam_centre_j)
 
     def calculate_beam_distance(
         self, horizontal_pixels: int, vertical_pixels: int
@@ -188,7 +188,6 @@ class OAV(AreaDetector):
         connected = super().wait_for_connection(all_signals, timeout)
         x = self.snapshot.x_size.get()
         y = self.snapshot.y_size.get()
-        print(x, y)
 
         cb = partial(self.parameters.update_on_zoom, xsize=x, ysize=y)
         self.zoom_controller.level.subscribe(cb)
