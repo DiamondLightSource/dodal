@@ -14,7 +14,7 @@ class DCM(Device):
 
     bragg_in_degrees: EpicsMotor = Cpt(EpicsMotor, "-MO-DCM-01:BRAGG")
     roll_in_mrad: EpicsMotor = Cpt(EpicsMotor, "-MO-DCM-01:ROLL")
-    offset: EpicsMotor = Cpt(EpicsMotor, "-MO-DCM-01:OFFSET")
+    offset_in_mm: EpicsMotor = Cpt(EpicsMotor, "-MO-DCM-01:OFFSET")
     perp_in_mm: EpicsMotor = Cpt(EpicsMotor, "-MO-DCM-01:PERP")
     energy_in_kev: EpicsMotor = Cpt(EpicsMotor, "-MO-DCM-01:ENERGY", kind=Kind.hinted)
     pitch_in_mrad: EpicsMotor = Cpt(EpicsMotor, "-MO-DCM-01:PITCH")
@@ -31,3 +31,9 @@ class DCM(Device):
 
     dcm_pitch_converter_lookup_table_path: str = "/dls_sw/i03/software/daq_configuration/lookup/BeamLineEnergy_DCM_Pitch_converter.txt"
     dcm_roll_converter_lookup_table_path: str = "/dls_sw/i03/software/daq_configuration/lookup/BeamLineEnergy_DCM_Roll_converter.txt"
+
+
+def fixed_offset_from_beamline_params(gda_beamline_parameters):
+    """I03 configures the DCM Perp as a side effect of applying this fixed value to the DCM Offset after an energy change"""
+    # Nb this parameter is misleadingly named to confuse you
+    return gda_beamline_parameters["DCM_Perp_Offset_FIXED"]
