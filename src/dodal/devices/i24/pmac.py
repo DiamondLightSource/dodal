@@ -14,3 +14,11 @@ class PMAC(Device):
     x: EpicsMotor = Cpt(EpicsMotor, "X")
     y: EpicsMotor = Cpt(EpicsMotor, "Y")
     z: EpicsMotor = Cpt(EpicsMotor, "Z")
+
+    def home_stages(self, direction: str):
+        # uses from ophyd.epics_motor import HomeEnum: forward or reverse (?)
+        # I think I shuld just be able to pass "forward" or "reverse"
+        # but which?
+        self.x.home(direction)
+        self.y.home(direction)
+        self.z.home(direction)
