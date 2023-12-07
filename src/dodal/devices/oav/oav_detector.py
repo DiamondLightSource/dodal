@@ -208,5 +208,4 @@ class OAV(AreaDetector):
 
         cb = partial(self.parameters.update_on_zoom, xsize=x, ysize=y)
         self.zoom_controller.level.subscribe(cb)
-        # self.zoom_controller.level.subscribe(self.parameters.update_on_zoom)
         return connected
