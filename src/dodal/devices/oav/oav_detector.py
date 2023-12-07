@@ -25,6 +25,10 @@ from dodal.devices.oav.oav_errors import (
 )
 from dodal.log import LOGGER
 
+# GDA corrently assumes this aspect ratio for the OAV window size.
+# For some beamline this doesn't affect anything as the actual OAV aspect ratio
+# matches. Others need to take it into account to rescale the values stored in
+# the configuration files.
 DEFAULT_OAV_WINDOW = (1024, 768)
 
 
