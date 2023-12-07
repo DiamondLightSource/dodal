@@ -67,7 +67,7 @@ def test_when_zoom_level_changed_then_status_waits_for_all_plugins_to_be_updated
 
 def test_load_microns_per_pixel_entry_not_found(oav: OAV):
     with pytest.raises(OAVError_ZoomLevelNotFound):
-        oav.parameters.load_microns_per_pixel(0.000001)
+        oav.parameters.load_microns_per_pixel(0.000001, 0, 0)
 
 
 @pytest.mark.parametrize(
@@ -84,8 +84,12 @@ def test_get_micronsperpixel_from_oav(
 ):
     oav.zoom_controller.level.sim_put(zoom_level)
 
-    assert oav.parameters.micronsPerXPixel == expected_microns_x
-    assert oav.parameters.micronsPerYPixel == expected_microns_y
+    assert oav.parameters.micronsPerXPixel == pytest.approx(
+        expected_microns_x, abs=1e-2
+    )
+    assert oav.parameters.micronsPerYPixel == pytest.approx(
+        expected_microns_y, abs=1e-2
+    )
 
 
 def test_beam_position_not_found_for_wrong_entry(oav: OAV):
