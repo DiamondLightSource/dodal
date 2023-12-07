@@ -39,7 +39,7 @@ def test_given_context_and_microns_per_pixel_get_max_tip_distance_in_pixels(
 ):
     zoom_level = mock_parameters.zoom
     config_params = OAVConfigParams(ZOOM_LEVELS_XML, DISPLAY_CONFIGURATION)
-    config_params.update_on_zoom(str(zoom_level))
+    config_params.update_on_zoom(str(zoom_level), 1024, 768)
 
     assert mock_parameters.max_tip_distance == 300
     assert mock_parameters.get_max_tip_distance_in_pixels(
