@@ -40,6 +40,8 @@ def mock_oav():
     oav: OAV = make_fake_device(OAV)(
         name="oav", prefix="a fake beamline", params=oav_params
     )
+    oav.snapshot.x_size.sim_put("1024")
+    oav.snapshot.y_size.sim_put("768")
     oav.wait_for_connection()
     return oav
 
