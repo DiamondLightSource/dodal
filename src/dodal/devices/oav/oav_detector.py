@@ -25,6 +25,8 @@ from dodal.devices.oav.oav_errors import (
 )
 from dodal.log import LOGGER
 
+DEFAULT_OAV_WINDOW = (1024, 768)
+
 
 class ZoomController(Device):
     """
@@ -122,7 +124,9 @@ class OAVConfigParams:
                 """
             )
 
-    def get_beam_position_from_zoom(self, zoom: float, xsize, ysize) -> Tuple[int, int]:
+    def get_beam_position_from_zoom(
+        self, zoom: float, xsize: int, ysize: int
+    ) -> Tuple[int, int]:
         """
         Extracts the beam location in pixels `xCentre` `yCentre`, for a requested zoom \
         level. The beam location is manually inputted by the beamline operator on GDA \
@@ -144,8 +148,12 @@ class OAVConfigParams:
                 f"Could not extract beam position at zoom level {zoom}"
             )
 
-        beam_centre_i = int(crosshair_x_line.split(" = ")[1]) * xsize / 1024
-        beam_centre_j = int(crosshair_y_line.split(" = ")[1]) * ysize / 768
+        beam_centre_i = (
+            int(crosshair_x_line.split(" = ")[1]) * xsize / DEFAULT_OAV_WINDOW[0]
+        )
+        beam_centre_j = (
+            int(crosshair_y_line.split(" = ")[1]) * ysize / DEFAULT_OAV_WINDOW[1]
+        )
         LOGGER.info(f"Beam centre: {beam_centre_i, beam_centre_j}")
         return int(beam_centre_i), int(beam_centre_j)
 
