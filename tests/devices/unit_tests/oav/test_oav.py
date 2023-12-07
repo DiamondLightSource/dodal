@@ -121,6 +121,17 @@ def test_extract_beam_position_given_different_zoom_levels(
     assert oav.parameters.beam_centre_j == expected_yCentre
 
 
+def test_extract_rescaled_micronsperpixel(oav: OAV):
+    oav.snapshot.x_size.sim_put("1292")
+    oav.snapshot.y_size.sim_put("964")
+    oav.wait_for_connection()
+
+    oav.zoom_controller.level.sim_put("1.0")
+
+    assert oav.parameters.micronsPerXPixel == pytest.approx(2.27, abs=1e-2)
+    assert oav.parameters.micronsPerYPixel == pytest.approx(2.28, abs=1e-2)
+
+
 def test_extract_rescaled_beam_position(oav: OAV):
     oav.snapshot.x_size.sim_put("1292")
     oav.snapshot.y_size.sim_put("964")
