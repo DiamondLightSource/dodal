@@ -1,7 +1,6 @@
 from ophyd import Component as Cpt
 from ophyd import (
     Device,
-    EpicsMotor,
     EpicsSignal,
 )
 
@@ -11,14 +10,9 @@ class PMAC(Device):
 
     pmac_string: EpicsSignal = Cpt(EpicsSignal, "PMAC_STRING")
 
-    x: EpicsMotor = Cpt(EpicsMotor, "X")
-    y: EpicsMotor = Cpt(EpicsMotor, "Y")
-    z: EpicsMotor = Cpt(EpicsMotor, "Z")
+    x: EpicsSignal = Cpt(EpicsSignal, "X")
+    y: EpicsSignal = Cpt(EpicsSignal, "Y")
+    z: EpicsSignal = Cpt(EpicsSignal, "Z")
 
-    def home_stages(self, direction: str):
-        # uses from ophyd.epics_motor import HomeEnum: forward or reverse (?)
-        # I think I shuld just be able to pass "forward" or "reverse"
-        # but which?
-        self.x.home(direction)
-        self.y.home(direction)
-        self.z.home(direction)
+    def home_stages(self):
+        self.pmac_string.set(r"\#1hmz\#2hmz\#3hmz")
