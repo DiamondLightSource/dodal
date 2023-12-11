@@ -156,6 +156,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_698_refactor_parameters/"
   },
   {
+    "version": "hyperion_984_arm_wait_for_load_then_centre",
+    "url": "https://DiamondLightSource.github.io/dodal/hyperion_984_arm_wait_for_load_then_centre/"
+  },
+  {
     "version": "hyperion_986_set_energy_apply_lookup_table_value_for_pitch_roll",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_986_set_energy_apply_lookup_table_value_for_pitch_roll/"
   },
