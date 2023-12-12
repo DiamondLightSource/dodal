@@ -7,20 +7,21 @@ from workflows.transport import lookup
 from dodal.log import LOGGER
 
 
+def _get_zocalo_connection(environment):
+    zc = zocalo.configuration.from_file()
+    zc.activate_environment(environment)
+
+    transport = lookup("PikaTransport")()
+    transport.connect()
+    return transport
+
+
 class ZocaloTrigger:
     def __init__(self, environment: str = "artemis"):
         self.zocalo_environment: str = environment
 
-    def _get_zocalo_connection(self):
-        zc = zocalo.configuration.from_file()
-        zc.activate_environment(self.zocalo_environment)
-
-        transport = lookup("PikaTransport")()
-        transport.connect()
-        return transport
-
     def _send_to_zocalo(self, parameters: dict):
-        transport = self._get_zocalo_connection()
+        transport = _get_zocalo_connection(self.zocalo_environment)
 
         try:
             message = {

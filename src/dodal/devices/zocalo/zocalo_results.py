@@ -7,15 +7,14 @@ import bluesky.plan_stubs as bps
 import numpy as np
 import workflows.recipe
 import workflows.transport
-import zocalo.configuration
 from bluesky.protocols import Descriptor, Triggerable
 from bluesky.run_engine import call_in_bluesky_event_loop
 from numpy.typing import NDArray
 from ophyd_async.core import StandardReadable
 from ophyd_async.core.async_status import AsyncStatus
-from workflows.transport import lookup
 
 from dodal.devices.ophyd_async_utils import create_soft_signal_r
+from dodal.devices.zocalo.zocalo_interaction import _get_zocalo_connection
 from dodal.log import LOGGER
 
 DEFAULT_TIMEOUT = 180
@@ -28,6 +27,7 @@ class SortKeys(str, Enum):
 
 
 DEFAULT_SORT_KEY = SortKeys.max_count
+ZOCALO_READING_PLAN_NAME = "zocalo reading"
 
 
 class XrcResult(TypedDict):
@@ -126,12 +126,17 @@ class ZocaloResults(StandardReadable, Triggerable):
             self._kickoff_run = False
 
     async def describe(self) -> dict[str, Descriptor]:
+        zocalo_array_type: Descriptor = {
+            "source": f"zocalo_service:{self.zocalo_environment}",
+            "dtype": "array",
+            "shape": [-1, 3],
+        }
         return OrderedDict(
             [
                 (
                     self._name + "-results",
                     {
-                        "source": f"sim://{self._prefix}",
+                        "source": f"zocalo_service:{self.zocalo_environment}",
                         "dtype": "array",
                         "shape": [
                             -1,
@@ -140,33 +145,17 @@ class ZocaloResults(StandardReadable, Triggerable):
                 ),
                 (
                     self._name + "-centres_of_mass",
-                    {
-                        "source": f"sim://{self._prefix}",
-                        "dtype": "array",
-                        "shape": [-1, 3],
-                    },
+                    zocalo_array_type,
                 ),
                 (
                     self._name + "-bbox_sizes",
-                    {
-                        "source": f"sim://{self._prefix}",
-                        "dtype": "number",
-                        "shape": [-1, 3],
-                    },
+                    zocalo_array_type,
                 ),
             ],
         )
 
-    def _get_zocalo_connection(self):
-        zc = zocalo.configuration.from_file()
-        zc.activate_environment(self.zocalo_environment)
-
-        transport = lookup("PikaTransport")()
-        transport.connect()
-        return transport
-
     def _subscribe_to_results(self):
-        transport = self._get_zocalo_connection()
+        transport = _get_zocalo_connection(self.zocalo_environment)
 
         def _receive_result(
             rw: workflows.recipe.RecipeWrapper, header: dict, message: dict
@@ -189,36 +178,23 @@ class ZocaloResults(StandardReadable, Triggerable):
         LOGGER.info(f"Made zocalo queue subscription: {bool(subscription)}.")
 
 
-ZOCALO_READING_PLAN_NAME = "zocalo reading"
-
-
-def trigger_wait_and_read_zocalo(zocalo: ZocaloResults):
-    """A minimal utility plan which will wait for analysis results to be returned from
-    Zocalo, and bundle them in a reading."""
-
-    yield from bps.create(ZOCALO_READING_PLAN_NAME)
-    LOGGER.info("Running zocalo device .trigger()")
-    yield from bps.trigger(zocalo, wait=True)
-    yield from bps.read(zocalo)
-    yield from bps.save()
-
-
-def get_processing_results(
+def get_processing_result(
     zocalo: ZocaloResults,
 ) -> Generator[Any, Any, Union[Tuple[np.ndarray, np.ndarray], Tuple[None, None]]]:
     """A minimal plan which will extract the top ranked xray centre and crystal bounding
-    box size from the zocalo results."""
+    box size from the zocalo results. Returns (None, None) if no crystals were found."""
+
     LOGGER.info("Getting zocalo processing results.")
     centres_of_mass = yield from bps.rd(zocalo.centres_of_mass, default_value=[])  # type: ignore
-    LOGGER.info(f"Centres of mass: {centres_of_mass}")
+    LOGGER.debug(f"Centres of mass: {centres_of_mass}")
     centre_of_mass = (
         None
         if len(centres_of_mass) == 0  # type: ignore
         else centres_of_mass[0] - np.array([0.5, 0.5, 0.5])  # type: ignore
     )
-    LOGGER.info(f"Adjusted top centring result: {centre_of_mass}")
+    LOGGER.debug(f"Adjusted top centring result: {centre_of_mass}")
     bbox_sizes = yield from bps.rd(zocalo.bbox_sizes, default_value=[])  # type: ignore
-    LOGGER.info(f"Bounding box sizes: {centres_of_mass}")
+    LOGGER.debug(f"Bounding box sizes: {centres_of_mass}")
     bbox_size = None if len(bbox_sizes) == 0 else bbox_sizes[0]  # type: ignore
-    LOGGER.info(f"Top bbox size: {bbox_size}")
+    LOGGER.debug(f"Top bbox size: {bbox_size}")
     return centre_of_mass, bbox_size

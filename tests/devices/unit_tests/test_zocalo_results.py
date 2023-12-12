@@ -10,10 +10,10 @@ from bluesky.utils import FailedStatus
 from ophyd_async.core.async_status import AsyncStatus
 
 from dodal.devices.zocalo import (
+    ZOCALO_READING_PLAN_NAME,
     XrcResult,
     ZocaloResults,
-    get_processing_results,
-    trigger_wait_and_read_zocalo,
+    get_processing_result,
 )
 
 TEST_RESULTS: list[XrcResult] = [
@@ -77,11 +77,11 @@ TEST_READING = {
 }
 
 
+@patch("dodal.devices.zocalo_results._get_zocalo_connection")
 @pytest_asyncio.fixture
 async def mocked_zocalo_device(RE):
     async def device(results, run_setup=False):
         zd = ZocaloResults(zocalo_environment="test_env")
-        zd._get_zocalo_connection = MagicMock()
 
         @AsyncStatus.wrap
         async def mock_trigger(results):
@@ -94,7 +94,7 @@ async def mocked_zocalo_device(RE):
 
             def plan():
                 yield from bps.open_run()
-                yield from trigger_wait_and_read_zocalo(zd)
+                yield from bps.trigger_and_read([zd], name=ZOCALO_READING_PLAN_NAME)
                 yield from bps.close_run()
 
             RE(plan())
@@ -107,7 +107,7 @@ async def mocked_zocalo_device(RE):
 async def test_put_result_read_results(
     mocked_zocalo_device,
     RE,
-):
+) -> None:
     zocalo_device = await mocked_zocalo_device([], run_setup=True)
     await zocalo_device._put_results(TEST_RESULTS)
     reading = await zocalo_device.read()
@@ -129,11 +129,11 @@ async def test_rd_top_results(
 
     def test_plan():
         bbox_size = yield from bps.rd(zocalo_device.bbox_sizes)
-        assert len(bbox_size[0]) == 3
-        assert np.all(bbox_size[0] == np.array([2, 2, 1]))
+        assert len(bbox_size[0]) == 3  # type: ignore
+        assert np.all(bbox_size[0] == np.array([2, 2, 1]))  # type: ignore
         centres_of_mass = yield from bps.rd(zocalo_device.centres_of_mass)
-        assert len(centres_of_mass[0]) == 3
-        assert np.all(centres_of_mass[0] == np.array([1, 2, 3]))
+        assert len(centres_of_mass[0]) == 3  # type: ignore
+        assert np.all(centres_of_mass[0] == np.array([1, 2, 3]))  # type: ignore
 
     RE(test_plan())
 
@@ -149,7 +149,7 @@ async def test_trigger_and_wait_puts_results(
 
     def plan():
         yield from bps.open_run()
-        yield from trigger_wait_and_read_zocalo(zocalo_device)
+        yield from bps.trigger_and_read([zocalo_device], name=ZOCALO_READING_PLAN_NAME)
         yield from bps.close_run()
 
     RE(plan())
@@ -157,15 +157,15 @@ async def test_trigger_and_wait_puts_results(
 
 
 @pytest.mark.asyncio
-async def test_extraction_plan(mocked_zocalo_device, RE):
+async def test_extraction_plan(mocked_zocalo_device, RE) -> None:
     zocalo_device: ZocaloResults = await mocked_zocalo_device(
         TEST_RESULTS, run_setup=False
     )
 
     def plan():
         yield from bps.open_run()
-        yield from trigger_wait_and_read_zocalo(zocalo_device)
-        com, bbox = yield from get_processing_results(zocalo_device)
+        yield from bps.trigger_and_read([zocalo_device], name=ZOCALO_READING_PLAN_NAME)
+        com, bbox = yield from get_processing_result(zocalo_device)
         assert np.all(com == np.array([0.5, 1.5, 2.5]))
         assert np.all(bbox == np.array([2, 2, 1]))
         yield from bps.close_run()
