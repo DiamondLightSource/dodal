@@ -4,6 +4,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/main/"
   },
   {
+    "version": "1.9.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.9.0/"
+  },
+  {
     "version": "1.8.0",
     "url": "https://DiamondLightSource.github.io/dodal/1.8.0/"
   },
@@ -150,10 +154,6 @@
   {
     "version": "hyperion_1007_reset_stub_offsets_if_required",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1007_reset_stub_offsets_if_required/"
-  },
-  {
-    "version": "hyperion_1028_unpin_ophyd_async",
-    "url": "https://DiamondLightSource.github.io/dodal/hyperion_1028_unpin_ophyd_async/"
   },
   {
     "version": "hyperion_698_refactor_parameters",
