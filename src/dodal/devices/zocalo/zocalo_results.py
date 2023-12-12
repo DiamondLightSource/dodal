@@ -51,7 +51,7 @@ class ZocaloResults(StandardReadable, Triggerable):
 
     def __init__(
         self,
-        name: str = "zocalo_results",
+        name: str = "zocalo",
         zocalo_environment: str = "dev_artemis",
         channel: str = "xrc.i03",
         sort_key: str = DEFAULT_SORT_KEY.value,

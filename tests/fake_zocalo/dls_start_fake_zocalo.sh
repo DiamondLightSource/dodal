@@ -18,6 +18,6 @@ module load rabbitmq/dev
 # allows the `dev_artemis` zocalo environment to be used
 module load dials/latest
 
-source .venv/bin/activate
+source ../hyperion/.venv/bin/activate
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 python $SCRIPT_DIR/__main__.py
