@@ -187,7 +187,7 @@ class BusySignalGetter(Device):
     device_busy: EpicsSignal = Component(EpicsSignal, "STATUS")
 
 
-busy_signal = BusySignalGetter(name="busy_signal", prefix="BL02J-EA-IOC-97:G0:")
+busy_signal = BusySignalGetter(name="busy_signal", prefix="BL24I-OP-MFM-01:G0:")
 parsed_read = partial(parsed_read, busy_signal.device_busy)
 protected_set = partial(protected_set, busy_signal.device_busy)
 
@@ -199,7 +199,7 @@ def test_on_off_read_write():
     """
     Tests that ONOFF is correctly setup to be read and set to.
     """
-    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL24I-OP-MFM-01:G0:")
     bimorph.wait_for_connection()
 
     protected_set(bimorph.on_off, OnOff.OFF)
@@ -214,7 +214,7 @@ def test_operation_mode_read_write():
     Tests that the OnOff Enum has correct values corresponding to op modes.
     Tests that all three opmodes can be accessed.
     """
-    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL24I-OP-MFM-01:G0:")
     bimorph.wait_for_connection()
 
     protected_set(bimorph.operation_mode, OperationMode.HI)
@@ -231,7 +231,7 @@ def test_status():
 
     I don't actually know if the way I'm testing this really works...
     """
-    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL24I-OP-MFM-01:G0:")
     bimorph.wait_for_connection()
 
     assert bimorph.status.read()[bimorph.status.name]["value"] == Status.IDLE
@@ -246,7 +246,7 @@ def test_all_shift():
     Tests that ALLSHIFT is correctly setup to be read and set to.
     Tests VOUT is correctly setup to be read from.
     """
-    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL24I-OP-MFM-01:G0:")
     bimorph.wait_for_connection()
 
     test_shift = round(random.random() * 30, 1) + 1
@@ -269,7 +269,7 @@ def test_all_volt():
     Tests that ALLVOLT is correctly set up to be read and set to.
     Tests that VOUT_RBV is correctly set up to beread from.
     """
-    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL24I-OP-MFM-01:G0:")
     bimorph.wait_for_connection()
 
     for i in range(3):
@@ -290,7 +290,7 @@ def test_voltage_target():
     Tests that VTRGT_RBV is correctly set up to be read and set to.
     Tests that VOUT_RBV is set up correctly to be read and set to.
     """
-    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL24I-OP-MFM-01:G0:")
     bimorph.wait_for_connection()
 
     voltage_target_list = get_channels_by_attributes(bimorph, ChannelAttribute.VTRGT)
@@ -329,7 +329,7 @@ def test_shift():
     """
     Test SHIFT if set up correctly to read and set to.
     """
-    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL24I-OP-MFM-01:G0:")
     bimorph.wait_for_connection()
 
     shift_list = get_channels_by_attributes(bimorph, ChannelAttribute.SHIFT)
@@ -357,7 +357,7 @@ def test_voltage_out():
     """
     Tests VOUT is set up correctly to read and set to.
     """
-    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL24I-OP-MFM-01:G0:")
     bimorph.wait_for_connection()
 
     voltage_out_list = get_channels_by_attributes(bimorph, ChannelAttribute.VOUT)
@@ -389,7 +389,7 @@ def test_get_channels_by_attribute():
     """
     Tests the bimorph's get_channels_by_attribute method.
     """
-    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL24I-OP-MFM-01:G0:")
     bimorph.wait_for_connection()
 
     for channel_attribute in list(ChannelAttribute):
@@ -412,7 +412,7 @@ def test_wait_for_signal_value():
 
     I don't really know that these tests proves much...
     """
-    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL24I-OP-MFM-01:G0:")
     bimorph.wait_for_connection()
 
     protected_set(bimorph.channel_1_voltage_out, 10)
@@ -435,7 +435,7 @@ def test_wait_till_idle_and_busy():
 
     I feel like to do this properly I need to do some clever async stuff, so this is fairly light.
     """
-    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL24I-OP-MFM-01:G0:")
     bimorph.wait_for_connection()
 
     test_voltage = round(random.random() * 30, 1) + 1
@@ -450,7 +450,7 @@ def test_protected_read():
     """
     Tests if CAENelsBimorphMirrorInterface.protected_read works
     """
-    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL24I-OP-MFM-01:G0:")
     bimorph.wait_for_connection()
 
     test_voltage = round(random.random() * 30, 1) + 1
@@ -470,7 +470,7 @@ def test_protected_set():
     """
     Tests CAENelsBimorphMirrorInterface.protected_set
     """
-    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL24I-OP-MFM-01:G0:")
     bimorph.wait_for_connection()
 
     test_voltage = round(random.random() * 30, 1) + 1
@@ -486,7 +486,7 @@ def test_parsed_protected_read():
     """
     Tests CAENelsBimorphMirrorInterface.parsed_protected_read
     """
-    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL24I-OP-MFM-01:G0:")
     bimorph.wait_for_connection()
 
     test_voltage = round(random.random() * 30, 1) + 1
@@ -504,7 +504,7 @@ def test_read_from_all_channels_by_attribute():
     """
     Tests CAENelsBimorphMirror8Channel.read_from_all_channels_by_attribute
     """
-    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL24I-OP-MFM-01:G0:")
     bimorph.wait_for_connection()
 
     voltage_out_list = get_channels_by_attributes(bimorph, ChannelAttribute.VOUT)
@@ -532,7 +532,7 @@ def test_write_to_all_channels_by_attribute():
     """
     Tests CAENelsBimorphMirror8Channel.write_to_all_channels_by_attribute
     """
-    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL24I-OP-MFM-01:G0:")
     bimorph.wait_for_connection()
 
     voltage_out_list = get_channels_by_attributes(bimorph, ChannelAttribute.VOUT)
@@ -565,7 +565,7 @@ def test_set_and_proc_target_voltages():
     """
     Tests CAENelsBimorphMirror8Channel.set_and_proc_target_voltages
     """
-    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL24I-OP-MFM-01:G0:")
     bimorph.wait_for_connection()
 
     target_voltages = [round(random.random() * 10, 1) for i in range(8)]
@@ -598,7 +598,7 @@ def test_set():
     """
     Tests CAENelsBimorphMirror8Channel.set
     """
-    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL24I-OP-MFM-01:G0:")
     bimorph.wait_for_connection()
 
     target_voltages = [round(random.random() * 10, 1) for i in range(8)]
@@ -635,7 +635,7 @@ RE = RunEngine({})
 
 
 def test_move_plan():
-    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL02J-EA-IOC-97:G0:")
+    bimorph = CAENelsBimorphMirror8Channel(name="bimorph", prefix="BL24I-OP-MFM-01:G0:")
     bimorph.wait_for_connection()
 
     target_voltages = [round(random.random() * 10, 1) for i in range(8)]
