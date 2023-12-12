@@ -158,15 +158,15 @@ class CAENelsBimorphMirror16Channel(CAENelsBimorphMirror8Channel):
             ]
         )
 
-        self._status_channels_channels.extend(
+        self._status_channels.extend(
             [
-                self.channel_9_status_channels,
-                self.channel_10_status_channels,
-                self.channel_11_status_channels,
-                self.channel_12_status_channels,
-                self.channel_13_status_channels,
-                self.channel_14_status_channels,
-                self.channel_15_status_channels,
-                self.channel_16_status_channels,
+                self.channel_9_status,
+                self.channel_10_status,
+                self.channel_11_status,
+                self.channel_12_status,
+                self.channel_13_status,
+                self.channel_14_status,
+                self.channel_15_status,
+                self.channel_16_status,
             ]
         )
