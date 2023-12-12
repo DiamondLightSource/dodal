@@ -9,7 +9,7 @@ from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
 from ophyd_async.core.async_status import AsyncStatus
 
-from dodal.devices.zocalo import (
+from dodal.devices.zocalo.zocalo_results import (
     ZOCALO_READING_PLAN_NAME,
     XrcResult,
     ZocaloResults,
@@ -111,9 +111,9 @@ async def test_put_result_read_results(
     zocalo_device = await mocked_zocalo_device([], run_setup=True)
     await zocalo_device._put_results(TEST_RESULTS)
     reading = await zocalo_device.read()
-    results: list[XrcResult] = reading["zocalo_results-results"]["value"]
-    centres: list[XrcResult] = reading["zocalo_results-centres_of_mass"]["value"]
-    bboxes: list[XrcResult] = reading["zocalo_results-bbox_sizes"]["value"]
+    results: list[XrcResult] = reading["zocalo-results"]["value"]
+    centres: list[XrcResult] = reading["zocalo-centres_of_mass"]["value"]
+    bboxes: list[XrcResult] = reading["zocalo-bbox_sizes"]["value"]
     assert results == TEST_RESULTS
     assert np.all(centres == np.array([[1, 2, 3], [2, 3, 4], [4, 5, 6]]))
     assert np.all(bboxes[0] == [2, 2, 1])
@@ -176,13 +176,9 @@ async def test_extraction_plan(mocked_zocalo_device, RE) -> None:
 @patch(
     "dodal.devices.zocalo.zocalo_results.workflows.recipe.wrap_subscribe", autospec=True
 )
-@patch("dodal.devices.zocalo.zocalo_results.workflows.transport", autospec=True)
-@patch("dodal.devices.zocalo.zocalo_results.zocalo.configuration", autospec=True)
-@patch("dodal.devices.zocalo.zocalo_results.lookup", autospec=True)
+@patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection", autospec=True)
 def test_subscribe_only_called_once_on_first_trigger(
-    mock_lookup,
-    mock_zocalo,
-    mock_transport,
+    mock_connection: MagicMock,
     mock_wrap_subscribe: MagicMock,
 ):
     RE = RunEngine()
@@ -197,15 +193,9 @@ def test_subscribe_only_called_once_on_first_trigger(
     mock_wrap_subscribe.assert_called_once()
 
 
-@patch("dodal.devices.zocalo.zocalo_results.workflows.recipe", autospec=True)
-@patch("dodal.devices.zocalo.zocalo_results.workflows.transport", autospec=True)
-@patch("dodal.devices.zocalo.zocalo_results.zocalo.configuration", autospec=True)
-@patch("dodal.devices.zocalo.zocalo_results.lookup", autospec=True)
+@patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection", autospec=True)
 def test_when_exception_caused_by_zocalo_message_then_exception_propagated(
-    mock_lookup,
-    mock_zocalo,
-    mock_transport,
-    mock_recipe,
+    mock_connection,
 ):
     RE = RunEngine()
     zocalo_results = ZocaloResults(
