@@ -1,8 +1,8 @@
-import time
 from enum import Enum
+from typing import Any
 
 from ophyd import Component, Device, EpicsMotor, EpicsSignal
-from ophyd.status import Status
+from ophyd.status import Status, StatusBase
 
 from dodal.log import LOGGER
 
@@ -21,46 +21,49 @@ class MirrorStripe(Enum):
 
 
 class MirrorVoltageDevice(Device):
+    """Abstract the bimorph mirror voltage PVs into a single device that can be set asynchronously and returns when
+    the demanded voltage setpoint is accepted, without blocking the caller as this process can take significant time.
+    """
+
     _actual_v: EpicsSignal = Component(EpicsSignal, "R")
     _setpoint_v: EpicsSignal = Component(EpicsSignal, "D")
     _demand_accepted: EpicsSignal = Component(EpicsSignal, "DSEV")
 
-    def set(self, value, *, timeout=None, settle_time=0, **kwargs):
+    def set(self, value, *args, **kwargs) -> StatusBase:
+        """Combine the following operations into a single set:
+        1. apply the value to the setpoint PV
+        2. Return to the caller with a Status future
+        3. Asynchronously poll the demand_accepted PV every VOLTAGE_POLLING_DELAY_S until demand is accepted
+        4. when either demand is accepted or DEFAULT_SETTLE_TIME expires, signal the result on the Status
+        """
+
         setpoint_v = self._setpoint_v
         demand_accepted = self._demand_accepted
+
+        if setpoint_v.get() == value:
+            LOGGER.debug(f"{setpoint_v.name} already at {value} - skipping set")
+            return Status(success=True, done=True)
 
         LOGGER.debug(f"setting {setpoint_v.name} to {value}")
         setpoint_status = setpoint_v.set(value)
         demand_accepted_status = Status(self, DEFAULT_SETTLE_TIME_S)
 
-        def demand_check_callback(expiry_time_s):
-            accepted = demand_accepted.get()
-            if accepted == DEMAND_ACCEPTED_OK:
+        subscription: dict[str, Any] = {}
+
+        def demand_check_callback(value, **kwargs):
+            if value == DEMAND_ACCEPTED_OK:
                 LOGGER.debug(f"Demand accepted for {setpoint_v.name}")
                 demand_accepted_status.set_finished()
-            elif time.time() < expiry_time_s:
-                check_timer = Status(self, VOLTAGE_POLLING_DELAY_S)
-                check_timer.add_callback(lambda _: demand_check_callback(expiry_time_s))
+
+                subs_handle = subscription.pop("value", None)
+                if subs_handle is None:
+                    raise AssertionError("Demand accepted before set attempted")
+                demand_accepted.unsubscribe(subs_handle)
             # else timeout handled by parent demand_accepted_status
 
         def setpoint_callback(status: Status):
             if status.success:
-                try:
-                    accepted = demand_accepted.get()
-                    if accepted == DEMAND_ACCEPTED_OK:
-                        LOGGER.debug(f"Demand accepted for {setpoint_v.name}")
-                        demand_accepted_status.set_finished()
-                    else:
-                        expiry_time_s = time.time() + DEFAULT_SETTLE_TIME_S
-                        check_timer = Status(self, VOLTAGE_POLLING_DELAY_S)
-                        check_timer.add_callback(
-                            lambda _: demand_check_callback(expiry_time_s)
-                        )
-                except Exception as e:
-                    LOGGER.warn(
-                        f"Failed to fetch {setpoint_v.name} Demand Accepted", exc_info=e
-                    )
-                    demand_accepted_status.set_exception(e)
+                subscription["value"] = demand_accepted.subscribe(demand_check_callback)
 
         setpoint_status.add_callback(setpoint_callback)
         status = setpoint_status & demand_accepted_status
@@ -68,6 +71,12 @@ class MirrorVoltageDevice(Device):
 
 
 class VFMMirrorVoltages(Device):
+    def __init__(self, *args, daq_configuration_path: str, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.voltage_lookup_table_path = (
+            daq_configuration_path + "/json/mirrorFocus.json"
+        )
+
     _channel14_voltage_device: MirrorVoltageDevice = Component(
         MirrorVoltageDevice, "BM:V14"
     )
@@ -93,29 +102,26 @@ class VFMMirrorVoltages(Device):
         MirrorVoltageDevice, "BM:V21"
     )
 
-    voltage_lookup_table_path: str = (
-        "/dls_sw/i03/software/daq_configuration/json/mirrorFocus.json"
-    )
-
     @property
     def voltage_channels(self) -> list[MirrorVoltageDevice]:
         return [
-            getattr(self, name)
-            for name in [
-                "_channel14_voltage_device",
-                "_channel15_voltage_device",
-                "_channel16_voltage_device",
-                "_channel17_voltage_device",
-                "_channel18_voltage_device",
-                "_channel19_voltage_device",
-                "_channel20_voltage_device",
-                "_channel21_voltage_device",
-            ]
+            self._channel14_voltage_device,
+            self._channel15_voltage_device,
+            self._channel16_voltage_device,
+            self._channel17_voltage_device,
+            self._channel18_voltage_device,
+            self._channel19_voltage_device,
+            self._channel20_voltage_device,
+            self._channel21_voltage_device,
         ]
 
 
 class FocusingMirror(Device):
     """Focusing Mirror"""
+
+    def __init__(self, bragg_to_lat_lut_path, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.bragg_to_lat_lookup_table_path = bragg_to_lat_lut_path
 
     yaw_mrad: EpicsMotor = Component(EpicsMotor, "YAW")
     pitch_mrad: EpicsMotor = Component(EpicsMotor, "PITCH")
@@ -132,10 +138,6 @@ class FocusingMirror(Device):
     stripe: EpicsSignal = Component(EpicsSignal, "STRP:DVAL", string=True)
     # apply the current set stripe setting
     apply_stripe: EpicsSignal = Component(EpicsSignal, "CHANGE.PROC")
-
-    bragg_to_lat_lookup_table_path: str = (
-        "CONFIGURE_ME"  # configured in per-mirror beamline-specific setup
-    )
 
     def energy_to_stripe(self, energy_kev):
         # In future, this should be configurable per-mirror

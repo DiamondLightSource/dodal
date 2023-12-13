@@ -30,6 +30,7 @@ ZOOM_PARAMS_FILE = (
     "/dls_sw/i03/software/gda/configurations/i03-config/xml/jCameraManZoomLevels.xml"
 )
 DISPLAY_CONFIG = "/dls_sw/i03/software/gda_versions/var/display.configuration"
+DAQ_CONFIGURATION_PATH = "/dls_sw/i03/software/daq_configuration"
 
 BL = get_beamline_name("s03")
 set_log_beamline(BL)
@@ -42,11 +43,12 @@ def dcm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return device_instantiation(
-        device_factory=DCM,
-        name="dcm",
-        prefix="",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
+        DCM,
+        "dcm",
+        "",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        daq_configuration_path=DAQ_CONFIGURATION_PATH,
     )
 
 
@@ -71,8 +73,9 @@ def vfm(
         prefix="-OP-VFM-01:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
+        bragg_to_lat_lut_path=DAQ_CONFIGURATION_PATH
+        + "/lookup/BeamLineEnergy_DCM_VFM_x_converter.txt",
     )
-    mirror.bragg_to_lat_lookup_table_path = "/dls_sw/i03/software/daq_configuration/lookup/BeamLineEnergy_DCM_VFM_x_converter.txt"
     return mirror
 
 
@@ -86,6 +89,7 @@ def vfm_mirror_voltages(
         prefix="-MO-PSU-01:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
+        daq_configuration_path=DAQ_CONFIGURATION_PATH,
     )
 
 

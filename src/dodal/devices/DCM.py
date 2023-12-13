@@ -3,6 +3,15 @@ from ophyd import Device, EpicsMotor, EpicsSignalRO, Kind
 
 
 class DCM(Device):
+    def __init__(self, *args, daq_configuration_path: str, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.dcm_pitch_converter_lookup_table_path = (
+            daq_configuration_path + "/lookup/BeamLineEnergy_DCM_Pitch_converter.txt"
+        )
+        self.dcm_roll_converter_lookup_table_path = (
+            daq_configuration_path + "/lookup/BeamLineEnergy_DCM_Roll_converter.txt"
+        )
+
     """
     A double crystal monochromator (DCM), used to select the energy of the beam.
 
@@ -28,9 +37,6 @@ class DCM(Device):
     backplate_temp: EpicsSignalRO = Cpt(EpicsSignalRO, "-MO-DCM-01:TEMP5")
     perp_temp: EpicsSignalRO = Cpt(EpicsSignalRO, "-MO-DCM-01:TEMP6")
     perp_sub_assembly_temp: EpicsSignalRO = Cpt(EpicsSignalRO, "-MO-DCM-01:TEMP7")
-
-    dcm_pitch_converter_lookup_table_path: str = "/dls_sw/i03/software/daq_configuration/lookup/BeamLineEnergy_DCM_Pitch_converter.txt"
-    dcm_roll_converter_lookup_table_path: str = "/dls_sw/i03/software/daq_configuration/lookup/BeamLineEnergy_DCM_Roll_converter.txt"
 
 
 def fixed_offset_from_beamline_params(gda_beamline_parameters):
