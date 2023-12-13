@@ -21,6 +21,9 @@ def oav() -> OAV:
     oav.proc.port_name.sim_put("proc")
     oav.cam.port_name.sim_put("CAM")
 
+    oav.snapshot.x_size.sim_put("1024")
+    oav.snapshot.y_size.sim_put("768")
+
     oav.zoom_controller.zrst.set("1.0x")
     oav.zoom_controller.onst.set("2.0x")
     oav.zoom_controller.twst.set("3.0x")
@@ -64,7 +67,7 @@ def test_when_zoom_level_changed_then_status_waits_for_all_plugins_to_be_updated
 
 def test_load_microns_per_pixel_entry_not_found(oav: OAV):
     with pytest.raises(OAVError_ZoomLevelNotFound):
-        oav.parameters.load_microns_per_pixel(0.000001)
+        oav.parameters.load_microns_per_pixel(0.000001, 0, 0)
 
 
 @pytest.mark.parametrize(
@@ -81,18 +84,22 @@ def test_get_micronsperpixel_from_oav(
 ):
     oav.zoom_controller.level.sim_put(zoom_level)
 
-    assert oav.parameters.micronsPerXPixel == expected_microns_x
-    assert oav.parameters.micronsPerYPixel == expected_microns_y
+    assert oav.parameters.micronsPerXPixel == pytest.approx(
+        expected_microns_x, abs=1e-2
+    )
+    assert oav.parameters.micronsPerYPixel == pytest.approx(
+        expected_microns_y, abs=1e-2
+    )
 
 
 def test_beam_position_not_found_for_wrong_entry(oav: OAV):
     with pytest.raises(OAVError_BeamPositionNotFound):
-        oav.parameters.get_beam_position_from_zoom(2.0)
+        oav.parameters.get_beam_position_from_zoom(2.0, 0, 0)
 
 
 def test_get_beam_position(oav: OAV):
     expected_beam_position = (493, 355)
-    beam_position = oav.parameters.get_beam_position_from_zoom(2.5)
+    beam_position = oav.parameters.get_beam_position_from_zoom(2.5, 1024, 768)
 
     assert beam_position[0] == expected_beam_position[0]
     assert beam_position[1] == expected_beam_position[1]
@@ -112,6 +119,28 @@ def test_extract_beam_position_given_different_zoom_levels(
 
     assert oav.parameters.beam_centre_i == expected_xCentre
     assert oav.parameters.beam_centre_j == expected_yCentre
+
+
+def test_extract_rescaled_micronsperpixel(oav: OAV):
+    oav.snapshot.x_size.sim_put("1292")
+    oav.snapshot.y_size.sim_put("964")
+    oav.wait_for_connection()
+
+    oav.zoom_controller.level.sim_put("1.0")
+
+    assert oav.parameters.micronsPerXPixel == pytest.approx(2.27, abs=1e-2)
+    assert oav.parameters.micronsPerYPixel == pytest.approx(2.28, abs=1e-2)
+
+
+def test_extract_rescaled_beam_position(oav: OAV):
+    oav.snapshot.x_size.sim_put("1292")
+    oav.snapshot.y_size.sim_put("964")
+    oav.wait_for_connection()
+
+    oav.zoom_controller.level.sim_put("1.0")
+
+    assert oav.parameters.beam_centre_i == 601
+    assert oav.parameters.beam_centre_j == 450
 
 
 @pytest.mark.parametrize(
