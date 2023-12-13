@@ -47,7 +47,11 @@ def bbox_size(result: XrcResult):
 
 
 class ZocaloResults(StandardReadable, Triggerable):
-    """An ophyd device which can wait for results from a Zocalo job"""
+    """An ophyd device which can wait for results from a Zocalo job. These jobs should
+    be triggered from a plan-subscribed callback using the run_start() and run_end()
+    methods on dodal.devices.zocalo.ZocaloTrigger.
+
+    See https://github.com/DiamondLightSource/dodal/wiki/How-to-Interact-with-Zocalo"""
 
     def __init__(
         self,
@@ -112,6 +116,9 @@ class ZocaloResults(StandardReadable, Triggerable):
                     )
                 )
 
+            # Testing on the beamline we saw an issue where results were received just
+            # after timeout - this retry is for monitoring that and avoiding crashes
+            # See https://github.com/DiamondLightSource/dodal/issues/265
             task = asyncio.create_task(_get_results())
             try:
                 await asyncio.wait_for(asyncio.shield(task), self.timeout_s / 2)

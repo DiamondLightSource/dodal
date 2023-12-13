@@ -17,10 +17,13 @@ def _get_zocalo_connection(environment):
 
 
 class ZocaloTrigger:
+    """This class just sends 'run_start' and 'run_end' messages to zocalo, it is
+    intended to be used in bluesky callback classes. To get results from zocalo back
+    into a plan, use the ZocaloResults ophyd device.
+
+    see https://github.com/DiamondLightSource/dodal/wiki/How-to-Interact-with-Zocalo"""
     def __init__(self, environment: str = "artemis"):
-        """This class just sends 'run_start' and 'run_end' messages to zocalo, it is
-        intended to be used in bluesky callback classes. To get results from zocalo back
-        into a plan, use the ZocaloResults ophyd device."""
+
         self.zocalo_environment: str = environment
 
     def _send_to_zocalo(self, parameters: dict):
