@@ -60,6 +60,7 @@ class Attenuator(Device):
     filter_2 = Component(AtteunatorFilter, "FILTER2")
     filter_3 = Component(AtteunatorFilter, "FILTER3")
     filter_4 = Component(AtteunatorFilter, "FILTER4")
+    filter_5 = Component(AtteunatorFilter, "FILTER5")
     filter_6 = Component(AtteunatorFilter, "FILTER6")
     filter_7 = Component(AtteunatorFilter, "FILTER7")
     filter_8 = Component(AtteunatorFilter, "FILTER8")
