@@ -71,9 +71,9 @@ class ArmingDevice(Device):
 
     TIMEOUT = 3
 
-    arm_set: EpicsSignal = Component(EpicsSignal, "PC_ARM")
-    disarm_set: EpicsSignal = Component(EpicsSignal, "PC_DISARM")
-    armed: EpicsSignal = Component(EpicsSignal, "PC_ARM_OUT")
+    arm_set = Component(EpicsSignal, "PC_ARM")
+    disarm_set = Component(EpicsSignal, "PC_DISARM")
+    armed = Component(EpicsSignal, "PC_ARM_OUT")
 
     def set(self, demand: ArmDemand) -> StatusBase:
         status = await_value(self.armed, demand.value, timeout=self.TIMEOUT)
@@ -83,36 +83,36 @@ class ArmingDevice(Device):
 
 
 class PositionCompare(Device):
-    num_gates: EpicsSignal = epics_signal_put_wait("PC_GATE_NGATE")
-    gate_trigger: EpicsSignal = epics_signal_put_wait("PC_ENC")
-    gate_source: EpicsSignal = epics_signal_put_wait("PC_GATE_SEL")
-    gate_input: EpicsSignal = epics_signal_put_wait("PC_GATE_INP")
-    gate_width: EpicsSignal = epics_signal_put_wait("PC_GATE_WID")
-    gate_start: EpicsSignal = epics_signal_put_wait("PC_GATE_START")
+    num_gates = epics_signal_put_wait("PC_GATE_NGATE")
+    gate_trigger = epics_signal_put_wait("PC_ENC")
+    gate_source = epics_signal_put_wait("PC_GATE_SEL")
+    gate_input = epics_signal_put_wait("PC_GATE_INP")
+    gate_width = epics_signal_put_wait("PC_GATE_WID")
+    gate_start = epics_signal_put_wait("PC_GATE_START")
 
-    pulse_source: EpicsSignal = epics_signal_put_wait("PC_PULSE_SEL")
-    pulse_input: EpicsSignal = epics_signal_put_wait("PC_PULSE_INP")
-    pulse_start: EpicsSignal = epics_signal_put_wait("PC_PULSE_START")
-    pulse_width: EpicsSignal = epics_signal_put_wait("PC_PULSE_WID")
-    pulse_step: EpicsSignal = epics_signal_put_wait("PC_PULSE_STEP")
+    pulse_source = epics_signal_put_wait("PC_PULSE_SEL")
+    pulse_input = epics_signal_put_wait("PC_PULSE_INP")
+    pulse_start = epics_signal_put_wait("PC_PULSE_START")
+    pulse_width = epics_signal_put_wait("PC_PULSE_WID")
+    pulse_step = epics_signal_put_wait("PC_PULSE_STEP")
 
-    dir: EpicsSignal = Component(EpicsSignal, "PC_DIR")
-    arm_source: EpicsSignal = epics_signal_put_wait("PC_ARM_SEL")
-    reset: EpicsSignal = Component(EpicsSignal, "SYS_RESET.PROC")
+    dir = Component(EpicsSignal, "PC_DIR")
+    arm_source = epics_signal_put_wait("PC_ARM_SEL")
+    reset = Component(EpicsSignal, "SYS_RESET.PROC")
 
-    arm: ArmingDevice = Component(ArmingDevice, "")
+    arm = Component(ArmingDevice, "")
 
     def is_armed(self) -> bool:
         return self.arm.armed.get() == 1
 
 
 class ZebraOutputPanel(Device):
-    pulse_1_input: EpicsSignal = epics_signal_put_wait("PULSE1_INP")
+    pulse_1_input = epics_signal_put_wait("PULSE1_INP")
 
-    out_1: EpicsSignal = epics_signal_put_wait("OUT1_TTL")
-    out_2: EpicsSignal = epics_signal_put_wait("OUT2_TTL")
-    out_3: EpicsSignal = epics_signal_put_wait("OUT3_TTL")
-    out_4: EpicsSignal = epics_signal_put_wait("OUT4_TTL")
+    out_1 = epics_signal_put_wait("OUT1_TTL")
+    out_2 = epics_signal_put_wait("OUT2_TTL")
+    out_3 = epics_signal_put_wait("OUT3_TTL")
+    out_4 = epics_signal_put_wait("OUT4_TTL")
 
     @property
     def out_pvs(self) -> List[EpicsSignal]:
@@ -136,12 +136,12 @@ def boolean_array_to_integer(values: List[bool]) -> int:
 
 
 class GateControl(Device):
-    enable: EpicsSignal = epics_signal_put_wait("_ENA", 30.0)
-    source_1: EpicsSignal = epics_signal_put_wait("_INP1", 30.0)
-    source_2: EpicsSignal = epics_signal_put_wait("_INP2", 30.0)
-    source_3: EpicsSignal = epics_signal_put_wait("_INP3", 30.0)
-    source_4: EpicsSignal = epics_signal_put_wait("_INP4", 30.0)
-    invert: EpicsSignal = epics_signal_put_wait("_INV", 30.0)
+    enable = epics_signal_put_wait("_ENA", 30.0)
+    source_1 = epics_signal_put_wait("_INP1", 30.0)
+    source_2 = epics_signal_put_wait("_INP2", 30.0)
+    source_3 = epics_signal_put_wait("_INP3", 30.0)
+    source_4 = epics_signal_put_wait("_INP4", 30.0)
+    invert = epics_signal_put_wait("_INV", 30.0)
 
     @property
     def sources(self):
@@ -248,14 +248,14 @@ class LogicGateConfiguration:
 
 
 class SoftInputs(Device):
-    soft_in_1: EpicsSignal = Component(EpicsSignal, "SOFT_IN:B0")
-    soft_in_2: EpicsSignal = Component(EpicsSignal, "SOFT_IN:B1")
-    soft_in_3: EpicsSignal = Component(EpicsSignal, "SOFT_IN:B2")
-    soft_in_4: EpicsSignal = Component(EpicsSignal, "SOFT_IN:B3")
+    soft_in_1 = Component(EpicsSignal, "SOFT_IN:B0")
+    soft_in_2 = Component(EpicsSignal, "SOFT_IN:B1")
+    soft_in_3 = Component(EpicsSignal, "SOFT_IN:B2")
+    soft_in_4 = Component(EpicsSignal, "SOFT_IN:B3")
 
 
 class Zebra(Device):
-    pc: PositionCompare = Component(PositionCompare, "")
-    output: ZebraOutputPanel = Component(ZebraOutputPanel, "")
-    inputs: SoftInputs = Component(SoftInputs, "")
-    logic_gates: LogicGateConfigurer = Component(LogicGateConfigurer, "")
+    pc = Component(PositionCompare, "")
+    output = Component(ZebraOutputPanel, "")
+    inputs = Component(SoftInputs, "")
+    logic_gates = Component(LogicGateConfigurer, "")

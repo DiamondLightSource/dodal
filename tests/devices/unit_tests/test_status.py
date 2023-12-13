@@ -6,7 +6,7 @@ from dodal.devices.status import await_value_in_list
 
 
 class FakeDevice(Device):
-    pv: EpicsSignalRO = Component(EpicsSignalRO, "test")
+    pv = Component(EpicsSignalRO, "test")
 
 
 @pytest.fixture

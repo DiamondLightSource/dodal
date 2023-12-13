@@ -6,8 +6,8 @@ class SimStage(MotorBundle):
     ADSIM EPICS motors
     """
 
-    x: EpicsMotor = Component(EpicsMotor, "M1")
-    y: EpicsMotor = Component(EpicsMotor, "M2")
-    z: EpicsMotor = Component(EpicsMotor, "M3")
-    theta: EpicsMotor = Component(EpicsMotor, "M4")
-    load: EpicsMotor = Component(EpicsMotor, "M5")
+    x = Component(EpicsMotor, "M1")
+    y = Component(EpicsMotor, "M2")
+    z = Component(EpicsMotor, "M3")
+    theta = Component(EpicsMotor, "M4")
+    load = Component(EpicsMotor, "M5")

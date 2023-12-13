@@ -9,7 +9,7 @@ from dodal.log import LOGGER
 
 
 class AtteunatorFilter(Device):
-    actual_filter_state: EpicsSignalRO = Component(EpicsSignalRO, ":INLIM")
+    actual_filter_state = Component(EpicsSignalRO, ":INLIM")
 
 
 class Attenuator(Device):
@@ -39,50 +39,47 @@ class Attenuator(Device):
             )
         return status
 
-    calulated_filter_state_1: EpicsSignalRO = Component(EpicsSignalRO, "DEC_TO_BIN.B0")
-    calulated_filter_state_2: EpicsSignalRO = Component(EpicsSignalRO, "DEC_TO_BIN.B1")
-    calulated_filter_state_3: EpicsSignalRO = Component(EpicsSignalRO, "DEC_TO_BIN.B2")
-    calulated_filter_state_4: EpicsSignalRO = Component(EpicsSignalRO, "DEC_TO_BIN.B3")
-    calulated_filter_state_5: EpicsSignalRO = Component(EpicsSignalRO, "DEC_TO_BIN.B4")
-    calulated_filter_state_6: EpicsSignalRO = Component(EpicsSignalRO, "DEC_TO_BIN.B5")
-    calulated_filter_state_7: EpicsSignalRO = Component(EpicsSignalRO, "DEC_TO_BIN.B6")
-    calulated_filter_state_8: EpicsSignalRO = Component(EpicsSignalRO, "DEC_TO_BIN.B7")
-    calulated_filter_state_9: EpicsSignalRO = Component(EpicsSignalRO, "DEC_TO_BIN.B8")
-    calulated_filter_state_10: EpicsSignalRO = Component(EpicsSignalRO, "DEC_TO_BIN.B9")
-    calulated_filter_state_11: EpicsSignalRO = Component(EpicsSignalRO, "DEC_TO_BIN.BA")
-    calulated_filter_state_12: EpicsSignalRO = Component(EpicsSignalRO, "DEC_TO_BIN.BB")
-    calulated_filter_state_13: EpicsSignalRO = Component(EpicsSignalRO, "DEC_TO_BIN.BC")
-    calulated_filter_state_14: EpicsSignalRO = Component(EpicsSignalRO, "DEC_TO_BIN.BD")
-    calulated_filter_state_15: EpicsSignalRO = Component(EpicsSignalRO, "DEC_TO_BIN.BE")
-    calulated_filter_state_16: EpicsSignalRO = Component(EpicsSignalRO, "DEC_TO_BIN.BF")
+    calulated_filter_state_1 = Component(EpicsSignalRO, "DEC_TO_BIN.B0")
+    calulated_filter_state_2 = Component(EpicsSignalRO, "DEC_TO_BIN.B1")
+    calulated_filter_state_3 = Component(EpicsSignalRO, "DEC_TO_BIN.B2")
+    calulated_filter_state_4 = Component(EpicsSignalRO, "DEC_TO_BIN.B3")
+    calulated_filter_state_5 = Component(EpicsSignalRO, "DEC_TO_BIN.B4")
+    calulated_filter_state_6 = Component(EpicsSignalRO, "DEC_TO_BIN.B5")
+    calulated_filter_state_7 = Component(EpicsSignalRO, "DEC_TO_BIN.B6")
+    calulated_filter_state_8 = Component(EpicsSignalRO, "DEC_TO_BIN.B7")
+    calulated_filter_state_9 = Component(EpicsSignalRO, "DEC_TO_BIN.B8")
+    calulated_filter_state_10 = Component(EpicsSignalRO, "DEC_TO_BIN.B9")
+    calulated_filter_state_11 = Component(EpicsSignalRO, "DEC_TO_BIN.BA")
+    calulated_filter_state_12 = Component(EpicsSignalRO, "DEC_TO_BIN.BB")
+    calulated_filter_state_13 = Component(EpicsSignalRO, "DEC_TO_BIN.BC")
+    calulated_filter_state_14 = Component(EpicsSignalRO, "DEC_TO_BIN.BD")
+    calulated_filter_state_15 = Component(EpicsSignalRO, "DEC_TO_BIN.BE")
+    calulated_filter_state_16 = Component(EpicsSignalRO, "DEC_TO_BIN.BF")
 
-    filter_1: AtteunatorFilter = Component(AtteunatorFilter, "FILTER1")
-    filter_2: AtteunatorFilter = Component(AtteunatorFilter, "FILTER2")
-    filter_3: AtteunatorFilter = Component(AtteunatorFilter, "FILTER3")
-    filter_4: AtteunatorFilter = Component(AtteunatorFilter, "FILTER4")
-    filter_5: AtteunatorFilter = Component(AtteunatorFilter, "FILTER5")
-    filter_6: AtteunatorFilter = Component(AtteunatorFilter, "FILTER6")
-    filter_7: AtteunatorFilter = Component(AtteunatorFilter, "FILTER7")
-    filter_8: AtteunatorFilter = Component(AtteunatorFilter, "FILTER8")
-    filter_9: AtteunatorFilter = Component(AtteunatorFilter, "FILTER9")
-    filter_10: AtteunatorFilter = Component(AtteunatorFilter, "FILTER10")
-    filter_11: AtteunatorFilter = Component(AtteunatorFilter, "FILTER11")
-    filter_12: AtteunatorFilter = Component(AtteunatorFilter, "FILTER12")
-    filter_13: AtteunatorFilter = Component(AtteunatorFilter, "FILTER13")
-    filter_14: AtteunatorFilter = Component(AtteunatorFilter, "FILTER14")
-    filter_15: AtteunatorFilter = Component(AtteunatorFilter, "FILTER15")
-    filter_16: AtteunatorFilter = Component(AtteunatorFilter, "FILTER16")
+    filter_1 = Component(AtteunatorFilter, "FILTER1")
+    filter_2 = Component(AtteunatorFilter, "FILTER2")
+    filter_3 = Component(AtteunatorFilter, "FILTER3")
+    filter_4 = Component(AtteunatorFilter, "FILTER4")
+    filter_6 = Component(AtteunatorFilter, "FILTER6")
+    filter_7 = Component(AtteunatorFilter, "FILTER7")
+    filter_8 = Component(AtteunatorFilter, "FILTER8")
+    filter_9 = Component(AtteunatorFilter, "FILTER9")
+    filter_10 = Component(AtteunatorFilter, "FILTER10")
+    filter_11 = Component(AtteunatorFilter, "FILTER11")
+    filter_12 = Component(AtteunatorFilter, "FILTER12")
+    filter_13 = Component(AtteunatorFilter, "FILTER13")
+    filter_14 = Component(AtteunatorFilter, "FILTER14")
+    filter_15 = Component(AtteunatorFilter, "FILTER15")
+    filter_16 = Component(AtteunatorFilter, "FILTER16")
 
-    desired_transmission: EpicsSignal = Component(EpicsSignal, "T2A:SETVAL1")
-    use_current_energy: EpicsSignal = Component(
-        EpicsSignal, "E2WL:USECURRENTENERGY.PROC"
-    )
-    change: EpicsSignal = Component(EpicsSignal, "FANOUT")
-    actual_transmission: EpicsSignal = Component(EpicsSignal, "MATCH", kind=Kind.hinted)
+    desired_transmission = Component(EpicsSignal, "T2A:SETVAL1")
+    use_current_energy = Component(EpicsSignal, "E2WL:USECURRENTENERGY.PROC")
+    change = Component(EpicsSignal, "FANOUT")
+    actual_transmission = Component(EpicsSignal, "MATCH", kind=Kind.hinted)
 
     detector_params: Optional[DetectorParams] = None
 
-    def get_calculated_filter_state_list(self) -> list[EpicsSignal]:
+    def get_calculated_filter_state_list(self) -> list[EpicsSignalRO]:
         return [
             self.calulated_filter_state_1,
             self.calulated_filter_state_2,
@@ -102,7 +99,7 @@ class Attenuator(Device):
             self.calulated_filter_state_16,
         ]
 
-    def get_actual_filter_state_list(self) -> list[EpicsSignal]:
+    def get_actual_filter_state_list(self) -> list[EpicsSignalRO]:
         return [
             self.filter_1.actual_filter_state,
             self.filter_2.actual_filter_state,

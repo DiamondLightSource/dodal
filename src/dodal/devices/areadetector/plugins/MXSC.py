@@ -45,12 +45,12 @@ class PinTipDetect(Device):
     """
 
     INVALID_POSITION = (-1, -1)
-    tip_x: EpicsSignalRO = Component(EpicsSignalRO, "TipX")
-    tip_y: EpicsSignalRO = Component(EpicsSignalRO, "TipY")
+    tip_x = Component(EpicsSignalRO, "TipX")
+    tip_y = Component(EpicsSignalRO, "TipY")
 
-    triggered_tip: Signal = Component(Signal, kind=Kind.hinted, value=INVALID_POSITION)
-    validity_timeout: Signal = Component(Signal, value=5)
-    settle_time_s: Signal = Component(Signal, value=0.5)
+    triggered_tip = Component(Signal, kind=Kind.hinted, value=INVALID_POSITION)
+    validity_timeout = Component(Signal, value=5)
+    settle_time_s = Component(Signal, value=0.5)
 
     def log_tips_and_statistics(self, _):
         median, standard_deviation = statistics_of_positions(self.tip_positions)
@@ -105,30 +105,26 @@ class MXSC(Device):
     Device for edge detection plugin.
     """
 
-    input_plugin: EpicsSignal = Component(EpicsSignal, "NDArrayPort")
-    enable_callbacks: EpicsSignal = Component(EpicsSignal, "EnableCallbacks")
-    min_callback_time: EpicsSignal = Component(EpicsSignal, "MinCallbackTime")
-    blocking_callbacks: EpicsSignal = Component(EpicsSignal, "BlockingCallbacks")
-    read_file: EpicsSignal = Component(EpicsSignal, "ReadFile")
-    filename: EpicsSignal = Component(EpicsSignal, "Filename", string=True)
-    preprocess_operation: EpicsSignal = Component(EpicsSignal, "Preprocess")
-    preprocess_ksize: EpicsSignal = Component(EpicsSignal, "PpParam1")
-    canny_upper_threshold: EpicsSignal = Component(EpicsSignal, "CannyUpper")
-    canny_lower_threshold: EpicsSignal = Component(EpicsSignal, "CannyLower")
-    close_ksize: EpicsSignal = Component(EpicsSignal, "CloseKsize")
-    sample_detection_scan_direction: EpicsSignal = Component(
-        EpicsSignal, "ScanDirection"
-    )
-    sample_detection_min_tip_height: EpicsSignal = Component(
-        EpicsSignal, "MinTipHeight"
-    )
+    input_plugin = Component(EpicsSignal, "NDArrayPort")
+    enable_callbacks = Component(EpicsSignal, "EnableCallbacks")
+    min_callback_time = Component(EpicsSignal, "MinCallbackTime")
+    blocking_callbacks = Component(EpicsSignal, "BlockingCallbacks")
+    read_file = Component(EpicsSignal, "ReadFile")
+    filename = Component(EpicsSignal, "Filename", string=True)
+    preprocess_operation = Component(EpicsSignal, "Preprocess")
+    preprocess_ksize = Component(EpicsSignal, "PpParam1")
+    canny_upper_threshold = Component(EpicsSignal, "CannyUpper")
+    canny_lower_threshold = Component(EpicsSignal, "CannyLower")
+    close_ksize = Component(EpicsSignal, "CloseKsize")
+    sample_detection_scan_direction = Component(EpicsSignal, "ScanDirection")
+    sample_detection_min_tip_height = Component(EpicsSignal, "MinTipHeight")
 
-    top: EpicsSignal = Component(EpicsSignal, "Top")
-    bottom: EpicsSignal = Component(EpicsSignal, "Bottom")
-    output_array: EpicsSignal = Component(EpicsSignal, "OutputArray")
-    draw_tip: EpicsSignal = Component(EpicsSignal, "DrawTip")
-    draw_edges: EpicsSignal = Component(EpicsSignal, "DrawEdges")
-    waveform_size_x: EpicsSignal = Component(EpicsSignal, "ArraySize1_RBV")
-    waveform_size_y: EpicsSignal = Component(EpicsSignal, "ArraySize2_RBV")
+    top = Component(EpicsSignal, "Top")
+    bottom = Component(EpicsSignal, "Bottom")
+    output_array = Component(EpicsSignal, "OutputArray")
+    draw_tip = Component(EpicsSignal, "DrawTip")
+    draw_edges = Component(EpicsSignal, "DrawEdges")
+    waveform_size_x = Component(EpicsSignal, "ArraySize1_RBV")
+    waveform_size_y = Component(EpicsSignal, "ArraySize2_RBV")
 
-    pin_tip: PinTipDetect = Component(PinTipDetect, "")
+    pin_tip = Component(PinTipDetect, "")

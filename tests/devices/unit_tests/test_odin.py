@@ -59,7 +59,7 @@ def test_check_odin_initialised(
     expected_error_num: int,
     expected_state: bool,
 ):
-    when(fake_odin.fan.connected).get().thenReturn(fan_connected)
+    when(fake_odin.fan.consumers_connected).get().thenReturn(fan_connected)
     when(fake_odin.fan.on).get().thenReturn(fan_on)
     when(fake_odin.meta.initialised).get().thenReturn(meta_init)
     when(fake_odin.nodes).get_error_state().thenReturn(

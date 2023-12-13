@@ -42,20 +42,20 @@ class ZoomController(Device):
     you should wait on any zoom changs to finish before changing the OAV wiring.
     """
 
-    percentage: EpicsSignal = Component(EpicsSignal, "ZOOMPOSCMD")
+    percentage = Component(EpicsSignal, "ZOOMPOSCMD")
 
     # Level is the string description of the zoom level e.g. "1.0x"
-    level: EpicsSignal = Component(EpicsSignal, "MP:SELECT", string=True)
+    level = Component(EpicsSignal, "MP:SELECT", string=True)
     # Used by OAV to work out if we're changing the setpoint
-    _level_sp: Signal = Component(Signal)
+    _level_sp = Component(Signal)
 
-    zrst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.ZRST")
-    onst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.ONST")
-    twst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.TWST")
-    thst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.THST")
-    frst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.FRST")
-    fvst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.FVST")
-    sxst: EpicsSignal = Component(EpicsSignal, "MP:SELECT.SXST")
+    zrst = Component(EpicsSignal, "MP:SELECT.ZRST")
+    onst = Component(EpicsSignal, "MP:SELECT.ONST")
+    twst = Component(EpicsSignal, "MP:SELECT.TWST")
+    thst = Component(EpicsSignal, "MP:SELECT.THST")
+    frst = Component(EpicsSignal, "MP:SELECT.FRST")
+    fvst = Component(EpicsSignal, "MP:SELECT.FVST")
+    sxst = Component(EpicsSignal, "MP:SELECT.SXST")
 
     def set_flatfield_on_zoom_level_one(self, value):
         flat_applied = self.parent.proc.port_name.get()
@@ -191,15 +191,15 @@ class OAVConfigParams:
 
 
 class OAV(AreaDetector):
-    cam: CamBase = ADC(CamBase, "-DI-OAV-01:CAM:")
-    roi: ROIPlugin = ADC(ROIPlugin, "-DI-OAV-01:ROI:")
-    proc: ProcessPlugin = ADC(ProcessPlugin, "-DI-OAV-01:PROC:")
-    over: OverlayPlugin = ADC(OverlayPlugin, "-DI-OAV-01:OVER:")
-    tiff: OverlayPlugin = ADC(OverlayPlugin, "-DI-OAV-01:TIFF:")
-    hdf5: HDF5Plugin = ADC(HDF5Plugin, "-DI-OAV-01:HDF5:")
-    snapshot: SnapshotWithGrid = Component(SnapshotWithGrid, "-DI-OAV-01:MJPG:")
-    mxsc: MXSC = ADC(MXSC, "-DI-OAV-01:MXSC:")
-    zoom_controller: ZoomController = Component(ZoomController, "-EA-OAV-01:FZOOM:")
+    cam = ADC(CamBase, "-DI-OAV-01:CAM:")
+    roi = ADC(ROIPlugin, "-DI-OAV-01:ROI:")
+    proc = ADC(ProcessPlugin, "-DI-OAV-01:PROC:")
+    over = ADC(OverlayPlugin, "-DI-OAV-01:OVER:")
+    tiff = ADC(OverlayPlugin, "-DI-OAV-01:TIFF:")
+    hdf5 = ADC(HDF5Plugin, "-DI-OAV-01:HDF5:")
+    snapshot = Component(SnapshotWithGrid, "-DI-OAV-01:MJPG:")
+    mxsc = ADC(MXSC, "-DI-OAV-01:MXSC:")
+    zoom_controller = Component(ZoomController, "-EA-OAV-01:FZOOM:")
 
     def __init__(self, *args, params: OAVConfigParams, **kwargs):
         super().__init__(*args, **kwargs)
