@@ -22,8 +22,8 @@ class ZocaloTrigger:
     into a plan, use the ZocaloResults ophyd device.
 
     see https://github.com/DiamondLightSource/dodal/wiki/How-to-Interact-with-Zocalo"""
-    def __init__(self, environment: str = "artemis"):
 
+    def __init__(self, environment: str = "artemis"):
         self.zocalo_environment: str = environment
 
     def _send_to_zocalo(self, parameters: dict):
