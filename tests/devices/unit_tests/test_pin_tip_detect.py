@@ -1,8 +1,8 @@
-from typing import List, Tuple
+from typing import Generator, List, Tuple
 
 import bluesky.plan_stubs as bps
 import pytest
-from bluesky import RunEngine
+from bluesky.run_engine import RunEngine
 from ophyd.sim import make_fake_device
 
 from dodal.devices.areadetector.plugins.MXSC import (
@@ -12,7 +12,7 @@ from dodal.devices.areadetector.plugins.MXSC import (
 
 
 @pytest.fixture
-def fake_pin_tip_detect() -> PinTipDetect:
+def fake_pin_tip_detect() -> Generator[PinTipDetect, None, None]:
     FakePinTipDetect = make_fake_device(PinTipDetect)
     pin_tip_detect: PinTipDetect = FakePinTipDetect(name="pin_tip")
     pin_tip_detect.settle_time_s.set(0).wait()
@@ -25,8 +25,8 @@ def trigger_and_read(
     yield from bps.trigger(fake_pin_tip_detect)
     if values_to_set_during_trigger:
         for position in values_to_set_during_trigger:
-            fake_pin_tip_detect.tip_y.sim_put(position[1])
-            fake_pin_tip_detect.tip_x.sim_put(position[0])
+            fake_pin_tip_detect.tip_y.sim_put(position[1])  # type: ignore
+            fake_pin_tip_detect.tip_x.sim_put(position[0])  # type: ignore
     yield from bps.wait()
     return (yield from bps.rd(fake_pin_tip_detect))
 
@@ -95,8 +95,8 @@ def trigger_and_read_twice(
     fake_pin_tip_detect: PinTipDetect, first_values: List[Tuple], second_value: Tuple
 ):
     yield from trigger_and_read(fake_pin_tip_detect, first_values)
-    fake_pin_tip_detect.tip_y.sim_put(second_value[1])
-    fake_pin_tip_detect.tip_x.sim_put(second_value[0])
+    fake_pin_tip_detect.tip_y.sim_put(second_value[1])  # type: ignore
+    fake_pin_tip_detect.tip_x.sim_put(second_value[0])  # type: ignore
     return (yield from trigger_and_read(fake_pin_tip_detect, []))
 
 

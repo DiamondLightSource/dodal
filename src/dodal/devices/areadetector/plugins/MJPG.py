@@ -9,14 +9,14 @@ from dodal.log import LOGGER
 
 
 class MJPG(Device):
-    filename: Signal = Component(Signal)
-    directory: Signal = Component(Signal)
-    last_saved_path: Signal = Component(Signal)
-    url: EpicsSignal = Component(EpicsSignal, "JPG_URL_RBV", string=True)
-    x_size: EpicsSignalRO = Component(EpicsSignalRO, "ArraySize1_RBV")
-    y_size: EpicsSignalRO = Component(EpicsSignalRO, "ArraySize2_RBV")
-    input_rbpv: EpicsSignalRO = Component(EpicsSignalRO, "NDArrayPort_RBV")
-    input_plugin: EpicsSignal = Component(EpicsSignal, "NDArrayPort")
+    filename = Component(Signal)
+    directory = Component(Signal)
+    last_saved_path = Component(Signal)
+    url = Component(EpicsSignal, "JPG_URL_RBV", string=True)
+    x_size = Component(EpicsSignalRO, "ArraySize1_RBV")
+    y_size = Component(EpicsSignalRO, "ArraySize2_RBV")
+    input_rbpv = Component(EpicsSignalRO, "NDArrayPort_RBV")
+    input_plugin = Component(EpicsSignal, "NDArrayPort")
     KICKOFF_TIMEOUT: float = 30.0
 
     def trigger(self):

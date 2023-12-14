@@ -18,11 +18,11 @@ ZOOM_LEVELS_XML = "tests/devices/unit_tests/test_jCameraManZoomLevels.xml"
 def oav() -> OAV:
     oav_params = OAVConfigParams(ZOOM_LEVELS_XML, DISPLAY_CONFIGURATION)
     oav: OAV = instantiate_fake_device(OAV, params=oav_params)
-    oav.proc.port_name.sim_put("proc")
-    oav.cam.port_name.sim_put("CAM")
+    oav.proc.port_name.sim_put("proc")  # type: ignore
+    oav.cam.port_name.sim_put("CAM")  # type: ignore
 
-    oav.snapshot.x_size.sim_put("1024")
-    oav.snapshot.y_size.sim_put("768")
+    oav.snapshot.x_size.sim_put("1024")  # type: ignore
+    oav.snapshot.y_size.sim_put("768")  # type: ignore
 
     oav.zoom_controller.zrst.set("1.0x")
     oav.zoom_controller.onst.set("2.0x")
@@ -82,7 +82,7 @@ def test_load_microns_per_pixel_entry_not_found(oav: OAV):
 def test_get_micronsperpixel_from_oav(
     zoom_level, expected_microns_x, expected_microns_y, oav: OAV
 ):
-    oav.zoom_controller.level.sim_put(zoom_level)
+    oav.zoom_controller.level.sim_put(zoom_level)  # type: ignore
 
     assert oav.parameters.micronsPerXPixel == pytest.approx(
         expected_microns_x, abs=1e-2
@@ -115,29 +115,29 @@ def test_extract_beam_position_given_different_zoom_levels(
     expected_yCentre,
     oav: OAV,
 ):
-    oav.zoom_controller.level.sim_put(zoom_level)
+    oav.zoom_controller.level.sim_put(zoom_level)  # type: ignore
 
     assert oav.parameters.beam_centre_i == expected_xCentre
     assert oav.parameters.beam_centre_j == expected_yCentre
 
 
 def test_extract_rescaled_micronsperpixel(oav: OAV):
-    oav.snapshot.x_size.sim_put("1292")
-    oav.snapshot.y_size.sim_put("964")
+    oav.snapshot.x_size.sim_put("1292")  # type: ignore
+    oav.snapshot.y_size.sim_put("964")  # type: ignore
     oav.wait_for_connection()
 
-    oav.zoom_controller.level.sim_put("1.0")
+    oav.zoom_controller.level.sim_put("1.0")  # type: ignore
 
     assert oav.parameters.micronsPerXPixel == pytest.approx(2.27, abs=1e-2)
     assert oav.parameters.micronsPerYPixel == pytest.approx(2.28, abs=1e-2)
 
 
 def test_extract_rescaled_beam_position(oav: OAV):
-    oav.snapshot.x_size.sim_put("1292")
-    oav.snapshot.y_size.sim_put("964")
+    oav.snapshot.x_size.sim_put("1292")  # type: ignore
+    oav.snapshot.y_size.sim_put("964")  # type: ignore
     oav.wait_for_connection()
 
-    oav.zoom_controller.level.sim_put("1.0")
+    oav.zoom_controller.level.sim_put("1.0")  # type: ignore
 
     assert oav.parameters.beam_centre_i == 601
     assert oav.parameters.beam_centre_j == 450
@@ -152,7 +152,7 @@ def test_extract_rescaled_beam_position(oav: OAV):
     ],
 )
 def test_calculate_beam_distance(h, v, expected_x, expected_y, oav: OAV):
-    oav.zoom_controller.level.sim_put("5.0x")
+    oav.zoom_controller.level.sim_put("5.0x")  # type: ignore
 
     assert oav.parameters.calculate_beam_distance(
         h,

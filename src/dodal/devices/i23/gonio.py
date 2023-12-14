@@ -6,12 +6,12 @@ from dodal.devices.motors import MotorLimitHelper, XYZLimitBundle
 
 
 class Gonio(MotorBundle):
-    x: EpicsMotor = Cpt(EpicsMotor, "X")
-    y: EpicsMotor = Cpt(EpicsMotor, "Y")
-    z: EpicsMotor = Cpt(EpicsMotor, "Z")
-    kappa: EpicsMotor = Cpt(EpicsMotor, "KAPPA")
-    phi: EpicsMotor = Cpt(EpicsMotor, "PHI")
-    omega: EpicsMotor = Cpt(EpicsMotor, "OMEGA")
+    x = Cpt(EpicsMotor, "X")
+    y = Cpt(EpicsMotor, "Y")
+    z = Cpt(EpicsMotor, "Z")
+    kappa = Cpt(EpicsMotor, "KAPPA")
+    phi = Cpt(EpicsMotor, "PHI")
+    omega = Cpt(EpicsMotor, "OMEGA")
 
     def get_xyz_limits(self) -> XYZLimitBundle:
         """Get the limits for the x, y and z axes.

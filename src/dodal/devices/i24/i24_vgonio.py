@@ -4,14 +4,14 @@ from ophyd.epics_motor import MotorBundle
 
 
 class VGonio(MotorBundle):
-    x: EpicsMotor = Cpt(EpicsMotor, "PINX")
-    z: EpicsMotor = Cpt(EpicsMotor, "PINZ")
-    yh: EpicsMotor = Cpt(EpicsMotor, "PINYH")
-    omega: EpicsMotor = Cpt(EpicsMotor, "OMEGA")
-    kappa: EpicsMotor = Cpt(EpicsMotor, "KAPPA")
-    phi: EpicsMotor = Cpt(EpicsMotor, "PHI")
+    x = Cpt(EpicsMotor, "PINX")
+    z = Cpt(EpicsMotor, "PINZ")
+    yh = Cpt(EpicsMotor, "PINYH")
+    omega = Cpt(EpicsMotor, "OMEGA")
+    kappa = Cpt(EpicsMotor, "KAPPA")
+    phi = Cpt(EpicsMotor, "PHI")
 
     # Real motors
-    xs: EpicsMotor = Cpt(EpicsMotor, "PINXS")
-    ys: EpicsMotor = Cpt(EpicsMotor, "PINXS")
-    zs: EpicsMotor = Cpt(EpicsMotor, "PINZS")
+    xs = Cpt(EpicsMotor, "PINXS")
+    ys = Cpt(EpicsMotor, "PINXS")
+    zs = Cpt(EpicsMotor, "PINZS")

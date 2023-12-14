@@ -5,7 +5,7 @@ class BacklightPositioner(Device):
     """Device to control the backlight position."""
 
     # String description of the backlight position e.g. "In", "OAV2"
-    pos_level: EpicsSignal = Component(EpicsSignal, "MP:SELECT")
+    pos_level = Component(EpicsSignal, "MP:SELECT")
 
 
 class DualBacklight(Device):
@@ -29,10 +29,10 @@ class DualBacklight(Device):
     OUT = "Out"
     IN = "In"
 
-    led1: EpicsSignal = Component(EpicsSignal, "-DI-LED-01:TOGGLE")
-    pos1: BacklightPositioner = Component(BacklightPositioner, "-MO-BL-01:")
+    led1 = Component(EpicsSignal, "-DI-LED-01:TOGGLE")
+    pos1 = Component(BacklightPositioner, "-MO-BL-01:")
 
-    led2: EpicsSignal = Component(EpicsSignal, "-DI-LED-02:TOGGLE")
+    led2 = Component(EpicsSignal, "-DI-LED-02:TOGGLE")
 
     def set(self, position: str) -> StatusBase:
         status = self.pos1.pos_level.set(position)

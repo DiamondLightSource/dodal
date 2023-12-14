@@ -10,11 +10,11 @@ class XBPMFeedback(Device):
     PAUSE = 0
     RUN = 1
 
-    pos_ok: EpicsSignalRO = Component(EpicsSignalRO, "-EA-FDBK-01:XBPM2POSITION_OK")
-    pos_stable: EpicsSignalRO = Component(EpicsSignalRO, "-EA-FDBK-01:XBPM2_STABLE")
-    pause_feedback: EpicsSignal = Component(EpicsSignal, "-EA-FDBK-01:FB_PAUSE")
-    x: EpicsSignalRO = Component(EpicsSignalRO, "-EA-XBPM-02:PosX:MeanValue_RBV")
-    y: EpicsSignalRO = Component(EpicsSignalRO, "-EA-XBPM-02:PosY:MeanValue_RBV")
+    pos_ok = Component(EpicsSignalRO, "-EA-FDBK-01:XBPM2POSITION_OK")
+    pos_stable = Component(EpicsSignalRO, "-EA-FDBK-01:XBPM2_STABLE")
+    pause_feedback = Component(EpicsSignal, "-EA-FDBK-01:FB_PAUSE")
+    x = Component(EpicsSignalRO, "-EA-XBPM-02:PosX:MeanValue_RBV")
+    y = Component(EpicsSignalRO, "-EA-XBPM-02:PosY:MeanValue_RBV")
 
     def trigger(self) -> StatusBase:
         return SubscriptionStatus(
@@ -29,10 +29,10 @@ class XBPMFeedbackI04(Device):
     PAUSE = 0
     RUN = 1
 
-    pos_ok: EpicsSignalRO = Component(EpicsSignalRO, "-EA-FDBK-01:XBPM2POSITION_OK")
-    pause_feedback: EpicsSignal = Component(EpicsSignal, "-EA-FDBK-01:FB_PAUSE")
-    x: EpicsSignalRO = Component(EpicsSignalRO, "-EA-XBPM-02:PosX:MeanValue_RBV")
-    y: EpicsSignalRO = Component(EpicsSignalRO, "-EA-XBPM-02:PosY:MeanValue_RBV")
+    pos_ok = Component(EpicsSignalRO, "-EA-FDBK-01:XBPM2POSITION_OK")
+    pause_feedback = Component(EpicsSignal, "-EA-FDBK-01:FB_PAUSE")
+    x = Component(EpicsSignalRO, "-EA-XBPM-02:PosX:MeanValue_RBV")
+    y = Component(EpicsSignalRO, "-EA-XBPM-02:PosY:MeanValue_RBV")
 
     def trigger(self) -> StatusBase:
         return SubscriptionStatus(

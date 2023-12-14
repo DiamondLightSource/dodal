@@ -18,15 +18,15 @@ class Transfocator(Device):
         my_transfocator.set(vert_beamsize_microns)
     """
 
-    beamsize_set_microns: EpicsSignal = Cpt(EpicsSignal, "VERT_REQ", kind=Kind.hinted)
-    predicted_vertical_num_lenses: EpicsSignal = Cpt(EpicsSignal, "LENS_PRED")
+    beamsize_set_microns = Cpt(EpicsSignal, "VERT_REQ", kind=Kind.hinted)
+    predicted_vertical_num_lenses = Cpt(EpicsSignal, "LENS_PRED")
 
-    number_filters_sp: EpicsSignal = Cpt(EpicsSignal, "NUM_FILTERS")
+    number_filters_sp = Cpt(EpicsSignal, "NUM_FILTERS")
 
-    start: EpicsSignal = Cpt(EpicsSignal, "START.PROC")
-    start_rbv: EpicsSignalRO = Cpt(EpicsSignalRO, "START_RBV")
+    start = Cpt(EpicsSignal, "START.PROC")
+    start_rbv = Cpt(EpicsSignalRO, "START_RBV")
 
-    vertical_lens_rbv: EpicsSignalRO = Cpt(EpicsSignalRO, "VER", kind=Kind.hinted)
+    vertical_lens_rbv = Cpt(EpicsSignalRO, "VER", kind=Kind.hinted)
 
     TIMEOUT = 120
     _POLLING_WAIT = 0.01

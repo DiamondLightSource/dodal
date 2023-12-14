@@ -6,10 +6,8 @@ from .adutils import Hdf5Writer, SingleTriggerV33, SynchronisedAdDriverBase
 
 
 class AdSimDetector(SingleTriggerV33, DetectorBase):
-    cam: SynchronisedAdDriverBase = Cpt(
-        SynchronisedAdDriverBase, suffix="CAM:", lazy=True
-    )
-    hdf: Hdf5Writer = Cpt(
+    cam = Cpt(SynchronisedAdDriverBase, suffix="CAM:", lazy=True)
+    hdf = Cpt(
         Hdf5Writer,
         suffix="HDF5:",
         root="",

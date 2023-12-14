@@ -11,8 +11,8 @@ _ACQUIRE_BUFFER_PERIOD = 0.2
 
 
 class AdAravisDetector(SingleTriggerV33, DetectorBase):
-    cam: SynchronisedAdDriverBase = Cpt(SynchronisedAdDriverBase, suffix="DET:")
-    hdf: Hdf5Writer = Cpt(
+    cam = Cpt(SynchronisedAdDriverBase, suffix="DET:")
+    hdf = Cpt(
         Hdf5Writer,
         suffix="HDF5:",
         root="",

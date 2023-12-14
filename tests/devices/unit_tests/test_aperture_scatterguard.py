@@ -24,41 +24,41 @@ def aperture_in_medium_pos(
     aperture_positions: AperturePositions,
 ):
     fake_aperture_scatterguard.load_aperture_positions(aperture_positions)
-    fake_aperture_scatterguard.aperture.x.user_setpoint.sim_put(
+    fake_aperture_scatterguard.aperture.x.user_setpoint.sim_put(  # type: ignore
         aperture_positions.MEDIUM[0]
     )
-    fake_aperture_scatterguard.aperture.y.user_setpoint.sim_put(
+    fake_aperture_scatterguard.aperture.y.user_setpoint.sim_put(  # type: ignore
         aperture_positions.MEDIUM[1]
     )
-    fake_aperture_scatterguard.aperture.z.user_setpoint.sim_put(
+    fake_aperture_scatterguard.aperture.z.user_setpoint.sim_put(  # type: ignore
         aperture_positions.MEDIUM[2]
     )
-    fake_aperture_scatterguard.aperture.x.user_readback.sim_put(
+    fake_aperture_scatterguard.aperture.x.user_readback.sim_put(  # type: ignore
         aperture_positions.MEDIUM[1]
     )
-    fake_aperture_scatterguard.aperture.y.user_readback.sim_put(
+    fake_aperture_scatterguard.aperture.y.user_readback.sim_put(  # type: ignore
         aperture_positions.MEDIUM[1]
     )
-    fake_aperture_scatterguard.aperture.z.user_readback.sim_put(
+    fake_aperture_scatterguard.aperture.z.user_readback.sim_put(  # type: ignore
         aperture_positions.MEDIUM[1]
     )
-    fake_aperture_scatterguard.scatterguard.x.user_setpoint.sim_put(
+    fake_aperture_scatterguard.scatterguard.x.user_setpoint.sim_put(  # type: ignore
         aperture_positions.MEDIUM[3]
     )
-    fake_aperture_scatterguard.scatterguard.y.user_setpoint.sim_put(
+    fake_aperture_scatterguard.scatterguard.y.user_setpoint.sim_put(  # type: ignore
         aperture_positions.MEDIUM[4]
     )
-    fake_aperture_scatterguard.scatterguard.x.user_readback.sim_put(
+    fake_aperture_scatterguard.scatterguard.x.user_readback.sim_put(  # type: ignore
         aperture_positions.MEDIUM[3]
     )
-    fake_aperture_scatterguard.scatterguard.y.user_readback.sim_put(
+    fake_aperture_scatterguard.scatterguard.y.user_readback.sim_put(  # type: ignore
         aperture_positions.MEDIUM[4]
     )
-    fake_aperture_scatterguard.aperture.x.motor_done_move.sim_put(1)
-    fake_aperture_scatterguard.aperture.y.motor_done_move.sim_put(1)
-    fake_aperture_scatterguard.aperture.z.motor_done_move.sim_put(1)
-    fake_aperture_scatterguard.scatterguard.x.motor_done_move.sim_put(1)
-    fake_aperture_scatterguard.scatterguard.y.motor_done_move.sim_put(1)
+    fake_aperture_scatterguard.aperture.x.motor_done_move.sim_put(1)  # type: ignore
+    fake_aperture_scatterguard.aperture.y.motor_done_move.sim_put(1)  # type: ignore
+    fake_aperture_scatterguard.aperture.z.motor_done_move.sim_put(1)  # type: ignore
+    fake_aperture_scatterguard.scatterguard.x.motor_done_move.sim_put(1)  # type: ignore
+    fake_aperture_scatterguard.scatterguard.y.motor_done_move.sim_put(1)  # type: ignore
     return fake_aperture_scatterguard
 
 
@@ -148,9 +148,9 @@ def test_aperture_scatterguard_select_top_moves_assembly_down_then_sg_up(
 def test_aperture_scatterguard_throws_error_if_outside_tolerance(
     fake_aperture_scatterguard: ApertureScatterguard,
 ):
-    fake_aperture_scatterguard.aperture.z.motor_resolution.sim_put(0.001)
-    fake_aperture_scatterguard.aperture.z.user_setpoint.sim_put(1)
-    fake_aperture_scatterguard.aperture.z.motor_done_move.sim_put(1)
+    fake_aperture_scatterguard.aperture.z.motor_resolution.sim_put(0.001)  # type: ignore
+    fake_aperture_scatterguard.aperture.z.user_setpoint.sim_put(1)  # type: ignore
+    fake_aperture_scatterguard.aperture.z.motor_done_move.sim_put(1)  # type: ignore
 
     with pytest.raises(InvalidApertureMove):
         fake_aperture_scatterguard._safe_move_within_datacollection_range(
@@ -161,9 +161,9 @@ def test_aperture_scatterguard_throws_error_if_outside_tolerance(
 def test_aperture_scatterguard_returns_status_if_within_tolerance(
     fake_aperture_scatterguard: ApertureScatterguard,
 ):
-    fake_aperture_scatterguard.aperture.z.motor_resolution.sim_put(0.001)
-    fake_aperture_scatterguard.aperture.z.user_setpoint.sim_put(1)
-    fake_aperture_scatterguard.aperture.z.motor_done_move.sim_put(1)
+    fake_aperture_scatterguard.aperture.z.motor_resolution.sim_put(0.001)  # type: ignore
+    fake_aperture_scatterguard.aperture.z.user_setpoint.sim_put(1)  # type: ignore
+    fake_aperture_scatterguard.aperture.z.motor_done_move.sim_put(1)  # type: ignore
 
     mock_set = MagicMock(return_value=Status(done=True, success=True))
 

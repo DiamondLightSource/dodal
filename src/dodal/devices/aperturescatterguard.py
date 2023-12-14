@@ -68,8 +68,8 @@ class AperturePositions:
 
 
 class ApertureScatterguard(InfoLoggingDevice):
-    aperture: Aperture = Cpt(Aperture, "-MO-MAPT-01:")
-    scatterguard: Scatterguard = Cpt(Scatterguard, "-MO-SCAT-01:")
+    aperture = Cpt(Aperture, "-MO-MAPT-01:")
+    scatterguard = Cpt(Scatterguard, "-MO-SCAT-01:")
     aperture_positions: Optional[AperturePositions] = None
     APERTURE_Z_TOLERANCE = 3  # Number of MRES steps
 

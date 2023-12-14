@@ -221,34 +221,34 @@ class GridScanCompleteStatus(DeviceStatus):
 
 
 class FastGridScan(Device):
-    x_steps: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "X_NUM_STEPS")
-    y_steps: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "Y_NUM_STEPS")
-    z_steps: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "Z_NUM_STEPS")
+    x_steps = Component(EpicsSignalWithRBV, "X_NUM_STEPS")
+    y_steps = Component(EpicsSignalWithRBV, "Y_NUM_STEPS")
+    z_steps = Component(EpicsSignalWithRBV, "Z_NUM_STEPS")
 
-    x_step_size: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "X_STEP_SIZE")
-    y_step_size: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "Y_STEP_SIZE")
-    z_step_size: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "Z_STEP_SIZE")
+    x_step_size = Component(EpicsSignalWithRBV, "X_STEP_SIZE")
+    y_step_size = Component(EpicsSignalWithRBV, "Y_STEP_SIZE")
+    z_step_size = Component(EpicsSignalWithRBV, "Z_STEP_SIZE")
 
-    dwell_time_ms: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "DWELL_TIME")
+    dwell_time_ms = Component(EpicsSignalWithRBV, "DWELL_TIME")
 
-    x_start: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "X_START")
-    y1_start: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "Y_START")
-    y2_start: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "Y2_START")
-    z1_start: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "Z_START")
-    z2_start: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "Z2_START")
+    x_start = Component(EpicsSignalWithRBV, "X_START")
+    y1_start = Component(EpicsSignalWithRBV, "Y_START")
+    y2_start = Component(EpicsSignalWithRBV, "Y2_START")
+    z1_start = Component(EpicsSignalWithRBV, "Z_START")
+    z2_start = Component(EpicsSignalWithRBV, "Z2_START")
 
-    position_counter: EpicsSignal = Component(
+    position_counter = Component(
         EpicsSignal, "POS_COUNTER", write_pv="POS_COUNTER_WRITE"
     )
-    x_counter: EpicsSignalRO = Component(EpicsSignalRO, "X_COUNTER")
-    y_counter: EpicsSignalRO = Component(EpicsSignalRO, "Y_COUNTER")
-    scan_invalid: EpicsSignalRO = Component(EpicsSignalRO, "SCAN_INVALID")
+    x_counter = Component(EpicsSignalRO, "X_COUNTER")
+    y_counter = Component(EpicsSignalRO, "Y_COUNTER")
+    scan_invalid = Component(EpicsSignalRO, "SCAN_INVALID")
 
-    run_cmd: EpicsSignal = Component(EpicsSignal, "RUN.PROC")
-    stop_cmd: EpicsSignal = Component(EpicsSignal, "STOP.PROC")
-    status: EpicsSignalRO = Component(EpicsSignalRO, "SCAN_STATUS")
+    run_cmd = Component(EpicsSignal, "RUN.PROC")
+    stop_cmd = Component(EpicsSignal, "STOP.PROC")
+    status = Component(EpicsSignalRO, "SCAN_STATUS")
 
-    expected_images: Signal = Component(Signal)
+    expected_images = Component(Signal)
 
     # Kickoff timeout in seconds
     KICKOFF_TIMEOUT: float = 5.0
@@ -257,7 +257,9 @@ class FastGridScan(Device):
         super().__init__(*args, **kwargs)
 
         def set_expected_images(*_, **__):
-            x, y, z = self.x_steps.get(), self.y_steps.get(), self.z_steps.get()
+            x = int(self.x_steps.get())
+            y = int(self.y_steps.get())
+            z = int(self.z_steps.get())
             first_grid = x * y
             second_grid = x * z
             self.expected_images.put(first_grid + second_grid)
@@ -269,7 +271,7 @@ class FastGridScan(Device):
     def is_invalid(self) -> bool:
         if "GONP" in self.scan_invalid.pvname:
             return False
-        return self.scan_invalid.get()
+        return bool(self.scan_invalid.get())
 
     def kickoff(self) -> StatusBase:
         # Check running already here?

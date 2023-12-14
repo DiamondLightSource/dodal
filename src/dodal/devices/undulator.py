@@ -13,9 +13,9 @@ class UndulatorGapAccess(Enum):
 
 
 class Undulator(Device):
-    gap_motor: EpicsMotor = Component(EpicsMotor, "BLGAPMTR")
-    current_gap: EpicsSignalRO = Component(EpicsSignalRO, "CURRGAPD")
-    gap_access: EpicsSignalRO = Component(EpicsSignalRO, "IDBLENA")
+    gap_motor = Component(EpicsMotor, "BLGAPMTR")
+    current_gap = Component(EpicsSignalRO, "CURRGAPD")
+    gap_access = Component(EpicsSignalRO, "IDBLENA")
     gap_discrepancy_tolerance_mm: float = UNDULATOR_DISCREPANCY_THRESHOLD_MM
 
     def __init__(

@@ -110,11 +110,11 @@ def test_status_points_to_provided_device_object():
 
 def test_given_disp_high_when_set_SetWhenEnabled_then_proc_not_set_until_disp_low():
     signal: SetWhenEnabled = make_fake_device(SetWhenEnabled)(name="test")
-    signal.disp.sim_put(1)
+    signal.disp.sim_put(1)  # type: ignore
     signal.proc.set = MagicMock(return_value=Status(done=True, success=True))
 
     status = signal.set(1)
     signal.proc.set.assert_not_called()
-    signal.disp.sim_put(0)
+    signal.disp.sim_put(0)  # type: ignore
     status.wait()
     signal.proc.set.assert_called_once()
