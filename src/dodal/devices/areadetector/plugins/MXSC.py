@@ -2,7 +2,7 @@ from typing import List, Tuple
 
 import numpy as np
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO, Kind, Signal
-from ophyd.status import StableSubscriptionStatus, Status
+from ophyd.status import StableSubscriptionStatus, Status, StatusBase
 
 from dodal.log import LOGGER
 
@@ -72,7 +72,7 @@ class PinTipDetect(Device):
             return True
         return False
 
-    def trigger(self) -> Status:
+    def trigger(self) -> StatusBase:
         self.tip_positions: List[Pixel] = []
 
         subscription_status = StableSubscriptionStatus(

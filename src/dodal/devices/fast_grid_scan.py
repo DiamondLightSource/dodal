@@ -248,7 +248,7 @@ class FastGridScan(Device):
     stop_cmd = Component(EpicsSignal, "STOP.PROC")
     status = Component(EpicsSignalRO, "SCAN_STATUS")
 
-    expected_images: Signal = Component(Signal)
+    expected_images = Component(Signal)
 
     # Kickoff timeout in seconds
     KICKOFF_TIMEOUT: float = 5.0
@@ -271,7 +271,7 @@ class FastGridScan(Device):
     def is_invalid(self) -> bool:
         if "GONP" in self.scan_invalid.pvname:
             return False
-        return self.scan_invalid.get()
+        return bool(self.scan_invalid.get())
 
     def kickoff(self) -> StatusBase:
         # Check running already here?

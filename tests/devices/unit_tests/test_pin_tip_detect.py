@@ -2,7 +2,7 @@ from typing import Generator, List, Tuple
 
 import bluesky.plan_stubs as bps
 import pytest
-from bluesky import RunEngine
+from bluesky.run_engine import RunEngine
 from ophyd.sim import make_fake_device
 
 from dodal.devices.areadetector.plugins.MXSC import (

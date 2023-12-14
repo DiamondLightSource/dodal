@@ -1,6 +1,6 @@
 import bluesky.plan_stubs as bps
 import pytest
-from bluesky import RunEngine
+from bluesky.run_engine import RunEngine
 
 from dodal.devices.oav.oav_detector import OAV, ZoomController
 

@@ -6,7 +6,7 @@ from dodal.devices.sample_shutter import OpenState, SampleShutter
 
 @pytest.fixture
 def fake_sample_shutter():
-    FakeSampleShutter: SampleShutter = make_fake_device(SampleShutter)
+    FakeSampleShutter = make_fake_device(SampleShutter)
     fake_sample_shutter: SampleShutter = FakeSampleShutter(name="sample_shutter")
     return fake_sample_shutter
 
