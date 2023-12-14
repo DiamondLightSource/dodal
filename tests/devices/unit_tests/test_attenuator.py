@@ -13,17 +13,17 @@ CALCULATED_VALUE = range(0, 17)
 
 @pytest.fixture
 def fake_attenuator():
-    FakeAttenuator: Attenuator = make_fake_device(Attenuator)
+    FakeAttenuator = make_fake_device(Attenuator)
     fake_attenuator: Attenuator = FakeAttenuator(name="attenuator")
 
     def mock_apply_values(val: int):
         actual_states = fake_attenuator.get_actual_filter_state_list()
         calculated_states = fake_attenuator.get_calculated_filter_state_list()
         for i in range(16):
-            calculated_states[i].sim_put(
+            calculated_states[i].sim_put(  # type: ignore
                 CALCULATED_VALUE[i]
             )  # Ignore the actual calculation as this is EPICS layer
-            actual_states[i].sim_put(calculated_states[i].get())
+            actual_states[i].sim_put(calculated_states[i].get())  # type: ignore
         return Status(done=True, success=True)
 
     fake_attenuator.change.set = MagicMock(side_effect=mock_apply_values)

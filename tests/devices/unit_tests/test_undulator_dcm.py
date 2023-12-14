@@ -31,7 +31,7 @@ def fake_undulator_dcm() -> UndulatorDCM:
 def test_when_gap_access_is_disabled_set_energy_then_error_is_raised(
     fake_undulator_dcm: UndulatorDCM,
 ):
-    fake_undulator_dcm.undulator.gap_access.sim_put(UndulatorGapAccess.DISABLED.value)
+    fake_undulator_dcm.undulator.gap_access.sim_put(UndulatorGapAccess.DISABLED.value)  # type: ignore
     with pytest.raises(AccessError):
         fake_undulator_dcm.energy_kev.set(5)
 
@@ -57,13 +57,13 @@ def test_correct_closest_distance_to_energy_from_table(dcm_energy, expected_outp
 @patch("dodal.devices.undulator_dcm.loadtxt")
 @patch("dodal.devices.undulator_dcm.LOGGER")
 def test_if_gap_is_wrong_then_logger_info_is_called_and_gap_is_set_correctly(
-    mock_logger: MagicMock, mock_load: MagicMock, fake_undulator_dcm
+    mock_logger: MagicMock, mock_load: MagicMock, fake_undulator_dcm: UndulatorDCM
 ):
-    fake_undulator_dcm.undulator.current_gap.sim_put(5.3)
+    fake_undulator_dcm.undulator.current_gap.sim_put(5.3)  # type: ignore
     fake_undulator_dcm.undulator.gap_motor.move = MagicMock()
     fake_undulator_dcm.dcm.energy_in_kev.move = MagicMock()
     mock_load.return_value = np.array([[5700, 5.4606], [7000, 6.045], [9700, 6.404]])
-    fake_undulator_dcm.dcm.energy_in_kev.user_readback.sim_put(5700)
+    fake_undulator_dcm.dcm.energy_in_kev.user_readback.sim_put(5700)  # type: ignore
     fake_undulator_dcm.energy_kev.set(6900)
     fake_undulator_dcm.dcm.energy_in_kev.move.assert_called_once_with(6900, timeout=10)
     fake_undulator_dcm.undulator.gap_motor.move.assert_called_once_with(
@@ -75,18 +75,20 @@ def test_if_gap_is_wrong_then_logger_info_is_called_and_gap_is_set_correctly(
 @patch("dodal.devices.undulator_dcm.loadtxt")
 @patch("dodal.devices.undulator_dcm.LOGGER")
 def test_if_gap_is_already_correct_then_dont_move_gap(
-    mock_logger: MagicMock, mock_load: MagicMock, fake_undulator_dcm
+    mock_logger: MagicMock, mock_load: MagicMock, fake_undulator_dcm: UndulatorDCM
 ):
     fake_undulator_dcm.undulator.gap_motor.move = MagicMock()
     fake_undulator_dcm.dcm.energy_in_kev.move = MagicMock()
     mock_load.return_value = np.array([[5700, 5.4606], [7000, 6.045], [9700, 6.404]])
-    fake_undulator_dcm.undulator.current_gap.sim_put(5.4605)
+    fake_undulator_dcm.undulator.current_gap.sim_put(5.4605)  # type: ignore
     fake_undulator_dcm.energy_kev.set(5800).wait(timeout=0.01)
     fake_undulator_dcm.undulator.gap_motor.move.assert_not_called()
     mock_logger.info.assert_called_once()
 
 
-def test_energy_set_only_complete_when_all_statuses_are_finished(fake_undulator_dcm):
+def test_energy_set_only_complete_when_all_statuses_are_finished(
+    fake_undulator_dcm: UndulatorDCM,
+):
     dcm_energy_move_status = Status()
     undulator_gap_move_status = Status()
 
@@ -98,7 +100,7 @@ def test_energy_set_only_complete_when_all_statuses_are_finished(fake_undulator_
     )
     _get_energy_distance_table = MagicMock()
     _get_closest_gap_for_energy = MagicMock(return_value=10)
-    fake_undulator_dcm.undulator.current_gap.sim_put(5)
+    fake_undulator_dcm.undulator.current_gap.sim_put(5)  # type: ignore
     status: Status = fake_undulator_dcm.energy_kev.set(5800)
     assert not status.success
     dcm_energy_move_status.set_finished()
