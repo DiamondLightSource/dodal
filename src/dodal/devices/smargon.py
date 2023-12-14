@@ -1,7 +1,7 @@
 from enum import Enum
 
 from ophyd import Component as Cpt
-from ophyd import Device, EpicsMotor
+from ophyd import Device, EpicsMotor, EpicsSignal
 from ophyd.epics_motor import MotorBundle
 from ophyd.status import StatusBase
 
@@ -63,6 +63,8 @@ class Smargon(MotorBundle):
     real_chi = Cpt(EpicsMotor, "MOTOR_6")
 
     stub_offsets = Cpt(StubOffsets, "")
+
+    disabled = Cpt(EpicsSignal, "DISABLED")
 
     def get_xyz_limits(self) -> XYZLimitBundle:
         """Get the limits for the x, y and z axes.
