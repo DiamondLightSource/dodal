@@ -64,7 +64,7 @@ class Smargon(MotorBundle):
 
     stub_offsets = Cpt(StubOffsets, "")
 
-    disabled: EpicsSignal = Cpt(EpicsSignal, "DISABLED")
+    disabled = Cpt(EpicsSignal, "DISABLED")
 
     def get_xyz_limits(self) -> XYZLimitBundle:
         """Get the limits for the x, y and z axes.
