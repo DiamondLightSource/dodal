@@ -14,8 +14,8 @@ class OpenState(Enum):
 class SampleShutter(Device):
     """Simple device to trigger the pneumatic in/out"""
 
-    pos: EpicsSignal = Component(EpicsSignal, "CTRL2")
-    pos_rbv: EpicsSignalRO = Component(EpicsSignalRO, "STA")
+    pos = Component(EpicsSignal, "CTRL2")
+    pos_rbv = Component(EpicsSignalRO, "STA")
 
     def set(self, open_val: Union[int, OpenState]):
         if isinstance(open_val, OpenState):

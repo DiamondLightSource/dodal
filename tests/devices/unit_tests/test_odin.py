@@ -59,7 +59,7 @@ def test_check_odin_initialised(
     expected_error_num: int,
     expected_state: bool,
 ):
-    when(fake_odin.fan.connected).get().thenReturn(fan_connected)
+    when(fake_odin.fan.consumers_connected).get().thenReturn(fan_connected)
     when(fake_odin.fan.on).get().thenReturn(fan_on)
     when(fake_odin.meta.initialised).get().thenReturn(meta_init)
     when(fake_odin.nodes).get_error_state().thenReturn(
@@ -79,8 +79,8 @@ def test_given_node_in_error_node_error_status_gives_message_and_node_number(
     fake_odin: EigerOdin,
 ):
     ERR_MESSAGE = "Help, I'm in error!"
-    fake_odin.nodes.node_0.error_status.sim_put(True)
-    fake_odin.nodes.node_0.error_message.sim_put(ERR_MESSAGE)
+    fake_odin.nodes.node_0.error_status.sim_put(True)  # type: ignore
+    fake_odin.nodes.node_0.error_message.sim_put(ERR_MESSAGE)  # type: ignore
 
     in_error, message = fake_odin.nodes.get_error_state()
 
@@ -100,11 +100,11 @@ def test_given_node_in_error_node_error_status_gives_message_and_node_number(
 def test_wait_for_all_filewriters_to_finish(
     fake_odin: EigerOdin, meta_writing, OD1_writing, OD2_writing
 ):
-    fake_odin.meta.ready.sim_put(meta_writing)
-    fake_odin.nodes.nodes[0].writing.sim_put(OD1_writing)
-    fake_odin.nodes.nodes[1].writing.sim_put(OD2_writing)
-    fake_odin.nodes.nodes[2].writing.sim_put(0)
-    fake_odin.nodes.nodes[3].writing.sim_put(0)
+    fake_odin.meta.ready.sim_put(meta_writing)  # type: ignore
+    fake_odin.nodes.nodes[0].writing.sim_put(OD1_writing)  # type: ignore
+    fake_odin.nodes.nodes[1].writing.sim_put(OD2_writing)  # type: ignore
+    fake_odin.nodes.nodes[2].writing.sim_put(0)  # type: ignore
+    fake_odin.nodes.nodes[3].writing.sim_put(0)  # type: ignore
 
     status = fake_odin.create_finished_status()
 
@@ -115,7 +115,7 @@ def test_wait_for_all_filewriters_to_finish(
         fake_odin.nodes.nodes[0].writing,
         fake_odin.nodes.nodes[1].writing,
     ]:
-        writer.sim_put(0)
+        writer.sim_put(0)  # type: ignore
 
     status.wait(1)
     assert status.done

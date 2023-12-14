@@ -21,22 +21,22 @@ class DCM(Device):
     offset ensures that the beam exits the DCM at the same point, regardless of energy.
     """
 
-    bragg_in_degrees: EpicsMotor = Cpt(EpicsMotor, "-MO-DCM-01:BRAGG")
-    roll_in_mrad: EpicsMotor = Cpt(EpicsMotor, "-MO-DCM-01:ROLL")
-    offset_in_mm: EpicsMotor = Cpt(EpicsMotor, "-MO-DCM-01:OFFSET")
-    perp_in_mm: EpicsMotor = Cpt(EpicsMotor, "-MO-DCM-01:PERP")
-    energy_in_kev: EpicsMotor = Cpt(EpicsMotor, "-MO-DCM-01:ENERGY", kind=Kind.hinted)
-    pitch_in_mrad: EpicsMotor = Cpt(EpicsMotor, "-MO-DCM-01:PITCH")
-    wavelength: EpicsMotor = Cpt(EpicsMotor, "-MO-DCM-01:WAVELENGTH")
+    bragg_in_degrees = Cpt(EpicsMotor, "-MO-DCM-01:BRAGG")
+    roll_in_mrad = Cpt(EpicsMotor, "-MO-DCM-01:ROLL")
+    offset_in_mm = Cpt(EpicsMotor, "-MO-DCM-01:OFFSET")
+    perp_in_mm = Cpt(EpicsMotor, "-MO-DCM-01:PERP")
+    energy_in_kev = Cpt(EpicsMotor, "-MO-DCM-01:ENERGY", kind=Kind.hinted)
+    pitch_in_mrad = Cpt(EpicsMotor, "-MO-DCM-01:PITCH")
+    wavelength = Cpt(EpicsMotor, "-MO-DCM-01:WAVELENGTH")
 
     # temperatures
-    xtal1_temp: EpicsSignalRO = Cpt(EpicsSignalRO, "-MO-DCM-01:TEMP1")
-    xtal2_temp: EpicsSignalRO = Cpt(EpicsSignalRO, "-MO-DCM-01:TEMP2")
-    xtal1_heater_temp: EpicsSignalRO = Cpt(EpicsSignalRO, "-MO-DCM-01:TEMP3")
-    xtal2_heater_temp: EpicsSignalRO = Cpt(EpicsSignalRO, "-MO-DCM-01:TEMP4")
-    backplate_temp: EpicsSignalRO = Cpt(EpicsSignalRO, "-MO-DCM-01:TEMP5")
-    perp_temp: EpicsSignalRO = Cpt(EpicsSignalRO, "-MO-DCM-01:TEMP6")
-    perp_sub_assembly_temp: EpicsSignalRO = Cpt(EpicsSignalRO, "-MO-DCM-01:TEMP7")
+    xtal1_temp = Cpt(EpicsSignalRO, "-MO-DCM-01:TEMP1")
+    xtal2_temp = Cpt(EpicsSignalRO, "-MO-DCM-01:TEMP2")
+    xtal1_heater_temp = Cpt(EpicsSignalRO, "-MO-DCM-01:TEMP3")
+    xtal2_heater_temp = Cpt(EpicsSignalRO, "-MO-DCM-01:TEMP4")
+    backplate_temp = Cpt(EpicsSignalRO, "-MO-DCM-01:TEMP5")
+    perp_temp = Cpt(EpicsSignalRO, "-MO-DCM-01:TEMP6")
+    perp_sub_assembly_temp = Cpt(EpicsSignalRO, "-MO-DCM-01:TEMP7")
 
 
 def fixed_offset_from_beamline_params(gda_beamline_parameters):

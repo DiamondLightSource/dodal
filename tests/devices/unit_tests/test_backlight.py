@@ -14,7 +14,7 @@ def fake_backlight() -> Backlight:
 
 
 def test_backlight_can_be_written_and_read_from(fake_backlight: Backlight):
-    fake_backlight.pos.sim_put(fake_backlight.IN)
+    fake_backlight.pos.sim_put(fake_backlight.IN)  # type: ignore
     assert fake_backlight.pos.get() == fake_backlight.IN
 
 

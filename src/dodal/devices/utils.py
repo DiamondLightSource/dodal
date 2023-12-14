@@ -8,7 +8,7 @@ from dodal.devices.status import await_value
 from dodal.log import LOGGER
 
 
-def epics_signal_put_wait(pv_name: str, wait: float = 3.0) -> EpicsSignal:
+def epics_signal_put_wait(pv_name: str, wait: float = 3.0) -> Component[EpicsSignal]:
     """Creates a `Component` around an `EpicsSignal` that waits for a callback on a put.
 
     Args:
@@ -111,8 +111,8 @@ def run_functions_without_blocking(
 class SetWhenEnabled(Device):
     """A device that sets the proc field of a PV when it becomes enabled."""
 
-    proc: EpicsSignal = Component(EpicsSignal, ".PROC")
-    disp: EpicsSignal = Component(EpicsSignal, ".DISP")
+    proc = Component(EpicsSignal, ".PROC")
+    disp = Component(EpicsSignal, ".DISP")
 
     def set(self, proc: int) -> Status:
         return run_functions_without_blocking(
