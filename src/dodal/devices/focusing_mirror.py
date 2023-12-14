@@ -45,27 +45,32 @@ class MirrorVoltageDevice(Device):
             return Status(success=True, done=True)
 
         LOGGER.debug(f"setting {setpoint_v.name} to {value}")
-        setpoint_status = setpoint_v.set(value)
         demand_accepted_status = Status(self, DEFAULT_SETTLE_TIME_S)
 
-        subscription: dict[str, Any] = {}
+        subscription: dict[str, Any] = {"handle": None, "old_value": None}
 
-        def demand_check_callback(value, **kwargs):
-            if value == DEMAND_ACCEPTED_OK:
+        def demand_check_callback(old_value, value, **kwargs):
+            # old_value parameter is unreliable when first called on subscribe, therefore we must
+            # save the current value and compare later to ensure that we definitely trigger on a rising edge.
+            LOGGER.debug(f"Got event old={old_value} new={value}")
+            if (
+                subscription["old_value"] is not None
+                and subscription["old_value"] != DEMAND_ACCEPTED_OK
+                and value == DEMAND_ACCEPTED_OK
+            ):
                 LOGGER.debug(f"Demand accepted for {setpoint_v.name}")
-                demand_accepted_status.set_finished()
-
-                subs_handle = subscription.pop("value", None)
+                subs_handle = subscription.pop("handle", None)
                 if subs_handle is None:
                     raise AssertionError("Demand accepted before set attempted")
                 demand_accepted.unsubscribe(subs_handle)
+
+                demand_accepted_status.set_finished()
             # else timeout handled by parent demand_accepted_status
+            else:
+                subscription["old_value"] = value
 
-        def setpoint_callback(status: Status):
-            if status.success:
-                subscription["value"] = demand_accepted.subscribe(demand_check_callback)
-
-        setpoint_status.add_callback(setpoint_callback)
+        subscription["handle"] = demand_accepted.subscribe(demand_check_callback)
+        setpoint_status = setpoint_v.set(value)
         status = setpoint_status & demand_accepted_status
         return status
 

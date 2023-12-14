@@ -1,4 +1,5 @@
-from unittest.mock import MagicMock, patch
+from threading import Timer
+from unittest.mock import DEFAULT, MagicMock, patch
 
 import pytest
 from ophyd.sim import NullStatus
@@ -13,7 +14,31 @@ from dodal.devices.focusing_mirror import (
 
 @pytest.fixture
 def vfm_mirror_voltages_with_set(vfm_mirror_voltages) -> VFMMirrorVoltages:
-    vfm_mirror_voltages._channel14_voltage_device._setpoint_v.set = MagicMock()
+    def not_ok_then_ok(_):
+        vfm_mirror_voltages._channel14_voltage_device._demand_accepted.sim_put(0)
+        Timer(
+            0.1,
+            lambda: vfm_mirror_voltages._channel14_voltage_device._demand_accepted.sim_put(
+                1
+            ),
+        ).start()
+        return DEFAULT
+
+    vfm_mirror_voltages._channel14_voltage_device._setpoint_v.set = MagicMock(
+        side_effect=not_ok_then_ok
+    )
+    return vfm_mirror_voltages
+
+
+@pytest.fixture
+def vfm_mirror_voltages_with_set_timing_out(vfm_mirror_voltages) -> VFMMirrorVoltages:
+    def not_ok(_):
+        vfm_mirror_voltages._channel14_voltage_device._demand_accepted.sim_put(0)
+        return DEFAULT
+
+    vfm_mirror_voltages._channel14_voltage_device._setpoint_v.set = MagicMock(
+        side_effect=not_ok
+    )
     return vfm_mirror_voltages
 
 
@@ -53,14 +78,15 @@ def test_mirror_set_voltage_sets_and_waits_set_fail(
 
 @patch("dodal.devices.focusing_mirror.DEFAULT_SETTLE_TIME_S", 3)
 def test_mirror_set_voltage_sets_and_waits_settle_timeout_expires(
-    vfm_mirror_voltages_with_set: VFMMirrorVoltages,
+    vfm_mirror_voltages_with_set_timing_out: VFMMirrorVoltages,
 ):
-    vfm_mirror_voltages_with_set._channel14_voltage_device._setpoint_v.set.return_value = (
+    vfm_mirror_voltages_with_set_timing_out._channel14_voltage_device._setpoint_v.set.return_value = (
         NullStatus()
     )
-    vfm_mirror_voltages_with_set._channel14_voltage_device._demand_accepted.sim_put(0)
 
-    status: StatusBase = vfm_mirror_voltages_with_set.voltage_channels[0].set(100)
+    status: StatusBase = vfm_mirror_voltages_with_set_timing_out.voltage_channels[
+        0
+    ].set(100)
 
     actual_exception = None
     try:
