@@ -76,9 +76,9 @@ ignore_missing_imports = true # Ignore missing stubs in imported modules
 markers = [
     "s03: marks tests as requiring the s03 simulator running (deselect with '-m \"not s03\"')",
 ]
+# --cov=dodal --cov-report term --cov-report xml:cov.xml
 addopts = """
     --tb=native -vv --doctest-modules --doctest-glob="*.rst"
-    --cov=dodal --cov-report term --cov-report xml:cov.xml
     """
 # Doctest python code in docs, python code in src docstrings, test functions in tests
 testpaths = "docs src tests"

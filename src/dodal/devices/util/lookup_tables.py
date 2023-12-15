@@ -2,6 +2,7 @@
 All the public methods in this module return a lookup table of some kind that
 converts the source value s to a target value t for different values of s.
 """
+from collections.abc import Sequence
 from typing import Callable
 
 import numpy as np
@@ -15,6 +16,8 @@ def linear_interpolation_lut(filename: str) -> Callable[[float], float]:
     LOGGER.info(f"Using lookup table {filename}")
     s_and_t_vals = zip(*loadtxt(filename, comments=["#", "Units"]))
 
+    s_values: Sequence
+    t_values: Sequence
     s_values, t_values = s_and_t_vals
 
     # numpy interp expects x-values to be increasing
@@ -32,8 +35,8 @@ def linear_interpolation_lut(filename: str) -> Callable[[float], float]:
                 f"Configuration file {filename} lookup table does not monotonically increase or decrease."
             )
 
-    def s_to_t(s: float) -> float:
+    def s_to_t2(s: float) -> float:
         # XXX numpy.interp doesn't do extrapolation, whereas GDA does, do we need this?
-        return interp(s, s_values, t_values)
+        return float(interp(s, s_values, t_values))
 
-    return s_to_t
+    return s_to_t2
