@@ -1,6 +1,7 @@
 from enum import Enum, auto
 from typing import Any, Optional, Tuple
 
+from hyperion.utils.get_run_number import get_run_number
 from pydantic import BaseModel, validator
 
 from dodal.devices.det_dim_constants import (
@@ -31,7 +32,6 @@ class DetectorParams(BaseModel):
     exposure_time: float
     directory: str
     prefix: str
-    run_number: int
     detector_distance: float
     omega_start: float
     omega_increment: float
@@ -42,6 +42,7 @@ class DetectorParams(BaseModel):
     trigger_mode: TriggerMode = TriggerMode.SET_FRAMES
     detector_size_constants: DetectorSizeConstants = EIGER2_X_16M_SIZE
     beam_xy_converter: DetectorDistanceToBeamXYConverter = None
+    run_number: int = 0
 
     class Config:
         arbitrary_types_allowed = True
@@ -71,6 +72,13 @@ class DetectorParams(BaseModel):
         return DetectorDistanceToBeamXYConverter(
             values["det_dist_to_beam_converter_path"]
         )
+
+    @validator("run_number", always=True)
+    def _set_run_number(cls, run_number: int, values: dict[str, Any]):
+        if values["run_number"] == 0:
+            return get_run_number(values["directory"])
+        else:
+            return values["run_number"]
 
     # The following are optional from GDA as populated internally
     # Where the VDS start index should be in the Nexus file
