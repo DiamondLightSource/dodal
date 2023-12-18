@@ -122,14 +122,14 @@ def add_grid_overlay_to_image(
 
 
 class SnapshotWithGrid(MJPG):
-    top_left_x: Signal = Component(Signal)
-    top_left_y: Signal = Component(Signal)
-    box_width: Signal = Component(Signal)
-    num_boxes_x: Signal = Component(Signal)
-    num_boxes_y: Signal = Component(Signal)
+    top_left_x = Component(Signal)
+    top_left_y = Component(Signal)
+    box_width = Component(Signal)
+    num_boxes_x = Component(Signal)
+    num_boxes_y = Component(Signal)
 
-    last_path_outer: Signal = Component(Signal)
-    last_path_full_overlay: Signal = Component(Signal)
+    last_path_outer = Component(Signal)
+    last_path_full_overlay = Component(Signal)
 
     def post_processing(self, image: Image.Image):
         top_left_x = self.top_left_x.get()

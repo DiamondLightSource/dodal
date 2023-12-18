@@ -32,6 +32,8 @@ class UndulatorDCM(Device):
     """
 
     class EnergySignal(Signal):
+        parent: "UndulatorDCM"
+
         def set(self, value, *, timeout=None, settle_time=None, **kwargs) -> Status:
             access_level = self.parent.undulator.gap_access.get()
             if access_level == UndulatorGapAccess.DISABLED.value:
@@ -69,7 +71,7 @@ class UndulatorDCM(Device):
 
             return status
 
-    energy_kev: EnergySignal = Component(EnergySignal)
+    energy_kev = Component(EnergySignal)
 
     def __init__(self, undulator: Undulator, dcm: DCM, *args, **kwargs):
         super().__init__(self, *args, **kwargs)

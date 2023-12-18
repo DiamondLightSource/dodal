@@ -16,7 +16,7 @@ def fake_transfocator():
 
 def given_predicted_lenses_is_half_of_beamsize(transfocator: Transfocator):
     def lens_number_is_half_beamsize(value, *args, **kwargs):
-        transfocator.predicted_vertical_num_lenses.sim_put(int(value / 2))
+        transfocator.predicted_vertical_num_lenses.sim_put(int(value / 2))  # type: ignore
 
     transfocator.beamsize_set_microns.subscribe(lens_number_is_half_beamsize)
 
@@ -24,7 +24,7 @@ def given_predicted_lenses_is_half_of_beamsize(transfocator: Transfocator):
 def test_given_beamsize_already_set_then_when_transfocator_set_then_returns_immediately(
     fake_transfocator: Transfocator,
 ):
-    fake_transfocator.beamsize_set_microns.sim_put(100)
+    fake_transfocator.beamsize_set_microns.sim_put(100)  # type: ignore
     set_status = fake_transfocator.set(100)
     set_status.wait(0.01)
     assert set_status.done and set_status.success

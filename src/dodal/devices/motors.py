@@ -5,9 +5,9 @@ from ophyd import Component, Device, EpicsMotor
 
 
 class XYZPositioner(Device):
-    x: EpicsMotor = Component(EpicsMotor, "X")
-    y: EpicsMotor = Component(EpicsMotor, "Y")
-    z: EpicsMotor = Component(EpicsMotor, "Z")
+    x = Component(EpicsMotor, "X")
+    y = Component(EpicsMotor, "Y")
+    z = Component(EpicsMotor, "Z")
 
 
 @dataclass

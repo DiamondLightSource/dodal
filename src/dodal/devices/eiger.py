@@ -26,12 +26,12 @@ class EigerDetector(Device):
         def set(self, value, *, timeout=None, settle_time=None, **kwargs):
             return self.parent.async_stage()
 
-    do_arm: ArmingSignal = Component(ArmingSignal)
-    cam: EigerDetectorCam = Component(EigerDetectorCam, "CAM:")
-    odin: EigerOdin = Component(EigerOdin, "")
+    do_arm = Component(ArmingSignal)
+    cam = Component(EigerDetectorCam, "CAM:")
+    odin = Component(EigerOdin, "")
 
-    stale_params: EpicsSignalRO = Component(EpicsSignalRO, "CAM:StaleParameters_RBV")
-    bit_depth: EpicsSignalRO = Component(EpicsSignalRO, "CAM:BitDepthImage_RBV")
+    stale_params = Component(EpicsSignalRO, "CAM:StaleParameters_RBV")
+    bit_depth = Component(EpicsSignalRO, "CAM:BitDepthImage_RBV")
 
     STALE_PARAMS_TIMEOUT = 60
     GENERAL_STATUS_TIMEOUT = 10

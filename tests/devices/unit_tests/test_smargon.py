@@ -13,15 +13,15 @@ def smargon() -> Smargon:
 
 
 def set_smargon_pos(smargon: Smargon, pos: Tuple[float, float, float]):
-    smargon.x.user_readback.sim_put(pos[0])
-    smargon.y.user_readback.sim_put(pos[1])
-    smargon.z.user_readback.sim_put(pos[2])
+    smargon.x.user_readback.sim_put(pos[0])  # type: ignore
+    smargon.y.user_readback.sim_put(pos[1])  # type: ignore
+    smargon.z.user_readback.sim_put(pos[2])  # type: ignore
 
 
 def test_given_to_robot_disp_low_when_stub_offsets_set_to_robot_load_then_proc_set(
     smargon: Smargon,
 ):
-    smargon.stub_offsets.to_robot_load.disp.sim_put(0)
+    smargon.stub_offsets.to_robot_load.disp.sim_put(0)  # type: ignore
 
     status = smargon.stub_offsets.set(StubPosition.RESET_TO_ROBOT_LOAD)
     status.wait()
@@ -33,7 +33,7 @@ def test_given_to_robot_disp_low_when_stub_offsets_set_to_robot_load_then_proc_s
 def test_given_center_disp_low_and_at_centre_when_stub_offsets_set_to_center_then_proc_set(
     smargon: Smargon,
 ):
-    smargon.stub_offsets.center_at_current_position.disp.sim_put(0)
+    smargon.stub_offsets.center_at_current_position.disp.sim_put(0)  # type: ignore
     set_smargon_pos(smargon, (0, 0, 0))
 
     status = smargon.stub_offsets.set(StubPosition.CURRENT_AS_CENTER)
@@ -46,7 +46,7 @@ def test_given_center_disp_low_and_at_centre_when_stub_offsets_set_to_center_the
 def test_given_center_disp_low_when_stub_offsets_set_to_center_and_moved_to_0_0_0_then_proc_set(
     smargon: Smargon,
 ):
-    smargon.stub_offsets.center_at_current_position.disp.sim_put(0)
+    smargon.stub_offsets.center_at_current_position.disp.sim_put(0)  # type: ignore
 
     set_smargon_pos(smargon, (1.5, 0.5, 3.4))
 
