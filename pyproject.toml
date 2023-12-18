@@ -19,6 +19,7 @@ dependencies = [
     "pyepics",
     "dataclasses-json",
     "pillow",
+    "zocalo",
     "requests",
     "graypy",
     "pydantic<2.0",
@@ -49,6 +50,7 @@ dev = [
     "tox-direct",
     "types-requests",
     "types-mock",
+    "types-PyYAML",
 ]
 
 [project.urls]
@@ -109,7 +111,7 @@ allowlist_externals =
     sphinx-autobuild
 commands =
     pytest: pytest -m 'not s03' {posargs}
-    mypy: mypy src tests --ignore-missing-imports --no-strict-optional {posargs}
+    mypy: mypy src tests -v --ignore-missing-imports --no-strict-optional --check-untyped-defs {posargs}
     pre-commit: pre-commit run --all-files {posargs}
     docs: sphinx-{posargs:build -EW --keep-going} -T docs build/html
 """

@@ -3,6 +3,9 @@ import sys
 from os import environ, getenv
 from unittest.mock import MagicMock, patch
 
+import pytest
+from bluesky.run_engine import RunEngine
+
 from dodal.log import LOGGER, GELFTCPHandler, set_up_logging_handlers
 
 
@@ -32,3 +35,8 @@ if s03_epics_server_port is not None:
 if s03_epics_repeater_port is not None:
     environ["EPICS_CA_REPEATER_PORT"] = s03_epics_repeater_port
     print(f"[EPICS_CA_REPEATER_PORT] = {s03_epics_repeater_port}")
+
+
+@pytest.fixture
+def RE():
+    return RunEngine()
