@@ -95,9 +95,9 @@ def test_aperture_scatterguard_rejects_unknown_position(
     aperture_positions, aperture_in_medium_pos
 ):
     for i in range(0, len(aperture_positions.MEDIUM)):
-        position_to_reject = list(aperture_positions.MEDIUM)
+        position_to_reject = aperture_positions.MEDIUM
         position_to_reject[i] += 0.01
-        position_to_reject = tuple(position_to_reject)
+        position_to_reject = position_to_reject
 
         with pytest.raises(InvalidApertureMove):
             aperture_in_medium_pos.set(position_to_reject)
