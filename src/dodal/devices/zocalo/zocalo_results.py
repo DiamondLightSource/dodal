@@ -121,11 +121,14 @@ class ZocaloResults(StandardReadable, Triggerable):
             # after timeout - this retry is for monitoring that and avoiding crashes
             # See https://github.com/DiamondLightSource/dodal/issues/265
             task = asyncio.create_task(_get_results())
+            shielded = asyncio.shield(task)
             try:
-                await asyncio.wait_for(asyncio.shield(task), self.timeout_s / 2)
-            except CancelledError:
+                await asyncio.wait_for(shielded, self.timeout_s / 2)
+            except (CancelledError, asyncio.exceptions.TimeoutError):
                 LOGGER.warning("Waited half of timeout for zocalo results - retrying")
-                await asyncio.wait_for(task, self.timeout_s / 2)
+                await asyncio.wait_for(_get_results, self.timeout_s / 2)
+            finally:
+                del shielded
 
         except TimeoutError:
             LOGGER.warning("Timed out waiting for zocalo results!")
