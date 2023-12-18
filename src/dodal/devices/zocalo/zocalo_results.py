@@ -126,7 +126,7 @@ class ZocaloResults(StandardReadable, Triggerable):
                 await asyncio.wait_for(shielded, self.timeout_s / 2)
             except (CancelledError, asyncio.exceptions.TimeoutError):
                 LOGGER.warning("Waited half of timeout for zocalo results - retrying")
-                await asyncio.wait_for(_get_results, self.timeout_s / 2)
+                await asyncio.wait_for(task, self.timeout_s / 2)
             finally:
                 del shielded
 
