@@ -1,4 +1,5 @@
 import asyncio
+from asyncio.exceptions import CancelledError
 from collections import OrderedDict
 from enum import Enum
 from typing import Any, Generator, Sequence, Tuple, TypedDict, Union
@@ -122,7 +123,7 @@ class ZocaloResults(StandardReadable, Triggerable):
             task = asyncio.create_task(_get_results())
             try:
                 await asyncio.wait_for(asyncio.shield(task), self.timeout_s / 2)
-            except TimeoutError:
+            except CancelledError:
                 LOGGER.warning("Waited half of timeout for zocalo results - retrying")
                 await asyncio.wait_for(task, self.timeout_s / 2)
 
