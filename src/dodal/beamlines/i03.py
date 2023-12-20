@@ -20,6 +20,7 @@ from dodal.devices.sample_shutter import SampleShutter
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import Undulator
+from dodal.devices.undulator_dcm import UndulatorDCM
 from dodal.devices.xbpm_feedback import XBPMFeedback
 from dodal.devices.xspress3_mini.xspress3_mini import Xspress3Mini
 from dodal.devices.zebra import Zebra
@@ -295,6 +296,24 @@ def undulator(
         wait_for_connection,
         fake_with_ophyd_sim,
         bl_prefix=False,
+    )
+
+
+@skip_device(lambda: BL == "s03")
+def undulator_dcm(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> UndulatorDCM:
+    """Get the i03 undulator DCM device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        UndulatorDCM,
+        name="undulator_dcm",
+        prefix="",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+        undulator=undulator(wait_for_connection, fake_with_ophyd_sim),
+        dcm=dcm(wait_for_connection, fake_with_ophyd_sim),
     )
 
 

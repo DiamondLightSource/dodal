@@ -78,6 +78,6 @@ class UndulatorDCM(Device):
     energy_kev = Component(EnergySignal)
 
     def __init__(self, undulator: Undulator, dcm: DCM, *args, **kwargs):
-        super().__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.undulator = undulator
         self.dcm = dcm
