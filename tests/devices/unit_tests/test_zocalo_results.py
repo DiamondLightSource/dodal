@@ -11,6 +11,7 @@ from ophyd_async.core.async_status import AsyncStatus
 
 from dodal.devices.zocalo.zocalo_results import (
     ZOCALO_READING_PLAN_NAME,
+    NoResultsFromZocalo,
     XrcResult,
     ZocaloResults,
     get_processing_result,
@@ -199,11 +200,9 @@ def test_when_exception_caused_by_zocalo_message_then_exception_propagated(
 ):
     RE = RunEngine()
     zocalo_results = ZocaloResults(
-        name="zocalo", zocalo_environment="dev_artemis", timeout_s=2
+        name="zocalo", zocalo_environment="dev_artemis", timeout_s=0.1
     )
     with pytest.raises(FailedStatus) as e:
         RE(bps.trigger(zocalo_results, wait=True))
 
-    tb = str(e.getrepr())
-    assert "exceptions.CancelledError" in tb
-    assert "TimeoutError" in tb
+    assert isinstance(e.value.__cause__, NoResultsFromZocalo)

@@ -20,6 +20,10 @@ from dodal.log import LOGGER
 DEFAULT_TIMEOUT = 180
 
 
+class NoResultsFromZocalo(Exception):
+    pass
+
+
 class SortKeys(str, Enum):
     max_count = "max_count"
     total_count = "total_count"
@@ -122,13 +126,13 @@ class ZocaloResults(StandardReadable, Triggerable):
             task = asyncio.create_task(_get_results())
             try:
                 await asyncio.wait_for(asyncio.shield(task), self.timeout_s / 2)
-            except TimeoutError:
+            except asyncio.TimeoutError:
                 LOGGER.warning("Waited half of timeout for zocalo results - retrying")
                 await asyncio.wait_for(task, self.timeout_s / 2)
 
-        except TimeoutError:
+        except asyncio.TimeoutError as timeout_exception:
             LOGGER.warning("Timed out waiting for zocalo results!")
-            raise
+            raise NoResultsFromZocalo() from timeout_exception
         finally:
             self._kickoff_run = False
 
