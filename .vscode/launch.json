@@ -14,6 +14,7 @@
                 "debug-test"
             ],
             "console": "integratedTerminal",
+            "preLaunchTask": "load_dials_env",
             "env": {
                 // The default config in setup.cfg's "[tool:pytest]" adds coverage.
                 // Cannot have coverage and debugging at the same time.
