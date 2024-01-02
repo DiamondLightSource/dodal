@@ -100,6 +100,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/262_make_arming_eiger_asynchronous/"
   },
   {
+    "version": "269_fix_zocalo_test",
+    "url": "https://DiamondLightSource.github.io/dodal/269_fix_zocalo_test/"
+  },
+  {
     "version": "51_aperture_scatterguard_no_positions",
     "url": "https://DiamondLightSource.github.io/dodal/51_aperture_scatterguard_no_positions/"
   },
