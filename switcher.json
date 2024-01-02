@@ -164,6 +164,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1007_reset_stub_offsets_if_required/"
   },
   {
+    "version": "hyperion_1036_set_energy_integrate_set_energy_functions_into_hyperion_plans",
+    "url": "https://DiamondLightSource.github.io/dodal/hyperion_1036_set_energy_integrate_set_energy_functions_into_hyperion_plans/"
+  },
+  {
     "version": "hyperion_698_refactor_parameters",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_698_refactor_parameters/"
   },
