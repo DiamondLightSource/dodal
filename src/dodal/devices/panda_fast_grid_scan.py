@@ -72,6 +72,9 @@ class PandaGridScanParams(BaseModel, AbstractExperimentParameterBase):
     z_axis: GridAxis = GridAxis(0, 0, 0)
     runnup_distance_mm: float = 0.1
 
+    # Whether to set the stub offsets after centering
+    set_stub_offsets: bool = False
+
     class Config:
         arbitrary_types_allowed = True
         fields = {
