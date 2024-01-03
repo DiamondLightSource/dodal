@@ -95,21 +95,6 @@ def vfm_mirror_voltages(
     )
 
 
-@skip_device(lambda: BL == "s03")
-def hfm(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> FocusingMirror:
-    return device_instantiation(
-        device_factory=FocusingMirror,
-        name="hfm",
-        prefix="-OP-HFM-01:",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
-        bragg_to_lat_lut_path=DAQ_CONFIGURATION_PATH
-        + "/lookup/BeamLineEnergy_DCM_HFM_y_converter.txt",
-    )
-
-
 def aperture_scatterguard(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
