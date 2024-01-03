@@ -71,7 +71,6 @@ class PandaGridScanParams(BaseModel, AbstractExperimentParameterBase):
     y_axis: GridAxis = GridAxis(0, 0, 0)
     z_axis: GridAxis = GridAxis(0, 0, 0)
     runnup_distance_mm: float = 0.1
-    time_between_x_steps_ms: float = 0
 
     class Config:
         arbitrary_types_allowed = True
@@ -92,17 +91,6 @@ class PandaGridScanParams(BaseModel, AbstractExperimentParameterBase):
     @validator("z_axis", always=True)
     def _get_z_axis(cls, z_axis: GridAxis, values: dict[str, Any]) -> GridAxis:
         return GridAxis(values["z2_start"], values["z_step_size"], values["z_steps"])
-
-    # If not specified, set so that the goniometer speed is 9mm/s
-    @validator("time_between_x_steps_ms", always=True)
-    def _set_time_between_x_steps(
-        cls, time_between_x_steps_ms: float, values: dict[str, Any]
-    ) -> float:
-        if time_between_x_steps_ms == 0:
-            time_between_x_steps_ms = values["x_step_size"] * 1e3
-            return time_between_x_steps_ms / 9e-3
-        else:
-            return time_between_x_steps_ms
 
     def is_valid(self, limits: XYZLimitBundle) -> bool:
         """
@@ -131,15 +119,7 @@ class PandaGridScanParams(BaseModel, AbstractExperimentParameterBase):
             x_in_limits and z_in_limits and limits.y.is_within(self.y2_start)
         )
 
-        within_smargon_speed_limit = (
-            self.runnup_distance_mm / self.time_between_x_steps_ms < 10e-3
-        )
-
-        return (
-            first_grid_in_limits
-            and second_grid_in_limits
-            and within_smargon_speed_limit
-        )
+        return first_grid_in_limits and second_grid_in_limits
 
     def get_num_images(self):
         return self.x_steps * self.y_steps + self.x_steps * self.z_steps
@@ -238,9 +218,7 @@ class PandAFastGridScan(Device):
     x_step_size: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "X_STEP_SIZE")
     y_step_size: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "Y_STEP_SIZE")
     z_step_size: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "Z_STEP_SIZE")
-
-    # dwell_time: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "DWELL_TIME")
-    # Dwell time shouldn't be used for panda scan
+    time_between_x_steps_ms = Component(EpicsSignalWithRBV, "TIME_BETWEEN_X_STEPS")
 
     runup_distance: EpicsSignalWithRBV = Component(EpicsSignal, "RUNUP_DISTANCE")
 
