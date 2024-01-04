@@ -6,7 +6,6 @@ on:
 env:
   # The target python version, which must match the Dockerfile version
   CONTAINER_PYTHON: "3.11"
-  DIST_LOCKFILE_PATH: lockfiles-${{env.CONTAINER_PYTHON}}-dist-${{ github.sha }}
 
 jobs:
   lint:
@@ -85,6 +84,11 @@ jobs:
           # Need this to get version number from last tag
           fetch-depth: 0
 
+      - name: Set artifact locations in environment
+        run: |
+          echo "DIST_LOCKFILE_PATH=lockfiles-${{ env.CONTAINER_PYTHON }}-dist-${{ github.sha }}" >> $GITHUB_ENV
+          echo "DIST_WHEEL_PATH=dist-${{ github.sha }}" >> $GITHUB_ENV
+
       - name: Build sdist and wheel
         run: |
           export SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct) && \
@@ -93,7 +97,7 @@ jobs:
       - name: Upload sdist and wheel as artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: dist-${{ github.sha }}
+          name: ${{ env.DIST_WHEEL_PATH }}
           path: dist
 
       - name: Check for packaging errors
@@ -154,7 +158,7 @@ jobs:
           # step and the later build-push-action, otherwise the second build-push-action
           # will attempt to build the image again
           build-args: |
-            PIP_OPTIONS=-r ${{env.DIST_LOCKFILE_PATH}}/requirements.txt dist-${{ github.sha }}/*.whl
+            PIP_OPTIONS=-r ${{ env.DIST_LOCKFILE_PATH }}/requirements.txt ${{ env.DIST_WHEEL_PATH }}/*.whl
           context: artifacts/
           file: ./Dockerfile
           target: runtime
@@ -195,7 +199,7 @@ jobs:
           # step and the previous build-push-action, otherwise this step will
           # attempt to build the image again
           build-args: |
-            PIP_OPTIONS=-r ${{env.DIST_LOCKFILE_PATH}}/requirements.txt dist-${{ github.sha }}/*.whl
+            PIP_OPTIONS=-r ${{ env.DIST_LOCKFILE_PATH }}/requirements.txt ${{ env.DIST_WHEEL_PATH }}/*.whl
           context: artifacts/
           file: ./Dockerfile
           target: runtime
@@ -220,7 +224,7 @@ jobs:
 
       - name: Fixup blank lockfiles
         # Github release artifacts can't be blank
-        run: for f in ${{env.DIST_LOCKFILE_PATH}}/*; do [ -s $f ] || echo '# No requirements' >> $f; done
+        run: for f in ${{ env.DIST_LOCKFILE_PATH }}/*; do [ -s $f ] || echo '# No requirements' >> $f; done
 
       - name: Github Release
         # We pin to the SHA, not the tag, for security reasons.
@@ -229,8 +233,8 @@ jobs:
         with:
           prerelease: ${{ contains(github.ref_name, 'a') || contains(github.ref_name, 'b') || contains(github.ref_name, 'rc') }}
           files: |
-            dist-${{ github.sha }}/*
-            ${{env.DIST_LOCKFILE_PATH}}/*
+            ${{ env.DIST_WHEEL_PATH }}/*
+            ${{ env.DIST_LOCKFILE_PATH }}/*
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
