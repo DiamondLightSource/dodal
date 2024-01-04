@@ -56,7 +56,7 @@ def create_loop():
     """Needed as loops are instantiated differently in different python versions.
     Remove when we drop support for Python 3.9"""
     if version.parse(platform.python_version()) < version.parse("3.10"):
-        return asyncio.Queue(loop=get_bluesky_event_loop())
+        return asyncio.Queue(loop=get_bluesky_event_loop())  # type: ignore
     else:
         return asyncio.Queue()
 
