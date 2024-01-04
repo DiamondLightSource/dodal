@@ -187,10 +187,6 @@ jobs:
           # Add line above to generate image for every commit to given branch,
           # and uncomment the end of if clause in next step
 
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v3
-
       - name: Push cached image to container registry
         if: github.ref_type == 'tag' # || github.ref_name == 'main'
         uses: docker/build-push-action@v5
