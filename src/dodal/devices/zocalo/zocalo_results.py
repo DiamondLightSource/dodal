@@ -1,4 +1,5 @@
 import asyncio
+import platform
 from collections import OrderedDict
 from enum import Enum
 from typing import Any, Generator, Sequence, Tuple, TypedDict, Union
@@ -8,10 +9,11 @@ import numpy as np
 import workflows.recipe
 import workflows.transport
 from bluesky.protocols import Descriptor, Triggerable
-from bluesky.run_engine import call_in_bluesky_event_loop
+from bluesky.run_engine import call_in_bluesky_event_loop, get_bluesky_event_loop
 from numpy.typing import NDArray
 from ophyd_async.core import StandardReadable
 from ophyd_async.core.async_status import AsyncStatus
+from packaging import version
 
 from dodal.devices.ophyd_async_utils import create_soft_signal_r
 from dodal.devices.zocalo.zocalo_interaction import _get_zocalo_connection
@@ -50,6 +52,15 @@ def bbox_size(result: XrcResult):
     ]
 
 
+def create_loop():
+    """Needed as loops are instantiated differently in different python versions.
+    Remove when we drop support for Python 3.9"""
+    if version.parse(platform.python_version()) < version.parse("3.10"):
+        return asyncio.Queue(loop=get_bluesky_event_loop())
+    else:
+        return asyncio.Queue()
+
+
 class ZocaloResults(StandardReadable, Triggerable):
     """An ophyd device which can wait for results from a Zocalo job. These jobs should
     be triggered from a plan-subscribed callback using the run_start() and run_end()
@@ -73,7 +84,7 @@ class ZocaloResults(StandardReadable, Triggerable):
         self._prefix = prefix
 
         self._subscription_run: bool = False
-        self._raw_results_received: asyncio.Queue = asyncio.Queue()
+        self._raw_results_received: asyncio.Queue = create_loop()
 
         self.results = create_soft_signal_r(list[XrcResult], "results", self.name)
         self.centres_of_mass = create_soft_signal_r(
