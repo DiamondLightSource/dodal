@@ -91,7 +91,7 @@ jobs:
       - name: Upload sdist and wheel as artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: dist
+          name: dist-${{ github.sha }}
           path: dist
 
       - name: Check for packaging errors
