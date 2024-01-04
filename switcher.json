@@ -242,5 +242,9 @@
   {
     "version": "tom_testing",
     "url": "https://DiamondLightSource.github.io/dodal/tom_testing/"
+  },
+  {
+    "version": "update_deps",
+    "url": "https://DiamondLightSource.github.io/dodal/update_deps/"
   }
 ]
