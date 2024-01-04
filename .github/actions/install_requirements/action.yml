@@ -7,12 +7,12 @@ inputs:
   install_options:
     description: Parameters to pass to pip install
     required: true
+  artifact_name:
+    description: A user friendly name to give the produced artifacts
+    required: true
   python_version:
     description: Python version to install
     default: "3.x"
-  artifact_name:
-    description: A user friendly name to give the produced artifacts
-    default: "tests"
 
 runs:
   using: composite
@@ -39,7 +39,7 @@ runs:
       shell: bash
 
     - name: Upload lockfiles
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v4.0.0
       with:
         name: lockfiles-${{ inputs.python_version }}-${{ inputs.artifact_name }}-${{ github.sha }}
         path: lockfiles
