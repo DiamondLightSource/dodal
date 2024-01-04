@@ -6,6 +6,7 @@ on:
 env:
   # The target python version, which must match the Dockerfile version
   CONTAINER_PYTHON: "3.11"
+  DIST_WHEEL_PATH: dist-${{ github.sha }}
 
 jobs:
   lint:
@@ -84,11 +85,6 @@ jobs:
           # Need this to get version number from last tag
           fetch-depth: 0
 
-      - name: Set artifact locations in environment
-        run: |
-          echo "DIST_LOCKFILE_PATH=lockfiles-${{ env.CONTAINER_PYTHON }}-dist-${{ github.sha }}" >> $GITHUB_ENV
-          echo "DIST_WHEEL_PATH=dist-${{ github.sha }}" >> $GITHUB_ENV
-
       - name: Build sdist and wheel
         run: |
           export SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct) && \
@@ -133,6 +129,10 @@ jobs:
       # image names must be all lower case
       - name: Generate image repo name
         run: echo IMAGE_REPOSITORY=ghcr.io/$(tr '[:upper:]' '[:lower:]' <<< "${{ github.repository }}") >> $GITHUB_ENV
+
+      - name: Set lockfile location in environment
+        run: |
+          echo "DIST_LOCKFILE_PATH=lockfiles-${{ env.CONTAINER_PYTHON }}-dist-${{ github.sha }}" >> $GITHUB_ENV
 
       - name: Download wheel and lockfiles
         uses: actions/download-artifact@v4
