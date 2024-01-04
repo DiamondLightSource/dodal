@@ -13,6 +13,12 @@ from dodal.devices.focusing_mirror import (
 
 
 @pytest.fixture
+def vfm_mirror_voltages_not_ok(vfm_mirror_voltages) -> VFMMirrorVoltages:
+    vfm_mirror_voltages._channel14_voltage_device._demand_accepted.sim_put(0)
+    return vfm_mirror_voltages
+
+
+@pytest.fixture
 def vfm_mirror_voltages_with_set(vfm_mirror_voltages) -> VFMMirrorVoltages:
     def not_ok_then_ok(_):
         vfm_mirror_voltages._channel14_voltage_device._demand_accepted.sim_put(0)
@@ -27,6 +33,7 @@ def vfm_mirror_voltages_with_set(vfm_mirror_voltages) -> VFMMirrorVoltages:
     vfm_mirror_voltages._channel14_voltage_device._setpoint_v.set = MagicMock(
         side_effect=not_ok_then_ok
     )
+    vfm_mirror_voltages._channel14_voltage_device._demand_accepted.sim_put(1)
     return vfm_mirror_voltages
 
 
@@ -39,6 +46,7 @@ def vfm_mirror_voltages_with_set_timing_out(vfm_mirror_voltages) -> VFMMirrorVol
     vfm_mirror_voltages._channel14_voltage_device._setpoint_v.set = MagicMock(
         side_effect=not_ok
     )
+    vfm_mirror_voltages._channel14_voltage_device._demand_accepted.sim_put(1)
     return vfm_mirror_voltages
 
 
@@ -60,6 +68,13 @@ def test_mirror_set_voltage_sets_and_waits_happy_path(
     assert status.success
 
 
+def test_mirror_set_voltage_set_rejected_when_not_ok(
+    vfm_mirror_voltages_not_ok: VFMMirrorVoltages,
+):
+    with pytest.raises(AssertionError):
+        vfm_mirror_voltages_not_ok.voltage_channels[0].set(100)
+
+
 def test_mirror_set_voltage_sets_and_waits_set_fail(
     vfm_mirror_voltages_with_set: VFMMirrorVoltages,
 ):
@@ -68,10 +83,8 @@ def test_mirror_set_voltage_sets_and_waits_set_fail(
     )
 
     status: StatusBase = vfm_mirror_voltages_with_set.voltage_channels[0].set(100)
-    try:
+    with pytest.raises(Exception):
         status.wait()
-    except Exception:
-        pass
 
     assert not status.success
 
@@ -88,15 +101,12 @@ def test_mirror_set_voltage_sets_and_waits_settle_timeout_expires(
         0
     ].set(100)
 
-    actual_exception = None
-    try:
+    with pytest.raises(Exception) as excinfo:
         status.wait()
-    except Exception as e:
-        actual_exception = e
 
     # Cannot assert because ophyd discards the original exception
-    # assert isinstance(actual_exception, WaitTimeoutError)
-    assert actual_exception
+    # assert isinstance(excinfo.value, WaitTimeoutError)
+    assert excinfo.value
 
 
 def test_mirror_set_voltage_returns_immediately_if_voltage_already_demanded(

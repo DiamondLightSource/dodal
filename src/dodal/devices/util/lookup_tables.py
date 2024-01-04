@@ -28,15 +28,15 @@ def linear_interpolation_lut(filename: str) -> Callable[[float], float]:
         s_values = list(reversed(s_values))
         t_values = list(reversed(t_values))
         if not np.all(np.diff(s_values) > 0):
-            LOGGER.error(
-                f"Configuration file {filename} lookup table does not monotonically increase or decrease."
-            )
             raise AssertionError(
                 f"Configuration file {filename} lookup table does not monotonically increase or decrease."
             )
 
     def s_to_t2(s: float) -> float:
-        # XXX numpy.interp doesn't do extrapolation, whereas GDA does, do we need this?
+        if s < s_values[0] or s > s_values[len(s_values) - 1]:
+            raise ValueError(
+                f"Lookup table does not support extrapolation from file {filename}, s={s}"
+            )
         return float(interp(s, s_values, t_values))
 
     return s_to_t2

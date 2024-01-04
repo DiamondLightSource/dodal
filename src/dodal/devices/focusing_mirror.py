@@ -33,8 +33,8 @@ class MirrorVoltageDevice(Device):
         """Combine the following operations into a single set:
         1. apply the value to the setpoint PV
         2. Return to the caller with a Status future
-        3. Asynchronously poll the demand_accepted PV every VOLTAGE_POLLING_DELAY_S until demand is accepted
-        4. when either demand is accepted or DEFAULT_SETTLE_TIME expires, signal the result on the Status
+        3. Wait until demand is accepted
+        4. When either demand is accepted or DEFAULT_SETTLE_TIME expires, signal the result on the Status
         """
 
         setpoint_v = self._setpoint_v
@@ -44,20 +44,19 @@ class MirrorVoltageDevice(Device):
             LOGGER.debug(f"{setpoint_v.name} already at {value} - skipping set")
             return Status(success=True, done=True)
 
+        if demand_accepted.get() != DEMAND_ACCEPTED_OK:
+            raise AssertionError(
+                f"Attempted to set {setpoint_v.name} when demand is not accepted."
+            )
+
         LOGGER.debug(f"setting {setpoint_v.name} to {value}")
         demand_accepted_status = Status(self, DEFAULT_SETTLE_TIME_S)
 
-        subscription: dict[str, Any] = {"handle": None, "old_value": None}
+        subscription: dict[str, Any] = {"handle": None}
 
         def demand_check_callback(old_value, value, **kwargs):
-            # old_value parameter is unreliable when first called on subscribe, therefore we must
-            # save the current value and compare later to ensure that we definitely trigger on a rising edge.
             LOGGER.debug(f"Got event old={old_value} new={value}")
-            if (
-                subscription["old_value"] is not None
-                and subscription["old_value"] != DEMAND_ACCEPTED_OK
-                and value == DEMAND_ACCEPTED_OK
-            ):
+            if old_value != DEMAND_ACCEPTED_OK and value == DEMAND_ACCEPTED_OK:
                 LOGGER.debug(f"Demand accepted for {setpoint_v.name}")
                 subs_handle = subscription.pop("handle", None)
                 if subs_handle is None:
@@ -66,8 +65,6 @@ class MirrorVoltageDevice(Device):
 
                 demand_accepted_status.set_finished()
             # else timeout handled by parent demand_accepted_status
-            else:
-                subscription["old_value"] = value
 
         subscription["handle"] = demand_accepted.subscribe(demand_check_callback)
         setpoint_status = setpoint_v.set(value)
@@ -82,30 +79,14 @@ class VFMMirrorVoltages(Device):
             daq_configuration_path + "/json/mirrorFocus.json"
         )
 
-    _channel14_voltage_device: MirrorVoltageDevice = Component(
-        MirrorVoltageDevice, "BM:V14"
-    )
-    _channel15_voltage_device: MirrorVoltageDevice = Component(
-        MirrorVoltageDevice, "BM:V15"
-    )
-    _channel16_voltage_device: MirrorVoltageDevice = Component(
-        MirrorVoltageDevice, "BM:V16"
-    )
-    _channel17_voltage_device: MirrorVoltageDevice = Component(
-        MirrorVoltageDevice, "BM:V17"
-    )
-    _channel18_voltage_device: MirrorVoltageDevice = Component(
-        MirrorVoltageDevice, "BM:V18"
-    )
-    _channel19_voltage_device: MirrorVoltageDevice = Component(
-        MirrorVoltageDevice, "BM:V19"
-    )
-    _channel20_voltage_device: MirrorVoltageDevice = Component(
-        MirrorVoltageDevice, "BM:V20"
-    )
-    _channel21_voltage_device: MirrorVoltageDevice = Component(
-        MirrorVoltageDevice, "BM:V21"
-    )
+    _channel14_voltage_device = Component(MirrorVoltageDevice, "BM:V14")
+    _channel15_voltage_device = Component(MirrorVoltageDevice, "BM:V15")
+    _channel16_voltage_device = Component(MirrorVoltageDevice, "BM:V16")
+    _channel17_voltage_device = Component(MirrorVoltageDevice, "BM:V17")
+    _channel18_voltage_device = Component(MirrorVoltageDevice, "BM:V18")
+    _channel19_voltage_device = Component(MirrorVoltageDevice, "BM:V19")
+    _channel20_voltage_device = Component(MirrorVoltageDevice, "BM:V20")
+    _channel21_voltage_device = Component(MirrorVoltageDevice, "BM:V21")
 
     @property
     def voltage_channels(self) -> list[MirrorVoltageDevice]:
