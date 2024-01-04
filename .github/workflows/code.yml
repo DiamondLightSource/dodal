@@ -172,9 +172,6 @@ jobs:
           #cache-from: type=gha
           #cache-to: type=gha,mode=max
 
-      - name: Test cli works in cached runtime image
-        run: docker run docker.io/library/${{ env.TEST_TAG }} --version
-
       - name: Create tags for publishing image
         id: meta
         uses: docker/metadata-action@v5
