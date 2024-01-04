@@ -23,6 +23,7 @@ jobs:
           requirements_file: requirements-dev-3.x.txt
           install_options: -e .[dev]
           python_version: "3.11"
+          artifact_name: lint
 
       - name: Lint
         run: tox -e pre-commit,mypy
@@ -103,6 +104,7 @@ jobs:
           python_version: ${{env.CONTAINER_PYTHON}}
           requirements_file: requirements.txt
           install_options: dist/*.whl
+          artifact_name: dist
 
       - name: Test module --version works using the installed wheel
         # If more than one module in src/ replace with module name to test
