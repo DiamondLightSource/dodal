@@ -220,13 +220,14 @@ jobs:
         with:
           pattern: "*dist*"
 
-      - name: Set lockfile location in environment
+      - name: Rename lockfiles and dist
         run: |
-          echo "DIST_LOCKFILE_PATH=lockfiles-${{ env.CONTAINER_PYTHON }}-dist-${{ github.sha }}" >> $GITHUB_ENV
+          mv lockfiles-${{ env.CONTAINER_PYTHON }}-dist-${{ github.sha }} lockfiles
+          mv ${{ env.DIST_WHEEL_PATH }} dist
 
       - name: Fixup blank lockfiles
         # Github release artifacts can't be blank
-        run: for f in ${{ env.DIST_LOCKFILE_PATH }}/*; do [ -s $f ] || echo '# No requirements' >> $f; done
+        run: for f in lockfiles/*; do [ -s $f ] || echo '# No requirements' >> $f; done
 
       - name: Github Release
         # We pin to the SHA, not the tag, for security reasons.
@@ -235,8 +236,8 @@ jobs:
         with:
           prerelease: ${{ contains(github.ref_name, 'a') || contains(github.ref_name, 'b') || contains(github.ref_name, 'rc') }}
           files: |
-            ${{ env.DIST_WHEEL_PATH }}/*
-            ${{ env.DIST_LOCKFILE_PATH }}/*
+            dist/*
+            lockfiles/*
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
