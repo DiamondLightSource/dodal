@@ -221,11 +221,13 @@ jobs:
           path: artifacts/
           pattern: "*dist*"
 
-      - name: Set lockfile location in environment and fix blank lockfiles
-        # Github release artifacts can't be blank
+      - name: Set lockfile location in environment
         run: |
           echo "DIST_LOCKFILE_PATH=lockfiles-${{ env.CONTAINER_PYTHON }}-dist-${{ github.sha }}" >> $GITHUB_ENV
-          for f in ${{ env.DIST_LOCKFILE_PATH }}/*; do [ -s $f ] || echo '# No requirements' >> $f; done
+
+      - name: Fixup blank lockfiles
+        # Github release artifacts can't be blank
+        run: for f in ${{ env.DIST_LOCKFILE_PATH }}/*; do [ -s $f ] || echo '# No requirements' >> $f; done
 
       - name: Github Release
         # We pin to the SHA, not the tag, for security reasons.
