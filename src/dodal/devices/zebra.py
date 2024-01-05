@@ -7,7 +7,7 @@ from typing import List
 from ophyd import Component, Device, EpicsSignal, StatusBase
 
 from dodal.devices.status import await_value
-from dodal.devices.utils import epics_signal_put_wait
+from dodal.devices.util.epics_util import epics_signal_put_wait
 
 PC_ARM_SOURCE_SOFT = "Soft"
 PC_ARM_SOURCE_EXT = "External"

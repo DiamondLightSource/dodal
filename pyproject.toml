@@ -80,8 +80,8 @@ markers = [
     "s03: marks tests as requiring the s03 simulator running (deselect with '-m \"not s03\"')",
 ]
 addopts = """
-    --tb=native -vv --doctest-modules --doctest-glob="*.rst"
     --cov=dodal --cov-report term --cov-report xml:cov.xml
+    --tb=native -vv --doctest-modules --doctest-glob="*.rst"
     """
 # Doctest python code in docs, python code in src docstrings, test functions in tests
 testpaths = "docs src tests"

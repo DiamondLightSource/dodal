@@ -7,7 +7,7 @@ from ophyd.status import StatusBase
 
 from dodal.devices.motors import MotorLimitHelper, XYZLimitBundle
 from dodal.devices.status import await_approx_value
-from dodal.devices.utils import SetWhenEnabled
+from dodal.devices.util.epics_util import SetWhenEnabled
 
 
 class StubPosition(Enum):
