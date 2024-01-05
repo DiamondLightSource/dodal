@@ -11,6 +11,7 @@ from ophyd_async.core.async_status import AsyncStatus
 
 from dodal.devices.zocalo.zocalo_results import (
     ZOCALO_READING_PLAN_NAME,
+    NoResultsFromZocalo,
     XrcResult,
     ZocaloResults,
     get_processing_result,
@@ -177,7 +178,9 @@ async def test_extraction_plan(mocked_zocalo_device, RE) -> None:
     "dodal.devices.zocalo.zocalo_results.workflows.recipe.wrap_subscribe", autospec=True
 )
 @patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection", autospec=True)
+@patch("dodal.devices.zocalo.zocalo_results.asyncio.wait_for")
 def test_subscribe_only_called_once_on_first_trigger(
+    mock_await_for: MagicMock,
     mock_connection: MagicMock,
     mock_wrap_subscribe: MagicMock,
 ):
@@ -199,11 +202,9 @@ def test_when_exception_caused_by_zocalo_message_then_exception_propagated(
 ):
     RE = RunEngine()
     zocalo_results = ZocaloResults(
-        name="zocalo", zocalo_environment="dev_artemis", timeout_s=2
+        name="zocalo", zocalo_environment="dev_artemis", timeout_s=0.1
     )
     with pytest.raises(FailedStatus) as e:
         RE(bps.trigger(zocalo_results, wait=True))
 
-    tb = str(e.getrepr())
-    assert "exceptions.CancelledError" in tb
-    assert "TimeoutError" in tb
+    assert isinstance(e.value.__cause__, NoResultsFromZocalo)
