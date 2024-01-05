@@ -1,6 +1,8 @@
 from os import environ
 from unittest.mock import patch
 
+import pytest
+
 from dodal.beamlines.beamline_parameters import (
     GDABeamlineParameters,
     get_beamline_parameters,
@@ -58,6 +60,11 @@ def test_parse_list():
         assert expected == actual, f"Actual:{actual}, expected: {expected}\n"
 
 
+def test_parse_list_raises_exception():
+    with pytest.raises(ValueError):
+        GDABeamlineParameters.parse_value("[1, 2")
+
+
 def test_get_beamline_parameters_works_with_no_environment_variable_set():
     if environ.get("BEAMLINE"):
         del environ["BEAMLINE"]
@@ -80,3 +87,19 @@ def test_get_beamline_parameters():
         environ["BEAMLINE"] = original_beamline
     else:
         del environ["BEAMLINE"]
+
+
+@patch("dodal.beamlines.beamline_parameters.get_beamline_name")
+def test_get_beamline_parameters_raises_error_when_beamline_not_set(get_beamline_name):
+    get_beamline_name.return_value = None
+    with pytest.raises(KeyError):
+        get_beamline_parameters()
+
+
+@patch("dodal.beamlines.beamline_parameters.get_beamline_name")
+def test_get_beamline_parameters_raises_error_when_beamline_not_found(
+    get_beamline_name,
+):
+    get_beamline_name.return_value = "invalid_beamline"
+    with pytest.raises(KeyError):
+        get_beamline_parameters()
