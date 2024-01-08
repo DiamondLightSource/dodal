@@ -3,5 +3,5 @@ from abc import ABC, abstractmethod
 
 class AbstractExperimentParameterBase(ABC):
     @abstractmethod
-    def get_num_images(self):
+    def get_num_images(self) -> int:
         pass
