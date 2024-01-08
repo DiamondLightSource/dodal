@@ -52,7 +52,7 @@ def bbox_size(result: XrcResult):
     ]
 
 
-def create_loop():
+def create_queue() -> asyncio.Queue:
     """Needed as loops are instantiated differently in different python versions.
     Remove when we drop support for Python 3.9"""
     if version.parse(platform.python_version()) < version.parse("3.10"):
@@ -84,7 +84,7 @@ class ZocaloResults(StandardReadable, Triggerable):
         self._prefix = prefix
 
         self._subscription_run: bool = False
-        self._raw_results_received: asyncio.Queue = create_loop()
+        self._raw_results_received: asyncio.Queue = create_queue()
 
         self.results = create_soft_signal_r(list[XrcResult], "results", self.name)
         self.centres_of_mass = create_soft_signal_r(
