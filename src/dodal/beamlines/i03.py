@@ -195,8 +195,9 @@ def fast_grid_scan(
 def panda_fast_grid_scan(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> PandAFastGridScan:
-    """Get the i03 fast_grid_scan device, instantiate it if it hasn't already been.
+    """Get the i03 panda_fast_grid_scan device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
+    This is used instead of the fast_grid_scan device when using the PandA.
     """
     return device_instantiation(
         device_factory=PandAFastGridScan,
