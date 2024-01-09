@@ -39,7 +39,7 @@ class UndulatorDCM(Device):
         parent: "UndulatorDCM"
 
         def set(self, value, *, timeout=None, settle_time=None, **kwargs) -> Status:
-            access_level = self.parent.undulator.gap_access.get()
+            access_level = self.parent.undulator.gap_access.get(as_string=True)
             if access_level == UndulatorGapAccess.DISABLED.value and not TEST_MODE:
                 raise AccessError(
                     "Undulator gap access is disabled. Contact Control Room"

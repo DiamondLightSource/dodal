@@ -67,7 +67,31 @@ def test_if_gap_is_wrong_then_logger_info_is_called_and_gap_is_set_correctly(
     fake_undulator_dcm.dcm.energy_in_kev.move = MagicMock()
     mock_load.return_value = np.array([[5700, 5.4606], [7000, 6.045], [9700, 6.404]])
     fake_undulator_dcm.dcm.energy_in_kev.user_readback.sim_put(5700)  # type: ignore
+
     fake_undulator_dcm.energy_kev.set(6900)
+
+    fake_undulator_dcm.dcm.energy_in_kev.move.assert_called_once_with(6900, timeout=30)
+    fake_undulator_dcm.undulator.gap_motor.move.assert_called_once_with(
+        6.045, timeout=10
+    )
+    mock_logger.info.assert_called()
+
+
+@patch("dodal.devices.undulator_dcm.loadtxt")
+@patch("dodal.devices.undulator_dcm.LOGGER")
+@patch("dodal.devices.undulator_dcm.TEST_MODE", True)
+def test_when_gap_access_is_not_checked_if_test_mode_enabled(
+    mock_logger: MagicMock, mock_load: MagicMock, fake_undulator_dcm: UndulatorDCM
+):
+    fake_undulator_dcm.undulator.gap_access.sim_put(UndulatorGapAccess.DISABLED.value)  # type: ignore
+    fake_undulator_dcm.undulator.current_gap.sim_put(5.3)  # type: ignore
+    fake_undulator_dcm.undulator.gap_motor.move = MagicMock()
+    fake_undulator_dcm.dcm.energy_in_kev.move = MagicMock()
+    mock_load.return_value = np.array([[5700, 5.4606], [7000, 6.045], [9700, 6.404]])
+    fake_undulator_dcm.dcm.energy_in_kev.user_readback.sim_put(5700)  # type: ignore
+
+    fake_undulator_dcm.energy_kev.set(6900)
+
     fake_undulator_dcm.dcm.energy_in_kev.move.assert_called_once_with(6900, timeout=30)
     fake_undulator_dcm.undulator.gap_motor.move.assert_called_once_with(
         6.045, timeout=10
