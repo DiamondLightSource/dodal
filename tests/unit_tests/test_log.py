@@ -130,7 +130,7 @@ def test_messages_logged_from_dodal_get_sent_to_graylog_and_file(
     mock_graylog_handler_class.return_value.level = logging.DEBUG
     handlers = [None, None, None]
     with patch("dodal.log.GELFTCPHandler", mock_graylog_handler_class):
-        handlers = log.set_up_logging_handlers(None, False)
+        handlers = log.set_up_logging_handlers(None, False)  # type: ignore
     logger = log.LOGGER
     logger.info("test")
     mock_GELFTCPHandler = handlers[1]
@@ -138,6 +138,52 @@ def test_messages_logged_from_dodal_get_sent_to_graylog_and_file(
     mock_graylog_handler_class.assert_called_once_with("graylog2.diamond.ac.uk", 12218)
     mock_GELFTCPHandler.handle.assert_called()
     mock_filehandler_emit.assert_called()
+
+
+@patch("dodal.log.logging.FileHandler.emit")
+def test_various_messages_to_graylog_get_beamline_filter(
+    mock_filehandler_emit: MagicMock,
+):
+    def mock_set_up_graylog_handler(
+        logging_level: str, dev_mode: bool = False, logger=log.LOGGER
+    ):
+        graylog_host, graylog_port = log._get_graylog_configuration(dev_mode=True)
+        graylog_handler = GELFTCPHandler(graylog_host, graylog_port)
+        graylog_handler.emit = MagicMock()
+        graylog_handler.addFilter(log.beamline_filter)
+        log._add_handler(logger, graylog_handler, logging_level)
+        return graylog_handler
+
+    for handler in log.LOGGER.handlers:
+        handler.close()
+    log.LOGGER.handlers = []
+    with patch("dodal.log.set_up_graylog_handler", mock_set_up_graylog_handler):
+        handlers = log.set_up_logging_handlers(None, False)
+    logger = log.LOGGER
+
+    mock_GELFTCPHandler: GELFTCPHandler = handlers[1]  # type: ignore
+    assert mock_GELFTCPHandler is not None
+    assert mock_GELFTCPHandler.host == "localhost"
+    assert mock_GELFTCPHandler.port == 5555
+
+    logger.info("test")
+    mock_GELFTCPHandler.emit.assert_called()
+    assert mock_GELFTCPHandler.emit.call_args.args[0].beamline == "s03"
+
+    from dodal.beamlines import i03
+
+    _aperture_scatterguard = i03.aperture_scatterguard(fake_with_ophyd_sim=True)
+    assert mock_GELFTCPHandler.emit.call_args.args[0].module == "logging_ophyd_device"
+    assert mock_GELFTCPHandler.emit.call_args.args[0].name == "ophyd"
+    assert mock_GELFTCPHandler.emit.call_args.args[0].beamline == "s03"
+
+    from bluesky.run_engine import RunEngine
+
+    RE = RunEngine()
+    RE.log.logger.info("RunEngine log message")
+
+    assert mock_GELFTCPHandler.emit.call_args.args[0].name == "bluesky"
+    assert mock_GELFTCPHandler.emit.call_args.args[0].beamline == "s03"
 
 
 def test_when_EnhancedRollingFileHandler_reaches_max_size_then_rolls_over():
