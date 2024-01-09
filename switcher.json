@@ -120,6 +120,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/278_fixes_from_testing/"
   },
   {
+    "version": "282_dcm_energy_timeout_should_be_increased",
+    "url": "https://DiamondLightSource.github.io/dodal/282_dcm_energy_timeout_should_be_increased/"
+  },
+  {
     "version": "51_aperture_scatterguard_no_positions",
     "url": "https://DiamondLightSource.github.io/dodal/51_aperture_scatterguard_no_positions/"
   },
