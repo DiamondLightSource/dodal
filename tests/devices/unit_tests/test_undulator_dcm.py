@@ -68,7 +68,7 @@ def test_if_gap_is_wrong_then_logger_info_is_called_and_gap_is_set_correctly(
     mock_load.return_value = np.array([[5700, 5.4606], [7000, 6.045], [9700, 6.404]])
     fake_undulator_dcm.dcm.energy_in_kev.user_readback.sim_put(5700)  # type: ignore
     fake_undulator_dcm.energy_kev.set(6900)
-    fake_undulator_dcm.dcm.energy_in_kev.move.assert_called_once_with(6900, timeout=10)
+    fake_undulator_dcm.dcm.energy_in_kev.move.assert_called_once_with(6900, timeout=30)
     fake_undulator_dcm.undulator.gap_motor.move.assert_called_once_with(
         6.045, timeout=10
     )
