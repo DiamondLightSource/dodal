@@ -19,7 +19,6 @@ def test_device_creation():
     beamline_utils.clear_devices()
     devices = make_all_devices(i03, fake_with_ophyd_sim=True)
     for device_name in devices.keys():
-        print(device_name)
         assert device_name in beamline_utils.ACTIVE_DEVICES
     assert len(beamline_utils.ACTIVE_DEVICES) == len(devices)
 
