@@ -144,6 +144,12 @@ def test_messages_logged_from_dodal_get_sent_to_graylog_and_file(
 def test_various_messages_to_graylog_get_beamline_filter(
     mock_filehandler_emit: MagicMock,
 ):
+    from os import environ
+
+    if environ.get("BEAMLINE"):
+        del environ["BEAMLINE"]
+    log.beamline_filter = log.BeamlineFilter()
+
     def mock_set_up_graylog_handler(
         logging_level: str, dev_mode: bool = False, logger=log.LOGGER
     ):
@@ -168,14 +174,14 @@ def test_various_messages_to_graylog_get_beamline_filter(
 
     logger.info("test")
     mock_GELFTCPHandler.emit.assert_called()
-    assert mock_GELFTCPHandler.emit.call_args.args[0].beamline == "s03"
+    assert mock_GELFTCPHandler.emit.call_args.args[0].beamline == "dev"
 
     from dodal.beamlines import i03
 
     _aperture_scatterguard = i03.aperture_scatterguard(fake_with_ophyd_sim=True)
     assert mock_GELFTCPHandler.emit.call_args.args[0].module == "logging_ophyd_device"
     assert mock_GELFTCPHandler.emit.call_args.args[0].name == "ophyd"
-    assert mock_GELFTCPHandler.emit.call_args.args[0].beamline == "s03"
+    assert mock_GELFTCPHandler.emit.call_args.args[0].beamline == "dev"
 
     from bluesky.run_engine import RunEngine
 
@@ -183,7 +189,7 @@ def test_various_messages_to_graylog_get_beamline_filter(
     RE.log.logger.info("RunEngine log message")
 
     assert mock_GELFTCPHandler.emit.call_args.args[0].name == "bluesky"
-    assert mock_GELFTCPHandler.emit.call_args.args[0].beamline == "s03"
+    assert mock_GELFTCPHandler.emit.call_args.args[0].beamline == "dev"
 
 
 def test_when_EnhancedRollingFileHandler_reaches_max_size_then_rolls_over():
