@@ -124,6 +124,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/282_dcm_energy_timeout_should_be_increased/"
   },
   {
+    "version": "283_undulator_gap_access_check_still_passes_even_when_undulator_gap_is_disabled",
+    "url": "https://DiamondLightSource.github.io/dodal/283_undulator_gap_access_check_still_passes_even_when_undulator_gap_is_disabled/"
+  },
+  {
     "version": "51_aperture_scatterguard_no_positions",
     "url": "https://DiamondLightSource.github.io/dodal/51_aperture_scatterguard_no_positions/"
   },
