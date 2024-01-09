@@ -120,10 +120,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/278_fixes_from_testing/"
   },
   {
-    "version": "282_dcm_energy_timeout_should_be_increased",
-    "url": "https://DiamondLightSource.github.io/dodal/282_dcm_energy_timeout_should_be_increased/"
-  },
-  {
     "version": "283_undulator_gap_access_check_still_passes_even_when_undulator_gap_is_disabled",
     "url": "https://DiamondLightSource.github.io/dodal/283_undulator_gap_access_check_still_passes_even_when_undulator_gap_is_disabled/"
   },
