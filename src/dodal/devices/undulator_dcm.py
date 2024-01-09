@@ -7,7 +7,8 @@ from dodal.devices.DCM import DCM
 from dodal.devices.undulator import Undulator, UndulatorGapAccess
 from dodal.log import LOGGER
 
-STATUS_TIMEOUT = 10
+ENERGY_TIMEOUT_S = 30
+STATUS_TIMEOUT_S = 10
 
 
 class AccessError(Exception):
@@ -47,7 +48,7 @@ class UndulatorDCM(Device):
             )
             LOGGER.info(f"Setting DCM energy to {value:.2f} kev")
 
-            status = self.parent.dcm.energy_in_kev.move(value, timeout=STATUS_TIMEOUT)
+            status = self.parent.dcm.energy_in_kev.move(value, timeout=ENERGY_TIMEOUT_S)
 
             # Use the lookup table to get the undulator gap associated with this dcm energy
             gap_to_match_dcm_energy = _get_closest_gap_for_energy(
@@ -66,7 +67,7 @@ class UndulatorDCM(Device):
                     Moving gap to nominal value, {gap_to_match_dcm_energy:.3f}mm"
                 )
                 status &= self.parent.undulator.gap_motor.move(
-                    gap_to_match_dcm_energy, timeout=STATUS_TIMEOUT
+                    gap_to_match_dcm_energy, timeout=STATUS_TIMEOUT_S
                 )
 
             return status
