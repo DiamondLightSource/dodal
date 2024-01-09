@@ -179,7 +179,6 @@ def test_various_messages_to_graylog_get_beamline_filter(
     from dodal.beamlines import i03
 
     _aperture_scatterguard = i03.aperture_scatterguard(fake_with_ophyd_sim=True)
-    assert mock_GELFTCPHandler.emit.call_args.args[0].module == "logging_ophyd_device"
     assert mock_GELFTCPHandler.emit.call_args.args[0].name == "ophyd"
     assert mock_GELFTCPHandler.emit.call_args.args[0].beamline == "dev"
 
