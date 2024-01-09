@@ -10,6 +10,9 @@ from dodal.log import LOGGER
 ENERGY_TIMEOUT_S = 30
 STATUS_TIMEOUT_S = 10
 
+# Enable to allow testing when the beamline is down, do not change in production!
+TEST_MODE = False
+
 
 class AccessError(Exception):
     pass
@@ -37,7 +40,7 @@ class UndulatorDCM(Device):
 
         def set(self, value, *, timeout=None, settle_time=None, **kwargs) -> Status:
             access_level = self.parent.undulator.gap_access.get()
-            if access_level == UndulatorGapAccess.DISABLED.value:
+            if access_level == UndulatorGapAccess.DISABLED.value and not TEST_MODE:
                 raise AccessError(
                     "Undulator gap access is disabled. Contact Control Room"
                 )
