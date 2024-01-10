@@ -10,7 +10,7 @@ from dodal.devices.det_dim_constants import EIGER2_X_16M_SIZE
 from dodal.devices.detector import DetectorParams, TriggerMode
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.status import await_value
-from dodal.devices.utils import run_functions_without_blocking
+from dodal.devices.util.epics_util import run_functions_without_blocking
 from dodal.log import LOGGER
 
 TEST_DETECTOR_SIZE_CONSTANTS = EIGER2_X_16M_SIZE

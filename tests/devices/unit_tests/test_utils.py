@@ -4,7 +4,7 @@ import pytest
 from ophyd.sim import make_fake_device
 from ophyd.status import Status
 
-from dodal.devices.utils import SetWhenEnabled, run_functions_without_blocking
+from dodal.devices.util.epics_util import SetWhenEnabled, run_functions_without_blocking
 from dodal.log import LOGGER, GELFTCPHandler, logging, set_up_logging_handlers
 
 

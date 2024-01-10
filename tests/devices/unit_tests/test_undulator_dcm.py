@@ -5,6 +5,7 @@ import pytest
 from ophyd.sim import make_fake_device
 from ophyd.status import Status
 
+from dodal.beamlines.i03 import DAQ_CONFIGURATION_PATH
 from dodal.devices.DCM import DCM
 from dodal.devices.undulator import Undulator, UndulatorGapAccess
 from dodal.devices.undulator_dcm import (
@@ -21,7 +22,9 @@ def fake_undulator_dcm() -> UndulatorDCM:
         name="undulator",
         lookup_table_path="./tests/devices/unit_tests/test_beamline_undulator_to_gap_lookup_table.txt",
     )
-    dcm: DCM = make_fake_device(DCM)(name="dcm")
+    dcm: DCM = make_fake_device(DCM)(
+        name="dcm", daq_configuration_path=DAQ_CONFIGURATION_PATH
+    )
     undulator_dcm: UndulatorDCM = make_fake_device(UndulatorDCM)(
         undulator, dcm, name="undulator_dcm"
     )
@@ -65,7 +68,7 @@ def test_if_gap_is_wrong_then_logger_info_is_called_and_gap_is_set_correctly(
     mock_load.return_value = np.array([[5700, 5.4606], [7000, 6.045], [9700, 6.404]])
     fake_undulator_dcm.dcm.energy_in_kev.user_readback.sim_put(5700)  # type: ignore
     fake_undulator_dcm.energy_kev.set(6900)
-    fake_undulator_dcm.dcm.energy_in_kev.move.assert_called_once_with(6900, timeout=10)
+    fake_undulator_dcm.dcm.energy_in_kev.move.assert_called_once_with(6900, timeout=30)
     fake_undulator_dcm.undulator.gap_motor.move.assert_called_once_with(
         6.045, timeout=10
     )
