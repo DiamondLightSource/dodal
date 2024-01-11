@@ -84,8 +84,8 @@ def set_up_graylog_handler(logging_level: str, dev_mode: bool = False, logger=LO
     """
     graylog_host, graylog_port = _get_graylog_configuration(dev_mode)
     graylog_handler = GELFTCPHandler(graylog_host, graylog_port)
+    graylog_handler.addFilter(beamline_filter)
     _add_handler(logger, graylog_handler, logging_level)
-    logger.addFilter(beamline_filter)
 
     # Warn users if trying to run in prod in debug mode
     if not dev_mode and logging_level == "DEBUG":
