@@ -116,10 +116,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/262_make_arming_eiger_asynchronous/"
   },
   {
-    "version": "278_fixes_from_testing",
-    "url": "https://DiamondLightSource.github.io/dodal/278_fixes_from_testing/"
-  },
-  {
     "version": "283_undulator_gap_access_check_still_passes_even_when_undulator_gap_is_disabled",
     "url": "https://DiamondLightSource.github.io/dodal/283_undulator_gap_access_check_still_passes_even_when_undulator_gap_is_disabled/"
   },
