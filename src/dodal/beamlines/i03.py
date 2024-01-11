@@ -104,6 +104,8 @@ def hfm(
         prefix="-OP-HFM-01:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
+        bragg_to_lat_lut_path=DAQ_CONFIGURATION_PATH
+        + "/lookup/BeamLineEnergy_DCM_HFM_y_converter.txt",
     )
 
 
