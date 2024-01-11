@@ -1,7 +1,6 @@
-import asyncio
-import platform
 from collections import OrderedDict
 from enum import Enum
+from queue import Empty, Queue
 from typing import Any, Generator, Sequence, Tuple, TypedDict, Union
 
 import bluesky.plan_stubs as bps
@@ -9,11 +8,9 @@ import numpy as np
 import workflows.recipe
 import workflows.transport
 from bluesky.protocols import Descriptor, Triggerable
-from bluesky.run_engine import call_in_bluesky_event_loop, get_bluesky_event_loop
 from numpy.typing import NDArray
 from ophyd_async.core import StandardReadable
 from ophyd_async.core.async_status import AsyncStatus
-from packaging import version
 
 from dodal.devices.ophyd_async_utils import create_soft_signal_r
 from dodal.devices.zocalo.zocalo_interaction import _get_zocalo_connection
@@ -52,15 +49,6 @@ def bbox_size(result: XrcResult):
     ]
 
 
-def create_queue() -> asyncio.Queue:
-    """Needed as loops are instantiated differently in different python versions.
-    Remove when we drop support for Python 3.9"""
-    if version.parse(platform.python_version()) < version.parse("3.10"):
-        return asyncio.Queue(loop=get_bluesky_event_loop())  # type: ignore
-    else:
-        return asyncio.Queue()
-
-
 class ZocaloResults(StandardReadable, Triggerable):
     """An ophyd device which can wait for results from a Zocalo job. These jobs should
     be triggered from a plan-subscribed callback using the run_start() and run_end()
@@ -84,7 +72,7 @@ class ZocaloResults(StandardReadable, Triggerable):
         self._prefix = prefix
 
         self._subscription_run: bool = False
-        self._raw_results_received: asyncio.Queue = create_queue()
+        self._raw_results_received: Queue = Queue()
 
         self.results = create_soft_signal_r(list[XrcResult], "results", self.name)
         self.centres_of_mass = create_soft_signal_r(
@@ -121,27 +109,13 @@ class ZocaloResults(StandardReadable, Triggerable):
         try:
             LOGGER.info("waiting for results in queue")
 
-            async def _get_results():
-                raw_results = await self._raw_results_received.get()
-                LOGGER.info(f"Zocalo: found {len(raw_results)} crystals.")
-                # Sort from strongest to weakest in case of multiple crystals
-                await self._put_results(
-                    sorted(
-                        raw_results, key=lambda d: d[self.sort_key.value], reverse=True
-                    )
-                )
-
-            # Testing on the beamline we saw an issue where results were received just
-            # after timeout - this retry is for monitoring that and avoiding crashes
-            # See https://github.com/DiamondLightSource/dodal/issues/265
-            task = asyncio.create_task(_get_results())
-            try:
-                await asyncio.wait_for(asyncio.shield(task), self.timeout_s / 2)
-            except asyncio.TimeoutError:
-                LOGGER.warning("Waited half of timeout for zocalo results - retrying")
-                await asyncio.wait_for(task, self.timeout_s / 2)
-
-        except asyncio.TimeoutError as timeout_exception:
+            raw_results = self._raw_results_received.get(timeout=self.timeout_s)
+            LOGGER.info(f"Zocalo: found {len(raw_results)} crystals.")
+            # Sort from strongest to weakest in case of multiple crystals
+            await self._put_results(
+                sorted(raw_results, key=lambda d: d[self.sort_key.value], reverse=True)
+            )
+        except Empty as timeout_exception:
             LOGGER.warning("Timed out waiting for zocalo results!")
             raise NoResultsFromZocalo() from timeout_exception
         finally:
@@ -188,7 +162,7 @@ class ZocaloResults(StandardReadable, Triggerable):
             transport.ack(header)
 
             results = message.get("results", [])
-            call_in_bluesky_event_loop(self._raw_results_received.put(results))
+            self._raw_results_received.put(results)
 
         subscription = workflows.recipe.wrap_subscribe(
             transport,
