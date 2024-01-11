@@ -72,7 +72,6 @@ class ZocaloResults(StandardReadable, Triggerable):
         self._prefix = prefix
         self._raw_results_received: Queue = Queue()
         self._subscription_run: bool = False
-        self._raw_results_received: Queue = Queue()
 
         self.results = create_soft_signal_r(list[XrcResult], "results", self.name)
         self.centres_of_mass = create_soft_signal_r(
@@ -121,7 +120,12 @@ class ZocaloResults(StandardReadable, Triggerable):
             LOGGER.info(f"Zocalo: found {len(raw_results)} crystals.")
             # Sort from strongest to weakest in case of multiple crystals
             await self._put_results(
-                sorted(raw_results, key=lambda d: d[self.sort_key.value], reverse=True)
+                sorted(
+                    raw_results["results"],
+                    key=lambda d: d[self.sort_key.value],
+                    reverse=True,
+                ),
+                raw_results["ispyb_ids"],
             )
         except Empty as timeout_exception:
             LOGGER.warning("Timed out waiting for zocalo results!")
