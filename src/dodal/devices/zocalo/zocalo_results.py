@@ -1,7 +1,6 @@
-import asyncio
 from collections import OrderedDict
 from enum import Enum
-from queue import Queue
+from queue import Empty, Queue
 from typing import Any, Generator, Sequence, Tuple, TypedDict, Union
 
 import bluesky.plan_stubs as bps
@@ -73,6 +72,7 @@ class ZocaloResults(StandardReadable, Triggerable):
         self._prefix = prefix
         self._raw_results_received: Queue = Queue()
         self._subscription_run: bool = False
+        self._raw_results_received: Queue = Queue()
 
         self.results = create_soft_signal_r(list[XrcResult], "results", self.name)
         self.centres_of_mass = create_soft_signal_r(
@@ -117,36 +117,13 @@ class ZocaloResults(StandardReadable, Triggerable):
                 f"waiting for results in queue - currently {self._raw_results_received.qsize()} items"
             )
 
-            async def _get_results():
-                raw_results = self._raw_results_received.get(timeout=self.timeout_s)
-                LOGGER.info(f"Zocalo: found {len(raw_results)} crystals.")
-                # Sort from strongest to weakest in case of multiple crystals
-                await self._put_results(
-                    sorted(
-                        raw_results["results"],
-                        key=lambda d: d[self.sort_key.value],
-                        reverse=True,
-                    ),
-                    raw_results["ispyb_ids"],
-                )
-                self._raw_results_received.task_done()
-
-            # Testing on the beamline we saw an issue where results were received just
-            # after timeout - this retry is for monitoring that and avoiding crashes
-            # See https://github.com/DiamondLightSource/dodal/issues/265
-            task = asyncio.create_task(_get_results())
-            try:
-                LOGGER.info(
-                    f"starting with half timeout - currently {self._raw_results_received.qsize()} items in queue"
-                )
-                await asyncio.wait_for(asyncio.shield(task), self.timeout_s / 2)
-            except asyncio.TimeoutError:
-                LOGGER.warning(
-                    f"Waited half of timeout for zocalo results - retrying - currently {self._raw_results_received.qsize()} items in queue"
-                )
-                await asyncio.wait_for(task, self.timeout_s / 2)
-
-        except asyncio.TimeoutError as timeout_exception:
+            raw_results = self._raw_results_received.get(timeout=self.timeout_s)
+            LOGGER.info(f"Zocalo: found {len(raw_results)} crystals.")
+            # Sort from strongest to weakest in case of multiple crystals
+            await self._put_results(
+                sorted(raw_results, key=lambda d: d[self.sort_key.value], reverse=True)
+            )
+        except Empty as timeout_exception:
             LOGGER.warning("Timed out waiting for zocalo results!")
             raise NoResultsFromZocalo() from timeout_exception
         finally:

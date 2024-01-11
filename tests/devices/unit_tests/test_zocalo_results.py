@@ -180,9 +180,7 @@ async def test_extraction_plan(mocked_zocalo_device, RE) -> None:
     "dodal.devices.zocalo.zocalo_results.workflows.recipe.wrap_subscribe", autospec=True
 )
 @patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection", autospec=True)
-@patch("dodal.devices.zocalo.zocalo_results.asyncio.wait_for")
 def test_subscribe_only_called_once_on_first_trigger(
-    mock_await_for: MagicMock,
     mock_connection: MagicMock,
     mock_wrap_subscribe: MagicMock,
 ):
@@ -191,9 +189,12 @@ def test_subscribe_only_called_once_on_first_trigger(
         name="zocalo", zocalo_environment="dev_artemis", timeout_s=2
     )
     mock_wrap_subscribe.assert_not_called()
+    zocalo_results._raw_results_received.put([])
     RE(bps.trigger(zocalo_results))
     mock_wrap_subscribe.assert_called_once()
+    zocalo_results._raw_results_received.put([])
     RE(bps.trigger(zocalo_results))
+    zocalo_results._raw_results_received.put([])
     RE(bps.trigger(zocalo_results))
     mock_wrap_subscribe.assert_called_once()
 
