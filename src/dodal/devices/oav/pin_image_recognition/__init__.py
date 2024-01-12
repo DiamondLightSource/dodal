@@ -4,9 +4,9 @@ from collections import OrderedDict
 from typing import Optional, Tuple
 
 import numpy as np
-from bluesky.protocols import Descriptor, Readable, Reading
+from bluesky.protocols import Descriptor, Reading
 from numpy.typing import NDArray
-from ophyd_async.core import Device, SignalR, SignalRW
+from ophyd_async.core import SignalR, SignalRW, StandardReadable
 from ophyd_async.epics.signal import epics_signal_r
 
 from dodal.devices.oav.pin_image_recognition.utils import (
@@ -19,7 +19,7 @@ from dodal.devices.ophyd_async_utils import create_soft_signal_rw
 from dodal.log import LOGGER
 
 
-class PinTipDetection(Readable, Device):
+class PinTipDetection(StandardReadable):
     """
     A device which will read a single frame from an on-axis view and use that frame
     to calculate the pin-tip offset (in pixels) of that frame.
@@ -30,6 +30,8 @@ class PinTipDetection(Readable, Device):
     of the image. If the entire sample if off-screen (i.e. no suitable edges were detected at all)
     then it will return (None, None).
     """
+
+    INVALID_POSITION = (None, None)
 
     def __init__(self, prefix: str, name: str = ""):
         self._prefix: str = prefix
@@ -43,7 +45,7 @@ class PinTipDetection(Readable, Device):
         self.timeout: SignalRW[float] = create_soft_signal_rw(
             float, "timeout", self.name
         )
-        self.preprocess: SignalRW[int] = create_soft_signal_rw(
+        self.preprocess_operation: SignalRW[int] = create_soft_signal_rw(
             int, "preprocess", self.name
         )
         self.preprocess_ksize: SignalRW[int] = create_soft_signal_rw(
@@ -52,10 +54,10 @@ class PinTipDetection(Readable, Device):
         self.preprocess_iterations: SignalRW[int] = create_soft_signal_rw(
             int, "preprocess_iterations", self.name
         )
-        self.canny_upper: SignalRW[int] = create_soft_signal_rw(
+        self.canny_upper_threshold: SignalRW[int] = create_soft_signal_rw(
             int, "canny_upper", self.name
         )
-        self.canny_lower: SignalRW[int] = create_soft_signal_rw(
+        self.canny_lower_threshold: SignalRW[int] = create_soft_signal_rw(
             int, "canny_lower", self.name
         )
         self.close_ksize: SignalRW[int] = create_soft_signal_rw(
@@ -70,6 +72,9 @@ class PinTipDetection(Readable, Device):
         self.min_tip_height: SignalRW[int] = create_soft_signal_rw(
             int, "min_tip_height", self.name
         )
+        self.validity_timeout: SignalR[float] = create_soft_signal_rw(
+            float, "validity_timeout", self.name
+        )
 
         super().__init__(name=name)
 
@@ -82,7 +87,7 @@ class PinTipDetection(Readable, Device):
         Returns tuple of:
             ((tip_x, tip_y), timestamp)
         """
-        preprocess_key = await self.preprocess.get_value()
+        preprocess_key = await self.preprocess_operation.get_value()
         preprocess_iter = await self.preprocess_iterations.get_value()
         preprocess_ksize = await self.preprocess_ksize.get_value()
 
@@ -94,13 +99,19 @@ class PinTipDetection(Readable, Device):
             LOGGER.error("Invalid preprocessing function, using identity")
             preprocess_func = identity()
 
+        direction = (
+            ScanDirections.FORWARD
+            if await self.scan_direction.get_value() == 0
+            else ScanDirections.REVERSE
+        )
+
         sample_detection = MxSampleDetect(
             preprocess=preprocess_func,
-            canny_lower=await self.canny_lower.get_value(),
-            canny_upper=await self.canny_upper.get_value(),
+            canny_lower=await self.canny_lower_threshold.get_value(),
+            canny_upper=await self.canny_upper_threshold.get_value(),
             close_ksize=await self.close_ksize.get_value(),
             close_iterations=await self.close_iterations.get_value(),
-            scan_direction=await self.scan_direction.get_value(),
+            scan_direction=direction,
             min_tip_height=await self.min_tip_height.get_value(),
         )
 
@@ -121,8 +132,7 @@ class PinTipDetection(Readable, Device):
             tip_y = location.tip_y
         except Exception as e:
             LOGGER.error(f"Failed to detect pin-tip location due to exception: {e}")
-            tip_x = None
-            tip_y = None
+            tip_x, tip_y = self.INVALID_POSITION
 
         return (tip_x, tip_y), timestamp
 
@@ -131,13 +141,13 @@ class PinTipDetection(Readable, Device):
 
         # Set defaults for soft parameters
         await self.timeout.set(10.0)
-        await self.canny_upper.set(100)
-        await self.canny_lower.set(50)
+        await self.canny_upper_threshold.set(100)
+        await self.canny_lower_threshold.set(50)
         await self.close_iterations.set(5)
         await self.close_ksize.set(5)
         await self.scan_direction.set(ScanDirections.FORWARD.value)
         await self.min_tip_height.set(5)
-        await self.preprocess.set(10)  # Identity function
+        await self.preprocess_operation.set(10)  # Identity function
         await self.preprocess_iterations.set(5)
         await self.preprocess_ksize.set(5)
 
