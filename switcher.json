@@ -192,6 +192,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_698_refactor_parameters/"
   },
   {
+    "version": "hyperion_863_use_ophyd_pin_tip",
+    "url": "https://DiamondLightSource.github.io/dodal/hyperion_863_use_ophyd_pin_tip/"
+  },
+  {
     "version": "hyperion_947_move_out_callbacks",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_947_move_out_callbacks/"
   },
