@@ -39,7 +39,6 @@ set_log_beamline(BL)
 set_utils_beamline(BL)
 
 
-@skip_device(lambda: BL == "s03")
 def dcm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> DCM:
     """Get the i03 DCM device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
@@ -284,7 +283,6 @@ def undulator(
     )
 
 
-@skip_device(lambda: BL == "s03")
 def undulator_dcm(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> UndulatorDCM:
