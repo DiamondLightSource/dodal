@@ -17,7 +17,7 @@ TEST_RESULT_LARGE: XrcResult = {
 
 @pytest_asyncio.fixture
 async def zocalo_device():
-    zd = ZocaloResults("zocalo")
+    zd = ZocaloResults()
     await zd.connect()
     return zd
 
