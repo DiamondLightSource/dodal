@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import Enum, IntEnum
 from typing import Any
 
 from ophyd import Component, Device, EpicsMotor, EpicsSignal
@@ -11,14 +11,16 @@ VOLTAGE_POLLING_DELAY_S = 0.5
 # The default timeout is 60 seconds as voltage slew rate is typically ~2V/s
 DEFAULT_SETTLE_TIME_S = 60
 
-DEMAND_ACCEPTED_OK = 1
-
-
 class MirrorStripe(Enum):
     RHODIUM = "Rhodium"
     BARE = "Bare"
     PLATINUM = "Platinum"
 
+class MirrorVoltageDemand(IntEnum):
+    N_A = 0
+    OK = 1
+    FAIL = 2
+    SLEW = 3
 
 class MirrorVoltageDevice(Device):
     """Abstract the bimorph mirror voltage PVs into a single device that can be set asynchronously and returns when
@@ -40,14 +42,14 @@ class MirrorVoltageDevice(Device):
         setpoint_v = self._setpoint_v
         demand_accepted = self._demand_accepted
 
-        if setpoint_v.get() == value:
-            LOGGER.debug(f"{setpoint_v.name} already at {value} - skipping set")
-            return Status(success=True, done=True)
-
-        if demand_accepted.get() != DEMAND_ACCEPTED_OK:
+        if demand_accepted.get() != MirrorVoltageDemand.OK:
             raise AssertionError(
                 f"Attempted to set {setpoint_v.name} when demand is not accepted."
             )
+
+        if setpoint_v.get() == value:
+            LOGGER.debug(f"{setpoint_v.name} already at {value} - skipping set")
+            return Status(success=True, done=True)
 
         LOGGER.debug(f"setting {setpoint_v.name} to {value}")
         demand_accepted_status = Status(self, DEFAULT_SETTLE_TIME_S)
@@ -55,8 +57,8 @@ class MirrorVoltageDevice(Device):
         subscription: dict[str, Any] = {"handle": None}
 
         def demand_check_callback(old_value, value, **kwargs):
-            LOGGER.debug(f"Got event old={old_value} new={value}")
-            if old_value != DEMAND_ACCEPTED_OK and value == DEMAND_ACCEPTED_OK:
+            LOGGER.debug(f"Got event old={old_value} new={value} for {setpoint_v.name}")
+            if old_value != MirrorVoltageDemand.OK and value == MirrorVoltageDemand.OK:
                 LOGGER.debug(f"Demand accepted for {setpoint_v.name}")
                 subs_handle = subscription.pop("handle", None)
                 if subs_handle is None:
