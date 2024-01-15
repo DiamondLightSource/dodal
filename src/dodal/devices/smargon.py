@@ -1,13 +1,13 @@
 from enum import Enum
 
 from ophyd import Component as Cpt
-from ophyd import Device, EpicsMotor
+from ophyd import Device, EpicsMotor, EpicsSignal
 from ophyd.epics_motor import MotorBundle
 from ophyd.status import StatusBase
 
 from dodal.devices.motors import MotorLimitHelper, XYZLimitBundle
 from dodal.devices.status import await_approx_value
-from dodal.devices.utils import SetWhenEnabled
+from dodal.devices.util.epics_util import SetWhenEnabled
 
 
 class StubPosition(Enum):
@@ -26,8 +26,8 @@ class StubOffsets(Device):
 
     parent: "Smargon"
 
-    center_at_current_position: SetWhenEnabled = Cpt(SetWhenEnabled, "CENTER_CS")
-    to_robot_load: SetWhenEnabled = Cpt(SetWhenEnabled, "SET_STUBS_TO_RL")
+    center_at_current_position = Cpt(SetWhenEnabled, "CENTER_CS")
+    to_robot_load = Cpt(SetWhenEnabled, "SET_STUBS_TO_RL")
 
     def set(self, pos: StubPosition) -> StatusBase:
         if pos == StubPosition.CURRENT_AS_CENTER:
@@ -48,21 +48,23 @@ class Smargon(MotorBundle):
     Robot loading can nudge these and lead to errors.
     """
 
-    x: EpicsMotor = Cpt(EpicsMotor, "X")
-    y: EpicsMotor = Cpt(EpicsMotor, "Y")
-    z: EpicsMotor = Cpt(EpicsMotor, "Z")
-    chi: EpicsMotor = Cpt(EpicsMotor, "CHI")
-    phi: EpicsMotor = Cpt(EpicsMotor, "PHI")
-    omega: EpicsMotor = Cpt(EpicsMotor, "OMEGA")
+    x = Cpt(EpicsMotor, "X")
+    y = Cpt(EpicsMotor, "Y")
+    z = Cpt(EpicsMotor, "Z")
+    chi = Cpt(EpicsMotor, "CHI")
+    phi = Cpt(EpicsMotor, "PHI")
+    omega = Cpt(EpicsMotor, "OMEGA")
 
-    real_x1: EpicsMotor = Cpt(EpicsMotor, "MOTOR_3")
-    real_x2: EpicsMotor = Cpt(EpicsMotor, "MOTOR_4")
-    real_y: EpicsMotor = Cpt(EpicsMotor, "MOTOR_1")
-    real_z: EpicsMotor = Cpt(EpicsMotor, "MOTOR_2")
-    real_phi: EpicsMotor = Cpt(EpicsMotor, "MOTOR_5")
-    real_chi: EpicsMotor = Cpt(EpicsMotor, "MOTOR_6")
+    real_x1 = Cpt(EpicsMotor, "MOTOR_3")
+    real_x2 = Cpt(EpicsMotor, "MOTOR_4")
+    real_y = Cpt(EpicsMotor, "MOTOR_1")
+    real_z = Cpt(EpicsMotor, "MOTOR_2")
+    real_phi = Cpt(EpicsMotor, "MOTOR_5")
+    real_chi = Cpt(EpicsMotor, "MOTOR_6")
 
-    stub_offsets: StubOffsets = Cpt(StubOffsets, "")
+    stub_offsets = Cpt(StubOffsets, "")
+
+    disabled = Cpt(EpicsSignal, "DISABLED")
 
     def get_xyz_limits(self) -> XYZLimitBundle:
         """Get the limits for the x, y and z axes.

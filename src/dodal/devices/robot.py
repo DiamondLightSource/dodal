@@ -3,4 +3,4 @@ from ophyd import Device, EpicsSignalRO
 
 
 class BART(Device):
-    GonioPinSensor: EpicsSignalRO = Cpt(EpicsSignalRO, "-MO-ROBOT-01:PIN_MOUNTED")
+    GonioPinSensor = Cpt(EpicsSignalRO, "-MO-ROBOT-01:PIN_MOUNTED")

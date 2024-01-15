@@ -52,3 +52,46 @@ def test_correct_det_dist_to_beam_converter_path_passed_in(mocked_parse_table):
     )
     params.json()
     assert params.beam_xy_converter.lookup_file == "a fake directory"
+
+
+@patch(
+    "src.dodal.devices.detector.DetectorDistanceToBeamXYConverter.parse_table",
+)
+def test_run_number_correct_when_not_specified(mocked_parse_table, tmpdir):
+    params = DetectorParams(
+        current_energy_ev=100,
+        exposure_time=1.0,
+        directory=str(tmpdir),
+        prefix="test",
+        detector_distance=1.0,
+        omega_start=0.0,
+        omega_increment=0.0,
+        num_images_per_trigger=1,
+        num_triggers=1,
+        use_roi_mode=False,
+        det_dist_to_beam_converter_path="a fake directory",
+        detector_size_constants="EIGER2_X_16M",
+    )
+    assert params.run_number == 1
+
+
+@patch(
+    "src.dodal.devices.detector.DetectorDistanceToBeamXYConverter.parse_table",
+)
+def test_run_number_correct_when_specified(mocked_parse_table, tmpdir):
+    params = DetectorParams(
+        current_energy_ev=100,
+        exposure_time=1.0,
+        directory=str(tmpdir),
+        run_number=6,
+        prefix="test",
+        detector_distance=1.0,
+        omega_start=0.0,
+        omega_increment=0.0,
+        num_images_per_trigger=1,
+        num_triggers=1,
+        use_roi_mode=False,
+        det_dist_to_beam_converter_path="a fake directory",
+        detector_size_constants="EIGER2_X_16M",
+    )
+    assert params.run_number == 6

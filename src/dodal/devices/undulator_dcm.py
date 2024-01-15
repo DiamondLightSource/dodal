@@ -7,7 +7,11 @@ from dodal.devices.DCM import DCM
 from dodal.devices.undulator import Undulator, UndulatorGapAccess
 from dodal.log import LOGGER
 
-STATUS_TIMEOUT = 10
+ENERGY_TIMEOUT_S = 30
+STATUS_TIMEOUT_S = 10
+
+# Enable to allow testing when the beamline is down, do not change in production!
+TEST_MODE = False
 
 
 class AccessError(Exception):
@@ -32,9 +36,11 @@ class UndulatorDCM(Device):
     """
 
     class EnergySignal(Signal):
+        parent: "UndulatorDCM"
+
         def set(self, value, *, timeout=None, settle_time=None, **kwargs) -> Status:
-            access_level = self.parent.undulator.gap_access.get()
-            if access_level == UndulatorGapAccess.DISABLED.value:
+            access_level = self.parent.undulator.gap_access.get(as_string=True)
+            if access_level == UndulatorGapAccess.DISABLED.value and not TEST_MODE:
                 raise AccessError(
                     "Undulator gap access is disabled. Contact Control Room"
                 )
@@ -45,7 +51,7 @@ class UndulatorDCM(Device):
             )
             LOGGER.info(f"Setting DCM energy to {value:.2f} kev")
 
-            status = self.parent.dcm.energy_in_kev.move(value, timeout=STATUS_TIMEOUT)
+            status = self.parent.dcm.energy_in_kev.move(value, timeout=ENERGY_TIMEOUT_S)
 
             # Use the lookup table to get the undulator gap associated with this dcm energy
             gap_to_match_dcm_energy = _get_closest_gap_for_energy(
@@ -64,12 +70,12 @@ class UndulatorDCM(Device):
                     Moving gap to nominal value, {gap_to_match_dcm_energy:.3f}mm"
                 )
                 status &= self.parent.undulator.gap_motor.move(
-                    gap_to_match_dcm_energy, timeout=STATUS_TIMEOUT
+                    gap_to_match_dcm_energy, timeout=STATUS_TIMEOUT_S
                 )
 
             return status
 
-    energy_kev: EnergySignal = Component(EnergySignal)
+    energy_kev = Component(EnergySignal)
 
     def __init__(self, undulator: Undulator, dcm: DCM, *args, **kwargs):
         super().__init__(self, *args, **kwargs)

@@ -1,12 +1,12 @@
 import asyncio
 import time
 from collections import OrderedDict
-from typing import Optional, Tuple, Type, TypeVar
+from typing import Optional, Tuple
 
 import numpy as np
 from bluesky.protocols import Descriptor, Readable, Reading
 from numpy.typing import NDArray
-from ophyd_async.core import Device, SignalR, SignalRW, SimSignalBackend
+from ophyd_async.core import Device, SignalR, SignalRW
 from ophyd_async.epics.signal import epics_signal_r
 
 from dodal.devices.oav.pin_image_recognition.utils import (
@@ -15,17 +15,8 @@ from dodal.devices.oav.pin_image_recognition.utils import (
     ScanDirections,
     identity,
 )
+from dodal.devices.ophyd_async_utils import create_soft_signal_rw
 from dodal.log import LOGGER
-
-T = TypeVar("T")
-
-
-def _create_soft_signal(datatype: Type[T], name: str) -> SignalRW[T]:
-    return SignalRW(
-        SimSignalBackend(
-            datatype, f"sim://oav_with_pin_tip_detection_soft_params:{name}"
-        )
-    )
 
 
 class PinTipDetection(Readable, Device):
@@ -49,22 +40,36 @@ class PinTipDetection(Readable, Device):
         )
 
         # Soft parameters for pin-tip detection.
-        self.timeout: SignalRW[float] = _create_soft_signal(float, "timeout")
-        self.preprocess: SignalRW[int] = _create_soft_signal(int, "preprocess")
-        self.preprocess_ksize: SignalRW[int] = _create_soft_signal(
-            int, "preprocess_ksize"
+        self.timeout: SignalRW[float] = create_soft_signal_rw(
+            float, "timeout", self.name
         )
-        self.preprocess_iterations: SignalRW[int] = _create_soft_signal(
-            int, "preprocess_iterations"
+        self.preprocess: SignalRW[int] = create_soft_signal_rw(
+            int, "preprocess", self.name
         )
-        self.canny_upper: SignalRW[int] = _create_soft_signal(int, "canny_upper")
-        self.canny_lower: SignalRW[int] = _create_soft_signal(int, "canny_lower")
-        self.close_ksize: SignalRW[int] = _create_soft_signal(int, "close_ksize")
-        self.close_iterations: SignalRW[int] = _create_soft_signal(
-            int, "close_iterations"
+        self.preprocess_ksize: SignalRW[int] = create_soft_signal_rw(
+            int, "preprocess_ksize", self.name
         )
-        self.scan_direction: SignalRW[int] = _create_soft_signal(int, "scan_direction")
-        self.min_tip_height: SignalRW[int] = _create_soft_signal(int, "min_tip_height")
+        self.preprocess_iterations: SignalRW[int] = create_soft_signal_rw(
+            int, "preprocess_iterations", self.name
+        )
+        self.canny_upper: SignalRW[int] = create_soft_signal_rw(
+            int, "canny_upper", self.name
+        )
+        self.canny_lower: SignalRW[int] = create_soft_signal_rw(
+            int, "canny_lower", self.name
+        )
+        self.close_ksize: SignalRW[int] = create_soft_signal_rw(
+            int, "close_ksize", self.name
+        )
+        self.close_iterations: SignalRW[int] = create_soft_signal_rw(
+            int, "close_iterations", self.name
+        )
+        self.scan_direction: SignalRW[int] = create_soft_signal_rw(
+            int, "scan_direction", self.name
+        )
+        self.min_tip_height: SignalRW[int] = create_soft_signal_rw(
+            int, "min_tip_height", self.name
+        )
 
         super().__init__(name=name)
 

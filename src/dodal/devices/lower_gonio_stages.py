@@ -3,6 +3,6 @@ from ophyd import Device, EpicsMotor
 
 
 class GonioLowerStages(Device):
-    x: EpicsMotor = Cpt(EpicsMotor, "-MO-GONP-01:X")
-    y: EpicsMotor = Cpt(EpicsMotor, "-MO-GONP-01:Y")
-    z: EpicsMotor = Cpt(EpicsMotor, "-MO-GONP-01:Z")
+    x = Cpt(EpicsMotor, "-MO-GONP-01:X")
+    y = Cpt(EpicsMotor, "-MO-GONP-01:Y")
+    z = Cpt(EpicsMotor, "-MO-GONP-01:Z")

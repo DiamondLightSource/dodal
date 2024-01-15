@@ -14,11 +14,12 @@ classifiers = [
 description = "Ophyd devices and other utils that could be used across DLS beamlines"
 dependencies = [
     "ophyd",
-    "ophyd-async==0.1.0",
+    "ophyd-async",
     "bluesky",
     "pyepics",
     "dataclasses-json",
     "pillow",
+    "zocalo",
     "requests",
     "graypy",
     "pydantic<2.0",
@@ -39,6 +40,7 @@ dev = [
     "pipdeptree",
     "pre-commit",
     "pydata-sphinx-theme>=0.12",
+    "pytest",
     "pytest-asyncio",
     "pytest-cov",
     "pytest-random-order",
@@ -49,6 +51,7 @@ dev = [
     "tox-direct",
     "types-requests",
     "types-mock",
+    "types-PyYAML",
 ]
 
 [project.urls]
@@ -77,8 +80,8 @@ markers = [
     "s03: marks tests as requiring the s03 simulator running (deselect with '-m \"not s03\"')",
 ]
 addopts = """
-    --tb=native -vv --doctest-modules --doctest-glob="*.rst"
     --cov=dodal --cov-report term --cov-report xml:cov.xml
+    --tb=native -vv --doctest-modules --doctest-glob="*.rst"
     """
 # Doctest python code in docs, python code in src docstrings, test functions in tests
 testpaths = "docs src tests"
@@ -109,7 +112,7 @@ allowlist_externals =
     sphinx-autobuild
 commands =
     pytest: pytest -m 'not s03' {posargs}
-    mypy: mypy src tests --ignore-missing-imports --no-strict-optional {posargs}
+    mypy: mypy src tests -v --ignore-missing-imports --no-strict-optional --check-untyped-defs {posargs}
     pre-commit: pre-commit run --all-files {posargs}
     docs: sphinx-{posargs:build -EW --keep-going} -T docs build/html
 """

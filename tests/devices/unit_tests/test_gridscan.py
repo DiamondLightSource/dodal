@@ -56,7 +56,7 @@ def run_test_on_complete_watcher(
     watcher = mock()
     complete_status.watch(watcher)
 
-    fast_grid_scan.position_counter.sim_put(put_value)
+    fast_grid_scan.position_counter.sim_put(put_value)  # type: ignore
     verify(watcher).__call__(
         *ARGS,
         current=put_value,
@@ -88,9 +88,9 @@ def test_given_0_expected_images_then_complete_watcher_correct(
 def test_given_different_step_numbers_then_expected_images_correct(
     fast_grid_scan: FastGridScan, steps, expected_images
 ):
-    fast_grid_scan.x_steps.sim_put(steps[0])
-    fast_grid_scan.y_steps.sim_put(steps[1])
-    fast_grid_scan.z_steps.sim_put(steps[2])
+    fast_grid_scan.x_steps.sim_put(steps[0])  # type: ignore
+    fast_grid_scan.y_steps.sim_put(steps[1])  # type: ignore
+    fast_grid_scan.z_steps.sim_put(steps[2])  # type: ignore
 
     assert fast_grid_scan.expected_images.get() == expected_images
 
@@ -113,12 +113,12 @@ def test_running_finished_with_all_images_done_then_complete_status_finishes_not
         )
     )
 
-    fast_grid_scan.status.sim_put(1)
+    fast_grid_scan.status.sim_put(1)  # type: ignore
 
     complete_status = fast_grid_scan.complete()
     assert not complete_status.done
-    fast_grid_scan.position_counter.sim_put(num_pos_1d**2)
-    fast_grid_scan.status.sim_put(0)
+    fast_grid_scan.position_counter.sim_put(num_pos_1d**2)  # type: ignore
+    fast_grid_scan.status.sim_put(0)  # type: ignore
 
     complete_status.wait()
 
@@ -135,8 +135,8 @@ def create_motor_bundle_with_limits(low_limit, high_limit) -> Smargon:
         grid_scan_motor_bundle.y,
         grid_scan_motor_bundle.z,
     ]:
-        axis.low_limit_travel.sim_put(low_limit)
-        axis.high_limit_travel.sim_put(high_limit)
+        axis.low_limit_travel.sim_put(low_limit)  # type: ignore
+        axis.high_limit_travel.sim_put(high_limit)  # type: ignore
     return grid_scan_motor_bundle
 
 

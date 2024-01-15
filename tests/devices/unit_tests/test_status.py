@@ -6,7 +6,7 @@ from dodal.devices.status import await_value_in_list
 
 
 class FakeDevice(Device):
-    pv: EpicsSignalRO = Component(EpicsSignalRO, "test")
+    pv = Component(EpicsSignalRO, "test")
 
 
 @pytest.fixture
@@ -25,5 +25,5 @@ def test_await_value_in_list_with_no_list_parameter_fails(awaited_value, fake_de
 def test_await_value_in_list_success(fake_device):
     status = await_value_in_list(fake_device.pv, [1, 2, 3, 4, 5])
     assert status.done is False
-    fake_device.pv.sim_put(5)
+    fake_device.pv.sim_put(5)  # type: ignore
     status.wait(timeout=1)

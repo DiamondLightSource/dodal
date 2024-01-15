@@ -30,7 +30,7 @@ DISPLAY_CONFIGURATION = "tests/devices/unit_tests/test_display.configuration"
 ZOOM_LEVELS_XML = "tests/devices/unit_tests/test_jCameraManZoomLevels.xml"
 
 
-def do_nothing(*args):
+def do_nothing(*args, **kwargs):
     pass
 
 
@@ -40,8 +40,8 @@ def mock_oav():
     oav: OAV = make_fake_device(OAV)(
         name="oav", prefix="a fake beamline", params=oav_params
     )
-    oav.snapshot.x_size.sim_put("1024")
-    oav.snapshot.y_size.sim_put("768")
+    oav.snapshot.x_size.sim_put("1024")  # type: ignore
+    oav.snapshot.y_size.sim_put("768")  # type: ignore
     oav.wait_for_connection()
     return oav
 
@@ -202,7 +202,7 @@ def test_distance_from_beam_centre_to_motor_coords_returns_the_same_values_as_GD
     h, v, omega, expected_values, mock_oav: OAV, mock_parameters: OAVParameters
 ):
     mock_parameters.zoom = "5.0"
-    mock_oav.zoom_controller.level.sim_put(mock_parameters.zoom)
+    mock_oav.zoom_controller.level.sim_put(mock_parameters.zoom)  # type: ignore
     results = camera_coordinates_to_xyz(
         h,
         v,

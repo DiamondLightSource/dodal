@@ -30,6 +30,7 @@ ZOOM_PARAMS_FILE = (
     "/dls_sw/i04/software/gda/configurations/i04-config/xml/jCameraManZoomLevels.xml"
 )
 DISPLAY_CONFIG = "/dls_sw/i04/software/gda_versions/var/display.configuration"
+DAQ_CONFIGURATION_PATH = "/dls_sw/i04/software/daq_configuration"
 
 BL = get_beamline_name("s04")
 set_log_beamline(BL)
@@ -192,6 +193,7 @@ def dcm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
         "",
         wait_for_connection,
         fake_with_ophyd_sim,
+        daq_configuration_path=DAQ_CONFIGURATION_PATH,
     )
 
 

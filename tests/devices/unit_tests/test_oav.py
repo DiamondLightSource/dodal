@@ -21,7 +21,7 @@ def fake_oav() -> OAV:
     FakeOAV = make_fake_device(OAV)
     fake_oav: OAV = FakeOAV(name="test fake OAV", params=oav_params)
 
-    fake_oav.snapshot.url.sim_put("http://test.url")
+    fake_oav.snapshot.url.sim_put("http://test.url")  # type: ignore
     fake_oav.snapshot.filename.put("test filename")
     fake_oav.snapshot.directory.put("test directory")
     fake_oav.snapshot.top_left_x.put(100)
@@ -30,8 +30,8 @@ def fake_oav() -> OAV:
     fake_oav.snapshot.num_boxes_x.put(15)
     fake_oav.snapshot.num_boxes_y.put(10)
 
-    fake_oav.cam.port_name.sim_put("CAM")
-    fake_oav.proc.port_name.sim_put("PROC")
+    fake_oav.cam.port_name.sim_put("CAM")  # type: ignore
+    fake_oav.proc.port_name.sim_put("PROC")  # type: ignore
 
     fake_oav.wait_for_connection()
 
@@ -136,9 +136,9 @@ def test_when_zoom_is_externally_changed_to_1_then_flat_field_not_changed(
 ):
     """This test is required to ensure that Hyperion doesn't cause unexpected behaviour
     e.g. change the flatfield when the zoom level is changed through the synoptic"""
-    fake_oav.mxsc.input_plugin.sim_put("CAM")
-    fake_oav.snapshot.input_plugin.sim_put("CAM")
+    fake_oav.mxsc.input_plugin.sim_put("CAM")  # type: ignore
+    fake_oav.snapshot.input_plugin.sim_put("CAM")  # type: ignore
 
-    fake_oav.zoom_controller.level.sim_put("1.0X")
+    fake_oav.zoom_controller.level.sim_put("1.0X")  # type: ignore
     assert fake_oav.mxsc.input_plugin.get() == "CAM"
     assert fake_oav.snapshot.input_plugin.get() == "CAM"

@@ -8,54 +8,52 @@ from dodal.devices.status import await_value
 
 
 class EigerFan(Device):
-    on: EpicsSignalRO = Component(EpicsSignalRO, "ProcessConnected_RBV")
-    connected: EpicsSignalRO = Component(EpicsSignalRO, "AllConsumersConnected_RBV")
-    ready: EpicsSignalRO = Component(EpicsSignalRO, "StateReady_RBV")
-    zmq_addr: EpicsSignalRO = Component(EpicsSignalRO, "EigerAddress_RBV")
-    zmq_port: EpicsSignalRO = Component(EpicsSignalRO, "EigerPort_RBV")
-    state: EpicsSignalRO = Component(EpicsSignalRO, "State_RBV")
-    frames_sent: EpicsSignalRO = Component(EpicsSignalRO, "FramesSent_RBV")
-    series: EpicsSignalRO = Component(EpicsSignalRO, "CurrentSeries_RBV")
-    offset: EpicsSignalRO = Component(EpicsSignalRO, "CurrentOffset_RBV")
-    forward_stream: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "ForwardStream")
+    on = Component(EpicsSignalRO, "ProcessConnected_RBV")
+    consumers_connected = Component(EpicsSignalRO, "AllConsumersConnected_RBV")
+    ready = Component(EpicsSignalRO, "StateReady_RBV")
+    zmq_addr = Component(EpicsSignalRO, "EigerAddress_RBV")
+    zmq_port = Component(EpicsSignalRO, "EigerPort_RBV")
+    state = Component(EpicsSignalRO, "State_RBV")
+    frames_sent = Component(EpicsSignalRO, "FramesSent_RBV")
+    series = Component(EpicsSignalRO, "CurrentSeries_RBV")
+    offset = Component(EpicsSignalRO, "CurrentOffset_RBV")
+    forward_stream = Component(EpicsSignalWithRBV, "ForwardStream")
 
 
 class OdinMetaListener(Device):
-    initialised: EpicsSignalRO = Component(EpicsSignalRO, "ProcessConnected_RBV")
-    ready: EpicsSignalRO = Component(EpicsSignalRO, "Writing_RBV")
+    initialised = Component(EpicsSignalRO, "ProcessConnected_RBV")
+    ready = Component(EpicsSignalRO, "Writing_RBV")
     # file_name should not be set. Set the filewriter file_name and this will be updated in EPICS
-    file_name: EpicsSignalRO = Component(EpicsSignalRO, "FileName", string=True)
-    stop_writing: EpicsSignal = Component(EpicsSignal, "Stop")
+    file_name = Component(EpicsSignalRO, "FileName", string=True)
+    stop_writing = Component(EpicsSignal, "Stop")
 
 
 class OdinFileWriter(HDF5Plugin_V22):
-    start_timeout: EpicsSignal = Component(EpicsSignal, "StartTimeout")
+    start_timeout = Component(EpicsSignal, "StartTimeout")
     # id should not be set. Set the filewriter file_name and this will be updated in EPICS
-    id: EpicsSignalRO = Component(EpicsSignalRO, "AcquisitionID_RBV", string=True)
-    image_height: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "ImageHeight")
-    image_width: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "ImageWidth")
+    id = Component(EpicsSignalRO, "AcquisitionID_RBV", string=True)
+    image_height = Component(EpicsSignalWithRBV, "ImageHeight")
+    image_width = Component(EpicsSignalWithRBV, "ImageWidth")
     plugin_type = None
 
 
 class OdinNode(Device):
-    writing: EpicsSignalRO = Component(EpicsSignalRO, "Writing_RBV")
-    frames_dropped: EpicsSignalRO = Component(EpicsSignalRO, "FramesDropped_RBV")
-    frames_timed_out: EpicsSignalRO = Component(EpicsSignalRO, "FramesTimedOut_RBV")
-    error_status: EpicsSignalRO = Component(EpicsSignalRO, "FPErrorState_RBV")
-    fp_initialised: EpicsSignalRO = Component(EpicsSignalRO, "FPProcessConnected_RBV")
-    fr_initialised: EpicsSignalRO = Component(EpicsSignalRO, "FRProcessConnected_RBV")
-    clear_errors: EpicsSignal = Component(EpicsSignal, "FPClearErrors")
-    num_captured: EpicsSignalRO = Component(EpicsSignalRO, "NumCaptured_RBV")
-    error_message: EpicsSignalRO = Component(
-        EpicsSignalRO, "FPErrorMessage_RBV", string=True
-    )
+    writing = Component(EpicsSignalRO, "Writing_RBV")
+    frames_dropped = Component(EpicsSignalRO, "FramesDropped_RBV")
+    frames_timed_out = Component(EpicsSignalRO, "FramesTimedOut_RBV")
+    error_status = Component(EpicsSignalRO, "FPErrorState_RBV")
+    fp_initialised = Component(EpicsSignalRO, "FPProcessConnected_RBV")
+    fr_initialised = Component(EpicsSignalRO, "FRProcessConnected_RBV")
+    clear_errors = Component(EpicsSignal, "FPClearErrors")
+    num_captured = Component(EpicsSignalRO, "NumCaptured_RBV")
+    error_message = Component(EpicsSignalRO, "FPErrorMessage_RBV", string=True)
 
 
 class OdinNodesStatus(Device):
-    node_0: OdinNode = Component(OdinNode, "OD1:")
-    node_1: OdinNode = Component(OdinNode, "OD2:")
-    node_2: OdinNode = Component(OdinNode, "OD3:")
-    node_3: OdinNode = Component(OdinNode, "OD4:")
+    node_0 = Component(OdinNode, "OD1:")
+    node_1 = Component(OdinNode, "OD2:")
+    node_2 = Component(OdinNode, "OD3:")
+    node_3 = Component(OdinNode, "OD4:")
 
     @property
     def nodes(self) -> List[OdinNode]:
@@ -112,10 +110,10 @@ class OdinNodesStatus(Device):
 
 
 class EigerOdin(Device):
-    fan: EigerFan = Component(EigerFan, "OD:FAN:")
-    file_writer: OdinFileWriter = Component(OdinFileWriter, "OD:")
-    meta: OdinMetaListener = Component(OdinMetaListener, "OD:META:")
-    nodes: OdinNodesStatus = Component(OdinNodesStatus, "")
+    fan = Component(EigerFan, "OD:FAN:")
+    file_writer = Component(OdinFileWriter, "OD:")
+    meta = Component(OdinMetaListener, "OD:META:")
+    nodes = Component(OdinNodesStatus, "")
 
     def create_finished_status(self) -> SubscriptionStatus:
         writing_finished = await_value(self.meta.ready, 0)
@@ -140,7 +138,7 @@ class EigerOdin(Device):
     def check_odin_initialised(self) -> Tuple[bool, str]:
         is_error_state, error_messages = self.nodes.get_error_state()
         to_check = [
-            (not self.fan.connected.get(), "EigerFan is not connected"),
+            (not self.fan.consumers_connected.get(), "EigerFan is not connected"),
             (not self.fan.on.get(), "EigerFan is not initialised"),
             (not self.meta.initialised.get(), "MetaListener is not initialised"),
             (is_error_state, error_messages),
