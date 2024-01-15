@@ -11,16 +11,19 @@ VOLTAGE_POLLING_DELAY_S = 0.5
 # The default timeout is 60 seconds as voltage slew rate is typically ~2V/s
 DEFAULT_SETTLE_TIME_S = 60
 
+
 class MirrorStripe(Enum):
     RHODIUM = "Rhodium"
     BARE = "Bare"
     PLATINUM = "Platinum"
+
 
 class MirrorVoltageDemand(IntEnum):
     N_A = 0
     OK = 1
     FAIL = 2
     SLEW = 3
+
 
 class MirrorVoltageDevice(Device):
     """Abstract the bimorph mirror voltage PVs into a single device that can be set asynchronously and returns when

@@ -13,6 +13,7 @@ STATUS_TIMEOUT_S = 10
 # Enable to allow testing when the beamline is down, do not change in production!
 TEST_MODE = False
 
+
 class AccessError(Exception):
     pass
 
@@ -51,7 +52,9 @@ class UndulatorDCM(Device):
             )
             LOGGER.info(f"Setting DCM energy to {energy_kev:.2f} kev")
 
-            status = self.parent.dcm.energy_in_kev.move(energy_kev, timeout=ENERGY_TIMEOUT_S)
+            status = self.parent.dcm.energy_in_kev.move(
+                energy_kev, timeout=ENERGY_TIMEOUT_S
+            )
 
             # Use the lookup table to get the undulator gap associated with this dcm energy
             gap_to_match_dcm_energy = _get_closest_gap_for_energy(
