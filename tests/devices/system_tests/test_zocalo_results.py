@@ -17,7 +17,7 @@ TEST_RESULT_LARGE: XrcResult = {
 
 @pytest_asyncio.fixture
 async def zocalo_device():
-    zd = ZocaloResults("dev_artemis")
+    zd = ZocaloResults()
     await zd.connect()
     return zd
 
@@ -32,12 +32,11 @@ async def test_read_results_from_fake_zocalo(zocalo_device: ZocaloResults):
 
     def plan():
         yield from bps.open_run()
-        yield from bps.kickoff(zocalo_device, wait=True)
-        yield from bps.complete(zocalo_device, wait=True)
+        yield from bps.trigger_and_read([zocalo_device])
         yield from bps.close_run()
 
     RE = RunEngine()
     RE(plan())
 
     results = await zocalo_device.read()
-    assert results["zocalo_results-results"]["value"][0] == TEST_RESULT_LARGE
+    assert results["zocalo-results"]["value"][0] == TEST_RESULT_LARGE

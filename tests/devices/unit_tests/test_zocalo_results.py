@@ -77,6 +77,8 @@ TEST_READING = {
     },
 }
 
+test_ispyb_ids = {"dcid": 0, "dcgid": 0}
+
 
 @patch("dodal.devices.zocalo_results._get_zocalo_connection")
 @pytest_asyncio.fixture
@@ -86,7 +88,7 @@ async def mocked_zocalo_device(RE):
 
         @AsyncStatus.wrap
         async def mock_trigger(results):
-            await zd._put_results(results)
+            await zd._put_results(results, test_ispyb_ids)
 
         zd.trigger = MagicMock(side_effect=partial(mock_trigger, results))  # type: ignore
         await zd.connect()
@@ -110,7 +112,7 @@ async def test_put_result_read_results(
     RE,
 ) -> None:
     zocalo_device = await mocked_zocalo_device([], run_setup=True)
-    await zocalo_device._put_results(TEST_RESULTS)
+    await zocalo_device._put_results(TEST_RESULTS, test_ispyb_ids)
     reading = await zocalo_device.read()
     results: list[XrcResult] = reading["zocalo-results"]["value"]
     centres: list[XrcResult] = reading["zocalo-centres_of_mass"]["value"]
@@ -126,7 +128,7 @@ async def test_rd_top_results(
     RE,
 ):
     zocalo_device = await mocked_zocalo_device([], run_setup=True)
-    await zocalo_device._put_results(TEST_RESULTS)
+    await zocalo_device._put_results(TEST_RESULTS, test_ispyb_ids)
 
     def test_plan():
         bbox_size = yield from bps.rd(zocalo_device.bbox_sizes)
@@ -197,14 +199,16 @@ def test_subscribe_only_called_once_on_first_trigger(
     mock_wrap_subscribe.assert_called_once()
 
 
+@pytest.mark.asyncio
 @patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection", autospec=True)
-def test_when_exception_caused_by_zocalo_message_then_exception_propagated(
+async def test_when_exception_caused_by_zocalo_message_then_exception_propagated(
     mock_connection,
 ):
     RE = RunEngine()
     zocalo_results = ZocaloResults(
         name="zocalo", zocalo_environment="dev_artemis", timeout_s=0.1
     )
+    await zocalo_results.connect()
     with pytest.raises(FailedStatus) as e:
         RE(bps.trigger(zocalo_results, wait=True))
 

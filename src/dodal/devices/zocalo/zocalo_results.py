@@ -70,9 +70,8 @@ class ZocaloResults(StandardReadable, Triggerable):
         self.channel = channel
         self.timeout_s = timeout_s
         self._prefix = prefix
-
-        self._subscription_run: bool = False
         self._raw_results_received: Queue = Queue()
+        self._subscription_run: bool = False
 
         self.results = create_soft_signal_r(list[XrcResult], "results", self.name)
         self.centres_of_mass = create_soft_signal_r(
@@ -81,21 +80,27 @@ class ZocaloResults(StandardReadable, Triggerable):
         self.bbox_sizes = create_soft_signal_r(
             NDArray[np.uint64], "bbox_sizes", self.name
         )
+        self.ispyb_dcid = create_soft_signal_r(int, "ispyb_dcid", self.name)
+        self.ispyb_dcgid = create_soft_signal_r(int, "ispyb_dcgid", self.name)
         self.set_readable_signals(
             read=[
                 self.results,
                 self.centres_of_mass,
                 self.bbox_sizes,
+                self.ispyb_dcid,
+                self.ispyb_dcgid,
             ]
         )
         super().__init__(name)
 
-    async def _put_results(self, results: Sequence[XrcResult]):
+    async def _put_results(self, results: Sequence[XrcResult], ispyb_ids):
         await self.results._backend.put(list(results))
         centres_of_mass = np.array([r["centre_of_mass"] for r in results])
         bbox_sizes = np.array([bbox_size(r) for r in results])
         await self.centres_of_mass._backend.put(centres_of_mass)
         await self.bbox_sizes._backend.put(bbox_sizes)
+        await self.ispyb_dcid._backend.put(ispyb_ids["dcid"])
+        await self.ispyb_dcgid._backend.put(ispyb_ids["dcgid"])
 
     @AsyncStatus.wrap
     async def trigger(self):
@@ -107,13 +112,20 @@ class ZocaloResults(StandardReadable, Triggerable):
             self._subscription_run = True
 
         try:
-            LOGGER.info("waiting for results in queue")
+            LOGGER.info(
+                f"waiting for results in queue - currently {self._raw_results_received.qsize()} items"
+            )
 
             raw_results = self._raw_results_received.get(timeout=self.timeout_s)
             LOGGER.info(f"Zocalo: found {len(raw_results)} crystals.")
             # Sort from strongest to weakest in case of multiple crystals
             await self._put_results(
-                sorted(raw_results, key=lambda d: d[self.sort_key.value], reverse=True)
+                sorted(
+                    raw_results["results"],
+                    key=lambda d: d[self.sort_key.value],
+                    reverse=True,
+                ),
+                raw_results["ispyb_ids"],
             )
         except Empty as timeout_exception:
             LOGGER.warning("Timed out waiting for zocalo results!")
@@ -126,6 +138,11 @@ class ZocaloResults(StandardReadable, Triggerable):
             "source": f"zocalo_service:{self.zocalo_environment}",
             "dtype": "array",
             "shape": [-1, 3],
+        }
+        zocalo_int_type: Descriptor = {
+            "source": f"zocalo_service:{self.zocalo_environment}",
+            "dtype": "integer",
+            "shape": [0],
         }
         return OrderedDict(
             [
@@ -147,6 +164,14 @@ class ZocaloResults(StandardReadable, Triggerable):
                     self._name + "-bbox_sizes",
                     zocalo_array_type,
                 ),
+                (
+                    self._name + "-ispyb_dcid",
+                    zocalo_int_type,
+                ),
+                (
+                    self._name + "-ispyb_dcgid",
+                    zocalo_int_type,
+                ),
             ],
         )
 
@@ -162,7 +187,9 @@ class ZocaloResults(StandardReadable, Triggerable):
             transport.ack(header)
 
             results = message.get("results", [])
-            self._raw_results_received.put(results)
+            self._raw_results_received.put(
+                {"results": results, "ispyb_ids": recipe_parameters}
+            )
 
         subscription = workflows.recipe.wrap_subscribe(
             transport,
