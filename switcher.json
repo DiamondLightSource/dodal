@@ -172,16 +172,16 @@
     "url": "https://DiamondLightSource.github.io/dodal/directory_provider/"
   },
   {
+    "version": "fix_type_error",
+    "url": "https://DiamondLightSource.github.io/dodal/fix_type_error/"
+  },
+  {
     "version": "fix_wrong_return_type",
     "url": "https://DiamondLightSource.github.io/dodal/fix_wrong_return_type/"
   },
   {
     "version": "hyperion_1007_reset_stub_offsets_if_required",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1007_reset_stub_offsets_if_required/"
-  },
-  {
-    "version": "hyperion_1036_set_energy_integrate_set_energy_functions_into_hyperion_plans",
-    "url": "https://DiamondLightSource.github.io/dodal/hyperion_1036_set_energy_integrate_set_energy_functions_into_hyperion_plans/"
   },
   {
     "version": "hyperion_698_refactor_parameters",
