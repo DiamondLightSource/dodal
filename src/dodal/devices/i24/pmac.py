@@ -16,4 +16,4 @@ class PMAC(Device):
     z = Cpt(EpicsMotor, "Z")
 
     def home_stages(self):
-        self.pmac_string.set(r"\#1hmz\#2hmz\#3hmz")
+        self.pmac_string.put(r"\#1hmz\#2hmz\#3hmz", wait=True)
