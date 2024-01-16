@@ -184,6 +184,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1007_reset_stub_offsets_if_required/"
   },
   {
+    "version": "hyperion_1071_replace_current_energy_from_GDA_with_requested_energy_and_actual_energy",
+    "url": "https://DiamondLightSource.github.io/dodal/hyperion_1071_replace_current_energy_from_GDA_with_requested_energy_and_actual_energy/"
+  },
+  {
     "version": "hyperion_698_refactor_parameters",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_698_refactor_parameters/"
   },
