@@ -36,7 +36,7 @@ def test_if_trailing_slash_provided_then_not_appended():
 )
 def test_correct_det_dist_to_beam_converter_path_passed_in(mocked_parse_table):
     params = DetectorParams(
-        current_energy_ev=100,
+        expected_energy_ev=100,
         exposure_time=1.0,
         directory="directory",
         prefix="test",
@@ -59,7 +59,7 @@ def test_correct_det_dist_to_beam_converter_path_passed_in(mocked_parse_table):
 )
 def test_run_number_correct_when_not_specified(mocked_parse_table, tmpdir):
     params = DetectorParams(
-        current_energy_ev=100,
+        expected_energy_ev=100,
         exposure_time=1.0,
         directory=str(tmpdir),
         prefix="test",
@@ -80,7 +80,7 @@ def test_run_number_correct_when_not_specified(mocked_parse_table, tmpdir):
 )
 def test_run_number_correct_when_specified(mocked_parse_table, tmpdir):
     params = DetectorParams(
-        current_energy_ev=100,
+        expected_energy_ev=100,
         exposure_time=1.0,
         directory=str(tmpdir),
         run_number=6,

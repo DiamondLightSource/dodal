@@ -6,7 +6,7 @@ from dodal.devices.eiger import DetectorParams, EigerDetector
 @pytest.fixture()
 def eiger():
     detector_params: DetectorParams = DetectorParams(
-        current_energy_ev=100,
+        expected_energy_ev=100,
         exposure_time=0.1,
         directory="/tmp",
         prefix="file_name",
