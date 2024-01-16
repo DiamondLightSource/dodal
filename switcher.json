@@ -184,6 +184,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1071_replace_current_energy_from_GDA_with_requested_energy_and_actual_energy/"
   },
   {
+    "version": "hyperion_1075_beam_centre_getting_too_many_calls",
+    "url": "https://DiamondLightSource.github.io/dodal/hyperion_1075_beam_centre_getting_too_many_calls/"
+  },
+  {
     "version": "hyperion_698_refactor_parameters",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_698_refactor_parameters/"
   },
