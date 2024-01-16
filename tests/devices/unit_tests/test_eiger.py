@@ -35,7 +35,7 @@ class StatusException(Exception):
 
 def create_new_params() -> DetectorParams:
     return DetectorParams(
-        current_energy_ev=TEST_CURRENT_ENERGY,
+        expected_energy_ev=TEST_CURRENT_ENERGY,
         exposure_time=TEST_EXPOSURE_TIME,
         directory=TEST_DIR,
         prefix=TEST_PREFIX,
