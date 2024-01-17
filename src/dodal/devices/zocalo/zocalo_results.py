@@ -102,6 +102,13 @@ class ZocaloResults(StandardReadable, Triggerable):
         await self.ispyb_dcid._backend.put(ispyb_ids["dcid"])
         await self.ispyb_dcgid._backend.put(ispyb_ids["dcgid"])
 
+    def _clear_old_results(self):
+        LOGGER.info("Clearing queue")
+        self._raw_results_received = Queue()
+
+    def stage(self):
+        self._clear_old_results()
+
     @AsyncStatus.wrap
     async def trigger(self):
         """Returns an AsyncStatus waiting for results to be received from Zocalo."""
