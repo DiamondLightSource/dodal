@@ -136,7 +136,9 @@ class ZocaloResults(StandardReadable, Triggerable):
             )
         except Empty as timeout_exception:
             LOGGER.warning("Timed out waiting for zocalo results!")
-            raise NoResultsFromZocalo() from timeout_exception
+            raise NoResultsFromZocalo(
+                "Timed out waiting for Zocalo results"
+            ) from timeout_exception
         finally:
             self._kickoff_run = False
 
