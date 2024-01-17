@@ -139,6 +139,27 @@ def test_when_zoom_is_externally_changed_to_1_then_flat_field_not_changed(
     fake_oav.mxsc.input_plugin.sim_put("CAM")  # type: ignore
     fake_oav.snapshot.input_plugin.sim_put("CAM")  # type: ignore
 
-    fake_oav.zoom_controller.level.sim_put("1.0X")  # type: ignore
+    fake_oav.zoom_controller.level.sim_put("1.0x")  # type: ignore
     assert fake_oav.mxsc.input_plugin.get() == "CAM"
     assert fake_oav.snapshot.input_plugin.get() == "CAM"
+
+
+def test_get_beam_position_from_zoom_only_called_once_on_multiple_connects(
+    fake_oav: OAV,
+):
+    fake_oav.wait_for_connection()
+    fake_oav.wait_for_connection()
+    fake_oav.wait_for_connection()
+
+    with patch(
+        "dodal.devices.oav.oav_detector.OAVConfigParams.update_on_zoom",
+        MagicMock(),
+    ), patch(
+        "dodal.devices.oav.oav_detector.OAVConfigParams.get_beam_position_from_zoom",
+        MagicMock(),
+    ) as mock_get_beam_position_from_zoom, patch(
+        "dodal.devices.oav.oav_detector.OAVConfigParams.load_microns_per_pixel",
+        MagicMock(),
+    ):
+        fake_oav.zoom_controller.level.sim_put("2.0x")  # type: ignore
+        assert mock_get_beam_position_from_zoom.call_count == 1
