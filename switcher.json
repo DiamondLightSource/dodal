@@ -92,10 +92,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/1.11.3/"
   },
   {
-    "version": "1080_discard_old_zocalo_results",
-    "url": "https://DiamondLightSource.github.io/dodal/1080_discard_old_zocalo_results/"
-  },
-  {
     "version": "117_add_panda",
     "url": "https://DiamondLightSource.github.io/dodal/117_add_panda/"
   },
@@ -214,6 +210,10 @@
   {
     "version": "linkam3",
     "url": "https://DiamondLightSource.github.io/dodal/linkam3/"
+  },
+  {
+    "version": "mx_10-use-zebra-for-serial",
+    "url": "https://DiamondLightSource.github.io/dodal/mx_10-use-zebra-for-serial/"
   },
   {
     "version": "mx_54-add-motors-to-pmac",
