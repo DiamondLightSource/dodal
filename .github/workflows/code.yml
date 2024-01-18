@@ -92,7 +92,7 @@ jobs:
           pipx run build
 
       - name: Upload sdist and wheel as artifacts
-        uses: actions/upload-artifact@v4.0.0
+        uses: actions/upload-artifact@v4.1.0
         with:
           name: ${{ env.DIST_WHEEL_PATH }}
           path: dist
@@ -136,7 +136,7 @@ jobs:
           echo "DIST_LOCKFILE_PATH=lockfiles-${{ env.CONTAINER_PYTHON }}-dist-${{ github.sha }}" >> $GITHUB_ENV
 
       - name: Download wheel and lockfiles
-        uses: actions/download-artifact@v4.1.0
+        uses: actions/download-artifact@v4.1.1
         with:
           path: artifacts/
           pattern: "*dist*"
@@ -216,7 +216,7 @@ jobs:
 
     steps:
       - name: Download wheel and lockfiles
-        uses: actions/download-artifact@v4.1.0
+        uses: actions/download-artifact@v4.1.1
         with:
           pattern: "*dist*"
 
