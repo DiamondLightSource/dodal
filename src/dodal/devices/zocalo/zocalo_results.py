@@ -135,17 +135,16 @@ class ZocaloResults(StandardReadable, Triggerable):
     async def trigger(self):
         """Returns an AsyncStatus waiting for results to be received from Zocalo."""
         LOGGER.info("Zocalo trigger called")
+        msg = (
+            "This device must be staged to subscribe to the Zocalo queue, and "
+            "unstaged at the end of the experiment to avoid consuming results not "
+            "meant for it"
+        )
         if not self.subscription:
             LOGGER.warning(
-                "This device must be staged to subscribe to the Zocalo queue, and "
-                "unstaged at the end of the experiment to avoid consuming results not "
-                "meant for it"  # AsyncStatus exception messages are poorly propagated, remove after https://github.com/bluesky/ophyd-async/issues/103
+                msg  # AsyncStatus exception messages are poorly propagated, remove after https://github.com/bluesky/ophyd-async/issues/103
             )
-            raise NoZocaloSubscription(
-                "This device must be staged to subscribe to the Zocalo queue, and "
-                "unstaged at the end of the experiment to avoid consuming results not "
-                "meant for it"
-            )
+            raise NoZocaloSubscription(msg)
 
         try:
             LOGGER.info(
