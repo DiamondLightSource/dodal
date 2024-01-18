@@ -124,7 +124,8 @@ class ZocaloResults(StandardReadable, Triggerable):
         await asyncio.sleep(CLEAR_QUEUE_WAIT_S)
         self._clear_old_results()
 
-    def unstage(self):
+    @AsyncStatus.wrap
+    async def unstage(self):
         transport = _get_zocalo_connection(self.zocalo_environment)
         if self.subscription:
             LOGGER.info("Disconnecting from Zocalo")

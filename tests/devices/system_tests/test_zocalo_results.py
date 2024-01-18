@@ -77,7 +77,7 @@ async def test_stage_unstage_controls_read_results_from_fake_zocalo(
     # With stage, the plan should run normally
     RE = RunEngine()
     RE(plan_with_stage())
-
+    assert not zocalo_device.subscription
     # Without stage, the plan should run fail because we didn't connect to Zocalo
     with pytest.raises(FailedStatus) as e:
         RE(plan())
@@ -91,3 +91,11 @@ async def test_stage_unstage_controls_read_results_from_fake_zocalo(
 
     results = await zocalo_device.read()
     assert results["zocalo-results"]["value"][0] == TEST_RESULT_LARGE
+    await zocalo_device.unstage()
+
+    # Generating some more results leaves them at RMQ
+    with pytest.raises(FailedStatus) as e:
+        RE(plan())
+    # But waiting for stage should clear them
+    RE(bps.stage(zocalo_device, wait=True))
+    assert zocalo_device._raw_results_received.empty()
