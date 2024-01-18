@@ -33,6 +33,8 @@ AND3 = 34
 AND4 = 35
 OR1 = 36
 PULSE1 = 52
+PULSE2 = 53
+SOFT_IN2 = 61
 SOFT_IN3 = 62
 
 # Instrument specific
@@ -89,12 +91,14 @@ class PositionCompare(Device):
     gate_input = epics_signal_put_wait("PC_GATE_INP")
     gate_width = epics_signal_put_wait("PC_GATE_WID")
     gate_start = epics_signal_put_wait("PC_GATE_START")
+    gate_step = epics_signal_put_wait("PC_GATE_STEP")
 
     pulse_source = epics_signal_put_wait("PC_PULSE_SEL")
     pulse_input = epics_signal_put_wait("PC_PULSE_INP")
     pulse_start = epics_signal_put_wait("PC_PULSE_START")
     pulse_width = epics_signal_put_wait("PC_PULSE_WID")
     pulse_step = epics_signal_put_wait("PC_PULSE_STEP")
+    pulse_max = epics_signal_put_wait("PC_PULSE_MAX")
 
     dir = Component(EpicsSignal, "PC_DIR")
     arm_source = epics_signal_put_wait("PC_ARM_SEL")
@@ -108,6 +112,11 @@ class PositionCompare(Device):
 
 class ZebraOutputPanel(Device):
     pulse_1_input = epics_signal_put_wait("PULSE1_INP")
+    pulse_1_delay = epics_signal_put_wait("PULSE1_DLY")
+    pulse_1_width = epics_signal_put_wait("PULSE1_WID")
+    pulse_2_input = epics_signal_put_wait("PULSE2_INP")
+    pulse_2_delay = epics_signal_put_wait("PULSE2_DLY")
+    pulse_2_width = epics_signal_put_wait("PULSE2_WID")
 
     out_1 = epics_signal_put_wait("OUT1_TTL")
     out_2 = epics_signal_put_wait("OUT2_TTL")
