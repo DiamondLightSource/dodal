@@ -36,6 +36,7 @@ DEFAULT_TIMEOUT = 180
 DEFAULT_SORT_KEY = SortKeys.max_count
 ZOCALO_READING_PLAN_NAME = "zocalo reading"
 CLEAR_QUEUE_WAIT_S = 2.0
+ZOCALO_STAGE_GROUP = "clear zocalo queue"
 
 
 class XrcResult(TypedDict):
@@ -112,7 +113,12 @@ class ZocaloResults(StandardReadable, Triggerable):
         self._raw_results_received = Queue()
 
     @AsyncStatus.wrap
-    async def stage(self):
+    async def stage(self, group=ZOCALO_STAGE_GROUP):
+        """Stages the Zocalo device by: subscribing to the queue, doing a background
+        sleep for a few seconds to wait for any stale messages to be recieved, then
+        clearing the queue. Plans using this device should wait on ZOCALO_STAGE_GROUP
+        before triggering processing for the experiment"""
+
         LOGGER.info("Subscribing to results queue")
         self._subscribe_to_results()
         await asyncio.sleep(CLEAR_QUEUE_WAIT_S)
