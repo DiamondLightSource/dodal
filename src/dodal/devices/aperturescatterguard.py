@@ -11,6 +11,7 @@ from dodal.devices.logging_ophyd_device import InfoLoggingDevice
 from dodal.devices.scatterguard import Scatterguard
 from dodal.log import LOGGER
 
+Aperture5d = Tuple[float, float, float, float, float]
 
 class InvalidApertureMove(Exception):
     pass
@@ -105,7 +106,6 @@ class AperturePositions:
 
 
 
-Aperture5d = Tuple[float, float, float, float, float]
 
 class ApertureScatterguard(InfoLoggingDevice):
     aperture = Cpt(Aperture, "-MO-MAPT-01:")
