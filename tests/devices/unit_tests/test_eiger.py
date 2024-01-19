@@ -15,7 +15,7 @@ from dodal.log import LOGGER
 
 TEST_DETECTOR_SIZE_CONSTANTS = EIGER2_X_16M_SIZE
 
-TEST_CURRENT_ENERGY = 100.0
+TEST_EXPECTED_ENERGY = 100.0
 TEST_EXPOSURE_TIME = 1.0
 TEST_DIR = "/test/dir"
 TEST_PREFIX = "test"
@@ -35,7 +35,7 @@ class StatusException(Exception):
 
 def create_new_params() -> DetectorParams:
     return DetectorParams(
-        expected_energy_ev=TEST_CURRENT_ENERGY,
+        expected_energy_ev=TEST_EXPECTED_ENERGY,
         exposure_time=TEST_EXPOSURE_TIME,
         directory=TEST_DIR,
         prefix=TEST_PREFIX,
