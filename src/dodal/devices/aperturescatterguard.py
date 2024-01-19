@@ -1,6 +1,8 @@
 from dataclasses import dataclass
+from enum import Enum
 from typing import Optional, Tuple
 
+import numpy as np
 from ophyd import Component as Cpt
 from ophyd.status import AndStatus, Status
 
@@ -14,16 +16,52 @@ class InvalidApertureMove(Exception):
     pass
 
 
+class PositionName(str, Enum):
+    LARGE = "large"
+    MEDIUM = "medium"
+    SMALL = "small"
+    INVALID = "invalid"
+    ROBOT_LOAD = "robot_load"
+
+
 @dataclass
 class AperturePositions:
     """Holds tuples (miniap_x, miniap_y, miniap_z, scatterguard_x, scatterguard_y)
     representing the motor positions needed to select a particular aperture size.
     """
 
+    # one micrometre tolerance
+    TOLERANCE_MM: float = 0.001
+
     LARGE: Tuple[float, float, float, float, float]
     MEDIUM: Tuple[float, float, float, float, float]
     SMALL: Tuple[float, float, float, float, float]
     ROBOT_LOAD: Tuple[float, float, float, float, float]
+
+    def _distance_check(
+        self,
+        target: Tuple[float, float, float, float, float],
+        present: Tuple[float, float, float, float, float],
+    ) -> bool:
+        return np.allclose(present, target, self.tolerance)
+
+    @classmethod
+    def match_to_name(
+        self, present_position: Tuple[float, float, float, float, float]
+    ) -> PositionName:
+        assert self.aperture_positions.position_valid(present_position)
+        positions = [
+            (PositionName.LARGE, self.LARGE),
+            (PositionName.MEDIUM, self.MEDIUM),
+            (PositionName.SMALL, self.SMALL),
+            (PositionName.ROBOT_LOAD, self.ROBOT_LOAD),
+        ]
+
+        for position_name, position_constant in positions:
+            if self._distance_check(position_constant, present_position):
+                return position_name
+
+        return PositionName.INVALID
 
     @classmethod
     def from_gda_beamline_params(cls, params):
@@ -58,24 +96,34 @@ class AperturePositions:
             ),
         )
 
-    def position_valid(self, pos: Tuple[float, float, float, float, float]):
+    def position_valid(self, pos: Tuple[float, float, float, float, float]) -> bool:
         """
         Check if argument 'pos' is a valid position in this AperturePositions object.
         """
-        if pos not in [self.LARGE, self.MEDIUM, self.SMALL, self.ROBOT_LOAD]:
-            return False
-        return True
+        options = [self.LARGE, self.MEDIUM, self.SMALL, self.ROBOT_LOAD]
+        return pos in options
+
+
+AperturePosition5d = Tuple[float, float, float, float, float]
 
 
 class ApertureScatterguard(InfoLoggingDevice):
     aperture = Cpt(Aperture, "-MO-MAPT-01:")
     scatterguard = Cpt(Scatterguard, "-MO-SCAT-01:")
     aperture_positions: Optional[AperturePositions] = None
+    aperture_name: PositionName = PositionName.INVALID
     APERTURE_Z_TOLERANCE = 3  # Number of MRES steps
 
     def load_aperture_positions(self, positions: AperturePositions):
         LOGGER.info(f"{self.name} loaded in {positions}")
         self.aperture_positions = positions
+
+    def read_name(self) -> PositionName:
+        return self.aperture_name
+
+    def _update_name(self, pos: Tuple[float, float, float, float, float]) -> None:
+        name = AperturePositions.match_to_name(pos)
+        self.aperture_name = name
 
     def set(self, pos: Tuple[float, float, float, float, float]) -> AndStatus:
         try:
@@ -83,6 +131,7 @@ class ApertureScatterguard(InfoLoggingDevice):
             assert self.aperture_positions.position_valid(pos)
         except AssertionError as e:
             raise InvalidApertureMove(repr(e))
+        self._update_name(pos)
         return self._safe_move_within_datacollection_range(*pos)
 
     def _safe_move_within_datacollection_range(
