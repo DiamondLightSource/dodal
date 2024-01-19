@@ -18,7 +18,7 @@ from dodal.devices.fast_grid_scan import (
 from dodal.devices.status import await_value
 
 
-class PandaGridScanParams(GridScanParamsCommon):
+class PandAGridScanParams(GridScanParamsCommon):
     """
     Holder class for the parameters of a grid scan in a similar
     layout to EPICS. These params are used for the panda-triggered
@@ -116,7 +116,7 @@ class PandAFastGridScan(Device):
         return {}
 
 
-def set_fast_grid_scan_params(scan: PandAFastGridScan, params: PandaGridScanParams):
+def set_fast_grid_scan_params(scan: PandAFastGridScan, params: PandAGridScanParams):
     yield from mv(
         scan.x_steps,
         params.x_steps,

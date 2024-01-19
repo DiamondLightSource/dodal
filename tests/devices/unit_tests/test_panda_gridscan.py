@@ -9,7 +9,7 @@ from ophyd.sim import instantiate_fake_device, make_fake_device
 
 from dodal.devices.panda_fast_grid_scan import (
     PandAFastGridScan,
-    PandaGridScanParams,
+    PandAGridScanParams,
     set_fast_grid_scan_params,
 )
 from dodal.devices.smargon import Smargon
@@ -68,7 +68,7 @@ def test_running_finished_with_all_images_done_then_complete_status_finishes_not
     RE = RunEngine()
     RE(
         set_fast_grid_scan_params(
-            fast_grid_scan, PandaGridScanParams(x_steps=num_pos_1d, y_steps=num_pos_1d)
+            fast_grid_scan, PandAGridScanParams(x_steps=num_pos_1d, y_steps=num_pos_1d)
         )
     )
 
@@ -134,7 +134,7 @@ FAILING_CONST = 15
 )
 def test_scan_within_limits_1d(start, steps, size, expected_in_limits):
     motor_bundle = create_motor_bundle_with_limits(0.0, 10.0)
-    grid_params = PandaGridScanParams(x_start=start, x_steps=steps, x_step_size=size)
+    grid_params = PandAGridScanParams(x_start=start, x_steps=steps, x_step_size=size)
     assert grid_params.is_valid(motor_bundle.get_xyz_limits()) == expected_in_limits
 
 
@@ -150,7 +150,7 @@ def test_scan_within_limits_2d(
     x_start, x_steps, x_size, y1_start, y_steps, y_size, z1_start, expected_in_limits
 ):
     motor_bundle = create_motor_bundle_with_limits(0.0, 10.0)
-    grid_params = PandaGridScanParams(
+    grid_params = PandAGridScanParams(
         x_start=x_start,
         x_steps=x_steps,
         x_step_size=x_size,
@@ -206,7 +206,7 @@ def test_scan_within_limits_3d(
     expected_in_limits,
 ):
     motor_bundle = create_motor_bundle_with_limits(0.0, 10.0)
-    grid_params = PandaGridScanParams(
+    grid_params = PandAGridScanParams(
         x_start=x_start,
         x_steps=x_steps,
         x_step_size=x_size,
@@ -224,7 +224,7 @@ def test_scan_within_limits_3d(
 
 @pytest.fixture
 def grid_scan_params():
-    yield PandaGridScanParams(
+    yield PandAGridScanParams(
         x_steps=10,
         y_steps=15,
         z_steps=20,
@@ -250,14 +250,14 @@ def grid_scan_params():
     ],
 )
 def test_given_x_y_z_out_of_range_then_converting_to_motor_coords_raises(
-    grid_scan_params: PandaGridScanParams, grid_position
+    grid_scan_params: PandAGridScanParams, grid_position
 ):
     with pytest.raises(IndexError):
         grid_scan_params.grid_position_to_motor_position(grid_position)
 
 
 def test_given_x_y_z_of_origin_when_get_motor_positions_then_initial_positions_returned(
-    grid_scan_params: PandaGridScanParams,
+    grid_scan_params: PandAGridScanParams,
 ):
     motor_positions = grid_scan_params.grid_position_to_motor_position(
         np.array([0, 0, 0])
@@ -274,7 +274,7 @@ def test_given_x_y_z_of_origin_when_get_motor_positions_then_initial_positions_r
     ],
 )
 def test_given_various_x_y_z_when_get_motor_positions_then_expected_positions_returned(
-    grid_scan_params: PandaGridScanParams,
+    grid_scan_params: PandAGridScanParams,
     grid_position,
     expected_x,
     expected_y,
@@ -298,6 +298,6 @@ def test_can_run_fast_grid_scan_in_run_engine(fast_grid_scan):
 
 
 def test_given_x_y_z_steps_when_full_number_calculated_then_answer_is_as_expected(
-    grid_scan_params: PandaGridScanParams,
+    grid_scan_params: PandAGridScanParams,
 ):
     assert grid_scan_params.get_num_images() == 350
