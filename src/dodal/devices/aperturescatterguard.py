@@ -30,24 +30,24 @@ class AperturePositions:
     representing the motor positions needed to select a particular aperture size.
     """
 
+    LARGE: Aperture5d
+    MEDIUM: Aperture5d
+    SMALL: Aperture5d
+    ROBOT_LOAD: Aperture5d
+
     # one micrometre tolerance
     TOLERANCE_MM: float = 0.001
 
-    LARGE: Tuple[float, float, float, float, float]
-    MEDIUM: Tuple[float, float, float, float, float]
-    SMALL: Tuple[float, float, float, float, float]
-    ROBOT_LOAD: Tuple[float, float, float, float, float]
-
     def _distance_check(
         self,
-        target: Tuple[float, float, float, float, float],
-        present: Tuple[float, float, float, float, float],
+        target: Aperture5d,
+        present: Aperture5d,
     ) -> bool:
         return np.allclose(present, target, self.tolerance)
 
     @classmethod
     def match_to_name(
-        self, present_position: Tuple[float, float, float, float, float]
+        self, present_position: Aperture5d
     ) -> PositionName:
         assert self.aperture_positions.position_valid(present_position)
         positions = [
@@ -96,7 +96,7 @@ class AperturePositions:
             ),
         )
 
-    def position_valid(self, pos: Tuple[float, float, float, float, float]) -> bool:
+    def position_valid(self, pos: Aperture5d) -> bool:
         """
         Check if argument 'pos' is a valid position in this AperturePositions object.
         """
@@ -104,8 +104,8 @@ class AperturePositions:
         return pos in options
 
 
-AperturePosition5d = Tuple[float, float, float, float, float]
 
+Aperture5d = Tuple[float, float, float, float, float]
 
 class ApertureScatterguard(InfoLoggingDevice):
     aperture = Cpt(Aperture, "-MO-MAPT-01:")
@@ -118,14 +118,11 @@ class ApertureScatterguard(InfoLoggingDevice):
         LOGGER.info(f"{self.name} loaded in {positions}")
         self.aperture_positions = positions
 
-    def read_name(self) -> PositionName:
-        return self.aperture_name
-
-    def _update_name(self, pos: Tuple[float, float, float, float, float]) -> None:
+    def _update_name(self, pos: Aperture5d) -> None:
         name = AperturePositions.match_to_name(pos)
         self.aperture_name = name
 
-    def set(self, pos: Tuple[float, float, float, float, float]) -> AndStatus:
+    def set(self, pos: Aperture5d) -> AndStatus:
         try:
             assert isinstance(self.aperture_positions, AperturePositions)
             assert self.aperture_positions.position_valid(pos)
@@ -151,6 +148,7 @@ class ApertureScatterguard(InfoLoggingDevice):
         # in a datacollection position is to see if we are "ready" (DMOV) and the target
         # position is correct
         ap_z_in_position = self.aperture.z.motor_done_move.get()
+        # CASE still moving
         if not ap_z_in_position:
             status: Status = Status(obj=self)
             status.set_exception(
@@ -162,6 +160,7 @@ class ApertureScatterguard(InfoLoggingDevice):
             return status
         current_ap_z = self.aperture.z.user_setpoint.get()
         tolerance = self.APERTURE_Z_TOLERANCE * self.aperture.z.motor_resolution.get()
+        # CASE invalid target position
         if abs(current_ap_z - aperture_z) > tolerance:
             raise InvalidApertureMove(
                 "ApertureScatterguard safe move is not yet defined for positions "
@@ -169,6 +168,7 @@ class ApertureScatterguard(InfoLoggingDevice):
                 f"Current aperture z ({current_ap_z}), outside of tolerance ({tolerance}) from target ({aperture_z})."
             )
 
+        # CASE moves along Z
         current_ap_y = self.aperture.y.user_readback.get()
         if aperture_y > current_ap_y:
             sg_status: AndStatus = self.scatterguard.x.set(
@@ -182,7 +182,8 @@ class ApertureScatterguard(InfoLoggingDevice):
                 & self.aperture.z.set(aperture_z)
             )
             return final_status
-
+        
+        # CASE does not move along Z
         else:
             ap_status: AndStatus = (
                 self.aperture.x.set(aperture_x)
