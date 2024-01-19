@@ -14,7 +14,7 @@ classifiers = [
 description = "Ophyd devices and other utils that could be used across DLS beamlines"
 dependencies = [
     "ophyd",
-    "ophyd_async@git+https://github.com/bluesky/ophyd-async@give_panda_name", #Use a specific commit from ophyd async until https://github.com/bluesky/ophyd-async/pull/101 is merged
+    "ophyd_async@git+https://github.com/bluesky/ophyd-async@ec5729640041ee5b77b4614158793af3a34cf9d8", #Use a specific branch from ophyd async until https://github.com/bluesky/ophyd-async/pull/101 is merged
     "bluesky",
     "pyepics",
     "dataclasses-json",
