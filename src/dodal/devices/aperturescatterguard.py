@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional, Tuple
+from typing import List, Literal, Optional, Tuple
 
 import numpy as np
 from ophyd import Component as Cpt
@@ -12,6 +12,7 @@ from dodal.devices.scatterguard import Scatterguard
 from dodal.log import LOGGER
 
 Aperture5d = Tuple[float, float, float, float, float]
+
 
 class InvalidApertureMove(Exception):
     pass
@@ -47,11 +48,9 @@ class AperturePositions:
         return np.allclose(present, target, self.tolerance)
 
     @classmethod
-    def match_to_name(
-        self, present_position: Aperture5d
-    ) -> PositionName:
+    def match_to_name(self, present_position: Aperture5d) -> PositionName:
         assert self.aperture_positions.position_valid(present_position)
-        positions = [
+        positions: List[(Literal, Aperture5d)] = [
             (PositionName.LARGE, self.LARGE),
             (PositionName.MEDIUM, self.MEDIUM),
             (PositionName.SMALL, self.SMALL),
@@ -103,8 +102,6 @@ class AperturePositions:
         """
         options = [self.LARGE, self.MEDIUM, self.SMALL, self.ROBOT_LOAD]
         return pos in options
-
-
 
 
 class ApertureScatterguard(InfoLoggingDevice):
@@ -182,7 +179,7 @@ class ApertureScatterguard(InfoLoggingDevice):
                 & self.aperture.z.set(aperture_z)
             )
             return final_status
-        
+
         # CASE does not move along Z
         else:
             ap_status: AndStatus = (
