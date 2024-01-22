@@ -49,7 +49,7 @@ class AperturePositions:
 
     @classmethod
     def match_to_name(self, present_position: Aperture5d) -> PositionName:
-        assert self.aperture_positions.position_valid(present_position)
+        assert AperturePositions.position_valid(present_position)
         positions: List[(Literal, Aperture5d)] = [
             (PositionName.LARGE, self.LARGE),
             (PositionName.MEDIUM, self.MEDIUM),
@@ -58,7 +58,7 @@ class AperturePositions:
         ]
 
         for position_name, position_constant in positions:
-            if self._distance_check(position_constant, present_position):
+            if AperturePositions._distance_check(position_constant, present_position):
                 return position_name
 
         return PositionName.INVALID
