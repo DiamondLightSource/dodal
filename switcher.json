@@ -4,6 +4,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/main/"
   },
   {
+    "version": "1.13.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.13.0/"
+  },
+  {
     "version": "1.12.0",
     "url": "https://DiamondLightSource.github.io/dodal/1.12.0/"
   },
@@ -122,10 +126,6 @@
   {
     "version": "262_make_arming_eiger_asynchronous",
     "url": "https://DiamondLightSource.github.io/dodal/262_make_arming_eiger_asynchronous/"
-  },
-  {
-    "version": "298_disconnect_zocalo_on_unstage",
-    "url": "https://DiamondLightSource.github.io/dodal/298_disconnect_zocalo_on_unstage/"
   },
   {
     "version": "51_aperture_scatterguard_no_positions",
