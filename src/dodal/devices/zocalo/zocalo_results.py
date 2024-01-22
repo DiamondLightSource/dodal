@@ -113,7 +113,7 @@ class ZocaloResults(StandardReadable, Triggerable):
         self._raw_results_received = Queue()
 
     @AsyncStatus.wrap
-    async def stage(self, group=ZOCALO_STAGE_GROUP):
+    async def stage(self):
         """Stages the Zocalo device by: subscribing to the queue, doing a background
         sleep for a few seconds to wait for any stale messages to be recieved, then
         clearing the queue. Plans using this device should wait on ZOCALO_STAGE_GROUP
