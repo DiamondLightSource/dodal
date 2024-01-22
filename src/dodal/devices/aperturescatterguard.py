@@ -40,6 +40,7 @@ class AperturePositions:
     # one micrometre tolerance
     TOLERANCE_MM: float = 0.001
 
+    @classmethod
     def _distance_check(
         self,
         target: Aperture5d,
@@ -49,7 +50,7 @@ class AperturePositions:
 
     @classmethod
     def match_to_name(self, present_position: Aperture5d) -> PositionName:
-        assert AperturePositions.position_valid(present_position)
+        assert self.position_valid(present_position)
         positions: List[(Literal, Aperture5d)] = [
             (PositionName.LARGE, self.LARGE),
             (PositionName.MEDIUM, self.MEDIUM),
@@ -58,7 +59,7 @@ class AperturePositions:
         ]
 
         for position_name, position_constant in positions:
-            if AperturePositions._distance_check(position_constant, present_position):
+            if self._distance_check(position_constant, present_position):
                 return position_name
 
         return PositionName.INVALID
@@ -96,6 +97,7 @@ class AperturePositions:
             ),
         )
 
+    @classmethod
     def position_valid(self, pos: Aperture5d) -> bool:
         """
         Check if argument 'pos' is a valid position in this AperturePositions object.

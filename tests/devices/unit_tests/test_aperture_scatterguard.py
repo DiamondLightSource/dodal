@@ -104,12 +104,13 @@ def test_aperture_scatterguard_rejects_unknown_position(
 
 
 def test_aperture_scatterguard_select_bottom_moves_sg_down_then_assembly_up(
-    aperture_in_medium_pos,
+    aperture_positions: AperturePositions,
+    aperture_in_medium_pos: ApertureScatterguard,
 ):
     aperture_scatterguard = aperture_in_medium_pos
     call_logger = install_logger_for_aperture_and_scatterguard(aperture_scatterguard)
 
-    aperture_scatterguard.set(AperturePositions.SMALL)
+    aperture_scatterguard.set(aperture_positions.SMALL)
 
     actual_calls = call_logger.mock_calls
     expected_calls = [
@@ -125,12 +126,12 @@ def test_aperture_scatterguard_select_bottom_moves_sg_down_then_assembly_up(
 
 
 def test_aperture_scatterguard_select_top_moves_assembly_down_then_sg_up(
-     aperture_in_medium_pos: ApertureScatterguard
+    aperture_positions: AperturePositions, aperture_in_medium_pos: ApertureScatterguard
 ):
     aperture_scatterguard = aperture_in_medium_pos
     call_logger = install_logger_for_aperture_and_scatterguard(aperture_scatterguard)
 
-    aperture_scatterguard.set(AperturePositions.LARGE)
+    aperture_scatterguard.set(aperture_positions.LARGE)
 
     actual_calls = call_logger.mock_calls
     expected_calls = [
