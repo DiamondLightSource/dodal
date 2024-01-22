@@ -1,12 +1,14 @@
-from typing import Dict, Union
+from typing import Dict, Generic, TypeVar, Union
 
 from pydantic.dataclasses import dataclass
 
+T = TypeVar("T", bound=Union[float, int])
+
 
 @dataclass
-class DetectorSize:
-    width: Union[float, int]
-    height: Union[float, int]
+class DetectorSize(Generic[T]):
+    width: T
+    height: T
 
 
 ALL_DETECTORS: Dict[str, "DetectorSizeConstants"] = {}
@@ -15,10 +17,10 @@ ALL_DETECTORS: Dict[str, "DetectorSizeConstants"] = {}
 @dataclass
 class DetectorSizeConstants:
     det_type_string: str
-    det_dimension: DetectorSize
-    det_size_pixels: DetectorSize
-    roi_dimension: DetectorSize
-    roi_size_pixels: DetectorSize
+    det_dimension: DetectorSize[float]
+    det_size_pixels: DetectorSize[int]
+    roi_dimension: DetectorSize[float]
+    roi_size_pixels: DetectorSize[int]
 
     def __post_init__(self):
         ALL_DETECTORS[self.det_type_string] = self

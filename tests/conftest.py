@@ -8,15 +8,13 @@ import pytest
 from bluesky.run_engine import RunEngine
 from ophyd.sim import make_fake_device
 
-from dodal.beamlines import i03
+from dodal.beamlines import beamline_utils, i03
 from dodal.devices.focusing_mirror import VFMMirrorVoltages
 from dodal.log import LOGGER, GELFTCPHandler, set_up_logging_handlers
 
 
 def pytest_runtest_setup(item):
-    if "dodal.beamlines.beamline_utils" in sys.modules:
-        sys.modules["dodal.beamlines.beamline_utils"].clear_devices()
-        assert sys.modules["dodal.beamlines.beamline_utils"].ACTIVE_DEVICES == {}
+    beamline_utils.clear_devices()
     if LOGGER.handlers == []:
         mock_graylog_handler = MagicMock(spec=GELFTCPHandler)
         mock_graylog_handler.return_value.level = logging.DEBUG

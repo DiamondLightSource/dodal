@@ -204,6 +204,7 @@ class OAV(AreaDetector):
     def __init__(self, *args, params: OAVConfigParams, **kwargs):
         super().__init__(*args, **kwargs)
         self.parameters = params
+        self.subscription_id = None
 
     def wait_for_connection(self, all_signals=False, timeout=2):
         connected = super().wait_for_connection(all_signals, timeout)
@@ -211,5 +212,9 @@ class OAV(AreaDetector):
         y = self.snapshot.y_size.get()
 
         cb = partial(self.parameters.update_on_zoom, xsize=x, ysize=y)
-        self.zoom_controller.level.subscribe(cb)
+
+        if self.subscription_id is not None:
+            self.zoom_controller.level.unsubscribe(self.subscription_id)
+        self.subscription_id = self.zoom_controller.level.subscribe(cb)
+
         return connected

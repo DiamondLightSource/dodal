@@ -1,6 +1,8 @@
 from ophyd import Component as Cpt
 from ophyd import Device, EpicsMotor, EpicsSignalRO, Kind
 
+from dodal.beamlines.beamline_parameters import get_beamline_parameters
+
 
 class DCM(Device):
     def __init__(self, *args, daq_configuration_path: str, **kwargs):
@@ -11,6 +13,9 @@ class DCM(Device):
         self.dcm_roll_converter_lookup_table_path = (
             daq_configuration_path + "/lookup/BeamLineEnergy_DCM_Roll_converter.txt"
         )
+        # I03 configures the DCM Perp as a side effect of applying this fixed value to the DCM Offset after an energy change
+        # Nb this parameter is misleadingly named to confuse you
+        self.fixed_offset_mm = get_beamline_parameters()["DCM_Perp_Offset_FIXED"]
 
     """
     A double crystal monochromator (DCM), used to select the energy of the beam.
@@ -37,9 +42,3 @@ class DCM(Device):
     backplate_temp = Cpt(EpicsSignalRO, "-MO-DCM-01:TEMP5")
     perp_temp = Cpt(EpicsSignalRO, "-MO-DCM-01:TEMP6")
     perp_sub_assembly_temp = Cpt(EpicsSignalRO, "-MO-DCM-01:TEMP7")
-
-
-def fixed_offset_from_beamline_params(gda_beamline_parameters):
-    """I03 configures the DCM Perp as a side effect of applying this fixed value to the DCM Offset after an energy change"""
-    # Nb this parameter is misleadingly named to confuse you
-    return gda_beamline_parameters["DCM_Perp_Offset_FIXED"]
