@@ -110,13 +110,15 @@ class PositionCompare(Device):
         return self.arm.armed.get() == 1
 
 
+class PulseOutput(Device):
+    pulse_inp = epics_signal_put_wait("_INP")
+    pulse_dly = epics_signal_put_wait("_DLY")
+    pulse_wid = epics_signal_put_wait("_WID")
+
+
 class ZebraOutputPanel(Device):
-    pulse_1_input = epics_signal_put_wait("PULSE1_INP")
-    pulse_1_delay = epics_signal_put_wait("PULSE1_DLY")
-    pulse_1_width = epics_signal_put_wait("PULSE1_WID")
-    pulse_2_input = epics_signal_put_wait("PULSE2_INP")
-    pulse_2_delay = epics_signal_put_wait("PULSE2_DLY")
-    pulse_2_width = epics_signal_put_wait("PULSE2_WID")
+    pulse_1 = Component(PulseOutput, "PULSE1")
+    pulse_2 = Component(PulseOutput, "PULSE2")
 
     out_1 = epics_signal_put_wait("OUT1_TTL")
     out_2 = epics_signal_put_wait("OUT2_TTL")
