@@ -116,8 +116,8 @@ class MXSC(Device):
     canny_upper_threshold = Component(EpicsSignal, "CannyUpper")
     canny_lower_threshold = Component(EpicsSignal, "CannyLower")
     close_ksize = Component(EpicsSignal, "CloseKsize")
-    sample_detection_scan_direction = Component(EpicsSignal, "ScanDirection")
-    sample_detection_min_tip_height = Component(EpicsSignal, "MinTipHeight")
+    scan_direction = Component(EpicsSignal, "ScanDirection")
+    min_tip_height = Component(EpicsSignal, "MinTipHeight")
 
     top = Component(EpicsSignal, "Top")
     bottom = Component(EpicsSignal, "Bottom")

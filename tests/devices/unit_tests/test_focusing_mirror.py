@@ -6,7 +6,7 @@ from ophyd.sim import NullStatus
 from ophyd.status import Status, StatusBase
 
 from dodal.devices.focusing_mirror import (
-    DEMAND_ACCEPTED_OK,
+    MirrorVoltageDemand,
     MirrorVoltageDevice,
     VFMMirrorVoltages,
 )
@@ -14,18 +14,22 @@ from dodal.devices.focusing_mirror import (
 
 @pytest.fixture
 def vfm_mirror_voltages_not_ok(vfm_mirror_voltages) -> VFMMirrorVoltages:
-    vfm_mirror_voltages._channel14_voltage_device._demand_accepted.sim_put(0)
+    vfm_mirror_voltages._channel14_voltage_device._demand_accepted.sim_put(
+        MirrorVoltageDemand.FAIL
+    )
     return vfm_mirror_voltages
 
 
 @pytest.fixture
 def vfm_mirror_voltages_with_set(vfm_mirror_voltages) -> VFMMirrorVoltages:
     def not_ok_then_ok(_):
-        vfm_mirror_voltages._channel14_voltage_device._demand_accepted.sim_put(0)
+        vfm_mirror_voltages._channel14_voltage_device._demand_accepted.sim_put(
+            MirrorVoltageDemand.SLEW
+        )
         Timer(
             0.1,
             lambda: vfm_mirror_voltages._channel14_voltage_device._demand_accepted.sim_put(
-                1
+                MirrorVoltageDemand.OK
             ),
         ).start()
         return DEFAULT
@@ -33,20 +37,26 @@ def vfm_mirror_voltages_with_set(vfm_mirror_voltages) -> VFMMirrorVoltages:
     vfm_mirror_voltages._channel14_voltage_device._setpoint_v.set = MagicMock(
         side_effect=not_ok_then_ok
     )
-    vfm_mirror_voltages._channel14_voltage_device._demand_accepted.sim_put(1)
+    vfm_mirror_voltages._channel14_voltage_device._demand_accepted.sim_put(
+        MirrorVoltageDemand.OK
+    )
     return vfm_mirror_voltages
 
 
 @pytest.fixture
 def vfm_mirror_voltages_with_set_timing_out(vfm_mirror_voltages) -> VFMMirrorVoltages:
     def not_ok(_):
-        vfm_mirror_voltages._channel14_voltage_device._demand_accepted.sim_put(0)
+        vfm_mirror_voltages._channel14_voltage_device._demand_accepted.sim_put(
+            MirrorVoltageDemand.SLEW
+        )
         return DEFAULT
 
     vfm_mirror_voltages._channel14_voltage_device._setpoint_v.set = MagicMock(
         side_effect=not_ok
     )
-    vfm_mirror_voltages._channel14_voltage_device._demand_accepted.sim_put(1)
+    vfm_mirror_voltages._channel14_voltage_device._demand_accepted.sim_put(
+        MirrorVoltageDemand.OK
+    )
     return vfm_mirror_voltages
 
 
@@ -57,7 +67,7 @@ def test_mirror_set_voltage_sets_and_waits_happy_path(
         NullStatus()
     )
     vfm_mirror_voltages_with_set._channel14_voltage_device._demand_accepted.sim_put(
-        DEMAND_ACCEPTED_OK
+        MirrorVoltageDemand.OK
     )
 
     status: StatusBase = vfm_mirror_voltages_with_set.voltage_channels[0].set(100)

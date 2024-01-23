@@ -29,13 +29,13 @@ async def test_soft_parameter_defaults_are_correct():
     device = await _get_pin_tip_detection_device()
 
     assert await device.timeout.get_value() == 10.0
-    assert await device.canny_lower.get_value() == 50
-    assert await device.canny_upper.get_value() == 100
+    assert await device.canny_lower_threshold.get_value() == 50
+    assert await device.canny_upper_threshold.get_value() == 100
     assert await device.close_ksize.get_value() == 5
     assert await device.close_iterations.get_value() == 5
     assert await device.min_tip_height.get_value() == 5
     assert await device.scan_direction.get_value() == 1
-    assert await device.preprocess.get_value() == 10
+    assert await device.preprocess_operation.get_value() == 10
     assert await device.preprocess_iterations.get_value() == 5
     assert await device.preprocess_ksize.get_value() == 5
 
@@ -45,24 +45,24 @@ async def test_numeric_soft_parameters_can_be_changed():
     device = await _get_pin_tip_detection_device()
 
     await device.timeout.set(100.0)
-    await device.canny_lower.set(5)
-    await device.canny_upper.set(10)
+    await device.canny_lower_threshold.set(5)
+    await device.canny_upper_threshold.set(10)
     await device.close_ksize.set(15)
     await device.close_iterations.set(20)
     await device.min_tip_height.set(25)
     await device.scan_direction.set(-1)
-    await device.preprocess.set(2)
+    await device.preprocess_operation.set(2)
     await device.preprocess_ksize.set(3)
     await device.preprocess_iterations.set(4)
 
     assert await device.timeout.get_value() == 100.0
-    assert await device.canny_lower.get_value() == 5
-    assert await device.canny_upper.get_value() == 10
+    assert await device.canny_lower_threshold.get_value() == 5
+    assert await device.canny_upper_threshold.get_value() == 10
     assert await device.close_ksize.get_value() == 15
     assert await device.close_iterations.get_value() == 20
     assert await device.min_tip_height.get_value() == 25
     assert await device.scan_direction.get_value() == -1
-    assert await device.preprocess.get_value() == 2
+    assert await device.preprocess_operation.get_value() == 2
     assert await device.preprocess_ksize.get_value() == 3
     assert await device.preprocess_iterations.get_value() == 4
 
@@ -71,7 +71,7 @@ async def test_numeric_soft_parameters_can_be_changed():
 async def test_invalid_processing_func_uses_identity_function():
     device = await _get_pin_tip_detection_device()
 
-    set_sim_value(device.preprocess, 50)  # Invalid index
+    set_sim_value(device.preprocess_operation, 50)  # Invalid index
 
     with patch.object(
         MxSampleDetect, "__init__", return_value=None

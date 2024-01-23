@@ -1,7 +1,11 @@
 import numpy as np
 import pytest
 
-from dodal.devices.oav.pin_image_recognition.utils import NONE_VALUE, MxSampleDetect
+from dodal.devices.oav.pin_image_recognition.utils import (
+    NONE_VALUE,
+    MxSampleDetect,
+    ScanDirections,
+)
 
 
 def test_locate_sample_simple_forward():
@@ -44,9 +48,9 @@ def test_locate_sample_simple_reverse():
         dtype=np.int32,
     )
 
-    location = MxSampleDetect(min_tip_height=1, scan_direction=-1)._locate_sample(
-        test_arr
-    )
+    location = MxSampleDetect(
+        min_tip_height=1, scan_direction=ScanDirections.REVERSE
+    )._locate_sample(test_arr)
 
     assert location.edge_top is not None
     assert location.edge_bottom is not None
@@ -92,7 +96,9 @@ def test_locate_sample_no_edges():
     assert location.tip_y is None
 
 
-@pytest.mark.parametrize("direction,x_centre", [(1, 0), (-1, 4)])
+@pytest.mark.parametrize(
+    "direction,x_centre", [(ScanDirections.FORWARD, 0), (ScanDirections.REVERSE, 4)]
+)
 def test_locate_sample_tip_off_screen(direction, x_centre):
     test_arr = np.array(
         [
@@ -147,9 +153,7 @@ def test_locate_sample_with_min_tip_height(
         dtype=np.int32,
     )
 
-    location = MxSampleDetect(
-        min_tip_height=min_tip_width, scan_direction=1
-    )._locate_sample(test_arr)
+    location = MxSampleDetect(min_tip_height=min_tip_width)._locate_sample(test_arr)
 
     assert location.edge_top is not None
     assert location.edge_bottom is not None
