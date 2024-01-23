@@ -40,15 +40,13 @@ class AperturePositions:
     # one micrometre tolerance
     TOLERANCE_MM: float = 0.001
 
-    @classmethod
     def _distance_check(
         self,
         target: Aperture5d,
         present: Aperture5d,
     ) -> bool:
-        return np.allclose(present, target, self.tolerance)
+        return np.allclose(present, target, AperturePositions.TOLERANCE_MM)
 
-    @classmethod
     def match_to_name(self, present_position: Aperture5d) -> PositionName:
         assert self.position_valid(present_position)
         positions: List[(Literal, Aperture5d)] = [
@@ -97,7 +95,6 @@ class AperturePositions:
             ),
         )
 
-    @classmethod
     def position_valid(self, pos: Aperture5d) -> bool:
         """
         Check if argument 'pos' is a valid position in this AperturePositions object.
@@ -118,7 +115,7 @@ class ApertureScatterguard(InfoLoggingDevice):
         self.aperture_positions = positions
 
     def _update_name(self, pos: Aperture5d) -> None:
-        name = AperturePositions.match_to_name(pos)
+        name = self.aperture_positions.match_to_name(pos)
         self.aperture_name = name
 
     def set(self, pos: Aperture5d) -> AndStatus:
