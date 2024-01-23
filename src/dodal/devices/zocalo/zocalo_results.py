@@ -1,7 +1,8 @@
+import asyncio
 from collections import OrderedDict
 from enum import Enum
 from queue import Empty, Queue
-from typing import Any, Generator, Sequence, Tuple, TypedDict, Union
+from typing import Any, Generator, Optional, Sequence, Tuple, TypedDict, Union
 
 import bluesky.plan_stubs as bps
 import numpy as np
@@ -16,10 +17,12 @@ from dodal.devices.ophyd_async_utils import create_soft_signal_r
 from dodal.devices.zocalo.zocalo_interaction import _get_zocalo_connection
 from dodal.log import LOGGER
 
-DEFAULT_TIMEOUT = 180
-
 
 class NoResultsFromZocalo(Exception):
+    pass
+
+
+class NoZocaloSubscription(Exception):
     pass
 
 
@@ -29,8 +32,11 @@ class SortKeys(str, Enum):
     n_voxels = "n_voxels"
 
 
+DEFAULT_TIMEOUT = 180
 DEFAULT_SORT_KEY = SortKeys.max_count
 ZOCALO_READING_PLAN_NAME = "zocalo reading"
+CLEAR_QUEUE_WAIT_S = 2.0
+ZOCALO_STAGE_GROUP = "clear zocalo queue"
 
 
 class XrcResult(TypedDict):
@@ -71,7 +77,7 @@ class ZocaloResults(StandardReadable, Triggerable):
         self.timeout_s = timeout_s
         self._prefix = prefix
         self._raw_results_received: Queue = Queue()
-        self._subscription_run: bool = False
+        self.subscription: Optional[int] = None
 
         self.results = create_soft_signal_r(list[XrcResult], "results", self.name)
         self.centres_of_mass = create_soft_signal_r(
@@ -106,17 +112,40 @@ class ZocaloResults(StandardReadable, Triggerable):
         LOGGER.info("Clearing queue")
         self._raw_results_received = Queue()
 
-    def stage(self):
+    @AsyncStatus.wrap
+    async def stage(self):
+        """Stages the Zocalo device by: subscribing to the queue, doing a background
+        sleep for a few seconds to wait for any stale messages to be recieved, then
+        clearing the queue. Plans using this device should wait on ZOCALO_STAGE_GROUP
+        before triggering processing for the experiment"""
+
+        LOGGER.info("Subscribing to results queue")
+        self._subscribe_to_results()
+        await asyncio.sleep(CLEAR_QUEUE_WAIT_S)
         self._clear_old_results()
+
+    @AsyncStatus.wrap
+    async def unstage(self):
+        transport = _get_zocalo_connection(self.zocalo_environment)
+        if self.subscription:
+            LOGGER.info("Disconnecting from Zocalo")
+            transport.disconnect()
+            self.subscription = None
 
     @AsyncStatus.wrap
     async def trigger(self):
         """Returns an AsyncStatus waiting for results to be received from Zocalo."""
         LOGGER.info("Zocalo trigger called")
-        if not self._subscription_run:
-            LOGGER.info("subscription not initialised, subscribing to queue")
-            self._subscribe_to_results()
-            self._subscription_run = True
+        msg = (
+            "This device must be staged to subscribe to the Zocalo queue, and "
+            "unstaged at the end of the experiment to avoid consuming results not "
+            "meant for it"
+        )
+        if not self.subscription:
+            LOGGER.warning(
+                msg  # AsyncStatus exception messages are poorly propagated, remove after https://github.com/bluesky/ophyd-async/issues/103
+            )
+            raise NoZocaloSubscription(msg)
 
         try:
             LOGGER.info(
@@ -200,14 +229,14 @@ class ZocaloResults(StandardReadable, Triggerable):
                 {"results": results, "ispyb_ids": recipe_parameters}
             )
 
-        subscription = workflows.recipe.wrap_subscribe(
+        self.subscription = workflows.recipe.wrap_subscribe(
             transport,
             self.channel,
             _receive_result,
             acknowledgement=True,
             allow_non_recipe_messages=False,
         )
-        LOGGER.info(f"Made zocalo queue subscription: {bool(subscription)}.")
+        LOGGER.info(f"Made zocalo queue subscription: {self.subscription}.")
 
 
 def get_processing_result(
