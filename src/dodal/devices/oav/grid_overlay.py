@@ -6,6 +6,7 @@ from ophyd import Component, Signal
 from PIL import Image, ImageDraw
 
 from dodal.devices.areadetector.plugins.MJPG import MJPG
+from dodal.log import LOGGER
 
 
 class Orientation(Enum):
@@ -121,14 +122,14 @@ def add_grid_overlay_to_image(
 
 
 class SnapshotWithGrid(MJPG):
-    top_left_x: Signal = Component(Signal)
-    top_left_y: Signal = Component(Signal)
-    box_width: Signal = Component(Signal)
-    num_boxes_x: Signal = Component(Signal)
-    num_boxes_y: Signal = Component(Signal)
+    top_left_x = Component(Signal)
+    top_left_y = Component(Signal)
+    box_width = Component(Signal)
+    num_boxes_x = Component(Signal)
+    num_boxes_y = Component(Signal)
 
-    last_path_outer: Signal = Component(Signal)
-    last_path_full_overlay: Signal = Component(Signal)
+    last_path_outer = Component(Signal)
+    last_path_full_overlay = Component(Signal)
 
     def post_processing(self, image: Image.Image):
         top_left_x = self.top_left_x.get()
@@ -141,14 +142,14 @@ class SnapshotWithGrid(MJPG):
         add_grid_border_overlay_to_image(
             image, top_left_x, top_left_y, box_width, num_boxes_x, num_boxes_y
         )
-        self.last_path_outer.put(
-            path_join(directory_str, f"{filename_str}_outer_overlay.png")
-        )
-        image.save(self.last_path_outer.get())
+        path = path_join(directory_str, f"{filename_str}_outer_overlay.png")
+        self.last_path_outer.put(path)
+        LOGGER.info(f"Saving {path}")
+        image.save(path)
         add_grid_overlay_to_image(
             image, top_left_x, top_left_y, box_width, num_boxes_x, num_boxes_y
         )
-        self.last_path_full_overlay.put(
-            path_join(directory_str, f"{filename_str}_grid_overlay.png")
-        )
-        image.save(self.last_path_full_overlay.get())
+        path = path_join(directory_str, f"{filename_str}_grid_overlay.png")
+        self.last_path_full_overlay.put(path)
+        LOGGER.info(f"Saving {path}")
+        image.save(path)

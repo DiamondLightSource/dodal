@@ -5,7 +5,7 @@ from bluesky.run_engine import RunEngine as RE
 from ophyd import Device
 from ophyd.device import Device as OphydV1Device
 from ophyd.sim import FakeEpicsSignal
-from ophyd.v2.core import Device as OphydV2Device
+from ophyd_async.core import Device as OphydV2Device
 
 from dodal.beamlines import beamline_utils, i03
 from dodal.devices.aperturescatterguard import ApertureScatterguard
@@ -44,6 +44,7 @@ def test_instantiating_different_device_with_same_name():
 
 
 def test_instantiate_function_fake_makes_fake():
+    beamline_utils.clear_devices()
     fake_zeb: Zebra = beamline_utils.device_instantiation(
         i03.Zebra, "zebra", "", True, True, None
     )
@@ -51,7 +52,7 @@ def test_instantiate_function_fake_makes_fake():
     assert isinstance(fake_zeb.pc.arm_source, FakeEpicsSignal)
 
 
-def test_clear_devices():
+def test_clear_devices(RE):
     beamline_utils.clear_devices()
     devices = make_all_devices(i03, fake_with_ophyd_sim=True)
     assert len(beamline_utils.ACTIVE_DEVICES) == len(devices.keys())
@@ -59,7 +60,7 @@ def test_clear_devices():
     assert beamline_utils.ACTIVE_DEVICES == {}
 
 
-def test_device_is_new_after_clearing():
+def test_device_is_new_after_clearing(RE):
     beamline_utils.clear_devices()
 
     def _make_devices_and_get_id():
@@ -91,7 +92,7 @@ def test_wait_for_v1_device_connection_passes_through_timeout(kwargs, expected_t
 @pytest.mark.parametrize(
     "kwargs,expected_timeout", [({}, 5.0), ({"timeout": 15.0}, 15.0)]
 )
-@patch("dodal.beamlines.beamline_utils.call_in_bluesky_event_loop", autospec=True)
+@patch.object(beamline_utils, "call_in_bluesky_event_loop", spec=callable)
 def test_wait_for_v2_device_connection_passes_through_timeout(
     call_in_bluesky_el, kwargs, expected_timeout
 ):
@@ -100,4 +101,4 @@ def test_wait_for_v2_device_connection_passes_through_timeout(
 
     beamline_utils._wait_for_connection(device, **kwargs)
 
-    call_in_bluesky_el.assert_called_once_with(ANY, expected_timeout)
+    call_in_bluesky_el.assert_called_once_with(ANY, timeout=expected_timeout)

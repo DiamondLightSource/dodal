@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Optional, Tuple
 
 from ophyd import Component as Cpt
-from ophyd.status import AndStatus
+from ophyd.status import AndStatus, Status
 
 from dodal.devices.aperture import Aperture
 from dodal.devices.logging_ophyd_device import InfoLoggingDevice
@@ -68,8 +68,8 @@ class AperturePositions:
 
 
 class ApertureScatterguard(InfoLoggingDevice):
-    aperture: Aperture = Cpt(Aperture, "-MO-MAPT-01:")
-    scatterguard: Scatterguard = Cpt(Scatterguard, "-MO-SCAT-01:")
+    aperture = Cpt(Aperture, "-MO-MAPT-01:")
+    scatterguard = Cpt(Scatterguard, "-MO-SCAT-01:")
     aperture_positions: Optional[AperturePositions] = None
     APERTURE_Z_TOLERANCE = 3  # Number of MRES steps
 
@@ -92,7 +92,7 @@ class ApertureScatterguard(InfoLoggingDevice):
         aperture_z: float,
         scatterguard_x: float,
         scatterguard_y: float,
-    ) -> AndStatus:
+    ) -> Status:
         """
         Move the aperture and scatterguard combo safely to a new position.
         See https://github.com/DiamondLightSource/hyperion/wiki/Aperture-Scatterguard-Collisions
@@ -103,7 +103,14 @@ class ApertureScatterguard(InfoLoggingDevice):
         # position is correct
         ap_z_in_position = self.aperture.z.motor_done_move.get()
         if not ap_z_in_position:
-            return
+            status: Status = Status(obj=self)
+            status.set_exception(
+                InvalidApertureMove(
+                    "ApertureScatterguard z is still moving. Wait for it to finish "
+                    "before triggering another move."
+                )
+            )
+            return status
         current_ap_z = self.aperture.z.user_setpoint.get()
         tolerance = self.APERTURE_Z_TOLERANCE * self.aperture.z.motor_resolution.get()
         if abs(current_ap_z - aperture_z) > tolerance:

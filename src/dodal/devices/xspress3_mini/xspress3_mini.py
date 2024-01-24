@@ -67,24 +67,22 @@ class Xspress3Mini(Device):
 
     ARM_STATUS_WAIT = 1
 
-    do_arm: ArmingSignal = Component(ArmingSignal)
+    do_arm = Component(ArmingSignal)
 
     # Assume only one channel for now
     channel_1 = Component(Xspress3MiniChannel, "C1_")
 
-    erase: EpicsSignal = Component(EpicsSignal, "ERASE", string=True)
+    erase = Component(EpicsSignal, "ERASE", string=True)
     get_max_num_channels = Component(EpicsSignalRO, "MAX_NUM_CHANNELS_RBV")
-    acquire: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "Acquire")
-    get_roi_calc_mini: EpicsSignal = Component(EpicsSignal, "MCA1:Enable_RBV")
-    trigger_mode_mini: EpicsSignalWithRBV = Component(EpicsSignalWithRBV, "TriggerMode")
-    roi_start_x: EpicsSignal = Component(EpicsSignal, "ROISUM1:MinX")
-    roi_size_x: EpicsSignal = Component(EpicsSignal, "ROISUM1:SizeX")
-    acquire_time: EpicsSignal = Component(EpicsSignal, "AcquireTime")
-    detector_state: EpicsSignalRO = Component(
-        EpicsSignalRO, "DetectorState_RBV", string=True
-    )
-    dt_corrected_latest_mca: EpicsSignalRO = Component(EpicsSignalRO, "ARR1:ArrayData")
-    set_num_images: EpicsSignal = Component(EpicsSignal, "NumImages")
+    acquire = Component(EpicsSignalWithRBV, "Acquire")
+    get_roi_calc_mini = Component(EpicsSignal, "MCA1:Enable_RBV")
+    trigger_mode_mini = Component(EpicsSignalWithRBV, "TriggerMode")
+    roi_start_x = Component(EpicsSignal, "ROISUM1:MinX")
+    roi_size_x = Component(EpicsSignal, "ROISUM1:SizeX")
+    acquire_time = Component(EpicsSignal, "AcquireTime")
+    detector_state = Component(EpicsSignalRO, "DetectorState_RBV", string=True)
+    dt_corrected_latest_mca = Component(EpicsSignalRO, "ARR1:ArrayData")
+    set_num_images = Component(EpicsSignal, "NumImages")
 
     detector_busy_states = [
         DetectorState.ACQUIRE.value,

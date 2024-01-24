@@ -1,5 +1,7 @@
 import importlib
 import inspect
+import os
+import re
 import socket
 import string
 from dataclasses import dataclass
@@ -13,6 +15,7 @@ from typing import (
     Callable,
     Dict,
     Iterable,
+    List,
     Mapping,
     Optional,
     Type,
@@ -37,7 +40,9 @@ from bluesky.protocols import (
     WritesExternalAssets,
 )
 from ophyd.device import Device as OphydV1Device
-from ophyd.v2.core import Device as OphydV2Device
+from ophyd_async.core import Device as OphydV2Device
+
+import dodal.log
 
 try:
     from typing import TypeAlias
@@ -205,7 +210,7 @@ def is_v2_device_type(obj: Type[Any]) -> bool:
 def is_v1_device_type(obj: Type[Any]) -> bool:
     is_class = inspect.isclass(obj)
     follows_protocols = any(
-        map(lambda protocol: isinstance(obj, protocol), BLUESKY_PROTOCOLS)
+        (isinstance(obj, protocol) for protocol in BLUESKY_PROTOCOLS)
     )
     return is_class and follows_protocols and not is_v2_device_type(obj)
 
@@ -243,3 +248,33 @@ def get_beamline_based_on_environment_variable() -> ModuleType:
             f"Failed to import beamline-specific dodal module 'dodal.beamlines.{beamline}'."
             " Ensure your BEAMLINE environment variable is set to a known instrument."
         ) from e
+
+
+def _find_next_run_number_from_files(file_names: List[str]) -> int:
+    valid_numbers = []
+
+    for file_name in file_names:
+        file_name = file_name.strip(".nxs")
+        # Give warning if nexus file name isn't in expcted format, xxx_number.nxs
+        match = re.search(r"_\d+$", file_name)
+        if match is not None:
+            valid_numbers.append(int(re.findall(r"\d+", file_name)[-1]))
+        else:
+            dodal.log.LOGGER.warning(
+                f"Identified nexus file {file_name} with unexpected format"
+            )
+    if len(valid_numbers) != 0:
+        return max(valid_numbers) + 1
+    else:
+        return 1
+
+
+def get_run_number(directory: str) -> int:
+    """Looks at the numbers coming from all nexus files with the format "xxx_(any number}.nxs", and returns the highest number + 1,
+    or 1 if there are no numbers found"""
+    nexus_file_names = [file for file in os.listdir(directory) if file.endswith(".nxs")]
+
+    if len(nexus_file_names) == 0:
+        return 1
+    else:
+        return _find_next_run_number_from_files(nexus_file_names)

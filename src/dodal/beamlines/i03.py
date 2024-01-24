@@ -11,33 +11,86 @@ from dodal.devices.detector_motion import DetectorMotion
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import FastGridScan
 from dodal.devices.flux import Flux
-from dodal.devices.oav.oav_detector import OAV
+from dodal.devices.focusing_mirror import FocusingMirror, VFMMirrorVoltages
+from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
+from dodal.devices.oav.pin_image_recognition import PinTipDetection
+from dodal.devices.qbpm1 import QBPM1
 from dodal.devices.s4_slit_gaps import S4SlitGaps
 from dodal.devices.sample_shutter import SampleShutter
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import Undulator
+from dodal.devices.undulator_dcm import UndulatorDCM
+from dodal.devices.xbpm_feedback import XBPMFeedback
 from dodal.devices.xspress3_mini.xspress3_mini import Xspress3Mini
 from dodal.devices.zebra import Zebra
+from dodal.devices.zocalo import ZocaloResults
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
+
+ZOOM_PARAMS_FILE = (
+    "/dls_sw/i03/software/gda/configurations/i03-config/xml/jCameraManZoomLevels.xml"
+)
+DISPLAY_CONFIG = "/dls_sw/i03/software/gda_versions/var/display.configuration"
+DAQ_CONFIGURATION_PATH = "/dls_sw/i03/software/daq_configuration"
 
 BL = get_beamline_name("s03")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
 
-@skip_device(lambda: BL == "s03")
 def dcm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> DCM:
     """Get the i03 DCM device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return device_instantiation(
-        device_factory=DCM,
-        name="dcm",
+        DCM,
+        "dcm",
+        "",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        daq_configuration_path=DAQ_CONFIGURATION_PATH,
+    )
+
+
+@skip_device(lambda: BL == "s03")
+def qbpm1(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> QBPM1:
+    return device_instantiation(
+        device_factory=QBPM1,
+        name="qbpm1",
         prefix="",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
+    )
+
+
+@skip_device(lambda: BL == "s03")
+def vfm(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> FocusingMirror:
+    mirror = device_instantiation(
+        device_factory=FocusingMirror,
+        name="vfm",
+        prefix="-OP-VFM-01:",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+        bragg_to_lat_lut_path=DAQ_CONFIGURATION_PATH
+        + "/lookup/BeamLineEnergy_DCM_VFM_x_converter.txt",
+    )
+    return mirror
+
+
+@skip_device(lambda: BL == "s03")
+def vfm_mirror_voltages(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> VFMMirrorVoltages:
+    return device_instantiation(
+        device_factory=VFMMirrorVoltages,
+        name="vfm_mirror_voltages",
+        prefix="-MO-PSU-01:",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+        daq_configuration_path=DAQ_CONFIGURATION_PATH,
     )
 
 
@@ -147,6 +200,23 @@ def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
         "",
         wait_for_connection,
         fake_with_ophyd_sim,
+        params=OAVConfigParams(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+    )
+
+
+@skip_device(lambda: BL == "s03")
+def pin_tip_detection(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> PinTipDetection:
+    """Get the i03 pin tip detection device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        PinTipDetection,
+        "pin_tip_detection",
+        "-DI-OAV-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
     )
 
 
@@ -210,6 +280,23 @@ def undulator(
         wait_for_connection,
         fake_with_ophyd_sim,
         bl_prefix=False,
+    )
+
+
+def undulator_dcm(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> UndulatorDCM:
+    """Get the i03 undulator DCM device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        UndulatorDCM,
+        name="undulator_dcm",
+        prefix="",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+        undulator=undulator(wait_for_connection, fake_with_ophyd_sim),
+        dcm=dcm(wait_for_connection, fake_with_ophyd_sim),
     )
 
 
@@ -281,6 +368,36 @@ def flux(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) ->
         Flux,
         "flux",
         "-MO-FLUX-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+def xbpm_feedback(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> XBPMFeedback:
+    """Get the i03 XBPM feeback device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        XBPMFeedback,
+        "xbpm_feedback",
+        "",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+def zocalo(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> ZocaloResults:
+    """Get the i03 ZocaloResults device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        ZocaloResults,
+        "zocalo",
+        "",
         wait_for_connection,
         fake_with_ophyd_sim,
     )

@@ -9,15 +9,19 @@ from ophyd.sim import make_fake_device
 from requests import HTTPError, Response
 
 import dodal.devices.oav.utils as oav_utils
-from dodal.devices.oav.oav_detector import OAV
+from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
+
+DISPLAY_CONFIGURATION = "tests/devices/unit_tests/test_display.configuration"
+ZOOM_LEVELS_XML = "tests/devices/unit_tests/test_jCameraManZoomLevels.xml"
 
 
 @pytest.fixture
 def fake_oav() -> OAV:
+    oav_params = OAVConfigParams(ZOOM_LEVELS_XML, DISPLAY_CONFIGURATION)
     FakeOAV = make_fake_device(OAV)
-    fake_oav: OAV = FakeOAV(name="test")
+    fake_oav: OAV = FakeOAV(name="test fake OAV", params=oav_params)
 
-    fake_oav.snapshot.url.sim_put("http://test.url")
+    fake_oav.snapshot.url.sim_put("http://test.url")  # type: ignore
     fake_oav.snapshot.filename.put("test filename")
     fake_oav.snapshot.directory.put("test directory")
     fake_oav.snapshot.top_left_x.put(100)
@@ -26,8 +30,10 @@ def fake_oav() -> OAV:
     fake_oav.snapshot.num_boxes_x.put(15)
     fake_oav.snapshot.num_boxes_y.put(10)
 
-    fake_oav.cam.port_name.sim_put("CAM")
-    fake_oav.proc.port_name.sim_put("PROC")
+    fake_oav.cam.port_name.sim_put("CAM")  # type: ignore
+    fake_oav.proc.port_name.sim_put("PROC")  # type: ignore
+
+    fake_oav.wait_for_connection()
 
     return fake_oav
 
@@ -63,7 +69,7 @@ def test_snapshot_trigger_saves_to_correct_file(
     image = PIL.Image.open("test")
     mock_save = MagicMock()
     image.save = mock_save
-    mock_open.return_value = image
+    mock_open.return_value.__enter__.return_value = image
     st = fake_oav.snapshot.trigger()
     st.wait()
     expected_calls_to_save = [
@@ -87,8 +93,12 @@ def test_correct_grid_drawn_on_image(
 ):
     st = fake_oav.snapshot.trigger()
     st.wait()
-    expected_border_calls = [call(mock_open.return_value, 100, 100, 50, 15, 10)]
-    expected_grid_calls = [call(mock_open.return_value, 100, 100, 50, 15, 10)]
+    expected_border_calls = [
+        call(mock_open.return_value.__enter__.return_value, 100, 100, 50, 15, 10)
+    ]
+    expected_grid_calls = [
+        call(mock_open.return_value.__enter__.return_value, 100, 100, 50, 15, 10)
+    ]
     actual_border_calls = mock_border_overlay.mock_calls
     actual_grid_calls = mock_grid_overlay.mock_calls
     assert actual_border_calls == expected_border_calls
@@ -126,9 +136,30 @@ def test_when_zoom_is_externally_changed_to_1_then_flat_field_not_changed(
 ):
     """This test is required to ensure that Hyperion doesn't cause unexpected behaviour
     e.g. change the flatfield when the zoom level is changed through the synoptic"""
-    fake_oav.mxsc.input_plugin.sim_put("CAM")
-    fake_oav.snapshot.input_plugin.sim_put("CAM")
+    fake_oav.mxsc.input_plugin.sim_put("CAM")  # type: ignore
+    fake_oav.snapshot.input_plugin.sim_put("CAM")  # type: ignore
 
-    fake_oav.zoom_controller.level.sim_put("1.0X")
+    fake_oav.zoom_controller.level.sim_put("1.0x")  # type: ignore
     assert fake_oav.mxsc.input_plugin.get() == "CAM"
     assert fake_oav.snapshot.input_plugin.get() == "CAM"
+
+
+def test_get_beam_position_from_zoom_only_called_once_on_multiple_connects(
+    fake_oav: OAV,
+):
+    fake_oav.wait_for_connection()
+    fake_oav.wait_for_connection()
+    fake_oav.wait_for_connection()
+
+    with patch(
+        "dodal.devices.oav.oav_detector.OAVConfigParams.update_on_zoom",
+        MagicMock(),
+    ), patch(
+        "dodal.devices.oav.oav_detector.OAVConfigParams.get_beam_position_from_zoom",
+        MagicMock(),
+    ) as mock_get_beam_position_from_zoom, patch(
+        "dodal.devices.oav.oav_detector.OAVConfigParams.load_microns_per_pixel",
+        MagicMock(),
+    ):
+        fake_oav.zoom_controller.level.sim_put("2.0x")  # type: ignore
+        assert mock_get_beam_position_from_zoom.call_count == 1

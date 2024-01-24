@@ -112,7 +112,7 @@ class MxSampleDetect(object):
         canny_lower: int = 50,
         close_ksize: int = 5,
         close_iterations: int = 5,
-        scan_direction: int = 1,
+        scan_direction: ScanDirections = ScanDirections.FORWARD,
         min_tip_height: int = 5,
     ):
         """
@@ -126,7 +126,7 @@ class MxSampleDetect(object):
             canny_lower: lower threshold for canny edge detection
             close_ksize: kernel size for "close" operation
             close_iterations: number of iterations for "close" operation
-            scan_direction: +1 for left-to-right, -1 for right-to-left
+            scan_direction: ScanDirections.FORWARD for left-to-right, ScanDirections.REVERSE for right-to-left
             min_tip_height: minimum height of pin tip
         """
 
@@ -135,14 +135,6 @@ class MxSampleDetect(object):
         self.canny_lower = canny_lower
         self.close_ksize = close_ksize
         self.close_iterations = close_iterations
-
-        if scan_direction not in [
-            ScanDirections.FORWARD.value,
-            ScanDirections.REVERSE.value,
-        ]:
-            raise ValueError(
-                "Invalid scan direction, expected +1 for left-to-right or -1 for right-to-left"
-            )
         self.scan_direction = scan_direction
 
         self.min_tip_height = min_tip_height
@@ -221,7 +213,7 @@ class MxSampleDetect(object):
             )
 
         # Choose our starting point - i.e. first column with non-narrow width for positive scan, last one for negative scan.
-        if self.scan_direction == ScanDirections.FORWARD.value:
+        if self.scan_direction == ScanDirections.FORWARD:
             start_column = int(column_indices_with_non_narrow_widths[0])
         else:
             start_column = int(column_indices_with_non_narrow_widths[-1])
@@ -230,20 +222,20 @@ class MxSampleDetect(object):
 
         # Move backwards to where there were no edges at all...
         while top[x] != NONE_VALUE:
-            x += -self.scan_direction
+            x += -self.scan_direction.value
             if x == -1 or x == width:
                 # (In this case the sample is off the edge of the picture.)
                 LOGGER.warning(
                     "pin-tip detection: Pin tip may be outside image area - assuming at edge."
                 )
                 break
-        x += self.scan_direction  # ...and forward one step. x is now at the tip.
+        x += self.scan_direction.value  # ...and forward one step. x is now at the tip.
 
         tip_x = x
         tip_y = int(round(0.5 * (top[x] + bottom[x])))
 
         # clear edges to the left (right) of the tip.
-        if self.scan_direction == 1:
+        if self.scan_direction.value == 1:
             top[:x] = NONE_VALUE
             bottom[:x] = NONE_VALUE
         else:
