@@ -4,6 +4,7 @@ from typing import List, Literal, Optional, Tuple
 
 import numpy as np
 from ophyd import Component as Cpt
+from ophyd import Signal
 from ophyd.status import AndStatus, Status
 
 from dodal.devices.aperture import Aperture
@@ -107,7 +108,13 @@ class ApertureScatterguard(InfoLoggingDevice):
     aperture = Cpt(Aperture, "-MO-MAPT-01:")
     scatterguard = Cpt(Scatterguard, "-MO-SCAT-01:")
     aperture_positions: Optional[AperturePositions] = None
-    aperture_name: PositionName = PositionName.INVALID
+    aperture_name = PositionName.INVALID
+
+    class NamingSignal(Signal):
+        def get(self):
+            return self.parent.aperture_name.value
+
+    ap_name = Cpt(NamingSignal)
     APERTURE_Z_TOLERANCE = 3  # Number of MRES steps
 
     def load_aperture_positions(self, positions: AperturePositions):
