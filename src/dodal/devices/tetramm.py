@@ -124,11 +124,13 @@ class TetrammController(DetectorControl):
     async def arm(
         self,
         trigger: DetectorTrigger = DetectorTrigger.internal,
-        num: int = 0,
+        num: int,
         exposure: Optional[float] = None,
     ) -> AsyncStatus:
-        if num != 0:
-            raise Exception("Tetramm has no concept of setting a number of exposures.")
+        """Arms the tetramm.
+        
+        Note that num is meaningless in this context, and is ignored.
+        """
         if exposure is None:
             raise ValueError("Exposure time is required")
         if trigger not in {DetectorTrigger.edge_trigger, DetectorTrigger.constant_gate}:
