@@ -216,6 +216,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/linkam3/"
   },
   {
+    "version": "merge-dls-bluesky-core",
+    "url": "https://DiamondLightSource.github.io/dodal/merge-dls-bluesky-core/"
+  },
+  {
     "version": "mx_10-use-zebra-for-serial",
     "url": "https://DiamondLightSource.github.io/dodal/mx_10-use-zebra-for-serial/"
   },
