@@ -11,11 +11,28 @@ from ophyd import (
 )
 from ophyd.status import DeviceStatus, StatusBase
 
-from dodal.devices.fast_grid_scan import (
-    GridScanCompleteStatus,
-    GridScanParamsCommon,
-)
+from dodal.devices.fast_grid_scan import GridScanParamsCommon
 from dodal.devices.status import await_value
+
+
+class GridScanCompleteStatus(DeviceStatus):
+    """
+    A Status for the grid scan completion
+    Progress bar functionality has been removed for now in the panda fast grid scan
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.device.status.subscribe(self._running_changed)
+
+    def _running_changed(self, value=None, old_value=None, **kwargs):
+        if (old_value == 1) and (value == 0):
+            self.set_finished()
+            self.clean_up()
+
+    def clean_up(self):
+        self.device.status.clear_sub(self._running_changed)
 
 
 class PandAGridScanParams(GridScanParamsCommon):
