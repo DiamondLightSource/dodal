@@ -3,8 +3,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 from numpy import isclose
 
-from dodal.devices.det_resolution import resolution
 from dodal.devices.detector import DetectorParams
+from dodal.devices.detector.det_resolution import resolution
 
 
 @pytest.fixture()
@@ -30,7 +30,7 @@ def detector_params():
     "roi, wavelength_angstroms, det_distance_mm, expected_res",
     [(False, 0.9795, 289.3, 1.5722)],
 )
-@patch("dodal.devices.det_resolution._get_detector_max_size_mm")
+@patch("dodal.devices.detector.det_resolution._get_detector_max_size_mm")
 def test_resolution(
     get_detector_max_size,
     detector_params,
@@ -54,7 +54,7 @@ def test_resolution(
     "roi, wavelength_angstroms, det_distance_mm, expected_res",
     [(True, 0.9795, 289.3, 2.26847)],
 )
-@patch("dodal.devices.det_resolution._get_detector_max_size_mm")
+@patch("dodal.devices.detector.det_resolution._get_detector_max_size_mm")
 def test_resolution_with_roi(
     get_detector_max_size,
     detector_params,

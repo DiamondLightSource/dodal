@@ -1,9 +1,9 @@
 from math import atan, sin
 
-from dodal.devices.det_dist_to_beam_converter import (
+from dodal.devices.detector import DetectorParams
+from dodal.devices.detector.det_dist_to_beam_converter import (
     Axis,
 )
-from dodal.devices.detector import DetectorParams
 
 
 def _get_detector_radius_mm(detector_params: DetectorParams):
