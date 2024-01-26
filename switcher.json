@@ -104,10 +104,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/1032-apertures/"
   },
   {
-    "version": "117_add_panda",
-    "url": "https://DiamondLightSource.github.io/dodal/117_add_panda/"
-  },
-  {
     "version": "141_i04_devices",
     "url": "https://DiamondLightSource.github.io/dodal/141_i04_devices/"
   },
@@ -202,6 +198,10 @@
   {
     "version": "hyperion_698_refactor_parameters",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_698_refactor_parameters/"
+  },
+  {
+    "version": "hyperion_v8_7_fixes",
+    "url": "https://DiamondLightSource.github.io/dodal/hyperion_v8_7_fixes/"
   },
   {
     "version": "i04_add_devices",
