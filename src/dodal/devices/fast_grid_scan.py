@@ -19,6 +19,7 @@ from pydantic.dataclasses import dataclass
 
 from dodal.devices.motors import XYZLimitBundle
 from dodal.devices.status import await_value
+from dodal.log import LOGGER
 from dodal.parameters.experiment_parameter_base import AbstractExperimentParameterBase
 
 
@@ -279,15 +280,16 @@ class FastGridScan(Device):
 
         def scan():
             try:
-                self.log.debug("Running scan")
+                LOGGER.info("Running scan")
                 self.run_cmd.put(1)
-                self.log.debug("Waiting for scan to start")
+                LOGGER.info("Waiting for scan to start")
                 await_value(self.status, 1).wait()
                 st.set_finished()
             except Exception as e:
                 st.set_exception(e)
 
         threading.Thread(target=scan, daemon=True).start()
+        LOGGER.info("returning FGS kickoff status")
         return st
 
     def complete(self) -> DeviceStatus:
