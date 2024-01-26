@@ -1,5 +1,7 @@
 from typing import Optional
 
+from ophyd_async.panda import PandA
+
 from dodal.beamlines.beamline_utils import device_instantiation
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.aperturescatterguard import AperturePositions, ApertureScatterguard
@@ -14,6 +16,7 @@ from dodal.devices.flux import Flux
 from dodal.devices.focusing_mirror import FocusingMirror, VFMMirrorVoltages
 from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
+from dodal.devices.panda_fast_grid_scan import PandAFastGridScan
 from dodal.devices.qbpm1 import QBPM1
 from dodal.devices.s4_slit_gaps import S4SlitGaps
 from dodal.devices.sample_shutter import SampleShutter
@@ -189,6 +192,22 @@ def fast_grid_scan(
     )
 
 
+def panda_fast_grid_scan(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> PandAFastGridScan:
+    """Get the i03 panda_fast_grid_scan device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    This is used instead of the fast_grid_scan device when using the PandA.
+    """
+    return device_instantiation(
+        device_factory=PandAFastGridScan,
+        name="panda_fast_grid_scan",
+        prefix="-MO-SGON-01:PGS:",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+    )
+
+
 @skip_device(lambda: BL == "s03")
 def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> OAV:
     """Get the i03 OAV device, instantiate it if it hasn't already been.
@@ -338,6 +357,19 @@ def attenuator(
         Attenuator,
         "attenuator",
         "-EA-ATTN-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+def panda(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> PandA:
+    """Get the i03 panda device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        PandA,
+        "panda",
+        "-EA-PANDA-01",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
