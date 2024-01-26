@@ -252,7 +252,7 @@ class FastGridScan(Device):
     expected_images = Component(Signal)
 
     # Kickoff timeout in seconds
-    KICKOFF_TIMEOUT: float = 5.0
+    KICKOFF_TIMEOUT: float = 60.0
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -281,10 +281,14 @@ class FastGridScan(Device):
         def scan():
             try:
                 LOGGER.info("Running scan")
+                from time import sleep
+                sleep(0.1) # TODO get rid of this
                 self.run_cmd.put(1)
                 LOGGER.info("Waiting for scan to start")
                 await_value(self.status, 1).wait()
+                LOGGER.info("Scan started according to EPICS, setting status to done")
                 st.set_finished()
+                LOGGER.info(f"{st} finished, exiting FGS kickoff thread")
             except Exception as e:
                 st.set_exception(e)
 
