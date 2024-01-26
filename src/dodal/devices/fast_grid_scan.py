@@ -280,20 +280,19 @@ class FastGridScan(Device):
 
         def scan():
             try:
-                LOGGER.info("Running scan")
+                LOGGER.debug("Running scan")
                 from time import sleep
-                sleep(0.1) # TODO get rid of this
+                sleep(0.1) # TODO see https://github.com/DiamondLightSource/hyperion/issues/1101
                 self.run_cmd.put(1)
-                LOGGER.info("Waiting for scan to start")
+                LOGGER.info("Waiting for FGS to start")
                 await_value(self.status, 1).wait()
-                LOGGER.info("Scan started according to EPICS, setting status to done")
                 st.set_finished()
-                LOGGER.info(f"{st} finished, exiting FGS kickoff thread")
+                LOGGER.debug(f"{st} finished, exiting FGS kickoff thread")
             except Exception as e:
                 st.set_exception(e)
 
         threading.Thread(target=scan, daemon=True).start()
-        LOGGER.info("returning FGS kickoff status")
+        LOGGER.info("Returning FGS kickoff status")
         return st
 
     def complete(self) -> DeviceStatus:
