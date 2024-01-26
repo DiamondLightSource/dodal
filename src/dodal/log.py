@@ -139,6 +139,7 @@ def set_up_logging_handlers(
     """
     logging_level = logging_level or "INFO"
     stream_handler = logging.StreamHandler()
+    print(f"adding handler {stream_handler} to logger {logger}, at level: {logging_level}")
     _add_handler(logger, stream_handler, logging_level)
     graylog_handler = set_up_graylog_handler(logging_level, dev_mode, logger)
     file_handler_logging_level = (
