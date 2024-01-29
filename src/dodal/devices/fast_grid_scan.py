@@ -252,7 +252,7 @@ class FastGridScan(Device):
     expected_images = Component(Signal)
 
     # Kickoff timeout in seconds
-    KICKOFF_TIMEOUT: float = 60.0
+    KICKOFF_TIMEOUT: float = 5.0
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
