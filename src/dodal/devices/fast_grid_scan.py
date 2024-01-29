@@ -19,6 +19,7 @@ from pydantic.dataclasses import dataclass
 
 from dodal.devices.motors import XYZLimitBundle
 from dodal.devices.status import await_value
+from dodal.log import LOGGER
 from dodal.parameters.experiment_parameter_base import AbstractExperimentParameterBase
 
 
@@ -295,15 +296,22 @@ class FastGridScan(Device):
 
         def scan():
             try:
-                self.log.debug("Running scan")
+                LOGGER.debug("Running scan")
+                from time import sleep
+
+                sleep(
+                    0.1
+                )  # TODO see https://github.com/DiamondLightSource/hyperion/issues/1101
                 self.run_cmd.put(1)
-                self.log.debug("Waiting for scan to start")
+                LOGGER.info("Waiting for FGS to start")
                 await_value(self.status, 1).wait()
                 st.set_finished()
+                LOGGER.debug(f"{st} finished, exiting FGS kickoff thread")
             except Exception as e:
                 st.set_exception(e)
 
         threading.Thread(target=scan, daemon=True).start()
+        LOGGER.info("Returning FGS kickoff status")
         return st
 
     def complete(self) -> DeviceStatus:
