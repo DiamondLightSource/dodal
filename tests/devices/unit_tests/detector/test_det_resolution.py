@@ -4,11 +4,13 @@ import pytest
 from numpy import isclose
 
 from dodal.devices.detector import DetectorParams
-from dodal.devices.detector.det_resolution import resolution
+from dodal.devices.detector.det_resolution import (
+    resolution,
+)
 
 
-@pytest.fixture()
-def detector_params():
+@pytest.fixture(scope="function")
+def detector_params(request):
     return DetectorParams(
         expected_energy_ev=100,
         exposure_time=1.0,
@@ -20,15 +22,16 @@ def detector_params():
         omega_increment=0.0,
         num_images_per_trigger=1,
         num_triggers=1,
-        use_roi_mode=False,
-        det_dist_to_beam_converter_path="tests/devices/unit_tests/test_lookup_table.txt",
-        detector_size_constants="EIGER2_X_16M",  # type: ignore
+        use_roi_mode=True,
+        det_dist_to_beam_converter_path="tests/test_data/test_det_dist_converter.txt",
+        detector_size_constants=request.param,  # type: ignore
     )
 
 
 @pytest.mark.parametrize(
-    "roi, wavelength_angstroms, det_distance_mm, expected_res",
-    [(False, 0.9795, 289.3, 1.5722)],
+    "detector_params, roi, wavelength_angstroms, det_distance_mm, expected_res",
+    [("EIGER2_X_16M", False, 0.9795, 289.3, 1.5722)],
+    indirect=["detector_params"],
 )
 @patch("dodal.devices.detector.det_resolution._get_detector_max_size_mm")
 def test_resolution(
@@ -51,8 +54,11 @@ def test_resolution(
 
 
 @pytest.mark.parametrize(
-    "roi, wavelength_angstroms, det_distance_mm, expected_res",
-    [(True, 0.9795, 289.3, 2.26847)],
+    "detector_params, roi, wavelength_angstroms, det_distance_mm, expected_res",
+    [
+        ("EIGER2_X_16M", True, 0.9795, 289.3, 2.26847),
+    ],
+    indirect=["detector_params"],
 )
 @patch("dodal.devices.detector.det_resolution._get_detector_max_size_mm")
 def test_resolution_with_roi(
@@ -73,5 +79,36 @@ def test_resolution_with_roi(
     actual_res = resolution(detector_params, wavelength_angstroms, det_distance_mm)
 
     assert isclose(
-        expected_res, actual_res
+        actual_res,
+        expected_res,
+    ), f"expected={expected_res}, actual={actual_res}"
+
+
+@pytest.mark.parametrize(
+    "detector_params, roi, wavelength_angstroms, det_distance_mm, expected_res",
+    [
+        ("EIGER2_X_16M", True, 0.976238, 289.289, 3.831388),
+        ("EIGER2_X_16M", True, 0.976277, 285.82, 3.787823),
+        ("EIGER2_X_16M", True, 0.976284, 285.82, 3.787853),
+        ("EIGER2_X_16M", True, 0.976246, 370.428, 4.859842),
+        ("EIGER2_X_16M", True, 0.976277, 272.9, 3.625220),
+        ("EIGER2_X_16M", True, 0.97623, 391.236, 5.124842),
+        ("EIGER2_X_16M", True, 0.97623, 196.744, 2.677350),
+    ],
+    indirect=["detector_params"],
+)
+def test_resolution_with_roi(
+    detector_params,
+    roi,
+    wavelength_angstroms,
+    det_distance_mm,
+    expected_res,
+):
+    detector_params.use_roi_mode = roi
+    detector_params.detector_distance = det_distance_mm
+
+    actual_res = resolution(detector_params, wavelength_angstroms, det_distance_mm)
+
+    assert isclose(
+        actual_res, expected_res, rtol=1e-3
     ), f"expected={expected_res}, actual={actual_res}"
