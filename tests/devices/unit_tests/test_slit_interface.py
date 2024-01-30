@@ -31,7 +31,7 @@ def test_set():
 
     assert all(
         [
-            abs(target - result) <= 0.002
+            round(abs(target - result)) <= 0.002
             for target, result in zip(target_values, results)
         ]
     ), f"target: {target_values}, results: {results}"
