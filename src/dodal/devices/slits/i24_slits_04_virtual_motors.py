@@ -5,7 +5,7 @@ from .slit_motor import SlitMotor
 from .gap_and_centre_slit_base_classes import GapAndCentreSlit2d
 
 
-class I24_SLITS_04_VIRTUAL_MOTORS(GapAndCentreSlit2d):
+class I24Slits04VirtualMotors(GapAndCentreSlit2d):
     x_centre: Device = Component(SlitMotor, "X:CENTER")
     x_size: Device = Component(SlitMotor, "X:SIZE")
 

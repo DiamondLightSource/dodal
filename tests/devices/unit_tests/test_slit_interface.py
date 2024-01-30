@@ -1,4 +1,4 @@
-from dodal.devices.slits.S5_BL02J_AL_SLITS_95 import S5_BL02J_AL_SLITS_95 as Slit
+from dodal.devices.slits.s5_blo2j_al_slits_95 import S5Bl02jAlSlits as Slit
 
 import random
 import pytest
