@@ -31,4 +31,4 @@ repos:
   #     - id: mypy
   #       files: 'src/.*\.py$'
   #       additional_dependencies: [types-requests, pydantic]
-  #       args: ["--ignore-missing-imports", "--no-strict-optional"]
+  #       args: ["--ignore-missing-imports", "--show-traceback", "--no-strict-optional"]
