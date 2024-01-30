@@ -7,7 +7,7 @@ from bluesky.protocols import Movable
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
 from ophyd.status import StatusBase, SubscriptionStatus
 
-from ..status import await_value
+from dodal.devices.status import await_value
 
 
 class ChannelAttribute(Enum):

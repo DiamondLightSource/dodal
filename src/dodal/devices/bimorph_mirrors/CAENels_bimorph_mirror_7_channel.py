@@ -1,6 +1,8 @@
 from ophyd import Component, EpicsSignal, EpicsSignalRO
 
-from .CAENels_bimorph_mirror_interface import CAENelsBimorphMirrorInterface
+from dodal.devices.bimorph_mirrors.CAENels_bimorph_mirror_interface import (
+    CAENelsBimorphMirrorInterface,
+)
 
 
 class CAENelsBimorphMirror7Channel(CAENelsBimorphMirrorInterface):

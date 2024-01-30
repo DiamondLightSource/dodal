@@ -1,8 +1,8 @@
 from ophyd import Component, Device
 from ophyd.status import StatusBase
 
-from .gap_and_centre_slit_base_classes import GapAndCentreSlit2d
-from .slit_motor import SlitMotor
+from dodal.devices.slits.gap_and_centre_slit_base_classes import GapAndCentreSlit2d
+from dodal.devices.slits.slit_motor import SlitMotor
 
 
 class I24Slits04VirtualMotors(GapAndCentreSlit2d):
