@@ -7,7 +7,7 @@ import pytest
 def parsed_read(component):
     description = component.describe()
     res = component.read()
-   return res[description[component.name]["source"]]["value"]
+    return res[description[component.name]["source"]]["value"]
 
 
 @pytest.mark.slits
