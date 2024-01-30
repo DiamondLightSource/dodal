@@ -62,7 +62,7 @@ class SlitMotor(Device, Movable, Readable):
     def describe(self) -> OrderedDict:
         od = OrderedDict()
 
-       od[self.name] = {
+        od[self.name] = {
             "source": self.readback_value.name,
             "dtype": "number",
             "shape": [],
