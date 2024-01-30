@@ -199,7 +199,7 @@ class CAENelsBimorphMirrorInterface(Device, Movable):
     def read_from_all_channels_by_attribute(
         self, channel_attribute: ChannelAttribute
     ) -> list:
-        """Takes an attribuet and returns a list of values read from all signals sharing that attribute.
+        """Takes an attribute and returns a list of values read from all signals sharing that attribute.
 
         Args:
             channel_attribute: A ChannelAttribute enum representing the grouping of signals to be returned.
