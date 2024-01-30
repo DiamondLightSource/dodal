@@ -1,6 +1,6 @@
 from enum import Enum, IntEnum
 import time
-from typing import Union
+from typing import Any, Union
 from functools import partial
 
 from bluesky.protocols import Movable
@@ -95,14 +95,20 @@ class CAENelsBimorphMirrorInterface(Device, Movable):
     def wait_for_signal_value(
         self,
         signal: EpicsSignal,
-        value,
+        value: Any,
         timeout: float = 10.0,
         sleep_time: float = 0.1,
         signal_range: Union[list, None] = None,
     ):
         """Wait for a signal to display given value. Default to polling time of 0.1 seconds, and timeout after 10.0.
-
         If signal_range is non-none, an exception will be raised if the signal value does not exist in signal_range list.
+
+        Args:
+            signal: The signal to be read from
+            value: Once this value is read from signal, the function will return
+            timeout: Time before an exception is raised in seconds (default 10.0)
+            sleep_time: Polling time in seconds (default 0.1)
+            signal_range: Range of allowed values. If value outside of this is read, an exception will be thrown
         """
         stamp = time.time()
         res = signal.read()[signal.name]["value"]
