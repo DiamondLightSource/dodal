@@ -35,10 +35,7 @@ class S5Bl02jAlSlits(GapAndCentreSlit2d):
         """
         x_centre_value, x_size_value, y_centre_value, y_size_value = position_tuple
 
-        status = StatusBase()
-        status.set_finished()
-
-        status &= self.x_centre.set(x_centre_value)
+        status = self.x_centre.set(x_centre_value)
         status &= self.x_size.set(x_size_value)
         status &= self.y_centre.set(y_centre_value)
         status &= self.y_size.set(y_size_value)
