@@ -1,7 +1,8 @@
-from dodal.devices.slits.s5_blo2j_al_slits_95 import S5Bl02jAlSlits as Slit
-
-import random
 import pytest
+import random
+
+
+from dodal.devices.slits.s5_blo2j_al_slits_95 import S5Bl02jAlSlits as Slit
 
 
 def parsed_read(component):

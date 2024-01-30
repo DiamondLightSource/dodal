@@ -1,6 +1,6 @@
-from .CAENels_bimorph_mirror_7_channel import CAENelsBimorphMirror7Channel
-
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
+
+from .CAENels_bimorph_mirror_7_channel import CAENelsBimorphMirror7Channel
 
 
 class CAENelsBimorphMirror8Channel(CAENelsBimorphMirror7Channel):

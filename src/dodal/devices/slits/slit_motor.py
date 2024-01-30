@@ -1,8 +1,9 @@
+from collections import OrderedDict
+from enum import IntEnum
+
+from bluesky.protocols import Movable, Readable
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
 from ophyd.status import SubscriptionStatus
-from bluesky.protocols import Movable, Readable
-from enum import IntEnum
-from collections import OrderedDict
 
 from ..status import await_value
 

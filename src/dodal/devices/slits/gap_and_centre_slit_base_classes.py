@@ -1,7 +1,8 @@
 from abc import abstractmethod, ABC
+from typing import Tuple
+
 from bluesky.protocols import Movable
 from ophyd import Device
-from typing import Tuple
 
 
 class GapAndCentreSlit1d(Device, Movable, ABC):

@@ -1,20 +1,19 @@
-from ophyd import EpicsSignal
+from functools import partial
+import pytest
+import random
+from typing import Union
 
-from dodal.devices.bimorph_mirrors.CAENels_bimorph_mirror_8_channel import (
-    CAENelsBimorphMirror8Channel,
-)
 from dodal.devices.bimorph_mirrors.CAENels_bimorph_mirror_interface import (
     ChannelAttribute,
     OnOff,
     OperationMode,
     Status,
 )
-
-import random
-from functools import partial
+from dodal.devices.bimorph_mirrors.CAENels_bimorph_mirror_8_channel import (
+    CAENelsBimorphMirror8Channel,
+)
 from ophyd import Component, Device, EpicsSignal
-from typing import Union
-import pytest
+
 
 """
 Stuff that isn't tested:

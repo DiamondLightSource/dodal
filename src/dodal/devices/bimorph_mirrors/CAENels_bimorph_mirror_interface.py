@@ -1,14 +1,11 @@
 from enum import Enum, IntEnum
-
-from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
-from ophyd.status import SubscriptionStatus, StatusBase
-
-from bluesky.protocols import Movable
-
 import time
 from typing import Union
-
 from functools import partial
+
+from bluesky.protocols import Movable
+from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
+from ophyd.status import StatusBase, SubscriptionStatus
 
 from ..status import await_value
 
