@@ -77,6 +77,7 @@ ignore_missing_imports = true # Ignore missing stubs in imported modules
 [tool.pytest.ini_options]
 # Run pytest with all our checkers, and don't spam us with massive tracebacks on error
 markers = [
+    "bimorph: marks tests as requiring the bimorph simulator running (deselect with -m \"not bimorph\"')",
     "s03: marks tests as requiring the s03 simulator running (deselect with '-m \"not s03\"')",
     "slits: marks tests as requiring the slits simulator running (deselect with '-m \"not slits\" ')",
 ]
