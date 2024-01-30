@@ -46,6 +46,7 @@ def test_resolution(
     detector_params.beam_xy_converter.get_beam_xy_from_det_dist = MagicMock(
         side_effect=[212.51, 219.98]
     )
+    detector_params.use_roi_mode = roi
     get_detector_max_size.return_value = 434.6
     actual_res = resolution(detector_params, wavelength_angstroms, det_distance_mm)
     assert isclose(
@@ -94,6 +95,13 @@ def test_resolution_with_roi(
         ("EIGER2_X_16M", True, 0.976277, 272.9, 3.625220),
         ("EIGER2_X_16M", True, 0.97623, 391.236, 5.124842),
         ("EIGER2_X_16M", True, 0.97623, 196.744, 2.677350),
+        ("EIGER2_X_16M", True, 1.28243, 203.756, 3.6282),
+        ("EIGER2_X_16M", True, 1.65314, 150, 3.57282),
+        ("EIGER2_X_16M", True, 1.65314, 199.96, 4.59785),
+        ("EIGER2_X_16M", True, 1.00008, 333.096, 4.4908),
+        ("EIGER2_X_16M", True, 0.918415, 312.488, 3.875),
+        ("EIGER2_X_16M", True, 0.70541, 201.8, 1.97832),
+        ("EIGER2_X_16M", False, 0.705422, 150, 0.909053),
     ],
     indirect=["detector_params"],
 )
