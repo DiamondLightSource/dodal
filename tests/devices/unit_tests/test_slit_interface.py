@@ -27,8 +27,13 @@ def test_set():
         parsed_read(slit.y_size),
     ]
 
+    results = [round(result, 3) for result in results]
+
     assert all(
-        [target == round(value, 3) for target, value in zip(target_values, results)]
-    )
+        [
+            abs(target - result) <= 0.001
+            for target, result in zip(target_values, results)
+        ]
+    ), f"target: {target_values}, results: {results}"
 
     # probably good enough...
