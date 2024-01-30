@@ -15,7 +15,7 @@ from dodal.log import LOGGER
 
 TEST_DETECTOR_SIZE_CONSTANTS = EIGER2_X_16M_SIZE
 
-TEST_CURRENT_ENERGY = 100.0
+TEST_EXPECTED_ENERGY = 100.0
 TEST_EXPOSURE_TIME = 1.0
 TEST_DIR = "/test/dir"
 TEST_PREFIX = "test"
@@ -35,7 +35,7 @@ class StatusException(Exception):
 
 def create_new_params() -> DetectorParams:
     return DetectorParams(
-        current_energy_ev=TEST_CURRENT_ENERGY,
+        expected_energy_ev=TEST_EXPECTED_ENERGY,
         exposure_time=TEST_EXPOSURE_TIME,
         directory=TEST_DIR,
         prefix=TEST_PREFIX,
@@ -289,7 +289,7 @@ def test_unsuccessful_true_roi_mode_change_results_in_callback_error(
     unwrapped_funcs = [
         lambda: fake_eiger.change_roi_mode(enable=True),
         lambda: fake_eiger.set_detector_threshold(
-            energy=fake_eiger.detector_params.current_energy_ev
+            energy=fake_eiger.detector_params.expected_energy_ev
         ),
     ]
     with pytest.raises(StatusException):
@@ -309,7 +309,7 @@ def test_unsuccessful_false_roi_mode_change_results_in_callback_error(
     unwrapped_funcs = [
         lambda: fake_eiger.change_roi_mode(enable=False),
         lambda: fake_eiger.set_detector_threshold(
-            energy=fake_eiger.detector_params.current_energy_ev
+            energy=fake_eiger.detector_params.expected_energy_ev
         ),
     ]
     with pytest.raises(StatusException):
@@ -480,7 +480,7 @@ def test_check_callback_error(fake_eiger: EigerDetector, iteration):
     unwrapped_funcs = [
         (
             lambda: fake_eiger.set_detector_threshold(
-                energy=fake_eiger.detector_params.current_energy_ev
+                energy=fake_eiger.detector_params.expected_energy_ev
             )
         ),
         (fake_eiger.set_cam_pvs),

@@ -19,6 +19,7 @@ from pydantic.dataclasses import dataclass
 
 from dodal.devices.motors import XYZLimitBundle
 from dodal.devices.status import await_value
+from dodal.log import LOGGER
 from dodal.parameters.experiment_parameter_base import AbstractExperimentParameterBase
 
 
@@ -43,10 +44,11 @@ class GridAxis:
         return 0 <= steps <= self.full_steps
 
 
-class GridScanParams(BaseModel, AbstractExperimentParameterBase):
+class GridScanParamsCommon(BaseModel, AbstractExperimentParameterBase):
     """
-    Holder class for the parameters of a grid scan in a similar
-    layout to EPICS.
+    Common holder class for the parameters of a grid scan in a similar
+    layout to EPICS. The parameters and functions of this class are common
+    to both the zebra and panda triggered fast grid scans.
 
     Motion program will do a grid in x-y then rotate omega +90 and perform
     a grid in x-z.
@@ -61,7 +63,6 @@ class GridScanParams(BaseModel, AbstractExperimentParameterBase):
     x_step_size: float = 0.1
     y_step_size: float = 0.1
     z_step_size: float = 0.1
-    dwell_time_ms: float = 10
     x_start: float = 0.1
     y1_start: float = 0.1
     y2_start: float = 0.1
@@ -93,18 +94,6 @@ class GridScanParams(BaseModel, AbstractExperimentParameterBase):
     @validator("z_axis", always=True)
     def _get_z_axis(cls, z_axis: GridAxis, values: dict[str, Any]) -> GridAxis:
         return GridAxis(values["z2_start"], values["z_step_size"], values["z_steps"])
-
-    @validator("dwell_time_ms", always=True, check_fields=True)
-    def non_integer_dwell_time(cls, dwell_time_ms: float) -> float:
-        dwell_time_floor_rounded = np.floor(dwell_time_ms)
-        dwell_time_is_close = np.isclose(
-            dwell_time_ms, dwell_time_floor_rounded, rtol=1e-3
-        )
-        if not dwell_time_is_close:
-            raise ValueError(
-                f"Dwell time of {dwell_time_ms}ms is not an integer value. Fast Grid Scan only accepts integer values"
-            )
-        return dwell_time_ms
 
     def is_valid(self, limits: XYZLimitBundle) -> bool:
         """
@@ -162,6 +151,34 @@ class GridScanParams(BaseModel, AbstractExperimentParameterBase):
                 self.z_axis.steps_to_motor_position(grid_position[2]),
             ]
         )
+
+
+class GridScanParams(GridScanParamsCommon):
+    """
+    Holder class for the parameters of a grid scan in a similar
+    layout to EPICS. These params are used for the zebra-triggered
+    fast grid scan
+
+    Motion program will do a grid in x-y then rotate omega +90 and perform
+    a grid in x-z.
+
+    The grid specified is where data is taken e.g. it can be assumed the first frame is
+    at x_start, y1_start, z1_start and subsequent frames are N*step_size away.
+    """
+
+    dwell_time_ms: float = 10
+
+    @validator("dwell_time_ms", always=True, check_fields=True)
+    def non_integer_dwell_time(cls, dwell_time_ms: float) -> float:
+        dwell_time_floor_rounded = np.floor(dwell_time_ms)
+        dwell_time_is_close = np.isclose(
+            dwell_time_ms, dwell_time_floor_rounded, rtol=1e-3
+        )
+        if not dwell_time_is_close:
+            raise ValueError(
+                f"Dwell time of {dwell_time_ms}ms is not an integer value. Fast Grid Scan only accepts integer values"
+            )
+        return dwell_time_ms
 
 
 class GridScanCompleteStatus(DeviceStatus):
@@ -279,15 +296,22 @@ class FastGridScan(Device):
 
         def scan():
             try:
-                self.log.debug("Running scan")
+                LOGGER.debug("Running scan")
+                from time import sleep
+
+                sleep(
+                    0.1
+                )  # TODO see https://github.com/DiamondLightSource/hyperion/issues/1101
                 self.run_cmd.put(1)
-                self.log.debug("Waiting for scan to start")
+                LOGGER.info("Waiting for FGS to start")
                 await_value(self.status, 1).wait()
                 st.set_finished()
+                LOGGER.debug(f"{st} finished, exiting FGS kickoff thread")
             except Exception as e:
                 st.set_exception(e)
 
         threading.Thread(target=scan, daemon=True).start()
+        LOGGER.info("Returning FGS kickoff status")
         return st
 
     def complete(self) -> DeviceStatus:
