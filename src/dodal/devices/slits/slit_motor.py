@@ -7,7 +7,7 @@ from collections import OrderedDict
 from ..status import await_value
 
 
-class MoveStatus(IntEnum):
+class MoveState(IntEnum):
     Moving = (0,)
     Stationary = 1
 
@@ -44,18 +44,18 @@ class SlitMotor(Device, Movable, Readable):
 
         Returns:
             A SubscriptionStatus marked complete when motor is idle after operation."""
-        await_value(self.done_moving, MoveStatus.Stationary).wait()
+        await_value(self.done_moving, MoveState.Stationary).wait()
 
         status = self.value.set(target_value)
 
-        await_value(self.done_moving, MoveStatus.Moving).wait()
+        await_value(self.done_moving, MoveState.Moving).wait()
 
-        status &= await_value(self.done_moving, MoveStatus.Stationary)
+        status &= await_value(self.done_moving, MoveState.Stationary)
 
         return status
 
     def read(self):
-        await_value(self.done_moving, MoveStatus.Stationary).wait()
+        await_value(self.done_moving, MoveState.Stationary).wait()
 
         return self.readback_value.read()
 
