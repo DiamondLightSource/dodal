@@ -23,7 +23,7 @@ class S5Bl02jAlSlits(GapAndCentreSlit2d):
     x_size: Device = Component(SlitMotor, "X:SIZE")
     x_centre: Device = Component(SlitMotor, "X:CENTRE")
 
-    def set(self, position_tuple):
+    def set(self, position_tuple: tuple[float, float, float, float]):
         """Method to set position of slit.
 
         Parameters:
