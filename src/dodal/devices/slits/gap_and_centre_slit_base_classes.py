@@ -1,10 +1,10 @@
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 from bluesky.protocols import Movable
 from ophyd import Device
 from typing import Tuple
 
 
-class GapAndCentreSlit1d(Device, Movable):
+class GapAndCentreSlit1d(Device, Movable, ABC):
     """Class defining interface between Ophyd and 1-dimensional gap and centre slits."""
 
     @abstractmethod
@@ -19,7 +19,7 @@ class GapAndCentreSlit1d(Device, Movable):
         ...
 
 
-class GapAndCentreSlit2d(Device, Movable):
+class GapAndCentreSlit2d(Device, Movable, ABC):
     """Class defining interface between Ophyd and 2-dimensional gap and centre slits."""
 
     @abstractmethod
