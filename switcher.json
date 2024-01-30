@@ -4,8 +4,8 @@
     "url": "https://DiamondLightSource.github.io/dodal/main/"
   },
   {
-    "version": "1.14.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.14.0/"
+    "version": "1.13.2",
+    "url": "https://DiamondLightSource.github.io/dodal/1.13.2/"
   },
   {
     "version": "1.13.1",
@@ -102,6 +102,10 @@
   {
     "version": "1.11.3",
     "url": "https://DiamondLightSource.github.io/dodal/1.11.3/"
+  },
+  {
+    "version": "1.14.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.14.0/"
   },
   {
     "version": "1032-apertures",
