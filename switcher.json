@@ -188,6 +188,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/directory_provider/"
   },
   {
+    "version": "fix_linting_CI_issues",
+    "url": "https://DiamondLightSource.github.io/dodal/fix_linting_CI_issues/"
+  },
+  {
     "version": "fix_wrong_return_type",
     "url": "https://DiamondLightSource.github.io/dodal/fix_wrong_return_type/"
   },
