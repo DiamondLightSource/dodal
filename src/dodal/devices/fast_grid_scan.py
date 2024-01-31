@@ -300,7 +300,7 @@ class FastGridScan(Device):
                 from time import sleep
 
                 sleep(
-                    0.1
+                    0.6
                 )  # TODO see https://github.com/DiamondLightSource/hyperion/issues/1101
                 self.run_cmd.put(1)
                 LOGGER.info("Waiting for FGS to start")
