@@ -107,6 +107,7 @@ def get_channels_by_attributes(
             bimorph8.channel_7_status,
             bimorph8.channel_8_status,
         ]
+    return [None for _ in range(8)]
 
 
 def get_8_channel_values(
