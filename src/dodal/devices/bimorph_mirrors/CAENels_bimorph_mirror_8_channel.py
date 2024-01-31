@@ -1,4 +1,4 @@
-from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
+from ophyd import Component, EpicsSignal, EpicsSignalRO
 
 from dodal.devices.bimorph_mirrors.CAENels_bimorph_mirror_7_channel import (
     CAENelsBimorphMirror7Channel,
