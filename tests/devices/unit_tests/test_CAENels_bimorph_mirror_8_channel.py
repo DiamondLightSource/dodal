@@ -1,19 +1,21 @@
-from functools import partial
-import pytest
 import random
+from functools import partial
 from typing import Union
 
+import pytest
+from bluesky import RunEngine
+from bluesky.plan_stubs import mv, rd
+from ophyd import Component, Device, EpicsSignal
+
+from dodal.devices.bimorph_mirrors.CAENels_bimorph_mirror_8_channel import (
+    CAENelsBimorphMirror8Channel,
+)
 from dodal.devices.bimorph_mirrors.CAENels_bimorph_mirror_interface import (
     ChannelAttribute,
     OnOff,
     OperationMode,
     Status,
 )
-from dodal.devices.bimorph_mirrors.CAENels_bimorph_mirror_8_channel import (
-    CAENelsBimorphMirror8Channel,
-)
-from ophyd import Component, Device, EpicsSignal
-
 
 """
 Stuff that isn't tested:
@@ -634,8 +636,7 @@ def test_set():
 
 
 # This section test the bimorph in Bluesky plan contexts:
-from bluesky import RunEngine
-from bluesky.plan_stubs import mv, rd
+
 
 RE = RunEngine({})
 

@@ -1,6 +1,6 @@
-import pytest
 import random
 
+import pytest
 
 from dodal.devices.slits.s5_blo2j_al_slits_95 import S5Bl02jAlSlits as Slit
 
