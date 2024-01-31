@@ -283,10 +283,8 @@ def test_all_volt():
         test_all_volt_value = random.randint(1, 30)
         protected_set(bimorph.all_volt, test_all_volt_value)
         assert all(
-            [
-                voltage == test_all_volt_value
+            voltage == test_all_volt_value
                 for voltage in get_all_voltage_out_readback_values(bimorph)
-            ]
         )
 
 
@@ -313,10 +311,8 @@ def test_voltage_target():
         # breakpoint()
 
         assert all(
-            [
-                parsed_read(voltage_target_readback_list[i]) == target_voltages[i]
+            parsed_read(voltage_target_readback_list[i]) == target_voltages[i]
                 for i in range(len(target_voltages))
-            ]
         )
 
         protected_set(bimorph.all_target_proc, 1)
@@ -324,10 +320,8 @@ def test_voltage_target():
         new_voltages = get_all_voltage_out_readback_values(bimorph)
 
         assert all(
-            [
-                voltage == target_voltage
+            voltage == target_voltage
                 for voltage, target_voltage in zip(new_voltages, target_voltages)
-            ]
         )
 
 
@@ -350,12 +344,10 @@ def test_shift():
     new_voltages = get_all_voltage_out_readback_values(bimorph)
 
     assert all(
-        [
-            new_voltage == old_voltage + shift
+        new_voltage == old_voltage + shift
             for new_voltage, old_voltage, shift in zip(
                 new_voltages, current_voltages, shifts
             )
-        ]
     )
 
 
@@ -375,19 +367,15 @@ def test_voltage_out():
             protected_set(voltage_out_signal, target_voltages[index])
 
         assert all(
-            [
-                parsed_read(voltage_out_list[i]) == target_voltages[i]
+            parsed_read(voltage_out_list[i]) == target_voltages[i]
                 for i in range(len(target_voltages))
-            ]
         )
 
         new_voltages = get_all_voltage_out_readback_values(bimorph)
 
         assert all(
-            [
-                voltage == target_voltage
+            voltage == target_voltage
                 for voltage, target_voltage in zip(new_voltages, target_voltages)
-            ]
         )
 
 
@@ -405,10 +393,8 @@ def test_get_channels_by_attribute():
         print(f"channel1_list: {channel1_list}\nchannel2_list: {channel2_list}")
 
         assert all(
-            [
-                channel_1 == channel_2
+            channel_1 == channel_2
                 for channel_1, channel_2 in zip(channel1_list, channel2_list)
-            ]
         )
 
 
@@ -525,12 +511,10 @@ def test_read_from_all_channels_by_attribute():
     )
 
     assert all(
-        [
-            vout_rbv_value == target_voltage
+        vout_rbv_value == target_voltage
             for vout_rbv_value, target_voltage in zip(
                 voltage_out_rbv_values, target_voltages
             )
-        ]
     )
 
 
@@ -551,19 +535,15 @@ def test_write_to_all_channels_by_attribute():
     status.wait()
 
     assert all(
-        [
-            parsed_read(voltage_out) == target_voltage
+        parsed_read(voltage_out) == target_voltage
             for voltage_out, target_voltage in zip(voltage_out_list, target_voltages)
-        ]
     )
 
     new_voltages = get_all_voltage_out_readback_values(bimorph)
 
     assert all(
-        [
-            voltage == target_voltage
+        voltage == target_voltage
             for voltage, target_voltage in zip(new_voltages, target_voltages)
-        ]
     )
 
 
@@ -586,17 +566,13 @@ def test_set_and_proc_target_voltages():
     status.wait()
 
     assert all(
-        [
-            parsed_read(vtrgt_rbv) == voltage
+        parsed_read(vtrgt_rbv) == voltage
             for vtrgt_rbv, voltage in zip(voltage_target_rbv_list, target_voltages)
-        ]
     )
 
     assert all(
-        [
-            parsed_read(vout) == voltage
+        parsed_read(vout) == voltage
             for vout, voltage in zip(vout_rbv_list, target_voltages)
-        ]
     )
 
 
@@ -619,17 +595,13 @@ def test_set():
     status.wait()
 
     assert all(
-        [
-            parsed_read(vtrgt_rbv) == voltage
+        parsed_read(vtrgt_rbv) == voltage
             for vtrgt_rbv, voltage in zip(voltage_target_rbv_list, target_voltages)
-        ]
     )
 
     assert all(
-        [
-            parsed_read(vout) == voltage
+        parsed_read(vout) == voltage
             for vout, voltage in zip(vout_rbv_list, target_voltages)
-        ]
     )
 
 
@@ -653,8 +625,6 @@ def test_move_plan():
     new_voltages = get_all_voltage_out_readback_values(bimorph)
 
     assert all(
-        [
-            voltage == target_voltage
+        voltage == target_voltage
             for voltage, target_voltage in zip(new_voltages, target_voltages)
-        ]
     )
