@@ -164,31 +164,6 @@ wait_till_idle = partial(wait_for_signal, value=0, signal_range={0, 1})
 wait_till_busy = partial(wait_for_signal, value=1, signal_range={0, 1})
 
 
-def protected_read(wait_signal: EpicsSignal, signal: EpicsSignal):
-    """
-    Reads from signal, but safely...
-    """
-    wait_till_idle(wait_signal)
-    return signal.read()
-
-
-def parsed_read(wait_signal: EpicsSignal, signal: EpicsSignal):
-    """
-    Writes to signal, but safely...
-    """
-    res = protected_read(wait_signal, signal)
-    return res[signal.name]["value"]
-
-
-def protected_set(wait_signal: EpicsSignal, signal: EpicsSignal, value) -> None:
-    """
-    Parses dict from Device.read to get value
-    """
-    wait_till_idle(wait_signal)
-    signal.set(value).wait()
-    wait_till_busy(wait_signal)
-
-
 # Stupid ugly class to get the "Device Busy" signal from the bimorph controller
 # Workaround because the architecture for this is weird and hard to implement
 # in a unit test:
@@ -197,8 +172,35 @@ class BusySignalGetter(Device):
 
 
 busy_signal = BusySignalGetter(name="busy_signal", prefix="BL02J-EA-IOC-97:G0:")
-parsed_read = partial(parsed_read, busy_signal.device_busy)
-protected_set = partial(protected_set, busy_signal.device_busy)
+
+
+def protected_read(wait_signal: EpicsSignal, signal: EpicsSignal):
+    """
+    Reads from signal, but safely...
+    """
+    wait_till_idle(wait_signal)
+    return signal.read()
+
+
+def parsed_read(
+    signal: EpicsSignal, wait_signal: EpicsSignal = busy_signal.device_busy
+):
+    """
+    Writes to signal, but safely...
+    """
+    res = protected_read(wait_signal, signal)
+    return res[signal.name]["value"]
+
+
+def protected_set(
+    signal: EpicsSignal, value, wait_signal: EpicsSignal = busy_signal.device_busy
+) -> None:
+    """
+    Parses dict from Device.read to get value
+    """
+    wait_till_idle(wait_signal)
+    signal.set(value).wait()
+    wait_till_busy(wait_signal)
 
 
 # ACTUAL TEST CASES:
