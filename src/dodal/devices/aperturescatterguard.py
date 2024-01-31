@@ -19,12 +19,12 @@ class InvalidApertureMove(Exception):
     pass
 
 
-class PositionName(str, Enum):
-    LARGE = "large"
-    MEDIUM = "medium"
-    SMALL = "small"
-    INVALID = "invalid"
-    ROBOT_LOAD = "robot_load"
+class ConfigurationRadiusMicrons(Optional[float], Enum):
+    LARGE = 100
+    MEDIUM = 50
+    SMALL = 20
+    INVALID = None
+    ROBOT_LOAD = None
 
 
 @dataclass
@@ -48,20 +48,20 @@ class AperturePositions:
     ) -> bool:
         return np.allclose(present, target, AperturePositions.TOLERANCE_MM)
 
-    def match_to_name(self, present_position: Aperture5d) -> PositionName:
+    def match_to_name(self, present_position: Aperture5d) -> ConfigurationRadiusMicrons:
         assert self.position_valid(present_position)
         positions: List[(Literal, Aperture5d)] = [
-            (PositionName.LARGE, self.LARGE),
-            (PositionName.MEDIUM, self.MEDIUM),
-            (PositionName.SMALL, self.SMALL),
-            (PositionName.ROBOT_LOAD, self.ROBOT_LOAD),
+            (ConfigurationRadiusMicrons.LARGE, self.LARGE),
+            (ConfigurationRadiusMicrons.MEDIUM, self.MEDIUM),
+            (ConfigurationRadiusMicrons.SMALL, self.SMALL),
+            (ConfigurationRadiusMicrons.ROBOT_LOAD, self.ROBOT_LOAD),
         ]
 
         for position_name, position_constant in positions:
             if self._distance_check(position_constant, present_position):
                 return position_name
 
-        return PositionName.INVALID
+        return ConfigurationRadiusMicrons.INVALID
 
     @classmethod
     def from_gda_beamline_params(cls, params):
@@ -108,7 +108,7 @@ class ApertureScatterguard(InfoLoggingDevice):
     aperture = Cpt(Aperture, "-MO-MAPT-01:")
     scatterguard = Cpt(Scatterguard, "-MO-SCAT-01:")
     aperture_positions: Optional[AperturePositions] = None
-    aperture_name = PositionName.INVALID
+    aperture_name = ConfigurationRadiusMicrons.INVALID
 
     class NamingSignal(Signal):
         def get(self):
