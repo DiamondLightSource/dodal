@@ -4,7 +4,7 @@ from typing import Union
 
 import pytest
 from bluesky import RunEngine
-from bluesky.plan_stubs import mv, rd
+from bluesky.plan_stubs import mv
 from ophyd import Component, Device, EpicsSignal
 
 from dodal.devices.bimorph_mirrors.CAENels_bimorph_mirror_8_channel import (
@@ -265,10 +265,8 @@ def test_all_shift():
 
     new_voltages = get_all_voltage_out_readback_values(bimorph)
     assert all(
-        [
-            voltpair[1] == voltpair[0] + test_shift
+        voltpair[1] == voltpair[0] + test_shift
             for voltpair in zip(current_voltages, new_voltages)
-        ]
     )
 
 
