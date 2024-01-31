@@ -4,6 +4,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/main/"
   },
   {
+    "version": "1.14.1",
+    "url": "https://DiamondLightSource.github.io/dodal/1.14.1/"
+  },
+  {
     "version": "1.14.0",
     "url": "https://DiamondLightSource.github.io/dodal/1.14.0/"
   },
@@ -202,10 +206,6 @@
   {
     "version": "hyperion_1077_hyperion_to_populate_ispyb_params_resolution_instead_of_gda",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1077_hyperion_to_populate_ispyb_params_resolution_instead_of_gda/"
-  },
-  {
-    "version": "hyperion_1105_hotfixes",
-    "url": "https://DiamondLightSource.github.io/dodal/hyperion_1105_hotfixes/"
   },
   {
     "version": "hyperion_698_refactor_parameters",
