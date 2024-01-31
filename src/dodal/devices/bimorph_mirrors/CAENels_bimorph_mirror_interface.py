@@ -1,7 +1,7 @@
-from enum import Enum, IntEnum
 import time
-from typing import Any, Union
+from enum import Enum, IntEnum
 from functools import partial
+from typing import Any, Union
 
 from bluesky.protocols import Movable
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO
