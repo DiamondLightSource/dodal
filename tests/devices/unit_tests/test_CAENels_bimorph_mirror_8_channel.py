@@ -266,7 +266,7 @@ def test_all_shift():
     new_voltages = get_all_voltage_out_readback_values(bimorph)
     assert all(
         voltpair[1] == voltpair[0] + test_shift
-            for voltpair in zip(current_voltages, new_voltages)
+        for voltpair in zip(current_voltages, new_voltages)
     )
 
 
@@ -284,7 +284,7 @@ def test_all_volt():
         protected_set(bimorph.all_volt, test_all_volt_value)
         assert all(
             voltage == test_all_volt_value
-                for voltage in get_all_voltage_out_readback_values(bimorph)
+            for voltage in get_all_voltage_out_readback_values(bimorph)
         )
 
 
@@ -312,7 +312,7 @@ def test_voltage_target():
 
         assert all(
             parsed_read(voltage_target_readback_list[i]) == target_voltages[i]
-                for i in range(len(target_voltages))
+            for i in range(len(target_voltages))
         )
 
         protected_set(bimorph.all_target_proc, 1)
@@ -321,7 +321,7 @@ def test_voltage_target():
 
         assert all(
             voltage == target_voltage
-                for voltage, target_voltage in zip(new_voltages, target_voltages)
+            for voltage, target_voltage in zip(new_voltages, target_voltages)
         )
 
 
@@ -345,9 +345,9 @@ def test_shift():
 
     assert all(
         new_voltage == old_voltage + shift
-            for new_voltage, old_voltage, shift in zip(
-                new_voltages, current_voltages, shifts
-            )
+        for new_voltage, old_voltage, shift in zip(
+            new_voltages, current_voltages, shifts
+        )
     )
 
 
@@ -368,14 +368,14 @@ def test_voltage_out():
 
         assert all(
             parsed_read(voltage_out_list[i]) == target_voltages[i]
-                for i in range(len(target_voltages))
+            for i in range(len(target_voltages))
         )
 
         new_voltages = get_all_voltage_out_readback_values(bimorph)
 
         assert all(
             voltage == target_voltage
-                for voltage, target_voltage in zip(new_voltages, target_voltages)
+            for voltage, target_voltage in zip(new_voltages, target_voltages)
         )
 
 
@@ -394,7 +394,7 @@ def test_get_channels_by_attribute():
 
         assert all(
             channel_1 == channel_2
-                for channel_1, channel_2 in zip(channel1_list, channel2_list)
+            for channel_1, channel_2 in zip(channel1_list, channel2_list)
         )
 
 
@@ -512,9 +512,9 @@ def test_read_from_all_channels_by_attribute():
 
     assert all(
         vout_rbv_value == target_voltage
-            for vout_rbv_value, target_voltage in zip(
-                voltage_out_rbv_values, target_voltages
-            )
+        for vout_rbv_value, target_voltage in zip(
+            voltage_out_rbv_values, target_voltages
+        )
     )
 
 
@@ -536,14 +536,14 @@ def test_write_to_all_channels_by_attribute():
 
     assert all(
         parsed_read(voltage_out) == target_voltage
-            for voltage_out, target_voltage in zip(voltage_out_list, target_voltages)
+        for voltage_out, target_voltage in zip(voltage_out_list, target_voltages)
     )
 
     new_voltages = get_all_voltage_out_readback_values(bimorph)
 
     assert all(
         voltage == target_voltage
-            for voltage, target_voltage in zip(new_voltages, target_voltages)
+        for voltage, target_voltage in zip(new_voltages, target_voltages)
     )
 
 
@@ -567,12 +567,12 @@ def test_set_and_proc_target_voltages():
 
     assert all(
         parsed_read(vtrgt_rbv) == voltage
-            for vtrgt_rbv, voltage in zip(voltage_target_rbv_list, target_voltages)
+        for vtrgt_rbv, voltage in zip(voltage_target_rbv_list, target_voltages)
     )
 
     assert all(
         parsed_read(vout) == voltage
-            for vout, voltage in zip(vout_rbv_list, target_voltages)
+        for vout, voltage in zip(vout_rbv_list, target_voltages)
     )
 
 
@@ -596,12 +596,12 @@ def test_set():
 
     assert all(
         parsed_read(vtrgt_rbv) == voltage
-            for vtrgt_rbv, voltage in zip(voltage_target_rbv_list, target_voltages)
+        for vtrgt_rbv, voltage in zip(voltage_target_rbv_list, target_voltages)
     )
 
     assert all(
         parsed_read(vout) == voltage
-            for vout, voltage in zip(vout_rbv_list, target_voltages)
+        for vout, voltage in zip(vout_rbv_list, target_voltages)
     )
 
 
@@ -626,5 +626,5 @@ def test_move_plan():
 
     assert all(
         voltage == target_voltage
-            for voltage, target_voltage in zip(new_voltages, target_voltages)
+        for voltage, target_voltage in zip(new_voltages, target_voltages)
     )
