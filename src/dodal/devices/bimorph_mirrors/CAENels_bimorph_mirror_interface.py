@@ -261,13 +261,17 @@ class CAENelsBimorphMirrorInterface(Device, Movable):
 
         return status & self.protected_set(self.all_target_proc, 1)
 
-    def set(self, target_voltages: list[float]) -> SubscriptionStatus:
+    def set(self, target_voltages: list[float], settle_time = 0) -> SubscriptionStatus:
         """Sets each voltage channel to equivalent value in target_voltages.
 
         Args:
             target_voltages: An array of length equal to number of channels
+            settle_time: Pause in seconds after action completes
         Returns:
             A SubscriptionStatus object tracking completion of operations
         """
 
-        return self.set_and_proc_target_voltages(target_voltages)
+        status = self.set_and_proc_target_voltages(target_voltages)
+        settler = StatusBase(settle_time = settle_time)
+        settler.set_finished()
+        return status & settler 
