@@ -212,6 +212,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1101_wait_for_moves/"
   },
   {
+    "version": "hyperion_1109_read_barcode_from_robot",
+    "url": "https://DiamondLightSource.github.io/dodal/hyperion_1109_read_barcode_from_robot/"
+  },
+  {
     "version": "hyperion_698_refactor_parameters",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_698_refactor_parameters/"
   },
