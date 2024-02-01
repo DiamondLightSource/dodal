@@ -18,6 +18,7 @@ from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.panda_fast_grid_scan import PandAFastGridScan
 from dodal.devices.qbpm1 import QBPM1
+from dodal.devices.robot import BartRobot
 from dodal.devices.s4_slit_gaps import S4SlitGaps
 from dodal.devices.sample_shutter import SampleShutter
 from dodal.devices.smargon import Smargon
@@ -430,6 +431,21 @@ def zocalo(
         ZocaloResults,
         "zocalo",
         "",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+def robot(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> BartRobot:
+    """Get the i03 robot device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        BartRobot,
+        "robot",
+        "-MO-ROBOT-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
