@@ -68,6 +68,11 @@ class ArmDemand(IntEnum):
     DISARM = 0
 
 
+class FastShutterAction(IntEnum):
+    OPEN = 1
+    CLOSE = 0
+
+
 class ArmingDevice(Device):
     """A useful device that can abstract some of the logic of arming.
     Allows a user to just call arm.set(ArmDemand.ARM)"""
