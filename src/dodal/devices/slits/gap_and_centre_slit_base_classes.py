@@ -19,6 +19,16 @@ class GapAndCentreSlit1d(Device, Movable, ABC):
         """
         ...
 
+    
+    def read(self) -> Tuple[float, float]:
+        """Method to read position of slit.
+
+        Returns:
+            Tuple of 2 floats containing:
+                Central x-coordinate of gap
+                Width of gap in x-dimension
+        """
+        ...
 
 class GapAndCentreSlit2d(Device, Movable, ABC):
     """Class defining interface between Ophyd and 2-dimensional gap and centre slits."""
@@ -33,5 +43,18 @@ class GapAndCentreSlit2d(Device, Movable, ABC):
                 x_size_value: Width of gap in x-dimension
                 y_centre_value: Central y-coordinate of gap
                 y_size_value: Width of gap in y-dimension
+        """
+        ...
+    
+
+    def read(self) -> Tuple[float, float, float, float]:
+        """Method to read position of slit.
+
+        Returns:
+            Tuple of 4 floats containing:
+                Central x-coordinate of gap
+                Width of gap in x-dimension
+                Central y-coordinate of gap
+                Width of gap in y-dimension
         """
         ...

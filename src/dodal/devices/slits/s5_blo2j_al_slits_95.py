@@ -40,3 +40,12 @@ class S5Bl02jAlSlits(GapAndCentreSlit2d):
         status &= self.y_size.set(y_size_value)
 
         return status
+
+
+    def read(self):
+        return (
+            self.x_centre.read(),
+            self.x_size.read(),
+            self.y_centre.read(),
+            self.y_size.read()
+        )
