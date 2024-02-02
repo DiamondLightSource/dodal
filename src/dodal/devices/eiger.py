@@ -143,10 +143,10 @@ class EigerDetector(Device):
         self.disable_roi_mode()
 
     def disable_roi_mode(self):
-        self.change_roi_mode(False)
+        return self.change_roi_mode(False)
 
     def enable_roi_mode(self):
-        self.change_roi_mode(True)
+        return self.change_roi_mode(True)
 
     def change_roi_mode(self, enable: bool) -> Status:
         assert self.detector_params is not None
