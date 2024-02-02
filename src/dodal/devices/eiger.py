@@ -1,4 +1,5 @@
 from enum import Enum
+from functools import partial
 from typing import Optional
 
 from ophyd import Component, Device, EpicsSignalRO, Signal
@@ -143,6 +144,9 @@ class EigerDetector(Device):
 
     def disable_roi_mode(self):
         self.change_roi_mode(False)
+
+    def enable_roi_mode(self):
+        self.change_roi_mode(True)
 
     def change_roi_mode(self, enable: bool) -> Status:
         assert self.detector_params is not None
@@ -315,21 +319,22 @@ class EigerDetector(Device):
         functions_to_do_arm = []
         detector_params: DetectorParams = self.detector_params
         if detector_params.use_roi_mode:
-            functions_to_do_arm.append(lambda: self.change_roi_mode(enable=True))
+            functions_to_do_arm.append(self.enable_roi_mode)
 
         functions_to_do_arm.extend(
             [
-                lambda: self.set_detector_threshold(
-                    energy=detector_params.expected_energy_ev
+                partial(
+                    self.set_detector_threshold,
+                    energy=detector_params.expected_energy_ev,
                 ),
                 self.set_cam_pvs,
                 self.set_odin_number_of_frame_chunks,
                 self.set_odin_pvs,
                 self.set_mx_settings_pvs,
                 self.set_num_triggers_and_captures,
-                lambda: await_value(self.stale_params, 0, 60),
+                partial(await_value, self.stale_params, 0, 60),
                 self._wait_for_odin_status,
-                lambda: self.cam.acquire.set(1, timeout=self.GENERAL_STATUS_TIMEOUT),
+                partial(self.cam.acquire.set, 1, timeout=self.GENERAL_STATUS_TIMEOUT),
                 self._wait_fan_ready,
                 self._finish_arm,
             ]
