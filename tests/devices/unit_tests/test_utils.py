@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from ophyd.sim import make_fake_device
 from ophyd.status import Status
+from ophyd.utils.errors import WaitTimeoutError
 
 from dodal.devices.util.epics_util import SetWhenEnabled, run_functions_without_blocking
 from dodal.log import LOGGER, GELFTCPHandler, logging, set_up_logging_handlers
@@ -30,7 +31,7 @@ def reset_logs():
 
 
 def get_bad_status():
-    status = Status(obj="Dodal test utils - get good status")
+    status = Status(obj="Dodal test utils - get bad status")
     status.set_exception(StatusException())
     return status
 
@@ -38,6 +39,11 @@ def get_bad_status():
 def get_good_status():
     status = Status(obj="Dodal test utils - get good status", timeout=0.1)
     status.set_finished()
+    return status
+
+
+def get_hanging_status():
+    status = Status(obj="Dodal test utils - get hanging status")
     return status
 
 
@@ -118,3 +124,45 @@ def test_given_disp_high_when_set_SetWhenEnabled_then_proc_not_set_until_disp_lo
     signal.disp.sim_put(0)  # type: ignore
     status.wait()
     signal.proc.set.assert_called_once()
+
+
+def test_if_one_status_errors_then_later_functions_not_called():
+    tester = MagicMock(return_value=Status(done=True, success=True))
+    status_calls = [
+        get_good_status,
+        get_good_status,
+        get_bad_status,
+        get_good_status,
+        tester,
+    ]
+    expected_obj = "TEST OBJECT"
+    returned_status = run_functions_without_blocking(
+        status_calls, associated_obj=expected_obj
+    )
+    with pytest.raises(StatusException):
+        returned_status.wait(0.1)
+    assert returned_status.done
+    tester.assert_not_called()
+
+
+def test_if_one_status_pending_then_later_functions_not_called():
+    tester = MagicMock(return_value=Status(done=True, success=True))
+    pending_status = Status()
+    status_calls = [
+        get_good_status,
+        get_good_status,
+        lambda: pending_status,
+        get_good_status,
+        tester,
+    ]
+    expected_obj = "TEST OBJECT"
+    returned_status = run_functions_without_blocking(
+        status_calls, associated_obj=expected_obj
+    )
+    with pytest.raises(WaitTimeoutError):
+        returned_status.wait(0.1)
+    tester.assert_not_called()
+    pending_status.set_exception(StatusException)
+    with pytest.raises(StatusException):
+        returned_status.wait(0.1)
+    tester.assert_not_called()

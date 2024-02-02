@@ -1,4 +1,5 @@
 import threading
+from functools import partial
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -618,3 +619,54 @@ def test_given_not_all_frames_done_when_eiger_stopped_then_do_not_wait_for_frame
     fake_eiger.stop()
 
     fake_eiger.disarm_detector.assert_called()
+
+
+def partial_in_calls(f, mock_calls):
+    result = False
+    for call in mock_calls:
+        if isinstance(call.args[0], partial):
+            if f is call.args[0].func:
+                return True
+    return result
+
+
+@patch("dodal.devices.util.epics_util.call_func")
+@patch("dodal.devices.eiger.await_value")
+def test_unwrapped_arm_chain_functions_are_not_called_outside_util(
+    await_value: MagicMock,
+    call_func: MagicMock,
+    fake_eiger: EigerDetector,
+):
+    done_status = Status(done=True, success=True)
+    call_func.return_value = done_status
+    fake_eiger.enable_roi_mode = MagicMock()
+    fake_eiger.set_detector_threshold = MagicMock()
+    fake_eiger.set_cam_pvs = MagicMock()
+    fake_eiger.set_odin_number_of_frame_chunks = MagicMock()
+    fake_eiger.set_odin_pvs = MagicMock()
+    fake_eiger.set_mx_settings_pvs = MagicMock()
+    fake_eiger.set_num_triggers_and_captures = MagicMock()
+    fake_eiger._wait_for_odin_status = MagicMock()
+    fake_eiger.cam.acquire.set = MagicMock()
+    fake_eiger._wait_fan_ready = MagicMock()
+    fake_eiger._finish_arm = MagicMock()
+
+    fake_eiger.do_arming_chain()
+
+    funcs = [
+        fake_eiger.enable_roi_mode,
+        fake_eiger.set_detector_threshold,
+        fake_eiger.set_cam_pvs,
+        fake_eiger.set_odin_number_of_frame_chunks,
+        fake_eiger.set_odin_pvs,
+        fake_eiger.set_mx_settings_pvs,
+        fake_eiger.set_num_triggers_and_captures,
+        fake_eiger._wait_for_odin_status,
+        fake_eiger.cam.acquire.set,
+        fake_eiger._wait_fan_ready,
+        fake_eiger._finish_arm,
+    ]
+
+    for f in funcs:
+        f.assert_not_called()
+        f in call_func.mock_calls or partial_in_calls(f, call_func.mock_calls)
