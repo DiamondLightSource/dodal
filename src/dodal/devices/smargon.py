@@ -1,7 +1,7 @@
 from enum import Enum
 
 from ophyd import Component as Cpt
-from ophyd import Device, EpicsMotor, EpicsSignal
+from ophyd import Device, EpicsMotor, EpicsSignal, EpicsSignalRO
 from ophyd.epics_motor import MotorBundle
 from ophyd.status import StatusBase
 
@@ -49,6 +49,7 @@ class Smargon(MotorBundle):
     """
 
     x = Cpt(EpicsMotor, "X")
+    x_speed_limit_mm_per_s = Cpt(EpicsSignalRO, "X.VMAX")
     y = Cpt(EpicsMotor, "Y")
     z = Cpt(EpicsMotor, "Z")
     chi = Cpt(EpicsMotor, "CHI")
