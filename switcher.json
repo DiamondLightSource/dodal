@@ -278,9 +278,5 @@
   {
     "version": "tom_testing",
     "url": "https://DiamondLightSource.github.io/dodal/tom_testing/"
-  },
-  {
-    "version": "unpin_ophyd_async",
-    "url": "https://DiamondLightSource.github.io/dodal/unpin_ophyd_async/"
   }
 ]
