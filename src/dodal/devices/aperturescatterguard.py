@@ -20,9 +20,9 @@ class InvalidApertureMove(Exception):
 ApertureFiveDimensionalLocation = namedtuple(
     "ApertureFiveDimensionalLocation",
     [
-        "miniap_x",
-        "miniap_y",
-        "miniap_z",
+        "aperture_x",
+        "aperture_y",
+        "aperture_z",
         "scatterguard_x",
         "scatterguard_y",
     ],
@@ -123,7 +123,6 @@ class ApertureScatterguard(InfoLoggingDevice):
     APERTURE_Z_TOLERANCE = 3  # Number of MRES steps
 
     def load_aperture_positions(self, positions: AperturePositions):
-        print(self.aperture_positions.LARGE.location.scatterguard_x)
         LOGGER.info(f"{self.name} loaded in {positions}")
         self.aperture_positions = positions
 
@@ -158,8 +157,8 @@ class ApertureScatterguard(InfoLoggingDevice):
         # unpacking the position
         aperture_x, aperture_y, aperture_z, scatterguard_x, scatterguard_y = pos
 
-        ap_z_in_position = self.aperture.z.motor_done_move.get()
         # CASE still moving
+        ap_z_in_position = self.aperture.z.motor_done_move.get()
         if not ap_z_in_position:
             status: Status = Status(obj=self)
             status.set_exception(

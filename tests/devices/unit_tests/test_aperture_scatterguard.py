@@ -5,6 +5,7 @@ from ophyd.sim import make_fake_device
 from ophyd.status import Status, StatusBase
 
 from dodal.devices.aperturescatterguard import (
+    ApertureFiveDimensionalLocation,
     AperturePositions,
     ApertureScatterguard,
     InvalidApertureMove,
@@ -25,34 +26,34 @@ def aperture_in_medium_pos(
 ):
     fake_aperture_scatterguard.load_aperture_positions(aperture_positions)
     fake_aperture_scatterguard.aperture.x.user_setpoint.sim_put(  # type: ignore
-        aperture_positions.MEDIUM[0]
+        aperture_positions.MEDIUM.location.aperture_x
     )
     fake_aperture_scatterguard.aperture.y.user_setpoint.sim_put(  # type: ignore
-        aperture_positions.MEDIUM[1]
+        aperture_positions.MEDIUM.location.aperture_y
     )
     fake_aperture_scatterguard.aperture.z.user_setpoint.sim_put(  # type: ignore
-        aperture_positions.MEDIUM[2]
+        aperture_positions.MEDIUM.location[2]
     )
     fake_aperture_scatterguard.aperture.x.user_readback.sim_put(  # type: ignore
-        aperture_positions.MEDIUM[1]
+        aperture_positions.MEDIUM.location[1]
     )
     fake_aperture_scatterguard.aperture.y.user_readback.sim_put(  # type: ignore
-        aperture_positions.MEDIUM[1]
+        aperture_positions.MEDIUM.location[1]
     )
     fake_aperture_scatterguard.aperture.z.user_readback.sim_put(  # type: ignore
-        aperture_positions.MEDIUM[1]
+        aperture_positions.MEDIUM.location[1]
     )
     fake_aperture_scatterguard.scatterguard.x.user_setpoint.sim_put(  # type: ignore
-        aperture_positions.MEDIUM[3]
+        aperture_positions.MEDIUM.location[3]
     )
     fake_aperture_scatterguard.scatterguard.y.user_setpoint.sim_put(  # type: ignore
-        aperture_positions.MEDIUM[4]
+        aperture_positions.MEDIUM.location[4]
     )
     fake_aperture_scatterguard.scatterguard.x.user_readback.sim_put(  # type: ignore
-        aperture_positions.MEDIUM[3]
+        aperture_positions.MEDIUM.location[3]
     )
     fake_aperture_scatterguard.scatterguard.y.user_readback.sim_put(  # type: ignore
-        aperture_positions.MEDIUM[4]
+        aperture_positions.MEDIUM.location[4]
     )
     fake_aperture_scatterguard.aperture.x.motor_done_move.sim_put(1)  # type: ignore
     fake_aperture_scatterguard.aperture.y.motor_done_move.sim_put(1)  # type: ignore
@@ -94,10 +95,12 @@ def aperture_positions():
 def test_aperture_scatterguard_rejects_unknown_position(
     aperture_positions, aperture_in_medium_pos
 ):
-    for i in range(0, len(aperture_positions.MEDIUM)):
-        temp_pos = list(aperture_positions.MEDIUM)
-        temp_pos[i] += 0.01
-        position_to_reject = tuple(temp_pos)
+    for i in range(len(aperture_positions.MEDIUM.location)):
+        # get a list copy
+        pos = list(aperture_positions.MEDIUM.location)
+        # change 1 dimension more than tolerance
+        pos[i] += 0.01
+        position_to_reject:ApertureFiveDimensionalLocation = tuple(pos)
 
         with pytest.raises(InvalidApertureMove):
             aperture_in_medium_pos.set(position_to_reject)
@@ -110,7 +113,7 @@ def test_aperture_scatterguard_select_bottom_moves_sg_down_then_assembly_up(
     aperture_scatterguard = aperture_in_medium_pos
     call_logger = install_logger_for_aperture_and_scatterguard(aperture_scatterguard)
 
-    aperture_scatterguard.set(aperture_positions.SMALL)
+    aperture_scatterguard.set(aperture_positions.SMALL.location)
 
     actual_calls = call_logger.mock_calls
     expected_calls = [
@@ -131,7 +134,7 @@ def test_aperture_scatterguard_select_top_moves_assembly_down_then_sg_up(
     aperture_scatterguard = aperture_in_medium_pos
     call_logger = install_logger_for_aperture_and_scatterguard(aperture_scatterguard)
 
-    aperture_scatterguard.set(aperture_positions.LARGE)
+    aperture_scatterguard.set(aperture_positions.LARGE.location)
 
     actual_calls = call_logger.mock_calls
     expected_calls = [
@@ -154,9 +157,8 @@ def test_aperture_scatterguard_throws_error_if_outside_tolerance(
     fake_aperture_scatterguard.aperture.z.motor_done_move.sim_put(1)  # type: ignore
 
     with pytest.raises(InvalidApertureMove):
-        fake_aperture_scatterguard._safe_move_within_datacollection_range(
-            0, 0, 1.1, 0, 0
-        )
+        pos: ApertureFiveDimensionalLocation = (0, 0, 1.1, 0, 0)
+        fake_aperture_scatterguard._safe_move_within_datacollection_range(pos)
 
 
 def test_aperture_scatterguard_returns_status_if_within_tolerance(
@@ -175,9 +177,8 @@ def test_aperture_scatterguard_returns_status_if_within_tolerance(
     fake_aperture_scatterguard.scatterguard.x.set = mock_set
     fake_aperture_scatterguard.scatterguard.y.set = mock_set
 
-    status = fake_aperture_scatterguard._safe_move_within_datacollection_range(
-        0, 0, 1, 0, 0
-    )
+    pos = (0, 0, 1, 0, 0)
+    status = fake_aperture_scatterguard._safe_move_within_datacollection_range(pos)
     assert isinstance(status, StatusBase)
 
 
@@ -204,26 +205,18 @@ def install_logger_for_aperture_and_scatterguard(aperture_scatterguard):
 def compare_actual_and_expected_calls(actual_calls, expected_calls):
     # ideally, we could use MagicMock.assert_has_calls but a) it doesn't work properly and b) doesn't do what I need
     i_actual = 0
-    for i_expected in range(0, len(expected_calls)):
-        try:
-            expected = expected_calls[i_expected]
-            if isinstance(expected, tuple):
-                # simple comparison
-                i_actual = actual_calls.index(expected_calls[i_expected], i_actual)
+    for i, expected in enumerate(expected_calls):
+        if isinstance(expected, tuple):
+            # simple comparison
+            i_actual = actual_calls.index(expected, i_actual)
+        else:
+            # expected is a predicate to be satisfied
+            i_matches = [
+                i for i, call in enumerate(actual_calls[i_actual:]) if expected(call)
+            ]
+            if i_matches:
+                i_actual = i_matches[0]
             else:
-                # expected is a predicate to be satisfied
-                i_matches = [
-                    i
-                    for i in range(i_actual, len(actual_calls))
-                    if expected(actual_calls[i])
-                ]
-                if i_matches:
-                    i_actual = i_matches[0]
-                else:
-                    raise ValueError("Couldn't find call matching predicate")
-        except ValueError:
-            assert (
-                False
-            ), f"Couldn't find call #{i_expected}: {expected_calls[i_expected]}"
+                raise ValueError("Couldn't find call matching predicate")
 
         i_actual += 1
