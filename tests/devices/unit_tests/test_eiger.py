@@ -1,6 +1,6 @@
 import threading
 from functools import partial
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, call, patch
 
 import pytest
 from mockito import ANY, mock, verify, when
@@ -623,33 +623,35 @@ def test_given_not_all_frames_done_when_eiger_stopped_then_do_not_wait_for_frame
 
 def partial_in_calls(f, mock_calls):
     result = False
-    for call in mock_calls:
-        if isinstance(call.args[0], partial):
-            if f is call.args[0].func:
+    for _call in mock_calls:
+        if isinstance(_call.args[0], partial):
+            if f is _call.args[0].func:
                 return True
     return result
 
 
 @patch("dodal.devices.util.epics_util.call_func")
-@patch("dodal.devices.eiger.await_value")
+@patch("dodal.devices.eiger.await_value", name="await_value")
 def test_unwrapped_arm_chain_functions_are_not_called_outside_util(
     await_value: MagicMock,
     call_func: MagicMock,
     fake_eiger: EigerDetector,
 ):
+    fake_eiger.detector_params.use_roi_mode = True
     done_status = Status(done=True, success=True)
+
     call_func.return_value = done_status
-    fake_eiger.enable_roi_mode = MagicMock()
-    fake_eiger.set_detector_threshold = MagicMock()
-    fake_eiger.set_cam_pvs = MagicMock()
-    fake_eiger.set_odin_number_of_frame_chunks = MagicMock()
-    fake_eiger.set_odin_pvs = MagicMock()
-    fake_eiger.set_mx_settings_pvs = MagicMock()
-    fake_eiger.set_num_triggers_and_captures = MagicMock()
-    fake_eiger._wait_for_odin_status = MagicMock()
-    fake_eiger.cam.acquire.set = MagicMock()
-    fake_eiger._wait_fan_ready = MagicMock()
-    fake_eiger._finish_arm = MagicMock()
+    fake_eiger.enable_roi_mode = MagicMock(name="roi_mode")
+    fake_eiger.set_detector_threshold = MagicMock(name="det_thresh")
+    fake_eiger.set_cam_pvs = MagicMock(name="cam_pvs")
+    fake_eiger.set_odin_number_of_frame_chunks = MagicMock(name="frame_chunks")
+    fake_eiger.set_odin_pvs = MagicMock(name="odin_pvs")
+    fake_eiger.set_mx_settings_pvs = MagicMock(name="mx_settings")
+    fake_eiger.set_num_triggers_and_captures = MagicMock(name="trigs_n_capts")
+    fake_eiger._wait_for_odin_status = MagicMock(name="wait_for_odin")
+    fake_eiger.cam.acquire.set = MagicMock(name="set_acq")
+    fake_eiger._wait_fan_ready = MagicMock(name="fan_ready")
+    fake_eiger._finish_arm = MagicMock(name="finish_arm")
 
     fake_eiger.do_arming_chain()
 
@@ -665,8 +667,11 @@ def test_unwrapped_arm_chain_functions_are_not_called_outside_util(
         fake_eiger.cam.acquire.set,
         fake_eiger._wait_fan_ready,
         fake_eiger._finish_arm,
+        await_value,
     ]
 
     for f in funcs:
         f.assert_not_called()
-        f in call_func.mock_calls or partial_in_calls(f, call_func.mock_calls)
+        assert call(f) in call_func.mock_calls or partial_in_calls(
+            f, call_func.mock_calls
+        )
