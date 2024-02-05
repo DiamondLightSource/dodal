@@ -58,7 +58,7 @@ class SlitMotor(Device, Movable, Readable):
     def read(self):
         await_value(self.done_moving, MoveState.Stationary).wait()
 
-        return self.readback_value.get()
+        return self.readback_value.read()
 
     def describe(self) -> OrderedDict:
         od = OrderedDict()
