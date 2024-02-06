@@ -14,11 +14,6 @@ from ophyd.log import logger as ophyd_logger
 LOGGER = logging.getLogger("Dodal")
 LOGGER.setLevel("DEBUG")
 
-ophyd_logger.setLevel("DEBUG")
-ophyd_logger.parent = LOGGER
-bluesky_logger.setLevel("DEBUG")
-bluesky_logger.parent = LOGGER
-
 DEFAULT_FORMATTER = logging.Formatter(
     "[%(asctime)s] %(name)s %(module)s %(levelname)s: %(message)s"
 )
@@ -105,8 +100,8 @@ def set_up_all_logging_handlers(
     logger: Logger,
     logging_path: Path,
     filename: str,
-    dev_mode: bool = False,
-    error_log_buffer_lines=ERROR_LOG_BUFFER_LINES,
+    dev_mode: bool,
+    error_log_buffer_lines,
 ) -> DodalLogHandlers:
     """Set up the default logging environment.
     Args:
@@ -133,6 +128,21 @@ def set_up_all_logging_handlers(
     }
 
     return handlers
+
+
+def integrate_bluesky_and_ophyd_logging(handlers: DodalLogHandlers):
+    for logger in [ophyd_logger, bluesky_logger]:
+        logger.setLevel("DEBUG")
+        logger.addHandler(handlers["info_file_handler"])
+        logger.addHandler(handlers["debug_memory_handler"])
+        logger.addHandler(handlers["graylog_handler"])
+
+
+def do_default_logging_setup(dev_mode=False):
+    handlers = set_up_all_logging_handlers(
+        LOGGER, get_logging_file_path(), "dodal.log", dev_mode, ERROR_LOG_BUFFER_LINES
+    )
+    integrate_bluesky_and_ophyd_logging(handlers)
 
 
 def get_logging_file_path() -> Path:
