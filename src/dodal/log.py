@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from logging import Logger
+from logging import Logger, StreamHandler
 from logging.handlers import MemoryHandler, TimedRotatingFileHandler
 from os import environ
 from pathlib import Path
@@ -12,12 +12,13 @@ from graypy import GELFTCPHandler
 from ophyd.log import logger as ophyd_logger
 
 LOGGER = logging.getLogger("Dodal")
-LOGGER.setLevel("DEBUG")
+LOGGER.setLevel(logging.DEBUG)
 
 DEFAULT_FORMATTER = logging.Formatter(
     "[%(asctime)s] %(name)s %(module)s %(levelname)s: %(message)s"
 )
 ERROR_LOG_BUFFER_LINES = 200000
+INFO_LOG_DAYS = 30
 
 
 class BeamlineFilter(logging.Filter):
@@ -31,16 +32,22 @@ class BeamlineFilter(logging.Filter):
 beamline_filter = BeamlineFilter()
 
 
-class DodalLogHandlers(TypedDict):
-    stream_handler: logging.Handler
-    graylog_handler: logging.Handler
-    info_file_handler: logging.Handler
-    debug_memory_handler: logging.Handler
+def clear_all_loggers_and_handlers():
+    for handler in LOGGER.handlers:
+        handler.close()
+    LOGGER.handlers.clear()
 
 
 def set_beamline(beamline_name: str):
     """Set the beamline on all subsequent log messages."""
     beamline_filter.beamline = beamline_name
+
+
+class DodalLogHandlers(TypedDict):
+    stream_handler: StreamHandler
+    graylog_handler: GELFTCPHandler
+    info_file_handler: TimedRotatingFileHandler
+    debug_memory_handler: MemoryHandler
 
 
 def _add_handler(logger: logging.Logger, handler: logging.Handler):
@@ -55,6 +62,7 @@ def set_up_graylog_handler(logger: Logger, host: str, port: int):
     for prod and dev respectively.
     """
     graylog_handler = GELFTCPHandler(host, port)
+    graylog_handler.setLevel(logging.INFO)
     _add_handler(logger, graylog_handler)
     return graylog_handler
 
@@ -65,8 +73,9 @@ def set_up_INFO_file_handler(logger, path: Path, filename: str):
     print(f"Logging to {path/filename}")
     path.mkdir(parents=True, exist_ok=True)
     file_handler = TimedRotatingFileHandler(
-        filename=path / filename, when="MIDNIGHT", backupCount=30
+        filename=path / filename, when="MIDNIGHT", backupCount=INFO_LOG_DAYS
     )
+    file_handler.setLevel(logging.INFO)
     _add_handler(logger, file_handler)
     return file_handler
 
@@ -81,17 +90,19 @@ def set_up_DEBUG_memory_handler(
     debug_path = path / "debug"
     debug_path.mkdir(parents=True, exist_ok=True)
     file_handler = TimedRotatingFileHandler(filename=debug_path / filename, when="H")
+    file_handler.setLevel(logging.DEBUG)
     memory_handler = MemoryHandler(
         capacity=capacity, flushLevel=logging.ERROR, target=file_handler
     )
+    memory_handler.setLevel(logging.DEBUG)
     memory_handler.addFilter(beamline_filter)
     _add_handler(logger, memory_handler)
     return memory_handler
 
 
 def set_up_stream_handler(logger: Logger):
-    stream_handler = logging.StreamHandler()
-    stream_handler.setLevel("DEBUG")
+    stream_handler = StreamHandler()
+    stream_handler.setLevel(logging.DEBUG)
     _add_handler(logger, stream_handler)
     return stream_handler
 
@@ -101,7 +112,7 @@ def set_up_all_logging_handlers(
     logging_path: Path,
     filename: str,
     dev_mode: bool,
-    error_log_buffer_lines,
+    error_log_buffer_lines: int,
 ) -> DodalLogHandlers:
     """Set up the default logging environment.
     Args:
@@ -130,9 +141,12 @@ def set_up_all_logging_handlers(
     return handlers
 
 
-def integrate_bluesky_and_ophyd_logging(handlers: DodalLogHandlers):
+def integrate_bluesky_and_ophyd_logging(
+    parent_logger: logging.Logger, handlers: DodalLogHandlers
+):
     for logger in [ophyd_logger, bluesky_logger]:
-        logger.setLevel("DEBUG")
+        logger.parent = parent_logger
+        logger.setLevel(logging.DEBUG)
         logger.addHandler(handlers["info_file_handler"])
         logger.addHandler(handlers["debug_memory_handler"])
         logger.addHandler(handlers["graylog_handler"])
@@ -142,7 +156,7 @@ def do_default_logging_setup(dev_mode=False):
     handlers = set_up_all_logging_handlers(
         LOGGER, get_logging_file_path(), "dodal.log", dev_mode, ERROR_LOG_BUFFER_LINES
     )
-    integrate_bluesky_and_ophyd_logging(handlers)
+    integrate_bluesky_and_ophyd_logging(LOGGER, handlers)
 
 
 def get_logging_file_path() -> Path:

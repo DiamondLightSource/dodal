@@ -1,3 +1,4 @@
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -5,7 +6,7 @@ from ophyd.sim import make_fake_device
 from ophyd.status import Status
 
 from dodal.devices.util.epics_util import SetWhenEnabled, run_functions_without_blocking
-from dodal.log import LOGGER, GELFTCPHandler, logging, set_up_logging_handlers
+from dodal.log import LOGGER, GELFTCPHandler, logging, set_up_all_logging_handlers
 
 
 class StatusException(Exception):
@@ -26,7 +27,7 @@ def reset_logs():
     mock_graylog_handler_class = MagicMock(spec=GELFTCPHandler)
     mock_graylog_handler_class.return_value.level = logging.DEBUG
     with patch("dodal.log.GELFTCPHandler", mock_graylog_handler_class):
-        set_up_logging_handlers(None, False)
+        set_up_all_logging_handlers(LOGGER, Path("./tmp/dev"), "dodal.log", True, 10000)
 
 
 def get_bad_status():

@@ -1,6 +1,7 @@
 import logging
 import sys
 from os import environ, getenv
+from pathlib import Path
 from typing import cast
 from unittest.mock import MagicMock, patch
 
@@ -10,7 +11,7 @@ from ophyd.sim import make_fake_device
 
 from dodal.beamlines import beamline_utils, i03
 from dodal.devices.focusing_mirror import VFMMirrorVoltages
-from dodal.log import LOGGER, GELFTCPHandler, set_up_logging_handlers
+from dodal.log import LOGGER, GELFTCPHandler, set_up_all_logging_handlers
 
 
 def pytest_runtest_setup(item):
@@ -20,7 +21,9 @@ def pytest_runtest_setup(item):
         mock_graylog_handler.return_value.level = logging.DEBUG
 
         with patch("dodal.log.GELFTCPHandler", mock_graylog_handler):
-            set_up_logging_handlers(None, False)
+            set_up_all_logging_handlers(
+                LOGGER, Path("./tmp/dev"), "dodal.log", True, 10000
+            )
 
 
 def pytest_runtest_teardown():
