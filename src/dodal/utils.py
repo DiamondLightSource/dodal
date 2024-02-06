@@ -178,9 +178,7 @@ def collect_factories(module: ModuleType) -> dict[str, AnyDeviceFactory]:
 
 
 def _is_device_skipped(func: AnyDeviceFactory) -> bool:
-    if not hasattr(func, "__skip__"):
-        return False
-    return func.__skip__  # type: ignore
+    return getattr(func, "__skip__", False)
 
 
 def is_v1_device_factory(func: Callable) -> bool:
@@ -233,7 +231,7 @@ def get_beamline_based_on_environment_variable() -> ModuleType:
     if (
         len(beamline) == 0
         or beamline[0] not in string.ascii_letters
-        or not all(c in valid_characters for c in beamline)
+        or any(c not in valid_characters for c in beamline)
     ):
         raise ValueError(
             "Invalid BEAMLINE variable - module name is not a permissible python module name, got '{}'".format(
@@ -263,10 +261,8 @@ def _find_next_run_number_from_files(file_names: List[str]) -> int:
             dodal.log.LOGGER.warning(
                 f"Identified nexus file {file_name} with unexpected format"
             )
-    if len(valid_numbers) != 0:
-        return max(valid_numbers) + 1
-    else:
-        return 1
+    return max(valid_numbers) + 1 if valid_numbers else 1
+    
 
 
 def get_run_number(directory: str) -> int:

@@ -109,8 +109,10 @@ class AperturePositions:
             self.SMALL,
             self.ROBOT_LOAD,
         ]
+        pos_list = list(pos)
         for obj in options:
-            if np.allclose(obj.location, pos, atol=self.TOLERANCE_MM):
+            local_position = list(obj.location)
+            if np.allclose(local_position, pos_list, atol=self.TOLERANCE_MM):
                 return obj
         return None
 
