@@ -6,7 +6,7 @@ from ophyd_async.core import StandardReadable
 from ophyd_async.epics.signal import epics_signal_r
 
 
-class IndexingReadable(StandardReadable):
+class SingleIndexWaveformReadable(StandardReadable):
     """Wraps a waveform PV that contains a list of strings into a device where only one
     of them is returned when read.
     """
@@ -52,6 +52,6 @@ class BartRobot(StandardReadable):
         name: str,
         prefix: str,
     ) -> None:
-        self.barcode = IndexingReadable(prefix + "BARCODE")
-        self.gonio_pin_sensor = epics_signal_r(bool, "PIN_MOUNTED")
+        self.barcode = SingleIndexWaveformReadable(prefix + "BARCODE")
+        self.gonio_pin_sensor = epics_signal_r(bool, prefix + "PIN_MOUNTED")
         super().__init__(name=name)
