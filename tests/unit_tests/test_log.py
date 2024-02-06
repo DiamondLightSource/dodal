@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from dodal import log
-from dodal.log import EnhancedRollingFileHandler, GELFTCPHandler
+from dodal.log import TRACE_NAME, EnhancedRollingFileHandler, GELFTCPHandler
 
 
 def get_mock_streamhandler(level=logging.INFO):
@@ -21,6 +21,23 @@ def mock_logger():
     with patch("dodal.log.LOGGER") as mock_LOGGER:
         yield mock_LOGGER
         log.beamline = None
+
+
+@patch("dodal.log.GELFTCPHandler.emit", autospec=True)
+@patch("dodal.log.EnhancedRollingFileHandler.emit", autospec=True)
+def test_trace_logging(file_emit: MagicMock, GELF_emit: MagicMock):
+    handlers = log.set_up_logging_handlers("DEBUG", False, logger=log.LOGGER)
+    msg = "Trace log message"
+    log.LOGGER.trace(msg)
+    assert msg != file_emit.call_args.args[1].msg
+    assert msg != file_emit.call_args.args[1].msg
+    [handler.close() for handler in handlers]
+    log.LOGGER.handlers.clear()
+
+    handlers = log.set_up_logging_handlers(TRACE_NAME, False, logger=log.LOGGER)
+    log.LOGGER.trace(msg)
+    assert msg == file_emit.call_args.args[1].msg
+    assert msg == file_emit.call_args.args[1].msg
 
 
 @patch("dodal.log.GELFTCPHandler", spec=GELFTCPHandler)
