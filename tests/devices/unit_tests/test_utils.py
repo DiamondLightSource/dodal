@@ -28,6 +28,7 @@ def reset_logs():
     mock_graylog_handler_class.return_value.level = logging.DEBUG
     with patch("dodal.log.GELFTCPHandler", mock_graylog_handler_class):
         set_up_all_logging_handlers(LOGGER, Path("./tmp/dev"), "dodal.log", True, 10000)
+    return mock_graylog_handler_class
 
 
 def get_bad_status():
@@ -78,7 +79,7 @@ def test_wrap_function_callback():
 
 
 def test_wrap_function_callback_errors_on_wrong_return_type():
-    reset_logs()
+    mock_gelf_handler = reset_logs().return_value
     dummy_func = MagicMock(return_value=3)
     returned_status = Status(done=True, success=True)
     returned_status = run_functions_without_blocking(
@@ -89,15 +90,13 @@ def test_wrap_function_callback_errors_on_wrong_return_type():
     assert returned_status.success is False
 
     dummy_func.assert_called_once()
-
     log_messages = "".join(
-        [call.args[0].message for call in LOGGER.handlers[1].handle.call_args_list]
+        [call.args[0].message for call in mock_gelf_handler.handle.call_args_list]
     )
     LOGGER.handlers = []
 
-    # assert "wrap_func attempted to wrap" in log_messages
-    # assert " when it does not return a Status" in log_messages
-    assert "An error was raised on a background thread" in log_messages
+    assert "wrap_func attempted to wrap" in log_messages
+    assert " when it does not return a Status" in log_messages
 
 
 def test_status_points_to_provided_device_object():
