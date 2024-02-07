@@ -100,7 +100,7 @@ def test_aperture_scatterguard_rejects_unknown_position(
         pos = list(aperture_positions.MEDIUM.location)
         # change 1 dimension more than tolerance
         pos[i] += 0.01
-        position_to_reject:ApertureFiveDimensionalLocation = tuple(pos)
+        position_to_reject: ApertureFiveDimensionalLocation = tuple(pos)
 
         with pytest.raises(InvalidApertureMove):
             aperture_in_medium_pos.set(position_to_reject)

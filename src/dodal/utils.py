@@ -262,7 +262,6 @@ def _find_next_run_number_from_files(file_names: List[str]) -> int:
                 f"Identified nexus file {file_name} with unexpected format"
             )
     return max(valid_numbers) + 1 if valid_numbers else 1
-    
 
 
 def get_run_number(directory: str) -> int:
