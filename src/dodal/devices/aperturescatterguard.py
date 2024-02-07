@@ -32,7 +32,7 @@ ApertureFiveDimensionalLocation = namedtuple(
 @dataclass
 class SingleAperturePosition:
     name: str
-    radius_microns: int | None
+    radius_microns: Optional[int]
     location: ApertureFiveDimensionalLocation
 
 
