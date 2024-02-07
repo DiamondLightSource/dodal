@@ -189,13 +189,12 @@ class ApertureScatterguard(InfoLoggingDevice):
                 scatterguard_x
             ) & self.scatterguard.y.set(scatterguard_y)
             sg_status.wait()
-            final_status: AndStatus = (
+            return (
                 sg_status
                 & self.aperture.x.set(aperture_x)
                 & self.aperture.y.set(aperture_y)
                 & self.aperture.z.set(aperture_z)
             )
-            return final_status
 
         # CASE does not move along Z
         ap_status: AndStatus = (
