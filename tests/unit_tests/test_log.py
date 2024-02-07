@@ -107,7 +107,6 @@ def test_messages_logged_from_dodal_get_sent_to_graylog_and_file(
     assert LOGGER.handlers == []
     mock_graylog_handler_class = MagicMock(spec=GELFTCPHandler)
     mock_graylog_handler_class.return_value.level = logging.DEBUG
-    handlers = [None, None, None]
     with patch("dodal.log.GELFTCPHandler", mock_graylog_handler_class):
         handlers = set_up_all_logging_handlers(
             LOGGER, Path("tmp/dev"), "dodal.log", False, 10000
