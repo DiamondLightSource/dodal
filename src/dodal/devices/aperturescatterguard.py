@@ -1,6 +1,6 @@
 from collections import namedtuple
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, Union
 
 import numpy as np
 from ophyd import Component as Cpt
@@ -146,7 +146,7 @@ class ApertureScatterguard(InfoLoggingDevice):
 
     def _safe_move_within_datacollection_range(
         self, pos: ApertureFiveDimensionalLocation
-    ) -> AndStatus | Status:
+    ) -> Union[AndStatus, Status]:
         """
         Move the aperture and scatterguard combo safely to a new position.
         See https://github.com/DiamondLightSource/hyperion/wiki/Aperture-Scatterguard-Collisions
