@@ -131,9 +131,7 @@ class ApertureScatterguard(InfoLoggingDevice):
     def set(self, pos: ApertureFiveDimensionalLocation) -> AndStatus:
         new_selected_aperture: SingleAperturePosition | None = None
         try:
-            # make sure that the reference values are loaded
             assert isinstance(self.aperture_positions, AperturePositions)
-            # get the new aperture obrect
             new_selected_aperture = self.aperture_positions.get_new_position(pos)
             assert new_selected_aperture is not None
         except AssertionError as e:
