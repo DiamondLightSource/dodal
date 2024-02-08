@@ -4,6 +4,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from ophyd.sim import make_fake_device
 from ophyd.status import Status
+from ophyd.utils.errors import StatusTimeoutError
 
 from dodal.devices.util.epics_util import SetWhenEnabled, run_functions_without_blocking
 from dodal.log import LOGGER, GELFTCPHandler, logging, set_up_all_logging_handlers
@@ -78,25 +79,20 @@ def test_wrap_function_callback():
     dummy_func.assert_called_once()
 
 
-def test_wrap_function_callback_errors_on_wrong_return_type():
-    mock_gelf_handler = reset_logs().return_value
+def test_wrap_function_callback_errors_on_wrong_return_type(caplog):
     dummy_func = MagicMock(return_value=3)
     returned_status = Status(done=True, success=True)
     returned_status = run_functions_without_blocking(
         [lambda: get_good_status(), dummy_func], timeout=0.05
     )
-    discard_status(returned_status)
+    with pytest.raises(StatusTimeoutError):
+        returned_status.wait(0.2)
     assert returned_status.done is True
     assert returned_status.success is False
 
     dummy_func.assert_called_once()
-    log_messages = "".join(
-        [call.args[0].message for call in mock_gelf_handler.handle.call_args_list]
-    )
-    LOGGER.handlers = []
 
-    assert "wrap_func attempted to wrap" in log_messages
-    assert " when it does not return a Status" in log_messages
+    assert "does not return a Status" in caplog.text
 
 
 def test_status_points_to_provided_device_object():
