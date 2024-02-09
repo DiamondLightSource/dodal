@@ -12,6 +12,7 @@ from bluesky.protocols import Descriptor, Triggerable
 from numpy.typing import NDArray
 from ophyd_async.core import StandardReadable
 from ophyd_async.core.async_status import AsyncStatus
+from workflows.transport.common_transport import CommonTransport
 
 from dodal.devices.ophyd_async_utils import create_soft_signal_r
 from dodal.devices.zocalo.zocalo_interaction import _get_zocalo_connection
@@ -77,7 +78,7 @@ class ZocaloResults(StandardReadable, Triggerable):
         self.timeout_s = timeout_s
         self._prefix = prefix
         self._raw_results_received: Queue = Queue()
-        self.subscription: Optional[int] = None
+        self.transport: Optional[CommonTransport] = None
 
         self.results = create_soft_signal_r(list[XrcResult], "results", self.name)
         self.centres_of_mass = create_soft_signal_r(
@@ -126,11 +127,10 @@ class ZocaloResults(StandardReadable, Triggerable):
 
     @AsyncStatus.wrap
     async def unstage(self):
-        transport = _get_zocalo_connection(self.zocalo_environment)
-        if self.subscription:
-            LOGGER.info("Disconnecting from Zocalo")
-            transport.disconnect()
-            self.subscription = None
+        LOGGER.info("Disconnecting from Zocalo")
+        if self.transport:
+            self.transport.disconnect()
+        self.transport = None
 
     @AsyncStatus.wrap
     async def trigger(self):
@@ -141,7 +141,7 @@ class ZocaloResults(StandardReadable, Triggerable):
             "unstaged at the end of the experiment to avoid consuming results not "
             "meant for it"
         )
-        if not self.subscription:
+        if not self.transport:
             LOGGER.warning(
                 msg  # AsyncStatus exception messages are poorly propagated, remove after https://github.com/bluesky/ophyd-async/issues/103
             )
@@ -214,7 +214,7 @@ class ZocaloResults(StandardReadable, Triggerable):
         )
 
     def _subscribe_to_results(self):
-        transport = _get_zocalo_connection(self.zocalo_environment)
+        self.transport = _get_zocalo_connection(self.zocalo_environment)
 
         def _receive_result(
             rw: workflows.recipe.RecipeWrapper, header: dict, message: dict
@@ -222,21 +222,23 @@ class ZocaloResults(StandardReadable, Triggerable):
             LOGGER.info(f"Received {message}")
             recipe_parameters = rw.recipe_step["parameters"]  # type: ignore # this rw is initialised with a message so recipe step is not None
             LOGGER.info(f"Recipe step parameters: {recipe_parameters}")
-            transport.ack(header)
+            self.transport.ack(header)  # type: ignore # we create transport here
 
             results = message.get("results", [])
             self._raw_results_received.put(
                 {"results": results, "ispyb_ids": recipe_parameters}
             )
 
-        self.subscription = workflows.recipe.wrap_subscribe(
-            transport,
+        subscription = workflows.recipe.wrap_subscribe(
+            self.transport,
             self.channel,
             _receive_result,
             acknowledgement=True,
             allow_non_recipe_messages=False,
         )
-        LOGGER.info(f"Made zocalo queue subscription: {self.subscription}.")
+        LOGGER.info(
+            f"Made zocalo queue subscription: {subscription} - stored transport connection {self.transport}."
+        )
 
 
 def get_processing_result(
