@@ -280,6 +280,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/pin_ophyd_async/"
   },
   {
+    "version": "rebased_directory_provider",
+    "url": "https://DiamondLightSource.github.io/dodal/rebased_directory_provider/"
+  },
+  {
     "version": "release-004-retroactive",
     "url": "https://DiamondLightSource.github.io/dodal/release-004-retroactive/"
   },
