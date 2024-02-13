@@ -196,10 +196,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/async-ad-sim/"
   },
   {
-    "version": "beamline-creation-readme",
-    "url": "https://DiamondLightSource.github.io/dodal/beamline-creation-readme/"
-  },
-  {
     "version": "directory_provider",
     "url": "https://DiamondLightSource.github.io/dodal/directory_provider/"
   },
@@ -286,6 +282,10 @@
   {
     "version": "rebased_directory_provider",
     "url": "https://DiamondLightSource.github.io/dodal/rebased_directory_provider/"
+  },
+  {
+    "version": "rebased_i22",
+    "url": "https://DiamondLightSource.github.io/dodal/rebased_i22/"
   },
   {
     "version": "release-004-retroactive",
