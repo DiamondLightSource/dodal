@@ -8,7 +8,6 @@ The Purpose of Dodal
 
 If you have some code that you think would be useful to be added please do so!
 
-
 Using Devices
 -------------
 
