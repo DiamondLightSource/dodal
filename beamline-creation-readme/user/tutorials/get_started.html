@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Getting Started &#8212; dodal 1.14.2.dev9+g995c8bf2 documentation</title>
+    <title>Getting Started &#8212; dodal 1.14.2.dev10+g2d7ef7d2 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../_static/documentation_options.js?v=01138b43"></script>
+    <script src="../../_static/documentation_options.js?v=2a4dbddd"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -414,6 +414,7 @@ document.write(`
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">How-to Guides</span></p>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../how-to/run-container.html">Run in a container</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../how-to/create-beamline.html">Creating a new beamline</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Explanations</span></p>
 <ul class="nav bd-sidenav">
@@ -486,69 +487,6 @@ document.write(`
 <h2>The Purpose of Dodal<a class="headerlink" href="#the-purpose-of-dodal" title="Link to this heading">#</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">dodal</span></code> provides set of <a class="reference external" href="https://nsls-ii.github.io/ophyd/">ophyd</a> devices and <a class="reference external" href="https://blueskyproject.io/bluesky/">bluesky</a> plans that are commonly useful across many beamlines at DLS.</p>
 <p>If you have some code that you think would be useful to be added please do so!</p>
-</section>
-<section id="creating-a-new-beamline">
-<h2>Creating a new beamline<a class="headerlink" href="#creating-a-new-beamline" title="Link to this heading">#</a></h2>
-<p>A beamline is a collection of devices that can be used together to run experiments, they may be read-only or capable of being set.
-They include motors in the experiment hutch, optical components in the optics hutch, the synchrotron “machine” and more.</p>
-<p>The following example creates a fictitious beamline <code class="docutils literal notranslate"><span class="pre">w41</span></code>, with a simulated twin <code class="docutils literal notranslate"><span class="pre">s41</span></code>.
-<code class="docutils literal notranslate"><span class="pre">w41</span></code> needs to monitor the status of the Synchrotron and has a AdAravisDetector.
-<code class="docutils literal notranslate"><span class="pre">s41</span></code> has a simulated clone of the AdAravisDetector, but not of the Synchrotron machine.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dodal.beamlines.beamline_utils</span> <span class="kn">import</span> <span class="n">device_instantiation</span>
-<span class="kn">from</span> <span class="nn">dodal.beamlines.beamline_utils</span> <span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_utils_beamline</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.areadetector.adaravis</span> <span class="kn">import</span> <span class="n">AdAravisDetector</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.synchrotron</span> <span class="kn">import</span> <span class="n">Synchrotron</span>
-<span class="kn">from</span> <span class="nn">dodal.log</span> <span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_log_beamline</span>
-<span class="kn">from</span> <span class="nn">dodal.utils</span> <span class="kn">import</span> <span class="n">get_beamline_name</span><span class="p">,</span> <span class="n">skip_device</span>
-
-<span class="n">BL</span> <span class="o">=</span> <span class="n">get_beamline_name</span><span class="p">(</span><span class="s2">&quot;s41&quot;</span><span class="p">)</span>  <span class="c1"># Default used when not on a live beamline</span>
-<span class="n">set_log_beamline</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>  <span class="c1"># Configure logging and util functions</span>
-<span class="n">set_utils_beamline</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>
-
-
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Define device factory functions below this point.</span>
-<span class="sd">A device factory function is any function that has a return type which conforms</span>
-<span class="sd">to one or more Bluesky Protocols.</span>
-<span class="sd">&quot;&quot;&quot;</span>
-
-
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">A valid factory function which is:</span>
-<span class="sd">- instantiated only on the live beamline</span>
-<span class="sd">- a maximum of once</span>
-<span class="sd">- can optionally be faked with ophyd simulated axes</span>
-<span class="sd">- can optionally be connected concurrently by not waiting for connect to complete</span>
-<span class="sd">- if constructor took a prefix, could optionally exclude the BLIXX prefix</span>
-<span class="sd">&quot;&quot;&quot;</span><span class="s2">&quot;</span>
-<span class="nd">@skip_device</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">BL</span> <span class="o">==</span> <span class="s2">&quot;s41&quot;</span><span class="p">)</span>  <span class="c1"># Conditionally do not instantiate this device</span>
-<span class="k">def</span> <span class="nf">synchrotron</span><span class="p">(</span>
-    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Synchrotron</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calls the Synchrotron class&#39;s constructor with name=&quot;synchrotron&quot;, prefix=&quot;&quot;</span>
-<span class="sd">    If this is called when already instantiated, it will return the existing object.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
-        <span class="n">Synchrotron</span><span class="p">,</span>
-        <span class="s2">&quot;synchrotron&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="n">wait_for_connection</span><span class="p">,</span>
-        <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
-        <span class="n">bl_prefix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="p">)</span>
-
-<span class="k">def</span> <span class="nf">d11</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;D11&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AdAravisDetector</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Also a valid Device factory function, but as multiple calls would instantiate</span>
-<span class="sd">    multiple copies of a device, discouraged.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">AdAravisDetector</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BL</span><span class="si">}</span><span class="s2">-DI-DCAM-01:&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p><code class="docutils literal notranslate"><span class="pre">w41</span></code> should also be added to the list of <code class="docutils literal notranslate"><span class="pre">ALL_BEAMLINES</span></code> in <code class="docutils literal notranslate"><span class="pre">tests/beamlines/test_device_instantiation</span></code>.
-This test checks that the function returns a type that conforms to Bluesky protocols,
-that it always returns the same instance of the device and that the arguments passed
-into the Device class constructor are valid.</p>
 </section>
 <section id="using-devices">
 <h2>Using Devices<a class="headerlink" href="#using-devices" title="Link to this heading">#</a></h2>
@@ -631,7 +569,6 @@ and pushed to a local graylog instance.</p>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-purpose-of-dodal">The Purpose of Dodal</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-a-new-beamline">Creating a new beamline</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-devices">Using Devices</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-logging">Adding Logging</a></li>
 </ul>
