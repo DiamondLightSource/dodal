@@ -1,10 +1,12 @@
 import inspect
+import tempfile
 from typing import Callable, Dict, Final, List, Optional, TypeVar, cast
 
 from bluesky.run_engine import call_in_bluesky_event_loop
 from ophyd import Device as OphydV1Device
 from ophyd.sim import make_fake_device
 from ophyd_async.core import Device as OphydV2Device
+from ophyd_async.core import DirectoryProvider, StaticDirectoryProvider
 from ophyd_async.core import wait_for_connection as v2_device_wait_for_connection
 
 from dodal.utils import AnyDevice, BeamlinePrefix, skip_device
@@ -13,6 +15,7 @@ DEFAULT_CONNECTION_TIMEOUT: Final[float] = 5.0
 
 ACTIVE_DEVICES: Dict[str, AnyDevice] = {}
 BL = ""
+DIRECTORY_PROVIDER: Optional[DirectoryProvider] = None
 
 
 def set_beamline(beamline: str):
@@ -115,3 +118,17 @@ def device_instantiation(
     if post_create:
         post_create(device_instance)
     return device_instance
+
+
+def set_directory_provider(provider: DirectoryProvider):
+    global DIRECTORY_PROVIDER
+
+    DIRECTORY_PROVIDER = provider
+
+
+def get_directory_provider() -> DirectoryProvider:
+    if DIRECTORY_PROVIDER is None:
+        set_directory_provider(
+            StaticDirectoryProvider(tempfile.NamedTemporaryFile().name, "")
+        )
+    return DIRECTORY_PROVIDER
