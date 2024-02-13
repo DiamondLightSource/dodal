@@ -248,10 +248,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/jungfrau_commissioning/"
   },
   {
-    "version": "linkam3",
-    "url": "https://DiamondLightSource.github.io/dodal/linkam3/"
-  },
-  {
     "version": "merge-dls-bluesky-core",
     "url": "https://DiamondLightSource.github.io/dodal/merge-dls-bluesky-core/"
   },
