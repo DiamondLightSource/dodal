@@ -1,21 +1,58 @@
+from dodal.beamlines.beamline_utils import device_instantiation
+from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.areadetector import AdAravisDetector
 from dodal.devices.p45 import Choppers, TomoStageWithStretchAndSkew
-from dodal.utils import BeamlinePrefix
+from dodal.log import set_beamline as set_log_beamline
+from dodal.utils import get_beamline_name
 
-PREFIX: str = BeamlinePrefix("p45").beamline_prefix
-
-
-def sample(name: str = "sample_stage") -> TomoStageWithStretchAndSkew:
-    return TomoStageWithStretchAndSkew(name=name, prefix=f"{PREFIX}-MO-STAGE-01:")
-
-
-def choppers(name: str = "chopper") -> Choppers:
-    return Choppers(name=name, prefix=f"{PREFIX}-MO-CHOP-01:")
+BL = get_beamline_name("p45")
+set_log_beamline(BL)
+set_utils_beamline(BL)
 
 
-def det(name: str = "det") -> AdAravisDetector:
-    return AdAravisDetector(name=name, prefix=f"{PREFIX}-EA-MAP-01:")
+def sample(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> TomoStageWithStretchAndSkew:
+    return device_instantiation(
+        TomoStageWithStretchAndSkew,
+        "sample_stage",
+        "-MO-STAGE-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
 
 
-def diff(name: str = "diff") -> AdAravisDetector:
-    return AdAravisDetector(name=name, prefix=f"{PREFIX}-EA-DIFF-01:")
+def choppers(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Choppers:
+    return device_instantiation(
+        Choppers,
+        "chopper",
+        "-MO-CHOP-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+def det(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> AdAravisDetector:
+    return device_instantiation(
+        AdAravisDetector,
+        "det",
+        "-EA-MAP-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+def diff(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> AdAravisDetector:
+    return device_instantiation(
+        AdAravisDetector,
+        "diff",
+        "-EA-DIFF-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
