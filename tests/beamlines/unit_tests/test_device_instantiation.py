@@ -8,19 +8,9 @@ import pytest
 from dodal.beamlines import beamline_utils
 from dodal.utils import BLUESKY_PROTOCOLS, make_all_devices
 
-ALL_BEAMLINES = {"i03", "i04", "i04_1", "i23", "i24", "p38", "p45"}
+from ...conftest import mock_beamline_module_filepaths
 
-mock_paths = [
-    ("DAQ_CONFIGURATION_PATH", "tests/devices/unit_tests/test_daq_configuration"),
-    ("ZOOM_PARAMS_FILE", "tests/devices/unit_tests/test_jCameraManZoomLevels.xml"),
-    ("DISPLAY_CONFIG", "tests/devices/unit_tests/test_display.configuration"),
-]
-mock_attributes_table = {
-    "i03": mock_paths,
-    "s03": mock_paths,
-    "i04": mock_paths,
-    "s04": mock_paths,
-}
+ALL_BEAMLINES = {"i03", "i04", "i04_1", "i23", "i24", "p38", "p45"}
 
 
 def follows_bluesky_protocols(obj: Any) -> bool:
@@ -29,8 +19,7 @@ def follows_bluesky_protocols(obj: Any) -> bool:
 
 def mock_bl(beamline):
     bl_mod = importlib.import_module("dodal.beamlines." + beamline)
-    if mock_attributes := mock_attributes_table.get(beamline):
-        [bl_mod.__setattr__(attr[0], attr[1]) for attr in mock_attributes]
+    mock_beamline_module_filepaths(beamline, bl_mod)
     return bl_mod
 
 
