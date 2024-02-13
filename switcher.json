@@ -268,10 +268,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/p38-h5/"
   },
   {
-    "version": "p38fix",
-    "url": "https://DiamondLightSource.github.io/dodal/p38fix/"
-  },
-  {
     "version": "pin_ophyd_async",
     "url": "https://DiamondLightSource.github.io/dodal/pin_ophyd_async/"
   },
