@@ -16,8 +16,8 @@ A beamline is a collection of devices that can be used together to run experimen
 They include motors in the experiment hutch, optical components in the optics hutch, the synchrotron "machine" and more.
 
 The following example creates a fictitious beamline `w41`, with a simulated twin `s41`. 
-`w41` wishes to monitor the status of the Synchrotron and has a AdAravisDetector
-`s41` has a simulated clone of the AdAravisDetector, but not of the Synchrotron machine
+`w41` needs to monitor the status of the Synchrotron and has a AdAravisDetector.
+`s41` has a simulated clone of the AdAravisDetector, but not of the Synchrotron machine.
 
 ```python
 from dodal.beamlines.beamline_utils import device_instantiation
@@ -63,11 +63,17 @@ def synchrotron(
         bl_prefix=False,
     )
 
-# Also a valid device factory function
+# Also a valid device factory function, but will not pass all tests!
 def d11(name: str = "D11") -> AdAravisDetector:
     return AdAravisDetector(name=name, prefix=f"{BL}-DI-DCAM-01:")
-
 ```
+
+`w41` should also be added to the list of 'ALL_BEAMLINES' in `tests/beamlines/test_device_instantiation`.
+This test checks that the function returns a type that conforms to Bluesky protocols, 
+that it always returns the same instance of the device and that the arguments passed 
+into the Device class constructor are valid.
+
+
 
 Using Devices
 -------------
