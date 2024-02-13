@@ -118,9 +118,9 @@ class PositionCompare(Device):
 
 
 class PulseOutput(Device):
-    inp = epics_signal_put_wait("_INP")
-    dly = epics_signal_put_wait("_DLY")
-    wid = epics_signal_put_wait("_WID")
+    input = epics_signal_put_wait("_INP")
+    delay = epics_signal_put_wait("_DLY")
+    width = epics_signal_put_wait("_WID")
 
 
 class ZebraOutputPanel(Device):
