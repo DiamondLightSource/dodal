@@ -1,3 +1,5 @@
+from typing import Union
+
 import numpy as np
 import pytest
 from bluesky import plan_stubs as bps
@@ -16,7 +18,7 @@ from dodal.devices.fast_grid_scan import (
 from dodal.devices.smargon import Smargon
 
 
-def discard_status(st: Status | DeviceStatus):
+def discard_status(st: Union[Status, DeviceStatus]):
     try:
         st.wait(0.01)
     except BaseException:
@@ -24,11 +26,12 @@ def discard_status(st: Status | DeviceStatus):
 
 
 @pytest.fixture
-def fast_grid_scan():
+def fast_grid_scan(request):
     FakeFastGridScan = make_fake_device(FastGridScan)
-    fast_grid_scan: FastGridScan = FakeFastGridScan(name="test fake FGS")
+    fast_grid_scan: FastGridScan = FakeFastGridScan(
+        name="test fake FGS: " + request.node.name
+    )
     fast_grid_scan.scan_invalid.pvname = ""
-
     yield fast_grid_scan
 
 
@@ -335,8 +338,13 @@ def test_given_various_x_y_z_when_get_motor_positions_then_expected_positions_re
 def test_can_run_fast_grid_scan_in_run_engine(fast_grid_scan):
     @bpp.run_decorator()
     def kickoff_and_complete(device):
-        yield from bps.kickoff(device)
-        yield from bps.complete(device)
+        yield from bps.kickoff(device, group="kickoff")
+        device.status.sim_put(1)
+        yield from bps.wait("kickoff")
+        yield from bps.complete(device, group="complete")
+        device.position_counter.sim_put(device.expected_images)
+        device.status.sim_put(0)
+        yield from bps.wait("complete")
 
     RE = RunEngine()
     RE(kickoff_and_complete(fast_grid_scan))
