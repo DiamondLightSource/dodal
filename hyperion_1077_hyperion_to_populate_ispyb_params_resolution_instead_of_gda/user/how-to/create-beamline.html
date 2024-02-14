@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>About the documentation &#8212; dodal 1.14.2.dev23+gbd97a57b documentation</title>
+    <title>Creating a new beamline &#8212; dodal 1.14.2.dev23+gbd97a57b documentation</title>
   
   
   
@@ -44,7 +44,7 @@
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=30646c52"></script>
     <script src="../../_static/design-tabs.js?v=36754332"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'user/explanations/docs-structure';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'user/how-to/create-beamline';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.2';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://DiamondLightSource.github.io/dodal/switcher.json';
@@ -54,8 +54,8 @@
     <link rel="icon" href="../../_static/dls-favicon.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="API" href="../reference/api.html" />
-    <link rel="prev" title="Creating a new beamline" href="../how-to/create-beamline.html" />
+    <link rel="next" title="About the documentation" href="../explanations/docs-structure.html" />
+    <link rel="prev" title="Run in a container" href="run-container.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -412,13 +412,13 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/get_started.html">Getting Started</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">How-to Guides</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../how-to/run-container.html">Run in a container</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../how-to/create-beamline.html">Creating a new beamline</a></li>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="run-container.html">Run in a container</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Creating a new beamline</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Explanations</span></p>
-<ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">About the documentation</a></li>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../explanations/docs-structure.html">About the documentation</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul class="nav bd-sidenav">
@@ -464,7 +464,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="../index.html" class="nav-link">User Guide</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">About the...</li>
+    <li class="breadcrumb-item active" aria-current="page">Creating a...</li>
   </ul>
 </nav>
 </div>
@@ -481,20 +481,68 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="about-the-documentation">
-<h1>About the documentation<a class="headerlink" href="#about-the-documentation" title="Link to this heading">#</a></h1>
-<blockquote>
-<div><p><svg version="4.0.0.63c5cb3" width="2.0em" height="2.0em" class="sd-material-icon sd-material-icon-format_quote" viewBox="0 0 24 24" aria-hidden="true"><path d="M0 0h24v24H0z" fill="none"></path><path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"></path></svg></p>
-<p>The Grand Unified Theory of Documentation</p>
-<p class="attribution">—David Laing</p>
-</div></blockquote>
-<p>There is a secret that needs to be understood in order to write good software
-documentation: there isn’t one thing called <em>documentation</em>, there are four.</p>
-<p>They are: <em>tutorials</em>, <em>how-to guides</em>, <em>technical reference</em> and <em>explanation</em>.
-They represent four different purposes or functions, and require four different
-approaches to their creation. Understanding the implications of this will help
-improve most documentation - often immensely.</p>
-<p><a class="reference external" href="https://documentation.divio.com">More information on this topic.</a></p>
+  <section id="creating-a-new-beamline">
+<h1>Creating a new beamline<a class="headerlink" href="#creating-a-new-beamline" title="Link to this heading">#</a></h1>
+<p>A beamline is a collection of devices that can be used together to run experiments, they may be read-only or capable of being set.
+They include motors in the experiment hutch, optical components in the optics hutch, the synchrotron “machine” and more.</p>
+<p>The following example creates a fictitious beamline <code class="docutils literal notranslate"><span class="pre">w41</span></code>, with a simulated twin <code class="docutils literal notranslate"><span class="pre">s41</span></code>.
+<code class="docutils literal notranslate"><span class="pre">w41</span></code> needs to monitor the status of the Synchrotron and has an AdAravisDetector.
+<code class="docutils literal notranslate"><span class="pre">s41</span></code> has a simulated clone of the AdAravisDetector, but not of the Synchrotron machine.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dodal.beamlines.beamline_utils</span> <span class="kn">import</span> <span class="n">device_instantiation</span>
+<span class="kn">from</span> <span class="nn">dodal.beamlines.beamline_utils</span> <span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_utils_beamline</span>
+<span class="kn">from</span> <span class="nn">dodal.devices.areadetector.adaravis</span> <span class="kn">import</span> <span class="n">AdAravisDetector</span>
+<span class="kn">from</span> <span class="nn">dodal.devices.synchrotron</span> <span class="kn">import</span> <span class="n">Synchrotron</span>
+<span class="kn">from</span> <span class="nn">dodal.log</span> <span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_log_beamline</span>
+<span class="kn">from</span> <span class="nn">dodal.utils</span> <span class="kn">import</span> <span class="n">get_beamline_name</span><span class="p">,</span> <span class="n">skip_device</span>
+
+<span class="n">BL</span> <span class="o">=</span> <span class="n">get_beamline_name</span><span class="p">(</span><span class="s2">&quot;s41&quot;</span><span class="p">)</span>  <span class="c1"># Default used when not on a live beamline</span>
+<span class="n">set_log_beamline</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>  <span class="c1"># Configure logging and util functions</span>
+<span class="n">set_utils_beamline</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Define device factory functions below this point.</span>
+<span class="sd">A device factory function is any function that has a return type which conforms</span>
+<span class="sd">to one or more Bluesky Protocols.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">A valid factory function which is:</span>
+<span class="sd">- instantiated only on the live beamline</span>
+<span class="sd">- a maximum of once</span>
+<span class="sd">- can optionally be faked with ophyd simulated axes</span>
+<span class="sd">- can optionally be connected concurrently by not waiting for connect to complete</span>
+<span class="sd">- if constructor took a prefix, could optionally exclude the BLIXX prefix</span>
+<span class="sd">&quot;&quot;&quot;</span><span class="s2">&quot;</span>
+<span class="nd">@skip_device</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">BL</span> <span class="o">==</span> <span class="s2">&quot;s41&quot;</span><span class="p">)</span>  <span class="c1"># Conditionally do not instantiate this device</span>
+<span class="k">def</span> <span class="nf">synchrotron</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Synchrotron</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calls the Synchrotron class&#39;s constructor with name=&quot;synchrotron&quot;, prefix=&quot;&quot;</span>
+<span class="sd">    If this is called when already instantiated, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">Synchrotron</span><span class="p">,</span>
+        <span class="s2">&quot;synchrotron&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+        <span class="n">bl_prefix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">d11</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;D11&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AdAravisDetector</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Also a valid Device factory function, but as multiple calls would instantiate</span>
+<span class="sd">    multiple copies of a device, discouraged.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">AdAravisDetector</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BL</span><span class="si">}</span><span class="s2">-DI-DCAM-01:&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">w41</span></code> should also be added to the list of <code class="docutils literal notranslate"><span class="pre">ALL_BEAMLINES</span></code> in <code class="docutils literal notranslate"><span class="pre">tests/beamlines/test_device_instantiation</span></code>.
+This test checks that the function returns a type that conforms to Bluesky protocols,
+that it always returns the same instance of the device and that the arguments passed
+into the Device class constructor are valid.</p>
 </section>
 
 
@@ -508,20 +556,20 @@ improve most documentation - often immensely.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../how-to/create-beamline.html"
+       href="run-container.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Creating a new beamline</p>
+        <p class="prev-next-title">Run in a container</p>
       </div>
     </a>
     <a class="right-next"
-       href="../reference/api.html"
+       href="../explanations/docs-structure.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">API</p>
+        <p class="prev-next-title">About the documentation</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -539,7 +587,7 @@ improve most documentation - often immensely.</p>
 
   
   <div class="tocsection editthispage">
-    <a href="https://github.com/DiamondLightSource/dodal/edit/hyperion_1077_hyperion_to_populate_ispyb_params_resolution_instead_of_gda/docs/user/explanations/docs-structure.rst">
+    <a href="https://github.com/DiamondLightSource/dodal/edit/hyperion_1077_hyperion_to_populate_ispyb_params_resolution_instead_of_gda/docs/user/how-to/create-beamline.rst">
       <i class="fa-solid fa-pencil"></i>
       
       
@@ -554,7 +602,7 @@ improve most documentation - often immensely.</p>
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../../_sources/user/explanations/docs-structure.rst.txt">
+    <a href="../../_sources/user/how-to/create-beamline.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>
