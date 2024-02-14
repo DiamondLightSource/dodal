@@ -1,11 +1,15 @@
-import sys
+import os
 from unittest.mock import patch
 
 from dodal.devices.i24.i24_vgonio import VGonio
 
-with patch.dict("os.environ", {"BEAMLINE": "i24"}, clear=True):
+with patch.dict(os.environ, {"BEAMLINE": "i24"}, clear=True):
     from dodal.beamlines import beamline_utils, i24
     from dodal.utils import make_all_devices
+
+
+def setup_module():
+    beamline_utils.set_beamline("i24")
 
 
 def test_device_creation():
@@ -23,7 +27,5 @@ def test_device_creation():
 
 
 def teardown_module():
-    beamline_utils.BL = "i03"
-    for module in list(sys.modules):
-        if module.endswith("beamline_utils"):
-            del sys.modules[module]
+    beamline_utils.set_beamline("i03")
+    beamline_utils.clear_devices()
