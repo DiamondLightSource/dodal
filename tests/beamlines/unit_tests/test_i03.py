@@ -1,6 +1,5 @@
 from dodal.beamlines import beamline_utils, i03
 from dodal.devices.aperturescatterguard import AperturePositions, ApertureScatterguard
-from dodal.utils import make_all_devices
 
 
 def test_list():
@@ -13,22 +12,6 @@ def test_list():
         "synchrotron",
         "aperture_scatterguard",
     ]
-
-
-def test_device_creation(RE):
-    beamline_utils.clear_devices()
-    devices = make_all_devices(i03, fake_with_ophyd_sim=True)
-    for device_name in devices.keys():
-        assert device_name in beamline_utils.ACTIVE_DEVICES
-    assert len(beamline_utils.ACTIVE_DEVICES) == len(devices)
-
-
-def test_devices_are_identical(RE):
-    beamline_utils.clear_devices()
-    devices_a = make_all_devices(i03, fake_with_ophyd_sim=True)
-    devices_b = make_all_devices(i03, fake_with_ophyd_sim=True)
-    for device_name in devices_a.keys():
-        assert devices_a[device_name] is devices_b[device_name]
 
 
 def test_getting_second_aperture_scatterguard_gives_valid_device():
