@@ -1,4 +1,4 @@
-from typing import Any, Tuple, cast
+from typing import Any, Optional, Tuple, cast
 
 from dodal.log import LOGGER
 from dodal.utils import get_beamline_name
@@ -87,11 +87,14 @@ class GDABeamlineParameters:
         return list_output
 
 
-def get_beamline_parameters():
-    beamline_name = get_beamline_name("s03")
-    beamline_param_path = BEAMLINE_PARAMETER_PATHS.get(beamline_name)
-    if beamline_param_path is None:
-        raise KeyError(
-            "No beamline parameter path found, maybe 'BEAMLINE' environment variable is not set!"
-        )
+def get_beamline_parameters(beamline_param_path: Optional[str] = None):
+    """Loads the beamline parameters from the specified path, or according to the
+    environment variable if none is given"""
+    if not beamline_param_path:
+        beamline_name = get_beamline_name("s03")
+        beamline_param_path = BEAMLINE_PARAMETER_PATHS.get(beamline_name)
+        if beamline_param_path is None:
+            raise KeyError(
+                "No beamline parameter path found, maybe 'BEAMLINE' environment variable is not set!"
+            )
     return GDABeamlineParameters.from_file(beamline_param_path)
