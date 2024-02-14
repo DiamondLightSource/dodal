@@ -33,6 +33,9 @@ AND3 = 34
 AND4 = 35
 OR1 = 36
 PULSE1 = 52
+PULSE2 = 53
+SOFT_IN1 = 60
+SOFT_IN2 = 61
 SOFT_IN3 = 62
 
 # Instrument specific
@@ -66,6 +69,11 @@ class ArmDemand(IntEnum):
     DISARM = 0
 
 
+class FastShutterAction(IntEnum):
+    OPEN = 1
+    CLOSE = 0
+
+
 class ArmingDevice(Device):
     """A useful device that can abstract some of the logic of arming.
     Allows a user to just call arm.set(ArmDemand.ARM)"""
@@ -90,12 +98,14 @@ class PositionCompare(Device):
     gate_input = epics_signal_put_wait("PC_GATE_INP")
     gate_width = epics_signal_put_wait("PC_GATE_WID")
     gate_start = epics_signal_put_wait("PC_GATE_START")
+    gate_step = epics_signal_put_wait("PC_GATE_STEP")
 
     pulse_source = epics_signal_put_wait("PC_PULSE_SEL")
     pulse_input = epics_signal_put_wait("PC_PULSE_INP")
     pulse_start = epics_signal_put_wait("PC_PULSE_START")
     pulse_width = epics_signal_put_wait("PC_PULSE_WID")
     pulse_step = epics_signal_put_wait("PC_PULSE_STEP")
+    pulse_max = epics_signal_put_wait("PC_PULSE_MAX")
 
     dir = Component(EpicsSignal, "PC_DIR")
     arm_source = epics_signal_put_wait("PC_ARM_SEL")
@@ -107,8 +117,15 @@ class PositionCompare(Device):
         return self.arm.armed.get() == 1
 
 
+class PulseOutput(Device):
+    input = epics_signal_put_wait("_INP")
+    delay = epics_signal_put_wait("_DLY")
+    width = epics_signal_put_wait("_WID")
+
+
 class ZebraOutputPanel(Device):
-    pulse_1_input = epics_signal_put_wait("PULSE1_INP")
+    pulse_1 = Component(PulseOutput, "PULSE1")
+    pulse_2 = Component(PulseOutput, "PULSE2")
 
     out_1 = epics_signal_put_wait("OUT1_TTL")
     out_2 = epics_signal_put_wait("OUT2_TTL")

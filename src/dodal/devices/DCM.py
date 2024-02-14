@@ -15,7 +15,9 @@ class DCM(Device):
         )
         # I03 configures the DCM Perp as a side effect of applying this fixed value to the DCM Offset after an energy change
         # Nb this parameter is misleadingly named to confuse you
-        self.fixed_offset_mm = get_beamline_parameters()["DCM_Perp_Offset_FIXED"]
+        self.fixed_offset_mm = get_beamline_parameters(
+            daq_configuration_path + "/domain/beamlineParameters"
+        )["DCM_Perp_Offset_FIXED"]
 
     """
     A double crystal monochromator (DCM), used to select the energy of the beam.
