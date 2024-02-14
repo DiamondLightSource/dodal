@@ -144,10 +144,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/262_make_arming_eiger_asynchronous/"
   },
   {
-    "version": "331_fix_tests",
-    "url": "https://DiamondLightSource.github.io/dodal/331_fix_tests/"
-  },
-  {
     "version": "334_clean_up_statuses_after_tests",
     "url": "https://DiamondLightSource.github.io/dodal/334_clean_up_statuses_after_tests/"
   },
