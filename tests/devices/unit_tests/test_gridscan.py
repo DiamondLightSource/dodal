@@ -6,6 +6,7 @@ from bluesky.run_engine import RunEngine
 from mockito import mock, verify, when
 from mockito.matchers import ANY, ARGS, KWARGS
 from ophyd.sim import make_fake_device
+from ophyd.status import DeviceStatus, Status
 
 from dodal.devices.fast_grid_scan import (
     FastGridScan,
@@ -13,6 +14,13 @@ from dodal.devices.fast_grid_scan import (
     set_fast_grid_scan_params,
 )
 from dodal.devices.smargon import Smargon
+
+
+def discard_status(st: Status | DeviceStatus):
+    try:
+        st.wait(0.01)
+    except BaseException:
+        pass
 
 
 @pytest.fixture
@@ -68,13 +76,15 @@ def run_test_on_complete_watcher(
 
 
 def test_when_new_image_then_complete_watcher_notified(fast_grid_scan: FastGridScan):
-    run_test_on_complete_watcher(fast_grid_scan, 2, 1, 3 / 4)
+    status = run_test_on_complete_watcher(fast_grid_scan, 2, 1, 3 / 4)
+    discard_status(status)
 
 
 def test_given_0_expected_images_then_complete_watcher_correct(
     fast_grid_scan: FastGridScan,
 ):
-    run_test_on_complete_watcher(fast_grid_scan, 0, 1, 0)
+    status = run_test_on_complete_watcher(fast_grid_scan, 0, 1, 0)
+    discard_status(status)
 
 
 @pytest.mark.parametrize(
