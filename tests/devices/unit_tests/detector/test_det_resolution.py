@@ -105,7 +105,7 @@ def test_resolution_with_roi(
     ],
     indirect=["detector_params"],
 )
-def test_resolution_with_roi(
+def test_resolution_with_roi_realistic(
     detector_params,
     roi,
     wavelength_angstroms,

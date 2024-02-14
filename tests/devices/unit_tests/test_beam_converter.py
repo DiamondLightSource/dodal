@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 import pytest
 from mockito import when
 
@@ -10,11 +12,13 @@ LOOKUP_TABLE_TEST_VALUES = [(100.0, 200.0), (150.0, 151.0), (160.0, 165.0)]
 
 
 @pytest.fixture
-def fake_converter() -> DetectorDistanceToBeamXYConverter:
-    when(DetectorDistanceToBeamXYConverter).parse_table().thenReturn(
-        LOOKUP_TABLE_TEST_VALUES
-    )
-    return DetectorDistanceToBeamXYConverter("test.txt")
+def fake_converter():
+    with patch.object(
+        DetectorDistanceToBeamXYConverter,
+        "parse_table",
+        return_value=LOOKUP_TABLE_TEST_VALUES,
+    ):
+        yield DetectorDistanceToBeamXYConverter("test.txt")
 
 
 def test_converter_eq():
