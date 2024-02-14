@@ -32,7 +32,7 @@ async def test_pin_tip_detect_can_be_connected_in_sim_mode():
 async def test_soft_parameter_defaults_are_correct():
     device = await _get_pin_tip_detection_device()
 
-    assert await device.validity_timeout.get_value() == 10.0
+    assert await device.validity_timeout.get_value() == 5.0
     assert await device.canny_lower_threshold.get_value() == 50
     assert await device.canny_upper_threshold.get_value() == 100
     assert await device.close_ksize.get_value() == 5
