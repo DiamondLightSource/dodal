@@ -13,8 +13,6 @@ def setup_module():
 
 
 def test_device_creation():
-    beamline_utils.BL = "i24"
-    beamline_utils.clear_devices()
     devices = make_all_devices(i24, fake_with_ophyd_sim=True)
     assert len(devices) > 0
     for device_name in devices.keys():
