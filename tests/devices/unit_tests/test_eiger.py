@@ -60,16 +60,10 @@ def fake_eiger(request):
     return fake_eiger
 
 
-def get_good_status():
-    status = Status()
-    status.set_finished()
-    return status
-
-
 def mock_eiger_odin_statuses(eiger):
-    eiger.set_odin_pvs = MagicMock(return_value=get_good_status())
-    eiger._wait_for_odin_status = MagicMock(return_value=get_good_status())
-    eiger._wait_fan_ready = MagicMock(return_value=get_good_status())
+    eiger.set_odin_pvs = MagicMock(return_value=finished_status())
+    eiger._wait_for_odin_status = MagicMock(return_value=finished_status())
+    eiger._wait_fan_ready = MagicMock(return_value=finished_status())
 
 
 def finished_status():
