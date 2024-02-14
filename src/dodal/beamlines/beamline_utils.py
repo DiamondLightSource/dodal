@@ -95,9 +95,11 @@ def device_instantiation(
     if already_existing_device is None:
         device_instance = device_factory(
             name=name,
-            prefix=f"{(BeamlinePrefix(BL).beamline_prefix)}{prefix}"
-            if bl_prefix
-            else prefix,
+            prefix=(
+                f"{(BeamlinePrefix(BL).beamline_prefix)}{prefix}"
+                if bl_prefix
+                else prefix
+            ),
             **kwargs,
         )
         ACTIVE_DEVICES[name] = device_instance

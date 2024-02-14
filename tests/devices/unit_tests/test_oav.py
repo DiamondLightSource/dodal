@@ -151,15 +151,19 @@ def test_get_beam_position_from_zoom_only_called_once_on_multiple_connects(
     fake_oav.wait_for_connection()
     fake_oav.wait_for_connection()
 
-    with patch(
-        "dodal.devices.oav.oav_detector.OAVConfigParams.update_on_zoom",
-        MagicMock(),
-    ), patch(
-        "dodal.devices.oav.oav_detector.OAVConfigParams.get_beam_position_from_zoom",
-        MagicMock(),
-    ) as mock_get_beam_position_from_zoom, patch(
-        "dodal.devices.oav.oav_detector.OAVConfigParams.load_microns_per_pixel",
-        MagicMock(),
+    with (
+        patch(
+            "dodal.devices.oav.oav_detector.OAVConfigParams.update_on_zoom",
+            MagicMock(),
+        ),
+        patch(
+            "dodal.devices.oav.oav_detector.OAVConfigParams.get_beam_position_from_zoom",
+            MagicMock(),
+        ) as mock_get_beam_position_from_zoom,
+        patch(
+            "dodal.devices.oav.oav_detector.OAVConfigParams.load_microns_per_pixel",
+            MagicMock(),
+        ),
     ):
         fake_oav.zoom_controller.level.sim_put("2.0x")  # type: ignore
         assert mock_get_beam_position_from_zoom.call_count == 1

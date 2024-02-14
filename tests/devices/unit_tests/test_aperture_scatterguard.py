@@ -183,17 +183,15 @@ def test_aperture_scatterguard_returns_status_if_within_tolerance(
 
 
 def test_aperture_positions_get_new_position_truthy_exact(aperture_positions):
-    should_be_large = ApertureFiveDimensionalLocation(
-        2.389, 40.986, 15.8, 5.25, 4.43
-    )
+    should_be_large = ApertureFiveDimensionalLocation(2.389, 40.986, 15.8, 5.25, 4.43)
     new_position = aperture_positions.get_new_position(should_be_large)
     assert new_position == aperture_positions.LARGE
 
 
-def test_aperture_positions_get_new_position_truthy_inside_tolerance(aperture_positions):
-    should_be_large = ApertureFiveDimensionalLocation(
-        2.389, 40.9865, 15.8, 5.25, 4.43
-    )
+def test_aperture_positions_get_new_position_truthy_inside_tolerance(
+    aperture_positions,
+):
+    should_be_large = ApertureFiveDimensionalLocation(2.389, 40.9865, 15.8, 5.25, 4.43)
     new_position = aperture_positions.get_new_position(should_be_large)
     assert new_position == aperture_positions.LARGE
 
@@ -208,7 +206,11 @@ def test_aperture_positions_get_new_position_falsy(aperture_positions):
 
 def test_aperture_positions_get_new_position_robot_load_exact(aperture_positions):
     robot_exact = ApertureFiveDimensionalLocation(
-             2.386, 31.40, 15.8, 5.25, 4.43,
+        2.386,
+        31.40,
+        15.8,
+        5.25,
+        4.43,
     )
     new_position = aperture_positions.get_new_position(robot_exact)
     assert new_position is aperture_positions.ROBOT_LOAD

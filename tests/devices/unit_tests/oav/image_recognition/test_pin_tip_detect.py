@@ -73,10 +73,9 @@ async def test_invalid_processing_func_uses_identity_function():
 
     set_sim_value(device.preprocess_operation, 50)  # Invalid index
 
-    with patch.object(
-        MxSampleDetect, "__init__", return_value=None
-    ) as mock_init, patch.object(
-        MxSampleDetect, "processArray", return_value=((None, None), None)
+    with (
+        patch.object(MxSampleDetect, "__init__", return_value=None) as mock_init,
+        patch.object(MxSampleDetect, "processArray", return_value=((None, None), None)),
     ):
         await device.read()
 

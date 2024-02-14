@@ -44,13 +44,15 @@ def _add_parallel_lines_to_image(
             parallel lines to draw."""
     lines = [
         (
-            (start_x, start_y + i * spacing),
-            (start_x + line_length, start_y + i * spacing),
-        )
-        if orientation == Orientation.horizontal
-        else (
-            (start_x + i * spacing, start_y),
-            (start_x + i * spacing, start_y + line_length),
+            (
+                (start_x, start_y + i * spacing),
+                (start_x + line_length, start_y + i * spacing),
+            )
+            if orientation == Orientation.horizontal
+            else (
+                (start_x + i * spacing, start_y),
+                (start_x + i * spacing, start_y + line_length),
+            )
         )
         for i in range(num_lines)
     ]
