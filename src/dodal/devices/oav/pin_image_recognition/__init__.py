@@ -116,8 +116,8 @@ class PinTipDetection(StandardReadable):
         )
 
         array_reading: dict[str, Reading] = await self.array_data.read()
-        array_data: NDArray[np.uint8] = array_reading[""]["value"]
-        timestamp: float = array_reading[""]["timestamp"]
+        array_data: NDArray[np.uint8] = array_reading[self.array_data.name]["value"]
+        timestamp: float = array_reading[self.array_data.name]["timestamp"]
 
         try:
             start_time = time.time()
