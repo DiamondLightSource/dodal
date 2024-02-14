@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Build the docs using sphinx &#8212; dodal 1.14.2.dev27+g97583878 documentation</title>
+    <title>Creating a new beamline &#8212; dodal 1.14.2.dev27+g97583878 documentation</title>
   
   
   
@@ -44,7 +44,7 @@
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=30646c52"></script>
     <script src="../../_static/design-tabs.js?v=36754332"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'developer/how-to/build-docs';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'user/how-to/create-beamline';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.2';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://DiamondLightSource.github.io/dodal/switcher.json';
@@ -54,8 +54,8 @@
     <link rel="icon" href="../../_static/dls-favicon.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Run the tests using pytest" href="run-tests.html" />
-    <link rel="prev" title="Moving code from another repo" href="move-code.html" />
+    <link rel="next" title="About the documentation" href="../explanations/docs-structure.html" />
+    <link rel="prev" title="Run in a container" href="run-container.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -150,15 +150,15 @@
 <nav class="navbar-nav">
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../user/index.html">
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
                         User Guide
                       </a>
                     </li>
                 
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="../index.html">
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../developer/index.html">
                         Developer Guide
                       </a>
                     </li>
@@ -304,15 +304,15 @@ document.write(`
 <nav class="navbar-nav">
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../user/index.html">
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
                         User Guide
                       </a>
                     </li>
                 
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="../index.html">
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../developer/index.html">
                         Developer Guide
                       </a>
                     </li>
@@ -408,30 +408,22 @@ document.write(`
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/dev-install.html">Developer install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/get_started.html">Getting Started</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">How-to Guides</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="contribute.html">Contributing to the project</a></li>
-<li class="toctree-l1"><a class="reference internal" href="move-code.html">Moving code from another repo</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Build the docs using sphinx</a></li>
-<li class="toctree-l1"><a class="reference internal" href="run-tests.html">Run the tests using pytest</a></li>
-<li class="toctree-l1"><a class="reference internal" href="static-analysis.html">Run static analysis using mypy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="lint.html">Run linting using pre-commit</a></li>
-<li class="toctree-l1"><a class="reference internal" href="update-tools.html">Update the tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="make-release.html">Make a release</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run-container.html">Run in a container</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Creating a new beamline</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Explanations</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1 has-children"><a class="reference internal" href="../explanations/decisions.html">Architectural Decision Records</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../explanations/decisions/0001-record-architecture-decisions.html">1. Record architecture decisions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../explanations/decisions/0002-switched-to-pip-skeleton.html">2. Adopt python3-pip-skeleton for project structure</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../explanations/docs-structure.html">About the documentation</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../reference/standards.html">Standards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../genindex.html">Index</a></li>
 </ul>
 </div>
 </nav></div>
@@ -470,9 +462,9 @@ document.write(`
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Developer Guide</a></li>
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">User Guide</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">Build the...</li>
+    <li class="breadcrumb-item active" aria-current="page">Creating a...</li>
   </ul>
 </nav>
 </div>
@@ -489,41 +481,68 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="build-the-docs-using-sphinx">
-<h1>Build the docs using sphinx<a class="headerlink" href="#build-the-docs-using-sphinx" title="Link to this heading">#</a></h1>
-<p>You can build the <a class="reference external" href="https://www.sphinx-doc.org/">sphinx</a> based docs from the project directory by running:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ tox -e docs
+  <section id="creating-a-new-beamline">
+<h1>Creating a new beamline<a class="headerlink" href="#creating-a-new-beamline" title="Link to this heading">#</a></h1>
+<p>A beamline is a collection of devices that can be used together to run experiments, they may be read-only or capable of being set.
+They include motors in the experiment hutch, optical components in the optics hutch, the synchrotron “machine” and more.</p>
+<p>The following example creates a fictitious beamline <code class="docutils literal notranslate"><span class="pre">w41</span></code>, with a simulated twin <code class="docutils literal notranslate"><span class="pre">s41</span></code>.
+<code class="docutils literal notranslate"><span class="pre">w41</span></code> needs to monitor the status of the Synchrotron and has an AdAravisDetector.
+<code class="docutils literal notranslate"><span class="pre">s41</span></code> has a simulated clone of the AdAravisDetector, but not of the Synchrotron machine.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dodal.beamlines.beamline_utils</span> <span class="kn">import</span> <span class="n">device_instantiation</span>
+<span class="kn">from</span> <span class="nn">dodal.beamlines.beamline_utils</span> <span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_utils_beamline</span>
+<span class="kn">from</span> <span class="nn">dodal.devices.areadetector.adaravis</span> <span class="kn">import</span> <span class="n">AdAravisDetector</span>
+<span class="kn">from</span> <span class="nn">dodal.devices.synchrotron</span> <span class="kn">import</span> <span class="n">Synchrotron</span>
+<span class="kn">from</span> <span class="nn">dodal.log</span> <span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_log_beamline</span>
+<span class="kn">from</span> <span class="nn">dodal.utils</span> <span class="kn">import</span> <span class="n">get_beamline_name</span><span class="p">,</span> <span class="n">skip_device</span>
+
+<span class="n">BL</span> <span class="o">=</span> <span class="n">get_beamline_name</span><span class="p">(</span><span class="s2">&quot;s41&quot;</span><span class="p">)</span>  <span class="c1"># Default used when not on a live beamline</span>
+<span class="n">set_log_beamline</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>  <span class="c1"># Configure logging and util functions</span>
+<span class="n">set_utils_beamline</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Define device factory functions below this point.</span>
+<span class="sd">A device factory function is any function that has a return type which conforms</span>
+<span class="sd">to one or more Bluesky Protocols.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">A valid factory function which is:</span>
+<span class="sd">- instantiated only on the live beamline</span>
+<span class="sd">- a maximum of once</span>
+<span class="sd">- can optionally be faked with ophyd simulated axes</span>
+<span class="sd">- can optionally be connected concurrently by not waiting for connect to complete</span>
+<span class="sd">- if constructor took a prefix, could optionally exclude the BLIXX prefix</span>
+<span class="sd">&quot;&quot;&quot;</span><span class="s2">&quot;</span>
+<span class="nd">@skip_device</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">BL</span> <span class="o">==</span> <span class="s2">&quot;s41&quot;</span><span class="p">)</span>  <span class="c1"># Conditionally do not instantiate this device</span>
+<span class="k">def</span> <span class="nf">synchrotron</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Synchrotron</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calls the Synchrotron class&#39;s constructor with name=&quot;synchrotron&quot;, prefix=&quot;&quot;</span>
+<span class="sd">    If this is called when already instantiated, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">Synchrotron</span><span class="p">,</span>
+        <span class="s2">&quot;synchrotron&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+        <span class="n">bl_prefix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">d11</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;D11&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AdAravisDetector</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Also a valid Device factory function, but as multiple calls would instantiate</span>
+<span class="sd">    multiple copies of a device, discouraged.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">AdAravisDetector</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BL</span><span class="si">}</span><span class="s2">-DI-DCAM-01:&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>This will build the static docs on the <code class="docutils literal notranslate"><span class="pre">docs</span></code> directory, which includes API
-docs that pull in docstrings from the code.</p>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><a class="reference internal" href="../reference/standards.html#documentation-standards"><span class="std std-ref">Documentation Standards</span></a></p>
-</div>
-<p>The docs will be built into the <code class="docutils literal notranslate"><span class="pre">build/html</span></code> directory, and can be opened
-locally with a web browser:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ firefox build/html/index.html
-</pre></div>
-</div>
-<section id="autobuild">
-<h2>Autobuild<a class="headerlink" href="#autobuild" title="Link to this heading">#</a></h2>
-<p>You can also run an autobuild process, which will watch your <code class="docutils literal notranslate"><span class="pre">docs</span></code>
-directory for changes and rebuild whenever it sees changes, reloading any
-browsers watching the pages:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ tox -e docs autobuild
-</pre></div>
-</div>
-<p>You can view the pages at localhost:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ firefox http://localhost:8000
-</pre></div>
-</div>
-<p>If you are making changes to source code too, you can tell it to watch
-changes in this directory too:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ tox -e docs autobuild -- --watch src
-</pre></div>
-</div>
-</section>
+<p><code class="docutils literal notranslate"><span class="pre">w41</span></code> should also be added to the list of <code class="docutils literal notranslate"><span class="pre">ALL_BEAMLINES</span></code> in <code class="docutils literal notranslate"><span class="pre">tests/beamlines/test_device_instantiation</span></code>.
+This test checks that the function returns a type that conforms to Bluesky protocols,
+that it always returns the same instance of the device and that the arguments passed
+into the Device class constructor are valid.</p>
 </section>
 
 
@@ -537,20 +556,20 @@ changes in this directory too:</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="move-code.html"
+       href="run-container.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Moving code from another repo</p>
+        <p class="prev-next-title">Run in a container</p>
       </div>
     </a>
     <a class="right-next"
-       href="run-tests.html"
+       href="../explanations/docs-structure.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Run the tests using pytest</p>
+        <p class="prev-next-title">About the documentation</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -565,22 +584,10 @@ changes in this directory too:</p>
 
 
   <div class="sidebar-secondary-item">
-<div
-    id="pst-page-navigation-heading-2"
-    class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> On this page
-  </div>
-  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#autobuild">Autobuild</a></li>
-</ul>
-  </nav></div>
-
-  <div class="sidebar-secondary-item">
 
   
   <div class="tocsection editthispage">
-    <a href="https://github.com/DiamondLightSource/dodal/edit/hyperion_1125_pin_detect_hotfixes/docs/developer/how-to/build-docs.rst">
+    <a href="https://github.com/DiamondLightSource/dodal/edit/hyperion_1125_pin_detect_hotfixes/docs/user/how-to/create-beamline.rst">
       <i class="fa-solid fa-pencil"></i>
       
       
@@ -595,7 +602,7 @@ changes in this directory too:</p>
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../../_sources/developer/how-to/build-docs.rst.txt">
+    <a href="../../_sources/user/how-to/create-beamline.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>
