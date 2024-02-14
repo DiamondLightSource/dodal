@@ -5,7 +5,6 @@ import pytest
 from ophyd.sim import make_fake_device
 from ophyd.status import Status
 
-from dodal.beamlines.i03 import DAQ_CONFIGURATION_PATH
 from dodal.devices.DCM import DCM
 from dodal.devices.undulator import Undulator, UndulatorGapAccess
 from dodal.devices.undulator_dcm import (
@@ -15,6 +14,8 @@ from dodal.devices.undulator_dcm import (
     _get_energy_distance_table,
 )
 
+from ...conftest import MOCK_DAQ_CONFIG_PATH
+
 
 @pytest.fixture
 def fake_undulator_dcm() -> UndulatorDCM:
@@ -23,7 +24,7 @@ def fake_undulator_dcm() -> UndulatorDCM:
         lookup_table_path="./tests/devices/unit_tests/test_beamline_undulator_to_gap_lookup_table.txt",
     )
     dcm: DCM = make_fake_device(DCM)(
-        name="dcm", daq_configuration_path=DAQ_CONFIGURATION_PATH
+        name="dcm", daq_configuration_path=MOCK_DAQ_CONFIG_PATH
     )
     undulator_dcm: UndulatorDCM = make_fake_device(UndulatorDCM)(
         undulator, dcm, name="undulator_dcm"

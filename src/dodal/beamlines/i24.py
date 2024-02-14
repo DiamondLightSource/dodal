@@ -10,14 +10,14 @@ from dodal.devices.i24.i24_vgonio import VGonio
 from dodal.devices.i24.pmac import PMAC
 from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
 from dodal.devices.zebra import Zebra
-from dodal.log import set_beamline
+from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import get_beamline_name, skip_device
 
 ZOOM_PARAMS_FILE = "/dls_sw/i24/software/gda/config/xml/jCameraManZoomLevels.xml"
 DISPLAY_CONFIG = "/dls_sw/i24/software/gda_versions/var/display.configuration"
 
 BL = get_beamline_name("s24")
-set_beamline(BL)
+set_log_beamline(BL)
 set_utils_beamline(BL)
 
 
