@@ -1,6 +1,8 @@
 import asyncio
+import os
 
 import bluesky.plan_stubs as bps
+import psutil
 import pytest
 import pytest_asyncio
 from bluesky.preprocessors import stage_decorator
@@ -99,3 +101,24 @@ async def test_stage_unstage_controls_read_results_from_fake_zocalo(
     # But waiting for stage should clear them
     RE(bps.stage(zocalo_device, wait=True))
     assert zocalo_device._raw_results_received.empty()
+
+
+@pytest.mark.s03
+@pytest.mark.asyncio
+async def test_stale_connections_closed_after_unstage(
+    zocalo_device: ZocaloResults,
+):
+    this_process = psutil.Process(os.getpid())
+
+    connections_before = len(this_process.connections())
+
+    def stage_unstage():
+        yield from bps.stage(zocalo_device)
+        yield from bps.unstage(zocalo_device)
+
+    RE = RunEngine()
+    RE(stage_unstage())
+
+    connections_after = len(this_process.connections())
+
+    assert connections_before == connections_after
