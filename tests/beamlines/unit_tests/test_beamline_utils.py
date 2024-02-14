@@ -27,22 +27,22 @@ def test_instantiate_function_makes_supplied_device():
     for device in device_types:
         beamline_utils.clear_devices()
         dev = beamline_utils.device_instantiation(
-            device, "device", "", False, False, None
+            device, device.__name__, "", False, True, None
         )
         assert isinstance(dev, device)
 
 
 def test_instantiating_different_device_with_same_name(reset_i03):
     dev1 = beamline_utils.device_instantiation(  # noqa
-        Zebra, "device", "", False, False, None
+        Zebra, "device", "", False, True, None
     )
     with pytest.raises(TypeError):
         dev2 = beamline_utils.device_instantiation(
-            Smargon, "device", "", False, False, None
+            Smargon, "device", "", False, True, None
         )
     beamline_utils.clear_device("device")
     dev2 = beamline_utils.device_instantiation(  # noqa
-        Smargon, "device", "", False, False, None
+        Smargon, "device", "", False, True, None
     )
     assert dev1.name == dev2.name
     assert type(dev1) != type(dev2)
