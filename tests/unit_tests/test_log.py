@@ -7,10 +7,11 @@ from graypy import GELFTCPHandler
 
 from dodal import log
 from dodal.log import (
+    ERROR_LOG_BUFFER_LINES,
     LOGGER,
     BeamlineFilter,
     clear_all_loggers_and_handlers,
-    do_default_logging_setup,
+    get_logging_file_path,
     integrate_bluesky_and_ophyd_logging,
     set_up_all_logging_handlers,
 )
@@ -82,7 +83,10 @@ def test_no_env_variable_sets_correct_file_handler(
     mock_file_handler.return_value.level = logging.INFO
     mock_GELFTCPHandler.return_value.level = logging.INFO
     clear_all_loggers_and_handlers()
-    do_default_logging_setup()
+    handlers = set_up_all_logging_handlers(
+        LOGGER, get_logging_file_path(), "dodal.log", True, ERROR_LOG_BUFFER_LINES
+    )
+    integrate_bluesky_and_ophyd_logging(LOGGER, handlers)
 
     expected_calls = [
         call(filename=PosixPath("tmp/dev/dodal.log"), when="MIDNIGHT", backupCount=30),
