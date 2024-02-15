@@ -17,6 +17,7 @@ from ...conftest import mock_beamline_module_filepaths
 
 
 def setup_module():
+    beamline_utils.clear_devices()
     mock_beamline_module_filepaths("i03", i03)
 
 
