@@ -1,5 +1,4 @@
 from enum import Enum
-from functools import partial
 from typing import Optional
 
 from ophyd import Component, Device, EpicsSignalRO, Signal
@@ -323,18 +322,15 @@ class EigerDetector(Device):
 
         functions_to_do_arm.extend(
             [
-                partial(
-                    self.set_detector_threshold,
-                    energy=detector_params.expected_energy_ev,
-                ),
+                lambda: self.set_detector_threshold(detector_params.expected_energy_ev),
                 self.set_cam_pvs,
                 self.set_odin_number_of_frame_chunks,
                 self.set_odin_pvs,
                 self.set_mx_settings_pvs,
                 self.set_num_triggers_and_captures,
-                partial(await_value, self.stale_params, 0, 60),
+                lambda: await_value(self.stale_params, 0, 60),
                 self._wait_for_odin_status,
-                partial(self.cam.acquire.set, 1, timeout=self.GENERAL_STATUS_TIMEOUT),
+                lambda: self.cam.acquire.set(1, timeout=self.GENERAL_STATUS_TIMEOUT),
                 self._wait_fan_ready,
                 self._finish_arm,
             ]
