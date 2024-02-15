@@ -10,14 +10,14 @@ from dodal.devices.i24.i24_vgonio import VGonio
 from dodal.devices.i24.pmac import PMAC
 from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
 from dodal.devices.zebra import Zebra
-from dodal.log import set_beamline
+from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import get_beamline_name, skip_device
 
 ZOOM_PARAMS_FILE = "/dls_sw/i24/software/gda/config/xml/jCameraManZoomLevels.xml"
 DISPLAY_CONFIG = "/dls_sw/i24/software/gda_versions/var/display.configuration"
 
 BL = get_beamline_name("s24")
-set_beamline(BL)
+set_log_beamline(BL)
 set_utils_beamline(BL)
 
 
@@ -108,7 +108,9 @@ def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
 
 
 @skip_device(lambda: BL == "s24")
-def vgonio(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> OAV:
+def vgonio(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> VGonio:
     """Get the i24 vgonio device, instantiate it if it hasn't already been.
     If this is called when already instantiated, it will return the existing object.
     """
