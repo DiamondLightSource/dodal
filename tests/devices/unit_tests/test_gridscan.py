@@ -29,7 +29,7 @@ def discard_status(st: Union[Status, DeviceStatus]):
 def fast_grid_scan(request):
     FakeFastGridScan = make_fake_device(FastGridScan)
     fast_grid_scan: FastGridScan = FakeFastGridScan(
-        name="test fake FGS: " + request.node.name
+        name=f"test fake FGS: {request.node.name}"
     )
     fast_grid_scan.scan_invalid.pvname = ""
     yield fast_grid_scan
