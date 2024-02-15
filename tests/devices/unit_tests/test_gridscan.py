@@ -1,3 +1,5 @@
+from typing import Union
+
 import numpy as np
 import pytest
 from bluesky import plan_stubs as bps
@@ -6,6 +8,7 @@ from bluesky.run_engine import RunEngine
 from mockito import mock, verify, when
 from mockito.matchers import ANY, ARGS, KWARGS
 from ophyd.sim import make_fake_device
+from ophyd.status import DeviceStatus, Status
 
 from dodal.devices.fast_grid_scan import (
     FastGridScan,
@@ -15,12 +18,20 @@ from dodal.devices.fast_grid_scan import (
 from dodal.devices.smargon import Smargon
 
 
-@pytest.fixture
-def fast_grid_scan():
-    FakeFastGridScan = make_fake_device(FastGridScan)
-    fast_grid_scan: FastGridScan = FakeFastGridScan(name="test fake FGS")
-    fast_grid_scan.scan_invalid.pvname = ""
+def discard_status(st: Union[Status, DeviceStatus]):
+    try:
+        st.wait(0.01)
+    except BaseException:
+        pass
 
+
+@pytest.fixture
+def fast_grid_scan(request):
+    FakeFastGridScan = make_fake_device(FastGridScan)
+    fast_grid_scan: FastGridScan = FakeFastGridScan(
+        name=f"test fake FGS: {request.node.name}"
+    )
+    fast_grid_scan.scan_invalid.pvname = ""
     yield fast_grid_scan
 
 
@@ -68,13 +79,15 @@ def run_test_on_complete_watcher(
 
 
 def test_when_new_image_then_complete_watcher_notified(fast_grid_scan: FastGridScan):
-    run_test_on_complete_watcher(fast_grid_scan, 2, 1, 3 / 4)
+    status = run_test_on_complete_watcher(fast_grid_scan, 2, 1, 3 / 4)
+    discard_status(status)
 
 
 def test_given_0_expected_images_then_complete_watcher_correct(
     fast_grid_scan: FastGridScan,
 ):
-    run_test_on_complete_watcher(fast_grid_scan, 0, 1, 0)
+    status = run_test_on_complete_watcher(fast_grid_scan, 0, 1, 0)
+    discard_status(status)
 
 
 @pytest.mark.parametrize(
@@ -325,8 +338,13 @@ def test_given_various_x_y_z_when_get_motor_positions_then_expected_positions_re
 def test_can_run_fast_grid_scan_in_run_engine(fast_grid_scan):
     @bpp.run_decorator()
     def kickoff_and_complete(device):
-        yield from bps.kickoff(device)
-        yield from bps.complete(device)
+        yield from bps.kickoff(device, group="kickoff")
+        device.status.sim_put(1)
+        yield from bps.wait("kickoff")
+        yield from bps.complete(device, group="complete")
+        device.position_counter.sim_put(device.expected_images)
+        device.status.sim_put(0)
+        yield from bps.wait("complete")
 
     RE = RunEngine()
     RE(kickoff_and_complete(fast_grid_scan))
