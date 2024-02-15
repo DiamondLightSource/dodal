@@ -9,14 +9,8 @@ from ophyd.status import Status
 from dodal.devices.xspress3_mini.xspress3_mini import DetectorState, Xspress3Mini
 
 
-def get_good_status() -> Status:
-    status = Status()
-    status.set_finished()
-    return status
-
-
 def get_bad_status() -> Status:
-    status = Status()
+    status = Status("get_bad_status")
     status.set_exception(Exception)
     return status
 
@@ -51,8 +45,6 @@ def test_stage_in_busy_state(mock_await_value, fake_xspress3mini):
 
 
 def test_stage_fails_in_failed_acquire_state(fake_xspress3mini):
-    bad_status = Status()
-    bad_status.set_exception(Exception)
     RE = RunEngine()
     with pytest.raises(Exception):
         RE(bps.stage(fake_xspress3mini))

@@ -16,8 +16,7 @@ from dodal.utils import make_all_devices
 from ...conftest import mock_beamline_module_filepaths
 
 
-@pytest.fixture
-def reset_i03():
+def setup_module():
     beamline_utils.clear_devices()
     mock_beamline_module_filepaths("i03", i03)
 
@@ -27,22 +26,23 @@ def test_instantiate_function_makes_supplied_device():
     for device in device_types:
         beamline_utils.clear_devices()
         dev = beamline_utils.device_instantiation(
-            device, "device", "", False, False, None
+            device, device.__name__, "", False, True, None
         )
         assert isinstance(dev, device)
 
 
-def test_instantiating_different_device_with_same_name(reset_i03):
+def test_instantiating_different_device_with_same_name():
+    beamline_utils.clear_devices()
     dev1 = beamline_utils.device_instantiation(  # noqa
-        Zebra, "device", "", False, False, None
+        Zebra, "device", "", False, True, None
     )
     with pytest.raises(TypeError):
         dev2 = beamline_utils.device_instantiation(
-            Smargon, "device", "", False, False, None
+            Smargon, "device", "", False, True, None
         )
     beamline_utils.clear_device("device")
     dev2 = beamline_utils.device_instantiation(  # noqa
-        Smargon, "device", "", False, False, None
+        Smargon, "device", "", False, True, None
     )
     assert dev1.name == dev2.name
     assert type(dev1) != type(dev2)
@@ -50,7 +50,8 @@ def test_instantiating_different_device_with_same_name(reset_i03):
     assert dev2 in beamline_utils.ACTIVE_DEVICES.values()
 
 
-def test_instantiate_function_fake_makes_fake(reset_i03):
+def test_instantiate_function_fake_makes_fake():
+    beamline_utils.clear_devices()
     fake_zeb: Zebra = beamline_utils.device_instantiation(
         i03.Zebra, "zebra", "", True, True, None
     )
@@ -58,8 +59,8 @@ def test_instantiate_function_fake_makes_fake(reset_i03):
     assert isinstance(fake_zeb.pc.arm_source, FakeEpicsSignal)
 
 
-def test_clear_devices(RE, reset_i03):
-    mock_beamline_module_filepaths("i03", i03)
+def test_clear_devices(RE):
+    beamline_utils.clear_devices()
     devices = make_all_devices(i03, fake_with_ophyd_sim=True)
     assert len(beamline_utils.ACTIVE_DEVICES) == len(devices.keys())
     beamline_utils.clear_devices()
