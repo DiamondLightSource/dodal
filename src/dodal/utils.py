@@ -110,7 +110,7 @@ def skip_device(precondition=lambda: True):
 
 
 def make_all_devices(
-    module: Union[str, ModuleType, None] = None, **kwargs
+    module: Union[str, ModuleType, None] = None, include_skipped: bool = False, **kwargs
 ) -> Dict[str, AnyDevice]:
     """Makes all devices in the given beamline module.
 
@@ -126,7 +126,7 @@ def make_all_devices(
     """
     if isinstance(module, str) or module is None:
         module = import_module(module or __name__)
-    factories = collect_factories(module)
+    factories = collect_factories(module, include_skipped)
     devices: dict[str, AnyDevice] = invoke_factories(factories, **kwargs)
 
     return devices
@@ -167,11 +167,17 @@ def extract_dependencies(
             yield name
 
 
-def collect_factories(module: ModuleType) -> dict[str, AnyDeviceFactory]:
+def collect_factories(
+    module: ModuleType, include_skipped: bool = False
+) -> dict[str, AnyDeviceFactory]:
     factories: dict[str, AnyDeviceFactory] = {}
 
     for var in module.__dict__.values():
-        if callable(var) and is_any_device_factory(var) and not _is_device_skipped(var):
+        if (
+            callable(var)
+            and is_any_device_factory(var)
+            and (include_skipped or not _is_device_skipped(var))
+        ):
             factories[var.__name__] = var
 
     return factories

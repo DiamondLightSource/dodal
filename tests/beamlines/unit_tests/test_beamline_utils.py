@@ -13,13 +13,20 @@ from dodal.devices.smargon import Smargon
 from dodal.devices.zebra import Zebra
 from dodal.utils import make_all_devices
 
+from ...conftest import mock_beamline_module_filepaths
+
+
+def setup_module():
+    beamline_utils.clear_devices()
+    mock_beamline_module_filepaths("i03", i03)
+
 
 def test_instantiate_function_makes_supplied_device():
     device_types = [Zebra, ApertureScatterguard, Smargon]
     for device in device_types:
         beamline_utils.clear_devices()
         dev = beamline_utils.device_instantiation(
-            device, "device", "", False, False, None
+            device, device.__name__, "", False, True, None
         )
         assert isinstance(dev, device)
 
@@ -27,15 +34,15 @@ def test_instantiate_function_makes_supplied_device():
 def test_instantiating_different_device_with_same_name():
     beamline_utils.clear_devices()
     dev1 = beamline_utils.device_instantiation(  # noqa
-        Zebra, "device", "", False, False, None
+        Zebra, "device", "", False, True, None
     )
     with pytest.raises(TypeError):
         dev2 = beamline_utils.device_instantiation(
-            Smargon, "device", "", False, False, None
+            Smargon, "device", "", False, True, None
         )
     beamline_utils.clear_device("device")
     dev2 = beamline_utils.device_instantiation(  # noqa
-        Smargon, "device", "", False, False, None
+        Smargon, "device", "", False, True, None
     )
     assert dev1.name == dev2.name
     assert type(dev1) != type(dev2)
@@ -61,8 +68,6 @@ def test_clear_devices(RE):
 
 
 def test_device_is_new_after_clearing(RE):
-    beamline_utils.clear_devices()
-
     def _make_devices_and_get_id():
         return [
             id(device)
@@ -102,3 +107,23 @@ def test_wait_for_v2_device_connection_passes_through_timeout(
     beamline_utils._wait_for_connection(device, **kwargs)
 
     call_in_bluesky_el.assert_called_once_with(ANY, timeout=expected_timeout)
+
+
+def test_default_directory_provider_is_singleton():
+    provider1 = beamline_utils.get_directory_provider()
+    provider2 = beamline_utils.get_directory_provider()
+    assert provider1 is provider2
+
+
+def test_set_directory_provider_is_singleton():
+    beamline_utils.set_directory_provider(lambda: "")
+    provider1 = beamline_utils.get_directory_provider()
+    provider2 = beamline_utils.get_directory_provider()
+    assert provider1 is provider2
+
+
+def test_set_overrides_singleton():
+    provider1 = beamline_utils.get_directory_provider()
+    beamline_utils.set_directory_provider(lambda: "")
+    provider2 = beamline_utils.get_directory_provider()
+    assert provider1 is not provider2

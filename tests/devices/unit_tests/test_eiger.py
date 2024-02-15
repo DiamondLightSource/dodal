@@ -52,12 +52,18 @@ def create_new_params() -> DetectorParams:
 
 
 @pytest.fixture
-def fake_eiger():
+def fake_eiger(request):
     FakeEigerDetector: EigerDetector = make_fake_device(EigerDetector)
     fake_eiger: EigerDetector = FakeEigerDetector.with_params(
-        params=create_new_params(), name="test fake Eiger"
+        params=create_new_params(), name=f"test fake Eiger: {request.node.name}"
     )
     return fake_eiger
+
+
+def mock_eiger_odin_statuses(eiger):
+    eiger.set_odin_pvs = MagicMock(return_value=finished_status())
+    eiger._wait_for_odin_status = MagicMock(return_value=finished_status())
+    eiger._wait_fan_ready = MagicMock(return_value=finished_status())
 
 
 def finished_status():
@@ -356,12 +362,14 @@ def test_given_stale_parameters_goes_high_before_callbacks_then_stale_parameters
 ):
     mock_await.return_value = Status(done=True)
     fake_eiger.odin.nodes.clear_odin_errors = MagicMock()
-    fake_eiger.odin.check_odin_initialised = MagicMock()
-    fake_eiger.odin.check_odin_initialised.return_value = (True, "")
+    fake_eiger.odin.check_odin_initialised = MagicMock(return_value=(True, ""))
     fake_eiger.odin.file_writer.file_path.put(True)
 
+    mock_eiger_odin_statuses(fake_eiger)
+
     def wait_on_staging():
-        fake_eiger.async_stage()
+        st = fake_eiger.async_stage()
+        st.wait()
 
     waiting_status = Status()
     fake_eiger.cam.num_images.set = MagicMock(return_value=waiting_status)
@@ -462,20 +470,10 @@ def test_when_stage_called_then_finish_arm_on_fan_ready(
     range(10),
 )
 def test_check_callback_error(fake_eiger: EigerDetector, iteration):
-    def get_good_status():
-        status = Status()
-        status.set_finished()
-        return status
-
     LOGGER.error = MagicMock()
 
     # These functions timeout without extra tweaking rather than give us the specific status error for the test
-    fake_eiger.set_odin_pvs = MagicMock()
-    fake_eiger.set_odin_pvs.return_value = get_good_status()
-    fake_eiger._wait_for_odin_status = MagicMock()
-    fake_eiger._wait_for_odin_status.return_value = get_good_status()
-    fake_eiger._wait_fan_ready = MagicMock()
-    fake_eiger._wait_fan_ready.return_value = get_good_status()
+    mock_eiger_odin_statuses(fake_eiger)
 
     unwrapped_funcs = [
         (

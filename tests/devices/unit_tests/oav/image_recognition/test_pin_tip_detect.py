@@ -1,19 +1,22 @@
 import asyncio
 from unittest.mock import patch
 
+import numpy as np
 import pytest
 from ophyd_async.core import set_sim_value
 
 from dodal.devices.oav.pin_image_recognition import MxSampleDetect, PinTipDetection
+from dodal.devices.oav.pin_image_recognition.utils import SampleLocation
 
 EVENT_LOOP = asyncio.new_event_loop()
 
 
 pytest_plugins = ("pytest_asyncio",)
+DEVICE_NAME = "pin_tip_detection"
 
 
 async def _get_pin_tip_detection_device() -> PinTipDetection:
-    device = PinTipDetection("-DI-OAV-01")
+    device = PinTipDetection("-DI-OAV-01", name=DEVICE_NAME)
     await device.connect(sim=True)
     return device
 
@@ -86,3 +89,24 @@ async def test_invalid_processing_func_uses_identity_function():
     # Assert captured preprocess function is the identitiy function
     arg = object()
     assert arg == captured_func(arg)
+
+
+@pytest.mark.asyncio
+async def test_given_valid_data_reading_then_used_to_find_location():
+    device = await _get_pin_tip_detection_device()
+    image_array = np.array([1, 2, 3])
+    test_sample_location = SampleLocation(100, 200, np.array([]), np.array([]))
+    set_sim_value(device.array_data, image_array)
+
+    with (
+        patch.object(MxSampleDetect, "__init__", return_value=None),
+        patch.object(
+            MxSampleDetect, "processArray", return_value=test_sample_location
+        ) as mock_process_array,
+    ):
+        location = await device.read()
+
+        process_call = mock_process_array.call_args[0][0]
+        assert np.array_equal(process_call, image_array)
+        assert location[DEVICE_NAME]["value"] == (200, 100)
+        assert location[DEVICE_NAME]["timestamp"] > 0
