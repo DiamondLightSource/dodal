@@ -26,5 +26,5 @@ def test_device_creation():
 
 
 def teardown_module():
-    beamline_utils.set_beamline("i03")
+    beamline_utils.set_beamline("i24")
     beamline_utils.clear_devices()

@@ -15,9 +15,9 @@ from dodal.devices.smargon import Smargon
 
 
 @pytest.fixture
-def fast_grid_scan():
+def fast_grid_scan(request):
     fast_grid_scan: PandAFastGridScan = instantiate_fake_device(
-        PandAFastGridScan, name="test fake FGS"
+        PandAFastGridScan, name=f"test fake FGS: {request.node.name}"
     )
     fast_grid_scan.scan_invalid.pvname = ""
 
