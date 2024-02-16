@@ -20,12 +20,12 @@ def _is_i20_1_machine():
 
 @skip_device(lambda: not _is_i20_1_machine())
 def turbo_slit_motor() -> EpicsMotor:
-    """Get the i20-1 OAV pin-tip detection device"""
+    """Get the i20-1 motor"""
 
     return device_instantiation(
         EpicsMotor,
         "BL20J-OP-PCHRO-01:TS:XFINE",
-        "turbo_slit_motor",
+        "turbo_slit_motor_x",
         wait=False,
         fake=False,
     )
