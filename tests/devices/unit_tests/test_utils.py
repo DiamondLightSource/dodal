@@ -1,12 +1,13 @@
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
 from ophyd.sim import NullStatus, make_fake_device
 from ophyd.status import Status
-from ophyd.utils.errors import WaitTimeoutError
+from ophyd.utils.errors import StatusTimeoutError, WaitTimeoutError
 
 from dodal.devices.util.epics_util import SetWhenEnabled, run_functions_without_blocking
-from dodal.log import LOGGER, GELFTCPHandler, logging, set_up_logging_handlers
+from dodal.log import LOGGER, GELFTCPHandler, logging, set_up_all_logging_handlers
 
 
 class StatusException(Exception):
@@ -27,7 +28,8 @@ def reset_logs():
     mock_graylog_handler_class = MagicMock(spec=GELFTCPHandler)
     mock_graylog_handler_class.return_value.level = logging.DEBUG
     with patch("dodal.log.GELFTCPHandler", mock_graylog_handler_class):
-        set_up_logging_handlers(None, False)
+        set_up_all_logging_handlers(LOGGER, Path("./tmp/dev"), "dodal.log", True, 10000)
+    return mock_graylog_handler_class
 
 
 def get_bad_status():
@@ -74,7 +76,7 @@ def test_wrap_function_callback():
     dummy_func.assert_called_once()
 
 
-def test_wrap_function_callback_errors_on_wrong_return_type():
+def test_wrap_function_callback_errors_on_wrong_return_type(caplog):
     reset_logs()
 
     def get_good_status():
@@ -87,20 +89,14 @@ def test_wrap_function_callback_errors_on_wrong_return_type():
     returned_status = run_functions_without_blocking(
         [lambda: get_good_status(), dummy_func], timeout=0.05
     )
-    discard_status(returned_status)
+    with pytest.raises(StatusTimeoutError):
+        returned_status.wait(0.2)
     assert returned_status.done is True
     assert returned_status.success is False
 
     dummy_func.assert_called_once()
 
-    log_messages = "".join(
-        [call.args[0].message for call in LOGGER.handlers[1].handle.call_args_list]
-    )
-    LOGGER.handlers = []
-
-    # assert "wrap_func attempted to wrap" in log_messages
-    # assert " when it does not return a Status" in log_messages
-    assert "An error was raised on a background thread" in log_messages
+    assert "does not return a Status" in caplog.text
 
 
 def test_status_points_to_provided_device_object():
