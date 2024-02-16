@@ -200,6 +200,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/async-ad-sim/"
   },
   {
+    "version": "convert_barcode_pv_reading_to_string",
+    "url": "https://DiamondLightSource.github.io/dodal/convert_barcode_pv_reading_to_string/"
+  },
+  {
     "version": "directory_provider",
     "url": "https://DiamondLightSource.github.io/dodal/directory_provider/"
   },
