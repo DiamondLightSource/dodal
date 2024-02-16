@@ -148,6 +148,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/262_make_arming_eiger_asynchronous/"
   },
   {
+    "version": "341-add-setup-for-the-j20-beamline",
+    "url": "https://DiamondLightSource.github.io/dodal/341-add-setup-for-the-j20-beamline/"
+  },
+  {
     "version": "51_aperture_scatterguard_no_positions",
     "url": "https://DiamondLightSource.github.io/dodal/51_aperture_scatterguard_no_positions/"
   },
