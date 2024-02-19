@@ -141,6 +141,7 @@ class PinTipDetection(StandardReadable):
 
             If a tip is found it will update the signal and stop monitoring
             If no tip is found it will retry with the next monitored value
+            This loop will serve as a good example of using 'observe_value' in the ophyd_async documentation
             """
             async for value in observe_value(self.array_data):
                 try:
