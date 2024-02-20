@@ -152,6 +152,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/341-add-setup-for-the-j20-beamline/"
   },
   {
+    "version": "344_fix_i24_instantiation",
+    "url": "https://DiamondLightSource.github.io/dodal/344_fix_i24_instantiation/"
+  },
+  {
     "version": "51_aperture_scatterguard_no_positions",
     "url": "https://DiamondLightSource.github.io/dodal/51_aperture_scatterguard_no_positions/"
   },
@@ -198,10 +202,6 @@
   {
     "version": "async-ad-sim",
     "url": "https://DiamondLightSource.github.io/dodal/async-ad-sim/"
-  },
-  {
-    "version": "convert_barcode_pv_reading_to_string",
-    "url": "https://DiamondLightSource.github.io/dodal/convert_barcode_pv_reading_to_string/"
   },
   {
     "version": "directory_provider",
