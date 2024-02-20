@@ -14,7 +14,7 @@ from dodal.devices.aperturescatterguard import (
 )
 
 I03_BEAMLINE_PARAMETER_PATH = (
-    "/dls_sw/i03/software/daq_configuration/domain/beamlineParameters"
+    "/dls_sw/i03/software/daq_configuration/domain/beamlineParameterspp"
 )
 BEAMLINE_PARAMETER_KEYWORDS = ["FB", "FULL", "deadtime"]
 
