@@ -23,13 +23,6 @@ class InvalidPinException(Exception):
     pass
 
 
-def set_pin_value(*args, **kwargs):
-    if args[1] == PinTipDetection.INVALID_POSITION:
-        raise InvalidPinException
-    else:
-        return set_sim_value(*args, **kwargs)
-
-
 class PinTipDetection(StandardReadable):
     """
     A device which will read from an on-axis view and calculate the location of the
@@ -83,6 +76,12 @@ class PinTipDetection(StandardReadable):
         )
 
         super().__init__(name=name)
+
+    async def _set_triggered_tip(self, value):
+        if value == self.INVALID_POSITION:
+            raise InvalidPinException
+        else:
+            await self.triggered_tip._backend.put(value)
 
     async def _get_tip_position(self, array_data: NDArray[np.uint8]) -> Tip:
         """
@@ -156,9 +155,7 @@ class PinTipDetection(StandardReadable):
             """
             async for value in observe_value(self.array_data):
                 try:
-                    set_pin_value(
-                        self.triggered_tip, await self._get_tip_position(value)
-                    )
+                    await self._set_triggered_tip(await self._get_tip_position(value))
                 except Exception as e:
                     LOGGER.warn(
                         f"Failed to detect pin-tip location, will retry with next image: {e}"
