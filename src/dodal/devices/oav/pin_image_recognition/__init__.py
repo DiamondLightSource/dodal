@@ -18,14 +18,17 @@ from dodal.log import LOGGER
 
 Tip = tuple[Optional[int], Optional[int]]
 
+
 class InvalidPinException(Exception):
     pass
+
 
 def set_pin_value(*args, **kwargs):
     if args[1] == PinTipDetection.INVALID_POSITION:
         raise InvalidPinException
     else:
         return set_sim_value(*args, **kwargs)
+
 
 class PinTipDetection(StandardReadable):
     """
