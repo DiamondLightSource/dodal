@@ -19,6 +19,13 @@ from dodal.log import LOGGER
 Tip = tuple[Optional[int], Optional[int]]
 
 
+def set_pin_value(*args, **kwargs):
+    if args[1] == PinTipDetection.INVALID_POSITION:
+        raise
+    else:
+        return set_sim_value(*args, **kwargs)
+
+
 class PinTipDetection(StandardReadable):
     """
     A device which will read from an on-axis view and calculate the location of the
@@ -117,10 +124,7 @@ class PinTipDetection(StandardReadable):
             )
         )
 
-        if (location.tip_x, location.tip_y) == self.INVALID_POSITION:
-            raise
-        else:
-            return (location.tip_x, location.tip_y)
+        return (location.tip_x, location.tip_y)
 
     async def connect(self, sim: bool = False):
         await super().connect(sim)
@@ -148,7 +152,7 @@ class PinTipDetection(StandardReadable):
             """
             async for value in observe_value(self.array_data):
                 try:
-                    set_sim_value(
+                    set_pin_value(
                         self.triggered_tip, await self._get_tip_position(value)
                     )
                 except Exception as e:

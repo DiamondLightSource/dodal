@@ -1,5 +1,4 @@
 from typing import Generator, List, Tuple
-from unittest.mock import MagicMock, patch
 
 import bluesky.plan_stubs as bps
 import pytest

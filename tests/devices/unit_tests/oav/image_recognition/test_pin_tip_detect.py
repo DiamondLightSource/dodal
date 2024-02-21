@@ -1,5 +1,5 @@
 import asyncio
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pytest
@@ -155,29 +155,31 @@ async def test_given_find_tip_fails_twice_when_triggered_then_tip_invalid_and_tr
         assert reading[TRIGGERED_TIP_READING]["value"] == device.INVALID_POSITION
         assert mock_process_array.call_count > 1
 
+
 @pytest.mark.asyncio
 @patch("dodal.devices.oav.pin_image_recognition.LOGGER.warn")
 @patch("dodal.devices.oav.pin_image_recognition.observe_value")
-async def test_given_tip_invalid_then_loop_keeps_retrying_until_valid(mock_image_read: MagicMock,
+async def test_given_tip_invalid_then_loop_keeps_retrying_until_valid(
+    mock_image_read: MagicMock,
     mock_logger: MagicMock,
 ):
     async def get_array_data(_):
         yield np.array([1, 2, 3])
         yield np.array([1, 2])
         await asyncio.sleep(100)
-    
+
     mock_image_read.side_effect = get_array_data
     device = await _get_pin_tip_detection_device()
 
-    class FakeLocation():
+    class FakeLocation:
         def __init__(self, tip_x, tip_y):
             self.tip_x = tip_x
             self.tip_y = tip_y
-    with (
-        patch.object(MxSampleDetect, "__init__", return_value=None),
-        patch.object(
-            MxSampleDetect, "processArray", side_effect=[FakeLocation(None,None),FakeLocation(1,1)]
-        )
+
+    with patch.object(MxSampleDetect, "__init__", return_value=None), patch.object(
+        MxSampleDetect,
+        "processArray",
+        side_effect=[FakeLocation(None, None), FakeLocation(1, 1)],
     ):
         await device.trigger()
         mock_logger.assert_called_once()
