@@ -117,7 +117,10 @@ class PinTipDetection(StandardReadable):
             )
         )
 
-        return (location.tip_x, location.tip_y)
+        if (location.tip_x, location.tip_y) == self.INVALID_POSITION:
+            raise
+        else:
+            return (location.tip_x, location.tip_y)
 
     async def connect(self, sim: bool = False):
         await super().connect(sim)
