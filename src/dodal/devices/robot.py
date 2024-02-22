@@ -2,7 +2,6 @@ from collections import OrderedDict
 from typing import Dict, Sequence
 
 from bluesky.protocols import Descriptor, Reading
-from numpy import str_
 from ophyd_async.core import StandardReadable
 from ophyd_async.epics.signal import epics_signal_r
 
@@ -23,7 +22,7 @@ class SingleIndexWaveformReadable(StandardReadable):
             pv (str): The waveform PV that contains a list of strings
             index (int, optional): The index to read. Defaults to 0.
         """
-        self.bare_signal = epics_signal_r(Sequence[str_], pv)
+        self.bare_signal = epics_signal_r(Sequence[str], pv)
         self.index = index
         super().__init__(name=name)
 
