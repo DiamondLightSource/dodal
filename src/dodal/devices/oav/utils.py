@@ -9,14 +9,14 @@ def bottom_right_from_top_left(
     steps_y: int,
     step_size_x: float,
     step_size_y: float,
-    pix_per_um_x: float,
-    pix_per_um_y: float,
+    um_per_pix_x: float,
+    um_per_pix_y: float,
 ) -> np.ndarray:
     return np.array(
         [
             # step size is given in mm, pix in um
-            int(steps_x * step_size_x * 1000 * pix_per_um_x + top_left[0]),
-            int(steps_y * step_size_y * 1000 * pix_per_um_y + top_left[1]),
+            int(steps_x * step_size_x * 1000 / um_per_pix_x + top_left[0]),
+            int(steps_y * step_size_y * 1000 / um_per_pix_y + top_left[1]),
         ],
         dtype=np.dtype(int),
     )
