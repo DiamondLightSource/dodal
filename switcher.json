@@ -228,10 +228,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1077_hyperion_to_populate_ispyb_params_resolution_instead_of_gda/"
   },
   {
-    "version": "hyperion_1191_circular_buffer_memory_handler",
-    "url": "https://DiamondLightSource.github.io/dodal/hyperion_1191_circular_buffer_memory_handler/"
-  },
-  {
     "version": "hyperion_698_refactor_parameters",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_698_refactor_parameters/"
   },
@@ -270,6 +266,10 @@
   {
     "version": "remove_ophyd_dependency_pin",
     "url": "https://DiamondLightSource.github.io/dodal/remove_ophyd_dependency_pin/"
+  },
+  {
+    "version": "remove_unused_params",
+    "url": "https://DiamondLightSource.github.io/dodal/remove_unused_params/"
   },
   {
     "version": "tom_testing",
