@@ -189,15 +189,15 @@ def test_given_circular_memory_handler_with_varying_number_of_messages_when_reco
     ]
     for message in info_messages:
         circular_handler.emit(message)
-    target.handle.assert_not_called()
+    target.handle.assert_not_called()  # type: ignore
     error_message = logging.LogRecord("Error", logging.ERROR, "", 0, None, None, None)
     circular_handler.emit(error_message)
     expected_calls = [
         call(message) for message in info_messages[expected_messages_start_idx:]
     ]
     expected_calls.append(call(error_message))
-    assert target.handle.call_count == len(expected_calls)
-    target.handle.assert_has_calls(expected_calls)
+    assert target.handle.call_count == len(expected_calls)  # type: ignore
+    target.handle.assert_has_calls(expected_calls)  # type: ignore
 
 
 def test_when_circular_memory_handler_closed_then_clears_buffer_and_target():
