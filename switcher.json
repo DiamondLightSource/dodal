@@ -236,10 +236,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1181_fix_pin_detect_trigger/"
   },
   {
-    "version": "hyperion_1189_correctly_set_runnup_distance",
-    "url": "https://DiamondLightSource.github.io/dodal/hyperion_1189_correctly_set_runnup_distance/"
-  },
-  {
     "version": "hyperion_698_refactor_parameters",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_698_refactor_parameters/"
   },
