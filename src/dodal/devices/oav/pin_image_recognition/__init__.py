@@ -4,7 +4,7 @@ from typing import Optional
 
 import numpy as np
 from numpy.typing import NDArray
-from ophyd_async.core import AsyncStatus, StandardReadable, observe_value, set_sim_value
+from ophyd_async.core import AsyncStatus, StandardReadable, observe_value
 from ophyd_async.epics.signal import epics_signal_r
 
 from dodal.devices.oav.pin_image_recognition.utils import (
@@ -34,8 +34,9 @@ class PinTipDetection(StandardReadable):
     the "edge" of the image.
 
     If no tip is found it will return {INVALID_POSITION}. However, it will also
-    occassionally give incorrect data. Therefore, it is recommended that you trigger
-    this device, which will attempt to find a pin within {validity_timeout} seconds.
+    occasionally give incorrect data. Therefore, it is recommended that you trigger
+    this device, which will attempt to find a pin within {validity_timeout} seconds if
+    no tip is found after this time it will not error but instead return {INVALID_POSITION}.
     """
 
     INVALID_POSITION = (None, None)
@@ -171,4 +172,4 @@ class PinTipDetection(StandardReadable):
             LOGGER.error(
                 f"No tip found in {await self.validity_timeout.get_value()} seconds."
             )
-            set_sim_value(self.triggered_tip, self.INVALID_POSITION)
+            await self.triggered_tip._backend.put(self.INVALID_POSITION)
