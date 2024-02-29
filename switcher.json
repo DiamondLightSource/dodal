@@ -228,10 +228,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1077_hyperion_to_populate_ispyb_params_resolution_instead_of_gda/"
   },
   {
-    "version": "hyperion_1168_set_stdout_log_to_info",
-    "url": "https://DiamondLightSource.github.io/dodal/hyperion_1168_set_stdout_log_to_info/"
-  },
-  {
     "version": "hyperion_1181_fix_pin_detect_trigger",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1181_fix_pin_detect_trigger/"
   },
