@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import logging
+from collections import deque
 from logging import Logger, StreamHandler
-from logging.handlers import MemoryHandler, TimedRotatingFileHandler
+from logging.handlers import TimedRotatingFileHandler
 from os import environ
 from pathlib import Path
 from typing import Optional, Tuple, TypedDict
@@ -19,6 +20,47 @@ DEFAULT_FORMATTER = logging.Formatter(
 )
 ERROR_LOG_BUFFER_LINES = 200000
 INFO_LOG_DAYS = 30
+
+
+class CircularMemoryHandler(logging.Handler):
+    """Loosely based on the MemoryHandler, which keeps a buffer and writes it when full
+    or when there is a record of specific level. This instead keeps a circular buffer
+    that always contains the last {capacity} number of messages, this is only flushed
+    when a log of specific {flushLevel} comes in. On flush this buffer is then passed to
+    the {target} handler.
+    """
+
+    def __init__(self, capacity, flushLevel=logging.ERROR, target=None):
+        logging.Handler.__init__(self)
+        self.buffer = deque(maxlen=capacity)
+        self.flushLevel = flushLevel
+        self.target = target
+
+    def emit(self, record):
+        self.buffer.append(record)
+        if record.levelno >= self.flushLevel:
+            self.flush()
+
+    def flush(self):
+        """
+        Pass the contents of the buffer forward to the target.
+        """
+        self.acquire()
+        try:
+            if self.target:
+                for record in self.buffer:
+                    self.target.handle(record)
+        finally:
+            self.release()
+
+    def close(self):
+        self.acquire()
+        try:
+            self.buffer.clear()
+            self.target = None
+            logging.Handler.close(self)
+        finally:
+            self.release()
 
 
 class BeamlineFilter(logging.Filter):
@@ -47,7 +89,7 @@ class DodalLogHandlers(TypedDict):
     stream_handler: StreamHandler
     graylog_handler: GELFTCPHandler
     info_file_handler: TimedRotatingFileHandler
-    debug_memory_handler: MemoryHandler
+    debug_memory_handler: CircularMemoryHandler
 
 
 def _add_handler(logger: logging.Logger, handler: logging.Handler):
@@ -91,7 +133,7 @@ def set_up_DEBUG_memory_handler(
     debug_path.mkdir(parents=True, exist_ok=True)
     file_handler = TimedRotatingFileHandler(filename=debug_path / filename, when="H")
     file_handler.setLevel(logging.DEBUG)
-    memory_handler = MemoryHandler(
+    memory_handler = CircularMemoryHandler(
         capacity=capacity, flushLevel=logging.ERROR, target=file_handler
     )
     memory_handler.setLevel(logging.DEBUG)
@@ -121,8 +163,8 @@ def set_up_all_logging_handlers(
         filename:               The log filename.
         dev_mode:               If true, will log to graylog on localhost instead of
                                 production. Defaults to False.
-        error_log_buffer_lines: Number of lines for the MemoryHandler to keep in buffer
-                                and write to file when encountering an error message.
+        error_log_buffer_lines: Number of lines for the CircularMemoryHandler to keep in
+                                buffer and write to file when encountering an error message.
     Returns:
         A DodaLogHandlers TypedDict with the created handlers.
     """

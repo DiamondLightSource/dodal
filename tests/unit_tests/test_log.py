@@ -10,6 +10,7 @@ from dodal.log import (
     ERROR_LOG_BUFFER_LINES,
     LOGGER,
     BeamlineFilter,
+    CircularMemoryHandler,
     clear_all_loggers_and_handlers,
     get_logging_file_path,
     integrate_bluesky_and_ophyd_logging,
@@ -26,7 +27,7 @@ def mock_logger():
 @patch("dodal.log.StreamHandler", autospec=True)
 @patch("dodal.log.GELFTCPHandler", autospec=True)
 @patch("dodal.log.TimedRotatingFileHandler", autospec=True)
-@patch("dodal.log.MemoryHandler", autospec=True)
+@patch("dodal.log.CircularMemoryHandler", autospec=True)
 def test_handlers_set_at_correct_default_level(
     mock_memory_handler,
     mock_file_handler,
@@ -72,7 +73,7 @@ def test_prod_mode_sets_correct_graypy_handler(
 
 @patch("dodal.log.GELFTCPHandler", autospec=True)
 @patch("dodal.log.TimedRotatingFileHandler", autospec=True)
-@patch("dodal.log.MemoryHandler", autospec=True)
+@patch("dodal.log.CircularMemoryHandler", autospec=True)
 def test_no_env_variable_sets_correct_file_handler(
     mock_memory_handler,
     mock_file_handler: MagicMock,
@@ -171,3 +172,40 @@ def test_various_messages_to_graylog_get_beamline_filter(
 
     assert mock_GELFTCPHandler.emit.call_args.args[0].name == "bluesky"
     assert mock_GELFTCPHandler.emit.call_args.args[0].beamline == "dev"
+
+
+@pytest.mark.parametrize(
+    "num_info_messages,expected_messages_start_idx",
+    [(5, 0), (20, 11), (500, 491)],
+)
+def test_given_circular_memory_handler_with_varying_number_of_messages_when_record_of_correct_level_comes_in_then_flushed_with_expected_messages(
+    num_info_messages, expected_messages_start_idx
+):
+    target: logging.Handler = MagicMock(spec=logging.Handler)
+    circular_handler = CircularMemoryHandler(10, target=target)
+    info_messages = [
+        logging.LogRecord(f"Info_{i}", logging.INFO, "", 0, None, None, None)
+        for i in range(num_info_messages)
+    ]
+    for message in info_messages:
+        circular_handler.emit(message)
+    target.handle.assert_not_called()
+    error_message = logging.LogRecord("Error", logging.ERROR, "", 0, None, None, None)
+    circular_handler.emit(error_message)
+    expected_calls = [
+        call(message) for message in info_messages[expected_messages_start_idx:]
+    ]
+    expected_calls.append(call(error_message))
+    assert target.handle.call_count == len(expected_calls)
+    target.handle.assert_has_calls(expected_calls)
+
+
+def test_when_circular_memory_handler_closed_then_clears_buffer_and_target():
+    circular_handler = CircularMemoryHandler(10, target=MagicMock())
+    circular_handler.emit(
+        logging.LogRecord("Info", logging.INFO, "", 0, None, None, None)
+    )
+    assert len(circular_handler.buffer) == 1
+    circular_handler.close()
+    assert len(circular_handler.buffer) == 0
+    assert circular_handler.target is None
