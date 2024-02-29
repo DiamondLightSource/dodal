@@ -42,16 +42,30 @@ class ZocaloTrigger:
         finally:
             transport.disconnect()
 
-    def run_start(self, data_collection_id: int):
+    def run_start(
+        self,
+        data_collection_id: int,
+        start_index: int,
+        number_of_frames: int,
+    ):
         """Tells the data analysis pipeline we have started a run.
         Assumes that appropriate data has already been put into ISPyB
 
         Args:
-            data_collection_id (int): The ID of the data collection representing the
-                                    gridscan in ISPyB
+            data_collection_id (int): The ID of the data collection in ISPyB
+            start_index (int): The index of the first image of this collection within
+                               the file written by the detector.
+            number_of_frames (int): The number of frames in this collection.
         """
         LOGGER.info(f"Starting Zocalo job with ispyb id {data_collection_id}")
-        self._send_to_zocalo({"event": "start", "ispyb_dcid": data_collection_id})
+        self._send_to_zocalo(
+            {
+                "event": "start",
+                "ispyb_dcid": data_collection_id,
+                "start_index": start_index,
+                "number_of_frames": number_of_frames,
+            }
+        )
 
     def run_end(self, data_collection_id: int):
         """Tells the data analysis pipeline we have finished a run.

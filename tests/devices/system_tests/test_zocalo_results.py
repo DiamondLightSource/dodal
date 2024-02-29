@@ -39,7 +39,7 @@ async def zocalo_device():
 async def test_read_results_from_fake_zocalo(zocalo_device: ZocaloResults):
     zocalo_device._subscribe_to_results()
     zc = ZocaloTrigger("dev_artemis")
-    zc.run_start(0)
+    zc.run_start(0, 0, 100)
     zc.run_end(0)
     zocalo_device.timeout_s = 5
 
@@ -66,7 +66,7 @@ async def test_stage_unstage_controls_read_results_from_fake_zocalo(
 
     def plan():
         yield from bps.open_run()
-        zc.run_start(0)
+        zc.run_start(0, 0, 100)
         zc.run_end(0)
         yield from bps.sleep(0.15)
         yield from bps.trigger_and_read([zocalo_device])
