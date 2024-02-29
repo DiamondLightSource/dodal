@@ -228,8 +228,8 @@
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1077_hyperion_to_populate_ispyb_params_resolution_instead_of_gda/"
   },
   {
-    "version": "hyperion_1181_fix_pin_detect_trigger",
-    "url": "https://DiamondLightSource.github.io/dodal/hyperion_1181_fix_pin_detect_trigger/"
+    "version": "hyperion_1191_circular_buffer_memory_handler",
+    "url": "https://DiamondLightSource.github.io/dodal/hyperion_1191_circular_buffer_memory_handler/"
   },
   {
     "version": "hyperion_698_refactor_parameters",
