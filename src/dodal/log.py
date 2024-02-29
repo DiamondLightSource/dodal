@@ -102,7 +102,7 @@ def set_up_DEBUG_memory_handler(
 
 def set_up_stream_handler(logger: Logger):
     stream_handler = StreamHandler()
-    stream_handler.setLevel(logging.DEBUG)
+    stream_handler.setLevel(logging.INFO)
     _add_handler(logger, stream_handler)
     return stream_handler
 

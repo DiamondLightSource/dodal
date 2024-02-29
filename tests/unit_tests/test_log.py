@@ -47,7 +47,7 @@ def test_handlers_set_at_correct_default_level(
     handlers["graylog_handler"].setLevel.assert_called_once_with(logging.INFO)
     handlers["info_file_handler"].setLevel.assert_any_call(logging.INFO)
     handlers["info_file_handler"].setLevel.assert_any_call(logging.DEBUG)
-    handlers["stream_handler"].setLevel.assert_called_once_with(logging.DEBUG)
+    handlers["stream_handler"].setLevel.assert_called_once_with(logging.INFO)
 
 
 @patch("dodal.log.GELFTCPHandler", autospec=True)
