@@ -19,13 +19,15 @@ def _is_i20_1_machine():
 
 
 @skip_device(lambda: not _is_i20_1_machine())
-def turbo_slit_motor() -> EpicsMotor:
+def turbo_slit_motor(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> EpicsMotor:
     """Get the i20-1 motor"""
 
     return device_instantiation(
         EpicsMotor,
-        "BL20J-OP-PCHRO-01:TS:XFINE",
-        "turbo_slit_motor_x",
-        wait=False,
-        fake=False,
+        prefix="BL20J-OP-PCHRO-01:TS:XFINE",
+        name="turbo_slit_motor_x",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
     )
