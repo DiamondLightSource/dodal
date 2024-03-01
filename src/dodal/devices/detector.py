@@ -80,11 +80,6 @@ class DetectorParams(BaseModel):
         else:
             return run_number
 
-    # The following are optional from GDA as populated internally
-    # Where the VDS start index should be in the Nexus file
-    start_index: Optional[int] = 0
-    nexus_file_run_number: Optional[int] = 0
-
     def __post_init__(self):
         self.beam_xy_converter = DetectorDistanceToBeamXYConverter(
             self.det_dist_to_beam_converter_path
@@ -136,16 +131,8 @@ class DetectorParams(BaseModel):
         return x_beam_pixels - offset_x, y_beam_pixels - offset_y
 
     @property
-    def omega_end(self):
-        return self.omega_start + self.num_triggers * self.omega_increment
-
-    @property
     def full_filename(self):
         return f"{self.prefix}_{self.run_number}"
-
-    @property
-    def nexus_filename(self):
-        return f"{self.prefix}_{self.nexus_file_run_number}"
 
     @property
     def full_number_of_images(self):
