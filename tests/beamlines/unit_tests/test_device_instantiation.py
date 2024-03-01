@@ -10,7 +10,7 @@ from dodal.utils import BLUESKY_PROTOCOLS, make_all_devices
 
 from ...conftest import mock_beamline_module_filepaths
 
-ALL_BEAMLINES = {"i03", "i04", "i04_1", "i23", "i24", "p38", "p45", "i20-1"}
+ALL_BEAMLINES = {"i03", "i04", "i04_1", "i23", "i24", "p38", "p45", "i20_1"}
 
 
 def follows_bluesky_protocols(obj: Any) -> bool:
