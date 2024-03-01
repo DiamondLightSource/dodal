@@ -1,5 +1,4 @@
 from ophyd import Component, Device, EpicsSignal, StatusBase
-from ophyd_async import Motor
 
 
 class TurboSlit(Device):
@@ -23,4 +22,5 @@ class TurboSlit(Device):
 class AsyncTurboSlit(Device):
     # .val - set value channel
     # .rbv - readback value - read channel
-    motor_x = Motor()
+    pass
+    # motor_x = Motor()
