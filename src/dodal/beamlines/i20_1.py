@@ -4,7 +4,7 @@ from dodal.devices.motors import EpicsMotor
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import get_beamline_name, get_hostname, skip_device
 
-BL = get_beamline_name("i20-1")
+BL = get_beamline_name("i20_1")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
@@ -15,7 +15,7 @@ def _is_i20_1_machine():
     PVA gateways at present.
     """
     hostname = get_hostname()
-    return hostname.startswith("i20-1")
+    return hostname.startswith("i20_1")
 
 
 @skip_device(lambda: not _is_i20_1_machine())

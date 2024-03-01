@@ -1,13 +1,10 @@
 from ophyd import Component, Device, EpicsSignal, StatusBase
+from ophyd_async import Motor
 
 
 class TurboSlit(Device):
     """
     todo for now only the x motor
-    - direct movement 
-    - continuous movement
-    - continuous movement with a defined trajectory
-    - trajectory scan - with TTL signal from Zebra box
     add soft limits
     check min speed
     set speed back to before movement
@@ -21,3 +18,9 @@ class TurboSlit(Device):
     def set(self, position: str) -> StatusBase:
         status = self.motor_x.set(position)
         return status
+
+
+class AsyncTurboSlit(Device):
+    # .val - set value channel
+    # .rbv - readback value - read channel
+    motor_x = Motor()
