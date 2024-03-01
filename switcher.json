@@ -272,10 +272,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/remove_ophyd_dependency_pin/"
   },
   {
-    "version": "remove_unused_params",
-    "url": "https://DiamondLightSource.github.io/dodal/remove_unused_params/"
-  },
-  {
     "version": "tom_testing",
     "url": "https://DiamondLightSource.github.io/dodal/tom_testing/"
   }
