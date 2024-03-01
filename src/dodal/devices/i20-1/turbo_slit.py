@@ -1,7 +1,8 @@
 from ophyd import Component, Device, EpicsSignal, StatusBase
+from ophyd_async.core import Device as OphydV2Device
 
 
-class TurboSlit(Device):
+class TurboSlit(OphydV2Device):
     """
     todo for now only the x motor
     add soft limits
