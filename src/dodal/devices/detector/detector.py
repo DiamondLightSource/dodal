@@ -3,13 +3,13 @@ from typing import Any, Optional, Tuple
 
 from pydantic import BaseModel, validator
 
-from dodal.devices.det_dim_constants import (
+from dodal.devices.detector.det_dim_constants import (
     EIGER2_X_16M_SIZE,
     DetectorSize,
     DetectorSizeConstants,
     constants_from_type,
 )
-from dodal.devices.det_dist_to_beam_converter import (
+from dodal.devices.detector.det_dist_to_beam_converter import (
     Axis,
     DetectorDistanceToBeamXYConverter,
 )

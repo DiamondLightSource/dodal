@@ -1,6 +1,6 @@
 import pytest
 
-from dodal.devices.det_dim_constants import (
+from dodal.devices.detector.det_dim_constants import (
     EIGER2_X_4M_DIMENSION_X,
     EIGER_TYPE_EIGER2_X_4M,
     constants_from_type,
