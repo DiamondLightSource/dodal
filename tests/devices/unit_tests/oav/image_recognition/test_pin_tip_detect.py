@@ -111,7 +111,7 @@ async def test_given_valid_data_reading_then_used_to_find_location():
 
         process_call = mock_process_array.call_args[0][0]
         assert np.array_equal(process_call, image_array)
-        assert location[TRIGGERED_TIP_READING]["value"] == (200, 100)
+        assert location[TRIGGERED_TIP_READING]["value"] == (100, 200)
         assert location[TRIGGERED_TIP_READING]["timestamp"] > 0
 
 
