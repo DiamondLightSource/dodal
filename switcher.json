@@ -236,6 +236,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1007_reset_stub_offsets_if_required/"
   },
   {
+    "version": "hyperion_1068_1213_ophyd_oav_for_grid_detect",
+    "url": "https://DiamondLightSource.github.io/dodal/hyperion_1068_1213_ophyd_oav_for_grid_detect/"
+  },
+  {
     "version": "hyperion_1091_provide_zocalo_with_more_info",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1091_provide_zocalo_with_more_info/"
   },
