@@ -97,8 +97,8 @@ class SampleLocation:
     Holder type for results from sample detection.
     """
 
-    tip_y: Optional[int]
     tip_x: Optional[int]
+    tip_y: Optional[int]
     edge_top: np.ndarray
     edge_bottom: np.ndarray
 
@@ -248,5 +248,5 @@ class MxSampleDetect(object):
             )
         )
         return SampleLocation(
-            tip_y=tip_y, tip_x=tip_x, edge_bottom=bottom, edge_top=top
+            tip_x=tip_x, tip_y=tip_y, edge_bottom=bottom, edge_top=top
         )
