@@ -1,6 +1,6 @@
 import asyncio
 import time
-from typing import Optional
+from typing import Optional, Tuple
 
 import numpy as np
 from numpy.typing import NDArray
@@ -10,6 +10,7 @@ from ophyd_async.epics.signal import epics_signal_r
 from dodal.devices.oav.pin_image_recognition.utils import (
     ARRAY_PROCESSING_FUNCTIONS_MAP,
     MxSampleDetect,
+    SampleLocation,
     ScanDirections,
     identity,
 )
@@ -46,6 +47,12 @@ class PinTipDetection(StandardReadable):
         self._name = name
 
         self.triggered_tip = create_soft_signal_r(Tip, "triggered_tip", self.name)
+        self.triggered_top_edge = create_soft_signal_r(
+            NDArray[np.uint32], "triggered_top_edge", self.name
+        )
+        self.triggered_bottom_edge = create_soft_signal_r(
+            NDArray[np.uint32], "triggered_bottom_edge", self.name
+        )
         self.array_data = epics_signal_r(NDArray[np.uint8], f"pva://{prefix}PVA:ARRAY")
 
         # Soft parameters for pin-tip detection.
@@ -73,23 +80,30 @@ class PinTipDetection(StandardReadable):
         )
 
         self.set_readable_signals(
-            read=[self.triggered_tip],
+            read=[
+                self.triggered_tip,
+                self.triggered_top_edge,
+                self.triggered_bottom_edge,
+            ],
         )
 
         super().__init__(name=name)
 
-    async def _set_triggered_tip(self, value):
+    async def _set_triggered_tip(self, value: Tip):
         if value == self.INVALID_POSITION:
             raise InvalidPinException
         else:
             await self.triggered_tip._backend.put(value)
 
-    async def _get_tip_position(self, array_data: NDArray[np.uint8]) -> Tip:
-        """
-        Gets the location of the pin tip.
+    async def _set_edges(self, values: tuple[NDArray, NDArray]):
+        await self.triggered_top_edge._backend.put(values[0])
+        await self.triggered_bottom_edge._backend.put(values[0])
 
-        Returns tuple of:
-            (tip_x, tip_y)
+    async def _get_tip_and_edge_data(
+        self, array_data: NDArray[np.uint8]
+    ) -> SampleLocation:
+        """
+        Gets the location of the pin tip and the top and bottom edges.
         """
         preprocess_key = await self.preprocess_operation.get_value()
         preprocess_iter = await self.preprocess_iterations.get_value()
@@ -127,8 +141,29 @@ class PinTipDetection(StandardReadable):
                 (end_time - start_time) * 1000.0
             )
         )
+        return location
 
+    async def _get_tip_position(self, array_data: NDArray[np.uint8]) -> Tip:
+        """
+        Gets the location of the pin tip.
+
+        Returns tuple of:
+            (tip_x, tip_y)
+        """
+        location = await self._get_tip_and_edge_data(array_data)
         return (location.tip_x, location.tip_y)
+
+    async def _get_sample_edges(
+        self, array_data: NDArray[np.uint8]
+    ) -> Tuple[NDArray, NDArray]:
+        """
+        Gets the location of the pin tip.
+
+        Returns tuple of:
+                (edge_top: NDArray, edge_bottom: NDArray)
+        """
+        location = await self._get_tip_and_edge_data(array_data)
+        return (location.edge_top, location.edge_bottom)
 
     async def connect(self, sim: bool = False):
         await super().connect(sim)
@@ -156,7 +191,9 @@ class PinTipDetection(StandardReadable):
             """
             async for value in observe_value(self.array_data):
                 try:
-                    await self._set_triggered_tip(await self._get_tip_position(value))
+                    location = await self._get_tip_and_edge_data(value)
+                    await self._set_edges((location.edge_top, location.edge_bottom))
+                    await self._set_triggered_tip((location.tip_x, location.tip_y))
                 except Exception as e:
                     LOGGER.warn(
                         f"Failed to detect pin-tip location, will retry with next image: {e}"

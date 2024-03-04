@@ -172,14 +172,25 @@ async def test_given_tip_invalid_then_loop_keeps_retrying_until_valid(
     device = await _get_pin_tip_detection_device()
 
     class FakeLocation:
-        def __init__(self, tip_x, tip_y):
+        def __init__(self, tip_x, tip_y, edge_top, edge_bottom):
             self.tip_x = tip_x
             self.tip_y = tip_y
+            self.edge_top = edge_top
+            self.edge_bottom = edge_bottom
 
-    with patch.object(MxSampleDetect, "__init__", return_value=None), patch.object(
-        MxSampleDetect,
-        "processArray",
-        side_effect=[FakeLocation(None, None), FakeLocation(1, 1)],
+    fake_top_edge = np.array([1, 2, 3])
+    fake_bottom_edge = np.array([4, 5, 6])
+
+    with (
+        patch.object(MxSampleDetect, "__init__", return_value=None),
+        patch.object(
+            MxSampleDetect,
+            "processArray",
+            side_effect=[
+                FakeLocation(None, None, fake_top_edge, fake_bottom_edge),
+                FakeLocation(1, 1, fake_top_edge, fake_bottom_edge),
+            ],
+        ),
     ):
         await device.trigger()
         mock_logger.assert_called_once()
