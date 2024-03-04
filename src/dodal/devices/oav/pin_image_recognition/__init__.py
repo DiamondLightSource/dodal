@@ -97,7 +97,7 @@ class PinTipDetection(StandardReadable):
 
     async def _set_edges(self, values: tuple[NDArray, NDArray]):
         await self.triggered_top_edge._backend.put(values[0])
-        await self.triggered_bottom_edge._backend.put(values[0])
+        await self.triggered_bottom_edge._backend.put(values[1])
 
     async def _get_tip_and_edge_data(
         self, array_data: NDArray[np.uint8]
