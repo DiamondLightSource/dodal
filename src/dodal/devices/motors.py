@@ -39,7 +39,9 @@ class XYZLimitBundle:
     y: MotorLimitHelper
     z: MotorLimitHelper
 
-    def position_valid(self, position: np.ndarray):
+    def position_valid(
+        self, position: np.ndarray | list[float] | tuple[float, float, float]
+    ):
         if len(position) != 3:
             raise ValueError(
                 f"Position valid expects a 3-vector, got {position} instead"
