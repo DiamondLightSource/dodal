@@ -210,3 +210,4 @@ class PinTipDetection(StandardReadable):
                 f"No tip found in {await self.validity_timeout.get_value()} seconds."
             )
             await self.triggered_tip._backend.put(self.INVALID_POSITION)
+            await self._set_edges((np.array([]), np.array([])))
