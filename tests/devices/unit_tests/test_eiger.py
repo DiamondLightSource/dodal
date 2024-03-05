@@ -6,8 +6,8 @@ from mockito import ANY, mock, verify, when
 from ophyd.sim import make_fake_device
 from ophyd.status import Status
 
-from dodal.devices.det_dim_constants import EIGER2_X_16M_SIZE
 from dodal.devices.detector import DetectorParams, TriggerMode
+from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.status import await_value
 from dodal.devices.util.epics_util import run_functions_without_blocking
