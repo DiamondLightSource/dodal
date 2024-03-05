@@ -13,11 +13,13 @@ from dodal.devices.zocalo import (
 SIM_ZOCALO_ENV = "dev_artemis"
 
 EXPECTED_DCID = 100
+EXPECTED_FILENAME = "test/file"
 EXPECTED_RUN_START_MESSAGE = {
     "event": "start",
     "ispyb_dcid": EXPECTED_DCID,
     "start_index": 0,
     "number_of_frames": 100,
+    "filename": EXPECTED_FILENAME,
 }
 EXPECTED_RUN_END_MESSAGE = {
     "event": "end",
@@ -85,7 +87,7 @@ def test_run_start(function_wrapper: Callable, expected_message: Dict):
         function_wrapper (Callable): A wrapper used to test for expected exceptions
         expected_message (Dict): The expected dictionary sent to zocalo
     """
-    function_to_run = partial(zc.run_start, EXPECTED_DCID, 0, 100)
+    function_to_run = partial(zc.run_start, EXPECTED_DCID, EXPECTED_FILENAME, 0, 100)
     function_to_run = partial(function_wrapper, function_to_run)
     _test_zocalo(function_to_run, expected_message)
 

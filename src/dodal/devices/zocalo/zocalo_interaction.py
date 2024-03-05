@@ -45,6 +45,7 @@ class ZocaloTrigger:
     def run_start(
         self,
         data_collection_id: int,
+        filename: str,
         start_index: int,
         number_of_frames: int,
     ):
@@ -53,6 +54,7 @@ class ZocaloTrigger:
 
         Args:
             data_collection_id (int): The ID of the data collection in ISPyB
+            filename (str): The name of the file that the detector will store into dev/shm
             start_index (int): The index of the first image of this collection within
                                the file written by the detector.
             number_of_frames (int): The number of frames in this collection.
@@ -62,6 +64,7 @@ class ZocaloTrigger:
             {
                 "event": "start",
                 "ispyb_dcid": data_collection_id,
+                "filename": filename,
                 "start_index": start_index,
                 "number_of_frames": number_of_frames,
             }
