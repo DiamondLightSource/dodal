@@ -22,7 +22,7 @@ def _get_zocalo_connection(environment):
 @dataclass
 class ZocaloStartInfo:
     """
-    data_collection_id (int): The ID of the data collection in ISPyB
+    ispyb_dcid (int): The ID of the data collection in ISPyB
     filename (str): The name of the file that the detector will store into dev/shm
     number_of_frames (int): The number of frames in this collection.
     start_index (int): The index of the first image of this collection within the file
