@@ -143,7 +143,7 @@ class AdAravisMakoController(DetectorControl):
     # TODO: Extract this to config and actually use the model of the camera.
     # https://github.com/DiamondLightSource/dodal/issues/340
     # cite: https://cdn.alliedvision.com/fileadmin/content/documents/products/cameras/various/appnote/GigE/GigE-Cameras_AppNote_PIV-Min-Time-Between-Exposures.pdf
-    deadtime_map: Dict[str, float] = {
+    _deadtime_map: Dict[str, float] = {
         "GB650": 78.0e-6,
         "GC650": 121e-6,
         "GE680": 38.2e-6,
@@ -240,7 +240,7 @@ class AdAravisMakoController(DetectorControl):
 
     def get_deadtime(self, exposure: float) -> float:
         # https://github.com/DiamondLightSource/dodal/issues/340
-        return self.deadtime_map.get("G-234")
+        return self._deadtime_map.get("G-234")
 
     async def arm(
         self,

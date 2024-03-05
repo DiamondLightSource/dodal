@@ -68,3 +68,22 @@ async def test_excepts_for_invalid_triggers(tetramm_controller: TetrammControlle
         await tetramm_controller.arm(DetectorTrigger.internal)
     # Function excepts early and does not do any sets
     assert tetramm_controller._drv.averaging_time == previous_averaging_time
+
+
+async def test_set_frame_time(tetramm_controller: TetrammController):
+    """
+    frame_time >= readings_per_frame * values_per_reading / sample_rate
+    With the default values:
+    base_sample_rate = 100_000
+    minimum_values_per_reading = 5
+    readings_per_frame = 1_000
+    frame_time >= 1_000 * 5 / 100_000 = 1/20
+    """
+
+    await tetramm_controller.set_frame_time(1 / 19)
+
+    with pytest.raises(
+        ValueError,
+        match="frame_time 0.02 is too low to collect at least 5 values per reading, at 1,000 readings per frame.",
+    ):
+        await tetramm_controller.set_frame_time(1 / 50)
