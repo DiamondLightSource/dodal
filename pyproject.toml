@@ -26,6 +26,7 @@ dependencies = [
     "opencv-python-headless",                                                                          # For pin-tip detection.
     "aioca",                                                                                           # Required for CA support with ophyd-async.
     "p4p",                                                                                             # Required for PVA support with ophyd-async.
+    "numpy",
 ]
 
 dynamic = ["version"]
@@ -87,6 +88,11 @@ addopts = """
     """
 # Doctest python code in docs, python code in src docstrings, test functions in tests
 testpaths = "docs src tests"
+
+[tool.coverage.report]
+exclude_also = [
+    '^"""', # Ignore the start/end of a file-level triple quoted docstring
+]
 
 [tool.coverage.run]
 data_file = "/tmp/dodal.coverage"
