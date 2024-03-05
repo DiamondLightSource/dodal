@@ -1,6 +1,6 @@
 import asyncio
 import time
-from typing import Optional, Tuple
+from typing import Optional
 
 import numpy as np
 from numpy.typing import NDArray
@@ -142,28 +142,6 @@ class PinTipDetection(StandardReadable):
             )
         )
         return location
-
-    async def _get_tip_position(self, array_data: NDArray[np.uint8]) -> Tip:
-        """
-        Gets the location of the pin tip.
-
-        Returns tuple of:
-            (tip_x, tip_y)
-        """
-        location = await self._get_tip_and_edge_data(array_data)
-        return (location.tip_x, location.tip_y)
-
-    async def _get_sample_edges(
-        self, array_data: NDArray[np.uint8]
-    ) -> Tuple[NDArray, NDArray]:
-        """
-        Gets the location of the pin tip.
-
-        Returns tuple of:
-                (edge_top: NDArray, edge_bottom: NDArray)
-        """
-        location = await self._get_tip_and_edge_data(array_data)
-        return (location.edge_top, location.edge_bottom)
 
     async def connect(self, sim: bool = False):
         await super().connect(sim)
