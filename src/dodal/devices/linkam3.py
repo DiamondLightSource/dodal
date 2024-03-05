@@ -14,14 +14,19 @@ class PumpControl(str, Enum):
 
 
 class Linkam3(StandardReadable):
-    tolerance: float = 0.5
-    """
-    The deadband around the setpoint within which the position is assumed to
-    have been reached
+    """Device to represent a Linkam3 temperature controller
+
+    Attributes:
+        tolerance (float): Deadband around the setpoint within which the position is assumed to have been reached
+        settle_time (int): The delay between reaching the setpoint and the move being considered complete
+
+    Args:
+        prefix (str): PV prefix for this device
+        name (str): unique name for this device
     """
 
+    tolerance: float = 0.5
     settle_time: int = 0
-    """The delay between reaching the setpoint and the move being considered complete"""
 
     def __init__(self, prefix: str, name: str):
         self.temp = epics_signal_r(float, prefix + "TEMP:")
@@ -80,21 +85,25 @@ class Linkam3(StandardReadable):
         coro = asyncio.wait_for(self._move(new_position, watchers), timeout=timeout)
         return AsyncStatus(coro, watchers)
 
-    # TODO: Check bitshift order
+    # TODO: Make use of values in Status.
+    # https://github.com/DiamondLightSource/dodal/issues/338
+    async def _is_nth_bit_set(self, n: int) -> bool:
+        return bool(int(await self.status.get_value()) & 1 << n)
+
     async def in_error(self) -> bool:
-        return bool(int(await self.status.get_value()) & 1)
+        return await self._is_nth_bit_set(0)
 
     async def at_setpoint(self) -> bool:
-        return bool(int(await self.status.get_value()) & 1 << 1)
+        return await self._is_nth_bit_set(1)
 
     async def heater_on(self) -> bool:
-        return bool(int(await self.status.get_value()) & 1 << 2)
+        return await self._is_nth_bit_set(2)
 
     async def pump_on(self) -> bool:
-        return bool(int(await self.status.get_value()) & 1 << 3)
+        return await self._is_nth_bit_set(3)
 
     async def pump_auto(self) -> bool:
-        return bool(int(await self.status.get_value()) & 1 << 4)
+        return await self._is_nth_bit_set(4)
 
     async def locate(self) -> Location:
         return {
