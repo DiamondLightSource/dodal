@@ -82,7 +82,7 @@ async def test_invalid_processing_func_uses_identity_function():
         patch.object(MxSampleDetect, "__init__", return_value=None) as mock_init,
         patch.object(MxSampleDetect, "processArray", return_value=test_sample_location),
     ):
-        await device._get_tip_position(np.array([]))
+        await device._get_tip_and_edge_data(np.array([]))
 
         mock_init.assert_called_once()
 
