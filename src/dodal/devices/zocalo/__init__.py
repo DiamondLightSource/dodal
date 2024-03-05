@@ -1,6 +1,4 @@
-from dodal.devices.zocalo.zocalo_interaction import (
-    ZocaloTrigger,
-)
+from dodal.devices.zocalo.zocalo_interaction import ZocaloStartInfo, ZocaloTrigger
 from dodal.devices.zocalo.zocalo_results import (
     NoResultsFromZocalo,
     NoZocaloSubscription,
@@ -17,6 +15,7 @@ __all__ = [
     "ZOCALO_READING_PLAN_NAME",
     "NoResultsFromZocalo",
     "NoZocaloSubscription",
+    "ZocaloStartInfo",
 ]
 
 ZOCALO_READING_PLAN_NAME = "zocalo reading"
