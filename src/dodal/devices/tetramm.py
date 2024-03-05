@@ -44,14 +44,6 @@ class TetrammResolution(str, Enum):
     SixteenBits = "16 bits"
     TwentyFourBits = "24 bits"
 
-    def __repr__(self):
-        if self == TetrammResolution.SixteenBits:
-            return "16bits"
-        elif self == TetrammResolution.TwentyFourBits:
-            return "24bits"
-        else:
-            return "Unknown"
-
 
 class TetrammGeometry(str, Enum):
     Diamond = "Diamond"
