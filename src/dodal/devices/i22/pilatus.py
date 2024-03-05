@@ -16,4 +16,10 @@ class I22HDFStatsPilatus(HDFStatsPilatus):
         **scalar_sigs: str,
     ):
         self.cdc = NDPluginBase(prefix + "CDC:")
-        super().__init__(prefix, directory_provider, name, config_sigs, **scalar_sigs)
+        super().__init__(
+            prefix=prefix,
+            name=name,
+            directory_provider=directory_provider,
+            config_sigs=config_sigs,
+            **scalar_sigs,
+        )

@@ -23,7 +23,7 @@ class Linkam3(StandardReadable):
     settle_time: int = 0
     """The delay between reaching the setpoint and the move being considered complete"""
 
-    def __init__(self, prefix: str, name: str = ""):
+    def __init__(self, prefix: str, name: str):
         self.temp = epics_signal_r(float, prefix + "TEMP:")
         self.dsc = epics_signal_r(float, prefix + "DSC:")
         self.start_heat = epics_signal_rw(bool, prefix + "STARTHEAT:")
