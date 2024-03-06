@@ -150,29 +150,29 @@ def test_aperture_scatterguard_returns_status_if_within_tolerance(
     assert isinstance(status, StatusBase)
 
 
-def test_aperture_positions_get_new_position_truthy_exact(aperture_positions):
+def test_aperture_positions_get_close_position_truthy_exact(aperture_positions):
     should_be_large = ApertureFiveDimensionalLocation(2.389, 40.986, 15.8, 5.25, 4.43)
-    new_position = aperture_positions.get_new_position(should_be_large)
+    new_position = aperture_positions.get_close_position(should_be_large)
     assert new_position == aperture_positions.LARGE
 
 
-def test_aperture_positions_get_new_position_truthy_inside_tolerance(
+def test_aperture_positions_get_close_position_truthy_inside_tolerance(
     aperture_positions,
 ):
     should_be_large = ApertureFiveDimensionalLocation(2.389, 40.9865, 15.8, 5.25, 4.43)
-    new_position = aperture_positions.get_new_position(should_be_large)
+    new_position = aperture_positions.get_close_position(should_be_large)
     assert new_position == aperture_positions.LARGE
 
 
-def test_aperture_positions_get_new_position_falsy(aperture_positions):
+def test_aperture_positions_get_close_position_falsy(aperture_positions):
     large_missed_by_2_at_y = ApertureFiveDimensionalLocation(
         2.389, 42, 15.8, 5.25, 4.43
     )
     with pytest.raises(InvalidApertureMove):
-        aperture_positions.get_new_position(large_missed_by_2_at_y)
+        aperture_positions.get_close_position(large_missed_by_2_at_y)
 
 
-def test_aperture_positions_get_new_position_robot_load_exact(aperture_positions):
+def test_aperture_positions_get_close_position_robot_load_exact(aperture_positions):
     robot_exact = ApertureFiveDimensionalLocation(
         2.386,
         31.40,
@@ -180,7 +180,7 @@ def test_aperture_positions_get_new_position_robot_load_exact(aperture_positions
         5.25,
         4.43,
     )
-    new_position = aperture_positions.get_new_position(robot_exact)
+    new_position = aperture_positions.get_close_position(robot_exact)
     assert new_position is aperture_positions.ROBOT_LOAD
 
 

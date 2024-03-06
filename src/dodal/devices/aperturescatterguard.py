@@ -97,24 +97,26 @@ class AperturePositions:
             ),
         )
 
-    def get_new_position(
-        self, pos: ApertureFiveDimensionalLocation
-    ) -> SingleAperturePosition:
-        """
-        Check if argument 'pos' is a valid position in this AperturePositions object.
-        """
-        options: List[SingleAperturePosition] = [
+    def as_list(self) -> List[SingleAperturePosition]:
+        return [
             self.LARGE,
             self.MEDIUM,
             self.SMALL,
             self.ROBOT_LOAD,
         ]
+
+    def get_close_position(
+        self, pos: ApertureFiveDimensionalLocation
+    ) -> SingleAperturePosition:
+        """
+        Returns the closest valid position to {pos} within {TOLERANCE_MM}
+        """
         pos_list = list(pos)
-        for obj in options:
+        for obj in self.as_list():
             local_position = list(obj.location)
             if np.allclose(local_position, pos_list, atol=self.TOLERANCE_MM):
                 return obj
-        raise InvalidApertureMove(f"Unknown aperture position: {pos}")
+        raise InvalidApertureMove(f"Unknown aperture: {pos}")
 
 
 class ApertureScatterguard(InfoLoggingDevice):
@@ -129,11 +131,10 @@ class ApertureScatterguard(InfoLoggingDevice):
 
     def set(self, pos: SingleAperturePosition) -> StatusBase:
         assert isinstance(self.aperture_positions, AperturePositions)
-        new_selected_aperture = self.aperture_positions.get_new_position(pos.location)
+        if pos not in self.aperture_positions.as_list():
+            raise InvalidApertureMove(f"Unknown aperture: {pos}")
 
-        return self._safe_move_within_datacollection_range(
-            new_selected_aperture.location
-        )
+        return self._safe_move_within_datacollection_range(pos.location)
 
     def read(self):
         selected_aperture = Signal(name=f"{self.name}_selected_aperture")
@@ -145,7 +146,7 @@ class ApertureScatterguard(InfoLoggingDevice):
             self.scatterguard.y.user_readback.get(),
         )
         assert isinstance(self.aperture_positions, AperturePositions)
-        current_aperture = self.aperture_positions.get_new_position(
+        current_aperture = self.aperture_positions.get_close_position(
             current_motor_positions
         )
         selected_aperture.put(current_aperture)
