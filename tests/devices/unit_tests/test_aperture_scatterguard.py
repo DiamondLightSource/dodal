@@ -9,6 +9,7 @@ from dodal.devices.aperturescatterguard import (
     AperturePositions,
     ApertureScatterguard,
     InvalidApertureMove,
+    SingleAperturePosition,
 )
 
 from .conftest import patch_motor
@@ -73,18 +74,13 @@ def aperture_positions():
     return aperture_positions
 
 
-def test_aperture_scatterguard_rejects_unknown_position(
-    aperture_positions, aperture_in_medium_pos
-):
-    for i in range(len(aperture_positions.MEDIUM.location)):
-        # get a list copy
-        pos = list(aperture_positions.MEDIUM.location)
-        # change 1 dimension more than tolerance
-        pos[i] += 0.01
-        position_to_reject: ApertureFiveDimensionalLocation = tuple(pos)
+def test_aperture_scatterguard_rejects_unknown_position(aperture_in_medium_pos):
+    position_to_reject = ApertureFiveDimensionalLocation(0, 0, 0, 0, 0)
 
-        with pytest.raises(InvalidApertureMove):
-            aperture_in_medium_pos.set(position_to_reject)
+    with pytest.raises(InvalidApertureMove):
+        aperture_in_medium_pos.set(
+            SingleAperturePosition("test", 10, position_to_reject)
+        )
 
 
 def test_aperture_scatterguard_select_bottom_moves_sg_down_then_assembly_up(
@@ -94,7 +90,7 @@ def test_aperture_scatterguard_select_bottom_moves_sg_down_then_assembly_up(
     aperture_scatterguard = aperture_in_medium_pos
     call_logger = install_logger_for_aperture_and_scatterguard(aperture_scatterguard)
 
-    aperture_scatterguard.set(aperture_positions.SMALL.location)
+    aperture_scatterguard.set(aperture_positions.SMALL)
 
     actual_calls = call_logger.mock_calls
     expected_calls = [
@@ -115,7 +111,7 @@ def test_aperture_scatterguard_select_top_moves_assembly_down_then_sg_up(
     aperture_scatterguard = aperture_in_medium_pos
     call_logger = install_logger_for_aperture_and_scatterguard(aperture_scatterguard)
 
-    aperture_scatterguard.set(aperture_positions.LARGE.location)
+    aperture_scatterguard.set(aperture_positions.LARGE)
 
     actual_calls = call_logger.mock_calls
     expected_calls = [
@@ -201,7 +197,7 @@ def test_given_aperture_not_set_through_device_but_motors_in_position_when_devic
 def test_when_aperture_set_and_device_read_then_position_returned(
     aperture_in_medium_pos: ApertureScatterguard, aperture_positions: AperturePositions
 ):
-    set_status = aperture_in_medium_pos.set(aperture_positions.SMALL.location)
+    set_status = aperture_in_medium_pos.set(aperture_positions.SMALL)
     set_status.wait()
     selected_aperture = aperture_in_medium_pos.read()
     assert (

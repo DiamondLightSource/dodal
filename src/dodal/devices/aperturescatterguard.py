@@ -127,9 +127,9 @@ class ApertureScatterguard(InfoLoggingDevice):
         LOGGER.info(f"{self.name} loaded in {positions}")
         self.aperture_positions = positions
 
-    def set(self, pos: ApertureFiveDimensionalLocation) -> StatusBase:
+    def set(self, pos: SingleAperturePosition) -> StatusBase:
         assert isinstance(self.aperture_positions, AperturePositions)
-        new_selected_aperture = self.aperture_positions.get_new_position(pos)
+        new_selected_aperture = self.aperture_positions.get_new_position(pos.location)
 
         return self._safe_move_within_datacollection_range(
             new_selected_aperture.location
