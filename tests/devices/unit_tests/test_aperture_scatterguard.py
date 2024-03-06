@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, call
 
 import pytest
 from ophyd.sim import make_fake_device
@@ -78,7 +78,7 @@ def test_aperture_scatterguard_rejects_unknown_position(aperture_in_medium_pos):
 
     with pytest.raises(InvalidApertureMove):
         aperture_in_medium_pos.set(
-            SingleAperturePosition("test", 10, position_to_reject)
+            SingleAperturePosition("test", "GDA_NAME", 10, position_to_reject)
         )
 
 
@@ -91,17 +91,15 @@ def test_aperture_scatterguard_select_bottom_moves_sg_down_then_assembly_up(
 
     aperture_scatterguard.set(aperture_positions.SMALL)
 
-    actual_calls = call_logger.mock_calls
-    expected_calls = [
-        ("_mock_sg_x", (5.3375,)),
-        ("_mock_sg_y", (-3.55,)),
-        lambda call: call[0].endswith("__and__().wait"),
-        ("_mock_ap_x", (2.43,)),
-        ("_mock_ap_y", (48.974,)),
-        ("_mock_ap_z", (15.8,)),
-    ]
-
-    compare_actual_and_expected_calls(actual_calls, expected_calls)
+    call_logger.assert_has_calls(
+        [
+            call._mock_sg_x(5.3375),
+            call._mock_sg_y(-3.55),
+            call._mock_ap_x(2.43),
+            call._mock_ap_y(48.974),
+            call._mock_ap_z(15.8),
+        ]
+    )
 
 
 def test_aperture_scatterguard_select_top_moves_assembly_down_then_sg_up(
@@ -112,17 +110,15 @@ def test_aperture_scatterguard_select_top_moves_assembly_down_then_sg_up(
 
     aperture_scatterguard.set(aperture_positions.LARGE)
 
-    actual_calls = call_logger.mock_calls
-    expected_calls = [
-        ("_mock_ap_x", (2.389,)),
-        ("_mock_ap_y", (40.986,)),
-        ("_mock_ap_z", (15.8,)),
-        lambda call: call[0].endswith("__and__().wait"),
-        ("_mock_sg_x", (5.25,)),
-        ("_mock_sg_y", (4.43,)),
-    ]
-
-    compare_actual_and_expected_calls(actual_calls, expected_calls)
+    call_logger.assert_has_calls(
+        [
+            call._mock_ap_x(2.389),
+            call._mock_ap_y(40.986),
+            call._mock_ap_z(15.8),
+            call._mock_sg_x(5.25),
+            call._mock_sg_y(4.43),
+        ]
+    )
 
 
 def test_aperture_scatterguard_throws_error_if_outside_tolerance(
@@ -211,39 +207,14 @@ def test_when_aperture_set_and_device_read_then_position_returned(
 
 def install_logger_for_aperture_and_scatterguard(aperture_scatterguard):
     parent_mock = MagicMock()
-    mock_ap_x = MagicMock(aperture_scatterguard.aperture.x.set)
-    mock_ap_y = MagicMock(aperture_scatterguard.aperture.y.set)
-    mock_ap_z = MagicMock(aperture_scatterguard.aperture.z.set)
-    mock_sg_x = MagicMock(aperture_scatterguard.scatterguard.x.set)
-    mock_sg_y = MagicMock(aperture_scatterguard.scatterguard.y.set)
-    aperture_scatterguard.aperture.x.set = mock_ap_x
-    aperture_scatterguard.aperture.y.set = mock_ap_y
-    aperture_scatterguard.aperture.z.set = mock_ap_z
-    aperture_scatterguard.scatterguard.x.set = mock_sg_x
-    aperture_scatterguard.scatterguard.y.set = mock_sg_y
+    mock_ap_x = aperture_scatterguard.aperture.x.set
+    mock_ap_y = aperture_scatterguard.aperture.y.set
+    mock_ap_z = aperture_scatterguard.aperture.z.set
+    mock_sg_x = aperture_scatterguard.scatterguard.x.set
+    mock_sg_y = aperture_scatterguard.scatterguard.y.set
     parent_mock.attach_mock(mock_ap_x, "_mock_ap_x")
     parent_mock.attach_mock(mock_ap_y, "_mock_ap_y")
     parent_mock.attach_mock(mock_ap_z, "_mock_ap_z")
     parent_mock.attach_mock(mock_sg_x, "_mock_sg_x")
     parent_mock.attach_mock(mock_sg_y, "_mock_sg_y")
     return parent_mock
-
-
-def compare_actual_and_expected_calls(actual_calls, expected_calls):
-    # ideally, we could use MagicMock.assert_has_calls but a) it doesn't work properly and b) doesn't do what I need
-    i_actual = 0
-    for i, expected in enumerate(expected_calls):
-        if isinstance(expected, tuple):
-            # simple comparison
-            i_actual = actual_calls.index(expected, i_actual)
-        else:
-            # expected is a predicate to be satisfied
-            i_matches = [
-                i for i, call in enumerate(actual_calls[i_actual:]) if expected(call)
-            ]
-            if i_matches:
-                i_actual = i_matches[0]
-            else:
-                raise ValueError("Couldn't find call matching predicate")
-
-        i_actual += 1
