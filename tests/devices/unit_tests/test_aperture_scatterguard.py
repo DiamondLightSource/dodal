@@ -200,8 +200,8 @@ def test_aperture_positions_get_new_position_falsy(aperture_positions):
     large_missed_by_2_at_y = ApertureFiveDimensionalLocation(
         2.389, 42, 15.8, 5.25, 4.43
     )
-    new_position = aperture_positions.get_new_position(large_missed_by_2_at_y)
-    assert new_position is None
+    with pytest.raises(InvalidApertureMove):
+        aperture_positions.get_new_position(large_missed_by_2_at_y)
 
 
 def test_aperture_positions_get_new_position_robot_load_exact(aperture_positions):
