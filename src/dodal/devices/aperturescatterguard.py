@@ -1,11 +1,11 @@
 from collections import namedtuple
 from dataclasses import dataclass
-from typing import List, Optional, Union
+from typing import List, Optional
 
 import numpy as np
 from ophyd import Component as Cpt
 from ophyd import Signal
-from ophyd.status import AndStatus, Status
+from ophyd.status import AndStatus, Status, StatusBase
 
 from dodal.devices.aperture import Aperture
 from dodal.devices.logging_ophyd_device import InfoLoggingDevice
@@ -114,7 +114,7 @@ class AperturePositions:
             local_position = list(obj.location)
             if np.allclose(local_position, pos_list, atol=self.TOLERANCE_MM):
                 return obj
-        return None
+        raise InvalidApertureMove(f"Unknown aperture position: {pos}")
 
 
 class ApertureScatterguard(InfoLoggingDevice):
@@ -128,14 +128,11 @@ class ApertureScatterguard(InfoLoggingDevice):
         LOGGER.info(f"{self.name} loaded in {positions}")
         self.aperture_positions = positions
 
-    def set(self, pos: ApertureFiveDimensionalLocation) -> AndStatus:
+    def set(self, pos: ApertureFiveDimensionalLocation) -> StatusBase:
         new_selected_aperture: SingleAperturePosition | None = None
-        try:
-            assert isinstance(self.aperture_positions, AperturePositions)
-            new_selected_aperture = self.aperture_positions.get_new_position(pos)
-            assert new_selected_aperture is not None
-        except AssertionError as e:
-            raise InvalidApertureMove(repr(e))
+
+        assert isinstance(self.aperture_positions, AperturePositions)
+        new_selected_aperture = self.aperture_positions.get_new_position(pos)
 
         self.selected_aperture.set(new_selected_aperture)
         return self._safe_move_within_datacollection_range(
@@ -144,7 +141,7 @@ class ApertureScatterguard(InfoLoggingDevice):
 
     def _safe_move_within_datacollection_range(
         self, pos: ApertureFiveDimensionalLocation
-    ) -> Union[AndStatus, Status]:
+    ) -> StatusBase:
         """
         Move the aperture and scatterguard combo safely to a new position.
         See https://github.com/DiamondLightSource/hyperion/wiki/Aperture-Scatterguard-Collisions
@@ -157,7 +154,6 @@ class ApertureScatterguard(InfoLoggingDevice):
         # unpacking the position
         aperture_x, aperture_y, aperture_z, scatterguard_x, scatterguard_y = pos
 
-        # CASE still moving
         ap_z_in_position = self.aperture.z.motor_done_move.get()
         if not ap_z_in_position:
             status: Status = Status(obj=self)
@@ -169,7 +165,6 @@ class ApertureScatterguard(InfoLoggingDevice):
             )
             return status
 
-        # CASE invalid target position
         current_ap_z = self.aperture.z.user_setpoint.get()
         tolerance = self.APERTURE_Z_TOLERANCE * self.aperture.z.motor_resolution.get()
         diff_on_z = abs(current_ap_z - aperture_z)
@@ -180,7 +175,6 @@ class ApertureScatterguard(InfoLoggingDevice):
                 f"Current aperture z ({current_ap_z}), outside of tolerance ({tolerance}) from target ({aperture_z})."
             )
 
-        # CASE moves along Z
         current_ap_y = self.aperture.y.user_readback.get()
         if aperture_y > current_ap_y:
             sg_status: AndStatus = self.scatterguard.x.set(
@@ -194,7 +188,6 @@ class ApertureScatterguard(InfoLoggingDevice):
                 & self.aperture.z.set(aperture_z)
             )
 
-        # CASE does not move along Z
         ap_status: AndStatus = (
             self.aperture.x.set(aperture_x)
             & self.aperture.y.set(aperture_y)
