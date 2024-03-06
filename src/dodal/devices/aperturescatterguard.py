@@ -57,9 +57,6 @@ class AperturePositions:
     SMALL: SingleAperturePosition
     ROBOT_LOAD: SingleAperturePosition
 
-    # one micrometre tolerance
-    TOLERANCE_MM: float = 0.001
-
     @classmethod
     def from_gda_beamline_params(cls, params):
         return cls(
@@ -85,25 +82,12 @@ class AperturePositions:
             self.ROBOT_LOAD,
         ]
 
-    def get_close_position(
-        self, pos: ApertureFiveDimensionalLocation
-    ) -> SingleAperturePosition:
-        """
-        Returns the closest valid position to {pos} within {TOLERANCE_MM}
-        """
-        pos_list = list(pos)
-        for obj in self.as_list():
-            local_position = list(obj.location)
-            if np.allclose(local_position, pos_list, atol=self.TOLERANCE_MM):
-                return obj
-        raise InvalidApertureMove(f"Unknown aperture: {pos}")
-
 
 class ApertureScatterguard(InfoLoggingDevice):
     aperture = Cpt(Aperture, "-MO-MAPT-01:")
     scatterguard = Cpt(Scatterguard, "-MO-SCAT-01:")
     aperture_positions: Optional[AperturePositions] = None
-    APERTURE_Z_TOLERANCE = 3  # Number of MRES steps
+    TOLERANCE_STEPS = 3  # Number of MRES steps
 
     def load_aperture_positions(self, positions: AperturePositions):
         LOGGER.info(f"{self.name} loaded in {positions}")
@@ -116,19 +100,35 @@ class ApertureScatterguard(InfoLoggingDevice):
 
         return self._safe_move_within_datacollection_range(pos.location)
 
+    def _get_closest_position_to_current(self) -> SingleAperturePosition:
+        """
+        Returns the closest valid position to current position within {TOLERANCE_STEPS}.
+        If no position is found then raises InvalidApertureMove.
+        """
+        assert isinstance(self.aperture_positions, AperturePositions)
+        for aperture in self.aperture_positions.as_list():
+            aperture_in_tolerence = []
+            motors = [
+                self.aperture.x,
+                self.aperture.y,
+                self.aperture.z,
+                self.scatterguard.x,
+                self.scatterguard.y,
+            ]
+            for motor, test_position in zip(motors, list(aperture.location)):
+                current_position = motor.user_readback.get()
+                tolerance = self.TOLERANCE_STEPS * motor.motor_resolution.get()
+                diff = abs(current_position - test_position)
+                aperture_in_tolerence.append(diff <= tolerance)
+            if np.all(aperture_in_tolerence):
+                return aperture
+
+        raise InvalidApertureMove("Current aperture/scatterguard state unrecognised")
+
     def read(self):
         selected_aperture = Signal(name=f"{self.name}_selected_aperture")
-        current_motor_positions = ApertureFiveDimensionalLocation(
-            self.aperture.x.user_readback.get(),
-            self.aperture.y.user_readback.get(),
-            self.aperture.z.user_readback.get(),
-            self.scatterguard.x.user_readback.get(),
-            self.scatterguard.y.user_readback.get(),
-        )
         assert isinstance(self.aperture_positions, AperturePositions)
-        current_aperture = self.aperture_positions.get_close_position(
-            current_motor_positions
-        )
+        current_aperture = self._get_closest_position_to_current()
         selected_aperture.put(current_aperture)
         res = super().read()
         res.update(selected_aperture.read())
@@ -161,7 +161,7 @@ class ApertureScatterguard(InfoLoggingDevice):
             return status
 
         current_ap_z = self.aperture.z.user_setpoint.get()
-        tolerance = self.APERTURE_Z_TOLERANCE * self.aperture.z.motor_resolution.get()
+        tolerance = self.TOLERANCE_STEPS * self.aperture.z.motor_resolution.get()
         diff_on_z = abs(current_ap_z - aperture_z)
         if diff_on_z > tolerance:
             raise InvalidApertureMove(

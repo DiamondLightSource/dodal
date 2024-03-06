@@ -16,9 +16,10 @@ from .conftest import patch_motor
 
 
 @pytest.fixture
-def ap_sg():
+def ap_sg(aperture_positions: AperturePositions):
     FakeApertureScatterguard = make_fake_device(ApertureScatterguard)
     ap_sg: ApertureScatterguard = FakeApertureScatterguard(name="test_ap_sg")
+    ap_sg.load_aperture_positions(aperture_positions)
     with (
         patch_motor(ap_sg.aperture.x),
         patch_motor(ap_sg.aperture.y),
@@ -34,8 +35,6 @@ def aperture_in_medium_pos(
     ap_sg: ApertureScatterguard,
     aperture_positions: AperturePositions,
 ):
-    ap_sg.load_aperture_positions(aperture_positions)
-
     medium = aperture_positions.MEDIUM.location
     ap_sg.aperture.x.set(medium.aperture_x)
     ap_sg.aperture.y.set(medium.aperture_y)
@@ -150,38 +149,42 @@ def test_aperture_scatterguard_returns_status_if_within_tolerance(
     assert isinstance(status, StatusBase)
 
 
-def test_aperture_positions_get_close_position_truthy_exact(aperture_positions):
+def set_underlying_motors(
+    ap_sg: ApertureScatterguard, position: ApertureFiveDimensionalLocation
+):
+    ap_sg.aperture.x.set(position.aperture_x)
+    ap_sg.aperture.y.set(position.aperture_y)
+    ap_sg.aperture.z.set(position.aperture_z)
+    ap_sg.scatterguard.x.set(position.scatterguard_x)
+    ap_sg.scatterguard.y.set(position.scatterguard_y)
+
+
+def test_aperture_positions_get_close_position_truthy_exact(
+    ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
+):
     should_be_large = ApertureFiveDimensionalLocation(2.389, 40.986, 15.8, 5.25, 4.43)
-    new_position = aperture_positions.get_close_position(should_be_large)
-    assert new_position == aperture_positions.LARGE
+    set_underlying_motors(ap_sg, should_be_large)
+
+    assert ap_sg._get_closest_position_to_current() == aperture_positions.LARGE
 
 
 def test_aperture_positions_get_close_position_truthy_inside_tolerance(
-    aperture_positions,
+    ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
 ):
     should_be_large = ApertureFiveDimensionalLocation(2.389, 40.9865, 15.8, 5.25, 4.43)
-    new_position = aperture_positions.get_close_position(should_be_large)
-    assert new_position == aperture_positions.LARGE
+    set_underlying_motors(ap_sg, should_be_large)
+    assert ap_sg._get_closest_position_to_current() == aperture_positions.LARGE
 
 
-def test_aperture_positions_get_close_position_falsy(aperture_positions):
+def test_aperture_positions_get_close_position_falsy(
+    ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
+):
     large_missed_by_2_at_y = ApertureFiveDimensionalLocation(
         2.389, 42, 15.8, 5.25, 4.43
     )
+    set_underlying_motors(ap_sg, large_missed_by_2_at_y)
     with pytest.raises(InvalidApertureMove):
-        aperture_positions.get_close_position(large_missed_by_2_at_y)
-
-
-def test_aperture_positions_get_close_position_robot_load_exact(aperture_positions):
-    robot_exact = ApertureFiveDimensionalLocation(
-        2.386,
-        31.40,
-        15.8,
-        5.25,
-        4.43,
-    )
-    new_position = aperture_positions.get_close_position(robot_exact)
-    assert new_position is aperture_positions.ROBOT_LOAD
+        ap_sg._get_closest_position_to_current()
 
 
 def test_given_aperture_not_set_through_device_but_motors_in_position_when_device_read_then_position_returned(
