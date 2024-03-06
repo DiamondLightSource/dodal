@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import List, Tuple, Union
 
 import numpy as np
 from ophyd import Component, Device, EpicsMotor
@@ -24,8 +25,8 @@ class MotorLimitHelper:
         :param position: The position to check
         :return: True if position is within the limits
         """
-        low = self.motor.low_limit_travel.get()
-        high = self.motor.high_limit_travel.get()
+        low = float(self.motor.low_limit_travel.get())
+        high = float(self.motor.high_limit_travel.get())
         return low <= position <= high
 
 
@@ -39,7 +40,9 @@ class XYZLimitBundle:
     y: MotorLimitHelper
     z: MotorLimitHelper
 
-    def position_valid(self, position: np.ndarray):
+    def position_valid(
+        self, position: Union[np.ndarray, List[float], Tuple[float, float, float]]
+    ):
         if len(position) != 3:
             raise ValueError(
                 f"Position valid expects a 3-vector, got {position} instead"
