@@ -33,7 +33,7 @@ ApertureFiveDimensionalLocation = namedtuple(
 class SingleAperturePosition:
     name: str
     GDA_name: str
-    radius_microns: Optional[int]
+    radius_microns: Optional[float]
     location: ApertureFiveDimensionalLocation
 
 
