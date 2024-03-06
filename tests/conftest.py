@@ -1,6 +1,9 @@
+import importlib
 import logging
+import os
 import sys
 from os import environ, getenv
+from pathlib import Path
 from typing import cast
 from unittest.mock import MagicMock, patch
 
@@ -10,7 +13,8 @@ from ophyd.sim import make_fake_device
 
 from dodal.beamlines import beamline_utils, i03
 from dodal.devices.focusing_mirror import VFMMirrorVoltages
-from dodal.log import LOGGER, GELFTCPHandler, set_up_logging_handlers
+from dodal.log import LOGGER, GELFTCPHandler, set_up_all_logging_handlers
+from dodal.utils import make_all_devices
 
 MOCK_DAQ_CONFIG_PATH = "tests/devices/unit_tests/test_daq_configuration"
 mock_paths = [
@@ -31,6 +35,20 @@ def mock_beamline_module_filepaths(bl_name, bl_module):
         [bl_module.__setattr__(attr[0], attr[1]) for attr in mock_attributes]
 
 
+@pytest.fixture(scope="function")
+def module_and_devices_for_beamline(request):
+    beamline = request.param
+    with patch.dict(os.environ, {"BEAMLINE": beamline}, clear=True):
+        bl_mod = importlib.import_module("dodal.beamlines." + beamline)
+        importlib.reload(bl_mod)
+        mock_beamline_module_filepaths(beamline, bl_mod)
+        yield bl_mod, make_all_devices(
+            bl_mod, include_skipped=True, fake_with_ophyd_sim=True
+        )
+        beamline_utils.clear_devices()
+        del bl_mod
+
+
 def pytest_runtest_setup(item):
     beamline_utils.clear_devices()
     if LOGGER.handlers == []:
@@ -38,7 +56,9 @@ def pytest_runtest_setup(item):
         mock_graylog_handler.return_value.level = logging.DEBUG
 
         with patch("dodal.log.GELFTCPHandler", mock_graylog_handler):
-            set_up_logging_handlers(None, False)
+            set_up_all_logging_handlers(
+                LOGGER, Path("./tmp/dev"), "dodal.log", True, 10000
+            )
 
 
 def pytest_runtest_teardown():

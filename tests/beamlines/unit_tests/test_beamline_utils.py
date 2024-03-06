@@ -16,7 +16,8 @@ from dodal.utils import make_all_devices
 from ...conftest import mock_beamline_module_filepaths
 
 
-def setup_module():
+@pytest.fixture(autouse=True)
+def setup():
     beamline_utils.clear_devices()
     mock_beamline_module_filepaths("i03", i03)
 
@@ -24,7 +25,6 @@ def setup_module():
 def test_instantiate_function_makes_supplied_device():
     device_types = [Zebra, ApertureScatterguard, Smargon]
     for device in device_types:
-        beamline_utils.clear_devices()
         dev = beamline_utils.device_instantiation(
             device, device.__name__, "", False, True, None
         )
@@ -32,7 +32,6 @@ def test_instantiate_function_makes_supplied_device():
 
 
 def test_instantiating_different_device_with_same_name():
-    beamline_utils.clear_devices()
     dev1 = beamline_utils.device_instantiation(  # noqa
         Zebra, "device", "", False, True, None
     )
@@ -51,7 +50,6 @@ def test_instantiating_different_device_with_same_name():
 
 
 def test_instantiate_function_fake_makes_fake():
-    beamline_utils.clear_devices()
     fake_zeb: Zebra = beamline_utils.device_instantiation(
         i03.Zebra, "zebra", "", True, True, None
     )
@@ -60,7 +58,6 @@ def test_instantiate_function_fake_makes_fake():
 
 
 def test_clear_devices(RE):
-    beamline_utils.clear_devices()
     devices = make_all_devices(i03, fake_with_ophyd_sim=True)
     assert len(beamline_utils.ACTIVE_DEVICES) == len(devices.keys())
     beamline_utils.clear_devices()

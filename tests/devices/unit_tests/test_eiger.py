@@ -1,13 +1,13 @@
 import threading
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, call, patch
 
 import pytest
 from mockito import ANY, mock, verify, when
 from ophyd.sim import make_fake_device
 from ophyd.status import Status
 
-from dodal.devices.det_dim_constants import EIGER2_X_16M_SIZE
 from dodal.devices.detector import DetectorParams, TriggerMode
+from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.status import await_value
 from dodal.devices.util.epics_util import run_functions_without_blocking
@@ -616,3 +616,62 @@ def test_given_not_all_frames_done_when_eiger_stopped_then_do_not_wait_for_frame
     fake_eiger.stop()
 
     fake_eiger.disarm_detector.assert_called()
+
+
+def lambda_in_calls(f, mock_calls):
+    for _call in mock_calls:
+        if hasattr(_call.args[0], "__name__") and _call.args[0].__name__ == "<lambda>":
+            if f._extract_mock_name() in _call.args[0].__code__.co_names:
+                return True
+    return False
+
+
+@patch("dodal.devices.util.epics_util.call_func")
+@patch("dodal.devices.eiger.await_value", name="await_value")
+def test_unwrapped_arm_chain_functions_are_not_called_outside_util(
+    await_value: MagicMock,
+    call_func: MagicMock,
+    fake_eiger: EigerDetector,
+):
+    fake_eiger.detector_params.use_roi_mode = True
+    done_status = Status(done=True, success=True)
+
+    call_func.return_value = done_status
+    fake_eiger.enable_roi_mode = MagicMock(name="enable_roi_mode")
+    fake_eiger.set_detector_threshold = MagicMock(name="set_detector_threshold")
+    fake_eiger.set_cam_pvs = MagicMock(name="set_cam_pvs")
+    fake_eiger.set_odin_number_of_frame_chunks = MagicMock(
+        name="set_odin_number_of_frame_chunks"
+    )
+    fake_eiger.set_odin_pvs = MagicMock(name="set_odin_pvs")
+    fake_eiger.set_mx_settings_pvs = MagicMock(name="set_mx_settings_pvs")
+    fake_eiger.set_num_triggers_and_captures = MagicMock(
+        name="set_num_triggers_and_captures"
+    )
+    fake_eiger._wait_for_odin_status = MagicMock(name="_wait_for_odin_status")
+    fake_eiger.cam.acquire.set = MagicMock(name="set")
+    fake_eiger._wait_fan_ready = MagicMock(name="_wait_fan_ready")
+    fake_eiger._finish_arm = MagicMock(name="_finish_arm")
+
+    fake_eiger.do_arming_chain()
+
+    funcs = [
+        fake_eiger.enable_roi_mode,
+        fake_eiger.set_detector_threshold,
+        fake_eiger.set_cam_pvs,
+        fake_eiger.set_odin_number_of_frame_chunks,
+        fake_eiger.set_odin_pvs,
+        fake_eiger.set_mx_settings_pvs,
+        fake_eiger.set_num_triggers_and_captures,
+        fake_eiger._wait_for_odin_status,
+        fake_eiger.cam.acquire.set,
+        fake_eiger._wait_fan_ready,
+        fake_eiger._finish_arm,
+        await_value,
+    ]
+
+    for f in funcs:
+        f.assert_not_called()
+        assert call(f) in call_func.mock_calls or lambda_in_calls(
+            f, call_func.mock_calls
+        )

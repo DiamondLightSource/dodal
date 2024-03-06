@@ -15,4 +15,5 @@
     "python.analysis.extraPaths": [
         "./src"
     ],
+    "python.analysis.typeCheckingMode": "basic",
 }

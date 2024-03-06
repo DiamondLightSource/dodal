@@ -63,7 +63,7 @@ def run_functions_without_blocking(
             set_global_exception_and_log(old_status)
             return
 
-        status = current_func()
+        status = call_func(current_func)
 
         if not isinstance(status, StatusBase):
             LOGGER.error(
@@ -106,6 +106,10 @@ def run_functions_without_blocking(
     # Initiate the chain of functions
     wrap_func(starting_status, functions_to_chain[0], wrapped_funcs[-1])
     return full_status
+
+
+def call_func(func: Callable[[], StatusBase]) -> StatusBase:
+    return func()
 
 
 class SetWhenEnabled(Device):

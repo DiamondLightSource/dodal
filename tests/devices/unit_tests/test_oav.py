@@ -108,7 +108,7 @@ def test_correct_grid_drawn_on_image(
 def test_bottom_right_from_top_left():
     top_left = np.array([123, 123])
     bottom_right = oav_utils.bottom_right_from_top_left(
-        top_left, 20, 30, 0.1, 0.15, 0.37, 0.37
+        top_left, 20, 30, 0.1, 0.15, 2.7027, 2.7027
     )
     assert bottom_right[0] == 863 and bottom_right[1] == 1788
     bottom_right = oav_utils.bottom_right_from_top_left(
