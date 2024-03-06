@@ -97,8 +97,8 @@ class SampleLocation:
     Holder type for results from sample detection.
     """
 
-    tip_y: Optional[int]
     tip_x: Optional[int]
+    tip_y: Optional[int]
     edge_top: np.ndarray
     edge_bottom: np.ndarray
 
@@ -209,7 +209,7 @@ class MxSampleDetect(object):
                 "pin-tip detection: No non-narrow edges found - cannot locate pin tip"
             )
             return SampleLocation(
-                tip_y=None, tip_x=None, edge_bottom=bottom, edge_top=top
+                tip_x=None, tip_y=None, edge_bottom=bottom, edge_top=top
             )
 
         # Choose our starting point - i.e. first column with non-narrow width for positive scan, last one for negative scan.
@@ -248,5 +248,5 @@ class MxSampleDetect(object):
             )
         )
         return SampleLocation(
-            tip_y=tip_y, tip_x=tip_x, edge_bottom=bottom, edge_top=top
+            tip_x=tip_x, tip_y=tip_y, edge_bottom=bottom, edge_top=top
         )
