@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 
 import pytest
 from ophyd.sim import make_fake_device
-from ophyd.status import Status, StatusBase
+from ophyd.status import StatusBase
 
 from dodal.devices.aperturescatterguard import (
     ApertureFiveDimensionalLocation,
@@ -11,12 +11,21 @@ from dodal.devices.aperturescatterguard import (
     InvalidApertureMove,
 )
 
+from .conftest import patch_motor
+
 
 @pytest.fixture
 def ap_sg():
     FakeApertureScatterguard = make_fake_device(ApertureScatterguard)
     ap_sg: ApertureScatterguard = FakeApertureScatterguard(name="test_ap_sg")
-    yield ap_sg
+    with (
+        patch_motor(ap_sg.aperture.x),
+        patch_motor(ap_sg.aperture.y),
+        patch_motor(ap_sg.aperture.z),
+        patch_motor(ap_sg.scatterguard.x),
+        patch_motor(ap_sg.scatterguard.y),
+    ):
+        yield ap_sg
 
 
 @pytest.fixture
@@ -25,42 +34,14 @@ def aperture_in_medium_pos(
     aperture_positions: AperturePositions,
 ):
     ap_sg.load_aperture_positions(aperture_positions)
-    ap_sg.aperture.x.user_setpoint.sim_put(  # type: ignore
-        aperture_positions.MEDIUM.location.aperture_x
-    )
-    ap_sg.aperture.y.user_setpoint.sim_put(  # type: ignore
-        aperture_positions.MEDIUM.location.aperture_y
-    )
-    ap_sg.aperture.z.user_setpoint.sim_put(  # type: ignore
-        aperture_positions.MEDIUM.location[2]
-    )
-    ap_sg.aperture.x.user_readback.sim_put(  # type: ignore
-        aperture_positions.MEDIUM.location[1]
-    )
-    ap_sg.aperture.y.user_readback.sim_put(  # type: ignore
-        aperture_positions.MEDIUM.location[1]
-    )
-    ap_sg.aperture.z.user_readback.sim_put(  # type: ignore
-        aperture_positions.MEDIUM.location[1]
-    )
-    ap_sg.scatterguard.x.user_setpoint.sim_put(  # type: ignore
-        aperture_positions.MEDIUM.location[3]
-    )
-    ap_sg.scatterguard.y.user_setpoint.sim_put(  # type: ignore
-        aperture_positions.MEDIUM.location[4]
-    )
-    ap_sg.scatterguard.x.user_readback.sim_put(  # type: ignore
-        aperture_positions.MEDIUM.location[3]
-    )
-    ap_sg.scatterguard.y.user_readback.sim_put(  # type: ignore
-        aperture_positions.MEDIUM.location[4]
-    )
-    ap_sg.aperture.x.motor_done_move.sim_put(1)  # type: ignore
-    ap_sg.aperture.y.motor_done_move.sim_put(1)  # type: ignore
-    ap_sg.aperture.z.motor_done_move.sim_put(1)  # type: ignore
-    ap_sg.scatterguard.x.motor_done_move.sim_put(1)  # type: ignore
-    ap_sg.scatterguard.y.motor_done_move.sim_put(1)  # type: ignore
-    return ap_sg
+
+    medium = aperture_positions.MEDIUM.location
+    ap_sg.aperture.x.set(medium.aperture_x)
+    ap_sg.aperture.y.set(medium.aperture_y)
+    ap_sg.aperture.z.set(medium.aperture_z)
+    ap_sg.scatterguard.x.set(medium.scatterguard_x)
+    ap_sg.scatterguard.y.set(medium.scatterguard_y)
+    yield ap_sg
 
 
 @pytest.fixture
@@ -157,7 +138,7 @@ def test_aperture_scatterguard_throws_error_if_outside_tolerance(
     ap_sg.aperture.z.motor_done_move.sim_put(1)  # type: ignore
 
     with pytest.raises(InvalidApertureMove):
-        pos: ApertureFiveDimensionalLocation = (0, 0, 1.1, 0, 0)
+        pos = ApertureFiveDimensionalLocation(0, 0, 1.1, 0, 0)
         ap_sg._safe_move_within_datacollection_range(pos)
 
 
@@ -168,16 +149,7 @@ def test_aperture_scatterguard_returns_status_if_within_tolerance(
     ap_sg.aperture.z.user_setpoint.sim_put(1)  # type: ignore
     ap_sg.aperture.z.motor_done_move.sim_put(1)  # type: ignore
 
-    mock_set = MagicMock(return_value=Status(done=True, success=True))
-
-    ap_sg.aperture.x.set = mock_set
-    ap_sg.aperture.y.set = mock_set
-    ap_sg.aperture.z.set = mock_set
-
-    ap_sg.scatterguard.x.set = mock_set
-    ap_sg.scatterguard.y.set = mock_set
-
-    pos = (0, 0, 1, 0, 0)
+    pos = ApertureFiveDimensionalLocation(0, 0, 1, 0, 0)
     status = ap_sg._safe_move_within_datacollection_range(pos)
     assert isinstance(status, StatusBase)
 
@@ -214,6 +186,28 @@ def test_aperture_positions_get_new_position_robot_load_exact(aperture_positions
     )
     new_position = aperture_positions.get_new_position(robot_exact)
     assert new_position is aperture_positions.ROBOT_LOAD
+
+
+def test_given_aperture_not_set_through_device_but_motors_in_position_when_device_read_then_position_returned(
+    aperture_in_medium_pos: ApertureScatterguard, aperture_positions: AperturePositions
+):
+    selected_aperture = aperture_in_medium_pos.read()
+    assert (
+        selected_aperture["test_ap_sg_selected_aperture"]["value"]
+        == aperture_positions.MEDIUM
+    )
+
+
+def test_when_aperture_set_and_device_read_then_position_returned(
+    aperture_in_medium_pos: ApertureScatterguard, aperture_positions: AperturePositions
+):
+    set_status = aperture_in_medium_pos.set(aperture_positions.SMALL.location)
+    set_status.wait()
+    selected_aperture = aperture_in_medium_pos.read()
+    assert (
+        selected_aperture["test_ap_sg_selected_aperture"]["value"]
+        == aperture_positions.SMALL
+    )
 
 
 def install_logger_for_aperture_and_scatterguard(aperture_scatterguard):

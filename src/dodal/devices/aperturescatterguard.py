@@ -121,7 +121,6 @@ class ApertureScatterguard(InfoLoggingDevice):
     aperture = Cpt(Aperture, "-MO-MAPT-01:")
     scatterguard = Cpt(Scatterguard, "-MO-SCAT-01:")
     aperture_positions: Optional[AperturePositions] = None
-    selected_aperture = Cpt(Signal)
     APERTURE_Z_TOLERANCE = 3  # Number of MRES steps
 
     def load_aperture_positions(self, positions: AperturePositions):
@@ -129,15 +128,30 @@ class ApertureScatterguard(InfoLoggingDevice):
         self.aperture_positions = positions
 
     def set(self, pos: ApertureFiveDimensionalLocation) -> StatusBase:
-        new_selected_aperture: SingleAperturePosition | None = None
-
         assert isinstance(self.aperture_positions, AperturePositions)
         new_selected_aperture = self.aperture_positions.get_new_position(pos)
 
-        self.selected_aperture.set(new_selected_aperture)
         return self._safe_move_within_datacollection_range(
             new_selected_aperture.location
         )
+
+    def read(self):
+        selected_aperture = Signal(name=f"{self.name}_selected_aperture")
+        current_motor_positions = ApertureFiveDimensionalLocation(
+            self.aperture.x.user_readback.get(),
+            self.aperture.y.user_readback.get(),
+            self.aperture.z.user_readback.get(),
+            self.scatterguard.x.user_readback.get(),
+            self.scatterguard.y.user_readback.get(),
+        )
+        assert isinstance(self.aperture_positions, AperturePositions)
+        current_aperture = self.aperture_positions.get_new_position(
+            current_motor_positions
+        )
+        selected_aperture.put(current_aperture)
+        res = super().read()
+        res.update(selected_aperture.read())
+        return res
 
     def _safe_move_within_datacollection_range(
         self, pos: ApertureFiveDimensionalLocation
