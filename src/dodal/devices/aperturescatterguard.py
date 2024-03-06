@@ -29,6 +29,18 @@ ApertureFiveDimensionalLocation = namedtuple(
 )
 
 
+def create_location_from_params(
+    GDA_location_name: str, params: dict
+) -> ApertureFiveDimensionalLocation:
+    return ApertureFiveDimensionalLocation(
+        params[f"miniap_x_{GDA_location_name}"],
+        params[f"miniap_y_{GDA_location_name}"],
+        params[f"miniap_z_{GDA_location_name}"],
+        params[f"sg_x_{GDA_location_name}"],
+        params[f"sg_y_{GDA_location_name}"],
+    )
+
+
 @dataclass
 class SingleAperturePosition:
     name: str
@@ -52,48 +64,16 @@ class AperturePositions:
     def from_gda_beamline_params(cls, params):
         return cls(
             LARGE=SingleAperturePosition(
-                "Large",
-                100,
-                ApertureFiveDimensionalLocation(
-                    params["miniap_x_LARGE_APERTURE"],
-                    params["miniap_y_LARGE_APERTURE"],
-                    params["miniap_z_LARGE_APERTURE"],
-                    params["sg_x_LARGE_APERTURE"],
-                    params["sg_y_LARGE_APERTURE"],
-                ),
+                "Large", 100, create_location_from_params("LARGE_APERTURE", params)
             ),
             MEDIUM=SingleAperturePosition(
-                "Medium",
-                50,
-                ApertureFiveDimensionalLocation(
-                    params["miniap_x_MEDIUM_APERTURE"],
-                    params["miniap_y_MEDIUM_APERTURE"],
-                    params["miniap_z_MEDIUM_APERTURE"],
-                    params["sg_x_MEDIUM_APERTURE"],
-                    params["sg_y_MEDIUM_APERTURE"],
-                ),
+                "Medium", 50, create_location_from_params("MEDIUM_APERTURE", params)
             ),
             SMALL=SingleAperturePosition(
-                "Small",
-                20,
-                ApertureFiveDimensionalLocation(
-                    params["miniap_x_SMALL_APERTURE"],
-                    params["miniap_y_SMALL_APERTURE"],
-                    params["miniap_z_SMALL_APERTURE"],
-                    params["sg_x_SMALL_APERTURE"],
-                    params["sg_y_SMALL_APERTURE"],
-                ),
+                "Small", 20, create_location_from_params("SMALL_APERTURE", params)
             ),
             ROBOT_LOAD=SingleAperturePosition(
-                "Robot load",
-                None,
-                ApertureFiveDimensionalLocation(
-                    params["miniap_x_ROBOT_LOAD"],
-                    params["miniap_y_ROBOT_LOAD"],
-                    params["miniap_z_ROBOT_LOAD"],
-                    params["sg_x_ROBOT_LOAD"],
-                    params["sg_y_ROBOT_LOAD"],
-                ),
+                "Robot load", None, create_location_from_params("ROBOT_LOAD", params)
             ),
         )
 
