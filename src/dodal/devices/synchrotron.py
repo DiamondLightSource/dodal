@@ -114,7 +114,11 @@ class OASynchrotron(OADevice):
         self.topup = OASynchrotronTopUp()
         self.ring_current = OASynchrotronRingCurrent()
 
-        self.components = [self.ring_current, self.topup, self.machine_status]
+        self.components: list[StandardReadable] = [
+            self.ring_current,
+            self.topup,
+            self.machine_status,
+        ]
 
         super().__init__(name=name)
 
