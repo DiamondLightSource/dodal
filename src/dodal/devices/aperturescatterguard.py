@@ -4,7 +4,7 @@ from typing import List, Optional
 
 import numpy as np
 from ophyd import Component as Cpt
-from ophyd import Signal
+from ophyd import SignalRO
 from ophyd.status import AndStatus, Status, StatusBase
 
 from dodal.devices.aperture import Aperture
@@ -89,6 +89,13 @@ class ApertureScatterguard(InfoLoggingDevice):
     aperture_positions: Optional[AperturePositions] = None
     TOLERANCE_STEPS = 3  # Number of MRES steps
 
+    class SelectedAperture(SignalRO):
+        def get(self):
+            assert isinstance(self.parent, ApertureScatterguard)
+            return self.parent._get_closest_position_to_current()
+
+    selected_aperture = Cpt(SelectedAperture)
+
     def load_aperture_positions(self, positions: AperturePositions):
         LOGGER.info(f"{self.name} loaded in {positions}")
         self.aperture_positions = positions
@@ -124,15 +131,6 @@ class ApertureScatterguard(InfoLoggingDevice):
                 return aperture
 
         raise InvalidApertureMove("Current aperture/scatterguard state unrecognised")
-
-    def read(self):
-        selected_aperture = Signal(name=f"{self.name}_selected_aperture")
-        assert isinstance(self.aperture_positions, AperturePositions)
-        current_aperture = self._get_closest_position_to_current()
-        selected_aperture.put(current_aperture)
-        res = super().read()
-        res.update(selected_aperture.read())
-        return res
 
     def _safe_move_within_datacollection_range(
         self, pos: ApertureFiveDimensionalLocation
