@@ -29,23 +29,29 @@ ApertureFiveDimensionalLocation = namedtuple(
 )
 
 
-def create_location_from_params(
-    GDA_location_name: str, params: dict
-) -> ApertureFiveDimensionalLocation:
-    return ApertureFiveDimensionalLocation(
-        params[f"miniap_x_{GDA_location_name}"],
-        params[f"miniap_y_{GDA_location_name}"],
-        params[f"miniap_z_{GDA_location_name}"],
-        params[f"sg_x_{GDA_location_name}"],
-        params[f"sg_y_{GDA_location_name}"],
-    )
-
-
 @dataclass
 class SingleAperturePosition:
     name: str
+    GDA_name: str
     radius_microns: Optional[int]
     location: ApertureFiveDimensionalLocation
+
+
+def position_from_params(
+    name: str, GDA_name: str, radius_microns: Optional[float], params: dict
+) -> SingleAperturePosition:
+    return SingleAperturePosition(
+        name,
+        GDA_name,
+        radius_microns,
+        ApertureFiveDimensionalLocation(
+            params[f"miniap_x_{GDA_name}"],
+            params[f"miniap_y_{GDA_name}"],
+            params[f"miniap_z_{GDA_name}"],
+            params[f"sg_x_{GDA_name}"],
+            params[f"sg_y_{GDA_name}"],
+        ),
+    )
 
 
 @dataclass
@@ -60,18 +66,10 @@ class AperturePositions:
     @classmethod
     def from_gda_beamline_params(cls, params):
         return cls(
-            LARGE=SingleAperturePosition(
-                "Large", 100, create_location_from_params("LARGE_APERTURE", params)
-            ),
-            MEDIUM=SingleAperturePosition(
-                "Medium", 50, create_location_from_params("MEDIUM_APERTURE", params)
-            ),
-            SMALL=SingleAperturePosition(
-                "Small", 20, create_location_from_params("SMALL_APERTURE", params)
-            ),
-            ROBOT_LOAD=SingleAperturePosition(
-                "Robot load", None, create_location_from_params("ROBOT_LOAD", params)
-            ),
+            LARGE=position_from_params("Large", "LARGE_APERTURE", 100, params),
+            MEDIUM=position_from_params("Medium", "MEDIUM_APERTURE", 50, params),
+            SMALL=position_from_params("Small", "SMALL_APERTURE", 20, params),
+            ROBOT_LOAD=position_from_params("Robot load", "ROBOT_LOAD", None, params),
         )
 
     def as_list(self) -> List[SingleAperturePosition]:
