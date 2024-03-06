@@ -1,3 +1,4 @@
+from asyncio import gather
 from enum import Enum
 from typing import Dict
 
@@ -119,13 +120,11 @@ class OASynchrotron(OADevice):
 
     @AsyncStatus.wrap
     async def stage(self) -> None:
-        for device in self.components:
-            await device.stage().task
+        await gather(*{device.stage().task for device in self.components})
 
     @AsyncStatus.wrap
     async def unstage(self) -> None:
-        for device in self.components:
-            await device.unstage().task
+        await gather(*{device.unstage().task for device in self.components})
 
     async def describe_configuration(self) -> Dict[str, Descriptor]:
         return await merge_gathered_dicts(
