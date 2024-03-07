@@ -148,6 +148,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/145_test_pypi/"
   },
   {
+    "version": "170_unpin_pydantic",
+    "url": "https://DiamondLightSource.github.io/dodal/170_unpin_pydantic/"
+  },
+  {
     "version": "184_per_device_log_level",
     "url": "https://DiamondLightSource.github.io/dodal/184_per_device_log_level/"
   },
