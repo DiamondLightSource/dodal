@@ -228,6 +228,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/directory_provider/"
   },
   {
+    "version": "extended_motor",
+    "url": "https://DiamondLightSource.github.io/dodal/extended_motor/"
+  },
+  {
     "version": "fix_linting_CI_issues",
     "url": "https://DiamondLightSource.github.io/dodal/fix_linting_CI_issues/"
   },
