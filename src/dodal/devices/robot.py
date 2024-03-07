@@ -67,8 +67,8 @@ class BartRobot(StandardReadable, Movable):
     ) -> None:
         self.barcode = SingleIndexWaveformReadable(prefix + "BARCODE")
         self.gonio_pin_sensor = epics_signal_r(bool, prefix + "PIN_MOUNTED")
-        self.next_pin = epics_signal_rw_rbv(int, prefix + "NEXT_PIN")
-        self.next_puck = epics_signal_rw_rbv(int, prefix + "NEXT_PUCK")
+        self.next_pin = epics_signal_rw_rbv(float, prefix + "NEXT_PIN")
+        self.next_puck = epics_signal_rw_rbv(float, prefix + "NEXT_PUCK")
         self.load = epics_signal_x(prefix + "LOAD.PROC")
         self.program_running = epics_signal_r(bool, prefix + "PROGRAM_RUNNING")
         super().__init__(name=name)
