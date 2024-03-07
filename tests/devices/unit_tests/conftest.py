@@ -1,4 +1,5 @@
 from functools import partial
+from typing import Union
 from unittest.mock import MagicMock, patch
 
 from ophyd.epics_motor import EpicsMotor
@@ -13,7 +14,7 @@ def mock_set(motor: EpicsMotor, val):
     return Status(done=True, success=True)
 
 
-def patch_motor(motor: EpicsMotor | ExtendedEpicsMotor, initial_position=0):
+def patch_motor(motor: Union[EpicsMotor, ExtendedEpicsMotor], initial_position=0):
     motor.user_setpoint.sim_put(initial_position)  # type: ignore
     motor.user_readback.sim_put(initial_position)  # type: ignore
     motor.motor_done_move.sim_put(1)  # type: ignore
