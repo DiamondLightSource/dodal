@@ -1,13 +1,14 @@
 from enum import Enum
 
 from ophyd import Component as Cpt
-from ophyd import Device, EpicsMotor, EpicsSignal, EpicsSignalRO
+from ophyd import Device, EpicsMotor, EpicsSignal
 from ophyd.epics_motor import MotorBundle
 from ophyd.status import StatusBase
 
 from dodal.devices.motors import MotorLimitHelper, XYZLimitBundle
 from dodal.devices.status import await_approx_value
 from dodal.devices.util.epics_util import SetWhenEnabled
+from dodal.devices.util.motor_utils import ExtendedEpicsMotor
 
 
 class StubPosition(Enum):
@@ -48,8 +49,7 @@ class Smargon(MotorBundle):
     Robot loading can nudge these and lead to errors.
     """
 
-    x = Cpt(EpicsMotor, "X")
-    x_speed_limit_mm_per_s = Cpt(EpicsSignalRO, "X.VMAX")
+    x = Cpt(ExtendedEpicsMotor, "X")
     y = Cpt(EpicsMotor, "Y")
     z = Cpt(EpicsMotor, "Z")
     chi = Cpt(EpicsMotor, "CHI")
