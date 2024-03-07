@@ -160,6 +160,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/262_make_arming_eiger_asynchronous/"
   },
   {
+    "version": "270_update_pydantic",
+    "url": "https://DiamondLightSource.github.io/dodal/270_update_pydantic/"
+  },
+  {
     "version": "341-add-setup-for-the-j20-beamline",
     "url": "https://DiamondLightSource.github.io/dodal/341-add-setup-for-the-j20-beamline/"
   },
@@ -234,10 +238,6 @@
   {
     "version": "hyperion_1007_reset_stub_offsets_if_required",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1007_reset_stub_offsets_if_required/"
-  },
-  {
-    "version": "hyperion_1228_tidy_up_aperture_reading",
-    "url": "https://DiamondLightSource.github.io/dodal/hyperion_1228_tidy_up_aperture_reading/"
   },
   {
     "version": "hyperion_698_refactor_parameters",
