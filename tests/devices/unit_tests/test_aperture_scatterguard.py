@@ -102,6 +102,26 @@ def test_aperture_scatterguard_select_bottom_moves_sg_down_then_assembly_up(
     )
 
 
+def test_aperture_unsafe_move(
+    aperture_positions: AperturePositions,
+    aperture_in_medium_pos: ApertureScatterguard,
+):
+    (a, b, c, d, e) = (0.2, 3.4, 5.6, 7.8, 9.0)
+    aperture_scatterguard = aperture_in_medium_pos
+    call_logger = install_logger_for_aperture_and_scatterguard(aperture_scatterguard)
+    aperture_scatterguard._set_raw_unsafe((a, b, c, d, e))  # type: ignore
+
+    call_logger.assert_has_calls(
+        [
+            call._mock_ap_x(a),
+            call._mock_ap_y(b),
+            call._mock_ap_z(c),
+            call._mock_sg_x(d),
+            call._mock_sg_y(e),
+        ]
+    )
+
+
 def test_aperture_scatterguard_select_top_moves_assembly_down_then_sg_up(
     aperture_positions: AperturePositions, aperture_in_medium_pos: ApertureScatterguard
 ):
