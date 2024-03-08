@@ -228,10 +228,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/directory_provider/"
   },
   {
-    "version": "extended_motor",
-    "url": "https://DiamondLightSource.github.io/dodal/extended_motor/"
-  },
-  {
     "version": "fix_linting_CI_issues",
     "url": "https://DiamondLightSource.github.io/dodal/fix_linting_CI_issues/"
   },
@@ -250,6 +246,10 @@
   {
     "version": "hyperion_1234_robot_load",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1234_robot_load/"
+  },
+  {
+    "version": "hyperion_685_use_vmax_for_rotation",
+    "url": "https://DiamondLightSource.github.io/dodal/hyperion_685_use_vmax_for_rotation/"
   },
   {
     "version": "hyperion_698_refactor_parameters",
