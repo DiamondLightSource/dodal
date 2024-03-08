@@ -176,10 +176,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/341-new-j20-setup/"
   },
   {
-    "version": "368_reduce_debug_log_amount",
-    "url": "https://DiamondLightSource.github.io/dodal/368_reduce_debug_log_amount/"
-  },
-  {
     "version": "51_aperture_scatterguard_no_positions",
     "url": "https://DiamondLightSource.github.io/dodal/51_aperture_scatterguard_no_positions/"
   },
@@ -262,6 +258,10 @@
   {
     "version": "hyperion_698_refactor_parameters",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_698_refactor_parameters/"
+  },
+  {
+    "version": "hyperion_818_system_tests",
+    "url": "https://DiamondLightSource.github.io/dodal/hyperion_818_system_tests/"
   },
   {
     "version": "i04_add_devices",
