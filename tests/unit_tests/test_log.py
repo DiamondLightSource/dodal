@@ -91,7 +91,7 @@ def test_no_env_variable_sets_correct_file_handler(
 
     expected_calls = [
         call(filename=PosixPath("tmp/dev/dodal.log"), when="MIDNIGHT", backupCount=30),
-        call(PosixPath("tmp/dev/debug/dodal.log"), when="H"),
+        call(PosixPath("tmp/dev/debug/dodal.log"), when="H", backupCount=7),
     ]
 
     mock_file_handler.assert_has_calls(expected_calls, any_order=True)
