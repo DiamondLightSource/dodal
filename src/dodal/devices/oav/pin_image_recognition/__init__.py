@@ -181,7 +181,7 @@ class PinTipDetection(StandardReadable):
                         filename = await self.diagnostics_filename.get_value()
                         store_grid_detection_array_data(value, location, filename)
                 except Exception as e:
-                    LOGGER.warn(
+                    LOGGER.warning(
                         f"Failed to detect pin-tip location, will retry with next image: {e}"
                     )
                 else:
@@ -203,7 +203,7 @@ class PinTipDetection(StandardReadable):
 def store_grid_detection_array_data(
     image: np.ndarray, location: SampleLocation, filename: str
 ):
-    pin_detected = f"pin_{'not' if not location.tip_x else ''}_detected"
+    pin_detected = f"pin{'_not' if not location.tip_x else ''}_detected"
     np.savez_compressed(
         f"{filename}_{pin_detected}",
         image=image,
