@@ -20,7 +20,7 @@ DEFAULT_FORMATTER = logging.Formatter(
 )
 ERROR_LOG_BUFFER_LINES = 20000
 INFO_LOG_DAYS = 30
-DEBUG_LOG_DAYS = 7
+DEBUG_LOG_FILES_TO_KEEP = 7
 
 
 class CircularMemoryHandler(logging.Handler):
@@ -133,7 +133,7 @@ def set_up_DEBUG_memory_handler(
     debug_path = path / "debug"
     debug_path.mkdir(parents=True, exist_ok=True)
     file_handler = TimedRotatingFileHandler(
-        filename=debug_path / filename, when="H", backupCount=DEBUG_LOG_DAYS
+        filename=debug_path / filename, when="H", backupCount=DEBUG_LOG_FILES_TO_KEEP
     )
     file_handler.setLevel(logging.DEBUG)
     memory_handler = CircularMemoryHandler(
