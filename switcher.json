@@ -244,6 +244,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1007_reset_stub_offsets_if_required/"
   },
   {
+    "version": "hyperion_1227_edge_array_logging",
+    "url": "https://DiamondLightSource.github.io/dodal/hyperion_1227_edge_array_logging/"
+  },
+  {
     "version": "hyperion_1234_robot_load",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1234_robot_load/"
   },
