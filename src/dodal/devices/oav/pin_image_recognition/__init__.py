@@ -79,6 +79,13 @@ class PinTipDetection(StandardReadable):
             float, "validity_timeout", self.name
         )
 
+        self.store_diagnostics = create_soft_signal_rw(
+            bool, "store_diagnostics", self.name
+        )
+        self.diagnostics_filename = create_soft_signal_rw(
+            str, "diagnostics_filename", self.name
+        )
+
         self.set_readable_signals(
             read=[
                 self.triggered_tip,
@@ -170,6 +177,9 @@ class PinTipDetection(StandardReadable):
                 try:
                     location = await self._get_tip_and_edge_data(value)
                     await self._set_triggered_values(location)
+                    if await self.store_diagnostics.get_value():
+                        filename = await self.diagnostics_filename.get_value()
+                        store_grid_detection_array_data(value, location, filename)
                 except Exception as e:
                     LOGGER.warn(
                         f"Failed to detect pin-tip location, will retry with next image: {e}"
@@ -188,3 +198,16 @@ class PinTipDetection(StandardReadable):
             await self.triggered_tip._backend.put(self.INVALID_POSITION)
             await self.triggered_bottom_edge._backend.put(np.array([]))
             await self.triggered_top_edge._backend.put(np.array([]))
+
+
+def store_grid_detection_array_data(
+    image: np.ndarray, location: SampleLocation, filename: str
+):
+    pin_detected = f"pin_{'not' if not location.tip_x else ''}_detected"
+    np.savez_compressed(
+        f"{filename}_{pin_detected}",
+        image=image,
+        top_edge=location.edge_top,
+        bottom_edge=location.edge_bottom,
+        tip=np.array([location.tip_x, location.tip_y]),
+    )
