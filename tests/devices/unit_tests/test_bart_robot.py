@@ -40,10 +40,22 @@ async def test_given_program_running_when_load_pin_then_times_out():
 async def test_given_program_not_running_when_load_pin_then_pin_loaded():
     device = await _get_bart_robot()
     set_sim_value(device.program_running, False)
+    set_sim_value(device.gonio_pin_sensor, True)
     device.load = AsyncMock(side_effect=device.load)
     status = device.set(SampleLocation(15, 10))
     await status
     assert status.success
     assert (await device.next_puck.get_value()) == 15
     assert (await device.next_pin.get_value()) == 10
+    device.load.trigger.assert_called_once()  # type:ignore
+
+
+@pytest.mark.asyncio
+async def test_given_program_not_running_but_pin_not_mounting_when_load_pin_then_timeout():
+    device = await _get_bart_robot()
+    set_sim_value(device.program_running, False)
+    set_sim_value(device.gonio_pin_sensor, False)
+    device.load = AsyncMock(side_effect=device.load)
+    with pytest.raises(TimeoutError):
+        await device.set(SampleLocation(15, 10))
     device.load.trigger.assert_called_once()  # type:ignore

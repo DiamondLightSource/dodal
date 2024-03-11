@@ -84,6 +84,10 @@ class BartRobot(StandardReadable, Movable):
             self.next_pin.set(sample_location.pin),
         )
         await self.load.trigger()
+        async for value in observe_value(self.gonio_pin_sensor):
+            if value:
+                break
+            LOGGER.info("Waiting on pin mounted")
 
     def set(self, sample_location: SampleLocation) -> AsyncStatus:
         return AsyncStatus(
