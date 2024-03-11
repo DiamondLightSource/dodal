@@ -18,8 +18,9 @@ LOGGER.setLevel(logging.DEBUG)
 DEFAULT_FORMATTER = logging.Formatter(
     "[%(asctime)s] %(name)s %(module)s %(levelname)s: %(message)s"
 )
-ERROR_LOG_BUFFER_LINES = 200000
+ERROR_LOG_BUFFER_LINES = 20000
 INFO_LOG_DAYS = 30
+DEBUG_LOG_FILES_TO_KEEP = 7
 
 
 class CircularMemoryHandler(logging.Handler):
@@ -131,10 +132,14 @@ def set_up_DEBUG_memory_handler(
     print(f"Logging to {path/filename}")
     debug_path = path / "debug"
     debug_path.mkdir(parents=True, exist_ok=True)
-    file_handler = TimedRotatingFileHandler(filename=debug_path / filename, when="H")
+    file_handler = TimedRotatingFileHandler(
+        filename=debug_path / filename, when="H", backupCount=DEBUG_LOG_FILES_TO_KEEP
+    )
     file_handler.setLevel(logging.DEBUG)
     memory_handler = CircularMemoryHandler(
-        capacity=capacity, flushLevel=logging.ERROR, target=file_handler
+        capacity=capacity,
+        flushLevel=logging.ERROR,
+        target=file_handler,
     )
     memory_handler.setLevel(logging.DEBUG)
     memory_handler.addFilter(beamline_filter)
