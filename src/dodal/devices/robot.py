@@ -4,10 +4,10 @@ from dataclasses import dataclass
 from typing import Dict, Sequence
 
 from bluesky.protocols import Descriptor, Movable, Reading
-from ophyd_async.core import AsyncStatus, StandardReadable, observe_value
+from ophyd_async.core import AsyncStatus, StandardReadable
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_x
 
-from dodal.devices.util.epics_util import epics_signal_rw_rbv
+from dodal.devices.util.epics_util import epics_signal_rw_rbv, signal_meets_predicate
 from dodal.log import LOGGER
 
 
@@ -75,19 +75,17 @@ class BartRobot(StandardReadable, Movable):
 
     async def _load_pin_and_puck(self, sample_location: SampleLocation):
         LOGGER.info(f"Loading pin {sample_location}")
-        async for value in observe_value(self.program_running):
-            if not value:
-                break
-            LOGGER.info("Waiting on robot program to finish")
+        await signal_meets_predicate(
+            self.program_running, lambda v: not v, "Waiting on robot program to finish"
+        )
         await asyncio.gather(
             self.next_puck.set(sample_location.puck),
             self.next_pin.set(sample_location.pin),
         )
         await self.load.trigger()
-        async for value in observe_value(self.gonio_pin_sensor):
-            if value:
-                break
-            LOGGER.info("Waiting on pin mounted")
+        await signal_meets_predicate(
+            self.gonio_pin_sensor, lambda v: v, "Waiting on pin mounted"
+        )
 
     def set(self, sample_location: SampleLocation) -> AsyncStatus:
         return AsyncStatus(
