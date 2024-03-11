@@ -136,7 +136,7 @@ jobs:
           echo "DIST_LOCKFILE_PATH=lockfiles-${{ env.CONTAINER_PYTHON }}-dist-${{ github.sha }}" >> $GITHUB_ENV
 
       - name: Download wheel and lockfiles
-        uses: actions/download-artifact@v4.1.2
+        uses: actions/download-artifact@v4.1.4
         with:
           path: artifacts/
           pattern: "*dist*"
@@ -216,7 +216,7 @@ jobs:
 
     steps:
       - name: Download wheel and lockfiles
-        uses: actions/download-artifact@v4.1.2
+        uses: actions/download-artifact@v4.1.4
         with:
           pattern: "*dist*"
 
