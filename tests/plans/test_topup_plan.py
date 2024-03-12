@@ -18,8 +18,8 @@ def synchrotron() -> Synchrotron:
     return i03.synchrotron(fake_with_ophyd_sim=True)
 
 
-@patch("hyperion.device_setup_plans.check_topup.wait_for_topup_complete")
-@patch("hyperion.device_setup_plans.check_topup.bps.sleep")
+@patch("dodal.plans.check_topup.wait_for_topup_complete")
+@patch("dodal.plans.check_topup.bps.sleep")
 def test_when_topup_before_end_of_collection_wait(
     fake_sleep, fake_wait, synchrotron: Synchrotron
 ):
@@ -38,8 +38,8 @@ def test_when_topup_before_end_of_collection_wait(
     fake_sleep.assert_called_once_with(60.0)
 
 
-@patch("hyperion.device_setup_plans.check_topup.bps.rd")
-@patch("hyperion.device_setup_plans.check_topup.bps.sleep")
+@patch("dodal.plans.check_topup.bps.rd")
+@patch("dodal.plans.check_topup.bps.sleep")
 def test_wait_for_topup_complete(fake_sleep, fake_rd, synchrotron):
     def fake_generator(value):
         yield from bps.null()
@@ -59,8 +59,8 @@ def test_wait_for_topup_complete(fake_sleep, fake_rd, synchrotron):
     fake_sleep.assert_called_with(0.1)
 
 
-@patch("hyperion.device_setup_plans.check_topup.bps.sleep")
-@patch("hyperion.device_setup_plans.check_topup.bps.null")
+@patch("dodal.plans.check_topup.bps.sleep")
+@patch("dodal.plans.check_topup.bps.null")
 def test_no_waiting_if_decay_mode(fake_null, fake_sleep, synchrotron: Synchrotron):
     set_sim_value(synchrotron.topup_start_countdown, -1)
 
@@ -76,7 +76,7 @@ def test_no_waiting_if_decay_mode(fake_null, fake_sleep, synchrotron: Synchrotro
     assert fake_sleep.call_count == 0
 
 
-@patch("hyperion.device_setup_plans.check_topup.bps.null")
+@patch("dodal.plans.check_topup.bps.null")
 def test_no_waiting_when_mode_does_not_allow_gating(
     fake_null, synchrotron: Synchrotron
 ):
