@@ -1,8 +1,11 @@
+from collections import namedtuple
 from dataclasses import dataclass
-from typing import Optional, Tuple
+from typing import List, Optional
 
+import numpy as np
 from ophyd import Component as Cpt
-from ophyd.status import AndStatus, Status
+from ophyd import SignalRO
+from ophyd.status import AndStatus, Status, StatusBase
 
 from dodal.devices.aperture import Aperture
 from dodal.devices.logging_ophyd_device import InfoLoggingDevice
@@ -14,85 +17,122 @@ class InvalidApertureMove(Exception):
     pass
 
 
+ApertureFiveDimensionalLocation = namedtuple(
+    "ApertureFiveDimensionalLocation",
+    [
+        "aperture_x",
+        "aperture_y",
+        "aperture_z",
+        "scatterguard_x",
+        "scatterguard_y",
+    ],
+)
+
+
+@dataclass
+class SingleAperturePosition:
+    name: str
+    GDA_name: str
+    radius_microns: Optional[float]
+    location: ApertureFiveDimensionalLocation
+
+
+def position_from_params(
+    name: str, GDA_name: str, radius_microns: Optional[float], params: dict
+) -> SingleAperturePosition:
+    return SingleAperturePosition(
+        name,
+        GDA_name,
+        radius_microns,
+        ApertureFiveDimensionalLocation(
+            params[f"miniap_x_{GDA_name}"],
+            params[f"miniap_y_{GDA_name}"],
+            params[f"miniap_z_{GDA_name}"],
+            params[f"sg_x_{GDA_name}"],
+            params[f"sg_y_{GDA_name}"],
+        ),
+    )
+
+
 @dataclass
 class AperturePositions:
-    """Holds tuples (miniap_x, miniap_y, miniap_z, scatterguard_x, scatterguard_y)
-    representing the motor positions needed to select a particular aperture size.
-    """
+    """Holds the motor positions needed to select a particular aperture size."""
 
-    LARGE: Tuple[float, float, float, float, float]
-    MEDIUM: Tuple[float, float, float, float, float]
-    SMALL: Tuple[float, float, float, float, float]
-    ROBOT_LOAD: Tuple[float, float, float, float, float]
+    LARGE: SingleAperturePosition
+    MEDIUM: SingleAperturePosition
+    SMALL: SingleAperturePosition
+    ROBOT_LOAD: SingleAperturePosition
 
     @classmethod
     def from_gda_beamline_params(cls, params):
         return cls(
-            LARGE=(
-                params["miniap_x_LARGE_APERTURE"],
-                params["miniap_y_LARGE_APERTURE"],
-                params["miniap_z_LARGE_APERTURE"],
-                params["sg_x_LARGE_APERTURE"],
-                params["sg_y_LARGE_APERTURE"],
-            ),
-            MEDIUM=(
-                params["miniap_x_MEDIUM_APERTURE"],
-                params["miniap_y_MEDIUM_APERTURE"],
-                params["miniap_z_MEDIUM_APERTURE"],
-                params["sg_x_MEDIUM_APERTURE"],
-                params["sg_y_MEDIUM_APERTURE"],
-            ),
-            SMALL=(
-                params["miniap_x_SMALL_APERTURE"],
-                params["miniap_y_SMALL_APERTURE"],
-                params["miniap_z_SMALL_APERTURE"],
-                params["sg_x_SMALL_APERTURE"],
-                params["sg_y_SMALL_APERTURE"],
-            ),
-            ROBOT_LOAD=(
-                params["miniap_x_ROBOT_LOAD"],
-                params["miniap_y_ROBOT_LOAD"],
-                params["miniap_z_ROBOT_LOAD"],
-                params["sg_x_ROBOT_LOAD"],
-                params["sg_y_ROBOT_LOAD"],
-            ),
+            LARGE=position_from_params("Large", "LARGE_APERTURE", 100, params),
+            MEDIUM=position_from_params("Medium", "MEDIUM_APERTURE", 50, params),
+            SMALL=position_from_params("Small", "SMALL_APERTURE", 20, params),
+            ROBOT_LOAD=position_from_params("Robot load", "ROBOT_LOAD", None, params),
         )
 
-    def position_valid(self, pos: Tuple[float, float, float, float, float]):
-        """
-        Check if argument 'pos' is a valid position in this AperturePositions object.
-        """
-        if pos not in [self.LARGE, self.MEDIUM, self.SMALL, self.ROBOT_LOAD]:
-            return False
-        return True
+    def as_list(self) -> List[SingleAperturePosition]:
+        return [
+            self.LARGE,
+            self.MEDIUM,
+            self.SMALL,
+            self.ROBOT_LOAD,
+        ]
 
 
 class ApertureScatterguard(InfoLoggingDevice):
     aperture = Cpt(Aperture, "-MO-MAPT-01:")
     scatterguard = Cpt(Scatterguard, "-MO-SCAT-01:")
     aperture_positions: Optional[AperturePositions] = None
-    APERTURE_Z_TOLERANCE = 3  # Number of MRES steps
+    TOLERANCE_STEPS = 3  # Number of MRES steps
+
+    class SelectedAperture(SignalRO):
+        def get(self):
+            assert isinstance(self.parent, ApertureScatterguard)
+            return self.parent._get_closest_position_to_current()
+
+    selected_aperture = Cpt(SelectedAperture)
 
     def load_aperture_positions(self, positions: AperturePositions):
         LOGGER.info(f"{self.name} loaded in {positions}")
         self.aperture_positions = positions
 
-    def set(self, pos: Tuple[float, float, float, float, float]) -> AndStatus:
-        try:
-            assert isinstance(self.aperture_positions, AperturePositions)
-            assert self.aperture_positions.position_valid(pos)
-        except AssertionError as e:
-            raise InvalidApertureMove(repr(e))
-        return self._safe_move_within_datacollection_range(*pos)
+    def set(self, pos: SingleAperturePosition) -> StatusBase:
+        assert isinstance(self.aperture_positions, AperturePositions)
+        if pos not in self.aperture_positions.as_list():
+            raise InvalidApertureMove(f"Unknown aperture: {pos}")
+
+        return self._safe_move_within_datacollection_range(pos.location)
+
+    def _get_closest_position_to_current(self) -> SingleAperturePosition:
+        """
+        Returns the closest valid position to current position within {TOLERANCE_STEPS}.
+        If no position is found then raises InvalidApertureMove.
+        """
+        assert isinstance(self.aperture_positions, AperturePositions)
+        for aperture in self.aperture_positions.as_list():
+            aperture_in_tolerence = []
+            motors = [
+                self.aperture.x,
+                self.aperture.y,
+                self.aperture.z,
+                self.scatterguard.x,
+                self.scatterguard.y,
+            ]
+            for motor, test_position in zip(motors, list(aperture.location)):
+                current_position = motor.user_readback.get()
+                tolerance = self.TOLERANCE_STEPS * motor.motor_resolution.get()
+                diff = abs(current_position - test_position)
+                aperture_in_tolerence.append(diff <= tolerance)
+            if np.all(aperture_in_tolerence):
+                return aperture
+
+        raise InvalidApertureMove("Current aperture/scatterguard state unrecognised")
 
     def _safe_move_within_datacollection_range(
-        self,
-        aperture_x: float,
-        aperture_y: float,
-        aperture_z: float,
-        scatterguard_x: float,
-        scatterguard_y: float,
-    ) -> Status:
+        self, pos: ApertureFiveDimensionalLocation
+    ) -> StatusBase:
         """
         Move the aperture and scatterguard combo safely to a new position.
         See https://github.com/DiamondLightSource/hyperion/wiki/Aperture-Scatterguard-Collisions
@@ -101,6 +141,10 @@ class ApertureScatterguard(InfoLoggingDevice):
         # EpicsMotor does not have deadband/MRES field, so the way to check if we are
         # in a datacollection position is to see if we are "ready" (DMOV) and the target
         # position is correct
+
+        # unpacking the position
+        aperture_x, aperture_y, aperture_z, scatterguard_x, scatterguard_y = pos
+
         ap_z_in_position = self.aperture.z.motor_done_move.get()
         if not ap_z_in_position:
             status: Status = Status(obj=self)
@@ -111,9 +155,11 @@ class ApertureScatterguard(InfoLoggingDevice):
                 )
             )
             return status
+
         current_ap_z = self.aperture.z.user_setpoint.get()
-        tolerance = self.APERTURE_Z_TOLERANCE * self.aperture.z.motor_resolution.get()
-        if abs(current_ap_z - aperture_z) > tolerance:
+        tolerance = self.TOLERANCE_STEPS * self.aperture.z.motor_resolution.get()
+        diff_on_z = abs(current_ap_z - aperture_z)
+        if diff_on_z > tolerance:
             raise InvalidApertureMove(
                 "ApertureScatterguard safe move is not yet defined for positions "
                 "outside of LARGE, MEDIUM, SMALL, ROBOT_LOAD. "
@@ -126,24 +172,22 @@ class ApertureScatterguard(InfoLoggingDevice):
                 scatterguard_x
             ) & self.scatterguard.y.set(scatterguard_y)
             sg_status.wait()
-            final_status = (
+            return (
                 sg_status
                 & self.aperture.x.set(aperture_x)
                 & self.aperture.y.set(aperture_y)
                 & self.aperture.z.set(aperture_z)
             )
-            return final_status
 
-        else:
-            ap_status: AndStatus = (
-                self.aperture.x.set(aperture_x)
-                & self.aperture.y.set(aperture_y)
-                & self.aperture.z.set(aperture_z)
-            )
-            ap_status.wait()
-            final_status = (
-                ap_status
-                & self.scatterguard.x.set(scatterguard_x)
-                & self.scatterguard.y.set(scatterguard_y)
-            )
-            return final_status
+        ap_status: AndStatus = (
+            self.aperture.x.set(aperture_x)
+            & self.aperture.y.set(aperture_y)
+            & self.aperture.z.set(aperture_z)
+        )
+        ap_status.wait()
+        final_status: AndStatus = (
+            ap_status
+            & self.scatterguard.x.set(scatterguard_x)
+            & self.scatterguard.y.set(scatterguard_y)
+        )
+        return final_status

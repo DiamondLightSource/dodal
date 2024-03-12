@@ -1,11 +1,9 @@
-from ophyd import Component, Device, EpicsMotor, EpicsSignalRO
+from ophyd import Component, Device
 
-
-class EpicsMotorWithMRES(EpicsMotor):
-    motor_resolution: Component[EpicsSignalRO] = Component(EpicsSignalRO, ".MRES")
+from dodal.devices.util.motor_utils import ExtendedEpicsMotor
 
 
 class Aperture(Device):
-    x = Component(EpicsMotor, "X")
-    y = Component(EpicsMotor, "Y")
-    z = Component(EpicsMotorWithMRES, "Z")
+    x = Component(ExtendedEpicsMotor, "X")
+    y = Component(ExtendedEpicsMotor, "Y")
+    z = Component(ExtendedEpicsMotor, "Z")

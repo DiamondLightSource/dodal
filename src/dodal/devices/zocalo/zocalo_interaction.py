@@ -1,5 +1,8 @@
+import dataclasses
 import getpass
 import socket
+from dataclasses import dataclass
+from typing import Optional
 
 import zocalo.configuration
 from workflows.transport import lookup
@@ -14,6 +17,22 @@ def _get_zocalo_connection(environment):
     transport = lookup("PikaTransport")()
     transport.connect()
     return transport
+
+
+@dataclass
+class ZocaloStartInfo:
+    """
+    ispyb_dcid (int): The ID of the data collection in ISPyB
+    filename (str): The name of the file that the detector will store into dev/shm
+    number_of_frames (int): The number of frames in this collection.
+    start_index (int): The index of the first image of this collection within the file
+                    written by the detector
+    """
+
+    ispyb_dcid: int
+    filename: Optional[str]
+    start_index: int
+    number_of_frames: int
 
 
 class ZocaloTrigger:
@@ -42,16 +61,20 @@ class ZocaloTrigger:
         finally:
             transport.disconnect()
 
-    def run_start(self, data_collection_id: int):
+    def run_start(
+        self,
+        start_data: ZocaloStartInfo,
+    ):
         """Tells the data analysis pipeline we have started a run.
         Assumes that appropriate data has already been put into ISPyB
 
         Args:
-            data_collection_id (int): The ID of the data collection representing the
-                                    gridscan in ISPyB
+            start_data (ZocaloStartInfo): Data about the collection to send to zocalo
         """
-        LOGGER.info(f"Starting Zocalo job with ispyb id {data_collection_id}")
-        self._send_to_zocalo({"event": "start", "ispyb_dcid": data_collection_id})
+        LOGGER.info(f"Starting Zocalo job {start_data}")
+        data = dataclasses.asdict(start_data)
+        data["event"] = "start"
+        self._send_to_zocalo(data)
 
     def run_end(self, data_collection_id: int):
         """Tells the data analysis pipeline we have finished a run.
