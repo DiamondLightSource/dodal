@@ -2,7 +2,6 @@ import asyncio
 from unittest.mock import MagicMock, patch
 
 import numpy as np
-import pytest
 from ophyd_async.core import set_sim_value
 
 from dodal.devices.oav.pin_image_recognition import MxSampleDetect, PinTipDetection
@@ -11,7 +10,6 @@ from dodal.devices.oav.pin_image_recognition.utils import SampleLocation
 EVENT_LOOP = asyncio.new_event_loop()
 
 
-pytest_plugins = ("pytest_asyncio",)
 DEVICE_NAME = "pin_tip_detection"
 TRIGGERED_TIP_READING = DEVICE_NAME + "-triggered_tip"
 TRIGGERED_TOP_EDGE_READING = DEVICE_NAME + "-triggered_top_edge"
@@ -24,13 +22,11 @@ async def _get_pin_tip_detection_device() -> PinTipDetection:
     return device
 
 
-@pytest.mark.asyncio
 async def test_pin_tip_detect_can_be_connected_in_sim_mode():
     device = await _get_pin_tip_detection_device()
     await device.connect(sim=True)
 
 
-@pytest.mark.asyncio
 async def test_soft_parameter_defaults_are_correct():
     device = await _get_pin_tip_detection_device()
 
@@ -46,7 +42,6 @@ async def test_soft_parameter_defaults_are_correct():
     assert await device.preprocess_ksize.get_value() == 5
 
 
-@pytest.mark.asyncio
 async def test_numeric_soft_parameters_can_be_changed():
     device = await _get_pin_tip_detection_device()
 
@@ -73,7 +68,6 @@ async def test_numeric_soft_parameters_can_be_changed():
     assert await device.preprocess_iterations.get_value() == 4
 
 
-@pytest.mark.asyncio
 async def test_invalid_processing_func_uses_identity_function():
     device = await _get_pin_tip_detection_device()
     test_sample_location = SampleLocation(100, 200, np.array([]), np.array([]))
@@ -95,7 +89,6 @@ async def test_invalid_processing_func_uses_identity_function():
     assert arg == captured_func(arg)
 
 
-@pytest.mark.asyncio
 async def test_given_valid_data_reading_then_used_to_find_location():
     device = await _get_pin_tip_detection_device()
     image_array = np.array([1, 2, 3])
@@ -125,7 +118,6 @@ async def test_given_valid_data_reading_then_used_to_find_location():
         assert location[TRIGGERED_TIP_READING]["timestamp"] > 0
 
 
-@pytest.mark.asyncio
 async def test_given_find_tip_fails_when_triggered_then_tip_invalid():
     device = await _get_pin_tip_detection_device()
     await device.validity_timeout.set(0.1)
@@ -142,7 +134,6 @@ async def test_given_find_tip_fails_when_triggered_then_tip_invalid():
         assert len(reading[TRIGGERED_BOTTOM_EDGE_READING]["value"]) == 0
 
 
-@pytest.mark.asyncio
 @patch("dodal.devices.oav.pin_image_recognition.observe_value")
 async def test_given_find_tip_fails_twice_when_triggered_then_tip_invalid_and_tried_twice(
     mock_image_read,
@@ -168,7 +159,6 @@ async def test_given_find_tip_fails_twice_when_triggered_then_tip_invalid_and_tr
         assert mock_process_array.call_count > 1
 
 
-@pytest.mark.asyncio
 @patch("dodal.devices.oav.pin_image_recognition.LOGGER.warn")
 @patch("dodal.devices.oav.pin_image_recognition.observe_value")
 async def test_given_tip_invalid_then_loop_keeps_retrying_until_valid(
