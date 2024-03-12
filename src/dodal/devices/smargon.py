@@ -54,7 +54,7 @@ class Smargon(MotorBundle):
     z = Cpt(EpicsMotor, "Z")
     chi = Cpt(EpicsMotor, "CHI")
     phi = Cpt(EpicsMotor, "PHI")
-    omega = Cpt(EpicsMotor, "OMEGA")
+    omega = Cpt(ExtendedEpicsMotor, "OMEGA")
 
     real_x1 = Cpt(EpicsMotor, "MOTOR_3")
     real_x2 = Cpt(EpicsMotor, "MOTOR_4")
