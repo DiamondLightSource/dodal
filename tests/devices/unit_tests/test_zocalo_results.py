@@ -4,7 +4,6 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import bluesky.plan_stubs as bps
 import numpy as np
 import pytest
-import pytest_asyncio
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
 from ophyd_async.core.async_status import AsyncStatus
@@ -81,7 +80,7 @@ test_ispyb_ids = {"dcid": 0, "dcgid": 0}
 
 
 @patch("dodal.devices.zocalo_results._get_zocalo_connection")
-@pytest_asyncio.fixture
+@pytest.fixture
 async def mocked_zocalo_device(RE):
     async def device(results, run_setup=False):
         zd = ZocaloResults(zocalo_environment="test_env")
@@ -106,7 +105,6 @@ async def mocked_zocalo_device(RE):
     return device
 
 
-@pytest.mark.asyncio
 async def test_put_result_read_results(
     mocked_zocalo_device,
     RE,
@@ -122,7 +120,6 @@ async def test_put_result_read_results(
     assert np.all(bboxes[0] == [2, 2, 1])
 
 
-@pytest.mark.asyncio
 async def test_rd_top_results(
     mocked_zocalo_device,
     RE,
@@ -141,7 +138,6 @@ async def test_rd_top_results(
     RE(test_plan())
 
 
-@pytest.mark.asyncio
 async def test_trigger_and_wait_puts_results(
     mocked_zocalo_device,
     RE,
@@ -159,7 +155,6 @@ async def test_trigger_and_wait_puts_results(
     zocalo_device._put_results.assert_called()
 
 
-@pytest.mark.asyncio
 async def test_extraction_plan(mocked_zocalo_device, RE) -> None:
     zocalo_device: ZocaloResults = await mocked_zocalo_device(
         TEST_RESULTS, run_setup=False
@@ -176,7 +171,6 @@ async def test_extraction_plan(mocked_zocalo_device, RE) -> None:
     RE(plan())
 
 
-@pytest.mark.asyncio
 @patch(
     "dodal.devices.zocalo.zocalo_results.workflows.recipe.wrap_subscribe", autospec=True
 )
@@ -202,7 +196,6 @@ async def test_subscribe_only_on_called_stage(
     mock_wrap_subscribe.assert_called_once()
 
 
-@pytest.mark.asyncio
 @patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection", autospec=True)
 async def test_when_exception_caused_by_zocalo_message_then_exception_propagated(
     mock_connection,
