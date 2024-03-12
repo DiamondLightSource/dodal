@@ -10,5 +10,5 @@ def synchrotron():
 
 
 @pytest.mark.s03
-def test_synchrotron_connects(synchrotron: Synchrotron):
-    synchrotron.wait_for_connection()
+async def test_synchrotron_connects(synchrotron: Synchrotron):
+    await synchrotron.connect()

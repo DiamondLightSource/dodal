@@ -1,6 +1,5 @@
 from enum import Enum
 
-from ophyd import Component, Device, EpicsSignal
 from ophyd_async.core import StandardReadable
 from ophyd_async.epics.signal import epics_signal_r
 
@@ -28,24 +27,7 @@ class SynchrotronMode(str, Enum):
     UNKNOWN = "Unknown"
 
 
-class SynchrotronMachineStatus(Device):
-    synchrotron_mode = Component(EpicsSignal, PV.MODE, string=True)
-    user_countdown = Component(EpicsSignal, PV.USRCNTDN)
-    beam_energy = Component(EpicsSignal, PV.BEAM_ENERGY)
-
-
-class SynchrotronTopUp(Device):
-    start_countdown = Component(EpicsSignal, PV.CNTDN)
-    end_countdown = Component(EpicsSignal, PV.ENDCNTDN)
-
-
-class Synchrotron(Device):
-    machine_status = Component(SynchrotronMachineStatus, PV.STATUS_PREFIX)
-    top_up = Component(SynchrotronTopUp, PV.TOP_UP_PREFIX)
-    ring_current = Component(EpicsSignal, PV.SIGNAL_PREFIX + PV.SIGNAL)
-
-
-class OASynchrotron(StandardReadable):
+class Synchrotron(StandardReadable):
     def __init__(self, prefix: str = PV.SIGNAL_PREFIX, name: str = "synchrotron"):
         self.ring_current = epics_signal_r(float, prefix + PV.SIGNAL)
         self.synchrotron_mode = epics_signal_r(
