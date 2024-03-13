@@ -6,7 +6,12 @@ import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import DeviceCollector, StandardReadable, set_sim_value
 
-from dodal.devices.synchrotron import PV, OASynchrotron, SynchrotronMode
+from dodal.devices.synchrotron import (
+    OASynchrotron,
+    Prefix,
+    Suffix,
+    SynchrotronMode,
+)
 
 RING_CURRENT = 0.556677
 USER_COUNTDOWN = 55.0
@@ -24,15 +29,15 @@ CONFIGS = [BEAM_ENERGY, MODE.value]
 READING_FIELDS = ["value", "alarm_severity"]
 DESCRIPTION_FIELDS = ["source", "dtype", "shape"]
 READING_ADDRESSES = [
-    f"sim://{PV.SIGNAL_PREFIX + PV.SIGNAL}",
-    f"sim://{PV.STATUS_PREFIX + PV.USRCNTDN}",
-    f"sim://{PV.TOP_UP_PREFIX + PV.CNTDN}",
-    f"sim://{PV.TOP_UP_PREFIX + PV.ENDCNTDN}",
+    f"sim://{Prefix.SIGNAL + Suffix.SIGNAL}",
+    f"sim://{Prefix.STATUS + Suffix.USER_COUNTDOWN}",
+    f"sim://{Prefix.TOP_UP + Suffix.COUNTDOWN}",
+    f"sim://{Prefix.TOP_UP + Suffix.END_COUNTDOWN}",
 ]
 
 CONFIG_ADDRESSES = [
-    f"sim://{PV.STATUS_PREFIX + PV.BEAM_ENERGY}",
-    f"sim://{PV.STATUS_PREFIX + PV.MODE}",
+    f"sim://{Prefix.STATUS + Suffix.BEAM_ENERGY}",
+    f"sim://{Prefix.STATUS + Suffix.MODE}",
 ]
 
 READ_SIGNALS = [
@@ -172,9 +177,9 @@ async def test_oasynchrotron_count(RE: RunEngine, sim_synchrotron: OASynchrotron
     cfg_data_keys = docs[1]["configuration"][sim_synchrotron.name]["data_keys"]
     for sig, addr in zip(CONFIG_SIGNALS, CONFIG_ADDRESSES):
         assert sig in cfg_data_keys
-        dt = NUMBER if sig == CONFIG_SIGNALS[0] else STRING
+        dtype = NUMBER if sig == CONFIG_SIGNALS[0] else STRING
         assert cfg_data_keys[sig][DESCRIPTION_FIELDS[0]] == addr
-        assert cfg_data_keys[sig][DESCRIPTION_FIELDS[1]] == dt
+        assert cfg_data_keys[sig][DESCRIPTION_FIELDS[1]] == dtype
         assert cfg_data_keys[sig][DESCRIPTION_FIELDS[2]] == EMPTY_LIST
     cfg_data = docs[1]["configuration"][sim_synchrotron.name]["data"]
     for sig, value in zip(CONFIG_SIGNALS, CONFIGS):

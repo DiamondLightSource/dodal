@@ -5,16 +5,19 @@ from ophyd_async.core import StandardReadable
 from ophyd_async.epics.signal import epics_signal_r
 
 
-class PV(str, Enum):
-    STATUS_PREFIX = "CS-CS-MSTAT-01:"
-    TOP_UP_PREFIX = "SR-CS-FILL-01:"
-    SIGNAL_PREFIX = "SR-DI-DCCT-01:"
+class Prefix(str, Enum):
+    STATUS = "CS-CS-MSTAT-01:"
+    TOP_UP = "SR-CS-FILL-01:"
+    SIGNAL = "SR-DI-DCCT-01:"
+
+
+class Suffix(str, Enum):
     SIGNAL = "SIGNAL"
     MODE = "MODE"
-    USRCNTDN = "USERCOUNTDN"
+    USER_COUNTDOWN = "USERCOUNTDN"
     BEAM_ENERGY = "BEAMENERGY"
-    CNTDN = "COUNTDOWN"
-    ENDCNTDN = "ENDCOUNTDN"
+    COUNTDOWN = "COUNTDOWN"
+    END_COUNTDOWN = "ENDCOUNTDN"
 
 
 class SynchrotronMode(str, Enum):
@@ -29,35 +32,45 @@ class SynchrotronMode(str, Enum):
 
 
 class SynchrotronMachineStatus(Device):
-    synchrotron_mode = Component(EpicsSignal, PV.MODE, string=True)
-    user_countdown = Component(EpicsSignal, PV.USRCNTDN)
-    beam_energy = Component(EpicsSignal, PV.BEAM_ENERGY)
+    synchrotron_mode = Component(EpicsSignal, Suffix.MODE, string=True)
+    user_countdown = Component(EpicsSignal, Suffix.USER_COUNTDOWN)
+    beam_energy = Component(EpicsSignal, Suffix.BEAM_ENERGY)
 
 
 class SynchrotronTopUp(Device):
-    start_countdown = Component(EpicsSignal, PV.CNTDN)
-    end_countdown = Component(EpicsSignal, PV.ENDCNTDN)
+    start_countdown = Component(EpicsSignal, Suffix.COUNTDOWN)
+    end_countdown = Component(EpicsSignal, Suffix.END_COUNTDOWN)
 
 
 class Synchrotron(Device):
-    machine_status = Component(SynchrotronMachineStatus, PV.STATUS_PREFIX)
-    top_up = Component(SynchrotronTopUp, PV.TOP_UP_PREFIX)
-    ring_current = Component(EpicsSignal, PV.SIGNAL_PREFIX + PV.SIGNAL)
+    machine_status = Component(SynchrotronMachineStatus, Prefix.STATUS)
+    top_up = Component(SynchrotronTopUp, Prefix.TOP_UP)
+    ring_current = Component(EpicsSignal, Prefix.SIGNAL + Suffix.SIGNAL)
 
 
 class OASynchrotron(StandardReadable):
-    def __init__(self, prefix: str = PV.SIGNAL_PREFIX, name: str = "synchrotron"):
-        self.ring_current = epics_signal_r(float, prefix + PV.SIGNAL)
+    def __init__(
+        self,
+        prefix: str = "",
+        name: str = "synchrotron",
+        *,
+        signal_prefix=Prefix.SIGNAL,
+        status_prefix=Prefix.STATUS,
+        topup_prefix=Prefix.TOP_UP,
+    ):
+        self.ring_current = epics_signal_r(float, signal_prefix + Suffix.SIGNAL)
         self.synchrotron_mode = epics_signal_r(
-            SynchrotronMode, PV.STATUS_PREFIX + PV.MODE
+            SynchrotronMode, status_prefix + Suffix.MODE
         )
         self.machine_user_countdown = epics_signal_r(
-            float, PV.STATUS_PREFIX + PV.USRCNTDN
+            float, status_prefix + Suffix.USER_COUNTDOWN
         )
-        self.beam_energy = epics_signal_r(float, PV.STATUS_PREFIX + PV.BEAM_ENERGY)
-        self.topup_start_countdown = epics_signal_r(float, PV.TOP_UP_PREFIX + PV.CNTDN)
+        self.beam_energy = epics_signal_r(float, status_prefix + Suffix.BEAM_ENERGY)
+        self.topup_start_countdown = epics_signal_r(
+            float, topup_prefix + Suffix.COUNTDOWN
+        )
         self.top_up_end_countdown = epics_signal_r(
-            float, PV.TOP_UP_PREFIX + PV.ENDCNTDN
+            float, topup_prefix + Suffix.END_COUNTDOWN
         )
 
         self.set_readable_signals(
