@@ -4,10 +4,11 @@ from enum import Enum, IntEnum
 from functools import partialmethod
 from typing import List
 
-from ophyd import Component, Device, EpicsSignal, StatusBase
+from ophyd import StatusBase
+from ophyd_async.core import SignalRW, StandardReadable
+from ophyd_async.epics.signal import epics_signal_rw
 
 from dodal.devices.status import await_value
-from dodal.devices.util.epics_util import epics_signal_put_wait
 
 PC_ARM_SOURCE_SOFT = "Soft"
 PC_ARM_SOURCE_EXT = "External"
@@ -74,70 +75,86 @@ class FastShutterAction(IntEnum):
     CLOSE = 0
 
 
-class ArmingDevice(Device):
+# TODO check all types for the PVs!
+
+
+class ArmingDevice(StandardReadable):
     """A useful device that can abstract some of the logic of arming.
     Allows a user to just call arm.set(ArmDemand.ARM)"""
 
     TIMEOUT = 3
 
-    arm_set = Component(EpicsSignal, "PC_ARM")
-    disarm_set = Component(EpicsSignal, "PC_DISARM")
-    armed = Component(EpicsSignal, "PC_ARM_OUT")
+    def __init__(self, prefix: str, name: str = "") -> None:
+        self.arm_set = epics_signal_rw(int, prefix + "PC_ARM")
+        self.disarm_set = epics_signal_rw(int, prefix + "PC_DISARM")
+        self.armed = epics_signal_rw(int, prefix + "PC_ARM_OUT")
+        super().__init__(name)
 
     def set(self, demand: ArmDemand) -> StatusBase:
+        # TODO Ask about StatusBase vs AsyncStatus
         status = await_value(self.armed, demand.value, timeout=self.TIMEOUT)
         signal_to_set = self.arm_set if demand == ArmDemand.ARM else self.disarm_set
         status &= signal_to_set.set(1)
         return status
 
 
-class PositionCompare(Device):
-    num_gates = epics_signal_put_wait("PC_GATE_NGATE")
-    gate_trigger = epics_signal_put_wait("PC_ENC")
-    gate_source = epics_signal_put_wait("PC_GATE_SEL")
-    gate_input = epics_signal_put_wait("PC_GATE_INP")
-    gate_width = epics_signal_put_wait("PC_GATE_WID")
-    gate_start = epics_signal_put_wait("PC_GATE_START")
-    gate_step = epics_signal_put_wait("PC_GATE_STEP")
+class PositionCompare(StandardReadable):
+    def __init__(self, prefix: str, name: str = "") -> None:
+        self.num_gates = epics_signal_rw(int, prefix + "PC_GATE_NGATE")
+        self.gate_trigger = epics_signal_rw(str, prefix + "PC_ENC")
+        self.gate_source = epics_signal_rw(str, prefix + "PC_GATE_SEL")
+        self.gate_input = epics_signal_rw(int, prefix + "PC_GATE_INP")
+        self.gate_width = epics_signal_rw(float, prefix + "PC_GATE_WID")
+        self.gate_start = epics_signal_rw(float, prefix + "PC_GATE_START")
+        self.gate_step = epics_signal_rw(float, prefix + "PC_GATE_STEP")
 
-    pulse_source = epics_signal_put_wait("PC_PULSE_SEL")
-    pulse_input = epics_signal_put_wait("PC_PULSE_INP")
-    pulse_start = epics_signal_put_wait("PC_PULSE_START")
-    pulse_width = epics_signal_put_wait("PC_PULSE_WID")
-    pulse_step = epics_signal_put_wait("PC_PULSE_STEP")
-    pulse_max = epics_signal_put_wait("PC_PULSE_MAX")
+        self.pulse_source = epics_signal_rw(str, prefix + "PC_PULSE_SEL")
+        self.pulse_input = epics_signal_rw(int, prefix + "PC_PULSE_INP")
+        self.pulse_start = epics_signal_rw(float, prefix + "PC_PULSE_START")
+        self.pulse_width = epics_signal_rw(float, prefix + "PC_PULSE_WID")
+        self.pulse_step = epics_signal_rw(float, prefix + "PC_PULSE_STEP")
+        self.pulse_max = epics_signal_rw(int, prefix + "PC_PULSE_MAX")
 
-    dir = Component(EpicsSignal, "PC_DIR")
-    arm_source = epics_signal_put_wait("PC_ARM_SEL")
-    reset = Component(EpicsSignal, "SYS_RESET.PROC")
+        self.dir = epics_signal_rw(int, prefix + "PC_DIR")
+        self.arm_source = epics_signal_rw(str, prefix + "PC_ARM_SEL")
+        self.reset = epics_signal_rw(int, prefix + "SYS_RESET.PROC")
 
-    arm = Component(ArmingDevice, "")
+        self.arm = ArmingDevice(prefix)
+        super().__init__(name)
 
-    def is_armed(self) -> bool:
-        return self.arm.armed.get() == 1
-
-
-class PulseOutput(Device):
-    input = epics_signal_put_wait("_INP")
-    delay = epics_signal_put_wait("_DLY")
-    width = epics_signal_put_wait("_WID")
+    async def is_armed(self) -> bool:
+        # TODO Check this makes sense
+        arm_state = await self.arm.armed.get_value()
+        return arm_state == 1
 
 
-class ZebraOutputPanel(Device):
-    pulse_1 = Component(PulseOutput, "PULSE1")
-    pulse_2 = Component(PulseOutput, "PULSE2")
+class PulseOutput(StandardReadable):
+    """Zebra pulse output panel."""
 
-    out_1 = epics_signal_put_wait("OUT1_TTL")
-    out_2 = epics_signal_put_wait("OUT2_TTL")
-    out_3 = epics_signal_put_wait("OUT3_TTL")
-    out_4 = epics_signal_put_wait("OUT4_TTL")
+    def __init__(self, prefix: str, name: str = "") -> None:
+        self.input = epics_signal_rw(int, prefix + "_INP")
+        self.delay = epics_signal_rw(float, prefix + "_DLY")
+        self.delay = epics_signal_rw(float, prefix + "_WID")
+        super().__init__(name)
+
+
+class ZebraOutputPanel(StandardReadable):
+    def __init__(self, prefix: str, name: str = "") -> None:
+        self.pulse1 = PulseOutput(prefix + "PULSE1")
+        self.pulse2 = PulseOutput(prefix + "PULSE2")
+
+        self.out_1 = epics_signal_rw(int, prefix + "OUT1_TTL")
+        self.out_2 = epics_signal_rw(int, prefix + "OUT2_TTL")
+        self.out_3 = epics_signal_rw(int, prefix + "OUT3_TTL")
+        self.out_4 = epics_signal_rw(int, prefix + "OUT4_TTL")
+        super().__init__(name)
 
     @property
-    def out_pvs(self) -> List[EpicsSignal]:
+    def out_pvs(self) -> List[SignalRW]:
         """A list of all the output TTL PVs. Note that as the PVs are 1 indexed
         `out_pvs[0]` is `None`.
         """
-        return [None, self.out_1, self.out_2, self.out_3, self.out_4]
+        return [None, self.out_1, self.out_2, self.out_3, self.out_4]  # type:ignore
 
 
 def boolean_array_to_integer(values: List[bool]) -> int:
@@ -153,13 +170,18 @@ def boolean_array_to_integer(values: List[bool]) -> int:
     return sum(v << i for i, v in enumerate(values))
 
 
-class GateControl(Device):
-    enable = epics_signal_put_wait("_ENA", 30.0)
-    source_1 = epics_signal_put_wait("_INP1", 30.0)
-    source_2 = epics_signal_put_wait("_INP2", 30.0)
-    source_3 = epics_signal_put_wait("_INP3", 30.0)
-    source_4 = epics_signal_put_wait("_INP4", 30.0)
-    invert = epics_signal_put_wait("_INV", 30.0)
+class GateControl(StandardReadable):
+    # TODO: Ophyd v1 had a timeout of 30 - see epics_signal_put_wait
+    # SignalRW has
+    # set(value: T, wait=True, timeout='USE_DEFAULT_TIMEOUT') → AsyncStatus
+    def __init__(self, prefix: str, name: str = "") -> None:
+        self.enable = epics_signal_rw(int, prefix + "_ENA")
+        self.source_1 = epics_signal_rw(int, prefix + "_INP1")
+        self.source_2 = epics_signal_rw(int, prefix + "_INP2")
+        self.source_3 = epics_signal_rw(int, prefix + "_INP3")
+        self.source_4 = epics_signal_rw(int, prefix + "_INP4")
+        self.invert = epics_signal_rw(int, prefix + "_INV")
+        super().__init__(name)
 
     @property
     def sources(self):
@@ -171,21 +193,20 @@ class GateType(Enum):
     OR = "OR"
 
 
-class LogicGateConfigurer(Device):
+class LogicGateConfigurer(StandardReadable):
     DEFAULT_SOURCE_IF_GATE_NOT_USED = 0
 
-    and_gate_1 = Component(GateControl, "AND1")
-    and_gate_2 = Component(GateControl, "AND2")
-    and_gate_3 = Component(GateControl, "AND3")
-    and_gate_4 = Component(GateControl, "AND4")
+    def __init__(self, prefix: str, name: str = "") -> None:
+        self.and_gate_1 = GateControl(prefix + "AND1")
+        self.and_gate_2 = GateControl(prefix + "AND2")
+        self.and_gate_3 = GateControl(prefix + "AND3")
+        self.and_gate_4 = GateControl(prefix + "AND4")
 
-    or_gate_1 = Component(GateControl, "OR1")
-    or_gate_2 = Component(GateControl, "OR2")
-    or_gate_3 = Component(GateControl, "OR3")
-    or_gate_4 = Component(GateControl, "OR4")
+        self.or_gate_1 = GateControl(prefix + "OR1")
+        self.or_gate_2 = GateControl(prefix + "OR1")
+        self.or_gate_3 = GateControl(prefix + "OR1")
+        self.or_gate_4 = GateControl(prefix + "OR1")
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
         self.all_gates = {
             GateType.AND: [
                 self.and_gate_1,
@@ -200,6 +221,7 @@ class LogicGateConfigurer(Device):
                 self.or_gate_4,
             ],
         }
+        super().__init__(name)
 
     def apply_logic_gate_config(
         self, type: GateType, gate_number: int, config: LogicGateConfiguration
@@ -213,17 +235,19 @@ class LogicGateConfigurer(Device):
         """
         gate: GateControl = self.all_gates[type][gate_number - 1]
 
-        gate.enable.put(boolean_array_to_integer([True] * len(config.sources)))
+        gate.enable.set(boolean_array_to_integer([True] * len(config.sources)))
 
         # Input Source
         for source_number, source_pv in enumerate(gate.sources):
             try:
-                source_pv.put(config.sources[source_number])
+                # TODO Maybe the wait can go here now?
+                # What was the reason for such a long wait on the gates?
+                source_pv.set(config.sources[source_number])
             except IndexError:
-                source_pv.put(self.DEFAULT_SOURCE_IF_GATE_NOT_USED)
+                source_pv.set(self.DEFAULT_SOURCE_IF_GATE_NOT_USED)
 
         # Invert
-        gate.invert.put(boolean_array_to_integer(config.invert))
+        gate.invert.set(boolean_array_to_integer(config.invert))
 
     apply_and_gate_config = partialmethod(apply_logic_gate_config, GateType.AND)
     apply_or_gate_config = partialmethod(apply_logic_gate_config, GateType.OR)
@@ -265,15 +289,26 @@ class LogicGateConfiguration:
         return ", ".join(input_strings)
 
 
-class SoftInputs(Device):
-    soft_in_1 = Component(EpicsSignal, "SOFT_IN:B0")
-    soft_in_2 = Component(EpicsSignal, "SOFT_IN:B1")
-    soft_in_3 = Component(EpicsSignal, "SOFT_IN:B2")
-    soft_in_4 = Component(EpicsSignal, "SOFT_IN:B3")
+class SoftInputs(StandardReadable):
+    def __init__(self, prefix: str, name: str = "") -> None:
+        self.soft_in_1 = epics_signal_rw(Enum, prefix + "SOFT_IN:B0")
+        self.soft_in_2 = epics_signal_rw(Enum, prefix + "SOFT_IN:B1")
+        self.soft_in_3 = epics_signal_rw(Enum, prefix + "SOFT_IN:B2")
+        self.soft_in_4 = epics_signal_rw(Enum, prefix + "SOFT_IN:B3")
+        super().__init__(name)
 
 
-class Zebra(Device):
-    pc = Component(PositionCompare, "")
-    output = Component(ZebraOutputPanel, "")
-    inputs = Component(SoftInputs, "")
-    logic_gates = Component(LogicGateConfigurer, "")
+class Zebra(StandardReadable):
+    """The Zebra device."""
+
+    def __init__(self, name: str, prefix: str) -> None:
+        self.pc = PositionCompare(prefix, name)
+        self.output = ZebraOutputPanel(prefix, name)
+        self.inputs = SoftInputs(prefix, name)
+        self.logic_gates = LogicGateConfigurer(prefix, name)
+        super().__init__(name=name)
+
+    # pc = Component(PositionCompare, "")
+    # output = Component(ZebraOutputPanel, "")
+    # inputs = Component(SoftInputs, "")
+    # logic_gates = Component(LogicGateConfigurer, "")
