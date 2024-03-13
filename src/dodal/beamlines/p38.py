@@ -1,4 +1,4 @@
-from ophyd_async.panda import PandA
+# from ophyd_async.panda import PandA
 
 from dodal.beamlines.beamline_utils import device_instantiation, get_directory_provider
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
@@ -99,12 +99,17 @@ def d12(
 #     )
 
 
-def panda2(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> PandA:
-    return device_instantiation(
-        PandA, "panda2", "-EA-PANDA-02:", wait_for_connection, fake_with_ophyd_sim
-    )
+# FIXME: Times out
+# def panda2(
+#     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+# ) -> PandA:
+#     return device_instantiation(
+#         PandA,
+#         "panda2",
+#         "-EA-PANDA-02:",
+#         wait_for_connection,
+#         fake_with_ophyd_sim,
+#     )
 
 
 # FIXME: Currently disconnected
