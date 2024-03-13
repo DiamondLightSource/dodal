@@ -111,10 +111,8 @@ class TetrammController(DetectorControl):
         self.readings_per_frame = readings_per_frame
 
     def get_deadtime(self, exposure: float) -> float:
-        # Not found in technical specifications
-        # May need to be discovered experimentally
-        # Returning 0.001 as a safe non-zero default
-        return 0.001
+        # 2 internal clock cycles. Best effort approximation
+        return 2 / self.base_sample_rate
 
     async def arm(
         self,

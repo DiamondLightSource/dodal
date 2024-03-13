@@ -1,6 +1,6 @@
 import asyncio
 from enum import Enum
-from typing import Any, Mapping, Optional
+from typing import Any, Dict, Mapping, Optional
 
 from bluesky.protocols import HasHints, Hints
 from ophyd import Component as Cpt
@@ -140,6 +140,91 @@ class AdAravisMakoDriver(ADBase):
 
 
 class AdAravisMakoController(DetectorControl):
+    # TODO: Extract this to config and actually use the model of the camera.
+    # https://github.com/DiamondLightSource/dodal/issues/340
+    # cite: https://cdn.alliedvision.com/fileadmin/content/documents/products/cameras/various/appnote/GigE/GigE-Cameras_AppNote_PIV-Min-Time-Between-Exposures.pdf
+    deadtime_map: Dict[str, float] = {
+        "GB650": 78.0e-6,
+        "GC650": 121e-6,
+        "GE680": 38.2e-6,
+        "GT1290": 90e-6,
+        "GX1050": 19.9e-6,
+        "G-031": 15e-6,
+        "G-030": 96e-6,
+        "GB660": 75.0e-6,
+        "GC655": 121e-6,
+        "GE1050": 134e-6,
+        "GT1380": 80e-6,
+        "GX1660": 19.6e-6,
+        "G-032": 283e-6,
+        # "G-032": 74e-6,  # Duplicated key, ignoring lower
+        "GB1380": 80.0e-6,
+        "GC660": 75.0e-6,
+        "GE1650": 104e-6,
+        "GT1600": 64e-6,
+        "GX1910": 19.9e-6,
+        "G-033": 93e-6,
+        "G-125": 70e-6,
+        # "G-125": 63e-6,  # Duplicated key, ignoring lower
+        "GB2450": 20.8e-6,
+        "GC750": 91.0e-6,
+        "GE1660": 62.1e-6,
+        "GT1660": 23.6e-6,
+        "GX1920": 50.0e-6,
+        "G-046": 114e-6,
+        "G-131": 24e-6,
+        "GC780": 113e-6,
+        "GE1900": 113e-6,
+        "GT1910": 26e-6,
+        "GX2300": 21.4e-6,
+        "G-192": 34e-6,
+        "GC1020": 123e-6,
+        "GE1910": 71.0e-6,
+        "GT1920": 52e-6,
+        "G-145": 106e-6,
+        "G-223": 84e-6,
+        # "G-223": 69e-6,  # Duplicated key, ignoring lower
+        "GC1290": 89.8e-6,
+        "GE2040": 115e-6,
+        "GT1930": 196e-6,
+        "GX3300": 22.2e-6,
+        "G-234": 269e-6,
+        "GC1350": 107e-6,
+        "GE4000": 110e-6,
+        "GT1930L": 196e-6,
+        "GX6600": 44.0e-6,
+        "G-146": 88e-6,
+        "G-419": 130e-6,
+        # "G-419": 107e-6,  # Duplicated key, ignoring lower
+        "GC1380": 125e-6,
+        "GE4900": 110e-6,
+        "GT2000": 76e-6,
+        "G-201": 60e-6,
+        "G-503": 451e-6,
+        "GC1380H": 84.0e-6,
+        "GT2050": 116e-6,
+        "GC1600": 115e-6,
+        "GT2300": 25e-6,
+        "GC1600H": 60.0e-6,
+        "GT2450": 24.8e-6,
+        "G-235": 210e-6,
+        "GC2450": 20.8e-6,
+        "GT2750": 55e-6,
+        "G-282": 47e-6,
+        "GT3300": 29e-6,
+        "G-283": 47e-6,
+        "GT3400": 54e-6,
+        "GT4907": 56e-6,
+        "G-504": 29e-6,
+        "GT6600": 48e-6,
+        "G-505": 76e-6,
+        "G-609": 47e-6,
+        "G-917": 47e-6,
+        "G-145-30fps": 35e-6,
+        "G-201-30fps": 72e-6,
+        "GX2750": float("nan"),
+    }
+
     def __init__(self, driver: AdAravisMakoDriver, gpio_number: int) -> None:
         self.driver = driver
 
@@ -154,10 +239,8 @@ class AdAravisMakoController(DetectorControl):
         }
 
     def get_deadtime(self, exposure: float) -> float:
-        # Not found in technical specifications
-        # May need to be discovered experimentally
-        # Returning 0.001 as a safe non-zero default
-        return 0.001
+        # https://github.com/DiamondLightSource/dodal/issues/340
+        return self.deadtime_map.get("G-234")
 
     async def arm(
         self,
