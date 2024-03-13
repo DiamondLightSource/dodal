@@ -133,7 +133,7 @@ class TriggerModeMako(str, Enum):
 
 
 class AdAravisMakoDriver(ADBase):
-    def __init__(self, prefix: str, name: str) -> None:
+    def __init__(self, prefix: str, name: str = "") -> None:
         self.trigger_mode = ad_rw(TriggerModeMako, prefix + "TriggerMode")
         self.trigger_source = ad_rw(TriggerSourceMako, prefix + "TriggerSource")
         super().__init__(prefix, name=name)
@@ -192,9 +192,9 @@ class SumHDFAravisDetector(StandardDetector, HasHints):
 
     def __init__(
         self,
+        name: str,
         prefix: str,
         directory_provider: DirectoryProvider,
-        name: str,
         gpio_number: int = 1,
     ):
         drv = AdAravisMakoDriver(prefix + "DET:")

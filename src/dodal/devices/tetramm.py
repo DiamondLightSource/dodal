@@ -62,8 +62,8 @@ class TetrammGeometry(str, Enum):
 class TetrammDriver(Device):
     def __init__(
         self,
-        prefix,
-        name="",
+        prefix: str,
+        name: str = "",
     ):
         self._prefix = prefix
         self.range = ad_rw(TetrammRange, prefix + "Range")
@@ -242,7 +242,7 @@ class TetrammDetector(StandardDetector):
         self,
         prefix: str,
         directory_provider: DirectoryProvider,
-        name: str = "",
+        name: str,
         **scalar_sigs: str,
     ) -> None:
         drv = TetrammDriver(prefix + "DRV:")
