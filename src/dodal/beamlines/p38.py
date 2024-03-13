@@ -60,9 +60,9 @@ def tetramm(
     )
 
 
-def panda_01(
+def panda1(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> PandA:
     return device_instantiation(
-        PandA, "panda", "-EA-PANDA-01:", wait_for_connection, fake_with_ophyd_sim
+        PandA, "panda1", "-EA-PANDA-01:", wait_for_connection, fake_with_ophyd_sim
     )
