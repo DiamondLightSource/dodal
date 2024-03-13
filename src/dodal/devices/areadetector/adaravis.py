@@ -154,7 +154,10 @@ class AdAravisMakoController(DetectorControl):
         }
 
     def get_deadtime(self, exposure: float) -> float:
-        return 0.002
+        # Not found in technical specifications
+        # May need to be discovered experimentally
+        # Returning 0.001 as a safe non-zero default
+        return 0.001
 
     async def arm(
         self,

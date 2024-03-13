@@ -39,7 +39,9 @@ def waxs(
     )
 
 
-def panda(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> PandA:
+def panda_01(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> PandA:
     return device_instantiation(
         PandA, "panda-01", "-EA-PANDA-01:", wait_for_connection, fake_with_ophyd_sim
     )
@@ -53,12 +55,12 @@ def linkam(
     )
 
 
-def tetramm1(
+def incident_beam(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> TetrammDetector:
     return device_instantiation(
         TetrammDetector,
-        "i0",
+        "incident_beam",
         "-EA-XBPM-02:",
         wait_for_connection,
         fake_with_ophyd_sim,
@@ -67,12 +69,12 @@ def tetramm1(
     )
 
 
-def tetramm2(
+def transmitted_beam(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> TetrammDetector:
     return device_instantiation(
         TetrammDetector,
-        "it",
+        "transmitted_beam",
         "-EA-TTRM-02:",
         wait_for_connection,
         fake_with_ophyd_sim,

@@ -1,7 +1,6 @@
 import asyncio
 from enum import Enum
-from math import floor
-from typing import Generator, Optional, Sequence
+from typing import Generator, Sequence
 
 import bluesky.plan_stubs as bps
 from bluesky.protocols import Hints
@@ -91,50 +90,60 @@ class TetrammDriver(Device):
 
 
 class TetrammController(DetectorControl):
+    """Controller for a TetrAMM current monitor
+
+    Attributes:
+        base_sample_rate (int): Fixed in hardware
+
+    Args:
+        drv (TetrammDriver): A configured driver for the device
+        maximum_readings_per_frame (int): Maximum number of readings per frame: actual readings may be lower if higher frame rate is required
+        minimum_values_per_reading (int): Lower bound on the values that will be averaged to create a single reading
+        readings_per_frame (int): Actual number of readings per frame.
+
+    """
+
+    base_sample_rate: int = 100_000
+
     def __init__(
         self,
         drv: TetrammDriver,
-        minimum_values_per_reading=5,
-        maximum_readings_per_frame=1_000,
-        base_sample_rate=100_000,
-        readings_per_frame=1_000,
+        minimum_values_per_reading: int = 5,
+        maximum_readings_per_frame: int = 1_000,
+        readings_per_frame: int = 1_000,
     ):
+        # TODO: Are any of these also fixed by hardware constraints?
         self._drv = drv
-
-        self.base_sample_rate = base_sample_rate
-        """base rate - fixed in hardware"""
-
         self.maximum_readings_per_frame = maximum_readings_per_frame
-        """
-        Maximum number of readings per frame
-        Actual readings may be lower if higher frame rate is required
-        """
-
         self.minimum_values_per_reading = minimum_values_per_reading
-        """A lower bound on the values that will be averaged to create a single reading"""
-
         self.readings_per_frame = readings_per_frame
-        """The number of readings per frame"""
 
-    def get_deadtime(self, _exposure: float) -> float:
-        return 0.001  # Picked from a hat
+    def get_deadtime(self, exposure: float) -> float:
+        # Not found in technical specifications
+        # May need to be discovered experimentally
+        # Returning 0.001 as a safe non-zero default
+        return 0.001
 
     async def arm(
         self,
-        trigger: DetectorTrigger = DetectorTrigger.internal,
-        num: int = 0,
-        exposure: Optional[float] = None,
+        trigger: DetectorTrigger,
+        num: int,
+        exposure: float,
     ) -> AsyncStatus:
-        """Arms the tetramm.
+        """Arms the TetrAMM
 
-        Note that num is meaningless in this context, and is ignored.
+        Args:
+            trigger (DetectorTrigger): Trigger type: supports edge_trigger, constant_gate
+            num (int): ignored
+            exposure (float): Exposure time in seconds
+
+        Raises:
+            ValueError: If DetectorTrigger is not supported
         """
-        if exposure is None:
-            raise ValueError("Exposure time is required")
         if trigger not in {DetectorTrigger.edge_trigger, DetectorTrigger.constant_gate}:
             raise ValueError("Only edge triggers are supported")
 
-        # trigger mode must be set first and on it's own!
+        # trigger mode must be set first and on its own!
         await self._drv.trigger_mode.set(TetrammTrigger.ExtTrigger)
 
         await asyncio.gather(
@@ -148,17 +157,31 @@ class TetrammController(DetectorControl):
     async def disarm(self):
         await stop_busy_record(self._drv.acquire, 0, timeout=1)
 
-    async def set_frame_time(self, seconds):
-        # It may not always be possible to set the exact collection time if the
-        # exposure is not a multiple of the base sample rate. In this case it
-        # will always be the closest collection time *below* the requested time
-        # to ensure that triggers are not missed.
-        values_per_reading = int(
-            floor(seconds * self.base_sample_rate / self.readings_per_frame)
+    async def set_frame_time(self, frame_time: float):
+        """Tries to set the exposure time of a single frame.
+
+        As during the  exposure time, the device must collect an integer number
+        of readings, in the case where the frame_time is not a multiple of the base
+        sample rate, it will be lowered to the prior multiple ot ensure triggers
+        are not missed.
+
+        Args:
+            frame_time (float): The time for a single frame in seconds
+
+        Raises:
+            ValueError: If frame_time is too low to collect the required number
+            of readings per frame.
+        """
+
+        values_per_reading: int = int(
+            frame_time * self.base_sample_rate / self.readings_per_frame
         )
+
         if values_per_reading < self.minimum_values_per_reading:
             raise ValueError(
-                f"Exposure ({seconds}) too short to collect required number of readings {self.readings_per_frame}. Values per reading is {values_per_reading}, seconds is : {seconds}"
+                f"frame_time {frame_time} is too low to collect at least \
+                {self.minimum_values_per_reading} values per reading, at \
+                {self.readings_per_frame} readings per frame."
             )
         await self._drv.values_per_reading.set(values_per_reading)
 
@@ -173,19 +196,16 @@ class TetrammController(DetectorControl):
 
     @property
     def minimum_frame_time(self) -> float:
-        sample_time = self.minimum_values_per_reading / self.base_sample_rate
-        return self.readings_per_frame * sample_time
+        time_per_reading = self.minimum_values_per_reading / self.base_sample_rate
+        return self.readings_per_frame * time_per_reading
 
     @minimum_frame_time.setter
     def minimum_frame_time(self, frame: float):
-        sample_time = self.minimum_values_per_reading / self.base_sample_rate
-        self.readings_per_frame = min(
-            self.maximum_readings_per_frame, int(floor(frame / sample_time))
+        time_per_reading = self.minimum_values_per_reading / self.base_sample_rate
+        self.readings_per_frame = int(
+            min(self.maximum_readings_per_frame, frame / time_per_reading)
         )
 
-
-# TODO: need to change this name.
-MAX_CHANNELS = 11
 
 IDLE_TETRAMM = {
     "drv.acquire": 0,
@@ -230,13 +250,16 @@ def free_tetramm(dev: TetrammDriver) -> Generator[Msg, None, None]:
 
 
 class TetrammShapeProvider(ShapeProvider):
+    max_channels = 11
+
     def __init__(self, controller: TetrammController) -> None:
         self.controller = controller
 
     async def __call__(self) -> Sequence[int]:
-        return [MAX_CHANNELS, self.controller.readings_per_frame]
+        return [self.max_channels, self.controller.readings_per_frame]
 
 
+# TODO: Support MeanValue signals https://github.com/DiamondLightSource/dodal/issues/337
 class TetrammDetector(StandardDetector):
     def __init__(
         self,
@@ -245,31 +268,23 @@ class TetrammDetector(StandardDetector):
         name: str,
         **scalar_sigs: str,
     ) -> None:
-        drv = TetrammDriver(prefix + "DRV:")
-        hdf = NDFileHDF(prefix + "HDF5:")
-
-        self.drv = drv
-        self.hdf = hdf
-
-        # TODO: how to make the below, readable signals?
-        # self.current_1 = ad_r(float, prefix + ":Cur1:MeanValue")
-        # self.current_2 = ad_r(float, prefix + ":Cur2:MeanValue")
-        # self.current_3 = ad_r(float, prefix + ":Cur3:MeanValue")
-        # self.current_4 = ad_r(float, prefix + ":Cur4:MeanValue")
-
-        # self.position_x = ad_r(float, prefix + ":PosX:MeanValue")
-        # self.position_y = ad_r(float, prefix + ":PosY:MeanValue")
-        controller = TetrammController(drv)
+        self.drv = TetrammDriver(prefix + "DRV:")
+        self.hdf = NDFileHDF(prefix + "HDF5:")
+        controller = TetrammController(self.drv)
         super().__init__(
             controller,
             HDFWriter(
-                hdf,
+                self.hdf,
                 directory_provider,
                 lambda: self.name,
                 TetrammShapeProvider(controller),
                 **scalar_sigs,
             ),
-            [drv.values_per_reading, drv.averaging_time, drv.sample_time],
+            [
+                self.drv.values_per_reading,
+                self.drv.averaging_time,
+                self.drv.sample_time,
+            ],
             name,
         )
 

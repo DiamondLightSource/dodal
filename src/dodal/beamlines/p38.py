@@ -39,11 +39,11 @@ def d12(
     )
 
 
-def linkam3(
+def linkam(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> Linkam3:
     return device_instantiation(
-        Linkam3, "linkam3", "-EA-LINKM-02:", wait_for_connection, fake_with_ophyd_sim
+        Linkam3, "linkam", "-EA-LINKM-02:", wait_for_connection, fake_with_ophyd_sim
     )
 
 
@@ -60,7 +60,9 @@ def tetramm(
     )
 
 
-def panda(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> PandA:
+def panda_01(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> PandA:
     return device_instantiation(
         PandA, "panda", "-EA-PANDA-01:", wait_for_connection, fake_with_ophyd_sim
     )
