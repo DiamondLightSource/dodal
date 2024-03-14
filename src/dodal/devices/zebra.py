@@ -33,12 +33,12 @@ TTL_XSPRESS3 = 3
 TTL_PANDA = 4
 
 
-class ArmSource(Enum, str):
+class ArmSource(Enum):
     SOFT = "Soft"
     EXTERNAL = "External"
 
 
-class TrigSource(Enum, str):
+class TrigSource(Enum):
     POSITION = "Position"
     TIME = "Time"
     EXTERNAL = "External"
