@@ -252,6 +252,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1007_reset_stub_offsets_if_required/"
   },
   {
+    "version": "hyperion_1219_remove_mxsc",
+    "url": "https://DiamondLightSource.github.io/dodal/hyperion_1219_remove_mxsc/"
+  },
+  {
     "version": "hyperion_1227_edge_array_logging",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1227_edge_array_logging/"
   },
