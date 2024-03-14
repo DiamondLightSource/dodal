@@ -215,13 +215,6 @@ class LogicGateConfigurer(StandardReadable):
             GateType.OR: self.or_gates,
         }
 
-        self.apply_and_gate_config = partialmethod(
-            self.apply_logic_gate_config, GateType.AND
-        )
-        self.apply_or_gate_config = partialmethod(
-            self.apply_logic_gate_config, GateType.OR
-        )
-
         super().__init__(name)
 
     def apply_logic_gate_config(
@@ -247,6 +240,9 @@ class LogicGateConfigurer(StandardReadable):
 
         # Invert
         gate.invert.set(boolean_array_to_integer(config.invert))
+
+    apply_and_gate_config = partialmethod(apply_logic_gate_config, GateType.AND)
+    apply_or_gate_config = partialmethod(apply_logic_gate_config, GateType.OR)
 
 
 class LogicGateConfiguration:

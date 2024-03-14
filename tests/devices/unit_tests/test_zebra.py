@@ -62,7 +62,7 @@ def run_configurer_test(gate_type: GateType, gate_num, config, expected_pv_value
         configurer.apply_or_gate_config(gate_num, config)
 
     for pv, value in zip(mock_pvs, expected_pv_values):
-        verify(pv).put(value)
+        verify(pv).set(value)
 
 
 def test_apply_and_logic_gate_configuration_32_and_51_inv_and_1():
