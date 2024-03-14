@@ -1,10 +1,13 @@
+import operator
 from collections import namedtuple
 from dataclasses import dataclass
-from typing import List, Optional
+from functools import reduce
+from typing import List, Optional, Sequence
 
 import numpy as np
 from ophyd import Component as Cpt
 from ophyd import SignalRO
+from ophyd.epics_motor import EpicsMotor
 from ophyd.status import AndStatus, Status, StatusBase
 
 from dodal.devices.aperture import Aperture
@@ -105,6 +108,21 @@ class ApertureScatterguard(InfoLoggingDevice):
 
         return self._safe_move_within_datacollection_range(pos.location)
 
+    def _get_motor_list(self):
+        return [
+            self.aperture.x,
+            self.aperture.y,
+            self.aperture.z,
+            self.scatterguard.x,
+            self.scatterguard.y,
+        ]
+
+    def _set_raw_unsafe(self, positions: ApertureFiveDimensionalLocation) -> AndStatus:
+        motors: Sequence[EpicsMotor] = self._get_motor_list()
+        return reduce(
+            operator.and_, [motor.set(pos) for motor, pos in zip(motors, positions)]
+        )
+
     def _get_closest_position_to_current(self) -> SingleAperturePosition:
         """
         Returns the closest valid position to current position within {TOLERANCE_STEPS}.
@@ -113,13 +131,7 @@ class ApertureScatterguard(InfoLoggingDevice):
         assert isinstance(self.aperture_positions, AperturePositions)
         for aperture in self.aperture_positions.as_list():
             aperture_in_tolerence = []
-            motors = [
-                self.aperture.x,
-                self.aperture.y,
-                self.aperture.z,
-                self.scatterguard.x,
-                self.scatterguard.y,
-            ]
+            motors = self._get_motor_list()
             for motor, test_position in zip(motors, list(aperture.location)):
                 current_position = motor.user_readback.get()
                 tolerance = self.TOLERANCE_STEPS * motor.motor_resolution.get()

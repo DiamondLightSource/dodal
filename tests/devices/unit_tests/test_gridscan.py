@@ -9,6 +9,7 @@ from mockito import mock, verify, when
 from mockito.matchers import ANY, ARGS, KWARGS
 from ophyd.sim import make_fake_device
 from ophyd.status import DeviceStatus, Status
+from ophyd.utils.errors import StatusTimeoutError
 
 from dodal.devices.fast_grid_scan import (
     FastGridScan,
@@ -43,13 +44,36 @@ def test_given_settings_valid_when_kickoff_then_run_started(
 
     mock_run_set_status = mock()
     when(fast_grid_scan.run_cmd).put(ANY).thenReturn(mock_run_set_status)
-    fast_grid_scan.status.subscribe = lambda func, **_: func(1)
+    fast_grid_scan.status.subscribe = lambda func, **_: func(1)  # type: ignore
 
     status = fast_grid_scan.kickoff()
 
     status.wait()
     assert status.exception() is None
 
+    verify(fast_grid_scan.run_cmd).put(1)
+
+
+def test_waits_for_running_motion(
+    fast_grid_scan: FastGridScan,
+):
+    when(fast_grid_scan.motion_program.running).get().thenReturn(1)
+
+    fast_grid_scan.KICKOFF_TIMEOUT = 0.01
+
+    with pytest.raises(StatusTimeoutError):
+        status = fast_grid_scan.kickoff()
+        status.wait()
+
+    fast_grid_scan.KICKOFF_TIMEOUT = 1
+
+    mock_run_set_status = mock()
+    when(fast_grid_scan.run_cmd).put(ANY).thenReturn(mock_run_set_status)
+    fast_grid_scan.status.subscribe = lambda func, **_: func(1)  # type: ignore
+
+    when(fast_grid_scan.motion_program.running).get().thenReturn(0)
+    status = fast_grid_scan.kickoff()
+    status.wait()
     verify(fast_grid_scan.run_cmd).put(1)
 
 
