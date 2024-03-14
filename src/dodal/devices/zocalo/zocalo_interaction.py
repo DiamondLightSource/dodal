@@ -24,15 +24,18 @@ class ZocaloStartInfo:
     """
     ispyb_dcid (int): The ID of the data collection in ISPyB
     filename (str): The name of the file that the detector will store into dev/shm
-    number_of_frames (int): The number of frames in this collection.
-    start_index (int): The index of the first image of this collection within the file
-                    written by the detector
+    start_frame_index (int): The index of the first image of this collection within the file
+                             written by the detector
+    number_of_frames (int): The number of frames in this collection
+    message_index (int): Which trigger this is in the detector collection e.g. 0 for the
+                         first collection after a single arm, 1 for the next...
     """
 
     ispyb_dcid: int
     filename: Optional[str]
-    start_index: int
+    start_frame_index: int
     number_of_frames: int
+    message_index: int
 
 
 class ZocaloTrigger:
