@@ -1,7 +1,7 @@
 from enum import Enum, auto
 from typing import Any, Optional, Tuple
 
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, root_validator, validator
 
 from dodal.devices.detector.det_dim_constants import (
     EIGER2_X_16M_SIZE,
@@ -28,7 +28,7 @@ class DetectorParams(BaseModel):
     """Holds parameters for the detector. Provides access to a list of Dectris detector
     sizes and a converter for distance to beam centre."""
 
-    expected_energy_ev: Optional[float]
+    expected_energy_ev: Optional[float] = None
     exposure_time: float
     directory: str
     prefix: str
@@ -41,8 +41,8 @@ class DetectorParams(BaseModel):
     det_dist_to_beam_converter_path: str
     trigger_mode: TriggerMode = TriggerMode.SET_FRAMES
     detector_size_constants: DetectorSizeConstants = EIGER2_X_16M_SIZE
-    beam_xy_converter: DetectorDistanceToBeamXYConverter = None
-    run_number: Optional[int] = None
+    beam_xy_converter: DetectorDistanceToBeamXYConverter
+    run_number: int
 
     class Config:
         arbitrary_types_allowed = True
@@ -50,6 +50,15 @@ class DetectorParams(BaseModel):
             DetectorDistanceToBeamXYConverter: lambda _: None,
             DetectorSizeConstants: lambda d: d.det_type_string,
         }
+
+    @root_validator(pre=True, skip_on_failure=True)  # type: ignore # should be replaced with model_validator once move to pydantic 2 is complete
+    def create_beamxy_and_runnumber(cls, values: dict[str, Any]) -> dict[str, Any]:
+        values["beam_xy_converter"] = DetectorDistanceToBeamXYConverter(
+            values["det_dist_to_beam_converter_path"]
+        )
+        if values.get("run_number") is None:
+            values["run_number"] = get_run_number(values["directory"])
+        return values
 
     @validator("detector_size_constants", pre=True)
     def _parse_detector_size_constants(
@@ -62,28 +71,6 @@ class DetectorParams(BaseModel):
         if not directory.endswith("/"):
             directory += "/"
         return directory
-
-    @validator("beam_xy_converter", always=True)
-    def _parse_beam_xy_converter(
-        cls,
-        beam_xy_converter: DetectorDistanceToBeamXYConverter,
-        values: dict[str, Any],
-    ) -> DetectorDistanceToBeamXYConverter:
-        return DetectorDistanceToBeamXYConverter(
-            values["det_dist_to_beam_converter_path"]
-        )
-
-    @validator("run_number", always=True)
-    def _set_run_number(cls, run_number: int, values: dict[str, Any]):
-        if run_number is None:
-            return get_run_number(values["directory"])
-        else:
-            return run_number
-
-    def __post_init__(self):
-        self.beam_xy_converter = DetectorDistanceToBeamXYConverter(
-            self.det_dist_to_beam_converter_path
-        )
 
     def get_beam_position_mm(self, detector_distance: float) -> Tuple[float, float]:
         x_beam_mm = self.beam_xy_converter.get_beam_xy_from_det_dist(
