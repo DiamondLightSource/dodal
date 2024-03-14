@@ -156,10 +156,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/145_test_pypi/"
   },
   {
-    "version": "170_unpin_pydantic",
-    "url": "https://DiamondLightSource.github.io/dodal/170_unpin_pydantic/"
-  },
-  {
     "version": "184_per_device_log_level",
     "url": "https://DiamondLightSource.github.io/dodal/184_per_device_log_level/"
   },
@@ -262,6 +258,10 @@
   {
     "version": "hyperion_1234_robot_load",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1234_robot_load/"
+  },
+  {
+    "version": "hyperion_1239_wait_for_motion_program",
+    "url": "https://DiamondLightSource.github.io/dodal/hyperion_1239_wait_for_motion_program/"
   },
   {
     "version": "hyperion_698_refactor_parameters",
