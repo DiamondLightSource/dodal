@@ -111,7 +111,7 @@ class ArmingDevice(StandardReadable):
 class PositionCompare(StandardReadable):
     def __init__(self, prefix: str, name: str = "") -> None:
         self.num_gates = epics_signal_rw(int, prefix + "PC_GATE_NGATE")
-        self.gate_trigger = epics_signal_rw(EncEnum, prefix + "PC_ENC")
+        self.gate_trigger = epics_signal_rw(str, prefix + "PC_ENC")
         self.gate_source = epics_signal_rw(TrigSource, prefix + "PC_GATE_SEL")
         self.gate_input = epics_signal_rw(int, prefix + "PC_GATE_INP")
         self.gate_width = epics_signal_rw(float, prefix + "PC_GATE_WID")

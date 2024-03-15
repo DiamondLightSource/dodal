@@ -8,6 +8,8 @@ from dodal.devices.zebra import (
     GateType,
     LogicGateConfiguration,
     LogicGateConfigurer,
+    PositionCompare,
+    TrigSource,
     boolean_array_to_integer,
 )
 
@@ -16,10 +18,27 @@ async def test_arming_device():
     RunEngine()
     arming_device = ArmingDevice("", name="fake arming device")
     await arming_device.connect(sim=True)
-    status = arming_device.set(ArmDemand.ARM)
+    status = arming_device.set(ArmDemand.DISARM)
     await status
     assert status.success
-    assert await arming_device.arm_set.get_value() == 1
+    assert await arming_device.disarm_set.get_value() == 1
+
+
+async def test_position_compare_sets():
+    RunEngine()
+    fake_pc = PositionCompare("", name="fake position compare")
+    await fake_pc.connect(sim=True)
+
+    fake_pc.gate_source.set(TrigSource.EXTERNAL)
+    # fake_pc.gate_trigger.set(I03Axes.OMEGA.value())
+    # TODO fix EncEnum bit in code
+    assert await fake_pc.gate_source.get_value() == TrigSource.EXTERNAL
+
+    status = fake_pc.arm.set(ArmDemand.ARM)
+    await status
+    assert await fake_pc.arm.arm_set.get_value() == 1
+    assert await fake_pc.arm.disarm_set.get_value() == 0
+    assert await fake_pc.is_armed()
 
 
 @pytest.mark.parametrize(
