@@ -103,7 +103,7 @@ class ArmingDevice(StandardReadable):
         # await asyncio.gather(self.armed.set(demand), signal_to_set.set(1))
         await signal_to_set.set(1)
 
-    async def set(self, demand: ArmDemand) -> AsyncStatus:
+    def set(self, demand: ArmDemand) -> AsyncStatus:
         return AsyncStatus(
             asyncio.wait_for(self._set_armed(demand), timeout=self.TIMEOUT)
         )

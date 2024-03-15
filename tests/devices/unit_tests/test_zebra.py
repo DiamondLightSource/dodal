@@ -3,22 +3,24 @@ from bluesky.run_engine import RunEngine
 from mockito import mock, verify
 
 from dodal.devices.zebra import (
-    # ArmDemand,
-    # ArmingDevice,
+    ArmDemand,
+    ArmingDevice,
     GateType,
     LogicGateConfiguration,
     LogicGateConfigurer,
     boolean_array_to_integer,
 )
 
-# async def test_arming_device():
-#     RunEngine()
-#     arming_device = ArmingDevice("", name="fake arming device")
-#     await arming_device.connect(sim=True)
-#     await arming_device.set(ArmDemand.ARM)
-#     # TODO This fails on this assert (arm set not to 1?)
-#     # Never hits _set_armed
-#     assert await arming_device.arm_set.get_value() == 1
+
+async def test_arming_device():
+    RunEngine()
+    arming_device = ArmingDevice("", name="fake arming device")
+    await arming_device.connect(sim=True)
+    status = arming_device.set(ArmDemand.ARM)
+    await status
+    # TODO This fails on this assert (arm set not to 1?)
+    # Never hits _set_armed
+    assert await arming_device.arm_set.get_value() == 1
 
 
 @pytest.mark.parametrize(
