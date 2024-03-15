@@ -143,7 +143,7 @@ class PulseOutput(StandardReadable):
     def __init__(self, prefix: str, name: str = "") -> None:
         self.input = epics_signal_rw(int, prefix + "_INP")
         self.delay = epics_signal_rw(float, prefix + "_DLY")
-        self.delay = epics_signal_rw(float, prefix + "_WID")
+        self.witdh = epics_signal_rw(float, prefix + "_WID")
         super().__init__(name)
 
 
