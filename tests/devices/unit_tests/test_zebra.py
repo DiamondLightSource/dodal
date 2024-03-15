@@ -18,8 +18,7 @@ async def test_arming_device():
     await arming_device.connect(sim=True)
     status = arming_device.set(ArmDemand.ARM)
     await status
-    # TODO This fails on this assert (arm set not to 1?)
-    # Never hits _set_armed
+    assert status.success
     assert await arming_device.arm_set.get_value() == 1
 
 

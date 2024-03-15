@@ -100,7 +100,6 @@ class ArmingDevice(StandardReadable):
     async def _set_armed(self, demand: ArmDemand):
         await self.armed.set(demand)
         signal_to_set = self.arm_set if demand == ArmDemand.ARM else self.disarm_set
-        # await asyncio.gather(self.armed.set(demand), signal_to_set.set(1))
         await signal_to_set.set(1)
 
     def set(self, demand: ArmDemand) -> AsyncStatus:
