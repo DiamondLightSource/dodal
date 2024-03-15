@@ -1,13 +1,24 @@
 import pytest
+from bluesky.run_engine import RunEngine
 from mockito import mock, verify
-from ophyd.sim import make_fake_device
 
 from dodal.devices.zebra import (
+    # ArmDemand,
+    # ArmingDevice,
     GateType,
     LogicGateConfiguration,
     LogicGateConfigurer,
     boolean_array_to_integer,
 )
+
+# async def test_arming_device():
+#     RunEngine()
+#     arming_device = ArmingDevice("", name="fake arming device")
+#     await arming_device.connect(sim=True)
+#     await arming_device.set(ArmDemand.ARM)
+#     # TODO This fails on this assert (arm set not to 1?)
+#     # Never hits _set_armed
+#     assert await arming_device.arm_set.get_value() == 1
 
 
 @pytest.mark.parametrize(
@@ -45,14 +56,20 @@ def test_logic_gate_configuration_62_and_34_inv_and_15_inv():
     assert str(config) == "INP1=62, INP2=!34, INP3=!15"
 
 
-def run_configurer_test(gate_type: GateType, gate_num, config, expected_pv_values):
-    FakeLogicConfigurer = make_fake_device(LogicGateConfigurer)
-    configurer = FakeLogicConfigurer(prefix="", name="test fake logicconfigurer")
+async def run_configurer_test(
+    gate_type: GateType,
+    gate_num,
+    config,
+    expected_pv_values,
+):
+    RunEngine()
+    configurer = LogicGateConfigurer(prefix="", name="test fake logicconfigurer")
+    await configurer.connect(sim=True)
 
     mock_gate_control = mock()
     mock_pvs = [mock() for i in range(6)]
     mock_gate_control.enable = mock_pvs[0]
-    mock_gate_control.sources = mock_pvs[1:5]
+    mock_gate_control.sources = {i: mock_pvs[i] for i in range(1, 5)}
     mock_gate_control.invert = mock_pvs[5]
     configurer.all_gates[gate_type][gate_num - 1] = mock_gate_control
 
@@ -65,18 +82,18 @@ def run_configurer_test(gate_type: GateType, gate_num, config, expected_pv_value
         verify(pv).set(value)
 
 
-def test_apply_and_logic_gate_configuration_32_and_51_inv_and_1():
+async def test_apply_and_logic_gate_configuration_32_and_51_inv_and_1():
     config = LogicGateConfiguration(32).add_input(51, True).add_input(1)
     expected_pv_values = [7, 32, 51, 1, 0, 2]
 
-    run_configurer_test(GateType.AND, 1, config, expected_pv_values)
+    await run_configurer_test(GateType.AND, 1, config, expected_pv_values)
 
 
-def test_apply_or_logic_gate_configuration_19_and_36_inv_and_60_inv():
+async def test_apply_or_logic_gate_configuration_19_and_36_inv_and_60_inv():
     config = LogicGateConfiguration(19).add_input(36, True).add_input(60, True)
     expected_pv_values = [7, 19, 36, 60, 0, 6]
 
-    run_configurer_test(GateType.OR, 2, config, expected_pv_values)
+    await run_configurer_test(GateType.OR, 2, config, expected_pv_values)
 
 
 @pytest.mark.parametrize(

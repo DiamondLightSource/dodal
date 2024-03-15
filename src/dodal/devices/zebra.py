@@ -5,7 +5,7 @@ from enum import Enum, IntEnum
 from functools import partialmethod
 from typing import List
 
-from ophyd_async.core import AsyncStatus, StandardReadable
+from ophyd_async.core import AsyncStatus, DeviceVector, SignalRW, StandardReadable
 from ophyd_async.epics.signal import epics_signal_rw
 
 # Sources
@@ -100,6 +100,7 @@ class ArmingDevice(StandardReadable):
     async def _set_armed(self, demand: ArmDemand):
         await self.armed.set(demand)
         signal_to_set = self.arm_set if demand == ArmDemand.ARM else self.disarm_set
+        # await asyncio.gather(self.armed.set(demand), signal_to_set.set(1))
         await signal_to_set.set(1)
 
     async def set(self, demand: ArmDemand) -> AsyncStatus:
@@ -152,12 +153,14 @@ class ZebraOutputPanel(StandardReadable):
         self.pulse1 = PulseOutput(prefix + "PULSE1")
         self.pulse2 = PulseOutput(prefix + "PULSE2")
 
-        self.out_pvs = [
-            epics_signal_rw(int, prefix + "OUT1_TTL"),
-            epics_signal_rw(int, prefix + "OUT2_TTL"),
-            epics_signal_rw(int, prefix + "OUT3_TTL"),
-            epics_signal_rw(int, prefix + "OUT4_TTL"),
-        ]
+        self.out_pvs: DeviceVector[SignalRW] = DeviceVector(
+            {
+                1: epics_signal_rw(int, prefix + "OUT1_TTL"),
+                2: epics_signal_rw(int, prefix + "OUT2_TTL"),
+                3: epics_signal_rw(int, prefix + "OUT3_TTL"),
+                4: epics_signal_rw(int, prefix + "OUT4_TTL"),
+            }
+        )
         super().__init__(name)
 
 
@@ -177,12 +180,9 @@ def boolean_array_to_integer(values: List[bool]) -> int:
 class GateControl(StandardReadable):
     def __init__(self, prefix: str, name: str = "") -> None:
         self.enable = epics_signal_rw(int, prefix + "_ENA")
-        self.sources = [
-            epics_signal_rw(int, prefix + "_INP1"),
-            epics_signal_rw(int, prefix + "_INP2"),
-            epics_signal_rw(int, prefix + "_INP3"),
-            epics_signal_rw(int, prefix + "_INP4"),
-        ]
+        self.sources = DeviceVector(
+            {i: epics_signal_rw(int, prefix + f"_INP{i}") for i in range(1, 5)}
+        )
         self.invert = epics_signal_rw(int, prefix + "_INV")
         super().__init__(name)
 
@@ -196,23 +196,27 @@ class LogicGateConfigurer(StandardReadable):
     DEFAULT_SOURCE_IF_GATE_NOT_USED = 0
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        self.and_gates = [
-            GateControl(prefix + "AND1"),
-            GateControl(prefix + "AND2"),
-            GateControl(prefix + "AND3"),
-            GateControl(prefix + "AND4"),
-        ]
+        self.and_gates: DeviceVector[GateControl] = DeviceVector(
+            {
+                1: GateControl(prefix + "AND1"),
+                2: GateControl(prefix + "AND2"),
+                3: GateControl(prefix + "AND3"),
+                4: GateControl(prefix + "AND4"),
+            }
+        )
 
-        self.or_gates = [
-            GateControl(prefix + "OR1"),
-            GateControl(prefix + "OR2"),
-            GateControl(prefix + "OR3"),
-            GateControl(prefix + "OR4"),
-        ]
+        self.or_gates: DeviceVector[GateControl] = DeviceVector(
+            {
+                1: GateControl(prefix + "OR1"),
+                2: GateControl(prefix + "OR2"),
+                3: GateControl(prefix + "OR3"),
+                4: GateControl(prefix + "OR4"),
+            }
+        )
 
         self.all_gates = {
-            GateType.AND: self.and_gates,
-            GateType.OR: self.or_gates,
+            GateType.AND: list(self.and_gates.values()),
+            GateType.OR: list(self.or_gates.values()),
         }
 
         super().__init__(name)
@@ -232,9 +236,9 @@ class LogicGateConfigurer(StandardReadable):
         gate.enable.set(boolean_array_to_integer([True] * len(config.sources)))
 
         # Input Source
-        for source_number, source_pv in enumerate(gate.sources):
+        for source_number, source_pv in gate.sources.items():
             try:
-                source_pv.set(config.sources[source_number])
+                source_pv.set(config.sources[source_number - 1])
             except IndexError:
                 source_pv.set(self.DEFAULT_SOURCE_IF_GATE_NOT_USED)
 
