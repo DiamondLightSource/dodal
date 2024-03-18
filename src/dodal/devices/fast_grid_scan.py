@@ -20,7 +20,7 @@ from pydantic.dataclasses import dataclass
 from dodal.devices.motors import XYZLimitBundle
 from dodal.devices.status import await_value
 from dodal.log import LOGGER
-from dodal.parameters.experiment_parameter_base import AbstractExperimentParameterBase
+from dodal.parameters.experiment_parameter_base import AbstractExperimentWithBeamParams
 
 
 @dataclass
@@ -44,7 +44,7 @@ class GridAxis:
         return 0 <= steps <= self.full_steps
 
 
-class GridScanParamsCommon(BaseModel, AbstractExperimentParameterBase):
+class GridScanParamsCommon(BaseModel, AbstractExperimentWithBeamParams):
     """
     Common holder class for the parameters of a grid scan in a similar
     layout to EPICS. The parameters and functions of this class are common
