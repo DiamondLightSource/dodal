@@ -3,9 +3,7 @@ from typing import Callable, Optional
 
 from ophyd import Component, Device, EpicsSignal
 from ophyd.status import Status, StatusBase
-from ophyd_async.core import observe_value
 from ophyd_async.epics.signal import epics_signal_rw
-from ophyd_async.epics.signal.signal import SignalR
 
 from dodal.devices.status import await_value
 from dodal.log import LOGGER
@@ -134,16 +132,3 @@ def epics_signal_rw_rbv(
     T, write_pv: str
 ):  # Remove when https://github.com/bluesky/ophyd-async/issues/139 is done
     return epics_signal_rw(T, write_pv + "_RBV", write_pv)
-
-
-async def signal_meets_predicate(
-    signal: SignalR, predicate: Callable, message: Optional[str] = None
-):
-    """Takes a signal and passes any updates it gets to {predicate}, will wait until the
-    return value of {predicate} is True. Optionally prints {message} when waiting.
-    """
-    async for value in observe_value(signal):
-        if predicate(value):
-            break
-        if message:
-            LOGGER.info(message)
