@@ -308,6 +308,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/release-004-retroactive/"
   },
   {
+    "version": "remove-container-build",
+    "url": "https://DiamondLightSource.github.io/dodal/remove-container-build/"
+  },
+  {
     "version": "remove_ophyd_dependency_pin",
     "url": "https://DiamondLightSource.github.io/dodal/remove_ophyd_dependency_pin/"
   },
