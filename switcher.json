@@ -296,6 +296,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/pin_ophyd_async/"
   },
   {
+    "version": "propagate-timeout",
+    "url": "https://DiamondLightSource.github.io/dodal/propagate-timeout/"
+  },
+  {
     "version": "rebased_i22",
     "url": "https://DiamondLightSource.github.io/dodal/rebased_i22/"
   },
