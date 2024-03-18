@@ -14,8 +14,8 @@ classifiers = [
 description = "Ophyd devices and other utils that could be used across DLS beamlines"
 dependencies = [
     "ophyd",
-    "ophyd_async@git+https://github.com/bluesky/ophyd-async",
-    "bluesky",
+    "ophyd_async @ file://dls_sw/p38/software/blueapi/devices_only/ophyd_async",
+    "bluesky @ file://dls_sw/p38/software/blueapi/devices_only/bluesky",
     "pyepics",
     "dataclasses-json",
     "pillow",
@@ -23,9 +23,9 @@ dependencies = [
     "requests",
     "graypy",
     "pydantic<2.0",
-    "opencv-python-headless",                                 # For pin-tip detection.
-    "aioca",                                                  # Required for CA support with ophyd-async.
-    "p4p",                                                    # Required for PVA support with ophyd-async.
+    "opencv-python-headless",                                                    # For pin-tip detection.
+    "aioca",                                                                     # Required for CA support with ophyd-async.
+    "p4p",                                                                       # Required for PVA support with ophyd-async.
     "numpy",
 ]
 

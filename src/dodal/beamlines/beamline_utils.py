@@ -52,8 +52,12 @@ def _wait_for_connection(
         device.wait_for_connection(timeout=timeout)
     elif isinstance(device, OphydV2Device):
         call_in_bluesky_event_loop(
-            v2_device_wait_for_connection(coros=device.connect(sim=sim)),
-            timeout=timeout,
+            v2_device_wait_for_connection(
+                coros=device.connect(
+                    sim=sim,
+                    timeout=timeout,
+                )
+            ),
         )
     else:
         raise TypeError(
@@ -130,7 +134,7 @@ def set_directory_provider(provider: DirectoryProvider):
 
 def get_directory_provider() -> DirectoryProvider:
     if DIRECTORY_PROVIDER is None:
-        set_directory_provider(
-            StaticDirectoryProvider(tempfile.NamedTemporaryFile().name, "")
-        )
+        provider = StaticDirectoryProvider(tempfile.NamedTemporaryFile().name, "")
+        set_directory_provider(provider)
+        return provider
     return DIRECTORY_PROVIDER

@@ -58,12 +58,12 @@ class TetrammDriver(Device):
     ):
         self._prefix = prefix
         self.range = ad_rw(TetrammRange, prefix + "Range")
-        self.sample_time = ad_r(float, prefix + "SampleTime")
+        # self.sample_time = ad_r(float, prefix + "SampleTime")
 
         self.values_per_reading = ad_rw(int, prefix + "ValuesPerRead")
         self.averaging_time = ad_rw(float, prefix + "AveragingTime")
-        self.to_average = ad_r(int, prefix + "NumAverage")
-        self.averaged = ad_r(int, prefix + "NumAveraged")
+        # self.to_average = ad_r(int, prefix + "NumAverage")
+        # self.averaged = ad_r(int, prefix + "NumAveraged")
 
         self.acquire = ad_rw(bool, prefix + "Acquire")
 
@@ -273,7 +273,7 @@ class TetrammDetector(StandardDetector):
             [
                 self.drv.values_per_reading,
                 self.drv.averaging_time,
-                self.drv.sample_time,
+                # self.drv.sample_time,
             ],
             name,
         )
