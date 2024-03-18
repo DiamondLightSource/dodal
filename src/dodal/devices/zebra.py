@@ -153,12 +153,7 @@ class ZebraOutputPanel(StandardReadable):
         self.pulse2 = PulseOutput(prefix + "PULSE2")
 
         self.out_pvs: DeviceVector[SignalRW] = DeviceVector(
-            {
-                1: epics_signal_rw(int, prefix + "OUT1_TTL"),
-                2: epics_signal_rw(int, prefix + "OUT2_TTL"),
-                3: epics_signal_rw(int, prefix + "OUT3_TTL"),
-                4: epics_signal_rw(int, prefix + "OUT4_TTL"),
-            }
+            {i: epics_signal_rw(int, prefix + f"OUT{i}_TTL") for i in range(1, 5)}
         )
         super().__init__(name)
 
@@ -196,21 +191,11 @@ class LogicGateConfigurer(StandardReadable):
 
     def __init__(self, prefix: str, name: str = "") -> None:
         self.and_gates: DeviceVector[GateControl] = DeviceVector(
-            {
-                1: GateControl(prefix + "AND1"),
-                2: GateControl(prefix + "AND2"),
-                3: GateControl(prefix + "AND3"),
-                4: GateControl(prefix + "AND4"),
-            }
+            {i: GateControl(prefix + f"AND{i}") for i in range(1, 5)}
         )
 
         self.or_gates: DeviceVector[GateControl] = DeviceVector(
-            {
-                1: GateControl(prefix + "OR1"),
-                2: GateControl(prefix + "OR2"),
-                3: GateControl(prefix + "OR3"),
-                4: GateControl(prefix + "OR4"),
-            }
+            {i: GateControl(prefix + f"OR{i}") for i in range(1, 5)}
         )
 
         self.all_gates = {
