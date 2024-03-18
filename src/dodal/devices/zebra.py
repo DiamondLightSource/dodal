@@ -33,32 +33,32 @@ TTL_XSPRESS3 = 3
 TTL_PANDA = 4
 
 
-class ArmSource(Enum):
+class ArmSource(str, Enum):
     SOFT = "Soft"
     EXTERNAL = "External"
 
 
-class TrigSource(Enum):
+class TrigSource(str, Enum):
     POSITION = "Position"
     TIME = "Time"
     EXTERNAL = "External"
 
 
-class EncEnum(Enum):
+class EncEnum(str, Enum):
     Enc1 = "Enc1"
     Enc2 = "Enc2"
     Enc3 = "Enc3"
     Enc4 = "Enc4"
 
 
-class I03Axes(Enum):
+class I03Axes:
     SMARGON_X1 = EncEnum.Enc1
     SMARGON_Y = EncEnum.Enc2
     SMARGON_Z = EncEnum.Enc3
     OMEGA = EncEnum.Enc4
 
 
-class I24Axes(Enum):
+class I24Axes:
     VGON_Z = EncEnum.Enc1
     OMEGA = EncEnum.Enc2
     VGON_X = EncEnum.Enc3

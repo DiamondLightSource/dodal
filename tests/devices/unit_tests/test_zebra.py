@@ -5,7 +5,9 @@ from mockito import mock, verify
 from dodal.devices.zebra import (
     ArmDemand,
     ArmingDevice,
+    ArmSource,
     GateType,
+    I03Axes,
     LogicGateConfiguration,
     LogicGateConfigurer,
     PositionCompare,
@@ -24,18 +26,24 @@ async def test_arming_device():
     assert await arming_device.disarm_set.get_value() == 1
 
 
-async def test_position_compare_sets():
+async def test_position_compare_sets_signals():
     RunEngine()
     fake_pc = PositionCompare("", name="fake position compare")
     await fake_pc.connect(sim=True)
 
     fake_pc.gate_source.set(TrigSource.EXTERNAL)
-    # fake_pc.gate_trigger.set(I03Axes.OMEGA.value())
-    # TODO fix EncEnum bit in code
-    assert await fake_pc.gate_source.get_value() == TrigSource.EXTERNAL
+    fake_pc.gate_trigger.set(I03Axes.OMEGA.value)
+    fake_pc.num_gates.set(10)
 
+    assert await fake_pc.gate_source.get_value() == "External"
+    assert await fake_pc.gate_trigger.get_value() == "Enc4"
+    assert await fake_pc.num_gates.get_value() == 10
+
+    fake_pc.arm_source.set(ArmSource.SOFT)
     status = fake_pc.arm.set(ArmDemand.ARM)
     await status
+
+    assert await fake_pc.arm_source.get_value() == "Soft"
     assert await fake_pc.arm.arm_set.get_value() == 1
     assert await fake_pc.arm.disarm_set.get_value() == 0
     assert await fake_pc.is_armed()
