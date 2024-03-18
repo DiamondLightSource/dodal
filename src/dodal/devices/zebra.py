@@ -49,6 +49,7 @@ class EncEnum(str, Enum):
     Enc2 = "Enc2"
     Enc3 = "Enc3"
     Enc4 = "Enc4"
+    Enc1_4Av = "Enc1-4Av"
 
 
 class I03Axes:
@@ -65,12 +66,12 @@ class I24Axes:
     VGON_YH = EncEnum.Enc4
 
 
-class RotationDirection(IntEnum):
-    POSITIVE = 1
-    NEGATIVE = -1
+class RotationDirection(str, Enum):
+    POSITIVE = "Positive"
+    NEGATIVE = "Negative"
 
 
-class ArmDemand(IntEnum):
+class ArmDemand(Enum):
     ARM = 1
     DISARM = 0
 
@@ -80,9 +81,9 @@ class FastShutterAction(IntEnum):
     CLOSE = 0
 
 
-class SoftInState(IntEnum):
-    YES = 1
-    NO = 0
+class SoftInState(str, Enum):
+    YES = "Yes"
+    NO = "No"
 
 
 class ArmingDevice(StandardReadable):
@@ -92,13 +93,13 @@ class ArmingDevice(StandardReadable):
     TIMEOUT = 3
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        self.arm_set = epics_signal_rw(int, prefix + "PC_ARM")
-        self.disarm_set = epics_signal_rw(int, prefix + "PC_DISARM")
-        self.armed = epics_signal_rw(ArmDemand, prefix + "PC_ARM_OUT")
+        self.arm_set = epics_signal_rw(float, prefix + "PC_ARM")
+        self.disarm_set = epics_signal_rw(float, prefix + "PC_DISARM")
+        self.armed = epics_signal_rw(float, prefix + "PC_ARM_OUT")
         super().__init__(name)
 
     async def _set_armed(self, demand: ArmDemand):
-        await self.armed.set(demand)
+        await self.armed.set(demand.value)
         signal_to_set = self.arm_set if demand == ArmDemand.ARM else self.disarm_set
         await signal_to_set.set(1)
 
@@ -110,22 +111,22 @@ class ArmingDevice(StandardReadable):
 
 class PositionCompare(StandardReadable):
     def __init__(self, prefix: str, name: str = "") -> None:
-        self.num_gates = epics_signal_rw(int, prefix + "PC_GATE_NGATE")
-        self.gate_trigger = epics_signal_rw(str, prefix + "PC_ENC")
+        self.num_gates = epics_signal_rw(float, prefix + "PC_GATE_NGATE")
+        self.gate_trigger = epics_signal_rw(EncEnum, prefix + "PC_ENC")
         self.gate_source = epics_signal_rw(TrigSource, prefix + "PC_GATE_SEL")
-        self.gate_input = epics_signal_rw(int, prefix + "PC_GATE_INP")
+        self.gate_input = epics_signal_rw(float, prefix + "PC_GATE_INP")
         self.gate_width = epics_signal_rw(float, prefix + "PC_GATE_WID")
         self.gate_start = epics_signal_rw(float, prefix + "PC_GATE_START")
         self.gate_step = epics_signal_rw(float, prefix + "PC_GATE_STEP")
 
         self.pulse_source = epics_signal_rw(TrigSource, prefix + "PC_PULSE_SEL")
-        self.pulse_input = epics_signal_rw(int, prefix + "PC_PULSE_INP")
+        self.pulse_input = epics_signal_rw(float, prefix + "PC_PULSE_INP")
         self.pulse_start = epics_signal_rw(float, prefix + "PC_PULSE_START")
         self.pulse_width = epics_signal_rw(float, prefix + "PC_PULSE_WID")
         self.pulse_step = epics_signal_rw(float, prefix + "PC_PULSE_STEP")
-        self.pulse_max = epics_signal_rw(int, prefix + "PC_PULSE_MAX")
+        self.pulse_max = epics_signal_rw(float, prefix + "PC_PULSE_MAX")
 
-        self.dir = epics_signal_rw(int, prefix + "PC_DIR")
+        self.dir = epics_signal_rw(RotationDirection, prefix + "PC_DIR")
         self.arm_source = epics_signal_rw(ArmSource, prefix + "PC_ARM_SEL")
         self.reset = epics_signal_rw(int, prefix + "SYS_RESET.PROC")
 
@@ -141,7 +142,7 @@ class PulseOutput(StandardReadable):
     """Zebra pulse output panel."""
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        self.input = epics_signal_rw(int, prefix + "_INP")
+        self.input = epics_signal_rw(float, prefix + "_INP")
         self.delay = epics_signal_rw(float, prefix + "_DLY")
         self.width = epics_signal_rw(float, prefix + "_WID")
         super().__init__(name)
@@ -153,7 +154,7 @@ class ZebraOutputPanel(StandardReadable):
         self.pulse2 = PulseOutput(prefix + "PULSE2")
 
         self.out_pvs: DeviceVector[SignalRW] = DeviceVector(
-            {i: epics_signal_rw(int, prefix + f"OUT{i}_TTL") for i in range(1, 5)}
+            {i: epics_signal_rw(float, prefix + f"OUT{i}_TTL") for i in range(1, 5)}
         )
         super().__init__(name)
 
@@ -175,7 +176,7 @@ class GateControl(StandardReadable):
     def __init__(self, prefix: str, name: str = "") -> None:
         self.enable = epics_signal_rw(int, prefix + "_ENA")
         self.sources = DeviceVector(
-            {i: epics_signal_rw(int, prefix + f"_INP{i}") for i in range(1, 5)}
+            {i: epics_signal_rw(float, prefix + f"_INP{i}") for i in range(1, 5)}
         )
         self.invert = epics_signal_rw(int, prefix + "_INV")
         super().__init__(name)

@@ -32,7 +32,7 @@ async def test_position_compare_sets_signals():
     await fake_pc.connect(sim=True)
 
     fake_pc.gate_source.set(TrigSource.EXTERNAL)
-    fake_pc.gate_trigger.set(I03Axes.OMEGA.value)
+    fake_pc.gate_trigger.set(I03Axes.OMEGA)
     fake_pc.num_gates.set(10)
 
     assert await fake_pc.gate_source.get_value() == "External"
