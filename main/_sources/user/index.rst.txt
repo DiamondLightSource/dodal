@@ -26,7 +26,6 @@ side-bar.
             :caption: How-to Guides
             :maxdepth: 1
 
-            how-to/run-container
             how-to/create-beamline.rst
 
         +++
