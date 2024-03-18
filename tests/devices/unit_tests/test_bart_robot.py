@@ -14,13 +14,11 @@ async def _get_bart_robot() -> BartRobot:
     return device
 
 
-@pytest.mark.asyncio
 async def test_bart_robot_can_be_connected_in_sim_mode():
     device = await _get_bart_robot()
     await device.connect(sim=True)
 
 
-@pytest.mark.asyncio
 async def test_when_barcode_updates_then_new_barcode_read():
     device = await _get_bart_robot()
     expected_barcode = "expected"
@@ -28,7 +26,6 @@ async def test_when_barcode_updates_then_new_barcode_read():
     assert (await device.barcode.read())["robot-barcode"]["value"] == expected_barcode
 
 
-@pytest.mark.asyncio
 @patch("dodal.devices.robot.LOGGER")
 async def test_given_program_running_when_load_pin_then_logs_the_program_name_and_times_out(
     patch_logger: MagicMock,
@@ -43,7 +40,6 @@ async def test_given_program_running_when_load_pin_then_logs_the_program_name_an
     assert program_name in last_log
 
 
-@pytest.mark.asyncio
 @patch("dodal.devices.robot.LOGGER")
 async def test_given_program_not_running_but_pin_not_unmounting_when_load_pin_then_timeout(
     patch_logger: MagicMock,
@@ -59,7 +55,6 @@ async def test_given_program_not_running_but_pin_not_unmounting_when_load_pin_th
     assert "Waiting on old pin unloaded" in last_log
 
 
-@pytest.mark.asyncio
 @patch("dodal.devices.robot.LOGGER")
 async def test_given_program_not_running_and_pin_unmounting_but_new_pin_not_mounting_when_load_pin_then_timeout(
     patch_logger: MagicMock,
@@ -75,7 +70,6 @@ async def test_given_program_not_running_and_pin_unmounting_but_new_pin_not_moun
     assert "Waiting on new pin loaded" in last_log
 
 
-@pytest.mark.asyncio
 async def test_given_program_not_running_and_pin_unmounts_then_mounts_when_load_pin_then_pin_loaded():
     device = await _get_bart_robot()
     device.LOAD_TIMEOUT = 0.03  # type: ignore

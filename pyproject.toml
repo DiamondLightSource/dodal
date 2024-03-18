@@ -22,7 +22,7 @@ dependencies = [
     "zocalo",
     "requests",
     "graypy",
-    "pydantic<2.0",
+    "pydantic",
     "opencv-python-headless",                                                                          # For pin-tip detection.
     "aioca",                                                                                           # Required for CA support with ophyd-async.
     "p4p",                                                                                             # Required for PVA support with ophyd-async.
@@ -79,6 +79,7 @@ ignore_missing_imports = true # Ignore missing stubs in imported modules
 
 [tool.pytest.ini_options]
 # Run pytest with all our checkers, and don't spam us with massive tracebacks on error
+asyncio_mode = "auto"
 markers = [
     "s03: marks tests as requiring the s03 simulator running (deselect with '-m \"not s03\"')",
 ]

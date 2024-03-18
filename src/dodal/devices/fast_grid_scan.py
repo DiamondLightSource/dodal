@@ -237,35 +237,42 @@ class GridScanCompleteStatus(DeviceStatus):
         self.device.status.clear_sub(self._running_changed)
 
 
+class MotionProgram(Device):
+    running = Component(EpicsSignalRO, "PROGBITS")
+    program_number = Component(EpicsSignalRO, "CS1:PROG_NUM")
+
+
 class FastGridScan(Device):
-    x_steps = Component(EpicsSignalWithRBV, "X_NUM_STEPS")
-    y_steps = Component(EpicsSignalWithRBV, "Y_NUM_STEPS")
-    z_steps = Component(EpicsSignalWithRBV, "Z_NUM_STEPS")
+    x_steps = Component(EpicsSignalWithRBV, "FGS:X_NUM_STEPS")
+    y_steps = Component(EpicsSignalWithRBV, "FGS:Y_NUM_STEPS")
+    z_steps = Component(EpicsSignalWithRBV, "FGS:Z_NUM_STEPS")
 
-    x_step_size = Component(EpicsSignalWithRBV, "X_STEP_SIZE")
-    y_step_size = Component(EpicsSignalWithRBV, "Y_STEP_SIZE")
-    z_step_size = Component(EpicsSignalWithRBV, "Z_STEP_SIZE")
+    x_step_size = Component(EpicsSignalWithRBV, "FGS:X_STEP_SIZE")
+    y_step_size = Component(EpicsSignalWithRBV, "FGS:Y_STEP_SIZE")
+    z_step_size = Component(EpicsSignalWithRBV, "FGS:Z_STEP_SIZE")
 
-    dwell_time_ms = Component(EpicsSignalWithRBV, "DWELL_TIME")
+    dwell_time_ms = Component(EpicsSignalWithRBV, "FGS:DWELL_TIME")
 
-    x_start = Component(EpicsSignalWithRBV, "X_START")
-    y1_start = Component(EpicsSignalWithRBV, "Y_START")
-    y2_start = Component(EpicsSignalWithRBV, "Y2_START")
-    z1_start = Component(EpicsSignalWithRBV, "Z_START")
-    z2_start = Component(EpicsSignalWithRBV, "Z2_START")
+    x_start = Component(EpicsSignalWithRBV, "FGS:X_START")
+    y1_start = Component(EpicsSignalWithRBV, "FGS:Y_START")
+    y2_start = Component(EpicsSignalWithRBV, "FGS:Y2_START")
+    z1_start = Component(EpicsSignalWithRBV, "FGS:Z_START")
+    z2_start = Component(EpicsSignalWithRBV, "FGS:Z2_START")
 
     position_counter = Component(
-        EpicsSignal, "POS_COUNTER", write_pv="POS_COUNTER_WRITE"
+        EpicsSignal, "FGS:POS_COUNTER", write_pv="FGS:POS_COUNTER_WRITE"
     )
-    x_counter = Component(EpicsSignalRO, "X_COUNTER")
-    y_counter = Component(EpicsSignalRO, "Y_COUNTER")
-    scan_invalid = Component(EpicsSignalRO, "SCAN_INVALID")
+    x_counter = Component(EpicsSignalRO, "FGS:X_COUNTER")
+    y_counter = Component(EpicsSignalRO, "FGS:Y_COUNTER")
+    scan_invalid = Component(EpicsSignalRO, "FGS:SCAN_INVALID")
 
-    run_cmd = Component(EpicsSignal, "RUN.PROC")
-    stop_cmd = Component(EpicsSignal, "STOP.PROC")
-    status = Component(EpicsSignalRO, "SCAN_STATUS")
+    run_cmd = Component(EpicsSignal, "FGS:RUN.PROC")
+    stop_cmd = Component(EpicsSignal, "FGS:STOP.PROC")
+    status = Component(EpicsSignalRO, "FGS:SCAN_STATUS")
 
     expected_images = Component(Signal)
+
+    motion_program = Component(MotionProgram, "")
 
     # Kickoff timeout in seconds
     KICKOFF_TIMEOUT: float = 5.0
@@ -291,11 +298,15 @@ class FastGridScan(Device):
         return bool(self.scan_invalid.get())
 
     def kickoff(self) -> StatusBase:
-        # Check running already here?
         st = DeviceStatus(device=self, timeout=self.KICKOFF_TIMEOUT)
 
         def scan():
             try:
+                curr_prog = self.motion_program.program_number.get()
+                running = self.motion_program.running.get()
+                if running:
+                    LOGGER.info(f"Motion program {curr_prog} still running, waiting...")
+                    await_value(self.motion_program.running, 0).wait()
                 LOGGER.debug("Running scan")
                 self.run_cmd.put(1)
                 LOGGER.info("Waiting for FGS to start")
