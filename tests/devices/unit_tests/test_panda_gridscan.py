@@ -67,7 +67,12 @@ def test_running_finished_with_all_images_done_then_complete_status_finishes_not
     RE = RunEngine()
     RE(
         set_fast_grid_scan_params(
-            fast_grid_scan, PandAGridScanParams(x_steps=num_pos_1d, y_steps=num_pos_1d)
+            fast_grid_scan,
+            PandAGridScanParams(
+                x_steps=num_pos_1d,
+                y_steps=num_pos_1d,
+                transmission_fraction=0.01,
+            ),
         )
     )
 

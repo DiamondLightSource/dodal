@@ -14,7 +14,7 @@ from ophyd import (
     Signal,
 )
 from ophyd.status import DeviceStatus, StatusBase
-from pydantic import BaseModel, validator
+from pydantic import validator
 from pydantic.dataclasses import dataclass
 
 from dodal.devices.motors import XYZLimitBundle
@@ -44,7 +44,7 @@ class GridAxis:
         return 0 <= steps <= self.full_steps
 
 
-class GridScanParamsCommon(BaseModel, AbstractExperimentWithBeamParams):
+class GridScanParamsCommon(AbstractExperimentWithBeamParams):
     """
     Common holder class for the parameters of a grid scan in a similar
     layout to EPICS. The parameters and functions of this class are common
