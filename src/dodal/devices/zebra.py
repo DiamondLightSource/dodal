@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-from enum import Enum, IntEnum
+from enum import Enum
 from functools import partialmethod
 from typing import List
 
@@ -74,11 +74,6 @@ class RotationDirection(str, Enum):
 class ArmDemand(Enum):
     ARM = 1
     DISARM = 0
-
-
-class FastShutterAction(IntEnum):
-    OPEN = 1
-    CLOSE = 0
 
 
 class SoftInState(str, Enum):
