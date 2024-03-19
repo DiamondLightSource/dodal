@@ -184,6 +184,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/356_zebra-to-ophyd-async/"
   },
   {
+    "version": "385_aperture_readback_PVs",
+    "url": "https://DiamondLightSource.github.io/dodal/385_aperture_readback_PVs/"
+  },
+  {
     "version": "51_aperture_scatterguard_no_positions",
     "url": "https://DiamondLightSource.github.io/dodal/51_aperture_scatterguard_no_positions/"
   },
