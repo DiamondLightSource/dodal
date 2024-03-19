@@ -23,15 +23,3 @@ WORKDIR /context
 
 # install python package into /venv
 RUN pip install ${PIP_OPTIONS}
-
-FROM python:3.11-slim as runtime
-
-# Add apt-get system dependecies for runtime here if needed
-
-# copy the virtual environment from the build stage and put it in PATH
-COPY --from=build /venv/ /venv/
-ENV PATH=/venv/bin:$PATH
-
-# change this entrypoint if it is not the same as the repo
-ENTRYPOINT ["dodal"]
-CMD ["--version"]

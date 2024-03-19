@@ -18,8 +18,9 @@ EXPECTED_FILENAME = "test/file"
 EXPECTED_RUN_START_MESSAGE = {
     "ispyb_dcid": EXPECTED_DCID,
     "filename": EXPECTED_FILENAME,
+    "start_frame_index": 0,
     "number_of_frames": 100,
-    "start_index": 0,
+    "message_index": 0,
     "event": "start",
 }
 EXPECTED_RUN_END_MESSAGE = {
@@ -88,7 +89,7 @@ def test_run_start(function_wrapper: Callable, expected_message: Dict):
         function_wrapper (Callable): A wrapper used to test for expected exceptions
         expected_message (Dict): The expected dictionary sent to zocalo
     """
-    data = ZocaloStartInfo(EXPECTED_DCID, EXPECTED_FILENAME, 0, 100)
+    data = ZocaloStartInfo(EXPECTED_DCID, EXPECTED_FILENAME, 0, 100, 0)
     function_to_run = partial(zc.run_start, data)
     function_to_run = partial(function_wrapper, function_to_run)
     _test_zocalo(function_to_run, expected_message)
