@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from functools import reduce
 from typing import List, Optional, Sequence
 
-import numpy as np
 from ophyd import Component as Cpt
 from ophyd import SignalRO
 from ophyd.epics_motor import EpicsMotor
@@ -89,11 +88,12 @@ class ApertureScatterguard(InfoLoggingDevice):
     scatterguard = Cpt(Scatterguard, "-MO-SCAT-01:")
     aperture_positions: Optional[AperturePositions] = None
     TOLERANCE_STEPS = 3  # Number of MRES steps
+    ROBOT_LOAD_Y = 35.0  # Below this in Y we assume to robot load
 
     class SelectedAperture(SignalRO):
         def get(self):
             assert isinstance(self.parent, ApertureScatterguard)
-            return self.parent._get_closest_position_to_current()
+            return self.parent._get_current_aperture_position()
 
     selected_aperture = Cpt(SelectedAperture)
 
@@ -123,22 +123,23 @@ class ApertureScatterguard(InfoLoggingDevice):
             operator.and_, [motor.set(pos) for motor, pos in zip(motors, positions)]
         )
 
-    def _get_closest_position_to_current(self) -> SingleAperturePosition:
+    def _get_current_aperture_position(self) -> SingleAperturePosition:
         """
-        Returns the closest valid position to current position within {TOLERANCE_STEPS}.
+        Returns the closest valid position to current position using readback values
+        for SMALL, MEDIUM, LARGE. ROBOT_LOAD position defined when mini aperture y <= ROBOT_LOAD_Y.
         If no position is found then raises InvalidApertureMove.
         """
         assert isinstance(self.aperture_positions, AperturePositions)
-        for aperture in self.aperture_positions.as_list():
-            aperture_in_tolerence = []
-            motors = self._get_motor_list()
-            for motor, test_position in zip(motors, list(aperture.location)):
-                current_position = motor.user_readback.get()
-                tolerance = self.TOLERANCE_STEPS * motor.motor_resolution.get()
-                diff = abs(current_position - test_position)
-                aperture_in_tolerence.append(diff <= tolerance)
-            if np.all(aperture_in_tolerence):
-                return aperture
+        current_ap_y = float(self.aperture.y.user_readback.get())
+
+        if int(self.aperture.large.get()) == 1:
+            return self.aperture_positions.LARGE
+        elif int(self.aperture.medium.get()) == 1:
+            return self.aperture_positions.MEDIUM
+        elif int(self.aperture.small.get()) == 1:
+            return self.aperture_positions.SMALL
+        elif current_ap_y <= self.ROBOT_LOAD_Y:
+            return self.aperture_positions.ROBOT_LOAD
 
         raise InvalidApertureMove("Current aperture/scatterguard state unrecognised")
 
