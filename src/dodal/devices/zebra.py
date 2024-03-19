@@ -145,8 +145,8 @@ class PulseOutput(StandardReadable):
 
 class ZebraOutputPanel(StandardReadable):
     def __init__(self, prefix: str, name: str = "") -> None:
-        self.pulse1 = PulseOutput(prefix + "PULSE1")
-        self.pulse2 = PulseOutput(prefix + "PULSE2")
+        self.pulse_1 = PulseOutput(prefix + "PULSE1")
+        self.pulse_2 = PulseOutput(prefix + "PULSE2")
 
         self.out_pvs: DeviceVector[SignalRW] = DeviceVector(
             {i: epics_signal_rw(float, prefix + f"OUT{i}_TTL") for i in range(1, 5)}
