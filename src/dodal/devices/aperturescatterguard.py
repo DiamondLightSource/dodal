@@ -139,7 +139,7 @@ class ApertureScatterguard(InfoLoggingDevice):
             return self.aperture_positions.MEDIUM
         elif int(self.aperture.small.get()) == 1:
             return self.aperture_positions.SMALL
-        elif current_ap_y <= +robot_load_ap_y + tolerance:
+        elif current_ap_y <= robot_load_ap_y + tolerance:
             return self.aperture_positions.ROBOT_LOAD
 
         raise InvalidApertureMove("Current aperture/scatterguard state unrecognised")
