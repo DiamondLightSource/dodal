@@ -210,20 +210,24 @@ def test_aperture_positions_robot_load(
 def test_aperture_positions_robot_load_within_tolerance(
     ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
 ):
+    robot_load_ap_y = aperture_positions.ROBOT_LOAD.location.aperture_y
+    tolerance = ap_sg.TOLERANCE_STEPS * ap_sg.aperture.y.motor_resolution.get()
     ap_sg.aperture.large.sim_put(0)  # type: ignore
     ap_sg.aperture.medium.sim_put(0)  # type: ignore
     ap_sg.aperture.small.sim_put(0)  # type: ignore
-    ap_sg.aperture.y.set(aperture_positions.ROBOT_LOAD.location.aperture_y + 0.003)  # type: ignore
+    ap_sg.aperture.y.set(robot_load_ap_y + tolerance)  # type: ignore
     assert ap_sg._get_current_aperture_position() == aperture_positions.ROBOT_LOAD
 
 
 def test_aperture_positions_robot_load_outside_tolerance(
     ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
 ):
+    robot_load_ap_y = aperture_positions.ROBOT_LOAD.location.aperture_y
+    tolerance = (ap_sg.TOLERANCE_STEPS + 1) * ap_sg.aperture.y.motor_resolution.get()
     ap_sg.aperture.large.sim_put(0)  # type: ignore
     ap_sg.aperture.medium.sim_put(0)  # type: ignore
     ap_sg.aperture.small.sim_put(0)  # type: ignore
-    ap_sg.aperture.y.set(aperture_positions.ROBOT_LOAD.location.aperture_y + 0.004)  # type: ignore
+    ap_sg.aperture.y.set(robot_load_ap_y + tolerance)  # type: ignore
     with pytest.raises(InvalidApertureMove):
         ap_sg._get_current_aperture_position()
 
