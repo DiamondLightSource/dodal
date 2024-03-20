@@ -203,7 +203,17 @@ def test_aperture_positions_robot_load(
     ap_sg.aperture.large.sim_put(0)  # type: ignore
     ap_sg.aperture.medium.sim_put(0)  # type: ignore
     ap_sg.aperture.small.sim_put(0)  # type: ignore
-    ap_sg.aperture.y.set(34.0)  # type: ignore
+    ap_sg.aperture.y.set(31.4)  # type: ignore
+    assert ap_sg._get_current_aperture_position() == aperture_positions.ROBOT_LOAD
+
+
+def test_aperture_positions_robot_load_within_tolerance(
+    ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
+):
+    ap_sg.aperture.large.sim_put(0)  # type: ignore
+    ap_sg.aperture.medium.sim_put(0)  # type: ignore
+    ap_sg.aperture.small.sim_put(0)  # type: ignore
+    ap_sg.aperture.y.set(33.4)  # type: ignore
     assert ap_sg._get_current_aperture_position() == aperture_positions.ROBOT_LOAD
 
 

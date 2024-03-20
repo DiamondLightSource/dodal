@@ -88,7 +88,8 @@ class ApertureScatterguard(InfoLoggingDevice):
     scatterguard = Cpt(Scatterguard, "-MO-SCAT-01:")
     aperture_positions: Optional[AperturePositions] = None
     TOLERANCE_STEPS = 3  # Number of MRES steps
-    ROBOT_LOAD_Y = 35.0  # Below this in Y we assume to robot load
+    ROBOT_LOAD_TOLERANCE = 5  # Number of mm from ROBOT_LOAD_Y
+    ROBOT_LOAD_Y = 31.4  # Robot load position in mm
 
     class SelectedAperture(SignalRO):
         def get(self):
@@ -125,8 +126,9 @@ class ApertureScatterguard(InfoLoggingDevice):
 
     def _get_current_aperture_position(self) -> SingleAperturePosition:
         """
-        Returns the closest valid position to current position using readback values
-        for SMALL, MEDIUM, LARGE. ROBOT_LOAD position defined when mini aperture y <= ROBOT_LOAD_Y.
+        Returns the current aperture position using readback values
+        for SMALL, MEDIUM, LARGE. ROBOT_LOAD position defined when
+        mini aperture y <= ROBOT_LOAD_Y + ROBOT_LOAD_TOLERANCE.
         If no position is found then raises InvalidApertureMove.
         """
         assert isinstance(self.aperture_positions, AperturePositions)
@@ -138,7 +140,7 @@ class ApertureScatterguard(InfoLoggingDevice):
             return self.aperture_positions.MEDIUM
         elif int(self.aperture.small.get()) == 1:
             return self.aperture_positions.SMALL
-        elif current_ap_y <= self.ROBOT_LOAD_Y:
+        elif current_ap_y <= self.ROBOT_LOAD_Y + self.ROBOT_LOAD_TOLERANCE:
             return self.aperture_positions.ROBOT_LOAD
 
         raise InvalidApertureMove("Current aperture/scatterguard state unrecognised")
