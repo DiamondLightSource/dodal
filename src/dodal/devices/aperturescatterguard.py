@@ -88,8 +88,6 @@ class ApertureScatterguard(InfoLoggingDevice):
     scatterguard = Cpt(Scatterguard, "-MO-SCAT-01:")
     aperture_positions: Optional[AperturePositions] = None
     TOLERANCE_STEPS = 3  # Number of MRES steps
-    ROBOT_LOAD_TOLERANCE = 5  # Number of mm from ROBOT_LOAD_Y
-    ROBOT_LOAD_Y = 31.4  # Robot load position in mm
 
     class SelectedAperture(SignalRO):
         def get(self):
@@ -128,19 +126,20 @@ class ApertureScatterguard(InfoLoggingDevice):
         """
         Returns the current aperture position using readback values
         for SMALL, MEDIUM, LARGE. ROBOT_LOAD position defined when
-        mini aperture y <= ROBOT_LOAD_Y + ROBOT_LOAD_TOLERANCE.
+        mini aperture y <= ROBOT_LOAD.location.aperture_y + tolerance.
         If no position is found then raises InvalidApertureMove.
         """
         assert isinstance(self.aperture_positions, AperturePositions)
         current_ap_y = float(self.aperture.y.user_readback.get())
-
+        robot_load_ap_y = self.aperture_positions.ROBOT_LOAD.location.aperture_y
+        tolerance = self.TOLERANCE_STEPS * self.aperture.y.motor_resolution.get()
         if int(self.aperture.large.get()) == 1:
             return self.aperture_positions.LARGE
         elif int(self.aperture.medium.get()) == 1:
             return self.aperture_positions.MEDIUM
         elif int(self.aperture.small.get()) == 1:
             return self.aperture_positions.SMALL
-        elif current_ap_y <= self.ROBOT_LOAD_Y + self.ROBOT_LOAD_TOLERANCE:
+        elif current_ap_y <= +robot_load_ap_y + tolerance:
             return self.aperture_positions.ROBOT_LOAD
 
         raise InvalidApertureMove("Current aperture/scatterguard state unrecognised")
