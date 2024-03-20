@@ -41,6 +41,7 @@ def aperture_in_medium_pos(
     ap_sg.aperture.z.set(medium.aperture_z)
     ap_sg.scatterguard.x.set(medium.scatterguard_x)
     ap_sg.scatterguard.y.set(medium.scatterguard_y)
+    ap_sg.aperture.medium.sim_put(1)  # type: ignore
     yield ap_sg
 
 
@@ -175,32 +176,71 @@ def set_underlying_motors(
     ap_sg.scatterguard.y.set(position.scatterguard_y)
 
 
-def test_aperture_positions_get_close_position_truthy_exact(
+def test_aperture_positions_large(
     ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
 ):
-    should_be_large = ApertureFiveDimensionalLocation(2.389, 40.986, 15.8, 5.25, 4.43)
-    set_underlying_motors(ap_sg, should_be_large)
-
-    assert ap_sg._get_closest_position_to_current() == aperture_positions.LARGE
+    ap_sg.aperture.large.sim_put(1)  # type: ignore
+    assert ap_sg._get_current_aperture_position() == aperture_positions.LARGE
 
 
-def test_aperture_positions_get_close_position_truthy_inside_tolerance(
+def test_aperture_positions_medium(
     ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
 ):
-    should_be_large = ApertureFiveDimensionalLocation(2.389, 40.9865, 15.8, 5.25, 4.43)
-    set_underlying_motors(ap_sg, should_be_large)
-    assert ap_sg._get_closest_position_to_current() == aperture_positions.LARGE
+    ap_sg.aperture.medium.sim_put(1)  # type: ignore
+    assert ap_sg._get_current_aperture_position() == aperture_positions.MEDIUM
 
 
-def test_aperture_positions_get_close_position_falsy(
+def test_aperture_positions_small(
     ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
 ):
-    large_missed_by_2_at_y = ApertureFiveDimensionalLocation(
-        2.389, 42, 15.8, 5.25, 4.43
-    )
-    set_underlying_motors(ap_sg, large_missed_by_2_at_y)
+    ap_sg.aperture.small.sim_put(1)  # type: ignore
+    assert ap_sg._get_current_aperture_position() == aperture_positions.SMALL
+
+
+def test_aperture_positions_robot_load(
+    ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
+):
+    ap_sg.aperture.large.sim_put(0)  # type: ignore
+    ap_sg.aperture.medium.sim_put(0)  # type: ignore
+    ap_sg.aperture.small.sim_put(0)  # type: ignore
+    ap_sg.aperture.y.set(aperture_positions.ROBOT_LOAD.location.aperture_y)  # type: ignore
+    assert ap_sg._get_current_aperture_position() == aperture_positions.ROBOT_LOAD
+
+
+def test_aperture_positions_robot_load_within_tolerance(
+    ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
+):
+    robot_load_ap_y = aperture_positions.ROBOT_LOAD.location.aperture_y
+    tolerance = ap_sg.TOLERANCE_STEPS * ap_sg.aperture.y.motor_resolution.get()
+    ap_sg.aperture.large.sim_put(0)  # type: ignore
+    ap_sg.aperture.medium.sim_put(0)  # type: ignore
+    ap_sg.aperture.small.sim_put(0)  # type: ignore
+    ap_sg.aperture.y.set(robot_load_ap_y + tolerance)  # type: ignore
+    assert ap_sg._get_current_aperture_position() == aperture_positions.ROBOT_LOAD
+
+
+def test_aperture_positions_robot_load_outside_tolerance(
+    ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
+):
+    robot_load_ap_y = aperture_positions.ROBOT_LOAD.location.aperture_y
+    tolerance = (ap_sg.TOLERANCE_STEPS + 1) * ap_sg.aperture.y.motor_resolution.get()
+    ap_sg.aperture.large.sim_put(0)  # type: ignore
+    ap_sg.aperture.medium.sim_put(0)  # type: ignore
+    ap_sg.aperture.small.sim_put(0)  # type: ignore
+    ap_sg.aperture.y.set(robot_load_ap_y + tolerance)  # type: ignore
     with pytest.raises(InvalidApertureMove):
-        ap_sg._get_closest_position_to_current()
+        ap_sg._get_current_aperture_position()
+
+
+def test_aperture_positions_robot_load_unsafe(
+    ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
+):
+    ap_sg.aperture.large.sim_put(0)  # type: ignore
+    ap_sg.aperture.medium.sim_put(0)  # type: ignore
+    ap_sg.aperture.small.sim_put(0)  # type: ignore
+    ap_sg.aperture.y.set(50.0)  # type: ignore
+    with pytest.raises(InvalidApertureMove):
+        ap_sg._get_current_aperture_position()
 
 
 def test_given_aperture_not_set_through_device_but_motors_in_position_when_device_read_then_position_returned(
@@ -216,12 +256,12 @@ def test_given_aperture_not_set_through_device_but_motors_in_position_when_devic
 def test_when_aperture_set_and_device_read_then_position_returned(
     aperture_in_medium_pos: ApertureScatterguard, aperture_positions: AperturePositions
 ):
-    set_status = aperture_in_medium_pos.set(aperture_positions.SMALL)
+    set_status = aperture_in_medium_pos.set(aperture_positions.MEDIUM)
     set_status.wait()
     selected_aperture = aperture_in_medium_pos.read()
     assert (
         selected_aperture["test_ap_sg_selected_aperture"]["value"]
-        == aperture_positions.SMALL
+        == aperture_positions.MEDIUM
     )
 
 
