@@ -1,4 +1,4 @@
-from unittest.mock import ANY, MagicMock, Mock, patch
+from unittest.mock import ANY, MagicMock, patch
 
 import pytest
 from bluesky.run_engine import RunEngine as RE
