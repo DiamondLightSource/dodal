@@ -4,7 +4,12 @@ from typing import Optional
 
 import numpy as np
 from numpy.typing import NDArray
-from ophyd_async.core import AsyncStatus, StandardReadable, observe_value
+from ophyd_async.core import (
+    DEFAULT_TIMEOUT,
+    AsyncStatus,
+    StandardReadable,
+    observe_value,
+)
 from ophyd_async.epics.signal import epics_signal_r
 
 from dodal.devices.oav.pin_image_recognition.utils import (
@@ -142,8 +147,8 @@ class PinTipDetection(StandardReadable):
         )
         return location
 
-    async def connect(self, sim: bool = False):
-        await super().connect(sim)
+    async def connect(self, sim: bool = False, timeout: float = DEFAULT_TIMEOUT):
+        await super().connect(sim, timeout)
 
         # Set defaults for soft parameters
         await self.validity_timeout.set(5.0)
