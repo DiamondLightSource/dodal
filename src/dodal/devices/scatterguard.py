@@ -1,11 +1,12 @@
 from ophyd_async.core import StandardReadable
-from ophyd_async.epics.signal import epics_signal_rw
+
+from dodal.devices.util.motor_utils import ExtendedMotor
 
 
 class Scatterguard(StandardReadable):
     """The scatterguard device."""
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        self.x = epics_signal_rw(float, prefix + "X")
-        self.y = epics_signal_rw(float, prefix + "Y")
+        self.x = ExtendedMotor(prefix + "X")
+        self.y = ExtendedMotor(prefix + "Y")
         super().__init__(name)

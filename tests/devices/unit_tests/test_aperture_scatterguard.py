@@ -186,7 +186,7 @@ def set_underlying_motors(
 def test_aperture_positions_large(
     ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
 ):
-    ap_sg.aperture.large.sim_put(1)  # type: ignore
+    ap_sg.aperture.large._backend._set_value(1)  # type: ignore
     assert ap_sg._get_current_aperture_position() == aperture_positions.LARGE
 
 

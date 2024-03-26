@@ -1,3 +1,4 @@
+import asyncio
 import operator
 from collections import namedtuple
 from dataclasses import dataclass
@@ -5,9 +6,8 @@ from functools import reduce
 from typing import List, Optional, Sequence
 
 from ophyd.status import AndStatus, Status, StatusBase
-from ophyd_async.core import SignalR, StandardReadable
+from ophyd_async.core import AsyncStatus, SignalR, StandardReadable
 from ophyd_async.core.sim_signal_backend import SimSignalBackend
-from ophyd_async.epics.motion import Motor
 
 from dodal.devices.aperture import Aperture
 from dodal.devices.scatterguard import Scatterguard
@@ -152,7 +152,7 @@ class ApertureScatterguard(StandardReadable):
 
         raise InvalidApertureMove("Current aperture/scatterguard state unrecognised")
 
-    def _safe_move_within_datacollection_range(
+    async def _safe_move_within_datacollection_range(
         self, pos: ApertureFiveDimensionalLocation
     ) -> StatusBase:
         """
@@ -167,7 +167,7 @@ class ApertureScatterguard(StandardReadable):
         # unpacking the position
         aperture_x, aperture_y, aperture_z, scatterguard_x, scatterguard_y = pos
 
-        ap_z_in_position = self.aperture.z.
+        ap_z_in_position = await self.aperture.z.done_with_move.get_value()
         if not ap_z_in_position:
             status: Status = Status(obj=self)
             status.set_exception(
@@ -178,8 +178,10 @@ class ApertureScatterguard(StandardReadable):
             )
             return status
 
-        current_ap_z = self.aperture.z.read()
-        tolerance = self.TOLERANCE_STEPS * self.aperture.z.motor_resolution.get()
+        current_ap_z = await self.aperture.z.readback.get_value()
+        tolerance = (
+            self.TOLERANCE_STEPS * await self.aperture.z.motor_resolution.get_value()
+        )
         diff_on_z = abs(current_ap_z - aperture_z)
         if diff_on_z > tolerance:
             raise InvalidApertureMove(
@@ -188,28 +190,29 @@ class ApertureScatterguard(StandardReadable):
                 f"Current aperture z ({current_ap_z}), outside of tolerance ({tolerance}) from target ({aperture_z})."
             )
 
-        current_ap_y = self.aperture.y.read()
+        current_ap_y = await self.aperture.y.readback.get_value()
         if aperture_y > current_ap_y:
-            sg_status: AndStatus = self.scatterguard.x.set(
-                scatterguard_x
-            ) & self.scatterguard.y.set(scatterguard_y)
-            sg_status.wait()
-            return (
-                sg_status
-                & self.aperture.x.set(aperture_x)
-                & self.aperture.y.set(aperture_y)
-                & self.aperture.z.set(aperture_z)
+            sg_status: AsyncStatus = asyncio.gather(
+                self.scatterguard.x._move(scatterguard_x),
+                self.scatterguard.y._move(scatterguard_y),
+            )
+            await sg_status
+            return asyncio.gather(
+                sg_status,
+                self.aperture.x._move(aperture_x),
+                self.aperture.y._move(aperture_y),
+                self.aperture.z._move(aperture_z),
             )
 
-        ap_status: AndStatus = (
-            self.aperture.x.set(aperture_x)
-            & self.aperture.y.set(aperture_y)
-            & self.aperture.z.set(aperture_z)
+        ap_status: AsyncStatus = asyncio.gather(
+            self.aperture.x._move(aperture_x),
+            self.aperture.y._move(aperture_y),
+            self.aperture.z._move(aperture_z),
         )
-        ap_status.wait()
-        final_status: AndStatus = (
-            ap_status
-            & self.scatterguard.x.set(scatterguard_x)
-            & self.scatterguard.y.set(scatterguard_y)
+        await ap_status
+        final_status: AsyncStatus = asyncio.gather(
+            ap_status,
+            self.scatterguard.x._move(scatterguard_x),
+            self.scatterguard.y._move(scatterguard_y),
         )
         return final_status
