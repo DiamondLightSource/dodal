@@ -4,14 +4,13 @@ from dataclasses import dataclass
 from functools import reduce
 from typing import List, Optional, Sequence
 
-from ophyd import Component as Cpt
-from ophyd import SignalRO
-from ophyd.epics_motor import EpicsMotor
 from ophyd.status import AndStatus, Status, StatusBase
+from ophyd_async.core import SignalR, StandardReadable
+from ophyd_async.epics.motion import Motor
 
 from dodal.devices.aperture import Aperture
-from dodal.devices.logging_ophyd_device import InfoLoggingDevice
 from dodal.devices.scatterguard import Scatterguard
+from dodal.devices.util.motor_utils import ExtendedMotor
 from dodal.log import LOGGER
 
 
@@ -83,18 +82,20 @@ class AperturePositions:
         ]
 
 
-class ApertureScatterguard(InfoLoggingDevice):
-    aperture = Cpt(Aperture, "-MO-MAPT-01:")
-    scatterguard = Cpt(Scatterguard, "-MO-SCAT-01:")
-    aperture_positions: Optional[AperturePositions] = None
-    TOLERANCE_STEPS = 3  # Number of MRES steps
+class ApertureScatterguard(StandardReadable):
+    def __init__(self, prefix: str = "", name: str = "") -> None:
+        self.aperture = Aperture(prefix="-MO-MAPT-01:")
+        self.scatterguard = Scatterguard(prefix="-MO-SCAT-01:")
+        self.aperture_positions: Optional[AperturePositions] = None
+        self.TOLERANCE_STEPS = 3  # Number of MRES steps
+        super().__init__(name)
 
-    class SelectedAperture(SignalRO):
+    class SelectedAperture(SignalR):
         def get(self):
             assert isinstance(self.parent, ApertureScatterguard)
             return self.parent._get_current_aperture_position()
 
-    selected_aperture = Cpt(SelectedAperture)
+    selected_aperture = SelectedAperture()  # look at software devices
 
     def load_aperture_positions(self, positions: AperturePositions):
         LOGGER.info(f"{self.name} loaded in {positions}")
@@ -117,7 +118,7 @@ class ApertureScatterguard(InfoLoggingDevice):
         ]
 
     def _set_raw_unsafe(self, positions: ApertureFiveDimensionalLocation) -> AndStatus:
-        motors: Sequence[EpicsMotor] = self._get_motor_list()
+        motors: Sequence[ExtendedMotor] = self._get_motor_list()
         return reduce(
             operator.and_, [motor.set(pos) for motor, pos in zip(motors, positions)]
         )
@@ -130,14 +131,16 @@ class ApertureScatterguard(InfoLoggingDevice):
         If no position is found then raises InvalidApertureMove.
         """
         assert isinstance(self.aperture_positions, AperturePositions)
-        current_ap_y = float(self.aperture.y.user_readback.get())
+        current_ap_y = self.aperture.y.get_value()
         robot_load_ap_y = self.aperture_positions.ROBOT_LOAD.location.aperture_y
-        tolerance = self.TOLERANCE_STEPS * self.aperture.y.motor_resolution.get()
-        if int(self.aperture.large.get()) == 1:
+        tolerance = self.TOLERANCE_STEPS * self.aperture.y.motor_resolution.get)
+        # extendedepicsmotor class has tolerance fields added
+        # ophyd-async epics motor may need to do the same thing - epics motor
+        if self.aperture.large.get_value() == 1:
             return self.aperture_positions.LARGE
-        elif int(self.aperture.medium.get()) == 1:
+        elif self.aperture.medium.get_value() == 1:
             return self.aperture_positions.MEDIUM
-        elif int(self.aperture.small.get()) == 1:
+        elif self.aperture.small.get_value() == 1:
             return self.aperture_positions.SMALL
         elif current_ap_y <= robot_load_ap_y + tolerance:
             return self.aperture_positions.ROBOT_LOAD
@@ -170,7 +173,7 @@ class ApertureScatterguard(InfoLoggingDevice):
             )
             return status
 
-        current_ap_z = self.aperture.z.user_setpoint.get()
+        current_ap_z = self.aperture.z.read()
         tolerance = self.TOLERANCE_STEPS * self.aperture.z.motor_resolution.get()
         diff_on_z = abs(current_ap_z - aperture_z)
         if diff_on_z > tolerance:
@@ -180,7 +183,7 @@ class ApertureScatterguard(InfoLoggingDevice):
                 f"Current aperture z ({current_ap_z}), outside of tolerance ({tolerance}) from target ({aperture_z})."
             )
 
-        current_ap_y = self.aperture.y.user_readback.get()
+        current_ap_y = self.aperture.y.read()
         if aperture_y > current_ap_y:
             sg_status: AndStatus = self.scatterguard.x.set(
                 scatterguard_x
