@@ -5,7 +5,6 @@ from dataclasses import dataclass
 from functools import reduce
 from typing import List, Optional, Sequence
 
-from ophyd.status import AndStatus, Status, StatusBase
 from ophyd_async.core import AsyncStatus, SignalR, StandardReadable
 from ophyd_async.core.sim_signal_backend import SimSignalBackend
 
@@ -104,7 +103,7 @@ class ApertureScatterguard(StandardReadable):
         LOGGER.info(f"{self.name} loaded in {positions}")
         self.aperture_positions = positions
 
-    def set(self, pos: SingleAperturePosition) -> StatusBase:
+    def set(self, pos: SingleAperturePosition):
         assert isinstance(self.aperture_positions, AperturePositions)
         if pos not in self.aperture_positions.as_list():
             raise InvalidApertureMove(f"Unknown aperture: {pos}")
@@ -120,7 +119,9 @@ class ApertureScatterguard(StandardReadable):
             self.scatterguard.y,
         ]
 
-    def _set_raw_unsafe(self, positions: ApertureFiveDimensionalLocation) -> AndStatus:
+    def _set_raw_unsafe(
+        self, positions: ApertureFiveDimensionalLocation
+    ) -> AsyncStatus:
         motors: Sequence[ExtendedMotor] = self._get_motor_list()
         return reduce(
             operator.and_, [motor.set(pos) for motor, pos in zip(motors, positions)]
@@ -154,7 +155,7 @@ class ApertureScatterguard(StandardReadable):
 
     async def _safe_move_within_datacollection_range(
         self, pos: ApertureFiveDimensionalLocation
-    ) -> StatusBase:
+    ):
         """
         Move the aperture and scatterguard combo safely to a new position.
         See https://github.com/DiamondLightSource/hyperion/wiki/Aperture-Scatterguard-Collisions
@@ -169,14 +170,10 @@ class ApertureScatterguard(StandardReadable):
 
         ap_z_in_position = await self.aperture.z.done_with_move.get_value()
         if not ap_z_in_position:
-            status: Status = Status(obj=self)
-            status.set_exception(
-                InvalidApertureMove(
-                    "ApertureScatterguard z is still moving. Wait for it to finish "
-                    "before triggering another move."
-                )
+            raise InvalidApertureMove(
+                "ApertureScatterguard z is still moving. Wait for it to finish "
+                "before triggering another move."
             )
-            return status
 
         current_ap_z = await self.aperture.z.readback.get_value()
         tolerance = (
@@ -191,28 +188,25 @@ class ApertureScatterguard(StandardReadable):
             )
 
         current_ap_y = await self.aperture.y.readback.get_value()
+
         if aperture_y > current_ap_y:
-            sg_status: AsyncStatus = asyncio.gather(
+            await asyncio.gather(
                 self.scatterguard.x._move(scatterguard_x),
                 self.scatterguard.y._move(scatterguard_y),
             )
-            await sg_status
-            return asyncio.gather(
-                sg_status,
+            await asyncio.gather(
                 self.aperture.x._move(aperture_x),
                 self.aperture.y._move(aperture_y),
                 self.aperture.z._move(aperture_z),
             )
-
-        ap_status: AsyncStatus = asyncio.gather(
+            return
+        await asyncio.gather(
             self.aperture.x._move(aperture_x),
             self.aperture.y._move(aperture_y),
             self.aperture.z._move(aperture_z),
         )
-        await ap_status
-        final_status: AsyncStatus = asyncio.gather(
-            ap_status,
+
+        await asyncio.gather(
             self.scatterguard.x._move(scatterguard_x),
             self.scatterguard.y._move(scatterguard_y),
         )
-        return final_status
