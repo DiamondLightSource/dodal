@@ -76,6 +76,11 @@ def aperture_positions():
     return aperture_positions
 
 
+def test_create_aperturescatterguard():
+    fake_aperture_scatterguard = make_fake_device(ApertureScatterguard)
+    ap_sg = fake_aperture_scatterguard()
+
+
 def test_aperture_scatterguard_rejects_unknown_position(aperture_in_medium_pos):
     position_to_reject = ApertureFiveDimensionalLocation(0, 0, 0, 0, 0)
 

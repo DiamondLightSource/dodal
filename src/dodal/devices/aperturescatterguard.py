@@ -6,6 +6,7 @@ from typing import List, Optional, Sequence
 
 from ophyd.status import AndStatus, Status, StatusBase
 from ophyd_async.core import SignalR, StandardReadable
+from ophyd_async.core.sim_signal_backend import SimSignalBackend
 from ophyd_async.epics.motion import Motor
 
 from dodal.devices.aperture import Aperture
@@ -91,11 +92,13 @@ class ApertureScatterguard(StandardReadable):
         super().__init__(name)
 
     class SelectedAperture(SignalR):
-        def get(self):
+        async def get(self):
             assert isinstance(self.parent, ApertureScatterguard)
-            return self.parent._get_current_aperture_position()
+            await self._backend.put(self.parent._get_current_aperture_position())
 
-    selected_aperture = SelectedAperture()  # look at software devices
+    selected_aperture = SelectedAperture(
+        backend=SimSignalBackend(datatype=SingleAperturePosition, source="")
+    )  # look at software devices
 
     def load_aperture_positions(self, positions: AperturePositions):
         LOGGER.info(f"{self.name} loaded in {positions}")
@@ -123,7 +126,7 @@ class ApertureScatterguard(StandardReadable):
             operator.and_, [motor.set(pos) for motor, pos in zip(motors, positions)]
         )
 
-    def _get_current_aperture_position(self) -> SingleAperturePosition:
+    async def _get_current_aperture_position(self) -> SingleAperturePosition:
         """
         Returns the current aperture position using readback values
         for SMALL, MEDIUM, LARGE. ROBOT_LOAD position defined when
@@ -131,9 +134,11 @@ class ApertureScatterguard(StandardReadable):
         If no position is found then raises InvalidApertureMove.
         """
         assert isinstance(self.aperture_positions, AperturePositions)
-        current_ap_y = self.aperture.y.get_value()
+        current_ap_y = await self.aperture.y.readback.get_value()
         robot_load_ap_y = self.aperture_positions.ROBOT_LOAD.location.aperture_y
-        tolerance = self.TOLERANCE_STEPS * self.aperture.y.motor_resolution.get)
+        tolerance = (
+            self.TOLERANCE_STEPS * await self.aperture.y.motor_resolution.get_value()
+        )
         # extendedepicsmotor class has tolerance fields added
         # ophyd-async epics motor may need to do the same thing - epics motor
         if self.aperture.large.get_value() == 1:
@@ -162,7 +167,7 @@ class ApertureScatterguard(StandardReadable):
         # unpacking the position
         aperture_x, aperture_y, aperture_z, scatterguard_x, scatterguard_y = pos
 
-        ap_z_in_position = self.aperture.z.motor_done_move.get()
+        ap_z_in_position = self.aperture.z.
         if not ap_z_in_position:
             status: Status = Status(obj=self)
             status.set_exception(
