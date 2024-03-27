@@ -3,7 +3,12 @@ from unittest.mock import Mock
 import pytest
 from ophyd_async.core import DetectorTrigger, DeviceCollector
 
-from dodal.devices.tetramm import TetrammController, TetrammDetector, TetrammDriver
+from dodal.devices.tetramm import (
+    TetrammController,
+    TetrammDetector,
+    TetrammDriver,
+    TetrammTrigger,
+)
 
 TEST_TETRAMM_NAME = "foobar"
 
@@ -101,18 +106,14 @@ def test_min_frame_time_is_calculated_correctly(
     assert tetramm_controller.readings_per_frame == int(readings_per_time * 0.1)
 
 
-async def test_raises_value_error_for_invalid_trigger_type(
-    tetramm_controller: TetrammController,
-):
-    with pytest.raises(ValueError):
-        await tetramm_controller.arm(-1, DetectorTrigger.internal, 0.01)
+VALID_TEST_EXPOSURE_TIME = 1 / 19
 
 
 async def test_set_frame_time_updates_values_per_reading(
     tetramm_controller: TetrammController,
     tetramm_driver: TetrammDriver,
 ):
-    await tetramm_controller.set_frame_time(1 / 19)
+    await tetramm_controller.set_frame_time(VALID_TEST_EXPOSURE_TIME)
     values_per_reading = await tetramm_driver.values_per_reading.get_value()
     assert values_per_reading == 5
 
@@ -133,7 +134,63 @@ async def test_set_invalid_frame_time_for_number_of_values_per_reading(
         ValueError,
         match="frame_time 0.02 is too low to collect at least 5 values per reading, at 1000 readings per frame.",
     ):
-        await tetramm_controller.set_frame_time(1 / 50)
+        await (await tetramm_controller.arm(-1, DetectorTrigger.edge_trigger, 1 / 50))
+
+
+@pytest.mark.parametrize(
+    "trigger_type",
+    [
+        DetectorTrigger.internal,
+        DetectorTrigger.variable_gate,
+    ],
+)
+async def test_arm_raises_value_error_for_invalid_trigger_type(
+    tetramm_controller: TetrammController,
+    trigger_type: DetectorTrigger,
+):
+    with pytest.raises(ValueError):
+        await tetramm_controller.arm(
+            -1,
+            trigger_type,
+            VALID_TEST_EXPOSURE_TIME,
+        )
+
+
+@pytest.mark.parametrize(
+    "trigger_type",
+    [
+        DetectorTrigger.edge_trigger,
+        DetectorTrigger.constant_gate,
+    ],
+)
+async def test_arm_sets_signals_correctly_given_valid_inputs(
+    tetramm_controller: TetrammController,
+    tetramm_driver: TetrammDriver,
+    trigger_type: DetectorTrigger,
+):
+    arm_status = await tetramm_controller.arm(
+        -1, trigger_type, VALID_TEST_EXPOSURE_TIME
+    )
+    await arm_status
+
+    assert (await tetramm_driver.trigger_mode.get_value()) is TetrammTrigger.ExtTrigger
+    assert (await tetramm_driver.averaging_time.get_value()) == VALID_TEST_EXPOSURE_TIME
+    assert (await tetramm_driver.values_per_reading.get_value()) == 5
+    assert (await tetramm_driver.acquire.get_value()) == 1
+
+
+async def test_disarm_disarms_driver(
+    tetramm_controller: TetrammController,
+    tetramm_driver: TetrammDriver,
+):
+    assert (await tetramm_driver.acquire.get_value()) == 0
+    arm_status = await tetramm_controller.arm(
+        -1, DetectorTrigger.edge_trigger, VALID_TEST_EXPOSURE_TIME
+    )
+    await arm_status
+    assert (await tetramm_driver.acquire.get_value()) == 1
+    await tetramm_controller.disarm()
+    assert (await tetramm_driver.acquire.get_value()) == 0
 
 
 async def test_hints_self_by_default(tetramm: TetrammDetector):
