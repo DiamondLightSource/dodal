@@ -260,6 +260,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1033_clarify_desired_transmission/"
   },
   {
+    "version": "hyperion_1167_detector_not_cleaned_after_smargon_fail",
+    "url": "https://DiamondLightSource.github.io/dodal/hyperion_1167_detector_not_cleaned_after_smargon_fail/"
+  },
+  {
     "version": "hyperion_1219_remove_mxsc",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1219_remove_mxsc/"
   },
