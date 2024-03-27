@@ -142,11 +142,11 @@ class ApertureScatterguard(StandardReadable):
         )
         # extendedepicsmotor class has tolerance fields added
         # ophyd-async epics motor may need to do the same thing - epics motor
-        if self.aperture.large.get_value() == 1:
+        if await self.aperture.large.get_value() == 1:
             return self.aperture_positions.LARGE
-        elif self.aperture.medium.get_value() == 1:
+        elif await self.aperture.medium.get_value() == 1:
             return self.aperture_positions.MEDIUM
-        elif self.aperture.small.get_value() == 1:
+        elif await self.aperture.small.get_value() == 1:
             return self.aperture_positions.SMALL
         elif current_ap_y <= robot_load_ap_y + tolerance:
             return self.aperture_positions.ROBOT_LOAD
@@ -168,7 +168,7 @@ class ApertureScatterguard(StandardReadable):
         # unpacking the position
         aperture_x, aperture_y, aperture_z, scatterguard_x, scatterguard_y = pos
 
-        ap_z_in_position = await self.aperture.z.done_with_move.get_value()
+        ap_z_in_position = await self.aperture.z.motor_done_move.get_value()
         if not ap_z_in_position:
             raise InvalidApertureMove(
                 "ApertureScatterguard z is still moving. Wait for it to finish "

@@ -12,5 +12,5 @@ class ExtendedMotor(Motor):
     def __init__(self, prefix: str, name: str = ""):
         self.motor_resolution = epics_signal_r(float, prefix + ".MRES")
         self.max_velocity = epics_signal_r(float, prefix + ".VMAX")
-        self.done_with_move = epics_signal_r(float, prefix + ".DMOV")
+        self.motor_done_move = epics_signal_r(float, prefix + ".DMOV")
         super().__init__(name)

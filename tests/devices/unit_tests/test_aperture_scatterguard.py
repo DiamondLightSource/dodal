@@ -2,7 +2,7 @@
 
 import pytest
 from ophyd.sim import make_fake_device
-from ophyd.status import StatusBase
+from ophyd_async.core import AsyncStatus
 
 # from ophyd_async.core import StandardReadable
 # from ophyd_async.core.sim_signal_backend import SimSignalBackend
@@ -18,9 +18,10 @@ from .conftest import patch_motor
 
 
 @pytest.fixture
-def ap_sg(aperture_positions: AperturePositions):
+async def ap_sg(aperture_positions: AperturePositions):
     FakeApertureScatterguard = make_fake_device(ApertureScatterguard)
     ap_sg: ApertureScatterguard = FakeApertureScatterguard(name="test_ap_sg")
+    await ap_sg.connect(sim=True)
     ap_sg.load_aperture_positions(aperture_positions)
     with (
         patch_motor(ap_sg.aperture.x),
@@ -43,7 +44,7 @@ def aperture_in_medium_pos(
     ap_sg.aperture.z.set(medium.aperture_z)
     ap_sg.scatterguard.x.set(medium.scatterguard_x)
     ap_sg.scatterguard.y.set(medium.scatterguard_y)
-    ap_sg.aperture.medium.sim_put(1)  # type: ignore
+    ap_sg.aperture.medium._backend._set_value(1)  # type: ignore
     yield ap_sg
 
 
@@ -79,6 +80,13 @@ def aperture_positions():
 def test_create_aperturescatterguard():
     fake_aperture_scatterguard = make_fake_device(ApertureScatterguard)
     ap_sg = fake_aperture_scatterguard()
+
+
+def test_get_aperturescatterguard_aperture():
+    fake_aperture_scatterguard = make_fake_device(ApertureScatterguard)
+    ap_sg = fake_aperture_scatterguard()
+    value = ap_sg.aperture.y.readback.get_value()
+    print(value)
 
 
 def test_aperture_scatterguard_rejects_unknown_position(aperture_in_medium_pos):
@@ -149,28 +157,27 @@ def test_aperture_scatterguard_rejects_unknown_position(aperture_in_medium_pos):
 #     )
 
 
-def test_aperture_scatterguard_throws_error_if_outside_tolerance(
+async def test_aperture_scatterguard_throws_error_if_outside_tolerance(
     ap_sg: ApertureScatterguard,
 ):
-    ap_sg.aperture.z.motor_resolution._set_value(0.001)  # type: ignore
-    ap_sg.aperture.z._set_value(1)  # type: ignore
-    ap_sg.aperture.z.motor_done_move.sim_put(1)  # type: ignore
+    ap_sg.aperture.z.motor_resolution._backend._set_value(0.001)  # type: ignore
+    ap_sg.aperture.z.readback._backend._set_value(1)  # type: ignore
+    ap_sg.aperture.z.motor_done_move._backend._set_value(1)  # type: ignore
 
     with pytest.raises(InvalidApertureMove):
         pos = ApertureFiveDimensionalLocation(0, 0, 1.1, 0, 0)
-        ap_sg._safe_move_within_datacollection_range(pos)
+        await ap_sg._safe_move_within_datacollection_range(pos)
 
 
-def test_aperture_scatterguard_returns_status_if_within_tolerance(
+async def test_aperture_scatterguard_returns_status_if_within_tolerance(
     ap_sg: ApertureScatterguard,
 ):
-    ap_sg.aperture.z.motor_resolution.sim_put(0.001)  # type: ignore
-    ap_sg.aperture.z.user_setpoint.sim_put(1)  # type: ignore
-    ap_sg.aperture.z.motor_done_move.sim_put(1)  # type: ignore
+    ap_sg.aperture.z.motor_resolution._backend._set_value(0.001)  # type: ignore
+    ap_sg.aperture.z.readback._backend._set_value(1)  # type: ignore
+    ap_sg.aperture.z.motor_done_move._backend._set_value(1)  # type: ignore
 
     pos = ApertureFiveDimensionalLocation(0, 0, 1, 0, 0)
-    status = ap_sg._safe_move_within_datacollection_range(pos)
-    assert isinstance(status, StatusBase)
+    await ap_sg._safe_move_within_datacollection_range(pos)
 
 
 def set_underlying_motors(
@@ -183,71 +190,75 @@ def set_underlying_motors(
     ap_sg.scatterguard.y.set(position.scatterguard_y)
 
 
-def test_aperture_positions_large(
+async def test_aperture_positions_large(
     ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
 ):
     ap_sg.aperture.large._backend._set_value(1)  # type: ignore
-    assert ap_sg._get_current_aperture_position() == aperture_positions.LARGE
+    assert await ap_sg._get_current_aperture_position() == aperture_positions.LARGE
 
 
-def test_aperture_positions_medium(
+async def test_aperture_positions_medium(
     ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
 ):
-    ap_sg.aperture.medium.sim_put(1)  # type: ignore
-    assert ap_sg._get_current_aperture_position() == aperture_positions.MEDIUM
+    ap_sg.aperture.medium._backend._set_value(1)  # type: ignore
+    assert await ap_sg._get_current_aperture_position() == aperture_positions.MEDIUM
 
 
-def test_aperture_positions_small(
+async def test_aperture_positions_small(
     ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
 ):
-    ap_sg.aperture.small.sim_put(1)  # type: ignore
-    assert ap_sg._get_current_aperture_position() == aperture_positions.SMALL
+    ap_sg.aperture.small._backend._set_value(1)  # type: ignore
+    assert await ap_sg._get_current_aperture_position() == aperture_positions.SMALL
 
 
-def test_aperture_positions_robot_load(
+async def test_aperture_positions_robot_load(
     ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
 ):
-    ap_sg.aperture.large.sim_put(0)  # type: ignore
-    ap_sg.aperture.medium.sim_put(0)  # type: ignore
-    ap_sg.aperture.small.sim_put(0)  # type: ignore
+    ap_sg.aperture.large._backend._set_value(0)  # type: ignore
+    ap_sg.aperture.medium._backend._set_value(0)  # type: ignore
+    ap_sg.aperture.small._backend._set_value(0)  # type: ignore
     ap_sg.aperture.y.set(aperture_positions.ROBOT_LOAD.location.aperture_y)  # type: ignore
-    assert ap_sg._get_current_aperture_position() == aperture_positions.ROBOT_LOAD
+    assert await ap_sg._get_current_aperture_position() == aperture_positions.ROBOT_LOAD
 
 
-def test_aperture_positions_robot_load_within_tolerance(
+async def test_aperture_positions_robot_load_within_tolerance(
     ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
 ):
     robot_load_ap_y = aperture_positions.ROBOT_LOAD.location.aperture_y
-    tolerance = ap_sg.TOLERANCE_STEPS * ap_sg.aperture.y.motor_resolution.get()
-    ap_sg.aperture.large.sim_put(0)  # type: ignore
-    ap_sg.aperture.medium.sim_put(0)  # type: ignore
-    ap_sg.aperture.small.sim_put(0)  # type: ignore
+    tolerance = (
+        ap_sg.TOLERANCE_STEPS * await ap_sg.aperture.y.motor_resolution.get_value()
+    )
+    ap_sg.aperture.large._backend._set_value(0)  # type: ignore
+    ap_sg.aperture.medium._backend._set_value(0)  # type: ignore
+    ap_sg.aperture.small._backend._set_value(0)  # type: ignore
     ap_sg.aperture.y.set(robot_load_ap_y + tolerance)  # type: ignore
-    assert ap_sg._get_current_aperture_position() == aperture_positions.ROBOT_LOAD
+    assert await ap_sg._get_current_aperture_position() == aperture_positions.ROBOT_LOAD
 
 
-def test_aperture_positions_robot_load_outside_tolerance(
+async def test_aperture_positions_robot_load_outside_tolerance(
     ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
 ):
     robot_load_ap_y = aperture_positions.ROBOT_LOAD.location.aperture_y
-    tolerance = (ap_sg.TOLERANCE_STEPS + 1) * ap_sg.aperture.y.motor_resolution.get()
-    ap_sg.aperture.large.sim_put(0)  # type: ignore
-    ap_sg.aperture.medium.sim_put(0)  # type: ignore
-    ap_sg.aperture.small.sim_put(0)  # type: ignore
+    tolerance = (
+        ap_sg.TOLERANCE_STEPS + 1
+    ) * await ap_sg.aperture.y.motor_resolution.get_value()
+    ap_sg.aperture.large._backend._set_value(0)  # type: ignore
+    ap_sg.aperture.medium._backend._set_value(0)  # type: ignore
+    ap_sg.aperture.small._backend._set_value(0)  # type: ignore
     ap_sg.aperture.y.set(robot_load_ap_y + tolerance)  # type: ignore
     with pytest.raises(InvalidApertureMove):
-        ap_sg._get_current_aperture_position()
+        await ap_sg._get_current_aperture_position()
 
 
-def test_aperture_positions_robot_load_unsafe(
+async def test_aperture_positions_robot_load_unsafe(
     ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
 ):
-    ap_sg.aperture.large.sim_put(0)  # type: ignore
-    ap_sg.aperture.medium.sim_put(0)  # type: ignore
-    ap_sg.aperture.small.sim_put(0)  # type: ignore
+    ap_sg.aperture.large._backend._set_value(0)  # type: ignore
+    ap_sg.aperture.medium._backend._set_value(0)  # type: ignore
+    ap_sg.aperture.small._backend._set_value(0)  # type: ignore
     ap_sg.aperture.y.set(50.0)  # type: ignore
     with pytest.raises(InvalidApertureMove):
-        ap_sg._get_current_aperture_position()
+        await ap_sg._get_current_aperture_position()
 
 
 def test_given_aperture_not_set_through_device_but_motors_in_position_when_device_read_then_position_returned(
@@ -264,7 +275,6 @@ def test_when_aperture_set_and_device_read_then_position_returned(
     aperture_in_medium_pos: ApertureScatterguard, aperture_positions: AperturePositions
 ):
     set_status = aperture_in_medium_pos.set(aperture_positions.MEDIUM)
-    set_status.wait()
     selected_aperture = aperture_in_medium_pos.read()
     assert (
         selected_aperture["test_ap_sg_selected_aperture"]["value"]
