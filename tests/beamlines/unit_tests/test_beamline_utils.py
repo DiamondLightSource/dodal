@@ -100,10 +100,14 @@ def test_wait_for_v2_device_connection_passes_through_timeout(
 ):
     RE()
     device = OphydV2Device()
+    device.connect = MagicMock()
 
     beamline_utils._wait_for_connection(device, **kwargs)
 
-    call_in_bluesky_el.assert_called_once_with(ANY, timeout=expected_timeout)
+    device.connect.assert_called_once_with(
+        sim=ANY,
+        timeout=expected_timeout,
+    )
 
 
 def test_default_directory_provider_is_singleton():
