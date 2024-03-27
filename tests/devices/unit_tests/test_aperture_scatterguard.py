@@ -261,23 +261,25 @@ async def test_aperture_positions_robot_load_unsafe(
         await ap_sg._get_current_aperture_position()
 
 
-def test_given_aperture_not_set_through_device_but_motors_in_position_when_device_read_then_position_returned(
+async def test_given_aperture_not_set_through_device_but_motors_in_position_when_device_read_then_position_returned(
     aperture_in_medium_pos: ApertureScatterguard, aperture_positions: AperturePositions
 ):
-    selected_aperture = aperture_in_medium_pos.read()
+    selected_aperture = await aperture_in_medium_pos.read()
+    assert isinstance(selected_aperture, dict)
     assert (
-        selected_aperture["test_ap_sg_selected_aperture"]["value"]
+        selected_aperture["test_ap_sg-selected_aperture"]["value"]
         == aperture_positions.MEDIUM
     )
 
 
-def test_when_aperture_set_and_device_read_then_position_returned(
+async def test_when_aperture_set_and_device_read_then_position_returned(
     aperture_in_medium_pos: ApertureScatterguard, aperture_positions: AperturePositions
 ):
-    set_status = aperture_in_medium_pos.set(aperture_positions.MEDIUM)
-    selected_aperture = aperture_in_medium_pos.read()
+    set_status = await aperture_in_medium_pos.set(aperture_positions.MEDIUM)
+    print(set_status)
+    selected_aperture = await aperture_in_medium_pos.read()
     assert (
-        selected_aperture["test_ap_sg_selected_aperture"]["value"]
+        selected_aperture["test_ap_sg-selected_aperture"]["value"]
         == aperture_positions.MEDIUM
     )
 

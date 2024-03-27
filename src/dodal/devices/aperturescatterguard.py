@@ -32,10 +32,12 @@ ApertureFiveDimensionalLocation = namedtuple(
 
 @dataclass
 class SingleAperturePosition:
-    name: str
-    GDA_name: str
-    radius_microns: Optional[float]
-    location: ApertureFiveDimensionalLocation
+    name: str = ""
+    GDA_name: str = ""
+    radius_microns: Optional[float] = 0
+    location: ApertureFiveDimensionalLocation = ApertureFiveDimensionalLocation(
+        0, 0, 0, 0, 0
+    )
 
 
 def position_from_params(
@@ -88,16 +90,21 @@ class ApertureScatterguard(StandardReadable):
         self.scatterguard = Scatterguard(prefix="-MO-SCAT-01:")
         self.aperture_positions: Optional[AperturePositions] = None
         self.TOLERANCE_STEPS = 3  # Number of MRES steps
+        self.selected_aperture = self.SelectedAperture(
+            backend=SimSignalBackend(datatype=SingleAperturePosition, source="")
+        )
+        self.set_readable_signals(
+            read=[
+                self.selected_aperture,
+            ]
+        )
         super().__init__(name)
 
     class SelectedAperture(SignalR):
-        async def get(self):
+        async def read(self, *args, **kwargs):
             assert isinstance(self.parent, ApertureScatterguard)
-            await self._backend.put(self.parent._get_current_aperture_position())
-
-    selected_aperture = SelectedAperture(
-        backend=SimSignalBackend(datatype=SingleAperturePosition, source="")
-    )  # look at software devices
+            await self._backend.put(await self.parent._get_current_aperture_position())
+            return {self.name: await self._backend.get_reading()}
 
     def load_aperture_positions(self, positions: AperturePositions):
         LOGGER.info(f"{self.name} loaded in {positions}")
@@ -135,18 +142,18 @@ class ApertureScatterguard(StandardReadable):
         If no position is found then raises InvalidApertureMove.
         """
         assert isinstance(self.aperture_positions, AperturePositions)
-        current_ap_y = await self.aperture.y.readback.get_value()
+        current_ap_y = await self.aperture.y.readback.get_value(cached=False)
         robot_load_ap_y = self.aperture_positions.ROBOT_LOAD.location.aperture_y
         tolerance = (
             self.TOLERANCE_STEPS * await self.aperture.y.motor_resolution.get_value()
         )
         # extendedepicsmotor class has tolerance fields added
         # ophyd-async epics motor may need to do the same thing - epics motor
-        if await self.aperture.large.get_value() == 1:
+        if await self.aperture.large.get_value(cached=False) == 1:
             return self.aperture_positions.LARGE
-        elif await self.aperture.medium.get_value() == 1:
+        elif await self.aperture.medium.get_value(cached=False) == 1:
             return self.aperture_positions.MEDIUM
-        elif await self.aperture.small.get_value() == 1:
+        elif await self.aperture.small.get_value(cached=False) == 1:
             return self.aperture_positions.SMALL
         elif current_ap_y <= robot_load_ap_y + tolerance:
             return self.aperture_positions.ROBOT_LOAD
