@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 
 import pytest
 from ophyd.sim import instantiate_fake_device
-from ophyd.status import Status
+from ophyd.status import AndStatus, Status
 
 from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
 from dodal.devices.oav.oav_errors import (
@@ -46,25 +46,18 @@ def oav() -> OAV:
 def test_when_zoom_level_changed_then_oav_rewired(zoom, expected_plugin, oav: OAV):
     oav.zoom_controller.set(zoom).wait()
 
-    assert oav.mxsc.input_plugin.get() == expected_plugin
     assert oav.snapshot.input_plugin.get() == expected_plugin
 
 
 def test_when_zoom_level_changed_then_status_waits_for_all_plugins_to_be_updated(
     oav: OAV,
 ):
-    mxsc_status = Status(obj="msxc - test_when_zoom_level...")
-    oav.mxsc.input_plugin.set = MagicMock(return_value=mxsc_status)
-
     mjpg_status = Status("mjpg - test_when_zoom_level...")
     oav.snapshot.input_plugin.set = MagicMock(return_value=mjpg_status)
 
-    full_status = oav.zoom_controller.set("1.0x")
-
-    assert mxsc_status in full_status
+    assert isinstance(full_status := oav.zoom_controller.set("1.0x"), AndStatus)
     assert mjpg_status in full_status
 
-    mxsc_status.set_finished()
     mjpg_status.set_finished()
     full_status.wait()
 
