@@ -1,6 +1,6 @@
 import asyncio
 from enum import Enum
-from typing import Generator, Sequence
+from typing import Generator, Mapping, Optional, Sequence
 
 import bluesky.plan_stubs as bps
 from bluesky.protocols import Hints
@@ -176,6 +176,7 @@ class TetrammController(DetectorControl):
 
     @property
     def minimum_frame_time(self) -> float:
+        """Smallest amount of time needed to take a frame"""
         time_per_reading = self.minimum_values_per_reading / self.base_sample_rate
         return self.readings_per_frame * time_per_reading
 
@@ -185,48 +186,6 @@ class TetrammController(DetectorControl):
         self.readings_per_frame = int(
             min(self.maximum_readings_per_frame, frame / time_per_reading)
         )
-
-
-IDLE_TETRAMM = {
-    "drv.acquire": 0,
-}
-
-COMMON_TETRAMM = {
-    "drv.range": TetrammRange.uA,
-    "drv.num_channels": "4",
-    "drv.resolution": TetrammResolution.TwentyFourBits,
-    "drv.geometry": TetrammGeometry.Square,
-}
-
-TRIGGERED_TETRAMM = {
-    **COMMON_TETRAMM,
-    "drv.trigger_mode": TetrammTrigger.ExtTrigger,
-}
-
-FREE_TETRAMM = {
-    **COMMON_TETRAMM,
-    "drv.values_per_reading": 10,
-    "drv.averaging_time": 0.1,
-    "drv.trigger_mode": TetrammTrigger.FreeRun,
-}
-
-
-def triggered_tetramm(dev: TetrammDriver) -> Generator[Msg, None, None]:
-    sigs = walk_rw_signals(dev)
-    yield from set_signal_values(
-        sigs,
-        [
-            IDLE_TETRAMM,
-            TRIGGERED_TETRAMM,
-        ],
-    )
-
-
-def free_tetramm(dev: TetrammDriver) -> Generator[Msg, None, None]:
-    """Freerun the tetramm, setting it to acquire so diodes update."""
-    sigs = walk_rw_signals(dev)
-    yield from set_signal_values(sigs, [IDLE_TETRAMM, FREE_TETRAMM])
-    yield from bps.abs_set(dev.drv.acquire, 1)
 
 
 class TetrammShapeProvider(ShapeProvider):
