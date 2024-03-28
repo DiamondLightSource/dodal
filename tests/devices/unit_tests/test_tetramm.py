@@ -153,7 +153,16 @@ async def test_arm_raises_value_error_for_invalid_trigger_type(
     tetramm_controller: TetrammController,
     trigger_type: DetectorTrigger,
 ):
-    with pytest.raises(ValueError):
+    accepted_types = {
+        DetectorTrigger.edge_trigger,
+        DetectorTrigger.constant_gate,
+    }
+    with pytest.raises(
+        ValueError,
+        match="TetrammController only supports the following trigger "
+        f"types: {accepted_types} but was asked to "
+        f"use {trigger_type}",
+    ):
         await tetramm_controller.arm(
             -1,
             trigger_type,
