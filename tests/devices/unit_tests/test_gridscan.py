@@ -83,7 +83,12 @@ def run_test_on_complete_watcher(
     RE = RunEngine()
     RE(
         set_fast_grid_scan_params(
-            fast_grid_scan, GridScanParams(x_steps=num_pos_1d, y_steps=num_pos_1d)
+            fast_grid_scan,
+            GridScanParams(
+                x_steps=num_pos_1d,
+                y_steps=num_pos_1d,
+                transmission_fraction=0.01,
+            ),
         )
     )
 
@@ -146,7 +151,10 @@ def test_running_finished_with_all_images_done_then_complete_status_finishes_not
     RE = RunEngine()
     RE(
         set_fast_grid_scan_params(
-            fast_grid_scan, GridScanParams(x_steps=num_pos_1d, y_steps=num_pos_1d)
+            fast_grid_scan,
+            GridScanParams(
+                transmission_fraction=0.01, x_steps=num_pos_1d, y_steps=num_pos_1d
+            ),
         )
     )
 
@@ -212,7 +220,9 @@ FAILING_CONST = 15
 )
 def test_scan_within_limits_1d(start, steps, size, expected_in_limits):
     motor_bundle = create_motor_bundle_with_limits(0.0, 10.0)
-    grid_params = GridScanParams(x_start=start, x_steps=steps, x_step_size=size)
+    grid_params = GridScanParams(
+        transmission_fraction=0.01, x_start=start, x_steps=steps, x_step_size=size
+    )
     assert grid_params.is_valid(motor_bundle.get_xyz_limits()) == expected_in_limits
 
 
@@ -229,6 +239,7 @@ def test_scan_within_limits_2d(
 ):
     motor_bundle = create_motor_bundle_with_limits(0.0, 10.0)
     grid_params = GridScanParams(
+        transmission_fraction=0.01,
         x_start=x_start,
         x_steps=x_steps,
         x_step_size=x_size,
@@ -285,6 +296,7 @@ def test_scan_within_limits_3d(
 ):
     motor_bundle = create_motor_bundle_with_limits(0.0, 10.0)
     grid_params = GridScanParams(
+        transmission_fraction=0.01,
         x_start=x_start,
         x_steps=x_steps,
         x_step_size=x_size,
@@ -303,6 +315,7 @@ def test_scan_within_limits_3d(
 @pytest.fixture
 def grid_scan_params():
     yield GridScanParams(
+        transmission_fraction=0.01,
         x_steps=10,
         y_steps=15,
         z_steps=20,
@@ -404,8 +417,14 @@ def test_given_x_y_z_steps_when_full_number_calculated_then_answer_is_as_expecte
 )
 def test_non_test_integer_dwell_time(test_dwell_times, expected_dwell_time_is_integer):
     if expected_dwell_time_is_integer:
-        params = GridScanParams(dwell_time_ms=test_dwell_times)
+        params = GridScanParams(
+            dwell_time_ms=test_dwell_times,
+            transmission_fraction=0.01,
+        )
         assert params.dwell_time_ms == test_dwell_times
     else:
         with pytest.raises(ValueError):
-            GridScanParams(dwell_time_ms=test_dwell_times)
+            GridScanParams(
+                dwell_time_ms=test_dwell_times,
+                transmission_fraction=0.01,
+            )
