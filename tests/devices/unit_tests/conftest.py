@@ -1,9 +1,12 @@
 from functools import partial
+from pathlib import Path
 from typing import Union
 from unittest.mock import MagicMock, patch
 
+import pytest
 from ophyd.epics_motor import EpicsMotor
 from ophyd.status import Status
+from ophyd_async.core import DirectoryInfo, DirectoryProvider, StaticDirectoryProvider
 
 from dodal.devices.util.motor_utils import ExtendedEpicsMotor
 
@@ -22,3 +25,14 @@ def patch_motor(motor: Union[EpicsMotor, ExtendedEpicsMotor], initial_position=0
     if isinstance(motor, ExtendedEpicsMotor):
         motor.motor_resolution.sim_put(0.001)  # type: ignore
     return patch.object(motor, "set", MagicMock(side_effect=partial(mock_set, motor)))
+
+
+DIRECTORY_INFO_FOR_TESTING: DirectoryInfo = DirectoryInfo(
+    root=Path("/does/not/exist"),
+    resource_dir=Path("/on/this/filesystem"),
+)
+
+
+@pytest.fixture
+def static_directory_provider(tmp_path: Path) -> DirectoryProvider:
+    return StaticDirectoryProvider(tmp_path)
