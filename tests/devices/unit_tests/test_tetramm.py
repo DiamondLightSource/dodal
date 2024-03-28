@@ -1,7 +1,13 @@
-from unittest.mock import Mock
-
 import pytest
-from ophyd_async.core import DetectorTrigger, DeviceCollector
+from bluesky.run_engine import RunEngine
+from ophyd_async.core import (
+    DetectorTrigger,
+    DeviceCollector,
+    DirectoryProvider,
+    set_sim_value,
+)
+from ophyd_async.core.detector import TriggerInfo
+from ophyd_async.epics.areadetector import FileWriteMode
 
 from dodal.devices.tetramm import (
     TetrammController,
@@ -14,7 +20,7 @@ TEST_TETRAMM_NAME = "foobar"
 
 
 @pytest.fixture
-async def tetramm_driver(RE) -> TetrammDriver:
+async def tetramm_driver(RE: RunEngine) -> TetrammDriver:
     async with DeviceCollector(sim=True):
         driver = TetrammDriver("DRIVER:")
 
@@ -22,7 +28,9 @@ async def tetramm_driver(RE) -> TetrammDriver:
 
 
 @pytest.fixture
-async def tetramm_controller(RE, tetramm_driver: TetrammDriver) -> TetrammController:
+async def tetramm_controller(
+    RE: RunEngine, tetramm_driver: TetrammDriver
+) -> TetrammController:
     async with DeviceCollector(sim=True):
         controller = TetrammController(
             tetramm_driver,
@@ -33,18 +41,15 @@ async def tetramm_controller(RE, tetramm_driver: TetrammDriver) -> TetrammContro
 
 
 @pytest.fixture
-async def tetramm() -> TetrammDetector:
+async def tetramm(static_directory_provider: DirectoryProvider) -> TetrammDetector:
     async with DeviceCollector(sim=True):
         tetramm = TetrammDetector(
             "MY-TETRAMM:",
-            Mock(),
+            static_directory_provider,
             name=TEST_TETRAMM_NAME,
         )
 
     return tetramm
-
-
-from ophyd_async.core import set_sim_value
 
 
 async def test_max_frame_rate_is_calculated_correctly(
@@ -173,10 +178,7 @@ async def test_arm_sets_signals_correctly_given_valid_inputs(
     )
     await arm_status
 
-    assert (await tetramm_driver.trigger_mode.get_value()) is TetrammTrigger.ExtTrigger
-    assert (await tetramm_driver.averaging_time.get_value()) == VALID_TEST_EXPOSURE_TIME
-    assert (await tetramm_driver.values_per_reading.get_value()) == 5
-    assert (await tetramm_driver.acquire.get_value()) == 1
+    await assert_armed(tetramm_driver)
 
 
 async def test_disarm_disarms_driver(
@@ -195,3 +197,74 @@ async def test_disarm_disarms_driver(
 
 async def test_hints_self_by_default(tetramm: TetrammDetector):
     assert tetramm.hints == {"fields": [TEST_TETRAMM_NAME]}
+
+
+async def test_prepare_with_too_low_a_deadtime_raises_error(
+    tetramm: TetrammDetector,
+):
+    with pytest.raises(
+        AssertionError,
+        match=r"Detector .* needs at least 2e-05s deadtime, but trigger logic "
+        "provides only 1e-05s",
+    ):
+        await tetramm.prepare(
+            TriggerInfo(
+                5,
+                DetectorTrigger.edge_trigger,
+                1.0 / 100_000.0,
+                VALID_TEST_EXPOSURE_TIME,
+            )
+        )
+
+
+async def test_prepare_arms_tetramm(
+    tetramm: TetrammDetector,
+):
+    await tetramm.prepare(
+        TriggerInfo(
+            5,
+            DetectorTrigger.edge_trigger,
+            0.1,
+            VALID_TEST_EXPOSURE_TIME,
+        )
+    )
+    await assert_armed(tetramm.drv)
+
+
+async def test_stage_sets_up_writer(
+    tetramm: TetrammDetector,
+):
+    set_sim_value(tetramm.hdf.file_path_exists, 1)
+    await tetramm.stage()
+
+    assert (await tetramm.hdf.num_capture.get_value()) == 0
+    assert (await tetramm.hdf.num_extra_dims.get_value()) == 0
+    assert await tetramm.hdf.lazy_open.get_value()
+    assert await tetramm.hdf.swmr_mode.get_value()
+    assert (await tetramm.hdf.file_template.get_value()) == "%s/%s.h5"
+    assert (await tetramm.hdf.file_write_mode.get_value()) == FileWriteMode.stream
+
+
+async def test_stage_sets_up_accurate_describe_output(
+    tetramm: TetrammDetector,
+):
+    assert tetramm.describe() == {}
+
+    set_sim_value(tetramm.hdf.file_path_exists, 1)
+    await tetramm.stage()
+
+    assert tetramm.describe() == {
+        TEST_TETRAMM_NAME: {
+            "source": "sim://MY-TETRAMM:HDF5:FullFileName_RBV",
+            "shape": (11, 1000),
+            "dtype": "array",
+            "external": "STREAM:",
+        }
+    }
+
+
+async def assert_armed(driver: TetrammDriver) -> None:
+    assert (await driver.trigger_mode.get_value()) is TetrammTrigger.ExtTrigger
+    assert (await driver.averaging_time.get_value()) == VALID_TEST_EXPOSURE_TIME
+    assert (await driver.values_per_reading.get_value()) == 5
+    assert (await driver.acquire.get_value()) == 1
