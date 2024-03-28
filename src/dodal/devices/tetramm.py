@@ -116,8 +116,7 @@ class TetrammController(DetectorControl):
         trigger: DetectorTrigger,
         exposure: float,
     ) -> AsyncStatus:
-        if trigger not in {DetectorTrigger.edge_trigger, DetectorTrigger.constant_gate}:
-            raise ValueError("Only edge triggers are supported")
+        self._validate_trigger(trigger)
 
         # trigger mode must be set first and on its own!
         await self._drv.trigger_mode.set(TetrammTrigger.ExtTrigger)
@@ -129,6 +128,19 @@ class TetrammController(DetectorControl):
         status = await set_and_wait_for_value(self._drv.acquire, 1)
 
         return status
+
+    def _validate_trigger(self, trigger: DetectorTrigger) -> None:
+        supported_trigger_types = {
+            DetectorTrigger.edge_trigger,
+            DetectorTrigger.constant_gate,
+        }
+
+        if trigger not in supported_trigger_types:
+            raise ValueError(
+                f"{self.__class__.__name__} only supports the following trigger "
+                f"types: {supported_trigger_types} but was asked to "
+                f"use {trigger}"
+            )
 
     async def disarm(self):
         await stop_busy_record(self._drv.acquire, 0, timeout=1)
