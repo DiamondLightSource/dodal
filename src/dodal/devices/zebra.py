@@ -5,7 +5,13 @@ from enum import Enum
 from functools import partialmethod
 from typing import List
 
-from ophyd_async.core import AsyncStatus, DeviceVector, SignalRW, StandardReadable
+from ophyd_async.core import (
+    AsyncStatus,
+    DeviceVector,
+    SignalRW,
+    StandardReadable,
+    observe_value,
+)
 from ophyd_async.epics.signal import epics_signal_rw
 
 # Sources
@@ -94,9 +100,11 @@ class ArmingDevice(StandardReadable):
         super().__init__(name)
 
     async def _set_armed(self, demand: ArmDemand):
-        await self.armed.set(demand.value)
         signal_to_set = self.arm_set if demand == ArmDemand.ARM else self.disarm_set
         await signal_to_set.set(1)
+        async for reading in observe_value(self.armed):
+            if reading == demand.value:
+                return
 
     def set(self, demand: ArmDemand) -> AsyncStatus:
         return AsyncStatus(

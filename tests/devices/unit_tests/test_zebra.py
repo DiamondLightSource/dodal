@@ -1,3 +1,5 @@
+from unittest.mock import AsyncMock
+
 import pytest
 from bluesky.run_engine import RunEngine
 from mockito import mock, verify
@@ -30,6 +32,14 @@ async def test_position_compare_sets_signals():
     RunEngine()
     fake_pc = PositionCompare("", name="fake position compare")
     await fake_pc.connect(sim=True)
+
+    async def mock_arm(demand):
+        fake_pc.arm.disarm_set._backend._set_value(not demand)  # type: ignore
+        fake_pc.arm.arm_set._backend._set_value(demand)  # type: ignore
+        await fake_pc.arm.armed.set(demand)
+
+    fake_pc.arm.arm_set.set = AsyncMock(side_effect=mock_arm)
+    fake_pc.arm.disarm_set.set = AsyncMock(side_effect=mock_arm)
 
     fake_pc.gate_source.set(TrigSource.EXTERNAL)
     fake_pc.gate_trigger.set(I03Axes.OMEGA)
