@@ -1,47 +1,110 @@
-from ophyd.areadetector.base import ADComponent as Cpt
-from ophyd.areadetector.detectors import DetectorBase
+import asyncio
+from enum import Enum
+from typing import Dict, Optional
 
-from .adutils import Hdf5Writer, SingleTriggerV33, SynchronisedAdDriverBase
+from bluesky.protocols import HasHints, Hints
+from ophyd_async.core import (
+    AsyncStatus,
+    DetectorControl,
+    DetectorTrigger,
+    DirectoryProvider,
+    StandardDetector,
+    set_and_wait_for_value,
+)
+from ophyd_async.epics.areadetector.drivers import ADBase, ADBaseShapeProvider
+from ophyd_async.epics.areadetector.utils import ImageMode, ad_rw, stop_busy_record
+from ophyd_async.epics.areadetector.writers import HDFWriter, NDFileHDF, NDPluginStats
 
 
-class AdSimDetector(SingleTriggerV33, DetectorBase):
-    cam = Cpt(SynchronisedAdDriverBase, suffix="CAM:", lazy=True)
-    hdf = Cpt(
-        Hdf5Writer,
-        suffix="HDF5:",
-        root="",
-        write_path_template="",
-        lazy=True,
-    )
+class AdSimTriggerMode(str, Enum):
+    Internal = "Internal"
+    External = "External"
 
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.hdf.kind = "normal"
 
-        self.stage_sigs = {
-            # Get stage to wire up the plugins
-            self.hdf.nd_array_port: self.cam.port_name.get(),
-            # Reset array counter on stage
-            self.cam.array_counter: 0,
-            # Set image mode to multiple on stage so we have the option, can still
-            # set num_images to 1
-            self.cam.image_mode: "Multiple",
-            # For now, this Ophyd device does not support hardware
-            # triggered scanning, disable on stage
-            self.cam.trigger_mode: "Internal",
-            **self.stage_sigs,  # type: ignore
-        }
+class AdSimDriver(ADBase):
+    def __init__(self, prefix: str, name: str = "") -> None:
+        self.image_mode = ad_rw(ImageMode, prefix + "ImageMode")
+        self.trigger_mode = ad_rw(AdSimTriggerMode, prefix + "TriggerMode")
+        # Acquisition period, including deadtime
+        self.acquire_period = ad_rw(float, prefix + "AcquirePeriod")
+        # Exposures per image
+        self.num_exposures = ad_rw(int, prefix + "NumExposures")
+        super().__init__(prefix, name=name)
 
-    def stage(self, *args, **kwargs) -> list[object]:
-        # We have to manually set the acquire period bcause the EPICS driver
-        # doesn't do it for us. If acquire time is a staged signal, we use the
-        # stage value to calculate the acquire period, otherwise we perform
-        # a caget and use the current acquire time.
-        if self.cam.acquire_time in self.stage_sigs:
-            acquire_time = self.stage_sigs[self.cam.acquire_time]
+
+class AdSimController(DetectorControl):
+    TRIGGER_SOURCE: Dict[DetectorTrigger, AdSimTriggerMode] = {
+        DetectorTrigger.internal: AdSimTriggerMode.Internal,
+        DetectorTrigger.constant_gate: AdSimTriggerMode.External,
+        DetectorTrigger.edge_trigger: AdSimTriggerMode.External,
+        DetectorTrigger.variable_gate: AdSimTriggerMode.External,
+    }
+
+    def __init__(self, driver: AdSimDriver) -> None:
+        self.driver = driver
+
+    async def arm(
+        self,
+        trigger: DetectorTrigger = DetectorTrigger.internal,
+        num: int = 0,
+        exposure: Optional[float] = None,
+    ) -> AsyncStatus:
+        if num == 0:
+            image_mode = ImageMode.continuous
+        elif num == 1:
+            image_mode = ImageMode.single
         else:
-            acquire_time = self.cam.acquire_time.get()
-        self.stage_sigs[self.cam.acquire_period] = acquire_time
+            image_mode = ImageMode.multiple
 
-        # Now calling the super method should set the acquire period
-        return super().stage(*args, **kwargs)
+        if exposure is not None:
+            await self.driver.acquire_time.set(exposure)
+
+        await asyncio.gather(
+            self.driver.trigger_mode.set(self.TRIGGER_SOURCE[trigger]),
+            self.driver.num_images.set(num),
+            self.driver.image_mode.set(image_mode),
+        )
+
+        return await set_and_wait_for_value(self.driver.acquire, True)
+
+    async def disarm(self):
+        await stop_busy_record(self.driver.acquire, False, timeout=1)
+
+    def get_deadtime(self, exposure: float) -> float:
+        return asyncio.run(self.driver.acquire_period.get_value()) - exposure
+
+
+class AdSimDetector(StandardDetector, HasHints):
+    """
+    Ophyd-async implementation of the SimAreaDetector
+    """
+
+    def __init__(
+        self,
+        name: str,
+        prefix: str,
+        directory_provider: DirectoryProvider,
+    ):
+        drv = AdSimDriver(prefix + "CAM:")
+        hdf = NDFileHDF(prefix + "HDF5:")
+
+        self.drv = drv
+        self.hdf = hdf
+        self.stats = NDPluginStats(prefix + "STAT:")
+
+        super().__init__(
+            AdSimController(drv),
+            HDFWriter(
+                hdf,
+                directory_provider,
+                lambda: self.name,
+                ADBaseShapeProvider(drv),
+                sum="StatsTotal",
+            ),
+            config_sigs=[drv.acquire_time, drv.acquire],
+            name=name,
+        )
+
+    @property
+    def hints(self) -> Hints:
+        return self.writer.hints
