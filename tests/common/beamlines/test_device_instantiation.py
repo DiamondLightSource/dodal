@@ -6,6 +6,8 @@ from dodal.beamlines import all_beamline_modules
 from dodal.common.beamlines import beamline_utils
 from dodal.utils import BLUESKY_PROTOCOLS, make_all_devices
 
+ALL_BEAMLINES = {"adsim", "i03", "i04", "i04_1", "i23", "i24", "p38", "p45"}
+
 
 def follows_bluesky_protocols(obj: Any) -> bool:
     return any(isinstance(obj, protocol) for protocol in BLUESKY_PROTOCOLS)
