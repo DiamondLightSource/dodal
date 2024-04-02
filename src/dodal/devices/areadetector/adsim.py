@@ -51,8 +51,6 @@ class AdSimController(DetectorControl):
     ) -> AsyncStatus:
         if num == 0:
             image_mode = ImageMode.continuous
-        elif num == 1:
-            image_mode = ImageMode.single
         else:
             image_mode = ImageMode.multiple
 
@@ -71,7 +69,7 @@ class AdSimController(DetectorControl):
         await stop_busy_record(self.driver.acquire, False, timeout=1)
 
     def get_deadtime(self, exposure: float) -> float:
-        return asyncio.run(self.driver.acquire_period.get_value()) - exposure
+        return min(0, asyncio.run(self.driver.acquire_period.get_value()) - exposure)
 
 
 class AdSimDetector(StandardDetector, HasHints):
@@ -107,4 +105,5 @@ class AdSimDetector(StandardDetector, HasHints):
 
     @property
     def hints(self) -> Hints:
+        assert isinstance(self.writer, HDFWriter)
         return self.writer.hints
