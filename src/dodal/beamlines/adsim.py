@@ -1,4 +1,4 @@
-from dodal.beamlines.beamline_utils import device_instantiation
+from dodal.beamlines.beamline_utils import device_instantiation, get_directory_provider
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.adsim import SimStage
 from dodal.devices.areadetector import AdSimDetector
@@ -31,4 +31,5 @@ def adsim(
         "-AD-SIM-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        directory_provider=get_directory_provider(),
     )
