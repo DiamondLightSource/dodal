@@ -180,10 +180,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/341-new-j20-setup/"
   },
   {
-    "version": "356_zebra-to-ophyd-async",
-    "url": "https://DiamondLightSource.github.io/dodal/356_zebra-to-ophyd-async/"
-  },
-  {
     "version": "391_aperture_scatterguard_ophyd_async",
     "url": "https://DiamondLightSource.github.io/dodal/391_aperture_scatterguard_ophyd_async/"
   },
@@ -206,6 +202,10 @@
   {
     "version": "adsim-fixes",
     "url": "https://DiamondLightSource.github.io/dodal/adsim-fixes/"
+  },
+  {
+    "version": "adsim_async",
+    "url": "https://DiamondLightSource.github.io/dodal/adsim_async/"
   },
   {
     "version": "allow_both_v1_and_v2_ophyd_devices",
