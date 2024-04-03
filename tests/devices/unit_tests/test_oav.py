@@ -119,14 +119,12 @@ def test_bottom_right_from_top_left():
 def test_when_zoom_1_then_flat_field_applied(fake_oav: OAV):
     RE = RunEngine()
     RE(bps.abs_set(fake_oav.zoom_controller, "1.0x"))
-    assert fake_oav.mxsc.input_plugin.get() == "PROC"
     assert fake_oav.snapshot.input_plugin.get() == "PROC"
 
 
 def test_when_zoom_not_1_then_flat_field_removed(fake_oav: OAV):
     RE = RunEngine()
     RE(bps.abs_set(fake_oav.zoom_controller, "10.0x"))
-    assert fake_oav.mxsc.input_plugin.get() == "CAM"
     assert fake_oav.snapshot.input_plugin.get() == "CAM"
 
 
@@ -135,11 +133,9 @@ def test_when_zoom_is_externally_changed_to_1_then_flat_field_not_changed(
 ):
     """This test is required to ensure that Hyperion doesn't cause unexpected behaviour
     e.g. change the flatfield when the zoom level is changed through the synoptic"""
-    fake_oav.mxsc.input_plugin.sim_put("CAM")  # type: ignore
     fake_oav.snapshot.input_plugin.sim_put("CAM")  # type: ignore
 
     fake_oav.zoom_controller.level.sim_put("1.0x")  # type: ignore
-    assert fake_oav.mxsc.input_plugin.get() == "CAM"
     assert fake_oav.snapshot.input_plugin.get() == "CAM"
 
 
