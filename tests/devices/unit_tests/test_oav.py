@@ -68,7 +68,8 @@ def test_snapshot_trigger_saves_to_correct_file(
 ):
     image = PIL.Image.open("test")
     mock_save = MagicMock()
-    image.save = mock_save
+    # mypy doesn't like method assignments
+    image.save = mock_save  # type: ignore
     mock_open.return_value.__enter__.return_value = image
     st = fake_oav.snapshot.trigger()
     st.wait()
