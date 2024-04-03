@@ -8,7 +8,7 @@ from ophyd.status import Status
 
 from dodal.devices.detector import DetectorParams, TriggerMode
 from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
-from dodal.devices.eiger import EigerDetector
+from dodal.devices.eiger import TEST_1169_FIX, EigerDetector
 from dodal.devices.status import await_value
 from dodal.devices.util.epics_util import run_functions_without_blocking
 from dodal.log import LOGGER
@@ -27,6 +27,8 @@ TEST_NUM_IMAGES_PER_TRIGGER = 1
 TEST_NUM_TRIGGERS = 2000
 TEST_USE_ROI_MODE = False
 TEST_DET_DIST_TO_BEAM_CONVERTER_PATH = "tests/devices/unit_tests/test_lookup_table.txt"
+
+TEST_1169_FIX = True
 
 
 class StatusException(Exception):
@@ -57,6 +59,7 @@ def fake_eiger(request):
     fake_eiger: EigerDetector = FakeEigerDetector.with_params(
         params=create_new_params(), name=f"test fake Eiger: {request.node.name}"
     )
+    fake_eiger.odin.stop = MagicMock()
     return fake_eiger
 
 
@@ -656,6 +659,7 @@ def test_unwrapped_arm_chain_functions_are_not_called_outside_util(
     fake_eiger.do_arming_chain()
 
     funcs = [
+        fake_eiger.odin.stop,
         fake_eiger.enable_roi_mode,
         fake_eiger.set_detector_threshold,
         fake_eiger.set_cam_pvs,
