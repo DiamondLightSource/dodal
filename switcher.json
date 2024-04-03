@@ -144,6 +144,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/1.11.3/"
   },
   {
+    "version": "1169_error_in_arming_the_detector_after_beam_dump",
+    "url": "https://DiamondLightSource.github.io/dodal/1169_error_in_arming_the_detector_after_beam_dump/"
+  },
+  {
     "version": "141_i04_devices",
     "url": "https://DiamondLightSource.github.io/dodal/141_i04_devices/"
   },
@@ -238,10 +242,6 @@
   {
     "version": "directory_provider",
     "url": "https://DiamondLightSource.github.io/dodal/directory_provider/"
-  },
-  {
-    "version": "fix-mypy-errors",
-    "url": "https://DiamondLightSource.github.io/dodal/fix-mypy-errors/"
   },
   {
     "version": "fix_linting_CI_issues",
