@@ -1,5 +1,8 @@
-from dodal.beamlines.beamline_utils import device_instantiation, get_directory_provider
-from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.beamline_utils import (
+    device_instantiation,
+    get_directory_provider,
+)
+from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.adsim import SimStage
 from dodal.devices.areadetector import AdSimDetector
 from dodal.log import set_beamline as set_log_beamline
