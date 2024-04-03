@@ -15,7 +15,7 @@ class Orientation(Enum):
 
 
 def _add_parallel_lines_to_image(
-    image: Image,
+    image: Image.Image,
     start_x: int,
     start_y: int,
     line_length: int,

@@ -67,17 +67,16 @@ def test_snapshot_trigger_saves_to_correct_file(
     mock_open: MagicMock, mock_get, fake_oav
 ):
     image = PIL.Image.open("test")
-    mock_save = MagicMock()
-    image.save = mock_save
     mock_open.return_value.__enter__.return_value = image
-    st = fake_oav.snapshot.trigger()
-    st.wait()
-    expected_calls_to_save = [
-        call(f"test directory/test filename{addition}.png")
-        for addition in ["", "_outer_overlay", "_grid_overlay"]
-    ]
-    calls_to_save = mock_save.mock_calls
-    assert calls_to_save == expected_calls_to_save
+    with patch.object(image, "save") as mock_save:
+        st = fake_oav.snapshot.trigger()
+        st.wait()
+        expected_calls_to_save = [
+            call(f"test directory/test filename{addition}.png")
+            for addition in ["", "_outer_overlay", "_grid_overlay"]
+        ]
+        calls_to_save = mock_save.mock_calls
+        assert calls_to_save == expected_calls_to_save
 
 
 @patch("requests.get")
