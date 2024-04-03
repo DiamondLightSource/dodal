@@ -1,13 +1,62 @@
+from unittest.mock import AsyncMock
+
 import pytest
+from bluesky.run_engine import RunEngine
 from mockito import mock, verify
-from ophyd.sim import make_fake_device
 
 from dodal.devices.zebra import (
+    ArmDemand,
+    ArmingDevice,
+    ArmSource,
     GateType,
+    I03Axes,
     LogicGateConfiguration,
     LogicGateConfigurer,
+    PositionCompare,
+    TrigSource,
     boolean_array_to_integer,
 )
+
+
+async def test_arming_device():
+    RunEngine()
+    arming_device = ArmingDevice("", name="fake arming device")
+    await arming_device.connect(sim=True)
+    status = arming_device.set(ArmDemand.DISARM)
+    await status
+    assert status.success
+    assert await arming_device.disarm_set.get_value() == 1
+
+
+async def test_position_compare_sets_signals():
+    RunEngine()
+    fake_pc = PositionCompare("", name="fake position compare")
+    await fake_pc.connect(sim=True)
+
+    async def mock_arm(demand):
+        fake_pc.arm.disarm_set._backend._set_value(not demand)  # type: ignore
+        fake_pc.arm.arm_set._backend._set_value(demand)  # type: ignore
+        await fake_pc.arm.armed.set(demand)
+
+    fake_pc.arm.arm_set.set = AsyncMock(side_effect=mock_arm)
+    fake_pc.arm.disarm_set.set = AsyncMock(side_effect=mock_arm)
+
+    fake_pc.gate_source.set(TrigSource.EXTERNAL)
+    fake_pc.gate_trigger.set(I03Axes.OMEGA)
+    fake_pc.num_gates.set(10)
+
+    assert await fake_pc.gate_source.get_value() == "External"
+    assert await fake_pc.gate_trigger.get_value() == "Enc4"
+    assert await fake_pc.num_gates.get_value() == 10
+
+    fake_pc.arm_source.set(ArmSource.SOFT)
+    status = fake_pc.arm.set(ArmDemand.ARM)
+    await status
+
+    assert await fake_pc.arm_source.get_value() == "Soft"
+    assert await fake_pc.arm.arm_set.get_value() == 1
+    assert await fake_pc.arm.disarm_set.get_value() == 0
+    assert await fake_pc.is_armed()
 
 
 @pytest.mark.parametrize(
@@ -45,14 +94,20 @@ def test_logic_gate_configuration_62_and_34_inv_and_15_inv():
     assert str(config) == "INP1=62, INP2=!34, INP3=!15"
 
 
-def run_configurer_test(gate_type: GateType, gate_num, config, expected_pv_values):
-    FakeLogicConfigurer = make_fake_device(LogicGateConfigurer)
-    configurer = FakeLogicConfigurer(name="test fake logicconfigurer")
+async def run_configurer_test(
+    gate_type: GateType,
+    gate_num,
+    config,
+    expected_pv_values,
+):
+    RunEngine()
+    configurer = LogicGateConfigurer(prefix="", name="test fake logicconfigurer")
+    await configurer.connect(sim=True)
 
     mock_gate_control = mock()
     mock_pvs = [mock() for i in range(6)]
     mock_gate_control.enable = mock_pvs[0]
-    mock_gate_control.sources = mock_pvs[1:5]
+    mock_gate_control.sources = {i: mock_pvs[i] for i in range(1, 5)}
     mock_gate_control.invert = mock_pvs[5]
     configurer.all_gates[gate_type][gate_num - 1] = mock_gate_control
 
@@ -62,21 +117,21 @@ def run_configurer_test(gate_type: GateType, gate_num, config, expected_pv_value
         configurer.apply_or_gate_config(gate_num, config)
 
     for pv, value in zip(mock_pvs, expected_pv_values):
-        verify(pv).put(value)
+        verify(pv).set(value)
 
 
-def test_apply_and_logic_gate_configuration_32_and_51_inv_and_1():
+async def test_apply_and_logic_gate_configuration_32_and_51_inv_and_1():
     config = LogicGateConfiguration(32).add_input(51, True).add_input(1)
     expected_pv_values = [7, 32, 51, 1, 0, 2]
 
-    run_configurer_test(GateType.AND, 1, config, expected_pv_values)
+    await run_configurer_test(GateType.AND, 1, config, expected_pv_values)
 
 
-def test_apply_or_logic_gate_configuration_19_and_36_inv_and_60_inv():
+async def test_apply_or_logic_gate_configuration_19_and_36_inv_and_60_inv():
     config = LogicGateConfiguration(19).add_input(36, True).add_input(60, True)
     expected_pv_values = [7, 19, 36, 60, 0, 6]
 
-    run_configurer_test(GateType.OR, 2, config, expected_pv_values)
+    await run_configurer_test(GateType.OR, 2, config, expected_pv_values)
 
 
 @pytest.mark.parametrize(
