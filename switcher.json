@@ -184,6 +184,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/391_aperture_scatterguard_ophyd_async/"
   },
   {
+    "version": "411_drop_py_3_9",
+    "url": "https://DiamondLightSource.github.io/dodal/411_drop_py_3_9/"
+  },
+  {
     "version": "51_aperture_scatterguard_no_positions",
     "url": "https://DiamondLightSource.github.io/dodal/51_aperture_scatterguard_no_positions/"
   },
