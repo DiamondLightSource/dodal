@@ -1,5 +1,3 @@
-from typing import Optional
-
 from ophyd_async.panda import PandA
 
 from dodal.beamlines.beamline_utils import device_instantiation
@@ -101,7 +99,7 @@ def vfm_mirror_voltages(
 def aperture_scatterguard(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
-    aperture_positions: Optional[AperturePositions] = None,
+    aperture_positions: AperturePositions | None = None,
 ) -> ApertureScatterguard:
     """Get the i03 aperture and scatterguard device, instantiate it if it hasn't already
     been. If this is called when already instantiated in i03, it will return the existing
@@ -157,7 +155,7 @@ def detector_motion(
 def eiger(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
-    params: Optional[DetectorParams] = None,
+    params: DetectorParams | None = None,
 ) -> EigerDetector:
     """Get the i03 Eiger device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.

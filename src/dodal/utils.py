@@ -17,7 +17,6 @@ from typing import (
     Iterable,
     List,
     Mapping,
-    Optional,
     Type,
     TypeVar,
 )
@@ -84,7 +83,7 @@ def get_hostname() -> str:
 @dataclass
 class BeamlinePrefix:
     ixx: str
-    suffix: Optional[str] = None
+    suffix: str | None = None
 
     def __post_init__(self):
         self.suffix = self.ixx[0].upper() if not self.suffix else self.suffix

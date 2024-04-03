@@ -2,7 +2,6 @@ import dataclasses
 import getpass
 import socket
 from dataclasses import dataclass
-from typing import Optional
 
 import zocalo.configuration
 from workflows.transport import lookup
@@ -32,7 +31,7 @@ class ZocaloStartInfo:
     """
 
     ispyb_dcid: int
-    filename: Optional[str]
+    filename: str | None
     start_frame_index: int
     number_of_frames: int
     message_index: int
