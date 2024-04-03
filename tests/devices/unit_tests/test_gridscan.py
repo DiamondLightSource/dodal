@@ -1,5 +1,3 @@
-from typing import Union
-
 import numpy as np
 import pytest
 from bluesky import plan_stubs as bps
@@ -19,7 +17,7 @@ from dodal.devices.fast_grid_scan import (
 from dodal.devices.smargon import Smargon
 
 
-def discard_status(st: Union[Status, DeviceStatus]):
+def discard_status(st: Status | DeviceStatus):
     try:
         st.wait(0.01)
     except BaseException:
