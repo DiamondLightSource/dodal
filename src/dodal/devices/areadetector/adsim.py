@@ -1,48 +1,45 @@
-from ophyd import Component as Cpt
-from ophyd.areadetector.base import ADComponent as Cpt
-from ophyd.areadetector.detectors import DetectorBase
+from bluesky.protocols import HasHints, Hints
+from ophyd_async.core import (
+    DirectoryProvider,
+    StandardDetector,
+)
+from ophyd_async.epics.areadetector.controllers import ADSimController
+from ophyd_async.epics.areadetector.drivers import ADBase, ADBaseShapeProvider
+from ophyd_async.epics.areadetector.writers import HDFWriter, NDFileHDF, NDPluginStats
 
-from .adutils import Hdf5Writer, SingleTriggerV33, SynchronisedAdDriverBase
 
+class AdSimDetector(StandardDetector, HasHints):
+    """
+    Ophyd-async implementation of the SimAreaDetector
+    """
 
-class AdSimDetector(SingleTriggerV33, DetectorBase):
-    cam = Cpt(SynchronisedAdDriverBase, suffix="CAM:", lazy=True)
-    hdf = Cpt(
-        Hdf5Writer,
-        suffix="HDF5:",
-        root="",
-        write_path_template="",
-        lazy=True,
-    )
+    def __init__(
+        self,
+        name: str,
+        prefix: str,
+        directory_provider: DirectoryProvider,
+    ):
+        drv = ADBase(prefix + "CAM:")
+        hdf = NDFileHDF(prefix + "HDF5:")
 
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.hdf.kind = "normal"
+        self.drv = drv
+        self.hdf = hdf
+        self.stats = NDPluginStats(prefix + "STAT:")
 
-        self.stage_sigs = {
-            # Get stage to wire up the plugins
-            self.hdf.nd_array_port: self.cam.port_name.get(),
-            # Reset array counter on stage
-            self.cam.array_counter: 0,
-            # Set image mode to multiple on stage so we have the option, can still
-            # set num_images to 1
-            self.cam.image_mode: "Multiple",
-            # For now, this Ophyd device does not support hardware
-            # triggered scanning, disable on stage
-            self.cam.trigger_mode: "Internal",
-            **self.stage_sigs,  # type: ignore
-        }
+        super().__init__(
+            ADSimController(drv),
+            HDFWriter(
+                hdf,
+                directory_provider,
+                lambda: self.name,
+                ADBaseShapeProvider(drv),
+                sum="StatsTotal",
+            ),
+            config_sigs=[drv.acquire_time, drv.acquire],
+            name=name,
+        )
 
-    def stage(self, *args, **kwargs):
-        # We have to manually set the acquire period bcause the EPICS driver
-        # doesn't do it for us. If acquire time is a staged signal, we use the
-        # stage value to calculate the acquire period, otherwise we perform
-        # a caget and use the current acquire time.
-        if self.cam.acquire_time in self.stage_sigs:
-            acquire_time = self.stage_sigs[self.cam.acquire_time]
-        else:
-            acquire_time = self.cam.acquire_time.get()
-        self.stage_sigs[self.cam.acquire_period] = acquire_time
-
-        # Now calling the super method should set the acquire period
-        super(AdSimDetector, self).stage(*args, **kwargs)
+    @property
+    def hints(self) -> Hints:
+        assert isinstance(self.writer, HDFWriter)
+        return self.writer.hints
