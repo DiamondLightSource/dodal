@@ -59,7 +59,6 @@ def fake_eiger(request):
     fake_eiger: EigerDetector = FakeEigerDetector.with_params(
         params=create_new_params(), name=f"test fake Eiger: {request.node.name}"
     )
-    fake_eiger.odin.stop = MagicMock()
     return fake_eiger
 
 
@@ -636,6 +635,7 @@ def test_unwrapped_arm_chain_functions_are_not_called_outside_util(
     call_func: MagicMock,
     fake_eiger: EigerDetector,
 ):
+    fake_eiger.odin.stop = MagicMock(return_value=Status(done=True, success=True))
     fake_eiger.detector_params.use_roi_mode = True
     done_status = Status(done=True, success=True)
 
