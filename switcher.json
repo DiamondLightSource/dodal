@@ -260,10 +260,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1007_reset_stub_offsets_if_required/"
   },
   {
-    "version": "hyperion_1033_clarify_desired_transmission",
-    "url": "https://DiamondLightSource.github.io/dodal/hyperion_1033_clarify_desired_transmission/"
-  },
-  {
     "version": "hyperion_1167_detector_not_cleaned_after_smargon_fail",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1167_detector_not_cleaned_after_smargon_fail/"
   },
@@ -274,6 +270,10 @@
   {
     "version": "hyperion_1227_edge_array_logging",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1227_edge_array_logging/"
+  },
+  {
+    "version": "hyperion_698",
+    "url": "https://DiamondLightSource.github.io/dodal/hyperion_698/"
   },
   {
     "version": "hyperion_698_refactor_parameters",
