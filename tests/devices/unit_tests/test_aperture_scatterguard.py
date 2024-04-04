@@ -162,9 +162,7 @@ async def test_aperture_scatterguard_select_top_moves_assembly_down_then_sg_up(
     aperture_positions: AperturePositions, aperture_in_medium_pos: ApertureScatterguard
 ):
     aperture_scatterguard = aperture_in_medium_pos
-    call_logger = await install_logger_for_aperture_and_scatterguard(
-        aperture_scatterguard
-    )
+    call_logger = install_logger_for_aperture_and_scatterguard(aperture_scatterguard)
 
     await aperture_scatterguard.set(aperture_positions.LARGE)  # type: ignore
 
