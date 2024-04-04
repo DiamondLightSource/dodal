@@ -3,11 +3,9 @@ import pytest
 from bluesky import plan_stubs as bps
 from bluesky import preprocessors as bpp
 from bluesky.run_engine import RunEngine
-from mockito import mock, verify, when
-from mockito.matchers import ANY, ARGS, KWARGS
 from ophyd.sim import make_fake_device
 from ophyd.status import DeviceStatus, Status
-from ophyd.utils.errors import StatusTimeoutError
+from ophyd_async.core import DeviceCollector, set_sim_value
 
 from dodal.devices.fast_grid_scan import (
     FastGridScan,
@@ -25,97 +23,46 @@ def discard_status(st: Status | DeviceStatus):
 
 
 @pytest.fixture
-def fast_grid_scan(request):
-    FakeFastGridScan = make_fake_device(FastGridScan)
-    fast_grid_scan: FastGridScan = FakeFastGridScan(
-        name=f"test fake FGS: {request.node.name}"
-    )
-    fast_grid_scan.scan_invalid.pvname = ""
-    yield fast_grid_scan
+async def fast_grid_scan(request):
+    async with DeviceCollector(sim=True):
+        fast_grid_scan = FastGridScan(name="fake_FGS", prefix="FGS")
+
+    # fast_grid_scan.scan_invalid.pvname = ""
+    return fast_grid_scan
 
 
-def test_given_settings_valid_when_kickoff_then_run_started(
+async def fake_get_value(value):
+    return value
+
+
+async def test_given_settings_valid_when_kickoff_then_run_started(
     fast_grid_scan: FastGridScan,
 ):
-    when(fast_grid_scan.scan_invalid).get().thenReturn(False)
-    when(fast_grid_scan.position_counter).get().thenReturn(0)
+    set_sim_value(fast_grid_scan.scan_invalid, False)
+    set_sim_value(fast_grid_scan.position_counter, 0)
+    set_sim_value(fast_grid_scan.status, 1)
 
-    mock_run_set_status = mock()
-    when(fast_grid_scan.run_cmd).put(ANY).thenReturn(mock_run_set_status)
-    fast_grid_scan.status.subscribe = lambda func, **_: func(1)  # type: ignore
+    await fast_grid_scan.kickoff()
 
-    status = fast_grid_scan.kickoff()
-
-    status.wait()
-    assert status.exception() is None
-
-    verify(fast_grid_scan.run_cmd).put(1)
+    assert await fast_grid_scan.run_cmd.get_value() == 1
 
 
-def test_waits_for_running_motion(
+async def test_waits_for_running_motion(
     fast_grid_scan: FastGridScan,
 ):
-    when(fast_grid_scan.motion_program.running).get().thenReturn(1)
+    set_sim_value(fast_grid_scan.motion_program.running, 1)
 
     fast_grid_scan.KICKOFF_TIMEOUT = 0.01
 
-    with pytest.raises(StatusTimeoutError):
-        status = fast_grid_scan.kickoff()
-        status.wait()
+    with pytest.raises(TimeoutError):
+        await fast_grid_scan.kickoff()
 
     fast_grid_scan.KICKOFF_TIMEOUT = 1
 
-    mock_run_set_status = mock()
-    when(fast_grid_scan.run_cmd).put(ANY).thenReturn(mock_run_set_status)
-    fast_grid_scan.status.subscribe = lambda func, **_: func(1)  # type: ignore
-
-    when(fast_grid_scan.motion_program.running).get().thenReturn(0)
-    status = fast_grid_scan.kickoff()
-    status.wait()
-    verify(fast_grid_scan.run_cmd).put(1)
-
-
-def run_test_on_complete_watcher(
-    RE: RunEngine, fast_grid_scan: FastGridScan, num_pos_1d, put_value, expected_frac
-):
-    RE(
-        set_fast_grid_scan_params(
-            fast_grid_scan,
-            GridScanParams(
-                x_steps=num_pos_1d,
-                y_steps=num_pos_1d,
-                transmission_fraction=0.01,
-            ),
-        )
-    )
-
-    complete_status = fast_grid_scan.complete()
-    watcher = mock()
-    complete_status.watch(watcher)
-
-    fast_grid_scan.position_counter.sim_put(put_value)  # type: ignore
-    verify(watcher).__call__(
-        *ARGS,
-        current=put_value,
-        target=num_pos_1d**2,
-        fraction=expected_frac,
-        **KWARGS,
-    )
-    return complete_status
-
-
-def test_when_new_image_then_complete_watcher_notified(
-    fast_grid_scan: FastGridScan, RE: RunEngine
-):
-    status = run_test_on_complete_watcher(RE, fast_grid_scan, 2, 1, 3 / 4)
-    discard_status(status)
-
-
-def test_given_0_expected_images_then_complete_watcher_correct(
-    fast_grid_scan: FastGridScan, RE: RunEngine
-):
-    status = run_test_on_complete_watcher(RE, fast_grid_scan, 0, 1, 0)
-    discard_status(status)
+    set_sim_value(fast_grid_scan.motion_program.running, 0)
+    set_sim_value(fast_grid_scan.status, 1)
+    await fast_grid_scan.kickoff()
+    assert await fast_grid_scan.run_cmd.get_value() == 1
 
 
 @pytest.mark.parametrize(
@@ -126,22 +73,14 @@ def test_given_0_expected_images_then_complete_watcher_correct(
         ((7, 0, 5), 35),
     ],
 )
-def test_given_different_step_numbers_then_expected_images_correct(
+async def test_given_different_step_numbers_then_expected_images_correct(
     fast_grid_scan: FastGridScan, steps, expected_images
 ):
-    fast_grid_scan.x_steps.sim_put(steps[0])  # type: ignore
-    fast_grid_scan.y_steps.sim_put(steps[1])  # type: ignore
-    fast_grid_scan.z_steps.sim_put(steps[2])  # type: ignore
+    set_sim_value(fast_grid_scan.x_steps, steps[0])
+    set_sim_value(fast_grid_scan.y_steps, steps[1])
+    set_sim_value(fast_grid_scan.z_steps, steps[2])
 
-    assert fast_grid_scan.expected_images.get() == expected_images
-
-
-def test_given_invalid_image_number_then_complete_watcher_correct(
-    fast_grid_scan: FastGridScan, RE: RunEngine
-):
-    complete_status = run_test_on_complete_watcher(RE, fast_grid_scan, 1, "BAD", None)
-    assert complete_status.exception()
-
+    assert await fast_grid_scan.expected_images.get_value() == expected_images
 
 def test_running_finished_with_all_images_done_then_complete_status_finishes_not_in_error(
     fast_grid_scan: FastGridScan, RE: RunEngine

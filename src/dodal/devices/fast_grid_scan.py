@@ -1,19 +1,20 @@
-import threading
-import time
 from typing import Any
 
 import numpy as np
 from bluesky.plan_stubs import mv
 from numpy import ndarray
-from ophyd.status import DeviceStatus, StatusBase
-from ophyd_async.core import Device, StandardReadable
+from ophyd_async.core import (
+    Device,
+    SignalRW,
+    SimSignalBackend,
+    StandardReadable,
+    wait_for_value,
+)
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 from pydantic import BaseModel, validator
 from pydantic.dataclasses import dataclass
 
 from dodal.devices.motors import XYZLimitBundle
-from dodal.devices.ophyd_async_utils import create_soft_signal_rw
-from dodal.devices.status import await_value
 from dodal.devices.util.epics_util import epics_signal_rw_rbv
 from dodal.log import LOGGER
 from dodal.parameters.experiment_parameter_base import AbstractExperimentWithBeamParams
@@ -177,62 +178,6 @@ class GridScanParams(GridScanParamsCommon):
         return dwell_time_ms
 
 
-class GridScanCompleteStatus(DeviceStatus):
-    """
-    A Status for the grid scan completion
-    A special status object that notifies watchers (progress bars)
-    based on comparing device.expected_images to device.position_counter.
-    """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.start_ts = time.time()
-
-        self.device.position_counter.subscribe(self._notify_watchers)
-        self.device.status.subscribe(self._running_changed)
-
-        self._name = self.device.name
-        self._target_count = self.device.expected_images.get()
-
-    def _notify_watchers(self, value, *args, **kwargs):
-        if not self._watchers:
-            return
-        time_elapsed = time.time() - self.start_ts
-        try:
-            fraction = 1 - value / self._target_count
-        except ZeroDivisionError:
-            fraction = 0
-            time_remaining = 0
-        except Exception as e:
-            fraction = None
-            time_remaining = None
-            self.set_exception(e)
-            self.clean_up()
-        else:
-            time_remaining = time_elapsed / fraction
-        for watcher in self._watchers:
-            watcher(
-                name=self._name,
-                current=value,
-                initial=0,
-                target=self._target_count,
-                unit="images",
-                precision=0,
-                fraction=fraction,
-                time_elapsed=time_elapsed,
-                time_remaining=time_remaining,
-            )
-
-    def _running_changed(self, value=None, old_value=None, **kwargs):
-        if (old_value == 1) and (value == 0):
-            self.set_finished()
-            self.clean_up()
-
-    def clean_up(self):
-        self.device.position_counter.clear_sub(self._notify_watchers)
-        self.device.status.clear_sub(self._running_changed)
-
-
 class MotionProgram(Device):
     def __init__(self, prefix: str, name: str = "") -> None:
         super().__init__(name)
@@ -240,13 +185,19 @@ class MotionProgram(Device):
         self.program_number = epics_signal_r(float, prefix + "CS1:PROG_NUM")
 
 
-# async def read_expected_images():
-#     x = int(await self.x_steps.get_value())
-#     y = int(await self.y_steps.get_value())
-#     z = int(await self.z_steps.get_value())
-#     first_grid = x * y
-#     second_grid = x * z
-#     self.expected_images.set(first_grid + second_grid)
+class ExpectedImages(SignalRW):
+    def __init__(self, parent) -> None:
+        super().__init__(SimSignalBackend(int, "sim://expected_images:expected_images"))
+        self.parent = parent
+
+    async def get_value(self):
+        x = int(await self.parent.x_steps.get_value())  # type: ignore
+        y = int(await self.parent.y_steps.get_value())  # type: ignore
+        z = int(await self.parent.z_steps.get_value())  # type: ignore
+        first_grid = x * y
+        second_grid = x * z
+        await self.set(first_grid + second_grid)
+        return first_grid + second_grid
 
 
 class FastGridScan(StandardReadable):
@@ -273,57 +224,34 @@ class FastGridScan(StandardReadable):
         self.y_counter = epics_signal_r(int, "FGS:Y_COUNTER")
         self.scan_invalid = epics_signal_r(float, "FGS:SCAN_INVALID")
 
-        self.run_cmd = epics_signal_rw(str, "FGS:RUN.PROC")
-        self.stop_cmd = epics_signal_rw(str, "FGS:STOP.PROC")
+        self.run_cmd = epics_signal_rw(int, "FGS:RUN.PROC")
+        self.stop_cmd = epics_signal_rw(int, "FGS:STOP.PROC")
         self.status = epics_signal_r(float, "FGS:SCAN_STATUS")
 
-        self.expected_images = create_soft_signal_rw(int, "expected_images", self.name)
+        self.expected_images = ExpectedImages(parent=self)
 
         self.motion_program = MotionProgram(prefix)
 
         # Kickoff timeout in seconds
         self.KICKOFF_TIMEOUT: float = 5.0
 
-        async def set_expected_images():
-            x = int(await self.x_steps.get_value())
-            y = int(await self.y_steps.get_value())
-            z = int(await self.z_steps.get_value())
-            first_grid = x * y
-            second_grid = x * z
-            return first_grid + second_grid
-
-        self.expected_images.read = set_expected_images
-
     def is_invalid(self) -> bool:
-        if "GONP" in self.scan_invalid.pvname:
+        if "GONP" in self.scan_invalid.source:
             return False
-        return bool(self.scan_invalid.get())
+        return bool(self.scan_invalid.get_value())
 
-    def kickoff(self) -> StatusBase:
-        st = DeviceStatus(device=self, timeout=self.KICKOFF_TIMEOUT)
+    async def kickoff(self):
+        curr_prog = await self.motion_program.program_number.get_value()
+        running = await self.motion_program.running.get_value()
+        if running:
+            LOGGER.info(f"Motion program {curr_prog} still running, waiting...")
+            await wait_for_value(self.motion_program.running, 0, self.KICKOFF_TIMEOUT)
 
-        def scan():
-            try:
-                curr_prog = self.motion_program.program_number.get()
-                running = self.motion_program.running.get()
-                if running:
-                    LOGGER.info(f"Motion program {curr_prog} still running, waiting...")
-                    await_value(self.motion_program.running, 0).wait()
-                LOGGER.debug("Running scan")
-                self.run_cmd.put(1)
-                LOGGER.info("Waiting for FGS to start")
-                await_value(self.status, 1).wait()
-                st.set_finished()
-                LOGGER.debug(f"{st} finished, exiting FGS kickoff thread")
-            except Exception as e:
-                st.set_exception(e)
-
-        threading.Thread(target=scan, daemon=True).start()
-        LOGGER.info("Returning FGS kickoff status")
-        return st
-
-    def complete(self) -> DeviceStatus:
-        return GridScanCompleteStatus(self)
+        LOGGER.debug("Running scan")
+        await self.run_cmd.set(1)
+        LOGGER.info("Waiting for FGS to start")
+        await wait_for_value(self.status, 1, self.KICKOFF_TIMEOUT)
+        LOGGER.debug("FGS kicked off, exiting FGS kickoff thread")
 
     def collect(self):
         return {}
