@@ -131,7 +131,8 @@ class ApertureScatterguard(StandardReadable):
     ) -> AsyncStatus:
         motors: Sequence[ExtendedMotor] = self._get_motor_list()
         return reduce(
-            operator.and_, [motor.set(pos) for motor, pos in zip(motors, positions)]
+            operator.and_,
+            [motor.set(pos) for motor, pos in zip(motors, positions)],
         )
 
     async def _get_current_aperture_position(self) -> SingleAperturePosition:
