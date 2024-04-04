@@ -3,7 +3,7 @@ import logging
 from argparse import ArgumentParser
 from pathlib import Path
 from subprocess import CalledProcessError, check_output
-from typing import List
+from typing import List, Optional
 
 
 def report_output(stdout: bytes, label: str) -> List[str]:
@@ -24,7 +24,7 @@ def get_sorted_tags_list() -> List[str]:
     return report_output(stdout, "Tags list")
 
 
-def get_versions(ref: str, add: str | None, remove: str | None) -> List[str]:
+def get_versions(ref: str, add: Optional[str], remove: Optional[str]) -> List[str]:
     """Generate the file containing the list of all GitHub Pages builds."""
     # Get the directories (i.e. builds) from the GitHub Pages branch
     try:
