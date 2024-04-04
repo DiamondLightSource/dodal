@@ -34,16 +34,16 @@ async def ap_sg(aperture_positions: AperturePositions):
 
 
 @pytest.fixture
-def aperture_in_medium_pos(
+async def aperture_in_medium_pos(
     ap_sg: ApertureScatterguard,
     aperture_positions: AperturePositions,
 ):
     medium = aperture_positions.MEDIUM.location
-    ap_sg.aperture.x.set(medium.aperture_x)
-    ap_sg.aperture.y.set(medium.aperture_y)
-    ap_sg.aperture.z.set(medium.aperture_z)
-    ap_sg.scatterguard.x.set(medium.scatterguard_x)
-    ap_sg.scatterguard.y.set(medium.scatterguard_y)
+    await ap_sg.aperture.x.set(medium.aperture_x)
+    await ap_sg.aperture.y.set(medium.aperture_y)
+    await ap_sg.aperture.z.set(medium.aperture_z)
+    await ap_sg.scatterguard.x.set(medium.scatterguard_x)
+    await ap_sg.scatterguard.y.set(medium.scatterguard_y)
     ap_sg.aperture.medium._backend._set_value(1)  # type: ignore
     yield ap_sg
 
@@ -118,27 +118,23 @@ def test_aperture_scatterguard_rejects_unknown_position(aperture_in_medium_pos):
 #     )
 
 
-@patch("dodal.devices.aperturescatterguard.asyncio.gather")
 async def test_aperture_scatterguard_select_bottom_moves_sg_down_then_assembly_up(
-    asyncio_gather: AsyncMock,
     aperture_positions: AperturePositions,
     aperture_in_medium_pos: ApertureScatterguard,
 ):
+    call_logger = install_logger_for_aperture_and_scatterguard(aperture_in_medium_pos)
     aperture_scatterguard = aperture_in_medium_pos
 
     await aperture_scatterguard.set(aperture_positions.SMALL)
 
-    asyncio_gather.assert_has_calls(
-        # [
-        #     <SG X and Y>
-        #     <AP X, Y Z>
-        # ]
-        [
-            asyncio.gather(
-                call._mock_sg_x(5.3375), call._mock_sg_y(-3.55), call._mock_ap_x(2.43)
-            ),
-            asyncio.gather(call._mock_ap_y(48.974), call._mock_ap_z(15.8)),
-        ]
+    call_logger.assert_has_calls(
+        calls=[
+            call._mock_sg_x(5.3375),
+            call._mock_sg_y(-3.55),
+            call._mock_ap_x(2.43),
+            call._mock_ap_y(48.974),
+            call._mock_ap_z(15.8),
+        ],
     )
 
 

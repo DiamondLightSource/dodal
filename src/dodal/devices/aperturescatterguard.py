@@ -134,6 +134,7 @@ class ApertureScatterguard(StandardReadable):
             operator.and_,
             [motor.set(pos) for motor, pos in zip(motors, positions)],
         )
+        # return AsyncStatus(asyncio.gather(a._move(...),b._move(...),...))
 
     async def _get_current_aperture_position(self) -> SingleAperturePosition:
         """
