@@ -1,10 +1,7 @@
-import asyncio
-from unittest.mock import AsyncMock, call, patch
+from unittest.mock import AsyncMock, call
 
 import pytest
 from ophyd.sim import make_fake_device
-from ophyd_async.core import AsyncStatus, StandardReadable
-from ophyd_async.core.sim_signal_backend import SimSignalBackend
 
 from dodal.devices.aperturescatterguard import (
     ApertureFiveDimensionalLocation,

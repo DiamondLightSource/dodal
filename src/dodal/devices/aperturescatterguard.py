@@ -1,16 +1,13 @@
 import asyncio
-import operator
 from collections import namedtuple
 from dataclasses import dataclass
-from functools import reduce
-from typing import List, Optional, Sequence
+from typing import List, Optional
 
-from ophyd_async.core import AsyncStatus, SignalR, StandardReadable
+from ophyd_async.core import SignalR, StandardReadable
 from ophyd_async.core.sim_signal_backend import SimSignalBackend
 
 from dodal.devices.aperture import Aperture
 from dodal.devices.scatterguard import Scatterguard
-from dodal.devices.util.motor_utils import ExtendedMotor
 from dodal.log import LOGGER
 
 
