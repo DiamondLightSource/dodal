@@ -126,15 +126,19 @@ class ApertureScatterguard(StandardReadable):
             self.scatterguard.y,
         ]
 
-    def _set_raw_unsafe(
-        self, positions: ApertureFiveDimensionalLocation
-    ) -> AsyncStatus:
-        motors: Sequence[ExtendedMotor] = self._get_motor_list()
-        return reduce(
-            operator.and_,
-            [motor.set(pos) for motor, pos in zip(motors, positions)],
+    async def _set_raw_unsafe(self, positions: ApertureFiveDimensionalLocation):
+        """Accept the risks and move in an unsafe way. Collisions possible."""
+
+        # unpacking the position
+        aperture_x, aperture_y, aperture_z, scatterguard_x, scatterguard_y = positions
+
+        await asyncio.gather(
+            self.aperture.x._move(aperture_x),
+            self.aperture.y._move(aperture_y),
+            self.aperture.z._move(aperture_z),
+            self.scatterguard.x._move(scatterguard_x),
+            self.scatterguard.y._move(scatterguard_y),
         )
-        # return AsyncStatus(asyncio.gather(a._move(...),b._move(...),...))
 
     async def _get_current_aperture_position(self) -> SingleAperturePosition:
         """

@@ -98,26 +98,6 @@ def test_aperture_scatterguard_rejects_unknown_position(aperture_in_medium_pos):
         )
 
 
-# def test_aperture_scatterguard_select_bottom_moves_sg_down_then_assembly_up(
-#     aperture_positions: AperturePositions,
-#     aperture_in_medium_pos: ApertureScatterguard,
-# ):
-#     aperture_scatterguard = aperture_in_medium_pos
-#     call_logger = install_logger_for_aperture_and_scatterguard(aperture_scatterguard)
-
-#     aperture_scatterguard.set(aperture_positions.SMALL)  # type: ignore
-
-#     call_logger.assert_has_calls(
-#         [
-#             call._mock_sg_x(5.3375),
-#             call._mock_sg_y(-3.55),
-#             call._mock_ap_x(2.43),
-#             call._mock_ap_y(48.974),
-#             call._mock_ap_z(15.8),
-#         ]
-#     )
-
-
 async def test_aperture_scatterguard_select_bottom_moves_sg_down_then_assembly_up(
     aperture_positions: AperturePositions,
     aperture_in_medium_pos: ApertureScatterguard,
