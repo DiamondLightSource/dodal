@@ -5,20 +5,16 @@ from typing import Any
 import numpy as np
 from bluesky.plan_stubs import mv
 from numpy import ndarray
-from ophyd import (
-    Component,
-    Device,
-    EpicsSignal,
-    EpicsSignalRO,
-    EpicsSignalWithRBV,
-    Signal,
-)
 from ophyd.status import DeviceStatus, StatusBase
-from pydantic import validator
+from ophyd_async.core import Device, StandardReadable
+from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
+from pydantic import BaseModel, validator
 from pydantic.dataclasses import dataclass
 
 from dodal.devices.motors import XYZLimitBundle
+from dodal.devices.ophyd_async_utils import create_soft_signal_rw
 from dodal.devices.status import await_value
+from dodal.devices.util.epics_util import epics_signal_rw_rbv
 from dodal.log import LOGGER
 from dodal.parameters.experiment_parameter_base import AbstractExperimentWithBeamParams
 
@@ -238,59 +234,65 @@ class GridScanCompleteStatus(DeviceStatus):
 
 
 class MotionProgram(Device):
-    running = Component(EpicsSignalRO, "PROGBITS")
-    program_number = Component(EpicsSignalRO, "CS1:PROG_NUM")
+    def __init__(self, prefix: str, name: str = "") -> None:
+        super().__init__(name)
+        self.running = epics_signal_r(float, prefix + "PROGBITS")
+        self.program_number = epics_signal_r(float, prefix + "CS1:PROG_NUM")
 
 
-class FastGridScan(Device):
-    x_steps = Component(EpicsSignalWithRBV, "FGS:X_NUM_STEPS")
-    y_steps = Component(EpicsSignalWithRBV, "FGS:Y_NUM_STEPS")
-    z_steps = Component(EpicsSignalWithRBV, "FGS:Z_NUM_STEPS")
+# async def read_expected_images():
+#     x = int(await self.x_steps.get_value())
+#     y = int(await self.y_steps.get_value())
+#     z = int(await self.z_steps.get_value())
+#     first_grid = x * y
+#     second_grid = x * z
+#     self.expected_images.set(first_grid + second_grid)
 
-    x_step_size = Component(EpicsSignalWithRBV, "FGS:X_STEP_SIZE")
-    y_step_size = Component(EpicsSignalWithRBV, "FGS:Y_STEP_SIZE")
-    z_step_size = Component(EpicsSignalWithRBV, "FGS:Z_STEP_SIZE")
 
-    dwell_time_ms = Component(EpicsSignalWithRBV, "FGS:DWELL_TIME")
+class FastGridScan(StandardReadable):
+    def __init__(self, prefix: str, name: str = "") -> None:
+        super().__init__(name)
+        self.x_steps = epics_signal_rw_rbv(int, "FGS:X_NUM_STEPS")
+        self.y_steps = epics_signal_rw_rbv(int, "FGS:X_NUM_STEPS")
+        self.z_steps = epics_signal_rw_rbv(int, "FGS:X_NUM_STEPS")
+        self.x_step_size = epics_signal_rw_rbv(float, "FGS:X_STEP_SIZE")
+        self.y_step_size = epics_signal_rw_rbv(float, "FGS:Y_STEP_SIZE")
+        self.z_step_size = epics_signal_rw_rbv(float, "FGS:Z_STEP_SIZE")
+        self.dwell_time_ms = epics_signal_rw_rbv(float, "FGS:DWELL_TIME")
 
-    x_start = Component(EpicsSignalWithRBV, "FGS:X_START")
-    y1_start = Component(EpicsSignalWithRBV, "FGS:Y_START")
-    y2_start = Component(EpicsSignalWithRBV, "FGS:Y2_START")
-    z1_start = Component(EpicsSignalWithRBV, "FGS:Z_START")
-    z2_start = Component(EpicsSignalWithRBV, "FGS:Z2_START")
+        self.x_start = epics_signal_rw_rbv(float, "FGS:X_START")
+        self.y1_start = epics_signal_rw_rbv(float, "FGS:Y_START")
+        self.y2_start = epics_signal_rw_rbv(float, "FGS:Y2_START")
+        self.z1_start = epics_signal_rw_rbv(float, "FGS:Z_START")
+        self.z2_start = epics_signal_rw_rbv(float, "FGS:Z2_START")
 
-    position_counter = Component(
-        EpicsSignal, "FGS:POS_COUNTER", write_pv="FGS:POS_COUNTER_WRITE"
-    )
-    x_counter = Component(EpicsSignalRO, "FGS:X_COUNTER")
-    y_counter = Component(EpicsSignalRO, "FGS:Y_COUNTER")
-    scan_invalid = Component(EpicsSignalRO, "FGS:SCAN_INVALID")
+        self.position_counter = epics_signal_rw(
+            int, "FGS:POS_COUNTER", write_pv="FGS:POS_COUNTER_WRITE"
+        )
+        self.x_counter = epics_signal_r(int, "FGS:X_COUNTER")
+        self.y_counter = epics_signal_r(int, "FGS:Y_COUNTER")
+        self.scan_invalid = epics_signal_r(float, "FGS:SCAN_INVALID")
 
-    run_cmd = Component(EpicsSignal, "FGS:RUN.PROC")
-    stop_cmd = Component(EpicsSignal, "FGS:STOP.PROC")
-    status = Component(EpicsSignalRO, "FGS:SCAN_STATUS")
+        self.run_cmd = epics_signal_rw(str, "FGS:RUN.PROC")
+        self.stop_cmd = epics_signal_rw(str, "FGS:STOP.PROC")
+        self.status = epics_signal_r(float, "FGS:SCAN_STATUS")
 
-    expected_images = Component(Signal)
+        self.expected_images = create_soft_signal_rw(int, "expected_images", self.name)
 
-    motion_program = Component(MotionProgram, "")
+        self.motion_program = MotionProgram(prefix)
 
-    # Kickoff timeout in seconds
-    KICKOFF_TIMEOUT: float = 5.0
+        # Kickoff timeout in seconds
+        self.KICKOFF_TIMEOUT: float = 5.0
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        def set_expected_images(*_, **__):
-            x = int(self.x_steps.get())
-            y = int(self.y_steps.get())
-            z = int(self.z_steps.get())
+        async def set_expected_images():
+            x = int(await self.x_steps.get_value())
+            y = int(await self.y_steps.get_value())
+            z = int(await self.z_steps.get_value())
             first_grid = x * y
             second_grid = x * z
-            self.expected_images.put(first_grid + second_grid)
+            return first_grid + second_grid
 
-        self.x_steps.subscribe(set_expected_images)
-        self.y_steps.subscribe(set_expected_images)
-        self.z_steps.subscribe(set_expected_images)
+        self.expected_images.read = set_expected_images
 
     def is_invalid(self) -> bool:
         if "GONP" in self.scan_invalid.pvname:
