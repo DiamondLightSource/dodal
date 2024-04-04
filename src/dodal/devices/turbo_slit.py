@@ -4,10 +4,13 @@ from ophyd_async.epics.motion.motor import Motor
 
 class TurboSlit(Device):
     """
-    todo for now only the x motor
-    add soft limits
-    check min speed
-    set speed back to before movement
+    This collection of motors coordinates time resolved XAS experiments.
+    It selects a beam out of the polychromatic fan.
+    These slits can be scanned continously or in step mode.
+    The relationship between the three motors is as follows:
+        - gap provides energy resolution
+        - xfine selects the energy
+        - arc - ???
     """
 
     def __init__(self, prefix: str, name: str):
