@@ -1,10 +1,13 @@
+from abc import ABC
 from typing import Any
 
 import numpy as np
 from bluesky.plan_stubs import mv
 from numpy import ndarray
 from ophyd_async.core import (
+    AsyncStatus,
     Device,
+    Signal,
     SignalRW,
     SimSignalBackend,
     StandardReadable,
@@ -17,7 +20,7 @@ from pydantic.dataclasses import dataclass
 from dodal.devices.motors import XYZLimitBundle
 from dodal.devices.util.epics_util import epics_signal_rw_rbv
 from dodal.log import LOGGER
-from dodal.parameters.experiment_parameter_base import AbstractExperimentWithBeamParams
+from dodal.parameters.experiment_parameter_base import AbstractExperimentParameterBase
 
 
 @dataclass
@@ -41,7 +44,7 @@ class GridAxis:
         return 0 <= steps <= self.full_steps
 
 
-class GridScanParamsCommon(AbstractExperimentWithBeamParams):
+class GridScanParamsCommon(BaseModel, AbstractExperimentParameterBase, ABC):
     """
     Common holder class for the parameters of a grid scan in a similar
     layout to EPICS. The parameters and functions of this class are common
@@ -71,6 +74,36 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
 
     # Whether to set the stub offsets after centering
     set_stub_offsets: bool = False
+
+    param_positions = {
+        "x_steps": x_steps,
+        "y_steps": y_steps,
+        "z_steps": z_steps,
+        "x_step_size": x_step_size,
+        "y_step_size": y_step_size,
+        "z_step_size": z_step_size,
+        "x_start": x_start,
+        "y1_start": y1_start,
+        "y2_start": y2_start,
+        "z1_start": z1_start,
+        "z2_start": z2_start,
+    }
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.param_positions = {
+            "x_steps": self.x_steps,
+            "y_steps": self.y_steps,
+            "z_steps": self.z_steps,
+            "x_step_size": self.x_step_size,
+            "y_step_size": self.y_step_size,
+            "z_step_size": self.z_step_size,
+            "x_start": self.x_start,
+            "y1_start": self.y1_start,
+            "y2_start": self.y2_start,
+            "z1_start": self.z1_start,
+            "z2_start": self.z2_start,
+        }
 
     class Config:
         arbitrary_types_allowed = True
@@ -152,18 +185,14 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
 
 class GridScanParams(GridScanParamsCommon):
     """
-    Holder class for the parameters of a grid scan in a similar
-    layout to EPICS. These params are used for the zebra-triggered
-    fast grid scan
-
-    Motion program will do a grid in x-y then rotate omega +90 and perform
-    a grid in x-z.
-
-    The grid specified is where data is taken e.g. it can be assumed the first frame is
-    at x_start, y1_start, z1_start and subsequent frames are N*step_size away.
+    Params for standard Zebra FGS, which includes the dwell time
     """
 
     dwell_time_ms: float = 10
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.param_positions["dwell_time_ms"] = self.dwell_time_ms
 
     @validator("dwell_time_ms", always=True, check_fields=True)
     def non_integer_dwell_time(cls, dwell_time_ms: float) -> float:
@@ -178,6 +207,18 @@ class GridScanParams(GridScanParamsCommon):
         return dwell_time_ms
 
 
+class PandAGridScanParams(GridScanParamsCommon):
+    """
+    Params for panda constant-motion scan, which includes the goniometer run-up distance
+    """
+
+    run_up_distance_mm: float = 0.15
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.param_positions["run_up_distance_mm"] = self.run_up_distance_mm
+
+
 class MotionProgram(Device):
     def __init__(self, prefix: str, name: str = "") -> None:
         super().__init__(name)
@@ -187,7 +228,7 @@ class MotionProgram(Device):
 
 class ExpectedImages(SignalRW):
     def __init__(self, parent) -> None:
-        super().__init__(SimSignalBackend(int, "sim://expected_images:expected_images"))
+        super().__init__(SimSignalBackend(int, "sim://expected_images"))
         self.parent = parent
 
     async def get_value(self):
@@ -200,33 +241,31 @@ class ExpectedImages(SignalRW):
         return first_grid + second_grid
 
 
-class FastGridScan(StandardReadable):
+class FastGridScanCommon(StandardReadable, ABC):
     def __init__(self, prefix: str, name: str = "") -> None:
         super().__init__(name)
-        self.x_steps = epics_signal_rw_rbv(int, "FGS:X_NUM_STEPS")
-        self.y_steps = epics_signal_rw_rbv(int, "FGS:X_NUM_STEPS")
-        self.z_steps = epics_signal_rw_rbv(int, "FGS:X_NUM_STEPS")
-        self.x_step_size = epics_signal_rw_rbv(float, "FGS:X_STEP_SIZE")
-        self.y_step_size = epics_signal_rw_rbv(float, "FGS:Y_STEP_SIZE")
-        self.z_step_size = epics_signal_rw_rbv(float, "FGS:Z_STEP_SIZE")
-        self.dwell_time_ms = epics_signal_rw_rbv(float, "FGS:DWELL_TIME")
-
-        self.x_start = epics_signal_rw_rbv(float, "FGS:X_START")
-        self.y1_start = epics_signal_rw_rbv(float, "FGS:Y_START")
-        self.y2_start = epics_signal_rw_rbv(float, "FGS:Y2_START")
-        self.z1_start = epics_signal_rw_rbv(float, "FGS:Z_START")
-        self.z2_start = epics_signal_rw_rbv(float, "FGS:Z2_START")
+        self.x_steps = epics_signal_rw_rbv(int, "X_NUM_STEPS")
+        self.y_steps = epics_signal_rw_rbv(int, "X_NUM_STEPS")
+        self.z_steps = epics_signal_rw_rbv(int, "X_NUM_STEPS")
+        self.x_step_size = epics_signal_rw_rbv(float, "X_STEP_SIZE")
+        self.y_step_size = epics_signal_rw_rbv(float, "Y_STEP_SIZE")
+        self.z_step_size = epics_signal_rw_rbv(float, "Z_STEP_SIZE")
+        self.x_start = epics_signal_rw_rbv(float, "X_START")
+        self.y1_start = epics_signal_rw_rbv(float, "Y_START")
+        self.y2_start = epics_signal_rw_rbv(float, "Y2_START")
+        self.z1_start = epics_signal_rw_rbv(float, "Z_START")
+        self.z2_start = epics_signal_rw_rbv(float, "Z2_START")
 
         self.position_counter = epics_signal_rw(
-            int, "FGS:POS_COUNTER", write_pv="FGS:POS_COUNTER_WRITE"
+            int, "POS_COUNTER", write_pv="POS_COUNTER_WRITE"
         )
-        self.x_counter = epics_signal_r(int, "FGS:X_COUNTER")
-        self.y_counter = epics_signal_r(int, "FGS:Y_COUNTER")
-        self.scan_invalid = epics_signal_r(float, "FGS:SCAN_INVALID")
+        self.x_counter = epics_signal_r(int, "X_COUNTER")
+        self.y_counter = epics_signal_r(int, "Y_COUNTER")
+        self.scan_invalid = epics_signal_r(float, "SCAN_INVALID")
 
-        self.run_cmd = epics_signal_rw(int, "FGS:RUN.PROC")
-        self.stop_cmd = epics_signal_rw(int, "FGS:STOP.PROC")
-        self.status = epics_signal_r(float, "FGS:SCAN_STATUS")
+        self.run_cmd = epics_signal_rw(int, "RUN.PROC")
+        self.stop_cmd = epics_signal_rw(int, "STOP.PROC")
+        self.status = epics_signal_r(float, "SCAN_STATUS")
 
         self.expected_images = ExpectedImages(parent=self)
 
@@ -235,11 +274,28 @@ class FastGridScan(StandardReadable):
         # Kickoff timeout in seconds
         self.KICKOFF_TIMEOUT: float = 5.0
 
+        self.COMPLETE_STATUS: float = 60.0
+
+        self.movable_params: dict[str, Signal] = {
+            "x_steps": self.x_steps,
+            "y_steps": self.y_steps,
+            "z_steps": self.z_steps,
+            "x_step_size": self.x_step_size,
+            "y_step_size": self.y_step_size,
+            "z_step_size": self.z_step_size,
+            "x_start": self.x_start,
+            "y1_start": self.y1_start,
+            "y2_start": self.y2_start,
+            "z1_start": self.z1_start,
+            "z2_start": self.z2_start,
+        }
+
     def is_invalid(self) -> bool:
         if "GONP" in self.scan_invalid.source:
             return False
         return bool(self.scan_invalid.get_value())
 
+    @AsyncStatus.wrap
     async def kickoff(self):
         curr_prog = await self.motion_program.program_number.get_value()
         running = await self.motion_program.running.get_value()
@@ -259,33 +315,44 @@ class FastGridScan(StandardReadable):
     def describe_collect(self):
         return {}
 
+    @AsyncStatus.wrap
+    async def complete(self):
+        await wait_for_value(self.status, 0, self.COMPLETE_STATUS)
 
-def set_fast_grid_scan_params(scan: FastGridScan, params: GridScanParams):
-    yield from mv(
-        scan.x_steps,
-        params.x_steps,
-        scan.y_steps,
-        params.y_steps,
-        scan.z_steps,
-        params.z_steps,
-        scan.x_step_size,
-        params.x_step_size,
-        scan.y_step_size,
-        params.y_step_size,
-        scan.z_step_size,
-        params.z_step_size,
-        scan.dwell_time_ms,
-        params.dwell_time_ms,
-        scan.x_start,
-        params.x_start,
-        scan.y1_start,
-        params.y1_start,
-        scan.y2_start,
-        params.y2_start,
-        scan.z1_start,
-        params.z1_start,
-        scan.z2_start,
-        params.z2_start,
-        scan.position_counter,
-        0,
-    )
+
+class FastGridScan(FastGridScanCommon):
+    """Device for standard Zebra FGS"""
+
+    def __init__(self, prefix: str, name: str = "") -> None:
+        super().__init__(prefix, name)
+        self.dwell_time_ms = epics_signal_rw_rbv(float, "DWELL_TIME")
+        self.movable_params["dwell_time_ms"] = self.dwell_time_ms
+
+
+class PandAFastGridScan(FastGridScanCommon):
+    """Device for panda constant-motion scan"""
+
+    def __init__(self, prefix: str, name: str = "") -> None:
+        super().__init__(prefix, name)
+        self.time_between_x_steps_ms = epics_signal_rw_rbv(
+            float, "TIME_BETWEEN_X_STEPS"
+        )
+        self.run_up_distance_mm = epics_signal_rw_rbv(float, "RUNUP_DISTANCE")
+        self.movable_params["run_up_distance_mm"] = self.run_up_distance_mm
+
+
+def set_fast_grid_scan_params(scan: FastGridScanCommon, params: GridScanParamsCommon):
+    assert set(params.param_positions.keys()) == set(
+        scan.movable_params.keys()
+    ), "Scan parameters don't match the scan device"
+
+    to_move = []
+
+    # Create arguments for bps.mv
+    for key in scan.movable_params.keys():
+        to_move.extend([scan.movable_params[key], params.__dict__[key]])
+
+    # Counter should always start at 0
+    to_move.extend([scan.position_counter, 0])
+
+    yield from mv(*to_move)

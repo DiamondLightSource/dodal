@@ -1,3 +1,7 @@
+from asyncio import wait_for
+from typing import Union
+from unittest.mock import patch
+
 import numpy as np
 import pytest
 from bluesky import plan_stubs as bps
@@ -10,6 +14,8 @@ from ophyd_async.core import DeviceCollector, set_sim_value
 from dodal.devices.fast_grid_scan import (
     FastGridScan,
     GridScanParams,
+    PandAFastGridScan,
+    PandAGridScanParams,
     set_fast_grid_scan_params,
 )
 from dodal.devices.smargon import Smargon
@@ -27,12 +33,15 @@ async def fast_grid_scan(request):
     async with DeviceCollector(sim=True):
         fast_grid_scan = FastGridScan(name="fake_FGS", prefix="FGS")
 
-    # fast_grid_scan.scan_invalid.pvname = ""
     return fast_grid_scan
 
 
-async def fake_get_value(value):
-    return value
+@pytest.fixture
+async def panda_fast_grid_scan(request):
+    async with DeviceCollector(sim=True):
+        panda_fast_grid_scan = PandAFastGridScan(name="fake_FGS", prefix="FGS")
+
+    return panda_fast_grid_scan
 
 
 async def test_given_settings_valid_when_kickoff_then_run_started(
@@ -65,6 +74,14 @@ async def test_waits_for_running_motion(
     assert await fast_grid_scan.run_cmd.get_value() == 1
 
 
+def test_is_invalid_gives_correct_value(fast_grid_scan: FastGridScan):
+    with patch("ophyd_async.core.signal.Signal.source", "GONP"):
+        set_sim_value(fast_grid_scan.scan_invalid, True)
+        assert not fast_grid_scan.is_invalid()
+    set_sim_value(fast_grid_scan.scan_invalid, False)
+    assert fast_grid_scan.is_invalid()
+
+
 @pytest.mark.parametrize(
     "steps, expected_images",
     [
@@ -82,8 +99,9 @@ async def test_given_different_step_numbers_then_expected_images_correct(
 
     assert await fast_grid_scan.expected_images.get_value() == expected_images
 
-def test_running_finished_with_all_images_done_then_complete_status_finishes_not_in_error(
-    fast_grid_scan: FastGridScan, RE: RunEngine
+
+async def test_running_finished_with_all_images_done_then_complete_status_finishes_not_in_error(
+    fast_grid_scan: FastGridScan,
 ):
     num_pos_1d = 2
     RE(
@@ -95,14 +113,14 @@ def test_running_finished_with_all_images_done_then_complete_status_finishes_not
         )
     )
 
-    fast_grid_scan.status.sim_put(1)  # type: ignore
+    set_sim_value(fast_grid_scan.status, 1)
 
     complete_status = fast_grid_scan.complete()
     assert not complete_status.done
-    fast_grid_scan.position_counter.sim_put(num_pos_1d**2)  # type: ignore
-    fast_grid_scan.status.sim_put(0)  # type: ignore
+    set_sim_value(fast_grid_scan.position_counter, num_pos_1d**2)
+    set_sim_value(fast_grid_scan.status, 0)
 
-    complete_status.wait()
+    await wait_for(complete_status, 0.1)
 
     assert complete_status.done
     assert complete_status.exception() is None
@@ -313,11 +331,11 @@ def test_can_run_fast_grid_scan_in_run_engine(fast_grid_scan, RE: RunEngine):
     @bpp.run_decorator()
     def kickoff_and_complete(device):
         yield from bps.kickoff(device, group="kickoff")
-        device.status.sim_put(1)
+        set_sim_value(device.status, 1)
         yield from bps.wait("kickoff")
         yield from bps.complete(device, group="complete")
-        device.position_counter.sim_put(device.expected_images)
-        device.status.sim_put(0)
+        set_sim_value(device.position_counter, device.expected_images)
+        set_sim_value(device.status, 0)
         yield from bps.wait("complete")
 
     RE(kickoff_and_complete(fast_grid_scan))
@@ -364,3 +382,22 @@ def test_non_test_integer_dwell_time(test_dwell_times, expected_dwell_time_is_in
                 dwell_time_ms=test_dwell_times,
                 transmission_fraction=0.01,
             )
+            GridScanParams(dwell_time_ms=test_dwell_times)
+
+
+def test_assert_must_use_correct_device_with_correct_parameters(
+    fast_grid_scan, panda_fast_grid_scan, RE
+):
+    panda_params = PandAGridScanParams()
+    zebra_params = GridScanParams()
+
+    with pytest.raises(AssertionError):
+        RE(set_fast_grid_scan_params(fast_grid_scan, panda_params))
+    with pytest.raises(AssertionError):
+        RE(set_fast_grid_scan_params(panda_fast_grid_scan, zebra_params))
+
+    def correct_plan():
+        yield from set_fast_grid_scan_params(fast_grid_scan, zebra_params)
+        yield from set_fast_grid_scan_params(panda_fast_grid_scan, panda_params)
+
+    RE(correct_plan())

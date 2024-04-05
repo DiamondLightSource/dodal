@@ -10,12 +10,11 @@ from dodal.devices.DCM import DCM
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.eiger import EigerDetector
-from dodal.devices.fast_grid_scan import FastGridScan
+from dodal.devices.fast_grid_scan import FastGridScan, PandAFastGridScan
 from dodal.devices.flux import Flux
 from dodal.devices.focusing_mirror import FocusingMirror, VFMMirrorVoltages
 from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
-from dodal.devices.panda_fast_grid_scan import PandAFastGridScan
 from dodal.devices.qbpm1 import QBPM1
 from dodal.devices.robot import BartRobot
 from dodal.devices.s4_slit_gaps import S4SlitGaps
@@ -187,7 +186,7 @@ def fast_grid_scan(
     return device_instantiation(
         device_factory=FastGridScan,
         name="fast_grid_scan",
-        prefix="-MO-SGON-01:",
+        prefix="-MO-SGON-01:FGS:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )
