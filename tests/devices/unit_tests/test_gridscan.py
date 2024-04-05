@@ -1,5 +1,4 @@
 from asyncio import wait_for
-from typing import Union
 from unittest.mock import patch
 
 import numpy as np
@@ -388,8 +387,8 @@ def test_non_test_integer_dwell_time(test_dwell_times, expected_dwell_time_is_in
 def test_assert_must_use_correct_device_with_correct_parameters(
     fast_grid_scan, panda_fast_grid_scan, RE
 ):
-    panda_params = PandAGridScanParams()
-    zebra_params = GridScanParams()
+    panda_params = PandAGridScanParams(transmission_fraction=0.01)
+    zebra_params = GridScanParams(transmission_fraction=0.01)
 
     with pytest.raises(AssertionError):
         RE(set_fast_grid_scan_params(fast_grid_scan, panda_params))
