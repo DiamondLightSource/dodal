@@ -67,17 +67,16 @@ def test_snapshot_trigger_saves_to_correct_file(
     mock_open: MagicMock, mock_get, fake_oav
 ):
     image = PIL.Image.open("test")
-    mock_save = MagicMock()
-    image.save = mock_save
     mock_open.return_value.__enter__.return_value = image
-    st = fake_oav.snapshot.trigger()
-    st.wait()
-    expected_calls_to_save = [
-        call(f"test directory/test filename{addition}.png")
-        for addition in ["", "_outer_overlay", "_grid_overlay"]
-    ]
-    calls_to_save = mock_save.mock_calls
-    assert calls_to_save == expected_calls_to_save
+    with patch.object(image, "save") as mock_save:
+        st = fake_oav.snapshot.trigger()
+        st.wait()
+        expected_calls_to_save = [
+            call(f"test directory/test filename{addition}.png")
+            for addition in ["", "_outer_overlay", "_grid_overlay"]
+        ]
+        calls_to_save = mock_save.mock_calls
+        assert calls_to_save == expected_calls_to_save
 
 
 @patch("requests.get")
@@ -120,14 +119,12 @@ def test_bottom_right_from_top_left():
 def test_when_zoom_1_then_flat_field_applied(fake_oav: OAV):
     RE = RunEngine()
     RE(bps.abs_set(fake_oav.zoom_controller, "1.0x"))
-    assert fake_oav.mxsc.input_plugin.get() == "PROC"
     assert fake_oav.snapshot.input_plugin.get() == "PROC"
 
 
 def test_when_zoom_not_1_then_flat_field_removed(fake_oav: OAV):
     RE = RunEngine()
     RE(bps.abs_set(fake_oav.zoom_controller, "10.0x"))
-    assert fake_oav.mxsc.input_plugin.get() == "CAM"
     assert fake_oav.snapshot.input_plugin.get() == "CAM"
 
 
@@ -136,11 +133,9 @@ def test_when_zoom_is_externally_changed_to_1_then_flat_field_not_changed(
 ):
     """This test is required to ensure that Hyperion doesn't cause unexpected behaviour
     e.g. change the flatfield when the zoom level is changed through the synoptic"""
-    fake_oav.mxsc.input_plugin.sim_put("CAM")  # type: ignore
     fake_oav.snapshot.input_plugin.sim_put("CAM")  # type: ignore
 
     fake_oav.zoom_controller.level.sim_put("1.0x")  # type: ignore
-    assert fake_oav.mxsc.input_plugin.get() == "CAM"
     assert fake_oav.snapshot.input_plugin.get() == "CAM"
 
 

@@ -6,6 +6,8 @@ from ophyd import Device
 from ophyd.device import Device as OphydV1Device
 from ophyd.sim import FakeEpicsSignal
 from ophyd_async.core import Device as OphydV2Device
+from ophyd_async.core import StandardReadable
+from ophyd_async.core.sim_signal_backend import SimSignalBackend
 
 from dodal.beamlines import beamline_utils, i03
 from dodal.devices.aperturescatterguard import ApertureScatterguard
@@ -49,12 +51,21 @@ def test_instantiating_different_device_with_same_name():
     assert dev2 in beamline_utils.ACTIVE_DEVICES.values()
 
 
-def test_instantiate_function_fake_makes_fake():
+def test_instantiate_v1_function_fake_makes_fake():
+    smargon: Smargon = beamline_utils.device_instantiation(
+        i03.Smargon, "smargon", "", True, True, None
+    )
+    assert isinstance(smargon, Device)
+    assert isinstance(smargon.disabled, FakeEpicsSignal)
+
+
+def test_instantiate_v2_function_fake_makes_fake():
+    RE()
     fake_zeb: Zebra = beamline_utils.device_instantiation(
         i03.Zebra, "zebra", "", True, True, None
     )
-    assert isinstance(fake_zeb, Device)
-    assert isinstance(fake_zeb.pc.arm_source, FakeEpicsSignal)
+    assert isinstance(fake_zeb, StandardReadable)
+    assert isinstance(fake_zeb.pc.arm.armed._backend, SimSignalBackend)
 
 
 def test_clear_devices(RE):
@@ -100,10 +111,14 @@ def test_wait_for_v2_device_connection_passes_through_timeout(
 ):
     RE()
     device = OphydV2Device()
+    device.connect = MagicMock()
 
     beamline_utils._wait_for_connection(device, **kwargs)
 
-    call_in_bluesky_el.assert_called_once_with(ANY, timeout=expected_timeout)
+    device.connect.assert_called_once_with(
+        sim=ANY,
+        timeout=expected_timeout,
+    )
 
 
 def test_default_directory_provider_is_singleton():

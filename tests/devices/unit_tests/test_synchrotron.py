@@ -7,9 +7,9 @@ from bluesky.run_engine import RunEngine
 from ophyd_async.core import DeviceCollector, StandardReadable, set_sim_value
 
 from dodal.devices.synchrotron import (
-    OASynchrotron,
     Prefix,
     Suffix,
+    Synchrotron,
     SynchrotronMode,
 )
 
@@ -120,9 +120,9 @@ EXPECTED_DESCRIBE_CONFIG_RESULT = f"""{{
 
 
 @pytest.fixture
-async def sim_synchrotron() -> OASynchrotron:
+async def sim_synchrotron() -> Synchrotron:
     async with DeviceCollector(sim=True):
-        sim_synchrotron = OASynchrotron()
+        sim_synchrotron = Synchrotron()
     set_sim_value(sim_synchrotron.ring_current, RING_CURRENT)
     set_sim_value(sim_synchrotron.machine_user_countdown, USER_COUNTDOWN)
     set_sim_value(sim_synchrotron.topup_start_countdown, START_COUNTDOWN)
@@ -132,7 +132,7 @@ async def sim_synchrotron() -> OASynchrotron:
     return sim_synchrotron
 
 
-async def test_oasynchrotron_read(sim_synchrotron: OASynchrotron):
+async def test_synchrotron_read(sim_synchrotron: Synchrotron):
     await verify(
         sim_synchrotron.read,
         READ_SIGNALS,
@@ -141,7 +141,7 @@ async def test_oasynchrotron_read(sim_synchrotron: OASynchrotron):
     )
 
 
-async def test_oasynchrotron_read_configuration(sim_synchrotron: OASynchrotron):
+async def test_synchrotron_read_configuration(sim_synchrotron: Synchrotron):
     await verify(
         sim_synchrotron.read_configuration,
         CONFIG_SIGNALS,
@@ -150,7 +150,7 @@ async def test_oasynchrotron_read_configuration(sim_synchrotron: OASynchrotron):
     )
 
 
-async def test_oasynchrotron_describe(sim_synchrotron: OASynchrotron):
+async def test_synchrotron_describe(sim_synchrotron: Synchrotron):
     await verify(
         sim_synchrotron.describe,
         READ_SIGNALS,
@@ -159,7 +159,7 @@ async def test_oasynchrotron_describe(sim_synchrotron: OASynchrotron):
     )
 
 
-async def test_oasynchrotron_describe_configuration(sim_synchrotron: OASynchrotron):
+async def test_synchrotron_describe_configuration(sim_synchrotron: Synchrotron):
     await verify(
         sim_synchrotron.describe_configuration,
         CONFIG_SIGNALS,
@@ -168,7 +168,7 @@ async def test_oasynchrotron_describe_configuration(sim_synchrotron: OASynchrotr
     )
 
 
-async def test_oasynchrotron_count(RE: RunEngine, sim_synchrotron: OASynchrotron):
+async def test_synchrotron_count(RE: RunEngine, sim_synchrotron: Synchrotron):
     docs = []
     RE(count_sim(sim_synchrotron), lambda x, y: docs.append(y))
 
