@@ -381,7 +381,6 @@ def test_non_test_integer_dwell_time(test_dwell_times, expected_dwell_time_is_in
                 dwell_time_ms=test_dwell_times,
                 transmission_fraction=0.01,
             )
-            GridScanParams(dwell_time_ms=test_dwell_times)
 
 
 def test_assert_must_use_correct_device_with_correct_parameters(

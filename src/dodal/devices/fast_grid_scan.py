@@ -75,23 +75,8 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
     # Whether to set the stub offsets after centering
     set_stub_offsets: bool = False
 
-    param_positions = {
-        "x_steps": x_steps,
-        "y_steps": y_steps,
-        "z_steps": z_steps,
-        "x_step_size": x_step_size,
-        "y_step_size": y_step_size,
-        "z_step_size": z_step_size,
-        "x_start": x_start,
-        "y1_start": y1_start,
-        "y2_start": y2_start,
-        "z1_start": z1_start,
-        "z2_start": z2_start,
-    }
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.param_positions = {
+    def get_param_positions(self) -> dict:
+        return {
             "x_steps": self.x_steps,
             "y_steps": self.y_steps,
             "z_steps": self.z_steps,
@@ -190,9 +175,10 @@ class GridScanParams(GridScanParamsCommon):
 
     dwell_time_ms: float = 10
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.param_positions["dwell_time_ms"] = self.dwell_time_ms
+    def get_param_positions(self):
+        param_positions = super().get_param_positions()
+        param_positions["dwell_time_ms"] = self.dwell_time_ms
+        return param_positions
 
     @validator("dwell_time_ms", always=True, check_fields=True)
     def non_integer_dwell_time(cls, dwell_time_ms: float) -> float:
@@ -214,9 +200,10 @@ class PandAGridScanParams(GridScanParamsCommon):
 
     run_up_distance_mm: float = 0.15
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.param_positions["run_up_distance_mm"] = self.run_up_distance_mm
+    def get_param_positions(self):
+        param_positions = super().get_param_positions()
+        param_positions["run_up_distance_mm"] = self.run_up_distance_mm
+        return param_positions
 
 
 class MotionProgram(Device):
@@ -342,7 +329,7 @@ class PandAFastGridScan(FastGridScanCommon):
 
 
 def set_fast_grid_scan_params(scan: FastGridScanCommon, params: GridScanParamsCommon):
-    assert set(params.param_positions.keys()) == set(
+    assert set(params.get_param_positions().keys()) == set(
         scan.movable_params.keys()
     ), "Scan parameters don't match the scan device"
 
