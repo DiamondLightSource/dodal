@@ -6,7 +6,7 @@ from logging import Logger, StreamHandler
 from logging.handlers import TimedRotatingFileHandler
 from os import environ
 from pathlib import Path
-from typing import Deque, Optional, Tuple, TypedDict
+from typing import Deque, Tuple, TypedDict
 
 from bluesky.log import logger as bluesky_logger
 from graypy import GELFTCPHandler
@@ -65,7 +65,7 @@ class CircularMemoryHandler(logging.Handler):
 
 
 class BeamlineFilter(logging.Filter):
-    beamline: Optional[str] = environ.get("BEAMLINE")
+    beamline: str | None = environ.get("BEAMLINE")
 
     def filter(self, record):
         record.beamline = self.beamline if self.beamline else "dev"
@@ -216,7 +216,7 @@ def get_logging_file_path() -> Path:
     Returns:
         logging_path (Path): Path to the log directory for the file handlers to write to.
     """
-    beamline: Optional[str] = environ.get("BEAMLINE")
+    beamline: str | None = environ.get("BEAMLINE")
     logging_path: Path
 
     if beamline:

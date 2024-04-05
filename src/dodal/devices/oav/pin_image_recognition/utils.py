@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import Callable, Final, Optional, Tuple
+from typing import Callable, Final, Tuple
 
 import cv2
 import numpy as np
@@ -97,8 +97,8 @@ class SampleLocation:
     Holder type for results from sample detection.
     """
 
-    tip_x: Optional[int]
-    tip_y: Optional[int]
+    tip_x: int | None
+    tip_y: int | None
     edge_top: np.ndarray
     edge_bottom: np.ndarray
 

@@ -15,7 +15,7 @@ DEFAULT_CONNECTION_TIMEOUT: Final[float] = 5.0
 
 ACTIVE_DEVICES: Dict[str, AnyDevice] = {}
 BL = ""
-DIRECTORY_PROVIDER: Optional[DirectoryProvider] = None
+DIRECTORY_PROVIDER: DirectoryProvider | None = None
 
 
 def set_beamline(beamline: str):
@@ -96,7 +96,7 @@ def device_instantiation(
     Returns:
         The instance of the device.
     """
-    already_existing_device: Optional[AnyDevice] = ACTIVE_DEVICES.get(name)
+    already_existing_device: AnyDevice | None = ACTIVE_DEVICES.get(name)
     if fake:
         device_factory = cast(Callable[..., T], make_fake_device(device_factory))
     if already_existing_device is None:

@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from typing import Any, Optional, Tuple
+from typing import Any, Tuple
 
 from pydantic import BaseModel, root_validator, validator
 
@@ -28,7 +28,7 @@ class DetectorParams(BaseModel):
     """Holds parameters for the detector. Provides access to a list of Dectris detector
     sizes and a converter for distance to beam centre."""
 
-    expected_energy_ev: Optional[float] = None
+    expected_energy_ev: float | None = None
     exposure_time: float
     directory: str
     prefix: str

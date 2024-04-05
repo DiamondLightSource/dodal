@@ -1,5 +1,3 @@
-from typing import Optional
-
 from dodal.beamlines.beamline_utils import BL, device_instantiation
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.detector import DetectorParams
@@ -56,7 +54,7 @@ def detector_motion(
 def eiger(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
-    params: Optional[DetectorParams] = None,
+    params: DetectorParams | None = None,
 ) -> EigerDetector:
     """Get the i24 Eiger device, instantiate it if it hasn't already been.
     If this is called when already instantiated, it will return the existing object.

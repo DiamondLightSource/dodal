@@ -1,5 +1,3 @@
-from typing import Optional
-
 from dodal.beamlines.beamline_utils import device_instantiation
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.backlight import Backlight
@@ -45,7 +43,7 @@ def backlight(
 def eiger(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
-    params: Optional[DetectorParams] = None,
+    params: DetectorParams | None = None,
 ) -> EigerDetector:
     """Get the i04_1 Eiger device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04_1, it will return the existing object.

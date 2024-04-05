@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Tuple, Union
+from typing import List, Tuple
 
 import numpy as np
 from ophyd import Component, Device, EpicsMotor
@@ -41,7 +41,7 @@ class XYZLimitBundle:
     z: MotorLimitHelper
 
     def position_valid(
-        self, position: Union[np.ndarray, List[float], Tuple[float, float, float]]
+        self, position: np.ndarray | List[float] | Tuple[float, float, float]
     ):
         if len(position) != 3:
             raise ValueError(
