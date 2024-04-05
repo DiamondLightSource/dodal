@@ -14,7 +14,7 @@ from ophyd_async.core import (
     wait_for_value,
 )
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
-from pydantic import BaseModel, validator
+from pydantic import validator
 from pydantic.dataclasses import dataclass
 
 from dodal.devices.motors import XYZLimitBundle
@@ -44,7 +44,7 @@ class GridAxis:
         return 0 <= steps <= self.full_steps
 
 
-class GridScanParamsCommon(BaseModel, AbstractExperimentParameterBase, ABC):
+class GridScanParamsCommon(AbstractExperimentParameterBase):
     """
     Common holder class for the parameters of a grid scan in a similar
     layout to EPICS. The parameters and functions of this class are common
