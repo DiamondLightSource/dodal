@@ -76,7 +76,7 @@ def aperture_positions():
 
 def test_create_aperturescatterguard():
     fake_aperture_scatterguard = make_fake_device(ApertureScatterguard)
-    ap_sg = fake_aperture_scatterguard()
+    _ = fake_aperture_scatterguard()
 
 
 def test_get_aperturescatterguard_aperture():
