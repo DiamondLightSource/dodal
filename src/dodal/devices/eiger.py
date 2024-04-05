@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import Optional
 
 from ophyd import Component, Device, EpicsSignalRO, Signal
 from ophyd.areadetector.cam import EigerDetectorCam
@@ -40,7 +39,7 @@ class EigerDetector(Device):
 
     filewriters_finished: SubscriptionStatus
 
-    detector_params: Optional[DetectorParams] = None
+    detector_params: DetectorParams | None = None
 
     arming_status = Status()
     arming_status.set_finished()

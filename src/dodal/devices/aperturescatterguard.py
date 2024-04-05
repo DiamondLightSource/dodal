@@ -1,7 +1,6 @@
 import asyncio
 from collections import namedtuple
 from dataclasses import dataclass
-from typing import List, Optional
 
 from ophyd_async.core import SignalR, StandardReadable
 from ophyd_async.core.sim_signal_backend import SimSignalBackend
@@ -31,14 +30,14 @@ ApertureFiveDimensionalLocation = namedtuple(
 class SingleAperturePosition:
     name: str = ""
     GDA_name: str = ""
-    radius_microns: Optional[float] = 0
+    radius_microns: float | None = 0
     location: ApertureFiveDimensionalLocation = ApertureFiveDimensionalLocation(
         0, 0, 0, 0, 0
     )
 
 
 def position_from_params(
-    name: str, GDA_name: str, radius_microns: Optional[float], params: dict
+    name: str, GDA_name: str, radius_microns: float | None, params: dict
 ) -> SingleAperturePosition:
     return SingleAperturePosition(
         name,
@@ -72,7 +71,7 @@ class AperturePositions:
             ROBOT_LOAD=position_from_params("Robot load", "ROBOT_LOAD", None, params),
         )
 
-    def as_list(self) -> List[SingleAperturePosition]:
+    def as_list(self) -> list[SingleAperturePosition]:
         return [
             self.LARGE,
             self.MEDIUM,
@@ -85,7 +84,7 @@ class ApertureScatterguard(StandardReadable):
     def __init__(self, prefix: str = "", name: str = "") -> None:
         self.aperture = Aperture(prefix="-MO-MAPT-01:")
         self.scatterguard = Scatterguard(prefix="-MO-SCAT-01:")
-        self.aperture_positions: Optional[AperturePositions] = None
+        self.aperture_positions: AperturePositions | None = None
         self.TOLERANCE_STEPS = 3  # Number of MRES steps
         self.selected_aperture = self.SelectedAperture(
             backend=SimSignalBackend(datatype=SingleAperturePosition, source="")

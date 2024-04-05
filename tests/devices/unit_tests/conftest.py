@@ -1,6 +1,5 @@
 import asyncio
 from functools import partial
-from typing import Union
 from unittest.mock import AsyncMock, patch
 
 from ophyd_async.epics.motion import Motor
@@ -12,13 +11,13 @@ async def mock_good_coroutine():
     return asyncio.sleep(0)
 
 
-def mock_move(motor: Union[ExtendedMotor, Motor], val, *args, **kwargs):
+def mock_move(motor: ExtendedMotor | Motor, val, *args, **kwargs):
     motor.setpoint._backend._set_value(val)  # type: ignore
     motor.readback._backend._set_value(val)  # type: ignore
     return mock_good_coroutine()  # type: ignore
 
 
-def patch_motor(motor: Union[ExtendedMotor, Motor], initial_position=0):
+def patch_motor(motor: ExtendedMotor | Motor, initial_position=0):
     motor.setpoint._backend._set_value(initial_position)  # type: ignore
     motor.readback._backend._set_value(initial_position)  # type: ignore
     if isinstance(motor, ExtendedMotor):

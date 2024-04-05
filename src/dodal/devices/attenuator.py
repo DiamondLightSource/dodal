@@ -1,5 +1,3 @@
-from typing import Optional
-
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO, Kind
 from ophyd.status import Status, SubscriptionStatus
 
@@ -78,7 +76,7 @@ class Attenuator(Device):
     change = Component(EpicsSignal, "FANOUT")
     actual_transmission = Component(EpicsSignal, "MATCH", kind=Kind.hinted)
 
-    detector_params: Optional[DetectorParams] = None
+    detector_params: DetectorParams | None = None
 
     def get_calculated_filter_state_list(self) -> list[EpicsSignalRO]:
         return [

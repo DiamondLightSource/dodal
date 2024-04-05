@@ -1,8 +1,8 @@
-from typing import Dict, Generic, TypeVar, Union
+from typing import Dict, Generic, TypeVar
 
 from pydantic.dataclasses import dataclass
 
-T = TypeVar("T", bound=Union[float, int])
+T = TypeVar("T", bound=float | int)
 
 
 @dataclass
