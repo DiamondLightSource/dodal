@@ -2,7 +2,7 @@ import operator
 from collections import namedtuple
 from dataclasses import dataclass
 from functools import reduce
-from typing import List, Optional, Sequence
+from typing import List, Sequence
 
 from ophyd import Component as Cpt
 from ophyd import SignalRO
@@ -35,12 +35,12 @@ ApertureFiveDimensionalLocation = namedtuple(
 class SingleAperturePosition:
     name: str
     GDA_name: str
-    radius_microns: Optional[float]
+    radius_microns: float | None
     location: ApertureFiveDimensionalLocation
 
 
 def position_from_params(
-    name: str, GDA_name: str, radius_microns: Optional[float], params: dict
+    name: str, GDA_name: str, radius_microns: float | None, params: dict
 ) -> SingleAperturePosition:
     return SingleAperturePosition(
         name,
@@ -86,7 +86,7 @@ class AperturePositions:
 class ApertureScatterguard(InfoLoggingDevice):
     aperture = Cpt(Aperture, "-MO-MAPT-01:")
     scatterguard = Cpt(Scatterguard, "-MO-SCAT-01:")
-    aperture_positions: Optional[AperturePositions] = None
+    aperture_positions: AperturePositions | None = None
     TOLERANCE_STEPS = 3  # Number of MRES steps
 
     class SelectedAperture(SignalRO):

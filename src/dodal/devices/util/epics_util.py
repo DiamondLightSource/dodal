@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Callable, Optional
+from typing import Callable
 
 from ophyd import Component, Device, EpicsSignal
 from ophyd.status import Status, StatusBase
@@ -25,7 +25,7 @@ def epics_signal_put_wait(pv_name: str, wait: float = 3.0) -> Component[EpicsSig
 def run_functions_without_blocking(
     functions_to_chain: list[Callable[[], StatusBase]],
     timeout: float = 60.0,
-    associated_obj: Optional[Device] = None,
+    associated_obj: Device | None = None,
 ) -> Status:
     """Creates and initiates an asynchronous chaining of functions which return a status
 
@@ -37,7 +37,7 @@ def run_functions_without_blocking(
     Args:
     functions_to_chain( list(function - > StatusBase) ): A list of functions which each
                                                             return a status object
-    associated_obj (Optional[Device]): The device that should be associated with the
+    associated_obj (Device | None): The device that should be associated with the
                                         returned status
 
     Returns:

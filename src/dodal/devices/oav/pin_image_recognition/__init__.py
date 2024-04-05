@@ -1,6 +1,5 @@
 import asyncio
 import time
-from typing import Optional
 
 import numpy as np
 from numpy.typing import NDArray
@@ -22,7 +21,7 @@ from dodal.devices.oav.pin_image_recognition.utils import (
 from dodal.devices.ophyd_async_utils import create_soft_signal_r, create_soft_signal_rw
 from dodal.log import LOGGER
 
-Tip = tuple[Optional[int], Optional[int]]
+Tip = tuple[int | None, int | None]
 
 
 class InvalidPinException(Exception):

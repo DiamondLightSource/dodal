@@ -2,7 +2,7 @@ import asyncio
 from collections import OrderedDict
 from enum import Enum
 from queue import Empty, Queue
-from typing import Any, Generator, Optional, Sequence, Tuple, TypedDict, Union
+from typing import Any, Generator, Sequence, Tuple, TypedDict
 
 import bluesky.plan_stubs as bps
 import numpy as np
@@ -78,7 +78,7 @@ class ZocaloResults(StandardReadable, Triggerable):
         self.timeout_s = timeout_s
         self._prefix = prefix
         self._raw_results_received: Queue = Queue()
-        self.transport: Optional[CommonTransport] = None
+        self.transport: CommonTransport | None = None
 
         self.results = create_soft_signal_r(list[XrcResult], "results", self.name)
         self.centres_of_mass = create_soft_signal_r(
@@ -243,7 +243,7 @@ class ZocaloResults(StandardReadable, Triggerable):
 
 def get_processing_result(
     zocalo: ZocaloResults,
-) -> Generator[Any, Any, Union[Tuple[np.ndarray, np.ndarray], Tuple[None, None]]]:
+) -> Generator[Any, Any, Tuple[np.ndarray, np.ndarray] | Tuple[None, None]]:
     """A minimal plan which will extract the top ranked xray centre and crystal bounding
     box size from the zocalo results. Returns (None, None) if no crystals were found."""
 
