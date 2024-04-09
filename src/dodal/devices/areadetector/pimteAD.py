@@ -1,5 +1,4 @@
 from typing import Sequence
-
 from bluesky.protocols import Hints
 from ophyd_async.core import DirectoryProvider, SignalR, StandardDetector
 from ophyd_async.epics.areadetector.drivers import ADBaseShapeProvider
@@ -42,4 +41,4 @@ class HDFStatsPimte(StandardDetector):
 
     @property
     def hints(self) -> Hints:
-        return self.writer.hints
+        return self._writer.hints

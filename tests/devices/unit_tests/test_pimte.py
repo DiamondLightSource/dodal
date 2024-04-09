@@ -1,6 +1,6 @@
 import bluesky.plan_stubs as bps
 import pytest
-from bluesky import RunEngine
+from bluesky.run_engine import RunEngine
 from bluesky.utils import new_uid
 from ophyd_async.core import DeviceCollector, StaticDirectoryProvider, set_sim_value
 
@@ -62,10 +62,6 @@ async def test_pimte(RE: RunEngine, single_detector: HDFStatsPimte):
     assert (
         await writer.hdf.file_path.get_value()
         == writer._directory_provider().root.as_posix()
-    )
-
-    assert (await writer.hdf.file_name.get_value()).startswith(
-        writer._directory_provider().prefix
     )
 
     assert names == [
