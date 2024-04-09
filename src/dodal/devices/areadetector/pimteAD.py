@@ -5,8 +5,8 @@ from ophyd_async.core import DirectoryProvider, SignalR, StandardDetector
 from ophyd_async.epics.areadetector.drivers import ADBaseShapeProvider
 from ophyd_async.epics.areadetector.writers import HDFWriter, NDFileHDF, NDPluginStats
 
-from epics.drivers.pimte1_driver import Pimte1Driver
-from epics.pimte_controller import PimteController
+from dodal.devices.areadetector.epics.drivers.pimte1_driver import Pimte1Driver
+from dodal.devices.areadetector.epics.pimte_controller import PimteController
 
 
 class HDFStatsPimte(StandardDetector):

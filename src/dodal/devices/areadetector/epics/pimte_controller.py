@@ -9,7 +9,7 @@ from ophyd_async.epics.areadetector.drivers.ad_base import (
 )
 from ophyd_async.epics.areadetector.utils import ImageMode, stop_busy_record
 
-from drivers.pimte1_driver import Pimte1Driver
+from dodal.devices.areadetector.epics.drivers.pimte1_driver import Pimte1Driver
 
 TRIGGER_MODE = {
     DetectorTrigger.internal: Pimte1Driver.TriggerMode.internal,
@@ -47,7 +47,6 @@ class PimteController(DetectorControl):
         trigger: DetectorTrigger = DetectorTrigger.internal,
         exposure: Optional[float] = None,
     ) -> AsyncStatus:
-
         funcs = [
             self.driver.num_images.set(999_999 if num == 0 else num),
             self.driver.image_mode.set(ImageMode.multiple),
