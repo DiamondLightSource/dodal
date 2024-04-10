@@ -2,7 +2,8 @@ import asyncio
 from collections import namedtuple
 from dataclasses import dataclass
 
-from ophyd_async.core import SignalR, StandardReadable
+from bluesky.protocols import Movable
+from ophyd_async.core import AsyncStatus, SignalR, StandardReadable
 from ophyd_async.core.sim_signal_backend import SimSignalBackend
 
 from dodal.devices.aperture import Aperture
@@ -80,7 +81,7 @@ class AperturePositions:
         ]
 
 
-class ApertureScatterguard(StandardReadable):
+class ApertureScatterguard(StandardReadable, Movable):
     def __init__(self, prefix: str = "", name: str = "") -> None:
         self.aperture = Aperture(prefix="-MO-MAPT-01:")
         self.scatterguard = Scatterguard(prefix="-MO-SCAT-01:")
@@ -106,12 +107,12 @@ class ApertureScatterguard(StandardReadable):
         LOGGER.info(f"{self.name} loaded in {positions}")
         self.aperture_positions = positions
 
-    def set(self, pos: SingleAperturePosition):
+    def set(self, pos: SingleAperturePosition) -> AsyncStatus:
         assert isinstance(self.aperture_positions, AperturePositions)
         if pos not in self.aperture_positions.as_list():
             raise InvalidApertureMove(f"Unknown aperture: {pos}")
 
-        return self._safe_move_within_datacollection_range(pos.location)
+        return AsyncStatus(self._safe_move_within_datacollection_range(pos.location))
 
     def _get_motor_list(self):
         return [
@@ -208,6 +209,10 @@ class ApertureScatterguard(StandardReadable):
                 self.aperture.y._move(aperture_y),
                 self.aperture.z._move(aperture_z),
             )
+            new_ap_x = await self.aperture.x.readback.get_value()
+            new_ap_y = await self.aperture.y.readback.get_value()
+
+            print(new_ap_x, new_ap_y)
             return
         await asyncio.gather(
             self.aperture.x._move(aperture_x),

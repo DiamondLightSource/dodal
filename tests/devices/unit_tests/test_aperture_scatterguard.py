@@ -1,6 +1,8 @@
 from unittest.mock import AsyncMock, call
 
+import bluesky.plan_stubs as bps
 import pytest
+from bluesky.run_engine import RunEngine
 from ophyd.sim import make_fake_device
 
 from dodal.devices.aperturescatterguard import (
@@ -72,6 +74,21 @@ def aperture_positions():
         }
     )
     return aperture_positions
+
+
+def install_logger_for_aperture_and_scatterguard(aperture_scatterguard):
+    parent_mock = AsyncMock()
+    mock_ap_x = aperture_scatterguard.aperture.x._move
+    mock_ap_y = aperture_scatterguard.aperture.y._move
+    mock_ap_z = aperture_scatterguard.aperture.z._move
+    mock_sg_x = aperture_scatterguard.scatterguard.x._move
+    mock_sg_y = aperture_scatterguard.scatterguard.y._move
+    parent_mock.attach_mock(mock_ap_x, "_mock_ap_x")
+    parent_mock.attach_mock(mock_ap_y, "_mock_ap_y")
+    parent_mock.attach_mock(mock_ap_z, "_mock_ap_z")
+    parent_mock.attach_mock(mock_sg_x, "_mock_sg_x")
+    parent_mock.attach_mock(mock_sg_y, "_mock_sg_y")
+    return parent_mock
 
 
 def test_create_aperturescatterguard():
@@ -282,17 +299,24 @@ async def test_when_aperture_set_and_device_read_then_position_returned(
     )
 
 
-# ensure movements happen correctly to avoid collision - find another way
-def install_logger_for_aperture_and_scatterguard(aperture_scatterguard):
-    parent_mock = AsyncMock()
-    mock_ap_x = aperture_scatterguard.aperture.x._move
-    mock_ap_y = aperture_scatterguard.aperture.y._move
-    mock_ap_z = aperture_scatterguard.aperture.z._move
-    mock_sg_x = aperture_scatterguard.scatterguard.x._move
-    mock_sg_y = aperture_scatterguard.scatterguard.y._move
-    parent_mock.attach_mock(mock_ap_x, "_mock_ap_x")
-    parent_mock.attach_mock(mock_ap_y, "_mock_ap_y")
-    parent_mock.attach_mock(mock_ap_z, "_mock_ap_z")
-    parent_mock.attach_mock(mock_sg_x, "_mock_sg_x")
-    parent_mock.attach_mock(mock_sg_y, "_mock_sg_y")
-    return parent_mock
+async def test_ap_sg_in_runengine(
+    aperture_in_medium_pos: ApertureScatterguard,
+    RE: RunEngine,
+):
+    test_position = (
+        aperture_in_medium_pos.aperture_positions.SMALL  # type: ignore
+    )  # I'll leave this to you
+    RE(
+        bps.abs_set(
+            aperture_in_medium_pos,
+            test_position,
+            wait=True,
+        )
+    )
+    # position = await aperture_in_medium_pos._get_current_aperture_position()
+    # medium = aperture_in_medium_pos.aperture_positions.MEDIUM  # type: ignore
+    # assert medium == position
+    # assert that positions afterwards are equal to specified in the test position
+    assert (
+        await aperture_in_medium_pos._get_current_aperture_position() == test_position
+    )
