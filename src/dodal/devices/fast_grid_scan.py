@@ -50,9 +50,6 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
     layout to EPICS. The parameters and functions of this class are common
     to both the zebra and panda triggered fast grid scans.
 
-    Motion program will do a grid in x-y then rotate omega +90 and perform
-    a grid in x-z.
-
     The grid specified is where data is taken e.g. it can be assumed the first frame is
     at x_start, y1_start, z1_start and subsequent frames are N*step_size away.
     """
@@ -170,7 +167,7 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
 
 class GridScanParams(GridScanParamsCommon):
     """
-    Params for standard Zebra FGS, which includes the dwell time
+    Params for standard Zebra FGS. Adds on the dwell time
     """
 
     dwell_time_ms: float = 10
@@ -195,7 +192,7 @@ class GridScanParams(GridScanParamsCommon):
 
 class PandAGridScanParams(GridScanParamsCommon):
     """
-    Params for panda constant-motion scan, which includes the goniometer run-up distance
+    Params for panda constant-motion scan. Adds on the goniometer run-up distance
     """
 
     run_up_distance_mm: float = 0.15
@@ -229,11 +226,24 @@ class ExpectedImages(SignalRW):
 
 
 class FastGridScanCommon(StandardReadable, ABC):
+    """Device for a general fast grid scan
+
+    When the motion program is started, the goniometer will move in a snake-like grid trajectory,
+    with X as the fast axis and Y as the slow axis. If Z steps isn't 0, the goniometer will
+    then rotate in the omega direction such that it moves from the X-Y, to the X-Z plane then
+    do a second grid scan. The detector is triggered after every x step.
+    See https://github.com/DiamondLightSource/hyperion/wiki/Coordinate-Systems for more
+    """
+
     def __init__(self, prefix: str, name: str = "") -> None:
         super().__init__(name)
         self.x_steps = epics_signal_rw_rbv(int, "X_NUM_STEPS")
-        self.y_steps = epics_signal_rw_rbv(int, "X_NUM_STEPS")
-        self.z_steps = epics_signal_rw_rbv(int, "X_NUM_STEPS")
+        self.y_steps = epics_signal_rw_rbv(
+            int, "X_NUM_STEPS"
+        )  # Number of vertical steps during the first grid scan
+        self.z_steps = epics_signal_rw_rbv(
+            int, "X_NUM_STEPS"
+        )  # Number of vertical steps during the second grid scan, after the rotation in omega
         self.x_step_size = epics_signal_rw_rbv(float, "X_STEP_SIZE")
         self.y_step_size = epics_signal_rw_rbv(float, "Y_STEP_SIZE")
         self.z_step_size = epics_signal_rw_rbv(float, "Z_STEP_SIZE")
@@ -308,11 +318,15 @@ class FastGridScanCommon(StandardReadable, ABC):
 
 
 class FastGridScan(FastGridScanCommon):
-    """Device for standard Zebra FGS"""
+    """Device for standard Zebra FGS. In this scan, the goniometer's velocity profile follows a parabloic shape between X steps,
+    with the slowest points occuring at each X step.
+    """
 
     def __init__(self, prefix: str, name: str = "") -> None:
         super().__init__(prefix, name)
-        self.dwell_time_ms = epics_signal_rw_rbv(float, "DWELL_TIME")
+        self.dwell_time_ms = epics_signal_rw_rbv(
+            float, "DWELL_TIME"
+        )  # Time taken to travel between X steps
         self.movable_params["dwell_time_ms"] = self.dwell_time_ms
 
 
@@ -321,10 +335,16 @@ class PandAFastGridScan(FastGridScanCommon):
 
     def __init__(self, prefix: str, name: str = "") -> None:
         super().__init__(prefix, name)
-        self.time_between_x_steps_ms = epics_signal_rw_rbv(
-            float, "TIME_BETWEEN_X_STEPS"
+        self.time_between_x_steps_ms = (
+            epics_signal_rw_rbv(  # Used by motion controller to set goniometer velocity
+                float, "TIME_BETWEEN_X_STEPS"
+            )
         )
+
+        # Distance before and after the grid given to allow goniometer to reach desired speed while it is within the
+        # grid
         self.run_up_distance_mm = epics_signal_rw_rbv(float, "RUNUP_DISTANCE")
+
         self.movable_params["run_up_distance_mm"] = self.run_up_distance_mm
 
 
