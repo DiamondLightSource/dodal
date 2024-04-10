@@ -209,10 +209,6 @@ class ApertureScatterguard(StandardReadable, Movable):
                 self.aperture.y._move(aperture_y),
                 self.aperture.z._move(aperture_z),
             )
-            new_ap_x = await self.aperture.x.readback.get_value()
-            new_ap_y = await self.aperture.y.readback.get_value()
-
-            print(new_ap_x, new_ap_y)
             return
         await asyncio.gather(
             self.aperture.x._move(aperture_x),

@@ -303,20 +303,24 @@ async def test_ap_sg_in_runengine(
     aperture_in_medium_pos: ApertureScatterguard,
     RE: RunEngine,
 ):
-    test_position = (
-        aperture_in_medium_pos.aperture_positions.SMALL  # type: ignore
-    )  # I'll leave this to you
-    RE(
-        bps.abs_set(
-            aperture_in_medium_pos,
-            test_position,
-            wait=True,
-        )
-    )
-    # position = await aperture_in_medium_pos._get_current_aperture_position()
-    # medium = aperture_in_medium_pos.aperture_positions.MEDIUM  # type: ignore
-    # assert medium == position
-    # assert that positions afterwards are equal to specified in the test position
+    ap_sg = aperture_in_medium_pos
+    assert ap_sg.aperture_positions
+    test_position = ap_sg.aperture_positions.SMALL
+    RE(bps.abs_set(ap_sg, test_position, wait=True))
     assert (
-        await aperture_in_medium_pos._get_current_aperture_position() == test_position
+        await ap_sg.aperture.x.readback.get_value() == test_position.location.aperture_x
+    )
+    assert (
+        await ap_sg.aperture.y.readback.get_value() == test_position.location.aperture_y
+    )
+    assert (
+        await ap_sg.aperture.z.readback.get_value() == test_position.location.aperture_z
+    )
+    assert (
+        await ap_sg.scatterguard.x.readback.get_value()
+        == test_position.location.scatterguard_x
+    )
+    assert (
+        await ap_sg.scatterguard.y.readback.get_value()
+        == test_position.location.scatterguard_y
     )
