@@ -1,7 +1,8 @@
+from typing import Any, Mapping
 from unittest.mock import ANY
 
 import pytest
-from ophyd_async.core import DeviceCollector, set_sim_value
+from ophyd_async.core import DeviceCollector, StandardReadable, set_sim_value
 
 from dodal.devices.s4_slit_gaps import S4SlitGaps, S4SlitGapsGroup
 
@@ -41,98 +42,110 @@ async def test_reading_slits_reads_gaps_and_centres(slits: S4SlitGaps):
     set_sim_value(slits.y_centre.readback, 1.0)
     set_sim_value(slits.y_gap.readback, 1.5)
 
-    await slits.stage()
-    reading = await slits.read()
-    await slits.unstage()
-
-    assert reading == {
-        "slits-x_centre": {
-            "alarm_severity": 0,
-            "timestamp": ANY,
-            "value": 0.0,
+    await assert_reading(
+        slits,
+        {
+            "slits-x_centre": {
+                "alarm_severity": 0,
+                "timestamp": ANY,
+                "value": 0.0,
+            },
+            "slits-x_gap": {
+                "alarm_severity": 0,
+                "timestamp": ANY,
+                "value": 0.5,
+            },
+            "slits-y_centre": {
+                "alarm_severity": 0,
+                "timestamp": ANY,
+                "value": 1.0,
+            },
+            "slits-y_gap": {
+                "alarm_severity": 0,
+                "timestamp": ANY,
+                "value": 1.5,
+            },
         },
-        "slits-x_gap": {
-            "alarm_severity": 0,
-            "timestamp": ANY,
-            "value": 0.5,
-        },
-        "slits-y_centre": {
-            "alarm_severity": 0,
-            "timestamp": ANY,
-            "value": 1.0,
-        },
-        "slits-y_gap": {
-            "alarm_severity": 0,
-            "timestamp": ANY,
-            "value": 1.5,
-        },
-    }
+    )
 
 
 async def test_reading_slit_group_reads_gaps_and_centres(slit_group: S4SlitGapsGroup):
-    await slit_group.stage()
-    reading = await slit_group.read()
-    await slit_group.unstage()
+    for i in range(2, 5):
+        set_sim_value(slit_group.slits[i].x_centre.readback, i + 0.0)
+        set_sim_value(slit_group.slits[i].x_gap.readback, i + 0.25)
+        set_sim_value(slit_group.slits[i].y_centre.readback, i + 0.5)
+        set_sim_value(slit_group.slits[i].y_gap.readback, i + 0.75)
 
-    assert reading == {
-        "slit_group-slits-2-x_centre": {
-            "alarm_severity": 0,
-            "timestamp": ANY,
-            "value": 0.0,
+    await assert_reading(
+        slit_group,
+        {
+            "slit_group-slits-2-x_centre": {
+                "alarm_severity": 0,
+                "timestamp": ANY,
+                "value": 2.0,
+            },
+            "slit_group-slits-2-x_gap": {
+                "alarm_severity": 0,
+                "timestamp": ANY,
+                "value": 2.25,
+            },
+            "slit_group-slits-2-y_centre": {
+                "alarm_severity": 0,
+                "timestamp": ANY,
+                "value": 2.5,
+            },
+            "slit_group-slits-2-y_gap": {
+                "alarm_severity": 0,
+                "timestamp": ANY,
+                "value": 2.75,
+            },
+            "slit_group-slits-3-x_centre": {
+                "alarm_severity": 0,
+                "timestamp": ANY,
+                "value": 3.0,
+            },
+            "slit_group-slits-3-x_gap": {
+                "alarm_severity": 0,
+                "timestamp": ANY,
+                "value": 3.25,
+            },
+            "slit_group-slits-3-y_centre": {
+                "alarm_severity": 0,
+                "timestamp": ANY,
+                "value": 3.5,
+            },
+            "slit_group-slits-3-y_gap": {
+                "alarm_severity": 0,
+                "timestamp": ANY,
+                "value": 3.75,
+            },
+            "slit_group-slits-4-x_centre": {
+                "alarm_severity": 0,
+                "timestamp": ANY,
+                "value": 4.0,
+            },
+            "slit_group-slits-4-x_gap": {
+                "alarm_severity": 0,
+                "timestamp": ANY,
+                "value": 4.25,
+            },
+            "slit_group-slits-4-y_centre": {
+                "alarm_severity": 0,
+                "timestamp": ANY,
+                "value": 4.5,
+            },
+            "slit_group-slits-4-y_gap": {
+                "alarm_severity": 0,
+                "timestamp": ANY,
+                "value": 4.75,
+            },
         },
-        "slit_group-slits-2-x_gap": {
-            "alarm_severity": 0,
-            "timestamp": ANY,
-            "value": 0.0,
-        },
-        "slit_group-slits-2-y_centre": {
-            "alarm_severity": 0,
-            "timestamp": ANY,
-            "value": 0.0,
-        },
-        "slit_group-slits-2-y_gap": {
-            "alarm_severity": 0,
-            "timestamp": ANY,
-            "value": 0.0,
-        },
-        "slit_group-slits-3-x_centre": {
-            "alarm_severity": 0,
-            "timestamp": ANY,
-            "value": 0.0,
-        },
-        "slit_group-slits-3-x_gap": {
-            "alarm_severity": 0,
-            "timestamp": ANY,
-            "value": 0.0,
-        },
-        "slit_group-slits-3-y_centre": {
-            "alarm_severity": 0,
-            "timestamp": ANY,
-            "value": 0.0,
-        },
-        "slit_group-slits-3-y_gap": {
-            "alarm_severity": 0,
-            "timestamp": ANY,
-            "value": 0.0,
-        },
-        "slit_group-slits-4-x_centre": {
-            "alarm_severity": 0,
-            "timestamp": ANY,
-            "value": 0.0,
-        },
-        "slit_group-slits-4-x_gap": {
-            "alarm_severity": 0,
-            "timestamp": ANY,
-            "value": 0.0,
-        },
-        "slit_group-slits-4-y_centre": {
-            "alarm_severity": 0,
-            "timestamp": ANY,
-            "value": 0.0,
-        },
-        "slit_group-slits-4-y_gap": {
-            "alarm_severity": 0,
-            "timestamp": ANY,
-            "value": 0.0,
-        },
-    }
+    )
+
+
+async def assert_reading(device: StandardReadable, expected_reading: Mapping[str, Any]):
+    await device.stage()
+    reading = await device.read()
+    await device.unstage()
+
+    assert reading == expected_reading
