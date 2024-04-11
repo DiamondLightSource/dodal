@@ -23,6 +23,14 @@ async def slit_group() -> S4SlitGapsGroup:
     return slit_group
 
 
+async def test_slit_group_does_not_create_extra_slits(
+    slit_group: S4SlitGapsGroup,
+):
+    for i in [0, 1, 5]:
+        with pytest.raises(KeyError):
+            slit_group.slits[i]
+
+
 async def test_slit_group_creates_slits_with_correct_prefixes(
     slit_group: S4SlitGapsGroup,
 ):
