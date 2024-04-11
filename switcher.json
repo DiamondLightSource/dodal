@@ -304,6 +304,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/jungfrau_commissioning/"
   },
   {
+    "version": "ophyd-async-slits",
+    "url": "https://DiamondLightSource.github.io/dodal/ophyd-async-slits/"
+  },
+  {
     "version": "ophyd_async_synchrotron_hyperion_compatible",
     "url": "https://DiamondLightSource.github.io/dodal/ophyd_async_synchrotron_hyperion_compatible/"
   },
