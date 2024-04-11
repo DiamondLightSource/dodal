@@ -7,14 +7,13 @@ name = "dls-dodal"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "License :: OSI Approved :: Apache Software License",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
 ]
 description = "Ophyd devices and other utils that could be used across DLS beamlines"
 dependencies = [
     "ophyd",
-    "ophyd-async@git+https://github.com/bluesky/ophyd-async",
+    "ophyd-async>=0.3a1",
     "bluesky",
     "pyepics",
     "dataclasses-json",
@@ -23,16 +22,16 @@ dependencies = [
     "requests",
     "graypy",
     "pydantic",
-    "opencv-python-headless",                                 # For pin-tip detection.
-    "aioca",                                                  # Required for CA support with ophyd-async.
-    "p4p",                                                    # Required for PVA support with ophyd-async.
+    "opencv-python-headless", # For pin-tip detection.
+    "aioca",                  # Required for CA support with ophyd-async.
+    "p4p",                    # Required for PVA support with ophyd-async.
     "numpy",
 ]
 
 dynamic = ["version"]
 license.file = "LICENSE"
 readme = "README.rst"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 
 [project.optional-dependencies]
 dev = [

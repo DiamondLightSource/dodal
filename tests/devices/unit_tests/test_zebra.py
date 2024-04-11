@@ -34,9 +34,9 @@ async def test_position_compare_sets_signals():
     await fake_pc.connect(sim=True)
 
     async def mock_arm(demand):
+        await fake_pc.arm.armed._backend.put(demand)  # type: ignore
         fake_pc.arm.disarm_set._backend._set_value(not demand)  # type: ignore
         fake_pc.arm.arm_set._backend._set_value(demand)  # type: ignore
-        await fake_pc.arm.armed.set(demand)
 
     fake_pc.arm.arm_set.set = AsyncMock(side_effect=mock_arm)
     fake_pc.arm.disarm_set.set = AsyncMock(side_effect=mock_arm)
