@@ -256,10 +256,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/directory_provider/"
   },
   {
-    "version": "finish-removing-3.9",
-    "url": "https://DiamondLightSource.github.io/dodal/finish-removing-3.9/"
-  },
-  {
     "version": "fix_linting_CI_issues",
     "url": "https://DiamondLightSource.github.io/dodal/fix_linting_CI_issues/"
   },
