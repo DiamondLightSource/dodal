@@ -5,7 +5,7 @@ from dodal.beamlines.beamline_utils import (
 )
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.visit import StaticVisitDirectoryProvider
-from dodal.devices.s4_slit_gaps import S4SlitGapsGroup
+from dodal.devices.s4_slit_gaps import Slits
 from dodal.devices.tetramm import TetrammDetector
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import get_beamline_name
@@ -52,15 +52,79 @@ def it(
     )
 
 
-def slits(
+def slits_1(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
-) -> S4SlitGapsGroup:
+) -> Slits:
     return device_instantiation(
-        S4SlitGapsGroup,
-        "slits",
-        "-AL-SLITS-{0:02d}:",
+        Slits,
+        "slits-01",
+        "-AL-SLITS-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        indices=range(1, 7),
+    )
+
+
+def slits_2(
+    wait_for_connection: bool = True,
+    fake_with_ophyd_sim: bool = False,
+) -> Slits:
+    return device_instantiation(
+        Slits,
+        "slits-02",
+        "-AL-SLITS-02:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+def slits_3(
+    wait_for_connection: bool = True,
+    fake_with_ophyd_sim: bool = False,
+) -> Slits:
+    return device_instantiation(
+        Slits,
+        "slits-03",
+        "-AL-SLITS-03:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+def slits_4(
+    wait_for_connection: bool = True,
+    fake_with_ophyd_sim: bool = False,
+) -> Slits:
+    return device_instantiation(
+        Slits,
+        "slits-04",
+        "-AL-SLITS-04:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+def slits_5(
+    wait_for_connection: bool = True,
+    fake_with_ophyd_sim: bool = False,
+) -> Slits:
+    return device_instantiation(
+        Slits,
+        "slits-05",
+        "-AL-SLITS-05:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+def slits_6(
+    wait_for_connection: bool = True,
+    fake_with_ophyd_sim: bool = False,
+) -> Slits:
+    return device_instantiation(
+        Slits,
+        "slits-06",
+        "-AL-SLITS-06:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
     )

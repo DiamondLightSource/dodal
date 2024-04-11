@@ -17,7 +17,7 @@ from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.panda_fast_grid_scan import PandAFastGridScan
 from dodal.devices.qbpm1 import QBPM1
 from dodal.devices.robot import BartRobot
-from dodal.devices.s4_slit_gaps import S4SlitGaps
+from dodal.devices.s4_slit_gaps import Slits
 from dodal.devices.sample_shutter import SampleShutter
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
@@ -260,12 +260,12 @@ def smargon(
 
 def s4_slit_gaps(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> S4SlitGaps:
+) -> Slits:
     """Get the i03 s4_slit_gaps device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return device_instantiation(
-        S4SlitGaps,
+        Slits,
         "s4_slit_gaps",
         "-AL-SLITS-04:",
         wait_for_connection,
