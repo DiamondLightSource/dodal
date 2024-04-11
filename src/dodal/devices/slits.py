@@ -4,7 +4,8 @@ from ophyd_async.epics.motion import Motor
 
 class Slits(StandardReadable):
     """
-    Representation of Slits, a group of motors controlling the xray optics slits
+    Representation of a 4-blade set of slits. Allows control/readout of the gap
+    between each pair of blades.
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
