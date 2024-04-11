@@ -196,10 +196,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/413_make_common_FGS/"
   },
   {
-    "version": "425_gracefully_handle_no_barcode",
-    "url": "https://DiamondLightSource.github.io/dodal/425_gracefully_handle_no_barcode/"
-  },
-  {
     "version": "51_aperture_scatterguard_no_positions",
     "url": "https://DiamondLightSource.github.io/dodal/51_aperture_scatterguard_no_positions/"
   },
@@ -258,6 +254,10 @@
   {
     "version": "directory_provider",
     "url": "https://DiamondLightSource.github.io/dodal/directory_provider/"
+  },
+  {
+    "version": "finish-removing-3.9",
+    "url": "https://DiamondLightSource.github.io/dodal/finish-removing-3.9/"
   },
   {
     "version": "fix_linting_CI_issues",
