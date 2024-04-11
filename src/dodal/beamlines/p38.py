@@ -1,5 +1,5 @@
-from ophyd_async.epics.areadetector import ADAravisDetector
-from ophyd_async.epics.areadetector.drivers import ADAravisDriver
+from ophyd_async.epics.areadetector import AravisDetector
+from ophyd_async.epics.areadetector.drivers import AravisDriver
 from ophyd_async.epics.areadetector.writers import NDFileHDF
 
 from dodal.beamlines.beamline_utils import device_instantiation, get_directory_provider
@@ -15,9 +15,9 @@ set_utils_beamline(BL)
 
 def d11_driver(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> ADAravisDriver:
+) -> AravisDriver:
     return device_instantiation(
-        ADAravisDriver,
+        AravisDriver,
         "d11_driver",
         "-DI-DCAM-03:DRV:",
         wait_for_connection,
@@ -38,13 +38,13 @@ def d11_writer(
 
 
 def d11(
-    d11_driver: ADAravisDriver,
+    d11_driver: AravisDriver,
     d11_writer: NDFileHDF,
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
-) -> ADAravisDetector:
+) -> AravisDetector:
     return device_instantiation(
-        ADAravisDetector,
+        AravisDetector,
         "D11",
         "-DI-DCAM-03:",
         wait_for_connection,
@@ -57,9 +57,9 @@ def d11(
 
 def d12_driver(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> ADAravisDriver:
+) -> AravisDriver:
     return device_instantiation(
-        ADAravisDriver,
+        AravisDriver,
         "d12_driver",
         "-DI-DCAM-04:DRV:",
         wait_for_connection,
@@ -80,13 +80,13 @@ def d12_writer(
 
 
 def d12(
-    d12_driver: ADAravisDriver,
+    d12_driver: AravisDriver,
     d12_writer: NDFileHDF,
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
-) -> ADAravisDetector:
+) -> AravisDetector:
     return device_instantiation(
-        ADAravisDetector,
+        AravisDetector,
         "D12",
         "-DI-DCAM-04:",
         wait_for_connection,
