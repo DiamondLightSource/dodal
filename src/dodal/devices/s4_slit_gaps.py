@@ -1,5 +1,3 @@
-from typing import Mapping
-
 from ophyd_async.core import DeviceVector, StandardReadable
 from ophyd_async.epics.motion import Motor
 

@@ -5,6 +5,7 @@ from dodal.beamlines.beamline_utils import (
 )
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.visit import StaticVisitDirectoryProvider
+from dodal.devices.s4_slit_gaps import S4SlitGapsGroup
 from dodal.devices.tetramm import TetrammDetector
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import get_beamline_name
@@ -48,4 +49,18 @@ def it(
         wait_for_connection,
         fake_with_ophyd_sim,
         directory_provider=get_directory_provider(),
+    )
+
+
+def slits(
+    wait_for_connection: bool = True,
+    fake_with_ophyd_sim: bool = False,
+) -> S4SlitGapsGroup:
+    return device_instantiation(
+        S4SlitGapsGroup,
+        "slits",
+        "-AL-SLITS-{0:02d}:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        indices=range(1, 7),
     )
