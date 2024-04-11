@@ -14,8 +14,8 @@ from dodal.devices.i04.transfocator import Transfocator
 from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZPositioner
 from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
-from dodal.devices.s4_slit_gaps import Slits
 from dodal.devices.sample_shutter import SampleShutter
+from dodal.devices.slits import Slits
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import Undulator

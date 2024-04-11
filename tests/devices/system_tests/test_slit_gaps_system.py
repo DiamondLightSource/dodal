@@ -1,6 +1,6 @@
 import pytest
 
-from dodal.devices.s4_slit_gaps import Slits
+from dodal.devices.slits import Slits
 
 
 @pytest.mark.s03

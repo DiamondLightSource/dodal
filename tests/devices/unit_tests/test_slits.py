@@ -4,7 +4,7 @@ from unittest.mock import ANY
 import pytest
 from ophyd_async.core import DeviceCollector, StandardReadable, set_sim_value
 
-from dodal.devices.s4_slit_gaps import Slits
+from dodal.devices.slits import Slits
 
 
 @pytest.fixture

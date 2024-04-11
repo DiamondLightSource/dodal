@@ -17,8 +17,8 @@ from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.panda_fast_grid_scan import PandAFastGridScan
 from dodal.devices.qbpm1 import QBPM1
 from dodal.devices.robot import BartRobot
-from dodal.devices.s4_slit_gaps import Slits
 from dodal.devices.sample_shutter import SampleShutter
+from dodal.devices.slits import Slits
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import Undulator

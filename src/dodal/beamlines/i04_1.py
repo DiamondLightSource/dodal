@@ -4,7 +4,7 @@ from dodal.devices.backlight import Backlight
 from dodal.devices.detector import DetectorParams
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
-from dodal.devices.s4_slit_gaps import Slits
+from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import Undulator
 from dodal.devices.zebra import Zebra
