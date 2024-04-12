@@ -136,6 +136,7 @@ def set_up_DEBUG_memory_handler(
         filename=debug_path / filename, when="H", backupCount=DEBUG_LOG_FILES_TO_KEEP
     )
     file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(DEFAULT_FORMATTER)
     memory_handler = CircularMemoryHandler(
         capacity=capacity,
         flushLevel=logging.ERROR,
