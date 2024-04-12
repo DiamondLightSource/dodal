@@ -40,9 +40,9 @@ def count_sim(det: HDFStatsPimte, times: int = 1):
 
 
 @pytest.fixture
-async def single_detector(RE: RunEngine) -> HDFStatsPimte:
-    detector = await make_detector(prefix="TEST")
-
+async def single_detector(RE: RunEngine, tmp_directory_provider: StaticDirectoryProvider) -> HDFStatsPimte:
+    async with DeviceCollector(sim=True):
+        detector = HDFStatsPimte(prefix, tmp_directory_provider, "pimte")
     set_sim_value(detector._controller.driver.array_size_x, 10)
     set_sim_value(detector._controller.driver.array_size_y, 20)
     set_sim_value(detector.hdf.file_path_exists, True)
