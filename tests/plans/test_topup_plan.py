@@ -2,7 +2,6 @@ from unittest.mock import patch
 
 import bluesky.plan_stubs as bps
 import pytest
-from bluesky.run_engine import RunEngine
 from ophyd_async.core import set_sim_value
 
 from dodal.beamlines import i03
@@ -21,13 +20,12 @@ def synchrotron() -> Synchrotron:
 @patch("dodal.plans.check_topup.wait_for_topup_complete")
 @patch("dodal.plans.check_topup.bps.sleep")
 def test_when_topup_before_end_of_collection_wait(
-    fake_sleep, fake_wait, synchrotron: Synchrotron
+    fake_sleep, fake_wait, synchrotron: Synchrotron, RE
 ):
     set_sim_value(synchrotron.synchrotron_mode, SynchrotronMode.USER)
     set_sim_value(synchrotron.topup_start_countdown, 20.0)
     set_sim_value(synchrotron.top_up_end_countdown, 60.0)
 
-    RE = RunEngine()
     RE(
         check_topup_and_wait_if_necessary(
             synchrotron=synchrotron,
@@ -40,7 +38,7 @@ def test_when_topup_before_end_of_collection_wait(
 
 @patch("dodal.plans.check_topup.bps.rd")
 @patch("dodal.plans.check_topup.bps.sleep")
-def test_wait_for_topup_complete(fake_sleep, fake_rd, synchrotron):
+def test_wait_for_topup_complete(fake_sleep, fake_rd, synchrotron, RE):
     def fake_generator(value):
         yield from bps.null()
         return value
@@ -52,7 +50,6 @@ def test_wait_for_topup_complete(fake_sleep, fake_rd, synchrotron):
         fake_generator(10.0),
     ]
 
-    RE = RunEngine()
     RE(wait_for_topup_complete(synchrotron))
 
     assert fake_sleep.call_count == 3
@@ -61,10 +58,9 @@ def test_wait_for_topup_complete(fake_sleep, fake_rd, synchrotron):
 
 @patch("dodal.plans.check_topup.bps.sleep")
 @patch("dodal.plans.check_topup.bps.null")
-def test_no_waiting_if_decay_mode(fake_null, fake_sleep, synchrotron: Synchrotron):
+def test_no_waiting_if_decay_mode(fake_null, fake_sleep, synchrotron: Synchrotron, RE):
     set_sim_value(synchrotron.topup_start_countdown, -1)
 
-    RE = RunEngine()
     RE(
         check_topup_and_wait_if_necessary(
             synchrotron=synchrotron,
@@ -78,12 +74,11 @@ def test_no_waiting_if_decay_mode(fake_null, fake_sleep, synchrotron: Synchrotro
 
 @patch("dodal.plans.check_topup.bps.null")
 def test_no_waiting_when_mode_does_not_allow_gating(
-    fake_null, synchrotron: Synchrotron
+    fake_null, synchrotron: Synchrotron, RE
 ):
     set_sim_value(synchrotron.topup_start_countdown, 1.0)
     set_sim_value(synchrotron.synchrotron_mode, SynchrotronMode.SHUTDOWN)
 
-    RE = RunEngine()
     RE(
         check_topup_and_wait_if_necessary(
             synchrotron=synchrotron,
