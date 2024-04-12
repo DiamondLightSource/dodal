@@ -31,6 +31,8 @@ from dodal.devices.zocalo import ZocaloResults
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
 
+from ._device_helpers import numbered_slits
+
 ZOOM_PARAMS_FILE = (
     "/dls_sw/i03/software/gda/configurations/i03-config/xml/jCameraManZoomLevels.xml"
 )
@@ -264,13 +266,7 @@ def s4_slit_gaps(
     """Get the i03 s4_slit_gaps device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        Slits,
-        "s4_slit_gaps",
-        "-AL-SLITS-04:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
+    return numbered_slits(4, wait_for_connection, fake_with_ophyd_sim)
 
 
 @skip_device(lambda: BL == "s03")

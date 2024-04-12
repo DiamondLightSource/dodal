@@ -11,6 +11,10 @@ from dodal.devices.tetramm import TetrammDetector
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import get_beamline_name
 
+from ._device_helpers import numbered_slits
+from .beamline_utils import device_instantiation, get_directory_provider
+from .beamline_utils import set_beamline as set_utils_beamline
+
 BL = get_beamline_name("i22")
 set_log_beamline(BL)
 set_utils_beamline(BL)
@@ -55,12 +59,10 @@ def it(
 
 def slits_1(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
+    fake_with_ophyd_sim: bool = True,
 ) -> Slits:
-    return device_instantiation(
-        Slits,
-        "slits-01",
-        "-AL-SLITS-01:",
+    return numbered_slits(
+        1,
         wait_for_connection,
         fake_with_ophyd_sim,
     )
@@ -68,12 +70,10 @@ def slits_1(
 
 def slits_2(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
+    fake_with_ophyd_sim: bool = True,
 ) -> Slits:
-    return device_instantiation(
-        Slits,
-        "slits-02",
-        "-AL-SLITS-02:",
+    return numbered_slits(
+        2,
         wait_for_connection,
         fake_with_ophyd_sim,
     )
@@ -81,12 +81,10 @@ def slits_2(
 
 def slits_3(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
+    fake_with_ophyd_sim: bool = True,
 ) -> Slits:
-    return device_instantiation(
-        Slits,
-        "slits-03",
-        "-AL-SLITS-03:",
+    return numbered_slits(
+        3,
         wait_for_connection,
         fake_with_ophyd_sim,
     )
@@ -94,12 +92,10 @@ def slits_3(
 
 def slits_4(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
+    fake_with_ophyd_sim: bool = True,
 ) -> Slits:
-    return device_instantiation(
-        Slits,
-        "slits-04",
-        "-AL-SLITS-04:",
+    return numbered_slits(
+        4,
         wait_for_connection,
         fake_with_ophyd_sim,
     )
@@ -107,12 +103,10 @@ def slits_4(
 
 def slits_5(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
+    fake_with_ophyd_sim: bool = True,
 ) -> Slits:
-    return device_instantiation(
-        Slits,
-        "slits-05",
-        "-AL-SLITS-05:",
+    return numbered_slits(
+        5,
         wait_for_connection,
         fake_with_ophyd_sim,
     )
@@ -120,12 +114,10 @@ def slits_5(
 
 def slits_6(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
+    fake_with_ophyd_sim: bool = True,
 ) -> Slits:
-    return device_instantiation(
-        Slits,
-        "slits-06",
-        "-AL-SLITS-06:",
+    return numbered_slits(
+        6,
         wait_for_connection,
         fake_with_ophyd_sim,
     )
