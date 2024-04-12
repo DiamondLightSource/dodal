@@ -9,12 +9,12 @@ from ophyd_async.epics.areadetector.drivers.ad_base import (
 )
 from ophyd_async.epics.areadetector.utils import ImageMode, stop_busy_record
 
-from dodal.devices.areadetector.epics.drivers.pimte1_driver import Pimte1Driver
+from dodal.devices.areadetector.epics.drivers.pimte1_driver import Pimte1Driver, TriggerMode, SpeedMode
 
 TRIGGER_MODE = {
-    DetectorTrigger.internal: Pimte1Driver.TriggerMode.internal,
-    DetectorTrigger.constant_gate: Pimte1Driver.TriggerMode.ext_trigger,
-    DetectorTrigger.variable_gate: Pimte1Driver.TriggerMode.ext_trigger,
+    DetectorTrigger.internal: TriggerMode.internal,
+    DetectorTrigger.constant_gate: TriggerMode.ext_trigger,
+    DetectorTrigger.variable_gate: TriggerMode.ext_trigger,
 }
 
 
@@ -28,7 +28,7 @@ class PimteController(DetectorControl):
         self.good_states = good_states
 
     def get_deadtime(self, exposure: float) -> float:
-        return exposure + 0.1
+        return 2.4e-5
 
     async def _process_setting(self) -> None:
         await self.driver.initialize.set(1)
@@ -37,7 +37,7 @@ class PimteController(DetectorControl):
         await self.driver.set_temperture.set(temperature)
         await self._process_setting()
 
-    async def set_speed(self, speed: Pimte1Driver.SpeedMode) -> None:
+    async def set_speed(self, speed: SpeedMode) -> None:
         await self.driver.speed.set(speed)
         await self._process_setting()
 
