@@ -9,7 +9,11 @@ from ophyd_async.epics.areadetector.drivers.ad_base import (
 )
 from ophyd_async.epics.areadetector.utils import ImageMode, stop_busy_record
 
-from dodal.devices.areadetector.epics.drivers.pimte1_driver import Pimte1Driver, TriggerMode, SpeedMode
+from dodal.devices.areadetector.epics.drivers.pimte1_driver import (
+    Pimte1Driver,
+    SpeedMode,
+    TriggerMode,
+)
 
 TRIGGER_MODE = {
     DetectorTrigger.internal: TriggerMode.internal,

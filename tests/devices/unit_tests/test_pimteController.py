@@ -8,7 +8,11 @@ from ophyd_async.epics.areadetector.controllers import (
 from ophyd_async.epics.areadetector.drivers import ADBase
 from ophyd_async.epics.areadetector.utils import ImageMode
 
-from dodal.devices.areadetector.epics.drivers.pimte1_driver import Pimte1Driver, TriggerMode, SpeedMode
+from dodal.devices.areadetector.epics.drivers.pimte1_driver import (
+    Pimte1Driver,
+    SpeedMode,
+    TriggerMode,
+)
 from dodal.devices.areadetector.epics.pimte_controller import PimteController
 
 
@@ -41,7 +45,7 @@ async def test_pimte_controller(RE, pimte: PimteController):
     assert await driver.trigger_mode.get_value() == TriggerMode.internal
     assert await driver.acquire.get_value() is True
     assert await driver.acquire_time.get_value() == 0.002
-    assert pimte.get_deadtime(2) == 2 + 0.1
+    assert pimte.get_deadtime(2) == 2.4e-5
 
     with patch(
         "ophyd_async.epics.areadetector.utils.wait_for_value", return_value=None

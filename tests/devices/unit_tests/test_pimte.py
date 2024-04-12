@@ -1,7 +1,6 @@
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
-from bluesky.utils import new_uid
 from ophyd_async.core import DeviceCollector, StaticDirectoryProvider, set_sim_value
 
 from dodal.devices.areadetector.pimteAD import HDFStatsPimte
@@ -30,13 +29,17 @@ def count_sim(det: HDFStatsPimte, times: int = 1):
 
 
 @pytest.fixture
-async def single_detector(RE: RunEngine, tmp_directory_provider: StaticDirectoryProvider) -> HDFStatsPimte:
+async def single_detector(
+    RE: RunEngine, tmp_directory_provider: StaticDirectoryProvider
+) -> HDFStatsPimte:
+    tempD = tmp_directory_provider
     async with DeviceCollector(sim=True):
-        detector = HDFStatsPimte("prefix", tmp_directory_provider, "pimte")
+        detector = HDFStatsPimte("prefix", tempD, "pimte")
 
     set_sim_value(detector._controller.driver.array_size_x, 10)
     set_sim_value(detector._controller.driver.array_size_y, 20)
     set_sim_value(detector.hdf.file_path_exists, True)
+    set_sim_value(detector.hdf.full_file_name, str(tempD().root.absolute()))
     set_sim_value(detector._writer.hdf.num_captured, 0)
     return detector
 
@@ -59,8 +62,6 @@ async def test_pimte(RE: RunEngine, single_detector: HDFStatsPimte):
         "start",
         "descriptor",
         "stream_resource",
-        "stream_resource",
-        "stream_datum",
         "stream_datum",
         "event",
         "stop",

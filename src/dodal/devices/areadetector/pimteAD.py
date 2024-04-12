@@ -1,8 +1,9 @@
 from typing import Sequence
+
 from bluesky.protocols import Hints
 from ophyd_async.core import DirectoryProvider, SignalR, StandardDetector
 from ophyd_async.epics.areadetector.drivers import ADBaseShapeProvider
-from ophyd_async.epics.areadetector.writers import HDFWriter, NDFileHDF, NDPluginStats
+from ophyd_async.epics.areadetector.writers import HDFWriter, NDFileHDF
 
 from dodal.devices.areadetector.epics.drivers.pimte1_driver import Pimte1Driver
 from dodal.devices.areadetector.epics.pimte_controller import PimteController
@@ -23,7 +24,7 @@ class HDFStatsPimte(StandardDetector):
         self.drv = Pimte1Driver(prefix + "CAM:")
         self.hdf = NDFileHDF(prefix + "HDF5:")
 
-                super().__init__(
+        super().__init__(
             PimteController(self.drv),
             HDFWriter(
                 self.hdf,
