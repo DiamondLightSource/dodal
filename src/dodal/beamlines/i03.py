@@ -211,7 +211,7 @@ def panda_fast_grid_scan(
 def oav(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
-    params=OAVConfigParams(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+    params: OAVConfigParams | None = None,
 ) -> OAV:
     """Get the i03 OAV device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
@@ -222,7 +222,7 @@ def oav(
         "",
         wait_for_connection,
         fake_with_ophyd_sim,
-        params=params,
+        params=params or OAVConfigParams(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
     )
 
 
