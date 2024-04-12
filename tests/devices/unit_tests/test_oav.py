@@ -116,14 +116,12 @@ def test_bottom_right_from_top_left():
     assert bottom_right[0] == 198 and bottom_right[1] == 263
 
 
-def test_when_zoom_1_then_flat_field_applied(fake_oav: OAV):
-    RE = RunEngine()
+def test_when_zoom_1_then_flat_field_applied(fake_oav: OAV, RE: RunEngine):
     RE(bps.abs_set(fake_oav.zoom_controller, "1.0x"))
     assert fake_oav.snapshot.input_plugin.get() == "PROC"
 
 
-def test_when_zoom_not_1_then_flat_field_removed(fake_oav: OAV):
-    RE = RunEngine()
+def test_when_zoom_not_1_then_flat_field_removed(fake_oav: OAV, RE: RunEngine):
     RE(bps.abs_set(fake_oav.zoom_controller, "10.0x"))
     assert fake_oav.snapshot.input_plugin.get() == "CAM"
 

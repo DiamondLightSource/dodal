@@ -24,12 +24,11 @@ def take_snapshot_with_grid(oav: OAV, snapshot_filename, snapshot_directory):
 
 
 @pytest.mark.skip(reason="Don't want to actually take snapshots during testing.")
-def test_grid_overlay():
+def test_grid_overlay(RE: RunEngine):
     beamline = "BL03I"
     oav = OAV(name="oav", prefix=f"{beamline}-DI-OAV-01")
     snapshot_filename = "snapshot"
     snapshot_directory = "."
-    RE = RunEngine()
     RE(take_snapshot_with_grid(oav, snapshot_filename, snapshot_directory))
 
 
