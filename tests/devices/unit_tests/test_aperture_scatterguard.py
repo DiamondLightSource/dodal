@@ -99,8 +99,7 @@ def test_create_aperturescatterguard():
 def test_get_aperturescatterguard_aperture():
     fake_aperture_scatterguard = make_fake_device(ApertureScatterguard)
     ap_sg = fake_aperture_scatterguard()
-    value = ap_sg.aperture.y.readback.get_value()
-    print(value)
+    _ = ap_sg.aperture.y.readback.get_value()
 
 
 def test_aperture_scatterguard_rejects_unknown_position(aperture_in_medium_pos):
@@ -304,23 +303,14 @@ async def test_ap_sg_in_runengine(
     RE: RunEngine,
 ):
     ap_sg = aperture_in_medium_pos
+    ap = ap_sg.aperture
+    sg = ap_sg.scatterguard
     assert ap_sg.aperture_positions
     test_position = ap_sg.aperture_positions.SMALL
+    test_loc = test_position.location
     RE(bps.abs_set(ap_sg, test_position, wait=True))
-    assert (
-        await ap_sg.aperture.x.readback.get_value() == test_position.location.aperture_x
-    )
-    assert (
-        await ap_sg.aperture.y.readback.get_value() == test_position.location.aperture_y
-    )
-    assert (
-        await ap_sg.aperture.z.readback.get_value() == test_position.location.aperture_z
-    )
-    assert (
-        await ap_sg.scatterguard.x.readback.get_value()
-        == test_position.location.scatterguard_x
-    )
-    assert (
-        await ap_sg.scatterguard.y.readback.get_value()
-        == test_position.location.scatterguard_y
-    )
+    assert await ap.x.readback.get_value() == test_loc.aperture_x
+    assert await ap.y.readback.get_value() == test_loc.aperture_y
+    assert await ap.z.readback.get_value() == test_loc.aperture_z
+    assert await sg.x.readback.get_value() == test_loc.scatterguard_x
+    assert await sg.y.readback.get_value() == test_loc.scatterguard_y
