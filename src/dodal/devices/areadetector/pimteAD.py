@@ -22,17 +22,14 @@ class HDFStatsPimte(StandardDetector):
     ):
         self.drv = Pimte1Driver(prefix + "CAM:")
         self.hdf = NDFileHDF(prefix + "HDF5:")
-        self.stats = NDPluginStats(prefix + "STAT:")
-        # taken from i22 but this does nothing atm
 
-        super().__init__(
+                super().__init__(
             PimteController(self.drv),
             HDFWriter(
                 self.hdf,
                 directory_provider,
                 lambda: self.name,
                 ADBaseShapeProvider(self.drv),
-                sum="StatsTotal",
                 **scalar_sigs,
             ),
             config_sigs=config_sigs,
