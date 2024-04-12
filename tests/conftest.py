@@ -10,11 +10,14 @@ from unittest.mock import MagicMock, patch
 import pytest
 from bluesky.run_engine import RunEngine
 from ophyd.sim import make_fake_device
+from ophyd_async.core import StaticDirectoryProvider
 
 from dodal.beamlines import beamline_utils, i03
 from dodal.devices.focusing_mirror import VFMMirrorVoltages
 from dodal.log import LOGGER, GELFTCPHandler, set_up_all_logging_handlers
 from dodal.utils import make_all_devices
+
+from pathlib import Path
 
 MOCK_DAQ_CONFIG_PATH = "tests/devices/unit_tests/test_daq_configuration"
 mock_paths = [
@@ -34,6 +37,10 @@ def mock_beamline_module_filepaths(bl_name, bl_module):
     if mock_attributes := mock_attributes_table.get(bl_name):
         [bl_module.__setattr__(attr[0], attr[1]) for attr in mock_attributes]
 
+
+@pytest.fixture
+def tmp_directory_provider(tmp_path: Path) -> StaticDirectoryProvider:
+    return StaticDirectoryProvider(tmp_path)
 
 @pytest.fixture(scope="function")
 def module_and_devices_for_beamline(request):

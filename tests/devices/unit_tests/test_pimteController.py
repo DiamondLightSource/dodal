@@ -8,7 +8,7 @@ from ophyd_async.epics.areadetector.controllers import (
 from ophyd_async.epics.areadetector.drivers import ADBase
 from ophyd_async.epics.areadetector.utils import ImageMode
 
-from dodal.devices.areadetector.epics.drivers.pimte1_driver import Pimte1Driver
+from dodal.devices.areadetector.epics.drivers.pimte1_driver import Pimte1Driver, TriggerMode, SpeedMode
 from dodal.devices.areadetector.epics.pimte_controller import PimteController
 
 
@@ -38,7 +38,7 @@ async def test_pimte_controller(RE, pimte: PimteController):
 
     assert await driver.num_images.get_value() == 1
     assert await driver.image_mode.get_value() == ImageMode.multiple
-    assert await driver.trigger_mode.get_value() == Pimte1Driver.TriggerMode.internal
+    assert await driver.trigger_mode.get_value() == TriggerMode.internal
     assert await driver.acquire.get_value() is True
     assert await driver.acquire_time.get_value() == 0.002
     assert pimte.get_deadtime(2) == 2 + 0.1
@@ -48,8 +48,8 @@ async def test_pimte_controller(RE, pimte: PimteController):
     ):
         await pimte.disarm()
         await pimte.set_temperature(20)
-        await pimte.set_speed(driver.SpeedMode.adc_200Khz)
+        await pimte.set_speed(SpeedMode.adc_200Khz)
     assert await driver.set_temperture.get_value() == 20
-    assert await driver.speed.get_value() == driver.SpeedMode.adc_200Khz
+    assert await driver.speed.get_value() == SpeedMode.adc_200Khz
 
     assert await driver.acquire.get_value() is False

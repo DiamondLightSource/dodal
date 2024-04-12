@@ -3,12 +3,9 @@ import pytest
 from bluesky.run_engine import RunEngine
 from bluesky.utils import new_uid
 from ophyd_async.core import DeviceCollector, StaticDirectoryProvider, set_sim_value
-from pathlib import Path
+
 from dodal.devices.areadetector.pimteAD import HDFStatsPimte
 
-@pytest.fixture
-def tmp_directory_provider(tmp_path: Path) -> StaticDirectoryProvider:
-    return StaticDirectoryProvider(tmp_path)
 
 def count_sim(det: HDFStatsPimte, times: int = 1):
     """Test plan to do the equivalent of bp.count for a sim detector."""
@@ -35,7 +32,8 @@ def count_sim(det: HDFStatsPimte, times: int = 1):
 @pytest.fixture
 async def single_detector(RE: RunEngine, tmp_directory_provider: StaticDirectoryProvider) -> HDFStatsPimte:
     async with DeviceCollector(sim=True):
-        detector = HDFStatsPimte(prefix, tmp_directory_provider, "pimte")
+        detector = HDFStatsPimte("prefix", tmp_directory_provider, "pimte")
+
     set_sim_value(detector._controller.driver.array_size_x, 10)
     set_sim_value(detector._controller.driver.array_size_y, 20)
     set_sim_value(detector.hdf.file_path_exists, True)
