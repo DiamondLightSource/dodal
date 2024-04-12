@@ -133,6 +133,7 @@ class SnapshotWithGrid(MJPG):
     last_path_outer = Component(Signal)
     last_path_full_overlay = Component(Signal)
 
+    # scaling factors for the snapshot at the time it was triggered
     microns_per_pixel_x = Component(Signal)
     microns_per_pixel_y = Component(Signal)
 
