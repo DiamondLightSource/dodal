@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import aiofiles
-import aiohttp
+from aiohttp import ClientSession
 from bluesky.protocols import Triggerable
 from ophyd_async.core import AsyncStatus, StandardReadable
 
@@ -24,7 +24,7 @@ class Webcam(StandardReadable, Triggerable):
         filename = await self.filename.get_value()
         directory = await self.directory.get_value()
 
-        async with aiohttp.ClientSession() as session:
+        async with ClientSession() as session:
             async with session.get(self.url) as response:
                 response.raise_for_status()
                 path = Path(f"{directory}/{filename}.png").as_posix()
