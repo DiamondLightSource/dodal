@@ -150,8 +150,6 @@ class ApertureScatterguard(StandardReadable, Movable):
         tolerance = (
             self.TOLERANCE_STEPS * await self.aperture.y.motor_resolution.get_value()
         )
-        # extendedepicsmotor class has tolerance fields added
-        # ophyd-async epics motor may need to do the same thing - epics motor
         if await self.aperture.large.get_value(cached=False) == 1:
             return self.aperture_positions.LARGE
         elif await self.aperture.medium.get_value(cached=False) == 1:

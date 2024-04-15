@@ -289,8 +289,7 @@ async def test_given_aperture_not_set_through_device_but_motors_in_position_when
 async def test_when_aperture_set_and_device_read_then_position_returned(
     aperture_in_medium_pos: ApertureScatterguard, aperture_positions: AperturePositions
 ):
-    set_status = await aperture_in_medium_pos.set(aperture_positions.MEDIUM)
-    print(set_status)
+    await aperture_in_medium_pos.set(aperture_positions.MEDIUM)
     selected_aperture = await aperture_in_medium_pos.read()
     assert (
         selected_aperture["test_ap_sg-selected_aperture"]["value"]
