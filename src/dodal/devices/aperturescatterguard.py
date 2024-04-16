@@ -145,7 +145,7 @@ class ApertureScatterguard(StandardReadable, Movable):
         If no position is found then raises InvalidApertureMove.
         """
         assert isinstance(self.aperture_positions, AperturePositions)
-        current_ap_y = await self.aperture.y.readback.get_value(cached=False)
+        current_ap_y = await self.aperture.y.user_readback.get_value(cached=False)
         robot_load_ap_y = self.aperture_positions.ROBOT_LOAD.location.aperture_y
         tolerance = (
             self.TOLERANCE_STEPS * await self.aperture.y.motor_resolution.get_value()
@@ -183,7 +183,7 @@ class ApertureScatterguard(StandardReadable, Movable):
                 "before triggering another move."
             )
 
-        current_ap_z = await self.aperture.z.readback.get_value()
+        current_ap_z = await self.aperture.z.user_readback.get_value()
         tolerance = (
             self.TOLERANCE_STEPS * await self.aperture.z.motor_resolution.get_value()
         )
@@ -195,7 +195,7 @@ class ApertureScatterguard(StandardReadable, Movable):
                 f"Current aperture z ({current_ap_z}), outside of tolerance ({tolerance}) from target ({aperture_z})."
             )
 
-        current_ap_y = await self.aperture.y.readback.get_value()
+        current_ap_y = await self.aperture.y.user_readback.get_value()
 
         if aperture_y > current_ap_y:
             await asyncio.gather(
