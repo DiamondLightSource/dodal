@@ -147,9 +147,7 @@ class ApertureScatterguard(StandardReadable, Movable):
         assert isinstance(self.aperture_positions, AperturePositions)
         current_ap_y = await self.aperture.y.user_readback.get_value(cached=False)
         robot_load_ap_y = self.aperture_positions.ROBOT_LOAD.location.aperture_y
-        tolerance = (
-            self.TOLERANCE_STEPS * await self.aperture.y.motor_resolution.get_value()
-        )
+        tolerance = self.TOLERANCE_STEPS * await self.aperture.y.deadband.get_value()
         if await self.aperture.large.get_value(cached=False) == 1:
             return self.aperture_positions.LARGE
         elif await self.aperture.medium.get_value(cached=False) == 1:
@@ -184,9 +182,7 @@ class ApertureScatterguard(StandardReadable, Movable):
             )
 
         current_ap_z = await self.aperture.z.user_readback.get_value()
-        tolerance = (
-            self.TOLERANCE_STEPS * await self.aperture.z.motor_resolution.get_value()
-        )
+        tolerance = self.TOLERANCE_STEPS * await self.aperture.z.deadband.get_value()
         diff_on_z = abs(current_ap_z - aperture_z)
         if diff_on_z > tolerance:
             raise InvalidApertureMove(

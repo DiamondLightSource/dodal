@@ -174,7 +174,7 @@ async def test_aperture_scatterguard_select_top_moves_assembly_down_then_sg_up(
 async def test_aperture_scatterguard_throws_error_if_outside_tolerance(
     ap_sg: ApertureScatterguard,
 ):
-    ap_sg.aperture.z.motor_resolution._backend._set_value(0.001)  # type: ignore
+    ap_sg.aperture.z.deadband._backend._set_value(0.001)  # type: ignore
     ap_sg.aperture.z.user_readback._backend._set_value(1)  # type: ignore
     ap_sg.aperture.z.motor_done_move._backend._set_value(1)  # type: ignore
 
@@ -186,7 +186,7 @@ async def test_aperture_scatterguard_throws_error_if_outside_tolerance(
 async def test_aperture_scatterguard_returns_status_if_within_tolerance(
     ap_sg: ApertureScatterguard,
 ):
-    ap_sg.aperture.z.motor_resolution._backend._set_value(0.001)  # type: ignore
+    ap_sg.aperture.z.deadband._backend._set_value(0.001)  # type: ignore
     ap_sg.aperture.z.user_readback._backend._set_value(1)  # type: ignore
     ap_sg.aperture.z.motor_done_move._backend._set_value(1)  # type: ignore
 
@@ -239,9 +239,7 @@ async def test_aperture_positions_robot_load_within_tolerance(
     ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
 ):
     robot_load_ap_y = aperture_positions.ROBOT_LOAD.location.aperture_y
-    tolerance = (
-        ap_sg.TOLERANCE_STEPS * await ap_sg.aperture.y.motor_resolution.get_value()
-    )
+    tolerance = ap_sg.TOLERANCE_STEPS * await ap_sg.aperture.y.deadband.get_value()
     ap_sg.aperture.large._backend._set_value(0)  # type: ignore
     ap_sg.aperture.medium._backend._set_value(0)  # type: ignore
     ap_sg.aperture.small._backend._set_value(0)  # type: ignore
@@ -255,7 +253,7 @@ async def test_aperture_positions_robot_load_outside_tolerance(
     robot_load_ap_y = aperture_positions.ROBOT_LOAD.location.aperture_y
     tolerance = (
         ap_sg.TOLERANCE_STEPS + 1
-    ) * await ap_sg.aperture.y.motor_resolution.get_value()
+    ) * await ap_sg.aperture.y.deadband.get_value()
     ap_sg.aperture.large._backend._set_value(0)  # type: ignore
     ap_sg.aperture.medium._backend._set_value(0)  # type: ignore
     ap_sg.aperture.small._backend._set_value(0)  # type: ignore
