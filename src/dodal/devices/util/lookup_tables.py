@@ -2,6 +2,7 @@
 All the public methods in this module return a lookup table of some kind that
 converts the source value s to a target value t for different values of s.
 """
+
 from collections.abc import Sequence
 from typing import Callable
 

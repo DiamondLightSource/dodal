@@ -52,8 +52,12 @@ def _wait_for_connection(
         device.wait_for_connection(timeout=timeout)
     elif isinstance(device, OphydV2Device):
         call_in_bluesky_event_loop(
-            v2_device_wait_for_connection(coros=device.connect(sim=sim)),
-            timeout=timeout,
+            v2_device_wait_for_connection(
+                coros=device.connect(
+                    sim=sim,
+                    timeout=timeout,
+                )
+            ),
         )
     else:
         raise TypeError(
@@ -98,9 +102,11 @@ def device_instantiation(
     if already_existing_device is None:
         device_instance = device_factory(
             name=name,
-            prefix=f"{(BeamlinePrefix(BL).beamline_prefix)}{prefix}"
-            if bl_prefix
-            else prefix,
+            prefix=(
+                f"{(BeamlinePrefix(BL).beamline_prefix)}{prefix}"
+                if bl_prefix
+                else prefix
+            ),
             **kwargs,
         )
         ACTIVE_DEVICES[name] = device_instance

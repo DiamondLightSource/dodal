@@ -4,7 +4,6 @@ import os
 import bluesky.plan_stubs as bps
 import psutil
 import pytest
-import pytest_asyncio
 from bluesky.preprocessors import stage_decorator
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
@@ -27,7 +26,7 @@ TEST_RESULT_LARGE: XrcResult = {
 }
 
 
-@pytest_asyncio.fixture
+@pytest.fixture
 async def zocalo_device():
     zd = ZocaloResults()
     await zd.connect()
@@ -35,11 +34,10 @@ async def zocalo_device():
 
 
 @pytest.mark.s03
-@pytest.mark.asyncio
 async def test_read_results_from_fake_zocalo(zocalo_device: ZocaloResults):
     zocalo_device._subscribe_to_results()
     zc = ZocaloTrigger("dev_artemis")
-    zc.run_start(0)
+    zc.run_start(0, 0, 100)
     zc.run_end(0)
     zocalo_device.timeout_s = 5
 
@@ -56,7 +54,6 @@ async def test_read_results_from_fake_zocalo(zocalo_device: ZocaloResults):
 
 
 @pytest.mark.s03
-@pytest.mark.asyncio
 async def test_stage_unstage_controls_read_results_from_fake_zocalo(
     zocalo_device: ZocaloResults,
 ):
@@ -66,7 +63,7 @@ async def test_stage_unstage_controls_read_results_from_fake_zocalo(
 
     def plan():
         yield from bps.open_run()
-        zc.run_start(0)
+        zc.run_start(0, 0, 100)
         zc.run_end(0)
         yield from bps.sleep(0.15)
         yield from bps.trigger_and_read([zocalo_device])
@@ -104,7 +101,6 @@ async def test_stage_unstage_controls_read_results_from_fake_zocalo(
 
 
 @pytest.mark.s03
-@pytest.mark.asyncio
 async def test_stale_connections_closed_after_unstage(
     zocalo_device: ZocaloResults,
 ):

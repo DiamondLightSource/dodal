@@ -9,6 +9,7 @@ from mockito import mock, verify, when
 from mockito.matchers import ANY, ARGS, KWARGS
 from ophyd.sim import make_fake_device
 from ophyd.status import DeviceStatus, Status
+from ophyd.utils.errors import StatusTimeoutError
 
 from dodal.devices.fast_grid_scan import (
     FastGridScan,
@@ -43,7 +44,7 @@ def test_given_settings_valid_when_kickoff_then_run_started(
 
     mock_run_set_status = mock()
     when(fast_grid_scan.run_cmd).put(ANY).thenReturn(mock_run_set_status)
-    fast_grid_scan.status.subscribe = lambda func, **_: func(1)
+    fast_grid_scan.status.subscribe = lambda func, **_: func(1)  # type: ignore
 
     status = fast_grid_scan.kickoff()
 
@@ -53,13 +54,41 @@ def test_given_settings_valid_when_kickoff_then_run_started(
     verify(fast_grid_scan.run_cmd).put(1)
 
 
+def test_waits_for_running_motion(
+    fast_grid_scan: FastGridScan,
+):
+    when(fast_grid_scan.motion_program.running).get().thenReturn(1)
+
+    fast_grid_scan.KICKOFF_TIMEOUT = 0.01
+
+    with pytest.raises(StatusTimeoutError):
+        status = fast_grid_scan.kickoff()
+        status.wait()
+
+    fast_grid_scan.KICKOFF_TIMEOUT = 1
+
+    mock_run_set_status = mock()
+    when(fast_grid_scan.run_cmd).put(ANY).thenReturn(mock_run_set_status)
+    fast_grid_scan.status.subscribe = lambda func, **_: func(1)  # type: ignore
+
+    when(fast_grid_scan.motion_program.running).get().thenReturn(0)
+    status = fast_grid_scan.kickoff()
+    status.wait()
+    verify(fast_grid_scan.run_cmd).put(1)
+
+
 def run_test_on_complete_watcher(
     fast_grid_scan: FastGridScan, num_pos_1d, put_value, expected_frac
 ):
     RE = RunEngine()
     RE(
         set_fast_grid_scan_params(
-            fast_grid_scan, GridScanParams(x_steps=num_pos_1d, y_steps=num_pos_1d)
+            fast_grid_scan,
+            GridScanParams(
+                x_steps=num_pos_1d,
+                y_steps=num_pos_1d,
+                transmission_fraction=0.01,
+            ),
         )
     )
 
@@ -122,7 +151,10 @@ def test_running_finished_with_all_images_done_then_complete_status_finishes_not
     RE = RunEngine()
     RE(
         set_fast_grid_scan_params(
-            fast_grid_scan, GridScanParams(x_steps=num_pos_1d, y_steps=num_pos_1d)
+            fast_grid_scan,
+            GridScanParams(
+                transmission_fraction=0.01, x_steps=num_pos_1d, y_steps=num_pos_1d
+            ),
         )
     )
 
@@ -188,7 +220,9 @@ FAILING_CONST = 15
 )
 def test_scan_within_limits_1d(start, steps, size, expected_in_limits):
     motor_bundle = create_motor_bundle_with_limits(0.0, 10.0)
-    grid_params = GridScanParams(x_start=start, x_steps=steps, x_step_size=size)
+    grid_params = GridScanParams(
+        transmission_fraction=0.01, x_start=start, x_steps=steps, x_step_size=size
+    )
     assert grid_params.is_valid(motor_bundle.get_xyz_limits()) == expected_in_limits
 
 
@@ -205,6 +239,7 @@ def test_scan_within_limits_2d(
 ):
     motor_bundle = create_motor_bundle_with_limits(0.0, 10.0)
     grid_params = GridScanParams(
+        transmission_fraction=0.01,
         x_start=x_start,
         x_steps=x_steps,
         x_step_size=x_size,
@@ -261,6 +296,7 @@ def test_scan_within_limits_3d(
 ):
     motor_bundle = create_motor_bundle_with_limits(0.0, 10.0)
     grid_params = GridScanParams(
+        transmission_fraction=0.01,
         x_start=x_start,
         x_steps=x_steps,
         x_step_size=x_size,
@@ -279,6 +315,7 @@ def test_scan_within_limits_3d(
 @pytest.fixture
 def grid_scan_params():
     yield GridScanParams(
+        transmission_fraction=0.01,
         x_steps=10,
         y_steps=15,
         z_steps=20,
@@ -380,8 +417,14 @@ def test_given_x_y_z_steps_when_full_number_calculated_then_answer_is_as_expecte
 )
 def test_non_test_integer_dwell_time(test_dwell_times, expected_dwell_time_is_integer):
     if expected_dwell_time_is_integer:
-        params = GridScanParams(dwell_time_ms=test_dwell_times)
+        params = GridScanParams(
+            dwell_time_ms=test_dwell_times,
+            transmission_fraction=0.01,
+        )
         assert params.dwell_time_ms == test_dwell_times
     else:
         with pytest.raises(ValueError):
-            GridScanParams(dwell_time_ms=test_dwell_times)
+            GridScanParams(
+                dwell_time_ms=test_dwell_times,
+                transmission_fraction=0.01,
+            )

@@ -9,11 +9,20 @@ from pytest import mark, raises
 from dodal.devices.zocalo import (
     ZocaloTrigger,
 )
+from dodal.devices.zocalo.zocalo_interaction import ZocaloStartInfo
 
 SIM_ZOCALO_ENV = "dev_artemis"
 
 EXPECTED_DCID = 100
-EXPECTED_RUN_START_MESSAGE = {"event": "start", "ispyb_dcid": EXPECTED_DCID}
+EXPECTED_FILENAME = "test/file"
+EXPECTED_RUN_START_MESSAGE = {
+    "ispyb_dcid": EXPECTED_DCID,
+    "filename": EXPECTED_FILENAME,
+    "start_frame_index": 0,
+    "number_of_frames": 100,
+    "message_index": 0,
+    "event": "start",
+}
 EXPECTED_RUN_END_MESSAGE = {
     "event": "end",
     "ispyb_dcid": EXPECTED_DCID,
@@ -65,27 +74,40 @@ zc = ZocaloTrigger(environment=SIM_ZOCALO_ENV)
 
 
 @mark.parametrize(
-    "function_to_test,function_wrapper,expected_message",
+    "function_wrapper,expected_message",
     [
-        (zc.run_start, normally, EXPECTED_RUN_START_MESSAGE),
+        (normally, EXPECTED_RUN_START_MESSAGE),
         (
-            zc.run_start,
             with_exception,
             EXPECTED_RUN_START_MESSAGE,
         ),
-        (zc.run_end, normally, EXPECTED_RUN_END_MESSAGE),
-        (zc.run_end, with_exception, EXPECTED_RUN_END_MESSAGE),
     ],
 )
-def test__run_start_and_end(
-    function_to_test: Callable, function_wrapper: Callable, expected_message: Dict
-):
+def test_run_start(function_wrapper: Callable, expected_message: Dict):
     """
     Args:
-        function_to_test (Callable): The function to test e.g. start/stop zocalo
-        function_wrapper (Callable): A wrapper around the function, used to test for expected exceptions
+        function_wrapper (Callable): A wrapper used to test for expected exceptions
         expected_message (Dict): The expected dictionary sent to zocalo
     """
-    function_to_run = partial(function_to_test, EXPECTED_DCID)
+    data = ZocaloStartInfo(EXPECTED_DCID, EXPECTED_FILENAME, 0, 100, 0)
+    function_to_run = partial(zc.run_start, data)
+    function_to_run = partial(function_wrapper, function_to_run)
+    _test_zocalo(function_to_run, expected_message)
+
+
+@mark.parametrize(
+    "function_wrapper,expected_message",
+    [
+        (normally, EXPECTED_RUN_END_MESSAGE),
+        (with_exception, EXPECTED_RUN_END_MESSAGE),
+    ],
+)
+def test__run_start_and_end(function_wrapper: Callable, expected_message: Dict):
+    """
+    Args:
+        function_wrapper (Callable): A wrapper used to test for expected exceptions
+        expected_message (Dict): The expected dictionary sent to zocalo
+    """
+    function_to_run = partial(zc.run_end, EXPECTED_DCID)
     function_to_run = partial(function_wrapper, function_to_run)
     _test_zocalo(function_to_run, expected_message)
