@@ -1,5 +1,3 @@
-from typing import Optional
-
 import pytest
 
 from dodal.common import in_micros, step_to_num
@@ -56,7 +54,7 @@ def test_step_to_num(
     stop: float,
     step: float,
     expected_num: int,
-    truncated_stop: Optional[float],
+    truncated_stop: float | None,
 ):
     truncated_stop = stop if truncated_stop is None else truncated_stop
     actual_start, actual_stop, num = step_to_num(start, stop, step)

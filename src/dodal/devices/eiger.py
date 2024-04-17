@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import Optional
 
 from ophyd import Component, Device, EpicsSignalRO, Signal
 from ophyd.areadetector.cam import EigerDetectorCam
@@ -40,7 +39,7 @@ class EigerDetector(Device):
 
     filewriters_finished: SubscriptionStatus
 
-    detector_params: Optional[DetectorParams] = None
+    detector_params: DetectorParams | None = None
 
     arming_status = Status()
     arming_status.set_finished()
@@ -136,10 +135,12 @@ class EigerDetector(Device):
         """Emergency stop the device, mainly used to clean up after error."""
         LOGGER.info("Eiger stop() called - cleaning up...")
         self.wait_on_arming_if_started()
-        self.odin.stop()
+        stop_status = self.odin.stop()
         self.odin.file_writer.start_timeout.put(1)
         self.disarm_detector()
-        self.disable_roi_mode()
+        stop_status &= self.disable_roi_mode()
+        stop_status.wait(self.GENERAL_STATUS_TIMEOUT)
+        LOGGER.info("Eiger has successfully been stopped")
 
     def disable_roi_mode(self):
         return self.change_roi_mode(False)

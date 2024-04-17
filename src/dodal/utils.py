@@ -17,10 +17,8 @@ from typing import (
     Iterable,
     List,
     Mapping,
-    Optional,
     Type,
     TypeVar,
-    Union,
 )
 
 from bluesky.protocols import (
@@ -68,10 +66,10 @@ BLUESKY_PROTOCOLS = [
     Triggerable,
 ]
 
-AnyDevice: TypeAlias = Union[OphydV1Device, OphydV2Device]
+AnyDevice: TypeAlias = OphydV1Device | OphydV2Device
 V1DeviceFactory: TypeAlias = Callable[..., OphydV1Device]
 V2DeviceFactory: TypeAlias = Callable[..., OphydV2Device]
-AnyDeviceFactory: TypeAlias = Union[V1DeviceFactory, V2DeviceFactory]
+AnyDeviceFactory: TypeAlias = V1DeviceFactory | V2DeviceFactory
 
 
 def get_beamline_name(default: str) -> str:
@@ -85,7 +83,7 @@ def get_hostname() -> str:
 @dataclass
 class BeamlinePrefix:
     ixx: str
-    suffix: Optional[str] = None
+    suffix: str | None = None
 
     def __post_init__(self):
         self.suffix = self.ixx[0].upper() if not self.suffix else self.suffix
@@ -110,7 +108,7 @@ def skip_device(precondition=lambda: True):
 
 
 def make_all_devices(
-    module: Union[str, ModuleType, None] = None, include_skipped: bool = False, **kwargs
+    module: str | ModuleType | None = None, include_skipped: bool = False, **kwargs
 ) -> Dict[str, AnyDevice]:
     """Makes all devices in the given beamline module.
 
@@ -118,7 +116,7 @@ def make_all_devices(
     depend on it.
 
     Args:
-        module (Union[str, ModuleType, None], optional): The module to make devices from.
+        module (str | ModuleType | None, optional): The module to make devices from.
         **kwargs: Arguments passed on to every device.
 
     Returns:

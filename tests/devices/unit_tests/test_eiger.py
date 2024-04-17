@@ -675,3 +675,11 @@ def test_unwrapped_arm_chain_functions_are_not_called_outside_util(
         assert call(f) in call_func.mock_calls or lambda_in_calls(
             f, call_func.mock_calls
         )
+
+
+@patch("ophyd.status.StatusBase.wait")
+def test_stop_eiger_waits_for_status_functions_to_complete(
+    mock_wait: MagicMock, fake_eiger: EigerDetector
+):
+    fake_eiger.stop()
+    mock_wait.assert_called_once()

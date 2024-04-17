@@ -12,7 +12,7 @@ from ophyd_async.core import (
     StandardReadable,
     observe_value,
 )
-from ophyd_async.epics.signal import epics_signal_rw
+from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
 # Sources
 DISCONNECT = 0
@@ -96,7 +96,7 @@ class ArmingDevice(StandardReadable):
     def __init__(self, prefix: str, name: str = "") -> None:
         self.arm_set = epics_signal_rw(float, prefix + "PC_ARM")
         self.disarm_set = epics_signal_rw(float, prefix + "PC_DISARM")
-        self.armed = epics_signal_rw(float, prefix + "PC_ARM_OUT")
+        self.armed = epics_signal_r(float, prefix + "PC_ARM_OUT")
         super().__init__(name)
 
     async def _set_armed(self, demand: ArmDemand):

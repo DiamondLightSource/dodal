@@ -84,10 +84,10 @@ def test_no_env_variable_sets_correct_file_handler(
     mock_file_handler.return_value.level = logging.INFO
     mock_GELFTCPHandler.return_value.level = logging.INFO
     clear_all_loggers_and_handlers()
-    handlers = set_up_all_logging_handlers(
+    _ = set_up_all_logging_handlers(
         LOGGER, get_logging_file_path(), "dodal.log", True, ERROR_LOG_BUFFER_LINES
     )
-    integrate_bluesky_and_ophyd_logging(LOGGER, handlers)
+    integrate_bluesky_and_ophyd_logging(LOGGER)
 
     expected_calls = [
         call(filename=PosixPath("tmp/dev/dodal.log"), when="MIDNIGHT", backupCount=30),
@@ -146,7 +146,7 @@ def test_various_messages_to_graylog_get_beamline_filter(
         handlers = set_up_all_logging_handlers(
             LOGGER, Path("tmp/dev"), "dodal.log", True, 10000
         )
-        integrate_bluesky_and_ophyd_logging(LOGGER, handlers)
+        integrate_bluesky_and_ophyd_logging(LOGGER)
 
     mock_GELFTCPHandler: GELFTCPHandler = handlers["graylog_handler"]
     assert mock_GELFTCPHandler is not None

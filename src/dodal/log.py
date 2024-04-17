@@ -6,7 +6,7 @@ from logging import Logger, StreamHandler
 from logging.handlers import TimedRotatingFileHandler
 from os import environ
 from pathlib import Path
-from typing import Deque, Optional, Tuple, TypedDict
+from typing import Deque, Tuple, TypedDict
 
 from bluesky.log import logger as bluesky_logger
 from graypy import GELFTCPHandler
@@ -65,7 +65,7 @@ class CircularMemoryHandler(logging.Handler):
 
 
 class BeamlineFilter(logging.Filter):
-    beamline: Optional[str] = environ.get("BEAMLINE")
+    beamline: str | None = environ.get("BEAMLINE")
 
     def filter(self, record):
         record.beamline = self.beamline if self.beamline else "dev"
@@ -136,6 +136,7 @@ def set_up_DEBUG_memory_handler(
         filename=debug_path / filename, when="H", backupCount=DEBUG_LOG_FILES_TO_KEEP
     )
     file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(DEFAULT_FORMATTER)
     memory_handler = CircularMemoryHandler(
         capacity=capacity,
         flushLevel=logging.ERROR,
@@ -188,22 +189,17 @@ def set_up_all_logging_handlers(
     return handlers
 
 
-def integrate_bluesky_and_ophyd_logging(
-    parent_logger: logging.Logger, handlers: DodalLogHandlers
-):
+def integrate_bluesky_and_ophyd_logging(parent_logger: logging.Logger):
     for logger in [ophyd_logger, bluesky_logger]:
         logger.parent = parent_logger
         logger.setLevel(logging.DEBUG)
-        logger.addHandler(handlers["info_file_handler"])
-        logger.addHandler(handlers["debug_memory_handler"])
-        logger.addHandler(handlers["graylog_handler"])
 
 
 def do_default_logging_setup(dev_mode=False):
-    handlers = set_up_all_logging_handlers(
+    set_up_all_logging_handlers(
         LOGGER, get_logging_file_path(), "dodal.log", dev_mode, ERROR_LOG_BUFFER_LINES
     )
-    integrate_bluesky_and_ophyd_logging(LOGGER, handlers)
+    integrate_bluesky_and_ophyd_logging(LOGGER)
 
 
 def get_logging_file_path() -> Path:
@@ -216,7 +212,7 @@ def get_logging_file_path() -> Path:
     Returns:
         logging_path (Path): Path to the log directory for the file handlers to write to.
     """
-    beamline: Optional[str] = environ.get("BEAMLINE")
+    beamline: str | None = environ.get("BEAMLINE")
     logging_path: Path
 
     if beamline:

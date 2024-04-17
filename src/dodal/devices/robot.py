@@ -35,7 +35,8 @@ class SingleIndexWaveformReadable(StandardReadable):
     async def read(self) -> Dict[str, Reading]:
         underlying_read = await self.bare_signal.read()
         pv_reading = underlying_read[self.bare_signal.name]
-        pv_reading["value"] = str(pv_reading["value"][self.index])
+        old_reading = pv_reading["value"]
+        pv_reading["value"] = str(old_reading[self.index]) if old_reading else ""
         return OrderedDict([(self._name, pv_reading)])
 
     async def describe(self) -> dict[str, Descriptor]:
