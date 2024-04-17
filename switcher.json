@@ -180,10 +180,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/341-add-setup-for-the-j20-beamline/"
   },
   {
-    "version": "341-new-j20-setup",
-    "url": "https://DiamondLightSource.github.io/dodal/341-new-j20-setup/"
-  },
-  {
     "version": "391_aperture_scatterguard_ophyd_async",
     "url": "https://DiamondLightSource.github.io/dodal/391_aperture_scatterguard_ophyd_async/"
   },
