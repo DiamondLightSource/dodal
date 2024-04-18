@@ -167,9 +167,6 @@ class ApertureScatterguard(StandardReadable, Movable):
         See https://github.com/DiamondLightSource/hyperion/wiki/Aperture-Scatterguard-Collisions
         for why this is required.
         """
-        # EpicsMotor does not have deadband/MRES field, so the way to check if we are
-        # in a datacollection position is to see if we are "ready" (DMOV) and the target
-        # position is correct
 
         # unpacking the position
         aperture_x, aperture_y, aperture_z, scatterguard_x, scatterguard_y = pos
