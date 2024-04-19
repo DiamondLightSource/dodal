@@ -260,6 +260,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/async-ad-sim/"
   },
   {
+    "version": "directoryInfo",
+    "url": "https://DiamondLightSource.github.io/dodal/directoryInfo/"
+  },
+  {
     "version": "directory_provider",
     "url": "https://DiamondLightSource.github.io/dodal/directory_provider/"
   },
