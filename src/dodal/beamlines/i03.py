@@ -368,7 +368,7 @@ def panda(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -
     return device_instantiation(
         PandA,
         "panda",
-        "-EA-PANDA-01",
+        "-EA-PANDA-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
