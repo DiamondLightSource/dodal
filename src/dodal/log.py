@@ -21,6 +21,7 @@ DEFAULT_FORMATTER = logging.Formatter(
 ERROR_LOG_BUFFER_LINES = 20000
 INFO_LOG_DAYS = 30
 DEBUG_LOG_FILES_TO_KEEP = 7
+DEFAULT_GRAYLOG_PORT = 12231
 
 
 class CircularMemoryHandler(logging.Handler):
@@ -161,6 +162,7 @@ def set_up_all_logging_handlers(
     filename: str,
     dev_mode: bool,
     error_log_buffer_lines: int,
+    graylog_port: int | None = None,
 ) -> DodalLogHandlers:
     """Set up the default logging environment.
     Args:
@@ -178,7 +180,7 @@ def set_up_all_logging_handlers(
     handlers: DodalLogHandlers = {
         "stream_handler": set_up_stream_handler(logger),
         "graylog_handler": set_up_graylog_handler(
-            logger, *get_graylog_configuration(dev_mode)
+            logger, *get_graylog_configuration(dev_mode, graylog_port)
         ),
         "info_file_handler": set_up_INFO_file_handler(logger, logging_path, filename),
         "debug_memory_handler": set_up_DEBUG_memory_handler(
@@ -195,9 +197,14 @@ def integrate_bluesky_and_ophyd_logging(parent_logger: logging.Logger):
         logger.setLevel(logging.DEBUG)
 
 
-def do_default_logging_setup(dev_mode=False):
+def do_default_logging_setup(dev_mode=False, graylog_port: int | None = None):
     set_up_all_logging_handlers(
-        LOGGER, get_logging_file_path(), "dodal.log", dev_mode, ERROR_LOG_BUFFER_LINES
+        LOGGER,
+        get_logging_file_path(),
+        "dodal.log",
+        dev_mode,
+        ERROR_LOG_BUFFER_LINES,
+        graylog_port,
     )
     integrate_bluesky_and_ophyd_logging(LOGGER)
 
@@ -222,7 +229,9 @@ def get_logging_file_path() -> Path:
     return logging_path
 
 
-def get_graylog_configuration(dev_mode: bool) -> Tuple[str, int]:
+def get_graylog_configuration(
+    dev_mode: bool, graylog_port: int | None = None
+) -> Tuple[str, int]:
     """Get the host and port for the graylog handler.
 
     If running in dev mode, this switches to localhost. Otherwise it publishes to the
@@ -234,4 +243,4 @@ def get_graylog_configuration(dev_mode: bool) -> Tuple[str, int]:
     if dev_mode:
         return "localhost", 5555
     else:
-        return "graylog2.diamond.ac.uk", 12218
+        return "graylog-log-target.diamond.ac.uk", graylog_port or DEFAULT_GRAYLOG_PORT
