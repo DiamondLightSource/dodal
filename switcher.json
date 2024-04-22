@@ -196,10 +196,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/432-create-sample-stage-device-for-p99/"
   },
   {
-    "version": "435_create_webcam_device",
-    "url": "https://DiamondLightSource.github.io/dodal/435_create_webcam_device/"
-  },
-  {
     "version": "442-convert-attenuator-into-an-ophyd-async-device",
     "url": "https://DiamondLightSource.github.io/dodal/442-convert-attenuator-into-an-ophyd-async-device/"
   },
