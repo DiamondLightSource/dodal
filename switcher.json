@@ -292,10 +292,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1227_edge_array_logging/"
   },
   {
-    "version": "hyperion_1244_fixes_from_deployment",
-    "url": "https://DiamondLightSource.github.io/dodal/hyperion_1244_fixes_from_deployment/"
-  },
-  {
     "version": "hyperion_1283_use_pixels_per_micron_from_file_not_GDA",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1283_use_pixels_per_micron_from_file_not_GDA/"
   },
@@ -306,6 +302,10 @@
   {
     "version": "hyperion_698_refactor_parameters",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_698_refactor_parameters/"
+  },
+  {
+    "version": "hyperion_801_use_new_graylog",
+    "url": "https://DiamondLightSource.github.io/dodal/hyperion_801_use_new_graylog/"
   },
   {
     "version": "i04_add_devices",
