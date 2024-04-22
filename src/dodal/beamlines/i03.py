@@ -23,6 +23,7 @@ from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import Undulator
 from dodal.devices.undulator_dcm import UndulatorDCM
+from dodal.devices.webcam import Webcam
 from dodal.devices.xbpm_feedback import XBPMFeedback
 from dodal.devices.xspress3_mini.xspress3_mini import Xspress3Mini
 from dodal.devices.zebra import Zebra
@@ -446,4 +447,20 @@ def robot(
         "-MO-ROBOT-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+    )
+
+
+def webcam(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Webcam:
+    """Get the i03 webcam, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        Webcam,
+        "webcam",
+        "",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        url="http://i03-webcam1/axis-cgi/jpg/image.cgi",
     )

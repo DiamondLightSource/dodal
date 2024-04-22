@@ -15,6 +15,7 @@ from dodal.plans.check_topup import (
 
 @pytest.fixture
 def synchrotron() -> Synchrotron:
+    RunEngine()
     return i03.synchrotron(fake_with_ophyd_sim=True)
 
 
