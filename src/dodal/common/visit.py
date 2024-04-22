@@ -50,24 +50,20 @@ class DirectoryServiceClient(DirectoryServiceClientBase):
     async def create_new_collection(self) -> DataCollectionIdentifier:
         async with ClientSession() as session:
             async with session.post(f"{self._url}/numtracker") as response:
-                if response.status == 200:
-                    json = await response.json()
-                    new_collection = DataCollectionIdentifier.parse_obj(json)
-                    LOGGER.debug("New DataCollection: %s", new_collection)
-                    return new_collection
-                else:
-                    raise Exception(response.status)
+                response.raise_for_status()
+                json = await response.json()
+                new_collection = DataCollectionIdentifier.parse_obj(json)
+                LOGGER.debug("New DataCollection: %s", new_collection)
+                return new_collection
 
     async def get_current_collection(self) -> DataCollectionIdentifier:
         async with ClientSession() as session:
             async with session.get(f"{self._url}/numtracker") as response:
-                if response.status == 200:
-                    json = await response.json()
-                    current_collection = DataCollectionIdentifier.parse_obj(json)
-                    LOGGER.debug("Current DataCollection: %s", current_collection)
-                    return current_collection
-                else:
-                    raise Exception(response.status)
+                response.raise_for_status()
+                json = await response.json()
+                current_collection = DataCollectionIdentifier.parse_obj(json)
+                LOGGER.debug("Current DataCollection: %s", current_collection)
+                return current_collection
 
 
 class LocalDirectoryServiceClient(DirectoryServiceClientBase):
