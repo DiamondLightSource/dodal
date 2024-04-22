@@ -43,7 +43,7 @@ def i0(
     return device_instantiation(
         TetrammDetector,
         "i0",
-        "-EA-XBPM-01",
+        "-EA-XBPM-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
         directory_provider=get_directory_provider(),

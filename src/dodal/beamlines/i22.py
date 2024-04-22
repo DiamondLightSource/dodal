@@ -16,7 +16,7 @@ def i0(
     return device_instantiation(
         TetrammDetector,
         "i0",
-        "-EA-XBPM-02",
+        "-EA-XBPM-02:",
         wait_for_connection,
         fake_with_ophyd_sim,
         directory_provider=get_directory_provider(),
@@ -30,7 +30,7 @@ def it(
     return device_instantiation(
         TetrammDetector,
         "it",
-        "-EA-TTRM-02",
+        "-EA-TTRM-02:",
         wait_for_connection,
         fake_with_ophyd_sim,
         directory_provider=get_directory_provider(),
