@@ -173,6 +173,8 @@ def set_up_all_logging_handlers(
                                 production. Defaults to False.
         error_log_buffer_lines: Number of lines for the CircularMemoryHandler to keep in
                                 buffer and write to file when encountering an error message.
+        graylog_port:           The port to send graylog messages to, if None uses the
+                                default dodal port
     Returns:
         A DodaLogHandlers TypedDict with the created handlers.
     """
