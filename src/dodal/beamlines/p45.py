@@ -1,6 +1,8 @@
+from ophyd_async.epics.areadetector import AravisDetector
+
 from dodal.beamlines.beamline_utils import device_instantiation
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.areadetector import AdAravisDetector
+from dodal.devices.areadetector.adaravis import DLSAravis
 from dodal.devices.p45 import Choppers, TomoStageWithStretchAndSkew
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import get_beamline_name
@@ -36,23 +38,25 @@ def choppers(
 
 def det(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> AdAravisDetector:
+) -> AravisDetector:
     return device_instantiation(
-        AdAravisDetector,
+        DLSAravis,
         "det",
         "-EA-MAP-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        directory_provider=get_directory_provider(),
     )
 
 
 def diff(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> AdAravisDetector:
+) -> AravisDetector:
     return device_instantiation(
-        AdAravisDetector,
+        DLSAravis,
         "diff",
         "-EA-DIFF-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        directory_provider=get_directory_provider(),
     )

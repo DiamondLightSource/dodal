@@ -10,6 +10,6 @@ def DLSAravis(
     return AravisDetector(
         name=name,
         directory_provider=directory_provider,
-        driver=AravisDriver(prefix + "DRV:"),
-        hdf=NDFileHDF(prefix + "HDF:"),
+        driver=AravisDriver(prefix + "DET:"),
+        hdf=NDFileHDF(prefix + "HDF5:"),
     )

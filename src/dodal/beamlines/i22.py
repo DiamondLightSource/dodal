@@ -1,3 +1,7 @@
+from dodal.devices.areadetector.adaravis import DLSAravis
+from ophyd_async.epics.areadetector import AravisDetector
+
+
 from dodal.beamlines.beamline_utils import device_instantiation, get_directory_provider
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.tetramm import TetrammDetector
@@ -31,6 +35,19 @@ def it(
         TetrammDetector,
         "it",
         "-EA-TTRM-02:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        directory_provider=get_directory_provider(),
+    )
+
+
+def diff(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> AravisDetector:
+    return device_instantiation(
+        DLSAravis,
+        "oav",
+        "-DI-OAV-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
         directory_provider=get_directory_provider(),
