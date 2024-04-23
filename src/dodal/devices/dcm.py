@@ -1,12 +1,57 @@
-from ophyd import Component as Cpt
-from ophyd import Device, EpicsMotor, EpicsSignalRO, Kind
+from bluesky.protocols import HasHints, Hints
+from ophyd_async.core import StandardReadable
+from ophyd_async.epics.motion import Motor
+from ophyd_async.epics.signal import epics_signal_r
 
 from dodal.beamlines.beamline_parameters import get_beamline_parameters
 
 
-class DCM(Device):
-    def __init__(self, *args, daq_configuration_path: str, **kwargs):
-        super().__init__(*args, **kwargs)
+class DCM(StandardReadable, HasHints):
+    def __init__(
+        self,
+        prefix: str,
+        daq_configuration_path: str,
+        name: str = "",
+    ) -> None:
+        self.bragg_in_degrees = Motor(prefix + "-MO-DCM-01:BRAGG")
+        self.roll_in_mrad = Motor(prefix + "-MO-DCM-01:ROLL")
+        self.offset_in_mm = Motor(prefix + "-MO-DCM-01:OFFSET")
+        self.perp_in_mm = Motor(prefix + "-MO-DCM-01:PERP")
+        self.energy_in_kev = Motor(prefix + "-MO-DCM-01:ENERGY")
+        self.pitch_in_mrad = Motor(prefix + "-MO-DCM-01:PITCH")
+        self.wavelength = Motor(prefix + "-MO-DCM-01:WAVELENGTH")
+
+        # temperatures
+        self.xtal1_temp = epics_signal_r(float, prefix + "-MO-DCM-01:TEMP1")
+        self.xtal2_temp = epics_signal_r(float, prefix + "-MO-DCM-01:TEMP2")
+        self.xtal1_heater_temp = epics_signal_r(float, prefix + "-MO-DCM-01:TEMP3")
+        self.xtal2_heater_temp = epics_signal_r(float, prefix + "-MO-DCM-01:TEMP4")
+        self.backplate_temp = epics_signal_r(float, prefix + "-MO-DCM-01:TEMP5")
+        self.perp_temp = epics_signal_r(float, prefix + "-MO-DCM-01:TEMP6")
+        self.perp_sub_assembly_temp = epics_signal_r(float, prefix + "-MO-DCM-01:TEMP7")
+
+        self.set_readable_signals(
+            read=[
+                self.bragg_in_degrees,  # type: ignore
+                self.roll_in_mrad,  # type: ignore
+                self.offset_in_mm,  # type: ignore
+                self.perp_in_mm,  # type: ignore
+                self.energy_in_kev,  # type: ignore
+                self.pitch_in_mrad,  # type: ignore
+                self.wavelength,  # type: ignore
+                self.xtal1_temp,
+                self.xtal2_temp,
+                self.xtal1_heater_temp,
+                self.xtal2_heater_temp,
+                self.backplate_temp,
+                self.perp_temp,
+                self.perp_sub_assembly_temp,
+            ]
+        )
+
+        super().__init__(name)
+
+        # These attributes are just used by hyperion for lookup purposes
         self.dcm_pitch_converter_lookup_table_path = (
             daq_configuration_path + "/lookup/BeamLineEnergy_DCM_Pitch_converter.txt"
         )
@@ -19,28 +64,16 @@ class DCM(Device):
             daq_configuration_path + "/domain/beamlineParameters"
         )["DCM_Perp_Offset_FIXED"]
 
-    """
-    A double crystal monochromator (DCM), used to select the energy of the beam.
-
-    perp describes the gap between the 2 DCM crystals which has to change as you alter
-    the angle to select the requested energy.
-
-    offset ensures that the beam exits the DCM at the same point, regardless of energy.
-    """
-
-    bragg_in_degrees = Cpt(EpicsMotor, "-MO-DCM-01:BRAGG")
-    roll_in_mrad = Cpt(EpicsMotor, "-MO-DCM-01:ROLL")
-    offset_in_mm = Cpt(EpicsMotor, "-MO-DCM-01:OFFSET")
-    perp_in_mm = Cpt(EpicsMotor, "-MO-DCM-01:PERP")
-    energy_in_kev = Cpt(EpicsMotor, "-MO-DCM-01:ENERGY", kind=Kind.hinted)
-    pitch_in_mrad = Cpt(EpicsMotor, "-MO-DCM-01:PITCH")
-    wavelength = Cpt(EpicsMotor, "-MO-DCM-01:WAVELENGTH")
-
-    # temperatures
-    xtal1_temp = Cpt(EpicsSignalRO, "-MO-DCM-01:TEMP1")
-    xtal2_temp = Cpt(EpicsSignalRO, "-MO-DCM-01:TEMP2")
-    xtal1_heater_temp = Cpt(EpicsSignalRO, "-MO-DCM-01:TEMP3")
-    xtal2_heater_temp = Cpt(EpicsSignalRO, "-MO-DCM-01:TEMP4")
-    backplate_temp = Cpt(EpicsSignalRO, "-MO-DCM-01:TEMP5")
-    perp_temp = Cpt(EpicsSignalRO, "-MO-DCM-01:TEMP6")
-    perp_sub_assembly_temp = Cpt(EpicsSignalRO, "-MO-DCM-01:TEMP7")
+    @property
+    def hints(self) -> Hints:
+        return {
+            "fields": [
+                "dcm_bragg_in_degrees",
+                "dcm_roll_in_mrad",
+                "dcm_offset_in_mm",
+                "dcm_perp_in_mm",
+                "dcm_energy_in_kev",
+                "dcm_pitch_in_mrad",
+                "dcm_wavelength",
+            ]
+        }
