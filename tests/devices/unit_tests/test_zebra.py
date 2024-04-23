@@ -18,8 +18,7 @@ from dodal.devices.zebra import (
 )
 
 
-async def test_arming_device():
-    RunEngine()
+async def test_arming_device(RE: RunEngine):
     arming_device = ArmingDevice("", name="fake arming device")
     await arming_device.connect(sim=True)
     status = arming_device.set(ArmDemand.DISARM)
@@ -28,8 +27,7 @@ async def test_arming_device():
     assert await arming_device.disarm_set.get_value() == 1
 
 
-async def test_position_compare_sets_signals():
-    RunEngine()
+async def test_position_compare_sets_signals(RE: RunEngine):
     fake_pc = PositionCompare("", name="fake position compare")
     await fake_pc.connect(sim=True)
 
@@ -95,12 +93,8 @@ def test_logic_gate_configuration_62_and_34_inv_and_15_inv():
 
 
 async def run_configurer_test(
-    gate_type: GateType,
-    gate_num,
-    config,
-    expected_pv_values,
+    gate_type: GateType, gate_num, config, expected_pv_values
 ):
-    RunEngine()
     configurer = LogicGateConfigurer(prefix="", name="test fake logicconfigurer")
     await configurer.connect(sim=True)
 
