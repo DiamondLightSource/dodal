@@ -29,11 +29,14 @@ def fake_oav() -> OAV:
     fake_oav.snapshot.box_width.put(50)
     fake_oav.snapshot.num_boxes_x.put(15)
     fake_oav.snapshot.num_boxes_y.put(10)
+    fake_oav.snapshot.x_size.sim_put(1024)  # type: ignore
+    fake_oav.snapshot.y_size.sim_put(768)  # type: ignore
 
     fake_oav.cam.port_name.sim_put("CAM")  # type: ignore
     fake_oav.proc.port_name.sim_put("PROC")  # type: ignore
 
     fake_oav.wait_for_connection()
+    fake_oav.zoom_controller.set("1.0x").wait()
 
     return fake_oav
 
@@ -77,6 +80,23 @@ def test_snapshot_trigger_saves_to_correct_file(
         ]
         calls_to_save = mock_save.mock_calls
         assert calls_to_save == expected_calls_to_save
+
+
+@patch("requests.get")
+@patch("dodal.devices.areadetector.plugins.MJPG.Image.open")
+def test_snapshot_trigger_applies_current_microns_per_pixel_to_snapshot(
+    mock_open: MagicMock, mock_get, fake_oav
+):
+    image = PIL.Image.open("test")  # type: ignore
+    mock_open.return_value.__enter__.return_value = image
+
+    expected_mpp_x = fake_oav.parameters.micronsPerXPixel
+    expected_mpp_y = fake_oav.parameters.micronsPerYPixel
+    with patch.object(image, "save"):
+        st = fake_oav.snapshot.trigger()
+        st.wait()
+        assert fake_oav.snapshot.microns_per_pixel_x.get() == expected_mpp_x
+        assert fake_oav.snapshot.microns_per_pixel_y.get() == expected_mpp_y
 
 
 @patch("requests.get")
