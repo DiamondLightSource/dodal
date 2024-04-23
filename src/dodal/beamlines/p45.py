@@ -1,8 +1,4 @@
-from functools import lru_cache
-
-from ophyd_async.core import DirectoryProvider
-
-from dodal.beamlines.beamline_utils import device_instantiation
+from dodal.beamlines.beamline_utils import device_instantiation, set_directory_provider
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.visit import StaticVisitDirectoryProvider
 from dodal.devices.areadetector import AdAravisDetector
@@ -13,14 +9,12 @@ from dodal.utils import get_beamline_name
 BL = get_beamline_name("p45")
 set_log_beamline(BL)
 set_utils_beamline(BL)
-
-
-@lru_cache
-def get_directory_provider() -> DirectoryProvider:
-    return StaticVisitDirectoryProvider(
+set_directory_provider(
+    StaticVisitDirectoryProvider(
         BL,
         "/data/2024/cm37283-2/",  # latest commissioning visit
     )
+)
 
 
 def sample(
