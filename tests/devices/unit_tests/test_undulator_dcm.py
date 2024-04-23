@@ -5,7 +5,7 @@ import pytest
 from ophyd.sim import make_fake_device
 from ophyd.status import Status
 
-from dodal.devices.DCM import DCM
+from dodal.devices.dcm import DCM
 from dodal.devices.undulator import Undulator, UndulatorGapAccess
 from dodal.devices.undulator_dcm import (
     AccessError,
