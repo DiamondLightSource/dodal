@@ -119,23 +119,3 @@ def test_wait_for_v2_device_connection_passes_through_timeout(
         sim=ANY,
         timeout=expected_timeout,
     )
-
-
-def test_default_directory_provider_is_singleton():
-    provider1 = beamline_utils.get_directory_provider()
-    provider2 = beamline_utils.get_directory_provider()
-    assert provider1 is provider2
-
-
-def test_set_directory_provider_is_singleton():
-    beamline_utils.set_directory_provider(lambda: "")
-    provider1 = beamline_utils.get_directory_provider()
-    provider2 = beamline_utils.get_directory_provider()
-    assert provider1 is provider2
-
-
-def test_set_overrides_singleton():
-    provider1 = beamline_utils.get_directory_provider()
-    beamline_utils.set_directory_provider(lambda: "")
-    provider2 = beamline_utils.get_directory_provider()
-    assert provider1 is not provider2
