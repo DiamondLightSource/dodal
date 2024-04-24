@@ -256,6 +256,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/async-ad-sim/"
   },
   {
+    "version": "async-panda-and-aravis",
+    "url": "https://DiamondLightSource.github.io/dodal/async-panda-and-aravis/"
+  },
+  {
     "version": "directory_provider",
     "url": "https://DiamondLightSource.github.io/dodal/directory_provider/"
   },
