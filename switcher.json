@@ -188,6 +188,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/391_aperture_scatterguard_ophyd_async/"
   },
   {
+    "version": "398_ophyd_async_vfm_hfm",
+    "url": "https://DiamondLightSource.github.io/dodal/398_ophyd_async_vfm_hfm/"
+  },
+  {
     "version": "413_make_common_FGS",
     "url": "https://DiamondLightSource.github.io/dodal/413_make_common_FGS/"
   },
