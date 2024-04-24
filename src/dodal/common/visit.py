@@ -146,7 +146,7 @@ class StaticVisitDirectoryProvider(UpdatingDirectoryProvider):
             # Currently all h5 files written to visit/ directory, as no guarantee that visit/dataCollection/ directory will have been produced. If it is as part of #452, append the resource_dir
             resource_dir=Path("."),
             # Diamond standard file naming
-            prefix=f"{self._beamline}-{collection_id_info.collectionNumber}",
+            prefix=f"{self._beamline}-{collection_id_info.collectionNumber}-",
         )
 
     def __call__(self) -> DirectoryInfo:
