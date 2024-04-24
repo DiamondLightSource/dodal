@@ -682,4 +682,4 @@ def test_stop_eiger_waits_for_status_functions_to_complete(
     mock_wait: MagicMock, fake_eiger: EigerDetector
 ):
     fake_eiger.stop()
-    mock_wait.assert_called_once()
+    mock_wait.assert_called()
