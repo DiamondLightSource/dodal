@@ -17,8 +17,6 @@ def numbered_slits(
     Args:
         slit_number: The number assigned to the slits in the control system, usually
         its position in the assembly. Defaults to 1.
-        device_name_override: Explicit name for the ophyd device. Defaults to
-        slits-{slit_number}.
         wait_for_connection: Require connection on instantiation. Defaults to True.
         fake_with_ophyd_sim: Make a fake device. Defaults to False.
 
