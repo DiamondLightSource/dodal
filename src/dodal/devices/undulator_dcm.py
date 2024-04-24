@@ -1,7 +1,7 @@
 import numpy as np
 from numpy import argmin, loadtxt, ndarray
-from ophyd import Component, Device, Signal
 from ophyd.status import Status
+from ophyd_async.core import SignalW, StandardReadable
 
 from dodal.devices.dcm import DCM
 from dodal.devices.undulator import Undulator, UndulatorGapAccess
@@ -30,7 +30,7 @@ def _get_closest_gap_for_energy(
     return table[1][idx]
 
 
-class UndulatorDCM(Device):
+class UndulatorDCM(StandardReadable):
     """
     Composite device to handle changing beamline energies
     """
@@ -82,6 +82,8 @@ class UndulatorDCM(Device):
     energy_kev = Component(EnergySignal)
 
     def __init__(self, undulator: Undulator, dcm: DCM, *args, **kwargs):
-        super().__init__(*args, **kwargs)
         self.undulator = undulator
         self.dcm = dcm
+        self.energy_kev = SignalW()
+
+        super().__init__(*args, **kwargs)
