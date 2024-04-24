@@ -42,8 +42,12 @@ async def test_when_gap_access_is_disabled_set_energy_then_error_is_raised(
         await fake_undulator_dcm.set(5)
 
 
-def test_energy_to_distance_table_correct_format(fake_undulator_dcm: UndulatorDCM):
-    table = _get_energy_distance_table(fake_undulator_dcm.undulator.lookup_table_path)
+async def test_energy_to_distance_table_correct_format(
+    fake_undulator_dcm: UndulatorDCM,
+):
+    table = await _get_energy_distance_table(
+        fake_undulator_dcm.undulator.lookup_table_path
+    )
     assert table[0][0] == 5700
     assert table[49][1] == 6.264
     assert table.shape == (50, 2)

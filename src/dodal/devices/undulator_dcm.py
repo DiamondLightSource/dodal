@@ -1,5 +1,7 @@
 import asyncio
+from io import StringIO
 
+import aiofiles
 import numpy as np
 from bluesky.protocols import Movable
 from numpy import argmin, loadtxt, ndarray
@@ -20,9 +22,12 @@ class AccessError(Exception):
     pass
 
 
-def _get_energy_distance_table(lookup_table_path: str) -> ndarray:
-    # TODO: Make IO async
-    return loadtxt(lookup_table_path, comments=["#", "Units"])
+async def _get_energy_distance_table(lookup_table_path: str) -> ndarray:
+    # Slight cheat to make the file IO async, numpy doesn't do any real IO now, just
+    # decodes the text
+    async with aiofiles.open(lookup_table_path, "r") as stream:
+        raw_table = await stream.read()
+    return loadtxt(StringIO(raw_table), comments=["#", "Units"])
 
 
 def _get_closest_gap_for_energy(
@@ -73,7 +78,7 @@ class UndulatorDCM(StandardReadable, Movable):
 
     async def _set_undulator_gap_if_required(self, energy_kev: float) -> None:
         LOGGER.info(f"Setting DCM energy to {energy_kev:.2f} kev")
-        gap_to_match_dcm_energy = self._gap_to_match_dcm_energy(energy_kev)
+        gap_to_match_dcm_energy = await self._gap_to_match_dcm_energy(energy_kev)
 
         # Check if undulator gap is close enough to the value from the DCM
         current_gap = await self.undulator.current_gap.get_value()
@@ -100,9 +105,9 @@ class UndulatorDCM(StandardReadable, Movable):
                 f"{energy_kev}, no need to ask it to move"
             )
 
-    def _gap_to_match_dcm_energy(self, energy_kev: float) -> float:
+    async def _gap_to_match_dcm_energy(self, energy_kev: float) -> float:
         # Get 2d np.array converting energies to undulator gap distance, from lookup table
-        energy_to_distance_table = _get_energy_distance_table(
+        energy_to_distance_table = await _get_energy_distance_table(
             self.undulator.lookup_table_path
         )
 
