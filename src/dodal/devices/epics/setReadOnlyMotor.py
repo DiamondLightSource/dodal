@@ -16,7 +16,7 @@ class SetReadOnlyMotor(StandardReadable, Movable):
     name:
         Name for the motor.
     suffix:
-        Th last part of any EPICS PV, default is the [".VAL", ".RBV"].
+        The last part of any EPICS PV, default is the [".VAL", ".RBV"].
     Notes
     -----
     Example usage::
@@ -47,7 +47,6 @@ class SetReadOnlyMotor(StandardReadable, Movable):
     async def _move(self, new_position: float, watchers: list[Callable] | None = None):
         if watchers is None:
             watchers = []
-        self._set_success = True
         start = time.monotonic()
         old_position, units = await asyncio.gather(
             self.user_setpoint.get_value(), self.motor_egu.get_value()
@@ -69,8 +68,6 @@ class SetReadOnlyMotor(StandardReadable, Movable):
             await self.user_setpoint.set(new_position)
         finally:
             self.user_readback.clear_sub(update_watchers)
-        if not self._set_success:
-            raise RuntimeError("Motor was stopped")
 
     def move(self, new_position: float, timeout: float | None = None):
         """Commandline only synchronous move of a Motor"""

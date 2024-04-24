@@ -43,7 +43,7 @@ def sample_xyz_stage(
 ) -> ThreeAxisStage:
     return device_instantiation(
         FilterMotor,
-        prefix="-MO-STAGE-02:LAB:",
+        prefix="-MO-STAGE-02:",
         name="sample_xyz_stage",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,

@@ -21,22 +21,22 @@ class SampleAngleStage(Device):
 
 
 class p99StageSelections(str, Enum):
-    Empty = ("Empty",)
-    Mn5um = ("Mn 5um",)
-    Fe = ("Fe (empty)",)
-    Co5um = ("Co 5um",)
-    Ni5um = ("Ni 5um",)
-    Cu5um = ("Cu 5um",)
-    Zn5um = ("Zn 5um",)
-    Zr = ("Zr (empty)",)
-    Mo = ("Mo (empty)",)
-    Rh = ("Rh (empty)",)
-    Pd = ("Pd (empty)",)
-    Ag = ("Ag (empty)",)
-    Cd25um = ("Cd 25um",)
-    W = ("W (empty)",)
-    Pt = ("Pt (empty)",)
-    User = ("User",)
+    Empty = "Empty"
+    Mn5um = "Mn 5um"
+    Fe = "Fe (empty)"
+    Co5um = "Co 5um"
+    Ni5um = "Ni 5um"
+    Cu5um = "Cu 5um"
+    Zn5um = "Zn 5um"
+    Zr = "Zr (empty)"
+    Mo = "Mo (empty)"
+    Rh = "Rh (empty)"
+    Pd = "Pd (empty)"
+    Ag = "Ag (empty)"
+    Cd25um = "Cd 25um"
+    W = "W (empty)"
+    Pt = "Pt (empty)"
+    User = "User"
 
 
 class FilterMotor(Device):

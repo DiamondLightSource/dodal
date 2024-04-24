@@ -59,7 +59,6 @@ async def test_setReadOnlyMotor_moves(sim_sr_motor: SetReadOnlyMotor) -> None:
     set_sim_put_proceeds(sim_sr_motor.user_setpoint, True)
     await asyncio.sleep(A_BIT)
     assert s.done
-    assert s.success is False
     done.assert_called_once_with(s)
 
 
@@ -67,9 +66,7 @@ def test_motor_in_re(sim_sr_motor: SetReadOnlyMotor, RE) -> None:
     sim_sr_motor.move(0)
 
     def my_plan():
-        sim_sr_motor.move(0)
-        return
-        yield
+        yield sim_sr_motor.move(1)
 
     with pytest.raises(RuntimeError, match="Will deadlock run engine if run in a plan"):
         RE(my_plan())
