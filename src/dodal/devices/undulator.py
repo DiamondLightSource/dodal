@@ -15,6 +15,11 @@ class UndulatorGapAccess(Enum):
 
 
 class Undulator(StandardReadable):
+    """
+    An Undulator-type insertion device, used to control photon emission at a given
+    beam energy.
+    """
+
     def __init__(
         self,
         prefix: str,
