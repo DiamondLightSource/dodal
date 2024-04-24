@@ -1,8 +1,11 @@
 from enum import Enum, IntEnum
 from typing import Any
 
-from ophyd import Component, Device, EpicsMotor, EpicsSignal
+from ophyd import Component, Device, EpicsSignal
 from ophyd.status import Status, StatusBase
+from ophyd_async.core import StandardReadable
+from ophyd_async.epics.motion import Motor
+from ophyd_async.epics.signal import epics_signal_rw, epics_signal_x
 
 from dodal.log import LOGGER
 
@@ -12,7 +15,7 @@ VOLTAGE_POLLING_DELAY_S = 0.5
 DEFAULT_SETTLE_TIME_S = 60
 
 
-class MirrorStripe(Enum):
+class MirrorStripe(str, Enum):
     RHODIUM = "Rhodium"
     BARE = "Bare"
     PLATINUM = "Platinum"
@@ -107,30 +110,38 @@ class VFMMirrorVoltages(Device):
         ]
 
 
-class FocusingMirror(Device):
+class FocusingMirror(StandardReadable):
     """Focusing Mirror"""
 
-    def __init__(self, bragg_to_lat_lut_path, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(
+        self, name, prefix, bragg_to_lat_lut_path=None, x_y_sufffixes=("X", "Y")
+    ):
         self.bragg_to_lat_lookup_table_path = bragg_to_lat_lut_path
+        self.yaw_mrad = Motor(prefix + "YAW")
+        self.pitch_mrad = Motor(prefix + "PITCH")
+        self.roll_mrad = Motor(prefix + "ROLL")
+        self.x_mm = Motor(prefix + x_y_sufffixes[0])
+        self.y_mm = Motor(prefix + x_y_sufffixes[1])
+        self.jack1_mm = Motor(prefix + "Y1")
+        self.jack2_mm = Motor(prefix + "Y2")
+        self.jack3_mm = Motor(prefix + "Y3")
+        self.translation1_mm = Motor(prefix + "X1")
+        self.translation2_mm = Motor(prefix + "X2")
+        super().__init__(name)
 
-    yaw_mrad: EpicsMotor = Component(EpicsMotor, "YAW")
-    pitch_mrad: EpicsMotor = Component(EpicsMotor, "PITCH")
-    fine_pitch_mm: EpicsMotor = Component(EpicsMotor, "FPMTR")
-    roll_mrad: EpicsMotor = Component(EpicsMotor, "ROLL")
-    vert_mm: EpicsMotor = Component(EpicsMotor, "VERT")
-    lat_mm: EpicsMotor = Component(EpicsMotor, "LAT")
-    jack1_mm: EpicsMotor = Component(EpicsMotor, "Y1")
-    jack2_mm: EpicsMotor = Component(EpicsMotor, "Y2")
-    jack3_mm: EpicsMotor = Component(EpicsMotor, "Y3")
-    translation1_mm: EpicsMotor = Component(EpicsMotor, "X1")
-    translation2_mm: EpicsMotor = Component(EpicsMotor, "X2")
 
-    stripe: EpicsSignal = Component(EpicsSignal, "STRP:DVAL", string=True)
-    # apply the current set stripe setting
-    apply_stripe: EpicsSignal = Component(EpicsSignal, "CHANGE.PROC")
+class FocusingMirrorWithStripes(FocusingMirror):
+    """A focusing mirror where the stripe material can be changed. This is usually done
+    based on the energy of the beamline."""
 
-    def energy_to_stripe(self, energy_kev):
+    def __init__(self, name, prefix, *args, **kwargs):
+        self.stripe = epics_signal_rw(MirrorStripe, prefix + "STRP:DVAL")
+        # apply the current set stripe setting
+        self.apply_stripe = epics_signal_x(prefix + "CHANGE.PROC")
+
+        super().__init__(name, prefix, *args, **kwargs)
+
+    def energy_to_stripe(self, energy_kev) -> MirrorStripe:
         # In future, this should be configurable per-mirror
         if energy_kev < 7:
             return MirrorStripe.BARE
