@@ -14,8 +14,8 @@ from dodal.devices.i04.transfocator import Transfocator
 from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZPositioner
 from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
+from dodal.devices.s4_slit_gaps import S4SlitGaps
 from dodal.devices.sample_shutter import SampleShutter
-from dodal.devices.slits import Slits
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import Undulator
@@ -23,8 +23,6 @@ from dodal.devices.xbpm_feedback import XBPMFeedbackI04
 from dodal.devices.zebra import Zebra
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
-
-from ._device_helpers import numbered_slits
 
 ZOOM_PARAMS_FILE = (
     "/dls_sw/i04/software/gda/configurations/i04-config/xml/jCameraManZoomLevels.xml"
@@ -278,11 +276,17 @@ def fast_grid_scan(
 
 def s4_slit_gaps(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Slits:
+) -> S4SlitGaps:
     """Get the i04 s4_slit_gaps device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return numbered_slits(4, wait_for_connection, fake_with_ophyd_sim)
+    return device_instantiation(
+        S4SlitGaps,
+        "s4_slit_gaps",
+        "-AL-SLITS-04:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
 
 
 def undulator(
