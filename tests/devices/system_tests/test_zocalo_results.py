@@ -34,7 +34,9 @@ async def zocalo_device():
 
 
 @pytest.mark.s03
-async def test_read_results_from_fake_zocalo(zocalo_device: ZocaloResults):
+async def test_read_results_from_fake_zocalo(
+    zocalo_device: ZocaloResults, RE: RunEngine
+):
     zocalo_device._subscribe_to_results()
     zc = ZocaloTrigger("dev_artemis")
     zc.run_start(0, 0, 100)
@@ -46,7 +48,6 @@ async def test_read_results_from_fake_zocalo(zocalo_device: ZocaloResults):
         yield from bps.trigger_and_read([zocalo_device])
         yield from bps.close_run()
 
-    RE = RunEngine()
     RE(plan())
 
     results = await zocalo_device.read()
@@ -55,7 +56,7 @@ async def test_read_results_from_fake_zocalo(zocalo_device: ZocaloResults):
 
 @pytest.mark.s03
 async def test_stage_unstage_controls_read_results_from_fake_zocalo(
-    zocalo_device: ZocaloResults,
+    zocalo_device: ZocaloResults, RE: RunEngine
 ):
     dodal.devices.zocalo.zocalo_results.CLEAR_QUEUE_WAIT_S = 0.05
     zc = ZocaloTrigger("dev_artemis")
@@ -74,7 +75,6 @@ async def test_stage_unstage_controls_read_results_from_fake_zocalo(
         yield from plan()
 
     # With stage, the plan should run normally
-    RE = RunEngine()
     RE(plan_with_stage())
     assert not zocalo_device.subscription
     # Without stage, the plan should run fail because we didn't connect to Zocalo
@@ -102,7 +102,7 @@ async def test_stage_unstage_controls_read_results_from_fake_zocalo(
 
 @pytest.mark.s03
 async def test_stale_connections_closed_after_unstage(
-    zocalo_device: ZocaloResults,
+    zocalo_device: ZocaloResults, RE: RunEngine
 ):
     this_process = psutil.Process(os.getpid())
 
@@ -112,7 +112,6 @@ async def test_stale_connections_closed_after_unstage(
         yield from bps.stage(zocalo_device)
         yield from bps.unstage(zocalo_device)
 
-    RE = RunEngine()
     RE(stage_unstage())
 
     connections_after = len(this_process.connections())

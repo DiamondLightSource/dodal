@@ -23,6 +23,7 @@ from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import Undulator
 from dodal.devices.undulator_dcm import UndulatorDCM
+from dodal.devices.webcam import Webcam
 from dodal.devices.xbpm_feedback import XBPMFeedback
 from dodal.devices.xspress3_mini.xspress3_mini import Xspress3Mini
 from dodal.devices.zebra import Zebra
@@ -208,7 +209,11 @@ def panda_fast_grid_scan(
 
 
 @skip_device(lambda: BL == "s03")
-def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> OAV:
+def oav(
+    wait_for_connection: bool = True,
+    fake_with_ophyd_sim: bool = False,
+    params: OAVConfigParams | None = None,
+) -> OAV:
     """Get the i03 OAV device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
@@ -218,7 +223,7 @@ def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
         "",
         wait_for_connection,
         fake_with_ophyd_sim,
-        params=OAVConfigParams(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+        params=params or OAVConfigParams(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
     )
 
 
@@ -368,7 +373,7 @@ def panda(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -
     return device_instantiation(
         PandA,
         "panda",
-        "-EA-PANDA-01",
+        "-EA-PANDA-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
@@ -446,4 +451,20 @@ def robot(
         "-MO-ROBOT-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+    )
+
+
+def webcam(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Webcam:
+    """Get the i03 webcam, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        Webcam,
+        "webcam",
+        "",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        url="http://i03-webcam1/axis-cgi/jpg/image.cgi",
     )

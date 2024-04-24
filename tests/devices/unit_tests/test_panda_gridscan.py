@@ -61,10 +61,9 @@ def test_given_different_step_numbers_then_expected_images_correct(
 
 
 def test_running_finished_with_all_images_done_then_complete_status_finishes_not_in_error(
-    fast_grid_scan: PandAFastGridScan,
+    fast_grid_scan: PandAFastGridScan, RE: RunEngine
 ):
     num_pos_1d = 2
-    RE = RunEngine()
     RE(
         set_fast_grid_scan_params(
             fast_grid_scan,
@@ -103,12 +102,11 @@ def create_motor_bundle_with_limits(low_limit, high_limit) -> Smargon:
     return grid_scan_motor_bundle
 
 
-def test_can_run_fast_grid_scan_in_run_engine(fast_grid_scan):
+def test_can_run_fast_grid_scan_in_run_engine(fast_grid_scan, RE: RunEngine):
     @bpp.run_decorator()
     def kickoff_and_complete(device):
         yield from bps.kickoff(device)
         yield from bps.complete(device)
 
-    RE = RunEngine()
     RE(kickoff_and_complete(fast_grid_scan))
     assert RE.state == "idle"
