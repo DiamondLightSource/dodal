@@ -35,10 +35,16 @@ def _get_closest_gap_for_energy(
 
 class UndulatorDCM(StandardReadable, Movable):
     """
-    Composite device to handle changing beamline energies
-    """
+    Composite device to handle changing beamline energies, wraps the Undulator and the
+    DCM. The DCM has a motor which controls the beam energy, when it moves, the
+    Undulator gap may also have to change to enable emission at the new energy.
+    The relationship between the two motor motor positions is provided via a lookup
+    table.
 
-    _setpoint: float
+    Calling unulator_dcm.set(energy) will move the DCM motor, perform a table lookup
+    and move the Undulator gap motor if needed. So the set method can be thought of as
+    a comprehensive way to set beam energy.
+    """
 
     def __init__(self, undulator: Undulator, dcm: DCM, name: str = ""):
         self.undulator = undulator
@@ -47,52 +53,61 @@ class UndulatorDCM(StandardReadable, Movable):
         super().__init__(name)
 
     def set(self, value: float) -> AsyncStatus:
-        async def _set(value: float):
-            # TODO: Break up into smaller methods
-            energy_kev = value
-            access_level = await self.undulator.gap_access.get_value()
-            if access_level is UndulatorGapAccess.DISABLED and not TEST_MODE:
-                raise AccessError(
-                    "Undulator gap access is disabled. Contact Control Room"
-                )
-
-            # Get 2d np.array converting energies to undulator gap distance, from lookup table
-            energy_to_distance_table = _get_energy_distance_table(
-                self.undulator.lookup_table_path
-            )
-            LOGGER.info(f"Setting DCM energy to {energy_kev:.2f} kev")
-
-            statuses = [
-                self.dcm.energy_in_kev.set(
-                    energy_kev,
-                    timeout=ENERGY_TIMEOUT_S,
-                )
-            ]
-
-            # Use the lookup table to get the undulator gap associated with this dcm energy
-            gap_to_match_dcm_energy = _get_closest_gap_for_energy(
-                energy_kev * 1000,
-                energy_to_distance_table,
+        async def _set():
+            await asyncio.gather(
+                self._set_dcm_energy(value),
+                self._set_undulator_gap_if_required(value),
             )
 
-            # Check if undulator gap is close enough to the value from the DCM
-            current_gap = await self.undulator.current_gap.get_value()
+        return AsyncStatus(_set())
 
-            if (
-                abs(gap_to_match_dcm_energy - current_gap)
-                > self.undulator.gap_discrepancy_tolerance_mm
-            ):
-                LOGGER.info(
-                    f"Undulator gap mismatch. {abs(gap_to_match_dcm_energy-current_gap):.3f}mm is outside tolerance.\
-                    Moving gap to nominal value, {gap_to_match_dcm_energy:.3f}mm"
+    async def _set_dcm_energy(self, energy_kev: float) -> None:
+        access_level = await self.undulator.gap_access.get_value()
+        if access_level is UndulatorGapAccess.DISABLED and not TEST_MODE:
+            raise AccessError("Undulator gap access is disabled. Contact Control Room")
+
+        await self.dcm.energy_in_kev.set(
+            energy_kev,
+            timeout=ENERGY_TIMEOUT_S,
+        )
+
+    async def _set_undulator_gap_if_required(self, energy_kev: float) -> None:
+        LOGGER.info(f"Setting DCM energy to {energy_kev:.2f} kev")
+        gap_to_match_dcm_energy = self._gap_to_match_dcm_energy(energy_kev)
+
+        # Check if undulator gap is close enough to the value from the DCM
+        current_gap = await self.undulator.current_gap.get_value()
+        if (
+            abs(gap_to_match_dcm_energy - current_gap)
+            > self.undulator.gap_discrepancy_tolerance_mm
+        ):
+            LOGGER.info(
+                f"Undulator gap mismatch. {abs(gap_to_match_dcm_energy-current_gap):.3f}mm is outside tolerance.\
+                Moving gap to nominal value, {gap_to_match_dcm_energy:.3f}mm"
+            )
+            if not TEST_MODE:
+                # Only move if the gap is sufficiently different to the value from the
+                # DCM lookup table AND we're not in TEST_MODE
+                await self.undulator.gap_motor.set(
+                    gap_to_match_dcm_energy,
+                    timeout=STATUS_TIMEOUT_S,
                 )
-                if not TEST_MODE:
-                    statuses.append(
-                        self.undulator.gap_motor.set(
-                            gap_to_match_dcm_energy,
-                            timeout=STATUS_TIMEOUT_S,
-                        )
-                    )
-            await asyncio.gather(*statuses)
+            else:
+                LOGGER.debug("In test mode, not moving ID gap")
+        else:
+            LOGGER.debug(
+                "Gap is already in the correct place for the new energy value "
+                f"{energy_kev}, no need to ask it to move"
+            )
 
-        return AsyncStatus(_set(value))
+    def _gap_to_match_dcm_energy(self, energy_kev: float) -> float:
+        # Get 2d np.array converting energies to undulator gap distance, from lookup table
+        energy_to_distance_table = _get_energy_distance_table(
+            self.undulator.lookup_table_path
+        )
+
+        # Use the lookup table to get the undulator gap associated with this dcm energy
+        return _get_closest_gap_for_energy(
+            energy_kev * 1000,
+            energy_to_distance_table,
+        )

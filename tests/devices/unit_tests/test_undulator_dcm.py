@@ -103,6 +103,7 @@ async def test_when_gap_access_is_not_checked_if_test_mode_enabled(
     assert (await fake_undulator_dcm.undulator.gap_motor.setpoint.get_value()) == 0.0
 
     mock_logger.info.assert_called()
+    mock_logger.debug.assert_called_once()
 
 
 @patch("dodal.devices.undulator_dcm.loadtxt")
@@ -123,6 +124,7 @@ async def test_if_gap_is_already_correct_then_dont_move_gap(
     # Verify undulator has not been asked to move
     assert (await fake_undulator_dcm.undulator.gap_motor.setpoint.get_value()) == 0.0
     mock_logger.info.assert_called_once()
+    mock_logger.debug.assert_called_once()
 
 
 async def test_energy_set_only_complete_when_all_statuses_are_finished(
