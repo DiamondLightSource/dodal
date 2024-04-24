@@ -33,7 +33,7 @@ class Undulator(StandardReadable):
         self.lookup_table_path = lookup_table_path
         self.set_readable_signals(
             read=[
-                self.gap_motor,  # type: ignore
+                self.gap_motor.readback,
                 self.current_gap,
                 self.gap_access,
             ]

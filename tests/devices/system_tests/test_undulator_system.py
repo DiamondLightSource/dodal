@@ -14,4 +14,5 @@ async def undulator() -> Undulator:
 
 
 @pytest.mark.s03
-def test_undulator_connects(undulator: Undulator): ...
+def test_undulator_connects(undulator: Undulator):
+    ...
