@@ -316,12 +316,12 @@
     "url": "https://DiamondLightSource.github.io/dodal/i19_1/"
   },
   {
-    "version": "jungfrau_commissioning",
-    "url": "https://DiamondLightSource.github.io/dodal/jungfrau_commissioning/"
+    "version": "i22-fswitch",
+    "url": "https://DiamondLightSource.github.io/dodal/i22-fswitch/"
   },
   {
-    "version": "ophyd-async-slits",
-    "url": "https://DiamondLightSource.github.io/dodal/ophyd-async-slits/"
+    "version": "jungfrau_commissioning",
+    "url": "https://DiamondLightSource.github.io/dodal/jungfrau_commissioning/"
   },
   {
     "version": "ophyd_async_synchrotron_hyperion_compatible",
