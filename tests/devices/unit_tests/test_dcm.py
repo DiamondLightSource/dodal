@@ -1,5 +1,3 @@
-from typing import AsyncIterable
-
 import pytest
 from ophyd_async.core import (
     DeviceCollector,

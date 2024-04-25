@@ -1,10 +1,8 @@
 import asyncio
-from io import StringIO
 
-import aiofiles
 import numpy as np
 from bluesky.protocols import Movable
-from numpy import argmin, loadtxt, ndarray
+from numpy import argmin, ndarray
 from ophyd_async.core import AsyncStatus, StandardReadable
 
 from dodal.log import LOGGER
