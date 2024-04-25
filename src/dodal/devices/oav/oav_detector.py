@@ -59,7 +59,7 @@ class ZoomController(Device):
     def set_flatfield_on_zoom_level_one(self, value):
         flat_applied = self.parent.proc.port_name.get()
         no_flat_applied = self.parent.cam.port_name.get()
-        return self.parent.snapshot.input_plugin.set(
+        return self.parent.grid_snapshot.input_plugin.set(
             flat_applied if value == "1.0x" else no_flat_applied
         )
 
@@ -194,7 +194,8 @@ class OAV(AreaDetector):
     over = ADC(OverlayPlugin, "-DI-OAV-01:OVER:")
     tiff = ADC(OverlayPlugin, "-DI-OAV-01:TIFF:")
     hdf5 = ADC(HDF5Plugin, "-DI-OAV-01:HDF5:")
-    snapshot = Component(SnapshotWithGrid, "-DI-OAV-01:MJPG:")
+    grid_snapshot = Component(SnapshotWithGrid, "-DI-OAV-01:MJPG:")
+
     zoom_controller = Component(ZoomController, "-EA-OAV-01:FZOOM:")
 
     def __init__(self, *args, params: OAVConfigParams, **kwargs):
@@ -205,8 +206,8 @@ class OAV(AreaDetector):
 
     def wait_for_connection(self, all_signals=False, timeout=2):
         connected = super().wait_for_connection(all_signals, timeout)
-        x = self.snapshot.x_size.get()
-        y = self.snapshot.y_size.get()
+        x = self.grid_snapshot.x_size.get()
+        y = self.grid_snapshot.y_size.get()
 
         cb = partial(self.parameters.update_on_zoom, xsize=x, ysize=y)
 
@@ -223,11 +224,11 @@ class OAV(AreaDetector):
             """Persist the current value of the mpp to the snapshot so that it is retained if zoom changes"""
             microns_per_x_pixel = self.parameters.micronsPerXPixel
             microns_per_y_pixel = self.parameters.micronsPerYPixel
-            self.snapshot.microns_per_pixel_x.put(microns_per_x_pixel)
-            self.snapshot.microns_per_pixel_y.put(microns_per_y_pixel)
+            self.grid_snapshot.microns_per_pixel_x.put(microns_per_x_pixel)
+            self.grid_snapshot.microns_per_pixel_y.put(microns_per_y_pixel)
 
         self._snapshot_trigger_subscription_id = (
-            self.snapshot.last_saved_path.subscribe(
+            self.grid_snapshot.last_saved_path.subscribe(
                 apply_current_microns_per_pixel_to_snapshot
             )
         )

@@ -21,8 +21,8 @@ def oav() -> OAV:
     oav.proc.port_name.sim_put("proc")  # type: ignore
     oav.cam.port_name.sim_put("CAM")  # type: ignore
 
-    oav.snapshot.x_size.sim_put("1024")  # type: ignore
-    oav.snapshot.y_size.sim_put("768")  # type: ignore
+    oav.grid_snapshot.x_size.sim_put("1024")  # type: ignore
+    oav.grid_snapshot.y_size.sim_put("768")  # type: ignore
 
     oav.zoom_controller.zrst.set("1.0x")
     oav.zoom_controller.onst.set("2.0x")
@@ -46,14 +46,14 @@ def oav() -> OAV:
 def test_when_zoom_level_changed_then_oav_rewired(zoom, expected_plugin, oav: OAV):
     oav.zoom_controller.set(zoom).wait()
 
-    assert oav.snapshot.input_plugin.get() == expected_plugin
+    assert oav.grid_snapshot.input_plugin.get() == expected_plugin
 
 
 def test_when_zoom_level_changed_then_status_waits_for_all_plugins_to_be_updated(
     oav: OAV,
 ):
     mjpg_status = Status("mjpg - test_when_zoom_level...")
-    oav.snapshot.input_plugin.set = MagicMock(return_value=mjpg_status)
+    oav.grid_snapshot.input_plugin.set = MagicMock(return_value=mjpg_status)
 
     assert isinstance(full_status := oav.zoom_controller.set("1.0x"), AndStatus)
     assert mjpg_status in full_status
@@ -119,8 +119,8 @@ def test_extract_beam_position_given_different_zoom_levels(
 
 
 def test_extract_rescaled_micronsperpixel(oav: OAV):
-    oav.snapshot.x_size.sim_put("1292")  # type: ignore
-    oav.snapshot.y_size.sim_put("964")  # type: ignore
+    oav.grid_snapshot.x_size.sim_put("1292")  # type: ignore
+    oav.grid_snapshot.y_size.sim_put("964")  # type: ignore
     oav.wait_for_connection()
 
     oav.zoom_controller.level.sim_put("1.0")  # type: ignore
@@ -130,8 +130,8 @@ def test_extract_rescaled_micronsperpixel(oav: OAV):
 
 
 def test_extract_rescaled_beam_position(oav: OAV):
-    oav.snapshot.x_size.sim_put("1292")  # type: ignore
-    oav.snapshot.y_size.sim_put("964")  # type: ignore
+    oav.grid_snapshot.x_size.sim_put("1292")  # type: ignore
+    oav.grid_snapshot.y_size.sim_put("964")  # type: ignore
     oav.wait_for_connection()
 
     oav.zoom_controller.level.sim_put("1.0")  # type: ignore
