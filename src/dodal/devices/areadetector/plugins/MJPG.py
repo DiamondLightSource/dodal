@@ -1,9 +1,10 @@
 import threading
+from os.path import join as path_join
 from pathlib import Path
 
 import requests
 from ophyd import Component, Device, DeviceStatus, EpicsSignal, EpicsSignalRO, Signal
-from PIL import Image
+from PIL import Image, ImageDraw
 
 from dodal.devices.oav.oav_parameters import OAVConfigParams
 from dodal.log import LOGGER
@@ -57,3 +58,23 @@ class MJPG(Device):
 
     def post_processing(self, image: Image.Image):
         pass
+
+
+class SnapshotWithBeamCentre(MJPG):
+    CROSSHAIR_LENGTH = 20
+
+    def post_processing(self, image: Image.Image):
+        assert self.oav_params is not None
+        beam_x = self.oav_params.beam_centre_i
+        beam_y = self.oav_params.beam_centre_j
+
+        draw = ImageDraw.Draw(image)
+        HALF_LEN = self.CROSSHAIR_LENGTH / 2
+        draw.line(((beam_x, beam_y - HALF_LEN), (beam_x, beam_y + HALF_LEN)))
+        draw.line(((beam_x - HALF_LEN, beam_y), (beam_x + HALF_LEN, beam_y)))
+
+        filename_str = self.filename.get()
+        directory_str = self.directory.get()
+
+        path = path_join(directory_str, f"{filename_str}_with_crosshair.png")
+        image.save(path)

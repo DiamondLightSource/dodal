@@ -15,6 +15,7 @@ from ophyd import (
     StatusBase,
 )
 
+from dodal.devices.areadetector.plugins.MJPG import SnapshotWithBeamCentre
 from dodal.devices.oav.grid_overlay import SnapshotWithGrid
 from dodal.devices.oav.oav_parameters import OAVConfigParams
 
@@ -78,12 +79,14 @@ class OAV(AreaDetector):
     tiff = ADC(OverlayPlugin, "-DI-OAV-01:TIFF:")
     hdf5 = ADC(HDF5Plugin, "-DI-OAV-01:HDF5:")
     grid_snapshot = Component(SnapshotWithGrid, "-DI-OAV-01:MJPG:")
+    snapshot = Component(SnapshotWithBeamCentre, "-DI-OAV-01:MJPG:")
     zoom_controller = Component(ZoomController, "-EA-OAV-01:FZOOM:")
 
     def __init__(self, *args, params: OAVConfigParams, **kwargs):
         super().__init__(*args, **kwargs)
         self.parameters = params
         self.grid_snapshot.oav_params = params
+        self.snapshot.oav_params = params
         self.subscription_id = None
         self._snapshot_trigger_subscription_id = None
 

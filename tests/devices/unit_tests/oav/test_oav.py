@@ -155,3 +155,8 @@ def test_calculate_beam_distance(h, v, expected_x, expected_y, oav: OAV):
         h,
         v,
     ) == (expected_x, expected_y)
+
+
+def test_when_oav_created_then_snapshot_parameters_set(oav: OAV):
+    assert oav.snapshot.oav_params is not None
+    assert oav.grid_snapshot.oav_params is not None
