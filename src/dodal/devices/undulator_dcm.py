@@ -51,11 +51,19 @@ class UndulatorDCM(StandardReadable, Movable):
     a comprehensive way to set beam energy.
     """
 
-    def __init__(self, undulator: Undulator, dcm: DCM, name: str = ""):
+    def __init__(
+        self,
+        undulator: Undulator,
+        dcm: DCM,
+        prefix: str = "",
+        name: str = "",
+    ):
+        super().__init__(name)
+
+        # Attributes are set after super call so they are not renamed to
+        # <name>-undulator, etc.
         self.undulator = undulator
         self.dcm = dcm
-
-        super().__init__(name)
 
     def set(self, value: float) -> AsyncStatus:
         async def _set():
