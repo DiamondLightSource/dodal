@@ -19,13 +19,6 @@ async def undulator() -> Undulator:
     return undulator
 
 
-@pytest.fixture
-async def staged_undulator(undulator: Undulator) -> AsyncIterable[Undulator]:
-    await undulator.stage()
-    yield undulator
-    await undulator.unstage()
-
-
 def test_lookup_table_path_passed(undulator: Undulator):
     assert (
         undulator.lookup_table_path
@@ -42,11 +35,11 @@ def test_lookup_table_path_passed(undulator: Undulator):
     ],
 )
 async def test_read_and_describe_includes(
-    staged_undulator: Undulator,
+    undulator: Undulator,
     key: str,
 ):
-    description = await staged_undulator.describe()
-    reading = await staged_undulator.read()
+    description = await undulator.describe()
+    reading = await undulator.read()
 
     assert key in description
     assert key in reading

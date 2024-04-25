@@ -16,13 +16,6 @@ async def dcm() -> DCM:
     return dcm
 
 
-@pytest.fixture
-async def staged_dcm(dcm: DCM) -> AsyncIterable[DCM]:
-    await dcm.stage()
-    yield dcm
-    await dcm.unstage()
-
-
 def test_lookup_table_paths_passed(dcm: DCM):
     assert (
         dcm.dcm_pitch_converter_lookup_table_path
@@ -48,11 +41,11 @@ async def test_offset_decoded(dcm: DCM):
     ],
 )
 async def test_read_and_describe_includes(
-    staged_dcm: DCM,
+    dcm: DCM,
     key: str,
 ):
-    description = await staged_dcm.describe()
-    reading = await staged_dcm.read()
+    description = await dcm.describe()
+    reading = await dcm.read()
 
     assert key in description
     assert key in reading
