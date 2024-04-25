@@ -3,19 +3,17 @@ from enum import Enum
 from ophyd_async.core import Device
 from ophyd_async.epics.signal import epics_signal_rw
 
-from dodal.devices.epics.setReadOnlyMotor import SetReadOnlyMotor
-
 
 class SampleAngleStage(Device):
     def __init__(self, prefix: str, name: str):
-        self.theta = SetReadOnlyMotor(
-            prefix, name, suffix=["WRITETHETA", "WRITETHETA:RBV", "WRITETHETA.EGU"]
+        self.theta = epics_signal_rw(
+            float, prefix + "WRITETHETA:RBV", prefix + "WRITETHETA"
         )
-        self.roll = SetReadOnlyMotor(
-            prefix, name, suffix=["WRITETHETA", "WRITETHETA:RBV", "WRITETHETA.EGU"]
+        self.roll = epics_signal_rw(
+            float, prefix + "WRITEROLL:RBV", prefix + "WRITEROLL"
         )
-        self.pitch = SetReadOnlyMotor(
-            prefix, name, suffix=["WRITETHETA", "WRITETHETA:RBV", "WRITETHETA.EGU"]
+        self.pitch = epics_signal_rw(
+            float, prefix + "WRITEPITCH:RBV", prefix + "WRITEPITCH"
         )
         super().__init__(name=name)
 
