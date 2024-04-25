@@ -133,10 +133,6 @@ class SnapshotWithGrid(MJPG):
     last_path_outer = Component(Signal)
     last_path_full_overlay = Component(Signal)
 
-    # scaling factors for the snapshot at the time it was triggered
-    microns_per_pixel_x = Component(Signal)
-    microns_per_pixel_y = Component(Signal)
-
     def post_processing(self, image: Image.Image):
         top_left_x = self.top_left_x.get()
         top_left_y = self.top_left_y.get()

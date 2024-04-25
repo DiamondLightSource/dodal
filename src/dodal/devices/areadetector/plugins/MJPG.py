@@ -5,6 +5,7 @@ import requests
 from ophyd import Component, Device, DeviceStatus, EpicsSignal, EpicsSignalRO, Signal
 from PIL import Image
 
+from dodal.devices.oav.oav_parameters import OAVConfigParams
 from dodal.log import LOGGER
 
 
@@ -17,6 +18,13 @@ class MJPG(Device):
     y_size = Component(EpicsSignalRO, "ArraySize2_RBV")
     input_rbpv = Component(EpicsSignalRO, "NDArrayPort_RBV")
     input_plugin = Component(EpicsSignal, "NDArrayPort")
+
+    # scaling factors for the snapshot at the time it was triggered
+    microns_per_pixel_x = Component(Signal)
+    microns_per_pixel_y = Component(Signal)
+
+    oav_params: OAVConfigParams | None = None
+
     KICKOFF_TIMEOUT: float = 30.0
 
     def trigger(self):
@@ -24,6 +32,10 @@ class MJPG(Device):
         url_str = self.url.get()
         filename_str = self.filename.get()
         directory_str = self.directory.get()
+
+        assert isinstance(self.oav_params, OAVConfigParams)
+        self.microns_per_pixel_x.set(self.oav_params.micronsPerXPixel)
+        self.microns_per_pixel_y.set(self.oav_params.micronsPerYPixel)
 
         def get_snapshot():
             try:
