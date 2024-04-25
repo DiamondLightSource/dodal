@@ -191,7 +191,6 @@ def dcm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
         "-MO-DCM-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        daq_configuration_path=DAQ_CONFIGURATION_PATH,
     )
 
 

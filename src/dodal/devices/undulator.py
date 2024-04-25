@@ -24,13 +24,11 @@ class Undulator(StandardReadable):
         self,
         prefix: str,
         name: str = "",
-        lookup_table_path="/dls_sw/i03/software/daq_configuration/lookup/BeamLine_Undulator_toGap.txt",
     ) -> None:
         self.gap_motor = Motor(prefix + "BLGAPMTR")
         self.current_gap = epics_signal_r(float, prefix + "CURRGAPD")
         self.gap_access = epics_signal_r(UndulatorGapAccess, prefix + "IDBLENA")
         self.gap_discrepancy_tolerance_mm: float = UNDULATOR_DISCREPANCY_THRESHOLD_MM
-        self.lookup_table_path = lookup_table_path
         self.set_readable_signals(
             read=[
                 self.gap_motor.readback,

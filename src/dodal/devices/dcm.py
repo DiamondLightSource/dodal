@@ -3,8 +3,6 @@ from ophyd_async.core import StandardReadable
 from ophyd_async.epics.motion import Motor
 from ophyd_async.epics.signal import epics_signal_r
 
-from dodal.beamlines.beamline_parameters import get_beamline_parameters
-
 
 class DCM(StandardReadable, HasHints):
     """
@@ -19,7 +17,6 @@ class DCM(StandardReadable, HasHints):
     def __init__(
         self,
         prefix: str,
-        daq_configuration_path: str,
         name: str = "",
     ) -> None:
         self.bragg_in_degrees = Motor(prefix + "BRAGG")
@@ -59,19 +56,6 @@ class DCM(StandardReadable, HasHints):
         )
 
         super().__init__(name)
-
-        # These attributes are just used by hyperion for lookup purposes
-        self.dcm_pitch_converter_lookup_table_path = (
-            daq_configuration_path + "/lookup/BeamLineEnergy_DCM_Pitch_converter.txt"
-        )
-        self.dcm_roll_converter_lookup_table_path = (
-            daq_configuration_path + "/lookup/BeamLineEnergy_DCM_Roll_converter.txt"
-        )
-        # I03 configures the DCM Perp as a side effect of applying this fixed value to the DCM Offset after an energy change
-        # Nb this parameter is misleadingly named to confuse you
-        self.fixed_offset_mm = get_beamline_parameters(
-            daq_configuration_path + "/domain/beamlineParameters"
-        )["DCM_Perp_Offset_FIXED"]
 
     @property
     def hints(self) -> Hints:

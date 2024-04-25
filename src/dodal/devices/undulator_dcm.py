@@ -5,6 +5,7 @@ from bluesky.protocols import Movable
 from numpy import argmin, ndarray
 from ophyd_async.core import AsyncStatus, StandardReadable
 
+from dodal.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.log import LOGGER
 
 from .dcm import DCM
@@ -47,6 +48,8 @@ class UndulatorDCM(StandardReadable, Movable):
         self,
         undulator: Undulator,
         dcm: DCM,
+        id_gap_lookup_table_path: str,
+        daq_configuration_path: str,
         prefix: str = "",
         name: str = "",
     ):
@@ -56,6 +59,20 @@ class UndulatorDCM(StandardReadable, Movable):
         # <name>-undulator, etc.
         self.undulator = undulator
         self.dcm = dcm
+
+        # These attributes are just used by hyperion for lookup purposes
+        self.id_gap_lookup_table_path = id_gap_lookup_table_path
+        self.dcm_pitch_converter_lookup_table_path = (
+            daq_configuration_path + "/lookup/BeamLineEnergy_DCM_Pitch_converter.txt"
+        )
+        self.dcm_roll_converter_lookup_table_path = (
+            daq_configuration_path + "/lookup/BeamLineEnergy_DCM_Roll_converter.txt"
+        )
+        # I03 configures the DCM Perp as a side effect of applying this fixed value to the DCM Offset after an energy change
+        # Nb this parameter is misleadingly named to confuse you
+        self.dcm_fixed_offset_mm = get_beamline_parameters(
+            daq_configuration_path + "/domain/beamlineParameters"
+        )["DCM_Perp_Offset_FIXED"]
 
     def set(self, value: float) -> AsyncStatus:
         async def _set():
@@ -108,7 +125,7 @@ class UndulatorDCM(StandardReadable, Movable):
     async def _gap_to_match_dcm_energy(self, energy_kev: float) -> float:
         # Get 2d np.array converting energies to undulator gap distance, from lookup table
         energy_to_distance_table = await energy_distance_table(
-            self.undulator.lookup_table_path
+            self.id_gap_lookup_table_path
         )
 
         # Use the lookup table to get the undulator gap associated with this dcm energy

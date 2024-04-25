@@ -19,18 +19,40 @@ from dodal.devices.undulator_dcm import (
 
 from ...conftest import MOCK_DAQ_CONFIG_PATH
 
+ID_GAP_LOOKUP_TABLE_PATH: str = (
+    "./tests/devices/unit_tests/test_beamline_undulator_to_gap_lookup_table.txt"
+)
+
 
 @pytest.fixture
 async def fake_undulator_dcm() -> UndulatorDCM:
     async with DeviceCollector(sim=True):
-        undulator = Undulator(
-            "UND-01",
-            name="undulator",
-            lookup_table_path="./tests/devices/unit_tests/test_beamline_undulator_to_gap_lookup_table.txt",
+        undulator = Undulator("UND-01", name="undulator")
+        dcm = DCM("DCM-01", name="dcm")
+        undulator_dcm = UndulatorDCM(
+            undulator,
+            dcm,
+            id_gap_lookup_table_path=ID_GAP_LOOKUP_TABLE_PATH,
+            daq_configuration_path=MOCK_DAQ_CONFIG_PATH,
+            name="undulator_dcm",
         )
-        dcm = DCM("DCM-01", name="dcm", daq_configuration_path=MOCK_DAQ_CONFIG_PATH)
-        undulator_dcm = UndulatorDCM(undulator, dcm, name="undulator_dcm")
     return undulator_dcm
+
+
+def test_lookup_table_paths_passed(fake_undulator_dcm: UndulatorDCM):
+    assert fake_undulator_dcm.id_gap_lookup_table_path == ID_GAP_LOOKUP_TABLE_PATH
+    assert (
+        fake_undulator_dcm.dcm_pitch_converter_lookup_table_path
+        == MOCK_DAQ_CONFIG_PATH + "/lookup/BeamLineEnergy_DCM_Pitch_converter.txt"
+    )
+    assert (
+        fake_undulator_dcm.dcm_roll_converter_lookup_table_path
+        == MOCK_DAQ_CONFIG_PATH + "/lookup/BeamLineEnergy_DCM_Roll_converter.txt"
+    )
+
+
+async def test_fixed_offset_decoded(fake_undulator_dcm: UndulatorDCM):
+    assert fake_undulator_dcm.dcm_fixed_offset_mm == 25.6
 
 
 async def test_when_gap_access_is_disabled_set_energy_then_error_is_raised(
