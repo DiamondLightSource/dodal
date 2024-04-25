@@ -15,7 +15,6 @@ from dodal.devices.undulator_dcm import (
     AccessError,
     UndulatorDCM,
     _get_closest_gap_for_energy,
-    _get_energy_distance_table,
 )
 
 from ...conftest import MOCK_DAQ_CONFIG_PATH
@@ -42,17 +41,6 @@ async def test_when_gap_access_is_disabled_set_energy_then_error_is_raised(
         await fake_undulator_dcm.set(5)
 
 
-async def test_energy_to_distance_table_correct_format(
-    fake_undulator_dcm: UndulatorDCM,
-):
-    table = await _get_energy_distance_table(
-        fake_undulator_dcm.undulator.lookup_table_path
-    )
-    assert table[0][0] == 5700
-    assert table[49][1] == 6.264
-    assert table.shape == (50, 2)
-
-
 @pytest.mark.parametrize(
     "dcm_energy, expected_output", [(5730, 5.4606), (7200, 6.045), (9000, 6.404)]
 )
@@ -64,7 +52,7 @@ def test_correct_closest_distance_to_energy_from_table(dcm_energy, expected_outp
     )
 
 
-@patch("dodal.devices.undulator_dcm.loadtxt")
+@patch("dodal.devices.util.lookup_tables.loadtxt")
 @patch("dodal.devices.undulator_dcm.LOGGER")
 async def test_if_gap_is_wrong_then_logger_info_is_called_and_gap_is_set_correctly(
     mock_logger: MagicMock, mock_load: MagicMock, fake_undulator_dcm: UndulatorDCM
@@ -83,7 +71,7 @@ async def test_if_gap_is_wrong_then_logger_info_is_called_and_gap_is_set_correct
     mock_logger.info.assert_called()
 
 
-@patch("dodal.devices.undulator_dcm.loadtxt")
+@patch("dodal.devices.util.lookup_tables.loadtxt")
 @patch("dodal.devices.undulator_dcm.LOGGER")
 @patch("dodal.devices.undulator_dcm.TEST_MODE", True)
 async def test_when_gap_access_is_not_checked_if_test_mode_enabled(
@@ -110,7 +98,7 @@ async def test_when_gap_access_is_not_checked_if_test_mode_enabled(
     mock_logger.debug.assert_called_once()
 
 
-@patch("dodal.devices.undulator_dcm.loadtxt")
+@patch("dodal.devices.util.lookup_tables.loadtxt")
 @patch("dodal.devices.undulator_dcm.LOGGER")
 async def test_if_gap_is_already_correct_then_dont_move_gap(
     mock_logger: MagicMock, mock_load: MagicMock, fake_undulator_dcm: UndulatorDCM

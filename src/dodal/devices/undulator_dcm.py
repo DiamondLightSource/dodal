@@ -7,9 +7,11 @@ from bluesky.protocols import Movable
 from numpy import argmin, loadtxt, ndarray
 from ophyd_async.core import AsyncStatus, StandardReadable
 
-from dodal.devices.dcm import DCM
-from dodal.devices.undulator import Undulator, UndulatorGapAccess
 from dodal.log import LOGGER
+
+from .dcm import DCM
+from .undulator import Undulator, UndulatorGapAccess
+from .util.lookup_tables import energy_distance_table
 
 ENERGY_TIMEOUT_S: float = 30.0
 STATUS_TIMEOUT_S: float = 10.0
@@ -20,14 +22,6 @@ TEST_MODE = False
 
 class AccessError(Exception):
     pass
-
-
-async def _get_energy_distance_table(lookup_table_path: str) -> ndarray:
-    # Slight cheat to make the file IO async, numpy doesn't do any real IO now, just
-    # decodes the text
-    async with aiofiles.open(lookup_table_path, "r") as stream:
-        raw_table = await stream.read()
-    return loadtxt(StringIO(raw_table), comments=["#", "Units"])
 
 
 def _get_closest_gap_for_energy(
@@ -115,7 +109,7 @@ class UndulatorDCM(StandardReadable, Movable):
 
     async def _gap_to_match_dcm_energy(self, energy_kev: float) -> float:
         # Get 2d np.array converting energies to undulator gap distance, from lookup table
-        energy_to_distance_table = await _get_energy_distance_table(
+        energy_to_distance_table = await energy_distance_table(
             self.undulator.lookup_table_path
         )
 
