@@ -9,7 +9,7 @@ from ophyd_async.epics.signal import epics_signal_r
 UNDULATOR_DISCREPANCY_THRESHOLD_MM = 2e-3
 
 
-class UndulatorGapAccess(Enum):
+class UndulatorGapAccess(str, Enum):
     ENABLED = "ENABLED"
     DISABLED = "DISABLED"
 
