@@ -22,22 +22,22 @@ class DCM(StandardReadable, HasHints):
         daq_configuration_path: str,
         name: str = "",
     ) -> None:
-        self.bragg_in_degrees = Motor(prefix + "-MO-DCM-01:BRAGG")
-        self.roll_in_mrad = Motor(prefix + "-MO-DCM-01:ROLL")
-        self.offset_in_mm = Motor(prefix + "-MO-DCM-01:OFFSET")
-        self.perp_in_mm = Motor(prefix + "-MO-DCM-01:PERP")
-        self.energy_in_kev = Motor(prefix + "-MO-DCM-01:ENERGY")
-        self.pitch_in_mrad = Motor(prefix + "-MO-DCM-01:PITCH")
-        self.wavelength = Motor(prefix + "-MO-DCM-01:WAVELENGTH")
+        self.bragg_in_degrees = Motor(prefix + "BRAGG")
+        self.roll_in_mrad = Motor(prefix + "ROLL")
+        self.offset_in_mm = Motor(prefix + "OFFSET")
+        self.perp_in_mm = Motor(prefix + "PERP")
+        self.energy_in_kev = Motor(prefix + "ENERGY")
+        self.pitch_in_mrad = Motor(prefix + "PITCH")
+        self.wavelength = Motor(prefix + "WAVELENGTH")
 
         # temperatures
-        self.xtal1_temp = epics_signal_r(float, prefix + "-MO-DCM-01:TEMP1")
-        self.xtal2_temp = epics_signal_r(float, prefix + "-MO-DCM-01:TEMP2")
-        self.xtal1_heater_temp = epics_signal_r(float, prefix + "-MO-DCM-01:TEMP3")
-        self.xtal2_heater_temp = epics_signal_r(float, prefix + "-MO-DCM-01:TEMP4")
-        self.backplate_temp = epics_signal_r(float, prefix + "-MO-DCM-01:TEMP5")
-        self.perp_temp = epics_signal_r(float, prefix + "-MO-DCM-01:TEMP6")
-        self.perp_sub_assembly_temp = epics_signal_r(float, prefix + "-MO-DCM-01:TEMP7")
+        self.xtal1_temp = epics_signal_r(float, prefix + "TEMP1")
+        self.xtal2_temp = epics_signal_r(float, prefix + "TEMP2")
+        self.xtal1_heater_temp = epics_signal_r(float, prefix + "TEMP3")
+        self.xtal2_heater_temp = epics_signal_r(float, prefix + "TEMP4")
+        self.backplate_temp = epics_signal_r(float, prefix + "TEMP5")
+        self.perp_temp = epics_signal_r(float, prefix + "TEMP6")
+        self.perp_sub_assembly_temp = epics_signal_r(float, prefix + "TEMP7")
 
         self.set_readable_signals(
             read=[
