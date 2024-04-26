@@ -34,7 +34,9 @@ class MJPG(Device):
         filename_str = self.filename.get()
         directory_str = self.directory.get()
 
-        assert isinstance(self.oav_params, OAVConfigParams)
+        assert isinstance(
+            self.oav_params, OAVConfigParams
+        ), "MJPG does not have valid OAV parameters"
         self.microns_per_pixel_x.set(self.oav_params.micronsPerXPixel)
         self.microns_per_pixel_y.set(self.oav_params.micronsPerYPixel)
 
@@ -61,15 +63,17 @@ class MJPG(Device):
 
 
 class SnapshotWithBeamCentre(MJPG):
-    CROSSHAIR_LENGTH = 20
+    CROSSHAIR_LENGTH_PX = 20
 
     def post_processing(self, image: Image.Image):
-        assert self.oav_params is not None
+        assert (
+            self.oav_params is not None
+        ), "Snapshot device does not have valid OAV parameters"
         beam_x = self.oav_params.beam_centre_i
         beam_y = self.oav_params.beam_centre_j
 
         draw = ImageDraw.Draw(image)
-        HALF_LEN = self.CROSSHAIR_LENGTH / 2
+        HALF_LEN = self.CROSSHAIR_LENGTH_PX / 2
         draw.line(((beam_x, beam_y - HALF_LEN), (beam_x, beam_y + HALF_LEN)))
         draw.line(((beam_x - HALF_LEN, beam_y), (beam_x + HALF_LEN, beam_y)))
 
