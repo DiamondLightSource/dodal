@@ -19,16 +19,19 @@ class Webcam(StandardReadable, Triggerable):
         self.set_readable_signals([self.last_saved_path])
         super().__init__(name=name)
 
+    async def _write_image(self, file_path: str):
+        async with ClientSession() as session:
+            async with session.get(self.url) as response:
+                response.raise_for_status()
+                LOGGER.info(f"Saving webcam image from {self.url} to {file_path}")
+                async with aiofiles.open(file_path, "wb") as file:
+                    await file.write((await response.read()))
+
     @AsyncStatus.wrap
     async def trigger(self) -> None:
         filename = await self.filename.get_value()
         directory = await self.directory.get_value()
 
-        async with ClientSession() as session:
-            async with session.get(self.url) as response:
-                response.raise_for_status()
-                path = Path(f"{directory}/{filename}.png").as_posix()
-                LOGGER.info(f"Saving webcam image from {self.url} to {path}")
-                async with aiofiles.open(path, "wb") as file:
-                    await file.write((await response.read()))
-                await self.last_saved_path.set(path)
+        file_path = Path(f"{directory}/{filename}.png").as_posix()
+        await self._write_image(file_path)
+        await self.last_saved_path.set(file_path)
