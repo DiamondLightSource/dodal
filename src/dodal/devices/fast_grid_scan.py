@@ -165,7 +165,7 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
         )
 
 
-class GridScanParams(GridScanParamsCommon):
+class ZebraGridScanParams(GridScanParamsCommon):
     """
     Params for standard Zebra FGS. Adds on the dwell time
     """

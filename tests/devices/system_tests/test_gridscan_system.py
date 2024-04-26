@@ -1,10 +1,9 @@
 import bluesky.plan_stubs as bps
 import pytest
-from bluesky.run_engine import RunEngine
 
 from dodal.devices.fast_grid_scan import (
-    GridScanParams,
     ZebraFastGridScan,
+    ZebraGridScanParams,
     set_fast_grid_scan_params,
 )
 
@@ -22,23 +21,23 @@ def wait_for_fgs_valid(fgs_motors: ZebraFastGridScan, timeout=0.5):
 
 
 @pytest.fixture()
-def fast_grid_scan():
-    fast_grid_scan = ZebraFastGridScan(
-        name="fast_grid_scan", prefix="BL03S-MO-SGON-01:FGS:"
+def zebra_fast_grid_scan():
+    zebra_fast_grid_scan = ZebraFastGridScan(
+        name="zebra_fast_grid_scan", prefix="BL03S-MO-SGON-01:FGS:"
     )
-    yield fast_grid_scan
+    yield zebra_fast_grid_scan
 
 
 @pytest.mark.s03
 async def test_when_program_data_set_and_staged_then_expected_images_correct(
-    fast_grid_scan: ZebraFastGridScan,
+    zebra_fast_grid_scan: ZebraFastGridScan, RE, RunEngine
 ):
     RE(
         set_fast_grid_scan_params(
-            fast_grid_scan,
-            GridScanParams(transmission_fraction=0.01, x_steps=2, y_steps=2),
+            zebra_fast_grid_scan,
+            ZebraGridScanParams(transmission_fraction=0.01, x_steps=2, y_steps=2),
         )
     )
-    assert await fast_grid_scan.expected_images.get_value() == 2 * 2
-    fast_grid_scan.stage()
-    assert await fast_grid_scan.position_counter.get_value() == 0
+    assert await zebra_fast_grid_scan.expected_images.get_value() == 2 * 2
+    zebra_fast_grid_scan.stage()
+    assert await zebra_fast_grid_scan.position_counter.get_value() == 0

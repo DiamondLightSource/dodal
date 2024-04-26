@@ -259,15 +259,15 @@ def eiger(
     )
 
 
-def fast_grid_scan(
+def zebra_fast_grid_scan(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> ZebraFastGridScan:
-    """Get the i04 fast_grid_scan device, instantiate it if it hasn't already been.
+    """Get the i04 zebra_fast_grid_scan device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
     return device_instantiation(
         device_factory=ZebraFastGridScan,
-        name="fast_grid_scan",
+        name="zebra_fast_grid_scan",
         prefix="-MO-SGON-01:FGS:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
