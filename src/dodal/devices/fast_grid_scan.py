@@ -287,11 +287,6 @@ class FastGridScanCommon(StandardReadable, ABC):
             "z2_start": self.z2_start,
         }
 
-    def is_invalid(self) -> bool:
-        if "GONP" in self.scan_invalid.source:
-            return False
-        return bool(self.scan_invalid.get_value())
-
     @AsyncStatus.wrap
     async def kickoff(self):
         curr_prog = await self.motion_program.program_number.get_value()
@@ -304,21 +299,15 @@ class FastGridScanCommon(StandardReadable, ABC):
         await self.run_cmd.set(1)
         LOGGER.info("Waiting for FGS to start")
         await wait_for_value(self.status, 1, self.KICKOFF_TIMEOUT)
-        LOGGER.debug("FGS kicked off, exiting FGS kickoff thread")
-
-    def collect(self):
-        return {}
-
-    def describe_collect(self):
-        return {}
+        LOGGER.debug("FGS kicked off")
 
     @AsyncStatus.wrap
     async def complete(self):
         await wait_for_value(self.status, 0, self.COMPLETE_STATUS)
 
 
-class FastGridScan(FastGridScanCommon):
-    """Device for standard Zebra FGS. In this scan, the goniometer's velocity profile follows a parabloic shape between X steps,
+class ZebraFastGridScan(FastGridScanCommon):
+    """Device for standard Zebra FGS. In this scan, the goniometer's velocity profile follows a parabolic shape between X steps,
     with the slowest points occuring at each X step.
     """
 

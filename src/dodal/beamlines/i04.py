@@ -8,7 +8,7 @@ from dodal.devices.DCM import DCM
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.eiger import EigerDetector
-from dodal.devices.fast_grid_scan import FastGridScan
+from dodal.devices.fast_grid_scan import ZebraFastGridScan
 from dodal.devices.flux import Flux
 from dodal.devices.i04.transfocator import Transfocator
 from dodal.devices.ipin import IPin
@@ -261,12 +261,12 @@ def eiger(
 
 def fast_grid_scan(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> FastGridScan:
+) -> ZebraFastGridScan:
     """Get the i04 fast_grid_scan device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
     return device_instantiation(
-        device_factory=FastGridScan,
+        device_factory=ZebraFastGridScan,
         name="fast_grid_scan",
         prefix="-MO-SGON-01:FGS:",
         wait=wait_for_connection,

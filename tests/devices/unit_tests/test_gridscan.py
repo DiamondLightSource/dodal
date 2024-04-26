@@ -1,5 +1,4 @@
 from asyncio import wait_for
-from unittest.mock import patch
 
 import numpy as np
 import pytest
@@ -11,10 +10,10 @@ from ophyd.status import DeviceStatus, Status
 from ophyd_async.core import DeviceCollector, set_sim_value
 
 from dodal.devices.fast_grid_scan import (
-    FastGridScan,
     GridScanParams,
     PandAFastGridScan,
     PandAGridScanParams,
+    ZebraFastGridScan,
     set_fast_grid_scan_params,
 )
 from dodal.devices.smargon import Smargon
@@ -30,7 +29,7 @@ def discard_status(st: Status | DeviceStatus):
 @pytest.fixture
 async def fast_grid_scan(request):
     async with DeviceCollector(sim=True):
-        fast_grid_scan = FastGridScan(name="fake_FGS", prefix="FGS")
+        fast_grid_scan = ZebraFastGridScan(name="fake_FGS", prefix="FGS")
 
     return fast_grid_scan
 
@@ -44,7 +43,7 @@ async def panda_fast_grid_scan(request):
 
 
 async def test_given_settings_valid_when_kickoff_then_run_started(
-    fast_grid_scan: FastGridScan,
+    fast_grid_scan: ZebraFastGridScan,
 ):
     set_sim_value(fast_grid_scan.scan_invalid, False)
     set_sim_value(fast_grid_scan.position_counter, 0)
@@ -56,7 +55,7 @@ async def test_given_settings_valid_when_kickoff_then_run_started(
 
 
 async def test_waits_for_running_motion(
-    fast_grid_scan: FastGridScan,
+    fast_grid_scan: ZebraFastGridScan,
 ):
     set_sim_value(fast_grid_scan.motion_program.running, 1)
 
@@ -73,14 +72,6 @@ async def test_waits_for_running_motion(
     assert await fast_grid_scan.run_cmd.get_value() == 1
 
 
-def test_is_invalid_gives_correct_value(fast_grid_scan: FastGridScan):
-    with patch("ophyd_async.core.signal.Signal.source", "GONP"):
-        set_sim_value(fast_grid_scan.scan_invalid, True)
-        assert not fast_grid_scan.is_invalid()
-    set_sim_value(fast_grid_scan.scan_invalid, False)
-    assert fast_grid_scan.is_invalid()
-
-
 @pytest.mark.parametrize(
     "steps, expected_images",
     [
@@ -90,7 +81,7 @@ def test_is_invalid_gives_correct_value(fast_grid_scan: FastGridScan):
     ],
 )
 async def test_given_different_step_numbers_then_expected_images_correct(
-    fast_grid_scan: FastGridScan, steps, expected_images
+    fast_grid_scan: ZebraFastGridScan, steps, expected_images
 ):
     set_sim_value(fast_grid_scan.x_steps, steps[0])
     set_sim_value(fast_grid_scan.y_steps, steps[1])
@@ -100,7 +91,7 @@ async def test_given_different_step_numbers_then_expected_images_correct(
 
 
 async def test_running_finished_with_all_images_done_then_complete_status_finishes_not_in_error(
-    fast_grid_scan: FastGridScan,
+    fast_grid_scan: ZebraFastGridScan,
 ):
     num_pos_1d = 2
     RE(

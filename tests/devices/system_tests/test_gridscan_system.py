@@ -3,13 +3,13 @@ import pytest
 from bluesky.run_engine import RunEngine
 
 from dodal.devices.fast_grid_scan import (
-    FastGridScan,
     GridScanParams,
+    ZebraFastGridScan,
     set_fast_grid_scan_params,
 )
 
 
-def wait_for_fgs_valid(fgs_motors: FastGridScan, timeout=0.5):
+def wait_for_fgs_valid(fgs_motors: ZebraFastGridScan, timeout=0.5):
     SLEEP_PER_CHECK = 0.1
     times_to_check = int(timeout / SLEEP_PER_CHECK)
     for _ in range(times_to_check):
@@ -23,13 +23,15 @@ def wait_for_fgs_valid(fgs_motors: FastGridScan, timeout=0.5):
 
 @pytest.fixture()
 def fast_grid_scan():
-    fast_grid_scan = FastGridScan(name="fast_grid_scan", prefix="BL03S-MO-SGON-01:FGS:")
+    fast_grid_scan = ZebraFastGridScan(
+        name="fast_grid_scan", prefix="BL03S-MO-SGON-01:FGS:"
+    )
     yield fast_grid_scan
 
 
 @pytest.mark.s03
 async def test_when_program_data_set_and_staged_then_expected_images_correct(
-    fast_grid_scan: FastGridScan, RE: RunEngine
+    fast_grid_scan: ZebraFastGridScan,
 ):
     RE(
         set_fast_grid_scan_params(
