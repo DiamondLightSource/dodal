@@ -76,6 +76,7 @@ class MJPG(Device, ABC):
 
 class SnapshotWithBeamCentre(MJPG):
     CROSSHAIR_LENGTH_PX = 20
+    CROSSHAIR_COLOUR = "Blue"
 
     def post_processing(self, image: Image.Image):
         assert (
@@ -86,7 +87,13 @@ class SnapshotWithBeamCentre(MJPG):
 
         draw = ImageDraw.Draw(image)
         HALF_LEN = self.CROSSHAIR_LENGTH_PX / 2
-        draw.line(((beam_x, beam_y - HALF_LEN), (beam_x, beam_y + HALF_LEN)))
-        draw.line(((beam_x - HALF_LEN, beam_y), (beam_x + HALF_LEN, beam_y)))
+        draw.line(
+            ((beam_x, beam_y - HALF_LEN), (beam_x, beam_y + HALF_LEN)),
+            fill=self.CROSSHAIR_COLOUR,
+        )
+        draw.line(
+            ((beam_x - HALF_LEN, beam_y), (beam_x + HALF_LEN, beam_y)),
+            fill=self.CROSSHAIR_COLOUR,
+        )
 
         self._save_image(image)
