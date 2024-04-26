@@ -51,8 +51,6 @@ async def assert_reading(
     device: StandardReadable,
     expected_reading: Mapping[str, Any],
 ) -> None:
-    await device.stage()
     reading = await device.read()
-    await device.unstage()
 
     assert reading == expected_reading
