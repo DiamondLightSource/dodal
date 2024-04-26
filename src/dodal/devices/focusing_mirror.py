@@ -4,8 +4,12 @@ from typing import Any
 from ophyd import Component, Device, EpicsSignal
 from ophyd.status import Status, StatusBase
 from ophyd_async.core import StandardReadable
+from ophyd_async.core.signal import soft_signal_r_and_backend
 from ophyd_async.epics.motion import Motor
-from ophyd_async.epics.signal import epics_signal_rw, epics_signal_x
+from ophyd_async.epics.signal import (
+    epics_signal_rw,
+    epics_signal_x,
+)
 
 from dodal.log import LOGGER
 
@@ -127,6 +131,17 @@ class FocusingMirror(StandardReadable):
         self.jack3_mm = Motor(prefix + "Y3")
         self.translation1_mm = Motor(prefix + "X1")
         self.translation2_mm = Motor(prefix + "X2")
+
+        # See https://manual.nexusformat.org/classes/base_classes/NXmirror.html
+        self.type, _ = soft_signal_r_and_backend(str, "single")
+        # The device is in the beamline co-ordinate system so pitch is the incident angle
+        # regardless of orientation of the mirror
+        self.incident_angle = Motor(prefix + "PITCH")
+
+        self.set_readable_signals(
+            read=[self.incident_angle],
+            config=[self.type],
+        )
         super().__init__(name)
 
 
