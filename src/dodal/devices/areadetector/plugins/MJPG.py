@@ -1,5 +1,5 @@
 import threading
-from os.path import join as path_join
+from abc import ABC, abstractmethod
 from pathlib import Path
 
 import requests
@@ -10,7 +10,7 @@ from dodal.devices.oav.oav_parameters import OAVConfigParams
 from dodal.log import LOGGER
 
 
-class MJPG(Device):
+class MJPG(Device, ABC):
     filename = Component(Signal)
     directory = Component(Signal)
     last_saved_path = Component(Signal)
@@ -28,11 +28,26 @@ class MJPG(Device):
 
     KICKOFF_TIMEOUT: float = 30.0
 
-    def trigger(self):
-        st = DeviceStatus(device=self, timeout=self.KICKOFF_TIMEOUT)
-        url_str = self.url.get()
+    def _save_image(self, image: Image.Image):
+        """A helper function to save a given image to the path supplied by the directory
+        and filename signals. The full resultant path is put on the last_saved_path signal
+        """
         filename_str = self.filename.get()
         directory_str = self.directory.get()
+
+        path = Path(f"{directory_str}/{filename_str}.png").as_posix()
+        LOGGER.info(f"Saving image to {path}")
+        image.save(path)
+        self.last_saved_path.put(path)
+
+    def trigger(self):
+        """This takes a snapshot image from the MJPG stream and send it to the
+        post_processing method, expected to be implemented by a child of this class.
+
+        It is the responsibility of the child class to save any resulting images.
+        """
+        st = DeviceStatus(device=self, timeout=self.KICKOFF_TIMEOUT)
+        url_str = self.url.get()
 
         assert isinstance(
             self.oav_params, OAVConfigParams
@@ -45,10 +60,6 @@ class MJPG(Device):
                 response = requests.get(url_str, stream=True)
                 response.raise_for_status()
                 with Image.open(response.raw) as image:
-                    path = Path(f"{directory_str}/{filename_str}.png").as_posix()
-                    self.last_saved_path.put(path)
-                    LOGGER.info(f"Saving {path}")
-                    image.save(path)
                     self.post_processing(image)
                     st.set_finished()
             except requests.HTTPError as e:
@@ -58,6 +69,7 @@ class MJPG(Device):
 
         return st
 
+    @abstractmethod
     def post_processing(self, image: Image.Image):
         pass
 
@@ -77,8 +89,4 @@ class SnapshotWithBeamCentre(MJPG):
         draw.line(((beam_x, beam_y - HALF_LEN), (beam_x, beam_y + HALF_LEN)))
         draw.line(((beam_x - HALF_LEN, beam_y), (beam_x + HALF_LEN, beam_y)))
 
-        filename_str = self.filename.get()
-        directory_str = self.directory.get()
-
-        path = path_join(directory_str, f"{filename_str}_with_crosshair.png")
-        image.save(path)
+        self._save_image(image)
