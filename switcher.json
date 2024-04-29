@@ -4,6 +4,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/main/"
   },
   {
+    "version": "1.22.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.22.0/"
+  },
+  {
     "version": "1.21.0",
     "url": "https://DiamondLightSource.github.io/dodal/1.21.0/"
   },
@@ -302,10 +306,6 @@
   {
     "version": "hyperion_1227_edge_array_logging",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1227_edge_array_logging/"
-  },
-  {
-    "version": "hyperion_1338_update_run_up_distance_for_panda",
-    "url": "https://DiamondLightSource.github.io/dodal/hyperion_1338_update_run_up_distance_for_panda/"
   },
   {
     "version": "hyperion_698",
