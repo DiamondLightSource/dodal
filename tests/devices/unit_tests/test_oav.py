@@ -29,11 +29,14 @@ def fake_oav() -> OAV:
     fake_oav.snapshot.box_width.put(50)
     fake_oav.snapshot.num_boxes_x.put(15)
     fake_oav.snapshot.num_boxes_y.put(10)
+    fake_oav.snapshot.x_size.sim_put(1024)  # type: ignore
+    fake_oav.snapshot.y_size.sim_put(768)  # type: ignore
 
     fake_oav.cam.port_name.sim_put("CAM")  # type: ignore
     fake_oav.proc.port_name.sim_put("PROC")  # type: ignore
 
     fake_oav.wait_for_connection()
+    fake_oav.zoom_controller.set("1.0x").wait()
 
     return fake_oav
 
@@ -81,6 +84,23 @@ def test_snapshot_trigger_saves_to_correct_file(
 
 @patch("requests.get")
 @patch("dodal.devices.areadetector.plugins.MJPG.Image.open")
+def test_snapshot_trigger_applies_current_microns_per_pixel_to_snapshot(
+    mock_open: MagicMock, mock_get, fake_oav
+):
+    image = PIL.Image.open("test")  # type: ignore
+    mock_open.return_value.__enter__.return_value = image
+
+    expected_mpp_x = fake_oav.parameters.micronsPerXPixel
+    expected_mpp_y = fake_oav.parameters.micronsPerYPixel
+    with patch.object(image, "save"):
+        st = fake_oav.snapshot.trigger()
+        st.wait()
+        assert fake_oav.snapshot.microns_per_pixel_x.get() == expected_mpp_x
+        assert fake_oav.snapshot.microns_per_pixel_y.get() == expected_mpp_y
+
+
+@patch("requests.get")
+@patch("dodal.devices.areadetector.plugins.MJPG.Image.open")
 @patch("dodal.devices.oav.grid_overlay.add_grid_overlay_to_image")
 @patch("dodal.devices.oav.grid_overlay.add_grid_border_overlay_to_image")
 def test_correct_grid_drawn_on_image(
@@ -116,14 +136,12 @@ def test_bottom_right_from_top_left():
     assert bottom_right[0] == 198 and bottom_right[1] == 263
 
 
-def test_when_zoom_1_then_flat_field_applied(fake_oav: OAV):
-    RE = RunEngine()
+def test_when_zoom_1_then_flat_field_applied(fake_oav: OAV, RE: RunEngine):
     RE(bps.abs_set(fake_oav.zoom_controller, "1.0x"))
     assert fake_oav.snapshot.input_plugin.get() == "PROC"
 
 
-def test_when_zoom_not_1_then_flat_field_removed(fake_oav: OAV):
-    RE = RunEngine()
+def test_when_zoom_not_1_then_flat_field_removed(fake_oav: OAV, RE: RunEngine):
     RE(bps.abs_set(fake_oav.zoom_controller, "10.0x"))
     assert fake_oav.snapshot.input_plugin.get() == "CAM"
 

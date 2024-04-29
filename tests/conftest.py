@@ -1,7 +1,9 @@
+import asyncio
 import importlib
 import logging
 import os
 import sys
+import time
 from os import environ, getenv
 from pathlib import Path
 from typing import cast
@@ -93,5 +95,13 @@ if s03_epics_repeater_port is not None:
 
 
 @pytest.fixture
-def RE():
-    return RunEngine()
+async def RE():
+    RE = RunEngine()
+    # make sure the event loop is thoroughly up and running before we try to create
+    # any ophyd_async devices which might need it
+    timeout = time.monotonic() + 1
+    while not RE.loop.is_running():
+        await asyncio.sleep(0)
+        if time.monotonic() > timeout:
+            raise TimeoutError("This really shouldn't happen but just in case...")
+    yield RE
