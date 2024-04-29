@@ -243,7 +243,7 @@ async def test_prepare_arms_tetramm(
 async def test_stage_sets_up_writer(
     tetramm: TetrammDetector,
 ):
-    set_sim_value(tetramm.hdf.file_path_exists, 1)
+    set_sim_value(tetramm.hdf.file_path_exists, True)
     await tetramm.stage()
 
     assert (await tetramm.hdf.num_capture.get_value()) == 0
@@ -257,14 +257,14 @@ async def test_stage_sets_up_writer(
 async def test_stage_sets_up_accurate_describe_output(
     tetramm: TetrammDetector,
 ):
-    assert tetramm.describe() == {}
+    assert await tetramm.describe() == {}
 
-    set_sim_value(tetramm.hdf.file_path_exists, 1)
+    set_sim_value(tetramm.hdf.file_path_exists, True)
     await tetramm.stage()
 
-    assert tetramm.describe() == {
+    assert await tetramm.describe() == {
         TEST_TETRAMM_NAME: {
-            "source": "sim://MY-TETRAMM:HDF5:FullFileName_RBV",
+            "source": "soft://foobar-hdf-full_file_name",
             "shape": (11, 1000),
             "dtype": "array",
             "external": "STREAM:",
