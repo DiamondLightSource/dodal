@@ -109,7 +109,7 @@ class OdinNodesStatus(Device):
             if len(error_message) != 0:
                 self.log.info(f"Clearing odin errors from node {node_number}")
                 clearing_status &= node_pv.clear_errors.set(1)
-        clearing_status.wait()
+        clearing_status.wait(10)
 
 
 class EigerOdin(Device):
