@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock, call
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd.sim import make_fake_device
+from ophyd_async.core import set_sim_value
 
 from dodal.devices.aperturescatterguard import (
     ApertureFiveDimensionalLocation,
@@ -18,8 +18,7 @@ from .conftest import patch_motor
 
 @pytest.fixture
 async def ap_sg(aperture_positions: AperturePositions):
-    FakeApertureScatterguard = make_fake_device(ApertureScatterguard)
-    ap_sg: ApertureScatterguard = FakeApertureScatterguard(name="test_ap_sg")
+    ap_sg = ApertureScatterguard(name="test_ap_sg")
     await ap_sg.connect(sim=True)
     ap_sg.load_aperture_positions(aperture_positions)
     with (
@@ -43,7 +42,7 @@ async def aperture_in_medium_pos(
     await ap_sg.aperture.z.set(medium.aperture_z)
     await ap_sg.scatterguard.x.set(medium.scatterguard_x)
     await ap_sg.scatterguard.y.set(medium.scatterguard_y)
-    ap_sg.aperture.medium._backend._set_value(1)  # type: ignore
+    set_sim_value(ap_sg.aperture.medium, 1)
     yield ap_sg
 
 
@@ -89,17 +88,6 @@ def install_logger_for_aperture_and_scatterguard(aperture_scatterguard):
     parent_mock.attach_mock(mock_sg_x, "_mock_sg_x")
     parent_mock.attach_mock(mock_sg_y, "_mock_sg_y")
     return parent_mock
-
-
-def test_create_aperturescatterguard():
-    fake_aperture_scatterguard = make_fake_device(ApertureScatterguard)
-    _ = fake_aperture_scatterguard()
-
-
-def test_get_aperturescatterguard_aperture():
-    fake_aperture_scatterguard = make_fake_device(ApertureScatterguard)
-    ap_sg = fake_aperture_scatterguard()
-    _ = ap_sg.aperture.y.user_readback.get_value()
 
 
 def test_aperture_scatterguard_rejects_unknown_position(aperture_in_medium_pos):
@@ -157,7 +145,7 @@ async def test_aperture_scatterguard_select_top_moves_assembly_down_then_sg_up(
     aperture_scatterguard = aperture_in_medium_pos
     call_logger = install_logger_for_aperture_and_scatterguard(aperture_scatterguard)
 
-    await aperture_scatterguard.set(aperture_positions.LARGE)  # type: ignore
+    await aperture_scatterguard.set(aperture_positions.LARGE)
 
     call_logger.assert_has_calls(
         [
@@ -174,9 +162,9 @@ async def test_aperture_scatterguard_select_top_moves_assembly_down_then_sg_up(
 async def test_aperture_scatterguard_throws_error_if_outside_tolerance(
     ap_sg: ApertureScatterguard,
 ):
-    ap_sg.aperture.z.deadband._backend._set_value(0.001)  # type: ignore
-    ap_sg.aperture.z.user_readback._backend._set_value(1)  # type: ignore
-    ap_sg.aperture.z.motor_done_move._backend._set_value(1)  # type: ignore
+    set_sim_value(ap_sg.aperture.z.deadband, 0.001)
+    set_sim_value(ap_sg.aperture.z.user_readback, 1)
+    set_sim_value(ap_sg.aperture.z.motor_done_move, 1)
 
     with pytest.raises(InvalidApertureMove):
         pos = ApertureFiveDimensionalLocation(0, 0, 1.1, 0, 0)
@@ -186,9 +174,9 @@ async def test_aperture_scatterguard_throws_error_if_outside_tolerance(
 async def test_aperture_scatterguard_returns_status_if_within_tolerance(
     ap_sg: ApertureScatterguard,
 ):
-    ap_sg.aperture.z.deadband._backend._set_value(0.001)  # type: ignore
-    ap_sg.aperture.z.user_readback._backend._set_value(1)  # type: ignore
-    ap_sg.aperture.z.motor_done_move._backend._set_value(1)  # type: ignore
+    set_sim_value(ap_sg.aperture.z.deadband, 0.001)
+    set_sim_value(ap_sg.aperture.z.user_readback, 1)
+    set_sim_value(ap_sg.aperture.z.motor_done_move, 1)
 
     pos = ApertureFiveDimensionalLocation(0, 0, 1, 0, 0)
     await ap_sg._safe_move_within_datacollection_range(pos)
@@ -207,31 +195,31 @@ def set_underlying_motors(
 async def test_aperture_positions_large(
     ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
 ):
-    ap_sg.aperture.large._backend._set_value(1)  # type: ignore
+    set_sim_value(ap_sg.aperture.large, 1)
     assert await ap_sg._get_current_aperture_position() == aperture_positions.LARGE
 
 
 async def test_aperture_positions_medium(
     ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
 ):
-    ap_sg.aperture.medium._backend._set_value(1)  # type: ignore
+    set_sim_value(ap_sg.aperture.medium, 1)
     assert await ap_sg._get_current_aperture_position() == aperture_positions.MEDIUM
 
 
 async def test_aperture_positions_small(
     ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
 ):
-    ap_sg.aperture.small._backend._set_value(1)  # type: ignore
+    set_sim_value(ap_sg.aperture.small, 1)
     assert await ap_sg._get_current_aperture_position() == aperture_positions.SMALL
 
 
 async def test_aperture_positions_robot_load(
     ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
 ):
-    ap_sg.aperture.large._backend._set_value(0)  # type: ignore
-    ap_sg.aperture.medium._backend._set_value(0)  # type: ignore
-    ap_sg.aperture.small._backend._set_value(0)  # type: ignore
-    ap_sg.aperture.y.set(aperture_positions.ROBOT_LOAD.location.aperture_y)  # type: ignore
+    set_sim_value(ap_sg.aperture.large, 0)
+    set_sim_value(ap_sg.aperture.medium, 0)
+    set_sim_value(ap_sg.aperture.small, 0)
+    await ap_sg.aperture.y.set(aperture_positions.ROBOT_LOAD.location.aperture_y)
     assert await ap_sg._get_current_aperture_position() == aperture_positions.ROBOT_LOAD
 
 
@@ -240,10 +228,10 @@ async def test_aperture_positions_robot_load_within_tolerance(
 ):
     robot_load_ap_y = aperture_positions.ROBOT_LOAD.location.aperture_y
     tolerance = ap_sg.TOLERANCE_STEPS * await ap_sg.aperture.y.deadband.get_value()
-    ap_sg.aperture.large._backend._set_value(0)  # type: ignore
-    ap_sg.aperture.medium._backend._set_value(0)  # type: ignore
-    ap_sg.aperture.small._backend._set_value(0)  # type: ignore
-    ap_sg.aperture.y.set(robot_load_ap_y + tolerance)  # type: ignore
+    set_sim_value(ap_sg.aperture.large, 0)
+    set_sim_value(ap_sg.aperture.medium, 0)
+    set_sim_value(ap_sg.aperture.small, 0)
+    await ap_sg.aperture.y.set(robot_load_ap_y + tolerance)
     assert await ap_sg._get_current_aperture_position() == aperture_positions.ROBOT_LOAD
 
 
@@ -254,10 +242,10 @@ async def test_aperture_positions_robot_load_outside_tolerance(
     tolerance = (
         ap_sg.TOLERANCE_STEPS + 1
     ) * await ap_sg.aperture.y.deadband.get_value()
-    ap_sg.aperture.large._backend._set_value(0)  # type: ignore
-    ap_sg.aperture.medium._backend._set_value(0)  # type: ignore
-    ap_sg.aperture.small._backend._set_value(0)  # type: ignore
-    ap_sg.aperture.y.set(robot_load_ap_y + tolerance)  # type: ignore
+    set_sim_value(ap_sg.aperture.large, 0)
+    set_sim_value(ap_sg.aperture.medium, 0)
+    set_sim_value(ap_sg.aperture.small, 0)
+    await ap_sg.aperture.y.set(robot_load_ap_y + tolerance)
     with pytest.raises(InvalidApertureMove):
         await ap_sg._get_current_aperture_position()
 
@@ -265,10 +253,10 @@ async def test_aperture_positions_robot_load_outside_tolerance(
 async def test_aperture_positions_robot_load_unsafe(
     ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
 ):
-    ap_sg.aperture.large._backend._set_value(0)  # type: ignore
-    ap_sg.aperture.medium._backend._set_value(0)  # type: ignore
-    ap_sg.aperture.small._backend._set_value(0)  # type: ignore
-    ap_sg.aperture.y.set(50.0)  # type: ignore
+    set_sim_value(ap_sg.aperture.large, 0)
+    set_sim_value(ap_sg.aperture.medium, 0)
+    set_sim_value(ap_sg.aperture.small, 0)
+    await ap_sg.aperture.y.set(50.0)
     with pytest.raises(InvalidApertureMove):
         await ap_sg._get_current_aperture_position()
 

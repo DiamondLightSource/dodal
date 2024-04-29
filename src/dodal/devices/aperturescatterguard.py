@@ -29,9 +29,11 @@ ApertureFiveDimensionalLocation = namedtuple(
 
 @dataclass
 class SingleAperturePosition:
+    # Default values are needed as ophyd_async sim does not respect initial_values of
+    # soft signal backends see https://github.com/bluesky/ophyd-async/issues/266
     name: str = ""
     GDA_name: str = ""
-    radius_microns: float | None = 0
+    radius_microns: float | None = None
     location: ApertureFiveDimensionalLocation = ApertureFiveDimensionalLocation(
         0, 0, 0, 0, 0
     )
@@ -63,6 +65,10 @@ class AperturePositions:
     SMALL: SingleAperturePosition
     ROBOT_LOAD: SingleAperturePosition
 
+    UNKNOWN = SingleAperturePosition(
+        "Unknown", "UNKNOWN", None, ApertureFiveDimensionalLocation(0, 0, 0, 0, 0)
+    )
+
     @classmethod
     def from_gda_beamline_params(cls, params):
         return cls(
@@ -88,7 +94,7 @@ class ApertureScatterguard(StandardReadable, Movable):
         self.aperture_positions: AperturePositions | None = None
         self.TOLERANCE_STEPS = 3  # Number of MRES steps
         self.selected_aperture = self.SelectedAperture(
-            backend=SimSignalBackend(datatype=SingleAperturePosition)
+            backend=SimSignalBackend(SingleAperturePosition, AperturePositions.UNKNOWN),
         )
         self.set_readable_signals(
             read=[

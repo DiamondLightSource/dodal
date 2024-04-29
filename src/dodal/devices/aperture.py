@@ -1,7 +1,6 @@
 from ophyd_async.core import StandardReadable
+from ophyd_async.epics.motion import Motor
 from ophyd_async.epics.signal import epics_signal_r
-
-from dodal.devices.util.motor_utils import Motor
 
 
 class Aperture(StandardReadable):

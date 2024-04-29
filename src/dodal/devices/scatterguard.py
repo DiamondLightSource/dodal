@@ -1,6 +1,5 @@
 from ophyd_async.core import StandardReadable
-
-from dodal.devices.util.motor_utils import Motor
+from ophyd_async.epics.motion import Motor
 
 
 class Scatterguard(StandardReadable):
