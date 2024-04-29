@@ -79,7 +79,8 @@ def vfm(
         fake=fake_with_ophyd_sim,
         bragg_to_lat_lut_path=DAQ_CONFIGURATION_PATH
         + "/lookup/BeamLineEnergy_DCM_VFM_x_converter.txt",
-        x_y_sufffixes=("LAT", "VERT"),
+        x_suffix="LAT",
+        y_suffix="VERT",
     )
 
 

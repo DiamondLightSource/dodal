@@ -19,6 +19,13 @@ VOLTAGE_POLLING_DELAY_S = 0.5
 DEFAULT_SETTLE_TIME_S = 60
 
 
+class MirrorType(Enum):
+    """See https://manual.nexusformat.org/classes/base_classes/NXmirror.html"""
+
+    SINGLE = "single"
+    MULTI = "multi"
+
+
 class MirrorStripe(str, Enum):
     RHODIUM = "Rhodium"
     BARE = "Bare"
@@ -118,28 +125,27 @@ class FocusingMirror(StandardReadable):
     """Focusing Mirror"""
 
     def __init__(
-        self, name, prefix, bragg_to_lat_lut_path=None, x_y_sufffixes=("X", "Y")
+        self, name, prefix, bragg_to_lat_lut_path=None, x_suffix="X", y_suffix="Y"
     ):
         self.bragg_to_lat_lookup_table_path = bragg_to_lat_lut_path
         self.yaw_mrad = Motor(prefix + "YAW")
         self.pitch_mrad = Motor(prefix + "PITCH")
         self.roll_mrad = Motor(prefix + "ROLL")
-        self.x_mm = Motor(prefix + x_y_sufffixes[0])
-        self.y_mm = Motor(prefix + x_y_sufffixes[1])
+        self.x_mm = Motor(prefix + x_suffix)
+        self.y_mm = Motor(prefix + y_suffix)
         self.jack1_mm = Motor(prefix + "Y1")
         self.jack2_mm = Motor(prefix + "Y2")
         self.jack3_mm = Motor(prefix + "Y3")
         self.translation1_mm = Motor(prefix + "X1")
         self.translation2_mm = Motor(prefix + "X2")
 
-        # See https://manual.nexusformat.org/classes/base_classes/NXmirror.html
-        self.type, _ = soft_signal_r_and_backend(str, "single")
+        self.type, _ = soft_signal_r_and_backend(MirrorType, MirrorType.SINGLE)
         # The device is in the beamline co-ordinate system so pitch is the incident angle
         # regardless of orientation of the mirror
         self.incident_angle = Motor(prefix + "PITCH")
 
         self.set_readable_signals(
-            read=[self.incident_angle],
+            read=[self.incident_angle.user_readback],
             config=[self.type],
         )
         super().__init__(name)
