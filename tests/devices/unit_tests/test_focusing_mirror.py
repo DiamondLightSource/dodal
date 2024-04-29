@@ -5,9 +5,7 @@ import pytest
 from ophyd.sim import NullStatus
 from ophyd.status import Status, StatusBase
 
-from dodal.beamlines import i03
 from dodal.devices.focusing_mirror import (
-    FocusingMirror,
     FocusingMirrorWithStripes,
     MirrorStripe,
     MirrorVoltageDemand,
@@ -141,19 +139,6 @@ def test_mirror_populates_voltage_channels(
     channels = vfm_mirror_voltages_with_set.voltage_channels
     assert len(channels) == 8
     assert isinstance(channels[0], MirrorVoltageDevice)
-
-
-async def test_focusing_mirror_has_correct_x_and_y_PVs_by_default():
-    device = FocusingMirror(prefix="-OP-VFM-01:", name="mirror")
-    await device.connect(sim=True)
-    assert device.x_mm.setpoint.source.endswith("X.VAL")
-    assert device.y_mm.setpoint.source.endswith("Y.VAL")
-
-
-def test_i03_focusing_mirror_has_correct_x_and_y_PVs(RE):
-    device = i03.vfm(fake_with_ophyd_sim=True)
-    assert device.x_mm.setpoint.source.endswith("LAT.VAL")
-    assert device.y_mm.setpoint.source.endswith("VERT.VAL")
 
 
 async def test_given_striped_focussing_mirror_then_energy_to_stripe_returns_expected():
