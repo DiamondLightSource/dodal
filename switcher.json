@@ -216,6 +216,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/471_beam_centre/"
   },
   {
+    "version": "475_update_to_ophyd_async",
+    "url": "https://DiamondLightSource.github.io/dodal/475_update_to_ophyd_async/"
+  },
+  {
     "version": "51_aperture_scatterguard_no_positions",
     "url": "https://DiamondLightSource.github.io/dodal/51_aperture_scatterguard_no_positions/"
   },
