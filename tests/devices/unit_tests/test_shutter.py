@@ -14,6 +14,7 @@ async def sim_shutter():
     return sim_shutter
 
 
+
 @pytest.mark.parametrize(
     "state",
     [
