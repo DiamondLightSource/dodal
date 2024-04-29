@@ -29,9 +29,8 @@ def fast_grid_scan():
 
 @pytest.mark.s03
 def test_when_program_data_set_and_staged_then_expected_images_correct(
-    fast_grid_scan: FastGridScan,
+    fast_grid_scan: FastGridScan, RE: RunEngine
 ):
-    RE = RunEngine()
     RE(
         set_fast_grid_scan_params(
             fast_grid_scan,
@@ -45,7 +44,7 @@ def test_when_program_data_set_and_staged_then_expected_images_correct(
 
 @pytest.mark.s03
 def test_given_valid_params_when_kickoff_then_completion_status_increases_and_finishes(
-    fast_grid_scan: FastGridScan,
+    fast_grid_scan: FastGridScan, RE: RunEngine
 ):
     def set_and_wait_plan(fast_grid_scan: FastGridScan):
         yield from set_fast_grid_scan_params(
@@ -68,7 +67,6 @@ def test_given_valid_params_when_kickoff_then_completion_status_increases_and_fi
                 assert 0 < fraction < 1
                 assert 0 < prev_fraction < 1
 
-    RE = RunEngine()
     RE(set_and_wait_plan(fast_grid_scan))
     assert fast_grid_scan.position_counter.get() == 0
 

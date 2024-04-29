@@ -201,6 +201,7 @@ class OAV(AreaDetector):
         super().__init__(*args, **kwargs)
         self.parameters = params
         self.subscription_id = None
+        self._snapshot_trigger_subscription_id = None
 
     def wait_for_connection(self, all_signals=False, timeout=2):
         connected = super().wait_for_connection(all_signals, timeout)
@@ -213,4 +214,20 @@ class OAV(AreaDetector):
             self.zoom_controller.level.unsubscribe(self.subscription_id)
         self.subscription_id = self.zoom_controller.level.subscribe(cb)
 
+        self.add_snapshot_trigger_hook()
+
         return connected
+
+    def add_snapshot_trigger_hook(self):
+        def apply_current_microns_per_pixel_to_snapshot(*args, **kwargs):
+            """Persist the current value of the mpp to the snapshot so that it is retained if zoom changes"""
+            microns_per_x_pixel = self.parameters.micronsPerXPixel
+            microns_per_y_pixel = self.parameters.micronsPerYPixel
+            self.snapshot.microns_per_pixel_x.put(microns_per_x_pixel)
+            self.snapshot.microns_per_pixel_y.put(microns_per_y_pixel)
+
+        self._snapshot_trigger_subscription_id = (
+            self.snapshot.last_saved_path.subscribe(
+                apply_current_microns_per_pixel_to_snapshot
+            )
+        )

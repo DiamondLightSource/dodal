@@ -13,7 +13,7 @@ classifiers = [
 description = "Ophyd devices and other utils that could be used across DLS beamlines"
 dependencies = [
     "ophyd",
-    "ophyd-async>=0.3a1",
+    "ophyd-async>=0.3a2",
     "bluesky",
     "pyepics",
     "dataclasses-json",
@@ -26,6 +26,8 @@ dependencies = [
     "aioca",                  # Required for CA support with ophyd-async.
     "p4p",                    # Required for PVA support with ophyd-async.
     "numpy",
+    "aiofiles",
+    "aiohttp",
 ]
 
 dynamic = ["version"]
@@ -54,6 +56,7 @@ dev = [
     "types-requests",
     "types-mock",
     "types-PyYAML",
+    "types-aiofiles",
 ]
 
 [project.urls]

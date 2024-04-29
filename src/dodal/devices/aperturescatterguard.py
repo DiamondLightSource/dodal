@@ -88,7 +88,7 @@ class ApertureScatterguard(StandardReadable, Movable):
         self.aperture_positions: AperturePositions | None = None
         self.TOLERANCE_STEPS = 3  # Number of MRES steps
         self.selected_aperture = self.SelectedAperture(
-            backend=SimSignalBackend(datatype=SingleAperturePosition, source="")
+            backend=SimSignalBackend(datatype=SingleAperturePosition)
         )
         self.set_readable_signals(
             read=[
