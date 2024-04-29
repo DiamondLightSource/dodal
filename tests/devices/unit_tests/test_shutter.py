@@ -1,5 +1,5 @@
 import pytest
-from ophyd_async.core import DeviceCollector, set_sim_value
+from ophyd_async.core import DeviceCollector
 
 from dodal.devices.shutter import OpenState, Shutter
 
@@ -12,7 +12,6 @@ async def sim_shutter():
             name="shutter",
         )
     return sim_shutter
-
 
 
 @pytest.mark.parametrize(
