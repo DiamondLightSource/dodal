@@ -196,6 +196,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/413_make_common_FGS/"
   },
   {
+    "version": "416-port-shutter-to-ophyd-async",
+    "url": "https://DiamondLightSource.github.io/dodal/416-port-shutter-to-ophyd-async/"
+  },
+  {
     "version": "432-create-sample-stage-device-for-p99",
     "url": "https://DiamondLightSource.github.io/dodal/432-create-sample-stage-device-for-p99/"
   },
@@ -350,10 +354,6 @@
   {
     "version": "remove-black",
     "url": "https://DiamondLightSource.github.io/dodal/remove-black/"
-  },
-  {
-    "version": "remove-slits-staging-in-tests",
-    "url": "https://DiamondLightSource.github.io/dodal/remove-slits-staging-in-tests/"
   },
   {
     "version": "remove_ophyd_dependency_pin",
