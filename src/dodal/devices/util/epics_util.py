@@ -3,7 +3,6 @@ from typing import Callable
 
 from ophyd import Component, Device, EpicsSignal
 from ophyd.status import Status, StatusBase
-from ophyd_async.epics.signal import epics_signal_rw
 
 from dodal.devices.status import await_value
 from dodal.log import LOGGER
@@ -126,9 +125,3 @@ class SetWhenEnabled(Device):
                 lambda: self.proc.set(proc),
             ]
         )
-
-
-def epics_signal_rw_rbv(
-    T, write_pv: str
-):  # Remove when https://github.com/bluesky/ophyd-async/issues/139 is done
-    return epics_signal_rw(T, write_pv + "_RBV", write_pv)

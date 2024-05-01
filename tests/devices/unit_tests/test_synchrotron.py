@@ -7,8 +7,6 @@ from bluesky.run_engine import RunEngine
 from ophyd_async.core import DeviceCollector, StandardReadable, set_sim_value
 
 from dodal.devices.synchrotron import (
-    Prefix,
-    Suffix,
     Synchrotron,
     SynchrotronMode,
 )
@@ -29,15 +27,15 @@ CONFIGS = [BEAM_ENERGY, MODE.value]
 READING_FIELDS = ["value", "alarm_severity"]
 DESCRIPTION_FIELDS = ["source", "dtype", "shape"]
 READING_ADDRESSES = [
-    f"sim://{Prefix.SIGNAL + Suffix.SIGNAL}",
-    f"sim://{Prefix.STATUS + Suffix.USER_COUNTDOWN}",
-    f"sim://{Prefix.TOP_UP + Suffix.COUNTDOWN}",
-    f"sim://{Prefix.TOP_UP + Suffix.END_COUNTDOWN}",
+    "soft://synchrotron-ring_current",
+    "soft://synchrotron-machine_user_countdown",
+    "soft://synchrotron-topup_start_countdown",
+    "soft://synchrotron-top_up_end_countdown",
 ]
 
 CONFIG_ADDRESSES = [
-    f"sim://{Prefix.STATUS + Suffix.BEAM_ENERGY}",
-    f"sim://{Prefix.STATUS + Suffix.MODE}",
+    "soft://synchrotron-beam_energy",
+    "soft://synchrotron-synchrotron_mode",
 ]
 
 READ_SIGNALS = [

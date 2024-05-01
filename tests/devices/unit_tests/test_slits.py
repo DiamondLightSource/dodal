@@ -16,9 +16,9 @@ async def slits() -> Slits:
 
 
 async def test_reading_slits_reads_gaps_and_centres(slits: Slits):
-    set_sim_value(slits.x_gap.readback, 0.5)
-    set_sim_value(slits.y_centre.readback, 1.0)
-    set_sim_value(slits.y_gap.readback, 1.5)
+    set_sim_value(slits.x_gap.user_readback, 0.5)
+    set_sim_value(slits.y_centre.user_readback, 1.0)
+    set_sim_value(slits.y_gap.user_readback, 1.5)
 
     await assert_reading(
         slits,
@@ -51,8 +51,6 @@ async def assert_reading(
     device: StandardReadable,
     expected_reading: Mapping[str, Any],
 ) -> None:
-    await device.stage()
     reading = await device.read()
-    await device.unstage()
 
     assert reading == expected_reading

@@ -163,7 +163,7 @@ DATA_GROUPS = "data_groups"
 
 
 def attach_metadata(
-    plan: MsgGenerator,
+    plan: MsgGenerator, provider: UpdatingDirectoryProvider | None
 ) -> MsgGenerator:
     """
     Attach data session metadata to the runs within a plan and make it correlate
@@ -183,10 +183,14 @@ def attach_metadata(
     Yields:
         Iterator[Msg]: Plan messages
     """
-    provider = beamline_utils.get_directory_provider()
+    if provider is None:
+        provider = beamline_utils.get_directory_provider()
     yield from bps.wait_for([provider.update])
     directory_info: DirectoryInfo = provider()
-    yield from bpp.inject_md_wrapper(plan, md={DATA_SESSION: directory_info.prefix})
+    # https://github.com/DiamondLightSource/dodal/issues/452
+    # As part of 452, write each dataCollection into their own folder, then can use resource_dir directly
+    data_session = directory_info.prefix.removesuffix("-")
+    yield from bpp.inject_md_wrapper(plan, md={DATA_SESSION: data_session})
 
 
 attach_metadata_decorator = make_decorator(attach_metadata)
