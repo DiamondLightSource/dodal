@@ -19,11 +19,13 @@
             "upgradePackages": false
         }
     },
+    "settings": {
+        "python.defaultInterpreterPath": "/venv/bin/python",
+    },
     // Set *default* container specific settings.json values on container create.
     "customizations": {
         "vscode": {
             // Add the IDs of extensions you want installed when the container is created.
-            "python.defaultInterpreterPath": "/venv/bin/python",
             "extensions": [
                 "ms-python.python",
                 "tamasfe.even-better-toml",
