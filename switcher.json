@@ -184,6 +184,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/341-add-setup-for-the-j20-beamline/"
   },
   {
+    "version": "389-and-397-undulator-dcm",
+    "url": "https://DiamondLightSource.github.io/dodal/389-and-397-undulator-dcm/"
+  },
+  {
     "version": "389-and-397-undulator-dcm-ophyd-async",
     "url": "https://DiamondLightSource.github.io/dodal/389-and-397-undulator-dcm-ophyd-async/"
   },
