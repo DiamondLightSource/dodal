@@ -15,7 +15,7 @@ from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZPositioner
 from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
 from dodal.devices.s4_slit_gaps import S4SlitGaps
-from dodal.devices.sample_shutter import SampleShutter
+from dodal.devices.shutter import Shutter
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import Undulator
@@ -110,12 +110,12 @@ def beamstop(
 
 def sample_shutter(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> SampleShutter:
+) -> Shutter:
     """Get the i04 sample shutter device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
     return device_instantiation(
-        SampleShutter,
+        Shutter,
         "sample_shutter",
         "-EA-SHTR-01:",
         wait_for_connection,
