@@ -15,7 +15,10 @@ class Shutter(StandardReadable, Movable):
         self.position = epics_signal_rw(
             write_pv=prefix + "CTRL2", read_pv=prefix + "STA", datatype=int, name=name
         )
-        super().__init__(name=name)
+        super().__init__(
+            name=name,
+        )
+        self.set_readable_signals([self.position])
 
     def set(self, open_val: int | OpenState):
         if isinstance(open_val, OpenState):
