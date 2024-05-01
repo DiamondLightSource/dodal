@@ -31,7 +31,7 @@ class Undulator(StandardReadable):
         self.gap_discrepancy_tolerance_mm: float = UNDULATOR_DISCREPANCY_THRESHOLD_MM
         self.set_readable_signals(
             read=[
-                self.gap_motor.readback,
+                self.gap_motor.user_readback,
                 self.current_gap,
                 self.gap_access,
             ]

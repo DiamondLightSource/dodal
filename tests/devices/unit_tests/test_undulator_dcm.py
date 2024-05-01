@@ -80,14 +80,16 @@ async def test_if_gap_is_wrong_then_logger_info_is_called_and_gap_is_set_correct
     mock_logger: MagicMock, mock_load: MagicMock, fake_undulator_dcm: UndulatorDCM
 ):
     set_sim_value(fake_undulator_dcm.undulator.current_gap, 5.3)
-    set_sim_value(fake_undulator_dcm.dcm.energy_in_kev.readback, 5.7)
+    set_sim_value(fake_undulator_dcm.dcm.energy_in_kev.user_readback, 5.7)
 
     mock_load.return_value = np.array([[5700, 5.4606], [7000, 6.045], [9700, 6.404]])
 
     await fake_undulator_dcm.set(6.9)
 
-    assert (await fake_undulator_dcm.dcm.energy_in_kev.setpoint.get_value()) == 6.9
-    assert (await fake_undulator_dcm.undulator.gap_motor.setpoint.get_value()) == 6.045
+    assert (await fake_undulator_dcm.dcm.energy_in_kev.user_setpoint.get_value()) == 6.9
+    assert (
+        await fake_undulator_dcm.undulator.gap_motor.user_setpoint.get_value()
+    ) == 6.045
     mock_logger.info.assert_called()
 
 
@@ -99,18 +101,20 @@ async def test_when_gap_access_is_not_checked_if_test_mode_enabled(
 ):
     set_sim_value(fake_undulator_dcm.undulator.gap_access, UndulatorGapAccess.DISABLED)
     set_sim_value(fake_undulator_dcm.undulator.current_gap, 5.3)
-    set_sim_value(fake_undulator_dcm.dcm.energy_in_kev.readback, 5.7)
+    set_sim_value(fake_undulator_dcm.dcm.energy_in_kev.user_readback, 5.7)
 
-    set_sim_value(fake_undulator_dcm.undulator.gap_motor.setpoint, 0.0)
-    set_sim_value(fake_undulator_dcm.undulator.gap_motor.readback, 0.0)
+    set_sim_value(fake_undulator_dcm.undulator.gap_motor.user_setpoint, 0.0)
+    set_sim_value(fake_undulator_dcm.undulator.gap_motor.user_readback, 0.0)
 
     mock_load.return_value = np.array([[5700, 5.4606], [7000, 6.045], [9700, 6.404]])
 
     await fake_undulator_dcm.set(6.9)
 
-    assert (await fake_undulator_dcm.dcm.energy_in_kev.setpoint.get_value()) == 6.9
+    assert (await fake_undulator_dcm.dcm.energy_in_kev.user_setpoint.get_value()) == 6.9
     # Verify undulator has not been asked to move
-    assert (await fake_undulator_dcm.undulator.gap_motor.setpoint.get_value()) == 0.0
+    assert (
+        await fake_undulator_dcm.undulator.gap_motor.user_setpoint.get_value()
+    ) == 0.0
 
     mock_logger.info.assert_called()
     mock_logger.debug.assert_called_once()
@@ -121,8 +125,8 @@ async def test_when_gap_access_is_not_checked_if_test_mode_enabled(
 async def test_if_gap_is_already_correct_then_dont_move_gap(
     mock_logger: MagicMock, mock_load: MagicMock, fake_undulator_dcm: UndulatorDCM
 ):
-    set_sim_value(fake_undulator_dcm.dcm.energy_in_kev.setpoint, 0.0)
-    set_sim_value(fake_undulator_dcm.dcm.energy_in_kev.readback, 0.0)
+    set_sim_value(fake_undulator_dcm.dcm.energy_in_kev.user_setpoint, 0.0)
+    set_sim_value(fake_undulator_dcm.dcm.energy_in_kev.user_readback, 0.0)
 
     mock_load.return_value = np.array([[5700, 5.4606], [7000, 6.045], [9700, 6.404]])
     set_sim_value(fake_undulator_dcm.undulator.current_gap, 5.4605)
@@ -131,7 +135,9 @@ async def test_if_gap_is_already_correct_then_dont_move_gap(
     await asyncio.wait_for(status, timeout=0.01)
 
     # Verify undulator has not been asked to move
-    assert (await fake_undulator_dcm.undulator.gap_motor.setpoint.get_value()) == 0.0
+    assert (
+        await fake_undulator_dcm.undulator.gap_motor.user_setpoint.get_value()
+    ) == 0.0
     mock_logger.info.assert_called_once()
     mock_logger.debug.assert_called_once()
 
