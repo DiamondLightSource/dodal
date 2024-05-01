@@ -220,10 +220,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/471_beam_centre/"
   },
   {
-    "version": "489_motor_issues",
-    "url": "https://DiamondLightSource.github.io/dodal/489_motor_issues/"
-  },
-  {
     "version": "489_motor_types_issue",
     "url": "https://DiamondLightSource.github.io/dodal/489_motor_types_issue/"
   },
@@ -370,6 +366,10 @@
   {
     "version": "remove_ophyd_dependency_pin",
     "url": "https://DiamondLightSource.github.io/dodal/remove_ophyd_dependency_pin/"
+  },
+  {
+    "version": "test-html",
+    "url": "https://DiamondLightSource.github.io/dodal/test-html/"
   },
   {
     "version": "tom_testing",
