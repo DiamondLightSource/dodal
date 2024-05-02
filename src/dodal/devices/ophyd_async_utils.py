@@ -4,8 +4,6 @@ from ophyd_async.core import SignalR, SignalRW, SimSignalBackend
 
 T = TypeVar("T")
 
-# Use ophyd_async supported soft signals when https://github.com/bluesky/ophyd-async/issues/94 is done
-
 
 def create_soft_signal_rw(
     datatype: Type[T], name: str, source_prefix: str
