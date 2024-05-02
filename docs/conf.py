@@ -106,7 +106,6 @@ inheritance_graph_attrs = {"rankdir": "TB"}
 # Common links that should be available on every page
 rst_epilog = """
 .. _Diamond Light Source: http://www.diamond.ac.uk
-.. _black: https://github.com/psf/black
 .. _ruff: https://beta.ruff.rs/docs/
 .. _mypy: http://mypy-lang.org/
 .. _pre-commit: https://pre-commit.com/
