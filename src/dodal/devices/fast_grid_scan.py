@@ -13,12 +13,15 @@ from ophyd_async.core import (
     StandardReadable,
     wait_for_value,
 )
-from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
+from ophyd_async.epics.signal import (
+    epics_signal_r,
+    epics_signal_rw,
+)
+from ophyd_async.epics.signal.signal import epics_signal_rw_rbv
 from pydantic import validator
 from pydantic.dataclasses import dataclass
 
 from dodal.devices.motors import XYZLimitBundle
-from dodal.devices.util.epics_util import epics_signal_rw_rbv
 from dodal.log import LOGGER
 from dodal.parameters.experiment_parameter_base import AbstractExperimentWithBeamParams
 
@@ -195,7 +198,7 @@ class PandAGridScanParams(GridScanParamsCommon):
     Params for panda constant-motion scan. Adds on the goniometer run-up distance
     """
 
-    run_up_distance_mm: float = 0.15
+    run_up_distance_mm: float = 0.17
 
     def get_param_positions(self):
         param_positions = super().get_param_positions()
