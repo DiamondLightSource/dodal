@@ -61,12 +61,12 @@ class DCM(StandardReadable, HasHints):
     def hints(self) -> Hints:
         return {
             "fields": [
-                "dcm_bragg_in_degrees",
-                "dcm_roll_in_mrad",
-                "dcm_offset_in_mm",
-                "dcm_perp_in_mm",
-                "dcm_energy_in_kev",
-                "dcm_pitch_in_mrad",
-                "dcm_wavelength",
+                self.bragg_in_degrees.name,
+                self.roll_in_mrad.name,
+                self.offset_in_mm.name,
+                self.perp_in_mm.name,
+                self.energy_in_kev.name,
+                self.pitch_in_mrad.name,
+                self.wavelength.name,
             ]
         }
