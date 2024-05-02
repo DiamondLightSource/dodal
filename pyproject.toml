@@ -37,7 +37,6 @@ requires-python = ">=3.10"
 
 [project.optional-dependencies]
 dev = [
-    "black",
     "mypy",
     "mockito",
     "pipdeptree",
