@@ -1,3 +1,5 @@
+from ophyd_async.epics.areadetector import PilatusDetector
+
 from dodal.beamlines.beamline_utils import (
     device_instantiation,
     get_directory_provider,
@@ -27,6 +29,36 @@ set_directory_provider(
         "/data/i22/2024/VISIT",
     )
 )
+
+
+def saxs(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> PilatusDetector:
+    return device_instantiation(
+        PilatusDetector,
+        "saxs",
+        "-EA-PILAT-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        drv_suffix="DRV:",
+        hdf_suffix="HDF:",
+        directory_provider=get_directory_provider(),
+    )
+
+
+def waxs(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> PilatusDetector:
+    return device_instantiation(
+        PilatusDetector,
+        "waxs",
+        "-EA-PILAT-03:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        drv_suffix="DRV:",
+        hdf_suffix="HDF:",
+        directory_provider=get_directory_provider(),
+    )
 
 
 def i0(
