@@ -4,6 +4,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/main/"
   },
   {
+    "version": "1.23.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.23.0/"
+  },
+  {
     "version": "1.22.0",
     "url": "https://DiamondLightSource.github.io/dodal/1.22.0/"
   },
@@ -282,10 +286,6 @@
   {
     "version": "async-ad-sim",
     "url": "https://DiamondLightSource.github.io/dodal/async-ad-sim/"
-  },
-  {
-    "version": "async-panda-and-aravis",
-    "url": "https://DiamondLightSource.github.io/dodal/async-panda-and-aravis/"
   },
   {
     "version": "directoryInfo",
