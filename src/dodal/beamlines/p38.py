@@ -58,6 +58,7 @@ def d11(
         directory_provider=get_directory_provider(),
     )
 
+
 def d12(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> AravisDetector:
