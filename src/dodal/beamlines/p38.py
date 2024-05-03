@@ -1,3 +1,4 @@
+from ophyd_async.epics.areadetector import AravisDetector
 from ophyd_async.panda import HDFPanda
 
 from dodal.beamlines.beamline_utils import (
@@ -7,7 +8,6 @@ from dodal.beamlines.beamline_utils import (
 )
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.visit import StaticVisitDirectoryProvider
-from dodal.devices.areadetector import AdAravisDetector
 from dodal.devices.slits import Slits
 from dodal.devices.tetramm import TetrammDetector
 from dodal.log import set_beamline as set_log_beamline
@@ -28,29 +28,50 @@ set_directory_provider(
 )
 
 
-def d11(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-) -> AdAravisDetector:
+def d3(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> AravisDetector:
     return device_instantiation(
-        AdAravisDetector,
-        "D11",
+        AravisDetector,
+        "d3",
+        "-DI-DCAM-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        drv_suffix="DET:",
+        hdf_suffix="HDF5:",
+        directory_provider=get_directory_provider(),
+    )
+
+
+# Disconnected
+@skip_device
+def d11(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> AravisDetector:
+    return device_instantiation(
+        AravisDetector,
+        "d11",
         "-DI-DCAM-03:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        drv_suffix="DET:",
+        hdf_suffix="HDF5:",
+        directory_provider=get_directory_provider(),
     )
 
 
 def d12(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-) -> AdAravisDetector:
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> AravisDetector:
     return device_instantiation(
-        AdAravisDetector,
-        "D12",
+        AravisDetector,
+        "d12",
         "-DI-DCAM-04:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        drv_suffix="DET:",
+        hdf_suffix="HDF5:",
+        directory_provider=get_directory_provider(),
     )
 
 
