@@ -224,10 +224,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/471_beam_centre/"
   },
   {
-    "version": "489_motor_issues",
-    "url": "https://DiamondLightSource.github.io/dodal/489_motor_issues/"
-  },
-  {
     "version": "489_motor_types_issue",
     "url": "https://DiamondLightSource.github.io/dodal/489_motor_types_issue/"
   },
@@ -262,6 +258,10 @@
   {
     "version": "allow_both_v1_and_v2_ophyd_devices",
     "url": "https://DiamondLightSource.github.io/dodal/allow_both_v1_and_v2_ophyd_devices/"
+  },
+  {
+    "version": "aravis",
+    "url": "https://DiamondLightSource.github.io/dodal/aravis/"
   },
   {
     "version": "artemis598_params_changes",
@@ -382,9 +382,5 @@
   {
     "version": "tom_testing",
     "url": "https://DiamondLightSource.github.io/dodal/tom_testing/"
-  },
-  {
-    "version": "update-ophyd-async",
-    "url": "https://DiamondLightSource.github.io/dodal/update-ophyd-async/"
   }
 ]
