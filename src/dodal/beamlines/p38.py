@@ -1,3 +1,6 @@
+from ophyd_async.epics.areadetector import AravisDetector
+from ophyd_async.panda import HDFPanda
+
 from dodal.beamlines.beamline_utils import (
     device_instantiation,
     get_directory_provider,
@@ -5,11 +8,10 @@ from dodal.beamlines.beamline_utils import (
 )
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.visit import StaticVisitDirectoryProvider
-from dodal.devices.areadetector import AdAravisDetector
 from dodal.devices.slits import Slits
 from dodal.devices.tetramm import TetrammDetector
 from dodal.log import set_beamline as set_log_beamline
-from dodal.utils import get_beamline_name
+from dodal.utils import get_beamline_name, skip_device
 
 from ._device_helpers import numbered_slits
 from .beamline_utils import device_instantiation, get_directory_provider
@@ -26,29 +28,50 @@ set_directory_provider(
 )
 
 
-def d11(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-) -> AdAravisDetector:
+def d3(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> AravisDetector:
     return device_instantiation(
-        AdAravisDetector,
-        "D11",
+        AravisDetector,
+        "d3",
+        "-DI-DCAM-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        drv_suffix="DET:",
+        hdf_suffix="HDF5:",
+        directory_provider=get_directory_provider(),
+    )
+
+
+# Disconnected
+@skip_device
+def d11(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> AravisDetector:
+    return device_instantiation(
+        AravisDetector,
+        "d11",
         "-DI-DCAM-03:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        drv_suffix="DET:",
+        hdf_suffix="HDF5:",
+        directory_provider=get_directory_provider(),
     )
 
 
 def d12(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-) -> AdAravisDetector:
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> AravisDetector:
     return device_instantiation(
-        AdAravisDetector,
-        "D12",
+        AravisDetector,
+        "d12",
         "-DI-DCAM-04:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        drv_suffix="DET:",
+        hdf_suffix="HDF5:",
+        directory_provider=get_directory_provider(),
     )
 
 
@@ -136,4 +159,52 @@ def slits_6(
         6,
         wait_for_connection,
         fake_with_ophyd_sim,
+    )
+
+
+# Must find which PandA IOC(s) are compatible
+# Must document what PandAs are physically connected to
+# See: https://github.com/bluesky/ophyd-async/issues/284
+@skip_device
+def panda1(
+    wait_for_connection: bool = True,
+    fake_with_ophyd_sim: bool = False,
+) -> HDFPanda:
+    return device_instantiation(
+        HDFPanda,
+        "panda1",
+        "-MO-PANDA-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        directory_provider=get_directory_provider(),
+    )
+
+
+@skip_device
+def panda2(
+    wait_for_connection: bool = True,
+    fake_with_ophyd_sim: bool = False,
+) -> HDFPanda:
+    return device_instantiation(
+        HDFPanda,
+        "panda2",
+        "-MO-PANDA-02:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        directory_provider=get_directory_provider(),
+    )
+
+
+@skip_device
+def panda3(
+    wait_for_connection: bool = True,
+    fake_with_ophyd_sim: bool = False,
+) -> HDFPanda:
+    return device_instantiation(
+        HDFPanda,
+        "panda3",
+        "-MO-PANDA-03:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        directory_provider=get_directory_provider(),
     )
