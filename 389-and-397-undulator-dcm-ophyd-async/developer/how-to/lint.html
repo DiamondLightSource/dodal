@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Run linting using pre-commit &#8212; dodal 1.22.1.dev21+gea806c504 documentation</title>
+    <title>Run linting using pre-commit &#8212; dodal 1.23.1.dev22+gd905a295a documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../_static/documentation_options.js?v=98836add"></script>
+    <script src="../../_static/documentation_options.js?v=9aa2a4bb"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -491,7 +491,7 @@ document.write(`
                   
   <section id="run-linting-using-pre-commit">
 <h1>Run linting using pre-commit<a class="headerlink" href="#run-linting-using-pre-commit" title="Link to this heading">#</a></h1>
-<p>Code linting is handled by <a class="reference external" href="https://github.com/psf/black">black</a> and <a class="reference external" href="https://beta.ruff.rs/docs/">ruff</a> run under <a class="reference external" href="https://pre-commit.com/">pre-commit</a>.</p>
+<p>Code linting is handled by <a class="reference external" href="https://beta.ruff.rs/docs/">ruff</a> run under <a class="reference external" href="https://pre-commit.com/">pre-commit</a>.</p>
 <section id="running-pre-commit">
 <h2>Running pre-commit<a class="headerlink" href="#running-pre-commit" title="Link to this heading">#</a></h2>
 <p>You can run the above checks on all files with this command:</p>
@@ -508,21 +508,16 @@ This will result in pre-commits being enabled on every repo your user clones fro
 </section>
 <section id="fixing-issues">
 <h2>Fixing issues<a class="headerlink" href="#fixing-issues" title="Link to this heading">#</a></h2>
-<p>If black reports an issue you can tell it to reformat all the files in the
+<p>If ruff reports an issue you can tell it to reformat all the files in the
 repository:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ black .
-</pre></div>
-</div>
-<p>Likewise with ruff:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ruff --fix .
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ruff check --fix .
 </pre></div>
 </div>
 <p>Ruff may not be able to automatically fix all issues; in this case, you will have to fix those manually.</p>
 </section>
 <section id="vscode-support">
 <h2>VSCode support<a class="headerlink" href="#vscode-support" title="Link to this heading">#</a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">.vscode/settings.json</span></code> will run black formatting as well as
-ruff checking on save. Issues will be highlighted in the editor window.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">.vscode/settings.json</span></code> will run formatting as well as ruff checking on save. Issues will be highlighted in the editor window.</p>
 </section>
 </section>
 
