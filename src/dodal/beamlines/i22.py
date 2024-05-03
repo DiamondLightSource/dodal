@@ -1,4 +1,4 @@
-from ophyd_async.epics.areadetector import PilatusDetector
+from ophyd_async.epics.areadetector import AravisDetector, PilatusDetector
 
 from dodal.beamlines.beamline_utils import (
     device_instantiation,
@@ -165,4 +165,19 @@ def fswitch(
         "-MO-FSWT-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+    )
+
+
+def oav(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> AravisDetector:
+    return device_instantiation(
+        AravisDetector,
+        "oav",
+        "-DI-OAV-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        drv_suffix="DET:",
+        hdf_suffix="HDF5:",
+        directory_provider=get_directory_provider(),
     )
