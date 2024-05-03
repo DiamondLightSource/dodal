@@ -1,10 +1,15 @@
-from dodal.beamlines.beamline_utils import device_instantiation, set_directory_provider
+from ophyd_async.epics.areadetector import AravisDetector
+
+from dodal.beamlines.beamline_utils import (
+    device_instantiation,
+    get_directory_provider,
+    set_directory_provider,
+)
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.visit import StaticVisitDirectoryProvider
-from dodal.devices.areadetector import AdAravisDetector
 from dodal.devices.p45 import Choppers, TomoStageWithStretchAndSkew
 from dodal.log import set_beamline as set_log_beamline
-from dodal.utils import get_beamline_name
+from dodal.utils import get_beamline_name, skip_device
 
 BL = get_beamline_name("p45")
 set_log_beamline(BL)
@@ -41,25 +46,35 @@ def choppers(
     )
 
 
+# Disconnected
+@skip_device
 def det(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> AdAravisDetector:
+) -> AravisDetector:
     return device_instantiation(
-        AdAravisDetector,
+        AravisDetector,
         "det",
         "-EA-MAP-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        drv_suffix="DET:",
+        hdf_suffix="HDF5:",
+        directory_provider=get_directory_provider(),
     )
 
 
+# Disconnected
+@skip_device
 def diff(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> AdAravisDetector:
+) -> AravisDetector:
     return device_instantiation(
-        AdAravisDetector,
+        AravisDetector,
         "diff",
         "-EA-DIFF-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        drv_suffix="DET:",
+        hdf_suffix="HDF5:",
+        directory_provider=get_directory_provider(),
     )

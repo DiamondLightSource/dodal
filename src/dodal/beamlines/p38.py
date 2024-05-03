@@ -1,3 +1,5 @@
+from ophyd_async.epics.areadetector import AravisDetector
+
 from dodal.beamlines.beamline_utils import (
     device_instantiation,
     get_directory_provider,
@@ -5,11 +7,10 @@ from dodal.beamlines.beamline_utils import (
 )
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.visit import StaticVisitDirectoryProvider
-from dodal.devices.areadetector import AdAravisDetector
 from dodal.devices.slits import Slits
 from dodal.devices.tetramm import TetrammDetector
 from dodal.log import set_beamline as set_log_beamline
-from dodal.utils import get_beamline_name
+from dodal.utils import get_beamline_name, skip_device
 
 from ._device_helpers import numbered_slits
 from .beamline_utils import device_instantiation, get_directory_provider
@@ -26,29 +27,49 @@ set_directory_provider(
 )
 
 
-def d11(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-) -> AdAravisDetector:
+def d3(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> AravisDetector:
     return device_instantiation(
-        AdAravisDetector,
-        "D11",
-        "-DI-DCAM-03:",
+        AravisDetector,
+        "d3",
+        "-DI-DCAM-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        drv_suffix="DET:",
+        hdf_suffix="HDF5:",
+        directory_provider=get_directory_provider(),
     )
 
 
-def d12(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-) -> AdAravisDetector:
+# Disconnected
+@skip_device
+def d11(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> AravisDetector:
     return device_instantiation(
-        AdAravisDetector,
-        "D12",
+        AravisDetector,
+        "d11",
+        "-DI-DCAM-03:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        drv_suffix="DET:",
+        hdf_suffix="HDF5:",
+        directory_provider=get_directory_provider(),
+    )
+
+def d12(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> AravisDetector:
+    return device_instantiation(
+        AravisDetector,
+        "d12",
         "-DI-DCAM-04:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        drv_suffix="DET:",
+        hdf_suffix="HDF5:",
+        directory_provider=get_directory_provider(),
     )
 
 
