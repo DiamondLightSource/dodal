@@ -382,5 +382,9 @@
   {
     "version": "tom_testing",
     "url": "https://DiamondLightSource.github.io/dodal/tom_testing/"
+  },
+  {
+    "version": "update-ophyd-async",
+    "url": "https://DiamondLightSource.github.io/dodal/update-ophyd-async/"
   }
 ]
