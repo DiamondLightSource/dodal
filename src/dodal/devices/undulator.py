@@ -25,15 +25,10 @@ class Undulator(StandardReadable):
         prefix: str,
         name: str = "",
     ) -> None:
-        self.gap_motor = Motor(prefix + "BLGAPMTR")
-        self.current_gap = epics_signal_r(float, prefix + "CURRGAPD")
-        self.gap_access = epics_signal_r(UndulatorGapAccess, prefix + "IDBLENA")
+        with self.add_children_as_readables():
+            self.gap_motor = Motor(prefix + "BLGAPMTR")
+            self.current_gap = epics_signal_r(float, prefix + "CURRGAPD")
+            self.gap_access = epics_signal_r(UndulatorGapAccess, prefix + "IDBLENA")
         self.gap_discrepancy_tolerance_mm: float = UNDULATOR_DISCREPANCY_THRESHOLD_MM
-        self.set_readable_signals(
-            read=[
-                self.gap_motor.user_readback,
-                self.current_gap,
-                self.gap_access,
-            ]
-        )
+
         super().__init__(name)
