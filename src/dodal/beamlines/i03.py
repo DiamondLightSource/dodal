@@ -6,7 +6,7 @@ from dodal.common.udc_directory_provider import get_udc_directory_provider
 from dodal.devices.aperturescatterguard import AperturePositions, ApertureScatterguard
 from dodal.devices.attenuator import Attenuator
 from dodal.devices.backlight import Backlight
-from dodal.devices.DCM import DCM
+from dodal.devices.dcm import DCM
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.eiger import EigerDetector
@@ -50,10 +50,9 @@ def dcm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
     return device_instantiation(
         DCM,
         "dcm",
-        "",
+        "-MO-DCM-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        daq_configuration_path=DAQ_CONFIGURATION_PATH,
     )
 
 
@@ -322,6 +321,8 @@ def undulator_dcm(
         fake=fake_with_ophyd_sim,
         undulator=undulator(wait_for_connection, fake_with_ophyd_sim),
         dcm=dcm(wait_for_connection, fake_with_ophyd_sim),
+        daq_configuration_path=DAQ_CONFIGURATION_PATH,
+        id_gap_lookup_table_path="/dls_sw/i03/software/daq_configuration/lookup/BeamLine_Undulator_toGap.txt",
     )
 
 

@@ -4,6 +4,7 @@ from unittest.mock import MagicMock, call, patch
 
 import pytest
 from graypy import GELFTCPHandler
+from ophyd import log as ophyd_log
 
 from dodal import log
 from dodal.log import (
@@ -134,6 +135,10 @@ def test_various_messages_to_graylog_get_beamline_filter(
 ):
     from os import environ
 
+    from bluesky.run_engine import RunEngine
+
+    RE = RunEngine()
+
     if environ.get("BEAMLINE"):
         del environ["BEAMLINE"]
     log.beamline_filter = log.BeamlineFilter()
@@ -161,19 +166,11 @@ def test_various_messages_to_graylog_get_beamline_filter(
     mock_GELFTCPHandler.emit.assert_called()
     assert mock_GELFTCPHandler.emit.call_args.args[0].beamline == "dev"
 
-    from dodal.beamlines import i03
-
-    _aperture_scatterguard = i03.aperture_scatterguard(
-        fake_with_ophyd_sim=True, wait_for_connection=True
-    )
+    ophyd_log.logger.info("Ophyd log message")
     assert mock_GELFTCPHandler.emit.call_args.args[0].name == "ophyd"
     assert mock_GELFTCPHandler.emit.call_args.args[0].beamline == "dev"
 
-    from bluesky.run_engine import RunEngine
-
-    RE = RunEngine()
     RE.log.logger.info("RunEngine log message")
-
     assert mock_GELFTCPHandler.emit.call_args.args[0].name == "bluesky"
     assert mock_GELFTCPHandler.emit.call_args.args[0].beamline == "dev"
 
