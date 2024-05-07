@@ -11,6 +11,12 @@ from dodal.log import LOGGER
 
 
 class MJPG(Device, ABC):
+    """The MJPG areadetector plugin creates an MJPG video stream of the camera's output.
+
+    This devices uses that stream to grab images. When it is triggered it will send the
+    latest image from the stream to the `post_processing` method for child classes to handle.
+    """
+
     filename = Component(Signal)
     directory = Component(Signal)
     last_saved_path = Component(Signal)
@@ -75,6 +81,9 @@ class MJPG(Device, ABC):
 
 
 class SnapshotWithBeamCentre(MJPG):
+    """A child of MJPG which, when triggered, draws a crosshair at the beam centre in the
+    image and saves the image to disk."""
+
     CROSSHAIR_LENGTH_PX = 20
     CROSSHAIR_COLOUR = "Blue"
 
