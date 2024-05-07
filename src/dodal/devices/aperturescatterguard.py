@@ -1,16 +1,12 @@
-import operator
+import asyncio
 from collections import namedtuple
 from dataclasses import dataclass
-from functools import reduce
-from typing import List, Sequence
 
-from ophyd import Component as Cpt
-from ophyd import SignalRO
-from ophyd.epics_motor import EpicsMotor
-from ophyd.status import AndStatus, Status, StatusBase
+from bluesky.protocols import Movable
+from ophyd_async.core import AsyncStatus, SignalR, StandardReadable
+from ophyd_async.core.sim_signal_backend import SimSignalBackend
 
 from dodal.devices.aperture import Aperture
-from dodal.devices.logging_ophyd_device import InfoLoggingDevice
 from dodal.devices.scatterguard import Scatterguard
 from dodal.log import LOGGER
 
@@ -33,10 +29,14 @@ ApertureFiveDimensionalLocation = namedtuple(
 
 @dataclass
 class SingleAperturePosition:
-    name: str
-    GDA_name: str
-    radius_microns: float | None
-    location: ApertureFiveDimensionalLocation
+    # Default values are needed as ophyd_async sim does not respect initial_values of
+    # soft signal backends see https://github.com/bluesky/ophyd-async/issues/266
+    name: str = ""
+    GDA_name: str = ""
+    radius_microns: float | None = None
+    location: ApertureFiveDimensionalLocation = ApertureFiveDimensionalLocation(
+        0, 0, 0, 0, 0
+    )
 
 
 def position_from_params(
@@ -65,6 +65,10 @@ class AperturePositions:
     SMALL: SingleAperturePosition
     ROBOT_LOAD: SingleAperturePosition
 
+    UNKNOWN = SingleAperturePosition(
+        "Unknown", "UNKNOWN", None, ApertureFiveDimensionalLocation(0, 0, 0, 0, 0)
+    )
+
     @classmethod
     def from_gda_beamline_params(cls, params):
         return cls(
@@ -74,7 +78,7 @@ class AperturePositions:
             ROBOT_LOAD=position_from_params("Robot load", "ROBOT_LOAD", None, params),
         )
 
-    def as_list(self) -> List[SingleAperturePosition]:
+    def as_list(self) -> list[SingleAperturePosition]:
         return [
             self.LARGE,
             self.MEDIUM,
@@ -83,29 +87,38 @@ class AperturePositions:
         ]
 
 
-class ApertureScatterguard(InfoLoggingDevice):
-    aperture = Cpt(Aperture, "-MO-MAPT-01:")
-    scatterguard = Cpt(Scatterguard, "-MO-SCAT-01:")
-    aperture_positions: AperturePositions | None = None
-    TOLERANCE_STEPS = 3  # Number of MRES steps
+class ApertureScatterguard(StandardReadable, Movable):
+    def __init__(self, prefix: str = "", name: str = "") -> None:
+        self.aperture = Aperture(prefix="-MO-MAPT-01:")
+        self.scatterguard = Scatterguard(prefix="-MO-SCAT-01:")
+        self.aperture_positions: AperturePositions | None = None
+        self.TOLERANCE_STEPS = 3  # Number of MRES steps
+        self.selected_aperture = self.SelectedAperture(
+            backend=SimSignalBackend(SingleAperturePosition, AperturePositions.UNKNOWN),
+        )
+        self.set_readable_signals(
+            read=[
+                self.selected_aperture,
+            ]
+        )
+        super().__init__(name)
 
-    class SelectedAperture(SignalRO):
-        def get(self):
+    class SelectedAperture(SignalR):
+        async def read(self, *args, **kwargs):
             assert isinstance(self.parent, ApertureScatterguard)
-            return self.parent._get_current_aperture_position()
-
-    selected_aperture = Cpt(SelectedAperture)
+            await self._backend.put(await self.parent._get_current_aperture_position())
+            return {self.name: await self._backend.get_reading()}
 
     def load_aperture_positions(self, positions: AperturePositions):
         LOGGER.info(f"{self.name} loaded in {positions}")
         self.aperture_positions = positions
 
-    def set(self, pos: SingleAperturePosition) -> StatusBase:
+    def set(self, pos: SingleAperturePosition) -> AsyncStatus:
         assert isinstance(self.aperture_positions, AperturePositions)
         if pos not in self.aperture_positions.as_list():
             raise InvalidApertureMove(f"Unknown aperture: {pos}")
 
-        return self._safe_move_within_datacollection_range(pos.location)
+        return AsyncStatus(self._safe_move_within_datacollection_range(pos.location))
 
     def _get_motor_list(self):
         return [
@@ -116,13 +129,21 @@ class ApertureScatterguard(InfoLoggingDevice):
             self.scatterguard.y,
         ]
 
-    def _set_raw_unsafe(self, positions: ApertureFiveDimensionalLocation) -> AndStatus:
-        motors: Sequence[EpicsMotor] = self._get_motor_list()
-        return reduce(
-            operator.and_, [motor.set(pos) for motor, pos in zip(motors, positions)]
+    async def _set_raw_unsafe(self, positions: ApertureFiveDimensionalLocation):
+        """Accept the risks and move in an unsafe way. Collisions possible."""
+
+        # unpacking the position
+        aperture_x, aperture_y, aperture_z, scatterguard_x, scatterguard_y = positions
+
+        await asyncio.gather(
+            self.aperture.x._move(aperture_x),
+            self.aperture.y._move(aperture_y),
+            self.aperture.z._move(aperture_z),
+            self.scatterguard.x._move(scatterguard_x),
+            self.scatterguard.y._move(scatterguard_y),
         )
 
-    def _get_current_aperture_position(self) -> SingleAperturePosition:
+    async def _get_current_aperture_position(self) -> SingleAperturePosition:
         """
         Returns the current aperture position using readback values
         for SMALL, MEDIUM, LARGE. ROBOT_LOAD position defined when
@@ -130,48 +151,41 @@ class ApertureScatterguard(InfoLoggingDevice):
         If no position is found then raises InvalidApertureMove.
         """
         assert isinstance(self.aperture_positions, AperturePositions)
-        current_ap_y = float(self.aperture.y.user_readback.get())
+        current_ap_y = await self.aperture.y.user_readback.get_value(cached=False)
         robot_load_ap_y = self.aperture_positions.ROBOT_LOAD.location.aperture_y
-        tolerance = self.TOLERANCE_STEPS * self.aperture.y.motor_resolution.get()
-        if int(self.aperture.large.get()) == 1:
+        tolerance = self.TOLERANCE_STEPS * await self.aperture.y.deadband.get_value()
+        if await self.aperture.large.get_value(cached=False) == 1:
             return self.aperture_positions.LARGE
-        elif int(self.aperture.medium.get()) == 1:
+        elif await self.aperture.medium.get_value(cached=False) == 1:
             return self.aperture_positions.MEDIUM
-        elif int(self.aperture.small.get()) == 1:
+        elif await self.aperture.small.get_value(cached=False) == 1:
             return self.aperture_positions.SMALL
         elif current_ap_y <= robot_load_ap_y + tolerance:
             return self.aperture_positions.ROBOT_LOAD
 
         raise InvalidApertureMove("Current aperture/scatterguard state unrecognised")
 
-    def _safe_move_within_datacollection_range(
+    async def _safe_move_within_datacollection_range(
         self, pos: ApertureFiveDimensionalLocation
-    ) -> StatusBase:
+    ):
         """
         Move the aperture and scatterguard combo safely to a new position.
         See https://github.com/DiamondLightSource/hyperion/wiki/Aperture-Scatterguard-Collisions
         for why this is required.
         """
-        # EpicsMotor does not have deadband/MRES field, so the way to check if we are
-        # in a datacollection position is to see if we are "ready" (DMOV) and the target
-        # position is correct
 
         # unpacking the position
         aperture_x, aperture_y, aperture_z, scatterguard_x, scatterguard_y = pos
 
-        ap_z_in_position = self.aperture.z.motor_done_move.get()
+        ap_z_in_position = await self.aperture.z.motor_done_move.get_value()
         if not ap_z_in_position:
-            status: Status = Status(obj=self)
-            status.set_exception(
-                InvalidApertureMove(
-                    "ApertureScatterguard z is still moving. Wait for it to finish "
-                    "before triggering another move."
-                )
+            raise InvalidApertureMove(
+                "ApertureScatterguard z is still moving. Wait for it to finish "
+                "before triggering another move."
             )
-            return status
 
-        current_ap_z = self.aperture.z.user_setpoint.get()
-        tolerance = self.TOLERANCE_STEPS * self.aperture.z.motor_resolution.get()
+        current_ap_z = await self.aperture.z.user_readback.get_value()
+        tolerance = self.TOLERANCE_STEPS * await self.aperture.z.deadband.get_value()
         diff_on_z = abs(current_ap_z - aperture_z)
         if diff_on_z > tolerance:
             raise InvalidApertureMove(
@@ -180,28 +194,26 @@ class ApertureScatterguard(InfoLoggingDevice):
                 f"Current aperture z ({current_ap_z}), outside of tolerance ({tolerance}) from target ({aperture_z})."
             )
 
-        current_ap_y = self.aperture.y.user_readback.get()
-        if aperture_y > current_ap_y:
-            sg_status: AndStatus = self.scatterguard.x.set(
-                scatterguard_x
-            ) & self.scatterguard.y.set(scatterguard_y)
-            sg_status.wait()
-            return (
-                sg_status
-                & self.aperture.x.set(aperture_x)
-                & self.aperture.y.set(aperture_y)
-                & self.aperture.z.set(aperture_z)
-            )
+        current_ap_y = await self.aperture.y.user_readback.get_value()
 
-        ap_status: AndStatus = (
-            self.aperture.x.set(aperture_x)
-            & self.aperture.y.set(aperture_y)
-            & self.aperture.z.set(aperture_z)
+        if aperture_y > current_ap_y:
+            await asyncio.gather(
+                self.scatterguard.x._move(scatterguard_x),
+                self.scatterguard.y._move(scatterguard_y),
+            )
+            await asyncio.gather(
+                self.aperture.x._move(aperture_x),
+                self.aperture.y._move(aperture_y),
+                self.aperture.z._move(aperture_z),
+            )
+            return
+        await asyncio.gather(
+            self.aperture.x._move(aperture_x),
+            self.aperture.y._move(aperture_y),
+            self.aperture.z._move(aperture_z),
         )
-        ap_status.wait()
-        final_status: AndStatus = (
-            ap_status
-            & self.scatterguard.x.set(scatterguard_x)
-            & self.scatterguard.y.set(scatterguard_y)
+
+        await asyncio.gather(
+            self.scatterguard.x._move(scatterguard_x),
+            self.scatterguard.y._move(scatterguard_y),
         )
-        return final_status

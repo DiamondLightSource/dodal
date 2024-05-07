@@ -1,9 +1,11 @@
-from ophyd import Component as Cpt
-from ophyd import Device
-
-from dodal.devices.util.motor_utils import ExtendedEpicsMotor
+from ophyd_async.core import StandardReadable
+from ophyd_async.epics.motion import Motor
 
 
-class Scatterguard(Device):
-    x = Cpt(ExtendedEpicsMotor, "X")
-    y = Cpt(ExtendedEpicsMotor, "Y")
+class Scatterguard(StandardReadable):
+    """The scatterguard device."""
+
+    def __init__(self, prefix: str, name: str = "") -> None:
+        self.x = Motor(prefix + "X")
+        self.y = Motor(prefix + "Y")
+        super().__init__(name)
