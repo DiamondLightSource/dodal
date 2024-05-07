@@ -1,6 +1,6 @@
 from enum import Enum
 
-from ophyd_async.core import StandardReadable
+from ophyd_async.core import ConfigSignal, StandardReadable, soft_signal_r_and_backend
 from ophyd_async.epics.motion import Motor
 from ophyd_async.epics.signal import epics_signal_r
 
@@ -23,12 +23,28 @@ class Undulator(StandardReadable):
     def __init__(
         self,
         prefix: str,
+        poles: int,
+        length: float,
         name: str = "",
     ) -> None:
+        """Constructor
+
+        Args:
+            prefix: PV prefix
+            poles (int): Number of magnetic poles built into the undulator
+            length (float): Length of the undulator in meters
+            name (str, optional): Name for device. Defaults to "".
+        """
+
         with self.add_children_as_readables():
             self.gap_motor = Motor(prefix + "BLGAPMTR")
             self.current_gap = epics_signal_r(float, prefix + "CURRGAPD")
             self.gap_access = epics_signal_r(UndulatorGapAccess, prefix + "IDBLENA")
-        self.gap_discrepancy_tolerance_mm: float = UNDULATOR_DISCREPANCY_THRESHOLD_MM
+
+        with self.add_children_as_readables(ConfigSignal):
+            self.poles, _ = soft_signal_r_and_backend(int, poles)
+            self.length, _ = soft_signal_r_and_backend(float, length)
+
+        self.gap_discrepancy_tolerance_mm = UNDULATOR_DISCREPANCY_THRESHOLD_MM
 
         super().__init__(name)

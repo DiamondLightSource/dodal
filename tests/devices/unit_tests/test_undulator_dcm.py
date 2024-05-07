@@ -27,7 +27,7 @@ ID_GAP_LOOKUP_TABLE_PATH: str = (
 @pytest.fixture
 async def fake_undulator_dcm() -> UndulatorDCM:
     async with DeviceCollector(mock=True):
-        undulator = Undulator("UND-01", name="undulator")
+        undulator = Undulator("UND-01", 80, 2.0, name="undulator")
         dcm = DCM("DCM-01", name="dcm")
         undulator_dcm = UndulatorDCM(
             undulator,

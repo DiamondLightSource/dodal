@@ -9,7 +9,7 @@ from dodal.devices.undulator import Undulator
 @pytest.fixture
 async def undulator() -> Undulator:
     async with DeviceCollector(mock=True):
-        undulator = Undulator("UND-01", name="undulator")
+        undulator = Undulator("UND-01", 80, 2.0, name="undulator")
     return undulator
 
 
@@ -27,6 +27,24 @@ async def test_read_and_describe_includes(
 ):
     description = await undulator.describe()
     reading = await undulator.read()
+
+    assert key in description
+    assert key in reading
+
+
+@pytest.mark.parametrize(
+    "key",
+    [
+        "undulator-poles",
+        "undulator-length",
+    ],
+)
+async def test_read_and_describe_configuration_includes(
+    undulator: Undulator,
+    key: str,
+):
+    description = await undulator.describe_configuration()
+    reading = await undulator.read_configuration()
 
     assert key in description
     assert key in reading
