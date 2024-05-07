@@ -4,12 +4,33 @@ converts the source value s to a target value t for different values of s.
 """
 
 from collections.abc import Sequence
+from io import StringIO
 from typing import Callable
 
+import aiofiles
 import numpy as np
 from numpy import interp, loadtxt
 
 from dodal.log import LOGGER
+
+
+async def energy_distance_table(lookup_table_path: str) -> np.ndarray:
+    """
+    Returns a numpy formatted lookup table for required positions of an ID gap to
+    provide emission at a given beam energy.
+
+    Args:
+        lookup_table_path: Path to lookup table
+
+    Returns:
+        ndarray: Lookup table
+    """
+
+    # Slight cheat to make the file IO async, numpy doesn't do any real IO now, just
+    # decodes the text
+    async with aiofiles.open(lookup_table_path, "r") as stream:
+        raw_table = await stream.read()
+    return loadtxt(StringIO(raw_table), comments=["#", "Units"])
 
 
 def linear_interpolation_lut(filename: str) -> Callable[[float], float]:
