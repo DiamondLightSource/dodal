@@ -220,10 +220,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/489_motor_types_issue/"
   },
   {
-    "version": "508_fix_ap_sg_description",
-    "url": "https://DiamondLightSource.github.io/dodal/508_fix_ap_sg_description/"
-  },
-  {
     "version": "51_aperture_scatterguard_no_positions",
     "url": "https://DiamondLightSource.github.io/dodal/51_aperture_scatterguard_no_positions/"
   },
@@ -310,6 +306,10 @@
   {
     "version": "hyperion_1227_edge_array_logging",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1227_edge_array_logging/"
+  },
+  {
+    "version": "hyperion_1346_dependency_issues",
+    "url": "https://DiamondLightSource.github.io/dodal/hyperion_1346_dependency_issues/"
   },
   {
     "version": "hyperion_698",
