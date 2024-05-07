@@ -8,6 +8,7 @@ from dodal.beamlines.beamline_utils import (
 )
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.visit import StaticVisitDirectoryProvider
+from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.i22.fswitch import FSwitch
 from dodal.devices.slits import Slits
 from dodal.devices.tetramm import TetrammDetector
@@ -87,6 +88,32 @@ def it(
         wait_for_connection,
         fake_with_ophyd_sim,
         directory_provider=get_directory_provider(),
+    )
+
+
+def vfm(
+    wait_for_connection: bool = True,
+    fake_with_ophyd_sim: bool = False,
+) -> FocusingMirror:
+    return device_instantiation(
+        FocusingMirror,
+        "vfm",
+        "-OP-KBM-01:VFM:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+def hfm(
+    wait_for_connection: bool = True,
+    fake_with_ophyd_sim: bool = False,
+) -> FocusingMirror:
+    return device_instantiation(
+        FocusingMirror,
+        "hfm",
+        "-OP-KBM-01:HFM:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
     )
 
 
