@@ -192,6 +192,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/389-and-397-undulator-dcm/"
   },
   {
+    "version": "389-undulator-fields",
+    "url": "https://DiamondLightSource.github.io/dodal/389-undulator-fields/"
+  },
+  {
     "version": "398_ophyd_async_vfm_hfm",
     "url": "https://DiamondLightSource.github.io/dodal/398_ophyd_async_vfm_hfm/"
   },
@@ -306,10 +310,6 @@
   {
     "version": "hyperion_1227_edge_array_logging",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1227_edge_array_logging/"
-  },
-  {
-    "version": "hyperion_1346_dependency_issues",
-    "url": "https://DiamondLightSource.github.io/dodal/hyperion_1346_dependency_issues/"
   },
   {
     "version": "hyperion_698",
