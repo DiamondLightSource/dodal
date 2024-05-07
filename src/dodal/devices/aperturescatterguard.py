@@ -1,5 +1,5 @@
 import asyncio
-from collections import namedtuple
+from collections import OrderedDict, namedtuple
 from dataclasses import dataclass
 
 from bluesky.protocols import Movable
@@ -108,6 +108,22 @@ class ApertureScatterguard(StandardReadable, Movable):
             assert isinstance(self.parent, ApertureScatterguard)
             await self._backend.put(await self.parent._get_current_aperture_position())
             return {self.name: await self._backend.get_reading()}
+
+        async def describe(self):
+            return OrderedDict(
+                [
+                    (
+                        self._name,
+                        {
+                            "source": self._backend.source(self._name),  # type: ignore
+                            "dtype": "array",
+                            "shape": [
+                                -1,
+                            ],  # TODO describe properly - see https://github.com/DiamondLightSource/dodal/issues/253
+                        },
+                    ),
+                ],
+            )
 
     def load_aperture_positions(self, positions: AperturePositions):
         LOGGER.info(f"{self.name} loaded in {positions}")

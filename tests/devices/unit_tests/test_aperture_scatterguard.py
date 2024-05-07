@@ -299,3 +299,11 @@ async def test_ap_sg_in_runengine(
     assert await ap.z.user_readback.get_value() == test_loc.aperture_z
     assert await sg.x.user_readback.get_value() == test_loc.scatterguard_x
     assert await sg.y.user_readback.get_value() == test_loc.scatterguard_y
+
+
+async def test_ap_sg_descriptor(
+    aperture_in_medium_pos: ApertureScatterguard,
+    RE: RunEngine,
+):
+    description = await aperture_in_medium_pos.describe()
+    assert description
