@@ -1,8 +1,12 @@
 from ophyd_async.panda import HDFPanda
 
-from dodal.beamlines.beamline_utils import device_instantiation
+from dodal.beamlines.beamline_utils import (
+    device_instantiation,
+    get_directory_provider,
+    set_directory_provider,
+)
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.udc_directory_provider import get_udc_directory_provider
+from dodal.common.udc_directory_provider import UDCDirectoryProvider
 from dodal.devices.aperturescatterguard import AperturePositions, ApertureScatterguard
 from dodal.devices.attenuator import Attenuator
 from dodal.devices.backlight import Backlight
@@ -41,6 +45,8 @@ DAQ_CONFIGURATION_PATH = "/dls_sw/i03/software/daq_configuration"
 BL = get_beamline_name("s03")
 set_log_beamline(BL)
 set_utils_beamline(BL)
+
+set_directory_provider(UDCDirectoryProvider())
 
 
 def dcm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> DCM:
@@ -380,7 +386,7 @@ def panda(
         "-EA-PANDA-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        directory_provider=get_udc_directory_provider(),
+        directory_provider=get_directory_provider(),
     )
 
 
