@@ -192,10 +192,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/389-and-397-undulator-dcm/"
   },
   {
-    "version": "391_aperture_scatterguard_ophyd_async",
-    "url": "https://DiamondLightSource.github.io/dodal/391_aperture_scatterguard_ophyd_async/"
-  },
-  {
     "version": "398_ophyd_async_vfm_hfm",
     "url": "https://DiamondLightSource.github.io/dodal/398_ophyd_async_vfm_hfm/"
   },
