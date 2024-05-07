@@ -165,7 +165,7 @@ def slits_6(
 
 def vfm(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
+    fake_with_ophyd_sim: bool = True,
 ) -> FocusingMirror:
     return device_instantiation(
         FocusingMirror,
@@ -178,7 +178,7 @@ def vfm(
 
 def hfm(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
+    fake_with_ophyd_sim: bool = True,
 ) -> FocusingMirror:
     return device_instantiation(
         FocusingMirror,
