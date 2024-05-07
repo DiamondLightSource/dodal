@@ -1,3 +1,4 @@
+import os
 import threading
 from abc import ABC, abstractmethod
 from pathlib import Path
@@ -39,9 +40,13 @@ class MJPG(Device, ABC):
         and filename signals. The full resultant path is put on the last_saved_path signal
         """
         filename_str = self.filename.get()
-        directory_str = self.directory.get()
+        directory_str = Path(self.directory.get())  # type: ignore
 
         path = Path(f"{directory_str}/{filename_str}.png").as_posix()
+        if not os.path.isdir(directory_str):
+            LOGGER.info(f"Snapshot folder {directory_str} does not exist, creating...")
+            os.mkdir(directory_str)
+
         LOGGER.info(f"Saving image to {path}")
         image.save(path)
         self.last_saved_path.put(path)

@@ -1,11 +1,12 @@
+from pathlib import PosixPath
 from unittest.mock import MagicMock, call, patch
 
 import numpy as np
-import PIL
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from ophyd.sim import make_fake_device
+from PIL import Image
 from requests import HTTPError, Response
 
 import dodal.devices.oav.utils as oav_utils
@@ -56,6 +57,7 @@ def test_snapshot_trigger_handles_request_with_bad_status_code_correctly(
 
 @patch("requests.get")
 @patch("dodal.devices.areadetector.plugins.MJPG.Image")
+@patch("dodal.devices.areadetector.plugins.MJPG.os", new=MagicMock())
 def test_snapshot_trigger_loads_correct_url(
     mock_image: MagicMock, mock_get: MagicMock, fake_oav: OAV
 ):
@@ -66,10 +68,11 @@ def test_snapshot_trigger_loads_correct_url(
 
 @patch("requests.get")
 @patch("dodal.devices.areadetector.plugins.MJPG.Image.open")
+@patch("dodal.devices.areadetector.plugins.MJPG.os", new=MagicMock())
 def test_snapshot_trigger_saves_to_correct_file(
     mock_open: MagicMock, mock_get, fake_oav
 ):
-    image = PIL.Image.open("test")
+    image = Image.open("test")
     mock_open.return_value.__enter__.return_value = image
     with patch.object(image, "save") as mock_save:
         st = fake_oav.grid_snapshot.trigger()
@@ -84,10 +87,23 @@ def test_snapshot_trigger_saves_to_correct_file(
 
 @patch("requests.get")
 @patch("dodal.devices.areadetector.plugins.MJPG.Image.open")
+@patch("dodal.devices.areadetector.plugins.MJPG.os")
+def test_given_directory_not_existing_when_snapshot_triggered_then_directory_created(
+    mock_os, mock_open: MagicMock, mock_get, fake_oav
+):
+    mock_os.path.isdir.return_value = False
+    st = fake_oav.grid_snapshot.trigger()
+    st.wait()
+    mock_os.mkdir.assert_called_once_with(PosixPath("test directory"))
+
+
+@patch("requests.get")
+@patch("dodal.devices.areadetector.plugins.MJPG.Image.open")
+@patch("dodal.devices.areadetector.plugins.MJPG.os", new=MagicMock())
 def test_snapshot_trigger_applies_current_microns_per_pixel_to_snapshot(
     mock_open: MagicMock, mock_get, fake_oav
 ):
-    image = PIL.Image.open("test")  # type: ignore
+    image = Image.open("test")  # type: ignore
     mock_open.return_value.__enter__.return_value = image
 
     expected_mpp_x = fake_oav.parameters.micronsPerXPixel
@@ -103,6 +119,7 @@ def test_snapshot_trigger_applies_current_microns_per_pixel_to_snapshot(
 @patch("dodal.devices.areadetector.plugins.MJPG.Image.open")
 @patch("dodal.devices.oav.grid_overlay.add_grid_overlay_to_image")
 @patch("dodal.devices.oav.grid_overlay.add_grid_border_overlay_to_image")
+@patch("dodal.devices.areadetector.plugins.MJPG.os", new=MagicMock())
 def test_correct_grid_drawn_on_image(
     mock_border_overlay: MagicMock,
     mock_grid_overlay: MagicMock,
