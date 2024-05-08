@@ -280,6 +280,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/async-ad-sim/"
   },
   {
+    "version": "correct_hdf_plugin_name",
+    "url": "https://DiamondLightSource.github.io/dodal/correct_hdf_plugin_name/"
+  },
+  {
     "version": "directoryInfo",
     "url": "https://DiamondLightSource.github.io/dodal/directoryInfo/"
   },
@@ -366,10 +370,6 @@
   {
     "version": "remove_ophyd_dependency_pin",
     "url": "https://DiamondLightSource.github.io/dodal/remove_ophyd_dependency_pin/"
-  },
-  {
-    "version": "test-fixes-2024-05-08",
-    "url": "https://DiamondLightSource.github.io/dodal/test-fixes-2024-05-08/"
   },
   {
     "version": "test-html",
