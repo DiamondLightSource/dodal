@@ -13,15 +13,16 @@ class OpenState(Enum):
 class Shutter(StandardReadable, Movable):
     def __init__(self, prefix: str, name: str):
         self.position = epics_signal_rw(
-            write_pv=prefix + "CTRL2", read_pv=prefix + "STA", datatype=int, name=name
+            write_pv=prefix + "CTRL2",
+            read_pv=prefix + "STA",
+            datatype=OpenState,
+            name=name,
         )
         super().__init__(
             name=name,
         )
         self.set_readable_signals([self.position])
 
-    def set(self, open_val: int | OpenState):
-        if isinstance(open_val, OpenState):
-            open_val = open_val.value
+    def set(self, open_val: OpenState):
         shutter_status: AsyncStatus = self.position.set(open_val)
         return shutter_status
