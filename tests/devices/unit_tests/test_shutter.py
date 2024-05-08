@@ -27,10 +27,7 @@ async def test_set_opens_and_closes_shutter(state: OpenState, sim_shutter: Shutt
     reading = await sim_shutter.read()
 
     shutter_position = reading.get("shutter-position", {})
-    assert shutter_position["value"] in [
-        0,
-        1,
-    ], f"Unexpected value: {shutter_position['value']}"
+    assert shutter_position["value"] in OpenState, f"Unexpected value: {shutter_position['value']}"
 
     # Assert that 'timestamp' is a float
     assert isinstance(
@@ -43,6 +40,6 @@ async def test_set_opens_and_closes_shutter(state: OpenState, sim_shutter: Shutt
     assert severity == 0, f"Alarm severity is not 0: {severity}"
 
     if state == OpenState.CLOSE:
-        assert shutter_position["value"] == OpenState.CLOSE
+        assert shutter_position["value"] == 0
     if state == OpenState.OPEN:
-        assert shutter_position["value"] == OpenState.OPEN
+        assert shutter_position["value"] == 1
