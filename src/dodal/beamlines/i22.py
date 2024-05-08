@@ -43,7 +43,7 @@ def saxs(
         wait_for_connection,
         fake_with_ophyd_sim,
         drv_suffix="CAM:",
-        hdf_suffix="HDF:",
+        hdf_suffix="HDF5:",
         directory_provider=get_directory_provider(),
     )
 
@@ -58,7 +58,7 @@ def waxs(
         wait_for_connection,
         fake_with_ophyd_sim,
         drv_suffix="CAM:",
-        hdf_suffix="HDF:",
+        hdf_suffix="HDF5:",
         directory_provider=get_directory_provider(),
     )
 
