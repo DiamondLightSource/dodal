@@ -42,7 +42,7 @@ def saxs(
         "-EA-PILAT-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        drv_suffix="DRV:",
+        drv_suffix="CAM:",
         hdf_suffix="HDF:",
         directory_provider=get_directory_provider(),
     )
@@ -57,7 +57,7 @@ def waxs(
         "-EA-PILAT-03:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        drv_suffix="DRV:",
+        drv_suffix="CAM:",
         hdf_suffix="HDF:",
         directory_provider=get_directory_provider(),
     )
