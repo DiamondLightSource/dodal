@@ -3,12 +3,17 @@ from pathlib import Path
 from ophyd_async.core import DirectoryInfo
 
 from dodal.common.types import UpdatingDirectoryProvider
+from dodal.log import LOGGER
 
 
-class UDCDirectoryProvider(UpdatingDirectoryProvider):
+class PandASubdirectoryProvider(UpdatingDirectoryProvider):
     resource_dir = Path("panda")
 
     def __init__(self, directory: Path | None = None):
+        if directory is None:
+            LOGGER.warn(
+                f"{self.__class__.__name__} instantiated with no root path, update() must be called before writing data!"
+            )
         self._directory_info = (
             DirectoryInfo(root=directory, resource_dir=self.resource_dir)
             if directory
@@ -21,4 +26,8 @@ class UDCDirectoryProvider(UpdatingDirectoryProvider):
         )
 
     def __call__(self) -> DirectoryInfo:
+        if self._directory_info is None:
+            raise ValueError(
+                "Directory unknown for PandA to write into, update() needs to be called at least once"
+            )
         return self._directory_info

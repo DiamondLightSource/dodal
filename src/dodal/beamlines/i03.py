@@ -6,7 +6,7 @@ from dodal.beamlines.beamline_utils import (
     set_directory_provider,
 )
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.udc_directory_provider import UDCDirectoryProvider
+from dodal.common.udc_directory_provider import PandASubdirectoryProvider
 from dodal.devices.aperturescatterguard import AperturePositions, ApertureScatterguard
 from dodal.devices.attenuator import Attenuator
 from dodal.devices.backlight import Backlight
@@ -46,7 +46,7 @@ BL = get_beamline_name("s03")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
-set_directory_provider(UDCDirectoryProvider())
+set_directory_provider(PandASubdirectoryProvider())
 
 
 def dcm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> DCM:
