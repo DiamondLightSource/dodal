@@ -13,14 +13,14 @@ TEST_GRID_NUM_BOXES_Y = 6
 
 def take_snapshot_with_grid(oav: OAV, snapshot_filename, snapshot_directory):
     oav.wait_for_connection()
-    yield from bps.abs_set(oav.snapshot.top_left_x, TEST_GRID_TOP_LEFT_X)
-    yield from bps.abs_set(oav.snapshot.top_left_y, TEST_GRID_TOP_LEFT_Y)
-    yield from bps.abs_set(oav.snapshot.box_width, TEST_GRID_BOX_WIDTH)
-    yield from bps.abs_set(oav.snapshot.num_boxes_x, TEST_GRID_NUM_BOXES_X)
-    yield from bps.abs_set(oav.snapshot.num_boxes_y, TEST_GRID_NUM_BOXES_Y)
-    yield from bps.abs_set(oav.snapshot.filename, snapshot_filename)
-    yield from bps.abs_set(oav.snapshot.directory, snapshot_directory)
-    yield from bps.trigger(oav.snapshot, wait=True)
+    yield from bps.abs_set(oav.grid_snapshot.top_left_x, TEST_GRID_TOP_LEFT_X)
+    yield from bps.abs_set(oav.grid_snapshot.top_left_y, TEST_GRID_TOP_LEFT_Y)
+    yield from bps.abs_set(oav.grid_snapshot.box_width, TEST_GRID_BOX_WIDTH)
+    yield from bps.abs_set(oav.grid_snapshot.num_boxes_x, TEST_GRID_NUM_BOXES_X)
+    yield from bps.abs_set(oav.grid_snapshot.num_boxes_y, TEST_GRID_NUM_BOXES_Y)
+    yield from bps.abs_set(oav.grid_snapshot.filename, snapshot_filename)
+    yield from bps.abs_set(oav.grid_snapshot.directory, snapshot_directory)
+    yield from bps.trigger(oav.grid_snapshot, wait=True)
 
 
 @pytest.mark.skip(reason="Don't want to actually take snapshots during testing.")

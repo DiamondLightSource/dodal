@@ -10,7 +10,7 @@ from dodal.devices.util.adjuster_plans import lookup_table_adjuster
 @pytest.fixture
 def fake_aperture():
     FakeAperture = make_fake_device(Aperture)
-    fake_aperture: Aperture = FakeAperture(name="aperture")
+    fake_aperture: Aperture = FakeAperture(prefix="", name="aperture")
     return fake_aperture
 
 
