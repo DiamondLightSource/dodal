@@ -1,8 +1,12 @@
 from ophyd_async.panda import HDFPanda
 
-from dodal.beamlines.beamline_utils import device_instantiation
+from dodal.beamlines.beamline_utils import (
+    device_instantiation,
+    get_directory_provider,
+    set_directory_provider,
+)
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.udc_directory_provider import get_udc_directory_provider
+from dodal.common.udc_directory_provider import PandASubdirectoryProvider
 from dodal.devices.aperturescatterguard import AperturePositions, ApertureScatterguard
 from dodal.devices.attenuator import Attenuator
 from dodal.devices.backlight import Backlight
@@ -12,7 +16,7 @@ from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import FastGridScan
 from dodal.devices.flux import Flux
-from dodal.devices.focusing_mirror import FocusingMirror, VFMMirrorVoltages
+from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, VFMMirrorVoltages
 from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.panda_fast_grid_scan import PandAFastGridScan
@@ -42,6 +46,8 @@ BL = get_beamline_name("s03")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
+set_directory_provider(PandASubdirectoryProvider())
+
 
 def dcm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> DCM:
     """Get the i03 DCM device, instantiate it if it hasn't already been.
@@ -70,17 +76,18 @@ def qbpm1(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -
 @skip_device(lambda: BL == "s03")
 def vfm(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> FocusingMirror:
-    mirror = device_instantiation(
-        device_factory=FocusingMirror,
+) -> FocusingMirrorWithStripes:
+    return device_instantiation(
+        device_factory=FocusingMirrorWithStripes,
         name="vfm",
         prefix="-OP-VFM-01:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
         bragg_to_lat_lut_path=DAQ_CONFIGURATION_PATH
         + "/lookup/BeamLineEnergy_DCM_VFM_x_converter.txt",
+        x_suffix="LAT",
+        y_suffix="VERT",
     )
-    return mirror
 
 
 @skip_device(lambda: BL == "s03")
@@ -380,7 +387,7 @@ def panda(
         "-EA-PANDA-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        directory_provider=get_udc_directory_provider(),
+        directory_provider=get_directory_provider(),
     )
 
 

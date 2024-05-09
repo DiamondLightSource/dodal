@@ -2,24 +2,32 @@ from pathlib import Path
 
 from ophyd_async.core import DirectoryInfo
 
-_directory_info: DirectoryInfo
+from dodal.common.types import UpdatingDirectoryProvider
+from dodal.log import LOGGER
 
 
-def set_directory(directory: Path):
-    """
-    Set the current base directory of the UDC DirectoryProvider.
-    Files will be stored in the 'panda' subdirectory.
-    """
-    global _directory_info
-    _directory_info = DirectoryInfo(
-        root=directory, resource_dir=Path("panda"), prefix="", suffix=""
-    )
+class PandASubdirectoryProvider(UpdatingDirectoryProvider):
+    resource_dir = Path("panda")
 
+    def __init__(self, directory: Path | None = None):
+        if directory is None:
+            LOGGER.warn(
+                f"{self.__class__.__name__} instantiated with no root path, update() must be called before writing data!"
+            )
+        self._directory_info = (
+            DirectoryInfo(root=directory, resource_dir=self.resource_dir)
+            if directory
+            else None
+        )
 
-def get_udc_directory_provider():
-    """Get the singleton instance of the UDC DirectoryProvider"""
-    return _get_directory
+    def update(self, directory: Path):
+        self._directory_info = DirectoryInfo(
+            root=directory, resource_dir=self.resource_dir
+        )
 
-
-def _get_directory() -> DirectoryInfo:
-    return _directory_info
+    def __call__(self) -> DirectoryInfo:
+        if self._directory_info is None:
+            raise ValueError(
+                "Directory unknown for PandA to write into, update() needs to be called at least once"
+            )
+        return self._directory_info

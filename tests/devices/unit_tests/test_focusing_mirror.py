@@ -6,6 +6,8 @@ from ophyd.sim import NullStatus
 from ophyd.status import Status, StatusBase
 
 from dodal.devices.focusing_mirror import (
+    FocusingMirrorWithStripes,
+    MirrorStripe,
     MirrorVoltageDemand,
     MirrorVoltageDevice,
     VFMMirrorVoltages,
@@ -133,3 +135,10 @@ def test_mirror_populates_voltage_channels(
     channels = vfm_mirror_voltages_with_set.voltage_channels
     assert len(channels) == 8
     assert isinstance(channels[0], MirrorVoltageDevice)
+
+
+async def test_given_striped_focussing_mirror_then_energy_to_stripe_returns_expected():
+    device = FocusingMirrorWithStripes(prefix="-OP-VFM-01:", name="mirror")
+    await device.connect(sim=True)
+    assert device.energy_to_stripe(1) == MirrorStripe.BARE
+    assert device.energy_to_stripe(14) == MirrorStripe.RHODIUM
