@@ -42,6 +42,6 @@ async def test_set_opens_and_closes_shutter(state: OpenState, sim_shutter: Shutt
     assert severity == 0, f"Alarm severity is not 0: {severity}"
 
     if state == OpenState.CLOSE:
-        assert shutter_position["value"] == 0
+        assert shutter_position["value"] == OpenState.CLOSE
     if state == OpenState.OPEN:
-        assert shutter_position["value"] == 1
+        assert shutter_position["value"] == OpenState.OPEN
