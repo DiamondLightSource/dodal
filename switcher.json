@@ -316,6 +316,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1227_edge_array_logging/"
   },
   {
+    "version": "hyperion_1339_fix_panda_pcap",
+    "url": "https://DiamondLightSource.github.io/dodal/hyperion_1339_fix_panda_pcap/"
+  },
+  {
     "version": "hyperion_1343_fix_v9.2.0",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1343_fix_v9.2.0/"
   },
@@ -354,10 +358,6 @@
   {
     "version": "pin_ophyd_async",
     "url": "https://DiamondLightSource.github.io/dodal/pin_ophyd_async/"
-  },
-  {
-    "version": "pre-processor",
-    "url": "https://DiamondLightSource.github.io/dodal/pre-processor/"
   },
   {
     "version": "rebased_i22",
