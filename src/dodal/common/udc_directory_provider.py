@@ -27,9 +27,9 @@ class PandASubdirectoryProvider(UpdatingDirectoryProvider):
     def update(self, directory: Path, create_directory=False):
         if create_directory:
             panda_directory = f"{directory}/{self.resource_dir}"
-            # At some point in the future, Ophyd Async will have the feature to create the requested directory
+            # At some point in the future, ophyd_async will have the feature to create the requested directory
             if not os.path.isdir(panda_directory):
-                LOGGER.debug(f"Creating PandA PCAP subdirectory in {panda_directory}")
+                LOGGER.debug(f"Creating PandA PCAP subdirectory at {panda_directory}")
                 os.makedirs(panda_directory)
         self._directory_info = DirectoryInfo(
             root=directory, resource_dir=self.resource_dir
