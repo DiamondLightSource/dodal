@@ -19,6 +19,7 @@ class EigerFan(Device):
     series = Component(EpicsSignalRO, "CurrentSeries_RBV")
     offset = Component(EpicsSignalRO, "CurrentOffset_RBV")
     forward_stream = Component(EpicsSignalWithRBV, "ForwardStream")
+    dev_shm_enable = Component(EpicsSignalWithRBV, "DevShmCache")
 
 
 class OdinMetaListener(Device):
