@@ -15,7 +15,8 @@ from ophyd_async.epics.signal.signal import (
 from dodal.devices.ophyd_async_xspress3_mini.xspress3_mini_channel_oa import (
     Xspress3MiniChannel,
 )
-#===========================================================================
+
+# ===========================================================================
 from dodal.log import LOGGER
 
 
@@ -65,25 +66,31 @@ class DetectorState(str, Enum):
 
 
 class Xspress3Mini(Device):
-    """    class ArmingSignal(Signal):
-            def set(self, value, *, timeout=None, settle_time=None, **kwargs):
-                return self.parent.arm()
+    """class ArmingSignal(Signal):
+    def set(self, value, *, timeout=None, settle_time=None, **kwargs):
+        return self.parent.arm()
     """
 
-    #do_arm = Component(ArmingSignal)
-    def __init__(self, prefix: str,  name: str = "", num:int = 1) -> None:
+    # do_arm = Component(ArmingSignal)
+    def __init__(self, prefix: str, name: str = "", num: int = 1) -> None:
         # Define some signals
-        #self.channels = DeviceVector({i: Xspress3MiniChannel(f"{prefix}:C{i}" for i in range(1, num+1))}) # type: ignore
-        self.channel_1 = Xspress3MiniChannel(prefix +"C1_")
+        # self.channels = DeviceVector({i: Xspress3MiniChannel(f"{prefix}:C{i}" for i in range(1, num+1))}) # type: ignore
+        self.channel_1 = Xspress3MiniChannel(prefix + "C1_")
         self.erase = epics_signal_rw(EraseState, prefix + "ERASE")
-        self.get_max_num_channels = epics_signal_r(float, prefix + "MAX_NUM_CHANNELS_RBV")
+        self.get_max_num_channels = epics_signal_r(
+            float, prefix + "MAX_NUM_CHANNELS_RBV"
+        )
         self.acquire = epics_signal_rw_rbv(AcquireState, prefix + "Acquire")
         self.get_roi_calc_mini = epics_signal_rw(float, prefix + "MCA1:Enable_RBV")
-        self.trigger_mode_mini = epics_signal_rw_rbv(TriggerMode, prefix + "TriggerMode")
+        self.trigger_mode_mini = epics_signal_rw_rbv(
+            TriggerMode, prefix + "TriggerMode"
+        )
         self.roi_start_x = epics_signal_rw(float, prefix + "ROISUM1:MinX")
         self.roi_size_x = epics_signal_rw(float, prefix + "ROISUM1:SizeX")
         self.acquire_time = epics_signal_rw(float, prefix + "AcquireTime")
-        self.detector_state = epics_signal_r(DetectorState, prefix + "DetectorState_RBV")
+        self.detector_state = epics_signal_r(
+            DetectorState, prefix + "DetectorState_RBV"
+        )
         self.dt_corrected_latest_mca = epics_signal_r(float, prefix + "ARR1:ArrayData")
         self.set_num_images = epics_signal_rw(float, prefix + "NumImages")
         self.detector_busy_states = [
@@ -91,7 +98,8 @@ class Xspress3Mini(Device):
             DetectorState.CORRECT,
             DetectorState.ABORTING,
         ]
-        super().__init__(name = name)
+        super().__init__(name=name)
+
     ARM_STATUS_WAIT = 1
 
     async def stage(self):
@@ -100,7 +108,11 @@ class Xspress3Mini(Device):
     async def arm(self) -> AsyncStatus:
         LOGGER.info("Arming Xspress3Mini detector...")
         self.trigger_mode_mini.set(TriggerMode.BURST)
-        await wait_for_value(self.detector_state, lambda v : v in self.detector_busy_states, timeout=1)
+        await wait_for_value(
+            self.detector_state, lambda v: v in self.detector_busy_states, timeout=1
+        )
         self.erase.set(EraseState.ERASE)
-        await set_and_wait_for_value (self.acquire,AcquireState.ACQUIRE)
-        return AsyncStatus( wait_for_value(self.acquire,AcquireState.DONE,timeout = None) )
+        await set_and_wait_for_value(self.acquire, AcquireState.ACQUIRE)
+        return AsyncStatus(
+            wait_for_value(self.acquire, AcquireState.DONE, timeout=None)
+        )
