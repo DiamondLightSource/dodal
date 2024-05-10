@@ -232,10 +232,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/51_aperture_scatterguard_no_positions/"
   },
   {
-    "version": "520-fix-i22-slits",
-    "url": "https://DiamondLightSource.github.io/dodal/520-fix-i22-slits/"
-  },
-  {
     "version": "76_make_stage_synchronous_if_arming_not_started",
     "url": "https://DiamondLightSource.github.io/dodal/76_make_stage_synchronous_if_arming_not_started/"
   },
