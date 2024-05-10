@@ -60,17 +60,17 @@ async def test_configuration_includes_configuration_fields(undulator: Undulator)
                 "alarm_severity": ANY,
             },
             "undulator-length": {
-                "value": 0.0,
+                "value": 2.0,
                 "timestamp": ANY,
                 "alarm_severity": ANY,
             },
             "undulator-poles": {
-                "value": 0,
+                "value": 80,
                 "timestamp": ANY,
                 "alarm_severity": ANY,
             },
             "undulator-gap_discrepancy_tolerance_mm": {
-                "value": 0.0,
+                "value": 0.002,
                 "timestamp": ANY,
                 "alarm_severity": ANY,
             },
