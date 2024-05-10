@@ -42,6 +42,10 @@ class Undulator(StandardReadable):
             self.gap_access = epics_signal_r(UndulatorGapAccess, prefix + "IDBLENA")
 
         with self.add_children_as_readables(ConfigSignal):
+            self.gap_discrepancy_tolerance_mm, _ = soft_signal_r_and_backend(
+                float,
+                UNDULATOR_DISCREPANCY_THRESHOLD_MM,
+            )
             if poles is not None:
                 self.poles, _ = soft_signal_r_and_backend(int, poles)
             else:
@@ -51,7 +55,5 @@ class Undulator(StandardReadable):
                 self.length, _ = soft_signal_r_and_backend(float, length)
             else:
                 self.length = None
-
-        self.gap_discrepancy_tolerance_mm = UNDULATOR_DISCREPANCY_THRESHOLD_MM
 
         super().__init__(name)

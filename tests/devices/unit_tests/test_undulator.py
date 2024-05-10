@@ -69,6 +69,11 @@ async def test_configuration_includes_configuration_fields(undulator: Undulator)
                 "timestamp": ANY,
                 "alarm_severity": ANY,
             },
+            "undulator-gap_discrepancy_tolerance_mm": {
+                "value": 0.0,
+                "timestamp": ANY,
+                "alarm_severity": ANY,
+            },
         },
     )
 
