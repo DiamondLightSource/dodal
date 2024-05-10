@@ -228,6 +228,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/489_motor_types_issue/"
   },
   {
+    "version": "517_wait_for_meta_file_active",
+    "url": "https://DiamondLightSource.github.io/dodal/517_wait_for_meta_file_active/"
+  },
+  {
     "version": "51_aperture_scatterguard_no_positions",
     "url": "https://DiamondLightSource.github.io/dodal/51_aperture_scatterguard_no_positions/"
   },
