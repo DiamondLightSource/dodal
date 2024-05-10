@@ -75,7 +75,9 @@ class Xspress3Mini(Device):
     erase = Component(EpicsSignal, "ERASE", string=True)
     get_max_num_channels = Component(EpicsSignalRO, "MAX_NUM_CHANNELS_RBV")
     acquire = Component(EpicsSignalWithRBV, "Acquire")
-    get_roi_calc_mini = Component(EpicsSignal, "MCA1:Enable_RBV")
+    get_roi_calc_mini = Component(
+        EpicsSignal, "MCA1:Enable_RBV"
+    )  # THIS CHANGE WITH CHANNEL
     trigger_mode_mini = Component(EpicsSignalWithRBV, "TriggerMode")
     roi_start_x = Component(EpicsSignal, "ROISUM1:MinX")
     roi_size_x = Component(EpicsSignal, "ROISUM1:SizeX")
