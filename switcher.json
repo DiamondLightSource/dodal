@@ -284,6 +284,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/async-ad-sim/"
   },
   {
+    "version": "cli-system-tests",
+    "url": "https://DiamondLightSource.github.io/dodal/cli-system-tests/"
+  },
+  {
     "version": "directoryInfo",
     "url": "https://DiamondLightSource.github.io/dodal/directoryInfo/"
   },
