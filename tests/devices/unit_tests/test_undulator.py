@@ -1,50 +1,95 @@
+from unittest.mock import ANY
+
 import pytest
 from ophyd_async.core import (
     DeviceCollector,
+    assert_configuration,
+    assert_reading,
 )
 
-from dodal.devices.undulator import Undulator
+from dodal.devices.undulator import Undulator, UndulatorGapAccess
 
 
 @pytest.fixture
 async def undulator() -> Undulator:
     async with DeviceCollector(mock=True):
-        undulator = Undulator("UND-01", 80, 2.0, name="undulator")
+        undulator = Undulator(
+            "UND-01",
+            name="undulator",
+            poles=80,
+            length=2.0,
+        )
     return undulator
 
 
-@pytest.mark.parametrize(
-    "key",
-    [
-        "undulator-gap_motor",
-        "undulator-current_gap",
-        "undulator-gap_access",
-    ],
-)
-async def test_read_and_describe_includes(
-    undulator: Undulator,
-    key: str,
-):
-    description = await undulator.describe()
-    reading = await undulator.read()
+async def test_reading_includes_read_fields(undulator: Undulator):
+    await assert_reading(
+        undulator,
+        {
+            "undulator-gap_access": {
+                "value": UndulatorGapAccess.ENABLED,
+                "timestamp": ANY,
+                "alarm_severity": ANY,
+            },
+            "undulator-gap_motor": {
+                "value": 0.0,
+                "timestamp": ANY,
+                "alarm_severity": ANY,
+            },
+            "undulator-current_gap": {
+                "value": 0.0,
+                "timestamp": ANY,
+                "alarm_severity": ANY,
+            },
+        },
+    )
 
-    assert key in description
-    assert key in reading
+
+async def test_configuration_includes_configuration_fields(undulator: Undulator):
+    await assert_configuration(
+        undulator,
+        {
+            "undulator-gap_motor-motor_egu": {
+                "value": "",
+                "timestamp": ANY,
+                "alarm_severity": ANY,
+            },
+            "undulator-gap_motor-velocity": {
+                "value": 0.0,
+                "timestamp": ANY,
+                "alarm_severity": ANY,
+            },
+            "undulator-length": {
+                "value": 0.0,
+                "timestamp": ANY,
+                "alarm_severity": ANY,
+            },
+            "undulator-poles": {
+                "value": 0,
+                "timestamp": ANY,
+                "alarm_severity": ANY,
+            },
+        },
+    )
 
 
-@pytest.mark.parametrize(
-    "key",
-    [
-        "undulator-poles",
-        "undulator-length",
-    ],
-)
-async def test_read_and_describe_configuration_includes(
-    undulator: Undulator,
-    key: str,
-):
-    description = await undulator.describe_configuration()
-    reading = await undulator.read_configuration()
+async def test_poles_not_propagated_if_not_supplied():
+    async with DeviceCollector(sim=True):
+        undulator = Undulator(
+            "UND-01",
+            name="undulator",
+            length=2.0,
+        )
+    assert undulator.poles is None
+    assert "undulator-poles" not in (await undulator.read_configuration())
 
-    assert key in description
-    assert key in reading
+
+async def test_length_not_propagated_if_not_supplied():
+    async with DeviceCollector(sim=True):
+        undulator = Undulator(
+            "UND-01",
+            name="undulator",
+            poles=80,
+        )
+    assert undulator.length is None
+    assert "undulator-length" not in (await undulator.read_configuration())
