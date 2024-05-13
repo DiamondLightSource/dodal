@@ -26,8 +26,7 @@ def main(ctx: click.Context) -> None:
     "-a",
     "--all",
     is_flag=True,
-    help="Attempt to connect to all devices, including the ones that are "
-    "not connected by default",
+    help="Attempt to connect to devices marked as skipped",
     default=False,
 )
 @click.option(
@@ -37,13 +36,6 @@ def main(ctx: click.Context) -> None:
     help="Connect to a sim backend, this initializes all device objects but does not "
     "attempt any I/O. Useful as a a dry-run.",
     default=False,
-)
-@click.option(
-    "-t",
-    "--timeout",
-    type=float,
-    help="Connection timeout in seconds",
-    default=DEFAULT_CONNECTION_TIMEOUT,
 )
 def connect(beamline: str, all: bool, sim_backend: bool, timeout: float) -> None:
     """Initialises a beamline module, connects to all devices, reports
@@ -58,13 +50,6 @@ def connect(beamline: str, all: bool, sim_backend: bool, timeout: float) -> None
         include_skipped=all,
         fake_with_ophyd_sim=sim_backend,
     )
-    if all:
-        for device in devices.values():
-            wait_for_connection(
-                device,
-                timeout=timeout,
-                sim=sim_backend,
-            )
     sim_statement = "sim mode" if sim_backend else ""
     print(f"{len(devices)} devices connected ({sim_statement}): ")
     print("\n".join([f"\t{key}" for key in devices.keys()]))
