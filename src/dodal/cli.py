@@ -13,7 +13,7 @@ from . import __version__
 
 
 @click.group(invoke_without_command=True)
-@click.version_option(version=__version__, prog_name="dodal")
+@click.version_option(version=__version__, message="%(version)s")
 @click.pass_context
 def main(ctx: click.Context) -> None:
     if ctx.invoked_subcommand is None:
@@ -37,7 +37,7 @@ def main(ctx: click.Context) -> None:
     "attempt any I/O. Useful as a a dry-run.",
     default=False,
 )
-def connect(beamline: str, all: bool, sim_backend: bool, timeout: float) -> None:
+def connect(beamline: str, all: bool, sim_backend: bool) -> None:
     """Initialises a beamline module, connects to all devices, reports
     any connection issues"""
 
@@ -45,25 +45,11 @@ def connect(beamline: str, all: bool, sim_backend: bool, timeout: float) -> None
 
     RE = RunEngine()  # noqa: F841
 
-    devices = _devices_for_beamline(
-        beamline,
+    devices = make_all_devices(
+        f"dodal.beamlines.{beamline}",
         include_skipped=all,
         fake_with_ophyd_sim=sim_backend,
     )
     sim_statement = "sim mode" if sim_backend else ""
     print(f"{len(devices)} devices connected ({sim_statement}): ")
     print("\n".join([f"\t{key}" for key in devices.keys()]))
-
-
-def _devices_for_beamline(
-    beamline: str,
-    include_skipped: bool,
-    fake_with_ophyd_sim: bool,
-):
-    bl_mod = importlib.import_module("dodal.beamlines." + beamline)
-    importlib.reload(bl_mod)
-    return make_all_devices(
-        bl_mod,
-        include_skipped=include_skipped,
-        fake_with_ophyd_sim=fake_with_ophyd_sim,
-    )
