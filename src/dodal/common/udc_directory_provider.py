@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 
 from ophyd_async.core import DirectoryInfo
@@ -8,8 +7,8 @@ from dodal.log import LOGGER
 
 
 class PandASubdirectoryProvider(UpdatingDirectoryProvider):
-    """Directory provider for the HDFPanda. Points to, and optionally creates, a panda subdirectory relative to the
-    directory path provided"""
+    """Directory provider for the HDFPanda. Points to a panda subdirectory within the
+    directory path provided, which must exist before attempting to arm the PCAP block"""
 
     resource_dir = Path("panda")
 
@@ -24,13 +23,7 @@ class PandASubdirectoryProvider(UpdatingDirectoryProvider):
             else None
         )
 
-    def update(self, directory: Path, create_directory=False):
-        if create_directory:
-            panda_directory = f"{directory}/{self.resource_dir}"
-            # At some point in the future, ophyd_async will have the feature to create the requested directory
-            if not os.path.isdir(panda_directory):
-                LOGGER.debug(f"Creating PandA PCAP subdirectory at {panda_directory}")
-                os.makedirs(panda_directory)
+    def update(self, directory: Path):
         self._directory_info = DirectoryInfo(
             root=directory, resource_dir=self.resource_dir
         )

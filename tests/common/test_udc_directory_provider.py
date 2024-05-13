@@ -1,4 +1,3 @@
-import os
 import re
 from pathlib import Path
 
@@ -45,11 +44,3 @@ def test_udc_directory_provider_after_update(initial, tmp_path):
     directory_info = provider()
     assert directory_info.root == tmp_path
     assert directory_info.resource_dir == Path("panda")
-
-
-def test_udc_directory_provider_update_creates_directory(tmp_path):
-    provider = PandASubdirectoryProvider()
-    new_directory = f"{tmp_path}/{provider.resource_dir}"
-    assert not os.path.isdir(new_directory)
-    provider.update(tmp_path, create_directory=True)
-    assert os.path.isdir(new_directory)
