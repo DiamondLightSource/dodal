@@ -43,11 +43,3 @@ def test_stage_in_busy_state_OA(fake_xspress3mini: Xspress3Mini, RE: RunEngine):
     set_sim_value(fake_xspress3mini.detector_state,DetectorState.ACQUIRE)
     set_sim_value(fake_xspress3mini.acquire, AcquireState.DONE)
     RE(bps.stage(fake_xspress3mini))
-
-
-"""
-def test_stage_fails_in_failed_acquire_state(fake_xspress3mini: Xspress3Mini, RE: RunEngine):
-    set_sim_value(fake_xspress3mini.detector_state,DetectorState.IDLE)
-    with pytest.raises(Exception):
-        RE(bps.stage(fake_xspress3mini))
-"""

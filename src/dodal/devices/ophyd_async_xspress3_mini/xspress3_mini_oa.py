@@ -69,7 +69,7 @@ class Xspress3Mini(Device):
     def __init__(self, prefix: str, name: str = "", num: int = 1) -> None:
         # Define some signals
         self.channels = DeviceVector(
-            {i: Xspress3MiniChannel(f"{prefix}:C{i}") for i in range(1, num + 1)}
+            {i: Xspress3MiniChannel(f"{prefix}:C{i}_") for i in range(1, num + 1)}
         )
         self.erase = epics_signal_rw(EraseState, prefix + "ERASE")
         self.get_max_num_channels = epics_signal_r(
