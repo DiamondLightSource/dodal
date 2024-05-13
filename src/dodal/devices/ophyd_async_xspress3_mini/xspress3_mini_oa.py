@@ -4,7 +4,6 @@ from ophyd_async.core import (
     AsyncStatus,
     Device,
     DeviceVector,
-    Signal,
     set_and_wait_for_value,
     wait_for_value,
 )
@@ -68,7 +67,6 @@ class DetectorState(str, Enum):
 
 
 class Xspress3Mini(Device):
-
     def __init__(self, prefix: str, name: str = "", num: int = 1) -> None:
         # Define some signals
         self.channels = DeviceVector(
