@@ -17,7 +17,6 @@ from dodal.devices.ophyd_async_xspress3_mini.xspress3_mini_channel_oa import (
     Xspress3MiniChannel,
 )
 
-# ===========================================================================
 from dodal.log import LOGGER
 
 
@@ -72,7 +71,6 @@ class Xspress3Mini(Device):
         self.channels = DeviceVector(
             {i: Xspress3MiniChannel(f"{prefix}:C{i}") for i in range(1, num + 1)}
         )
-        # self.channel_1 = Xspress3MiniChannel(prefix + "C1_")
         self.erase = epics_signal_rw(EraseState, prefix + "ERASE")
         self.get_max_num_channels = epics_signal_r(
             float, prefix + "MAX_NUM_CHANNELS_RBV"
