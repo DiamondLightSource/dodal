@@ -99,8 +99,6 @@ class Xspress3Mini(Device):
         ]
         super().__init__(name=name)
 
-    ARM_STATUS_WAIT = 1
-
     async def stage(self):
         await self.arm()
 
