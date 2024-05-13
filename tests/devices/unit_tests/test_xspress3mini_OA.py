@@ -34,7 +34,10 @@ async def test_arm_success_on_busy_state_OA(fake_xspress3mini: Xspress3Mini):
     set_sim_value(fake_xspress3mini.acquire, AcquireState.DONE)
     await asyncio.sleep(0.1)
     assert status.done is True
-    await fake_xspress3mini.stage()
+
+    set_sim_value(fake_xspress3mini.detector_state, DetectorState.IDLE)
+    with pytest.raises(TimeoutError):
+        await fake_xspress3mini.stage()
 
 
 # @patch("dodal.devices.xspress3_mini.xspress3_mini.await_value")

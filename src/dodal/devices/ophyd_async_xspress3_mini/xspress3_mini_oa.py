@@ -3,6 +3,8 @@ from enum import Enum
 from ophyd_async.core import (
     AsyncStatus,
     Device,
+    DeviceVector,
+    Signal,
     set_and_wait_for_value,
     wait_for_value,
 )
@@ -66,16 +68,16 @@ class DetectorState(str, Enum):
 
 
 class Xspress3Mini(Device):
-    """class ArmingSignal(Signal):
-    def set(self, value, *, timeout=None, settle_time=None, **kwargs):
-        return self.parent.arm()
-    """
+    class ArmingSignal(Signal):
+        def set(self, value, *, timeout=None, settle_time=None, **kwargs):
+            return self.parent.arm()
 
-    # do_arm = Component(ArmingSignal)
     def __init__(self, prefix: str, name: str = "", num: int = 1) -> None:
         # Define some signals
-        # self.channels = DeviceVector({i: Xspress3MiniChannel(f"{prefix}:C{i}" for i in range(1, num+1))}) # type: ignore
-        self.channel_1 = Xspress3MiniChannel(prefix + "C1_")
+        self.channels = DeviceVector(
+            {i: Xspress3MiniChannel(f"{prefix}:C{i}") for i in range(1, num + 1)}
+        )
+        # self.channel_1 = Xspress3MiniChannel(prefix + "C1_")
         self.erase = epics_signal_rw(EraseState, prefix + "ERASE")
         self.get_max_num_channels = epics_signal_r(
             float, prefix + "MAX_NUM_CHANNELS_RBV"
@@ -112,7 +114,5 @@ class Xspress3Mini(Device):
             self.detector_state, lambda v: v in self.detector_busy_states, timeout=1
         )
         self.erase.set(EraseState.ERASE)
-        await set_and_wait_for_value(self.acquire, AcquireState.ACQUIRE)
-        return AsyncStatus(
-            wait_for_value(self.acquire, AcquireState.DONE, timeout=None)
-        )
+        await set_and_wait_for_value(self.acquire, AcquireState.ACQUIRE, timeout=1)
+        return AsyncStatus(wait_for_value(self.acquire, AcquireState.DONE, timeout=1))
