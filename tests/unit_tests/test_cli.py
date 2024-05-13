@@ -1,7 +1,3 @@
-import re
-import subprocess
-import sys
-import traceback
 from unittest.mock import patch
 
 import pytest
