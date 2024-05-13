@@ -8,6 +8,8 @@ from ophyd_async.core import (
     AsyncStatus,
     StandardReadable,
     observe_value,
+    soft_signal_r_and_setter,
+    soft_signal_rw,
 )
 from ophyd_async.epics.signal import epics_signal_r
 
@@ -18,7 +20,6 @@ from dodal.devices.oav.pin_image_recognition.utils import (
     ScanDirections,
     identity,
 )
-from dodal.devices.ophyd_async_utils import create_soft_signal_r, create_soft_signal_rw
 from dodal.log import LOGGER
 
 Tip = tuple[int | None, int | None]
@@ -50,38 +51,30 @@ class PinTipDetection(StandardReadable):
         self._prefix: str = prefix
         self._name = name
 
-        self.triggered_tip = create_soft_signal_r(Tip, "triggered_tip", self.name)
-        self.triggered_top_edge = create_soft_signal_r(
+        self.triggered_tip, _ = soft_signal_r_and_setter(
+            Tip, "triggered_tip", self.name
+        )
+        self.triggered_top_edge, _ = soft_signal_r_and_setter(
             NDArray[np.uint32], "triggered_top_edge", self.name
         )
-        self.triggered_bottom_edge = create_soft_signal_r(
+        self.triggered_bottom_edge, _ = soft_signal_r_and_setter(
             NDArray[np.uint32], "triggered_bottom_edge", self.name
         )
         self.array_data = epics_signal_r(NDArray[np.uint8], f"pva://{prefix}PVA:ARRAY")
 
         # Soft parameters for pin-tip detection.
-        self.preprocess_operation = create_soft_signal_rw(int, "preprocess", self.name)
-        self.preprocess_ksize = create_soft_signal_rw(
-            int, "preprocess_ksize", self.name
-        )
-        self.preprocess_iterations = create_soft_signal_rw(
+        self.preprocess_operation = soft_signal_rw(int, "preprocess", self.name)
+        self.preprocess_ksize = soft_signal_rw(int, "preprocess_ksize", self.name)
+        self.preprocess_iterations = soft_signal_rw(
             int, "preprocess_iterations", self.name
         )
-        self.canny_upper_threshold = create_soft_signal_rw(
-            int, "canny_upper", self.name
-        )
-        self.canny_lower_threshold = create_soft_signal_rw(
-            int, "canny_lower", self.name
-        )
-        self.close_ksize = create_soft_signal_rw(int, "close_ksize", self.name)
-        self.close_iterations = create_soft_signal_rw(
-            int, "close_iterations", self.name
-        )
-        self.scan_direction = create_soft_signal_rw(int, "scan_direction", self.name)
-        self.min_tip_height = create_soft_signal_rw(int, "min_tip_height", self.name)
-        self.validity_timeout = create_soft_signal_rw(
-            float, "validity_timeout", self.name
-        )
+        self.canny_upper_threshold = soft_signal_rw(int, "canny_upper", self.name)
+        self.canny_lower_threshold = soft_signal_rw(int, "canny_lower", self.name)
+        self.close_ksize = soft_signal_rw(int, "close_ksize", self.name)
+        self.close_iterations = soft_signal_rw(int, "close_iterations", self.name)
+        self.scan_direction = soft_signal_rw(int, "scan_direction", self.name)
+        self.min_tip_height = soft_signal_rw(int, "min_tip_height", self.name)
+        self.validity_timeout = soft_signal_rw(float, "validity_timeout", self.name)
 
         self.set_readable_signals(
             read=[
@@ -146,8 +139,8 @@ class PinTipDetection(StandardReadable):
         )
         return location
 
-    async def connect(self, sim: bool = False, timeout: float = DEFAULT_TIMEOUT):
-        await super().connect(sim, timeout)
+    async def connect(self, mock: bool = False, timeout: float = DEFAULT_TIMEOUT):
+        await super().connect(mock, timeout)
 
         # Set defaults for soft parameters
         await self.validity_timeout.set(5.0)
