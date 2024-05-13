@@ -68,9 +68,6 @@ class DetectorState(str, Enum):
 
 
 class Xspress3Mini(Device):
-    class ArmingSignal(Signal):
-        def set(self, value, *, timeout=None, settle_time=None, **kwargs):
-            return self.parent.arm()
 
     def __init__(self, prefix: str, name: str = "", num: int = 1) -> None:
         # Define some signals
