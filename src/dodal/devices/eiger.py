@@ -290,6 +290,8 @@ class EigerDetector(Device):
 
     def _wait_for_odin_status(self) -> Status:
         self.forward_bit_depth_to_filewriter()
+        await_value(self.odin.meta.active, 1).wait(self.GENERAL_STATUS_TIMEOUT)
+
         status = self.odin.file_writer.capture.set(
             1, timeout=self.GENERAL_STATUS_TIMEOUT
         )

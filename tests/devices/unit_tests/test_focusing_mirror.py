@@ -6,6 +6,8 @@ from ophyd.sim import NullStatus
 from ophyd.status import Status, StatusBase
 
 from dodal.devices.focusing_mirror import (
+    FocusingMirrorWithStripes,
+    MirrorStripe,
     MirrorVoltageDemand,
     MirrorVoltageDevice,
     VFMMirrorVoltages,
@@ -63,9 +65,7 @@ def vfm_mirror_voltages_with_set_timing_out(vfm_mirror_voltages) -> VFMMirrorVol
 def test_mirror_set_voltage_sets_and_waits_happy_path(
     vfm_mirror_voltages_with_set: VFMMirrorVoltages,
 ):
-    vfm_mirror_voltages_with_set._channel14_voltage_device._setpoint_v.set.return_value = (
-        NullStatus()
-    )
+    vfm_mirror_voltages_with_set._channel14_voltage_device._setpoint_v.set.return_value = NullStatus()
     vfm_mirror_voltages_with_set._channel14_voltage_device._demand_accepted.sim_put(
         MirrorVoltageDemand.OK
     )
@@ -103,9 +103,7 @@ def test_mirror_set_voltage_sets_and_waits_set_fail(
 def test_mirror_set_voltage_sets_and_waits_settle_timeout_expires(
     vfm_mirror_voltages_with_set_timing_out: VFMMirrorVoltages,
 ):
-    vfm_mirror_voltages_with_set_timing_out._channel14_voltage_device._setpoint_v.set.return_value = (
-        NullStatus()
-    )
+    vfm_mirror_voltages_with_set_timing_out._channel14_voltage_device._setpoint_v.set.return_value = NullStatus()
 
     status: StatusBase = vfm_mirror_voltages_with_set_timing_out.voltage_channels[
         0
@@ -137,3 +135,10 @@ def test_mirror_populates_voltage_channels(
     channels = vfm_mirror_voltages_with_set.voltage_channels
     assert len(channels) == 8
     assert isinstance(channels[0], MirrorVoltageDevice)
+
+
+async def test_given_striped_focussing_mirror_then_energy_to_stripe_returns_expected():
+    device = FocusingMirrorWithStripes(prefix="-OP-VFM-01:", name="mirror")
+    await device.connect(sim=True)
+    assert device.energy_to_stripe(1) == MirrorStripe.BARE
+    assert device.energy_to_stripe(14) == MirrorStripe.RHODIUM
