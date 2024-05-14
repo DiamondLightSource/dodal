@@ -236,6 +236,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/520-fix-i22-slits/"
   },
   {
+    "version": "530_bart_string",
+    "url": "https://DiamondLightSource.github.io/dodal/530_bart_string/"
+  },
+  {
     "version": "76_make_stage_synchronous_if_arming_not_started",
     "url": "https://DiamondLightSource.github.io/dodal/76_make_stage_synchronous_if_arming_not_started/"
   },
