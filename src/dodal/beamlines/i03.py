@@ -30,8 +30,8 @@ from dodal.devices.undulator import Undulator
 from dodal.devices.undulator_dcm import UndulatorDCM
 from dodal.devices.webcam import Webcam
 from dodal.devices.xbpm_feedback import XBPMFeedback
-from dodal.devices.xspress3_mini.xspress3_mini import Xspress3Mini
 from dodal.devices.xspress3.xspress3 import Xspress3
+from dodal.devices.xspress3_mini.xspress3_mini import Xspress3Mini
 from dodal.devices.zebra import Zebra
 from dodal.devices.zocalo import ZocaloResults
 from dodal.log import set_beamline as set_log_beamline
@@ -359,6 +359,7 @@ def xspress3mini(
         wait_for_connection,
         fake_with_ophyd_sim,
     )
+
 
 def xspress3(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
