@@ -15,7 +15,8 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.areadetector.utils import stop_busy_record
 from ophyd_async.epics.areadetector.writers import HDFWriter, NDFileHDF
-from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
+from ophyd_async.epics.signal import epics_signal_r
+from ophyd_async.epics.signal.signal import epics_signal_rw_rbv
 
 
 class TetrammRange(str, Enum):
@@ -53,26 +54,26 @@ class TetrammDriver(Device):
         name: str = "",
     ):
         self._prefix = prefix
-        self.range = epics_signal_rw(TetrammRange, prefix + "Range")
+        self.range = epics_signal_rw_rbv(TetrammRange, prefix + "Range")
         self.sample_time = epics_signal_r(float, prefix + "SampleTime")
 
-        self.values_per_reading = epics_signal_rw(int, prefix + "ValuesPerRead")
-        self.averaging_time = epics_signal_rw(float, prefix + "AveragingTime")
+        self.values_per_reading = epics_signal_rw_rbv(int, prefix + "ValuesPerRead")
+        self.averaging_time = epics_signal_rw_rbv(float, prefix + "AveragingTime")
         self.to_average = epics_signal_r(int, prefix + "NumAverage")
         self.averaged = epics_signal_r(int, prefix + "NumAveraged")
 
-        self.acquire = epics_signal_rw(bool, prefix + "Acquire")
+        self.acquire = epics_signal_rw_rbv(bool, prefix + "Acquire")
 
         # this PV is special, for some reason it doesn't have a _RBV suffix...
         self.overflows = epics_signal_r(int, prefix + "RingOverflows")
 
-        self.num_channels = epics_signal_rw(TetrammChannels, prefix + "NumChannels")
-        self.resolution = epics_signal_rw(TetrammResolution, prefix + "Resolution")
-        self.trigger_mode = epics_signal_rw(TetrammTrigger, prefix + "TriggerMode")
-        self.bias = epics_signal_rw(bool, prefix + "BiasState")
-        self.bias_volts = epics_signal_rw(float, prefix + "BiasVoltage")
-        self.geometry = epics_signal_rw(TetrammGeometry, prefix + "Geometry")
-        self.nd_attributes_file = epics_signal_rw(str, prefix + "NDAttributesFile")
+        self.num_channels = epics_signal_rw_rbv(TetrammChannels, prefix + "NumChannels")
+        self.resolution = epics_signal_rw_rbv(TetrammResolution, prefix + "Resolution")
+        self.trigger_mode = epics_signal_rw_rbv(TetrammTrigger, prefix + "TriggerMode")
+        self.bias = epics_signal_rw_rbv(bool, prefix + "BiasState")
+        self.bias_volts = epics_signal_rw_rbv(float, prefix + "BiasVoltage")
+        self.geometry = epics_signal_rw_rbv(TetrammGeometry, prefix + "Geometry")
+        self.nd_attributes_file = epics_signal_rw_rbv(str, prefix + "NDAttributesFile")
 
         super().__init__(name=name)
 
