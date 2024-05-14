@@ -55,12 +55,12 @@ class TetrammDriver(Device):
     ):
         self._prefix = prefix
         self.range = epics_signal_rw_rbv(TetrammRange, prefix + "Range")
-        self.sample_time = epics_signal_r(float, prefix + "SampleTime")
+        self.sample_time = epics_signal_r(float, prefix + "SampleTime_RBV")
 
         self.values_per_reading = epics_signal_rw_rbv(int, prefix + "ValuesPerRead")
         self.averaging_time = epics_signal_rw_rbv(float, prefix + "AveragingTime")
-        self.to_average = epics_signal_r(int, prefix + "NumAverage")
-        self.averaged = epics_signal_r(int, prefix + "NumAveraged")
+        self.to_average = epics_signal_r(int, prefix + "NumAverage_RBV")
+        self.averaged = epics_signal_r(int, prefix + "NumAveraged_RBV")
 
         self.acquire = epics_signal_rw_rbv(bool, prefix + "Acquire")
 
