@@ -51,14 +51,12 @@ class PinTipDetection(StandardReadable):
         self._prefix: str = prefix
         self._name = name
 
-        self.triggered_tip, _ = soft_signal_r_and_setter(
-            Tip, "triggered_tip", self.name
-        )
+        self.triggered_tip, _ = soft_signal_r_and_setter(Tip, name="triggered_tip")
         self.triggered_top_edge, _ = soft_signal_r_and_setter(
-            NDArray[np.uint32], "triggered_top_edge", self.name
+            NDArray[np.uint32], name="triggered_top_edge"
         )
         self.triggered_bottom_edge, _ = soft_signal_r_and_setter(
-            NDArray[np.uint32], "triggered_bottom_edge", self.name
+            NDArray[np.uint32], name="triggered_bottom_edge"
         )
         self.array_data = epics_signal_r(NDArray[np.uint8], f"pva://{prefix}PVA:ARRAY")
 

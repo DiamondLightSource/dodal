@@ -79,17 +79,15 @@ class ZocaloResults(StandardReadable, Triggerable):
         self._raw_results_received: Queue = Queue()
         self.transport: CommonTransport | None = None
 
-        self.results, _ = soft_signal_r_and_setter(
-            list[XrcResult], "results", self.name
-        )
+        self.results, _ = soft_signal_r_and_setter(list[XrcResult], name="results")
         self.centres_of_mass, _ = soft_signal_r_and_setter(
-            NDArray[np.uint64], "centres_of_mass", self.name
+            NDArray[np.uint64], name="centres_of_mass"
         )
         self.bbox_sizes, _ = soft_signal_r_and_setter(
             NDArray[np.uint64], "bbox_sizes", self.name
         )
-        self.ispyb_dcid, _ = soft_signal_r_and_setter(int, "ispyb_dcid", self.name)
-        self.ispyb_dcgid, _ = soft_signal_r_and_setter(int, "ispyb_dcgid", self.name)
+        self.ispyb_dcid, _ = soft_signal_r_and_setter(int, name="ispyb_dcid")
+        self.ispyb_dcgid, _ = soft_signal_r_and_setter(int, name="ispyb_dcgid")
         self.set_readable_signals(
             read=[
                 self.results,
