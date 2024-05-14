@@ -65,9 +65,7 @@ def vfm_mirror_voltages_with_set_timing_out(vfm_mirror_voltages) -> VFMMirrorVol
 def test_mirror_set_voltage_sets_and_waits_happy_path(
     vfm_mirror_voltages_with_set: VFMMirrorVoltages,
 ):
-    vfm_mirror_voltages_with_set._channel14_voltage_device._setpoint_v.set.return_value = (
-        NullStatus()
-    )
+    vfm_mirror_voltages_with_set._channel14_voltage_device._setpoint_v.set.return_value = NullStatus()
     vfm_mirror_voltages_with_set._channel14_voltage_device._demand_accepted.sim_put(
         MirrorVoltageDemand.OK
     )
@@ -105,9 +103,7 @@ def test_mirror_set_voltage_sets_and_waits_set_fail(
 def test_mirror_set_voltage_sets_and_waits_settle_timeout_expires(
     vfm_mirror_voltages_with_set_timing_out: VFMMirrorVoltages,
 ):
-    vfm_mirror_voltages_with_set_timing_out._channel14_voltage_device._setpoint_v.set.return_value = (
-        NullStatus()
-    )
+    vfm_mirror_voltages_with_set_timing_out._channel14_voltage_device._setpoint_v.set.return_value = NullStatus()
 
     status: StatusBase = vfm_mirror_voltages_with_set_timing_out.voltage_channels[
         0

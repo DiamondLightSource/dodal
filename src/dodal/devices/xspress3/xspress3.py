@@ -68,20 +68,22 @@ class Xspress3Mini(Device):
     """
 
     def __init__(self, prefix: str, name: str = "", num: int = 1, timeout=1) -> None:
-
         self.channels = DeviceVector(
             {i: Xspress3Channel(f"{prefix}:C{i}_") for i in range(1, num + 1)}
         )
+        """MCA on/off switch"""
         self.get_roi_calc_status = DeviceVector(
             {
                 i: epics_signal_rw(UpdateRBV, f"{prefix}:MCA{i}:Enable_RBV")
                 for i in range(1, num + 1)
             }
         )
+        """start and size of the MCA array"""
         self.roi_mca = DeviceVector(
             {i: Xspress3ROIChannel(f"{prefix}:ROISUM{i}:") for i in range(1, num + 1)}
         )
 
+        """signal for the correct MCA spectrum (1d array)"""
         self.dt_corrected_latest_mca = DeviceVector(
             {
                 i: epics_signal_r(float, f"{prefix}:ARR{i}:ArrayData")
@@ -89,6 +91,7 @@ class Xspress3Mini(Device):
             }
         )  # this is not float need fixing
 
+        """Shared controls"""
         self.timeout = timeout
         self.acquire_time = epics_signal_rw(float, prefix + "AcquireTime")
         self.erase = epics_signal_rw(EraseState, prefix + "ERASE")
