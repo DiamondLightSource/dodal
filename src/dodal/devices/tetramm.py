@@ -15,7 +15,7 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.areadetector.utils import stop_busy_record
 from ophyd_async.epics.areadetector.writers import HDFWriter, NDFileHDF
-from ophyd_async.epics.signal import epics_signal_r
+from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 from ophyd_async.epics.signal.signal import epics_signal_rw_rbv
 
 
@@ -73,7 +73,7 @@ class TetrammDriver(Device):
         self.bias = epics_signal_rw_rbv(bool, prefix + "BiasState")
         self.bias_volts = epics_signal_rw_rbv(float, prefix + "BiasVoltage")
         self.geometry = epics_signal_rw_rbv(TetrammGeometry, prefix + "Geometry")
-        self.nd_attributes_file = epics_signal_rw_rbv(str, prefix + "NDAttributesFile")
+        self.nd_attributes_file = epics_signal_rw(str, prefix + "NDAttributesFile")
 
         super().__init__(name=name)
 
