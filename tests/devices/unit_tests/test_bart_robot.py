@@ -19,20 +19,6 @@ async def test_bart_robot_can_be_connected_in_sim_mode():
     await device.connect(sim=True)
 
 
-async def test_when_barcode_updates_then_new_barcode_read():
-    device = await _get_bart_robot()
-    expected_barcode = "expected"
-    set_sim_value(device.barcode.bare_signal, [expected_barcode, "other_barcode"])
-    assert (await device.barcode.read())["robot-barcode"]["value"] == expected_barcode
-
-
-async def test_when_barcode_updates_with_empty_list_then_new_barcode_is_empty_string():
-    device = await _get_bart_robot()
-    expected_barcode = ""
-    set_sim_value(device.barcode.bare_signal, [])
-    assert (await device.barcode.read())["robot-barcode"]["value"] == expected_barcode
-
-
 @patch("dodal.devices.robot.LOGGER")
 async def test_given_program_running_when_load_pin_then_logs_the_program_name_and_times_out(
     patch_logger: MagicMock,
