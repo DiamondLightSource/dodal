@@ -61,16 +61,20 @@ class PinTipDetection(StandardReadable):
         self.array_data = epics_signal_r(NDArray[np.uint8], f"pva://{prefix}PVA:ARRAY")
 
         # Soft parameters for pin-tip detection.
-        self.preprocess_operation = soft_signal_rw(int, name="preprocess")
-        self.preprocess_ksize = soft_signal_rw(int, name="preprocess_ksize")
-        self.preprocess_iterations = soft_signal_rw(int, name="preprocess_iterations")
-        self.canny_upper_threshold = soft_signal_rw(int, name="canny_upper")
-        self.canny_lower_threshold = soft_signal_rw(int, name="canny_lower")
-        self.close_ksize = soft_signal_rw(int, name="close_ksize")
-        self.close_iterations = soft_signal_rw(int, name="close_iterations")
-        self.scan_direction = soft_signal_rw(int, name="scan_direction")
-        self.min_tip_height = soft_signal_rw(int, name="min_tip_height")
-        self.validity_timeout = soft_signal_rw(float, name="validity_timeout")
+        self.preprocess_operation = soft_signal_rw(int, 10, name="preprocess")
+        self.preprocess_ksize = soft_signal_rw(int, 5, name="preprocess_ksize")
+        self.preprocess_iterations = soft_signal_rw(
+            int, 5, name="preprocess_iterations"
+        )
+        self.canny_upper_threshold = soft_signal_rw(int, 100, name="canny_upper")
+        self.canny_lower_threshold = soft_signal_rw(int, 50, name="canny_lower")
+        self.close_ksize = soft_signal_rw(int, 5, name="close_ksize")
+        self.close_iterations = soft_signal_rw(int, 5, name="close_iterations")
+        self.scan_direction = soft_signal_rw(
+            int, ScanDirections.FORWARD.value, name="scan_direction"
+        )
+        self.min_tip_height = soft_signal_rw(int, 5, name="min_tip_height")
+        self.validity_timeout = soft_signal_rw(float, 5.0, name="validity_timeout")
 
         self.set_readable_signals(
             read=[
@@ -134,21 +138,6 @@ class PinTipDetection(StandardReadable):
             )
         )
         return location
-
-    async def connect(self, mock: bool = False, timeout: float = DEFAULT_TIMEOUT):
-        await super().connect(mock, timeout)
-
-        # Set defaults for soft parameters
-        await self.validity_timeout.set(5.0)
-        await self.canny_upper_threshold.set(100)
-        await self.canny_lower_threshold.set(50)
-        await self.close_iterations.set(5)
-        await self.close_ksize.set(5)
-        await self.scan_direction.set(ScanDirections.FORWARD.value)
-        await self.min_tip_height.set(5)
-        await self.preprocess_operation.set(10)  # Identity function
-        await self.preprocess_iterations.set(5)
-        await self.preprocess_ksize.set(5)
 
     @AsyncStatus.wrap
     async def trigger(self):
