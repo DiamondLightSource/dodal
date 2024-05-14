@@ -30,6 +30,7 @@ from dodal.devices.undulator import Undulator
 from dodal.devices.undulator_dcm import UndulatorDCM
 from dodal.devices.webcam import Webcam
 from dodal.devices.xbpm_feedback import XBPMFeedback
+from dodal.devices.xspress3.xspress3 import Xspress3
 from dodal.devices.xspress3_mini.xspress3_mini import Xspress3Mini
 from dodal.devices.zebra import Zebra
 from dodal.devices.zocalo import ZocaloResults
@@ -353,6 +354,21 @@ def xspress3mini(
     """
     return device_instantiation(
         Xspress3Mini,
+        "xspress3mini",
+        "-EA-XSP3-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+def xspress3(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Xspress3:
+    """Get the i03 Xspress3Mini device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        Xspress3,
         "xspress3mini",
         "-EA-XSP3-01:",
         wait_for_connection,
