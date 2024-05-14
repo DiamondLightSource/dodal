@@ -4,7 +4,6 @@ import time
 import numpy as np
 from numpy.typing import NDArray
 from ophyd_async.core import (
-    DEFAULT_TIMEOUT,
     AsyncStatus,
     StandardReadable,
     observe_value,
