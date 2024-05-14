@@ -11,9 +11,9 @@ from dodal.log import LOGGER
 class Webcam(StandardReadable, Triggerable):
     def __init__(self, name, prefix, url):
         self.url = url
-        self.filename = soft_signal_rw(str, "filename", "webcam")
-        self.directory = soft_signal_rw(str, "directory", "webcam")
-        self.last_saved_path = soft_signal_rw(str, "last_saved_path", "webcam")
+        self.filename = soft_signal_rw(str, name="filename")
+        self.directory = soft_signal_rw(str, name="directory")
+        self.last_saved_path = soft_signal_rw(str, name="last_saved_path")
 
         self.set_readable_signals([self.last_saved_path])
         super().__init__(name=name)

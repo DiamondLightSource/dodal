@@ -63,18 +63,16 @@ class PinTipDetection(StandardReadable):
         self.array_data = epics_signal_r(NDArray[np.uint8], f"pva://{prefix}PVA:ARRAY")
 
         # Soft parameters for pin-tip detection.
-        self.preprocess_operation = soft_signal_rw(int, "preprocess", self.name)
-        self.preprocess_ksize = soft_signal_rw(int, "preprocess_ksize", self.name)
-        self.preprocess_iterations = soft_signal_rw(
-            int, "preprocess_iterations", self.name
-        )
-        self.canny_upper_threshold = soft_signal_rw(int, "canny_upper", self.name)
-        self.canny_lower_threshold = soft_signal_rw(int, "canny_lower", self.name)
-        self.close_ksize = soft_signal_rw(int, "close_ksize", self.name)
-        self.close_iterations = soft_signal_rw(int, "close_iterations", self.name)
-        self.scan_direction = soft_signal_rw(int, "scan_direction", self.name)
-        self.min_tip_height = soft_signal_rw(int, "min_tip_height", self.name)
-        self.validity_timeout = soft_signal_rw(float, "validity_timeout", self.name)
+        self.preprocess_operation = soft_signal_rw(int, name="preprocess")
+        self.preprocess_ksize = soft_signal_rw(int, name="preprocess_ksize")
+        self.preprocess_iterations = soft_signal_rw(int, name="preprocess_iterations")
+        self.canny_upper_threshold = soft_signal_rw(int, name="canny_upper")
+        self.canny_lower_threshold = soft_signal_rw(int, name="canny_lower")
+        self.close_ksize = soft_signal_rw(int, name="close_ksize")
+        self.close_iterations = soft_signal_rw(int, name="close_iterations")
+        self.scan_direction = soft_signal_rw(int, name="scan_direction")
+        self.min_tip_height = soft_signal_rw(int, name="min_tip_height")
+        self.validity_timeout = soft_signal_rw(float, name="validity_timeout")
 
         self.set_readable_signals(
             read=[
