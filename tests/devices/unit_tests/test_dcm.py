@@ -8,7 +8,7 @@ from dodal.devices.dcm import DCM
 
 @pytest.fixture
 async def dcm() -> DCM:
-    async with DeviceCollector(sim=True):
+    async with DeviceCollector(mock=True):
         dcm = DCM("DCM-01", name="dcm")
     return dcm
 

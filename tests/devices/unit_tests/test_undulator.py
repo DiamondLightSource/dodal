@@ -8,7 +8,7 @@ from dodal.devices.undulator import Undulator
 
 @pytest.fixture
 async def undulator() -> Undulator:
-    async with DeviceCollector(sim=True):
+    async with DeviceCollector(mock=True):
         undulator = Undulator("UND-01", name="undulator")
     return undulator
 
