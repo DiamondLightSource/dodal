@@ -75,27 +75,32 @@ class Xspress3(Device):
      discriminator to provide better energy resolution in X-ray detection experiments.
     """
 
-    def __init__(self, prefix: str, name: str = "", num: int = 1, timeout=1) -> None:
+    def __init__(
+        self, prefix: str, name: str = "", num_channels: int = 1, timeout=1
+    ) -> None:
         self.channels = DeviceVector(
-            {i: Xspress3Channel(f"{prefix}C{i}_") for i in range(1, num + 1)}
+            {i: Xspress3Channel(f"{prefix}C{i}_") for i in range(1, num_channels + 1)}
         )
         """MCA on/off switch readback"""
         self.get_roi_calc_status = DeviceVector(
             {
                 i: epics_signal_rw(float, f"{prefix}MCA{i}:Enable_RBV")
-                for i in range(1, num + 1)
+                for i in range(1, num_channels + 1)
             }
         )
         """start and size of the MCA array"""
         self.roi_mca = DeviceVector(
-            {i: Xspress3ROIChannel(f"{prefix}ROISUM{i}:") for i in range(1, num + 1)}
+            {
+                i: Xspress3ROIChannel(f"{prefix}ROISUM{i}:")
+                for i in range(1, num_channels + 1)
+            }
         )
 
         """signal for the correct MCA spectrum (1d array)"""
         self.dt_corrected_latest_mca = DeviceVector(
             {
                 i: epics_signal_r(NDArray[float64], f"{prefix}ARR{i}:ArrayData")
-                for i in range(1, num + 1)
+                for i in range(1, num_channels + 1)
             }
         )
 
@@ -107,7 +112,6 @@ class Xspress3(Device):
         # acquire and acquire readback has a diffenert enum
         self.acquire = epics_signal_rw(AcquireState, prefix + "Acquire")
         self.acquire_rbv = epics_signal_r(AcquireRBVState, prefix + "Acquire_RBV")
-
         self.trigger_mode = epics_signal_rw_rbv(TriggerMode, prefix + "TriggerMode")
 
         self.detector_state = epics_signal_r(

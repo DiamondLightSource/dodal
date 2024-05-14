@@ -30,13 +30,14 @@ def express3(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> Xspress3:
     """
-    8 channels Xspress3 detector
+    16 channels Xspress3 detector
     """
 
     return device_instantiation(
         Xspress3,
         prefix="-EA-DET-03:",
         name="Xspress3",
+        num_channels=16,
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )
