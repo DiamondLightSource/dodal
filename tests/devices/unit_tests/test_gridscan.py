@@ -76,9 +76,8 @@ def test_waits_for_running_motion(
 
 
 def run_test_on_complete_watcher(
-    fast_grid_scan: FastGridScan, num_pos_1d, put_value, expected_frac
+    RE: RunEngine, fast_grid_scan: FastGridScan, num_pos_1d, put_value, expected_frac
 ):
-    RE = RunEngine()
     RE(
         set_fast_grid_scan_params(
             fast_grid_scan,
@@ -105,15 +104,17 @@ def run_test_on_complete_watcher(
     return complete_status
 
 
-def test_when_new_image_then_complete_watcher_notified(fast_grid_scan: FastGridScan):
-    status = run_test_on_complete_watcher(fast_grid_scan, 2, 1, 3 / 4)
+def test_when_new_image_then_complete_watcher_notified(
+    fast_grid_scan: FastGridScan, RE: RunEngine
+):
+    status = run_test_on_complete_watcher(RE, fast_grid_scan, 2, 1, 3 / 4)
     discard_status(status)
 
 
 def test_given_0_expected_images_then_complete_watcher_correct(
-    fast_grid_scan: FastGridScan,
+    fast_grid_scan: FastGridScan, RE: RunEngine
 ):
-    status = run_test_on_complete_watcher(fast_grid_scan, 0, 1, 0)
+    status = run_test_on_complete_watcher(RE, fast_grid_scan, 0, 1, 0)
     discard_status(status)
 
 
@@ -136,17 +137,16 @@ def test_given_different_step_numbers_then_expected_images_correct(
 
 
 def test_given_invalid_image_number_then_complete_watcher_correct(
-    fast_grid_scan: FastGridScan,
+    fast_grid_scan: FastGridScan, RE: RunEngine
 ):
-    complete_status = run_test_on_complete_watcher(fast_grid_scan, 1, "BAD", None)
+    complete_status = run_test_on_complete_watcher(RE, fast_grid_scan, 1, "BAD", None)
     assert complete_status.exception()
 
 
 def test_running_finished_with_all_images_done_then_complete_status_finishes_not_in_error(
-    fast_grid_scan: FastGridScan,
+    fast_grid_scan: FastGridScan, RE: RunEngine
 ):
     num_pos_1d = 2
-    RE = RunEngine()
     RE(
         set_fast_grid_scan_params(
             fast_grid_scan,
@@ -370,7 +370,7 @@ def test_given_various_x_y_z_when_get_motor_positions_then_expected_positions_re
     )
 
 
-def test_can_run_fast_grid_scan_in_run_engine(fast_grid_scan):
+def test_can_run_fast_grid_scan_in_run_engine(fast_grid_scan, RE: RunEngine):
     @bpp.run_decorator()
     def kickoff_and_complete(device):
         yield from bps.kickoff(device, group="kickoff")
@@ -381,7 +381,6 @@ def test_can_run_fast_grid_scan_in_run_engine(fast_grid_scan):
         device.status.sim_put(0)
         yield from bps.wait("complete")
 
-    RE = RunEngine()
     RE(kickoff_and_complete(fast_grid_scan))
     assert RE.state == "idle"
 

@@ -4,6 +4,7 @@ from unittest.mock import MagicMock, call, patch
 
 import pytest
 from graypy import GELFTCPHandler
+from ophyd import log as ophyd_log
 
 from dodal import log
 from dodal.log import (
@@ -68,7 +69,9 @@ def test_prod_mode_sets_correct_graypy_handler(
 ):
     mock_GELFTCPHandler.return_value.level = logging.INFO
     set_up_all_logging_handlers(mock_logger, Path("tmp/dev"), "dodal.log", False, 10000)
-    mock_GELFTCPHandler.assert_called_once_with("graylog2.diamond.ac.uk", 12218)
+    mock_GELFTCPHandler.assert_called_once_with(
+        "graylog-log-target.diamond.ac.uk", 12231
+    )
 
 
 @patch("dodal.log.GELFTCPHandler", autospec=True)
@@ -84,10 +87,10 @@ def test_no_env_variable_sets_correct_file_handler(
     mock_file_handler.return_value.level = logging.INFO
     mock_GELFTCPHandler.return_value.level = logging.INFO
     clear_all_loggers_and_handlers()
-    handlers = set_up_all_logging_handlers(
+    _ = set_up_all_logging_handlers(
         LOGGER, get_logging_file_path(), "dodal.log", True, ERROR_LOG_BUFFER_LINES
     )
-    integrate_bluesky_and_ophyd_logging(LOGGER, handlers)
+    integrate_bluesky_and_ophyd_logging(LOGGER)
 
     expected_calls = [
         call(filename=PosixPath("tmp/dev/dodal.log"), when="MIDNIGHT", backupCount=30),
@@ -119,7 +122,9 @@ def test_messages_logged_from_dodal_get_sent_to_graylog_and_file(
     LOGGER.info("test")
     mock_GELFTCPHandler = handlers["graylog_handler"]
     assert mock_GELFTCPHandler is not None
-    mock_graylog_handler_class.assert_called_once_with("graylog2.diamond.ac.uk", 12218)
+    mock_graylog_handler_class.assert_called_once_with(
+        "graylog-log-target.diamond.ac.uk", 12231
+    )
     mock_GELFTCPHandler.handle.assert_called()
     mock_filehandler_emit.assert_called()
 
@@ -129,6 +134,10 @@ def test_various_messages_to_graylog_get_beamline_filter(
     mock_filehandler_emit: MagicMock,
 ):
     from os import environ
+
+    from bluesky.run_engine import RunEngine
+
+    RE = RunEngine()
 
     if environ.get("BEAMLINE"):
         del environ["BEAMLINE"]
@@ -146,7 +155,7 @@ def test_various_messages_to_graylog_get_beamline_filter(
         handlers = set_up_all_logging_handlers(
             LOGGER, Path("tmp/dev"), "dodal.log", True, 10000
         )
-        integrate_bluesky_and_ophyd_logging(LOGGER, handlers)
+        integrate_bluesky_and_ophyd_logging(LOGGER)
 
     mock_GELFTCPHandler: GELFTCPHandler = handlers["graylog_handler"]
     assert mock_GELFTCPHandler is not None
@@ -157,19 +166,11 @@ def test_various_messages_to_graylog_get_beamline_filter(
     mock_GELFTCPHandler.emit.assert_called()
     assert mock_GELFTCPHandler.emit.call_args.args[0].beamline == "dev"
 
-    from dodal.beamlines import i03
-
-    _aperture_scatterguard = i03.aperture_scatterguard(
-        fake_with_ophyd_sim=True, wait_for_connection=True
-    )
+    ophyd_log.logger.info("Ophyd log message")
     assert mock_GELFTCPHandler.emit.call_args.args[0].name == "ophyd"
     assert mock_GELFTCPHandler.emit.call_args.args[0].beamline == "dev"
 
-    from bluesky.run_engine import RunEngine
-
-    RE = RunEngine()
     RE.log.logger.info("RunEngine log message")
-
     assert mock_GELFTCPHandler.emit.call_args.args[0].name == "bluesky"
     assert mock_GELFTCPHandler.emit.call_args.args[0].beamline == "dev"
 

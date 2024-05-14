@@ -124,7 +124,7 @@ class EigerDetector(Device):
                 # In free run mode we have to manually stop odin
                 self.stop_odin_when_all_frames_collected()
 
-            self.odin.file_writer.start_timeout.put(1)
+            self.odin.file_writer.start_timeout.set(1).wait(self.GENERAL_STATUS_TIMEOUT)
             LOGGER.info("Waiting on filewriter to finish")
             self.filewriters_finished.wait(30)
 
@@ -140,7 +140,7 @@ class EigerDetector(Device):
         LOGGER.info("Eiger stop() called - cleaning up...")
         self.wait_on_arming_if_started()
         stop_status = self.odin.stop()
-        self.odin.file_writer.start_timeout.put(1)
+        self.odin.file_writer.start_timeout.set(1).wait(self.GENERAL_STATUS_TIMEOUT)
         self.disarm_detector()
         stop_status &= self.disable_roi_mode()
         stop_status.wait(self.GENERAL_STATUS_TIMEOUT)
@@ -294,6 +294,8 @@ class EigerDetector(Device):
 
     def _wait_for_odin_status(self) -> Status:
         self.forward_bit_depth_to_filewriter()
+        await_value(self.odin.meta.active, 1).wait(self.GENERAL_STATUS_TIMEOUT)
+
         status = self.odin.file_writer.capture.set(
             1, timeout=self.GENERAL_STATUS_TIMEOUT
         )
@@ -314,10 +316,12 @@ class EigerDetector(Device):
 
     def forward_bit_depth_to_filewriter(self):
         bit_depth = self.bit_depth.get()
-        self.odin.file_writer.data_type.put(f"UInt{bit_depth}")
+        self.odin.file_writer.data_type.set(f"UInt{bit_depth}").wait(
+            self.GENERAL_STATUS_TIMEOUT
+        )
 
     def disarm_detector(self):
-        self.cam.acquire.put(0)
+        self.cam.acquire.set(0).wait(self.GENERAL_STATUS_TIMEOUT)
 
     def do_arming_chain(self) -> Status:
         functions_to_do_arm = []

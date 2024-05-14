@@ -1,21 +1,20 @@
 import inspect
-import tempfile
 from typing import Callable, Dict, Final, List, Optional, TypeVar, cast
 
 from bluesky.run_engine import call_in_bluesky_event_loop
 from ophyd import Device as OphydV1Device
 from ophyd.sim import make_fake_device
 from ophyd_async.core import Device as OphydV2Device
-from ophyd_async.core import DirectoryProvider, StaticDirectoryProvider
 from ophyd_async.core import wait_for_connection as v2_device_wait_for_connection
 
+from dodal.common.types import UpdatingDirectoryProvider
 from dodal.utils import AnyDevice, BeamlinePrefix, skip_device
 
 DEFAULT_CONNECTION_TIMEOUT: Final[float] = 5.0
 
 ACTIVE_DEVICES: Dict[str, AnyDevice] = {}
 BL = ""
-DIRECTORY_PROVIDER: DirectoryProvider | None = None
+DIRECTORY_PROVIDER: UpdatingDirectoryProvider | None = None
 
 
 def set_beamline(beamline: str):
@@ -126,15 +125,15 @@ def device_instantiation(
     return device_instance
 
 
-def set_directory_provider(provider: DirectoryProvider):
+def set_directory_provider(provider: UpdatingDirectoryProvider):
     global DIRECTORY_PROVIDER
 
     DIRECTORY_PROVIDER = provider
 
 
-def get_directory_provider() -> DirectoryProvider:
+def get_directory_provider() -> UpdatingDirectoryProvider:
     if DIRECTORY_PROVIDER is None:
-        set_directory_provider(
-            StaticDirectoryProvider(tempfile.NamedTemporaryFile().name, "")
+        raise ValueError(
+            "DirectoryProvider has not been set! Ophyd-async StandardDetectors will not be able to write!"
         )
     return DIRECTORY_PROVIDER

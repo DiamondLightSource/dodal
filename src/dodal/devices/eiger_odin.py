@@ -2,6 +2,7 @@ from typing import List, Tuple
 
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO, EpicsSignalWithRBV
 from ophyd.areadetector.plugins import HDF5Plugin_V22
+from ophyd.sim import NullStatus
 from ophyd.status import Status, SubscriptionStatus
 
 from dodal.devices.status import await_value
@@ -26,6 +27,7 @@ class OdinMetaListener(Device):
     # file_name should not be set. Set the filewriter file_name and this will be updated in EPICS
     file_name = Component(EpicsSignalRO, "FileName", string=True)
     stop_writing = Component(EpicsSignal, "Stop")
+    active = Component(EpicsSignalRO, "AcquisitionActive_RBV")
 
 
 class OdinFileWriter(HDF5Plugin_V22):
@@ -102,11 +104,13 @@ class OdinNodesStatus(Device):
         return all(is_initialised)
 
     def clear_odin_errors(self):
+        clearing_status = NullStatus()
         for node_number, node_pv in enumerate(self.nodes):
             error_message = node_pv.error_message.get()
             if len(error_message) != 0:
                 self.log.info(f"Clearing odin errors from node {node_number}")
-                node_pv.clear_errors.put(1)
+                clearing_status &= node_pv.clear_errors.set(1)
+        clearing_status.wait(10)
 
 
 class EigerOdin(Device):

@@ -1,17 +1,22 @@
-from ophyd_async.panda import PandA
+from ophyd_async.panda import HDFPanda
 
-from dodal.beamlines.beamline_utils import device_instantiation
+from dodal.beamlines.beamline_utils import (
+    device_instantiation,
+    get_directory_provider,
+    set_directory_provider,
+)
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.udc_directory_provider import PandASubdirectoryProvider
 from dodal.devices.aperturescatterguard import AperturePositions, ApertureScatterguard
 from dodal.devices.attenuator import Attenuator
 from dodal.devices.backlight import Backlight
-from dodal.devices.DCM import DCM
+from dodal.devices.dcm import DCM
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import FastGridScan
 from dodal.devices.flux import Flux
-from dodal.devices.focusing_mirror import FocusingMirror, VFMMirrorVoltages
+from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, VFMMirrorVoltages
 from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.panda_fast_grid_scan import PandAFastGridScan
@@ -23,6 +28,7 @@ from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import Undulator
 from dodal.devices.undulator_dcm import UndulatorDCM
+from dodal.devices.webcam import Webcam
 from dodal.devices.xbpm_feedback import XBPMFeedback
 from dodal.devices.xspress3_mini.xspress3_mini import Xspress3Mini
 from dodal.devices.zebra import Zebra
@@ -40,6 +46,8 @@ BL = get_beamline_name("s03")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
+set_directory_provider(PandASubdirectoryProvider())
+
 
 def dcm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> DCM:
     """Get the i03 DCM device, instantiate it if it hasn't already been.
@@ -48,10 +56,9 @@ def dcm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
     return device_instantiation(
         DCM,
         "dcm",
-        "",
+        "-MO-DCM-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        daq_configuration_path=DAQ_CONFIGURATION_PATH,
     )
 
 
@@ -69,17 +76,18 @@ def qbpm1(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -
 @skip_device(lambda: BL == "s03")
 def vfm(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> FocusingMirror:
-    mirror = device_instantiation(
-        device_factory=FocusingMirror,
+) -> FocusingMirrorWithStripes:
+    return device_instantiation(
+        device_factory=FocusingMirrorWithStripes,
         name="vfm",
         prefix="-OP-VFM-01:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
         bragg_to_lat_lut_path=DAQ_CONFIGURATION_PATH
         + "/lookup/BeamLineEnergy_DCM_VFM_x_converter.txt",
+        x_suffix="LAT",
+        y_suffix="VERT",
     )
-    return mirror
 
 
 @skip_device(lambda: BL == "s03")
@@ -208,7 +216,11 @@ def panda_fast_grid_scan(
 
 
 @skip_device(lambda: BL == "s03")
-def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> OAV:
+def oav(
+    wait_for_connection: bool = True,
+    fake_with_ophyd_sim: bool = False,
+    params: OAVConfigParams | None = None,
+) -> OAV:
     """Get the i03 OAV device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
@@ -218,7 +230,7 @@ def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
         "",
         wait_for_connection,
         fake_with_ophyd_sim,
-        params=OAVConfigParams(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+        params=params or OAVConfigParams(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
     )
 
 
@@ -315,6 +327,8 @@ def undulator_dcm(
         fake=fake_with_ophyd_sim,
         undulator=undulator(wait_for_connection, fake_with_ophyd_sim),
         dcm=dcm(wait_for_connection, fake_with_ophyd_sim),
+        daq_configuration_path=DAQ_CONFIGURATION_PATH,
+        id_gap_lookup_table_path="/dls_sw/i03/software/daq_configuration/lookup/BeamLine_Undulator_toGap.txt",
     )
 
 
@@ -361,16 +375,19 @@ def attenuator(
     )
 
 
-def panda(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> PandA:
+def panda(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> HDFPanda:
     """Get the i03 panda device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return device_instantiation(
-        PandA,
+        HDFPanda,
         "panda",
-        "-EA-PANDA-01",
+        "-EA-PANDA-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        directory_provider=get_directory_provider(),
     )
 
 
@@ -446,4 +463,20 @@ def robot(
         "-MO-ROBOT-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+    )
+
+
+def webcam(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Webcam:
+    """Get the i03 webcam, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        Webcam,
+        "webcam",
+        "",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        url="http://i03-webcam1/axis-cgi/jpg/image.cgi",
     )

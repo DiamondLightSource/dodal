@@ -48,7 +48,7 @@ class PandAGridScanParams(GridScanParamsCommon):
     at x_start, y1_start, z1_start and subsequent frames are N*step_size away.
     """
 
-    run_up_distance_mm: float = 0.15
+    run_up_distance_mm: float = 0.17
 
 
 class PandAFastGridScan(Device):

@@ -49,4 +49,4 @@ If you would like to only log to graylog/file exlusively there are helper functi
 
 .. _ophyd: https://nsls-ii.github.io/ophyd/
 .. _bluesky: https://blueskyproject.io/bluesky/
-.. _graylog: https://graylog2.diamond.ac.uk/search
+.. _graylog: https://graylog-log-target.diamond.ac.uk/search

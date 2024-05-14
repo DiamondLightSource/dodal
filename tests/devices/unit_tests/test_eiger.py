@@ -402,6 +402,7 @@ def test_when_stage_called_then_odin_started_after_stale_params_goes_low(
 
     fake_eiger.stale_params.sim_put(1)  # type: ignore
     fake_eiger.odin.file_writer.capture.sim_put(0)  # type: ignore
+    fake_eiger.odin.meta.active.sim_put(1)  # type: ignore
 
     unwrapped_funcs = [
         lambda: await_value(fake_eiger.stale_params, 0, 60),
@@ -430,6 +431,7 @@ def test_when_stage_called_then_cam_acquired_on_meta_ready(
 
     fake_eiger.odin.file_writer.capture.sim_put(0)  # type: ignore
     fake_eiger.stale_params.sim_put(0)  # type: ignore
+    fake_eiger.odin.meta.active.sim_put(1)  # type: ignore
 
     unwrapped_funcs = [
         fake_eiger._wait_for_odin_status,
@@ -686,4 +688,4 @@ def test_stop_eiger_waits_for_status_functions_to_complete(
     mock_wait: MagicMock, fake_eiger: EigerDetector
 ):
     fake_eiger.stop()
-    mock_wait.assert_called_once()
+    mock_wait.assert_called()

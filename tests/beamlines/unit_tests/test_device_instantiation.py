@@ -5,7 +5,7 @@ import pytest
 from dodal.beamlines import beamline_utils
 from dodal.utils import BLUESKY_PROTOCOLS, make_all_devices
 
-ALL_BEAMLINES = {"i03", "i04", "i04_1", "i23", "i24", "p38", "i22", "p45"}
+ALL_BEAMLINES = {"i03", "i04", "i04_1", "i20_1", "i22", "i23", "i24", "p38", "p45"}
 
 
 def follows_bluesky_protocols(obj: Any) -> bool:
@@ -22,7 +22,10 @@ def test_device_creation(RE, module_and_devices_for_beamline):
     """
     module, devices = module_and_devices_for_beamline
     for device_name, device in devices.items():
-        assert device_name in beamline_utils.ACTIVE_DEVICES
+        assert device_name in beamline_utils.ACTIVE_DEVICES, (
+            f"No device named {device_name} was created, devices "
+            f"are {beamline_utils.ACTIVE_DEVICES.keys()}"
+        )
         assert follows_bluesky_protocols(device)
     assert len(beamline_utils.ACTIVE_DEVICES) == len(devices)
 
