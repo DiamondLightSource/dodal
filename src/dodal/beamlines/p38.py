@@ -11,6 +11,7 @@ from dodal.common.beamlines.beamline_utils import (
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import numbered_slits
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitDirectoryProvider
+from dodal.devices.dcm import DCM, DCMCrystal
 from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.slits import Slits
 from dodal.devices.tetramm import TetrammDetector
@@ -101,6 +102,25 @@ def i0(
 # but having mock devices here means they will be reflected in downstream data
 # processing, where they may be required.
 #
+
+
+def dcm(
+    wait_for_connection: bool = True,
+    fake_with_ophyd_sim: bool = True,
+) -> FocusingMirror:
+    return device_instantiation(
+        DCM,
+        "dcm",
+        "-MO-DCM-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        crystal=DCMCrystal(
+            usage="Bragg",
+            type="Silicon",
+            reflection=(1, 1, 1),
+            d_spacing=3.13475,
+        ),
+    )
 
 
 def slits_1(
