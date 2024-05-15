@@ -40,6 +40,7 @@ class UpdateRBV(str, Enum):
     ENABLED = "Enabled"
 
 
+'''
 class EraseState(str, Enum):
     """
     Epic does not actually have a str value so the only way to set it is
@@ -48,6 +49,8 @@ class EraseState(str, Enum):
 
     DONE = ""
     ERASE = ""
+
+'''
 
 
 class AcquireRBVState(str, Enum):
@@ -107,7 +110,7 @@ class Xspress3(Device):
         """Shared controls for triggering detection"""
         self.timeout = timeout
         self.acquire_time = epics_signal_rw(float, prefix + "AcquireTime")
-        self.erase = epics_signal_rw(EraseState, prefix + "ERASE")
+        self.erase = epics_signal_rw(int, prefix + "ERASE")
         self.max_num_channels = epics_signal_r(int, prefix + "MAX_NUM_CHANNELS_RBV")
         # acquire and acquire readback has a different enum
         self.acquire = epics_signal_rw(AcquireState, prefix + "Acquire")
@@ -134,7 +137,7 @@ class Xspress3(Device):
             lambda v: v in self.detector_busy_states,
             timeout=self.timeout,
         )
-        await self.erase.set(1)  # type: ignore
+        await self.erase.set(1)
         await set_and_wait_for_value(
             self.acquire, AcquireState.ACQUIRE, timeout=self.timeout
         )

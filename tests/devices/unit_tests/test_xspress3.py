@@ -30,7 +30,7 @@ async def mock_xspress3mini(prefix: str = "BLXX-EA-DET-007:") -> Xspress3:
     return mock_xspress3mini
 
 
-async def test_arm_success_on_busy_state_OA(mock_xspress3mini: Xspress3):
+async def test_arm_success_on_busy_state(mock_xspress3mini: Xspress3):
     set_mock_value(mock_xspress3mini.detector_state, DetectorState.ACQUIRE)
     status = await mock_xspress3mini.stage()
     assert status.done is False
