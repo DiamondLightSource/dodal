@@ -384,6 +384,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/release-004-retroactive/"
   },
   {
+    "version": "remove_extra_logging_test",
+    "url": "https://DiamondLightSource.github.io/dodal/remove_extra_logging_test/"
+  },
+  {
     "version": "remove_ophyd_dependency_pin",
     "url": "https://DiamondLightSource.github.io/dodal/remove_ophyd_dependency_pin/"
   },
