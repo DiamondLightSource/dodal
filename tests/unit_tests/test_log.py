@@ -7,6 +7,7 @@ from bluesky.log import logger as bluesky_logger
 from graypy import GELFTCPHandler
 from ophyd import log as ophyd_log
 from ophyd.log import logger as ophyd_logger
+from ophyd_async.core import soft_signal_rw
 from ophyd_async.log import logger as ophyd_async_logger
 
 from dodal import log
@@ -215,10 +216,18 @@ def test_when_circular_memory_handler_closed_then_clears_buffer_and_target():
     assert circular_handler.target is None
 
 
-def test_dodal_logger_correct_children():
+def test_intgrate_loggers_gives_correct_children():
     loggers = [ophyd_logger, ophyd_async_logger, bluesky_logger]
     for logger in loggers:
         assert not logger.parent == LOGGER
     integrate_bluesky_and_ophyd_logging(LOGGER)
     for logger in loggers:
         assert logger.parent == LOGGER
+
+
+async def test_ophyd_async_logger_integrated(caplog):
+    integrate_bluesky_and_ophyd_logging(LOGGER)
+    test_signal = soft_signal_rw(int, 0, "test_signal")
+    await test_signal.connect()
+    print("test")
+    assert "Connecting to soft://test_signal" in caplog.text
