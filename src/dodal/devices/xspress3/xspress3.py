@@ -104,12 +104,12 @@ class Xspress3(Device):
             }
         )
 
-        """Shared controls for tiggering detection"""
+        """Shared controls for triggering detection"""
         self.timeout = timeout
         self.acquire_time = epics_signal_rw(float, prefix + "AcquireTime")
         self.erase = epics_signal_rw(EraseState, prefix + "ERASE")
         self.max_num_channels = epics_signal_r(int, prefix + "MAX_NUM_CHANNELS_RBV")
-        # acquire and acquire readback has a diffenert enum
+        # acquire and acquire readback has a different enum
         self.acquire = epics_signal_rw(AcquireState, prefix + "Acquire")
         self.acquire_rbv = epics_signal_r(AcquireRBVState, prefix + "Acquire_RBV")
         self.trigger_mode = epics_signal_rw_rbv(TriggerMode, prefix + "TriggerMode")
