@@ -1,6 +1,9 @@
+import os
+import sys
+
 import click
 
-from dodal.beamlines import ALL_BEAMLINES
+from dodal.beamlines import all_beamline_names, module_name_for_beamline
 from dodal.utils import make_all_devices
 
 from . import __version__
@@ -15,7 +18,11 @@ def main(ctx: click.Context) -> None:
 
 
 @main.command(name="connect")
-@click.argument("beamline", type=click.Choice(list(ALL_BEAMLINES)), required=True)
+@click.argument(
+    "beamline",
+    type=click.Choice(list(all_beamline_names())),
+    required=True,
+)
 @click.option(
     "-a",
     "--all",
@@ -31,16 +38,18 @@ def main(ctx: click.Context) -> None:
     "attempt any I/O. Useful as a a dry-run.",
     default=False,
 )
-def connect(beamline: str, all: bool, sim_backend: bool) -> None:
+def connect(beamline: str | None, all: bool, sim_backend: bool) -> None:
     """Initialises a beamline module, connects to all devices, reports
-    any connection issues"""
+    any connection issues."""
+
+    module_name = module_name_for_beamline(beamline)
 
     from bluesky import RunEngine
 
     RE = RunEngine()  # noqa: F841
 
     devices = make_all_devices(
-        f"dodal.beamlines.{beamline}",
+        f"dodal.beamlines.{module_name}",
         include_skipped=all,
         fake_with_ophyd_sim=sim_backend,
     )

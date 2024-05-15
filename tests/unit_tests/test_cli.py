@@ -4,7 +4,7 @@ import pytest
 from click.testing import CliRunner
 
 from dodal import __version__
-from dodal.beamlines import ALL_BEAMLINES
+from dodal.beamlines import all_beamline_names
 from dodal.cli import main
 
 
@@ -24,7 +24,7 @@ def test_cli_version(runner: CliRunner):
 
 
 def test_cli_connect(runner: CliRunner):
-    beamline = next(iter(ALL_BEAMLINES))  # Test with an example beamline,
+    beamline = next(iter(all_beamline_names()))  # Test with an example beamline,
     # device instantiation is already tested in beamline unit tests
 
     with patch(
@@ -40,7 +40,7 @@ def test_cli_connect(runner: CliRunner):
 
 
 def test_cli_connect_in_sim_mode(runner: CliRunner):
-    beamline = next(iter(ALL_BEAMLINES))  # Test with an example beamline,
+    beamline = next(iter(all_beamline_names()))  # Test with an example beamline,
     # device instantiation is already tested in beamline unit tests
 
     with patch(
