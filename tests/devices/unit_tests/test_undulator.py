@@ -79,7 +79,7 @@ async def test_configuration_includes_configuration_fields(undulator: Undulator)
 
 
 async def test_poles_not_propagated_if_not_supplied():
-    async with DeviceCollector(sim=True):
+    async with DeviceCollector(mock=True):
         undulator = Undulator(
             "UND-01",
             name="undulator",
@@ -90,7 +90,7 @@ async def test_poles_not_propagated_if_not_supplied():
 
 
 async def test_length_not_propagated_if_not_supplied():
-    async with DeviceCollector(sim=True):
+    async with DeviceCollector(mock=True):
         undulator = Undulator(
             "UND-01",
             name="undulator",
