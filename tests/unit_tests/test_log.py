@@ -29,6 +29,13 @@ def mock_logger():
         yield mock_LOGGER
 
 
+@pytest.fixture()
+def dodal_logger_for_tests():
+    logger = logging.getLogger("test_dodal")
+    logger.handlers.clear()
+    return logger
+
+
 @patch("dodal.log.StreamHandler", autospec=True)
 @patch("dodal.log.GELFTCPHandler", autospec=True)
 @patch("dodal.log.TimedRotatingFileHandler", autospec=True)
@@ -216,17 +223,17 @@ def test_when_circular_memory_handler_closed_then_clears_buffer_and_target():
     assert circular_handler.target is None
 
 
-def test_intgrate_loggers_gives_correct_children():
+def test_integrateloggers_gives_correct_children(dodal_logger_for_tests):
     loggers = [ophyd_logger, ophyd_async_logger, bluesky_logger]
     for logger in loggers:
-        assert not logger.parent == LOGGER
-    integrate_bluesky_and_ophyd_logging(LOGGER)
+        assert not logger.parent == dodal_logger_for_tests
+    integrate_bluesky_and_ophyd_logging(dodal_logger_for_tests)
     for logger in loggers:
-        assert logger.parent == LOGGER
+        assert logger.parent == dodal_logger_for_tests
 
 
-async def test_ophyd_async_logger_integrated(caplog):
-    integrate_bluesky_and_ophyd_logging(LOGGER)
+async def test_ophyd_async_logger_integrated(caplog, dodal_logger_for_tests):
+    integrate_bluesky_and_ophyd_logging(dodal_logger_for_tests)
     test_signal = soft_signal_rw(int, 0, "test_signal")
     await test_signal.connect()
     print("test")
