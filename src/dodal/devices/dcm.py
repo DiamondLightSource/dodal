@@ -1,6 +1,22 @@
-from ophyd_async.core import StandardReadable
+from dataclasses import dataclass
+from typing import Literal
+
+from ophyd_async.core import ConfigSignal, StandardReadable, soft_signal_r_and_setter
 from ophyd_async.epics.motion import Motor
 from ophyd_async.epics.signal import epics_signal_r
+
+
+@dataclass
+class DCMCrystal:
+    """
+    Information about a DCM crystal, based on
+    https://manual.nexusformat.org/classes/base_classes/NXcrystal.html
+    """
+
+    usage: Literal["Bragg", "Laue"] | None = None
+    type: str | None = None
+    reflection: tuple[int, int, int] | None = None
+    d_spacing: float | None = None
 
 
 class DCM(StandardReadable):
@@ -17,6 +33,7 @@ class DCM(StandardReadable):
         self,
         prefix: str,
         name: str = "",
+        crystal: DCMCrystal | None = None,
     ) -> None:
         with self.add_children_as_readables():
             self.bragg_in_degrees = Motor(prefix + "BRAGG")
@@ -35,5 +52,34 @@ class DCM(StandardReadable):
             self.backplate_temp = epics_signal_r(float, prefix + "TEMP5")
             self.perp_temp = epics_signal_r(float, prefix + "TEMP6")
             self.perp_sub_assembly_temp = epics_signal_r(float, prefix + "TEMP7")
+
+        # If supplied include crystal details in output of read_configuration
+        crystal = crystal or DCMCrystal()
+
+        with self.add_children_as_readables(ConfigSignal):
+            if crystal.usage is not None:
+                self.crystal_usage, _ = soft_signal_r_and_setter(
+                    str, initial_value=crystal.usage
+                )
+            else:
+                self.crystal_usage = None
+            if crystal.type is not None:
+                self.crystal_type, _ = soft_signal_r_and_setter(
+                    str, initial_value=crystal.type
+                )
+            else:
+                self.crystal_type = None
+            if crystal.reflection is not None:
+                self.crystal_reflection, _ = soft_signal_r_and_setter(
+                    str, initial_value=crystal.reflection
+                )
+            else:
+                self.crystal_reflection = None
+            if crystal.d_spacing is not None:
+                self.crystal_d_spacing, _ = soft_signal_r_and_setter(
+                    str, initial_value=crystal.d_spacing
+                )
+            else:
+                self.crystal_d_spacing = None
 
         super().__init__(name)
