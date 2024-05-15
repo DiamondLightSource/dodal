@@ -7,7 +7,6 @@ from ophyd.device import Device as OphydV1Device
 from ophyd.sim import FakeEpicsSignal
 from ophyd_async.core import Device as OphydV2Device
 from ophyd_async.core import StandardReadable
-from ophyd_async.core.sim_signal_backend import SimSignalBackend
 
 from dodal.beamlines import beamline_utils, i03
 from dodal.devices.aperturescatterguard import ApertureScatterguard
@@ -65,7 +64,7 @@ def test_instantiate_v2_function_fake_makes_fake():
         i03.Zebra, "zebra", "", True, True, None
     )
     assert isinstance(fake_zeb, StandardReadable)
-    assert isinstance(fake_zeb.pc.arm.armed._backend, SimSignalBackend)
+    assert fake_zeb.pc.arm.armed.source.startswith("mock+ca")
 
 
 def test_clear_devices(RE):
@@ -116,6 +115,6 @@ def test_wait_for_v2_device_connection_passes_through_timeout(
     beamline_utils._wait_for_connection(device, **kwargs)
 
     device.connect.assert_called_once_with(
-        sim=ANY,
+        mock=ANY,
         timeout=expected_timeout,
     )
