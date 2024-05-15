@@ -4,7 +4,7 @@ from typing import Any
 from ophyd import Component, Device, EpicsSignal
 from ophyd.status import Status, StatusBase
 from ophyd_async.core import StandardReadable
-from ophyd_async.core.signal import soft_signal_r_and_backend
+from ophyd_async.core.signal import soft_signal_r_and_setter
 from ophyd_async.epics.motion import Motor
 from ophyd_async.epics.signal import (
     epics_signal_rw,
@@ -139,7 +139,7 @@ class FocusingMirror(StandardReadable):
         self.translation1_mm = Motor(prefix + "X1")
         self.translation2_mm = Motor(prefix + "X2")
 
-        self.type, _ = soft_signal_r_and_backend(MirrorType, MirrorType.SINGLE)
+        self.type, _ = soft_signal_r_and_setter(MirrorType, MirrorType.SINGLE)
         # The device is in the beamline co-ordinate system so pitch is the incident angle
         # regardless of orientation of the mirror
         self.incident_angle = Motor(prefix + "PITCH")

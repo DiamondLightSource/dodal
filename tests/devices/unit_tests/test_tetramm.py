@@ -4,7 +4,7 @@ from ophyd_async.core import (
     DetectorTrigger,
     DeviceCollector,
     DirectoryProvider,
-    set_sim_value,
+    set_mock_value,
 )
 from ophyd_async.core.detector import TriggerInfo
 from ophyd_async.epics.areadetector import FileWriteMode
@@ -21,7 +21,7 @@ TEST_TETRAMM_NAME = "foobar"
 
 @pytest.fixture
 async def tetramm_driver(RE: RunEngine) -> TetrammDriver:
-    async with DeviceCollector(sim=True):
+    async with DeviceCollector(mock=True):
         driver = TetrammDriver("DRIVER:")
 
     return driver
@@ -31,7 +31,7 @@ async def tetramm_driver(RE: RunEngine) -> TetrammDriver:
 async def tetramm_controller(
     RE: RunEngine, tetramm_driver: TetrammDriver
 ) -> TetrammController:
-    async with DeviceCollector(sim=True):
+    async with DeviceCollector(mock=True):
         controller = TetrammController(
             tetramm_driver,
             maximum_readings_per_frame=2_000,
@@ -42,7 +42,7 @@ async def tetramm_controller(
 
 @pytest.fixture
 async def tetramm(static_directory_provider: DirectoryProvider) -> TetrammDetector:
-    async with DeviceCollector(sim=True):
+    async with DeviceCollector(mock=True):
         tetramm = TetrammDetector(
             "MY-TETRAMM:",
             static_directory_provider,
@@ -243,7 +243,7 @@ async def test_prepare_arms_tetramm(
 async def test_stage_sets_up_writer(
     tetramm: TetrammDetector,
 ):
-    set_sim_value(tetramm.hdf.file_path_exists, True)
+    set_mock_value(tetramm.hdf.file_path_exists, True)
     await tetramm.stage()
 
     assert (await tetramm.hdf.num_capture.get_value()) == 0
@@ -259,12 +259,12 @@ async def test_stage_sets_up_accurate_describe_output(
 ):
     assert await tetramm.describe() == {}
 
-    set_sim_value(tetramm.hdf.file_path_exists, True)
+    set_mock_value(tetramm.hdf.file_path_exists, True)
     await tetramm.stage()
 
     assert await tetramm.describe() == {
         TEST_TETRAMM_NAME: {
-            "source": "soft://foobar-hdf-full_file_name",
+            "source": "mock+ca://MY-TETRAMM:HDF5:FullFileName_RBV",
             "shape": (11, 1000),
             "dtype": "array",
             "external": "STREAM:",

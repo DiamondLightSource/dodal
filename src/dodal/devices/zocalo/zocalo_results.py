@@ -10,11 +10,10 @@ import workflows.recipe
 import workflows.transport
 from bluesky.protocols import Descriptor, Triggerable
 from numpy.typing import NDArray
-from ophyd_async.core import StandardReadable
+from ophyd_async.core import StandardReadable, soft_signal_r_and_setter
 from ophyd_async.core.async_status import AsyncStatus
 from workflows.transport.common_transport import CommonTransport
 
-from dodal.devices.ophyd_async_utils import create_soft_signal_r
 from dodal.devices.zocalo.zocalo_interaction import _get_zocalo_connection
 from dodal.log import LOGGER
 
@@ -80,15 +79,15 @@ class ZocaloResults(StandardReadable, Triggerable):
         self._raw_results_received: Queue = Queue()
         self.transport: CommonTransport | None = None
 
-        self.results = create_soft_signal_r(list[XrcResult], "results", self.name)
-        self.centres_of_mass = create_soft_signal_r(
-            NDArray[np.uint64], "centres_of_mass", self.name
+        self.results, _ = soft_signal_r_and_setter(list[XrcResult], name="results")
+        self.centres_of_mass, _ = soft_signal_r_and_setter(
+            NDArray[np.uint64], name="centres_of_mass"
         )
-        self.bbox_sizes = create_soft_signal_r(
+        self.bbox_sizes, _ = soft_signal_r_and_setter(
             NDArray[np.uint64], "bbox_sizes", self.name
         )
-        self.ispyb_dcid = create_soft_signal_r(int, "ispyb_dcid", self.name)
-        self.ispyb_dcgid = create_soft_signal_r(int, "ispyb_dcgid", self.name)
+        self.ispyb_dcid, _ = soft_signal_r_and_setter(int, name="ispyb_dcid")
+        self.ispyb_dcgid, _ = soft_signal_r_and_setter(int, name="ispyb_dcgid")
         self.set_readable_signals(
             read=[
                 self.results,

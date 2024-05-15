@@ -3,18 +3,17 @@ from pathlib import Path
 import aiofiles
 from aiohttp import ClientSession
 from bluesky.protocols import Triggerable
-from ophyd_async.core import AsyncStatus, StandardReadable
+from ophyd_async.core import AsyncStatus, StandardReadable, soft_signal_rw
 
-from dodal.devices.ophyd_async_utils import create_soft_signal_rw
 from dodal.log import LOGGER
 
 
 class Webcam(StandardReadable, Triggerable):
     def __init__(self, name, prefix, url):
         self.url = url
-        self.filename = create_soft_signal_rw(str, "filename", "webcam")
-        self.directory = create_soft_signal_rw(str, "directory", "webcam")
-        self.last_saved_path = create_soft_signal_rw(str, "last_saved_path", "webcam")
+        self.filename = soft_signal_rw(str, name="filename")
+        self.directory = soft_signal_rw(str, name="directory")
+        self.last_saved_path = soft_signal_rw(str, name="last_saved_path")
 
         self.set_readable_signals([self.last_saved_path])
         super().__init__(name=name)

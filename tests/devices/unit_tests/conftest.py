@@ -4,7 +4,12 @@ from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
 import pytest
-from ophyd_async.core import DirectoryInfo, DirectoryProvider, StaticDirectoryProvider
+from ophyd_async.core import (
+    DirectoryInfo,
+    DirectoryProvider,
+    StaticDirectoryProvider,
+    set_mock_value,
+)
 from ophyd_async.epics.motion import Motor
 
 
@@ -13,16 +18,16 @@ async def mock_good_coroutine():
 
 
 def mock_move(motor: Motor, val, *args, **kwargs):
-    motor.user_setpoint._backend._set_value(val)  # type: ignore
-    motor.user_readback._backend._set_value(val)  # type: ignore
+    set_mock_value(motor.user_setpoint, val)
+    set_mock_value(motor.user_readback, val)
     return mock_good_coroutine()  # type: ignore
 
 
 def patch_motor(motor: Motor, initial_position=0):
-    motor.user_setpoint._backend._set_value(initial_position)  # type: ignore
-    motor.user_readback._backend._set_value(initial_position)  # type: ignore
-    motor.deadband._backend._set_value(0.001)  # type: ignore
-    motor.motor_done_move._backend._set_value(1)  # type: ignore
+    set_mock_value(motor.user_setpoint, initial_position)
+    set_mock_value(motor.user_readback, initial_position)
+    set_mock_value(motor.deadband, 0.001)
+    set_mock_value(motor.motor_done_move, 1)
     return patch.object(
         motor, "_move", AsyncMock(side_effect=partial(mock_move, motor))
     )

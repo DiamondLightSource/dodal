@@ -4,7 +4,7 @@ from typing import Any, Awaitable, Callable, Dict, List
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import DeviceCollector, StandardReadable, set_sim_value
+from ophyd_async.core import DeviceCollector, StandardReadable, set_mock_value
 
 from dodal.devices.synchrotron import (
     Synchrotron,
@@ -27,15 +27,15 @@ CONFIGS = [BEAM_ENERGY, MODE.value]
 READING_FIELDS = ["value", "alarm_severity"]
 DESCRIPTION_FIELDS = ["source", "dtype", "shape"]
 READING_ADDRESSES = [
-    "soft://synchrotron-ring_current",
-    "soft://synchrotron-machine_user_countdown",
-    "soft://synchrotron-topup_start_countdown",
-    "soft://synchrotron-top_up_end_countdown",
+    "mock+ca://SR-DI-DCCT-01:SIGNAL",
+    "mock+ca://CS-CS-MSTAT-01:USERCOUNTDN",
+    "mock+ca://SR-CS-FILL-01:COUNTDOWN",
+    "mock+ca://SR-CS-FILL-01:ENDCOUNTDN",
 ]
 
 CONFIG_ADDRESSES = [
-    "soft://synchrotron-beam_energy",
-    "soft://synchrotron-synchrotron_mode",
+    "mock+ca://CS-CS-MSTAT-01:BEAMENERGY",
+    "mock+ca://CS-CS-MSTAT-01:MODE",
 ]
 
 READ_SIGNALS = [
@@ -119,14 +119,14 @@ EXPECTED_DESCRIBE_CONFIG_RESULT = f"""{{
 
 @pytest.fixture
 async def sim_synchrotron() -> Synchrotron:
-    async with DeviceCollector(sim=True):
+    async with DeviceCollector(mock=True):
         sim_synchrotron = Synchrotron()
-    set_sim_value(sim_synchrotron.ring_current, RING_CURRENT)
-    set_sim_value(sim_synchrotron.machine_user_countdown, USER_COUNTDOWN)
-    set_sim_value(sim_synchrotron.topup_start_countdown, START_COUNTDOWN)
-    set_sim_value(sim_synchrotron.top_up_end_countdown, END_COUNTDOWN)
-    set_sim_value(sim_synchrotron.beam_energy, BEAM_ENERGY)
-    set_sim_value(sim_synchrotron.synchrotron_mode, MODE)
+    set_mock_value(sim_synchrotron.ring_current, RING_CURRENT)
+    set_mock_value(sim_synchrotron.machine_user_countdown, USER_COUNTDOWN)
+    set_mock_value(sim_synchrotron.topup_start_countdown, START_COUNTDOWN)
+    set_mock_value(sim_synchrotron.top_up_end_countdown, END_COUNTDOWN)
+    set_mock_value(sim_synchrotron.beam_energy, BEAM_ENERGY)
+    set_mock_value(sim_synchrotron.synchrotron_mode, MODE)
     return sim_synchrotron
 
 

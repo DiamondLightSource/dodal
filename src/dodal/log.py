@@ -11,6 +11,7 @@ from typing import Deque, Tuple, TypedDict
 from bluesky.log import logger as bluesky_logger
 from graypy import GELFTCPHandler
 from ophyd.log import logger as ophyd_logger
+from ophyd_async.log import logger as ophyd_async_logger
 
 LOGGER = logging.getLogger("Dodal")
 LOGGER.setLevel(logging.DEBUG)
@@ -194,7 +195,7 @@ def set_up_all_logging_handlers(
 
 
 def integrate_bluesky_and_ophyd_logging(parent_logger: logging.Logger):
-    for logger in [ophyd_logger, bluesky_logger]:
+    for logger in [ophyd_logger, bluesky_logger, ophyd_async_logger]:
         logger.parent = parent_logger
         logger.setLevel(logging.DEBUG)
 

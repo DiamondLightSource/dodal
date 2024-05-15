@@ -3,6 +3,7 @@ from unittest.mock import AsyncMock
 import pytest
 from bluesky.run_engine import RunEngine
 from mockito import mock, verify
+from ophyd_async.core import set_mock_value
 
 from dodal.devices.zebra import (
     ArmDemand,
@@ -20,7 +21,7 @@ from dodal.devices.zebra import (
 
 async def test_arming_device(RE: RunEngine):
     arming_device = ArmingDevice("", name="fake arming device")
-    await arming_device.connect(sim=True)
+    await arming_device.connect(mock=True)
     status = arming_device.set(ArmDemand.DISARM)
     await status
     assert status.success
@@ -29,12 +30,12 @@ async def test_arming_device(RE: RunEngine):
 
 async def test_position_compare_sets_signals(RE: RunEngine):
     fake_pc = PositionCompare("", name="fake position compare")
-    await fake_pc.connect(sim=True)
+    await fake_pc.connect(mock=True)
 
     async def mock_arm(demand):
-        await fake_pc.arm.armed._backend.put(demand)  # type: ignore
-        fake_pc.arm.disarm_set._backend._set_value(not demand)  # type: ignore
-        fake_pc.arm.arm_set._backend._set_value(demand)  # type: ignore
+        set_mock_value(fake_pc.arm.armed, demand)
+        set_mock_value(fake_pc.arm.disarm_set, not demand)
+        set_mock_value(fake_pc.arm.arm_set, demand)
 
     fake_pc.arm.arm_set.set = AsyncMock(side_effect=mock_arm)
     fake_pc.arm.disarm_set.set = AsyncMock(side_effect=mock_arm)
@@ -96,7 +97,7 @@ async def run_configurer_test(
     gate_type: GateType, gate_num, config, expected_pv_values
 ):
     configurer = LogicGateConfigurer(prefix="", name="test fake logicconfigurer")
-    await configurer.connect(sim=True)
+    await configurer.connect(mock=True)
 
     mock_gate_control = mock()
     mock_pvs = [mock() for i in range(6)]

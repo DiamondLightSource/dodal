@@ -2,23 +2,23 @@ from typing import Any, Mapping
 from unittest.mock import ANY
 
 import pytest
-from ophyd_async.core import DeviceCollector, StandardReadable, set_sim_value
+from ophyd_async.core import DeviceCollector, StandardReadable, set_mock_value
 
 from dodal.devices.slits import Slits
 
 
 @pytest.fixture
 async def slits() -> Slits:
-    async with DeviceCollector(sim=True):
+    async with DeviceCollector(mock=True):
         slits = Slits("DEMO-SLITS-01:")
 
     return slits
 
 
 async def test_reading_slits_reads_gaps_and_centres(slits: Slits):
-    set_sim_value(slits.x_gap.user_readback, 0.5)
-    set_sim_value(slits.y_centre.user_readback, 1.0)
-    set_sim_value(slits.y_gap.user_readback, 1.5)
+    set_mock_value(slits.x_gap.user_readback, 0.5)
+    set_mock_value(slits.y_centre.user_readback, 1.0)
+    set_mock_value(slits.y_gap.user_readback, 1.5)
 
     await assert_reading(
         slits,

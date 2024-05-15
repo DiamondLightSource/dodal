@@ -139,6 +139,6 @@ def test_mirror_populates_voltage_channels(
 
 async def test_given_striped_focussing_mirror_then_energy_to_stripe_returns_expected():
     device = FocusingMirrorWithStripes(prefix="-OP-VFM-01:", name="mirror")
-    await device.connect(sim=True)
+    await device.connect(mock=True)
     assert device.energy_to_stripe(1) == MirrorStripe.BARE
     assert device.energy_to_stripe(14) == MirrorStripe.RHODIUM
