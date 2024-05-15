@@ -7,7 +7,7 @@ from bluesky import preprocessors as bpp
 from bluesky.run_engine import RunEngine
 from ophyd.sim import make_fake_device
 from ophyd.status import DeviceStatus, Status
-from ophyd_async.core import DeviceCollector, set_sim_value
+from ophyd_async.core import DeviceCollector, set_mock_value
 
 from dodal.devices.fast_grid_scan import (
     PandAFastGridScan,
@@ -28,7 +28,7 @@ def discard_status(st: Status | DeviceStatus):
 
 @pytest.fixture
 async def zebra_fast_grid_scan(request):
-    async with DeviceCollector(sim=True):
+    async with DeviceCollector(mock=True):
         zebra_fast_grid_scan = ZebraFastGridScan(name="fake_FGS", prefix="FGS")
 
     return zebra_fast_grid_scan
@@ -36,7 +36,7 @@ async def zebra_fast_grid_scan(request):
 
 @pytest.fixture
 async def panda_fast_grid_scan(request):
-    async with DeviceCollector(sim=True):
+    async with DeviceCollector(mock=True):
         panda_fast_grid_scan = PandAFastGridScan(name="fake_FGS", prefix="FGS")
 
     return panda_fast_grid_scan
@@ -45,9 +45,9 @@ async def panda_fast_grid_scan(request):
 async def test_given_settings_valid_when_kickoff_then_run_started(
     zebra_fast_grid_scan: ZebraFastGridScan,
 ):
-    set_sim_value(zebra_fast_grid_scan.scan_invalid, False)
-    set_sim_value(zebra_fast_grid_scan.position_counter, 0)
-    set_sim_value(zebra_fast_grid_scan.status, 1)
+    set_mock_value(zebra_fast_grid_scan.scan_invalid, False)
+    set_mock_value(zebra_fast_grid_scan.position_counter, 0)
+    set_mock_value(zebra_fast_grid_scan.status, 1)
 
     await zebra_fast_grid_scan.kickoff()
 
@@ -57,7 +57,7 @@ async def test_given_settings_valid_when_kickoff_then_run_started(
 async def test_waits_for_running_motion(
     zebra_fast_grid_scan: ZebraFastGridScan,
 ):
-    set_sim_value(zebra_fast_grid_scan.motion_program.running, 1)
+    set_mock_value(zebra_fast_grid_scan.motion_program.running, 1)
 
     zebra_fast_grid_scan.KICKOFF_TIMEOUT = 0.01
 
@@ -66,8 +66,8 @@ async def test_waits_for_running_motion(
 
     zebra_fast_grid_scan.KICKOFF_TIMEOUT = 1
 
-    set_sim_value(zebra_fast_grid_scan.motion_program.running, 0)
-    set_sim_value(zebra_fast_grid_scan.status, 1)
+    set_mock_value(zebra_fast_grid_scan.motion_program.running, 0)
+    set_mock_value(zebra_fast_grid_scan.status, 1)
     await zebra_fast_grid_scan.kickoff()
     assert await zebra_fast_grid_scan.run_cmd.get_value() == 1
 
@@ -83,9 +83,9 @@ async def test_waits_for_running_motion(
 async def test_given_different_step_numbers_then_expected_images_correct(
     zebra_fast_grid_scan: ZebraFastGridScan, steps, expected_images
 ):
-    set_sim_value(zebra_fast_grid_scan.x_steps, steps[0])
-    set_sim_value(zebra_fast_grid_scan.y_steps, steps[1])
-    set_sim_value(zebra_fast_grid_scan.z_steps, steps[2])
+    set_mock_value(zebra_fast_grid_scan.x_steps, steps[0])
+    set_mock_value(zebra_fast_grid_scan.y_steps, steps[1])
+    set_mock_value(zebra_fast_grid_scan.z_steps, steps[2])
 
     assert await zebra_fast_grid_scan.expected_images.get_value() == expected_images
 
@@ -103,12 +103,12 @@ async def test_running_finished_with_all_images_done_then_complete_status_finish
         )
     )
 
-    set_sim_value(zebra_fast_grid_scan.status, 1)
+    set_mock_value(zebra_fast_grid_scan.status, 1)
 
     complete_status = zebra_fast_grid_scan.complete()
     assert not complete_status.done
-    set_sim_value(zebra_fast_grid_scan.position_counter, num_pos_1d**2)
-    set_sim_value(zebra_fast_grid_scan.status, 0)
+    set_mock_value(zebra_fast_grid_scan.position_counter, num_pos_1d**2)
+    set_mock_value(zebra_fast_grid_scan.status, 0)
 
     await wait_for(complete_status, 0.1)
 
@@ -325,11 +325,11 @@ def test_can_run_fast_grid_scan_in_run_engine(zebra_fast_grid_scan, RE: RunEngin
     @bpp.run_decorator()
     def kickoff_and_complete(device):
         yield from bps.kickoff(device, group="kickoff")
-        set_sim_value(device.status, 1)
+        set_mock_value(device.status, 1)
         yield from bps.wait("kickoff")
         yield from bps.complete(device, group="complete")
-        set_sim_value(device.position_counter, device.expected_images)
-        set_sim_value(device.status, 0)
+        set_mock_value(device.position_counter, device.expected_images)
+        set_mock_value(device.status, 0)
         yield from bps.wait("complete")
 
     RE(kickoff_and_complete(zebra_fast_grid_scan))

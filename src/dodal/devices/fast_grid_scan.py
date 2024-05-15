@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Any
+from typing import Any, Generic, TypeVar
 
 import numpy as np
 from bluesky.plan_stubs import mv
@@ -8,8 +8,8 @@ from ophyd_async.core import (
     AsyncStatus,
     Device,
     Signal,
-    SignalRW,
-    SimSignalBackend,
+    SignalR,
+    SoftSignalBackend,
     StandardReadable,
     wait_for_value,
 )
@@ -168,6 +168,9 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
         )
 
 
+ParamType = TypeVar("ParamType", bound=GridScanParamsCommon)
+
+
 class ZebraGridScanParams(GridScanParamsCommon):
     """
     Params for standard Zebra FGS. Adds on the dwell time
@@ -213,9 +216,9 @@ class MotionProgram(Device):
         self.program_number = epics_signal_r(float, prefix + "CS1:PROG_NUM")
 
 
-class ExpectedImages(SignalRW):
-    def __init__(self, parent) -> None:
-        super().__init__(SimSignalBackend(int, "sim://expected_images"))
+class ExpectedImages(SignalR[int]):
+    def __init__(self, parent: "FastGridScanCommon") -> None:
+        super().__init__(SoftSignalBackend(int))
         self.parent = parent
 
     async def get_value(self):
@@ -224,11 +227,10 @@ class ExpectedImages(SignalRW):
         z = int(await self.parent.z_steps.get_value())  # type: ignore
         first_grid = x * y
         second_grid = x * z
-        await self.set(first_grid + second_grid)
         return first_grid + second_grid
 
 
-class FastGridScanCommon(StandardReadable, ABC):
+class FastGridScanCommon(StandardReadable, ABC, Generic[ParamType]):
     """Device for a general fast grid scan
 
     When the motion program is started, the goniometer will move in a snake-like grid trajectory,
@@ -309,7 +311,7 @@ class FastGridScanCommon(StandardReadable, ABC):
         await wait_for_value(self.status, 0, self.COMPLETE_STATUS)
 
 
-class ZebraFastGridScan(FastGridScanCommon):
+class ZebraFastGridScan(FastGridScanCommon[ZebraGridScanParams]):
     """Device for standard Zebra FGS. In this scan, the goniometer's velocity profile follows a parabolic shape between X steps,
     with the slowest points occuring at each X step.
     """
@@ -322,7 +324,7 @@ class ZebraFastGridScan(FastGridScanCommon):
         self.movable_params["dwell_time_ms"] = self.dwell_time_ms
 
 
-class PandAFastGridScan(FastGridScanCommon):
+class PandAFastGridScan(FastGridScanCommon[PandAGridScanParams]):
     """Device for panda constant-motion scan"""
 
     def __init__(self, prefix: str, name: str = "") -> None:
@@ -340,7 +342,9 @@ class PandAFastGridScan(FastGridScanCommon):
         self.movable_params["run_up_distance_mm"] = self.run_up_distance_mm
 
 
-def set_fast_grid_scan_params(scan: FastGridScanCommon, params: GridScanParamsCommon):
+def set_fast_grid_scan_params(
+    scan: FastGridScanCommon[ParamType], params: GridScanParamsCommon
+):
     assert set(params.get_param_positions().keys()) == set(
         scan.movable_params.keys()
     ), "Scan parameters don't match the scan device"
