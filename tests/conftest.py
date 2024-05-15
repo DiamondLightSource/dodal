@@ -13,7 +13,8 @@ import pytest
 from bluesky.run_engine import RunEngine
 from ophyd.sim import make_fake_device
 
-from dodal.beamlines import beamline_utils, i03
+from dodal.beamlines import i03
+from dodal.beamlines_common import beamline_utils
 from dodal.devices.focusing_mirror import VFMMirrorVoltages
 from dodal.log import LOGGER, GELFTCPHandler, set_up_all_logging_handlers
 from dodal.utils import make_all_devices

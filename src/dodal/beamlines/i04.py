@@ -1,5 +1,5 @@
-from dodal.beamlines.beamline_utils import device_instantiation
-from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.beamlines_common.beamline_utils import device_instantiation
+from dodal.beamlines_common.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.aperturescatterguard import AperturePositions, ApertureScatterguard
 from dodal.devices.attenuator import Attenuator
 from dodal.devices.backlight import Backlight

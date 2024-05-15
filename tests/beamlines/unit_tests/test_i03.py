@@ -1,4 +1,5 @@
-from dodal.beamlines import beamline_utils, i03
+from dodal.beamlines import i03
+from dodal.beamlines_common import beamline_utils
 from dodal.devices.aperturescatterguard import (
     AperturePositions,
     ApertureScatterguard,

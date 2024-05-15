@@ -1,6 +1,6 @@
 import pytest
 
-from dodal.beamlines._device_helpers import numbered_slits
+from dodal.beamlines_common.device_helpers import numbered_slits
 
 
 @pytest.mark.parametrize("num", [5, 17])
