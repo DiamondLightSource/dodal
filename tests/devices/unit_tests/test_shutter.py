@@ -6,7 +6,7 @@ from dodal.devices.shutter import OpenState, Shutter
 
 @pytest.fixture
 async def sim_shutter():
-    async with DeviceCollector(sim=True):
+    async with DeviceCollector(mock=True):
         sim_shutter: Shutter = Shutter(
             prefix="sim_shutter",
             name="shutter",
