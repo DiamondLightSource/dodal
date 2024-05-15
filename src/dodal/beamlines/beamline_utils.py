@@ -45,17 +45,16 @@ def active_device_is_same_type(
 
 
 def _wait_for_connection(
-    device: AnyDevice, timeout: float = DEFAULT_CONNECTION_TIMEOUT, sim: bool = False
+    device: AnyDevice,
+    timeout: float = DEFAULT_CONNECTION_TIMEOUT,
+    mock: bool = False,
 ) -> None:
     if isinstance(device, OphydV1Device):
         device.wait_for_connection(timeout=timeout)
     elif isinstance(device, OphydV2Device):
         call_in_bluesky_event_loop(
             v2_device_wait_for_connection(
-                coros=device.connect(
-                    sim=sim,
-                    timeout=timeout,
-                )
+                coros=device.connect(mock=mock, timeout=timeout)
             ),
         )
     else:
@@ -110,7 +109,7 @@ def device_instantiation(
         )
         ACTIVE_DEVICES[name] = device_instance
         if wait:
-            _wait_for_connection(device_instance, sim=fake)
+            _wait_for_connection(device_instance, mock=fake)
 
     else:
         if not active_device_is_same_type(already_existing_device, device_factory):
