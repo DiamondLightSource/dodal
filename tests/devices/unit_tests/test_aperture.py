@@ -8,7 +8,7 @@ from dodal.devices.aperture import Aperture
 async def fake_aperture():
     FakeAperture = make_fake_device(Aperture)
     fake_aperture: Aperture = FakeAperture(prefix="test_ap", name="aperture")
-    await fake_aperture.connect(sim=True)
+    await fake_aperture.connect(mock=True)
     return fake_aperture
 
 

@@ -125,7 +125,7 @@ def provider(
 @pytest.fixture(params=[1, 2])
 def detectors(request, provider: UpdatingDirectoryProvider) -> list[Readable]:
     number_of_detectors = request.param
-    with DeviceCollector(sim=True):
+    with DeviceCollector(mock=True):
         dets: list[Readable] = [
             FakeDetector(name=f"det{i}", provider=provider)
             for i in range(number_of_detectors)
