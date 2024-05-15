@@ -208,10 +208,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/432-create-sample-stage-device-for-p99/"
   },
   {
-    "version": "434_get_logs_from_ophyd_async",
-    "url": "https://DiamondLightSource.github.io/dodal/434_get_logs_from_ophyd_async/"
-  },
-  {
     "version": "442-convert-attenuator-into-an-ophyd-async-device",
     "url": "https://DiamondLightSource.github.io/dodal/442-convert-attenuator-into-an-ophyd-async-device/"
   },
