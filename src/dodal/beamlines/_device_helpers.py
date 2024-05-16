@@ -26,7 +26,7 @@ def numbered_slits(
 
     return device_instantiation(
         Slits,
-        f"s{slit_number}_slit_gaps",
+        f"slits_{slit_number}",
         f"-AL-SLITS-{slit_number:02}:",
         wait_for_connection,
         fake_with_ophyd_sim,
