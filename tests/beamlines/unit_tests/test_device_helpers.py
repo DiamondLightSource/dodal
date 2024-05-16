@@ -1,9 +1,9 @@
 from random import randint
+
 from dodal.beamlines._device_helpers import numbered_slits
 
 
 def test_slit_field_naming():
-
     num = randint(1, 20)
     prefix = f"-AL-SLITS-{num:02}:"
     slits = numbered_slits(
@@ -21,4 +21,3 @@ def test_slit_field_naming():
     assert f"{prefix}X:SIZE.VAL" in slits.x_gap.user_setpoint.source
     assert f"{prefix}Y:CENTRE.VAL" in slits.y_centre.user_setpoint.source
     assert f"{prefix}Y:SIZE.VAL" in slits.y_gap.user_setpoint.source
-
