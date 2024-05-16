@@ -332,6 +332,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1227_edge_array_logging/"
   },
   {
+    "version": "hyperion_1311_read_ispyb_beamsize_from_aperture",
+    "url": "https://DiamondLightSource.github.io/dodal/hyperion_1311_read_ispyb_beamsize_from_aperture/"
+  },
+  {
     "version": "hyperion_1372_enable_dev_shm",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1372_enable_dev_shm/"
   },
