@@ -328,10 +328,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1339_fix_panda_pcap/"
   },
   {
-    "version": "hyperion_1343_fix_v9.2.0",
-    "url": "https://DiamondLightSource.github.io/dodal/hyperion_1343_fix_v9.2.0/"
-  },
-  {
     "version": "hyperion_1372_enable_dev_shm",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1372_enable_dev_shm/"
   },
@@ -354,6 +350,10 @@
   {
     "version": "i22-and-p38-system-tests",
     "url": "https://DiamondLightSource.github.io/dodal/i22-and-p38-system-tests/"
+  },
+  {
+    "version": "issue_529",
+    "url": "https://DiamondLightSource.github.io/dodal/issue_529/"
   },
   {
     "version": "jungfrau_commissioning",
