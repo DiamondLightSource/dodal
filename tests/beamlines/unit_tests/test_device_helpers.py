@@ -1,15 +1,15 @@
-from random import randint
+import pytest
 
 from dodal.beamlines._device_helpers import numbered_slits
 
 
-def test_slit_field_naming():
-    num = randint(1, 20)
+@pytest.mark.parametrize("num", [5, 17])
+def test_slit_field_naming(num):
     prefix = f"-AL-SLITS-{num:02}:"
     slits = numbered_slits(
-        num,
-        False,
-        True,
+        slit_number=num,
+        wait_for_connection=False,
+        fake_with_ophyd_sim=True,
     )
 
     assert slits.name == f"slits_{num}"
