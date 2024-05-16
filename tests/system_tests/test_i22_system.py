@@ -12,12 +12,12 @@ if __name__ == "__main__":
     This is not implemented as a normal pytest test as those tests run using the S03
     EPICS ports and switching ports at runtime is non-trivial
     """
-    os.environ["BEAMLINE"] = "i04"
-    from dodal.beamlines import i04
+    os.environ["BEAMLINE"] = "i22"
+    from dodal.beamlines import i22
 
     # Need to start a run engine so that the bluesky event loop is running
     RunEngine()
 
-    print("Making all i04 devices")
-    make_all_devices(i04)
+    print("Making all i22 devices")
+    make_all_devices(i22)
     print("Successfully connected")

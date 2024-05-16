@@ -8,7 +8,7 @@ from ophyd.status import Status
 
 from dodal.devices.detector import DetectorParams, TriggerMode
 from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
-from dodal.devices.eiger import EigerDetector
+from dodal.devices.eiger import TEST_1169_FIX, EigerDetector
 from dodal.devices.status import await_value
 from dodal.devices.util.epics_util import run_functions_without_blocking
 from dodal.log import LOGGER
@@ -27,6 +27,8 @@ TEST_NUM_IMAGES_PER_TRIGGER = 1
 TEST_NUM_TRIGGERS = 2000
 TEST_USE_ROI_MODE = False
 TEST_DET_DIST_TO_BEAM_CONVERTER_PATH = "tests/devices/unit_tests/test_lookup_table.txt"
+
+TEST_1169_FIX = True
 
 
 class StatusException(Exception):
@@ -400,6 +402,7 @@ def test_when_stage_called_then_odin_started_after_stale_params_goes_low(
 
     fake_eiger.stale_params.sim_put(1)  # type: ignore
     fake_eiger.odin.file_writer.capture.sim_put(0)  # type: ignore
+    fake_eiger.odin.meta.active.sim_put(1)  # type: ignore
 
     unwrapped_funcs = [
         lambda: await_value(fake_eiger.stale_params, 0, 60),
@@ -428,6 +431,7 @@ def test_when_stage_called_then_cam_acquired_on_meta_ready(
 
     fake_eiger.odin.file_writer.capture.sim_put(0)  # type: ignore
     fake_eiger.stale_params.sim_put(0)  # type: ignore
+    fake_eiger.odin.meta.active.sim_put(1)  # type: ignore
 
     unwrapped_funcs = [
         fake_eiger._wait_for_odin_status,
@@ -633,6 +637,7 @@ def test_unwrapped_arm_chain_functions_are_not_called_outside_util(
     call_func: MagicMock,
     fake_eiger: EigerDetector,
 ):
+    fake_eiger.odin.stop = MagicMock(return_value=Status(done=True, success=True))
     fake_eiger.detector_params.use_roi_mode = True
     done_status = Status(done=True, success=True)
 
@@ -656,6 +661,7 @@ def test_unwrapped_arm_chain_functions_are_not_called_outside_util(
     fake_eiger.do_arming_chain()
 
     funcs = [
+        fake_eiger.odin.stop,
         fake_eiger.enable_roi_mode,
         fake_eiger.set_detector_threshold,
         fake_eiger.set_cam_pvs,

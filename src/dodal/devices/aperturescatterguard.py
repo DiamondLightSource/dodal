@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 from bluesky.protocols import Movable
 from ophyd_async.core import AsyncStatus, SignalR, StandardReadable
-from ophyd_async.core.sim_signal_backend import SimSignalBackend
+from ophyd_async.core.soft_signal_backend import SoftSignalBackend
 
 from dodal.devices.aperture import Aperture
 from dodal.devices.scatterguard import Scatterguard
@@ -89,12 +89,14 @@ class AperturePositions:
 
 class ApertureScatterguard(StandardReadable, Movable):
     def __init__(self, prefix: str = "", name: str = "") -> None:
-        self.aperture = Aperture(prefix="-MO-MAPT-01:")
-        self.scatterguard = Scatterguard(prefix="-MO-SCAT-01:")
+        self.aperture = Aperture(prefix + "-MO-MAPT-01:")
+        self.scatterguard = Scatterguard(prefix + "-MO-SCAT-01:")
         self.aperture_positions: AperturePositions | None = None
         self.TOLERANCE_STEPS = 3  # Number of MRES steps
         self.selected_aperture = self.SelectedAperture(
-            backend=SimSignalBackend(SingleAperturePosition, AperturePositions.UNKNOWN),
+            backend=SoftSignalBackend(
+                SingleAperturePosition, AperturePositions.UNKNOWN
+            ),
         )
         self.set_readable_signals(
             read=[

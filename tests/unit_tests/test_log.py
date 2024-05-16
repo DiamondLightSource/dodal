@@ -3,8 +3,12 @@ from pathlib import Path, PosixPath
 from unittest.mock import MagicMock, call, patch
 
 import pytest
+from bluesky.log import logger as bluesky_logger
 from graypy import GELFTCPHandler
 from ophyd import log as ophyd_log
+from ophyd.log import logger as ophyd_logger
+from ophyd_async.core import soft_signal_rw
+from ophyd_async.log import logger as ophyd_async_logger
 
 from dodal import log
 from dodal.log import (
@@ -23,6 +27,13 @@ from dodal.log import (
 def mock_logger():
     with patch("dodal.log.LOGGER") as mock_LOGGER:
         yield mock_LOGGER
+
+
+@pytest.fixture()
+def dodal_logger_for_tests():
+    logger = logging.getLogger("test_dodal")
+    logger.handlers.clear()
+    return logger
 
 
 @patch("dodal.log.StreamHandler", autospec=True)
@@ -210,3 +221,20 @@ def test_when_circular_memory_handler_closed_then_clears_buffer_and_target():
     circular_handler.close()
     assert len(circular_handler.buffer) == 0
     assert circular_handler.target is None
+
+
+def test_integrateloggers_gives_correct_children(dodal_logger_for_tests):
+    loggers = [ophyd_logger, ophyd_async_logger, bluesky_logger]
+    for logger in loggers:
+        assert not logger.parent == dodal_logger_for_tests
+    integrate_bluesky_and_ophyd_logging(dodal_logger_for_tests)
+    for logger in loggers:
+        assert logger.parent == dodal_logger_for_tests
+
+
+async def test_ophyd_async_logger_integrated(caplog, dodal_logger_for_tests):
+    integrate_bluesky_and_ophyd_logging(dodal_logger_for_tests)
+    test_signal = soft_signal_rw(int, 0, "test_signal")
+    await test_signal.connect()
+    print("test")
+    assert "Connecting to soft://test_signal" in caplog.text
