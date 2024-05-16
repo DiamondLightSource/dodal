@@ -10,10 +10,11 @@ ZOOM_LEVELS_XML = "tests/devices/unit_tests/test_jCameraManZoomLevels.xml"
 
 
 @patch("dodal.devices.areadetector.plugins.MJPG.Image")
+@patch("dodal.devices.areadetector.plugins.MJPG.os")
 @patch("dodal.devices.areadetector.plugins.MJPG.ImageDraw")
 @patch("dodal.devices.areadetector.plugins.MJPG.requests")
 def test_given_snapshot_triggered_then_crosshair_drawn(
-    patch_requests, patch_image_draw, patch_image
+    patch_requests, patch_image_draw, patch_os, patch_image
 ):
     patch_line = MagicMock()
     params = OAVConfigParams(ZOOM_LEVELS_XML, DISPLAY_CONFIGURATION)
