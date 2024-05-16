@@ -228,6 +228,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/489_motor_types_issue/"
   },
   {
+    "version": "494_use_beamline_params_for_apsg_tolerance",
+    "url": "https://DiamondLightSource.github.io/dodal/494_use_beamline_params_for_apsg_tolerance/"
+  },
+  {
     "version": "51_aperture_scatterguard_no_positions",
     "url": "https://DiamondLightSource.github.io/dodal/51_aperture_scatterguard_no_positions/"
   },
