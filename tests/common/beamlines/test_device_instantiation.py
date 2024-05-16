@@ -22,13 +22,13 @@ def test_device_creation(RE, module_and_devices_for_beamline):
     and creating types that conform to Bluesky protocols.
     """
     module, devices = module_and_devices_for_beamline
-    for device_name, device in devices.items():
+    for device_name, device in devices[0].items():
         assert device_name in beamline_utils.ACTIVE_DEVICES, (
             f"No device named {device_name} was created, devices "
             f"are {beamline_utils.ACTIVE_DEVICES.keys()}"
         )
         assert follows_bluesky_protocols(device)
-    assert len(beamline_utils.ACTIVE_DEVICES) == len(devices)
+    assert len(beamline_utils.ACTIVE_DEVICES) == len(devices[0])
 
 
 @pytest.mark.parametrize(
