@@ -1,4 +1,3 @@
-from pathlib import PosixPath
 from unittest.mock import MagicMock, call, patch
 
 import numpy as np
@@ -94,7 +93,7 @@ def test_given_directory_not_existing_when_snapshot_triggered_then_directory_cre
     mock_os.path.isdir.return_value = False
     st = fake_oav.grid_snapshot.trigger()
     st.wait()
-    mock_os.mkdir.assert_called_once_with(PosixPath("test directory"))
+    mock_os.mkdir.assert_called_once_with("test directory")
 
 
 @patch("requests.get")

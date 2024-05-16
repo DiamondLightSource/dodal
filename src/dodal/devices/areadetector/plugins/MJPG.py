@@ -40,10 +40,10 @@ class MJPG(Device, ABC):
         and filename signals. The full resultant path is put on the last_saved_path signal
         """
         filename_str = self.filename.get()
-        directory_str = Path(self.directory.get())  # type: ignore
+        directory_str: str = self.directory.get()  # type: ignore
 
         path = Path(f"{directory_str}/{filename_str}.png").as_posix()
-        if not os.path.isdir(directory_str):
+        if not os.path.isdir(Path(directory_str)):
             LOGGER.info(f"Snapshot folder {directory_str} does not exist, creating...")
             os.mkdir(directory_str)
 
