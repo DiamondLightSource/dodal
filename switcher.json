@@ -300,6 +300,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/cli-system-tests/"
   },
   {
+    "version": "device-resilience",
+    "url": "https://DiamondLightSource.github.io/dodal/device-resilience/"
+  },
+  {
     "version": "directoryInfo",
     "url": "https://DiamondLightSource.github.io/dodal/directoryInfo/"
   },
