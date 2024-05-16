@@ -34,26 +34,26 @@ def test_makes_devices() -> None:
     import tests.fake_beamline as fake_beamline
 
     devices = make_all_devices(fake_beamline)
-    assert {"readable", "motor", "cryo"} == devices.keys()
+    assert {"readable", "motor", "cryo"} == devices[0].keys()
 
 
 def test_makes_devices_with_dependencies() -> None:
     import tests.fake_beamline_dependencies as fake_beamline
 
     devices = make_all_devices(fake_beamline)
-    assert {"readable", "motor", "cryo"} == devices.keys()
+    assert {"readable", "motor", "cryo"} == devices[0].keys()
 
 
 def test_makes_devices_with_disordered_dependencies() -> None:
     import tests.fake_beamline_disordered_dependencies as fake_beamline
 
     devices = make_all_devices(fake_beamline)
-    assert {"readable", "motor", "cryo"} == devices.keys()
+    assert {"readable", "motor", "cryo"} == devices[0].keys()
 
 
 def test_makes_devices_with_module_name() -> None:
     devices = make_all_devices("tests.fake_beamline")
-    assert {"readable", "motor", "cryo"} == devices.keys()
+    assert {"readable", "motor", "cryo"} == devices[0].keys()
 
 
 def test_get_hostname() -> None:
@@ -66,7 +66,9 @@ def test_no_signature_builtins_not_devices() -> None:
     import tests.fake_beamline_misbehaving_builtins as fake_beamline
 
     devices = make_all_devices(fake_beamline)
-    assert not devices
+    assert not devices[0]
+    for exception in devices[1]:
+        assert isinstance(exception, Exception)
 
 
 def device_a() -> Readable:

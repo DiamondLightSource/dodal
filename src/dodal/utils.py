@@ -17,6 +17,7 @@ from typing import (
     Iterable,
     List,
     Mapping,
+    Tuple,
     Type,
     TypeVar,
 )
@@ -109,7 +110,7 @@ def skip_device(precondition=lambda: True):
 
 def make_all_devices(
     module: str | ModuleType | None = None, include_skipped: bool = False, **kwargs
-) -> Dict[str, AnyDevice]:
+) -> Tuple[Dict[str, AnyDevice], Dict[str, Exception]]:
     """Makes all devices in the given beamline module.
 
     In cases of device interdependencies it ensures a device is created before any which
@@ -125,7 +126,9 @@ def make_all_devices(
     if isinstance(module, str) or module is None:
         module = import_module(module or __name__)
     factories = collect_factories(module, include_skipped)
-    devices: dict[str, AnyDevice] = invoke_factories(factories, **kwargs)
+    devices: Tuple[Dict[str, AnyDevice], Dict[str, Exception]] = invoke_factories(
+        factories, **kwargs
+    )
 
     return devices
 
@@ -133,8 +136,9 @@ def make_all_devices(
 def invoke_factories(
     factories: Mapping[str, AnyDeviceFactory],
     **kwargs,
-) -> Dict[str, AnyDevice]:
+) -> Tuple[Dict[str, AnyDevice], Dict[str, Exception]]:
     devices: dict[str, AnyDevice] = {}
+    exception_devices: dict[str, Exception] = {}
 
     dependencies = {
         factory_name: set(extract_dependencies(factories, factory_name))
@@ -150,11 +154,18 @@ def invoke_factories(
         ]
         dependent_name = leaves.pop()
         params = {name: devices[name] for name in dependencies[dependent_name]}
-        devices[dependent_name] = factories[dependent_name](**params, **kwargs)
+        try:
+            devices[dependent_name] = factories[dependent_name](**params, **kwargs)
+        except Exception as e:
+            exception_devices[dependent_name] = e
 
-    all_devices = {device.name: device for device in devices.values()}
+    all_devices = {
+        device.name: device
+        for device in devices.values()
+        if not isinstance(device, Exception)
+    }
 
-    return all_devices
+    return (all_devices, exception_devices)
 
 
 def extract_dependencies(
