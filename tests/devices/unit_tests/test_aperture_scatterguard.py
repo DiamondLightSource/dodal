@@ -268,7 +268,7 @@ async def test_given_aperture_not_set_through_device_but_motors_in_position_when
     assert isinstance(selected_aperture, dict)
     assert (
         selected_aperture["test_ap_sg-selected_aperture"]["value"]
-        == aperture_positions.MEDIUM
+        == aperture_positions.MEDIUM.dict()
     )
 
 
@@ -279,7 +279,7 @@ async def test_when_aperture_set_and_device_read_then_position_returned(
     selected_aperture = await aperture_in_medium_pos.read()
     assert (
         selected_aperture["test_ap_sg-selected_aperture"]["value"]
-        == aperture_positions.MEDIUM
+        == aperture_positions.MEDIUM.dict()
     )
 
 
