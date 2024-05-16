@@ -318,9 +318,9 @@ class ZebraFastGridScan(FastGridScanCommon[ZebraGridScanParams]):
 
     def __init__(self, prefix: str, name: str = "") -> None:
         super().__init__(prefix, name)
-        self.dwell_time_ms = epics_signal_rw_rbv(
-            float, "DWELL_TIME"
-        )  # Time taken to travel between X steps
+
+        # Time taken to travel between X steps
+        self.dwell_time_ms = epics_signal_rw_rbv(float, "DWELL_TIME")
         self.movable_params["dwell_time_ms"] = self.dwell_time_ms
 
 
@@ -338,7 +338,6 @@ class PandAFastGridScan(FastGridScanCommon[PandAGridScanParams]):
         # Distance before and after the grid given to allow goniometer to reach desired speed while it is within the
         # grid
         self.run_up_distance_mm = epics_signal_rw_rbv(float, "RUNUP_DISTANCE")
-
         self.movable_params["run_up_distance_mm"] = self.run_up_distance_mm
 
 
