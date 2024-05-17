@@ -364,16 +364,16 @@
     "url": "https://DiamondLightSource.github.io/dodal/i22-and-p38-system-tests/"
   },
   {
-    "version": "issue_529",
-    "url": "https://DiamondLightSource.github.io/dodal/issue_529/"
-  },
-  {
     "version": "jungfrau_commissioning",
     "url": "https://DiamondLightSource.github.io/dodal/jungfrau_commissioning/"
   },
   {
     "version": "new-beamline-utils",
     "url": "https://DiamondLightSource.github.io/dodal/new-beamline-utils/"
+  },
+  {
+    "version": "old-main",
+    "url": "https://DiamondLightSource.github.io/dodal/old-main/"
   },
   {
     "version": "ophyd_async_synchrotron_hyperion_compatible",
