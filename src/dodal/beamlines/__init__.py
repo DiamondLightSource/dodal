@@ -1,5 +1,4 @@
 import importlib.util
-import os
 from pathlib import Path
 from typing import Iterable
 

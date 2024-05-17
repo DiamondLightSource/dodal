@@ -1,6 +1,3 @@
-import os
-import sys
-
 import click
 
 from dodal.beamlines import all_beamline_names, module_name_for_beamline
