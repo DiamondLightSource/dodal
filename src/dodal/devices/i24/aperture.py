@@ -5,7 +5,7 @@ from ophyd_async.epics.motion import Motor
 from ophyd_async.epics.signal import epics_signal_rw
 
 
-class ApPosition(set, Enum):
+class ApPosition(str, Enum):
     IN = "In"
     OUT = "Out"
     ROBOT = "Robot"
