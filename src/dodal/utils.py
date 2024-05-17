@@ -121,7 +121,10 @@ def make_all_devices(
         **kwargs: Arguments passed on to every device.
 
     Returns:
-        Dict[str, Any]: A dictionary of device name and device
+        Tuple[Dict[str, AnyDevice], Dict[str, Exception]]: This represents a tuple containing two dictionaries:
+
+    A dictionary where the keys are device names and the values are devices.
+    A dictionary where the keys are device names and the values are exceptions.
     """
     if isinstance(module, str) or module is None:
         module = import_module(module or __name__)
@@ -138,14 +141,15 @@ def invoke_factories(
     **kwargs,
 ) -> Tuple[Dict[str, AnyDevice], Dict[str, Exception]]:
     devices: dict[str, AnyDevice] = {}
-    exception_devices: dict[str, Exception] = {}
+    device_exceptions: dict[str, Exception] = {}
 
     dependencies = {
         factory_name: set(extract_dependencies(factories, factory_name))
         for factory_name in factories.keys()
     }
-
-    while len(devices) < len(factories):
+    # This is going into a infinite loop if there are circular dependencies.
+    # need to figure out how to handle this.
+    while (len(devices) + len(device_exceptions)) < len(factories):
         leaves = [
             device
             for device, device_dependencies in dependencies.items()
@@ -157,7 +161,7 @@ def invoke_factories(
         try:
             devices[dependent_name] = factories[dependent_name](**params, **kwargs)
         except Exception as e:
-            exception_devices[dependent_name] = e
+            device_exceptions[dependent_name] = e
 
     all_devices = {
         device.name: device
@@ -165,7 +169,7 @@ def invoke_factories(
         if not isinstance(device, Exception)
     }
 
-    return (all_devices, exception_devices)
+    return (all_devices, device_exceptions)
 
 
 def extract_dependencies(
@@ -188,7 +192,6 @@ def collect_factories(
             and (include_skipped or not _is_device_skipped(var))
         ):
             factories[var.__name__] = var
-
     return factories
 
 
