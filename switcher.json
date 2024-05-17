@@ -368,6 +368,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/jungfrau_commissioning/"
   },
   {
+    "version": "mx_97-devices-for-i24-beamline-setup",
+    "url": "https://DiamondLightSource.github.io/dodal/mx_97-devices-for-i24-beamline-setup/"
+  },
+  {
     "version": "new-beamline-utils",
     "url": "https://DiamondLightSource.github.io/dodal/new-beamline-utils/"
   },
