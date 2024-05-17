@@ -1,9 +1,9 @@
 from dodal.beamlines.beamline_utils import BL, device_instantiation
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.beamstop import BeamStop
 from dodal.devices.detector import DetectorParams
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.i24.aperture import Aperture
+from dodal.devices.i24.beamstop import Beamstop
 from dodal.devices.i24.dual_backlight import DualBacklight
 from dodal.devices.i24.I24_detector_motion import DetectorMotion
 from dodal.devices.i24.i24_vgonio import VGonio
@@ -34,12 +34,12 @@ def aperture(
 
 def beamstop(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> BeamStop:
+) -> Beamstop:
     """Get the i24 beamstop device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i24, it will return the existing object.
     """
     return device_instantiation(
-        BeamStop,
+        Beamstop,
         "beamstop",
         "",
         wait_for_connection,

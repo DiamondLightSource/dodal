@@ -6,5 +6,3 @@ class BeamStop(Device):
     x = Cpt(EpicsMotor, "-MO-BS-01:X")
     y = Cpt(EpicsMotor, "-MO-BS-01:Y")
     z = Cpt(EpicsMotor, "-MO-BS-01:Z")
-
-    rot_y = Cpt(EpicsMotor, "-MO-BS-01:ROTY")  # Not all beamlines have this
