@@ -1,6 +1,6 @@
 import asyncio
 from collections import OrderedDict, namedtuple
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 
 from bluesky.protocols import Movable, Reading
 from ophyd_async.core import AsyncStatus, SignalR, StandardReadable
@@ -37,14 +37,6 @@ class SingleAperturePosition:
     location: ApertureFiveDimensionalLocation = ApertureFiveDimensionalLocation(
         0, 0, 0, 0, 0
     )
-
-    def dict(self):
-        return {
-            "name": self.name,
-            "GDA_name": self.GDA_name,
-            "radius_microns": self.radius_microns,
-            "location": tuple(self.location),
-        }
 
 
 def position_from_params(
@@ -106,7 +98,6 @@ class ApertureScatterguard(StandardReadable, Movable):
         )
         aperture_backend.converter = self.ApertureConverter()
         self.selected_aperture = self.SelectedAperture(backend=aperture_backend)
-        self.selected_aperture
         self.set_readable_signals(
             read=[
                 self.selected_aperture,
@@ -120,7 +111,7 @@ class ApertureScatterguard(StandardReadable, Movable):
             self, value: SingleAperturePosition, timestamp: float, severity: int
         ) -> Reading:
             return Reading(
-                value=value.dict(),
+                value=asdict(value),
                 timestamp=timestamp,
                 alarm_severity=-1 if severity > 2 else severity,
             )

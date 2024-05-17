@@ -1,3 +1,4 @@
+from dataclasses import asdict
 from unittest.mock import AsyncMock, call
 
 import bluesky.plan_stubs as bps
@@ -266,9 +267,8 @@ async def test_given_aperture_not_set_through_device_but_motors_in_position_when
 ):
     selected_aperture = await aperture_in_medium_pos.read()
     assert isinstance(selected_aperture, dict)
-    assert (
-        selected_aperture["test_ap_sg-selected_aperture"]["value"]
-        == aperture_positions.MEDIUM.dict()
+    assert selected_aperture["test_ap_sg-selected_aperture"]["value"] == asdict(
+        aperture_positions.MEDIUM
     )
 
 
@@ -277,9 +277,8 @@ async def test_when_aperture_set_and_device_read_then_position_returned(
 ):
     await aperture_in_medium_pos.set(aperture_positions.MEDIUM)
     selected_aperture = await aperture_in_medium_pos.read()
-    assert (
-        selected_aperture["test_ap_sg-selected_aperture"]["value"]
-        == aperture_positions.MEDIUM.dict()
+    assert selected_aperture["test_ap_sg-selected_aperture"]["value"] == asdict(
+        aperture_positions.MEDIUM
     )
 
 

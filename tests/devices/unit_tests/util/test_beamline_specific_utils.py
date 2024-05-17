@@ -1,6 +1,9 @@
 import pytest
 
-from dodal.beamline_specific_utils.i03 import I03_BEAM_HEIGHT, beam_size_from_aperture
+from dodal.beamline_specific_utils.i03 import (
+    I03_BEAM_HEIGHT_UM,
+    beam_size_from_aperture,
+)
 from dodal.devices.aperturescatterguard import (
     ApertureFiveDimensionalLocation,
     SingleAperturePosition,
@@ -8,9 +11,9 @@ from dodal.devices.aperturescatterguard import (
 
 RADII_AND_SIZES = [
     (None, (None, None)),
-    (123, (123, I03_BEAM_HEIGHT)),
-    (23.45, (23.45, I03_BEAM_HEIGHT)),
-    (888, (888, I03_BEAM_HEIGHT)),
+    (123, (123, I03_BEAM_HEIGHT_UM)),
+    (23.45, (23.45, I03_BEAM_HEIGHT_UM)),
+    (888, (888, I03_BEAM_HEIGHT_UM)),
 ]
 
 
