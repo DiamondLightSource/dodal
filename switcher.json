@@ -372,6 +372,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/new-beamline-utils/"
   },
   {
+    "version": "old-main",
+    "url": "https://DiamondLightSource.github.io/dodal/old-main/"
+  },
+  {
     "version": "ophyd_async_synchrotron_hyperion_compatible",
     "url": "https://DiamondLightSource.github.io/dodal/ophyd_async_synchrotron_hyperion_compatible/"
   },
