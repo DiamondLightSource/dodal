@@ -267,7 +267,7 @@ def fast_grid_scan(
     return device_instantiation(
         device_factory=FastGridScan,
         name="fast_grid_scan",
-        prefix="-MO-SGON-01:FGS:",
+        prefix="-MO-SGON-01:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )

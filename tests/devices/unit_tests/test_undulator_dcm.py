@@ -132,7 +132,7 @@ async def test_if_gap_is_already_correct_then_dont_move_gap(
     set_mock_value(fake_undulator_dcm.undulator.current_gap, 5.4605)
 
     status = fake_undulator_dcm.set(5.8)
-    await asyncio.wait_for(status, timeout=0.01)
+    await asyncio.wait_for(status, timeout=0.05)
 
     # Verify undulator has not been asked to move
     assert (

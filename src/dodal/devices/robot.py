@@ -1,54 +1,13 @@
 import asyncio
-from collections import OrderedDict
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, Sequence
 
-from bluesky.protocols import Descriptor, Movable, Reading
+from bluesky.protocols import Movable
 from ophyd_async.core import AsyncStatus, StandardReadable, wait_for_value
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_x
 from ophyd_async.epics.signal.signal import epics_signal_rw_rbv
 
 from dodal.log import LOGGER
-
-
-class SingleIndexWaveformReadable(StandardReadable):
-    """Wraps a waveform PV that contains a list of strings into a device where only one
-    of them is returned when read.
-    """
-
-    def __init__(
-        self,
-        pv: str,
-        name="",
-        index: int = 0,
-    ) -> None:
-        """
-        Args:
-            pv (str): The waveform PV that contains a list of strings
-            index (int, optional): The index to read. Defaults to 0.
-        """
-        self.bare_signal = epics_signal_r(Sequence[str], pv)
-        self.index = index
-        super().__init__(name=name)
-
-    async def read(self) -> Dict[str, Reading]:
-        underlying_read = await self.bare_signal.read()
-        pv_reading = underlying_read[self.bare_signal.name]
-        old_reading = pv_reading["value"]
-        pv_reading["value"] = str(old_reading[self.index]) if old_reading else ""
-        return OrderedDict([(self._name, pv_reading)])
-
-    async def describe(self) -> dict[str, Descriptor]:
-        desc = OrderedDict(
-            [
-                (
-                    self._name,
-                    (await self.bare_signal.describe())[self.bare_signal.name],
-                )
-            ],
-        )
-        return desc
 
 
 @dataclass
@@ -72,7 +31,7 @@ class BartRobot(StandardReadable, Movable):
         name: str,
         prefix: str,
     ) -> None:
-        self.barcode = SingleIndexWaveformReadable(prefix + "BARCODE")
+        self.barcode = epics_signal_r(str, prefix + "BARCODE")
         self.gonio_pin_sensor = epics_signal_r(PinMounted, prefix + "PIN_MOUNTED")
         self.next_pin = epics_signal_rw_rbv(float, prefix + "NEXT_PIN")
         self.next_puck = epics_signal_rw_rbv(float, prefix + "NEXT_PUCK")

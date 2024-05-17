@@ -7,11 +7,14 @@ from dodal.log import LOGGER
 
 
 class PandASubdirectoryProvider(UpdatingDirectoryProvider):
+    """Directory provider for the HDFPanda. Points to a panda subdirectory within the
+    directory path provided, which must exist before attempting to arm the PCAP block"""
+
     resource_dir = Path("panda")
 
     def __init__(self, directory: Path | None = None):
         if directory is None:
-            LOGGER.warn(
+            LOGGER.debug(
                 f"{self.__class__.__name__} instantiated with no root path, update() must be called before writing data!"
             )
         self._directory_info = (

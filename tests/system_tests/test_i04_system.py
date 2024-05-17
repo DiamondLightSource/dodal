@@ -1,5 +1,7 @@
 import os
 
+from bluesky.run_engine import RunEngine
+
 from dodal.utils import make_all_devices
 
 if __name__ == "__main__":
@@ -12,6 +14,9 @@ if __name__ == "__main__":
     """
     os.environ["BEAMLINE"] = "i04"
     from dodal.beamlines import i04
+
+    # Need to start a run engine so that the bluesky event loop is running
+    RunEngine()
 
     print("Making all i04 devices")
     make_all_devices(i04)

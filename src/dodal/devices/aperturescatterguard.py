@@ -89,8 +89,8 @@ class AperturePositions:
 
 class ApertureScatterguard(StandardReadable, Movable):
     def __init__(self, prefix: str = "", name: str = "") -> None:
-        self.aperture = Aperture(prefix="-MO-MAPT-01:")
-        self.scatterguard = Scatterguard(prefix="-MO-SCAT-01:")
+        self.aperture = Aperture(prefix + "-MO-MAPT-01:")
+        self.scatterguard = Scatterguard(prefix + "-MO-SCAT-01:")
         self.aperture_positions: AperturePositions | None = None
         self.TOLERANCE_STEPS = 3  # Number of MRES steps
         self.selected_aperture = self.SelectedAperture(
