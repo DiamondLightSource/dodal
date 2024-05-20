@@ -20,7 +20,7 @@ class I24Slits04VirtualMotors(GapAndCenterSlit2d):
 
         status &= self.x_center.set(x_center_value)
         status &= self.x_size.set(x_size_value)
-        status &= self.x_center.set(x_center_value)
+        status &= self.y_center.set(y_center_value)
         status &= self.y_size.set(y_size_value)
 
         return status
