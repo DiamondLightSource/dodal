@@ -49,6 +49,45 @@ set_utils_beamline(BL)
 set_directory_provider(PandASubdirectoryProvider())
 
 
+def aperture_scatterguard(
+    wait_for_connection: bool = True,
+    fake_with_ophyd_sim: bool = False,
+    aperture_positions: AperturePositions | None = None,
+) -> ApertureScatterguard:
+    """Get the i03 aperture and scatterguard device, instantiate it if it hasn't already
+    been. If this is called when already instantiated in i03, it will return the existing
+    object. If aperture_positions is specified, it will update them.
+    """
+
+    def load_positions(a_s: ApertureScatterguard):
+        if aperture_positions is not None:
+            a_s.load_aperture_positions(aperture_positions)
+
+    return device_instantiation(
+        device_factory=ApertureScatterguard,
+        name="aperture_scatterguard",
+        prefix="",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+        post_create=load_positions,
+    )
+
+
+def attenuator(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Attenuator:
+    """Get the i03 attenuator device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        Attenuator,
+        "attenuator",
+        "-EA-ATTN-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
 def dcm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> DCM:
     """Get the i03 DCM device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
@@ -101,30 +140,6 @@ def vfm_mirror_voltages(
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
         daq_configuration_path=DAQ_CONFIGURATION_PATH,
-    )
-
-
-def aperture_scatterguard(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-    aperture_positions: AperturePositions | None = None,
-) -> ApertureScatterguard:
-    """Get the i03 aperture and scatterguard device, instantiate it if it hasn't already
-    been. If this is called when already instantiated in i03, it will return the existing
-    object. If aperture_positions is specified, it will update them.
-    """
-
-    def load_positions(a_s: ApertureScatterguard):
-        if aperture_positions is not None:
-            a_s.load_aperture_positions(aperture_positions)
-
-    return device_instantiation(
-        device_factory=ApertureScatterguard,
-        name="aperture_scatterguard",
-        prefix="",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
-        post_create=load_positions,
     )
 
 
@@ -355,21 +370,6 @@ def xspress3mini(
         Xspress3Mini,
         "xspress3mini",
         "-EA-XSP3-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
-
-
-def attenuator(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Attenuator:
-    """Get the i03 attenuator device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i03, it will return the existing object.
-    """
-    return device_instantiation(
-        Attenuator,
-        "attenuator",
-        "-EA-ATTN-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
     )

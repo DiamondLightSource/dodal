@@ -168,6 +168,7 @@ class ApertureScatterguard(StandardReadable, Movable):
             self.scatterguard.y,
         ]
 
+    @AsyncStatus.wrap
     async def _set_raw_unsafe(self, positions: ApertureFiveDimensionalLocation):
         """Accept the risks and move in an unsafe way. Collisions possible."""
 
@@ -175,11 +176,11 @@ class ApertureScatterguard(StandardReadable, Movable):
         aperture_x, aperture_y, aperture_z, scatterguard_x, scatterguard_y = positions
 
         await asyncio.gather(
-            self.aperture.x._move(aperture_x),
-            self.aperture.y._move(aperture_y),
-            self.aperture.z._move(aperture_z),
-            self.scatterguard.x._move(scatterguard_x),
-            self.scatterguard.y._move(scatterguard_y),
+            self.aperture.x.set(aperture_x),
+            self.aperture.y.set(aperture_y),
+            self.aperture.z.set(aperture_z),
+            self.scatterguard.x.set(scatterguard_x),
+            self.scatterguard.y.set(scatterguard_y),
         )
 
     async def _get_current_aperture_position(self) -> SingleAperturePosition:
@@ -235,22 +236,22 @@ class ApertureScatterguard(StandardReadable, Movable):
 
         if aperture_y > current_ap_y:
             await asyncio.gather(
-                self.scatterguard.x._move(scatterguard_x),
-                self.scatterguard.y._move(scatterguard_y),
+                self.scatterguard.x.set(scatterguard_x),
+                self.scatterguard.y.set(scatterguard_y),
             )
             await asyncio.gather(
-                self.aperture.x._move(aperture_x),
-                self.aperture.y._move(aperture_y),
-                self.aperture.z._move(aperture_z),
+                self.aperture.x.set(aperture_x),
+                self.aperture.y.set(aperture_y),
+                self.aperture.z.set(aperture_z),
             )
             return
         await asyncio.gather(
-            self.aperture.x._move(aperture_x),
-            self.aperture.y._move(aperture_y),
-            self.aperture.z._move(aperture_z),
+            self.aperture.x.set(aperture_x),
+            self.aperture.y.set(aperture_y),
+            self.aperture.z.set(aperture_z),
         )
 
         await asyncio.gather(
-            self.scatterguard.x._move(scatterguard_x),
-            self.scatterguard.y._move(scatterguard_y),
+            self.scatterguard.x.set(scatterguard_x),
+            self.scatterguard.y.set(scatterguard_y),
         )
