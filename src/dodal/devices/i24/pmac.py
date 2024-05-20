@@ -58,7 +58,7 @@ class PMAC(StandardReadable):  # Should it also be a movable?
         #     self.pmac_string, r"\#1hmz\#2hmz\#3hmz", backend=SoftSignalBackend(str)
         # )
 
-        self.motors = StageMotors(prefix)
+        self.stages = StageMotors(prefix)
 
         super().__init__(name)
 
