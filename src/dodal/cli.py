@@ -35,7 +35,7 @@ def main(ctx: click.Context) -> None:
     "attempt any I/O. Useful as a a dry-run.",
     default=False,
 )
-def connect(beamline: str | None, all: bool, sim_backend: bool) -> None:
+def connect(beamline: str, all: bool, sim_backend: bool) -> None:
     """Initialises a beamline module, connects to all devices, reports
     any connection issues."""
 
