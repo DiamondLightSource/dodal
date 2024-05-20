@@ -50,8 +50,6 @@ class StageMotors(StandardReadable):
 class PMAC(StandardReadable):  # Should it also be a movable?
     """Device to control the chip stage on I24."""
 
-    TIMEOUT = 1
-
     def __init__(self, prefix: str, name: str = "") -> None:
         self.pmac_string = epics_signal_rw(str, prefix + "PMAC_STRING")
         # self.home = PMACStringHome(
@@ -61,12 +59,3 @@ class PMAC(StandardReadable):  # Should it also be a movable?
         self.stages = StageMotors(prefix)
 
         super().__init__(name)
-
-    # In the first instance, just a set for the pmac_string. Figure it out later
-    async def _set_pmac_string(self, cmd_str: str):
-        await self.pmac_string.set(cmd_str)
-
-    def set(self, cmd: str) -> AsyncStatus:
-        return AsyncStatus(
-            asyncio.wait_for(self._set_pmac_string(cmd), timeout=self.TIMEOUT)
-        )
