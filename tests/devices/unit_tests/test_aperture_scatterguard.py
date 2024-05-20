@@ -86,6 +86,11 @@ def aperture_positions():
             "miniap_z_ROBOT_LOAD": 15.8,
             "sg_x_ROBOT_LOAD": 5.25,
             "sg_y_ROBOT_LOAD": 4.43,
+            "miniap_x_tolerance": 0.004,
+            "miniap_y_tolerance": 0.1,
+            "miniap_z_tolerance": 0.1,
+            "sg_x_tolerance": 0.1,
+            "sg_y_tolerance": 0.1,
         }
     )
     return aperture_positions
@@ -220,7 +225,7 @@ async def test_aperture_positions_robot_load_within_tolerance(
     ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
 ):
     robot_load_ap_y = aperture_positions.ROBOT_LOAD.location.aperture_y
-    tolerance = ap_sg.TOLERANCE_STEPS * await ap_sg.aperture.y.deadband.get_value()
+    tolerance = aperture_positions.tolerances.ap_y
     set_mock_value(ap_sg.aperture.large, 0)
     set_mock_value(ap_sg.aperture.medium, 0)
     set_mock_value(ap_sg.aperture.small, 0)
@@ -232,9 +237,7 @@ async def test_aperture_positions_robot_load_outside_tolerance(
     ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
 ):
     robot_load_ap_y = aperture_positions.ROBOT_LOAD.location.aperture_y
-    tolerance = (
-        ap_sg.TOLERANCE_STEPS + 1
-    ) * await ap_sg.aperture.y.deadband.get_value()
+    tolerance = aperture_positions.tolerances.ap_y + 0.01
     set_mock_value(ap_sg.aperture.large, 0)
     set_mock_value(ap_sg.aperture.medium, 0)
     set_mock_value(ap_sg.aperture.small, 0)
