@@ -14,10 +14,8 @@ class OpenState(str, Enum):
 
 class Shutter(StandardReadable):
     def __init__(self, prefix: str, name: str):
-        self.position = epics_signal_rw(
-            write_pv=prefix + "CTRL2", read_pv=prefix + "STA", datatype=OpenState
-        )
-        super().__init__(
-            name=name,
-        )
-        self.set_readable_signals([self.position])
+        with self.add_children_as_readables():
+            self.position = epics_signal_rw(
+                write_pv=prefix + "CTRL2", read_pv=prefix + "STA", datatype=OpenState
+            )
+        super().__init__(name=name)
