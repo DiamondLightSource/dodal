@@ -26,9 +26,3 @@ def device_c() -> Cryo:
 
 def not_device() -> int:
     raise WaitTimeoutError
-
-
-def _mock_with_name(name: str) -> MagicMock:
-    mock = MagicMock()
-    mock.name = name
-    return mock

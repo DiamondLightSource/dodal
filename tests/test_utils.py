@@ -70,22 +70,22 @@ def test_no_signature_builtins_not_devices() -> None:
     assert len(exceptions) == 0
 
 
-def test_all_beamline_devices_raise_exceptions() -> None:
+def test_no_devices_when_all_factories_raise_exceptions() -> None:
     import tests.fake_beamline_all_devices_rasie_exception as fake_beamline
 
     devices, exceptions = make_all_devices(fake_beamline)
     assert len(devices) == 0
-    assert len(exceptions) > 0 and all(
+    assert len(exceptions) == 4 and all(
         isinstance(e, Exception) for e in exceptions.values()
     )
 
 
-def test_all_beamline_some_devices_work() -> None:
+def test_some_devices_when_some_factories_raise_exceptions() -> None:
     import tests.fake_beamline_some_devices_working as fake_beamline
 
     devices, exceptions = make_all_devices(fake_beamline)
-    assert len(devices) != 0
-    assert len(exceptions) >= 0 and all(
+    assert len(devices) == 2
+    assert len(exceptions) == 2 and all(
         isinstance(e, Exception) for e in exceptions.values()
     )
 
