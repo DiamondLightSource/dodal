@@ -6,10 +6,10 @@ from dodal.devices.slits.slit_motor import SlitMotor
 
 
 class I24Slits04VirtualMotors(GapAndCenterSlit2d):
-    x_center: Device = Component(SlitMotor, "X:CENTER")
+    x_center: Device = Component(SlitMotor, "X:CENTRE")
     x_size: Device = Component(SlitMotor, "X:SIZE")
 
-    x_center: Device = Component(SlitMotor, "Y:CENTER")
+    x_center: Device = Component(SlitMotor, "Y:CENTRE")
     y_size: Device = Component(SlitMotor, "Y:SIZE")
 
     def set(self, position_tuple):
