@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from ophyd_async.epics.areadetector import AravisDetector, PilatusDetector
 from ophyd_async.panda import HDFPanda
 
@@ -7,7 +9,7 @@ from dodal.beamlines.beamline_utils import (
     set_directory_provider,
 )
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.visit import StaticVisitDirectoryProvider
+from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitDirectoryProvider
 from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.i22.fswitch import FSwitch
 from dodal.devices.slits import Slits
@@ -22,13 +24,17 @@ from .beamline_utils import set_beamline as set_utils_beamline
 BL = get_beamline_name("i22")
 set_log_beamline(BL)
 set_utils_beamline(BL)
-"""VISIT is a placeholder value for reference.
-    Requires that all StandardDetector IOCs are running with /data mapping to /dls/i22/data
-    """
+
+# Currently we must hard-code the visit, determining the visit at runtime requires
+# infrastructure that is still WIP.
+# Communication with GDA is also WIP so for now we determine an arbitrary scan number
+# locally and write the commissioning directory. The scan number is not guaranteed to
+# be unique and the data is at risk - this configuration is for testing only.
 set_directory_provider(
     StaticVisitDirectoryProvider(
         BL,
-        "/data/i22/2024/VISIT",
+        Path("/dls/i22/data/2024/cm37271-2/bluesky"),
+        client=LocalDirectoryServiceClient(),
     )
 )
 
