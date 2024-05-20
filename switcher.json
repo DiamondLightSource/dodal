@@ -220,6 +220,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/442-convert-attenuator-into-an-ophyd-async-device/"
   },
   {
+    "version": "462_rationalise_slits",
+    "url": "https://DiamondLightSource.github.io/dodal/462_rationalise_slits/"
+  },
+  {
     "version": "471_beam_centre",
     "url": "https://DiamondLightSource.github.io/dodal/471_beam_centre/"
   },
