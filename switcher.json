@@ -408,6 +408,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/remove_ophyd_dependency_pin/"
   },
   {
+    "version": "static-directory-provider-i22-and-p38",
+    "url": "https://DiamondLightSource.github.io/dodal/static-directory-provider-i22-and-p38/"
+  },
+  {
     "version": "test-html",
     "url": "https://DiamondLightSource.github.io/dodal/test-html/"
   },
