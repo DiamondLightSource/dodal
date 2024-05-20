@@ -1,4 +1,3 @@
-import asyncio
 from enum import Enum
 
 from bluesky.protocols import Movable
@@ -12,8 +11,8 @@ class OpenStateSet(str, Enum):
 
 
 class OpenStateReadback(str, Enum):
-    CLOSED = "closed"
-    OPEN = "open"
+    CLOSED = OpenStateSet.CLOSED
+    OPEN = OpenStateSet.OPEN
     OPENING = "opening"
     CLOSING = "closing"
     FAULT = "fault"
@@ -32,10 +31,9 @@ class Shutter(StandardReadable, Movable):
             )
         super().__init__(name=name)
 
-    def set(self, position: OpenStateSet):
-
-        return AsyncStatus(
-            asyncio.wait_for(
-                await wait_for_value(self.position_readback, position, None), timeout=5
-            )
+    @AsyncStatus.wrap
+    async def set(self, position: OpenStateSet):
+        new_position = OpenStateReadback(position)
+        return await wait_for_value(
+            signal=self.position_readback, match=new_position, timeout=50
         )
