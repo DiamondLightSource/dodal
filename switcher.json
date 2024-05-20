@@ -248,10 +248,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/520-fix-i22-slits/"
   },
   {
-    "version": "554_bump_ophyd_async",
-    "url": "https://DiamondLightSource.github.io/dodal/554_bump_ophyd_async/"
-  },
-  {
     "version": "76_make_stage_synchronous_if_arming_not_started",
     "url": "https://DiamondLightSource.github.io/dodal/76_make_stage_synchronous_if_arming_not_started/"
   },
