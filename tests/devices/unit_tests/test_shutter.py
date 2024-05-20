@@ -18,7 +18,7 @@ async def sim_shutter():
     "state",
     [
         (OpenState.OPEN),
-        (OpenState.CLOSE),
+        (OpenState.CLOSED),
     ],
 )
 async def test_set_opens_and_closes_shutter(state: OpenState, sim_shutter: Shutter):
@@ -30,3 +30,4 @@ async def test_set_opens_and_closes_shutter(state: OpenState, sim_shutter: Shutt
     assert (
         shutter_position["value"] is state
     ), f"Unexpected value: {shutter_position['value']}"
+    await status

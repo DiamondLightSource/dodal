@@ -5,9 +5,12 @@ from ophyd_async.core import AsyncStatus, StandardReadable
 from ophyd_async.epics.signal import epics_signal_rw
 
 
-class OpenState(Enum):
-    CLOSE = 0
-    OPEN = 1
+class OpenState(str, Enum):
+    CLOSED = "closed"
+    OPEN = "open"
+    OPENING = "opening"
+    CLOSING = "closing"
+    FAULT = "fault"
 
 
 class Shutter(StandardReadable, Movable):
@@ -22,7 +25,3 @@ class Shutter(StandardReadable, Movable):
             name=name,
         )
         self.set_readable_signals([self.position])
-
-    def set(self, open_val: OpenState):
-        shutter_status: AsyncStatus = self.position.set(open_val)
-        return shutter_status
