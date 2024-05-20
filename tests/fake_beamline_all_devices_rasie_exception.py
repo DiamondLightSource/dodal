@@ -1,12 +1,9 @@
-from unittest.mock import MagicMock
-
 from bluesky.protocols import Readable
 from ophyd import EpicsMotor
 from ophyd.utils import (
     DestroyedError,
     DisconnectedError,
     UnknownStatusFailure,
-    WaitTimeoutError,
 )
 
 from dodal.devices.cryostream import Cryo
@@ -22,7 +19,3 @@ def device_b() -> EpicsMotor:
 
 def device_c() -> Cryo:
     raise UnknownStatusFailure
-
-
-def not_device() -> int:
-    raise WaitTimeoutError

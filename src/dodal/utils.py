@@ -161,11 +161,7 @@ def invoke_factories(
         except Exception as e:
             exceptions[dependent_name] = e
 
-    all_devices = {
-        device.name: device
-        for device in devices.values()
-        if not isinstance(device, Exception)
-    }
+    all_devices = {device.name: device for device in devices.values()}
 
     return (all_devices, exceptions)
 
