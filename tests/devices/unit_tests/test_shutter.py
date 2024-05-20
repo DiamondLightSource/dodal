@@ -22,7 +22,7 @@ async def sim_shutter():
     ],
 )
 async def test_set_opens_and_closes_shutter(state: OpenState, sim_shutter: Shutter):
-    status = sim_shutter.set(state)
+    status = sim_shutter.position.set(state)
     assert not status.done
     reading = await sim_shutter.read()
 
