@@ -13,7 +13,7 @@ class I24Slits04VirtualMotors(GapAndCenterSlit2d):
     y_size: Device = Component(SlitMotor, "Y:SIZE")
 
     def set(self, position_tuple):
-        x_center_value, x_size_value, x_center_value, y_size_value = position_tuple
+        x_center_value, x_size_value, y_center_value, y_size_value = position_tuple
 
         status = StatusBase()
         status.set_finished()
@@ -29,6 +29,6 @@ class I24Slits04VirtualMotors(GapAndCenterSlit2d):
         return (
             self.x_center.read(),
             self.x_size.read(),
-            self.x_center.read(),
+            self.y_center.read(),
             self.y_size.read(),
         )
