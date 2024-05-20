@@ -2,7 +2,7 @@ import asyncio
 from unittest.mock import MagicMock, patch
 
 import numpy as np
-from ophyd_async.core import set_sim_value
+from ophyd_async.core import set_mock_value
 
 from dodal.devices.oav.pin_image_recognition import MxSampleDetect, PinTipDetection
 from dodal.devices.oav.pin_image_recognition.utils import SampleLocation
@@ -18,13 +18,13 @@ TRIGGERED_BOTTOM_EDGE_READING = DEVICE_NAME + "-triggered_bottom_edge"
 
 async def _get_pin_tip_detection_device() -> PinTipDetection:
     device = PinTipDetection("-DI-OAV-01", name=DEVICE_NAME)
-    await device.connect(sim=True)
+    await device.connect(mock=True)
     return device
 
 
 async def test_pin_tip_detect_can_be_connected_in_sim_mode():
     device = await _get_pin_tip_detection_device()
-    await device.connect(sim=True)
+    await device.connect(mock=True)
 
 
 async def test_soft_parameter_defaults_are_correct():
@@ -72,7 +72,7 @@ async def test_invalid_processing_func_uses_identity_function():
     device = await _get_pin_tip_detection_device()
     test_sample_location = SampleLocation(100, 200, np.array([]), np.array([]))
 
-    set_sim_value(device.preprocess_operation, 50)  # Invalid index
+    set_mock_value(device.preprocess_operation, 50)  # Invalid index
 
     with (
         patch.object(MxSampleDetect, "__init__", return_value=None) as mock_init,
@@ -95,7 +95,7 @@ async def test_given_valid_data_reading_then_used_to_find_location():
     test_sample_location = SampleLocation(
         100, 200, np.array([1, 2, 3]), np.array([4, 5, 6])
     )
-    set_sim_value(device.array_data, image_array)
+    set_mock_value(device.array_data, image_array)
 
     with (
         patch.object(MxSampleDetect, "__init__", return_value=None),
@@ -121,7 +121,7 @@ async def test_given_valid_data_reading_then_used_to_find_location():
 async def test_given_find_tip_fails_when_triggered_then_tip_invalid():
     device = await _get_pin_tip_detection_device()
     await device.validity_timeout.set(0.1)
-    set_sim_value(device.array_data, np.array([1, 2, 3]))
+    set_mock_value(device.array_data, np.array([1, 2, 3]))
 
     with (
         patch.object(MxSampleDetect, "__init__", return_value=None),

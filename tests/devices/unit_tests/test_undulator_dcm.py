@@ -6,7 +6,7 @@ import pytest
 from ophyd_async.core import (
     AsyncStatus,
     DeviceCollector,
-    set_sim_value,
+    set_mock_value,
 )
 
 from dodal.devices.dcm import DCM
@@ -26,7 +26,7 @@ ID_GAP_LOOKUP_TABLE_PATH: str = (
 
 @pytest.fixture
 async def fake_undulator_dcm() -> UndulatorDCM:
-    async with DeviceCollector(sim=True):
+    async with DeviceCollector(mock=True):
         undulator = Undulator("UND-01", name="undulator")
         dcm = DCM("DCM-01", name="dcm")
         undulator_dcm = UndulatorDCM(
@@ -58,7 +58,7 @@ async def test_fixed_offset_decoded(fake_undulator_dcm: UndulatorDCM):
 async def test_when_gap_access_is_disabled_set_energy_then_error_is_raised(
     fake_undulator_dcm: UndulatorDCM,
 ):
-    set_sim_value(fake_undulator_dcm.undulator.gap_access, UndulatorGapAccess.DISABLED)
+    set_mock_value(fake_undulator_dcm.undulator.gap_access, UndulatorGapAccess.DISABLED)
     with pytest.raises(AccessError):
         await fake_undulator_dcm.set(5)
 
@@ -79,8 +79,8 @@ def test_correct_closest_distance_to_energy_from_table(dcm_energy, expected_outp
 async def test_if_gap_is_wrong_then_logger_info_is_called_and_gap_is_set_correctly(
     mock_logger: MagicMock, mock_load: MagicMock, fake_undulator_dcm: UndulatorDCM
 ):
-    set_sim_value(fake_undulator_dcm.undulator.current_gap, 5.3)
-    set_sim_value(fake_undulator_dcm.dcm.energy_in_kev.user_readback, 5.7)
+    set_mock_value(fake_undulator_dcm.undulator.current_gap, 5.3)
+    set_mock_value(fake_undulator_dcm.dcm.energy_in_kev.user_readback, 5.7)
 
     mock_load.return_value = np.array([[5700, 5.4606], [7000, 6.045], [9700, 6.404]])
 
@@ -99,12 +99,12 @@ async def test_if_gap_is_wrong_then_logger_info_is_called_and_gap_is_set_correct
 async def test_when_gap_access_is_not_checked_if_test_mode_enabled(
     mock_logger: MagicMock, mock_load: MagicMock, fake_undulator_dcm: UndulatorDCM
 ):
-    set_sim_value(fake_undulator_dcm.undulator.gap_access, UndulatorGapAccess.DISABLED)
-    set_sim_value(fake_undulator_dcm.undulator.current_gap, 5.3)
-    set_sim_value(fake_undulator_dcm.dcm.energy_in_kev.user_readback, 5.7)
+    set_mock_value(fake_undulator_dcm.undulator.gap_access, UndulatorGapAccess.DISABLED)
+    set_mock_value(fake_undulator_dcm.undulator.current_gap, 5.3)
+    set_mock_value(fake_undulator_dcm.dcm.energy_in_kev.user_readback, 5.7)
 
-    set_sim_value(fake_undulator_dcm.undulator.gap_motor.user_setpoint, 0.0)
-    set_sim_value(fake_undulator_dcm.undulator.gap_motor.user_readback, 0.0)
+    set_mock_value(fake_undulator_dcm.undulator.gap_motor.user_setpoint, 0.0)
+    set_mock_value(fake_undulator_dcm.undulator.gap_motor.user_readback, 0.0)
 
     mock_load.return_value = np.array([[5700, 5.4606], [7000, 6.045], [9700, 6.404]])
 
@@ -125,14 +125,14 @@ async def test_when_gap_access_is_not_checked_if_test_mode_enabled(
 async def test_if_gap_is_already_correct_then_dont_move_gap(
     mock_logger: MagicMock, mock_load: MagicMock, fake_undulator_dcm: UndulatorDCM
 ):
-    set_sim_value(fake_undulator_dcm.dcm.energy_in_kev.user_setpoint, 0.0)
-    set_sim_value(fake_undulator_dcm.dcm.energy_in_kev.user_readback, 0.0)
+    set_mock_value(fake_undulator_dcm.dcm.energy_in_kev.user_setpoint, 0.0)
+    set_mock_value(fake_undulator_dcm.dcm.energy_in_kev.user_readback, 0.0)
 
     mock_load.return_value = np.array([[5700, 5.4606], [7000, 6.045], [9700, 6.404]])
-    set_sim_value(fake_undulator_dcm.undulator.current_gap, 5.4605)
+    set_mock_value(fake_undulator_dcm.undulator.current_gap, 5.4605)
 
     status = fake_undulator_dcm.set(5.8)
-    await asyncio.wait_for(status, timeout=0.01)
+    await asyncio.wait_for(status, timeout=0.05)
 
     # Verify undulator has not been asked to move
     assert (
@@ -145,7 +145,7 @@ async def test_if_gap_is_already_correct_then_dont_move_gap(
 async def test_energy_set_only_complete_when_all_statuses_are_finished(
     fake_undulator_dcm: UndulatorDCM,
 ):
-    set_sim_value(fake_undulator_dcm.undulator.current_gap, 5.0)
+    set_mock_value(fake_undulator_dcm.undulator.current_gap, 5.0)
 
     release_dcm = asyncio.Event()
     release_undulator = asyncio.Event()

@@ -12,6 +12,10 @@ from dodal.log import LOGGER
 
 FREE_RUN_MAX_IMAGES = 1000000
 
+# TODO present for testing purposes, remove
+TEST_1169_FIX = True
+TEST_1169_INJECT = False
+
 
 class InternalEigerTriggerMode(Enum):
     INTERNAL_SERIES = 0
@@ -96,7 +100,7 @@ class EigerDetector(Device):
 
     def stage(self):
         self.wait_on_arming_if_started()
-        if not self.is_armed():
+        if TEST_1169_INJECT or not self.is_armed():
             LOGGER.info("Eiger not armed, arming")
 
             self.async_stage().wait(timeout=self.ARMING_TIMEOUT)
@@ -290,6 +294,8 @@ class EigerDetector(Device):
 
     def _wait_for_odin_status(self) -> Status:
         self.forward_bit_depth_to_filewriter()
+        await_value(self.odin.meta.active, 1).wait(self.GENERAL_STATUS_TIMEOUT)
+
         status = self.odin.file_writer.capture.set(
             1, timeout=self.GENERAL_STATUS_TIMEOUT
         )
@@ -323,20 +329,25 @@ class EigerDetector(Device):
         if detector_params.use_roi_mode:
             functions_to_do_arm.append(self.enable_roi_mode)
 
-        functions_to_do_arm.extend(
-            [
-                lambda: self.set_detector_threshold(detector_params.expected_energy_ev),
-                self.set_cam_pvs,
-                self.set_odin_number_of_frame_chunks,
-                self.set_odin_pvs,
-                self.set_mx_settings_pvs,
-                self.set_num_triggers_and_captures,
-                lambda: await_value(self.stale_params, 0, 60),
-                self._wait_for_odin_status,
-                lambda: self.cam.acquire.set(1, timeout=self.GENERAL_STATUS_TIMEOUT),
-                self._wait_fan_ready,
-                self._finish_arm,
-            ]
-        )
+        arming_sequence_funcs = [
+            lambda: self.set_detector_threshold(detector_params.expected_energy_ev),
+            self.set_cam_pvs,
+            self.set_odin_number_of_frame_chunks,
+            self.set_odin_pvs,
+            self.set_mx_settings_pvs,
+            self.set_num_triggers_and_captures,
+            lambda: await_value(self.stale_params, 0, 60),
+            self._wait_for_odin_status,
+            lambda: self.cam.acquire.set(1, timeout=self.GENERAL_STATUS_TIMEOUT),
+            self._wait_fan_ready,
+            self._finish_arm,
+        ]
+        if TEST_1169_FIX:
+            # If a beam dump occurs after arming the eiger but prior to eiger staging,
+            # the odin may timeout which will cause the arming sequence to be retried;
+            # if this previously completed successfully we must reset the odin first
+            arming_sequence_funcs.insert(0, self.odin.stop)
+
+        functions_to_do_arm.extend(arming_sequence_funcs)
 
         return run_functions_without_blocking(functions_to_do_arm, associated_obj=self)
