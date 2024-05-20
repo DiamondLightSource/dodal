@@ -5,8 +5,8 @@ from bluesky.protocols import Movable
 from ophyd import Device
 
 
-class GapAndCentreSlit1d(Device, Movable, ABC):
-    """Class defining interface between Ophyd and 1-dimensional gap and centre slits."""
+class GapAndCenterSlit1d(Device, Movable, ABC):
+    """Class defining interface between Ophyd and 1-dimensional gap and center slits."""
 
     @abstractmethod
     def set(self, position_tuple: Tuple[float, float]):
@@ -14,12 +14,11 @@ class GapAndCentreSlit1d(Device, Movable, ABC):
 
         Parameters:
             position_tuple: A 2-tuple containing:
-                x_centre_value: Central coordinate of gap
+                x_center_value: Central coordinate of gap
                 x_size_value: Width of gap
         """
         ...
 
-    
     def read(self) -> Tuple[float, float]:
         """Method to read position of slit.
 
@@ -30,8 +29,9 @@ class GapAndCentreSlit1d(Device, Movable, ABC):
         """
         ...
 
-class GapAndCentreSlit2d(Device, Movable, ABC):
-    """Class defining interface between Ophyd and 2-dimensional gap and centre slits."""
+
+class GapAndCenterSlit2d(Device, Movable, ABC):
+    """Class defining interface between Ophyd and 2-dimensional gap and center slits."""
 
     @abstractmethod
     def set(self, position_tuple: Tuple[float, float, float, float]):
@@ -39,13 +39,12 @@ class GapAndCentreSlit2d(Device, Movable, ABC):
 
         Parameters:
             position_tuple: A 4-tuple containing:
-                x_centre_value: Central x-coordinate of gap
+                x_center_value: Central x-coordinate of gap
                 x_size_value: Width of gap in x-dimension
-                y_centre_value: Central y-coordinate of gap
+                y_center_value: Central y-coordinate of gap
                 y_size_value: Width of gap in y-dimension
         """
         ...
-    
 
     def read(self) -> Tuple[float, float, float, float]:
         """Method to read position of slit.
