@@ -19,10 +19,6 @@ def device_c() -> Cryo:
     return _mock_with_name("cryo")
 
 
-def not_device() -> int:
-    return 5
-
-
 def _mock_with_name(name: str) -> MagicMock:
     mock = MagicMock()
     mock.name = name

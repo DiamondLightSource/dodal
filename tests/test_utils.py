@@ -75,7 +75,7 @@ def test_no_devices_when_all_factories_raise_exceptions() -> None:
 
     devices, exceptions = make_all_devices(fake_beamline)
     assert len(devices) == 0
-    assert len(exceptions) == 4 and all(
+    assert len(exceptions) == 3 and all(
         isinstance(e, Exception) for e in exceptions.values()
     )
 
@@ -85,7 +85,7 @@ def test_some_devices_when_some_factories_raise_exceptions() -> None:
 
     devices, exceptions = make_all_devices(fake_beamline)
     assert len(devices) == 2
-    assert len(exceptions) == 2 and all(
+    assert len(exceptions) == 1 and all(
         isinstance(e, Exception) for e in exceptions.values()
     )
 

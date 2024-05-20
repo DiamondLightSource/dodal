@@ -141,7 +141,7 @@ def invoke_factories(
     **kwargs,
 ) -> Tuple[Dict[str, AnyDevice], Dict[str, Exception]]:
     devices: dict[str, AnyDevice] = {}
-    device_exceptions: dict[str, Exception] = {}
+    exceptions: dict[str, Exception] = {}
 
     dependencies = {
         factory_name: set(extract_dependencies(factories, factory_name))
@@ -149,11 +149,11 @@ def invoke_factories(
     }
     # This is going into a infinite loop if there are circular dependencies.
     # need to figure out how to handle this.
-    while (len(devices) + len(device_exceptions)) < len(factories):
+    while (len(devices) + len(exceptions)) < len(factories):
         leaves = [
             device
             for device, device_dependencies in dependencies.items()
-            if device not in devices.keys()
+            if (device not in devices.keys() and device not in exceptions.keys())
             and len(device_dependencies - set(devices.keys())) == 0
         ]
         dependent_name = leaves.pop()
@@ -161,15 +161,11 @@ def invoke_factories(
         try:
             devices[dependent_name] = factories[dependent_name](**params, **kwargs)
         except Exception as e:
-            device_exceptions[dependent_name] = e
+            exceptions[dependent_name] = e
 
-    all_devices = {
-        device.name: device
-        for device in devices.values()
-        if not isinstance(device, Exception)
-    }
+    all_devices = {device.name: device for device in devices.values()}
 
-    return (all_devices, device_exceptions)
+    return (all_devices, exceptions)
 
 
 def extract_dependencies(
