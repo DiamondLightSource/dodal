@@ -45,6 +45,7 @@ class CAENelsBimorphMirror12Channel(CAENelsBimorphMirror8Channel):
     )
     channel_12_voltage_out_readback_value: EpicsSignal = Component(
         EpicsSignal, "C12:VOUT_RBV"
+    )
 
     channel_9_status: EpicsSignal = Component(EpicsSignal, "C9:STATUS")
     channel_10_status: EpicsSignal = Component(EpicsSignal, "C10:STATUS")
