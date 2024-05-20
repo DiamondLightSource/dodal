@@ -248,10 +248,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/520-fix-i22-slits/"
   },
   {
-    "version": "551_fix_epicsmotor_mocking_for_tests",
-    "url": "https://DiamondLightSource.github.io/dodal/551_fix_epicsmotor_mocking_for_tests/"
-  },
-  {
     "version": "554_bump_ophyd_async",
     "url": "https://DiamondLightSource.github.io/dodal/554_bump_ophyd_async/"
   },
