@@ -1,7 +1,7 @@
 import pytest
 from ophyd_async.core import DeviceCollector
 
-from dodal.devices.shutter import OpenState, Shutter
+from dodal.devices.shutter import OpenStateReadback, Shutter
 
 
 @pytest.fixture
@@ -17,12 +17,14 @@ async def sim_shutter():
 @pytest.mark.parametrize(
     "state",
     [
-        (OpenState.OPEN),
-        (OpenState.CLOSED),
+        (OpenStateReadback.OPEN),
+        (OpenStateReadback.CLOSED),
     ],
 )
-async def test_set_opens_and_closes_shutter(state: OpenState, sim_shutter: Shutter):
-    status = sim_shutter.position.set(state)
+async def test_set_opens_and_closes_shutter(
+    state: OpenStateReadback, sim_shutter: Shutter
+):
+    status = sim_shutter.position_readback.set(state)
     assert not status.done
     reading = await sim_shutter.read()
 
