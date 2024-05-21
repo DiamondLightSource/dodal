@@ -18,11 +18,16 @@ from .device_fixtures import (
     mock_backlight,
     mock_bart_robot,
     mock_dual_backlight,
+    mock_smargon,
     mock_undulator_dcm,
     mock_vfm_mirror_voltages,
     test_aperture_positions,
 )
-from .utility_functions import mock_beamline_module_filepaths, patch_ophyd_async_motor
+from .utility_functions import (
+    mock_beamline_module_filepaths,
+    patch_ophyd_async_motor,
+    set_smargon_pos,
+)
 
 __all__ = [
     # Constants
@@ -37,6 +42,7 @@ __all__ = [
     "mock_backlight",
     "mock_bart_robot",
     "mock_dual_backlight",
+    "mock_smargon",
     "mock_undulator_dcm",
     "mock_vfm_mirror_voltages",
     # Test data fixtures
@@ -46,6 +52,7 @@ __all__ = [
     # Utility functions
     "mock_beamline_module_filepaths",
     "patch_ophyd_async_motor",
+    "set_smargon_pos",
 ]
 
 

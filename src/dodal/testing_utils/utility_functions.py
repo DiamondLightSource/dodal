@@ -6,6 +6,8 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.motion import Motor
 
+from dodal.devices.smargon import Smargon
+
 from .constants import MOCK_ATTRIBUTES_TABLE
 
 
@@ -21,6 +23,12 @@ def _pass_on_mock(motor, call_log: MagicMock | None = None):
             call_log(value, **kwargs)
 
     return _pass_on_mock
+
+
+def set_smargon_pos(smargon: Smargon, pos: tuple[float, float, float]):
+    smargon.x.user_readback.sim_put(pos[0])  # type: ignore
+    smargon.y.user_readback.sim_put(pos[1])  # type: ignore
+    smargon.z.user_readback.sim_put(pos[2])  # type: ignore
 
 
 def patch_ophyd_async_motor(
