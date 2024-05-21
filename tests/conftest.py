@@ -6,17 +6,17 @@ import sys
 import time
 from os import environ, getenv
 from pathlib import Path
-from typing import cast
 from unittest.mock import MagicMock, patch
 
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd.sim import make_fake_device
 
-from dodal.beamlines import beamline_utils, i03
-from dodal.devices.focusing_mirror import VFMMirrorVoltages
+from dodal.beamlines import beamline_utils
 from dodal.log import LOGGER, GELFTCPHandler, set_up_all_logging_handlers
+from dodal.testing_utils import vfm_mirror_voltages
 from dodal.utils import make_all_devices
+
+__all__ = ["vfm_mirror_voltages"]
 
 MOCK_DAQ_CONFIG_PATH = "tests/devices/unit_tests/test_daq_configuration"
 mock_paths = [
@@ -67,20 +67,6 @@ def pytest_runtest_setup(item):
 def pytest_runtest_teardown():
     if "dodal.beamlines.beamline_utils" in sys.modules:
         sys.modules["dodal.beamlines.beamline_utils"].clear_devices()
-
-
-@pytest.fixture
-def vfm_mirror_voltages() -> VFMMirrorVoltages:
-    voltages = cast(
-        VFMMirrorVoltages,
-        make_fake_device(VFMMirrorVoltages)(
-            name="vfm_mirror_voltages",
-            prefix="BL-I03-MO-PSU-01:",
-            daq_configuration_path=i03.DAQ_CONFIGURATION_PATH,
-        ),
-    )
-    voltages.voltage_lookup_table_path = "tests/test_data/test_mirror_focus.json"
-    return voltages
 
 
 s03_epics_server_port = getenv("S03_EPICS_CA_SERVER_PORT")

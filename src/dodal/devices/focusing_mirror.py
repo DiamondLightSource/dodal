@@ -1,7 +1,8 @@
 from enum import Enum, IntEnum
-from typing import Any
+from typing import Any, cast
 
 from ophyd import Component, Device, EpicsSignal
+from ophyd.sim import make_fake_device
 from ophyd.status import Status, StatusBase
 from ophyd_async.core import StandardReadable
 from ophyd_async.core.signal import soft_signal_r_and_setter
@@ -44,9 +45,9 @@ class MirrorVoltageDevice(Device):
     the demanded voltage setpoint is accepted, without blocking the caller as this process can take significant time.
     """
 
-    _actual_v: EpicsSignal = Component(EpicsSignal, "R")
-    _setpoint_v: EpicsSignal = Component(EpicsSignal, "D")
-    _demand_accepted: EpicsSignal = Component(EpicsSignal, "DSEV")
+    _actual_v = Component(EpicsSignal, "R")
+    _setpoint_v = Component(EpicsSignal, "D")
+    _demand_accepted = Component(EpicsSignal, "DSEV")
 
     def set(self, value, *args, **kwargs) -> StatusBase:
         """Combine the following operations into a single set:
@@ -168,3 +169,16 @@ class FocusingMirrorWithStripes(FocusingMirror):
             return MirrorStripe.BARE
         else:
             return MirrorStripe.RHODIUM
+
+
+def get_sim_voltages() -> VFMMirrorVoltages:
+    voltages = cast(
+        VFMMirrorVoltages,
+        make_fake_device(VFMMirrorVoltages)(
+            name="vfm_mirror_voltages",
+            prefix="BL-I03-MO-PSU-01:",
+            daq_configuration_path="tests/test_data/",
+        ),
+    )
+    voltages.voltage_lookup_table_path = "tests/test_data/test_mirror_focus.json"
+    return voltages
