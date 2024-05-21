@@ -175,7 +175,7 @@ class CAENelsBimorphMirror32Channel(CAENelsBimorphMirror16Channel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self._voltage_out_channels.extend(
+        self._voltage_target_channels.extend(
             [
                 self.channel_17_voltage_target,
                 self.channel_18_voltage_target,
