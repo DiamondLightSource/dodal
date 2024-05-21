@@ -252,6 +252,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/564_organise_testing_utils/"
   },
   {
+    "version": "566-fswitch-config-fields",
+    "url": "https://DiamondLightSource.github.io/dodal/566-fswitch-config-fields/"
+  },
+  {
     "version": "76_make_stage_synchronous_if_arming_not_started",
     "url": "https://DiamondLightSource.github.io/dodal/76_make_stage_synchronous_if_arming_not_started/"
   },
