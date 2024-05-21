@@ -33,11 +33,15 @@ class Shutter(StandardReadable, Movable):
         super().__init__(name=name)
 
     @AsyncStatus.wrap
-    async def set(self, position: ShutterSetState):
-        if position == ShutterSetState.RESET:
+    async def set(self, desired_position: ShutterSetState):
+        if desired_position == ShutterSetState.RESET:
             return
-        new_position = ShutterState.CLOSED if position === ShutterSetState.CLOSE else ShutterState.OPEN
-        await self.position_set.set(position)
+        new_position = (
+            ShutterState.CLOSED
+            if desired_position == ShutterSetState.CLOSED
+            else ShutterState.OPEN
+        )
+        await self.position_set.set(desired_position)
         return await wait_for_value(
             signal=self.position_readback, match=new_position, timeout=50
         )
