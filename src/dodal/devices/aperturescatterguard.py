@@ -267,3 +267,43 @@ class ApertureScatterguard(StandardReadable, Movable):
             self.scatterguard.x.set(scatterguard_x),
             self.scatterguard.y.set(scatterguard_y),
         )
+
+
+TEST_APERTURE_POSITIONS = {
+    "miniap_x_LARGE_APERTURE": 2.389,
+    "miniap_y_LARGE_APERTURE": 40.986,
+    "miniap_z_LARGE_APERTURE": 15.8,
+    "sg_x_LARGE_APERTURE": 5.25,
+    "sg_y_LARGE_APERTURE": 4.43,
+    "miniap_x_MEDIUM_APERTURE": 2.384,
+    "miniap_y_MEDIUM_APERTURE": 44.967,
+    "miniap_z_MEDIUM_APERTURE": 15.8,
+    "sg_x_MEDIUM_APERTURE": 5.285,
+    "sg_y_MEDIUM_APERTURE": 0.46,
+    "miniap_x_SMALL_APERTURE": 2.430,
+    "miniap_y_SMALL_APERTURE": 48.974,
+    "miniap_z_SMALL_APERTURE": 15.8,
+    "sg_x_SMALL_APERTURE": 5.3375,
+    "sg_y_SMALL_APERTURE": -3.55,
+    "miniap_x_ROBOT_LOAD": 2.386,
+    "miniap_y_ROBOT_LOAD": 31.40,
+    "miniap_z_ROBOT_LOAD": 15.8,
+    "sg_x_ROBOT_LOAD": 5.25,
+    "sg_y_ROBOT_LOAD": 4.43,
+    "miniap_x_tolerance": 0.004,
+    "miniap_y_tolerance": 0.1,
+    "miniap_z_tolerance": 0.1,
+    "sg_x_tolerance": 0.1,
+    "sg_y_tolerance": 0.1,
+}
+
+
+async def get_mock_device(
+    aperture_positions: AperturePositions = AperturePositions.from_gda_beamline_params(
+        TEST_APERTURE_POSITIONS
+    ),
+):
+    ap_sg = ApertureScatterguard(name="test_ap_sg")
+    await ap_sg.connect(mock=True)
+    ap_sg.load_aperture_positions(aperture_positions)
+    return ap_sg
