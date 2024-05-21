@@ -10,11 +10,10 @@ class PMACStringHome(Triggerable):
         self,
         pmac_str_sig: SignalRW,
         string_to_send: str,
-        name: str = "",
     ) -> None:
         self.signal = pmac_str_sig
         self.cmd_string = string_to_send
-        super().__init__(name)
+        super().__init__()
 
     async def trigger(self):
         await self.signal.set(self.cmd_string)
