@@ -260,6 +260,36 @@ class CAENelsBimorphMirrorInterface(Device, Movable):
         status.wait()
 
         return status & self.protected_set(self.all_target_proc, 1)
+    
+    def diff_set_and_proc_target_voltages(
+        self, target_voltages: list[float]
+    ) -> SubscriptionStatus:
+        """Sets VTRGT channels to values in target_voltages efficiently by diff
+
+        Checks for diff between VTRGT_RBV and target_voltages, then writes to VTRGT for
+        each difference.
+
+        Args:
+            target_voltages: An array of length equal to number of channels, with
+                target_voltages[X] being set for channel_X_target_voltage if 
+                channel_x_target_voltage_readback_value != target_voltage[x]
+        
+        Returns:
+            A SubscriptionStatus object tracking completion of operations
+        """
+
+        voltage_target_rbvs = self.read_from_all_channels_by_attribute(ChannelAttribute.VTRGT_RBV)
+
+        status = StatusBase()
+        status.set_finished()
+
+        for i, channel in enumerate(self.get_channels_by_attribute(ChannelAttribute.VTRGT)):
+            if target_voltages[i] != voltage_target_rbvs[i]:
+                status &= self.protected_set(channel, target_voltages[i])
+            
+            status.wait()
+        return status
+
 
     def set(self, target_voltages: list[float], settle_time = 0) -> SubscriptionStatus:
         """Sets each voltage channel to equivalent value in target_voltages.
@@ -271,7 +301,7 @@ class CAENelsBimorphMirrorInterface(Device, Movable):
             A SubscriptionStatus object tracking completion of operations
         """
 
-        status = self.set_and_proc_target_voltages(target_voltages)
+        status = self.diff_set_and_proc_target_voltages(target_voltages_)
         settler = StatusBase(settle_time = settle_time)
         settler.set_finished()
         return status & settler 
