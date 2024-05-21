@@ -214,6 +214,9 @@ def fswitch(
         "-MO-FSWT-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        lens_geometry="paraboloid",
+        cylindrical=True,
+        lens_material="Beryllium",
     )
 
 
