@@ -64,3 +64,10 @@ class BartRobot(StandardReadable, Movable):
                 self._load_pin_and_puck(sample_location), timeout=self.LOAD_TIMEOUT
             )
         )
+
+
+async def get_mock_device() -> BartRobot:
+    device = BartRobot("robot", "-MO-ROBOT-01:")
+    device.LOAD_TIMEOUT = 0.01  # type: ignore
+    await device.connect(mock=True)
+    return device

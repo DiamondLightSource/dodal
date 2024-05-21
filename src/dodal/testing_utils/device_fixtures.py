@@ -13,6 +13,7 @@ from dodal.devices.aperturescatterguard import get_mock_device as get_mock_ap_sg
 from dodal.devices.backlight import Backlight
 from dodal.devices.focusing_mirror import get_mock_voltages
 from dodal.devices.i24.dual_backlight import DualBacklight
+from dodal.devices.robot import get_mock_device as get_mock_bart_robot
 from dodal.devices.undulator_dcm import get_mock_device as get_mock_undulator_dcm
 from dodal.testing_utils.utility_functions import patch_ophyd_async_motor
 
@@ -76,6 +77,11 @@ async def mock_aperturescatterguard_in_medium_pos(
 @pytest.fixture
 def mock_backlight() -> Backlight:
     return make_fake_device(Backlight)(name="backlight")
+
+
+@pytest.fixture
+async def mock_bart_robot():
+    return await get_mock_bart_robot()
 
 
 @pytest.fixture
