@@ -420,6 +420,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/remove_ophyd_dependency_pin/"
   },
   {
+    "version": "scan-number-directory-provider",
+    "url": "https://DiamondLightSource.github.io/dodal/scan-number-directory-provider/"
+  },
+  {
     "version": "test-html",
     "url": "https://DiamondLightSource.github.io/dodal/test-html/"
   },
