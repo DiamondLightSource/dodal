@@ -1,6 +1,9 @@
 from unittest import mock
 
 import pytest
+from bluesky.plans import count
+from bluesky.protocols import DataKey
+from bluesky.run_engine import RunEngine
 from ophyd_async.core import DeviceCollector, set_mock_value
 
 from dodal.devices.i22.fswitch import FilterState, FSwitch
@@ -26,3 +29,25 @@ async def test_reading_fswitch(fswitch: FSwitch):
             "value": 125,  # three filters out
         }
     }
+
+
+def test_fswitch_count_plan(RE: RunEngine, fswitch: FSwitch):
+    names = []
+    docs = []
+
+    def subscription(name, doc):
+        names.append(name)
+        docs.append(doc)
+
+    RE(count([fswitch]), subscription)
+
+    descriptor_doc = docs[names.index("descriptor")]
+    event_doc = docs[names.index("event")]
+
+    expected_data_key = DataKey(
+        dtype="integer", shape=[], source="fswitch", object_name="fswitch"
+    )
+    assert descriptor_doc["data_keys"] == {"number_of_lenses": expected_data_key}
+
+    expected_data = {"number_of_lenses": 128}
+    assert event_doc["data"] == expected_data
