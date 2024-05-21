@@ -3,19 +3,24 @@ from pathlib import Path
 from typing import Optional
 
 from aiohttp import ClientSession
+from bluesky import RunEngine
 from bluesky import plan_stubs as bps
 from bluesky import preprocessors as bpp
+from bluesky.run_engine import call_in_bluesky_event_loop
 from bluesky.utils import make_decorator
-from ophyd_async.core import DirectoryInfo
+from ophyd_async.core import DirectoryInfo, DirectoryProvider
 from pydantic import BaseModel
 
 from dodal.beamlines import beamline_utils
-from dodal.common.types import MsgGenerator, UpdatingDirectoryProvider
+from dodal.common.types import MsgGenerator, RunEngineAwareDirectoryProvider
 from dodal.log import LOGGER
 
 """
 Functionality required for/from the API of a DirectoryService which exposes the specifics of the Diamond filesystem.
 """
+
+DATA_SESSION = "data_session"
+DATA_GROUPS = "data_groups"
 
 
 class DataCollectionIdentifier(BaseModel):
@@ -27,7 +32,7 @@ class DataCollectionIdentifier(BaseModel):
     collectionNumber: int
 
 
-class DirectoryServiceClientBase(ABC):
+class ScanNumberProvider(ABC):
     """
     Object responsible for I/O in determining collection number
     """
@@ -41,7 +46,7 @@ class DirectoryServiceClientBase(ABC):
         """Get current collection"""
 
 
-class DirectoryServiceClient(DirectoryServiceClientBase):
+class RemoteScanNumberProvider(ScanNumberProvider):
     """Client for the VisitService REST API
     Currently exposed by the GDA Server to co-ordinate unique filenames.
     While VisitService is embedded in GDA, url is likely to be `ixx-control:8088/api`
@@ -71,7 +76,7 @@ class DirectoryServiceClient(DirectoryServiceClientBase):
                 return current_collection
 
 
-class LocalDirectoryServiceClient(DirectoryServiceClientBase):
+class InMemoryScanNumberProvider(ScanNumberProvider):
     """Local or dummy impl of VisitService client to co-ordinate unique filenames."""
 
     _count: int
@@ -89,108 +94,62 @@ class LocalDirectoryServiceClient(DirectoryServiceClientBase):
         return DataCollectionIdentifier(collectionNumber=self._count)
 
 
-class StaticVisitDirectoryProvider(UpdatingDirectoryProvider):
+class VisitDirectory(BaseModel):
+    root: Path
+    beamline: str
+
+
+class ScanNumberDirectoryProvider(RunEngineAwareDirectoryProvider):
     """
-    Static (single visit) implementation of DirectoryProvider whilst awaiting auth infrastructure to generate necessary information per-scan.
-    Allows setting a singular visit into which all run files will be saved.
-    update() queries a visit service to get the next DataCollectionIdentifier to increment the suffix of all file writers' next files.
-    Requires that all detectors are running with a mutual view on the filesystem.
-    Supports a single Visit which should be passed as a Path relative to the root of the Detector IOC mounting.
-    i.e. to write to visit /dls/ixx/data/YYYY/cm12345-1, assuming all detectors are mounted with /data -> /dls/ixx/data, root=/data/YYYY/cm12345-1/
+    DirectoryProvider that integrates with the RunEngine's scan_number hook. Generates a
+    scan number using injected logic and applies it to itself and the hook. Detectors
+    then write to a location determined by the RunEngine's scan_number, which also
+    appears in run metadata.
     """
 
-    _beamline: str
-    _root: Path
-    _client: DirectoryServiceClientBase
-    _current_collection: DirectoryInfo | None
-    _session: ClientSession | None
+    _visit_directory: VisitDirectory
+    _client: ScanNumberProvider
+    _scan_number: int | None
 
     def __init__(
         self,
-        beamline: str,
-        root: Path,
-        client: Optional[DirectoryServiceClientBase] = None,
+        visit_directory: VisitDirectory | None = None,
+        client: ScanNumberProvider | None = None,
     ):
-        self._beamline = beamline
-        self._client = client or DirectoryServiceClient(f"{beamline}-control:8088/api")
-        self._root = root
-        self._current_collection = None
-        self._session = None
-
-    async def update(self) -> None:
-        """
-        Creates a new data collection in the current visit.
-        """
-        # https://github.com/DiamondLightSource/dodal/issues/452
-        # TODO: Allow selecting visit as part of a request
-        # TODO: DAQ-4827: Pass AuthN information as part of request
-
-        try:
-            collection_id_info = await self._client.create_new_collection()
-            self._current_collection = self._generate_directory_info(collection_id_info)
-        except Exception:
-            LOGGER.error(
-                "Exception while updating data collection, preventing overwriting data by setting current_collection to None"
-            )
-            self._current_collection = None
-            raise
-
-    def _generate_directory_info(
-        self,
-        collection_id_info: DataCollectionIdentifier,
-    ) -> DirectoryInfo:
-        return DirectoryInfo(
-            # See DocString of DirectoryInfo. At DLS, root = visit directory, resource_dir is relative to it.
-            root=self._root,
-            # https://github.com/DiamondLightSource/dodal/issues/452
-            # Currently all h5 files written to visit/ directory, as no guarantee that visit/dataCollection/ directory will have been produced. If it is as part of #452, append the resource_dir
-            resource_dir=Path("."),
-            # Diamond standard file naming
-            prefix=f"{self._beamline}-{collection_id_info.collectionNumber}-",
+        self._visit_directory = visit_directory or VisitDirectory(
+            root=Path("/tmp"),
+            beamline="unknown-beamline",
         )
+        self._client = client or InMemoryScanNumberProvider()
+        self._scan_number = None
+        super().__init__()
+
+    def next_scan_number(self) -> int:
+        """
+        Hook to pass to the RunEngine to make sure its scan_number is kept in sync
+        with this DirectoryProvider's scan_number. Generates a new scan number
+        as a side effect and returns it.
+
+        Returns:
+            int: A new scan number for detectors to use.
+        """
+
+        collection = call_in_bluesky_event_loop(self._client.create_new_collection())
+        self.scan_number = collection.collectionNumber
+        return self.scan_number
 
     def __call__(self) -> DirectoryInfo:
-        if self._current_collection is not None:
-            return self._current_collection
+        if self._scan_number is not None:
+            return DirectoryInfo(
+                # See DocString of DirectoryInfo. At DLS, root = visit directory, resource_dir is relative to it.
+                root=self._visit_directory.root,
+                # https://github.com/DiamondLightSource/dodal/issues/452
+                # Currently all h5 files written to visit/ directory, as no guarantee that visit/dataCollection/ directory will have been produced. If it is as part of #452, append the resource_dir
+                resource_dir=Path("."),
+                # Diamond standard file naming
+                prefix=f"{self._visit_directory.beamline}-{self._scan_number}-",
+            )
         else:
             raise ValueError(
                 "No current collection, update() needs to be called at least once"
             )
-
-
-DATA_SESSION = "data_session"
-DATA_GROUPS = "data_groups"
-
-
-def attach_metadata(
-    plan: MsgGenerator, provider: UpdatingDirectoryProvider | None
-) -> MsgGenerator:
-    """
-    Attach data session metadata to the runs within a plan and make it correlate
-    with an ophyd-async DirectoryProvider.
-
-    This updates the directory provider (which in turn makes a call to to a service
-    to figure out which scan number we are using for such a scan), and ensures the
-    start document contains the correct data session.
-
-    Args:
-        plan: The plan to preprocess
-        provider: The directory provider that participating detectors are aware of.
-
-    Returns:
-        MsgGenerator: A plan
-
-    Yields:
-        Iterator[Msg]: Plan messages
-    """
-    if provider is None:
-        provider = beamline_utils.get_directory_provider()
-    yield from bps.wait_for([provider.update])
-    directory_info: DirectoryInfo = provider()
-    # https://github.com/DiamondLightSource/dodal/issues/452
-    # As part of 452, write each dataCollection into their own folder, then can use resource_dir directly
-    data_session = directory_info.prefix.removesuffix("-")
-    yield from bpp.inject_md_wrapper(plan, md={DATA_SESSION: data_session})
-
-
-attach_metadata_decorator = make_decorator(attach_metadata)

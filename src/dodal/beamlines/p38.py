@@ -9,7 +9,11 @@ from dodal.beamlines.beamline_utils import (
     set_directory_provider,
 )
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitDirectoryProvider
+from dodal.common.visit import (
+    InMemoryScanNumberProvider,
+    ScanNumberDirectoryProvider,
+    VisitDirectory,
+)
 from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.slits import Slits
 from dodal.devices.tetramm import TetrammDetector
@@ -30,10 +34,11 @@ set_utils_beamline(BL)
 # locally and write the commissioning directory. The scan number is not guaranteed to
 # be unique and the data is at risk - this configuration is for testing only.
 set_directory_provider(
-    StaticVisitDirectoryProvider(
-        BL,
-        Path("/dls/p38/data/2024/cm37282-2/bluesky"),
-        client=LocalDirectoryServiceClient(),
+    ScanNumberDirectoryProvider(
+        VisitDirectory(
+            beamline=BL,
+            root=Path("/dls/p38/data/2024/cm37282-2/bluesky"),
+        )
     )
 )
 

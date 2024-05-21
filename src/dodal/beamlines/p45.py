@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from ophyd_async.epics.areadetector import AravisDetector
 from ophyd_async.panda import HDFPanda
 
@@ -7,7 +9,7 @@ from dodal.beamlines.beamline_utils import (
     set_directory_provider,
 )
 from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.visit import StaticVisitDirectoryProvider
+from dodal.common.visit import ScanNumberDirectoryProvider, VisitDirectory
 from dodal.devices.p45 import Choppers, TomoStageWithStretchAndSkew
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import get_beamline_name, skip_device
@@ -16,9 +18,11 @@ BL = get_beamline_name("p45")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 set_directory_provider(
-    StaticVisitDirectoryProvider(
-        BL,
-        "/data/2024/cm37283-2/",  # latest commissioning visit
+    ScanNumberDirectoryProvider(
+        VisitDirectory(
+            beamline=BL,
+            root=Path("/data/2024/cm37283-2/"),
+        )
     )
 )
 

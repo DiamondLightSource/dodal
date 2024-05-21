@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from bluesky import RunEngine
 from ophyd_async.core import DirectoryInfo
 
 from dodal.common.types import UpdatingDirectoryProvider
@@ -22,6 +23,8 @@ class PandASubdirectoryProvider(UpdatingDirectoryProvider):
             if directory
             else None
         )
+
+    def connect_to_run_engine(self, run_engine: RunEngine) -> None: ...
 
     def update(self, directory: Path):
         self._directory_info = DirectoryInfo(
