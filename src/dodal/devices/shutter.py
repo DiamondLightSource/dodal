@@ -6,17 +6,17 @@ from ophyd_async.epics.signal import epics_signal_r, epics_signal_w
 
 
 class ShutterSetState(str, Enum):
-    CLOSED = "close"
-    OPEN = "open"
-    RESET = "reset"
+    CLOSED = "Close"
+    OPEN = "Open"
+    RESET = "Reset"
 
 
 class ShutterState(str, Enum):
-    CLOSED = ShutterSetState.CLOSED
-    OPEN = ShutterSetState.OPEN
-    OPENING = "opening"
-    CLOSING = "closing"
-    FAULT = "fault"
+    CLOSED = "Closed"
+    OPEN = "Open"
+    OPENING = "Opening"
+    CLOSING = "Closing"
+    FAULT = "Fault"
 
 
 class Shutter(StandardReadable, Movable):
@@ -36,8 +36,7 @@ class Shutter(StandardReadable, Movable):
     async def set(self, position: ShutterSetState):
         if position == ShutterSetState.RESET:
             return
-        assert position in ShutterState
-        new_position = ShutterState(position)
+        new_position = ShutterState.CLOSED if position === ShutterSetState.CLOSE else ShutterState.OPEN
         await self.position_set.set(position)
         return await wait_for_value(
             signal=self.position_readback, match=new_position, timeout=50
