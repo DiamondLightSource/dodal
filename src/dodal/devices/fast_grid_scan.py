@@ -13,6 +13,7 @@ from ophyd import (
     EpicsSignalWithRBV,
     Signal,
 )
+from ophyd.sim import make_fake_device
 from ophyd.status import DeviceStatus, StatusBase
 from pydantic import validator
 from pydantic.dataclasses import dataclass
@@ -359,3 +360,10 @@ def set_fast_grid_scan_params(scan: FastGridScan, params: GridScanParams):
         scan.position_counter,
         0,
     )
+
+
+def make_mock_device(name):
+    FakeFastGridScan = make_fake_device(FastGridScan)
+    fast_grid_scan: FastGridScan = FakeFastGridScan(name=f"test fake FGS: {name}")
+    fast_grid_scan.scan_invalid.pvname = ""
+    return fast_grid_scan

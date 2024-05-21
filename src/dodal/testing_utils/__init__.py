@@ -18,12 +18,17 @@ from .device_fixtures import (
     mock_backlight,
     mock_bart_robot,
     mock_dual_backlight,
+    mock_eiger,
+    mock_fast_grid_scan,
     mock_smargon,
     mock_undulator_dcm,
     mock_vfm_mirror_voltages,
     test_aperture_positions,
 )
 from .utility_functions import (
+    StatusException,
+    create_new_detector_params,
+    get_bad_status,
     mock_beamline_module_filepaths,
     patch_ophyd_async_motor,
     set_smargon_pos,
@@ -42,9 +47,13 @@ __all__ = [
     "mock_backlight",
     "mock_bart_robot",
     "mock_dual_backlight",
+    "mock_eiger",
+    "mock_fast_grid_scan",
     "mock_smargon",
     "mock_undulator_dcm",
     "mock_vfm_mirror_voltages",
+    # Exceptions
+    "StatusException",
     # Test data fixtures
     "test_aperture_positions",
     # Types
@@ -53,6 +62,8 @@ __all__ = [
     "mock_beamline_module_filepaths",
     "patch_ophyd_async_motor",
     "set_smargon_pos",
+    "get_bad_status",
+    "create_new_detector_params",
 ]
 
 

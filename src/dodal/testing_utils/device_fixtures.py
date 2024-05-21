@@ -11,17 +11,19 @@ from dodal.devices.aperturescatterguard import (
 )
 from dodal.devices.aperturescatterguard import get_mock_device as get_mock_ap_sg
 from dodal.devices.backlight import Backlight
+from dodal.devices.eiger import get_mock_eiger
+from dodal.devices.fast_grid_scan import make_mock_device as make_mock_fgs
 from dodal.devices.focusing_mirror import get_mock_voltages
 from dodal.devices.i24.dual_backlight import DualBacklight
 from dodal.devices.robot import get_mock_device as get_mock_bart_robot
 from dodal.devices.smargon import Smargon
 from dodal.devices.undulator_dcm import get_mock_device as get_mock_undulator_dcm
-from dodal.testing_utils.utility_functions import patch_ophyd_async_motor
 
 from .constants import (
     ID_GAP_LOOKUP_TABLE_PATH,
     MOCK_DAQ_CONFIG_PATH,
 )
+from .utility_functions import create_new_detector_params, patch_ophyd_async_motor
 
 ApSgAndLog = tuple[ApertureScatterguard, MagicMock]
 
@@ -76,8 +78,8 @@ async def mock_aperturescatterguard_in_medium_pos(
 
 
 @pytest.fixture
-def mock_backlight() -> Backlight:
-    return make_fake_device(Backlight)(name="backlight")
+def mock_backlight(request: pytest.FixtureRequest) -> Backlight:
+    return make_fake_device(Backlight)(name=f"backlight: {request.node.name}")
 
 
 @pytest.fixture
@@ -86,13 +88,23 @@ async def mock_bart_robot():
 
 
 @pytest.fixture
-def mock_dual_backlight() -> DualBacklight:
-    return make_fake_device(DualBacklight)(name="backlight")
+def mock_dual_backlight(request: pytest.FixtureRequest) -> DualBacklight:
+    return make_fake_device(DualBacklight)(name=f"backlight: {request.node.name}")
 
 
 @pytest.fixture
-def mock_smargon() -> Smargon:
-    return make_fake_device(Smargon)(name="smargon")
+def mock_eiger(request: pytest.FixtureRequest):
+    yield get_mock_eiger(create_new_detector_params(), request.node.name)
+
+
+@pytest.fixture
+def mock_fast_grid_scan(request: pytest.FixtureRequest):
+    yield make_mock_fgs(request.node.name)
+
+
+@pytest.fixture
+def mock_smargon(request: pytest.FixtureRequest) -> Smargon:
+    return make_fake_device(Smargon)(name=f"smargon: {request.node.name}")
 
 
 @pytest.fixture

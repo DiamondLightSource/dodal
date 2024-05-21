@@ -25,6 +25,9 @@ class DetectorSizeConstants:
     def __post_init__(self):
         ALL_DETECTORS[self.det_type_string] = self
 
+    def __hash__(self) -> int:
+        return self.det_type_string.__hash__()
+
 
 EIGER_TYPE_EIGER2_X_4M = "EIGER2_X_4M"
 EIGER2_X_4M_DIMENSION_X = 155.1

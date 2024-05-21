@@ -62,8 +62,10 @@ class DetectorParams(BaseModel):
 
     @validator("detector_size_constants", pre=True)
     def _parse_detector_size_constants(
-        cls, det_type: str, values: dict[str, Any]
+        cls, det_type: str | DetectorSizeConstants, values: dict[str, Any]
     ) -> DetectorSizeConstants:
+        if isinstance(det_type, DetectorSizeConstants):
+            return det_type
         return constants_from_type(det_type)
 
     @validator("directory", pre=True)

@@ -2,6 +2,7 @@ from enum import Enum
 
 from ophyd import Component, Device, EpicsSignalRO, Signal
 from ophyd.areadetector.cam import EigerDetectorCam
+from ophyd.sim import make_fake_device
 from ophyd.status import AndStatus, Status, SubscriptionStatus
 
 from dodal.devices.detector import DetectorParams, TriggerMode
@@ -351,3 +352,11 @@ class EigerDetector(Device):
         functions_to_do_arm.extend(arming_sequence_funcs)
 
         return run_functions_without_blocking(functions_to_do_arm, associated_obj=self)
+
+
+def get_mock_eiger(params: DetectorParams, test_name: str = ""):
+    FakeEigerDetector: EigerDetector = make_fake_device(EigerDetector)
+    fake_eiger: EigerDetector = FakeEigerDetector.with_params(
+        params, name=f"test fake Eiger: {test_name}"
+    )
+    return fake_eiger

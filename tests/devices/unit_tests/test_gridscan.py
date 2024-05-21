@@ -24,63 +24,57 @@ def discard_status(st: Status | DeviceStatus):
         pass
 
 
-@pytest.fixture
-def fast_grid_scan(request):
-    FakeFastGridScan = make_fake_device(FastGridScan)
-    fast_grid_scan: FastGridScan = FakeFastGridScan(
-        name=f"test fake FGS: {request.node.name}"
-    )
-    fast_grid_scan.scan_invalid.pvname = ""
-    yield fast_grid_scan
-
-
 def test_given_settings_valid_when_kickoff_then_run_started(
-    fast_grid_scan: FastGridScan,
+    mock_fast_grid_scan: FastGridScan,
 ):
-    when(fast_grid_scan.scan_invalid).get().thenReturn(False)
-    when(fast_grid_scan.position_counter).get().thenReturn(0)
+    when(mock_fast_grid_scan.scan_invalid).get().thenReturn(False)
+    when(mock_fast_grid_scan.position_counter).get().thenReturn(0)
 
     mock_run_set_status = mock()
-    when(fast_grid_scan.run_cmd).put(ANY).thenReturn(mock_run_set_status)
-    fast_grid_scan.status.subscribe = lambda func, **_: func(1)  # type: ignore
+    when(mock_fast_grid_scan.run_cmd).put(ANY).thenReturn(mock_run_set_status)
+    mock_fast_grid_scan.status.subscribe = lambda func, **_: func(1)  # type: ignore
 
-    status = fast_grid_scan.kickoff()
+    status = mock_fast_grid_scan.kickoff()
 
     status.wait()
     assert status.exception() is None
 
-    verify(fast_grid_scan.run_cmd).put(1)
+    verify(mock_fast_grid_scan.run_cmd).put(1)
 
 
 def test_waits_for_running_motion(
-    fast_grid_scan: FastGridScan,
+    mock_fast_grid_scan: FastGridScan,
 ):
-    when(fast_grid_scan.motion_program.running).get().thenReturn(1)
+    when(mock_fast_grid_scan.motion_program.running).get().thenReturn(1)
 
-    fast_grid_scan.KICKOFF_TIMEOUT = 0.01
+    mock_fast_grid_scan.KICKOFF_TIMEOUT = 0.01
 
     with pytest.raises(StatusTimeoutError):
-        status = fast_grid_scan.kickoff()
+        status = mock_fast_grid_scan.kickoff()
         status.wait()
 
-    fast_grid_scan.KICKOFF_TIMEOUT = 1
+    mock_fast_grid_scan.KICKOFF_TIMEOUT = 1
 
     mock_run_set_status = mock()
-    when(fast_grid_scan.run_cmd).put(ANY).thenReturn(mock_run_set_status)
-    fast_grid_scan.status.subscribe = lambda func, **_: func(1)  # type: ignore
+    when(mock_fast_grid_scan.run_cmd).put(ANY).thenReturn(mock_run_set_status)
+    mock_fast_grid_scan.status.subscribe = lambda func, **_: func(1)  # type: ignore
 
-    when(fast_grid_scan.motion_program.running).get().thenReturn(0)
-    status = fast_grid_scan.kickoff()
+    when(mock_fast_grid_scan.motion_program.running).get().thenReturn(0)
+    status = mock_fast_grid_scan.kickoff()
     status.wait()
-    verify(fast_grid_scan.run_cmd).put(1)
+    verify(mock_fast_grid_scan.run_cmd).put(1)
 
 
 def run_test_on_complete_watcher(
-    RE: RunEngine, fast_grid_scan: FastGridScan, num_pos_1d, put_value, expected_frac
+    RE: RunEngine,
+    mock_fast_grid_scan: FastGridScan,
+    num_pos_1d,
+    put_value,
+    expected_frac,
 ):
     RE(
         set_fast_grid_scan_params(
-            fast_grid_scan,
+            mock_fast_grid_scan,
             GridScanParams(
                 x_steps=num_pos_1d,
                 y_steps=num_pos_1d,
@@ -89,11 +83,11 @@ def run_test_on_complete_watcher(
         )
     )
 
-    complete_status = fast_grid_scan.complete()
+    complete_status = mock_fast_grid_scan.complete()
     watcher = mock()
     complete_status.watch(watcher)
 
-    fast_grid_scan.position_counter.sim_put(put_value)  # type: ignore
+    mock_fast_grid_scan.position_counter.sim_put(put_value)  # type: ignore
     verify(watcher).__call__(
         *ARGS,
         current=put_value,
@@ -105,16 +99,16 @@ def run_test_on_complete_watcher(
 
 
 def test_when_new_image_then_complete_watcher_notified(
-    fast_grid_scan: FastGridScan, RE: RunEngine
+    mock_fast_grid_scan: FastGridScan, RE: RunEngine
 ):
-    status = run_test_on_complete_watcher(RE, fast_grid_scan, 2, 1, 3 / 4)
+    status = run_test_on_complete_watcher(RE, mock_fast_grid_scan, 2, 1, 3 / 4)
     discard_status(status)
 
 
 def test_given_0_expected_images_then_complete_watcher_correct(
-    fast_grid_scan: FastGridScan, RE: RunEngine
+    mock_fast_grid_scan: FastGridScan, RE: RunEngine
 ):
-    status = run_test_on_complete_watcher(RE, fast_grid_scan, 0, 1, 0)
+    status = run_test_on_complete_watcher(RE, mock_fast_grid_scan, 0, 1, 0)
     discard_status(status)
 
 
@@ -127,41 +121,43 @@ def test_given_0_expected_images_then_complete_watcher_correct(
     ],
 )
 def test_given_different_step_numbers_then_expected_images_correct(
-    fast_grid_scan: FastGridScan, steps, expected_images
+    mock_fast_grid_scan: FastGridScan, steps, expected_images
 ):
-    fast_grid_scan.x_steps.sim_put(steps[0])  # type: ignore
-    fast_grid_scan.y_steps.sim_put(steps[1])  # type: ignore
-    fast_grid_scan.z_steps.sim_put(steps[2])  # type: ignore
+    mock_fast_grid_scan.x_steps.sim_put(steps[0])  # type: ignore
+    mock_fast_grid_scan.y_steps.sim_put(steps[1])  # type: ignore
+    mock_fast_grid_scan.z_steps.sim_put(steps[2])  # type: ignore
 
-    assert fast_grid_scan.expected_images.get() == expected_images
+    assert mock_fast_grid_scan.expected_images.get() == expected_images
 
 
 def test_given_invalid_image_number_then_complete_watcher_correct(
-    fast_grid_scan: FastGridScan, RE: RunEngine
+    mock_fast_grid_scan: FastGridScan, RE: RunEngine
 ):
-    complete_status = run_test_on_complete_watcher(RE, fast_grid_scan, 1, "BAD", None)
+    complete_status = run_test_on_complete_watcher(
+        RE, mock_fast_grid_scan, 1, "BAD", None
+    )
     assert complete_status.exception()
 
 
 def test_running_finished_with_all_images_done_then_complete_status_finishes_not_in_error(
-    fast_grid_scan: FastGridScan, RE: RunEngine
+    mock_fast_grid_scan: FastGridScan, RE: RunEngine
 ):
     num_pos_1d = 2
     RE(
         set_fast_grid_scan_params(
-            fast_grid_scan,
+            mock_fast_grid_scan,
             GridScanParams(
                 transmission_fraction=0.01, x_steps=num_pos_1d, y_steps=num_pos_1d
             ),
         )
     )
 
-    fast_grid_scan.status.sim_put(1)  # type: ignore
+    mock_fast_grid_scan.status.sim_put(1)  # type: ignore
 
-    complete_status = fast_grid_scan.complete()
+    complete_status = mock_fast_grid_scan.complete()
     assert not complete_status.done
-    fast_grid_scan.position_counter.sim_put(num_pos_1d**2)  # type: ignore
-    fast_grid_scan.status.sim_put(0)  # type: ignore
+    mock_fast_grid_scan.position_counter.sim_put(num_pos_1d**2)  # type: ignore
+    mock_fast_grid_scan.status.sim_put(0)  # type: ignore
 
     complete_status.wait()
 
@@ -370,7 +366,7 @@ def test_given_various_x_y_z_when_get_motor_positions_then_expected_positions_re
     )
 
 
-def test_can_run_fast_grid_scan_in_run_engine(fast_grid_scan, RE: RunEngine):
+def test_can_run_fast_grid_scan_in_run_engine(mock_fast_grid_scan, RE: RunEngine):
     @bpp.run_decorator()
     def kickoff_and_complete(device):
         yield from bps.kickoff(device, group="kickoff")
@@ -381,7 +377,7 @@ def test_can_run_fast_grid_scan_in_run_engine(fast_grid_scan, RE: RunEngine):
         device.status.sim_put(0)
         yield from bps.wait("complete")
 
-    RE(kickoff_and_complete(fast_grid_scan))
+    RE(kickoff_and_complete(mock_fast_grid_scan))
     assert RE.state == "idle"
 
 
