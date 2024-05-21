@@ -4,7 +4,7 @@ import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
 
-from dodal.devices.i24.pmac import PMAC
+from dodal.devices.i24.pmac import HOME_STR, PMAC
 
 from ..conftest import patch_motor
 
@@ -47,3 +47,9 @@ async def test_pmac_set_pmac_string(fake_pmac: PMAC, RE):
     RE(bps.abs_set(fake_pmac.pmac_string, "!x0y0z0", wait=True))
 
     assert await fake_pmac.pmac_string.get_value() == "!x0y0z0"
+
+
+async def test_pmac_home(fake_pmac: PMAC, RE):
+    RE(bps.trigger(fake_pmac.home, wait=True))
+
+    assert await fake_pmac.pmac_string.get_value() == HOME_STR
