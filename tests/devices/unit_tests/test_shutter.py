@@ -1,7 +1,7 @@
 import pytest
 from ophyd_async.core import DeviceCollector
 
-from dodal.devices.shutter import Shutter, ShutterState, ShutterSetState
+from dodal.devices.shutter import Shutter, ShutterSetState, ShutterState
 
 
 @pytest.fixture
@@ -14,18 +14,23 @@ async def sim_shutter():
     return sim_shutter
 
 
-@pytest.mark.parametrize(
-    "state",
-    [
-        (ShutterSetState.OPEN),
-        (ShutterSetState.CLOSED),
-    ],
-)
-async def test_set_opens_and_closes_shutter(state: ShutterState, sim_shutter: Shutter):
-    await sim_shutter.set(state)
+async def test_set_shutter_open(sim_shutter: Shutter):
+    desired_state: ShutterSetState = ShutterSetState.OPEN
+    await sim_shutter.set(desired_state)
     reading = await sim_shutter.read()
 
     shutter_position = reading.get("shutter-position", {})
     assert (
-        shutter_position["value"] is state
+        shutter_position["value"] is ShutterState.OPEN
+    ), f"Unexpected value: {shutter_position['value']}"
+
+
+async def test_set_shutter_close(sim_shutter: Shutter):
+    desired_state: ShutterSetState = ShutterSetState.CLOSE
+    await sim_shutter.set(desired_state)
+    reading = await sim_shutter.read()
+
+    shutter_position = reading.get("shutter-position", {})
+    assert (
+        shutter_position["value"] is ShutterState.CLOSED
     ), f"Unexpected value: {shutter_position['value']}"

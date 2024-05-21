@@ -6,7 +6,7 @@ from ophyd_async.epics.signal import epics_signal_r, epics_signal_w
 
 
 class ShutterSetState(str, Enum):
-    CLOSED = "Close"
+    CLOSE = "Close"
     OPEN = "Open"
     RESET = "Reset"
 
@@ -38,7 +38,7 @@ class Shutter(StandardReadable, Movable):
             return
         new_position = (
             ShutterState.CLOSED
-            if desired_position == ShutterSetState.CLOSED
+            if desired_position == ShutterSetState.CLOSE
             else ShutterState.OPEN
         )
         await self.position_set.set(desired_position)
