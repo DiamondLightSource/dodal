@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock
 
 import pytest
+from ophyd.sim import make_fake_device
 from ophyd_async.core import set_mock_value
 
 from dodal.devices.aperturescatterguard import (
@@ -9,7 +10,9 @@ from dodal.devices.aperturescatterguard import (
     ApertureScatterguard,
 )
 from dodal.devices.aperturescatterguard import get_mock_device as get_mock_ap_sg
+from dodal.devices.backlight import Backlight
 from dodal.devices.focusing_mirror import get_mock_voltages
+from dodal.devices.i24.dual_backlight import DualBacklight
 from dodal.devices.undulator_dcm import get_mock_device as get_mock_undulator_dcm
 from dodal.testing_utils.utility_functions import patch_ophyd_async_motor
 
@@ -68,6 +71,16 @@ async def mock_aperturescatterguard_in_medium_pos(
 ):
     ap_sg, _ = mock_aperturescatterguard_in_medium_pos_w_call_log
     return ap_sg
+
+
+@pytest.fixture
+def mock_backlight() -> Backlight:
+    return make_fake_device(Backlight)(name="backlight")
+
+
+@pytest.fixture
+def mock_dual_backlight() -> DualBacklight:
+    return make_fake_device(DualBacklight)(name="backlight")
 
 
 @pytest.fixture

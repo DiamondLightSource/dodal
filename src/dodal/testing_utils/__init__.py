@@ -15,6 +15,8 @@ from .device_fixtures import (
     mock_aperturescatterguard_in_medium_pos,
     mock_aperturescatterguard_in_medium_pos_w_call_log,
     mock_aperturescatterguard_with_call_log,
+    mock_backlight,
+    mock_dual_backlight,
     mock_undulator_dcm,
     mock_vfm_mirror_voltages,
     test_aperture_positions,
@@ -31,6 +33,8 @@ __all__ = [
     "mock_aperturescatterguard_in_medium_pos",
     "mock_aperturescatterguard_in_medium_pos_w_call_log",
     "mock_aperturescatterguard_with_call_log",
+    "mock_backlight",
+    "mock_dual_backlight",
     "mock_undulator_dcm",
     "mock_vfm_mirror_voltages",
     # Test data fixtures
