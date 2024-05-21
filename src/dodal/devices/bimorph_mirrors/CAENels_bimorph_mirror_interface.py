@@ -282,7 +282,7 @@ class CAENelsBimorphMirrorInterface(Device, Movable):
 
         status = StatusBase()
         status.set_finished()
-
+    
         for i, channel in enumerate(self.get_channels_by_attribute(ChannelAttribute.VTRGT)):
             if target_voltages[i] != voltage_target_rbvs[i]:
                 status &= self.protected_set(channel, target_voltages[i])
@@ -301,7 +301,7 @@ class CAENelsBimorphMirrorInterface(Device, Movable):
             A SubscriptionStatus object tracking completion of operations
         """
 
-        status = self.diff_set_and_proc_target_voltages(target_voltages_)
+        status = self.diff_set_and_proc_target_voltages(target_voltages)
         settler = StatusBase(settle_time = settle_time)
         settler.set_finished()
         return status & settler 
