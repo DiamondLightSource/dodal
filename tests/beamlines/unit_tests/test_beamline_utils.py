@@ -12,9 +12,8 @@ from dodal.beamlines import beamline_utils, i03
 from dodal.devices.aperturescatterguard import ApertureScatterguard
 from dodal.devices.smargon import Smargon
 from dodal.devices.zebra import Zebra
+from dodal.testing_utils import mock_beamline_module_filepaths
 from dodal.utils import make_all_devices
-
-from ...conftest import mock_beamline_module_filepaths
 
 
 @pytest.fixture(autouse=True)

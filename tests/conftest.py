@@ -1,40 +1,19 @@
-import asyncio
 import importlib
 import logging
 import os
 import sys
-import time
 from os import environ, getenv
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-from bluesky.run_engine import RunEngine
 
 from dodal.beamlines import beamline_utils
 from dodal.log import LOGGER, GELFTCPHandler, set_up_all_logging_handlers
-from dodal.testing_utils import vfm_mirror_voltages
+from dodal.testing_utils import RE, mock_beamline_module_filepaths, vfm_mirror_voltages
 from dodal.utils import make_all_devices
 
-__all__ = ["vfm_mirror_voltages"]
-
-MOCK_DAQ_CONFIG_PATH = "tests/devices/unit_tests/test_daq_configuration"
-mock_paths = [
-    ("DAQ_CONFIGURATION_PATH", MOCK_DAQ_CONFIG_PATH),
-    ("ZOOM_PARAMS_FILE", "tests/devices/unit_tests/test_jCameraManZoomLevels.xml"),
-    ("DISPLAY_CONFIG", "tests/devices/unit_tests/test_display.configuration"),
-]
-mock_attributes_table = {
-    "i03": mock_paths,
-    "s03": mock_paths,
-    "i04": mock_paths,
-    "s04": mock_paths,
-}
-
-
-def mock_beamline_module_filepaths(bl_name, bl_module):
-    if mock_attributes := mock_attributes_table.get(bl_name):
-        [bl_module.__setattr__(attr[0], attr[1]) for attr in mock_attributes]
+__all__ = ["vfm_mirror_voltages", "RE"]
 
 
 @pytest.fixture(scope="function")
@@ -78,16 +57,3 @@ if s03_epics_server_port is not None:
 if s03_epics_repeater_port is not None:
     environ["EPICS_CA_REPEATER_PORT"] = s03_epics_repeater_port
     print(f"[EPICS_CA_REPEATER_PORT] = {s03_epics_repeater_port}")
-
-
-@pytest.fixture
-async def RE():
-    RE = RunEngine()
-    # make sure the event loop is thoroughly up and running before we try to create
-    # any ophyd_async devices which might need it
-    timeout = time.monotonic() + 1
-    while not RE.loop.is_running():
-        await asyncio.sleep(0)
-        if time.monotonic() > timeout:
-            raise TimeoutError("This really shouldn't happen but just in case...")
-    yield RE

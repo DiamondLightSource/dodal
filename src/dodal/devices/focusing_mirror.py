@@ -171,13 +171,13 @@ class FocusingMirrorWithStripes(FocusingMirror):
             return MirrorStripe.RHODIUM
 
 
-def get_sim_voltages() -> VFMMirrorVoltages:
+def get_sim_voltages(config_path: str = "tests/test_data/") -> VFMMirrorVoltages:
     voltages = cast(
         VFMMirrorVoltages,
         make_fake_device(VFMMirrorVoltages)(
             name="vfm_mirror_voltages",
             prefix="BL-I03-MO-PSU-01:",
-            daq_configuration_path="tests/test_data/",
+            daq_configuration_path=config_path,
         ),
     )
     voltages.voltage_lookup_table_path = "tests/test_data/test_mirror_focus.json"

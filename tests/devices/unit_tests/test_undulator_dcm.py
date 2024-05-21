@@ -16,8 +16,7 @@ from dodal.devices.undulator_dcm import (
     UndulatorDCM,
     _get_closest_gap_for_energy,
 )
-
-from ...conftest import MOCK_DAQ_CONFIG_PATH
+from dodal.testing_utils import MOCK_DAQ_CONFIG_PATH
 
 ID_GAP_LOOKUP_TABLE_PATH: str = (
     "./tests/devices/unit_tests/test_beamline_undulator_to_gap_lookup_table.txt"
