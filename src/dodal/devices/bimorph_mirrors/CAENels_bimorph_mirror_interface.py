@@ -288,7 +288,7 @@ class CAENelsBimorphMirrorInterface(Device, Movable):
                 status &= self.protected_set(channel, target_voltages[i])
             
             status.wait()
-        return status
+        return status self.protected_set(self.all_target_proc, 1)
 
 
     def set(self, target_voltages: list[float], settle_time = 0) -> SubscriptionStatus:
