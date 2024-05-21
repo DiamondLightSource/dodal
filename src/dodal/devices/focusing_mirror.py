@@ -171,7 +171,7 @@ class FocusingMirrorWithStripes(FocusingMirror):
             return MirrorStripe.RHODIUM
 
 
-def get_sim_voltages(config_path: str = "tests/test_data/") -> VFMMirrorVoltages:
+def get_mock_voltages(config_path: str = "tests/test_data/") -> VFMMirrorVoltages:
     voltages = cast(
         VFMMirrorVoltages,
         make_fake_device(VFMMirrorVoltages)(

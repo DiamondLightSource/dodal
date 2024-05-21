@@ -3,7 +3,7 @@ import asyncio
 import numpy as np
 from bluesky.protocols import Movable
 from numpy import argmin, ndarray
-from ophyd_async.core import AsyncStatus, StandardReadable
+from ophyd_async.core import AsyncStatus, DeviceCollector, StandardReadable
 
 from dodal.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.log import LOGGER
@@ -133,3 +133,17 @@ class UndulatorDCM(StandardReadable, Movable):
             energy_kev * 1000,
             energy_to_distance_table,
         )
+
+
+async def get_mock_device(id_gap_lut_path="", daq_config_path="") -> UndulatorDCM:
+    async with DeviceCollector(mock=True):
+        undulator = Undulator("UND-01", name="undulator")
+        dcm = DCM("DCM-01", name="dcm")
+        undulator_dcm = UndulatorDCM(
+            undulator,
+            dcm,
+            id_gap_lookup_table_path=id_gap_lut_path,
+            daq_configuration_path=daq_config_path,
+            name="undulator_dcm",
+        )
+    return undulator_dcm
