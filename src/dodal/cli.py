@@ -1,4 +1,5 @@
 import click
+from bluesky.run_engine import RunEngine
 
 from dodal.beamlines import all_beamline_names, module_name_for_beamline
 from dodal.utils import make_all_devices
@@ -40,8 +41,6 @@ def connect(beamline: str, all: bool, sim_backend: bool) -> None:
     any connection issues."""
 
     module_name = module_name_for_beamline(beamline)
-
-    from bluesky import RunEngine
 
     RE = RunEngine()  # noqa: F841
 
