@@ -354,7 +354,7 @@ class EigerDetector(Device):
         return run_functions_without_blocking(functions_to_do_arm, associated_obj=self)
 
 
-def get_mock_eiger(params: DetectorParams, test_name: str = ""):
+def get_mock_device(params: DetectorParams, test_name: str = ""):
     FakeEigerDetector: EigerDetector = make_fake_device(EigerDetector)
     fake_eiger: EigerDetector = FakeEigerDetector.with_params(
         params, name=f"test fake Eiger: {test_name}"

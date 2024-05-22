@@ -29,3 +29,5 @@ EIGER_NUM_TRIGGERS = 2000
 EIGER_USE_ROI_MODE = False
 EIGER_DET_DIST_TO_BEAM_CONVERTER_PATH = "tests/devices/unit_tests/test_lookup_table.txt"
 EIGER_1169_FIX = True
+OAV_DISPLAY_CONFIG = "tests/devices/unit_tests/test_display.configuration"
+OAV_ZOOM_LEVELS = "tests/devices/unit_tests/test_jCameraManZoomLevels.xml"

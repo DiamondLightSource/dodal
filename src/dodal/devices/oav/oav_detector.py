@@ -14,6 +14,7 @@ from ophyd import (
     Signal,
     StatusBase,
 )
+from ophyd.sim import make_fake_device
 
 from dodal.devices.areadetector.plugins.MJPG import SnapshotWithBeamCentre
 from dodal.devices.oav.grid_overlay import SnapshotWithGrid
@@ -102,3 +103,28 @@ class OAV(AreaDetector):
         self.subscription_id = self.zoom_controller.level.subscribe(cb)
 
         return connected
+
+
+def get_mock_device(zoom_levels_path, display_config_path) -> OAV:
+    oav_params = OAVConfigParams(zoom_levels_path, display_config_path)
+    FakeOAV = make_fake_device(OAV)
+    fake_oav: OAV = FakeOAV(name="test fake OAV", params=oav_params)
+
+    fake_oav.grid_snapshot.url.sim_put("http://test.url")  # type: ignore
+    fake_oav.grid_snapshot.filename.put("test filename")
+    fake_oav.grid_snapshot.directory.put("test directory")
+    fake_oav.grid_snapshot.top_left_x.put(100)
+    fake_oav.grid_snapshot.top_left_y.put(100)
+    fake_oav.grid_snapshot.box_width.put(50)
+    fake_oav.grid_snapshot.num_boxes_x.put(15)
+    fake_oav.grid_snapshot.num_boxes_y.put(10)
+    fake_oav.grid_snapshot.x_size.sim_put(1024)  # type: ignore
+    fake_oav.grid_snapshot.y_size.sim_put(768)  # type: ignore
+
+    fake_oav.cam.port_name.sim_put("CAM")  # type: ignore
+    fake_oav.proc.port_name.sim_put("PROC")  # type: ignore
+
+    fake_oav.wait_for_connection()
+    fake_oav.zoom_controller.set("1.0x").wait()
+
+    return fake_oav

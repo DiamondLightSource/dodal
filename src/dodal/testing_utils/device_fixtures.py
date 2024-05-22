@@ -11,18 +11,16 @@ from dodal.devices.aperturescatterguard import (
 )
 from dodal.devices.aperturescatterguard import get_mock_device as get_mock_ap_sg
 from dodal.devices.backlight import Backlight
-from dodal.devices.eiger import get_mock_eiger
+from dodal.devices.eiger import get_mock_device as get_mock_eiger
 from dodal.devices.fast_grid_scan import make_mock_device as make_mock_fgs
 from dodal.devices.focusing_mirror import get_mock_voltages
 from dodal.devices.i24.dual_backlight import DualBacklight
+from dodal.devices.oav.oav_detector import get_mock_device as get_mock_oav
 from dodal.devices.robot import get_mock_device as get_mock_bart_robot
 from dodal.devices.smargon import Smargon
 from dodal.devices.undulator_dcm import get_mock_device as get_mock_undulator_dcm
+from dodal.testing_utils import constants
 
-from .constants import (
-    ID_GAP_LOOKUP_TABLE_PATH,
-    MOCK_DAQ_CONFIG_PATH,
-)
 from .utility_functions import create_new_detector_params, patch_ophyd_async_motor
 
 ApSgAndLog = tuple[ApertureScatterguard, MagicMock]
@@ -103,15 +101,22 @@ def mock_fast_grid_scan(request: pytest.FixtureRequest):
 
 
 @pytest.fixture
+def mock_oav():
+    yield get_mock_oav(constants.OAV_ZOOM_LEVELS, constants.OAV_DISPLAY_CONFIG)
+
+
+@pytest.fixture
 def mock_smargon(request: pytest.FixtureRequest) -> Smargon:
     return make_fake_device(Smargon)(name=f"smargon: {request.node.name}")
 
 
 @pytest.fixture
 def mock_vfm_mirror_voltages():
-    return get_mock_voltages(MOCK_DAQ_CONFIG_PATH)
+    return get_mock_voltages(constants.MOCK_DAQ_CONFIG_PATH)
 
 
 @pytest.fixture
 async def mock_undulator_dcm():
-    return await get_mock_undulator_dcm(ID_GAP_LOOKUP_TABLE_PATH, MOCK_DAQ_CONFIG_PATH)
+    return await get_mock_undulator_dcm(
+        constants.ID_GAP_LOOKUP_TABLE_PATH, constants.MOCK_DAQ_CONFIG_PATH
+    )
