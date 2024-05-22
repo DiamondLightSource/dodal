@@ -20,7 +20,7 @@ VOLTAGE_POLLING_DELAY_S = 0.5
 DEFAULT_SETTLE_TIME_S = 60
 
 
-class MirrorType(Enum):
+class MirrorType(str, Enum):
     """See https://manual.nexusformat.org/classes/base_classes/NXmirror.html"""
 
     SINGLE = "single"
