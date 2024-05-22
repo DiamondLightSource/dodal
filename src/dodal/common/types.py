@@ -5,6 +5,7 @@ from typing import (
     Generator,
 )
 
+from bluesky import RunEngine
 from bluesky.utils import Msg
 from ophyd_async.core import DirectoryProvider
 
@@ -16,6 +17,11 @@ MsgGenerator = Generator[Msg, Any, None]
 PlanGenerator = Callable[..., MsgGenerator]
 
 
+class RunEngineAwareDirectoryProvider(DirectoryProvider, ABC):
+    @abstractmethod
+    def connect_to_run_engine(self, run_engine: RunEngine) -> None: ...
+
+
 class UpdatingDirectoryProvider(DirectoryProvider, ABC):
     @abstractmethod
-    def update(self, **kwargs) -> None: ...
+    async def update(self, **kwargs) -> None: ...

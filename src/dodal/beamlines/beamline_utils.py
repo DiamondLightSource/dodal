@@ -130,9 +130,5 @@ def set_directory_provider(provider: UpdatingDirectoryProvider):
     DIRECTORY_PROVIDER = provider
 
 
-def get_directory_provider() -> UpdatingDirectoryProvider:
-    if DIRECTORY_PROVIDER is None:
-        raise ValueError(
-            "DirectoryProvider has not been set! Ophyd-async StandardDetectors will not be able to write!"
-        )
+def get_directory_provider() -> UpdatingDirectoryProvider | None:
     return DIRECTORY_PROVIDER

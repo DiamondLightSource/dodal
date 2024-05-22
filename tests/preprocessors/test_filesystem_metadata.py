@@ -31,10 +31,9 @@ from dodal.common.types import MsgGenerator, UpdatingDirectoryProvider
 from dodal.common.visit import (
     DATA_SESSION,
     DataCollectionIdentifier,
-    DirectoryServiceClientBase,
-    LocalDirectoryServiceClient,
-    StaticVisitDirectoryProvider,
-    attach_metadata,
+    InMemoryScanNumberProvider,
+    ScanNumberDirectoryProvider,
+    ScanNumberProvider,
 )
 
 
@@ -87,7 +86,7 @@ class FakeDetector(Readable, HasName, Triggerable):
         return None
 
 
-class MockDirectoryServiceClient(LocalDirectoryServiceClient):
+class MockDirectoryServiceClient(InMemoryScanNumberProvider):
     def __init__(self):
         self.fail = False
         super().__init__()
@@ -111,15 +110,13 @@ class DataEvent(BaseModel):
 
 
 @pytest.fixture
-def client() -> DirectoryServiceClientBase:
+def client() -> ScanNumberProvider:
     return MockDirectoryServiceClient()
 
 
 @pytest.fixture
-def provider(
-    client: DirectoryServiceClientBase, tmp_path: Path
-) -> UpdatingDirectoryProvider:
-    return StaticVisitDirectoryProvider("example", tmp_path, client=client)
+def provider(client: ScanNumberProvider, tmp_path: Path) -> UpdatingDirectoryProvider:
+    return ScanNumberDirectoryProvider("example", tmp_path, client=client)
 
 
 @pytest.fixture(params=[1, 2])
