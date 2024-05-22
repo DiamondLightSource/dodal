@@ -23,6 +23,7 @@ from dodal.devices.robot import get_mock_device as get_mock_bart_robot
 from dodal.devices.slits import Slits
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import get_mock_device as get_mock_synchrotron
+from dodal.devices.undulator import Undulator
 from dodal.devices.undulator_dcm import get_mock_device as get_mock_undulator_dcm
 from dodal.devices.xspress3_mini.xspress3_mini import Xspress3Mini
 from dodal.devices.zocalo.zocalo_results import ZOCALO_READING_PLAN_NAME, ZocaloResults
@@ -144,6 +145,13 @@ async def mock_undulator_dcm():
     return await get_mock_undulator_dcm(
         constants.ID_GAP_LOOKUP_TABLE_PATH, constants.MOCK_DAQ_CONFIG_PATH
     )
+
+
+@pytest.fixture
+async def mock_undulator() -> Undulator:
+    async with DeviceCollector(mock=True):
+        undulator = Undulator("UND-01", name="undulator")
+    return undulator
 
 
 @pytest.fixture

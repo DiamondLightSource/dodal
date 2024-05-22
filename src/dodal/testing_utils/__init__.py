@@ -21,6 +21,7 @@ from .device_fixtures import (
     mock_slits,
     mock_smargon,
     mock_synchrotron,
+    mock_undulator,
     mock_undulator_dcm,
     mock_vfm_mirror_voltages,
     mock_xspress3mini,
@@ -38,10 +39,13 @@ from .utility_functions import (
 
 __all__ = [
     # Device fixtures
-    "mock_aperturescatterguard",
-    "mock_aperturescatterguard_in_medium_pos",
+    #   for functions which return devices:
+    "get_mock_zocalo_device",
+    #   for devices:
     "mock_aperturescatterguard_in_medium_pos_w_call_log",
+    "mock_aperturescatterguard_in_medium_pos",
     "mock_aperturescatterguard_with_call_log",
+    "mock_aperturescatterguard",
     "mock_backlight",
     "mock_bart_robot",
     "mock_dual_backlight",
@@ -49,13 +53,13 @@ __all__ = [
     "mock_fast_grid_scan",
     "mock_oav",
     "mock_odin",
+    "mock_slits",
     "mock_smargon",
     "mock_synchrotron",
-    "mock_slits",
     "mock_undulator_dcm",
+    "mock_undulator",
     "mock_vfm_mirror_voltages",
     "mock_xspress3mini",
-    "get_mock_zocalo_device",
     # Exceptions
     "StatusException",
     # Test data fixtures

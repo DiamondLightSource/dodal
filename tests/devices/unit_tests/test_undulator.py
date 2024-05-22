@@ -1,16 +1,6 @@
 import pytest
-from ophyd_async.core import (
-    DeviceCollector,
-)
 
 from dodal.devices.undulator import Undulator
-
-
-@pytest.fixture
-async def undulator() -> Undulator:
-    async with DeviceCollector(mock=True):
-        undulator = Undulator("UND-01", name="undulator")
-    return undulator
 
 
 @pytest.mark.parametrize(
@@ -22,11 +12,11 @@ async def undulator() -> Undulator:
     ],
 )
 async def test_read_and_describe_includes(
-    undulator: Undulator,
+    mock_undulator: Undulator,
     key: str,
 ):
-    description = await undulator.describe()
-    reading = await undulator.read()
+    description = await mock_undulator.describe()
+    reading = await mock_undulator.read()
 
     assert key in description
     assert key in reading
