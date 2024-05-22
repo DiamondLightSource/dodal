@@ -1,7 +1,9 @@
+from typing import Any, Mapping
 from unittest.mock import MagicMock
 
 from ophyd.status import Status
 from ophyd_async.core import (
+    StandardReadable,
     callback_on_mock_put,
     set_mock_value,
 )
@@ -16,18 +18,18 @@ from dodal.devices.smargon import Smargon
 from dodal.testing_utils import constants
 
 
+async def assert_reading(
+    device: StandardReadable,
+    expected_reading: Mapping[str, Any],
+) -> None:
+    reading = await device.read()
+
+    assert reading == expected_reading
+
+
 def mock_beamline_module_filepaths(bl_name, bl_module):
     if mock_attributes := constants.MOCK_ATTRIBUTES_TABLE.get(bl_name):
         [bl_module.__setattr__(attr[0], attr[1]) for attr in mock_attributes]
-
-
-def _pass_on_mock(motor, call_log: MagicMock | None = None):
-    def _pass_on_mock(value, **kwargs):
-        set_mock_value(motor.user_readback, value)
-        if call_log is not None:
-            call_log(value, **kwargs)
-
-    return _pass_on_mock
 
 
 def set_smargon_pos(smargon: Smargon, pos: tuple[float, float, float]):
@@ -43,6 +45,15 @@ def patch_ophyd_async_motor(
     If passed a mock object for call_log, it will call it for all calls to the
     setpoint - useful for testing the order multiple motors are set in.
     """
+
+    def _pass_on_mock(motor, call_log: MagicMock | None = None):
+        def _pass_on_mock(value, **kwargs):
+            set_mock_value(motor.user_readback, value)
+            if call_log is not None:
+                call_log(value, **kwargs)
+
+        return _pass_on_mock
+
     set_mock_value(motor.user_setpoint, initial_position)
     set_mock_value(motor.user_readback, initial_position)
     set_mock_value(motor.deadband, 0.001)

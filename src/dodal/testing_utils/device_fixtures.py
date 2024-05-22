@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 
 import pytest
 from ophyd.sim import make_fake_device
-from ophyd_async.core import set_mock_value
+from ophyd_async.core import DeviceCollector, set_mock_value
 
 from dodal.devices.aperturescatterguard import (
     TEST_APERTURE_POSITIONS,
@@ -12,11 +12,13 @@ from dodal.devices.aperturescatterguard import (
 from dodal.devices.aperturescatterguard import get_mock_device as get_mock_ap_sg
 from dodal.devices.backlight import Backlight
 from dodal.devices.eiger import get_mock_device as get_mock_eiger
+from dodal.devices.eiger_odin import EigerOdin
 from dodal.devices.fast_grid_scan import make_mock_device as make_mock_fgs
 from dodal.devices.focusing_mirror import get_mock_voltages
 from dodal.devices.i24.dual_backlight import DualBacklight
 from dodal.devices.oav.oav_detector import get_mock_device as get_mock_oav
 from dodal.devices.robot import get_mock_device as get_mock_bart_robot
+from dodal.devices.slits import Slits
 from dodal.devices.smargon import Smargon
 from dodal.devices.undulator_dcm import get_mock_device as get_mock_undulator_dcm
 from dodal.testing_utils import constants
@@ -103,6 +105,18 @@ def mock_fast_grid_scan(request: pytest.FixtureRequest):
 @pytest.fixture
 def mock_oav():
     yield get_mock_oav(constants.OAV_ZOOM_LEVELS, constants.OAV_DISPLAY_CONFIG)
+
+
+@pytest.fixture
+def mock_odin(request: pytest.FixtureRequest):
+    return make_fake_device(EigerOdin)(name=f"eigerodin: {request.node.name}")
+
+
+@pytest.fixture
+async def mock_slits(request: pytest.FixtureRequest):
+    async with DeviceCollector(mock=True):
+        slits = Slits(f"slits: {request.node.name}")
+    return slits
 
 
 @pytest.fixture

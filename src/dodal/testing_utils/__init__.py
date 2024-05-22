@@ -21,6 +21,8 @@ from .device_fixtures import (
     mock_eiger,
     mock_fast_grid_scan,
     mock_oav,
+    mock_odin,
+    mock_slits,
     mock_smargon,
     mock_undulator_dcm,
     mock_vfm_mirror_voltages,
@@ -28,6 +30,7 @@ from .device_fixtures import (
 )
 from .utility_functions import (
     StatusException,
+    assert_reading,
     create_new_detector_params,
     get_bad_status,
     mock_beamline_module_filepaths,
@@ -51,7 +54,9 @@ __all__ = [
     "mock_eiger",
     "mock_fast_grid_scan",
     "mock_oav",
+    "mock_odin",
     "mock_smargon",
+    "mock_slits",
     "mock_undulator_dcm",
     "mock_vfm_mirror_voltages",
     # Exceptions
@@ -66,6 +71,7 @@ __all__ = [
     "set_smargon_pos",
     "get_bad_status",
     "create_new_detector_params",
+    "assert_reading",
 ]
 
 

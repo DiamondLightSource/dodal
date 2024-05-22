@@ -1,27 +1,18 @@
-from typing import Any, Mapping
 from unittest.mock import ANY
 
-import pytest
-from ophyd_async.core import DeviceCollector, StandardReadable, set_mock_value
+from ophyd_async.core import set_mock_value
 
 from dodal.devices.slits import Slits
+from dodal.testing_utils import assert_reading
 
 
-@pytest.fixture
-async def slits() -> Slits:
-    async with DeviceCollector(mock=True):
-        slits = Slits("DEMO-SLITS-01:")
-
-    return slits
-
-
-async def test_reading_slits_reads_gaps_and_centres(slits: Slits):
-    set_mock_value(slits.x_gap.user_readback, 0.5)
-    set_mock_value(slits.y_centre.user_readback, 1.0)
-    set_mock_value(slits.y_gap.user_readback, 1.5)
+async def test_reading_slits_reads_gaps_and_centres(mock_slits: Slits):
+    set_mock_value(mock_slits.x_gap.user_readback, 0.5)
+    set_mock_value(mock_slits.y_centre.user_readback, 1.0)
+    set_mock_value(mock_slits.y_gap.user_readback, 1.5)
 
     await assert_reading(
-        slits,
+        mock_slits,
         {
             "slits-x_centre": {
                 "alarm_severity": 0,
@@ -45,12 +36,3 @@ async def test_reading_slits_reads_gaps_and_centres(slits: Slits):
             },
         },
     )
-
-
-async def assert_reading(
-    device: StandardReadable,
-    expected_reading: Mapping[str, Any],
-) -> None:
-    reading = await device.read()
-
-    assert reading == expected_reading
