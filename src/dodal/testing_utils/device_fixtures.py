@@ -22,6 +22,7 @@ from dodal.devices.slits import Slits
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import get_mock_device as get_mock_synchrotron
 from dodal.devices.undulator_dcm import get_mock_device as get_mock_undulator_dcm
+from dodal.devices.xspress3_mini.xspress3_mini import Xspress3Mini
 from dodal.testing_utils import constants
 
 from .utility_functions import create_new_detector_params, patch_ophyd_async_motor
@@ -140,3 +141,8 @@ async def mock_undulator_dcm():
     return await get_mock_undulator_dcm(
         constants.ID_GAP_LOOKUP_TABLE_PATH, constants.MOCK_DAQ_CONFIG_PATH
     )
+
+
+@pytest.fixture
+def mock_xspress3mini(request: pytest.FixtureRequest):
+    return make_fake_device(Xspress3Mini)(name=f"xspress3mini: {request.node.name}")

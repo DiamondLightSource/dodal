@@ -22,6 +22,7 @@ from .device_fixtures import (
     mock_synchrotron,
     mock_undulator_dcm,
     mock_vfm_mirror_voltages,
+    mock_xspress3mini,
     test_aperture_positions,
 )
 from .utility_functions import (
@@ -52,6 +53,7 @@ __all__ = [
     "mock_slits",
     "mock_undulator_dcm",
     "mock_vfm_mirror_voltages",
+    "mock_xspress3mini",
     # Exceptions
     "StatusException",
     # Test data fixtures
