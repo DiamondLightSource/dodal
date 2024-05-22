@@ -1,5 +1,5 @@
 import pytest
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import DeviceCollector, callback_on_mock_put, set_mock_value
 
 from dodal.devices.shutter import Shutter, ShutterSetState, ShutterState
 
@@ -16,6 +16,10 @@ async def sim_shutter():
 
 async def test_set_shutter_open(sim_shutter: Shutter):
     desired_state: ShutterSetState = ShutterSetState.OPEN
+    callback_on_mock_put(
+        sim_shutter.position_set,
+        lambda _: set_mock_value(sim_shutter.position_readback, ShutterState.OPENING),
+    )
     await sim_shutter.set(desired_state)
     reading = await sim_shutter.read()
 
@@ -27,6 +31,10 @@ async def test_set_shutter_open(sim_shutter: Shutter):
 
 async def test_set_shutter_close(sim_shutter: Shutter):
     desired_state: ShutterSetState = ShutterSetState.CLOSE
+    callback_on_mock_put(
+        sim_shutter.position_set,
+        lambda _: set_mock_value(sim_shutter.position_readback, ShutterState.CLOSED),
+    )
     await sim_shutter.set(desired_state)
     reading = await sim_shutter.read()
 
