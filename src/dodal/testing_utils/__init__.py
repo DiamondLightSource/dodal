@@ -6,6 +6,7 @@ from bluesky.run_engine import RunEngine
 
 from .device_fixtures import (
     ApSgAndLog,
+    get_mock_zocalo_device,
     mock_aperturescatterguard,
     mock_aperturescatterguard_in_medium_pos,
     mock_aperturescatterguard_in_medium_pos_w_call_log,
@@ -54,6 +55,7 @@ __all__ = [
     "mock_undulator_dcm",
     "mock_vfm_mirror_voltages",
     "mock_xspress3mini",
+    "get_mock_zocalo_device",
     # Exceptions
     "StatusException",
     # Test data fixtures

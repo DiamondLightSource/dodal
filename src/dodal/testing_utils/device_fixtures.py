@@ -1,8 +1,10 @@
-from unittest.mock import MagicMock
+from functools import partial
+from unittest.mock import MagicMock, patch
 
+import bluesky.plan_stubs as bps
 import pytest
 from ophyd.sim import make_fake_device
-from ophyd_async.core import DeviceCollector, set_mock_value
+from ophyd_async.core import AsyncStatus, DeviceCollector, set_mock_value
 
 from dodal.devices.aperturescatterguard import (
     TEST_APERTURE_POSITIONS,
@@ -23,6 +25,7 @@ from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import get_mock_device as get_mock_synchrotron
 from dodal.devices.undulator_dcm import get_mock_device as get_mock_undulator_dcm
 from dodal.devices.xspress3_mini.xspress3_mini import Xspress3Mini
+from dodal.devices.zocalo.zocalo_results import ZOCALO_READING_PLAN_NAME, ZocaloResults
 from dodal.testing_utils import constants
 
 from .utility_functions import create_new_detector_params, patch_ophyd_async_motor
@@ -146,3 +149,29 @@ async def mock_undulator_dcm():
 @pytest.fixture
 def mock_xspress3mini(request: pytest.FixtureRequest):
     return make_fake_device(Xspress3Mini)(name=f"xspress3mini: {request.node.name}")
+
+
+@patch("dodal.devices.zocalo_results._get_zocalo_connection")
+@pytest.fixture
+async def get_mock_zocalo_device(RE):
+    async def device(results, run_setup=False):
+        zd = ZocaloResults(zocalo_environment="test_env")
+
+        @AsyncStatus.wrap
+        async def mock_trigger(results):
+            await zd._put_results(results, constants.ZOC_ISPYB_IDS)
+
+        zd.trigger = MagicMock(side_effect=partial(mock_trigger, results))  # type: ignore
+        await zd.connect()
+
+        if run_setup:
+
+            def plan():
+                yield from bps.open_run()
+                yield from bps.trigger_and_read([zd], name=ZOCALO_READING_PLAN_NAME)
+                yield from bps.close_run()
+
+            RE(plan())
+        return zd
+
+    return device

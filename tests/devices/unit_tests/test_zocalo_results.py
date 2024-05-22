@@ -1,4 +1,3 @@
-from functools import partial
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import bluesky.plan_stubs as bps
@@ -6,7 +5,6 @@ import numpy as np
 import pytest
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
-from ophyd_async.core.async_status import AsyncStatus
 
 from dodal.devices.zocalo.zocalo_results import (
     ZOCALO_READING_PLAN_NAME,
@@ -15,117 +13,24 @@ from dodal.devices.zocalo.zocalo_results import (
     ZocaloResults,
     get_processing_result,
 )
-
-TEST_RESULTS: list[XrcResult] = [
-    {
-        "centre_of_mass": [1, 2, 3],
-        "max_voxel": [2, 4, 5],
-        "max_count": 105062,
-        "n_voxels": 38,
-        "total_count": 2387574,
-        "bounding_box": [[1, 2, 3], [3, 4, 4]],
-    },
-    {
-        "centre_of_mass": [2, 3, 4],
-        "max_voxel": [2, 4, 5],
-        "max_count": 105123,
-        "n_voxels": 35,
-        "total_count": 2387574,
-        "bounding_box": [[1, 2, 3], [3, 4, 4]],
-    },
-    {
-        "centre_of_mass": [4, 5, 6],
-        "max_voxel": [2, 4, 5],
-        "max_count": 102062,
-        "n_voxels": 31,
-        "total_count": 2387574,
-        "bounding_box": [[1, 2, 3], [3, 4, 4]],
-    },
-]
-
-TEST_READING = {
-    "zocalo_results-centre_of_mass": {
-        "value": np.array([2, 3, 4]),
-        "timestamp": 11250827.378482452,
-        "alarm_severity": 0,
-    },
-    "zocalo_results-max_voxel": {
-        "value": np.array([2, 4, 5]),
-        "timestamp": 11250827.378502235,
-        "alarm_severity": 0,
-    },
-    "zocalo_results-max_count": {
-        "value": 105123,
-        "timestamp": 11250827.378515247,
-        "alarm_severity": 0,
-    },
-    "zocalo_results-n_voxels": {
-        "value": 35,
-        "timestamp": 11250827.37852733,
-        "alarm_severity": 0,
-    },
-    "zocalo_results-total_count": {
-        "value": 2387574,
-        "timestamp": 11250827.378539408,
-        "alarm_severity": 0,
-    },
-    "zocalo_results-bounding_box": {
-        "value": np.array([[1, 2, 3], [3, 4, 4]]),
-        "timestamp": 11250827.378558964,
-        "alarm_severity": 0,
-    },
-}
-
-test_ispyb_ids = {"dcid": 0, "dcgid": 0}
+from dodal.testing_utils import constants
 
 
-@patch("dodal.devices.zocalo_results._get_zocalo_connection")
-@pytest.fixture
-async def mocked_zocalo_device(RE):
-    async def device(results, run_setup=False):
-        zd = ZocaloResults(zocalo_environment="test_env")
-
-        @AsyncStatus.wrap
-        async def mock_trigger(results):
-            await zd._put_results(results, test_ispyb_ids)
-
-        zd.trigger = MagicMock(side_effect=partial(mock_trigger, results))  # type: ignore
-        await zd.connect()
-
-        if run_setup:
-
-            def plan():
-                yield from bps.open_run()
-                yield from bps.trigger_and_read([zd], name=ZOCALO_READING_PLAN_NAME)
-                yield from bps.close_run()
-
-            RE(plan())
-        return zd
-
-    return device
-
-
-async def test_put_result_read_results(
-    mocked_zocalo_device,
-    RE,
-) -> None:
-    zocalo_device = await mocked_zocalo_device([], run_setup=True)
-    await zocalo_device._put_results(TEST_RESULTS, test_ispyb_ids)
+async def test_put_result_read_results(get_mock_zocalo_device, RE) -> None:
+    zocalo_device = await get_mock_zocalo_device([], run_setup=True)
+    await zocalo_device._put_results(constants.ZOC_RESULTS, constants.ZOC_ISPYB_IDS)
     reading = await zocalo_device.read()
     results: list[XrcResult] = reading["zocalo-results"]["value"]
     centres: list[XrcResult] = reading["zocalo-centres_of_mass"]["value"]
     bboxes: list[XrcResult] = reading["zocalo-bbox_sizes"]["value"]
-    assert results == TEST_RESULTS
+    assert results == constants.ZOC_RESULTS
     assert np.all(centres == np.array([[1, 2, 3], [2, 3, 4], [4, 5, 6]]))
     assert np.all(bboxes[0] == [2, 2, 1])
 
 
-async def test_rd_top_results(
-    mocked_zocalo_device,
-    RE,
-):
-    zocalo_device = await mocked_zocalo_device([], run_setup=True)
-    await zocalo_device._put_results(TEST_RESULTS, test_ispyb_ids)
+async def test_rd_top_results(get_mock_zocalo_device, RE):
+    zocalo_device = await get_mock_zocalo_device([], run_setup=True)
+    await zocalo_device._put_results(constants.ZOC_RESULTS, constants.ZOC_ISPYB_IDS)
 
     def test_plan():
         bbox_size = yield from bps.rd(zocalo_device.bbox_sizes)
@@ -138,11 +43,8 @@ async def test_rd_top_results(
     RE(test_plan())
 
 
-async def test_trigger_and_wait_puts_results(
-    mocked_zocalo_device,
-    RE,
-):
-    zocalo_device = await mocked_zocalo_device(TEST_RESULTS)
+async def test_trigger_and_wait_puts_results(get_mock_zocalo_device, RE):
+    zocalo_device = await get_mock_zocalo_device(constants.ZOC_RESULTS)
     zocalo_device._put_results = AsyncMock()
     zocalo_device._put_results.assert_not_called()
 
@@ -155,9 +57,9 @@ async def test_trigger_and_wait_puts_results(
     zocalo_device._put_results.assert_called()
 
 
-async def test_extraction_plan(mocked_zocalo_device, RE) -> None:
-    zocalo_device: ZocaloResults = await mocked_zocalo_device(
-        TEST_RESULTS, run_setup=False
+async def test_extraction_plan(get_mock_zocalo_device, RE) -> None:
+    zocalo_device: ZocaloResults = await get_mock_zocalo_device(
+        constants.ZOC_RESULTS, run_setup=False
     )
 
     def plan():

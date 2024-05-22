@@ -1,4 +1,11 @@
+from typing import TYPE_CHECKING
+
+import numpy as np
+
 from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
+
+if TYPE_CHECKING:
+    from dodal.devices.zocalo import XrcResult
 
 MOCK_DAQ_CONFIG_PATH = "tests/devices/unit_tests/test_daq_configuration"
 ID_GAP_LOOKUP_TABLE_PATH: str = (
@@ -42,3 +49,66 @@ SYNCHR_BEAM_ENERGY = 3.0158
 SYNCHR_MODE = "Injection"
 SYNCHR_NUMBER = "number"
 SYNCHR_STRING = "string"
+
+
+ZOC_RESULTS: list["XrcResult"] = [
+    {
+        "centre_of_mass": [1, 2, 3],
+        "max_voxel": [2, 4, 5],
+        "max_count": 105062,
+        "n_voxels": 38,
+        "total_count": 2387574,
+        "bounding_box": [[1, 2, 3], [3, 4, 4]],
+    },
+    {
+        "centre_of_mass": [2, 3, 4],
+        "max_voxel": [2, 4, 5],
+        "max_count": 105123,
+        "n_voxels": 35,
+        "total_count": 2387574,
+        "bounding_box": [[1, 2, 3], [3, 4, 4]],
+    },
+    {
+        "centre_of_mass": [4, 5, 6],
+        "max_voxel": [2, 4, 5],
+        "max_count": 102062,
+        "n_voxels": 31,
+        "total_count": 2387574,
+        "bounding_box": [[1, 2, 3], [3, 4, 4]],
+    },
+]
+
+ZOC_READING = {
+    "zocalo_results-centre_of_mass": {
+        "value": np.array([2, 3, 4]),
+        "timestamp": 11250827.378482452,
+        "alarm_severity": 0,
+    },
+    "zocalo_results-max_voxel": {
+        "value": np.array([2, 4, 5]),
+        "timestamp": 11250827.378502235,
+        "alarm_severity": 0,
+    },
+    "zocalo_results-max_count": {
+        "value": 105123,
+        "timestamp": 11250827.378515247,
+        "alarm_severity": 0,
+    },
+    "zocalo_results-n_voxels": {
+        "value": 35,
+        "timestamp": 11250827.37852733,
+        "alarm_severity": 0,
+    },
+    "zocalo_results-total_count": {
+        "value": 2387574,
+        "timestamp": 11250827.378539408,
+        "alarm_severity": 0,
+    },
+    "zocalo_results-bounding_box": {
+        "value": np.array([[1, 2, 3], [3, 4, 4]]),
+        "timestamp": 11250827.378558964,
+        "alarm_severity": 0,
+    },
+}
+
+ZOC_ISPYB_IDS = {"dcid": 0, "dcgid": 0}
