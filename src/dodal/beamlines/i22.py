@@ -3,12 +3,13 @@ from pathlib import Path
 from ophyd_async.epics.areadetector import AravisDetector, PilatusDetector
 from ophyd_async.panda import HDFPanda
 
-from dodal.beamlines.beamline_utils import (
+from dodal.common.beamlines.beamline_utils import (
     device_instantiation,
     get_directory_provider,
     set_directory_provider,
 )
-from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.device_helpers import numbered_slits
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitDirectoryProvider
 from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.i22.fswitch import FSwitch
@@ -16,10 +17,6 @@ from dodal.devices.slits import Slits
 from dodal.devices.tetramm import TetrammDetector
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import get_beamline_name, skip_device
-
-from ._device_helpers import numbered_slits
-from .beamline_utils import device_instantiation, get_directory_provider
-from .beamline_utils import set_beamline as set_utils_beamline
 
 BL = get_beamline_name("i22")
 set_log_beamline(BL)
@@ -125,7 +122,7 @@ def hfm(
 
 def slits_1(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
+    fake_with_ophyd_sim: bool = False,
 ) -> Slits:
     return numbered_slits(
         1,
@@ -136,7 +133,7 @@ def slits_1(
 
 def slits_2(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
+    fake_with_ophyd_sim: bool = False,
 ) -> Slits:
     return numbered_slits(
         2,
@@ -147,7 +144,7 @@ def slits_2(
 
 def slits_3(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
+    fake_with_ophyd_sim: bool = False,
 ) -> Slits:
     return numbered_slits(
         3,
@@ -156,9 +153,10 @@ def slits_3(
     )
 
 
+@skip_device
 def slits_4(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
+    fake_with_ophyd_sim: bool = False,
 ) -> Slits:
     return numbered_slits(
         4,
@@ -169,7 +167,7 @@ def slits_4(
 
 def slits_5(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
+    fake_with_ophyd_sim: bool = False,
 ) -> Slits:
     return numbered_slits(
         5,
@@ -180,7 +178,7 @@ def slits_5(
 
 def slits_6(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
+    fake_with_ophyd_sim: bool = False,
 ) -> Slits:
     return numbered_slits(
         6,
