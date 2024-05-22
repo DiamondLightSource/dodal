@@ -1,6 +1,7 @@
 import asyncio
 from collections import OrderedDict, namedtuple
 from dataclasses import asdict, dataclass
+from enum import StrEnum
 
 from bluesky.protocols import Movable, Reading
 from ophyd_async.core import AsyncStatus, SignalR, StandardReadable
@@ -48,8 +49,18 @@ class SingleAperturePosition:
     )
 
 
+class AperturePositionGDANames(StrEnum):
+    LARGE_APERTURE = "LARGE_APERTURE"
+    MEDIUM_APERTURE = "MEDIUM_APERTURE"
+    SMALL_APERTURE = "SMALL_APERTURE"
+    ROBOT_LOAD = "ROBOT_LOAD"
+
+
 def position_from_params(
-    name: str, GDA_name: str, radius_microns: float | None, params: dict
+    name: str,
+    GDA_name: AperturePositionGDANames,
+    radius_microns: float | None,
+    params: dict,
 ) -> SingleAperturePosition:
     return SingleAperturePosition(
         name,
@@ -93,10 +104,18 @@ class AperturePositions:
     @classmethod
     def from_gda_beamline_params(cls, params):
         return cls(
-            LARGE=position_from_params("Large", "LARGE_APERTURE", 100, params),
-            MEDIUM=position_from_params("Medium", "MEDIUM_APERTURE", 50, params),
-            SMALL=position_from_params("Small", "SMALL_APERTURE", 20, params),
-            ROBOT_LOAD=position_from_params("Robot load", "ROBOT_LOAD", None, params),
+            LARGE=position_from_params(
+                "Large", AperturePositionGDANames.LARGE_APERTURE, 100, params
+            ),
+            MEDIUM=position_from_params(
+                "Medium", AperturePositionGDANames.MEDIUM_APERTURE, 50, params
+            ),
+            SMALL=position_from_params(
+                "Small", AperturePositionGDANames.MEDIUM_APERTURE, 20, params
+            ),
+            ROBOT_LOAD=position_from_params(
+                "Robot load", AperturePositionGDANames.ROBOT_LOAD, None, params
+            ),
             tolerances=tolerances_from_params(params),
         )
 
@@ -107,6 +126,17 @@ class AperturePositions:
             self.SMALL,
             self.ROBOT_LOAD,
         ]
+
+
+# This can be removed once GDA stops interferring between XRC and rotation
+GDA_TO_HYPERION_APERTURE_MAPPING: dict[
+    AperturePositionGDANames, SingleAperturePosition
+] = {
+    AperturePositionGDANames.LARGE_APERTURE: AperturePositions.LARGE,
+    AperturePositionGDANames.MEDIUM_APERTURE: AperturePositions.MEDIUM,
+    AperturePositionGDANames.SMALL_APERTURE: AperturePositions.SMALL,
+    AperturePositionGDANames.ROBOT_LOAD: AperturePositions.ROBOT_LOAD,
+}
 
 
 class ApertureScatterguard(StandardReadable, Movable):
