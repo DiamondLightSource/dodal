@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 import pytest
 
-from dodal.beamlines_common.beamline_parameters import (
+from dodal.common.beamlines.beamline_parameters import (
     GDABeamlineParameters,
     get_beamline_parameters,
 )
@@ -31,7 +31,7 @@ def test_i03_beamline_parameters():
     ]
 
 
-@patch("dodal.beamlines_common.beamline_parameters.LOGGER")
+@patch("dodal.common.beamlines.beamline_parameters.LOGGER")
 def test_parse_exception_causes_warning(mock_logger):
     params = GDABeamlineParameters.from_file("tests/test_data/bad_beamlineParameters")
     assert params["flux_predict_polynomial_coefficients_5"] == [
@@ -75,7 +75,7 @@ def test_get_beamline_parameters():
     original_beamline = environ.get("BEAMLINE")
     environ["BEAMLINE"] = "i03"
     with patch.dict(
-        "dodal.beamlines_common.beamline_parameters.BEAMLINE_PARAMETER_PATHS",
+        "dodal.common.beamlines.beamline_parameters.BEAMLINE_PARAMETER_PATHS",
         {"i03": "tests/test_data/test_beamline_parameters.txt"},
     ):
         params = get_beamline_parameters()
@@ -89,14 +89,14 @@ def test_get_beamline_parameters():
         del environ["BEAMLINE"]
 
 
-@patch("dodal.beamlines_common.beamline_parameters.get_beamline_name")
+@patch("dodal.common.beamlines.beamline_parameters.get_beamline_name")
 def test_get_beamline_parameters_raises_error_when_beamline_not_set(get_beamline_name):
     get_beamline_name.return_value = None
     with pytest.raises(KeyError):
         get_beamline_parameters()
 
 
-@patch("dodal.beamlines_common.beamline_parameters.get_beamline_name")
+@patch("dodal.common.beamlines.beamline_parameters.get_beamline_name")
 def test_get_beamline_parameters_raises_error_when_beamline_not_found(
     get_beamline_name,
 ):

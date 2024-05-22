@@ -9,7 +9,7 @@ from ophyd_async.core import Device as OphydV2Device
 from ophyd_async.core import StandardReadable
 
 from dodal.beamlines import i03
-from dodal.beamlines_common import beamline_utils
+from dodal.common.beamlines import beamline_utils
 from dodal.devices.aperturescatterguard import ApertureScatterguard
 from dodal.devices.smargon import Smargon
 from dodal.devices.zebra import Zebra

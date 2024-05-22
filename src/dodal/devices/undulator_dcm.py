@@ -5,7 +5,7 @@ from bluesky.protocols import Movable
 from numpy import argmin, ndarray
 from ophyd_async.core import AsyncStatus, StandardReadable
 
-from dodal.beamlines_common.beamline_parameters import get_beamline_parameters
+from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.log import LOGGER
 
 from .dcm import DCM
