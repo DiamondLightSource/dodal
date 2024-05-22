@@ -362,7 +362,7 @@ def set_fast_grid_scan_params(scan: FastGridScan, params: GridScanParams):
     )
 
 
-def make_mock_device(name):
+def get_mock_device(name):
     FakeFastGridScan = make_fake_device(FastGridScan)
     fast_grid_scan: FastGridScan = FakeFastGridScan(name=f"test fake FGS: {name}")
     fast_grid_scan.scan_invalid.pvname = ""

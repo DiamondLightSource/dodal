@@ -1,7 +1,9 @@
 from enum import Enum
 
-from ophyd_async.core import StandardReadable
+from ophyd_async.core import DeviceCollector, StandardReadable, set_mock_value
 from ophyd_async.epics.signal import epics_signal_r
+
+from dodal.testing_utils import constants
 
 
 class Prefix(str, Enum):
@@ -68,3 +70,15 @@ class Synchrotron(StandardReadable):
             ],
         )
         super().__init__(name=name)
+
+
+async def get_mock_device() -> Synchrotron:
+    async with DeviceCollector(mock=True):
+        device = Synchrotron()
+    set_mock_value(device.ring_current, constants.SYNCHR_RING_CURRENT)
+    set_mock_value(device.machine_user_countdown, constants.SYNCHR_USER_COUNTDOWN)
+    set_mock_value(device.topup_start_countdown, constants.SYNCHR_START_COUNTDOWN)
+    set_mock_value(device.top_up_end_countdown, constants.SYNCHR_END_COUNTDOWN)
+    set_mock_value(device.beam_energy, constants.SYNCHR_BEAM_ENERGY)
+    set_mock_value(device.synchrotron_mode, SynchrotronMode(constants.SYNCHR_MODE))
+    return device

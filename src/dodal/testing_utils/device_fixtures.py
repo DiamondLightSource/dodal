@@ -13,13 +13,14 @@ from dodal.devices.aperturescatterguard import get_mock_device as get_mock_ap_sg
 from dodal.devices.backlight import Backlight
 from dodal.devices.eiger import get_mock_device as get_mock_eiger
 from dodal.devices.eiger_odin import EigerOdin
-from dodal.devices.fast_grid_scan import make_mock_device as make_mock_fgs
+from dodal.devices.fast_grid_scan import get_mock_device as get_mock_fgs
 from dodal.devices.focusing_mirror import get_mock_voltages
 from dodal.devices.i24.dual_backlight import DualBacklight
 from dodal.devices.oav.oav_detector import get_mock_device as get_mock_oav
 from dodal.devices.robot import get_mock_device as get_mock_bart_robot
 from dodal.devices.slits import Slits
 from dodal.devices.smargon import Smargon
+from dodal.devices.synchrotron import get_mock_device as get_mock_synchrotron
 from dodal.devices.undulator_dcm import get_mock_device as get_mock_undulator_dcm
 from dodal.testing_utils import constants
 
@@ -99,7 +100,7 @@ def mock_eiger(request: pytest.FixtureRequest):
 
 @pytest.fixture
 def mock_fast_grid_scan(request: pytest.FixtureRequest):
-    yield make_mock_fgs(request.node.name)
+    yield get_mock_fgs(request.node.name)
 
 
 @pytest.fixture
@@ -122,6 +123,11 @@ async def mock_slits(request: pytest.FixtureRequest):
 @pytest.fixture
 def mock_smargon(request: pytest.FixtureRequest) -> Smargon:
     return make_fake_device(Smargon)(name=f"smargon: {request.node.name}")
+
+
+@pytest.fixture
+async def mock_synchrotron():
+    return await get_mock_synchrotron()
 
 
 @pytest.fixture

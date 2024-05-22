@@ -14,18 +14,23 @@ from dodal.devices.undulator_dcm import (
     UndulatorDCM,
     _get_closest_gap_for_energy,
 )
-from dodal.testing_utils import ID_GAP_LOOKUP_TABLE_PATH, MOCK_DAQ_CONFIG_PATH
+from dodal.testing_utils import constants
 
 
 def test_lookup_table_paths_passed(mock_undulator_dcm: UndulatorDCM):
-    assert mock_undulator_dcm.id_gap_lookup_table_path == ID_GAP_LOOKUP_TABLE_PATH
+    assert (
+        mock_undulator_dcm.id_gap_lookup_table_path
+        == constants.ID_GAP_LOOKUP_TABLE_PATH
+    )
     assert (
         mock_undulator_dcm.dcm_pitch_converter_lookup_table_path
-        == MOCK_DAQ_CONFIG_PATH + "/lookup/BeamLineEnergy_DCM_Pitch_converter.txt"
+        == constants.MOCK_DAQ_CONFIG_PATH
+        + "/lookup/BeamLineEnergy_DCM_Pitch_converter.txt"
     )
     assert (
         mock_undulator_dcm.dcm_roll_converter_lookup_table_path
-        == MOCK_DAQ_CONFIG_PATH + "/lookup/BeamLineEnergy_DCM_Roll_converter.txt"
+        == constants.MOCK_DAQ_CONFIG_PATH
+        + "/lookup/BeamLineEnergy_DCM_Roll_converter.txt"
     )
 
 

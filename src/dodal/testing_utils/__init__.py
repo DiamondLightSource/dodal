@@ -4,11 +4,6 @@ import time
 import pytest
 from bluesky.run_engine import RunEngine
 
-from .constants import (
-    ID_GAP_LOOKUP_TABLE_PATH,
-    MOCK_ATTRIBUTES_TABLE,
-    MOCK_DAQ_CONFIG_PATH,
-)
 from .device_fixtures import (
     ApSgAndLog,
     mock_aperturescatterguard,
@@ -24,6 +19,7 @@ from .device_fixtures import (
     mock_odin,
     mock_slits,
     mock_smargon,
+    mock_synchrotron,
     mock_undulator_dcm,
     mock_vfm_mirror_voltages,
     test_aperture_positions,
@@ -39,10 +35,6 @@ from .utility_functions import (
 )
 
 __all__ = [
-    # Constants
-    "ID_GAP_LOOKUP_TABLE_PATH",
-    "MOCK_ATTRIBUTES_TABLE",
-    "MOCK_DAQ_CONFIG_PATH",
     # Device fixtures
     "mock_aperturescatterguard",
     "mock_aperturescatterguard_in_medium_pos",
@@ -56,6 +48,7 @@ __all__ = [
     "mock_oav",
     "mock_odin",
     "mock_smargon",
+    "mock_synchrotron",
     "mock_slits",
     "mock_undulator_dcm",
     "mock_vfm_mirror_voltages",
