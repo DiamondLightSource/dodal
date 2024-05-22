@@ -33,11 +33,17 @@ def test_cli_sets_beamline_environment_variable(runner: CliRunner):
         assert os.environ["BEAMLINE"] == EXAMPLE_BEAMLINE
 
 
+# We need to mock the environment because the CLI edits it and this could break other
+# tests
+@patch.dict(os.environ, clear=True)
 def test_cli_connect(runner: CliRunner):
     result = _mock_connect(EXAMPLE_BEAMLINE, runner=runner)
     assert result.stdout.startswith("3 devices connected")
 
 
+# We need to mock the environment because the CLI edits it and this could break other
+# tests
+@patch.dict(os.environ, clear=True)
 def test_cli_connect_in_sim_mode(runner: CliRunner):
     result = _mock_connect("-s", EXAMPLE_BEAMLINE, runner=runner)
     assert result.stdout.startswith("3 devices connected (sim mode)")
