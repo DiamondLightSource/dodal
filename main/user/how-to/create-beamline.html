@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Creating a new beamline &#8212; dodal 1.25.1.dev2+g94c632b9d documentation</title>
+    <title>Creating a new beamline &#8212; dodal 1.25.1.dev3+g156d1ae28 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../_static/documentation_options.js?v=b16799de"></script>
+    <script src="../../_static/documentation_options.js?v=990ff4d7"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -487,8 +487,8 @@ They include motors in the experiment hutch, optical components in the optics hu
 <p>The following example creates a fictitious beamline <code class="docutils literal notranslate"><span class="pre">w41</span></code>, with a simulated twin <code class="docutils literal notranslate"><span class="pre">s41</span></code>.
 <code class="docutils literal notranslate"><span class="pre">w41</span></code> needs to monitor the status of the Synchrotron and has an AdAravisDetector.
 <code class="docutils literal notranslate"><span class="pre">s41</span></code> has a simulated clone of the AdAravisDetector, but not of the Synchrotron machine.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dodal.beamlines.beamline_utils</span> <span class="kn">import</span> <span class="n">device_instantiation</span>
-<span class="kn">from</span> <span class="nn">dodal.beamlines.beamline_utils</span> <span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_utils_beamline</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dodal.common.beamlines.beamline_utils</span> <span class="kn">import</span> <span class="n">device_instantiation</span>
+<span class="kn">from</span> <span class="nn">dodal.common.beamlines.beamline_utils</span> <span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_utils_beamline</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.areadetector.adaravis</span> <span class="kn">import</span> <span class="n">AdAravisDetector</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.synchrotron</span> <span class="kn">import</span> <span class="n">Synchrotron</span>
 <span class="kn">from</span> <span class="nn">dodal.log</span> <span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_log_beamline</span>
