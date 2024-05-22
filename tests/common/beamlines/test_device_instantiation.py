@@ -2,7 +2,7 @@ from typing import Any
 
 import pytest
 
-from dodal.beamlines import ALL_BEAMLINES, all_beamline_modules
+from dodal.beamlines import all_beamline_modules
 from dodal.common.beamlines import beamline_utils
 from dodal.utils import BLUESKY_PROTOCOLS, make_all_devices
 
