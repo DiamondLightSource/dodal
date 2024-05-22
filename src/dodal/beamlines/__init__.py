@@ -11,6 +11,7 @@ from typing import Iterable, Mapping
 _BEAMLINE_NAME_OVERRIDES = {
     "i04-1": "i04_1",
     "i20-1": "i20_1",
+    "s03": "i03",
 }
 
 

@@ -1,3 +1,5 @@
+import os
+
 import click
 from bluesky.run_engine import RunEngine
 
@@ -39,6 +41,8 @@ def main(ctx: click.Context) -> None:
 def connect(beamline: str, all: bool, sim_backend: bool) -> None:
     """Initialises a beamline module, connects to all devices, reports
     any connection issues."""
+
+    os.environ["BEAMLINE"] = beamline
 
     module_name = module_name_for_beamline(beamline)
 
