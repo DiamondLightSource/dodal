@@ -252,6 +252,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/566-fswitch-config-fields/"
   },
   {
+    "version": "571_attenuator_wrong_type",
+    "url": "https://DiamondLightSource.github.io/dodal/571_attenuator_wrong_type/"
+  },
+  {
     "version": "76_make_stage_synchronous_if_arming_not_started",
     "url": "https://DiamondLightSource.github.io/dodal/76_make_stage_synchronous_if_arming_not_started/"
   },
