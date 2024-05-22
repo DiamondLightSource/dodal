@@ -16,14 +16,15 @@ async def sim_shutter():
 
 async def test_set_shutter_open(sim_shutter: Shutter):
     desired_state: ShutterSetState = ShutterSetState.OPEN
-    callback_on_mock_put(
-        sim_shutter.position_set,
-        lambda _: set_mock_value(sim_shutter.position_readback, ShutterState.OPENING),
-    )
+
+    def set_correct_mock_value(*args, **kwargs):
+        set_mock_value(sim_shutter.position_readback, ShutterState.OPEN)
+
+    callback_on_mock_put(sim_shutter.position_set, set_correct_mock_value)
     await sim_shutter.set(desired_state)
     reading = await sim_shutter.read()
 
-    shutter_position = reading.get("shutter-position", {})
+    shutter_position = reading.get("shutter-position_readback", {})
     assert (
         shutter_position["value"] is ShutterState.OPEN
     ), f"Unexpected value: {shutter_position['value']}"
@@ -31,14 +32,15 @@ async def test_set_shutter_open(sim_shutter: Shutter):
 
 async def test_set_shutter_close(sim_shutter: Shutter):
     desired_state: ShutterSetState = ShutterSetState.CLOSE
-    callback_on_mock_put(
-        sim_shutter.position_set,
-        lambda _: set_mock_value(sim_shutter.position_readback, ShutterState.CLOSED),
-    )
+
+    def set_correct_mock_value(*args, **kwargs):
+        set_mock_value(sim_shutter.position_readback, ShutterState.CLOSED)
+
+    callback_on_mock_put(sim_shutter.position_set, set_correct_mock_value)
     await sim_shutter.set(desired_state)
     reading = await sim_shutter.read()
 
-    shutter_position = reading.get("shutter-position", {})
+    shutter_position = reading.get("shutter-position_readback", {})
     assert (
         shutter_position["value"] is ShutterState.CLOSED
     ), f"Unexpected value: {shutter_position['value']}"
