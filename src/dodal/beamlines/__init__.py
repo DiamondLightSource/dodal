@@ -22,12 +22,19 @@ def all_beamline_modules() -> Iterable[str]:
     Returns:
         Iterable[str]: Generator of beamline module names
     """
+
+    # This is done bty inspecting file names rather than modules to avoid
+    # premature importing
     spec = importlib.util.find_spec(__name__)
     if spec is not None:
         search_paths = [Path(path) for path in spec.submodule_search_locations]
         for path in search_paths:
             for subpath in path.glob("**/*"):
-                if subpath.name.endswith(".py") and subpath.name != "__init__.py":
+                if (
+                    subpath.name.endswith(".py")
+                    and subpath.name != "__init__.py"
+                    and ("__pycache__" not in str(subpath))
+                ):
                     yield subpath.with_suffix("").name
     else:
         raise KeyError(f"Unable to find {__name__} module")
@@ -42,7 +49,7 @@ def all_beamline_names() -> Iterable[str]:
     """
     inverse_mapping = _module_name_overrides()
     for module_name in all_beamline_modules():
-        yield from inverse_mapping.get(module_name, {module_name})
+        yield from inverse_mapping.get(module_name, set()).union({module_name})
 
 
 @lru_cache
