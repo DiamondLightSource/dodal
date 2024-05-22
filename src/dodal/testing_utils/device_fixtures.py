@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 
 import bluesky.plan_stubs as bps
 import pytest
-from ophyd.sim import make_fake_device
+from ophyd.sim import NullStatus, make_fake_device
 from ophyd_async.core import AsyncStatus, DeviceCollector, set_mock_value
 
 from dodal.devices.aperturescatterguard import (
@@ -29,7 +29,11 @@ from dodal.devices.xspress3_mini.xspress3_mini import Xspress3Mini
 from dodal.devices.zocalo.zocalo_results import ZOCALO_READING_PLAN_NAME, ZocaloResults
 from dodal.testing_utils import constants
 
-from .utility_functions import create_new_detector_params, patch_ophyd_async_motor
+from .utility_functions import (
+    create_new_detector_params,
+    patch_ophyd_async_motor,
+    patch_ophyd_motor,
+)
 
 ApSgAndLog = tuple[ApertureScatterguard, MagicMock]
 
@@ -104,6 +108,18 @@ def mock_eiger(request: pytest.FixtureRequest):
 
 
 @pytest.fixture
+def mock_eiger_and_stage(mock_eiger):
+    mock_eiger.stage = MagicMock(return_value=NullStatus())
+    yield mock_eiger
+
+
+@pytest.fixture
+def mock_eiger_and_stage_unstage(mock_eiger_noop_stage):
+    mock_eiger_noop_stage.unstage = MagicMock(return_value=NullStatus())
+    yield mock_eiger_noop_stage
+
+
+@pytest.fixture
 def mock_fast_grid_scan(request: pytest.FixtureRequest):
     yield get_mock_fgs(request.node.name)
 
@@ -126,8 +142,22 @@ async def mock_slits(request: pytest.FixtureRequest):
 
 
 @pytest.fixture
-def mock_smargon(request: pytest.FixtureRequest) -> Smargon:
-    return make_fake_device(Smargon)(name=f"smargon: {request.node.name}")
+def mock_smargon(request: pytest.FixtureRequest):
+    smargon: Smargon = make_fake_device(Smargon)(name=f"smargon: {request.node.name}")
+    smargon.x.user_setpoint._use_limits = False
+    smargon.y.user_setpoint._use_limits = False
+    smargon.z.user_setpoint._use_limits = False
+    smargon.omega.user_setpoint._use_limits = False
+    smargon.omega.velocity._use_limits = False
+    with (
+        patch_ophyd_motor(smargon.omega),
+        patch_ophyd_motor(smargon.x),
+        patch_ophyd_motor(smargon.y),
+        patch_ophyd_motor(smargon.z),
+        patch_ophyd_motor(smargon.chi),
+        patch_ophyd_motor(smargon.phi),
+    ):
+        yield smargon
 
 
 @pytest.fixture

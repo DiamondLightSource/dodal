@@ -34,6 +34,7 @@ from .utility_functions import (
     get_bad_status,
     mock_beamline_module_filepaths,
     patch_ophyd_async_motor,
+    patch_ophyd_motor,
     set_smargon_pos,
 )
 
@@ -69,6 +70,7 @@ __all__ = [
     # Utility functions
     "mock_beamline_module_filepaths",
     "patch_ophyd_async_motor",
+    "patch_ophyd_motor",
     "set_smargon_pos",
     "get_bad_status",
     "create_new_detector_params",

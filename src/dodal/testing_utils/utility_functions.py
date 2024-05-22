@@ -1,6 +1,8 @@
+from functools import partial
 from typing import Any, Mapping
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
+from ophyd.epics_motor import EpicsMotor
 from ophyd.status import Status
 from ophyd_async.core import (
     StandardReadable,
@@ -61,6 +63,17 @@ def patch_ophyd_async_motor(
     return callback_on_mock_put(motor.user_setpoint, _pass_on_mock(motor, call_log))
 
 
+def patch_ophyd_motor(motor: EpicsMotor, initial_position=0):
+    def mock_set(motor: EpicsMotor, val):
+        motor.user_setpoint.sim_put(val)  # type: ignore
+        motor.user_readback.sim_put(val)  # type: ignore
+        return Status(done=True, success=True)
+
+    motor.user_setpoint.sim_put(initial_position)  # type: ignore
+    motor.user_readback.sim_put(initial_position)  # type: ignore
+    return patch.object(motor, "set", MagicMock(side_effect=partial(mock_set, motor)))
+
+
 class StatusException(Exception):
     pass
 
@@ -71,24 +84,32 @@ def get_bad_status(exception=StatusException):
     return status
 
 
-def create_new_detector_params() -> DetectorParams:
+def create_new_detector_params(
+    *,
+    directory=constants.EIGER_DIR,
+    det_dist_path=constants.EIGER_DET_DIST_TO_BEAM_CONVERTER_PATH,
+    run_number: int | None = constants.EIGER_RUN_NUMBER,
+) -> DetectorParams:
+    extra_params = {}
+    if run_number is not None:
+        extra_params["run_number"] = run_number
     return DetectorParams(
         expected_energy_ev=constants.EIGER_EXPECTED_ENERGY,
         exposure_time=constants.EIGER_EXPOSURE_TIME,
-        directory=constants.EIGER_DIR,
+        directory=directory,
         prefix=constants.EIGER_PREFIX,
-        run_number=constants.EIGER_RUN_NUMBER,
         detector_distance=constants.EIGER_DETECTOR_DISTANCE,
         omega_start=constants.EIGER_OMEGA_START,
         omega_increment=constants.EIGER_OMEGA_INCREMENT,
         num_images_per_trigger=constants.EIGER_NUM_IMAGES_PER_TRIGGER,
         num_triggers=constants.EIGER_NUM_TRIGGERS,
         use_roi_mode=constants.EIGER_USE_ROI_MODE,
-        det_dist_to_beam_converter_path=constants.EIGER_DET_DIST_TO_BEAM_CONVERTER_PATH,
+        det_dist_to_beam_converter_path=det_dist_path,
         detector_size_constants=constants_from_type(
             constants.EIGER_DETECTOR_SIZE_CONSTANTS.det_type_string
         ),
         beam_xy_converter=DetectorDistanceToBeamXYConverter(
             constants.EIGER_DET_DIST_TO_BEAM_CONVERTER_PATH
         ),
+        **extra_params,
     )
