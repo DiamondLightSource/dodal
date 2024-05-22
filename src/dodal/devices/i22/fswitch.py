@@ -3,7 +3,7 @@ import time
 from enum import Enum
 from typing import Dict
 
-from bluesky.protocols import Reading
+from bluesky.protocols import DataKey, Reading
 from ophyd_async.core import StandardReadable
 from ophyd_async.core.device import DeviceVector
 from ophyd_async.epics.signal import epics_signal_r
@@ -34,6 +34,7 @@ class FSwitch(StandardReadable):
     """
 
     NUM_FILTERS = 128
+    NUM_LENSES_FIELD_NAME = "number_of_lenses"
 
     def __init__(self, prefix: str, name: str = "") -> None:
         self.filters = DeviceVector(
@@ -44,6 +45,15 @@ class FSwitch(StandardReadable):
         )
         super().__init__(name)
 
+    async def describe(self) -> Dict[str, DataKey]:
+        default_describe = await super().describe()
+        return {
+            FSwitch.NUM_LENSES_FIELD_NAME: DataKey(
+                dtype="integer", shape=[], source=self.name
+            ),
+            **default_describe,
+        }
+
     async def read(self) -> Dict[str, Reading]:
         result = await asyncio.gather(
             *(filter.get_value() for filter in self.filters.values())
@@ -51,6 +61,6 @@ class FSwitch(StandardReadable):
         num_in = sum(r.value == FilterState.IN_BEAM for r in result)
         default_reading = await super().read()
         return {
-            "number_of_lenses": Reading(value=num_in, timestamp=time.time()),
+            FSwitch.NUM_LENSES_FIELD_NAME: Reading(value=num_in, timestamp=time.time()),
             **default_reading,
         }

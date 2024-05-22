@@ -1,10 +1,10 @@
 import asyncio
 from collections import OrderedDict, namedtuple
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 
-from bluesky.protocols import Movable
+from bluesky.protocols import Movable, Reading
 from ophyd_async.core import AsyncStatus, SignalR, StandardReadable
-from ophyd_async.core.soft_signal_backend import SoftSignalBackend
+from ophyd_async.core.soft_signal_backend import SoftConverter, SoftSignalBackend
 
 from dodal.devices.aperture import Aperture
 from dodal.devices.scatterguard import Scatterguard
@@ -114,17 +114,29 @@ class ApertureScatterguard(StandardReadable, Movable):
         self.aperture = Aperture(prefix + "-MO-MAPT-01:")
         self.scatterguard = Scatterguard(prefix + "-MO-SCAT-01:")
         self.aperture_positions: AperturePositions | None = None
-        self.selected_aperture = self.SelectedAperture(
-            backend=SoftSignalBackend(
-                SingleAperturePosition, AperturePositions.UNKNOWN
-            ),
+        self.TOLERANCE_STEPS = 3  # Number of MRES steps
+        aperture_backend = SoftSignalBackend(
+            SingleAperturePosition, AperturePositions.UNKNOWN
         )
+        aperture_backend.converter = self.ApertureConverter()
+        self.selected_aperture = self.SelectedAperture(backend=aperture_backend)
         self.set_readable_signals(
             read=[
                 self.selected_aperture,
             ]
         )
         super().__init__(name)
+
+    class ApertureConverter(SoftConverter):
+        # Ophyd-async #311 should add a default converter for dataclasses to do this
+        def reading(
+            self, value: SingleAperturePosition, timestamp: float, severity: int
+        ) -> Reading:
+            return Reading(
+                value=asdict(value),
+                timestamp=timestamp,
+                alarm_severity=-1 if severity > 2 else severity,
+            )
 
     class SelectedAperture(SignalR):
         async def read(self, *args, **kwargs):
