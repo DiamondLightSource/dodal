@@ -23,7 +23,7 @@ def all_beamline_modules() -> Iterable[str]:
         Iterable[str]: Generator of beamline module names
     """
 
-    # This is done bty inspecting file names rather than modules to avoid
+    # This is done by inspecting file names rather than modules to avoid
     # premature importing
     spec = importlib.util.find_spec(__name__)
     if spec is not None:
