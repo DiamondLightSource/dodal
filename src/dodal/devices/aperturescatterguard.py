@@ -49,6 +49,7 @@ class SingleAperturePosition:
     )
 
 
+# Use StrEnum once we stop python 3.10 support
 class AperturePositionGDANames(str, Enum):
     LARGE_APERTURE = "LARGE_APERTURE"
     MEDIUM_APERTURE = "MEDIUM_APERTURE"
