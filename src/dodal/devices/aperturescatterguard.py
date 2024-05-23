@@ -127,8 +127,8 @@ class AperturePositions:
         elif gda_aperture_name == AperturePositionGDANames.MEDIUM_APERTURE:
             return self.MEDIUM
         elif gda_aperture_name == AperturePositionGDANames.SMALL_APERTURE:
-            return self.MEDIUM
-        elif gda_aperture_name == AperturePositionGDANames.SMALL_APERTURE:
+            return self.SMALL
+        elif gda_aperture_name == AperturePositionGDANames.ROBOT_LOAD:
             return self.ROBOT_LOAD
         else:
             raise ValueError(
