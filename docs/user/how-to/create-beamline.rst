@@ -10,8 +10,8 @@ The following example creates a fictitious beamline ``w41``, with a simulated tw
 
 .. code-block:: python
 
-    from dodal.beamlines.beamline_utils import device_instantiation
-    from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
+    from dodal.common.beamlines.beamline_utils import device_instantiation
+    from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
     from dodal.devices.areadetector.adaravis import AdAravisDetector
     from dodal.devices.synchrotron import Synchrotron
     from dodal.log import set_beamline as set_log_beamline

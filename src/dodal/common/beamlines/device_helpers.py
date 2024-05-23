@@ -1,7 +1,6 @@
+from dodal.common.beamlines.beamline_utils import device_instantiation
 from dodal.devices.slits import Slits
 from dodal.utils import skip_device
-
-from .beamline_utils import device_instantiation
 
 
 @skip_device()
