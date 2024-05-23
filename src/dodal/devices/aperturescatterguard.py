@@ -1,7 +1,7 @@
 import asyncio
 from collections import OrderedDict, namedtuple
 from dataclasses import asdict, dataclass
-from enum import StrEnum
+from enum import Enum
 
 from bluesky.protocols import Movable, Reading
 from ophyd_async.core import AsyncStatus, SignalR, StandardReadable
@@ -49,11 +49,14 @@ class SingleAperturePosition:
     )
 
 
-class AperturePositionGDANames(StrEnum):
+class AperturePositionGDANames(str, Enum):
     LARGE_APERTURE = "LARGE_APERTURE"
     MEDIUM_APERTURE = "MEDIUM_APERTURE"
     SMALL_APERTURE = "SMALL_APERTURE"
     ROBOT_LOAD = "ROBOT_LOAD"
+
+    def __str__(self):
+        return str(self.value)
 
 
 def position_from_params(
