@@ -45,13 +45,15 @@ def connect(beamline: str, all: bool, sim_backend: bool) -> None:
     os.environ["BEAMLINE"] = beamline
 
     module_name = module_name_for_beamline(beamline)
+    full_module_path = f"dodal.beamlines.{module_name}"
 
     # We need to make a RunEngine to allow ophyd-async devices to connect.
     # See https://blueskyproject.io/ophyd-async/main/explanations/event-loop-choice.html
     RunEngine()
 
+    print(f"Attempting connection to {beamline} (using {full_module_path})")
     devices = make_all_devices(
-        f"dodal.beamlines.{module_name}",
+        full_module_path,
         include_skipped=all,
         fake_with_ophyd_sim=sim_backend,
     )
