@@ -46,7 +46,9 @@ def connect(beamline: str, all: bool, sim_backend: bool) -> None:
 
     module_name = module_name_for_beamline(beamline)
 
-    RE = RunEngine()  # noqa: F841
+    # We need to make a RunEngine to allow ophyd-async devices to connect.
+    # See https://blueskyproject.io/ophyd-async/main/explanations/event-loop-choice.html
+    RunEngine()
 
     devices = make_all_devices(
         f"dodal.beamlines.{module_name}",
