@@ -111,7 +111,7 @@ class AperturePositions:
                 "Medium", AperturePositionGDANames.MEDIUM_APERTURE, 50, params
             ),
             SMALL=position_from_params(
-                "Small", AperturePositionGDANames.MEDIUM_APERTURE, 20, params
+                "Small", AperturePositionGDANames.SMALL_APERTURE, 20, params
             ),
             ROBOT_LOAD=position_from_params(
                 "Robot load", AperturePositionGDANames.ROBOT_LOAD, None, params
