@@ -2,7 +2,6 @@ import pytest
 from ophyd_async.core import DeviceCollector, callback_on_mock_put, set_mock_value
 
 from dodal.devices.zebra_controlled_shutter import (
-    ShutterSetState,
     ZebraShutter,
     ZebraShutterState,
 )
@@ -19,7 +18,7 @@ async def sim_shutter():
 
 
 async def test_set_shutter_open(sim_shutter: ZebraShutter):
-    desired_state: ShutterSetState = ShutterSetState.OPEN
+    desired_state = ZebraShutterState.OPEN
 
     def set_correct_mock_value(*args, **kwargs):
         set_mock_value(sim_shutter.position_readback, ZebraShutterState.OPEN)
@@ -35,10 +34,10 @@ async def test_set_shutter_open(sim_shutter: ZebraShutter):
 
 
 async def test_set_shutter_close(sim_shutter: ZebraShutter):
-    desired_state: ShutterSetState = ShutterSetState.CLOSE
+    desired_state = ZebraShutterState.CLOSE
 
     def set_correct_mock_value(*args, **kwargs):
-        set_mock_value(sim_shutter.position_readback, ZebraShutterState.CLOSED)
+        set_mock_value(sim_shutter.position_readback, ZebraShutterState.CLOSE)
 
     callback_on_mock_put(sim_shutter.position_set, set_correct_mock_value)
     await sim_shutter.set(desired_state)
@@ -46,5 +45,5 @@ async def test_set_shutter_close(sim_shutter: ZebraShutter):
 
     shutter_position = reading.get("shutter-position_readback", {})
     assert (
-        shutter_position["value"] is ZebraShutterState.CLOSED
+        shutter_position["value"] is ZebraShutterState.CLOSE
     ), f"Unexpected value: {shutter_position['value']}"

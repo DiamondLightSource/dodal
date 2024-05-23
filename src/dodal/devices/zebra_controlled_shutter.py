@@ -6,7 +6,7 @@ from ophyd_async.epics.signal import epics_signal_r, epics_signal_w
 
 
 class ZebraShutterState(str, Enum):
-    CLOSED = "Close"
+    CLOSE = "Close"
     OPEN = "Open"
 
 
