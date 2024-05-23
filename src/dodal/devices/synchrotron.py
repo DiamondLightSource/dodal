@@ -1,9 +1,8 @@
+from dataclasses import dataclass
 from enum import Enum
 
 from ophyd_async.core import DeviceCollector, StandardReadable, set_mock_value
 from ophyd_async.epics.signal import epics_signal_r
-
-from dodal.testing_utils import constants
 
 
 class Prefix(str, Enum):
@@ -72,13 +71,25 @@ class Synchrotron(StandardReadable):
         super().__init__(name=name)
 
 
+@dataclass
+class testing_constants:
+    RING_CURRENT = 0.556677
+    USER_COUNTDOWN = 55.0
+    START_COUNTDOWN = 66.0
+    END_COUNTDOWN = 77.0
+    BEAM_ENERGY = 3.0158
+    MODE = "Injection"
+    NUMBER = "number"
+    STRING = "string"
+
+
 async def get_mock_device() -> Synchrotron:
     async with DeviceCollector(mock=True):
         device = Synchrotron()
-    set_mock_value(device.ring_current, constants.SYNCHR_RING_CURRENT)
-    set_mock_value(device.machine_user_countdown, constants.SYNCHR_USER_COUNTDOWN)
-    set_mock_value(device.topup_start_countdown, constants.SYNCHR_START_COUNTDOWN)
-    set_mock_value(device.top_up_end_countdown, constants.SYNCHR_END_COUNTDOWN)
-    set_mock_value(device.beam_energy, constants.SYNCHR_BEAM_ENERGY)
-    set_mock_value(device.synchrotron_mode, SynchrotronMode(constants.SYNCHR_MODE))
+    set_mock_value(device.ring_current, testing_constants.RING_CURRENT)
+    set_mock_value(device.machine_user_countdown, testing_constants.USER_COUNTDOWN)
+    set_mock_value(device.topup_start_countdown, testing_constants.START_COUNTDOWN)
+    set_mock_value(device.top_up_end_countdown, testing_constants.END_COUNTDOWN)
+    set_mock_value(device.beam_energy, testing_constants.BEAM_ENERGY)
+    set_mock_value(device.synchrotron_mode, SynchrotronMode(testing_constants.MODE))
     return device

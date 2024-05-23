@@ -3,7 +3,12 @@ from dataclasses import dataclass
 from enum import Enum
 
 from bluesky.protocols import Movable
-from ophyd_async.core import AsyncStatus, StandardReadable, wait_for_value
+from ophyd_async.core import (
+    AsyncStatus,
+    StandardReadable,
+    set_mock_value,
+    wait_for_value,
+)
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_x
 from ophyd_async.epics.signal.signal import epics_signal_rw_rbv
 
@@ -68,6 +73,7 @@ class BartRobot(StandardReadable, Movable):
 
 async def get_mock_device() -> BartRobot:
     device = BartRobot("robot", "-MO-ROBOT-01:")
-    device.LOAD_TIMEOUT = 0.01  # type: ignore
     await device.connect(mock=True)
+    device.LOAD_TIMEOUT = 0.01  # type: ignore
+    set_mock_value(device.barcode, "BARCODE")
     return device

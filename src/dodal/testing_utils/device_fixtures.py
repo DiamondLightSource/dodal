@@ -16,6 +16,7 @@ from dodal.devices.backlight import Backlight
 from dodal.devices.eiger import get_mock_device as get_mock_eiger
 from dodal.devices.eiger_odin import EigerOdin
 from dodal.devices.fast_grid_scan import get_mock_device as get_mock_fgs
+from dodal.devices.flux import Flux
 from dodal.devices.focusing_mirror import get_mock_voltages
 from dodal.devices.i24.dual_backlight import DualBacklight
 from dodal.devices.oav.oav_detector import get_mock_device as get_mock_oav
@@ -125,6 +126,11 @@ def mock_fast_grid_scan(request: pytest.FixtureRequest):
 
 
 @pytest.fixture
+def mock_flux(request: pytest.FixtureRequest):
+    return make_fake_device(Flux)(name=f"flux: {request.node.name}")
+
+
+@pytest.fixture
 def mock_oav():
     yield get_mock_oav(constants.OAV_ZOOM_LEVELS, constants.OAV_DISPLAY_CONFIG)
 
@@ -192,7 +198,7 @@ def mock_xspress3mini(request: pytest.FixtureRequest):
 @patch("dodal.devices.zocalo_results._get_zocalo_connection")
 @pytest.fixture
 async def get_mock_zocalo_device(RE):
-    async def device(results, run_setup=False):
+    async def device(results, run_setup=False, mock_stage=False, mock_unstage=False):
         zd = ZocaloResults(zocalo_environment="test_env")
 
         @AsyncStatus.wrap
@@ -210,6 +216,10 @@ async def get_mock_zocalo_device(RE):
                 yield from bps.close_run()
 
             RE(plan())
+        if mock_stage:
+            zd.stage = MagicMock(return_value=NullStatus())  # type: ignore
+        if mock_unstage:
+            zd.unstage = MagicMock(return_value=NullStatus())  # type: ignore
         return zd
 
     return device
