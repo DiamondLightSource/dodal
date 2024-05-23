@@ -41,15 +41,6 @@ EIGER_1169_FIX = True
 OAV_DISPLAY_CONFIG = "tests/devices/unit_tests/test_display.configuration"
 OAV_ZOOM_LEVELS = "tests/devices/unit_tests/test_jCameraManZoomLevels.xml"
 
-SYNCHR_RING_CURRENT = 0.556677
-SYNCHR_USER_COUNTDOWN = 55.0
-SYNCHR_START_COUNTDOWN = 66.0
-SYNCHR_END_COUNTDOWN = 77.0
-SYNCHR_BEAM_ENERGY = 3.0158
-SYNCHR_MODE = "Injection"
-SYNCHR_NUMBER = "number"
-SYNCHR_STRING = "string"
-
 
 ZOC_RESULTS: list["XrcResult"] = [
     {

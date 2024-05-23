@@ -8,17 +8,13 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from dodal.beamlines import beamline_utils
+from dodal.common.beamlines import beamline_utils
 from dodal.log import LOGGER, GELFTCPHandler, set_up_all_logging_handlers
+from dodal.testing_utils import *  # noqa: F403
 from dodal.testing_utils import (
-    RE,
     mock_beamline_module_filepaths,
-    mock_undulator_dcm,
-    mock_vfm_mirror_voltages,
 )
 from dodal.utils import make_all_devices
-
-__all__ = ["mock_vfm_mirror_voltages", "RE", "mock_undulator_dcm"]
 
 
 @pytest.fixture(scope="function")

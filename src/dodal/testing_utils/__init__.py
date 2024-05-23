@@ -7,6 +7,7 @@ from bluesky.run_engine import RunEngine
 from .device_fixtures import (
     ApSgAndLog,
     get_mock_zocalo_device,
+    make_mock_smargon,
     mock_aperturescatterguard,
     mock_aperturescatterguard_in_medium_pos,
     mock_aperturescatterguard_in_medium_pos_w_call_log,
@@ -42,6 +43,7 @@ from .utility_functions import (
 )
 
 __all__ = [
+    "RE",
     # Device fixtures
     #   for functions which return devices:
     "get_mock_zocalo_device",
@@ -81,6 +83,7 @@ __all__ = [
     "get_bad_status",
     "create_new_detector_params",
     "assert_reading",
+    "make_mock_smargon",
 ]
 
 

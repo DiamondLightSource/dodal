@@ -284,13 +284,16 @@ def test_given_failing_odin_when_stage_then_exception_raised(mock_eiger):
     assert error_contents in e.value.__str__()
 
 
+def set_up_eiger_to_stage_happily(mock_eiger: EigerDetector):
+    mock_eiger.odin.nodes.clear_odin_errors = MagicMock()
+    mock_eiger.odin.check_odin_initialised = MagicMock(return_value=(True, ""))
+    mock_eiger.odin.file_writer.file_path.put(True)
+
+
 @patch("dodal.devices.eiger.await_value")
 def test_stage_runs_successfully(mock_await, mock_eiger: EigerDetector):
     mock_await.return_value = NullStatus()
-    mock_eiger.odin.nodes.clear_odin_errors = MagicMock()
-    mock_eiger.odin.check_odin_initialised = MagicMock()
-    mock_eiger.odin.check_odin_initialised.return_value = (True, "")
-    mock_eiger.odin.file_writer.file_path.put(True)
+    set_up_eiger_to_stage_happily(mock_eiger)
     mock_eiger.stage()
     mock_eiger.arming_status.wait(1)  # This should complete long before 1s
 
@@ -301,9 +304,7 @@ def test_given_stale_parameters_goes_high_before_callbacks_then_stale_parameters
     mock_eiger: EigerDetector,
 ):
     mock_await.return_value = Status(done=True)
-    mock_eiger.odin.nodes.clear_odin_errors = MagicMock()
-    mock_eiger.odin.check_odin_initialised = MagicMock(return_value=(True, ""))
-    mock_eiger.odin.file_writer.file_path.put(True)
+    set_up_eiger_to_stage_happily(mock_eiger)
 
     mock_eiger_odin_statuses(mock_eiger)
 
@@ -577,9 +578,8 @@ def test_unwrapped_arm_chain_functions_are_not_called_outside_util(
 ):
     mock_eiger.odin.stop = MagicMock(return_value=Status(done=True, success=True))
     mock_eiger.detector_params.use_roi_mode = True
-    done_status = Status(done=True, success=True)
 
-    call_func.return_value = done_status
+    call_func.return_value = NullStatus()
     mock_eiger.enable_roi_mode = MagicMock(name="enable_roi_mode")
     mock_eiger.set_detector_threshold = MagicMock(name="set_detector_threshold")
     mock_eiger.set_cam_pvs = MagicMock(name="set_cam_pvs")
@@ -627,3 +627,35 @@ def test_stop_eiger_waits_for_status_functions_to_complete(
 ):
     mock_eiger.stop()
     mock_wait.assert_called()
+
+
+@pytest.mark.parametrize(
+    "enable_dev_shm, expected_set",
+    [
+        (True, 1),
+        (False, 0),
+    ],
+)
+@patch("dodal.devices.eiger.await_value")
+def test_given_dev_shm_when_stage_then_correctly_enable_disable_dev_shm(
+    mock_await,
+    enable_dev_shm: bool,
+    expected_set: int,
+    mock_eiger: EigerDetector,
+):
+    mock_await.return_value = NullStatus()
+    set_up_eiger_to_stage_happily(mock_eiger)
+
+    mock_eiger.detector_params.enable_dev_shm = enable_dev_shm  # type:ignore
+
+    mock_eiger.stage()
+
+    assert mock_eiger.odin.fan.dev_shm_enable.get() == expected_set
+
+
+def test_when_eiger_is_stopped_then_dev_shm_disabled(mock_eiger: EigerDetector):
+    mock_eiger.odin.fan.dev_shm_enable.sim_put(1)  # type:ignore
+
+    mock_eiger.stop()
+
+    assert mock_eiger.odin.fan.dev_shm_enable.get() == 0

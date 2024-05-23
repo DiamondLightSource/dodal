@@ -145,6 +145,9 @@ class EigerDetector(Device):
         self.disarm_detector()
         stop_status &= self.disable_roi_mode()
         stop_status.wait(self.GENERAL_STATUS_TIMEOUT)
+        # See https://github.com/DiamondLightSource/hyperion/issues/1395
+        LOGGER.info("Turning off Eiger dev/shm streaming")
+        self.odin.fan.dev_shm_enable.set(0).wait()
         LOGGER.info("Eiger has successfully been stopped")
 
     def disable_roi_mode(self):
@@ -321,6 +324,10 @@ class EigerDetector(Device):
             self.GENERAL_STATUS_TIMEOUT
         )
 
+    def change_dev_shm(self, enable_dev_shm: bool):
+        LOGGER.info(f"{'Enabling' if enable_dev_shm else 'Disabling'} dev shm")
+        return self.odin.fan.dev_shm_enable.set(1 if enable_dev_shm else 0)
+
     def disarm_detector(self):
         self.cam.acquire.set(0).wait(self.GENERAL_STATUS_TIMEOUT)
 
@@ -331,6 +338,7 @@ class EigerDetector(Device):
             functions_to_do_arm.append(self.enable_roi_mode)
 
         arming_sequence_funcs = [
+            lambda: self.change_dev_shm(detector_params.enable_dev_shm),
             lambda: self.set_detector_threshold(detector_params.expected_energy_ev),
             self.set_cam_pvs,
             self.set_odin_number_of_frame_chunks,

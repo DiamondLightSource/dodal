@@ -127,7 +127,7 @@ def mock_fast_grid_scan(request: pytest.FixtureRequest):
 
 @pytest.fixture
 def mock_flux(request: pytest.FixtureRequest):
-    return make_fake_device(Flux)(name=f"flux: {request.node.name}")
+    return make_fake_device(Flux)(name="flux")
 
 
 @pytest.fixture
@@ -147,14 +147,14 @@ async def mock_slits(request: pytest.FixtureRequest):
     return slits
 
 
-@pytest.fixture
-def mock_smargon(request: pytest.FixtureRequest):
-    smargon: Smargon = make_fake_device(Smargon)(name=f"smargon: {request.node.name}")
+def make_mock_smargon(name_tag=""):
+    smargon: Smargon = make_fake_device(Smargon)(name=f"smargon: {name_tag}")
     smargon.x.user_setpoint._use_limits = False
     smargon.y.user_setpoint._use_limits = False
     smargon.z.user_setpoint._use_limits = False
     smargon.omega.user_setpoint._use_limits = False
     smargon.omega.velocity._use_limits = False
+    smargon.stub_offsets.center_at_current_position.disp.sim_put(0)  # type: ignore
     with (
         patch_ophyd_motor(smargon.omega),
         patch_ophyd_motor(smargon.x),
@@ -164,6 +164,11 @@ def mock_smargon(request: pytest.FixtureRequest):
         patch_ophyd_motor(smargon.phi),
     ):
         yield smargon
+
+
+@pytest.fixture
+def mock_smargon(request: pytest.FixtureRequest):
+    return make_mock_smargon(request.node.name)
 
 
 @pytest.fixture
