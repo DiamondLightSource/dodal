@@ -92,7 +92,8 @@ def tolerances_from_params(params: dict) -> ApertureScatterguardTolerances:
 
 @dataclass
 class AperturePositions:
-    """Holds the motor positions needed to select a particular aperture size."""
+    """Holds the motor positions needed to select a particular aperture size. This class should be instantiated with definitions for its sizes
+    using from_gda_beamline_params"""
 
     LARGE: SingleAperturePosition
     MEDIUM: SingleAperturePosition
