@@ -119,6 +119,22 @@ class AperturePositions:
             tolerances=tolerances_from_params(params),
         )
 
+    def get_position_from_gda_aperture_name(
+        self, gda_aperture_name: AperturePositionGDANames
+    ) -> SingleAperturePosition:
+        if gda_aperture_name == AperturePositionGDANames.LARGE_APERTURE:
+            return self.LARGE
+        elif gda_aperture_name == AperturePositionGDANames.MEDIUM_APERTURE:
+            return self.MEDIUM
+        elif gda_aperture_name == AperturePositionGDANames.SMALL_APERTURE:
+            return self.MEDIUM
+        elif gda_aperture_name == AperturePositionGDANames.SMALL_APERTURE:
+            return self.ROBOT_LOAD
+        else:
+            raise ValueError(
+                f"Tried to convert unknown aperture name {gda_aperture_name} to a SingleAperturePosition"
+            )
+
     def as_list(self) -> list[SingleAperturePosition]:
         return [
             self.LARGE,
@@ -126,17 +142,6 @@ class AperturePositions:
             self.SMALL,
             self.ROBOT_LOAD,
         ]
-
-
-# This can be removed once GDA stops interferring between XRC and rotation
-GDA_TO_HYPERION_APERTURE_MAPPING: dict[
-    AperturePositionGDANames, SingleAperturePosition
-] = {
-    AperturePositionGDANames.LARGE_APERTURE: AperturePositions.LARGE,
-    AperturePositionGDANames.MEDIUM_APERTURE: AperturePositions.MEDIUM,
-    AperturePositionGDANames.SMALL_APERTURE: AperturePositions.SMALL,
-    AperturePositionGDANames.ROBOT_LOAD: AperturePositions.ROBOT_LOAD,
-}
 
 
 class ApertureScatterguard(StandardReadable, Movable):
