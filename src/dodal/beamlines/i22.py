@@ -25,6 +25,7 @@ from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.tetramm import TetrammDetector
 from dodal.devices.undulator import Undulator
+from dodal.devices.watsonmarlow323 import WatsonMarlow323
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
 
@@ -376,3 +377,17 @@ def linkam(
         wait_for_connection,
         fake_with_ophyd_sim,
     )
+
+@skip_device
+def ppump(
+    wait_for_connection: bool = True, 
+    fake_with_ophyd_sim: bool = False
+) -> WatsonMarlow323:
+    return device_instantiation(
+        WatsonMarlow323,
+        "ppump",
+        "-EA-PUMP-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim
+    )
+
