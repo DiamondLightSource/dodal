@@ -12,6 +12,7 @@ from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beam
 from dodal.common.beamlines.device_helpers import numbered_slits
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitDirectoryProvider
 from dodal.devices.focusing_mirror import FocusingMirror
+from dodal.devices.i22.fswitch import FSwitch
 from dodal.devices.slits import Slits
 from dodal.devices.tetramm import TetrammDetector
 from dodal.devices.undulator import Undulator
@@ -167,6 +168,22 @@ def slits_6(
         6,
         wait_for_connection,
         fake_with_ophyd_sim,
+    )
+
+
+def fswitch(
+    wait_for_connection: bool = True,
+    fake_with_ophyd_sim: bool = True,
+) -> FSwitch:
+    return device_instantiation(
+        FSwitch,
+        "fswitch",
+        "-MO-FSWT-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        lens_geometry="paraboloid",
+        cylindrical=True,
+        lens_material="Beryllium",
     )
 
 
