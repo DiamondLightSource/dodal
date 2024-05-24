@@ -151,7 +151,7 @@ def invoke_factories(
         leaves = [
             device
             for device, device_dependencies in dependencies.items()
-            if (device not in devices.keys() and device not in exceptions.keys())
+            if (device not in devices and device not in exceptions)
             and len(device_dependencies - set(devices.keys())) == 0
         ]
         dependent_name = leaves.pop()

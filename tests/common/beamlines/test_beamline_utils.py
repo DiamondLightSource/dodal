@@ -81,7 +81,7 @@ def test_clear_devices(RE):
 def test_device_is_new_after_clearing(RE):
     def _make_devices_and_get_id():
         devices, _ = make_all_devices(i03, fake_with_ophyd_sim=True)
-        return [id(device) for _, device in devices.items()]
+        return [id(device) for device in devices.values()]
 
     ids_1 = [_make_devices_and_get_id()]
     ids_2 = [_make_devices_and_get_id()]
