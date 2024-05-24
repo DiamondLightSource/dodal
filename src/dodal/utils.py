@@ -147,8 +147,6 @@ def invoke_factories(
         factory_name: set(extract_dependencies(factories, factory_name))
         for factory_name in factories.keys()
     }
-    # This is going into a infinite loop if there are circular dependencies.
-    # need to figure out how to handle this.
     while (len(devices) + len(exceptions)) < len(factories):
         leaves = [
             device
