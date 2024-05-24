@@ -71,7 +71,7 @@ def test_no_signature_builtins_not_devices() -> None:
 
 
 def test_no_devices_when_all_factories_raise_exceptions() -> None:
-    import tests.fake_beamline_all_devices_rasie_exception as fake_beamline
+    import tests.fake_beamline_all_devices_raise_exception as fake_beamline
 
     devices, exceptions = make_all_devices(fake_beamline)
     assert len(devices) == 0
