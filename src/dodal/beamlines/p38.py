@@ -14,8 +14,9 @@ from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitDirectory
 from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.slits import Slits
 from dodal.devices.tetramm import TetrammDetector
+from dodal.devices.undulator import Undulator
 from dodal.log import set_beamline as set_log_beamline
-from dodal.utils import get_beamline_name, skip_device
+from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
 
 BL = get_beamline_name("p38")
 set_log_beamline(BL)
@@ -192,6 +193,22 @@ def hfm(
         "-OP-KBM-01:HFM:",
         wait_for_connection,
         fake_with_ophyd_sim,
+    )
+
+
+def undulator(
+    wait_for_connection: bool = True,
+    fake_with_ophyd_sim: bool = True,
+) -> Undulator:
+    return device_instantiation(
+        Undulator,
+        "undulator",
+        f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        bl_prefix=False,
+        poles=80,
+        length=2.0,
     )
 
 
