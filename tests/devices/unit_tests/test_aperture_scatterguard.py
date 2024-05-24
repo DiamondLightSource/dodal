@@ -332,3 +332,7 @@ def test_get_position_from_gda_aperture_name(
         )
         == aperture_positions.ROBOT_LOAD
     )
+    with pytest.raises(ValueError):
+        aperture_positions.get_position_from_gda_aperture_name(
+            "VERY TINY APERTURE"  # type: ignore
+        )
