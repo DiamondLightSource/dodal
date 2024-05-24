@@ -5,6 +5,7 @@ from ophyd_async.epics.motion import Motor
 from ophyd_async.epics.signal import epics_signal_rw
 
 HOME_STR = r"\#1hmz\#2hmz\#3hmz"
+ZERO_STR = "!x0y0z0"
 
 
 class PMACStringHome(Triggerable):
@@ -13,6 +14,16 @@ class PMACStringHome(Triggerable):
         pmac_str_sig: SignalRW,
         string_to_send: str,
     ) -> None:
+        self.signal = pmac_str_sig
+        self.cmd_string = string_to_send
+
+    @AsyncStatus.wrap
+    async def trigger(self):
+        await self.signal.set(self.cmd_string, wait=True)
+
+
+class PMACMoveToZero(Triggerable):
+    def __init__(self, pmac_str_sig: SignalRW, string_to_send: str) -> None:
         self.signal = pmac_str_sig
         self.cmd_string = string_to_send
 
@@ -30,6 +41,7 @@ class PMAC(StandardReadable):
             self.pmac_string,
             HOME_STR,
         )
+        self.to_xyz_zero = PMACMoveToZero(self.pmac_string, ZERO_STR)
 
         self.x = Motor(prefix + "X")
         self.y = Motor(prefix + "Y")
