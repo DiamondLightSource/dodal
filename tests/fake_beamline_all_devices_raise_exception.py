@@ -1,21 +1,18 @@
-from bluesky.protocols import Readable
-from ophyd import EpicsMotor
-from ophyd.utils import (
-    DestroyedError,
-    DisconnectedError,
-    UnknownStatusFailure,
-)
+import asyncio
 
-from dodal.devices.cryostream import Cryo
+from bluesky.protocols import Readable
+from ophyd_async.epics.motion import Motor
+
+from dodal.devices.undulator import Undulator
 
 
 def device_a() -> Readable:
-    raise DestroyedError
+    raise TimeoutError
 
 
-def device_b() -> EpicsMotor:
-    raise DisconnectedError
+def device_b() -> Motor:
+    raise asyncio.TimeoutError
 
 
-def device_c() -> Cryo:
-    raise UnknownStatusFailure
+def device_c() -> Undulator:
+    raise ValueError

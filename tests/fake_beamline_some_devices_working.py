@@ -1,22 +1,21 @@
 from unittest.mock import MagicMock
 
 from bluesky.protocols import Readable
-from ophyd import EpicsMotor
-from ophyd.utils import DisconnectedError
+from ophyd_async.epics.motion import Motor
 
-from dodal.devices.cryostream import Cryo
+from dodal.devices.undulator import Undulator
 
 
 def device_a() -> Readable:
     return _mock_with_name("readable")
 
 
-def device_b() -> EpicsMotor:
-    raise DisconnectedError
+def device_b() -> Motor:
+    raise TimeoutError
 
 
-def device_c() -> Cryo:
-    return _mock_with_name("cryo")
+def device_c() -> Undulator:
+    return _mock_with_name("undulator")
 
 
 def _mock_with_name(name: str) -> MagicMock:
