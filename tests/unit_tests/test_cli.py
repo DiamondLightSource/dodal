@@ -39,6 +39,7 @@ def test_cli_sets_beamline_environment_variable(runner: CliRunner):
 def test_cli_connect(runner: CliRunner):
     result = _mock_connect(EXAMPLE_BEAMLINE, runner=runner)
     assert "3 devices connected" in result.stdout
+    assert "3 devices failed" in result.stdout
 
 
 # We need to mock the environment because the CLI edits it and this could break other
@@ -47,12 +48,16 @@ def test_cli_connect(runner: CliRunner):
 def test_cli_connect_in_sim_mode(runner: CliRunner):
     result = _mock_connect("-s", EXAMPLE_BEAMLINE, runner=runner)
     assert "3 devices connected (sim mode)" in result.stdout
+    assert "3 devices failed (sim mode)" in result.stdout
 
 
 def _mock_connect(*args, runner: CliRunner) -> Result:
     with patch(
         "dodal.cli.make_all_devices",
-        return_value={f"device_{i}": object() for i in range(3)},
+        return_value=(
+            {f"device_{i}": object() for i in range(3)},
+            {f"device_{i}": TimeoutError() for i in range(3, 6)},
+        ),
     ):
         result = runner.invoke(
             main,
