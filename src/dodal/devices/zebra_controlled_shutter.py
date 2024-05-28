@@ -17,7 +17,7 @@ class ZebraShutterState(str, Enum):
 
 class ZebraShutter(StandardReadable, Movable):
     def __init__(self, prefix: str, name: str):
-        self.position_set = epics_signal_w(
+        self.position_setpoint = epics_signal_w(
             write_pv=prefix + "CTRL2",
             datatype=ZebraShutterState,
         )
@@ -30,7 +30,7 @@ class ZebraShutter(StandardReadable, Movable):
 
     @AsyncStatus.wrap
     async def set(self, desired_position: ZebraShutterState):
-        await self.position_set.set(desired_position)
+        await self.position_setpoint.set(desired_position)
         return await wait_for_value(
             signal=self.position_readback,
             match=desired_position,
