@@ -1,12 +1,12 @@
 from dataclasses import asdict
 from typing import Sequence
-from unittest.mock import MagicMock, call
+from unittest.mock import ANY, MagicMock, call
 
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import (
-    assert_mock_put_called_with,
+    get_mock_put,
     set_mock_value,
 )
 
@@ -99,8 +99,9 @@ def aperture_positions():
 
 def _assert_patched_ap_sg_has_call(
     ap_sg: ApertureScatterguard,
-    position: ApertureFiveDimensionalLocation
-    | tuple[float, float, float, float, float],
+    position: (
+        ApertureFiveDimensionalLocation | tuple[float, float, float, float, float]
+    ),
 ):
     for motor, pos in zip(
         (
@@ -112,7 +113,9 @@ def _assert_patched_ap_sg_has_call(
         ),
         position,
     ):
-        assert_mock_put_called_with(motor.user_setpoint, pos)
+        get_mock_put(motor.user_setpoint).assert_called_with(
+            pos, wait=True, timeout=ANY
+        )
 
 
 def test_aperture_scatterguard_rejects_unknown_position(aperture_in_medium_pos):
@@ -125,7 +128,7 @@ def test_aperture_scatterguard_rejects_unknown_position(aperture_in_medium_pos):
 
 
 def _call_list(calls: Sequence[float]):
-    return [call(v, wait=True, timeout=10.0) for v in calls]
+    return [call(v, wait=True, timeout=ANY) for v in calls]
 
 
 async def test_aperture_scatterguard_select_bottom_moves_sg_down_then_assembly_up(

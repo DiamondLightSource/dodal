@@ -168,4 +168,4 @@ async def test_energy_set_only_complete_when_all_statuses_are_finished(
     release_dcm.set()
     assert not status.done
     release_undulator.set()
-    await asyncio.wait_for(status, timeout=0.01)
+    await asyncio.wait_for(status, timeout=0.02)

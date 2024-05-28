@@ -31,6 +31,7 @@ def patch_motor(motor: Motor, initial_position=0, call_log: MagicMock | None = N
     set_mock_value(motor.user_readback, initial_position)
     set_mock_value(motor.deadband, 0.001)
     set_mock_value(motor.motor_done_move, 1)
+    set_mock_value(motor.velocity, 3)
     return callback_on_mock_put(motor.user_setpoint, pass_on_mock(motor, call_log))
 
 
