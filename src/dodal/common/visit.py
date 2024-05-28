@@ -9,7 +9,7 @@ from bluesky.utils import make_decorator
 from ophyd_async.core import DirectoryInfo
 from pydantic import BaseModel
 
-from dodal.beamlines import beamline_utils
+from dodal.common.beamlines import beamline_utils
 from dodal.common.types import MsgGenerator, UpdatingDirectoryProvider
 from dodal.log import LOGGER
 

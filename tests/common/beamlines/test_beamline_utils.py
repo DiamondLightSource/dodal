@@ -8,7 +8,8 @@ from ophyd.sim import FakeEpicsSignal
 from ophyd_async.core import Device as OphydV2Device
 from ophyd_async.core import StandardReadable
 
-from dodal.beamlines import beamline_utils, i03
+from dodal.beamlines import i03
+from dodal.common.beamlines import beamline_utils
 from dodal.devices.aperturescatterguard import ApertureScatterguard
 from dodal.devices.smargon import Smargon
 from dodal.devices.zebra import Zebra
@@ -96,7 +97,7 @@ def test_wait_for_v1_device_connection_passes_through_timeout(kwargs, expected_t
     device = OphydV1Device(name="")
     device.wait_for_connection = MagicMock()
 
-    beamline_utils._wait_for_connection(device, **kwargs)
+    beamline_utils.wait_for_connection(device, **kwargs)
 
     device.wait_for_connection.assert_called_once_with(timeout=expected_timeout)
 
@@ -112,7 +113,7 @@ def test_wait_for_v2_device_connection_passes_through_timeout(
     device = OphydV2Device()
     device.connect = MagicMock()
 
-    beamline_utils._wait_for_connection(device, **kwargs)
+    beamline_utils.wait_for_connection(device, **kwargs)
 
     device.connect.assert_called_once_with(
         mock=ANY,
