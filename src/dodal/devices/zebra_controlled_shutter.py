@@ -1,7 +1,12 @@
 from enum import Enum
 
 from bluesky.protocols import Movable
-from ophyd_async.core import AsyncStatus, StandardReadable, wait_for_value
+from ophyd_async.core import (
+    DEFAULT_TIMEOUT,
+    AsyncStatus,
+    StandardReadable,
+    wait_for_value,
+)
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_w
 
 
@@ -27,5 +32,7 @@ class ZebraShutter(StandardReadable, Movable):
     async def set(self, desired_position: ZebraShutterState):
         await self.position_set.set(desired_position)
         return await wait_for_value(
-            signal=self.position_readback, match=desired_position, timeout=50
+            signal=self.position_readback,
+            match=desired_position,
+            timeout=DEFAULT_TIMEOUT,
         )
