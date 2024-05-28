@@ -24,9 +24,9 @@ class Attenuator(StandardReadable, Movable):
     read from the device it is also fractional"""
 
     def __init__(self, prefix: str, name: str = ""):
-        self._calculated_filter_states: DeviceVector[SignalR[bool]] = DeviceVector(
+        self._calculated_filter_states: DeviceVector[SignalR[int]] = DeviceVector(
             {
-                int(digit, 16): epics_signal_r(bool, f"{prefix}DEC_TO_BIN.B{digit}")
+                int(digit, 16): epics_signal_r(int, f"{prefix}DEC_TO_BIN.B{digit}")
                 for digit in string.hexdigits
                 if not digit.islower()
             }
