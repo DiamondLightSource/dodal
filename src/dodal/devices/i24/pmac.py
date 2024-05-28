@@ -1,3 +1,5 @@
+from enum import Enum
+
 from bluesky.protocols import Triggerable
 from ophyd_async.core import AsyncStatus, StandardReadable
 from ophyd_async.core.signal import SignalRW
@@ -6,6 +8,10 @@ from ophyd_async.epics.signal import epics_signal_rw
 
 HOME_STR = r"\#1hmz\#2hmz\#3hmz"
 ZERO_STR = "!x0y0z0"
+
+
+class LaserSettings(str, Enum):
+    LASER1ON = "M712=1 M711=1"
 
 
 class PMACStringMove(Triggerable):
@@ -20,6 +26,11 @@ class PMACStringMove(Triggerable):
     @AsyncStatus.wrap
     async def trigger(self):
         await self.signal.set(self.cmd_string, wait=True)
+
+
+class PMACStringLaser(SignalRW):
+    def __init__(self, pmac_str_sig: SignalRW, laser_setting: LaserSettings):
+        self.signal = pmac_str_sig
 
 
 class PMAC(StandardReadable):
