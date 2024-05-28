@@ -140,9 +140,26 @@ def invoke_factories(
     factories: Mapping[str, AnyDeviceFactory],
     **kwargs,
 ) -> Tuple[Dict[str, AnyDevice], Dict[str, Exception]]:
+    """Call device factory functions in the correct order to resolve dependencies.
+    Inspect function signatures to work out dependencies and execute functions in
+    correct order.
+
+    If one device takes another as an argument (by name, similar to pytest fixtures)
+    this will detect a dependency and create and cache the non-dependant device first.
+
+    Args:
+        factories: Mapping of function name -> function
+
+    Returns:
+        Tuple[Dict[str, AnyDevice], Dict[str, Exception]]: Tuple of two dictionaries.
+        One mapping device name to device, one mapping device name to exception for
+        any failed devices
+    """
+
     devices: dict[str, AnyDevice] = {}
     exceptions: dict[str, Exception] = {}
 
+    # Compute tree of dependencies,
     dependencies = {
         factory_name: set(extract_dependencies(factories, factory_name))
         for factory_name in factories.keys()
@@ -169,6 +186,23 @@ def invoke_factories(
 def extract_dependencies(
     factories: Mapping[str, AnyDeviceFactory], factory_name: str
 ) -> Iterable[str]:
+    """Compute dependencies for a device factory. Dependencies are named in the
+    factory function signature, similar to pytest fixtures. For example given
+    def device_one(): and def device_two(device_one: Readable):, indicate taht
+    device_one is a dependency of device_two.
+
+    Args:
+        factories: All factories, mapping of function name -> function
+        factory_name: The name of the factory in factories whose dependencies need
+        computing
+
+    Returns:
+        Iterable[str]: Generator of factory names
+
+    Yields:
+        Iterator[Iterable[str]]: Factory names
+    """
+
     for name, param in inspect.signature(factories[factory_name]).parameters.items():
         if param.default is inspect.Parameter.empty and name in factories:
             yield name
@@ -177,6 +211,18 @@ def extract_dependencies(
 def collect_factories(
     module: ModuleType, include_skipped: bool = False
 ) -> dict[str, AnyDeviceFactory]:
+    """Automatically detect device factory functions within a module. They are detected
+    via the return type signature e.g. def my_device() -> ADeviceType:
+
+    Args:
+        module: The module to inspect
+        include_skipped: If True, also load factories with the @skip_device annotation.
+        Defaults to False.
+
+    Returns:
+        dict[str, AnyDeviceFactory]: Mapping of factory name -> factory.
+    """
+
     factories: dict[str, AnyDeviceFactory] = {}
 
     for var in module.__dict__.values():
