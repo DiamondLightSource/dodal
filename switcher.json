@@ -244,6 +244,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/564_organise_testing_utils/"
   },
   {
+    "version": "578-add-a-flowchart-on-the-decisions-to-make-a-new-ophyd-device-for-dls",
+    "url": "https://DiamondLightSource.github.io/dodal/578-add-a-flowchart-on-the-decisions-to-make-a-new-ophyd-device-for-dls/"
+  },
+  {
     "version": "76_make_stage_synchronous_if_arming_not_started",
     "url": "https://DiamondLightSource.github.io/dodal/76_make_stage_synchronous_if_arming_not_started/"
   },
