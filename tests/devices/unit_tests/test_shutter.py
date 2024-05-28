@@ -15,10 +15,10 @@ async def sim_shutter():
             name="shutter",
         )
 
-        def propagate_status(value: ZebraShutterState):
-            set_mock_value(sim_shutter.position_readback, value)
+    def propagate_status(value: ZebraShutterState, *args, **kwargs):
+        set_mock_value(sim_shutter.position_readback, value)
 
-        callback_on_mock_put(sim_shutter.position_setpoint, propagate_status)
+    callback_on_mock_put(sim_shutter.position_setpoint, propagate_status)
     return sim_shutter
 
 
