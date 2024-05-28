@@ -3,6 +3,8 @@ from enum import Enum
 from bluesky.protocols import Triggerable
 from ophyd_async.core import AsyncStatus, StandardReadable
 from ophyd_async.core.signal import SignalRW
+from ophyd_async.core.signal_backend import SignalBackend
+from ophyd_async.core.utils import DEFAULT_TIMEOUT
 from ophyd_async.epics.motion import Motor
 from ophyd_async.epics.signal import epics_signal_rw
 
@@ -29,8 +31,17 @@ class PMACStringMove(Triggerable):
 
 
 class PMACStringLaser(SignalRW):
-    def __init__(self, pmac_str_sig: SignalRW, laser_setting: LaserSettings):
+    def __init__(
+        self,
+        pmac_str_sig: SignalRW,
+        laser_setting: LaserSettings,
+        backend: SignalBackend,
+        timeout: float | None = DEFAULT_TIMEOUT,
+        name: str = "",
+    ) -> None:
         self.signal = pmac_str_sig
+        self.laser_str = laser_setting
+        super().__init__(backend, timeout, name)
 
 
 class PMAC(StandardReadable):
