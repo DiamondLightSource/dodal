@@ -44,7 +44,13 @@ async def test_pmac_motor_move(fake_pmac: PMAC, RE):
 
 
 async def test_pmac_set_pmac_string(fake_pmac: PMAC, RE):
-    RE(bps.abs_set(fake_pmac.pmac_string, "!x0y0z0", wait=True))
+    RE(bps.abs_set(fake_pmac.pmac_string, "M712=0 M711=1", wait=True))
+
+    assert await fake_pmac.pmac_string.get_value() == "M712=0 M711=1"
+
+
+async def test_pmac_pmac_to_zero(fake_pmac: PMAC, RE):
+    RE(bps.trigger(fake_pmac.to_xyz_zero, wait=True))
 
     assert await fake_pmac.pmac_string.get_value() == "!x0y0z0"
 
