@@ -4,7 +4,7 @@ from enum import Enum
 from typing import Dict
 
 from bluesky.protocols import DataKey, Reading
-from ophyd_async.core import StandardReadable
+from ophyd_async.core import ConfigSignal, StandardReadable, soft_signal_r_and_setter
 from ophyd_async.core.device import DeviceVector
 from ophyd_async.epics.signal import epics_signal_r
 
@@ -36,13 +36,42 @@ class FSwitch(StandardReadable):
     NUM_FILTERS = 128
     NUM_LENSES_FIELD_NAME = "number_of_lenses"
 
-    def __init__(self, prefix: str, name: str = "") -> None:
+    def __init__(
+        self,
+        prefix: str,
+        name: str = "",
+        lens_geometry: str | None = None,
+        cylindrical: bool | None = None,
+        lens_material: str | None = None,
+    ) -> None:
         self.filters = DeviceVector(
             {
                 i: epics_signal_r(FilterState, f"{prefix}FILTER-{i:03}:STATUS_RBV")
                 for i in range(FSwitch.NUM_FILTERS)
             }
         )
+        with self.add_children_as_readables(ConfigSignal):
+            if lens_geometry is not None:
+                self.lens_geometry, _ = soft_signal_r_and_setter(
+                    str, initial_value=lens_geometry
+                )
+            else:
+                self.lens_geometry = None
+
+            if cylindrical is not None:
+                self.cylindrical, _ = soft_signal_r_and_setter(
+                    bool, initial_value=cylindrical
+                )
+            else:
+                self.cylindrical = None
+
+            if lens_material is not None:
+                self.lens_material, _ = soft_signal_r_and_setter(
+                    str, initial_value=lens_material
+                )
+            else:
+                self.lens_material = None
+
         super().__init__(name)
 
     async def describe(self) -> Dict[str, DataKey]:

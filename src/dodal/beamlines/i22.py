@@ -15,8 +15,9 @@ from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.i22.fswitch import FSwitch
 from dodal.devices.slits import Slits
 from dodal.devices.tetramm import TetrammDetector
+from dodal.devices.undulator import Undulator
 from dodal.log import set_beamline as set_log_beamline
-from dodal.utils import get_beamline_name, skip_device
+from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
 
 BL = get_beamline_name("i22")
 set_log_beamline(BL)
@@ -120,6 +121,22 @@ def hfm(
     )
 
 
+def undulator(
+    wait_for_connection: bool = True,
+    fake_with_ophyd_sim: bool = False,
+) -> Undulator:
+    return device_instantiation(
+        Undulator,
+        "undulator",
+        f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        bl_prefix=False,
+        poles=80,
+        length=2.0,
+    )
+
+
 def slits_1(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
@@ -197,6 +214,9 @@ def fswitch(
         "-MO-FSWT-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        lens_geometry="paraboloid",
+        cylindrical=True,
+        lens_material="Beryllium",
     )
 
 

@@ -12,7 +12,12 @@ from dodal.devices.i22.fswitch import FilterState, FSwitch
 @pytest.fixture
 async def fswitch() -> FSwitch:
     async with DeviceCollector(mock=True):
-        fswitch = FSwitch("DEMO-FSWT-01:")
+        fswitch = FSwitch(
+            "DEMO-FSWT-01:",
+            lens_geometry="paraboloid",
+            cylindrical=True,
+            lens_material="Beryllium",
+        )
 
     return fswitch
 
@@ -48,6 +53,12 @@ def test_fswitch_count_plan(RE: RunEngine, fswitch: FSwitch):
         dtype="integer", shape=[], source="fswitch", object_name="fswitch"
     )
     assert descriptor_doc["data_keys"] == {"number_of_lenses": expected_data_key}
+
+    assert descriptor_doc["configuration"]["fswitch"]["data"] == {
+        "fswitch-cylindrical": True,
+        "fswitch-lens_geometry": "paraboloid",
+        "fswitch-lens_material": "Beryllium",
+    }
 
     expected_data = {"number_of_lenses": 128}
     assert event_doc["data"] == expected_data

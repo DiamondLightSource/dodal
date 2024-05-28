@@ -12,10 +12,12 @@ from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beam
 from dodal.common.beamlines.device_helpers import numbered_slits
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitDirectoryProvider
 from dodal.devices.focusing_mirror import FocusingMirror
+from dodal.devices.i22.fswitch import FSwitch
 from dodal.devices.slits import Slits
 from dodal.devices.tetramm import TetrammDetector
+from dodal.devices.undulator import Undulator
 from dodal.log import set_beamline as set_log_beamline
-from dodal.utils import get_beamline_name, skip_device
+from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
 
 BL = get_beamline_name("p38")
 set_log_beamline(BL)
@@ -169,6 +171,22 @@ def slits_6(
     )
 
 
+def fswitch(
+    wait_for_connection: bool = True,
+    fake_with_ophyd_sim: bool = True,
+) -> FSwitch:
+    return device_instantiation(
+        FSwitch,
+        "fswitch",
+        "-MO-FSWT-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        lens_geometry="paraboloid",
+        cylindrical=True,
+        lens_material="Beryllium",
+    )
+
+
 def vfm(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = True,
@@ -192,6 +210,22 @@ def hfm(
         "-OP-KBM-01:HFM:",
         wait_for_connection,
         fake_with_ophyd_sim,
+    )
+
+
+def undulator(
+    wait_for_connection: bool = True,
+    fake_with_ophyd_sim: bool = True,
+) -> Undulator:
+    return device_instantiation(
+        Undulator,
+        "undulator",
+        f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        bl_prefix=False,
+        poles=80,
+        length=2.0,
     )
 
 

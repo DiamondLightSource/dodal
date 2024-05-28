@@ -97,7 +97,7 @@ def test_wait_for_v1_device_connection_passes_through_timeout(kwargs, expected_t
     device = OphydV1Device(name="")
     device.wait_for_connection = MagicMock()
 
-    beamline_utils._wait_for_connection(device, **kwargs)
+    beamline_utils.wait_for_connection(device, **kwargs)
 
     device.wait_for_connection.assert_called_once_with(timeout=expected_timeout)
 
@@ -113,7 +113,7 @@ def test_wait_for_v2_device_connection_passes_through_timeout(
     device = OphydV2Device()
     device.connect = MagicMock()
 
-    beamline_utils._wait_for_connection(device, **kwargs)
+    beamline_utils.wait_for_connection(device, **kwargs)
 
     device.connect.assert_called_once_with(
         mock=ANY,
