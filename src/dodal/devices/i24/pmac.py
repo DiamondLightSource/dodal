@@ -4,6 +4,7 @@ from bluesky.protocols import Triggerable
 from ophyd_async.core import AsyncStatus, StandardReadable
 from ophyd_async.core.signal import SignalRW
 from ophyd_async.core.signal_backend import SignalBackend
+from ophyd_async.core.soft_signal_backend import SoftSignalBackend
 from ophyd_async.core.utils import DEFAULT_TIMEOUT
 from ophyd_async.epics.motion import Motor
 from ophyd_async.epics.signal import epics_signal_rw
@@ -13,6 +14,11 @@ ZERO_STR = "!x0y0z0"
 
 
 class LaserSettings(str, Enum):
+    """PMAC strings to switch laser on and off.
+    Note. On the PMAC, M strings usually have to do with position compare
+    set up.
+    """
+
     LASER1ON = " M712=1 M711=1"
     LASER1OFF = " M712=0 M711=1"
     LASER2ON = " M812=1 M811=1"
@@ -37,18 +43,16 @@ class PMACStringLaser(SignalRW):
     def __init__(
         self,
         pmac_str_sig: SignalRW,
-        laser_setting: LaserSettings,
         backend: SignalBackend,
         timeout: float | None = DEFAULT_TIMEOUT,
         name: str = "",
     ) -> None:
         self.signal = pmac_str_sig
-        self.laser_str = laser_setting
         super().__init__(backend, timeout, name)
 
     @AsyncStatus.wrap
-    async def set(self):
-        await self.signal.set(self.laser_str.value, wait=True)
+    async def set(self, laser_setting: LaserSettings):
+        await self.signal.set(laser_setting.value, wait=True)
 
 
 class PMAC(StandardReadable):
@@ -61,6 +65,8 @@ class PMAC(StandardReadable):
             HOME_STR,
         )
         self.to_xyz_zero = PMACStringMove(self.pmac_string, ZERO_STR)
+
+        self.laser = PMACStringLaser(self.pmac_string, backend=SoftSignalBackend(str))
 
         self.x = Motor(prefix + "X")
         self.y = Motor(prefix + "Y")
