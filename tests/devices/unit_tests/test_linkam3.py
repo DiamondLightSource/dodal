@@ -55,7 +55,7 @@ async def test_linkam_set_changes_setpoint_and_temp(fake_linkam: Linkam3):
         "setpoint": 0.0,
     }
     # move
-    await fake_linkam.set(1.0, 10)
+    await fake_linkam.set(1.0, 1.0)
 
     mock_put = get_mock_put(fake_linkam.set_point)
     mock_put.assert_called_once_with(1.0, wait=ANY, timeout=ANY)
