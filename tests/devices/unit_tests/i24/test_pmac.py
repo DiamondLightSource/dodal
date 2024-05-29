@@ -1,5 +1,3 @@
-from unittest.mock import MagicMock
-
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
@@ -10,25 +8,17 @@ from ..conftest import patch_motor
 
 
 @pytest.fixture
-async def fake_pmac_and_log():
-    call_log = MagicMock()
-
+async def fake_pmac():
     RunEngine()
     pmac = PMAC("", name="fake_pmac")
     await pmac.connect(mock=True)
 
     with (
-        patch_motor(pmac.x, call_log=call_log),
-        patch_motor(pmac.y, call_log=call_log),
-        patch_motor(pmac.z, call_log=call_log),
+        patch_motor(pmac.x),
+        patch_motor(pmac.y),
+        patch_motor(pmac.z),
     ):
-        yield pmac, call_log
-
-
-@pytest.fixture
-async def fake_pmac(fake_pmac_and_log) -> PMAC:
-    fake_pmac, _ = fake_pmac_and_log
-    return fake_pmac
+        yield pmac
 
 
 def test_pmac_can_be_created(fake_pmac: PMAC):
