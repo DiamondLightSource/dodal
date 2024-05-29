@@ -17,6 +17,9 @@ class LaserSettings(str, Enum):
     """PMAC strings to switch laser on and off.
     Note. On the PMAC, M strings usually have to do with position compare
     set up.
+    For example, for laser1:
+        Use M712 = 0 if triggering on falling edge.
+        Use M712 = 1 if on rising edge.
     """
 
     LASER1ON = " M712=1 M711=1"
