@@ -13,7 +13,10 @@ ZERO_STR = "!x0y0z0"
 
 
 class LaserSettings(str, Enum):
-    LASER1ON = "M712=1 M711=1"
+    LASER1ON = " M712=1 M711=1"
+    LASER1OFF = " M712=0 M711=1"
+    LASER2ON = " M812=1 M811=1"
+    LASER2OFF = " M812=0 M811=1"
 
 
 class PMACStringMove(Triggerable):
@@ -42,6 +45,10 @@ class PMACStringLaser(SignalRW):
         self.signal = pmac_str_sig
         self.laser_str = laser_setting
         super().__init__(backend, timeout, name)
+
+    @AsyncStatus.wrap
+    async def set(self):
+        await self.signal.set(self.laser_str.value, wait=True)
 
 
 class PMAC(StandardReadable):
