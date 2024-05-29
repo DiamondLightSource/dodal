@@ -2,7 +2,6 @@ from pathlib import Path
 
 from ophyd_async.epics.areadetector import AravisDetector, PilatusDetector
 from ophyd_async.panda import HDFPanda
-from ophyd_async.core import StaticDirectoryProvider
 
 from dodal.common.beamlines.beamline_utils import (
     device_instantiation,
