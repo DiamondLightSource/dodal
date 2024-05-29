@@ -490,7 +490,7 @@ def thawer(
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return device_instantiation(
-        Webcam,
+        Thawer,
         "thawer",
         "-EA-THAW-01",
         wait_for_connection,
