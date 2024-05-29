@@ -312,10 +312,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/directory_provider/"
   },
   {
-    "version": "fix-i22-panda-names",
-    "url": "https://DiamondLightSource.github.io/dodal/fix-i22-panda-names/"
-  },
-  {
     "version": "fix_linting_CI_issues",
     "url": "https://DiamondLightSource.github.io/dodal/fix_linting_CI_issues/"
   },
