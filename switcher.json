@@ -244,10 +244,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/578-add-a-flowchart-on-the-decisions-to-make-a-new-ophyd-device-for-dls/"
   },
   {
-    "version": "580_fix_with_latest_ophyd_async",
-    "url": "https://DiamondLightSource.github.io/dodal/580_fix_with_latest_ophyd_async/"
-  },
-  {
     "version": "76_make_stage_synchronous_if_arming_not_started",
     "url": "https://DiamondLightSource.github.io/dodal/76_make_stage_synchronous_if_arming_not_started/"
   },
