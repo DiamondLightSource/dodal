@@ -249,6 +249,7 @@ def panda2(
         "-EA-PANDA-02:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        directory_provider=get_directory_provider(),
     )
 
 
@@ -263,6 +264,7 @@ def panda3(
         "-EA-PANDA-03:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        directory_provider=get_directory_provider(),
     )
 
 
@@ -277,6 +279,7 @@ def panda4(
         "-EA-PANDA-04:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        directory_provider=get_directory_provider(),
     )
 
 
