@@ -40,19 +40,6 @@ class UpdateRBV(str, Enum):
     ENABLED = "Enabled"
 
 
-'''
-class EraseState(str, Enum):
-    """
-    Epic does not actually have a str value so the only way to set it is
-    to pass int(position).
-    """
-
-    DONE = ""
-    ERASE = ""
-
-'''
-
-
 class AcquireRBVState(str, Enum):
     DONE = "Done"
     ACQUIRE = "Acquiring"
@@ -76,6 +63,18 @@ class Xspress3(Device):
     """Xpress/XpressMini is a region of interest (ROI) picker that sums the detector
     output into a scaler with user-defined regions. It is often used as a signal
      discriminator to provide better energy resolution in X-ray detection experiments.
+     This currently only provide staging functionality.
+
+    Parameters
+    ----------
+    prefix:
+        Beamline part of PV
+    name:
+        Name of the device
+    num_channels:
+        Number of channel xspress3 has, default is 1 for mini.
+    timeout:
+        How long to wait for before timing out for staging/arming of detector default is 1 sec
     """
 
     def __init__(
@@ -99,7 +98,7 @@ class Xspress3(Device):
             }
         )
 
-        """signal for the correct MCA spectrum (1d array)"""
+        """signal for the corrected MCA spectrum (1d array)"""
         self.dt_corrected_latest_mca = DeviceVector(
             {
                 i: epics_signal_r(NDArray[float64], f"{prefix}ARR{i}:ArrayData")
