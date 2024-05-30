@@ -43,6 +43,9 @@ class DetectorParams(BaseModel):
     detector_size_constants: DetectorSizeConstants = EIGER2_X_16M_SIZE
     beam_xy_converter: DetectorDistanceToBeamXYConverter
     run_number: int
+    enable_dev_shm: bool = (
+        False  # Remove in https://github.com/DiamondLightSource/hyperion/issues/1395
+    )
 
     class Config:
         arbitrary_types_allowed = True

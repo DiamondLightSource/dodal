@@ -1,34 +1,39 @@
+from pathlib import Path
+
 from ophyd_async.epics.areadetector import AravisDetector, PilatusDetector
 from ophyd_async.panda import HDFPanda
 
-from dodal.beamlines.beamline_utils import (
+from dodal.common.beamlines.beamline_utils import (
     device_instantiation,
     get_directory_provider,
     set_directory_provider,
 )
-from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.visit import StaticVisitDirectoryProvider
+from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.device_helpers import numbered_slits
+from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitDirectoryProvider
 from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.i22.fswitch import FSwitch
+from dodal.devices.linkam3 import Linkam3
 from dodal.devices.slits import Slits
 from dodal.devices.tetramm import TetrammDetector
+from dodal.devices.undulator import Undulator
 from dodal.log import set_beamline as set_log_beamline
-from dodal.utils import get_beamline_name, skip_device
-
-from ._device_helpers import numbered_slits
-from .beamline_utils import device_instantiation, get_directory_provider
-from .beamline_utils import set_beamline as set_utils_beamline
+from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
 
 BL = get_beamline_name("i22")
 set_log_beamline(BL)
 set_utils_beamline(BL)
-"""VISIT is a placeholder value for reference.
-    Requires that all StandardDetector IOCs are running with /data mapping to /dls/i22/data
-    """
+
+# Currently we must hard-code the visit, determining the visit at runtime requires
+# infrastructure that is still WIP.
+# Communication with GDA is also WIP so for now we determine an arbitrary scan number
+# locally and write the commissioning directory. The scan number is not guaranteed to
+# be unique and the data is at risk - this configuration is for testing only.
 set_directory_provider(
     StaticVisitDirectoryProvider(
         BL,
-        "/data/i22/2024/VISIT",
+        Path("/dls/i22/data/2024/cm37271-2/bluesky"),
+        client=LocalDirectoryServiceClient(),
     )
 )
 
@@ -117,9 +122,25 @@ def hfm(
     )
 
 
+def undulator(
+    wait_for_connection: bool = True,
+    fake_with_ophyd_sim: bool = False,
+) -> Undulator:
+    return device_instantiation(
+        Undulator,
+        "undulator",
+        f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        bl_prefix=False,
+        poles=80,
+        length=2.0,
+    )
+
+
 def slits_1(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
+    fake_with_ophyd_sim: bool = False,
 ) -> Slits:
     return numbered_slits(
         1,
@@ -130,7 +151,7 @@ def slits_1(
 
 def slits_2(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
+    fake_with_ophyd_sim: bool = False,
 ) -> Slits:
     return numbered_slits(
         2,
@@ -141,7 +162,7 @@ def slits_2(
 
 def slits_3(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
+    fake_with_ophyd_sim: bool = False,
 ) -> Slits:
     return numbered_slits(
         3,
@@ -150,9 +171,10 @@ def slits_3(
     )
 
 
+@skip_device
 def slits_4(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
+    fake_with_ophyd_sim: bool = False,
 ) -> Slits:
     return numbered_slits(
         4,
@@ -163,7 +185,7 @@ def slits_4(
 
 def slits_5(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
+    fake_with_ophyd_sim: bool = False,
 ) -> Slits:
     return numbered_slits(
         5,
@@ -174,7 +196,7 @@ def slits_5(
 
 def slits_6(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
+    fake_with_ophyd_sim: bool = False,
 ) -> Slits:
     return numbered_slits(
         6,
@@ -193,13 +215,15 @@ def fswitch(
         "-MO-FSWT-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        lens_geometry="paraboloid",
+        cylindrical=True,
+        lens_material="Beryllium",
     )
 
 
 # Must find which PandA IOC(s) are compatible
 # Must document what PandAs are physically connected to
 # See: https://github.com/bluesky/ophyd-async/issues/284
-@skip_device
 def panda1(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
@@ -207,9 +231,10 @@ def panda1(
     return device_instantiation(
         HDFPanda,
         "panda1",
-        "-MO-PANDA-01:",
+        "-EA-PANDA-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        directory_provider=get_directory_provider(),
     )
 
 
@@ -221,9 +246,10 @@ def panda2(
     return device_instantiation(
         HDFPanda,
         "panda2",
-        "-MO-PANDA-02:",
+        "-EA-PANDA-02:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        directory_provider=get_directory_provider(),
     )
 
 
@@ -235,9 +261,10 @@ def panda3(
     return device_instantiation(
         HDFPanda,
         "panda3",
-        "-MO-PANDA-03:",
+        "-EA-PANDA-03:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        directory_provider=get_directory_provider(),
     )
 
 
@@ -249,9 +276,10 @@ def panda4(
     return device_instantiation(
         HDFPanda,
         "panda4",
-        "-MO-PANDA-04:",
+        "-EA-PANDA-04:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        directory_provider=get_directory_provider(),
     )
 
 
@@ -267,4 +295,17 @@ def oav(
         drv_suffix="DET:",
         hdf_suffix="HDF5:",
         directory_provider=get_directory_provider(),
+    )
+
+
+@skip_device
+def linkam(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Linkam3:
+    return device_instantiation(
+        Linkam3,
+        "linkam",
+        "-EA-TEMPC-05",
+        wait_for_connection,
+        fake_with_ophyd_sim,
     )

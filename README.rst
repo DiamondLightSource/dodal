@@ -13,6 +13,26 @@ Documentation  https://DiamondLightSource.github.io/dodal
 Releases       https://github.com/DiamondLightSource/dodal/releases
 ============== ==============================================================
 
+Testing Connectivity
+--------------------
+
+You can test your connection to a beamline if it's PVs are visible to your machine with:
+
+.. code:: shell
+
+    # On any workstation:
+    dodal connect <BEAMLINE>
+
+    # On a beamline workstation, this should suffice:
+    dodal connect ${BEAMLINE}
+
+
+For more options, including a list of valid beamlines, type
+
+.. code:: shell
+
+    dodal connect --help
+
 
 .. |code_ci| image:: https://github.com/DiamondLightSource/dodal/actions/workflows/code.yml/badge.svg?branch=main
     :target: https://github.com/DiamondLightSource/dodal/actions/workflows/code.yml

@@ -1,5 +1,5 @@
-from dodal.beamlines.beamline_utils import BL, device_instantiation
-from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.beamline_utils import BL, device_instantiation
+from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.detector import DetectorParams
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.i24.aperture import Aperture
