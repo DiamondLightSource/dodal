@@ -5,7 +5,7 @@ from bluesky.protocols import Movable
 from numpy import argmin, ndarray
 from ophyd_async.core import AsyncStatus, StandardReadable
 
-from dodal.beamlines.beamline_parameters import get_beamline_parameters
+from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.log import LOGGER
 
 from .dcm import DCM
@@ -99,10 +99,8 @@ class UndulatorDCM(StandardReadable, Movable):
 
         # Check if undulator gap is close enough to the value from the DCM
         current_gap = await self.undulator.current_gap.get_value()
-        if (
-            abs(gap_to_match_dcm_energy - current_gap)
-            > self.undulator.gap_discrepancy_tolerance_mm
-        ):
+        tolerance = await self.undulator.gap_discrepancy_tolerance_mm.get_value()
+        if abs(gap_to_match_dcm_energy - current_gap) > tolerance:
             LOGGER.info(
                 f"Undulator gap mismatch. {abs(gap_to_match_dcm_energy-current_gap):.3f}mm is outside tolerance.\
                 Moving gap to nominal value, {gap_to_match_dcm_energy:.3f}mm"

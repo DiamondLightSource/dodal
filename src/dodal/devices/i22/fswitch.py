@@ -3,8 +3,8 @@ import time
 from enum import Enum
 from typing import Dict
 
-from bluesky.protocols import Reading
-from ophyd_async.core import StandardReadable
+from bluesky.protocols import DataKey, Reading
+from ophyd_async.core import ConfigSignal, StandardReadable, soft_signal_r_and_setter
 from ophyd_async.core.device import DeviceVector
 from ophyd_async.epics.signal import epics_signal_r
 
@@ -34,15 +34,54 @@ class FSwitch(StandardReadable):
     """
 
     NUM_FILTERS = 128
+    NUM_LENSES_FIELD_NAME = "number_of_lenses"
 
-    def __init__(self, prefix: str, name: str = "") -> None:
+    def __init__(
+        self,
+        prefix: str,
+        name: str = "",
+        lens_geometry: str | None = None,
+        cylindrical: bool | None = None,
+        lens_material: str | None = None,
+    ) -> None:
         self.filters = DeviceVector(
             {
                 i: epics_signal_r(FilterState, f"{prefix}FILTER-{i:03}:STATUS_RBV")
                 for i in range(FSwitch.NUM_FILTERS)
             }
         )
+        with self.add_children_as_readables(ConfigSignal):
+            if lens_geometry is not None:
+                self.lens_geometry, _ = soft_signal_r_and_setter(
+                    str, initial_value=lens_geometry
+                )
+            else:
+                self.lens_geometry = None
+
+            if cylindrical is not None:
+                self.cylindrical, _ = soft_signal_r_and_setter(
+                    bool, initial_value=cylindrical
+                )
+            else:
+                self.cylindrical = None
+
+            if lens_material is not None:
+                self.lens_material, _ = soft_signal_r_and_setter(
+                    str, initial_value=lens_material
+                )
+            else:
+                self.lens_material = None
+
         super().__init__(name)
+
+    async def describe(self) -> Dict[str, DataKey]:
+        default_describe = await super().describe()
+        return {
+            FSwitch.NUM_LENSES_FIELD_NAME: DataKey(
+                dtype="integer", shape=[], source=self.name
+            ),
+            **default_describe,
+        }
 
     async def read(self) -> Dict[str, Reading]:
         result = await asyncio.gather(
@@ -51,6 +90,6 @@ class FSwitch(StandardReadable):
         num_in = sum(r.value == FilterState.IN_BEAM for r in result)
         default_reading = await super().read()
         return {
-            "number_of_lenses": Reading(value=num_in, timestamp=time.time()),
+            FSwitch.NUM_LENSES_FIELD_NAME: Reading(value=num_in, timestamp=time.time()),
             **default_reading,
         }
