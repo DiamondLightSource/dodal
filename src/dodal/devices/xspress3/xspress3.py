@@ -147,7 +147,7 @@ class Xspress3(Device):
             lambda v: v in self.detector_busy_states,
             timeout=self.timeout,
         )
-        await self.erase.set(EraseState.ERASE)  # type: ignore
+        await self.erase.set(1)  # type: ignore
         await set_and_wait_for_value(
             self.acquire, AcquireState.ACQUIRE, timeout=self.timeout
         )
