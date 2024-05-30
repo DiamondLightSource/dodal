@@ -1,14 +1,36 @@
-from ophyd import Component, Device, EpicsSignal, StatusBase
+from enum import Enum
+
+from ophyd_async.core import AsyncStatus, StandardReadable
+from ophyd_async.epics.signal import epics_signal_rw
 
 
-class BacklightPositioner(Device):
+class BLPositions(str, Enum):
+    OUT = "Out"
+    IN = "In"
+    LOADCHECK = "LoadCheck"
+    OAV2 = "OAV2"
+    DIODE = "Diode"
+
+
+class LedStatus(str, Enum):
+    OFF = "OFF"
+    ON = "ON"
+
+
+class BacklightPositioner(StandardReadable):
     """Device to control the backlight position."""
 
-    # String description of the backlight position e.g. "In", "OAV2"
-    pos_level = Component(EpicsSignal, "MP:SELECT")
+    def __init__(self, prefix: str, name: str = "") -> None:
+        # String description of the backlight position e.g. "In", "OAV2"
+        self.pos_level = epics_signal_rw(BLPositions, prefix + "MP:SELECT")
+        super().__init__(name)
+
+    @AsyncStatus.wrap
+    async def set(self, position: BLPositions):
+        await self.pos_level.set(position, wait=True)
 
 
-class DualBacklight(Device):
+class DualBacklight(StandardReadable):
     """
     Device to trigger the dual backlight on I24.
     This device is made up by two LEDs:
@@ -26,18 +48,17 @@ class DualBacklight(Device):
     in "Out" position (switched off), LED2 might still be on.
     """
 
-    OUT = "Out"
-    IN = "In"
+    def __init__(self, prefix: str, name: str = "") -> None:
+        self.led1 = epics_signal_rw(LedStatus, prefix + "-DI-LED-01:TOGGLE")
+        self.pos1 = BacklightPositioner(prefix + "-MO-BL-01", name)
 
-    led1 = Component(EpicsSignal, "-DI-LED-01:TOGGLE")
-    pos1 = Component(BacklightPositioner, "-MO-BL-01:")
+        self.led2 = epics_signal_rw(LedStatus, prefix + "-DI-LED-02:TOGGLE")
+        super().__init__(name)
 
-    led2 = Component(EpicsSignal, "-DI-LED-02:TOGGLE")
-
-    def set(self, position: str) -> StatusBase:
-        status = self.pos1.pos_level.set(position)
-        if position == self.OUT:
-            status &= self.led1.set("OFF")
+    @AsyncStatus.wrap
+    async def set(self, position: BLPositions):
+        await self.pos1.pos_level.set(position, wait=True)
+        if position == BLPositions.OUT:
+            await self.led1.set(LedStatus.OFF, wait=True)
         else:
-            status &= self.led1.set("ON")
-        return status
+            await self.led1.set(LedStatus.ON, wait=True)
