@@ -378,16 +378,15 @@ def linkam(
         fake_with_ophyd_sim,
     )
 
+
 @skip_device
 def ppump(
-    wait_for_connection: bool = True, 
-    fake_with_ophyd_sim: bool = False
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> WatsonMarlow323Pump:
     return device_instantiation(
         WatsonMarlow323Pump,
         "ppump",
         "-EA-PUMP-01:",
         wait_for_connection,
-        fake_with_ophyd_sim
+        fake_with_ophyd_sim,
     )
-

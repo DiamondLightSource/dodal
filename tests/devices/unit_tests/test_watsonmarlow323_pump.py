@@ -1,9 +1,14 @@
 from unittest.mock import ANY
 
 import pytest
-from ophyd_async.core import DeviceCollector, set_mock_value, assert_reading
+from ophyd_async.core import DeviceCollector, assert_reading, set_mock_value
 
-from dodal.devices.watsonmarlow323_pump import WatsonMarlow323Pump, WatsonMarlow323PumpDirection, WatsonMarlow323PumpState
+from dodal.devices.watsonmarlow323_pump import (
+    WatsonMarlow323Pump,
+    WatsonMarlow323PumpDirection,
+    WatsonMarlow323PumpState,
+)
+
 
 @pytest.fixture
 async def watsonmarlow323() -> WatsonMarlow323Pump:
@@ -12,11 +17,14 @@ async def watsonmarlow323() -> WatsonMarlow323Pump:
 
     return wm_pump
 
-async def test_reading_pump_reads_state_speed_and_direction( watsonmarlow323: WatsonMarlow323Pump):
+
+async def test_reading_pump_reads_state_speed_and_direction(
+    watsonmarlow323: WatsonMarlow323Pump,
+):
     set_mock_value(watsonmarlow323.state, WatsonMarlow323PumpState.STOPPED)
     set_mock_value(watsonmarlow323.speed, 25)
     set_mock_value(watsonmarlow323.direction, WatsonMarlow323PumpDirection.CLOCKWISE)
-    
+
     await assert_reading(
         watsonmarlow323,
         {
@@ -35,6 +43,5 @@ async def test_reading_pump_reads_state_speed_and_direction( watsonmarlow323: Wa
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
-        }
+        },
     )
-
