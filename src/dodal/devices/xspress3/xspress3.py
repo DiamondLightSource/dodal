@@ -110,8 +110,8 @@ class Xspress3(Device):
         """Shared controls for triggering detection"""
         self.timeout = timeout
         self.acquire_time = epics_signal_rw(float, prefix + "AcquireTime")
-        #Epic does not actually have a str value for erase so the only way to set it is to pass int(position).
-        self.erase = epics_signal_rw(int, prefix + "ERASE") 
+        # Epic does not actually have a str value for erase so the only way to set it is to pass int(position).
+        self.erase = epics_signal_rw(int, prefix + "ERASE")
         self.max_num_channels = epics_signal_r(int, prefix + "MAX_NUM_CHANNELS_RBV")
         # acquire and acquire readback has a different enum
         self.acquire = epics_signal_rw(AcquireState, prefix + "Acquire")
