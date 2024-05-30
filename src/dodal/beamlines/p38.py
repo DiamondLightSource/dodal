@@ -241,7 +241,7 @@ def panda1(
     return device_instantiation(
         HDFPanda,
         "panda1",
-        "-MO-PANDA-01:",
+        "-EA-PANDA-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
         directory_provider=get_directory_provider(),
@@ -256,7 +256,7 @@ def panda2(
     return device_instantiation(
         HDFPanda,
         "panda2",
-        "-MO-PANDA-02:",
+        "-EA-PANDA-02:",
         wait_for_connection,
         fake_with_ophyd_sim,
         directory_provider=get_directory_provider(),
@@ -271,7 +271,7 @@ def panda3(
     return device_instantiation(
         HDFPanda,
         "panda3",
-        "-MO-PANDA-03:",
+        "-EA-PANDA-03:",
         wait_for_connection,
         fake_with_ophyd_sim,
         directory_provider=get_directory_provider(),
