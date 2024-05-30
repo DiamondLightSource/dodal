@@ -336,6 +336,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1227_edge_array_logging/"
   },
   {
+    "version": "hyperion_1307_remove_detector_param_from_hyperion_req_params",
+    "url": "https://DiamondLightSource.github.io/dodal/hyperion_1307_remove_detector_param_from_hyperion_req_params/"
+  },
+  {
     "version": "hyperion_1336_move_aperture_before_rotation",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1336_move_aperture_before_rotation/"
   },
