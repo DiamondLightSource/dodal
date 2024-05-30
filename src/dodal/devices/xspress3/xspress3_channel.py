@@ -11,8 +11,8 @@ class AcquireState(str, Enum):
 
 class Xspress3Channel(Device):
     """
-    Xspress3 Channel contains the truncated detector data and its collection condition
-     including the definition of ROI.
+    Xspress3 Channel contains the truncated detector data and its collection conditions
+     including the definition of ROI(region of interest).
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
@@ -20,7 +20,6 @@ class Xspress3Channel(Device):
 
         self.roi_high_limit = epics_signal_rw(int, prefix + "SCA5_HLM")
         self.roi_low_limit = epics_signal_rw(int, prefix + "SCA5_LLM")
-
         self.time = epics_signal_r(int, prefix + "SCA0:Value_RBV")
         self.reset_ticks = epics_signal_r(int, prefix + "SCA1:Value_RBV")
         self.reset_count = epics_signal_r(int, prefix + "SCA2:Value_RBV")
@@ -34,7 +33,7 @@ class Xspress3Channel(Device):
 
 class Xspress3ROIChannel(Device):
     """
-    This is the Xspress3 multi-channel ananlysor range
+    This is the Xspress3 multi-channel analyzer range
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:

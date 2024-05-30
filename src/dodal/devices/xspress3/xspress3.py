@@ -44,7 +44,7 @@ class UpdateRBV(str, Enum):
 class EraseState(str, Enum):
     """
     Epic does not actually have a str value so the only way to set it is
-    to pass int(position) but we still need an Enum to bypass checking in signal
+    to pass int(position).
     """
 
     DONE = ""
@@ -91,7 +91,7 @@ class Xspress3(Device):
                 for i in range(1, num_channels + 1)
             }
         )
-        """start and size of the MCA array"""
+        """start and size of the multi-channel analyzer (MCA) array"""
         self.roi_mca = DeviceVector(
             {
                 i: Xspress3ROIChannel(f"{prefix}ROISUM{i}:")
@@ -110,7 +110,8 @@ class Xspress3(Device):
         """Shared controls for triggering detection"""
         self.timeout = timeout
         self.acquire_time = epics_signal_rw(float, prefix + "AcquireTime")
-        self.erase = epics_signal_rw(int, prefix + "ERASE")
+        #Epic does not actually have a str value for erase so the only way to set it is to pass int(position).
+        self.erase = epics_signal_rw(int, prefix + "ERASE") 
         self.max_num_channels = epics_signal_r(int, prefix + "MAX_NUM_CHANNELS_RBV")
         # acquire and acquire readback has a different enum
         self.acquire = epics_signal_rw(AcquireState, prefix + "Acquire")
@@ -130,7 +131,7 @@ class Xspress3(Device):
         super().__init__(name=name)
 
     async def stage(self) -> AsyncStatus:
-        LOGGER.info("Arming Xspress3Mini detector...")
+        LOGGER.info("Arming Xspress3 detector...")
         await self.trigger_mode.set(TriggerMode.BURST)
         await wait_for_value(
             self.detector_state,
