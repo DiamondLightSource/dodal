@@ -2,6 +2,7 @@ import os
 
 import click
 from bluesky.run_engine import RunEngine
+from ophyd_async.core import NotConnected
 
 from dodal.beamlines import all_beamline_names, module_name_for_beamline
 from dodal.utils import make_all_devices
@@ -52,11 +53,16 @@ def connect(beamline: str, all: bool, sim_backend: bool) -> None:
     RunEngine()
 
     print(f"Attempting connection to {beamline} (using {full_module_path})")
-    devices = make_all_devices(
+    devices, exceptions = make_all_devices(
         full_module_path,
         include_skipped=all,
         fake_with_ophyd_sim=sim_backend,
     )
-    sim_statement = "sim mode" if sim_backend else ""
-    print(f"{len(devices)} devices connected ({sim_statement}): ")
-    print("\n".join([f"\t{key}" for key in devices.keys()]))
+    sim_statement = "(sim mode)" if sim_backend else ""
+
+    print(f"{len(devices)} devices connected {sim_statement}:")
+    print("\n".join([f"\t{device_name}" for device_name in devices.keys()]))
+
+    # If exceptions have occurred, this will print details of the relevant PVs
+    if len(exceptions) > 0:
+        raise NotConnected(exceptions)

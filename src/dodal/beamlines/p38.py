@@ -13,6 +13,7 @@ from dodal.common.beamlines.device_helpers import numbered_slits
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitDirectoryProvider
 from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.i22.fswitch import FSwitch
+from dodal.devices.linkam3 import Linkam3
 from dodal.devices.slits import Slits
 from dodal.devices.tetramm import TetrammDetector
 from dodal.devices.undulator import Undulator
@@ -240,7 +241,7 @@ def panda1(
     return device_instantiation(
         HDFPanda,
         "panda1",
-        "-MO-PANDA-01:",
+        "-EA-PANDA-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
         directory_provider=get_directory_provider(),
@@ -255,7 +256,7 @@ def panda2(
     return device_instantiation(
         HDFPanda,
         "panda2",
-        "-MO-PANDA-02:",
+        "-EA-PANDA-02:",
         wait_for_connection,
         fake_with_ophyd_sim,
         directory_provider=get_directory_provider(),
@@ -270,8 +271,21 @@ def panda3(
     return device_instantiation(
         HDFPanda,
         "panda3",
-        "-MO-PANDA-03:",
+        "-EA-PANDA-03:",
         wait_for_connection,
         fake_with_ophyd_sim,
         directory_provider=get_directory_provider(),
+    )
+
+
+@skip_device
+def linkam(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Linkam3:
+    return device_instantiation(
+        Linkam3,
+        "linkam",
+        "-EA-LINKM-02:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
     )
