@@ -10,7 +10,7 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import numbered_slits
-from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitDirectoryProvider
+from dodal.common.visit import DirectoryServiceClient, StaticVisitDirectoryProvider
 from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.i22.fswitch import FSwitch
 from dodal.devices.linkam3 import Linkam3
@@ -32,8 +32,8 @@ set_utils_beamline(BL)
 set_directory_provider(
     StaticVisitDirectoryProvider(
         BL,
-        Path("/dls/i22/data/2024/cm37271-2/bluesky"),
-        client=LocalDirectoryServiceClient(),
+        Path("/dls/i22/data/2024/cm37271-2"),
+        client=DirectoryServiceClient(f"http://{BL}-control.diamond.ac.uk:8000"),
     )
 )
 
