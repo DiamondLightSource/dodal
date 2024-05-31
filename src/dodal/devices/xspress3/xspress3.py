@@ -35,16 +35,6 @@ class TriggerMode(str, Enum):
     LVDS_both = "LVDS Both"
 
 
-class EraseState(str, Enum):
-    """
-    Epic does not actually have a str value so the only way to set it is
-    to pass int(position) but we still need an Enum to bypass checking in signal
-    """
-
-    DONE = ""
-    ERASE = ""
-
-
 class UpdateRBV(str, Enum):
     DISABLED = "Disabled"
     ENABLED = "Enabled"
@@ -119,8 +109,6 @@ class Xspress3(Device):
         """Shared controls for triggering detection"""
         self.timeout = timeout
         self.acquire_time = epics_signal_rw(float, prefix + "AcquireTime")
-        # Epic does not actually have a str value for erase so the only way to set it is to pass int(position).
-        self.erase = epics_signal_rw(EraseState, prefix + "ERASE")
         self.max_num_channels = epics_signal_r(int, prefix + "MAX_NUM_CHANNELS_RBV")
         # acquire and acquire readback has a different enum
         self.acquire = epics_signal_rw(AcquireState, prefix + "Acquire")
@@ -147,7 +135,6 @@ class Xspress3(Device):
             lambda v: v in self.detector_busy_states,
             timeout=self.timeout,
         )
-        await self.erase.set(1)  # type: ignore
         await set_and_wait_for_value(
             self.acquire, AcquireState.ACQUIRE, timeout=self.timeout
         )
