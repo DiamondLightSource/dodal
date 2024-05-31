@@ -11,7 +11,7 @@ class BSPositions(str, Enum):
     DATACOLLECTIONFAR = "Data Collection Far"
     TRAYMOUNT = "Tray Mount"
     ROTATABLE = "Rotatable"
-    ROBOT = "RObot"
+    ROBOT = "Robot"
 
 
 class Beamstop(StandardReadable):
