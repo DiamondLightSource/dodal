@@ -312,6 +312,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/directory_provider/"
   },
   {
+    "version": "fix-attach-metadata",
+    "url": "https://DiamondLightSource.github.io/dodal/fix-attach-metadata/"
+  },
+  {
     "version": "fix_linting_CI_issues",
     "url": "https://DiamondLightSource.github.io/dodal/fix_linting_CI_issues/"
   },
