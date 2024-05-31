@@ -13,6 +13,7 @@ from ophyd_async.core import (
 
 from dodal.devices.aperturescatterguard import (
     ApertureFiveDimensionalLocation,
+    AperturePositionGDANames,
     AperturePositions,
     ApertureScatterguard,
     InvalidApertureMove,
@@ -307,3 +308,36 @@ async def test_ap_sg_descriptor(
 ):
     description = await aperture_in_medium_pos.describe()
     assert description
+
+
+def test_get_position_from_gda_aperture_name(
+    RE: RunEngine, aperture_positions: AperturePositions
+):
+    assert (
+        aperture_positions.get_position_from_gda_aperture_name(
+            AperturePositionGDANames.LARGE_APERTURE
+        )
+        == aperture_positions.LARGE
+    )
+    assert (
+        aperture_positions.get_position_from_gda_aperture_name(
+            AperturePositionGDANames.MEDIUM_APERTURE
+        )
+        == aperture_positions.MEDIUM
+    )
+    assert (
+        aperture_positions.get_position_from_gda_aperture_name(
+            AperturePositionGDANames.SMALL_APERTURE
+        )
+        == aperture_positions.SMALL
+    )
+    assert (
+        aperture_positions.get_position_from_gda_aperture_name(
+            AperturePositionGDANames.ROBOT_LOAD
+        )
+        == aperture_positions.ROBOT_LOAD
+    )
+    with pytest.raises(ValueError):
+        aperture_positions.get_position_from_gda_aperture_name(
+            "VERY TINY APERTURE"  # type: ignore
+        )
