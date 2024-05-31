@@ -69,18 +69,19 @@ def test_instantiate_v2_function_fake_makes_fake():
 
 
 def test_clear_devices(RE):
-    devices = make_all_devices(i03, fake_with_ophyd_sim=True)
-    assert len(beamline_utils.ACTIVE_DEVICES) == len(devices.keys())
+    devices, exceptions = make_all_devices(i03, fake_with_ophyd_sim=True)
+    assert (
+        len(beamline_utils.ACTIVE_DEVICES) == len(devices.keys())
+        and len(exceptions) == 0
+    )
     beamline_utils.clear_devices()
     assert beamline_utils.ACTIVE_DEVICES == {}
 
 
 def test_device_is_new_after_clearing(RE):
     def _make_devices_and_get_id():
-        return [
-            id(device)
-            for _, device in make_all_devices(i03, fake_with_ophyd_sim=True).items()
-        ]
+        devices, _ = make_all_devices(i03, fake_with_ophyd_sim=True)
+        return [id(device) for device in devices.values()]
 
     ids_1 = [_make_devices_and_get_id()]
     ids_2 = [_make_devices_and_get_id()]

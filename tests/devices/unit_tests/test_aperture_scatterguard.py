@@ -1,12 +1,13 @@
+from contextlib import ExitStack
 from dataclasses import asdict
 from typing import Sequence
-from unittest.mock import MagicMock, call
+from unittest.mock import ANY, MagicMock, call
 
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import (
-    assert_mock_put_called_with,
+    get_mock_put,
     set_mock_value,
 )
 
@@ -24,19 +25,26 @@ from .conftest import patch_motor
 ApSgAndLog = tuple[ApertureScatterguard, MagicMock]
 
 
+def get_all_motors(ap_sg: ApertureScatterguard):
+    return [
+        ap_sg.aperture.x,
+        ap_sg.aperture.y,
+        ap_sg.aperture.z,
+        ap_sg.scatterguard.x,
+        ap_sg.scatterguard.y,
+    ]
+
+
 @pytest.fixture
 async def ap_sg_and_call_log(aperture_positions: AperturePositions):
     call_log = MagicMock()
     ap_sg = ApertureScatterguard(name="test_ap_sg")
     await ap_sg.connect(mock=True)
     ap_sg.load_aperture_positions(aperture_positions)
-    with (
-        patch_motor(ap_sg.aperture.x, call_log=call_log),
-        patch_motor(ap_sg.aperture.y, call_log=call_log),
-        patch_motor(ap_sg.aperture.z, call_log=call_log),
-        patch_motor(ap_sg.scatterguard.x, call_log=call_log),
-        patch_motor(ap_sg.scatterguard.y, call_log=call_log),
-    ):
+    with ExitStack() as motor_patch_stack:
+        for motor in get_all_motors(ap_sg):
+            motor_patch_stack.enter_context(patch_motor(motor))
+            call_log.attach_mock(get_mock_put(motor.user_setpoint), "setpoint")
         yield ap_sg, call_log
 
 
@@ -100,20 +108,17 @@ def aperture_positions():
 
 def _assert_patched_ap_sg_has_call(
     ap_sg: ApertureScatterguard,
-    position: ApertureFiveDimensionalLocation
-    | tuple[float, float, float, float, float],
+    position: (
+        ApertureFiveDimensionalLocation | tuple[float, float, float, float, float]
+    ),
 ):
     for motor, pos in zip(
-        (
-            ap_sg.aperture.x,
-            ap_sg.aperture.y,
-            ap_sg.aperture.z,
-            ap_sg.scatterguard.x,
-            ap_sg.scatterguard.y,
-        ),
+        get_all_motors(ap_sg),
         position,
     ):
-        assert_mock_put_called_with(motor.user_setpoint, pos)
+        get_mock_put(motor.user_setpoint).assert_called_with(
+            pos, wait=True, timeout=ANY
+        )
 
 
 def test_aperture_scatterguard_rejects_unknown_position(aperture_in_medium_pos):
@@ -126,7 +131,7 @@ def test_aperture_scatterguard_rejects_unknown_position(aperture_in_medium_pos):
 
 
 def _call_list(calls: Sequence[float]):
-    return [call(v, wait=True, timeout=10.0) for v in calls]
+    return [call.setpoint(v, wait=True, timeout=ANY) for v in calls]
 
 
 async def test_aperture_scatterguard_select_bottom_moves_sg_down_then_assembly_up(
@@ -185,11 +190,11 @@ async def test_aperture_scatterguard_returns_status_if_within_tolerance(
 def set_underlying_motors(
     ap_sg: ApertureScatterguard, position: ApertureFiveDimensionalLocation
 ):
-    ap_sg.aperture.x.set(position.aperture_x)
-    ap_sg.aperture.y.set(position.aperture_y)
-    ap_sg.aperture.z.set(position.aperture_z)
-    ap_sg.scatterguard.x.set(position.scatterguard_x)
-    ap_sg.scatterguard.y.set(position.scatterguard_y)
+    for motor, pos in zip(
+        get_all_motors(ap_sg),
+        position,
+    ):
+        motor.set(pos)
 
 
 async def test_aperture_positions_large(
