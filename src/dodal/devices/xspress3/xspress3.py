@@ -6,7 +6,6 @@ from ophyd_async.core import (
     AsyncStatus,
     Device,
     DeviceVector,
-    set_and_wait_for_value,
     wait_for_value,
 )
 from ophyd_async.epics.signal.signal import (
@@ -127,7 +126,8 @@ class Xspress3(Device):
         ]
         super().__init__(name=name)
 
-    async def stage(self) -> AsyncStatus:
+    @AsyncStatus.wrap
+    async def stage(self) -> None:
         LOGGER.info("Arming Xspress3 detector...")
         await self.trigger_mode.set(TriggerMode.BURST)
         await wait_for_value(
@@ -135,9 +135,7 @@ class Xspress3(Device):
             lambda v: v in self.detector_busy_states,
             timeout=self.timeout,
         )
-        await set_and_wait_for_value(
-            self.acquire, AcquireState.ACQUIRE, timeout=self.timeout
-        )
-        return AsyncStatus(
-            wait_for_value(self.acquire_rbv, AcquireRBVState.DONE, timeout=self.timeout)
+        await self.acquire.set(AcquireState.ACQUIRE)
+        await wait_for_value(
+            self.acquire_rbv, AcquireRBVState.DONE, timeout=self.timeout
         )
