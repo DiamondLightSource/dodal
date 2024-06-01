@@ -40,7 +40,9 @@ async def test_stage_success_on_busy_state(mock_xspress3mini: Xspress3):
     set_mock_value(mock_xspress3mini.detector_state, DetectorState.ACQUIRE)
     callback_on_mock_put(
         mock_xspress3mini.acquire,
-        lambda _: set_mock_value(mock_xspress3mini.acquire_rbv, AcquireRBVState.DONE),
+        lambda _: set_mock_value(
+            mock_xspress3mini.acquire_rbv, AcquireRBVState.ACQUIRE
+        ),
     )
 
     mock_xspress3mini.trigger_mode.set = AsyncMock()

@@ -137,5 +137,8 @@ class Xspress3(Device):
         )
         await self.acquire.set(AcquireState.ACQUIRE)
         await wait_for_value(
+            self.acquire_rbv, AcquireRBVState.ACQUIRE, timeout=self.timeout
+        )
+        await wait_for_value(
             self.acquire_rbv, AcquireRBVState.DONE, timeout=self.timeout
         )
