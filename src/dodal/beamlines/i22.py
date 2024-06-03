@@ -113,6 +113,7 @@ def i0(
         "-EA-XBPM-02:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        type="Cividec Diamond XBPM",
         directory_provider=get_directory_provider(),
     )
 
@@ -127,6 +128,7 @@ def it(
         "-EA-TTRM-02:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        type="PIN Diode",
         directory_provider=get_directory_provider(),
     )
 

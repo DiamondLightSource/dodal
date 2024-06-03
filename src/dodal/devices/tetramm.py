@@ -12,6 +12,7 @@ from ophyd_async.core import (
     ShapeProvider,
     StandardDetector,
     set_and_wait_for_value,
+    soft_signal_r_and_setter,
 )
 from ophyd_async.epics.areadetector.utils import stop_busy_record
 from ophyd_async.epics.areadetector.writers import HDFWriter, NDFileHDF
@@ -219,11 +220,20 @@ class TetrammDetector(StandardDetector):
         prefix: str,
         directory_provider: DirectoryProvider,
         name: str,
+        type: str | None = None,
         **scalar_sigs: str,
     ) -> None:
         self.drv = TetrammDriver(prefix + "DRV:")
         self.hdf = NDFileHDF(prefix + "HDF5:")
         controller = TetrammController(self.drv)
+        config_signals = [
+            self.drv.values_per_reading,
+            self.drv.averaging_time,
+            self.drv.sample_time,
+        ]
+        if type:
+            type_signal, _ = soft_signal_r_and_setter(str, type)
+            config_signals.append(type_signal)
         super().__init__(
             controller,
             HDFWriter(
@@ -233,11 +243,7 @@ class TetrammDetector(StandardDetector):
                 TetrammShapeProvider(controller),
                 **scalar_sigs,
             ),
-            [
-                self.drv.values_per_reading,
-                self.drv.averaging_time,
-                self.drv.sample_time,
-            ],
+            config_signals,
             name,
         )
 
