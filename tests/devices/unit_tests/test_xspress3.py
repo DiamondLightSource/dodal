@@ -35,7 +35,7 @@ async def mock_xspress3mini(prefix: str = "BLXX-EA-DET-007:") -> Xspress3:
     )
     assert mock_xspress3mini.roi_mca[1].name == "Xspress3Mini-roi_mca-1"
     assert mock_xspress3mini.roi_mca[2].name == "Xspress3Mini-roi_mca-2"
-    mock_xspress3mini.timeout = 0.5
+    mock_xspress3mini.timeout = 0.1
     return mock_xspress3mini
 
 
@@ -84,7 +84,7 @@ def stage_plan(mock_xspress3mini: Xspress3):
             mock_xspress3mini.acquire_rbv, AcquireRBVState.ACQUIRE
         ),
     )
-    yield from bps.stage(mock_xspress3mini, wait=True)
+    yield from bps.stage(mock_xspress3mini, group="aa", wait=True)
     callback_on_mock_put(
         mock_xspress3mini.acquire,
         lambda *_, **__: set_mock_value(
