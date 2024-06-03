@@ -12,11 +12,11 @@ from requests import HTTPError, Response
 
 import dodal.devices.oav.utils as oav_utils
 from dodal.beamlines import i03
-from dodal.common.exceptions import WarningException
 from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.oav.pin_image_recognition.utils import SampleLocation
 from dodal.devices.oav.utils import (
+    PinNotFoundException,
     get_move_required_so_that_beam_is_at_pixel,
     wait_for_tip_to_be_found,
 )
@@ -306,5 +306,5 @@ async def test_given_no_tip_when_wait_for_tip_to_be_found_called_then_exception_
         )
     )
     RE = RunEngine(call_returns_result=True)
-    with pytest.raises(WarningException):
+    with pytest.raises(PinNotFoundException):
         RE(wait_for_tip_to_be_found(mock_pin_tip_detect))

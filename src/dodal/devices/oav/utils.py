@@ -5,13 +5,16 @@ import bluesky.plan_stubs as bps
 import numpy as np
 from bluesky.utils import Msg
 
-from dodal.common.exceptions import WarningException
 from dodal.devices.oav.oav_calculations import camera_coordinates_to_xyz
 from dodal.devices.oav.oav_detector import OAVConfigParams
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.smargon import Smargon
 
 Pixel = Tuple[int, int]
+
+
+class PinNotFoundException(Exception):
+    pass
 
 
 def bottom_right_from_top_left(
@@ -101,6 +104,6 @@ def wait_for_tip_to_be_found(
     found_tip = yield from bps.rd(ophyd_pin_tip_detection.triggered_tip)
     if found_tip == ophyd_pin_tip_detection.INVALID_POSITION:
         timeout = yield from bps.rd(ophyd_pin_tip_detection.validity_timeout)
-        raise WarningException(f"No pin found after {timeout} seconds")
+        raise PinNotFoundException(f"No pin found after {timeout} seconds")
 
     return found_tip  # type: ignore
