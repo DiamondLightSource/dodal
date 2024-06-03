@@ -26,7 +26,7 @@ def turbo_slit(
     )
 
 
-def express3(
+def xspress3(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> Xspress3:
     """

@@ -47,12 +47,7 @@ async def test_stage_success_on_busy_state(mock_xspress3mini: Xspress3):
 
     callback_on_mock_put(mock_xspress3mini.acquire, lambda *_, **__: set_mock_value(mock_xspress3mini.acquire_rbv, AcquireRBVState.ACQUIRE))
 
-    status: AsyncStatus = mock_xspress3mini.stage()
-    assert status.done is False
-    await asyncio.sleep(0.01)
-    set_mock_value(mock_xspress3mini.acquire_rbv, AcquireRBVState.DONE)
-    await asyncio.sleep(0.01)
-    assert status.done is True
+    await mock_xspress3mini.stage()
     get_mock_put(mock_xspress3mini.trigger_mode).assert_called_once_with(
         TriggerMode.BURST, wait=ANY, timeout=ANY
     )
@@ -61,20 +56,29 @@ async def test_stage_success_on_busy_state(mock_xspress3mini: Xspress3):
     )
 
 
-async def test_stage_fail_on_not_busy_state(mock_xspress3mini: Xspress3):
+async def test_stage_fail_on_detector_not_busy_state(mock_xspress3mini: Xspress3):
     set_mock_value(mock_xspress3mini.detector_state, DetectorState.IDLE)
     with pytest.raises(TimeoutError):
         await mock_xspress3mini.stage()
 
 
-async def test_stage_fail_timeout(mock_xspress3mini: Xspress3):
-    set_mock_value(mock_xspress3mini.acquire_rbv, AcquireRBVState.ACQUIRE)
-    with pytest.raises(TimeoutError):
-        await mock_xspress3mini.stage()
-    set_mock_value(mock_xspress3mini.detector_state, DetectorState.IDLE)
+async def test_stage_fail_to_acquire_timeout(mock_xspress3mini: Xspress3):
+    set_mock_value(mock_xspress3mini.detector_state, DetectorState.ACQUIRE)
+    set_mock_value(mock_xspress3mini.acquire_rbv, AcquireRBVState.DONE)
     with pytest.raises(TimeoutError):
         await mock_xspress3mini.stage()
 
 def test_stage_timeOut_in_RE(mock_xspress3mini: Xspress3, RE: RunEngine):
     with pytest.raises(Exception):
         RE(bps.stage(mock_xspress3mini, wait=True))
+
+def plan(mock_xspress3mini: Xspress3):
+    callback_on_mock_put(mock_xspress3mini.acquire, lambda *_, **__: set_mock_value(mock_xspress3mini.acquire_rbv, AcquireRBVState.ACQUIRE))
+    yield from bps.stage(mock_xspress3mini, wait=True)
+    set_mock_value(mock_xspress3mini.acquire_rbv, AcquireRBVState.DONE)
+    yield from bps.unstage(mock_xspress3mini, wait=True)
+
+def test_stage_staged_in_RE(mock_xspress3mini: Xspress3, RE: RunEngine):
+    set_mock_value(mock_xspress3mini.acquire_rbv, AcquireRBVState.DONE)
+    set_mock_value(mock_xspress3mini.detector_state, DetectorState.ACQUIRE)
+    RE(plan(mock_xspress3mini))
