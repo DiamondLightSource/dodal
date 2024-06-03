@@ -379,10 +379,10 @@ def linkam(
     )
 
 
-@skip_device
 def ppump(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = True
 ) -> WatsonMarlow323Pump:
+    """Sample Environment Peristaltic Pump"""
     return device_instantiation(
         WatsonMarlow323Pump,
         "ppump",
