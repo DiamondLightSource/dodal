@@ -60,9 +60,9 @@ class DetectorState(str, Enum):
 
 
 class Xspress3(Device, Stageable):
-    """Xpress/XpressMini is a region of interest (ROI) picker that sums the detector 
-    output into a scaler with user-defined regions. It is often used as a signal 
-    discriminator to provide better energy resolution and signal to noise in X-ray detection experiments. 
+    """Xpress/XpressMini is a region of interest (ROI) picker that sums the detector
+    output into a scaler with user-defined regions. It is often used as a signal
+    discriminator to provide better energy resolution and signal to noise in X-ray detection experiments.
     This currently only provide staging functionality.
 
     Parameters
@@ -140,8 +140,10 @@ class Xspress3(Device, Stageable):
         await wait_for_value(
             self.acquire_rbv, AcquireRBVState.ACQUIRE, timeout=self.timeout
         )
+
     @AsyncStatus.wrap
     async def unstage(self) -> None:
+        await self.acquire.set(AcquireState.DONE)
         LOGGER.info("unstaging Xspress3 detector...")
         await wait_for_value(
             self.acquire_rbv, AcquireRBVState.DONE, timeout=self.timeout
