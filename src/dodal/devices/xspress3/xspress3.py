@@ -1,5 +1,6 @@
 from enum import Enum
 
+from bluesky.protocols import Stageable
 from numpy import float64
 from numpy.typing import NDArray
 from ophyd_async.core import (
@@ -58,10 +59,10 @@ class DetectorState(str, Enum):
     ABORTED = "Aborted"
 
 
-class Xspress3(Device):
+class Xspress3(Device, Stageable):
     """Xpress/XpressMini is a region of interest (ROI) picker that sums the detector
     output into a scaler with user-defined regions. It is often used as a signal
-     discriminator to provide better energy resolution in X-ray detection experiments.
+     discriminator to provide better energy resolution and signal to noise in X-ray detection experiments.
      This currently only provide staging functionality.
 
     Parameters
@@ -77,7 +78,7 @@ class Xspress3(Device):
     """
 
     def __init__(
-        self, prefix: str, name: str = "", num_channels: int = 1, timeout=1
+        self, prefix: str, name: str = "", num_channels: int = 1, timeout: float = 1
     ) -> None:
         self.channels = DeviceVector(
             {i: Xspress3Channel(f"{prefix}C{i}_") for i in range(1, num_channels + 1)}
@@ -139,6 +140,11 @@ class Xspress3(Device):
         await wait_for_value(
             self.acquire_rbv, AcquireRBVState.ACQUIRE, timeout=self.timeout
         )
+
         await wait_for_value(
             self.acquire_rbv, AcquireRBVState.DONE, timeout=self.timeout
         )
+
+    @AsyncStatus.wrap
+    async def unstage(self) -> None:
+        LOGGER.info("unstaging Xspress3 detector...")

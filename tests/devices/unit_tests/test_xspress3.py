@@ -32,28 +32,27 @@ async def mock_xspress3mini(prefix: str = "BLXX-EA-DET-007:") -> Xspress3:
     )
     assert mock_xspress3mini.roi_mca[1].name == "Xspress3Mini-roi_mca-1"
     assert mock_xspress3mini.roi_mca[2].name == "Xspress3Mini-roi_mca-2"
-    mock_xspress3mini.timeout = 1
+    mock_xspress3mini.timeout = 0.5
     return mock_xspress3mini
 
 
 async def test_stage_success_on_busy_state(mock_xspress3mini: Xspress3):
+    set_mock_value(mock_xspress3mini.acquire_rbv, AcquireRBVState.DONE)
     set_mock_value(mock_xspress3mini.detector_state, DetectorState.ACQUIRE)
+
     callback_on_mock_put(
         mock_xspress3mini.acquire,
-        lambda _: set_mock_value(
-            mock_xspress3mini.acquire_rbv, AcquireRBVState.ACQUIRE
-        ),
+        set_mock_value(mock_xspress3mini.acquire_rbv, AcquireRBVState.ACQUIRE),
     )
 
     mock_xspress3mini.trigger_mode.set = AsyncMock()
     mock_xspress3mini.acquire.set = AsyncMock()
     status: AsyncStatus = mock_xspress3mini.stage()
-
     assert status.done is False
-    while not status.done:
-        await asyncio.sleep(0.1)
+    await asyncio.sleep(0.01)
+    set_mock_value(mock_xspress3mini.acquire_rbv, AcquireRBVState.DONE)
+    await asyncio.sleep(0.01)
     assert status.done is True
-
     mock_xspress3mini.trigger_mode.set.assert_called_once_with(TriggerMode.BURST)
     mock_xspress3mini.acquire.set.assert_called_once_with(AcquireState.ACQUIRE)
 
@@ -73,6 +72,12 @@ async def test_stage_fail_timeout(mock_xspress3mini: Xspress3):
         await mock_xspress3mini.stage()
 
 
-def test_stage_in_RE(mock_xspress3mini, RE: RunEngine):
-    # should make it do more than just run stage.....
-    RE(bps.stage(mock_xspress3mini))
+def test_stage_in_RE(mock_xspress3mini: Xspress3, RE: RunEngine):
+    with pytest.raises(Exception):
+        RE(bps.stage(mock_xspress3mini, wait=True))
+
+
+def test_stage_timeOut_in_RE(mock_xspress3mini: Xspress3, RE: RunEngine):
+    set_mock_value(mock_xspress3mini.acquire_rbv, AcquireRBVState.ACQUIRE)
+
+    RE(bps.stage(mock_xspress3mini), wait=True)
