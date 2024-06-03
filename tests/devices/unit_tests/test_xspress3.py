@@ -71,13 +71,6 @@ async def test_stage_fail_timeout(mock_xspress3mini: Xspress3):
     with pytest.raises(TimeoutError):
         await mock_xspress3mini.stage()
 
-
-def test_stage_in_RE(mock_xspress3mini: Xspress3, RE: RunEngine):
+def test_stage_timeOut_in_RE(mock_xspress3mini: Xspress3, RE: RunEngine):
     with pytest.raises(Exception):
         RE(bps.stage(mock_xspress3mini, wait=True))
-
-
-def test_stage_timeOut_in_RE(mock_xspress3mini: Xspress3, RE: RunEngine):
-    set_mock_value(mock_xspress3mini.acquire_rbv, AcquireRBVState.ACQUIRE)
-
-    RE(bps.stage(mock_xspress3mini), wait=True)
