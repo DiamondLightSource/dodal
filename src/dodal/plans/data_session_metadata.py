@@ -11,7 +11,7 @@ DATA_GROUPS = "data_groups"
 
 
 def attach_data_session_metadata_wrapper(
-    plan: MsgGenerator, provider: UpdatingDirectoryProvider | None
+    plan: MsgGenerator, provider: UpdatingDirectoryProvider | None = None
 ) -> MsgGenerator:
     """
     Attach data session metadata to the runs within a plan and make it correlate
