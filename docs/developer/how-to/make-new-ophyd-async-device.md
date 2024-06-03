@@ -58,11 +58,17 @@ This flowchart outlines the testing procedure for the new ophyd_async device, fr
 ```{mermaid}
 
   flowchart TD
-    testStart([Start Testing]) --> createFixtures[Create fixtures for various states of the device]
+    testStart([Start Testing]) --> checkExistingFixtures[Check for existing fixtures]
+    checkExistingFixtures --> createFixtures[Create or update fixtures for various states of the device]
     createFixtures --> createMockReactions[Create mock reactions to signals]
     createMockReactions --> testStateTransitions[Test each device state transition]
-    testStateTransitions --> testAgainstHardware[Test against hardware]
-    testAgainstHardware --> testingComplete[Testing Complete]
+    testStateTransitions --> testPVValues[Check PV values to ensure accuracy]
+    testPVValues --> testAgainstHardware[Test against hardware]
+    testAgainstHardware --> decision{Check if all tests pass}
+    decision -- "Yes" --> testingComplete[Testing Complete]
+    decision -- "No" --> modifyCode[Modify code and update tests]
+    modifyCode --> createFixtures
+
 
 ```
 
