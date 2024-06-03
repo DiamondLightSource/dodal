@@ -20,13 +20,12 @@ class WatsonMarlow323PumpState(str, Enum):
 
 
 class WatsonMarlow323Pump(StandardReadable):
-    """Watson Marlow 323 Pump device"""
+    """Watson Marlow 323 Peristaltic Pump device"""
 
     def __init__(self, prefix: str, name: str = "") -> None:
         self.enabled = epics_signal_rw(
             WatsonMarlow323PumpEnable,
-            read_pv=prefix + "DISABLE",
-            write_pv=prefix + "DISABLE",
+            prefix + "DISABLE",
         )
 
         self.direction = epics_signal_rw(
