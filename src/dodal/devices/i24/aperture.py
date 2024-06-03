@@ -19,6 +19,14 @@ class AperturePositioner(StandardReadable):
 
 
 class Aperture(StandardReadable):
+    """Device to trigger the aperture motor move on I24.
+
+    The aperture positioner has 4 possible positions: In, Out, Robot and Manual.
+
+    When a position is selected, the x motor is moved.
+    The position of the y motor is calibrated at start up and is not changed.
+    """
+
     def __init__(self, prefix: str, name: str = "") -> None:
         self.x = Motor(prefix + "X")
         self.y = Motor(prefix + "Y")
