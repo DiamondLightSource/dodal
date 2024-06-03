@@ -1,10 +1,15 @@
 import asyncio
-from unittest.mock import AsyncMock
+from unittest.mock import ANY
 
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import DeviceCollector, callback_on_mock_put, set_mock_value
+from ophyd_async.core import (
+    DeviceCollector,
+    callback_on_mock_put,
+    get_mock_put,
+    set_mock_value,
+)
 
 from dodal.devices.xspress3.xspress3 import (
     AcquireRBVState,
@@ -40,21 +45,20 @@ async def test_stage_success_on_busy_state(mock_xspress3mini: Xspress3):
     set_mock_value(mock_xspress3mini.acquire_rbv, AcquireRBVState.DONE)
     set_mock_value(mock_xspress3mini.detector_state, DetectorState.ACQUIRE)
 
-    callback_on_mock_put(
-        mock_xspress3mini.acquire,
-        set_mock_value(mock_xspress3mini.acquire_rbv, AcquireRBVState.ACQUIRE),
-    )
+    callback_on_mock_put(mock_xspress3mini.acquire, lambda *_, **__: set_mock_value(mock_xspress3mini.acquire_rbv, AcquireRBVState.ACQUIRE))
 
-    mock_xspress3mini.trigger_mode.set = AsyncMock()
-    mock_xspress3mini.acquire.set = AsyncMock()
     status: AsyncStatus = mock_xspress3mini.stage()
     assert status.done is False
     await asyncio.sleep(0.01)
     set_mock_value(mock_xspress3mini.acquire_rbv, AcquireRBVState.DONE)
     await asyncio.sleep(0.01)
     assert status.done is True
-    mock_xspress3mini.trigger_mode.set.assert_called_once_with(TriggerMode.BURST)
-    mock_xspress3mini.acquire.set.assert_called_once_with(AcquireState.ACQUIRE)
+    get_mock_put(mock_xspress3mini.trigger_mode).assert_called_once_with(
+        TriggerMode.BURST, wait=ANY, timeout=ANY
+    )
+    get_mock_put(mock_xspress3mini.acquire).assert_called_once_with(
+        AcquireState.ACQUIRE, wait=ANY, timeout=ANY
+    )
 
 
 async def test_stage_fail_on_not_busy_state(mock_xspress3mini: Xspress3):
