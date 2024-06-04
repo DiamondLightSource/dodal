@@ -29,12 +29,14 @@ from pydantic import BaseModel
 
 from dodal.common.types import MsgGenerator, UpdatingDirectoryProvider
 from dodal.common.visit import (
-    DATA_SESSION,
     DataCollectionIdentifier,
     DirectoryServiceClientBase,
     LocalDirectoryServiceClient,
     StaticVisitDirectoryProvider,
-    attach_metadata,
+)
+from dodal.plans.data_session_metadata import (
+    DATA_SESSION,
+    attach_data_session_metadata_wrapper,
 )
 
 
@@ -368,7 +370,7 @@ def collect_docs(
     def on_event(name: str, doc: Mapping[str, Any]) -> None:
         events.append(DataEvent(name=name, doc=doc))
 
-    wrapped_plan = attach_metadata(plan, provider)
+    wrapped_plan = attach_data_session_metadata_wrapper(plan, provider)
     RE(wrapped_plan, on_event)
     return events
 
