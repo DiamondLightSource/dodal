@@ -25,6 +25,7 @@ from dodal.devices.robot import BartRobot
 from dodal.devices.s4_slit_gaps import S4SlitGaps
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
+from dodal.devices.thawer import Thawer
 from dodal.devices.undulator import Undulator
 from dodal.devices.undulator_dcm import UndulatorDCM
 from dodal.devices.webcam import Webcam
@@ -479,4 +480,19 @@ def webcam(
         wait_for_connection,
         fake_with_ophyd_sim,
         url="http://i03-webcam1/axis-cgi/jpg/image.cgi",
+    )
+
+
+def thawer(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Thawer:
+    """Get the i03 thawer, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        Thawer,
+        "thawer",
+        "-EA-THAW-01",
+        wait_for_connection,
+        fake_with_ophyd_sim,
     )
