@@ -386,7 +386,7 @@ def robot(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> BartRobot:
     """Get the i04 robot device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i03, it will return the existing object.
+    If this is called when already instantiated in i04, it will return the existing object.
     """
     return device_instantiation(
         BartRobot,
