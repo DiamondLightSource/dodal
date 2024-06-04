@@ -37,4 +37,34 @@ class DCM(StandardReadable):
             self.backplate_temp = epics_signal_r(float, prefix + "PT100-7")
             self.perp_temp = epics_signal_r(float, prefix + "TC-1")
 
+            # Soft metadata
+            # If supplied include crystal details in output of read_configuration
+            crystal = crystal or DCMCrystal()
+
+            with self.add_children_as_readables(ConfigSignal):
+                if crystal.usage is not None:
+                    self.crystal_usage, _ = soft_signal_r_and_setter(
+                        str, initial_value=crystal.usage
+                    )
+                else:
+                    self.crystal_usage = None
+                if crystal.type is not None:
+                    self.crystal_type, _ = soft_signal_r_and_setter(
+                        str, initial_value=crystal.type
+                    )
+                else:
+                    self.crystal_type = None
+                if crystal.reflection is not None:
+                    self.crystal_reflection, _ = soft_signal_r_and_setter(
+                        str, initial_value=crystal.reflection
+                    )
+                else:
+                    self.crystal_reflection = None
+                if crystal.d_spacing is not None:
+                    self.crystal_d_spacing, _ = soft_signal_r_and_setter(
+                        str, initial_value=crystal.d_spacing
+                    )
+                else:
+                    self.crystal_d_spacing = None
+
         super().__init__(name)
