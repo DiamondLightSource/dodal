@@ -35,7 +35,7 @@ class MonochromatingCrystal(StandardReadable):
     ) -> None:
         with self.add_children_as_readables():
             # Positionable Parameters
-            # self.roll = Motor(prefix + "ROLL")
+            self.roll = Motor(prefix + "ROLL")
             self.pitch = Motor(prefix + "PITCH")
 
             # # Temperatures
@@ -92,7 +92,6 @@ class DoubleCrystalMonochromator(StandardReadable):
     ) -> None:
         with self.add_children_as_readables():
             # Positionable Parameters
-            self.bragg = Motor(prefix + "BRAGG")
             self.crystal_1 = MonochromatingCrystal(
                 prefix + "XSTAL1:",
                 metadata=crystal_1_metadata or CrystalMetadata(),
@@ -105,10 +104,11 @@ class DoubleCrystalMonochromator(StandardReadable):
                 temp_prefix=prefix + "PT100-4",
                 heater_temp_prefix=prefix + "PT100-5",
             )
+
+            self.bragg = Motor(prefix + "BRAGG")
             self.offset = Motor(prefix + "OFFSET")
             self.perp = Motor(prefix + "PERP")
             self.energy = Motor(prefix + "ENERGY")
-            self.wavelength = Motor(prefix + "WAVELENGTH")
 
             # Assembly Temperatures
             self.backplate_temp = epics_signal_r(float, prefix + "PT100-7")

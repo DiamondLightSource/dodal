@@ -12,6 +12,7 @@ from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beam
 from dodal.common.beamlines.device_helpers import numbered_slits
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitDirectoryProvider
 from dodal.devices.focusing_mirror import FocusingMirror
+from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
 from dodal.devices.i22.fswitch import FSwitch
 from dodal.devices.linkam3 import Linkam3
 from dodal.devices.slits import Slits
@@ -211,6 +212,31 @@ def hfm(
         "-OP-KBM-01:HFM:",
         wait_for_connection,
         fake_with_ophyd_sim,
+    )
+
+
+def dcm(
+    wait_for_connection: bool = True,
+    fake_with_ophyd_sim: bool = True,
+) -> DoubleCrystalMonochromator:
+    return device_instantiation(
+        DoubleCrystalMonochromator,
+        "unduldcmator",
+        f"{BeamlinePrefix(BL).insertion_prefix}-MO-DCM-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        crystal_1_metadata=CrystalMetadata(
+            usage="Bragg",
+            type="silicon",
+            reflection=(1, 1, 1),
+            d_spacing=3.13475,
+        ),
+        crystal_2_metadata=CrystalMetadata(
+            usage="Bragg",
+            type="silicon",
+            reflection=(1, 1, 1),
+            d_spacing=3.13475,
+        ),
     )
 
 

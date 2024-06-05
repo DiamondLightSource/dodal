@@ -77,21 +77,6 @@ async def test_reading(dcm: DoubleCrystalMonochromator):
     await assert_reading(
         dcm,
         {
-            "dcm-crystal_1-temp": {
-                "value": 0.0,
-                "timestamp": ANY,
-                "alarm_severity": ANY,
-            },
-            "dcm-crystal_1-heater_temp": {
-                "value": 0.0,
-                "timestamp": ANY,
-                "alarm_severity": ANY,
-            },
-            "dcm-crystal_1-pitch": {
-                "value": 0.0,
-                "timestamp": ANY,
-                "alarm_severity": ANY,
-            },
             "dcm-energy": {
                 "value": 0.0,
                 "timestamp": ANY,
@@ -102,12 +87,7 @@ async def test_reading(dcm: DoubleCrystalMonochromator):
                 "timestamp": ANY,
                 "alarm_severity": ANY,
             },
-            "dcm-offset": {
-                "value": 0.0,
-                "timestamp": ANY,
-                "alarm_severity": ANY,
-            },
-            "dcm-perp": {
+            "dcm-perp_temp": {
                 "value": 0.0,
                 "timestamp": ANY,
                 "alarm_severity": ANY,
@@ -117,17 +97,37 @@ async def test_reading(dcm: DoubleCrystalMonochromator):
                 "timestamp": ANY,
                 "alarm_severity": ANY,
             },
-            "dcm-perp_temp": {
+            "dcm-offset": {
                 "value": 0.0,
                 "timestamp": ANY,
                 "alarm_severity": ANY,
             },
-            "dcm-wavelength": {
+            "dcm-crystal_1-pitch": {
                 "value": 0.0,
                 "timestamp": ANY,
                 "alarm_severity": ANY,
             },
-            "dcm-crystal_2-temp": {
+            "dcm-crystal_1-roll": {
+                "value": 0.0,
+                "timestamp": ANY,
+                "alarm_severity": ANY,
+            },
+            "dcm-crystal_1-heater_temp": {
+                "value": 0.0,
+                "timestamp": ANY,
+                "alarm_severity": ANY,
+            },
+            "dcm-crystal_1-temp": {
+                "value": 0.0,
+                "timestamp": ANY,
+                "alarm_severity": ANY,
+            },
+            "dcm-crystal_2-pitch": {
+                "value": 0.0,
+                "timestamp": ANY,
+                "alarm_severity": ANY,
+            },
+            "dcm-crystal_2-roll": {
                 "value": 0.0,
                 "timestamp": ANY,
                 "alarm_severity": ANY,
@@ -137,7 +137,12 @@ async def test_reading(dcm: DoubleCrystalMonochromator):
                 "timestamp": ANY,
                 "alarm_severity": ANY,
             },
-            "dcm-crystal_2-pitch": {
+            "dcm-crystal_2-temp": {
+                "value": 0.0,
+                "timestamp": ANY,
+                "alarm_severity": ANY,
+            },
+            "dcm-perp": {
                 "value": 0.0,
                 "timestamp": ANY,
                 "alarm_severity": ANY,
@@ -150,17 +155,12 @@ async def test_configuration(dcm: DoubleCrystalMonochromator):
     await assert_configuration(
         dcm,
         {
-            "dcm-wavelength-velocity": {
-                "value": 0.0,
-                "timestamp": ANY,
-                "alarm_severity": ANY,
-            },
-            "dcm-wavelength-motor_egu": {
+            "dcm-crystal_1-roll-motor_egu": {
                 "value": "",
                 "timestamp": ANY,
                 "alarm_severity": ANY,
             },
-            "dcm-crystal_1-pitch-velocity": {
+            "dcm-crystal_1-roll-velocity": {
                 "value": 0.0,
                 "timestamp": ANY,
                 "alarm_severity": ANY,
@@ -170,8 +170,8 @@ async def test_configuration(dcm: DoubleCrystalMonochromator):
                 "timestamp": ANY,
                 "alarm_severity": ANY,
             },
-            "dcm-crystal_1-usage": {
-                "value": "Bragg",
+            "dcm-crystal_1-pitch-velocity": {
+                "value": 0.0,
                 "timestamp": ANY,
                 "alarm_severity": ANY,
             },
@@ -180,72 +180,22 @@ async def test_configuration(dcm: DoubleCrystalMonochromator):
                 "timestamp": ANY,
                 "alarm_severity": ANY,
             },
-            "dcm-crystal_1-d_spacing": {
-                "value": 3.13475,
-                "timestamp": ANY,
-                "alarm_severity": ANY,
-            },
             "dcm-crystal_1-type": {
                 "value": "silicon",
                 "timestamp": ANY,
                 "alarm_severity": ANY,
             },
-            "dcm-offset-velocity": {
-                "value": 0.0,
-                "timestamp": ANY,
-                "alarm_severity": ANY,
-            },
-            "dcm-offset-motor_egu": {
-                "value": "",
-                "timestamp": ANY,
-                "alarm_severity": ANY,
-            },
-            "dcm-perp-velocity": {
-                "value": 0.0,
-                "timestamp": ANY,
-                "alarm_severity": ANY,
-            },
-            "dcm-perp-motor_egu": {
-                "value": "",
-                "timestamp": ANY,
-                "alarm_severity": ANY,
-            },
-            "dcm-crystal_2-pitch-velocity": {
-                "value": 0.0,
-                "timestamp": ANY,
-                "alarm_severity": ANY,
-            },
-            "dcm-crystal_2-pitch-motor_egu": {
-                "value": "",
-                "timestamp": ANY,
-                "alarm_severity": ANY,
-            },
-            "dcm-crystal_2-usage": {
-                "value": "Bragg",
-                "timestamp": ANY,
-                "alarm_severity": ANY,
-            },
-            "dcm-crystal_2-reflection": {
-                "value": (1, 1, 1),
-                "timestamp": ANY,
-                "alarm_severity": ANY,
-            },
-            "dcm-crystal_2-d_spacing": {
+            "dcm-crystal_1-d_spacing": {
                 "value": 3.13475,
                 "timestamp": ANY,
                 "alarm_severity": ANY,
             },
-            "dcm-crystal_2-type": {
-                "value": "silicon",
+            "dcm-crystal_1-usage": {
+                "value": "Bragg",
                 "timestamp": ANY,
                 "alarm_severity": ANY,
             },
-            "dcm-energy-velocity": {
-                "value": 0.0,
-                "timestamp": ANY,
-                "alarm_severity": ANY,
-            },
-            "dcm-energy-motor_egu": {
+            "dcm-bragg-motor_egu": {
                 "value": "",
                 "timestamp": ANY,
                 "alarm_severity": ANY,
@@ -255,8 +205,73 @@ async def test_configuration(dcm: DoubleCrystalMonochromator):
                 "timestamp": ANY,
                 "alarm_severity": ANY,
             },
-            "dcm-bragg-motor_egu": {
+            "dcm-energy-motor_egu": {
                 "value": "",
+                "timestamp": ANY,
+                "alarm_severity": ANY,
+            },
+            "dcm-energy-velocity": {
+                "value": 0.0,
+                "timestamp": ANY,
+                "alarm_severity": ANY,
+            },
+            "dcm-perp-motor_egu": {
+                "value": "",
+                "timestamp": ANY,
+                "alarm_severity": ANY,
+            },
+            "dcm-perp-velocity": {
+                "value": 0.0,
+                "timestamp": ANY,
+                "alarm_severity": ANY,
+            },
+            "dcm-crystal_2-roll-motor_egu": {
+                "value": "",
+                "timestamp": ANY,
+                "alarm_severity": ANY,
+            },
+            "dcm-crystal_2-roll-velocity": {
+                "value": 0.0,
+                "timestamp": ANY,
+                "alarm_severity": ANY,
+            },
+            "dcm-crystal_2-pitch-motor_egu": {
+                "value": "",
+                "timestamp": ANY,
+                "alarm_severity": ANY,
+            },
+            "dcm-crystal_2-pitch-velocity": {
+                "value": 0.0,
+                "timestamp": ANY,
+                "alarm_severity": ANY,
+            },
+            "dcm-crystal_2-reflection": {
+                "value": (1, 1, 1),
+                "timestamp": ANY,
+                "alarm_severity": ANY,
+            },
+            "dcm-crystal_2-type": {
+                "value": "silicon",
+                "timestamp": ANY,
+                "alarm_severity": ANY,
+            },
+            "dcm-crystal_2-d_spacing": {
+                "value": 3.13475,
+                "timestamp": ANY,
+                "alarm_severity": ANY,
+            },
+            "dcm-crystal_2-usage": {
+                "value": "Bragg",
+                "timestamp": ANY,
+                "alarm_severity": ANY,
+            },
+            "dcm-offset-motor_egu": {
+                "value": "",
+                "timestamp": ANY,
+                "alarm_severity": ANY,
+            },
+            "dcm-offset-velocity": {
+                "value": 0.0,
                 "timestamp": ANY,
                 "alarm_severity": ANY,
             },
