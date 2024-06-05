@@ -232,6 +232,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/473-create-a-device-for-xpress3-areadetector/"
   },
   {
+    "version": "483-make-device_factory-decorator-to-ease-making-and-connecting-ophyd-async-devices",
+    "url": "https://DiamondLightSource.github.io/dodal/483-make-device_factory-decorator-to-ease-making-and-connecting-ophyd-async-devices/"
+  },
+  {
     "version": "489_motor_types_issue",
     "url": "https://DiamondLightSource.github.io/dodal/489_motor_types_issue/"
   },
