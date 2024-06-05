@@ -1,18 +1,16 @@
 # Decision Flowchart for Creating a New ophyd_async Device
 
-This document contains decision flowcharts designed to guide developers through the process of creating a new device in the Dodal library. That is done using [ophyd-async](https://github.com/bluesky/ophyd-async) framework. These flowcharts help in determining the appropriate class inheritance, methods to override, and testing procedures for optimal device functionality and integration into the system.
+This document contains decision flowcharts designed to guide developers through the process of creating a new device in the Dodal library. That is done using [ophyd-async](https://github.com/bluesky/ophyd-async) framework, the standard hardware abstraction library at Diamond. These flowcharts help in determining the appropriate class inheritance, methods to override, and testing procedures for optimal device functionality and integration into the system.
 
 ## High-Level Development Flowchart
-
-This high-level flowchart guides the overall process of creating a new ophyd_async device, from testing PVs to overriding methods and determining state enums.
 
 The **objective** is to get it into main and then test it on the beamline! Ensuring fast iteration. You write the device, you assume you know how it works, you write tests against those assumptions, you merge. Then and only then do you test your assumptions on the beamline. If they were wrong, that's more issues.
 
 See if you can find a similar device that someone has already made. If one seems to exists but has different PV names, those can and should be changed. Advise consulting with controls. If the device is urgently needed, two copies can coexist but there must be an issue to reconcile.
 
-There's some of this already but more general advise not to do this task alone. Consult before starting, seek feedback early (e.g. draft PR) and merge with other people's devices where possible. The test suite should provide the confidence to do so without breaking anything.
+You might find the dodal CLI useful to verify the PV values.
 
-<!-- todo add on dodal cli -->
+There's some of this already but more general advise not to do this task alone. Consult before starting, seek feedback early (e.g. draft PR) and merge with other people's devices where possible. The test suite should provide the confidence to do so without breaking anything.
 
 ```{mermaid}
 
@@ -37,19 +35,7 @@ There's some of this already but more general advise not to do this task alone. 
 
 ## Interface Selection Flowchart
 
-This flowchart assists in selecting the appropriate interfaces based on the device's capabilities, such as file writing, reading values from process variables (PVs), and mobility within scans.
-
-```{mermaid}
-
-  flowchart TD
-    start([Start]) --> isFileWriting{Is it a File Writing Detector?}
-    isFileWriting -- Yes --> useStandardDetector[Use StandardDetector]
-    isFileWriting -- No --> producesPVValue{Does it produce a value from a PV you want to read in a scan?}
-    producesPVValue -- Yes --> isMovable{Is it something that you move in a scan?}
-    isMovable -- Yes --> useReadableMovable[Use StandardReadable + AsyncMovable + Override set method]
-    isMovable -- No --> useReadable[Use StandardReadable]
-    producesPVValue -- No --> useDevice[Use Device]
-```
+See the chart in [ophyd-async](https://blueskyproject.io/ophyd-async/main/how-to/choose-interfaces-for-devices.html)
 
 ## Testing Flowchart
 
