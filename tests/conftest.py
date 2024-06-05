@@ -45,10 +45,12 @@ def module_and_devices_for_beamline(request):
         bl_mod = importlib.import_module("dodal.beamlines." + beamline)
         importlib.reload(bl_mod)
         mock_beamline_module_filepaths(beamline, bl_mod)
-        yield (
+        devices, _ = make_all_devices(
             bl_mod,
-            make_all_devices(bl_mod, include_skipped=True, fake_with_ophyd_sim=True),
+            include_skipped=True,
+            fake_with_ophyd_sim=True,
         )
+        yield (bl_mod, devices)
         beamline_utils.clear_devices()
         del bl_mod
 
