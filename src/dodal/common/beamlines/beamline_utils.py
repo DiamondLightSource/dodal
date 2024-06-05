@@ -1,10 +1,11 @@
 import inspect
-from typing import Callable, Dict, Final, List, Optional, TypeVar, cast
+from typing import Callable, Dict, Final, Generic, List, Optional, Protocol, TypeVar, cast
 
 from bluesky.run_engine import call_in_bluesky_event_loop
 from ophyd import Device as OphydV1Device
 from ophyd.sim import make_fake_device
 from ophyd_async.core import Device as OphydV2Device
+from ophyd_async.core import DEFAULT_TIMEOUT
 from ophyd_async.core import wait_for_connection as v2_device_wait_for_connection
 
 from dodal.common.types import UpdatingDirectoryProvider
@@ -65,6 +66,33 @@ def wait_for_connection(
 
 T = TypeVar("T", bound=AnyDevice)
 
+D = TypeVar("D", bound=OphydV2Device)
+class DeviceFactory(Protocol, Generic[D]):
+    def __call__(self, connect: bool = False, timeout: float = DEFAULT_TIMEOUT) -> D:
+        ...
+
+_factory_made_devices: Dict[DeviceFactory, OphydV2Device] = {}
+_device_is_lazy: Dict[DeviceFactory, bool] = {}
+
+def device_factory(lazy=False, set_name=True)->(f:Callable)->DeviceFactory[D@wrapper]:
+    def wrapper(f) -> DeviceFactory[D]:
+        def factory(connect=False, timeout: float = DEFAULT_TIMEOUT):
+            device = _factory_made_devices.get(f)
+            if not device:
+                device = f()
+                if set_name:
+                    device.set_name(f.__name__)
+                _factory_made_devices[f] = device
+            if connect: 
+                call_in_bluesky_event_loop(device.connect(timeout=timeout))
+            return device
+        _device_is_lazy[factory] = lazy
+        factory.__name__ = f.__name__
+        return factory
+    return wrapper
+
+def get_device_factories() -> Dict[DeviceFactory, bool]:
+    return _device_is_lazy.copy()
 
 @skip_device()
 def device_instantiation(
