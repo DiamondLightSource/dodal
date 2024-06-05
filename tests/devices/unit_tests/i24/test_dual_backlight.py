@@ -34,7 +34,7 @@ async def test_when_led1_out_it_switches_off(
     fake_backlight: DualBacklight, RE: RunEngine
 ):
     set_mock_value(fake_backlight.led1, LedStatus.ON)
-    RE(bps.abs_set(fake_backlight, BLPositions.OUT))
+    RE(bps.abs_set(fake_backlight, BLPositions.OUT, wait=True))
     assert await fake_backlight.pos1.pos_level.get_value() == "Out"
     assert await fake_backlight.led1.get_value() == "OFF"
 
