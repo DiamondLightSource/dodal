@@ -4,10 +4,10 @@ from ophyd_async.epics.areadetector import AravisDetector, PilatusDetector
 from ophyd_async.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
+    device_factory,
     device_instantiation,
     get_directory_provider,
     set_directory_provider,
-    device_factory
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import numbered_slits

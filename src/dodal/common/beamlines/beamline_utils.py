@@ -1,11 +1,21 @@
 import inspect
-from typing import Callable, Dict, Final, Generic, List, Optional, Protocol, TypeVar, cast
+from typing import (
+    Callable,
+    Dict,
+    Final,
+    Generic,
+    List,
+    Optional,
+    Protocol,
+    TypeVar,
+    cast,
+)
 
 from bluesky.run_engine import call_in_bluesky_event_loop
 from ophyd import Device as OphydV1Device
 from ophyd.sim import make_fake_device
-from ophyd_async.core import Device as OphydV2Device
 from ophyd_async.core import DEFAULT_TIMEOUT
+from ophyd_async.core import Device as OphydV2Device
 from ophyd_async.core import wait_for_connection as v2_device_wait_for_connection
 
 from dodal.common.types import UpdatingDirectoryProvider
