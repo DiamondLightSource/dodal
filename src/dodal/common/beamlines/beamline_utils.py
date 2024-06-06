@@ -71,11 +71,13 @@ class DeviceFactory(Protocol, Generic[D]):
     def __call__(self, connect: bool = False, timeout: float = DEFAULT_TIMEOUT) -> D:
         ...
 
+F = Callable[..., D]
+
 _factory_made_devices: Dict[DeviceFactory, OphydV2Device] = {}
 _device_is_lazy: Dict[DeviceFactory, bool] = {}
 
-def device_factory(lazy=False, set_name=True)->(f:Callable)->DeviceFactory[D@wrapper]:
-    def wrapper(f) -> DeviceFactory[D]:
+def device_factory(lazy=False, set_name=True)-> Callable[[F], DeviceFactory[D]]:
+    def wrapper(f: F) -> DeviceFactory[D]:
         def factory(connect=False, timeout: float = DEFAULT_TIMEOUT):
             device = _factory_made_devices.get(f)
             if not device:
