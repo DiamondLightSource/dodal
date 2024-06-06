@@ -264,6 +264,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/593-i22-dcm/"
   },
   {
+    "version": "602_ophyd_async_backlight",
+    "url": "https://DiamondLightSource.github.io/dodal/602_ophyd_async_backlight/"
+  },
+  {
     "version": "76_make_stage_synchronous_if_arming_not_started",
     "url": "https://DiamondLightSource.github.io/dodal/76_make_stage_synchronous_if_arming_not_started/"
   },
