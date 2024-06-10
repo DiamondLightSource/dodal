@@ -1,9 +1,16 @@
+import time
 from dataclasses import dataclass
-from typing import Literal
+from typing import Dict, Literal
 
+from bluesky.protocols import Reading
+from event_model.documents.event_descriptor import DataKey
 from ophyd_async.core import ConfigSignal, StandardReadable, soft_signal_r_and_setter
 from ophyd_async.epics.motion import Motor
 from ophyd_async.epics.signal import epics_signal_r
+
+# Speed of light and Planck's constant
+_C = 299792458
+_H = 6.62607015e-34
 
 
 @dataclass(frozen=True, unsafe_hash=True)
@@ -115,3 +122,28 @@ class DoubleCrystalMonochromator(StandardReadable):
                 self.crystal_2_d_spacing = None
 
         super().__init__(name)
+
+    async def describe(self) -> Dict[str, DataKey]:
+        default_describe = await super().describe()
+        return {
+            f"{self.name}-wavelength": DataKey(
+                dtype="number", shape=[], source=self.name
+            ),
+            **default_describe,
+        }
+
+    async def read(self) -> Dict[str, Reading]:
+        default_reading = await super().read()
+        energy: float = default_reading[f"{self.name}-energy"]["value"]
+        if energy > 0.0:
+            wavelength = (_C * _H) / energy
+        else:
+            wavelength = 0.0
+
+        return {
+            **default_reading,
+            f"{self.name}-wavelength": Reading(
+                value=wavelength,
+                timestamp=time.time(),
+            ),
+        }

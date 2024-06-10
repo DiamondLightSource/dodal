@@ -1,7 +1,12 @@
 from unittest.mock import ANY
 
 import pytest
-from ophyd_async.core import DeviceCollector, assert_configuration, assert_reading
+from ophyd_async.core import (
+    DeviceCollector,
+    assert_configuration,
+    assert_reading,
+    set_mock_value,
+)
 
 from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
 
@@ -50,6 +55,24 @@ async def test_crystal_metadata_not_propagated_when_not_supplied():
         "crystal-2-d_spacing",
     }
     assert expected_absent_keys.isdisjoint(configuration)
+
+
+@pytest.mark.parametrize(
+    "energy,wavelength",
+    [
+        (0.0, 0.0),
+        (1.0, 1.9864458571489286e-25),
+        (2.0, 9.932229285744643e-26),
+    ],
+)
+async def test_wavelength(
+    dcm: DoubleCrystalMonochromator,
+    energy: float,
+    wavelength: float,
+):
+    set_mock_value(dcm.energy.user_readback, energy)
+    reading = await dcm.read()
+    assert reading["dcm-wavelength"]["value"] == wavelength
 
 
 async def test_reading(dcm: DoubleCrystalMonochromator):
@@ -118,6 +141,10 @@ async def test_reading(dcm: DoubleCrystalMonochromator):
             },
             "dcm-perp_temp": {
                 "alarm_severity": ANY,
+                "timestamp": ANY,
+                "value": 0.0,
+            },
+            "dcm-wavelength": {
                 "timestamp": ANY,
                 "value": 0.0,
             },
