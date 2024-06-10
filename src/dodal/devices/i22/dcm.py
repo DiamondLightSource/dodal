@@ -93,13 +93,13 @@ class DoubleCrystalMonochromator(StandardReadable):
         with self.add_children_as_readables():
             # Positionable Parameters
             self.crystal_1 = MonochromatingCrystal(
-                prefix + "XSTAL1:",
+                prefix + "XTAL1:",
                 metadata=crystal_1_metadata or CrystalMetadata(),
                 temp_prefix=prefix + "PT100-1",
                 heater_temp_prefix=prefix + "PT100-2",
             )
             self.crystal_2 = MonochromatingCrystal(
-                prefix + "XSTAL2:",
+                prefix + "XTAL2:",
                 metadata=crystal_2_metadata or CrystalMetadata(),
                 temp_prefix=prefix + "PT100-4",
                 heater_temp_prefix=prefix + "PT100-5",

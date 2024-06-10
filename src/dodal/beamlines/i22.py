@@ -129,8 +129,8 @@ def dcm(
 ) -> DoubleCrystalMonochromator:
     return device_instantiation(
         DoubleCrystalMonochromator,
-        "unduldcmator",
-        f"{BeamlinePrefix(BL).insertion_prefix}-MO-DCM-01:",
+        "dcm",
+        f"-MO-DCM-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
         crystal_1_metadata=CrystalMetadata(
