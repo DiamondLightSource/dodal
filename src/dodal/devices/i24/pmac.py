@@ -15,7 +15,7 @@ ZERO_STR = "!x0y0z0"  # Command to blend any ongoing move into new position
 
 class LaserSettings(str, Enum):
     """PMAC strings to switch laser on and off.
-    Note. On the PMAC, M strings usually have to do with position compare
+    Note. On the PMAC, M-variables usually have to do with position compare
     set up.
     For example, for laser1:
         Use M712 = 0 if triggering on falling edge.
@@ -26,6 +26,21 @@ class LaserSettings(str, Enum):
     LASER_1_OFF = " M712=0 M711=1"
     LASER_2_ON = " M812=1 M811=1"
     LASER_2_OFF = " M812=0 M811=1"
+
+
+class EncReset(str, Enum):
+    """PMAC strings for position compare on encoder channels in the controller.
+
+    For example, for ENC5:
+        m508 sets position A to be compared with value in Channel5 in the controller.
+        m509 sets position B to be compared with value in Channel5 in the controller.
+    Note. These settings are usually used for initialisation.
+    """
+
+    ENC5 = "m508=100 m509=150"
+    ENC6 = "m608=100 m609=150"
+    ENC7 = "m708=100 m709=150"
+    ENC8 = "m808=100 m809=150"
 
 
 class PMACStringMove(Triggerable):
@@ -62,6 +77,24 @@ class PMACStringLaser(SignalRW):
         await self.signal.set(laser_setting.value, wait=True)
 
 
+class PMACStringEncReset(SignalRW):
+    """"""
+
+    def __init__(
+        self,
+        pmac_str_sig: SignalRW,
+        backend: SignalBackend,
+        timeout: float | None = DEFAULT_TIMEOUT,
+        name: str = "",
+    ) -> None:
+        self.signal = pmac_str_sig
+        super().__init__(backend, timeout, name)
+
+    @AsyncStatus.wrap
+    async def set(self, enc_string: EncReset):
+        await self.signal.set(enc_string.value, wait=True)
+
+
 class PMAC(StandardReadable):
     """Device to control the chip stage on I24."""
 
@@ -74,6 +107,10 @@ class PMAC(StandardReadable):
         self.to_xyz_zero = PMACStringMove(self.pmac_string, ZERO_STR)
 
         self.laser = PMACStringLaser(self.pmac_string, backend=SoftSignalBackend(str))
+
+        self.enc_reset = PMACStringEncReset(
+            self.pmac_string, backend=SoftSignalBackend(str)
+        )
 
         self.x = Motor(prefix + "X")
         self.y = Motor(prefix + "Y")

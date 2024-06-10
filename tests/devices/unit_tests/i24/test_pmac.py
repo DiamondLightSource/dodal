@@ -2,7 +2,7 @@ import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
 
-from dodal.devices.i24.pmac import HOME_STR, PMAC, LaserSettings
+from dodal.devices.i24.pmac import HOME_STR, PMAC, EncReset, LaserSettings
 
 from ..conftest import patch_motor
 
@@ -55,3 +55,9 @@ async def test_set_pmac_string_for_laser(fake_pmac: PMAC, RE):
     RE(bps.abs_set(fake_pmac.laser, LaserSettings.LASER_1_ON))
 
     assert await fake_pmac.pmac_string.get_value() == " M712=1 M711=1"
+
+
+async def test_set_pmac_string_for_enc_reset(fake_pmac: PMAC, RE):
+    RE(bps.abs_set(fake_pmac.enc_reset, EncReset.ENC7, wait=True))
+
+    assert await fake_pmac.pmac_string.get_value() == "m708=100 m709=150"
