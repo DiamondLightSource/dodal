@@ -8,7 +8,8 @@ from ophyd.sim import FakeEpicsSignal
 from ophyd_async.core import Device as OphydV2Device
 from ophyd_async.core import StandardReadable
 
-from dodal.beamlines import beamline_utils, i03
+from dodal.beamlines import i03
+from dodal.common.beamlines import beamline_utils
 from dodal.devices.aperturescatterguard import ApertureScatterguard
 from dodal.devices.smargon import Smargon
 from dodal.devices.zebra import Zebra
@@ -68,18 +69,19 @@ def test_instantiate_v2_function_fake_makes_fake():
 
 
 def test_clear_devices(RE):
-    devices = make_all_devices(i03, fake_with_ophyd_sim=True)
-    assert len(beamline_utils.ACTIVE_DEVICES) == len(devices.keys())
+    devices, exceptions = make_all_devices(i03, fake_with_ophyd_sim=True)
+    assert (
+        len(beamline_utils.ACTIVE_DEVICES) == len(devices.keys())
+        and len(exceptions) == 0
+    )
     beamline_utils.clear_devices()
     assert beamline_utils.ACTIVE_DEVICES == {}
 
 
 def test_device_is_new_after_clearing(RE):
     def _make_devices_and_get_id():
-        return [
-            id(device)
-            for _, device in make_all_devices(i03, fake_with_ophyd_sim=True).items()
-        ]
+        devices, _ = make_all_devices(i03, fake_with_ophyd_sim=True)
+        return [id(device) for device in devices.values()]
 
     ids_1 = [_make_devices_and_get_id()]
     ids_2 = [_make_devices_and_get_id()]
@@ -96,7 +98,7 @@ def test_wait_for_v1_device_connection_passes_through_timeout(kwargs, expected_t
     device = OphydV1Device(name="")
     device.wait_for_connection = MagicMock()
 
-    beamline_utils._wait_for_connection(device, **kwargs)
+    beamline_utils.wait_for_connection(device, **kwargs)
 
     device.wait_for_connection.assert_called_once_with(timeout=expected_timeout)
 
@@ -112,7 +114,7 @@ def test_wait_for_v2_device_connection_passes_through_timeout(
     device = OphydV2Device()
     device.connect = MagicMock()
 
-    beamline_utils._wait_for_connection(device, **kwargs)
+    beamline_utils.wait_for_connection(device, **kwargs)
 
     device.connect.assert_called_once_with(
         mock=ANY,

@@ -1,5 +1,5 @@
-from dodal.beamlines.beamline_utils import BL, device_instantiation
-from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.beamline_utils import BL, device_instantiation
+from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.detector import DetectorParams
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.i24.dual_backlight import DualBacklight
@@ -11,7 +11,9 @@ from dodal.devices.zebra import Zebra
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import get_beamline_name, skip_device
 
-ZOOM_PARAMS_FILE = "/dls_sw/i24/software/gda/config/xml/jCameraManZoomLevels.xml"
+ZOOM_PARAMS_FILE = (
+    "/dls_sw/i24/software/gda_versions/gda_9_34/config/xml/jCameraManZoomLevels.xml"
+)
 DISPLAY_CONFIG = "/dls_sw/i24/software/gda_versions/var/display.configuration"
 
 BL = get_beamline_name("s24")

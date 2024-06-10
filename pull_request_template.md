@@ -8,3 +8,4 @@ Fixes #ISSUE
 - [ ] Would the PR title make sense to a scientist on a set of release notes
 - [ ] If a new device has been added does it follow the [standards](https://github.com/DiamondLightSource/dodal/wiki/Device-Standards)
 - [ ] If changing the API for a pre-existing device, ensure that any beamlines using this device have updated their Bluesky plans accordingly
+- [ ] Have the connection tests for the relevant beamline(s) been run via `dodal connect ${BEAMLINE}`

@@ -13,7 +13,8 @@ import pytest
 from bluesky.run_engine import RunEngine
 from ophyd.sim import make_fake_device
 
-from dodal.beamlines import beamline_utils, i03
+from dodal.beamlines import i03
+from dodal.common.beamlines import beamline_utils
 from dodal.devices.focusing_mirror import VFMMirrorVoltages
 from dodal.log import LOGGER, GELFTCPHandler, set_up_all_logging_handlers
 from dodal.utils import make_all_devices
@@ -44,10 +45,12 @@ def module_and_devices_for_beamline(request):
         bl_mod = importlib.import_module("dodal.beamlines." + beamline)
         importlib.reload(bl_mod)
         mock_beamline_module_filepaths(beamline, bl_mod)
-        yield (
+        devices, _ = make_all_devices(
             bl_mod,
-            make_all_devices(bl_mod, include_skipped=True, fake_with_ophyd_sim=True),
+            include_skipped=True,
+            fake_with_ophyd_sim=True,
         )
+        yield (bl_mod, devices)
         beamline_utils.clear_devices()
         del bl_mod
 
