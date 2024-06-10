@@ -320,6 +320,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/directory_provider/"
   },
   {
+    "version": "fix_intermittent_tests",
+    "url": "https://DiamondLightSource.github.io/dodal/fix_intermittent_tests/"
+  },
+  {
     "version": "fix_linting_CI_issues",
     "url": "https://DiamondLightSource.github.io/dodal/fix_linting_CI_issues/"
   },
