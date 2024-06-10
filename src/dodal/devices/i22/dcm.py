@@ -31,28 +31,33 @@ class DoubleCrystalMonochromator(StandardReadable):
 
     def __init__(
         self,
-        prefix: str,
+        motion_prefix: str,
+        temperature_prefix: str,
         crystal_1_metadata: CrystalMetadata | None = None,
         crystal_2_metadata: CrystalMetadata | None = None,
         name: str = "",
     ) -> None:
         with self.add_children_as_readables():
             # Positionable Parameters
-            self.bragg = Motor(prefix + "BRAGG")
-            self.offset = Motor(prefix + "OFFSET")
-            self.perp = Motor(prefix + "PERP")
-            self.energy = Motor(prefix + "ENERGY")
-            self.crystal_1_roll = Motor(prefix + "XTAL1:ROLL")
-            self.crystal_2_roll = Motor(prefix + "XTAL2:ROLL")
-            self.crystal_2_pitch = Motor(prefix + "XTAL2:PITCH")
+            self.bragg = Motor(motion_prefix + "BRAGG")
+            self.offset = Motor(motion_prefix + "OFFSET")
+            self.perp = Motor(motion_prefix + "PERP")
+            self.energy = Motor(motion_prefix + "ENERGY")
+            self.crystal_1_roll = Motor(motion_prefix + "XTAL1:ROLL")
+            self.crystal_2_roll = Motor(motion_prefix + "XTAL2:ROLL")
+            self.crystal_2_pitch = Motor(motion_prefix + "XTAL2:PITCH")
 
             # Temperatures
-            self.backplate_temp = epics_signal_r(float, prefix + "PT100-7")
-            self.perp_temp = epics_signal_r(float, prefix + "TC-1")
-            self.crystal_1_temp = epics_signal_r(float, prefix + "PT100-1")
-            self.crystal_1_heater_temp = epics_signal_r(float, prefix + "PT100-2")
-            self.crystal_2_temp = epics_signal_r(float, prefix + "PT100-4")
-            self.crystal_2_heater_temp = epics_signal_r(float, prefix + "PT100-5")
+            self.backplate_temp = epics_signal_r(float, temperature_prefix + "PT100-7")
+            self.perp_temp = epics_signal_r(float, temperature_prefix + "TC-1")
+            self.crystal_1_temp = epics_signal_r(float, temperature_prefix + "PT100-1")
+            self.crystal_1_heater_temp = epics_signal_r(
+                float, temperature_prefix + "PT100-2"
+            )
+            self.crystal_2_temp = epics_signal_r(float, temperature_prefix + "PT100-4")
+            self.crystal_2_heater_temp = epics_signal_r(
+                float, temperature_prefix + "PT100-5"
+            )
 
         # Soft metadata
         # If supplied include crystal details in output of read_configuration

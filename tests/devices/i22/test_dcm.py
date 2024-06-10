@@ -12,7 +12,8 @@ from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
 async def dcm() -> DoubleCrystalMonochromator:
     async with DeviceCollector(mock=True):
         dcm = DoubleCrystalMonochromator(
-            "FOO",
+            motion_prefix="FOO-MO",
+            temperature_prefix="FOO-DI",
             crystal_1_metadata=CrystalMetadata(
                 usage="Bragg",
                 type="silicon",
@@ -33,7 +34,8 @@ async def dcm() -> DoubleCrystalMonochromator:
 async def test_crystal_metadata_not_propagated_when_not_supplied():
     async with DeviceCollector(mock=True):
         dcm = DoubleCrystalMonochromator(
-            "FOO",
+            motion_prefix="FOO-MO",
+            temperature_prefix="FOO-DI",
             crystal_1_metadata=None,
             crystal_2_metadata=None,
         )
