@@ -29,6 +29,8 @@ class LaserSettings(str, Enum):
 
 
 class PMACStringMove(Triggerable):
+    """Trigger a PMAC move by setting the pmac_string."""
+
     def __init__(
         self,
         pmac_str_sig: SignalRW,
@@ -43,6 +45,8 @@ class PMACStringMove(Triggerable):
 
 
 class PMACStringLaser(SignalRW):
+    """Set the pmac_string control the laser."""
+
     def __init__(
         self,
         pmac_str_sig: SignalRW,
