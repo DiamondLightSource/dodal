@@ -1,8 +1,6 @@
-from typing import Iterable
 from unittest.mock import ANY
 
 import pytest
-from bluesky.protocols import Reading
 from ophyd_async.core import DeviceCollector, assert_configuration, assert_reading
 
 from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
