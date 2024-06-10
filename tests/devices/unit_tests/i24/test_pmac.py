@@ -52,6 +52,6 @@ async def test_pmac_home(fake_pmac: PMAC, RE):
 
 
 async def test_set_pmac_string_for_laser(fake_pmac: PMAC, RE):
-    RE(bps.abs_set(fake_pmac.laser, LaserSettings.LASER1ON))
+    RE(bps.abs_set(fake_pmac.laser, LaserSettings.LASER_1_ON))
 
     assert await fake_pmac.pmac_string.get_value() == " M712=1 M711=1"
