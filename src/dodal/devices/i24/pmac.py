@@ -45,7 +45,7 @@ class PMACStringMove(Triggerable):
 
 
 class PMACStringLaser(SignalRW):
-    """Set the pmac_string control the laser."""
+    """Set the pmac_string to control the laser."""
 
     def __init__(
         self,
