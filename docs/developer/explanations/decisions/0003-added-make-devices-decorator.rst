@@ -1,5 +1,5 @@
-3. Adopt python3-pip-skeleton for project structure
-===================================================
+3. Add device factory decorator with lazy connect support
+=========================================================
 
 Date: 2024-04-26
 
