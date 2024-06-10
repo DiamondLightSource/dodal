@@ -22,10 +22,10 @@ class LaserSettings(str, Enum):
         Use M712 = 1 if on rising edge.
     """
 
-    LASER1ON = " M712=1 M711=1"
-    LASER1OFF = " M712=0 M711=1"
-    LASER2ON = " M812=1 M811=1"
-    LASER2OFF = " M812=0 M811=1"
+    LASER_1_ON = " M712=1 M711=1"
+    LASER_1_OFF = " M712=0 M711=1"
+    LASER_2_ON = " M812=1 M811=1"
+    LASER_2_OFF = " M812=0 M811=1"
 
 
 class PMACStringMove(Triggerable):
