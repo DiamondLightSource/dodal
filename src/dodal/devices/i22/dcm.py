@@ -49,10 +49,10 @@ class DoubleCrystalMonochromator(StandardReadable):
             # Temperatures
             self.backplate_temp = epics_signal_r(float, prefix + "PT100-7")
             self.perp_temp = epics_signal_r(float, prefix + "TC-1")
-            self.crystal_1_temp = epics_signal_r(float, "PT100-1")
-            self.crystal_1_heater_temp = epics_signal_r(float, "PT100-2")
-            self.crystal_2_temp = epics_signal_r(float, "PT100-4")
-            self.crystal_2_heater_temp = epics_signal_r(float, "PT100-5")
+            self.crystal_1_temp = epics_signal_r(float, prefix + "PT100-1")
+            self.crystal_1_heater_temp = epics_signal_r(float, prefix + "PT100-2")
+            self.crystal_2_temp = epics_signal_r(float, prefix + "PT100-4")
+            self.crystal_2_heater_temp = epics_signal_r(float, prefix + "PT100-5")
 
         # Soft metadata
         # If supplied include crystal details in output of read_configuration
