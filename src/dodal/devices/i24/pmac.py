@@ -9,8 +9,8 @@ from ophyd_async.core.utils import DEFAULT_TIMEOUT
 from ophyd_async.epics.motion import Motor
 from ophyd_async.epics.signal import epics_signal_rw
 
-HOME_STR = r"\#1hmz\#2hmz\#3hmz"
-ZERO_STR = "!x0y0z0"
+HOME_STR = r"\#1hmz\#2hmz\#3hmz"  # Command to home the PMAC motors
+ZERO_STR = "!x0y0z0"  # Command to blend any ongoing move into new position
 
 
 class LaserSettings(str, Enum):
