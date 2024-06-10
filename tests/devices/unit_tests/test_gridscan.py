@@ -27,7 +27,7 @@ def discard_status(st: Status | DeviceStatus):
 
 
 @pytest.fixture
-async def zebra_fast_grid_scan(request):
+async def zebra_fast_grid_scan():
     async with DeviceCollector(mock=True):
         zebra_fast_grid_scan = ZebraFastGridScan(name="fake_FGS", prefix="FGS")
 
@@ -35,7 +35,7 @@ async def zebra_fast_grid_scan(request):
 
 
 @pytest.fixture
-async def panda_fast_grid_scan(request):
+async def panda_fast_grid_scan():
     async with DeviceCollector(mock=True):
         panda_fast_grid_scan = PandAFastGridScan(name="fake_FGS", prefix="FGS")
 

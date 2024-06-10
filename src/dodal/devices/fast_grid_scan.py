@@ -219,12 +219,12 @@ class MotionProgram(Device):
 class ExpectedImages(SignalR[int]):
     def __init__(self, parent: "FastGridScanCommon") -> None:
         super().__init__(SoftSignalBackend(int))
-        self.parent = parent
+        self.parent: "FastGridScanCommon" = parent
 
     async def get_value(self):
-        x = int(await self.parent.x_steps.get_value())  # type: ignore
-        y = int(await self.parent.y_steps.get_value())  # type: ignore
-        z = int(await self.parent.z_steps.get_value())  # type: ignore
+        x = await self.parent.x_steps.get_value()
+        y = await self.parent.y_steps.get_value()
+        z = await self.parent.z_steps.get_value()
         first_grid = x * y
         second_grid = x * z
         return first_grid + second_grid
@@ -341,13 +341,7 @@ class PandAFastGridScan(FastGridScanCommon[PandAGridScanParams]):
         self.movable_params["run_up_distance_mm"] = self.run_up_distance_mm
 
 
-def set_fast_grid_scan_params(
-    scan: FastGridScanCommon[ParamType], params: GridScanParamsCommon
-):
-    assert set(params.get_param_positions().keys()) == set(
-        scan.movable_params.keys()
-    ), "Scan parameters don't match the scan device"
-
+def set_fast_grid_scan_params(scan: FastGridScanCommon[ParamType], params: ParamType):
     to_move = []
 
     # Create arguments for bps.mv
