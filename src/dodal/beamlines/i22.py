@@ -134,8 +134,8 @@ def dcm(
         wait_for_connection,
         fake_with_ophyd_sim,
         bl_prefix=False,
-        motion_prefix="-MO-DCM-01:",
-        temperature_prefix="-DI-DCM-01:",
+        motion_prefix=f"{BeamlinePrefix(BL).beamline_prefix}-MO-DCM-01:",
+        temperature_prefix=f"{BeamlinePrefix(BL).beamline_prefix}-DI-DCM-01:",
         crystal_1_metadata=CrystalMetadata(
             usage="Bragg",
             type="silicon",
