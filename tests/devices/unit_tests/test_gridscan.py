@@ -37,39 +37,57 @@ async def zebra_fast_grid_scan():
 @pytest.fixture
 async def panda_fast_grid_scan():
     async with DeviceCollector(mock=True):
-        panda_fast_grid_scan = PandAFastGridScan(name="fake_FGS", prefix="FGS")
+        panda_fast_grid_scan = PandAFastGridScan(name="fake_PGS", prefix="PGS")
 
     return panda_fast_grid_scan
 
 
+@pytest.mark.parametrize(
+    "use_pgs",
+    [(False), (True)],
+)
 async def test_given_settings_valid_when_kickoff_then_run_started(
+    use_pgs,
     zebra_fast_grid_scan: ZebraFastGridScan,
+    panda_fast_grid_scan: PandAFastGridScan,
 ):
-    set_mock_value(zebra_fast_grid_scan.scan_invalid, False)
-    set_mock_value(zebra_fast_grid_scan.position_counter, 0)
-    set_mock_value(zebra_fast_grid_scan.status, 1)
+    grid_scan: ZebraFastGridScan | PandAFastGridScan = (
+        panda_fast_grid_scan if use_pgs else zebra_fast_grid_scan
+    )
+    set_mock_value(grid_scan.scan_invalid, False)
+    set_mock_value(grid_scan.position_counter, 0)
+    set_mock_value(grid_scan.status, 1)
 
-    await zebra_fast_grid_scan.kickoff()
+    await grid_scan.kickoff()
 
-    assert await zebra_fast_grid_scan.run_cmd.get_value() == 1
+    assert await grid_scan.run_cmd.get_value() == 1
 
 
+@pytest.mark.parametrize(
+    "use_pgs",
+    [(False), (True)],
+)
 async def test_waits_for_running_motion(
+    use_pgs,
     zebra_fast_grid_scan: ZebraFastGridScan,
+    panda_fast_grid_scan: PandAFastGridScan,
 ):
-    set_mock_value(zebra_fast_grid_scan.motion_program.running, 1)
+    grid_scan: ZebraFastGridScan | PandAFastGridScan = (
+        panda_fast_grid_scan if use_pgs else zebra_fast_grid_scan
+    )
+    set_mock_value(grid_scan.motion_program.running, 1)
 
-    zebra_fast_grid_scan.KICKOFF_TIMEOUT = 0.01
+    grid_scan.KICKOFF_TIMEOUT = 0.01
 
     with pytest.raises(TimeoutError):
-        await zebra_fast_grid_scan.kickoff()
+        await grid_scan.kickoff()
 
-    zebra_fast_grid_scan.KICKOFF_TIMEOUT = 1
+    grid_scan.KICKOFF_TIMEOUT = 1
 
-    set_mock_value(zebra_fast_grid_scan.motion_program.running, 0)
-    set_mock_value(zebra_fast_grid_scan.status, 1)
-    await zebra_fast_grid_scan.kickoff()
-    assert await zebra_fast_grid_scan.run_cmd.get_value() == 1
+    set_mock_value(grid_scan.motion_program.running, 0)
+    set_mock_value(grid_scan.status, 1)
+    await grid_scan.kickoff()
+    assert await grid_scan.run_cmd.get_value() == 1
 
 
 @pytest.mark.parametrize(
@@ -90,25 +108,43 @@ async def test_given_different_step_numbers_then_expected_images_correct(
     assert await zebra_fast_grid_scan.expected_images.get_value() == expected_images
 
 
+@pytest.mark.parametrize(
+    "use_pgs",
+    [(False), (True)],
+)
 async def test_running_finished_with_all_images_done_then_complete_status_finishes_not_in_error(
-    zebra_fast_grid_scan: ZebraFastGridScan, RE: RunEngine
+    use_pgs,
+    zebra_fast_grid_scan: ZebraFastGridScan,
+    panda_fast_grid_scan: PandAFastGridScan,
+    RE: RunEngine,
 ):
     num_pos_1d = 2
-    RE(
-        set_fast_grid_scan_params(
-            zebra_fast_grid_scan,
-            ZebraGridScanParams(
-                transmission_fraction=0.01, x_steps=num_pos_1d, y_steps=num_pos_1d
-            ),
+    if use_pgs:
+        grid_scan = panda_fast_grid_scan
+        RE(
+            set_fast_grid_scan_params(
+                grid_scan,
+                PandAGridScanParams(
+                    transmission_fraction=0.01, x_steps=num_pos_1d, y_steps=num_pos_1d
+                ),
+            )
         )
-    )
+    else:
+        grid_scan = zebra_fast_grid_scan
+        RE(
+            set_fast_grid_scan_params(
+                grid_scan,
+                ZebraGridScanParams(
+                    transmission_fraction=0.01, x_steps=num_pos_1d, y_steps=num_pos_1d
+                ),
+            )
+        )
+    set_mock_value(grid_scan.status, 1)
 
-    set_mock_value(zebra_fast_grid_scan.status, 1)
-
-    complete_status = zebra_fast_grid_scan.complete()
+    complete_status = grid_scan.complete()
     assert not complete_status.done
-    set_mock_value(zebra_fast_grid_scan.position_counter, num_pos_1d**2)
-    set_mock_value(zebra_fast_grid_scan.status, 0)
+    set_mock_value(grid_scan.position_counter, num_pos_1d**2)
+    set_mock_value(grid_scan.status, 0)
 
     await wait_for(complete_status, 0.1)
 
@@ -258,8 +294,26 @@ def test_scan_within_limits_3d(
 
 
 @pytest.fixture
-def grid_scan_params():
+def zebra_grid_scan_params():
     yield ZebraGridScanParams(
+        transmission_fraction=0.01,
+        x_steps=10,
+        y_steps=15,
+        z_steps=20,
+        x_step_size=0.3,
+        y_step_size=0.2,
+        z_step_size=0.1,
+        x_start=0,
+        y1_start=1,
+        y2_start=2,
+        z1_start=3,
+        z2_start=4,
+    )
+
+
+@pytest.fixture
+def panda_grid_scan_params():
+    yield PandAGridScanParams(
         transmission_fraction=0.01,
         x_steps=10,
         y_steps=15,
@@ -285,19 +339,25 @@ def grid_scan_params():
     ],
 )
 def test_given_x_y_z_out_of_range_then_converting_to_motor_coords_raises(
-    grid_scan_params: ZebraGridScanParams, grid_position
+    zebra_grid_scan_params: ZebraGridScanParams,
+    panda_grid_scan_params: PandAGridScanParams,
+    grid_position,
 ):
     with pytest.raises(IndexError):
-        grid_scan_params.grid_position_to_motor_position(grid_position)
+        zebra_grid_scan_params.grid_position_to_motor_position(grid_position)
+    with pytest.raises(IndexError):
+        panda_grid_scan_params.grid_position_to_motor_position(grid_position)
 
 
 def test_given_x_y_z_of_origin_when_get_motor_positions_then_initial_positions_returned(
-    grid_scan_params: ZebraGridScanParams,
+    zebra_grid_scan_params: ZebraGridScanParams,
+    panda_grid_scan_params: PandAGridScanParams,
 ):
-    motor_positions = grid_scan_params.grid_position_to_motor_position(
-        np.array([0, 0, 0])
-    )
-    assert np.allclose(motor_positions, np.array([0, 1, 4]))
+    motor_positions = [
+        zebra_grid_scan_params.grid_position_to_motor_position(np.array([0, 0, 0])),
+        panda_grid_scan_params.grid_position_to_motor_position(np.array([0, 0, 0])),
+    ]
+    assert [np.allclose(position, np.array([0, 1, 4])) for position in motor_positions]
 
 
 @pytest.mark.parametrize(
@@ -309,19 +369,35 @@ def test_given_x_y_z_of_origin_when_get_motor_positions_then_initial_positions_r
     ],
 )
 def test_given_various_x_y_z_when_get_motor_positions_then_expected_positions_returned(
-    grid_scan_params: ZebraGridScanParams,
+    zebra_grid_scan_params: ZebraGridScanParams,
+    panda_grid_scan_params: PandAGridScanParams,
     grid_position,
     expected_x,
     expected_y,
     expected_z,
 ):
-    motor_positions = grid_scan_params.grid_position_to_motor_position(grid_position)
-    np.testing.assert_allclose(
-        motor_positions, np.array([expected_x, expected_y, expected_z])
-    )
+    motor_positions = [
+        zebra_grid_scan_params.grid_position_to_motor_position(grid_position),
+        panda_grid_scan_params.grid_position_to_motor_position(grid_position),
+    ]
+    [
+        np.testing.assert_allclose(
+            position, np.array([expected_x, expected_y, expected_z])
+        )
+        for position in motor_positions
+    ]
 
 
-def test_can_run_fast_grid_scan_in_run_engine(zebra_fast_grid_scan, RE: RunEngine):
+@pytest.mark.parametrize(
+    "pgs",
+    [(False), (True)],
+)
+def test_can_run_fast_grid_scan_in_run_engine(
+    pgs,
+    zebra_fast_grid_scan: ZebraFastGridScan,
+    panda_fast_grid_scan: PandAFastGridScan,
+    RE: RunEngine,
+):
     @bpp.run_decorator()
     def kickoff_and_complete(device):
         yield from bps.kickoff(device, group="kickoff")
@@ -332,14 +408,18 @@ def test_can_run_fast_grid_scan_in_run_engine(zebra_fast_grid_scan, RE: RunEngin
         set_mock_value(device.status, 0)
         yield from bps.wait("complete")
 
-    RE(kickoff_and_complete(zebra_fast_grid_scan))
+    RE(kickoff_and_complete(panda_fast_grid_scan)) if pgs else RE(
+        kickoff_and_complete(zebra_fast_grid_scan)
+    )
     assert RE.state == "idle"
 
 
 def test_given_x_y_z_steps_when_full_number_calculated_then_answer_is_as_expected(
-    grid_scan_params: ZebraGridScanParams,
+    zebra_grid_scan_params: ZebraGridScanParams,
+    panda_grid_scan_params: PandAGridScanParams,
 ):
-    assert grid_scan_params.get_num_images() == 350
+    assert zebra_grid_scan_params.get_num_images() == 350
+    assert panda_grid_scan_params.get_num_images() == 350
 
 
 @pytest.mark.parametrize(
@@ -376,21 +456,3 @@ def test_non_test_integer_dwell_time(test_dwell_times, expected_dwell_time_is_in
                 dwell_time_ms=test_dwell_times,
                 transmission_fraction=0.01,
             )
-
-
-def test_assert_must_use_correct_device_with_correct_parameters(
-    zebra_fast_grid_scan, panda_fast_grid_scan, RE
-):
-    panda_params = PandAGridScanParams(transmission_fraction=0.01)
-    zebra_params = ZebraGridScanParams(transmission_fraction=0.01)
-
-    with pytest.raises(AssertionError):
-        RE(set_fast_grid_scan_params(zebra_fast_grid_scan, panda_params))
-    with pytest.raises(AssertionError):
-        RE(set_fast_grid_scan_params(panda_fast_grid_scan, zebra_params))
-
-    def correct_plan():
-        yield from set_fast_grid_scan_params(zebra_fast_grid_scan, zebra_params)
-        yield from set_fast_grid_scan_params(panda_fast_grid_scan, panda_params)
-
-    RE(correct_plan())
