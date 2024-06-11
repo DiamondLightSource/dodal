@@ -1,7 +1,13 @@
 from asyncio import Task, create_task, sleep
 from enum import Enum
 
-from ophyd_async.core import AsyncStatus, StandardReadable, soft_signal_rw
+from bluesky.protocols import Stoppable
+from ophyd_async.core import (
+    AsyncStatus,
+    SignalRW,
+    SoftSignalBackend,
+    StandardReadable,
+)
 from ophyd_async.epics.signal import epics_signal_rw
 
 
@@ -14,22 +20,33 @@ class ThawerStates(str, Enum):
     ON = "On"
 
 
-class Thawer(StandardReadable):
+class ThawingTimer(SignalRW[float]):
+    def __init__(self, control_signal: SignalRW[ThawerStates]) -> None:
+        super().__init__(SoftSignalBackend(float))
+        self._control_signal = control_signal
+        self._thawing_task: Task | None = None
+
+    @AsyncStatus.wrap
+    async def set(self, time_to_thaw_for: float):
+        await self._control_signal.set(ThawerStates.ON)
+        if self._thawing_task and not self._thawing_task.done():
+            raise ThawingException("Thawing task already in progress")
+        self._thawing_task = create_task(sleep(time_to_thaw_for))
+        try:
+            await self._thawing_task
+        finally:
+            await self._control_signal.set(ThawerStates.OFF)
+
+    async def stop(self):
+        if self._thawing_task:
+            self._thawing_task.cancel()
+
+
+class Thawer(StandardReadable, Stoppable):
     def __init__(self, prefix: str, name: str = "") -> None:
         self.control = epics_signal_rw(ThawerStates, prefix + ":CTRL")
-        self.thaw_time_s = soft_signal_rw(float, 10, name="thaw_time_s")
-        self.thawing_task: Task | None = None
+        self.thaw_for_time_s = ThawingTimer(self.control)
         super().__init__(name)
 
-    @AsyncStatus.wrap
-    async def kickoff(self):
-        await self.control.set(ThawerStates.ON)
-        if self.thawing_task and not self.thawing_task.done:
-            raise ThawingException("Thawing task already in progress")
-        self.thawing_task = create_task(sleep(await self.thaw_time_s.get_value()))
-
-    @AsyncStatus.wrap
-    async def complete(self):
-        if not self.thawing_task:
-            raise ThawingException("Kickoff called before complete")
-        await self.thawing_task
+    async def stop(self):
+        await self.thaw_for_time_s.stop()
