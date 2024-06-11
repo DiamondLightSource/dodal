@@ -7,7 +7,7 @@ from ophyd_async.core.signal_backend import SignalBackend
 from ophyd_async.core.soft_signal_backend import SoftSignalBackend
 from ophyd_async.core.utils import DEFAULT_TIMEOUT
 from ophyd_async.epics.motion import Motor
-from ophyd_async.epics.signal import epics_signal_rw
+from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
 HOME_STR = r"\#1hmz\#2hmz\#3hmz"  # Command to home the PMAC motors
 ZERO_STR = "!x0y0z0"  # Command to blend any ongoing move into new position
@@ -115,5 +115,10 @@ class PMAC(StandardReadable):
         self.x = Motor(prefix + "X")
         self.y = Motor(prefix + "Y")
         self.z = Motor(prefix + "Z")
+
+        # These next signals are readback values on PVARS which are set by the motion
+        # program.
+        self.scanstatus = epics_signal_r(int, "BL24I-MO-STEP-14:signal:P2401")
+        self.counter = epics_signal_r(int, "BL24I-MO-STEP-14:signal:P2402")
 
         super().__init__(name)
