@@ -4,6 +4,7 @@ from enum import Enum
 from bluesky.protocols import Stoppable
 from ophyd_async.core import (
     AsyncStatus,
+    Device,
     SignalRW,
     SoftSignalBackend,
     StandardReadable,
@@ -20,7 +21,7 @@ class ThawerStates(str, Enum):
     ON = "On"
 
 
-class ThawingTimer(SignalRW[float]):
+class ThawingTimer(Device):
     def __init__(self, control_signal: SignalRW[ThawerStates]) -> None:
         super().__init__(SoftSignalBackend(float))
         self._control_signal = control_signal
