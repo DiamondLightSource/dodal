@@ -8,9 +8,9 @@ from ophyd_async.core import ConfigSignal, StandardReadable, soft_signal_r_and_s
 from ophyd_async.epics.motion import Motor
 from ophyd_async.epics.signal import epics_signal_r
 
-# Speed of light and Planck's constant
-_C = 299792458
-_H = 6.62607015e-34
+# Conversion constant for energy and wavelength, taken from the X-Ray data booklet
+# Converts between energy in KeV and wavelength in angstrom
+_CONVERSION_CONSTANT = 12.3984
 
 
 @dataclass(frozen=True, unsafe_hash=True)
@@ -127,7 +127,10 @@ class DoubleCrystalMonochromator(StandardReadable):
         default_describe = await super().describe()
         return {
             f"{self.name}-wavelength": DataKey(
-                dtype="number", shape=[], source=self.name
+                dtype="number",
+                shape=[],
+                source=self.name,
+                units="angstrom",
             ),
             **default_describe,
         }
@@ -136,7 +139,7 @@ class DoubleCrystalMonochromator(StandardReadable):
         default_reading = await super().read()
         energy: float = default_reading[f"{self.name}-energy"]["value"]
         if energy > 0.0:
-            wavelength = (_C * _H) / energy
+            wavelength = _CONVERSION_CONSTANT / energy
         else:
             wavelength = 0.0
 

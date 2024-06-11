@@ -61,8 +61,8 @@ async def test_crystal_metadata_not_propagated_when_not_supplied():
     "energy,wavelength",
     [
         (0.0, 0.0),
-        (1.0, 1.9864458571489286e-25),
-        (2.0, 9.932229285744643e-26),
+        (1.0, 12.3984),
+        (2.0, 6.1992),
     ],
 )
 async def test_wavelength(
