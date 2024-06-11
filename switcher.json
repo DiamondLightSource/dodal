@@ -288,6 +288,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/allow_both_v1_and_v2_ophyd_devices/"
   },
   {
+    "version": "apply-DLS-device",
+    "url": "https://DiamondLightSource.github.io/dodal/apply-DLS-device/"
+  },
+  {
     "version": "artemis598_params_changes",
     "url": "https://DiamondLightSource.github.io/dodal/artemis598_params_changes/"
   },
