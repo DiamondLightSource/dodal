@@ -6,7 +6,6 @@ from ophyd_async.core import (
     AsyncStatus,
     Device,
     SignalRW,
-    SoftSignalBackend,
     StandardReadable,
 )
 from ophyd_async.epics.signal import epics_signal_rw
@@ -23,7 +22,7 @@ class ThawerStates(str, Enum):
 
 class ThawingTimer(Device):
     def __init__(self, control_signal: SignalRW[ThawerStates]) -> None:
-        super().__init__(SoftSignalBackend(float))
+        super().__init__("thawing_timer")
         self._control_signal = control_signal
         self._thawing_task: Task | None = None
 
