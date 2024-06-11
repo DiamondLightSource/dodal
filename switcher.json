@@ -260,6 +260,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/593-i22-dcm/"
   },
   {
+    "version": "612_fix_grid_scan_PVs",
+    "url": "https://DiamondLightSource.github.io/dodal/612_fix_grid_scan_PVs/"
+  },
+  {
     "version": "613_add_lower_gonio",
     "url": "https://DiamondLightSource.github.io/dodal/613_add_lower_gonio/"
   },
