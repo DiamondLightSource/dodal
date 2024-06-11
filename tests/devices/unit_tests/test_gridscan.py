@@ -7,7 +7,7 @@ from bluesky import preprocessors as bpp
 from bluesky.run_engine import RunEngine
 from ophyd.sim import make_fake_device
 from ophyd.status import DeviceStatus, Status
-from ophyd_async.core import DeviceCollector, set_mock_value
+from ophyd_async.core import DeviceCollector, get_mock_put, set_mock_value
 
 from dodal.devices.fast_grid_scan import (
     PandAFastGridScan,
@@ -60,7 +60,7 @@ async def test_given_settings_valid_when_kickoff_then_run_started(
 
     await grid_scan.kickoff()
 
-    assert await grid_scan.run_cmd.get_value() == 1
+    get_mock_put(grid_scan.run_cmd).assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -87,7 +87,7 @@ async def test_waits_for_running_motion(
     set_mock_value(grid_scan.motion_program.running, 0)
     set_mock_value(grid_scan.status, 1)
     await grid_scan.kickoff()
-    assert await grid_scan.run_cmd.get_value() == 1
+    get_mock_put(grid_scan.run_cmd).assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -408,8 +408,10 @@ def test_can_run_fast_grid_scan_in_run_engine(
         set_mock_value(device.status, 0)
         yield from bps.wait("complete")
 
-    RE(kickoff_and_complete(panda_fast_grid_scan)) if pgs else RE(
-        kickoff_and_complete(zebra_fast_grid_scan)
+    (
+        RE(kickoff_and_complete(panda_fast_grid_scan))
+        if pgs
+        else RE(kickoff_and_complete(zebra_fast_grid_scan))
     )
     assert RE.state == "idle"
 
