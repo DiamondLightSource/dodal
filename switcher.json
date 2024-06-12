@@ -4,48 +4,164 @@
     "url": "https://DiamondLightSource.github.io/dodal/main/"
   },
   {
-    "version": "0.0.1",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.1/"
+    "version": "1.27.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.27.0/"
   },
   {
-    "version": "0.0.2",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.2/"
+    "version": "1.26.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.26.0/"
   },
   {
-    "version": "0.0.2_async_arming",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.2_async_arming/"
+    "version": "1.25.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.25.0/"
   },
   {
-    "version": "0.0.3",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.3/"
+    "version": "1.24.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.24.0/"
   },
   {
-    "version": "0.0.4",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.4/"
+    "version": "1.23.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.23.0/"
   },
   {
-    "version": "0.0.5",
-    "url": "https://DiamondLightSource.github.io/dodal/0.0.5/"
+    "version": "1.22.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.22.0/"
   },
   {
-    "version": "1.0.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.0.0/"
+    "version": "1.21.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.21.0/"
   },
   {
-    "version": "1.1.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.1.0/"
+    "version": "1.20.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.20.0/"
   },
   {
-    "version": "1.10.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.10.0/"
+    "version": "1.19.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.19.0/"
+  },
+  {
+    "version": "1.18.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.18.0/"
+  },
+  {
+    "version": "1.17.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.17.0/"
+  },
+  {
+    "version": "1.17",
+    "url": "https://DiamondLightSource.github.io/dodal/1.17/"
+  },
+  {
+    "version": "1.16",
+    "url": "https://DiamondLightSource.github.io/dodal/1.16/"
+  },
+  {
+    "version": "1.15.1",
+    "url": "https://DiamondLightSource.github.io/dodal/1.15.1/"
+  },
+  {
+    "version": "1.15.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.15.0/"
+  },
+  {
+    "version": "1.14.1",
+    "url": "https://DiamondLightSource.github.io/dodal/1.14.1/"
+  },
+  {
+    "version": "1.14.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.14.0/"
+  },
+  {
+    "version": "1.13.2",
+    "url": "https://DiamondLightSource.github.io/dodal/1.13.2/"
+  },
+  {
+    "version": "1.13.1",
+    "url": "https://DiamondLightSource.github.io/dodal/1.13.1/"
+  },
+  {
+    "version": "1.13.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.13.0/"
+  },
+  {
+    "version": "1.12.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.12.0/"
+  },
+  {
+    "version": "1.11.1",
+    "url": "https://DiamondLightSource.github.io/dodal/1.11.1/"
   },
   {
     "version": "1.11.0",
     "url": "https://DiamondLightSource.github.io/dodal/1.11.0/"
   },
   {
-    "version": "1.11.1",
-    "url": "https://DiamondLightSource.github.io/dodal/1.11.1/"
+    "version": "1.10.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.10.0/"
+  },
+  {
+    "version": "1.9.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.9.0/"
+  },
+  {
+    "version": "1.8.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.8.0/"
+  },
+  {
+    "version": "1.7.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.7.0/"
+  },
+  {
+    "version": "1.6.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.6.0/"
+  },
+  {
+    "version": "1.5.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.5.0/"
+  },
+  {
+    "version": "1.4.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.4.0/"
+  },
+  {
+    "version": "1.3.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.3.0/"
+  },
+  {
+    "version": "1.2.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.2.0/"
+  },
+  {
+    "version": "1.1.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.1.0/"
+  },
+  {
+    "version": "1.0.0",
+    "url": "https://DiamondLightSource.github.io/dodal/1.0.0/"
+  },
+  {
+    "version": "0.0.5",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.5/"
+  },
+  {
+    "version": "0.0.4",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.4/"
+  },
+  {
+    "version": "0.0.3",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.3/"
+  },
+  {
+    "version": "0.0.2",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.2/"
+  },
+  {
+    "version": "0.0.1",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.1/"
+  },
+  {
+    "version": "0.0.2_async_arming",
+    "url": "https://DiamondLightSource.github.io/dodal/0.0.2_async_arming/"
   },
   {
     "version": "1.11.2",
@@ -54,122 +170,6 @@
   {
     "version": "1.11.3",
     "url": "https://DiamondLightSource.github.io/dodal/1.11.3/"
-  },
-  {
-    "version": "1.12.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.12.0/"
-  },
-  {
-    "version": "1.13.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.13.0/"
-  },
-  {
-    "version": "1.13.1",
-    "url": "https://DiamondLightSource.github.io/dodal/1.13.1/"
-  },
-  {
-    "version": "1.13.2",
-    "url": "https://DiamondLightSource.github.io/dodal/1.13.2/"
-  },
-  {
-    "version": "1.14.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.14.0/"
-  },
-  {
-    "version": "1.14.1",
-    "url": "https://DiamondLightSource.github.io/dodal/1.14.1/"
-  },
-  {
-    "version": "1.15.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.15.0/"
-  },
-  {
-    "version": "1.15.1",
-    "url": "https://DiamondLightSource.github.io/dodal/1.15.1/"
-  },
-  {
-    "version": "1.16",
-    "url": "https://DiamondLightSource.github.io/dodal/1.16/"
-  },
-  {
-    "version": "1.17",
-    "url": "https://DiamondLightSource.github.io/dodal/1.17/"
-  },
-  {
-    "version": "1.17.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.17.0/"
-  },
-  {
-    "version": "1.18.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.18.0/"
-  },
-  {
-    "version": "1.19.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.19.0/"
-  },
-  {
-    "version": "1.2.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.2.0/"
-  },
-  {
-    "version": "1.20.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.20.0/"
-  },
-  {
-    "version": "1.21.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.21.0/"
-  },
-  {
-    "version": "1.22.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.22.0/"
-  },
-  {
-    "version": "1.23.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.23.0/"
-  },
-  {
-    "version": "1.24.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.24.0/"
-  },
-  {
-    "version": "1.25.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.25.0/"
-  },
-  {
-    "version": "1.26.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.26.0/"
-  },
-  {
-    "version": "1.27.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.27.0/"
-  },
-  {
-    "version": "1.3.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.3.0/"
-  },
-  {
-    "version": "1.4.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.4.0/"
-  },
-  {
-    "version": "1.5.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.5.0/"
-  },
-  {
-    "version": "1.6.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.6.0/"
-  },
-  {
-    "version": "1.7.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.7.0/"
-  },
-  {
-    "version": "1.8.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.8.0/"
-  },
-  {
-    "version": "1.9.0",
-    "url": "https://DiamondLightSource.github.io/dodal/1.9.0/"
   },
   {
     "version": "141_i04_devices",
@@ -258,6 +258,10 @@
   {
     "version": "610-tetramm-arm-exposure",
     "url": "https://DiamondLightSource.github.io/dodal/610-tetramm-arm-exposure/"
+  },
+  {
+    "version": "613_add_lower_gonio",
+    "url": "https://DiamondLightSource.github.io/dodal/613_add_lower_gonio/"
   },
   {
     "version": "76_make_stage_synchronous_if_arming_not_started",
