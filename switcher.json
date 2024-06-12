@@ -320,6 +320,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/async-ad-sim/"
   },
   {
+    "version": "diamond-soft-pilatus",
+    "url": "https://DiamondLightSource.github.io/dodal/diamond-soft-pilatus/"
+  },
+  {
     "version": "directoryInfo",
     "url": "https://DiamondLightSource.github.io/dodal/directoryInfo/"
   },
