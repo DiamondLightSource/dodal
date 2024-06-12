@@ -34,9 +34,9 @@ READING_ADDRESSES = [
 ]
 
 CONFIG_ADDRESSES = [
-    "mock+soft://",
+    "mock+soft://synchrotron-probe",
     "mock+ca://CS-CS-MSTAT-01:MODE",
-    "mock+soft://",
+    "mock+soft://synchrotron-type",
 ]
 
 READ_SIGNALS = [
