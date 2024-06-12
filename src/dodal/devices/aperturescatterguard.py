@@ -1,6 +1,7 @@
 import asyncio
 from collections import OrderedDict, namedtuple
 from dataclasses import asdict, dataclass
+from enum import Enum
 
 from bluesky.protocols import Movable, Reading
 from ophyd_async.core import AsyncStatus, SignalR, StandardReadable
@@ -48,8 +49,22 @@ class SingleAperturePosition:
     )
 
 
+# Use StrEnum once we stop python 3.10 support
+class AperturePositionGDANames(str, Enum):
+    LARGE_APERTURE = "LARGE_APERTURE"
+    MEDIUM_APERTURE = "MEDIUM_APERTURE"
+    SMALL_APERTURE = "SMALL_APERTURE"
+    ROBOT_LOAD = "ROBOT_LOAD"
+
+    def __str__(self):
+        return str(self.value)
+
+
 def position_from_params(
-    name: str, GDA_name: str, radius_microns: float | None, params: dict
+    name: str,
+    GDA_name: AperturePositionGDANames,
+    radius_microns: float | None,
+    params: dict,
 ) -> SingleAperturePosition:
     return SingleAperturePosition(
         name,
@@ -77,7 +92,8 @@ def tolerances_from_params(params: dict) -> ApertureScatterguardTolerances:
 
 @dataclass
 class AperturePositions:
-    """Holds the motor positions needed to select a particular aperture size."""
+    """Holds the motor positions needed to select a particular aperture size. This class should be instantiated with definitions for its sizes
+    using from_gda_beamline_params"""
 
     LARGE: SingleAperturePosition
     MEDIUM: SingleAperturePosition
@@ -93,12 +109,31 @@ class AperturePositions:
     @classmethod
     def from_gda_beamline_params(cls, params):
         return cls(
-            LARGE=position_from_params("Large", "LARGE_APERTURE", 100, params),
-            MEDIUM=position_from_params("Medium", "MEDIUM_APERTURE", 50, params),
-            SMALL=position_from_params("Small", "SMALL_APERTURE", 20, params),
-            ROBOT_LOAD=position_from_params("Robot load", "ROBOT_LOAD", None, params),
+            LARGE=position_from_params(
+                "Large", AperturePositionGDANames.LARGE_APERTURE, 100, params
+            ),
+            MEDIUM=position_from_params(
+                "Medium", AperturePositionGDANames.MEDIUM_APERTURE, 50, params
+            ),
+            SMALL=position_from_params(
+                "Small", AperturePositionGDANames.SMALL_APERTURE, 20, params
+            ),
+            ROBOT_LOAD=position_from_params(
+                "Robot load", AperturePositionGDANames.ROBOT_LOAD, None, params
+            ),
             tolerances=tolerances_from_params(params),
         )
+
+    def get_position_from_gda_aperture_name(
+        self, gda_aperture_name: AperturePositionGDANames
+    ) -> SingleAperturePosition:
+        apertures = [ap for ap in self.as_list() if ap.GDA_name == gda_aperture_name]
+        if not apertures:
+            raise ValueError(
+                f"Tried to convert unknown aperture name {gda_aperture_name} to a SingleAperturePosition"
+            )
+        else:
+            return apertures[0]
 
     def as_list(self) -> list[SingleAperturePosition]:
         return [

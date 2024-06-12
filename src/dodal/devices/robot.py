@@ -35,6 +35,8 @@ class BartRobot(StandardReadable, Movable):
         self.gonio_pin_sensor = epics_signal_r(PinMounted, prefix + "PIN_MOUNTED")
         self.next_pin = epics_signal_rw_rbv(float, prefix + "NEXT_PIN")
         self.next_puck = epics_signal_rw_rbv(float, prefix + "NEXT_PUCK")
+        self.next_sample_id = epics_signal_rw_rbv(float, prefix + "NEXT_ID")
+        self.sample_id = epics_signal_r(float, prefix + "CURRENT_ID_RBV")
         self.load = epics_signal_x(prefix + "LOAD.PROC")
         self.program_running = epics_signal_r(bool, prefix + "PROGRAM_RUNNING")
         self.program_name = epics_signal_r(str, prefix + "PROGRAM_NAME")
