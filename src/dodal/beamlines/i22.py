@@ -59,9 +59,9 @@ def source(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> Synchrotron:
     return device_instantiation(
-       Synchrotron,
-       "DLS",
-       "_",
+        Synchrotron,
+        "DLS",
+        "_",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
