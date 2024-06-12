@@ -34,7 +34,7 @@ class Synchrotron(StandardReadable):
     def __init__(
         self,
         prefix: str = "",
-        name: str = "source",
+        name: str = "synchrotron",
         *,
         signal_prefix=Prefix.SIGNAL,
         status_prefix=Prefix.STATUS,
