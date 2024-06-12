@@ -272,6 +272,11 @@ async def test_stage_sets_up_accurate_describe_output(
     }
 
 
+async def test_error_if_armed_without_exposure(tetramm_controller: TetrammController):
+    with pytest.raises(ValueError):
+        await tetramm_controller.arm(10, DetectorTrigger.internal)
+
+
 async def assert_armed(driver: TetrammDriver) -> None:
     assert (await driver.trigger_mode.get_value()) is TetrammTrigger.ExtTrigger
     assert (await driver.averaging_time.get_value()) == VALID_TEST_EXPOSURE_TIME
