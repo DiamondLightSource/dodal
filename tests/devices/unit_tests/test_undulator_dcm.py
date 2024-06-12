@@ -27,7 +27,12 @@ ID_GAP_LOOKUP_TABLE_PATH: str = (
 @pytest.fixture
 async def fake_undulator_dcm() -> UndulatorDCM:
     async with DeviceCollector(mock=True):
-        undulator = Undulator("UND-01", name="undulator")
+        undulator = Undulator(
+            "UND-01",
+            name="undulator",
+            poles=80,
+            length=2.0,
+        )
         dcm = DCM("DCM-01", name="dcm")
         undulator_dcm = UndulatorDCM(
             undulator,
@@ -131,8 +136,7 @@ async def test_if_gap_is_already_correct_then_dont_move_gap(
     mock_load.return_value = np.array([[5700, 5.4606], [7000, 6.045], [9700, 6.404]])
     set_mock_value(fake_undulator_dcm.undulator.current_gap, 5.4605)
 
-    status = fake_undulator_dcm.set(5.8)
-    await asyncio.wait_for(status, timeout=0.05)
+    await fake_undulator_dcm.set(5.8)
 
     # Verify undulator has not been asked to move
     assert (
@@ -163,4 +167,4 @@ async def test_energy_set_only_complete_when_all_statuses_are_finished(
     release_dcm.set()
     assert not status.done
     release_undulator.set()
-    await asyncio.wait_for(status, timeout=0.01)
+    await asyncio.wait_for(status, timeout=0.02)

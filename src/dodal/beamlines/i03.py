@@ -1,11 +1,11 @@
 from ophyd_async.panda import HDFPanda
 
-from dodal.beamlines.beamline_utils import (
+from dodal.common.beamlines.beamline_utils import (
     device_instantiation,
     get_directory_provider,
     set_directory_provider,
 )
-from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.udc_directory_provider import PandASubdirectoryProvider
 from dodal.devices.aperturescatterguard import AperturePositions, ApertureScatterguard
 from dodal.devices.attenuator import Attenuator
@@ -14,24 +14,25 @@ from dodal.devices.dcm import DCM
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.eiger import EigerDetector
-from dodal.devices.fast_grid_scan import FastGridScan
+from dodal.devices.fast_grid_scan import PandAFastGridScan, ZebraFastGridScan
 from dodal.devices.flux import Flux
 from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, VFMMirrorVoltages
 from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
-from dodal.devices.panda_fast_grid_scan import PandAFastGridScan
 from dodal.devices.qbpm1 import QBPM1
 from dodal.devices.robot import BartRobot
 from dodal.devices.sample_shutter import SampleShutter
 from dodal.devices.slits import Slits
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
+from dodal.devices.thawer import Thawer
 from dodal.devices.undulator import Undulator
 from dodal.devices.undulator_dcm import UndulatorDCM
 from dodal.devices.webcam import Webcam
 from dodal.devices.xbpm_feedback import XBPMFeedback
 from dodal.devices.xspress3_mini.xspress3_mini import Xspress3Mini
 from dodal.devices.zebra import Zebra
+from dodal.devices.zebra_controlled_shutter import ZebraShutter
 from dodal.devices.zocalo import ZocaloResults
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
@@ -47,6 +48,45 @@ set_log_beamline(BL)
 set_utils_beamline(BL)
 
 set_directory_provider(PandASubdirectoryProvider())
+
+
+def aperture_scatterguard(
+    wait_for_connection: bool = True,
+    fake_with_ophyd_sim: bool = False,
+    aperture_positions: AperturePositions | None = None,
+) -> ApertureScatterguard:
+    """Get the i03 aperture and scatterguard device, instantiate it if it hasn't already
+    been. If this is called when already instantiated in i03, it will return the existing
+    object. If aperture_positions is specified, it will update them.
+    """
+
+    def load_positions(a_s: ApertureScatterguard):
+        if aperture_positions is not None:
+            a_s.load_aperture_positions(aperture_positions)
+
+    return device_instantiation(
+        device_factory=ApertureScatterguard,
+        name="aperture_scatterguard",
+        prefix="",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+        post_create=load_positions,
+    )
+
+
+def attenuator(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Attenuator:
+    """Get the i03 attenuator device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        Attenuator,
+        "attenuator",
+        "-EA-ATTN-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
 
 
 def dcm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> DCM:
@@ -101,30 +141,6 @@ def vfm_mirror_voltages(
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
         daq_configuration_path=DAQ_CONFIGURATION_PATH,
-    )
-
-
-def aperture_scatterguard(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-    aperture_positions: AperturePositions | None = None,
-) -> ApertureScatterguard:
-    """Get the i03 aperture and scatterguard device, instantiate it if it hasn't already
-    been. If this is called when already instantiated in i03, it will return the existing
-    object. If aperture_positions is specified, it will update them.
-    """
-
-    def load_positions(a_s: ApertureScatterguard):
-        if aperture_positions is not None:
-            a_s.load_aperture_positions(aperture_positions)
-
-    return device_instantiation(
-        device_factory=ApertureScatterguard,
-        name="aperture_scatterguard",
-        prefix="",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
-        post_create=load_positions,
     )
 
 
@@ -184,15 +200,15 @@ def eiger(
     )
 
 
-def fast_grid_scan(
+def zebra_fast_grid_scan(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> FastGridScan:
-    """Get the i03 fast_grid_scan device, instantiate it if it hasn't already been.
+) -> ZebraFastGridScan:
+    """Get the i03 zebra_fast_grid_scan device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return device_instantiation(
-        device_factory=FastGridScan,
-        name="fast_grid_scan",
+        device_factory=ZebraFastGridScan,
+        name="zebra_fast_grid_scan",
         prefix="-MO-SGON-01:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
@@ -204,12 +220,12 @@ def panda_fast_grid_scan(
 ) -> PandAFastGridScan:
     """Get the i03 panda_fast_grid_scan device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
-    This is used instead of the fast_grid_scan device when using the PandA.
+    This is used instead of the zebra_fast_grid_scan device when using the PandA.
     """
     return device_instantiation(
         device_factory=PandAFastGridScan,
         name="panda_fast_grid_scan",
-        prefix="-MO-SGON-01:PGS:",
+        prefix="-MO-SGON-01:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )
@@ -360,21 +376,6 @@ def xspress3mini(
     )
 
 
-def attenuator(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Attenuator:
-    """Get the i03 attenuator device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i03, it will return the existing object.
-    """
-    return device_instantiation(
-        Attenuator,
-        "attenuator",
-        "-EA-ATTN-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
-
-
 def panda(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> HDFPanda:
@@ -394,12 +395,12 @@ def panda(
 @skip_device(lambda: BL == "s03")
 def sample_shutter(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> SampleShutter:
+) -> ZebraShutter:
     """Get the i03 sample shutter device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return device_instantiation(
-        SampleShutter,
+        ZebraShutter,
         "sample_shutter",
         "-EA-SHTR-01:",
         wait_for_connection,
@@ -479,4 +480,19 @@ def webcam(
         wait_for_connection,
         fake_with_ophyd_sim,
         url="http://i03-webcam1/axis-cgi/jpg/image.cgi",
+    )
+
+
+def thawer(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Thawer:
+    """Get the i03 thawer, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        Thawer,
+        "thawer",
+        "-EA-THAW-01",
+        wait_for_connection,
+        fake_with_ophyd_sim,
     )

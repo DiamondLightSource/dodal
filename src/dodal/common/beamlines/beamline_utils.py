@@ -44,7 +44,7 @@ def active_device_is_same_type(
     return inspect.isclass(device) and isinstance(active_device, device)
 
 
-def _wait_for_connection(
+def wait_for_connection(
     device: AnyDevice,
     timeout: float = DEFAULT_CONNECTION_TIMEOUT,
     mock: bool = False,
@@ -109,7 +109,7 @@ def device_instantiation(
         )
         ACTIVE_DEVICES[name] = device_instance
         if wait:
-            _wait_for_connection(device_instance, mock=fake)
+            wait_for_connection(device_instance, mock=fake)
 
     else:
         if not active_device_is_same_type(already_existing_device, device_factory):

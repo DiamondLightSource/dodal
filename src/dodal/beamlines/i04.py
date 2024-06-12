@@ -1,5 +1,5 @@
-from dodal.beamlines.beamline_utils import device_instantiation
-from dodal.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.beamline_utils import device_instantiation
+from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.aperturescatterguard import AperturePositions, ApertureScatterguard
 from dodal.devices.attenuator import Attenuator
 from dodal.devices.backlight import Backlight
@@ -8,7 +8,7 @@ from dodal.devices.dcm import DCM
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.eiger import EigerDetector
-from dodal.devices.fast_grid_scan import FastGridScan
+from dodal.devices.fast_grid_scan import ZebraFastGridScan
 from dodal.devices.flux import Flux
 from dodal.devices.i04.transfocator import Transfocator
 from dodal.devices.ipin import IPin
@@ -16,11 +16,14 @@ from dodal.devices.motors import XYZPositioner
 from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
 from dodal.devices.sample_shutter import SampleShutter
 from dodal.devices.slits import Slits
+from dodal.devices.robot import BartRobot
 from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
+from dodal.devices.thawer import Thawer
 from dodal.devices.undulator import Undulator
 from dodal.devices.xbpm_feedback import XBPMFeedbackI04
 from dodal.devices.zebra import Zebra
+from dodal.devices.zebra_controlled_shutter import ZebraShutter
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
 
@@ -110,12 +113,12 @@ def beamstop(
 
 def sample_shutter(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> SampleShutter:
+) -> ZebraShutter:
     """Get the i04 sample shutter device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
     return device_instantiation(
-        SampleShutter,
+        ZebraShutter,
         "sample_shutter",
         "-EA-SHTR-01:",
         wait_for_connection,
@@ -258,15 +261,15 @@ def eiger(
     )
 
 
-def fast_grid_scan(
+def zebra_fast_grid_scan(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> FastGridScan:
-    """Get the i04 fast_grid_scan device, instantiate it if it hasn't already been.
+) -> ZebraFastGridScan:
+    """Get the i04 zebra_fast_grid_scan device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
     return device_instantiation(
-        device_factory=FastGridScan,
-        name="fast_grid_scan",
+        device_factory=ZebraFastGridScan,
+        name="zebra_fast_grid_scan",
         prefix="-MO-SGON-01:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
@@ -362,4 +365,34 @@ def detector_motion(
         prefix="",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
+    )
+
+
+def thawer(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Thawer:
+    """Get the i04 thawer, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i04, it will return the existing object.
+    """
+    return device_instantiation(
+        Thawer,
+        "thawer",
+        "-EA-THAW-01",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+def robot(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> BartRobot:
+    """Get the i04 robot device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i04, it will return the existing object.
+    """
+    return device_instantiation(
+        BartRobot,
+        "robot",
+        "-MO-ROBOT-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
     )

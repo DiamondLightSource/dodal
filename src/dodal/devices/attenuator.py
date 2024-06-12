@@ -1,119 +1,75 @@
-from ophyd import Component, Device, EpicsSignal, EpicsSignalRO, Kind
-from ophyd.status import Status, SubscriptionStatus
+import asyncio
+import string
 
-from dodal.devices.detector import DetectorParams
-from dodal.devices.status import await_value
+from bluesky.protocols import Movable
+from ophyd_async.core import (
+    AsyncStatus,
+    DeviceVector,
+    SignalR,
+    StandardReadable,
+    wait_for_value,
+)
+from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw, epics_signal_x
+
 from dodal.log import LOGGER
 
 
-class AtteunatorFilter(Device):
-    actual_filter_state = Component(EpicsSignalRO, ":INLIM")
+class Attenuator(StandardReadable, Movable):
+    """The attenuator will insert filters into the beam to reduce its transmission.
 
+    This device should be set with:
+        yield from bps.set(attenuator, desired_transmission)
 
-class Attenuator(Device):
-    """Any reference to transmission (both read and write) in this Device is fraction
-    e.g. 0-1"""
+    Where desired_transmission is fraction e.g. 0-1. When the actual_transmission is
+    read from the device it is also fractional"""
 
-    def set(self, transmission: float) -> SubscriptionStatus:
-        """Set the transmission to the fractional value given.
-        Args:
-            transmission (float): A fraction to set transmission to between 0-1
-        Get desired states and calculated states, return a status which is complete once they are equal
+    def __init__(self, prefix: str, name: str = ""):
+        self._calculated_filter_states: DeviceVector[SignalR[int]] = DeviceVector(
+            {
+                int(digit, 16): epics_signal_r(int, f"{prefix}DEC_TO_BIN.B{digit}")
+                for digit in string.hexdigits
+                if not digit.islower()
+            }
+        )
+        self._filters_in_position: DeviceVector[SignalR[bool]] = DeviceVector(
+            {
+                i - 1: epics_signal_r(bool, f"{prefix}FILTER{i}:INLIM")
+                for i in range(1, 17)
+            }
+        )
+
+        self._desired_transmission = epics_signal_rw(float, prefix + "T2A:SETVAL1")
+        self._use_current_energy = epics_signal_x(prefix + "E2WL:USECURRENTENERGY.PROC")
+        self._change = epics_signal_x(prefix + "FANOUT")
+
+        with self.add_children_as_readables():
+            self.actual_transmission = epics_signal_r(float, prefix + "MATCH")
+
+        super().__init__(name)
+
+    @AsyncStatus.wrap
+    async def set(self, transmission: float):
+        """Set the transmission to the fractional (0-1) value given.
+
+        The attenuator IOC will then insert filters to reach the desired transmission for
+        the current beamline energy, the set will only complete when they have all been
+        applied.
         """
 
-        LOGGER.info("Using current energy ")
-        self.use_current_energy.set(1).wait()
+        LOGGER.debug("Using current energy ")
+        await self._use_current_energy.trigger()
         LOGGER.info(f"Setting desired transmission to {transmission}")
-        self.desired_transmission.set(transmission).wait()
-        LOGGER.info("Sending change filter command")
-        self.change.set(1).wait()
+        await self._desired_transmission.set(transmission)
+        LOGGER.debug("Sending change filter command")
+        await self._change.trigger()
 
-        status = Status(done=True, success=True)
-        actual_states = self.get_actual_filter_state_list()
-        calculated_states = self.get_calculated_filter_state_list()
-        for i in range(16):
-            status &= await_value(
-                actual_states[i], calculated_states[i].get(), timeout=10
-            )
-        return status
-
-    calulated_filter_state_1 = Component(EpicsSignalRO, "DEC_TO_BIN.B0")
-    calulated_filter_state_2 = Component(EpicsSignalRO, "DEC_TO_BIN.B1")
-    calulated_filter_state_3 = Component(EpicsSignalRO, "DEC_TO_BIN.B2")
-    calulated_filter_state_4 = Component(EpicsSignalRO, "DEC_TO_BIN.B3")
-    calulated_filter_state_5 = Component(EpicsSignalRO, "DEC_TO_BIN.B4")
-    calulated_filter_state_6 = Component(EpicsSignalRO, "DEC_TO_BIN.B5")
-    calulated_filter_state_7 = Component(EpicsSignalRO, "DEC_TO_BIN.B6")
-    calulated_filter_state_8 = Component(EpicsSignalRO, "DEC_TO_BIN.B7")
-    calulated_filter_state_9 = Component(EpicsSignalRO, "DEC_TO_BIN.B8")
-    calulated_filter_state_10 = Component(EpicsSignalRO, "DEC_TO_BIN.B9")
-    calulated_filter_state_11 = Component(EpicsSignalRO, "DEC_TO_BIN.BA")
-    calulated_filter_state_12 = Component(EpicsSignalRO, "DEC_TO_BIN.BB")
-    calulated_filter_state_13 = Component(EpicsSignalRO, "DEC_TO_BIN.BC")
-    calulated_filter_state_14 = Component(EpicsSignalRO, "DEC_TO_BIN.BD")
-    calulated_filter_state_15 = Component(EpicsSignalRO, "DEC_TO_BIN.BE")
-    calulated_filter_state_16 = Component(EpicsSignalRO, "DEC_TO_BIN.BF")
-
-    filter_1 = Component(AtteunatorFilter, "FILTER1")
-    filter_2 = Component(AtteunatorFilter, "FILTER2")
-    filter_3 = Component(AtteunatorFilter, "FILTER3")
-    filter_4 = Component(AtteunatorFilter, "FILTER4")
-    filter_5 = Component(AtteunatorFilter, "FILTER5")
-    filter_6 = Component(AtteunatorFilter, "FILTER6")
-    filter_7 = Component(AtteunatorFilter, "FILTER7")
-    filter_8 = Component(AtteunatorFilter, "FILTER8")
-    filter_9 = Component(AtteunatorFilter, "FILTER9")
-    filter_10 = Component(AtteunatorFilter, "FILTER10")
-    filter_11 = Component(AtteunatorFilter, "FILTER11")
-    filter_12 = Component(AtteunatorFilter, "FILTER12")
-    filter_13 = Component(AtteunatorFilter, "FILTER13")
-    filter_14 = Component(AtteunatorFilter, "FILTER14")
-    filter_15 = Component(AtteunatorFilter, "FILTER15")
-    filter_16 = Component(AtteunatorFilter, "FILTER16")
-
-    desired_transmission = Component(EpicsSignal, "T2A:SETVAL1")
-    use_current_energy = Component(EpicsSignal, "E2WL:USECURRENTENERGY.PROC")
-    change = Component(EpicsSignal, "FANOUT")
-    actual_transmission = Component(EpicsSignal, "MATCH", kind=Kind.hinted)
-
-    detector_params: DetectorParams | None = None
-
-    def get_calculated_filter_state_list(self) -> list[EpicsSignalRO]:
-        return [
-            self.calulated_filter_state_1,
-            self.calulated_filter_state_2,
-            self.calulated_filter_state_3,
-            self.calulated_filter_state_4,
-            self.calulated_filter_state_5,
-            self.calulated_filter_state_6,
-            self.calulated_filter_state_7,
-            self.calulated_filter_state_8,
-            self.calulated_filter_state_9,
-            self.calulated_filter_state_10,
-            self.calulated_filter_state_11,
-            self.calulated_filter_state_12,
-            self.calulated_filter_state_13,
-            self.calulated_filter_state_14,
-            self.calulated_filter_state_15,
-            self.calulated_filter_state_16,
-        ]
-
-    def get_actual_filter_state_list(self) -> list[EpicsSignalRO]:
-        return [
-            self.filter_1.actual_filter_state,
-            self.filter_2.actual_filter_state,
-            self.filter_3.actual_filter_state,
-            self.filter_4.actual_filter_state,
-            self.filter_5.actual_filter_state,
-            self.filter_6.actual_filter_state,
-            self.filter_7.actual_filter_state,
-            self.filter_8.actual_filter_state,
-            self.filter_9.actual_filter_state,
-            self.filter_10.actual_filter_state,
-            self.filter_11.actual_filter_state,
-            self.filter_12.actual_filter_state,
-            self.filter_13.actual_filter_state,
-            self.filter_14.actual_filter_state,
-            self.filter_15.actual_filter_state,
-            self.filter_16.actual_filter_state,
-        ]
+        await asyncio.gather(
+            *[
+                wait_for_value(
+                    self._filters_in_position[i],
+                    await self._calculated_filter_states[i].get_value(),
+                    None,
+                )
+                for i in range(16)
+            ]
+        )
