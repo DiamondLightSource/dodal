@@ -64,7 +64,7 @@ def test_wait_for_topup_complete(
 def test_no_waiting_if_decay_mode(
     fake_null: MagicMock, fake_sleep: MagicMock, synchrotron: Synchrotron, RE: RunEngine
 ):
-    set_mock_value(synchrotron.topup_start_countdown, -1)
+    set_mock_value(synchrotron.top_up_start_countdown, -1)
 
     RE(
         check_topup_and_wait_if_necessary(
