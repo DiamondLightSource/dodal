@@ -1,5 +1,6 @@
 from typing import Dict, Tuple
 
+from bluesky.protocols import Reading
 from event_model.documents.event_descriptor import DataKey
 from ophyd_async.core import (
     ConfigSignal,
@@ -138,6 +139,12 @@ class NXSasPilatus(PilatusDetector):
             **await self._metadata_holder.describe_configuration(),
         }
 
+    async def read_configuration(self) -> Dict[str, Reading]:
+        return {
+            **await super().read_configuration(),
+            **await self._metadata_holder.read_configuration(),
+        }
+
 
 class NXSasOAV(AravisDetector):
     def __init__(
@@ -164,4 +171,10 @@ class NXSasOAV(AravisDetector):
         return {
             **await super().describe_configuration(),
             **await self._metadata_holder.describe_configuration(),
+        }
+
+    async def read_configuration(self) -> Dict[str, Reading]:
+        return {
+            **await super().read_configuration(),
+            **await self._metadata_holder.read_configuration(),
         }
