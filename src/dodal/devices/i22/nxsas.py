@@ -15,7 +15,8 @@ from ophyd_async.epics.areadetector.aravis import AravisController
 class NXSasMetadataHolder(StandardReadable):
     ValueAndUnits = Tuple[float, str]
     """
-    Required fields for NXDetectors that are used in an NXsas application definition
+    Required fields for NXDetectors that are used in an NXsas application definition.
+    All fields are Configuration and read once per run only.
     """
 
     def __init__(
@@ -119,11 +120,16 @@ class NXSasPilatus(PilatusDetector):
         self,
         prefix: str,
         directory_provider: DirectoryProvider,
-        drv_suffix,
-        hdf_suffix,
+        drv_suffix: str,
+        hdf_suffix: str,
         metadata_holder: NXSasMetadataHolder,
         name: str = "",
     ):
+        """Extends detector with configuration metadata required or desired
+        to comply with the NXsas application definition.
+        Adds all values in the NXSasMetadataHolder's configuration fields
+        to the configuration of the parent device.
+        Writes hdf5 files."""
         super().__init__(
             prefix,
             directory_provider,
@@ -151,12 +157,17 @@ class NXSasOAV(AravisDetector):
         self,
         prefix: str,
         directory_provider: DirectoryProvider,
-        drv_suffix,
-        hdf_suffix,
+        drv_suffix: str,
+        hdf_suffix: str,
         metadata_holder: NXSasMetadataHolder,
         name: str = "",
         gpio_number: AravisController.GPIO_NUMBER = 1,
     ):
+        """Extends detector with configuration metadata required or desired
+        to comply with the NXsas application definition.
+        Adds all values in the NXSasMetadataHolder's configuration fields
+        to the configuration of the parent device.
+        Writes hdf5 files."""
         super().__init__(
             prefix,
             directory_provider,
