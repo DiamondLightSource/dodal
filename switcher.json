@@ -252,6 +252,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/578-add-a-flowchart-on-the-decisions-to-make-a-new-ophyd-device-for-dls/"
   },
   {
+    "version": "611_hutch-shutter-device",
+    "url": "https://DiamondLightSource.github.io/dodal/611_hutch-shutter-device/"
+  },
+  {
     "version": "76_make_stage_synchronous_if_arming_not_started",
     "url": "https://DiamondLightSource.github.io/dodal/76_make_stage_synchronous_if_arming_not_started/"
   },
@@ -278,10 +282,6 @@
   {
     "version": "allow_both_v1_and_v2_ophyd_devices",
     "url": "https://DiamondLightSource.github.io/dodal/allow_both_v1_and_v2_ophyd_devices/"
-  },
-  {
-    "version": "apply-DLS-device",
-    "url": "https://DiamondLightSource.github.io/dodal/apply-DLS-device/"
   },
   {
     "version": "artemis598_params_changes",
