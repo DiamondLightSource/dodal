@@ -2,13 +2,17 @@ from dataclasses import dataclass
 from typing import List, Tuple
 
 import numpy as np
-from ophyd import Component, Device, EpicsMotor
+from ophyd import EpicsMotor
+from ophyd_async.core import Device
+from ophyd_async.epics.motion import Motor
 
 
 class XYZPositioner(Device):
-    x = Component(EpicsMotor, "X")
-    y = Component(EpicsMotor, "Y")
-    z = Component(EpicsMotor, "Z")
+    def __init__(self, prefix: str, name: str):
+        self.x = Motor(prefix + "X")
+        self.y = Motor(prefix + "Y")
+        self.z = Motor(prefix + "Z")
+        super().__init__(name)
 
 
 @dataclass
