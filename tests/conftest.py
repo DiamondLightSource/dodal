@@ -6,7 +6,7 @@ import sys
 import time
 from os import environ, getenv
 from pathlib import Path
-from typing import cast
+from typing import Mapping, cast
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -108,3 +108,16 @@ async def RE():
         if time.monotonic() > timeout:
             raise TimeoutError("This really shouldn't happen but just in case...")
     yield RE
+
+
+@pytest.fixture
+def run_engine_documents(RE: RunEngine) -> Mapping[str, list[dict]]:
+    docs = {}
+
+    def append_and_print(name, doc):
+        if name not in docs:
+            docs[name] = []
+        docs[name] += [doc]
+
+    RE.subscribe(append_and_print)
+    return docs

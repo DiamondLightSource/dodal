@@ -1,6 +1,6 @@
 import time
 from dataclasses import dataclass
-from typing import Dict, Literal
+from typing import Dict, Literal, Sequence
 
 from bluesky.protocols import Reading
 from event_model.documents.event_descriptor import DataKey
@@ -86,13 +86,13 @@ class DoubleCrystalMonochromator(StandardReadable):
                 self.crystal_1_type = None
             if crystal_1_metadata.reflection is not None:
                 self.crystal_1_reflection, _ = soft_signal_r_and_setter(
-                    str, initial_value=crystal_1_metadata.reflection
+                    Sequence[int], initial_value=crystal_1_metadata.reflection
                 )
             else:
                 self.crystal_1_reflection = None
             if crystal_1_metadata.d_spacing is not None:
                 self.crystal_1_d_spacing, _ = soft_signal_r_and_setter(
-                    str, initial_value=crystal_1_metadata.d_spacing
+                    float, initial_value=crystal_1_metadata.d_spacing
                 )
             else:
                 self.crystal_1_d_spacing = None
@@ -110,13 +110,13 @@ class DoubleCrystalMonochromator(StandardReadable):
                 self.crystal_2_type = None
             if crystal_2_metadata.reflection is not None:
                 self.crystal_2_reflection, _ = soft_signal_r_and_setter(
-                    str, initial_value=crystal_2_metadata.reflection
+                    Sequence[int], initial_value=crystal_2_metadata.reflection
                 )
             else:
                 self.crystal_2_reflection = None
             if crystal_2_metadata.d_spacing is not None:
                 self.crystal_2_d_spacing, _ = soft_signal_r_and_setter(
-                    str, initial_value=crystal_2_metadata.d_spacing
+                    float, initial_value=crystal_2_metadata.d_spacing
                 )
             else:
                 self.crystal_2_d_spacing = None

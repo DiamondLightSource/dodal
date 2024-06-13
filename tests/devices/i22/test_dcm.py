@@ -1,9 +1,13 @@
+from typing import Mapping
 from unittest.mock import ANY
 
+import bluesky.plans as bp
 import pytest
+from bluesky.run_engine import RunEngine
 from ophyd_async.core import (
     DeviceCollector,
     assert_configuration,
+    assert_emitted,
     assert_reading,
     set_mock_value,
 )
@@ -32,6 +36,21 @@ async def dcm() -> DoubleCrystalMonochromator:
         )
 
     return dcm
+
+
+def test_count_dcm(
+    RE: RunEngine,
+    run_engine_documents: Mapping[str, list[dict]],
+    dcm: DoubleCrystalMonochromator,
+):
+    RE(bp.count([dcm]))
+    assert_emitted(
+        run_engine_documents,
+        start=1,
+        descriptor=1,
+        event=1,
+        stop=1,
+    )
 
 
 async def test_crystal_metadata_not_propagated_when_not_supplied():
