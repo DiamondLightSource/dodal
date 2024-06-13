@@ -108,7 +108,7 @@ class NXSasMetadataHolder(StandardReadable):
                 self.sensor_thickness = None
             if threshold_energy is not None:
                 self.threshold_energy, _ = soft_signal_r_and_setter(
-                    float, threshold_energy[0], threshold_energy[1]
+                    float, threshold_energy[0], units=threshold_energy[1]
                 )
             else:
                 self.threshold_energy = None
