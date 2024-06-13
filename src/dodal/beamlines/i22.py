@@ -79,6 +79,7 @@ def i0(
         wait_for_connection,
         fake_with_ophyd_sim,
         directory_provider=get_directory_provider(),
+        readings_per_frame=5,
     )
 
 
@@ -93,6 +94,7 @@ def it(
         wait_for_connection,
         fake_with_ophyd_sim,
         directory_provider=get_directory_provider(),
+        readings_per_frame=5,
     )
 
 

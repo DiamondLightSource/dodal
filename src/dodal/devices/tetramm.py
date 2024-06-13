@@ -214,11 +214,12 @@ class TetrammDetector(StandardDetector):
         prefix: str,
         directory_provider: DirectoryProvider,
         name: str,
+        readings_per_frame: int = 1_000,
         **scalar_sigs: str,
     ) -> None:
         self.drv = TetrammDriver(prefix + "DRV:")
         self.hdf = NDFileHDF(prefix + "HDF5:")
-        controller = TetrammController(self.drv)
+        controller = TetrammController(self.drv, readings_per_frame=readings_per_frame)
         super().__init__(
             controller,
             HDFWriter(
