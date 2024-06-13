@@ -55,13 +55,13 @@ def saxs(
     )
 
 
-def source(
+def synchrotron(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> Synchrotron:
     return device_instantiation(
         Synchrotron,
-        "DLS",
-        "_",
+        "synchrotron",
+        "",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
