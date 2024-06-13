@@ -16,6 +16,7 @@ from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
 from dodal.devices.i22.fswitch import FSwitch
 from dodal.devices.linkam3 import Linkam3
 from dodal.devices.slits import Slits
+from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.tetramm import TetrammDetector
 from dodal.devices.undulator import Undulator
 from dodal.log import set_beamline as set_log_beamline
@@ -51,6 +52,18 @@ def saxs(
         drv_suffix="CAM:",
         hdf_suffix="HDF5:",
         directory_provider=get_directory_provider(),
+    )
+
+
+def synchrotron(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Synchrotron:
+    return device_instantiation(
+        Synchrotron,
+        "synchrotron",
+        "",
+        wait_for_connection,
+        fake_with_ophyd_sim,
     )
 
 
@@ -312,6 +325,7 @@ def panda4(
     )
 
 
+@skip_device
 def oav(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> AravisDetector:
