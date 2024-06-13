@@ -68,7 +68,7 @@ class NXSasMetadataHolder(StandardReadable):
                 self.rotation_angle = None
             if aequetorial_angle is not None:
                 self.aequetorial_angle, _ = soft_signal_r_and_setter(
-                    float, aequetorial_angle[0], aequetorial_angle[1]
+                    float, aequetorial_angle[0], units=aequetorial_angle[1]
                 )
             else:
                 self.aequetorial_angle = None
