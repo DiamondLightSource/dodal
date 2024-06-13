@@ -115,8 +115,13 @@ class TetrammController(DetectorControl):
         self,
         num: int,
         trigger: DetectorTrigger,
-        exposure: float,
+        exposure: float | None = None,
     ) -> AsyncStatus:
+        if exposure is None:
+            raise ValueError(
+                "Tetramm does not support arm without exposure time. "
+                "Is this a software scan? Tetramm only supports hardware scans."
+            )
         self._validate_trigger(trigger)
 
         # trigger mode must be set first and on its own!
