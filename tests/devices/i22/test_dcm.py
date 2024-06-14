@@ -25,13 +25,13 @@ async def dcm() -> DoubleCrystalMonochromator:
                 usage="Bragg",
                 type="silicon",
                 reflection=(1, 1, 1),
-                d_spacing=3.13475,
+                d_spacing=(3.13475, "mm"),
             ),
             crystal_2_metadata=CrystalMetadata(
                 usage="Bragg",
                 type="silicon",
                 reflection=(1, 1, 1),
-                d_spacing=3.13475,
+                d_spacing=(3.13475, "mm"),
             ),
         )
 
@@ -189,6 +189,7 @@ async def test_configuration(dcm: DoubleCrystalMonochromator):
                 "alarm_severity": ANY,
                 "timestamp": ANY,
                 "value": 3.13475,
+                "units": "mm",
             },
             "dcm-crystal_1_reflection": {
                 "alarm_severity": ANY,
@@ -219,6 +220,7 @@ async def test_configuration(dcm: DoubleCrystalMonochromator):
                 "alarm_severity": ANY,
                 "timestamp": ANY,
                 "value": 3.13475,
+                "units": "mm",
             },
             "dcm-crystal_2_pitch-motor_egu": {
                 "alarm_severity": ANY,

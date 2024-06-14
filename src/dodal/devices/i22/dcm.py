@@ -23,7 +23,7 @@ class CrystalMetadata:
     usage: Literal["Bragg", "Laue"] | None = None
     type: str | None = None
     reflection: tuple[int, int, int] | None = None
-    d_spacing: float | None = None
+    d_spacing: tuple[float, str] | None = None
 
 
 class DoubleCrystalMonochromator(StandardReadable):
@@ -92,7 +92,9 @@ class DoubleCrystalMonochromator(StandardReadable):
                 self.crystal_1_reflection = None
             if crystal_1_metadata.d_spacing is not None:
                 self.crystal_1_d_spacing, _ = soft_signal_r_and_setter(
-                    float, initial_value=crystal_1_metadata.d_spacing
+                    float,
+                    initial_value=crystal_1_metadata.d_spacing[0],
+                    units=crystal_1_metadata.d_spacing[1],
                 )
             else:
                 self.crystal_1_d_spacing = None
@@ -116,7 +118,9 @@ class DoubleCrystalMonochromator(StandardReadable):
                 self.crystal_2_reflection = None
             if crystal_2_metadata.d_spacing is not None:
                 self.crystal_2_d_spacing, _ = soft_signal_r_and_setter(
-                    float, initial_value=crystal_2_metadata.d_spacing
+                    float,
+                    initial_value=crystal_2_metadata.d_spacing,
+                    units=crystal_2_metadata.d_spacing[1],
                 )
             else:
                 self.crystal_2_d_spacing = None
