@@ -14,6 +14,7 @@ from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitDirectory
 from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
 from dodal.devices.i22.fswitch import FSwitch
+from dodal.devices.i22.nxsas import NXSasMetadataHolder, NXSasOAV, NXSasPilatus
 from dodal.devices.linkam3 import Linkam3
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
@@ -44,13 +45,23 @@ def saxs(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> PilatusDetector:
     return device_instantiation(
-        PilatusDetector,
+        NXSasPilatus,
         "saxs",
         "-EA-PILAT-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
         drv_suffix="CAM:",
         hdf_suffix="HDF5:",
+        metadata_holder=NXSasMetadataHolder(
+            x_pixel_size=(1.72e-1, "mm"),
+            y_pixel_size=(1.72e-1, "mm"),
+            description="Dectris Pilatus3 2M",
+            type="Photon Counting Hybrid Pixel",
+            sensor_material="silicon",
+            distance=(0, "m"),  # To get from configuration data after visit begins
+            sensor_thickness=(0, "mm"),
+            threshold_energy=(0, "keV"),
+        ),
         directory_provider=get_directory_provider(),
     )
 
@@ -71,13 +82,23 @@ def waxs(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> PilatusDetector:
     return device_instantiation(
-        PilatusDetector,
+        NXSasPilatus,
         "waxs",
         "-EA-PILAT-03:",
         wait_for_connection,
         fake_with_ophyd_sim,
         drv_suffix="CAM:",
         hdf_suffix="HDF5:",
+        metadata_holder=NXSasMetadataHolder(
+            x_pixel_size=(1.72e-1, "mm"),
+            y_pixel_size=(1.72e-1, "mm"),
+            description="Dectris Pilatus3 2M",
+            type="Photon Counting Hybrid Pixel",
+            sensor_material="silicon",
+            distance=(0, "m"),  # To get from configuration data after visit begins
+            sensor_thickness=(0, "mm"),
+            threshold_energy=(0, "keV"),
+        ),
         directory_provider=get_directory_provider(),
     )
 
@@ -330,13 +351,19 @@ def oav(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> AravisDetector:
     return device_instantiation(
-        AravisDetector,
+        NXSasOAV,
         "oav",
         "-DI-OAV-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
         drv_suffix="DET:",
         hdf_suffix="HDF5:",
+        metadata_holder=NXSasMetadataHolder(
+            x_pixel_size=(3.45e-3, "mm"),  # Double check this figure
+            y_pixel_size=(3.45e-3, "mm"),
+            description="AVT Mako G-507B",
+            distance=(0, "m"),  # To get from configuration data after visit begins
+        ),
         directory_provider=get_directory_provider(),
     )
 
