@@ -52,7 +52,7 @@ def saxs(
         fake_with_ophyd_sim,
         drv_suffix="CAM:",
         hdf_suffix="HDF5:",
-        metadata_holder=NXSasMetadataHolder(
+        metadata=NXSasMetadataHolder(
             x_pixel_size=(1.72e-1, "mm"),
             y_pixel_size=(1.72e-1, "mm"),
             description="Dectris Pilatus3 2M",
@@ -89,7 +89,7 @@ def waxs(
         fake_with_ophyd_sim,
         drv_suffix="CAM:",
         hdf_suffix="HDF5:",
-        metadata_holder=NXSasMetadataHolder(
+        metadata=NXSasMetadataHolder(
             x_pixel_size=(1.72e-1, "mm"),
             y_pixel_size=(1.72e-1, "mm"),
             description="Dectris Pilatus3 2M",
@@ -358,7 +358,7 @@ def oav(
         fake_with_ophyd_sim,
         drv_suffix="DET:",
         hdf_suffix="HDF5:",
-        metadata_holder=NXSasMetadataHolder(
+        metadata=NXSasMetadataHolder(
             x_pixel_size=(3.45e-3, "mm"),  # Double check this figure
             y_pixel_size=(3.45e-3, "mm"),
             description="AVT Mako G-507B",

@@ -37,7 +37,6 @@ class NXSasMetadataHolder(StandardReadable):
         description: str | None = None,
         type: str | None = None,
         prefix: str = "",
-        name: str = "",
     ):
         with self.add_children_as_readables(ConfigSignal):
             self.distance, _ = soft_signal_r_and_setter(
@@ -122,7 +121,7 @@ class NXSasPilatus(PilatusDetector):
         directory_provider: DirectoryProvider,
         drv_suffix: str,
         hdf_suffix: str,
-        metadata_holder: NXSasMetadataHolder,
+        metadata: NXSasMetadataHolder,
         name: str = "",
     ):
         """Extends detector with configuration metadata required or desired
@@ -130,6 +129,7 @@ class NXSasPilatus(PilatusDetector):
         Adds all values in the NXSasMetadataHolder's configuration fields
         to the configuration of the parent device.
         Writes hdf5 files."""
+        self.metadata = metadata
         super().__init__(
             prefix,
             directory_provider,
@@ -137,18 +137,17 @@ class NXSasPilatus(PilatusDetector):
             hdf_suffix=hdf_suffix,
             name=name,
         )
-        self._metadata_holder = metadata_holder
 
     async def describe_configuration(self) -> Dict[str, DataKey]:
         return {
             **await super().describe_configuration(),
-            **await self._metadata_holder.describe_configuration(),
+            **await self.metadata.describe_configuration(),
         }
 
     async def read_configuration(self) -> Dict[str, Reading]:
         return {
             **await super().read_configuration(),
-            **await self._metadata_holder.read_configuration(),
+            **await self.metadata.read_configuration(),
         }
 
 
@@ -159,7 +158,7 @@ class NXSasOAV(AravisDetector):
         directory_provider: DirectoryProvider,
         drv_suffix: str,
         hdf_suffix: str,
-        metadata_holder: NXSasMetadataHolder,
+        metadata: NXSasMetadataHolder,
         name: str = "",
         gpio_number: AravisController.GPIO_NUMBER = 1,
     ):
@@ -168,6 +167,7 @@ class NXSasOAV(AravisDetector):
         Adds all values in the NXSasMetadataHolder's configuration fields
         to the configuration of the parent device.
         Writes hdf5 files."""
+        self.metadata = metadata
         super().__init__(
             prefix,
             directory_provider,
@@ -176,16 +176,15 @@ class NXSasOAV(AravisDetector):
             name=name,
             gpio_number=gpio_number,
         )
-        self._metadata_holder = metadata_holder
 
     async def describe_configuration(self) -> Dict[str, DataKey]:
         return {
             **await super().describe_configuration(),
-            **await self._metadata_holder.describe_configuration(),
+            **await self.metadata.describe_configuration(),
         }
 
     async def read_configuration(self) -> Dict[str, Reading]:
         return {
             **await super().read_configuration(),
-            **await self._metadata_holder.read_configuration(),
+            **await self.metadata.read_configuration(),
         }
