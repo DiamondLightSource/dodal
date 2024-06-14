@@ -232,8 +232,10 @@ class TetrammDetector(StandardDetector):
             self.drv.sample_time,
         ]
         if type:
-            type_signal, _ = soft_signal_r_and_setter(str, type)
-            config_signals.append(type_signal)
+            self.type, _ = soft_signal_r_and_setter(str, type)
+            config_signals.append(self.type)
+        else:
+            self.type = None
         super().__init__(
             controller,
             HDFWriter(
