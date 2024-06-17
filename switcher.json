@@ -436,10 +436,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/scan-number-directory-provider/"
   },
   {
-    "version": "synchrotron_soft_signals",
-    "url": "https://DiamondLightSource.github.io/dodal/synchrotron_soft_signals/"
-  },
-  {
     "version": "test-html",
     "url": "https://DiamondLightSource.github.io/dodal/test-html/"
   },
