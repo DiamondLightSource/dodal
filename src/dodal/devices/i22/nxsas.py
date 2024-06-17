@@ -142,7 +142,6 @@ class NXSasPilatus(PilatusDetector):
             name=name,
         )
 
-
     async def describe_configuration(self) -> Dict[str, DataKey]:
         return {
             **await super().describe_configuration(),
@@ -182,7 +181,6 @@ class NXSasOAV(AravisDetector):
             name=name,
             gpio_number=gpio_number,
         )
-
 
     async def describe_configuration(self) -> Dict[str, DataKey]:
         return {
