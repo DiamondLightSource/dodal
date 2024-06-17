@@ -324,6 +324,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/directory_provider/"
   },
   {
+    "version": "fix-tetramm-scaling",
+    "url": "https://DiamondLightSource.github.io/dodal/fix-tetramm-scaling/"
+  },
+  {
     "version": "fix_linting_CI_issues",
     "url": "https://DiamondLightSource.github.io/dodal/fix_linting_CI_issues/"
   },
