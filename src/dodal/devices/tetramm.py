@@ -168,6 +168,7 @@ class TetrammController(DetectorControl):
             of readings per frame.
         """
 
+        self._set_minimum_frame_time(frame_time)
         values_per_reading: int = int(
             frame_time * self.base_sample_rate / self.readings_per_frame
         )
@@ -187,7 +188,7 @@ class TetrammController(DetectorControl):
 
     @max_frame_rate.setter
     def max_frame_rate(self, mfr: float):
-        self.minimum_frame_time = 1 / mfr
+        self._set_minimum_frame_time(1 / mfr)
 
     @property
     def minimum_frame_time(self) -> float:
@@ -195,9 +196,13 @@ class TetrammController(DetectorControl):
         time_per_reading = self.minimum_values_per_reading / self.base_sample_rate
         return self.readings_per_frame * time_per_reading
 
-    @minimum_frame_time.setter
-    def minimum_frame_time(self, frame: float):
+    def _set_minimum_frame_time(self, frame: float):
         time_per_reading = self.minimum_values_per_reading / self.base_sample_rate
+        if frame < time_per_reading:
+            raise ValueError(
+                "Tetramm exposure time must be at least "
+                f"{time_per_reading}s, asked to set it to {frame}s"
+            )
         self.readings_per_frame = int(
             min(self.maximum_readings_per_frame, frame / time_per_reading)
         )
