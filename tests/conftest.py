@@ -112,7 +112,7 @@ async def RE():
 
 @pytest.fixture
 def run_engine_documents(RE: RunEngine) -> Mapping[str, list[dict]]:
-    docs = {}
+    docs: dict[str, list[dict]] = {}
 
     def append_and_print(name, doc):
         if name not in docs:
