@@ -176,10 +176,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/1.11.3/"
   },
   {
-    "version": "14-2-test",
-    "url": "https://DiamondLightSource.github.io/dodal/14-2-test/"
-  },
-  {
     "version": "141_i04_devices",
     "url": "https://DiamondLightSource.github.io/dodal/141_i04_devices/"
   },
@@ -414,6 +410,10 @@
   {
     "version": "p38",
     "url": "https://DiamondLightSource.github.io/dodal/p38/"
+  },
+  {
+    "version": "pin_numpy",
+    "url": "https://DiamondLightSource.github.io/dodal/pin_numpy/"
   },
   {
     "version": "pin_ophyd_async",
