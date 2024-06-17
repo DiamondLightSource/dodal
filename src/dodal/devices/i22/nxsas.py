@@ -114,6 +114,8 @@ class NXSasMetadataHolder(StandardReadable):
             else:
                 self.threshold_energy = None
 
+        super().__init__(name=name)
+
 
 class NXSasPilatus(PilatusDetector):
     def __init__(
@@ -130,6 +132,8 @@ class NXSasPilatus(PilatusDetector):
         Adds all values in the NXSasMetadataHolder's configuration fields
         to the configuration of the parent device.
         Writes hdf5 files."""
+
+        self._metadata_holder = metadata_holder
         super().__init__(
             prefix,
             directory_provider,
@@ -137,7 +141,7 @@ class NXSasPilatus(PilatusDetector):
             hdf_suffix=hdf_suffix,
             name=name,
         )
-        self._metadata_holder = metadata_holder
+
 
     async def describe_configuration(self) -> Dict[str, DataKey]:
         return {
@@ -168,6 +172,8 @@ class NXSasOAV(AravisDetector):
         Adds all values in the NXSasMetadataHolder's configuration fields
         to the configuration of the parent device.
         Writes hdf5 files."""
+
+        self._metadata_holder = metadata_holder
         super().__init__(
             prefix,
             directory_provider,
@@ -176,7 +182,7 @@ class NXSasOAV(AravisDetector):
             name=name,
             gpio_number=gpio_number,
         )
-        self._metadata_holder = metadata_holder
+
 
     async def describe_configuration(self) -> Dict[str, DataKey]:
         return {
