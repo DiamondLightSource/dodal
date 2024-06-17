@@ -24,7 +24,7 @@ def test_when_topup_before_end_of_collection_wait(
     fake_sleep: MagicMock, fake_wait: MagicMock, synchrotron: Synchrotron, RE: RunEngine
 ):
     set_mock_value(synchrotron.synchrotron_mode, SynchrotronMode.USER)
-    set_mock_value(synchrotron.topup_start_countdown, 20.0)
+    set_mock_value(synchrotron.top_up_start_countdown, 20.0)
     set_mock_value(synchrotron.top_up_end_countdown, 60.0)
 
     RE(
@@ -64,7 +64,7 @@ def test_wait_for_topup_complete(
 def test_no_waiting_if_decay_mode(
     fake_null: MagicMock, fake_sleep: MagicMock, synchrotron: Synchrotron, RE: RunEngine
 ):
-    set_mock_value(synchrotron.topup_start_countdown, -1)
+    set_mock_value(synchrotron.top_up_start_countdown, -1)
 
     RE(
         check_topup_and_wait_if_necessary(
@@ -81,7 +81,7 @@ def test_no_waiting_if_decay_mode(
 def test_no_waiting_when_mode_does_not_allow_gating(
     fake_null: MagicMock, synchrotron: Synchrotron, RE: RunEngine
 ):
-    set_mock_value(synchrotron.topup_start_countdown, 1.0)
+    set_mock_value(synchrotron.top_up_start_countdown, 1.0)
     set_mock_value(synchrotron.synchrotron_mode, SynchrotronMode.SHUTDOWN)
 
     RE(

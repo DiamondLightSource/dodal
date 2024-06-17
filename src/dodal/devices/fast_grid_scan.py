@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import Any, Generic, TypeVar
 
 import numpy as np
@@ -9,6 +9,7 @@ from ophyd_async.core import (
     Device,
     Signal,
     SignalR,
+    SignalRW,
     SoftSignalBackend,
     StandardReadable,
     wait_for_value,
@@ -16,8 +17,9 @@ from ophyd_async.core import (
 from ophyd_async.epics.signal import (
     epics_signal_r,
     epics_signal_rw,
+    epics_signal_rw_rbv,
+    epics_signal_x,
 )
-from ophyd_async.epics.signal.signal import epics_signal_rw_rbv
 from pydantic import validator
 from pydantic.dataclasses import dataclass
 
@@ -212,7 +214,7 @@ class PandAGridScanParams(GridScanParamsCommon):
 class MotionProgram(Device):
     def __init__(self, prefix: str, name: str = "") -> None:
         super().__init__(name)
-        self.running = epics_signal_r(float, prefix + "PROGBITS")
+        self.running = epics_signal_r(int, prefix + "PROGBITS")
         self.program_number = epics_signal_r(float, prefix + "CS1:PROG_NUM")
 
 
@@ -240,38 +242,33 @@ class FastGridScanCommon(StandardReadable, ABC, Generic[ParamType]):
     See https://github.com/DiamondLightSource/hyperion/wiki/Coordinate-Systems for more
     """
 
-    def __init__(self, prefix: str, name: str = "") -> None:
-        super().__init__(name)
-        self.x_steps = epics_signal_rw_rbv(int, "X_NUM_STEPS")
+    def __init__(self, prefix: str, smargon_prefix: str, name: str = "") -> None:
+        self.x_steps = epics_signal_rw_rbv(int, f"{prefix}X_NUM_STEPS")
         self.y_steps = epics_signal_rw_rbv(
-            int, "X_NUM_STEPS"
+            int, f"{prefix}Y_NUM_STEPS"
         )  # Number of vertical steps during the first grid scan
         self.z_steps = epics_signal_rw_rbv(
-            int, "X_NUM_STEPS"
+            int, f"{prefix}Z_NUM_STEPS"
         )  # Number of vertical steps during the second grid scan, after the rotation in omega
-        self.x_step_size = epics_signal_rw_rbv(float, "X_STEP_SIZE")
-        self.y_step_size = epics_signal_rw_rbv(float, "Y_STEP_SIZE")
-        self.z_step_size = epics_signal_rw_rbv(float, "Z_STEP_SIZE")
-        self.x_start = epics_signal_rw_rbv(float, "X_START")
-        self.y1_start = epics_signal_rw_rbv(float, "Y_START")
-        self.y2_start = epics_signal_rw_rbv(float, "Y2_START")
-        self.z1_start = epics_signal_rw_rbv(float, "Z_START")
-        self.z2_start = epics_signal_rw_rbv(float, "Z2_START")
+        self.x_step_size = epics_signal_rw_rbv(float, f"{prefix}X_STEP_SIZE")
+        self.y_step_size = epics_signal_rw_rbv(float, f"{prefix}Y_STEP_SIZE")
+        self.z_step_size = epics_signal_rw_rbv(float, f"{prefix}Z_STEP_SIZE")
+        self.x_start = epics_signal_rw_rbv(float, f"{prefix}X_START")
+        self.y1_start = epics_signal_rw_rbv(float, f"{prefix}Y_START")
+        self.y2_start = epics_signal_rw_rbv(float, f"{prefix}Y2_START")
+        self.z1_start = epics_signal_rw_rbv(float, f"{prefix}Z_START")
+        self.z2_start = epics_signal_rw_rbv(float, f"{prefix}Z2_START")
 
-        self.position_counter = epics_signal_rw(
-            int, "POS_COUNTER", write_pv="POS_COUNTER_WRITE"
-        )
-        self.x_counter = epics_signal_r(int, "X_COUNTER")
-        self.y_counter = epics_signal_r(int, "Y_COUNTER")
-        self.scan_invalid = epics_signal_r(float, "SCAN_INVALID")
+        self.scan_invalid = epics_signal_r(float, f"{prefix}SCAN_INVALID")
 
-        self.run_cmd = epics_signal_rw(int, "RUN.PROC")
-        self.stop_cmd = epics_signal_rw(int, "STOP.PROC")
-        self.status = epics_signal_r(float, "SCAN_STATUS")
+        self.run_cmd = epics_signal_x(f"{prefix}RUN.PROC")
+        self.status = epics_signal_r(int, f"{prefix}SCAN_STATUS")
 
         self.expected_images = ExpectedImages(parent=self)
 
-        self.motion_program = MotionProgram(prefix)
+        self.motion_program = MotionProgram(smargon_prefix)
+
+        self.position_counter = self._create_position_counter(prefix)
 
         # Kickoff timeout in seconds
         self.KICKOFF_TIMEOUT: float = 5.0
@@ -291,6 +288,7 @@ class FastGridScanCommon(StandardReadable, ABC, Generic[ParamType]):
             "z1_start": self.z1_start,
             "z2_start": self.z2_start,
         }
+        super().__init__(name)
 
     @AsyncStatus.wrap
     async def kickoff(self):
@@ -301,7 +299,7 @@ class FastGridScanCommon(StandardReadable, ABC, Generic[ParamType]):
             await wait_for_value(self.motion_program.running, 0, self.KICKOFF_TIMEOUT)
 
         LOGGER.debug("Running scan")
-        await self.run_cmd.set(1)
+        await self.run_cmd.trigger()
         LOGGER.info("Waiting for FGS to start")
         await wait_for_value(self.status, 1, self.KICKOFF_TIMEOUT)
         LOGGER.debug("FGS kicked off")
@@ -310,6 +308,10 @@ class FastGridScanCommon(StandardReadable, ABC, Generic[ParamType]):
     async def complete(self):
         await wait_for_value(self.status, 0, self.COMPLETE_STATUS)
 
+    @abstractmethod
+    def _create_position_counter(self, prefix: str) -> SignalRW[int]:
+        pass
+
 
 class ZebraFastGridScan(FastGridScanCommon[ZebraGridScanParams]):
     """Device for standard Zebra FGS. In this scan, the goniometer's velocity profile follows a parabolic shape between X steps,
@@ -317,28 +319,45 @@ class ZebraFastGridScan(FastGridScanCommon[ZebraGridScanParams]):
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        super().__init__(prefix, name)
-
+        full_prefix = prefix + "FGS:"
         # Time taken to travel between X steps
-        self.dwell_time_ms = epics_signal_rw_rbv(float, "DWELL_TIME")
+        self.dwell_time_ms = epics_signal_rw_rbv(float, f"{full_prefix}DWELL_TIME")
+
+        self.x_counter = epics_signal_r(int, f"{full_prefix}X_COUNTER")
+        self.y_counter = epics_signal_r(int, f"{full_prefix}Y_COUNTER")
+
+        super().__init__(full_prefix, prefix, name)
+
         self.movable_params["dwell_time_ms"] = self.dwell_time_ms
+
+    def _create_position_counter(self, prefix: str):
+        return epics_signal_rw(
+            int, f"{prefix}POS_COUNTER", write_pv=f"{prefix}POS_COUNTER_WRITE"
+        )
 
 
 class PandAFastGridScan(FastGridScanCommon[PandAGridScanParams]):
     """Device for panda constant-motion scan"""
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        super().__init__(prefix, name)
+        full_prefix = prefix + "PGS:"
         self.time_between_x_steps_ms = (
             epics_signal_rw_rbv(  # Used by motion controller to set goniometer velocity
-                float, "TIME_BETWEEN_X_STEPS"
+                float, f"{full_prefix}TIME_BETWEEN_X_STEPS"
             )
         )
 
         # Distance before and after the grid given to allow goniometer to reach desired speed while it is within the
         # grid
-        self.run_up_distance_mm = epics_signal_rw_rbv(float, "RUNUP_DISTANCE")
+        self.run_up_distance_mm = epics_signal_rw_rbv(
+            float, f"{full_prefix}RUNUP_DISTANCE"
+        )
+        super().__init__(full_prefix, prefix, name)
+
         self.movable_params["run_up_distance_mm"] = self.run_up_distance_mm
+
+    def _create_position_counter(self, prefix: str):
+        return epics_signal_rw(int, f"{prefix}Y_COUNTER")
 
 
 def set_fast_grid_scan_params(scan: FastGridScanCommon[ParamType], params: ParamType):

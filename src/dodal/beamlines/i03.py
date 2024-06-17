@@ -17,6 +17,7 @@ from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import PandAFastGridScan, ZebraFastGridScan
 from dodal.devices.flux import Flux
 from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, VFMMirrorVoltages
+from dodal.devices.motors import XYZPositioner
 from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.qbpm1 import QBPM1
@@ -208,7 +209,7 @@ def zebra_fast_grid_scan(
     return device_instantiation(
         device_factory=ZebraFastGridScan,
         name="zebra_fast_grid_scan",
-        prefix="-MO-SGON-01:FGS:",
+        prefix="-MO-SGON-01:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )
@@ -224,7 +225,7 @@ def panda_fast_grid_scan(
     return device_instantiation(
         device_factory=PandAFastGridScan,
         name="panda_fast_grid_scan",
-        prefix="-MO-SGON-01:PGS:",
+        prefix="-MO-SGON-01:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )
@@ -492,6 +493,21 @@ def thawer(
         Thawer,
         "thawer",
         "-EA-THAW-01",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+def lower_gonio_positioner(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> XYZPositioner:
+    """Get the i03 lower gonio device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        XYZPositioner,
+        "lower_gonio_positioner",
+        "-MO-GONP-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
