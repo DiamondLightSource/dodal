@@ -412,10 +412,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/p38/"
   },
   {
-    "version": "pin_numpy",
-    "url": "https://DiamondLightSource.github.io/dodal/pin_numpy/"
-  },
-  {
     "version": "pin_ophyd_async",
     "url": "https://DiamondLightSource.github.io/dodal/pin_ophyd_async/"
   },
