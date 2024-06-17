@@ -84,9 +84,12 @@ async def test_given_thawing_already_triggered_when_stop_called_then_stop_thawin
     )
 
 
-async def test_calling_stop_on_thawer_stops_thawing(
+async def test_calling_stop_on_thawer_stops_thawing_timer_and_turns_thawer_off(
     thawer: Thawer,
 ):
     thawer.thaw_for_time_s = MagicMock(spec=ThawingTimer)
     await thawer.stop()
     thawer.thaw_for_time_s.stop.assert_called_once()
+    get_mock_put(thawer.control).assert_called_once_with(
+        ThawerStates.OFF, wait=ANY, timeout=ANY
+    )

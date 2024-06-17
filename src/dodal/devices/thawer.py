@@ -50,3 +50,4 @@ class Thawer(StandardReadable, Stoppable):
 
     async def stop(self):
         await self.thaw_for_time_s.stop()
+        await self.control.set(ThawerStates.OFF)
