@@ -6,7 +6,7 @@ import sys
 import time
 from os import environ, getenv
 from pathlib import Path
-from typing import Mapping, cast
+from typing import Mapping
 from unittest.mock import MagicMock, patch
 
 import pytest
