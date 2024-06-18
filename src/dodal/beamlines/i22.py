@@ -44,14 +44,11 @@ set_directory_provider(
 
 @device_factory(lazy=True)
 def saxs(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> PilatusDetector:
-    return device_instantiation(
-        NXSasPilatus,
-        "saxs",
+    return NXSasPilatus(
         "-EA-PILAT-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+        name="saxs",
+        directory_provider=get_directory_provider(),
         drv_suffix="CAM:",
         hdf_suffix="HDF5:",
         metadata_holder=NXSasMetadataHolder(
@@ -63,7 +60,6 @@ def saxs(
             sensor_thickness=(0.45, "mm"),
             distance=(4711.833684146172, "mm"),
         ),
-        directory_provider=get_directory_provider(),
     )
 
 
