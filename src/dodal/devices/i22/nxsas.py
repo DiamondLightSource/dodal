@@ -1,120 +1,80 @@
-from typing import Dict, Tuple
+from dataclasses import dataclass, fields
+from typing import Dict
 
 from bluesky.protocols import Reading
 from event_model.documents.event_descriptor import DataKey
-from ophyd_async.core import (
-    ConfigSignal,
-    DirectoryProvider,
-    StandardReadable,
-    soft_signal_r_and_setter,
-)
+from ophyd_async.core import DirectoryProvider, merge_gathered_dicts
 from ophyd_async.epics.areadetector import AravisDetector, PilatusDetector
 from ophyd_async.epics.areadetector.aravis import AravisController
 
+ValueAndUnits = tuple[float, str]
 
-class NXSasMetadataHolder(StandardReadable):
-    ValueAndUnits = Tuple[float, str]
+
+@dataclass
+class MetadataHolder:
+    # TODO: just in case this is useful more widely...
+    async def describe(self, parent_name: str) -> Dict[str, DataKey]:
+        def datakey(value) -> DataKey:
+            if isinstance(value, tuple):
+                return {"units": value[1], **datakey(value[0])}
+            dtype = "string"
+            shape = []
+            match value:
+                case bool():
+                    dtype = "boolean"
+                case int():
+                    dtype = "integer"
+                case float():
+                    dtype = "number"
+                case str():
+                    dtype = "string"
+                case list():
+                    dtype = "array"
+                    shape = [len(value)]
+
+            return {"dtype": dtype, "shape": shape, "source": "calibration"}
+
+        return {
+            f"{parent_name}-{field.name}": datakey(getattr(self, field.name))
+            for field in fields(self)
+            if getattr(self, field.name, None) is not None
+        }
+
+    async def read(self, parent_name: str) -> Dict[str, Reading]:
+        def reading(value):
+            if isinstance(value, tuple):
+                return value[0]
+            return value
+
+        return {
+            f"{parent_name}-{field.name}": reading(getattr(self, field.name))
+            for field in fields(self)
+            if hasattr(self, field.name)
+        }
+
+
+@dataclass
+class NXSasMetadataHolder(MetadataHolder):
     """
     Required fields for NXDetectors that are used in an NXsas application definition.
     All fields are Configuration and read once per run only.
     """
 
-    def __init__(
-        self,
-        distance: ValueAndUnits,
-        x_pixel_size: ValueAndUnits,
-        y_pixel_size: ValueAndUnits,
-        beam_center_x: ValueAndUnits | None = None,
-        beam_center_y: ValueAndUnits | None = None,
-        aequetorial_angle: ValueAndUnits | None = None,
-        azimuthal_angle: ValueAndUnits | None = None,
-        polar_angle: ValueAndUnits | None = None,
-        rotation_angle: ValueAndUnits | None = None,
-        threshold_energy: ValueAndUnits | None = None,
-        serial_number: str | None = None,
-        sensor_material: str | None = None,
-        sensor_thickness: ValueAndUnits | None = None,
-        description: str | None = None,
-        type: str | None = None,
-        prefix: str = "",
-        name: str = "",
-    ):
-        with self.add_children_as_readables(ConfigSignal):
-            self.distance, _ = soft_signal_r_and_setter(
-                float, distance[0], units=distance[1]
-            )
-            self.x_pixel_size, _ = soft_signal_r_and_setter(
-                float, x_pixel_size[0], units=x_pixel_size[1]
-            )
-            self.y_pixel_size, _ = soft_signal_r_and_setter(
-                float, y_pixel_size[0], units=y_pixel_size[1]
-            )
-            if polar_angle is not None:
-                self.polar_angle, _ = soft_signal_r_and_setter(
-                    float, polar_angle[0], units=polar_angle[1]
-                )
-            else:
-                self.polar_angle = None
-            if azimuthal_angle is not None:
-                self.azimuthal_angle, _ = soft_signal_r_and_setter(
-                    float, azimuthal_angle[0], units=azimuthal_angle[1]
-                )
-            else:
-                self.azimuthal_angle = None
-            if rotation_angle is not None:
-                self.rotation_angle, _ = soft_signal_r_and_setter(
-                    float, rotation_angle[0], units=rotation_angle[1]
-                )
-            else:
-                self.rotation_angle = None
-            if aequetorial_angle is not None:
-                self.aequetorial_angle, _ = soft_signal_r_and_setter(
-                    float, aequetorial_angle[0], units=aequetorial_angle[1]
-                )
-            else:
-                self.aequetorial_angle = None
-            if beam_center_x is not None:
-                self.beam_center_x, _ = soft_signal_r_and_setter(
-                    float, beam_center_x[0], units=beam_center_x[1]
-                )
-            else:
-                self.beam_center_x = None
-            if beam_center_y is not None:
-                self.beam_center_y, _ = soft_signal_r_and_setter(
-                    float, beam_center_y[0], units=beam_center_y[1]
-                )
-            else:
-                self.beam_center_y = None
-            if sensor_material is not None:
-                self.sensor_material, _ = soft_signal_r_and_setter(str, sensor_material)
-            else:
-                self.sensor_material = None
-            if description is not None:
-                self.description, _ = soft_signal_r_and_setter(str, description)
-            else:
-                self.description = None
-            if type is not None:
-                self.type, _ = soft_signal_r_and_setter(str, type)
-            else:
-                self.type = None
-            if serial_number is not None:
-                self.serial_number, _ = soft_signal_r_and_setter(str, serial_number)
-            else:
-                self.serial_number = None
-            if sensor_thickness is not None:
-                self.sensor_thickness, _ = soft_signal_r_and_setter(
-                    float, sensor_thickness[0], units=sensor_thickness[1]
-                )
-            else:
-                self.sensor_thickness = None
-            if threshold_energy is not None:
-                self.threshold_energy, _ = soft_signal_r_and_setter(
-                    float, threshold_energy[0], units=threshold_energy[1]
-                )
-            else:
-                self.threshold_energy = None
-
-        super().__init__(name=name)
+    distance: ValueAndUnits
+    x_pixel_size: ValueAndUnits
+    y_pixel_size: ValueAndUnits
+    beam_center_x: ValueAndUnits | None = None
+    beam_center_y: ValueAndUnits | None = None
+    aequetorial_angle: ValueAndUnits | None = None
+    azimuthal_angle: ValueAndUnits | None = None
+    polar_angle: ValueAndUnits | None = None
+    rotation_angle: ValueAndUnits | None = None
+    threshold_energy: ValueAndUnits | None = None
+    serial_number: str | None = None
+    sensor_material: str | None = None
+    sensor_thickness: ValueAndUnits | None = None
+    description: str | None = None
+    type: str | None = None
 
 
 class NXSasPilatus(PilatusDetector):
@@ -132,8 +92,6 @@ class NXSasPilatus(PilatusDetector):
         Adds all values in the NXSasMetadataHolder's configuration fields
         to the configuration of the parent device.
         Writes hdf5 files."""
-
-        self._metadata_holder = metadata_holder
         super().__init__(
             prefix,
             directory_provider,
@@ -141,18 +99,29 @@ class NXSasPilatus(PilatusDetector):
             hdf_suffix=hdf_suffix,
             name=name,
         )
-
-    async def describe_configuration(self) -> Dict[str, DataKey]:
-        return {
-            **await super().describe_configuration(),
-            **await self._metadata_holder.describe_configuration(),
-        }
+        self._metadata_holder = metadata_holder
 
     async def read_configuration(self) -> Dict[str, Reading]:
-        return {
-            **await super().read_configuration(),
-            **await self._metadata_holder.read_configuration(),
-        }
+        return await merge_gathered_dicts(
+            (
+                r
+                for r in (
+                    super().read_configuration(),
+                    self._metadata_holder.read(self.name),
+                )
+            )
+        )
+
+    async def describe_configuration(self) -> Dict[str, DataKey]:
+        return await merge_gathered_dicts(
+            (
+                r
+                for r in (
+                    super().describe_configuration(),
+                    self._metadata_holder.describe(self.name),
+                )
+            )
+        )
 
 
 class NXSasOAV(AravisDetector):
@@ -171,8 +140,6 @@ class NXSasOAV(AravisDetector):
         Adds all values in the NXSasMetadataHolder's configuration fields
         to the configuration of the parent device.
         Writes hdf5 files."""
-
-        self._metadata_holder = metadata_holder
         super().__init__(
             prefix,
             directory_provider,
@@ -181,15 +148,26 @@ class NXSasOAV(AravisDetector):
             name=name,
             gpio_number=gpio_number,
         )
-
-    async def describe_configuration(self) -> Dict[str, DataKey]:
-        return {
-            **await super().describe_configuration(),
-            **await self._metadata_holder.describe_configuration(),
-        }
+        self._metadata_holder = metadata_holder
 
     async def read_configuration(self) -> Dict[str, Reading]:
-        return {
-            **await super().read_configuration(),
-            **await self._metadata_holder.read_configuration(),
-        }
+        return await merge_gathered_dicts(
+            (
+                r
+                for r in (
+                    super().read_configuration(),
+                    self._metadata_holder.read(self.name),
+                )
+            )
+        )
+
+    async def describe_configuration(self) -> Dict[str, DataKey]:
+        return await merge_gathered_dicts(
+            (
+                r
+                for r in (
+                    super().describe_configuration(),
+                    self._metadata_holder.describe(self.name),
+                )
+            )
+        )
