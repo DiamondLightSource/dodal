@@ -48,12 +48,15 @@ class HutchInterlock(StandardReadable):
 class HutchShutter(StandardReadable, Movable):
     """Device to operate the hutch shutter.
 
-    If the requested shutter position is "Open", the shutter control PV should first \
-    be set to "Reset" in order to reset the interlock state and then move to "Open".
-    The reset setp is not needed for closing the shutter.
-
     When a demand is sent, the device should first check the hutch status \
-    and raise an error if it's not interlocked.
+    and raise an error if it's not interlocked (searched and locked), meaning it's not \
+    safe to operate the shutter.
+
+    If the requested shutter position is "Open", the shutter control PV should first \
+    be set to "Reset" and then move to "Open". This is because before opening the hutch \
+    shutter, the interlock status PV (`-PS-SHTR-01:ILKSTA`). Resetting the shutter will \
+    set this status to `OK`, allowing for shutter operations. Until this step is done, \
+    the hutch shutter can't be opened. The reset is not needed for closing the shutter.
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
