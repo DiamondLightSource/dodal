@@ -168,17 +168,13 @@ class TetrammController(DetectorControl):
             of readings per frame.
         """
 
+        # Set up the number of readings across the exposure period to scale with
+        # the exposure time
         self._set_minimum_frame_time(frame_time)
         values_per_reading: int = int(
             frame_time * self.base_sample_rate / self.readings_per_frame
         )
 
-        if values_per_reading < self.minimum_values_per_reading:
-            raise ValueError(
-                f"frame_time {frame_time} is too low to collect at least "
-                f"{self.minimum_values_per_reading} values per reading, at "
-                f"{self.readings_per_frame} readings per frame."
-            )
         await self._drv.values_per_reading.set(values_per_reading)
 
     @property
