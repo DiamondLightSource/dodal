@@ -1,4 +1,6 @@
 import inspect
+from functools import wraps
+from typing import Type, Callable, Optional, TypeVar
 from typing import (
     Callable,
     Dict,
@@ -110,6 +112,32 @@ def device_factory(lazy=False, set_name=True) -> Callable[[F], DeviceFactory[D]]
         return factory
 
     return wrapper_around_device_init
+
+
+
+T = TypeVar('T', bound=OphydV2Device)  # Generic type for devices
+
+def device_factory(lazy: bool = False, fake: bool = False, wait: bool = False):
+    def decorator(func: Callable[..., T]) -> Callable[[], T]:
+        _cache = None
+
+        @wraps(func)
+        def wrapper() -> T:
+            nonlocal _cache
+            if lazy and _cache is not None:
+                return _cache
+
+            device = func()
+            if fake:
+                device = make_fake_device(device)  # Assume make_fake_device modifies the device for simulation.
+            if wait:
+                device.wait_for_connection()  # Assume wait_for_connection is a method of the device.
+
+            _cache = device
+            return device
+
+        return wrapper
+    return decorator
 
 
 def get_device_factories() -> Dict[DeviceFactory, bool]:
