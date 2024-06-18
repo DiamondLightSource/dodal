@@ -10,7 +10,7 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import numbered_slits
-from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitDirectoryProvider
+from dodal.common.visit import DirectoryServiceClient, StaticVisitDirectoryProvider
 from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
 from dodal.devices.i22.fswitch import FSwitch
@@ -36,7 +36,7 @@ set_directory_provider(
     StaticVisitDirectoryProvider(
         BL,
         Path("/dls/i22/data/2024/cm37271-2/bluesky"),
-        client=LocalDirectoryServiceClient(),
+        client=DirectoryServiceClient("http://i22-control:8088/api"),
     )
 )
 
@@ -58,9 +58,7 @@ def saxs(
             description="Dectris Pilatus3 2M",
             type="Photon Counting Hybrid Pixel",
             sensor_material="silicon",
-            distance=(0, "m"),  # To get from configuration data after visit begins
-            sensor_thickness=(0, "mm"),
-            threshold_energy=(0, "keV"),
+            distance=(4711.833684146172, "mm"),
         ),
         directory_provider=get_directory_provider(),
     )
@@ -95,9 +93,7 @@ def waxs(
             description="Dectris Pilatus3 2M",
             type="Photon Counting Hybrid Pixel",
             sensor_material="silicon",
-            distance=(0, "m"),  # To get from configuration data after visit begins
-            sensor_thickness=(0, "mm"),
-            threshold_energy=(0, "keV"),
+            distance=(175.4199417092314, "mm"),
         ),
         directory_provider=get_directory_provider(),
     )
@@ -176,13 +172,13 @@ def dcm(
             usage="Bragg",
             type="silicon",
             reflection=(1, 1, 1),
-            d_spacing=3.13475,
+            d_spacing=(3.13475, "mm"),
         ),
         crystal_2_metadata=CrystalMetadata(
             usage="Bragg",
             type="silicon",
             reflection=(1, 1, 1),
-            d_spacing=3.13475,
+            d_spacing=(3.13475, "mm"),
         ),
     )
 
@@ -286,7 +282,6 @@ def fswitch(
     )
 
 
-# Must find which PandA IOC(s) are compatible
 # Must document what PandAs are physically connected to
 # See: https://github.com/bluesky/ophyd-async/issues/284
 def panda1(
