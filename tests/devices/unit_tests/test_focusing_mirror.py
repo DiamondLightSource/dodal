@@ -1,4 +1,7 @@
 import asyncio
+
+# prevent python 3.10 exception doppelganger stupidity
+from asyncio import TimeoutError
 from unittest.mock import DEFAULT, AsyncMock, patch
 
 import pytest
@@ -148,7 +151,7 @@ def test_mirror_set_voltage_sets_and_waits_settle_timeout_expires(
                 100,
                 wait=True,
             )
-
+        print(f"exception is {type(excinfo.value.args[0].exception())}")
         assert isinstance(excinfo.value.args[0].exception(), TimeoutError)
 
     RE(plan())
