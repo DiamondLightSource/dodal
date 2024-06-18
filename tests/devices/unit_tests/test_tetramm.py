@@ -58,17 +58,17 @@ async def test_max_frame_rate_is_calculated_correctly(
     status = await tetramm_controller.arm(1, DetectorTrigger.edge_trigger, 2.0)
     await status
 
-    assert tetramm_controller.minimum_frame_time == 0.1
+    assert tetramm_controller.minimum_exposure == 0.1
     assert tetramm_controller.max_frame_rate == 10.0
 
     # Ensure that the minimum frame time is correctly calculated given a maximum
     # frame rate.
-    # max_frame_rate**-1 = minimum_frame_times
+    # max_frame_rate**-1 = minimum_exposures
     tetramm_controller.max_frame_rate = 20.0
-    assert tetramm_controller.minimum_frame_time == pytest.approx(1 / 20)
+    assert tetramm_controller.minimum_exposure == pytest.approx(1 / 20)
 
 
-async def test_min_frame_time_is_calculated_correctly(
+async def test_min_exposure_is_calculated_correctly(
     tetramm_controller: TetrammController,
 ):
     # Using coprimes to ensure the solution has a unique relation to the values.
@@ -77,17 +77,17 @@ async def test_min_frame_time_is_calculated_correctly(
     tetramm_controller.maximum_readings_per_frame = 1_001
     tetramm_controller.minimum_values_per_reading = 17
 
-    # min_frame_time (s/f) = max_readings_per_frame * values_per_reading / sample_rate (v/s)
-    minimum_frame_time = (
+    # min_exposure (s/f) = max_readings_per_frame * values_per_reading / sample_rate (v/s)
+    minimum_exposure = (
         tetramm_controller.readings_per_frame
         * tetramm_controller.minimum_values_per_reading
         / float(tetramm_controller.base_sample_rate)
     )
 
-    assert tetramm_controller.minimum_frame_time == pytest.approx(minimum_frame_time)
+    assert tetramm_controller.minimum_exposure == pytest.approx(minimum_exposure)
 
     # From rearranging the above
-    # readings_per_frame = frame_time * sample_rate / values_per_reading
+    # readings_per_frame = exposure * sample_rate / values_per_reading
 
     readings_per_time = (
         tetramm_controller.base_sample_rate
@@ -117,25 +117,25 @@ async def test_min_frame_time_is_calculated_correctly(
 VALID_TEST_EXPOSURE_TIME = 1 / 19
 
 
-async def test_set_frame_time_updates_values_per_reading(
+async def test_set_exposure_updates_values_per_reading(
     tetramm_controller: TetrammController,
     tetramm_driver: TetrammDriver,
 ):
-    await tetramm_controller.set_frame_time(VALID_TEST_EXPOSURE_TIME)
+    await tetramm_controller.set_exposure(VALID_TEST_EXPOSURE_TIME)
     values_per_reading = await tetramm_driver.values_per_reading.get_value()
     assert values_per_reading == 5
 
 
-async def test_set_invalid_frame_time_for_number_of_values_per_reading(
+async def test_set_invalid_exposure_for_number_of_values_per_reading(
     tetramm_controller: TetrammController,
 ):
     """
-    frame_time >= readings_per_frame * values_per_reading / sample_rate
+    exposure >= readings_per_frame * values_per_reading / sample_rate
     With the default values:
     base_sample_rate = 100_000
     minimum_values_per_reading = 5
     readings_per_frame = 1_000
-    frame_time >= 1_000 * 5 / 100_000 = 1/20
+    exposure >= 1_000 * 5 / 100_000 = 1/20
     """
 
     with pytest.raises(
