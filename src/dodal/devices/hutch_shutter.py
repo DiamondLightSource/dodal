@@ -11,8 +11,10 @@ from ophyd_async.epics.signal import epics_signal_r, epics_signal_w
 
 from dodal.log import LOGGER
 
+HUTCH_SAFE_FOR_OPERATIONS = 0  # Hutch is locked and can't be entered
 
-class HutchNotInterlockedError(Exception):
+
+class ShutterNotSafeToOperateError(Exception):
     def __init__(self, errmsg, *args: object) -> None:
         LOGGER.error(errmsg)
         super().__init__(*args)
@@ -39,10 +41,14 @@ class HutchInterlock(StandardReadable):
         self.status = epics_signal_r(int, bl_prefix + "-PS-IOC-01:M14:LOP")
         super().__init__(name)
 
-    async def is_interlocked(self) -> bool:
-        """If the status value is 0, hutch is interlocked."""
+    async def shutter_safe_to_operate(self) -> bool:
+        """If the status value is 0, hutch has been searched and locked and it is safe \
+        to operate the shutter.
+        If the status value is not 0 (usually set to 7), the hutch is open and the \
+        shutter should not be in use.
+        """
         interlock_state = await self.status.get_value()
-        return interlock_state == 0
+        return interlock_state == HUTCH_SAFE_FOR_OPERATIONS
 
 
 class HutchShutter(StandardReadable, Movable):
@@ -70,10 +76,10 @@ class HutchShutter(StandardReadable, Movable):
 
     @AsyncStatus.wrap
     async def set(self, position_demand: ShutterDemand):
-        interlock_state = await self.interlock.is_insterlocked()
+        interlock_state = await self.interlock.shutter_safe_to_operate()
         if not interlock_state:
-            raise HutchNotInterlockedError(
-                "The hutch is not interlocked, not operating shutter."
+            raise ShutterNotSafeToOperateError(
+                "The hutch has not been locked, not operating shutter."
             )
         if position_demand == ShutterDemand.OPEN:
             await self.control.set(ShutterDemand.RESET, wait=True)

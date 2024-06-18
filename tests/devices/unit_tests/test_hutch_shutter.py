@@ -12,9 +12,9 @@ from ophyd_async.core import (
 )
 
 from dodal.devices.hutch_shutter import (
-    HutchNotInterlockedError,
     HutchShutter,
     ShutterDemand,
+    ShutterNotSafeToOperateError,
     ShutterState,
 )
 
@@ -42,9 +42,9 @@ async def test_shutter_raises_error_on_set_if_hutch_not_interlocked(
     fake_shutter: HutchShutter,
 ):
     set_mock_value(fake_shutter.interlock.status, 1)
-    assert await fake_shutter.interlock.is_insterlocked() is False
+    assert await fake_shutter.interlock.shutter_safe_to_operate() is False
 
-    with pytest.raises(HutchNotInterlockedError):
+    with pytest.raises(ShutterNotSafeToOperateError):
         await fake_shutter.set(ShutterDemand.CLOSE)
 
 
