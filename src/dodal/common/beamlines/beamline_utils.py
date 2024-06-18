@@ -76,35 +76,45 @@ def wait_for_connection(
 
 T = TypeVar("T", bound=AnyDevice)
 
-D = TypeVar("D", bound=OphydV2Device)
-class DeviceFactory(Protocol, Generic[D]):
-    def __call__(self, connect: bool = False, timeout: float = DEFAULT_TIMEOUT) -> D:
-        ...
+D = TypeVar("D", bound=OphydV2Device, covariant=True)
 
-F = Callable[..., D]
+
+class DeviceFactory(Protocol[D]):
+    def __call__(
+        self, connect: bool = False, timeout: float = DEFAULT_TIMEOUT
+    ) -> D: ...
+
+
+F = Callable[[], D]
 
 _factory_made_devices: Dict[DeviceFactory, OphydV2Device] = {}
-_device_is_lazy: Dict[DeviceFactory, bool] = {}
+_device_is_lazy: Dict[, bool] = {}
 
-def device_factory(lazy=False, set_name=True)-> Callable[[F], DeviceFactory[D]]:
-    def wrapper(f: F) -> DeviceFactory[D]:
+
+def device_factory(lazy=False, set_name=True) -> Callable[[F], DeviceFactory[D]]:
+    def wrapper_around_device_init(f: F) -> DeviceFactory[D]:
         def factory(connect=False, timeout: float = DEFAULT_TIMEOUT):
-            device = _factory_made_devices.get(f)
+            device: OphydV2Device | None = _factory_made_devices.get(f)
             if not device:
                 device = f()
+                assert device is not None
                 if set_name:
                     device.set_name(f.__name__)
-                _factory_made_devices[f] = device
-            if connect: 
+                _factory_made_devices[f.__name__] = device
+            if connect:
                 call_in_bluesky_event_loop(device.connect(timeout=timeout))
             return device
+
         _device_is_lazy[factory] = lazy
         factory.__name__ = f.__name__
         return factory
-    return wrapper
+
+    return wrapper_around_device_init
+
 
 def get_device_factories() -> Dict[DeviceFactory, bool]:
     return _device_is_lazy.copy()
+
 
 @skip_device()
 def device_instantiation(
