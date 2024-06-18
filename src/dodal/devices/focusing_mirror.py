@@ -1,7 +1,12 @@
 from enum import Enum
 
-from ophyd_async import core
-from ophyd_async.core import AsyncStatus, StandardReadable, observe_value
+from ophyd_async.core import (
+    AsyncStatus,
+    Device,
+    DeviceVector,
+    StandardReadable,
+    observe_value,
+)
 from ophyd_async.core.signal import soft_signal_r_and_setter
 from ophyd_async.epics.motion import Motor
 from ophyd_async.epics.signal import (
@@ -38,12 +43,12 @@ class MirrorVoltageDemand(str, Enum):
     SLEW = "SLEW"
 
 
-class MirrorVoltageDevice(core.Device):
+class MirrorVoltageDevice(Device):
     """Abstract the bimorph mirror voltage PVs into a single device that can be set asynchronously and returns when
     the demanded voltage setpoint is accepted, without blocking the caller as this process can take significant time.
     """
 
-    def __init__(self, name: str, prefix: str = ""):
+    def __init__(self, name: str = "", prefix: str = ""):
         self._actual_v = epics_signal_r(int, prefix + "R")
         self._setpoint_v = epics_signal_rw(int, prefix + "D")
         self._demand_accepted = epics_signal_r(MirrorVoltageDemand, prefix + "DSEV")
@@ -94,51 +99,21 @@ class MirrorVoltageDevice(core.Device):
                     break
 
 
-class VFMMirrorVoltages(core.Device):
+class VFMMirrorVoltages(StandardReadable):
     def __init__(
         self, name: str, prefix: str, *args, daq_configuration_path: str, **kwargs
     ):
-        super().__init__(*args, name=name, **kwargs)
         self.voltage_lookup_table_path = (
             daq_configuration_path + "/json/mirrorFocus.json"
         )
-        self._channel14_voltage_device = MirrorVoltageDevice(
-            "channel14_voltage_device", prefix + "BM:V14"
-        )
-        self._channel15_voltage_device = MirrorVoltageDevice(
-            "channel15_voltage_device", prefix + "BM:V15"
-        )
-        self._channel16_voltage_device = MirrorVoltageDevice(
-            "channel16_voltage_device", prefix + "BM:V16"
-        )
-        self._channel17_voltage_device = MirrorVoltageDevice(
-            "channel17_voltage_device", prefix + "BM:V17"
-        )
-        self._channel18_voltage_device = MirrorVoltageDevice(
-            "channel18_voltage_device", prefix + "BM:V18"
-        )
-        self._channel19_voltage_device = MirrorVoltageDevice(
-            "channel19_voltage_device", prefix + "BM:V19"
-        )
-        self._channel20_voltage_device = MirrorVoltageDevice(
-            "channel20_voltage_device", prefix + "BM:V20"
-        )
-        self._channel21_voltage_device = MirrorVoltageDevice(
-            "channel21_voltage_device", prefix + "BM:V21"
-        )
-
-    @property
-    def voltage_channels(self) -> list[MirrorVoltageDevice]:
-        return [
-            self._channel14_voltage_device,
-            self._channel15_voltage_device,
-            self._channel16_voltage_device,
-            self._channel17_voltage_device,
-            self._channel18_voltage_device,
-            self._channel19_voltage_device,
-            self._channel20_voltage_device,
-            self._channel21_voltage_device,
-        ]
+        with self.add_children_as_readables():
+            self.voltage_channels = DeviceVector(
+                {
+                    i - 14: MirrorVoltageDevice(prefix=f"{prefix}BM:V{i}")
+                    for i in range(14, 22)
+                }
+            )
+        super().__init__(*args, name=name, **kwargs)
 
 
 class FocusingMirror(StandardReadable):
