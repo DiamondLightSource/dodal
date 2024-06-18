@@ -10,11 +10,14 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import numbered_slits
-from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitDirectoryProvider
+from dodal.common.visit import DirectoryServiceClient, StaticVisitDirectoryProvider
 from dodal.devices.focusing_mirror import FocusingMirror
+from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
 from dodal.devices.i22.fswitch import FSwitch
+from dodal.devices.i22.nxsas import NXSasMetadataHolder, NXSasOAV, NXSasPilatus
 from dodal.devices.linkam3 import Linkam3
 from dodal.devices.slits import Slits
+from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.tetramm import TetrammDetector
 from dodal.devices.undulator import Undulator
 from dodal.log import set_beamline as set_log_beamline
@@ -33,7 +36,7 @@ set_directory_provider(
     StaticVisitDirectoryProvider(
         BL,
         Path("/dls/i22/data/2024/cm37271-2/bluesky"),
-        client=LocalDirectoryServiceClient(),
+        client=DirectoryServiceClient("http://i22-control:8088/api"),
     )
 )
 
@@ -42,14 +45,34 @@ def saxs(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> PilatusDetector:
     return device_instantiation(
-        PilatusDetector,
+        NXSasPilatus,
         "saxs",
         "-EA-PILAT-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
         drv_suffix="CAM:",
         hdf_suffix="HDF5:",
+        metadata_holder=NXSasMetadataHolder(
+            x_pixel_size=(1.72e-1, "mm"),
+            y_pixel_size=(1.72e-1, "mm"),
+            description="Dectris Pilatus3 2M",
+            type="Photon Counting Hybrid Pixel",
+            sensor_material="silicon",
+            distance=(4711.833684146172, "mm"),
+        ),
         directory_provider=get_directory_provider(),
+    )
+
+
+def synchrotron(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Synchrotron:
+    return device_instantiation(
+        Synchrotron,
+        "synchrotron",
+        "",
+        wait_for_connection,
+        fake_with_ophyd_sim,
     )
 
 
@@ -57,13 +80,21 @@ def waxs(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> PilatusDetector:
     return device_instantiation(
-        PilatusDetector,
+        NXSasPilatus,
         "waxs",
         "-EA-PILAT-03:",
         wait_for_connection,
         fake_with_ophyd_sim,
         drv_suffix="CAM:",
         hdf_suffix="HDF5:",
+        metadata_holder=NXSasMetadataHolder(
+            x_pixel_size=(1.72e-1, "mm"),
+            y_pixel_size=(1.72e-1, "mm"),
+            description="Dectris Pilatus3 2M",
+            type="Photon Counting Hybrid Pixel",
+            sensor_material="silicon",
+            distance=(175.4199417092314, "mm"),
+        ),
         directory_provider=get_directory_provider(),
     )
 
@@ -78,6 +109,7 @@ def i0(
         "-EA-XBPM-02:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        type="Cividec Diamond XBPM",
         directory_provider=get_directory_provider(),
     )
 
@@ -92,6 +124,7 @@ def it(
         "-EA-TTRM-02:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        type="PIN Diode",
         directory_provider=get_directory_provider(),
     )
 
@@ -119,6 +152,34 @@ def hfm(
         "-OP-KBM-01:HFM:",
         wait_for_connection,
         fake_with_ophyd_sim,
+    )
+
+
+def dcm(
+    wait_for_connection: bool = True,
+    fake_with_ophyd_sim: bool = False,
+) -> DoubleCrystalMonochromator:
+    return device_instantiation(
+        DoubleCrystalMonochromator,
+        "dcm",
+        "",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        bl_prefix=False,
+        motion_prefix=f"{BeamlinePrefix(BL).beamline_prefix}-MO-DCM-01:",
+        temperature_prefix=f"{BeamlinePrefix(BL).beamline_prefix}-DI-DCM-01:",
+        crystal_1_metadata=CrystalMetadata(
+            usage="Bragg",
+            type="silicon",
+            reflection=(1, 1, 1),
+            d_spacing=(3.13475, "mm"),
+        ),
+        crystal_2_metadata=CrystalMetadata(
+            usage="Bragg",
+            type="silicon",
+            reflection=(1, 1, 1),
+            d_spacing=(3.13475, "mm"),
+        ),
     )
 
 
@@ -221,7 +282,6 @@ def fswitch(
     )
 
 
-# Must find which PandA IOC(s) are compatible
 # Must document what PandAs are physically connected to
 # See: https://github.com/bluesky/ophyd-async/issues/284
 def panda1(
@@ -283,17 +343,24 @@ def panda4(
     )
 
 
+@skip_device
 def oav(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> AravisDetector:
     return device_instantiation(
-        AravisDetector,
+        NXSasOAV,
         "oav",
         "-DI-OAV-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
         drv_suffix="DET:",
         hdf_suffix="HDF5:",
+        metadata_holder=NXSasMetadataHolder(
+            x_pixel_size=(3.45e-3, "mm"),  # Double check this figure
+            y_pixel_size=(3.45e-3, "mm"),
+            description="AVT Mako G-507B",
+            distance=(0, "m"),  # To get from configuration data after visit begins
+        ),
         directory_provider=get_directory_provider(),
     )
 
