@@ -39,7 +39,7 @@ class HutchInterlock(StandardReadable):
         self.status = epics_signal_r(int, bl_prefix + "-PS-IOC-01:M14:LOP")
         super().__init__(name)
 
-    async def is_insterlocked(self) -> bool:
+    async def is_interlocked(self) -> bool:
         """If the status value is 0, hutch is interlocked."""
         interlock_state = await self.status.get_value()
         return interlock_state == 0
