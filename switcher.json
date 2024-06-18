@@ -446,5 +446,9 @@
   {
     "version": "tom_testing",
     "url": "https://DiamondLightSource.github.io/dodal/tom_testing/"
+  },
+  {
+    "version": "unskip-oav",
+    "url": "https://DiamondLightSource.github.io/dodal/unskip-oav/"
   }
 ]
