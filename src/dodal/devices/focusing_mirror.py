@@ -1,12 +1,11 @@
-from enum import Enum, IntEnum
-from typing import Any
+from enum import Enum
 
-from ophyd import Component, Device, EpicsSignal
-from ophyd.status import Status, StatusBase
-from ophyd_async.core import StandardReadable
+from ophyd_async import core
+from ophyd_async.core import AsyncStatus, StandardReadable, observe_value
 from ophyd_async.core.signal import soft_signal_r_and_setter
 from ophyd_async.epics.motion import Motor
 from ophyd_async.epics.signal import (
+    epics_signal_r,
     epics_signal_rw,
     epics_signal_x,
 )
@@ -32,26 +31,28 @@ class MirrorStripe(str, Enum):
     PLATINUM = "Platinum"
 
 
-class MirrorVoltageDemand(IntEnum):
-    N_A = 0
-    OK = 1
-    FAIL = 2
-    SLEW = 3
+class MirrorVoltageDemand(str, Enum):
+    N_A = "N/A"
+    OK = "OK"
+    FAIL = "FAIL"
+    SLEW = "SLEW"
 
 
-class MirrorVoltageDevice(Device):
+class MirrorVoltageDevice(core.Device):
     """Abstract the bimorph mirror voltage PVs into a single device that can be set asynchronously and returns when
     the demanded voltage setpoint is accepted, without blocking the caller as this process can take significant time.
     """
 
-    _actual_v: EpicsSignal = Component(EpicsSignal, "R")
-    _setpoint_v: EpicsSignal = Component(EpicsSignal, "D")
-    _demand_accepted: EpicsSignal = Component(EpicsSignal, "DSEV")
+    def __init__(self, name: str, prefix: str = ""):
+        self._actual_v = epics_signal_r(int, prefix + "R")
+        self._setpoint_v = epics_signal_rw(int, prefix + "D")
+        self._demand_accepted = epics_signal_r(MirrorVoltageDemand, prefix + "DSEV")
+        super().__init__(name=name)
 
-    def set(self, value, *args, **kwargs) -> StatusBase:
+    @AsyncStatus.wrap
+    async def set(self, value, *args, **kwargs):
         """Combine the following operations into a single set:
         1. apply the value to the setpoint PV
-        2. Return to the caller with a Status future
         3. Wait until demand is accepted
         4. When either demand is accepted or DEFAULT_SETTLE_TIME expires, signal the result on the Status
         """
@@ -59,53 +60,72 @@ class MirrorVoltageDevice(Device):
         setpoint_v = self._setpoint_v
         demand_accepted = self._demand_accepted
 
-        if demand_accepted.get() != MirrorVoltageDemand.OK:
+        if await demand_accepted.get_value() != MirrorVoltageDemand.OK:
             raise AssertionError(
                 f"Attempted to set {setpoint_v.name} when demand is not accepted."
             )
 
-        if setpoint_v.get() == value:
+        if await setpoint_v.get_value() == value:
             LOGGER.debug(f"{setpoint_v.name} already at {value} - skipping set")
-            return Status(success=True, done=True)
+            return
 
         LOGGER.debug(f"setting {setpoint_v.name} to {value}")
-        demand_accepted_status = Status(self, DEFAULT_SETTLE_TIME_S)
 
-        subscription: dict[str, Any] = {"handle": None}
-
-        def demand_check_callback(old_value, value, **kwargs):
-            LOGGER.debug(f"Got event old={old_value} new={value} for {setpoint_v.name}")
-            if old_value != MirrorVoltageDemand.OK and value == MirrorVoltageDemand.OK:
-                LOGGER.debug(f"Demand accepted for {setpoint_v.name}")
-                subs_handle = subscription.pop("handle", None)
-                if subs_handle is None:
+        set_applied = False
+        async for accepted_value in observe_value(
+            demand_accepted, timeout=DEFAULT_SETTLE_TIME_S
+        ):
+            LOGGER.debug(
+                f"Current demand accepted = {accepted_value} for {setpoint_v.name}"
+            )
+            if not set_applied:
+                if accepted_value == MirrorVoltageDemand.OK:
+                    await setpoint_v.set(value)
+                    set_applied = True
+                else:
                     raise AssertionError("Demand accepted before set attempted")
-                demand_accepted.unsubscribe(subs_handle)
+            else:
+                if accepted_value != MirrorVoltageDemand.OK:
+                    LOGGER.debug(
+                        f"Demand not accepted for {setpoint_v.name}, waiting for acceptance..."
+                    )
+                else:
+                    LOGGER.debug(f"Demand accepted for {setpoint_v.name}")
+                    break
 
-                demand_accepted_status.set_finished()
-            # else timeout handled by parent demand_accepted_status
 
-        subscription["handle"] = demand_accepted.subscribe(demand_check_callback)
-        setpoint_status = setpoint_v.set(value)
-        status = setpoint_status & demand_accepted_status
-        return status
-
-
-class VFMMirrorVoltages(Device):
-    def __init__(self, *args, daq_configuration_path: str, **kwargs):
-        super().__init__(*args, **kwargs)
+class VFMMirrorVoltages(core.Device):
+    def __init__(
+        self, name: str, prefix: str, *args, daq_configuration_path: str, **kwargs
+    ):
+        super().__init__(*args, name=name, **kwargs)
         self.voltage_lookup_table_path = (
             daq_configuration_path + "/json/mirrorFocus.json"
         )
-
-    _channel14_voltage_device = Component(MirrorVoltageDevice, "BM:V14")
-    _channel15_voltage_device = Component(MirrorVoltageDevice, "BM:V15")
-    _channel16_voltage_device = Component(MirrorVoltageDevice, "BM:V16")
-    _channel17_voltage_device = Component(MirrorVoltageDevice, "BM:V17")
-    _channel18_voltage_device = Component(MirrorVoltageDevice, "BM:V18")
-    _channel19_voltage_device = Component(MirrorVoltageDevice, "BM:V19")
-    _channel20_voltage_device = Component(MirrorVoltageDevice, "BM:V20")
-    _channel21_voltage_device = Component(MirrorVoltageDevice, "BM:V21")
+        self._channel14_voltage_device = MirrorVoltageDevice(
+            "channel14_voltage_device", prefix + "BM:V14"
+        )
+        self._channel15_voltage_device = MirrorVoltageDevice(
+            "channel15_voltage_device", prefix + "BM:V15"
+        )
+        self._channel16_voltage_device = MirrorVoltageDevice(
+            "channel16_voltage_device", prefix + "BM:V16"
+        )
+        self._channel17_voltage_device = MirrorVoltageDevice(
+            "channel17_voltage_device", prefix + "BM:V17"
+        )
+        self._channel18_voltage_device = MirrorVoltageDevice(
+            "channel18_voltage_device", prefix + "BM:V18"
+        )
+        self._channel19_voltage_device = MirrorVoltageDevice(
+            "channel19_voltage_device", prefix + "BM:V19"
+        )
+        self._channel20_voltage_device = MirrorVoltageDevice(
+            "channel20_voltage_device", prefix + "BM:V20"
+        )
+        self._channel21_voltage_device = MirrorVoltageDevice(
+            "channel21_voltage_device", prefix + "BM:V21"
+        )
 
     @property
     def voltage_channels(self) -> list[MirrorVoltageDevice]:
