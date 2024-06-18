@@ -260,6 +260,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/578-add-a-flowchart-on-the-decisions-to-make-a-new-ophyd-device-for-dls/"
   },
   {
+    "version": "604_ophyd_async_device_for_mirror_voltages",
+    "url": "https://DiamondLightSource.github.io/dodal/604_ophyd_async_device_for_mirror_voltages/"
+  },
+  {
     "version": "611_hutch-shutter-device",
     "url": "https://DiamondLightSource.github.io/dodal/611_hutch-shutter-device/"
   },
@@ -390,10 +394,6 @@
   {
     "version": "i22-and-p38-system-tests",
     "url": "https://DiamondLightSource.github.io/dodal/i22-and-p38-system-tests/"
-  },
-  {
-    "version": "i22-metadata",
-    "url": "https://DiamondLightSource.github.io/dodal/i22-metadata/"
   },
   {
     "version": "i22-metadata-fix",
