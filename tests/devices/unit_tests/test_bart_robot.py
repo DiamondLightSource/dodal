@@ -1,4 +1,4 @@
-from asyncio import sleep
+from asyncio import create_task, sleep
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -32,9 +32,9 @@ async def test_given_robot_load_times_out_when_load_called_then_exception_contai
 
     with pytest.raises(RobotLoadFailed) as e:
         await device.set(SampleLocation(0, 0))
-        assert e.value.error_code == expected_error_code
-        assert e.value.error_code == expected_error_string
-        assert str(e.value) == expected_error_string
+    assert e.value.error_code == expected_error_code
+    assert e.value.error_string == expected_error_string
+    assert str(e.value) == expected_error_string
 
 
 @patch("dodal.devices.robot.LOGGER")
@@ -90,6 +90,7 @@ async def test_given_program_not_running_and_pin_unmounts_then_mounts_when_load_
     device.load = AsyncMock(side_effect=device.load)
     status = device.set(SampleLocation(15, 10))
     await sleep(0.01)
+    device.load.trigger.assert_called_once()  # type:ignore
     set_mock_value(device.gonio_pin_sensor, PinMounted.NO_PIN_MOUNTED)
     await sleep(0.005)
     set_mock_value(device.gonio_pin_sensor, PinMounted.PIN_MOUNTED)
@@ -102,8 +103,8 @@ async def test_given_program_not_running_and_pin_unmounts_then_mounts_when_load_
 
 async def test_given_waiting_for_pin_to_mount_when_no_pin_mounted_then_error_raised():
     device = await _get_bart_robot()
-    status = device.pin_mounted_or_no_pin_found()
-    await sleep(0.01)
+    status = create_task(device.pin_mounted_or_no_pin_found())
+    await sleep(0.2)
     set_mock_value(device.error_code, 25)
     await sleep(0.01)
     with pytest.raises(RobotLoadFailed):
@@ -112,7 +113,7 @@ async def test_given_waiting_for_pin_to_mount_when_no_pin_mounted_then_error_rai
 
 async def test_given_waiting_for_pin_to_mount_when_pin_mounted_then_no_error_raised():
     device = await _get_bart_robot()
-    status = device.pin_mounted_or_no_pin_found()
+    status = create_task(device.pin_mounted_or_no_pin_found())
     await sleep(0.01)
     set_mock_value(device.gonio_pin_sensor, PinMounted.PIN_MOUNTED)
     await sleep(0.01)
