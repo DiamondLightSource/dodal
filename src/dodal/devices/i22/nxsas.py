@@ -43,13 +43,13 @@ class MetadataHolder:
     async def read(self, parent_name: str) -> Dict[str, Reading]:
         def reading(value):
             if isinstance(value, tuple):
-                return value[0]
-            return value
+                return reading(value[0])
+            return {"timestamp": -1, "value": value}
 
         return {
             f"{parent_name}-{field.name}": reading(getattr(self, field.name))
             for field in fields(self)
-            if hasattr(self, field.name)
+            if getattr(self, field.name, None) is not None
         }
 
 
