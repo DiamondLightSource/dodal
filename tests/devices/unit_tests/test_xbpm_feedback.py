@@ -1,32 +1,42 @@
 import pytest
-from ophyd.sim import make_fake_device
+from bluesky import RunEngine
+from bluesky import plan_stubs as bps
+from ophyd_async.core import DeviceCollector, set_mock_value
 
 from dodal.devices.xbpm_feedback import XBPMFeedback
 
 
 @pytest.fixture
-def fake_xbpm_feedback():
-    FakeXBPMFeedback = make_fake_device(XBPMFeedback)
-    return FakeXBPMFeedback(name="xbpm")
+async def fake_xbpm_feedback() -> XBPMFeedback:
+    async with DeviceCollector(mock=True):
+        xbpm = XBPMFeedback()
+    return xbpm
 
 
 def test_given_pos_stable_when_xbpm_feedback_kickoff_then_return_immediately(
+    RE: RunEngine,
     fake_xbpm_feedback: XBPMFeedback,
 ):
-    fake_xbpm_feedback.pos_stable.sim_put(1)  # type: ignore
-    status = fake_xbpm_feedback.trigger()
-    status.wait(0.1)
-    assert status.done and status.success
+    set_mock_value(fake_xbpm_feedback.pos_stable, True)
+
+    def plan():
+        yield from bps.trigger(fake_xbpm_feedback)
+        yield from bps.wait(timeout=0.1)
+
+    RE(plan())
 
 
 def test_given_pos_not_stable_and_goes_stable_when_xbpm_feedback_kickoff_then_return(
-    fake_xbpm_feedback: XBPMFeedback,
+    RE: RunEngine, fake_xbpm_feedback: XBPMFeedback
 ):
-    fake_xbpm_feedback.pos_stable.sim_put(0)  # type: ignore
-    status = fake_xbpm_feedback.trigger()
+    set_mock_value(fake_xbpm_feedback.pos_stable, False)
 
-    assert not status.done
+    def plan():
+        yield from bps.trigger(fake_xbpm_feedback)
+        with pytest.raises(expected_exception=TimeoutError):
+            yield from bps.wait(timeout=0.1)
 
-    fake_xbpm_feedback.pos_stable.sim_put(1)  # type: ignore
-    status.wait(0.1)
-    assert status.done and status.success
+        set_mock_value(fake_xbpm_feedback.pos_stable, True)
+        yield from bps.wait(0.1)
+
+    RE(plan())
