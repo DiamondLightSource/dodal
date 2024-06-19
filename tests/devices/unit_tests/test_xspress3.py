@@ -62,7 +62,7 @@ async def test_stage_fail_on_detector_not_busy_state(
     mock_xspress3mini: Xspress3, RE: RunEngine
 ):
     set_mock_value(mock_xspress3mini.detector_state, DetectorState.IDLE)
-    mock_xspress3mini.timeout = 0.1
+    mock_xspress3mini.timeout = 0.01
     with pytest.raises(TimeoutError):
         await mock_xspress3mini.stage()
     with pytest.raises(Exception):
@@ -77,7 +77,7 @@ async def test_stage_fail_to_acquire_timeout(
 ):
     set_mock_value(mock_xspress3mini.detector_state, DetectorState.ACQUIRE)
     set_mock_value(mock_xspress3mini.acquire_rbv, AcquireRBVState.DONE)
-    mock_xspress3mini.timeout = 0.1
+    mock_xspress3mini.timeout = 0.01
     with pytest.raises(TimeoutError):
         await mock_xspress3mini.stage()
     with pytest.raises(Exception):
