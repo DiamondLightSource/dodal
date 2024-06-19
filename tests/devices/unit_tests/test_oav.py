@@ -117,7 +117,12 @@ def test_snapshot_trigger_saves_to_correct_file(
         st.wait()
         expected_calls_to_save = [
             call(f"test directory/test filename{addition}.png")
-            for addition in ["", "_outer_overlay", "_grid_overlay"]
+            for addition in [
+                "",
+                "t",
+                "_outer_overlay",
+                "_grid_overlay",
+            ]
         ]
         calls_to_save = mock_save.mock_calls
         assert calls_to_save == expected_calls_to_save
