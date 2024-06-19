@@ -85,8 +85,6 @@ async def test_stage_fail_to_acquire_timeout(
     mock_xspress3mini.timeout = 0.1
     with pytest.raises(TimeoutError):
         await mock_xspress3mini.stage()
-    set_mock_value(mock_xspress3mini.detector_state, DetectorState.ACQUIRE)
-    set_mock_value(mock_xspress3mini.acquire_rbv, AcquireRBVState.DONE)
     with pytest.raises(Exception):
         RE(bps.stage(mock_xspress3mini, wait=True))
     await asyncio.sleep(0.2)
