@@ -264,10 +264,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/611_hutch-shutter-device/"
   },
   {
-    "version": "628_thumbnail_on_snapshots",
-    "url": "https://DiamondLightSource.github.io/dodal/628_thumbnail_on_snapshots/"
-  },
-  {
     "version": "76_make_stage_synchronous_if_arming_not_started",
     "url": "https://DiamondLightSource.github.io/dodal/76_make_stage_synchronous_if_arming_not_started/"
   },
