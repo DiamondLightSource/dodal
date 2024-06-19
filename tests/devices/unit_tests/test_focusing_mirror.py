@@ -30,24 +30,41 @@ def vfm_mirror_voltages_not_ok(vfm_mirror_voltages) -> VFMMirrorVoltages:
 
 @pytest.fixture
 def vfm_mirror_voltages_with_set(vfm_mirror_voltages) -> VFMMirrorVoltages:
-    async def set_ok_after_delay():
+    return vfm_mirror_voltages_with_set_to_value(
+        vfm_mirror_voltages, MirrorVoltageDemand.OK
+    )
+
+
+@pytest.fixture
+def vfm_mirror_voltages_with_set_accepted_fail(
+    vfm_mirror_voltages,
+) -> VFMMirrorVoltages:
+    return vfm_mirror_voltages_with_set_to_value(
+        vfm_mirror_voltages, MirrorVoltageDemand.FAIL
+    )
+
+
+def vfm_mirror_voltages_with_set_to_value(
+    vfm_mirror_voltages, new_value: MirrorVoltageDemand
+) -> VFMMirrorVoltages:
+    async def set_demand_accepted_after_delay():
         await asyncio.sleep(0.1)
         set_mock_value(
             vfm_mirror_voltages.voltage_channels[0]._demand_accepted,
-            MirrorVoltageDemand.OK,
+            new_value,
         )
         LOGGER.debug("DEMAND ACCEPTED OK")
 
-    def not_ok_then_ok(_):
+    def not_ok_then_other_value(_):
         set_mock_value(
             vfm_mirror_voltages.voltage_channels[0]._demand_accepted,
             MirrorVoltageDemand.SLEW,
         )
-        asyncio.create_task(set_ok_after_delay())
+        asyncio.create_task(set_demand_accepted_after_delay())
         return DEFAULT
 
     vfm_mirror_voltages.voltage_channels[0]._setpoint_v.set = AsyncMock(
-        side_effect=not_ok_then_ok
+        side_effect=not_ok_then_other_value
     )
     set_mock_value(
         vfm_mirror_voltages.voltage_channels[0]._demand_accepted,
@@ -132,6 +149,22 @@ def test_mirror_set_voltage_sets_and_waits_set_fail(
         with pytest.raises(FailedStatus) as e:
             yield from bps.abs_set(
                 vfm_mirror_voltages_with_set.voltage_channels[0], 100, wait=True
+            )
+
+        assert isinstance(e.value.args[0].exception(), AssertionError)
+
+    RE(plan())
+
+
+def test_mirror_set_voltage_sets_and_waits_demand_accepted_fail(
+    RE: RunEngine, vfm_mirror_voltages_with_set_accepted_fail
+):
+    def plan():
+        with pytest.raises(FailedStatus) as e:
+            yield from bps.abs_set(
+                vfm_mirror_voltages_with_set_accepted_fail.voltage_channels[0],
+                100,
+                wait=True,
             )
 
         assert isinstance(e.value.args[0].exception(), AssertionError)

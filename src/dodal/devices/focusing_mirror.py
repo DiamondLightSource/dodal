@@ -76,27 +76,27 @@ class MirrorVoltageDevice(Device):
 
         LOGGER.debug(f"setting {setpoint_v.name} to {value}")
 
-        set_applied = False
-        async for accepted_value in observe_value(
-            demand_accepted, timeout=DEFAULT_SETTLE_TIME_S
-        ):
-            LOGGER.debug(
-                f"Current demand accepted = {accepted_value} for {setpoint_v.name}"
+        it_values = observe_value(demand_accepted, timeout=DEFAULT_SETTLE_TIME_S)
+        accepted_value = await anext(it_values)
+        if accepted_value == MirrorVoltageDemand.OK:
+            await setpoint_v.set(value)
+        else:
+            raise AssertionError(
+                f"Demand not accepted {accepted_value} before set attempted"
             )
-            if not set_applied:
-                if accepted_value == MirrorVoltageDemand.OK:
-                    await setpoint_v.set(value)
-                    set_applied = True
-                else:
-                    raise AssertionError("Demand accepted before set attempted")
-            else:
-                if accepted_value != MirrorVoltageDemand.OK:
-                    LOGGER.debug(
-                        f"Demand not accepted for {setpoint_v.name}, waiting for acceptance..."
-                    )
-                else:
-                    LOGGER.debug(f"Demand accepted for {setpoint_v.name}")
-                    break
+
+        accepted_value = await anext(it_values)
+        assert accepted_value == MirrorVoltageDemand.SLEW
+        LOGGER.debug(
+            f"Demand not accepted for {setpoint_v.name}, waiting for acceptance..."
+        )
+        while MirrorVoltageDemand.SLEW == (accepted_value := await anext(it_values)):
+            pass
+
+        if accepted_value != MirrorVoltageDemand.OK:
+            raise AssertionError(
+                f"Voltage slew failed for {setpoint_v.name}, new state={accepted_value}"
+            )
 
 
 class VFMMirrorVoltages(StandardReadable):
