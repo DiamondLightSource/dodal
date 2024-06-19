@@ -196,6 +196,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/207_vmxm_fast_grid_scan_devices/"
   },
   {
+    "version": "229_convert_xbpm_feedback_to_ophyd_async",
+    "url": "https://DiamondLightSource.github.io/dodal/229_convert_xbpm_feedback_to_ophyd_async/"
+  },
+  {
     "version": "262_make_arming_eiger_asynchronous",
     "url": "https://DiamondLightSource.github.io/dodal/262_make_arming_eiger_asynchronous/"
   },
