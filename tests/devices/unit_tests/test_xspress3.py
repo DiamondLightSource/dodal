@@ -34,7 +34,7 @@ async def mock_xspress3mini(prefix: str = "BLXX-EA-DET-007:") -> Xspress3:
     )
     assert mock_xspress3mini.roi_mca[1].name == "Xspress3Mini-roi_mca-1"
     assert mock_xspress3mini.roi_mca[2].name == "Xspress3Mini-roi_mca-2"
-    mock_xspress3mini.timeout = 5.0
+    mock_xspress3mini.timeout = 10.0
     return mock_xspress3mini
 
 
