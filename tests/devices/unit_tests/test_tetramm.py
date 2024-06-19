@@ -134,8 +134,8 @@ async def test_set_invalid_exposure_for_number_of_values_per_reading(
     With the default values:
     base_sample_rate = 100_000
     minimum_values_per_reading = 5
-    readings_per_frame = 1_000
-    exposure >= 1_000 * 5 / 100_000 = 1/20
+    readings_per_frame = 5
+    exposure >= 5 * 5 / 100_000 = 1/4000
     """
 
     with pytest.raises(
