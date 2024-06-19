@@ -28,7 +28,9 @@ async def test_given_last_saved_path_when_device_read_then_returns_path(webcam: 
 )
 @patch("dodal.devices.webcam.aiofiles", autospec=True)
 @patch("dodal.devices.webcam.ClientSession.get", autospec=True)
+@patch("dodal.devices.webcam.Image", autospec=True)
 async def test_given_filename_and_directory_when_trigger_and_read_then_returns_expected_path(
+    mock_image,
     mock_get: MagicMock,
     mock_aiofiles,
     directory,
@@ -36,7 +38,8 @@ async def test_given_filename_and_directory_when_trigger_and_read_then_returns_e
     expected_path,
     webcam: Webcam,
 ):
-    mock_get.return_value.__aenter__.return_value = AsyncMock()
+    mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
+    mock_response.read.return_value = b"TEST"
     await webcam.filename.set(filename)
     await webcam.directory.set(directory)
     await webcam.trigger()
@@ -46,11 +49,12 @@ async def test_given_filename_and_directory_when_trigger_and_read_then_returns_e
 
 @patch("dodal.devices.webcam.aiofiles", autospec=True)
 @patch("dodal.devices.webcam.ClientSession.get", autospec=True)
+@patch("dodal.devices.webcam.Image", autospec=True)
 async def test_given_data_returned_from_url_when_trigger_then_data_written(
-    mock_get: MagicMock, mock_aiofiles, webcam: Webcam
+    mock_image, mock_get: MagicMock, mock_aiofiles, webcam: Webcam
 ):
     mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
-    mock_response.read.return_value = (test_web_data := "TEST")
+    mock_response.read.return_value = (test_web_data := b"TEST")
     mock_open = mock_aiofiles.open
     mock_open.return_value.__aenter__.return_value = (mock_file := AsyncMock())
     await webcam.filename.set("file")
@@ -62,8 +66,9 @@ async def test_given_data_returned_from_url_when_trigger_then_data_written(
 
 @patch("dodal.devices.webcam.aiofiles", autospec=True)
 @patch("dodal.devices.webcam.ClientSession.get", autospec=True)
+@patch("dodal.devices.webcam.Image", autospec=True)
 async def test_given_response_throws_exception_when_trigger_then_exception_rasied(
-    mock_get: MagicMock, mock_aiofiles, webcam: Webcam
+    mock_image, mock_get: MagicMock, mock_aiofiles, webcam: Webcam
 ):
     class MyException(Exception):
         pass
@@ -72,6 +77,7 @@ async def test_given_response_throws_exception_when_trigger_then_exception_rasie
         raise MyException()
 
     mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
+    mock_response.read.return_value = b"TEST"
     mock_response.raise_for_status = _raise
     await webcam.filename.set("file")
     await webcam.directory.set("/tmp")

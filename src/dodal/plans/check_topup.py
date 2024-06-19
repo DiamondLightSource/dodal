@@ -42,10 +42,10 @@ def _delay_to_avoid_topup(total_run_time, time_to_topup):
 
 def wait_for_topup_complete(synchrotron: Synchrotron):
     LOGGER.info("Waiting for topup to complete")
-    start = yield from bps.rd(synchrotron.topup_start_countdown)
+    start = yield from bps.rd(synchrotron.top_up_start_countdown)
     while start == COUNTDOWN_DURING_TOPUP:
         yield from bps.sleep(0.1)
-        start = yield from bps.rd(synchrotron.topup_start_countdown)
+        start = yield from bps.rd(synchrotron.top_up_start_countdown)
 
 
 def check_topup_and_wait_if_necessary(
@@ -65,7 +65,7 @@ def check_topup_and_wait_if_necessary(
     """
     machine_mode = yield from bps.rd(synchrotron.synchrotron_mode)
     assert isinstance(machine_mode, SynchrotronMode)
-    time_to_topup = yield from bps.rd(synchrotron.topup_start_countdown)
+    time_to_topup = yield from bps.rd(synchrotron.top_up_start_countdown)
     if _in_decay_mode(time_to_topup) or not _gating_permitted(machine_mode):
         yield from bps.null()
         return
@@ -77,6 +77,6 @@ def check_topup_and_wait_if_necessary(
 
     yield from bps.sleep(time_to_wait)
 
-    check_start = yield from bps.rd(synchrotron.topup_start_countdown)
+    check_start = yield from bps.rd(synchrotron.top_up_start_countdown)
     if check_start == COUNTDOWN_DURING_TOPUP:
         yield from wait_for_topup_complete(synchrotron)

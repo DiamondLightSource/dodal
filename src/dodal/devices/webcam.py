@@ -1,10 +1,13 @@
+import io
 from pathlib import Path
 
 import aiofiles
 from aiohttp import ClientSession
 from bluesky.protocols import Triggerable
 from ophyd_async.core import AsyncStatus, StandardReadable, soft_signal_rw
+from PIL import Image
 
+from dodal.devices.oav.utils import save_thumbnail
 from dodal.log import LOGGER
 
 
@@ -23,8 +26,10 @@ class Webcam(StandardReadable, Triggerable):
             async with session.get(self.url) as response:
                 response.raise_for_status()
                 LOGGER.info(f"Saving webcam image from {self.url} to {file_path}")
+                data = await response.read()
                 async with aiofiles.open(file_path, "wb") as file:
-                    await file.write((await response.read()))
+                    await file.write(data)
+                save_thumbnail(Path(file_path), Image.open(io.BytesIO(data)))
 
     @AsyncStatus.wrap
     async def trigger(self) -> None:
