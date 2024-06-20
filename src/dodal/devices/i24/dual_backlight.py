@@ -39,26 +39,26 @@ class DualBacklight(StandardReadable):
 
     To set the position for LED1:
         b = DualBacklight(name="backlight)
-        b.pos1.pos_level.set("OAV2")
+        b.bl_position.pos_level.set("OAV2")
 
     To see get the available position values for LED1:
-        b.pos1.alowed_backlight_positions
+        b.bl_position.alowed_backlight_positions
 
     Note that the two LED are independently switched on and off. When LED1 is
     in "Out" position (switched off), LED2 might still be on.
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        self.backlight = epics_signal_rw(LEDStatus, prefix + "-DI-LED-01:TOGGLE")
+        self.backlight_state = epics_signal_rw(LEDStatus, prefix + "-DI-LED-01:TOGGLE")
         self.bl_position = BacklightPositioner(prefix + "-MO-BL-01:", name)
 
-        self.frontlight = epics_signal_rw(LEDStatus, prefix + "-DI-LED-02:TOGGLE")
+        self.frontlight_state = epics_signal_rw(LEDStatus, prefix + "-DI-LED-02:TOGGLE")
         super().__init__(name)
 
     @AsyncStatus.wrap
     async def set(self, position: BacklightPositions):
         await self.bl_position.pos_level.set(position, wait=True)
         if position == BacklightPositions.OUT:
-            await self.backlight.set(LEDStatus.OFF, wait=True)
+            await self.backlight_state.set(LEDStatus.OFF, wait=True)
         else:
-            await self.backlight.set(LEDStatus.ON, wait=True)
+            await self.backlight_state.set(LEDStatus.ON, wait=True)
