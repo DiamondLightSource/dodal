@@ -50,7 +50,7 @@ class DualBacklight(StandardReadable):
 
     def __init__(self, prefix: str, name: str = "") -> None:
         self.led1 = epics_signal_rw(LedStatus, prefix + "-DI-LED-01:TOGGLE")
-        self.pos1 = BacklightPositioner(prefix + "-MO-BL-01", name)
+        self.pos1 = BacklightPositioner(prefix + "-MO-BL-01:", name)
 
         self.led2 = epics_signal_rw(LedStatus, prefix + "-DI-LED-02:TOGGLE")
         super().__init__(name)
