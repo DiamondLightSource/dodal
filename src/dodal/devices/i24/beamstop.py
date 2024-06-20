@@ -5,11 +5,11 @@ from ophyd_async.epics.motion import Motor
 from ophyd_async.epics.signal import epics_signal_rw
 
 
-class BSPositions(str, Enum):
-    CHECKBEAM = "CheckBeam"
-    DATACOLLECTION = "Data Collection"
-    DATACOLLECTIONFAR = "Data Collection Far"
-    TRAYMOUNT = "Tray Mount"
+class BeamstopPositions(str, Enum):
+    CHECK_BEAM = "CheckBeam"
+    DATA_COLLECTION = "Data Collection"
+    DATA_COLLECTION_FAR = "Data Collection Far"
+    TRAY_MOUNT = "Tray Mount"
     ROTATABLE = "Rotatable"
     ROBOT = "Robot"
 
@@ -30,8 +30,8 @@ class Beamstop(StandardReadable):
         self.y = Motor(prefix + "Y")
         self.z = Motor(prefix + "Z")
 
-        self.roty = Motor(prefix + "ROTY")
+        self.y_rotation = Motor(prefix + "ROTY")
 
-        self.pos_select = epics_signal_rw(BSPositions, prefix + "MP:SELECT")
+        self.pos_select = epics_signal_rw(BeamstopPositions, prefix + "MP:SELECT")
 
         super().__init__(name)
