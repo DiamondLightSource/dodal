@@ -129,7 +129,7 @@ class TetrammController(DetectorControl):
         await self._drv.trigger_mode.set(TetrammTrigger.ExtTrigger)
 
         await asyncio.gather(
-            self._drv.averaging_time.set(exposure), self.set_frame_time(exposure)
+            self._drv.averaging_time.set(exposure), self.set_exposure(exposure)
         )
 
         status = await set_and_wait_for_value(self._drv.acquire, 1)
@@ -152,54 +152,55 @@ class TetrammController(DetectorControl):
     async def disarm(self):
         await stop_busy_record(self._drv.acquire, 0, timeout=1)
 
-    async def set_frame_time(self, frame_time: float):
+    async def set_exposure(self, exposure: float):
         """Tries to set the exposure time of a single frame.
 
         As during the  exposure time, the device must collect an integer number
-        of readings, in the case where the frame_time is not a multiple of the base
+        of readings, in the case where the exposure is not a multiple of the base
         sample rate, it will be lowered to the prior multiple ot ensure triggers
         are not missed.
 
         Args:
-            frame_time (float): The time for a single frame in seconds
+            exposure (float): The time for a single frame in seconds
 
         Raises:
-            ValueError: If frame_time is too low to collect the required number
+            ValueError: If exposure is too low to collect the required number
             of readings per frame.
         """
 
+        # Set up the number of readings across the exposure period to scale with
+        # the exposure time
+        self._set_minimum_exposure(exposure)
         values_per_reading: int = int(
-            frame_time * self.base_sample_rate / self.readings_per_frame
+            exposure * self.base_sample_rate / self.readings_per_frame
         )
 
-        if values_per_reading < self.minimum_values_per_reading:
-            raise ValueError(
-                f"frame_time {frame_time} is too low to collect at least "
-                f"{self.minimum_values_per_reading} values per reading, at "
-                f"{self.readings_per_frame} readings per frame."
-            )
         await self._drv.values_per_reading.set(values_per_reading)
 
     @property
     def max_frame_rate(self) -> float:
         """Max frame rate in Hz for the current configuration"""
-        return 1 / self.minimum_frame_time
+        return 1 / self.minimum_exposure
 
     @max_frame_rate.setter
     def max_frame_rate(self, mfr: float):
-        self.minimum_frame_time = 1 / mfr
+        self._set_minimum_exposure(1 / mfr)
 
     @property
-    def minimum_frame_time(self) -> float:
+    def minimum_exposure(self) -> float:
         """Smallest amount of time needed to take a frame"""
         time_per_reading = self.minimum_values_per_reading / self.base_sample_rate
         return self.readings_per_frame * time_per_reading
 
-    @minimum_frame_time.setter
-    def minimum_frame_time(self, frame: float):
+    def _set_minimum_exposure(self, exposure: float):
         time_per_reading = self.minimum_values_per_reading / self.base_sample_rate
+        if exposure < time_per_reading:
+            raise ValueError(
+                "Tetramm exposure time must be at least "
+                f"{time_per_reading}s, asked to set it to {exposure}s"
+            )
         self.readings_per_frame = int(
-            min(self.maximum_readings_per_frame, frame / time_per_reading)
+            min(self.maximum_readings_per_frame, exposure / time_per_reading)
         )
 
 
