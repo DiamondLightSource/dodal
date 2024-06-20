@@ -38,7 +38,7 @@ class HutchInterlock(StandardReadable):
     """Device to check the interlock status of the hutch."""
 
     def __init__(self, bl_prefix: str, name: str = "") -> None:
-        self.status = epics_signal_r(int, bl_prefix + "-PS-IOC-01:M14:LOP")
+        self.status = epics_signal_r(float, bl_prefix + "-PS-IOC-01:M14:LOP")
         super().__init__(name)
 
     async def shutter_safe_to_operate(self) -> bool:
