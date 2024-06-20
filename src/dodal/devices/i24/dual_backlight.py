@@ -4,15 +4,15 @@ from ophyd_async.core import AsyncStatus, StandardReadable
 from ophyd_async.epics.signal import epics_signal_rw
 
 
-class BLPositions(str, Enum):
+class BacklightPositions(str, Enum):
     OUT = "Out"
     IN = "In"
-    LOADCHECK = "LoadCheck"
+    LOAD_CHECK = "LoadCheck"
     OAV2 = "OAV2"
     DIODE = "Diode"
 
 
-class LedStatus(str, Enum):
+class LEDStatus(str, Enum):
     OFF = "OFF"
     ON = "ON"
 
@@ -21,12 +21,12 @@ class BacklightPositioner(StandardReadable):
     """Device to control the backlight position."""
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        # String description of the backlight position e.g. "In", "OAV2"
-        self.pos_level = epics_signal_rw(BLPositions, prefix + "MP:SELECT")
+        # Enum description of the backlight position e.g. "In", "OAV2"
+        self.pos_level = epics_signal_rw(BacklightPositions, prefix + "MP:SELECT")
         super().__init__(name)
 
     @AsyncStatus.wrap
-    async def set(self, position: BLPositions):
+    async def set(self, position: BacklightPositions):
         await self.pos_level.set(position, wait=True)
 
 
@@ -49,16 +49,16 @@ class DualBacklight(StandardReadable):
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        self.led1 = epics_signal_rw(LedStatus, prefix + "-DI-LED-01:TOGGLE")
-        self.pos1 = BacklightPositioner(prefix + "-MO-BL-01:", name)
+        self.backlight = epics_signal_rw(LEDStatus, prefix + "-DI-LED-01:TOGGLE")
+        self.bl_position = BacklightPositioner(prefix + "-MO-BL-01:", name)
 
-        self.led2 = epics_signal_rw(LedStatus, prefix + "-DI-LED-02:TOGGLE")
+        self.frontlight = epics_signal_rw(LEDStatus, prefix + "-DI-LED-02:TOGGLE")
         super().__init__(name)
 
     @AsyncStatus.wrap
-    async def set(self, position: BLPositions):
-        await self.pos1.pos_level.set(position, wait=True)
-        if position == BLPositions.OUT:
-            await self.led1.set(LedStatus.OFF, wait=True)
+    async def set(self, position: BacklightPositions):
+        await self.bl_position.pos_level.set(position, wait=True)
+        if position == BacklightPositions.OUT:
+            await self.backlight.set(LEDStatus.OFF, wait=True)
         else:
-            await self.led1.set(LedStatus.ON, wait=True)
+            await self.backlight.set(LEDStatus.ON, wait=True)
