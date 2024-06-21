@@ -18,6 +18,15 @@ The code in this repository conforms to standards set by the following tools:
 
 .. _documentation_standards:
 
+Supported Python Versions
+-------------------------
+
+As a standard for the python versions to support, we should be matching the deprecation policy at 
+https://numpy.org/neps/nep-0029-deprecation_policy.html.
+
+Currently supported versions are: 3.10, 3.11.
+
+
 Documentation Standards
 -----------------------
 
