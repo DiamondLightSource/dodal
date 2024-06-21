@@ -29,6 +29,7 @@ side-bar.
             how-to/move-code
             how-to/build-docs
             how-to/run-tests
+            how-to/make-new-ophyd-async-device
             how-to/static-analysis
             how-to/lint
             how-to/update-tools
