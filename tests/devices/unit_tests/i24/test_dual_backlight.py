@@ -32,10 +32,12 @@ async def test_backlight_position(
 ):
     RE(
         bps.abs_set(
-            fake_backlight.bl_position.pos_level, BacklightPositions.IN, wait=True
+            fake_backlight.backlight_position.pos_level,
+            BacklightPositions.IN,
+            wait=True,
         )
     )
-    assert await fake_backlight.bl_position.pos_level.get_value() == "In"
+    assert await fake_backlight.backlight_position.pos_level.get_value() == "In"
 
 
 async def test_when_backlight_out_it_switches_off(
@@ -43,7 +45,7 @@ async def test_when_backlight_out_it_switches_off(
 ):
     set_mock_value(fake_backlight.backlight_state, LEDStatus.ON)
     RE(bps.abs_set(fake_backlight, BacklightPositions.OUT, wait=True))
-    assert await fake_backlight.bl_position.pos_level.get_value() == "Out"
+    assert await fake_backlight.backlight_position.pos_level.get_value() == "Out"
     assert await fake_backlight.backlight_state.get_value() == "OFF"
 
 
