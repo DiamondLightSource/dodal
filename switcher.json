@@ -4,6 +4,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/main/"
   },
   {
+    "version": "1.29.1",
+    "url": "https://DiamondLightSource.github.io/dodal/1.29.1/"
+  },
+  {
     "version": "1.29.0",
     "url": "https://DiamondLightSource.github.io/dodal/1.29.0/"
   },
@@ -326,10 +330,6 @@
   {
     "version": "directory_provider",
     "url": "https://DiamondLightSource.github.io/dodal/directory_provider/"
-  },
-  {
-    "version": "fix-i22-init-error",
-    "url": "https://DiamondLightSource.github.io/dodal/fix-i22-init-error/"
   },
   {
     "version": "fix_linting_CI_issues",
