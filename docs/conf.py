@@ -44,6 +44,8 @@ extensions = [
     "sphinx_copybutton",
     # For the card element
     "sphinx_design",
+    # for the mermaid diagrams#
+    "sphinxcontrib.mermaid",
 ]
 
 # If true, Sphinx will warn about all references where the target cannot
