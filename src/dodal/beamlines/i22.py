@@ -4,8 +4,8 @@ from ophyd_async.epics.areadetector import AravisDetector, PilatusDetector
 from ophyd_async.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
+    decorator_name,
     device_factory,
-    device_factory3,
     device_instantiation,
     get_directory_provider,
     set_directory_provider,
@@ -376,11 +376,3 @@ def linkam(
         fake_with_ophyd_sim,
     )
 
-
-@device_factory3(lazy=True, fake=True, post_create=None, timeout=10)
-def test_device():
-    return AravisDetector(
-        prefix="TEST:",
-        name="test_device",
-        directory_provider=get_directory_provider(),
-    )

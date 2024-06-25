@@ -220,7 +220,7 @@ def get_directory_provider() -> UpdatingDirectoryProvider:
 
 
 @skip_device()
-def device_factory3(
+def decorator_name(
     name: str,
     prefix: str,
     not_lazy: bool,
@@ -275,3 +275,5 @@ def device_factory3(
     if post_create:
         post_create(device_instance)
     return device_instance
+
+
