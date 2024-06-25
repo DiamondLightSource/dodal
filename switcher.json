@@ -328,6 +328,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/directory_provider/"
   },
   {
+    "version": "fix-i22-init-error",
+    "url": "https://DiamondLightSource.github.io/dodal/fix-i22-init-error/"
+  },
+  {
     "version": "fix_linting_CI_issues",
     "url": "https://DiamondLightSource.github.io/dodal/fix_linting_CI_issues/"
   },
