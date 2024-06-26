@@ -93,3 +93,13 @@ async def test_calling_stop_on_thawer_stops_thawing_timer_and_turns_thawer_off(
     get_mock_put(thawer.control).assert_called_once_with(
         ThawerStates.OFF, wait=ANY, timeout=ANY
     )
+
+
+@pytest.mark.skip(
+    "Re-enable when https://github.com/bluesky/ophyd-async/issues/410 done"
+)
+async def test_thawing_timer_does_not_override_the_name_of_the_control_signal(
+    thawer: Thawer,
+):
+    assert thawer.control.name == "thawer-control"
+    assert thawer.thaw_for_time_s.name == "thawer-thaw_for_time_s"

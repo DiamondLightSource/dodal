@@ -1,12 +1,8 @@
 from asyncio import Task, create_task, sleep
 from enum import Enum
 
-from bluesky.protocols import Movable, Stoppable
-from ophyd_async.core import (
-    AsyncStatus,
-    SignalRW,
-    StandardReadable,
-)
+from bluesky.protocols import Stoppable
+from ophyd_async.core import AsyncStatus, Device, SignalRW, StandardReadable
 from ophyd_async.epics.signal import epics_signal_rw
 
 
@@ -19,10 +15,11 @@ class ThawerStates(str, Enum):
     ON = "On"
 
 
-class ThawingTimer(Movable):
+class ThawingTimer(Device):
     def __init__(self, control_signal: SignalRW[ThawerStates]) -> None:
         self._control_signal = control_signal
         self._thawing_task: Task | None = None
+        super().__init__("thaw_for_time_s")
 
     @AsyncStatus.wrap
     async def set(self, time_to_thaw_for: float):
