@@ -1,0 +1,81 @@
+dodal.devices.i24.I24\_detector\_motion.DetectorMotion
+======================================================
+
+.. currentmodule:: dodal.devices.i24.I24_detector_motion
+
+.. autoclass:: DetectorMotion
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      ~DetectorMotion.component_names
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~DetectorMotion.subscriptions
+      
+      
+      
+      ~DetectorMotion.y
+      
+      
+      ~DetectorMotion.z
+      
+   
+   

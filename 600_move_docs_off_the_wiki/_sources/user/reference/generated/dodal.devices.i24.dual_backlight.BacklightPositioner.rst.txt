@@ -1,0 +1,78 @@
+dodal.devices.i24.dual\_backlight.BacklightPositioner
+=====================================================
+
+.. currentmodule:: dodal.devices.i24.dual_backlight
+
+.. autoclass:: BacklightPositioner
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      ~BacklightPositioner.component_names
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~BacklightPositioner.pos_level
+      
+      
+      
+      
+      
+      
+      ~BacklightPositioner.subscriptions
+      
+      
+   
+   

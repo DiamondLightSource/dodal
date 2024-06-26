@@ -1,0 +1,41 @@
+dodal.devices.thawer.Thawer
+===========================
+
+.. currentmodule:: dodal.devices.thawer
+
+.. autoclass:: Thawer
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   
