@@ -76,21 +76,26 @@ class MirrorVoltageDevice(Device):
 
         LOGGER.debug(f"setting {setpoint_v.name} to {value}")
 
-        it_values = observe_value(demand_accepted, timeout=DEFAULT_SETTLE_TIME_S)
-        accepted_value = await anext(it_values)
-        if accepted_value == MirrorVoltageDemand.OK:
-            await setpoint_v.set(value)
-        else:
-            raise AssertionError(
-                f"Demand not accepted {accepted_value} before set attempted"
-            )
+        # Register an observer up front to ensure we don't miss events after we
+        # perform the set
+        demand_accepted_iterator = observe_value(
+            demand_accepted, timeout=DEFAULT_SETTLE_TIME_S
+        )
+        # discard the current value (OK) so we can await a subsequent change
+        await anext(demand_accepted_iterator)
+        await setpoint_v.set(value)
 
-        accepted_value = await anext(it_values)
+        # The set should always change to SLEW regardless of whether we are
+        # already at the set point, then change back to OK/FAIL depending on
+        # success
+        accepted_value = await anext(demand_accepted_iterator)
         assert accepted_value == MirrorVoltageDemand.SLEW
         LOGGER.debug(
             f"Demand not accepted for {setpoint_v.name}, waiting for acceptance..."
         )
-        while MirrorVoltageDemand.SLEW == (accepted_value := await anext(it_values)):
+        while MirrorVoltageDemand.SLEW == (
+            accepted_value := await anext(demand_accepted_iterator)
+        ):
             pass
 
         if accepted_value != MirrorVoltageDemand.OK:
