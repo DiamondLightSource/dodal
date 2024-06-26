@@ -58,7 +58,13 @@ class DeviceInitalizationController:
         post_create: Optional[Callable[[T], None]] = None,
     ) -> T:
         assert self.config is not None
+
         # todo add fake and cache logic
+        cached_device = self.see_if_device_is_in_cache(self.config.name)
+        # todo should we run the post-create again if we recover from cache?
+        if self.config.fake:
+            # todo not sure what is the ophyd-2 faking logic
+            pass
         device = factory()
         if self.config.lazy:
             print(f"Device {factory.__name__} is lazy, not initalizing now")
