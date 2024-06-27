@@ -33,27 +33,27 @@ def test_finds_device_factories() -> None:
 def test_makes_devices() -> None:
     import tests.fake_beamline as fake_beamline
 
-    devices = make_all_devices(fake_beamline)
-    assert {"readable", "motor", "cryo"} == devices.keys()
+    devices, exceptions = make_all_devices(fake_beamline)
+    assert {"readable", "motor", "cryo"} == devices.keys() and len(exceptions) == 0
 
 
 def test_makes_devices_with_dependencies() -> None:
     import tests.fake_beamline_dependencies as fake_beamline
 
-    devices = make_all_devices(fake_beamline)
-    assert {"readable", "motor", "cryo"} == devices.keys()
+    devices, exceptions = make_all_devices(fake_beamline)
+    assert {"readable", "motor", "cryo"} == devices.keys() and len(exceptions) == 0
 
 
 def test_makes_devices_with_disordered_dependencies() -> None:
     import tests.fake_beamline_disordered_dependencies as fake_beamline
 
-    devices = make_all_devices(fake_beamline)
-    assert {"readable", "motor", "cryo"} == devices.keys()
+    devices, exceptions = make_all_devices(fake_beamline)
+    assert {"readable", "motor", "cryo"} == devices.keys() and len(exceptions) == 0
 
 
 def test_makes_devices_with_module_name() -> None:
-    devices = make_all_devices("tests.fake_beamline")
-    assert {"readable", "motor", "cryo"} == devices.keys()
+    devices, exceptions = make_all_devices("tests.fake_beamline")
+    assert {"readable", "motor", "cryo"} == devices.keys() and len(exceptions) == 0
 
 
 def test_get_hostname() -> None:
@@ -65,8 +65,29 @@ def test_get_hostname() -> None:
 def test_no_signature_builtins_not_devices() -> None:
     import tests.fake_beamline_misbehaving_builtins as fake_beamline
 
-    devices = make_all_devices(fake_beamline)
-    assert not devices
+    devices, exceptions = make_all_devices(fake_beamline)
+    assert len(devices) == 0
+    assert len(exceptions) == 0
+
+
+def test_no_devices_when_all_factories_raise_exceptions() -> None:
+    import tests.fake_beamline_all_devices_raise_exception as fake_beamline
+
+    devices, exceptions = make_all_devices(fake_beamline)
+    assert len(devices) == 0
+    assert len(exceptions) == 3 and all(
+        isinstance(e, Exception) for e in exceptions.values()
+    )
+
+
+def test_some_devices_when_some_factories_raise_exceptions() -> None:
+    import tests.fake_beamline_some_devices_working as fake_beamline
+
+    devices, exceptions = make_all_devices(fake_beamline)
+    assert len(devices) == 2
+    assert len(exceptions) == 1 and all(
+        isinstance(e, Exception) for e in exceptions.values()
+    )
 
 
 def device_a() -> Readable:

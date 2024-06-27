@@ -12,8 +12,9 @@ classifiers = [
 ]
 description = "Ophyd devices and other utils that could be used across DLS beamlines"
 dependencies = [
+    "click",
     "ophyd",
-    "ophyd-async>=0.3a1",
+    "ophyd-async>=0.3.1",
     "bluesky",
     "pyepics",
     "dataclasses-json",
@@ -25,7 +26,7 @@ dependencies = [
     "opencv-python-headless", # For pin-tip detection.
     "aioca",                  # Required for CA support with ophyd-async.
     "p4p",                    # Required for PVA support with ophyd-async.
-    "numpy",
+    "numpy<2.0",              # Unpin when https://github.com/bluesky/ophyd-async/issues/387 resolved
     "aiofiles",
     "aiohttp",
 ]
@@ -37,7 +38,6 @@ requires-python = ">=3.10"
 
 [project.optional-dependencies]
 dev = [
-    "black",
     "mypy",
     "mockito",
     "pipdeptree",
@@ -49,7 +49,7 @@ dev = [
     "pytest-cov",
     "pytest-random-order",
     "ruff",
-    "sphinx-autobuild",
+    "sphinx-autobuild==2024.2.4", # Later versions have a clash with fastapi<0.99, remove pin when fastapi is unpinned in blueapi
     "sphinx-copybutton",
     "sphinx-design",
     "tox-direct",
@@ -58,6 +58,9 @@ dev = [
     "types-PyYAML",
     "types-aiofiles",
 ]
+
+[project.scripts]
+dodal = "dodal.__main__:main"
 
 [project.urls]
 GitHub = "https://github.com/DiamondLightSource/dodal"

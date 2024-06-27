@@ -1,6 +1,23 @@
 from enum import IntEnum
+from pathlib import Path
+from typing import Generator, Tuple
 
+import bluesky.plan_stubs as bps
 import numpy as np
+from bluesky.utils import Msg
+from PIL.Image import Image
+
+from dodal.devices.oav.oav_calculations import camera_coordinates_to_xyz
+from dodal.devices.oav.oav_parameters import OAVConfigParams
+from dodal.devices.oav.pin_image_recognition import PinTipDetection
+from dodal.devices.smargon import Smargon
+from dodal.log import LOGGER
+
+Pixel = Tuple[int, int]
+
+
+class PinNotFoundException(Exception):
+    pass
 
 
 def bottom_right_from_top_left(
@@ -47,3 +64,60 @@ class EdgeOutputArrayImageType(IntEnum):
     PREPROCESSED = 2
     CANNY_EDGES = 3
     CLOSED_EDGES = 4
+
+
+def get_move_required_so_that_beam_is_at_pixel(
+    smargon: Smargon, pixel: Pixel, oav_params: OAVConfigParams
+) -> Generator[Msg, None, np.ndarray]:
+    """Calculate the required move so that the given pixel is in the centre of the beam."""
+
+    current_motor_xyz = np.array(
+        [
+            (yield from bps.rd(smargon.x)),
+            (yield from bps.rd(smargon.y)),
+            (yield from bps.rd(smargon.z)),
+        ],
+        dtype=np.float64,
+    )
+    current_angle = yield from bps.rd(smargon.omega)
+
+    return calculate_x_y_z_of_pixel(current_motor_xyz, current_angle, pixel, oav_params)
+
+
+def calculate_x_y_z_of_pixel(
+    current_x_y_z, current_omega, pixel: Pixel, oav_params: OAVConfigParams
+) -> np.ndarray:
+    beam_distance_px: Pixel = oav_params.calculate_beam_distance(*pixel)
+
+    assert oav_params.micronsPerXPixel
+    assert oav_params.micronsPerYPixel
+    return current_x_y_z + camera_coordinates_to_xyz(
+        beam_distance_px[0],
+        beam_distance_px[1],
+        current_omega,
+        oav_params.micronsPerXPixel,
+        oav_params.micronsPerYPixel,
+    )
+
+
+def wait_for_tip_to_be_found(
+    ophyd_pin_tip_detection: PinTipDetection,
+) -> Generator[Msg, None, Pixel]:
+    yield from bps.trigger(ophyd_pin_tip_detection, wait=True)
+    found_tip = yield from bps.rd(ophyd_pin_tip_detection.triggered_tip)
+    if found_tip == ophyd_pin_tip_detection.INVALID_POSITION:
+        timeout = yield from bps.rd(ophyd_pin_tip_detection.validity_timeout)
+        raise PinNotFoundException(f"No pin found after {timeout} seconds")
+
+    return found_tip  # type: ignore
+
+
+def save_thumbnail(full_file_path: Path, full_image: Image, new_height=192):
+    """Scales an image down to have the height specified in new_height and saves it
+    to the same location as the full image with a t appended to the filename"""
+    thumbnail_path = full_file_path.with_stem(full_file_path.stem + "t")
+    LOGGER.info(f"Saving thumbnail to {thumbnail_path}")
+    full_size = full_image.size
+    new_width = (new_height / full_size[1]) * full_size[0]
+    full_image.thumbnail((new_width, new_height))
+    full_image.save(thumbnail_path.as_posix())

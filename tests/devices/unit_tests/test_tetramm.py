@@ -4,7 +4,7 @@ from ophyd_async.core import (
     DetectorTrigger,
     DeviceCollector,
     DirectoryProvider,
-    set_sim_value,
+    set_mock_value,
 )
 from ophyd_async.core.detector import TriggerInfo
 from ophyd_async.epics.areadetector import FileWriteMode
@@ -21,7 +21,7 @@ TEST_TETRAMM_NAME = "foobar"
 
 @pytest.fixture
 async def tetramm_driver(RE: RunEngine) -> TetrammDriver:
-    async with DeviceCollector(sim=True):
+    async with DeviceCollector(mock=True):
         driver = TetrammDriver("DRIVER:")
 
     return driver
@@ -31,7 +31,7 @@ async def tetramm_driver(RE: RunEngine) -> TetrammDriver:
 async def tetramm_controller(
     RE: RunEngine, tetramm_driver: TetrammDriver
 ) -> TetrammController:
-    async with DeviceCollector(sim=True):
+    async with DeviceCollector(mock=True):
         controller = TetrammController(
             tetramm_driver,
             maximum_readings_per_frame=2_000,
@@ -42,7 +42,7 @@ async def tetramm_controller(
 
 @pytest.fixture
 async def tetramm(static_directory_provider: DirectoryProvider) -> TetrammDetector:
-    async with DeviceCollector(sim=True):
+    async with DeviceCollector(mock=True):
         tetramm = TetrammDetector(
             "MY-TETRAMM:",
             static_directory_provider,
@@ -55,39 +55,39 @@ async def tetramm(static_directory_provider: DirectoryProvider) -> TetrammDetect
 async def test_max_frame_rate_is_calculated_correctly(
     tetramm_controller: TetrammController,
 ):
-    tetramm_controller.minimum_frame_time = 2.0
+    status = await tetramm_controller.arm(1, DetectorTrigger.edge_trigger, 2.0)
+    await status
 
-    assert tetramm_controller.minimum_frame_time == 0.1
+    assert tetramm_controller.minimum_exposure == 0.1
     assert tetramm_controller.max_frame_rate == 10.0
 
     # Ensure that the minimum frame time is correctly calculated given a maximum
     # frame rate.
-    # max_frame_rate**-1 = minimum_frame_times
+    # max_frame_rate**-1 = minimum_exposures
     tetramm_controller.max_frame_rate = 20.0
-    assert tetramm_controller.minimum_frame_time == pytest.approx(1 / 20)
+    assert tetramm_controller.minimum_exposure == pytest.approx(1 / 20)
 
 
-def test_min_frame_time_is_calculated_correctly(
+async def test_min_exposure_is_calculated_correctly(
     tetramm_controller: TetrammController,
 ):
-    tetramm_controller = tetramm_controller
     # Using coprimes to ensure the solution has a unique relation to the values.
     tetramm_controller.base_sample_rate = 100_000
     tetramm_controller.readings_per_frame = 999
     tetramm_controller.maximum_readings_per_frame = 1_001
     tetramm_controller.minimum_values_per_reading = 17
 
-    # min_frame_time (s/f) = max_readings_per_frame * values_per_reading / sample_rate (v/s)
-    minimum_frame_time = (
+    # min_exposure (s/f) = max_readings_per_frame * values_per_reading / sample_rate (v/s)
+    minimum_exposure = (
         tetramm_controller.readings_per_frame
         * tetramm_controller.minimum_values_per_reading
         / float(tetramm_controller.base_sample_rate)
     )
 
-    assert tetramm_controller.minimum_frame_time == pytest.approx(minimum_frame_time)
+    assert tetramm_controller.minimum_exposure == pytest.approx(minimum_exposure)
 
     # From rearranging the above
-    # readings_per_frame = frame_time * sample_rate / values_per_reading
+    # readings_per_frame = exposure * sample_rate / values_per_reading
 
     readings_per_time = (
         tetramm_controller.base_sample_rate
@@ -95,11 +95,13 @@ def test_min_frame_time_is_calculated_correctly(
     )
 
     # 100_000 / 17 ~ 5800; 5800 * 0.01 = 58; 58 << tetramm_controller.maximum_readings_per_frame
-    tetramm_controller.minimum_frame_time = 0.01
+    status = await tetramm_controller.arm(1, DetectorTrigger.edge_trigger, 0.01)
+    await status
     assert tetramm_controller.readings_per_frame == int(readings_per_time * 0.01)
 
     # 100_000 / 17 ~ 5800; 5800 * 0.2 = 1160; 1160 > tetramm_controller.maximum_readings_per_frame
-    tetramm_controller.minimum_frame_time = 0.2
+    status = await tetramm_controller.arm(1, DetectorTrigger.edge_trigger, 0.2)
+    await status
     assert (
         tetramm_controller.readings_per_frame
         == tetramm_controller.maximum_readings_per_frame
@@ -107,39 +109,71 @@ def test_min_frame_time_is_calculated_correctly(
 
     # 100_000 / 17 ~ 5800; 5800 * 0.2 = 1160; 1160 < 1200
     tetramm_controller.maximum_readings_per_frame = 1200
-    tetramm_controller.minimum_frame_time = 0.1
+    status = await tetramm_controller.arm(1, DetectorTrigger.edge_trigger, 0.1)
+    await status
     assert tetramm_controller.readings_per_frame == int(readings_per_time * 0.1)
 
 
 VALID_TEST_EXPOSURE_TIME = 1 / 19
 
 
-async def test_set_frame_time_updates_values_per_reading(
+async def test_set_exposure_updates_values_per_reading(
     tetramm_controller: TetrammController,
     tetramm_driver: TetrammDriver,
 ):
-    await tetramm_controller.set_frame_time(VALID_TEST_EXPOSURE_TIME)
+    await tetramm_controller.set_exposure(VALID_TEST_EXPOSURE_TIME)
     values_per_reading = await tetramm_driver.values_per_reading.get_value()
     assert values_per_reading == 5
 
 
-async def test_set_invalid_frame_time_for_number_of_values_per_reading(
+async def test_set_invalid_exposure_for_number_of_values_per_reading(
     tetramm_controller: TetrammController,
 ):
     """
-    frame_time >= readings_per_frame * values_per_reading / sample_rate
+    exposure >= readings_per_frame * values_per_reading / sample_rate
     With the default values:
     base_sample_rate = 100_000
     minimum_values_per_reading = 5
-    readings_per_frame = 1_000
-    frame_time >= 1_000 * 5 / 100_000 = 1/20
+    readings_per_frame = 5
+    exposure >= 5 * 5 / 100_000 = 1/4000
     """
 
     with pytest.raises(
         ValueError,
-        match="frame_time 0.02 is too low to collect at least 5 values per reading, at 1000 readings per frame.",
+        match="Tetramm exposure time must be at least 5e-05s, asked to set it to 4e-05s",
     ):
-        await (await tetramm_controller.arm(-1, DetectorTrigger.edge_trigger, 1 / 50))
+        await (await tetramm_controller.arm(-1, DetectorTrigger.edge_trigger, 4e-5))
+
+
+@pytest.mark.parametrize(
+    "exposure,expected_values_per_reading",
+    [
+        (20.0, 2000),
+        (10.0, 1000),
+        (1.0, 100),
+        (0.1, 10),
+        (0.05, 5),  # Smallest exposure time where we can still have 1000 readings per
+        # frame
+        (1 / 50.0, 5),
+        (1 / 1000.0, 5),
+        (5e-5, 5),  # Smallest possible exposure time
+    ],
+)
+async def test_sample_rate_scales_with_exposure_time(
+    tetramm: TetrammDetector,
+    exposure: float,
+    expected_values_per_reading: int,
+):
+    await tetramm.prepare(
+        TriggerInfo(
+            100,
+            DetectorTrigger.edge_trigger,
+            2e-5,
+            exposure,
+        )
+    )
+    values_per_reading = await tetramm.drv.values_per_reading.get_value()
+    assert values_per_reading == expected_values_per_reading
 
 
 @pytest.mark.parametrize(
@@ -243,7 +277,7 @@ async def test_prepare_arms_tetramm(
 async def test_stage_sets_up_writer(
     tetramm: TetrammDetector,
 ):
-    set_sim_value(tetramm.hdf.file_path_exists, 1)
+    set_mock_value(tetramm.hdf.file_path_exists, True)
     await tetramm.stage()
 
     assert (await tetramm.hdf.num_capture.get_value()) == 0
@@ -257,19 +291,24 @@ async def test_stage_sets_up_writer(
 async def test_stage_sets_up_accurate_describe_output(
     tetramm: TetrammDetector,
 ):
-    assert tetramm.describe() == {}
+    assert await tetramm.describe() == {}
 
-    set_sim_value(tetramm.hdf.file_path_exists, 1)
+    set_mock_value(tetramm.hdf.file_path_exists, True)
     await tetramm.stage()
 
-    assert tetramm.describe() == {
+    assert await tetramm.describe() == {
         TEST_TETRAMM_NAME: {
-            "source": "sim://MY-TETRAMM:HDF5:FullFileName_RBV",
+            "source": "mock+ca://MY-TETRAMM:HDF5:FullFileName_RBV",
             "shape": (11, 1000),
             "dtype": "array",
             "external": "STREAM:",
         }
     }
+
+
+async def test_error_if_armed_without_exposure(tetramm_controller: TetrammController):
+    with pytest.raises(ValueError):
+        await tetramm_controller.arm(10, DetectorTrigger.internal)
 
 
 async def assert_armed(driver: TetrammDriver) -> None:
