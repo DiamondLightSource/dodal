@@ -22,7 +22,7 @@ you will not get the option to edit the release notes.
 .. _release: https://github.com/DiamondLightSource/dodal/releases
 
 Deciding release numbers
-^^^^^^^^^^^^^^^^^^^^^^^^
+------------------------
 
 Releases should obviously be versioned higher than the previous latest release. Otherwise you should follow this guide:
 

@@ -1,13 +1,13 @@
 Creating a new beamline
------------------------
+=======================
 
 A beamline is a collection of devices that can be used together to run experiments, they may be read-only or capable of being set.
 They include motors in the experiment hutch, optical components in the optics hutch, the synchrotron "machine" and more.
 
 Beamline Modules
-^^^^^^^^^^^^^^^^
+----------------
 
-Each beamline should have it's own file in the ``beamlines`` folder, in which the particular devices for the 
+Each beamline should have its own file in the ``doodal.beamlines`` folder, in which the particular devices for the 
 beamline are instantiated. The file should be named after the colloquial name for the beamline. For example:
 
 * ``i03.py``
