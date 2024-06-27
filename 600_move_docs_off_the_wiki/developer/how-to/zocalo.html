@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Zocalo Interaction &#8212; dodal 1.29.2.dev4+gdb134227e documentation</title>
+    <title>Zocalo Interaction &#8212; dodal 1.29.2.dev5+g4aa0b0bd1 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../_static/documentation_options.js?v=e1fe5676"></script>
+    <script src="../../_static/documentation_options.js?v=0e5229b0"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -439,12 +439,8 @@ document.write(`
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../reference/standards.html">Standards</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../reference/device-standards.html">Ophyd vs Ophyd-async</a></li>
-
-
-
-
+<li class="toctree-l1"><a class="reference internal" href="../reference/standards.html">General Coding Standards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/device-standards.html">Device Standards</a></li>
 </ul>
 </div>
 </nav></div>
@@ -505,11 +501,11 @@ document.write(`
   <section id="zocalo-interaction">
 <h1>Zocalo Interaction<a class="headerlink" href="#zocalo-interaction" title="Link to this heading">#</a></h1>
 <img alt="Diagram of zocalo" src="../../_images/zocalo.png" />
-<p>Zocalo jobs are triggered based on their ISPyB DCID using the ZocaloTrigger class in a callback subscribed to the
-Bluesky plan or RunEngine. These can trigger processing for any kind of job, as zocalo infers the necessary
+<p>Zocalo jobs are triggered based on their ISPyB DCID using the <code class="docutils literal notranslate"><span class="pre">ZocaloTrigger</span></code> class in a callback subscribed to the
+Bluesky plan or <code class="docutils literal notranslate"><span class="pre">RunEngine</span></code>. These can trigger processing for any kind of job, as zocalo infers the necessary
 processing from data in ISPyB.</p>
-<p>Results are received using the ZocaloResults device, so that they can be read into a plan and used for
-decision-making. Currently the ZocaloResults device is only made to handle X-ray centring results. It subscribes to
+<p>Results are received using the <code class="docutils literal notranslate"><span class="pre">ZocaloResults</span></code> device, so that they can be read into a plan and used for
+decision-making. Currently the <code class="docutils literal notranslate"><span class="pre">ZocaloResults</span></code> device is only made to handle X-ray centring results. It subscribes to
 a given zocalo RabbitMQ channel the first time that it is triggered.</p>
 </section>
 

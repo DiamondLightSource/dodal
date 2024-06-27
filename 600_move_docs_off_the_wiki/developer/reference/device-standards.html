@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Ophyd vs Ophyd-async &#8212; dodal 1.29.2.dev4+gdb134227e documentation</title>
+    <title>Device Standards &#8212; dodal 1.29.2.dev5+g4aa0b0bd1 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../_static/documentation_options.js?v=e1fe5676"></script>
+    <script src="../../_static/documentation_options.js?v=0e5229b0"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="icon" href="../../_static/dls-favicon.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="prev" title="Standards" href="standards.html" />
+    <link rel="prev" title="General Coding Standards" href="standards.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -438,12 +438,8 @@ document.write(`
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="standards.html">Standards</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Ophyd vs Ophyd-async</a></li>
-
-
-
-
+<li class="toctree-l1"><a class="reference internal" href="standards.html">General Coding Standards</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Device Standards</a></li>
 </ul>
 </div>
 </nav></div>
@@ -484,7 +480,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Developer Guide</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">Ophyd vs Ophyd-async</li>
+    <li class="breadcrumb-item active" aria-current="page">Device Standards</li>
   </ul>
 </nav>
 </div>
@@ -501,45 +497,57 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="ophyd-vs-ophyd-async">
-<h1>Ophyd vs Ophyd-async<a class="headerlink" href="#ophyd-vs-ophyd-async" title="Link to this heading">#</a></h1>
+  <section id="device-standards">
+<h1>Device Standards<a class="headerlink" href="#device-standards" title="Link to this heading">#</a></h1>
+<section id="ophyd-vs-ophyd-async">
+<h2>Ophyd vs Ophyd-async<a class="headerlink" href="#ophyd-vs-ophyd-async" title="Link to this heading">#</a></h2>
 <p>Some devices have been written in <code class="docutils literal notranslate"><span class="pre">ophyd</span></code> for historic reasons. However, all new devices should be written in
-<code class="docutils literal notranslate"><span class="pre">ophyd-async</span></code> and if old <code class="docutils literal notranslate"><span class="pre">ophyd</span></code> devices are undergoing a large re-write they should also be considered for
+<code class="docutils literal notranslate"><span class="pre">ophyd-async</span></code> and any old <code class="docutils literal notranslate"><span class="pre">ophyd</span></code> devices undergoing a large re-write should be considered for
 conversion to <code class="docutils literal notranslate"><span class="pre">ophyd-async</span></code>.</p>
 </section>
 <section id="where-to-put-devices">
-<h1>Where to put devices<a class="headerlink" href="#where-to-put-devices" title="Link to this heading">#</a></h1>
+<h2>Where to put devices<a class="headerlink" href="#where-to-put-devices" title="Link to this heading">#</a></h2>
 <p>Dodal is written with the philosophy that Ophyd devices should be assumed to be as generic as possible. I.e. you
 should think about where to place them in the following order:</p>
 <ol class="arabic simple">
 <li><p>A device that could be used at any facility, e.g. a generic <code class="docutils literal notranslate"><span class="pre">EpicsMotor</span></code> or a commercial product with a
 standard IOC, should go in <a class="github reference external" href="https://github.com/bluesky/ophyd-epics-devices">bluesky/ophyd-epics-devices</a></p></li>
 <li><p>A device that may be on any beamline should go in the top level of the <code class="docutils literal notranslate"><span class="pre">devices</span></code> folder. If it is a quite
-complex device (e.g. multiple files) it should have a folder of it’s own i.e. <code class="docutils literal notranslate"><span class="pre">oav</span></code></p></li>
+complex device (e.g. multiple files) it should have a folder of its own e.g. <code class="docutils literal notranslate"><span class="pre">oav</span></code></p></li>
 <li><p>A device that is very specific to a particular beamline should go in the <code class="docutils literal notranslate"><span class="pre">devices/ixx</span></code> folder</p></li>
 </ol>
 <p>This is in an effort to avoid duplication across facilities/beamlines.</p>
 </section>
 <section id="pv-suffixes">
-<h1>PV Suffixes<a class="headerlink" href="#pv-suffixes" title="Link to this heading">#</a></h1>
+<h2>PV Suffixes<a class="headerlink" href="#pv-suffixes" title="Link to this heading">#</a></h2>
 <p>In general devices should contain only the PV suffixes that are generic for any instance of the device e.g.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
-    <span class="n">bragg</span><span class="p">:</span> <span class="n">EpicsMotor</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">EpicsMotor</span><span class="p">,</span> <span class="s2">&quot;BRAGG&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bragg</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;BRAGG&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
-<span class="n">device_instantiation</span><span class="p">(</span><span class="n">DCM</span><span class="p">,</span> <span class="s2">&quot;dcm&quot;</span><span class="p">,</span> <span class="s2">&quot;-MO-DCM-01:&quot;</span><span class="p">)</span>
+<span class="n">device_instantiation</span><span class="p">(</span><span class="n">MyDevice</span><span class="p">,</span> <span class="s2">&quot;dcm&quot;</span><span class="p">,</span> <span class="s2">&quot;-MO-DCM-01:&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>is preferred over</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
-    <span class="n">bragg</span><span class="p">:</span> <span class="n">EpicsMotor</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">EpicsMotor</span><span class="p">,</span> <span class="s2">&quot;-MO-DCM-01:BRAGG&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bragg</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-MO-DCM-01:BRAGG&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
-<span class="n">device_instantiation</span><span class="p">(</span><span class="n">DCM</span><span class="p">,</span> <span class="s2">&quot;dcm&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="n">device_instantiation</span><span class="p">(</span><span class="n">MyDevice</span><span class="p">,</span> <span class="s2">&quot;dcm&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This is so that a new device on say <code class="docutils literal notranslate"><span class="pre">-MO-DCM-02</span></code> can be easily created.</p>
 </section>
+<section id="beamline-prefix">
+<h2>Beamline Prefix<a class="headerlink" href="#beamline-prefix" title="Link to this heading">#</a></h2>
+<p>Most devices have a beamline-specific prefix such as BL03I however some devices do not. In such cases when calling
+<a class="reference internal" href="../../user/reference/generated/dodal.common.beamlines.beamline_utils.html#dodal.common.beamlines.beamline_utils.device_instantiation" title="dodal.common.beamlines.beamline_utils.device_instantiation"><code class="xref any py py-func docutils literal notranslate"><span class="pre">device_instantiation()</span></code></a> you can specify <code class="xref any docutils literal notranslate"><span class="pre">bl_prefix=False</span></code> to ensure that the beamline prefix is not automatically
+prepended.</p>
+</section>
 <section id="use-of-signals">
-<h1>Use of signals<a class="headerlink" href="#use-of-signals" title="Link to this heading">#</a></h1>
+<h2>Use of signals<a class="headerlink" href="#use-of-signals" title="Link to this heading">#</a></h2>
 <p>Anything in a device that is expected to be set externally e.g. by a plan should be a signal, even if it does not
 connect to EPICS. If it does not connect to EPICS it should be a soft signal.</p>
 <p>Whilst it would be possible to do:</p>
@@ -558,7 +566,7 @@ connect to EPICS. If it does not connect to EPICS it should be a soft signal.</p
 <li><p>There may be external things attached to the RE that are tracking messages e.g. metrics. A set like this would be
 lost</p></li>
 </ul>
-<p>Instead you should make a sort signal:</p>
+<p>Instead you should make a soft signal:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
          <span class="bp">self</span><span class="o">.</span><span class="n">param</span> <span class="o">=</span> <span class="n">create_soft_signal</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
@@ -570,9 +578,10 @@ lost</p></li>
 </div>
 </section>
 <section id="ophyd-devices-best-practices">
-<h1>Ophyd Devices best practices<a class="headerlink" href="#ophyd-devices-best-practices" title="Link to this heading">#</a></h1>
+<h2>Ophyd Devices best practices<a class="headerlink" href="#ophyd-devices-best-practices" title="Link to this heading">#</a></h2>
 <p>Ophyd-async directory contains a <a class="reference external" href="https://blueskyproject.io/ophyd-async/main/how-to/choose-interfaces-for-devices.html">flowchart</a> for a simplified decision tree about what interfaces
 should a given device implement.</p>
+</section>
 </section>
 
 
@@ -591,7 +600,7 @@ should a given device implement.</p>
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Standards</p>
+        <p class="prev-next-title">General Coding Standards</p>
       </div>
     </a>
 </div>
@@ -612,13 +621,13 @@ should a given device implement.</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Ophyd vs Ophyd-async</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#where-to-put-devices">Where to put devices</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#pv-suffixes">PV Suffixes</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#use-of-signals">Use of signals</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#ophyd-devices-best-practices">Ophyd Devices best practices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ophyd-vs-ophyd-async">Ophyd vs Ophyd-async</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#where-to-put-devices">Where to put devices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pv-suffixes">PV Suffixes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#beamline-prefix">Beamline Prefix</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#use-of-signals">Use of signals</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ophyd-devices-best-practices">Ophyd Devices best practices</a></li>
 </ul>
-
   </nav></div>
 
   <div class="sidebar-secondary-item">

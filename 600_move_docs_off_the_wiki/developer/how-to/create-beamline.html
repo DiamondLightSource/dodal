@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Creating a new beamline &#8212; dodal 1.29.2.dev4+gdb134227e documentation</title>
+    <title>Creating a new beamline &#8212; dodal 1.29.2.dev5+g4aa0b0bd1 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../_static/documentation_options.js?v=e1fe5676"></script>
+    <script src="../../_static/documentation_options.js?v=0e5229b0"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -439,12 +439,8 @@ document.write(`
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../reference/standards.html">Standards</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../reference/device-standards.html">Ophyd vs Ophyd-async</a></li>
-
-
-
-
+<li class="toctree-l1"><a class="reference internal" href="../reference/standards.html">General Coding Standards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/device-standards.html">Device Standards</a></li>
 </ul>
 </div>
 </nav></div>
@@ -508,7 +504,7 @@ document.write(`
 They include motors in the experiment hutch, optical components in the optics hutch, the synchrotron “machine” and more.</p>
 <section id="beamline-modules">
 <h2>Beamline Modules<a class="headerlink" href="#beamline-modules" title="Link to this heading">#</a></h2>
-<p>Each beamline should have it’s own file in the <code class="docutils literal notranslate"><span class="pre">beamlines</span></code> folder, in which the particular devices for the
+<p>Each beamline should have its own file in the <code class="docutils literal notranslate"><span class="pre">doodal.beamlines</span></code> folder, in which the particular devices for the
 beamline are instantiated. The file should be named after the colloquial name for the beamline. For example:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">i03.py</span></code></p></li>
