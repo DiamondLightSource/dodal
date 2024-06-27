@@ -9,8 +9,6 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_w
 
-from dodal.log import LOGGER
-
 HUTCH_SAFE_FOR_OPERATIONS = 0  # Hutch is locked and can't be entered
 
 
@@ -57,10 +55,11 @@ class HutchShutter(StandardReadable, Movable):
     safe to operate the shutter.
 
     If the requested shutter position is "Open", the shutter control PV should first \
-    be set to "Reset" and then move to "Open". This is because before opening the hutch \
-    shutter, the interlock status PV (`-PS-SHTR-01:ILKSTA`). Resetting the shutter will \
-    set this status to `OK`, allowing for shutter operations. Until this step is done, \
-    the hutch shutter can't be opened. The reset is not needed for closing the shutter.
+    go to "Reset" and then move to "Open". This is because before opening the hutch \
+    shutter, the interlock status PV (`-PS-SHTR-01:ILKSTA`) will show as `failed` until \
+    the hutch shutter is reset. This will set the interlock status to `OK`, allowing \
+    for shutter operations. Until this step is done, the hutch shutter can't be opened.
+    The reset is not needed for closing the shutter.
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
