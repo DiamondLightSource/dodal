@@ -4,6 +4,7 @@ from dodal.devices.detector import DetectorParams
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.i24.aperture import Aperture
 from dodal.devices.i24.beamstop import Beamstop
+from dodal.devices.i24.dcm import DCM
 from dodal.devices.i24.dual_backlight import DualBacklight
 from dodal.devices.i24.I24_detector_motion import DetectorMotion
 from dodal.devices.i24.i24_vgonio import VGonio
@@ -76,6 +77,19 @@ def detector_motion(
         device_factory=DetectorMotion,
         name="detector_motion",
         prefix="-EA-DET-01:",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+    )
+
+
+def dcm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> DCM:
+    """Get the i24 DCM device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i24, it will return the existing object.
+    """
+    return device_instantiation(
+        device_factory=DCM,
+        name="dcm",
+        prefix="",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )
