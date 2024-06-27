@@ -15,9 +15,7 @@ HUTCH_SAFE_FOR_OPERATIONS = 0  # Hutch is locked and can't be entered
 
 
 class ShutterNotSafeToOperateError(Exception):
-    def __init__(self, errmsg, *args: object) -> None:
-        LOGGER.error(errmsg)
-        super().__init__(*args)
+    pass
 
 
 class ShutterDemand(str, Enum):
