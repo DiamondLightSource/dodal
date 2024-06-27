@@ -37,6 +37,8 @@ class HutchInterlock(StandardReadable):
         self.status = epics_signal_r(float, bl_prefix + "-PS-IOC-01:M14:LOP")
         super().__init__(name)
 
+    # TODO replace with read
+    # See https://github.com/DiamondLightSource/dodal/issues/651
     async def shutter_safe_to_operate(self) -> bool:
         """If the status value is 0, hutch has been searched and locked and it is safe \
         to operate the shutter.
