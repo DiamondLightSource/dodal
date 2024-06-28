@@ -498,7 +498,7 @@ def thawer(
     )
 
 
-def lower_gonio_positioner(
+def lower_gonio(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> XYZPositioner:
     """Get the i03 lower gonio device, instantiate it if it hasn't already been.
@@ -506,7 +506,7 @@ def lower_gonio_positioner(
     """
     return device_instantiation(
         XYZPositioner,
-        "lower_gonio_positioner",
+        "lower_gonio",
         "-MO-GONP-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
