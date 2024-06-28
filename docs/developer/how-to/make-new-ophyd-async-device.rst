@@ -1,7 +1,8 @@
 Decision Flowchart for Creating a New ophyd_async Device
 ========================================================
 
-This document contains decision flowcharts designed to guide developers through the process of creating a new device in the Dodal library. That is done using `ophyd-async <https://github.com/bluesky/ophyd-async>`_ framework, the standard hardware abstraction library at Diamond. These flowcharts help in determining the appropriate class inheritance, methods to override, and testing procedures for optimal device functionality and integration into the system.
+This document contains decision flowcharts designed to guide developers through the process of creating a new device in the Dodal library. 
+That is done using `ophyd-async`_ framework, the standard hardware abstraction library at Diamond. These flowcharts help in determining the appropriate class inheritance, methods to override, and testing procedures for optimal device functionality and integration into the system.
 
 High-Level Development Flowchart
 --------------------------------
@@ -36,7 +37,7 @@ There's some of this already but more general advice not to do this task alone. 
 Interface Selection Flowchart
 -----------------------------
 
-See the chart in `ophyd-async <https://blueskyproject.io/ophyd-async/main/how-to/choose-interfaces-for-devices.html>`_
+See the chart in `ophyd-async`_.
 
 Testing Flowchart
 -----------------
@@ -61,3 +62,6 @@ Additional Notes
 ----------------
 
 - ``with self.add_children_as_readables():`` Ensure this context manager is used appropriately in the device implementation to add child components as readable properties, but not Movables.
+
+
+.. _ophyd-async: https://blueskyproject.io/ophyd-async/main/how-to/choose-interfaces-for-devices.html
