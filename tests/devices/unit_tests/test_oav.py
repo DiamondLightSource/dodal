@@ -7,6 +7,7 @@ from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from ophyd.sim import instantiate_fake_device, make_fake_device
 from ophyd.status import Status
+from ophyd_async.core import set_mock_value
 from PIL import Image
 from requests import HTTPError, Response
 
@@ -34,7 +35,7 @@ def fake_smargon() -> Smargon:
     smargon.omega.user_setpoint._use_limits = False
 
     def mock_set(motor, val):
-        motor.user_readback.sim_put(val)  # type: ignore
+        set_mock_value(motor.user_readback, val)
         return Status(done=True, success=True)
 
     def patch_motor(motor):
@@ -271,7 +272,7 @@ def test_values_for_move_so_that_beam_is_at_pixel(
     fake_oav.parameters.beam_centre_i = beam_centre[0]
     fake_oav.parameters.beam_centre_j = beam_centre[1]
 
-    smargon.omega.user_readback.sim_put(angle)  # type: ignore
+    set_mock_value(smargon.omega.user_readback, angle)
 
     RE = RunEngine(call_returns_result=True)
     pos = RE(
