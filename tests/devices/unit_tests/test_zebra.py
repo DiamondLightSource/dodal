@@ -14,6 +14,7 @@ from dodal.devices.zebra import (
     LogicGateConfiguration,
     LogicGateConfigurer,
     PositionCompare,
+    RotationDirection,
     TrigSource,
     boolean_array_to_integer,
 )
@@ -149,3 +150,8 @@ def test_logic_gate_configuration_with_too_many_sources_then_error():
 
     with pytest.raises(AssertionError):
         config.add_input(5)
+
+
+def test_direction_multiplier():
+    assert RotationDirection.NEGATIVE.multiplier == -1
+    assert RotationDirection.POSITIVE.multiplier == 1

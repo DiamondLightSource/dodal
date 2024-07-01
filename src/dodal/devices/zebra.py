@@ -76,6 +76,10 @@ class RotationDirection(str, Enum):
     POSITIVE = "Positive"
     NEGATIVE = "Negative"
 
+    @property
+    def multiplier(self):
+        return 1 if self == RotationDirection.POSITIVE else -1
+
 
 class ArmDemand(Enum):
     ARM = 1
