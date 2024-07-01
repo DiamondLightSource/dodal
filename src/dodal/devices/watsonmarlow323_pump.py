@@ -41,19 +41,11 @@ class WatsonMarlow323Pump(StandardReadable):
         self.speed = epics_signal_rw(
             float, read_pv=prefix + "INFO:SPD", write_pv=prefix + "SET:SPD"
         )
-        self.limit_high = epics_signal_rw(
-            float, read_pv=prefix + "SET:SPD.DRVH", write_pv=prefix + "SET:SPD.DRVH"
-        )
-        self.limit_low = epics_signal_rw(
-            float, read_pv=prefix + "SET:SPD.DRVL", write_pv=prefix + "SET:SPD.DRVL"
-        )
 
         self.set_readable_signals(
             read=[self.state, self.speed, self.direction],
             config=[
                 self.enabled,
-                self.limit_high,
-                self.limit_low,
             ],
         )
 
