@@ -1,0 +1,15 @@
+dodal.common.beamlines.beamline\_utils.DeviceFactory
+====================================================
+
+.. currentmodule:: dodal.common.beamlines.beamline_utils
+
+.. autoclass:: DeviceFactory
+   :members:
+
+   
+   
+   
+
+   
+   
+   

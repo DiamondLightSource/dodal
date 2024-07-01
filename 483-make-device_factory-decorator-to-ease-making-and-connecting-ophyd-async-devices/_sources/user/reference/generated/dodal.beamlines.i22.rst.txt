@@ -1,0 +1,48 @@
+dodal.beamlines.i22
+===================
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.beamlines.i22
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      dcm
+      fswitch
+      hfm
+      i0
+      it
+      oav
+      panda1
+      slits_1
+      slits_2
+      slits_3
+      slits_5
+      slits_6
+      synchrotron
+      undulator
+      vfm
+      waxs
+   
+   
+
+   
+   
+   

@@ -1,0 +1,36 @@
+dodal.devices.i23.gonio
+=======================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.i23
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~gonio.Gonio
+
+
+
+
+.. automodule:: dodal.devices.i23.gonio
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
