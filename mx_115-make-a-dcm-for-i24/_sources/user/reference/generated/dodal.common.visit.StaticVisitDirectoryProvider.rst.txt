@@ -1,0 +1,23 @@
+dodal.common.visit.StaticVisitDirectoryProvider
+===============================================
+
+.. currentmodule:: dodal.common.visit
+
+.. autoclass:: StaticVisitDirectoryProvider
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~StaticVisitDirectoryProvider.update
+      
+   
+   
+
+   
+   
+   

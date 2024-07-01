@@ -260,10 +260,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/564_organise_testing_utils/"
   },
   {
-    "version": "600_move_docs_off_the_wiki",
-    "url": "https://DiamondLightSource.github.io/dodal/600_move_docs_off_the_wiki/"
-  },
-  {
     "version": "604_ophyd_async_device_for_mirror_voltages",
     "url": "https://DiamondLightSource.github.io/dodal/604_ophyd_async_device_for_mirror_voltages/"
   },
