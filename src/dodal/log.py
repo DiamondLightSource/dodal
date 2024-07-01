@@ -11,13 +11,19 @@ from typing import Deque, Tuple, TypedDict
 from bluesky.log import logger as bluesky_logger
 from graypy import GELFTCPHandler
 from ophyd.log import logger as ophyd_logger
+from ophyd_async.log import (
+    DEFAULT_DATE_FORMAT,
+    DEFAULT_FORMAT,
+    DEFAULT_LOG_COLORS,
+    ColoredFormatterWithDeviceName,
+)
 from ophyd_async.log import logger as ophyd_async_logger
 
 LOGGER = logging.getLogger("Dodal")
 LOGGER.setLevel(logging.DEBUG)
 
-DEFAULT_FORMATTER = logging.Formatter(
-    "[%(asctime)s] %(name)s %(module)s %(levelname)s: %(message)s"
+DEFAULT_FORMATTER = ColoredFormatterWithDeviceName(
+    fmt=DEFAULT_FORMAT, datefmt=DEFAULT_DATE_FORMAT, log_colors=DEFAULT_LOG_COLORS
 )
 ERROR_LOG_BUFFER_LINES = 20000
 INFO_LOG_DAYS = 30
@@ -247,3 +253,8 @@ def get_graylog_configuration(
         return "localhost", 5555
     else:
         return "graylog-log-target.diamond.ac.uk", graylog_port or DEFAULT_GRAYLOG_PORT
+
+
+class _NoOpFileHandler:
+    def write(*args, **kwargs):
+        pass
