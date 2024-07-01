@@ -1,0 +1,111 @@
+dodal.devices.oav.grid\_overlay.SnapshotWithGrid
+================================================
+
+.. currentmodule:: dodal.devices.oav.grid_overlay
+
+.. autoclass:: SnapshotWithGrid
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~SnapshotWithGrid.post_processing
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      ~SnapshotWithGrid.box_width
+      
+      
+      ~SnapshotWithGrid.component_names
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~SnapshotWithGrid.last_path_full_overlay
+      
+      
+      ~SnapshotWithGrid.last_path_outer
+      
+      
+      
+      
+      
+      
+      
+      ~SnapshotWithGrid.num_boxes_x
+      
+      
+      ~SnapshotWithGrid.num_boxes_y
+      
+      
+      
+      
+      
+      
+      
+      
+      ~SnapshotWithGrid.subscriptions
+      
+      
+      ~SnapshotWithGrid.top_left_x
+      
+      
+      ~SnapshotWithGrid.top_left_y
+      
+      
+      
+      
+      
+   
+   

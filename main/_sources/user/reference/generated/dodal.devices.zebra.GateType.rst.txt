@@ -1,0 +1,26 @@
+dodal.devices.zebra.GateType
+============================
+
+.. currentmodule:: dodal.devices.zebra
+
+.. autoclass:: GateType
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~GateType.AND
+      
+      
+      ~GateType.OR
+      
+   
+   
