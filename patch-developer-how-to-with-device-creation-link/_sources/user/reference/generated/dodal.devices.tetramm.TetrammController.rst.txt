@@ -1,0 +1,46 @@
+dodal.devices.tetramm.TetrammController
+=======================================
+
+.. currentmodule:: dodal.devices.tetramm
+
+.. autoclass:: TetrammController
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~TetrammController.arm
+      
+      
+      ~TetrammController.disarm
+      
+      
+      ~TetrammController.get_deadtime
+      
+      
+      ~TetrammController.set_exposure
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~TetrammController.base_sample_rate
+      
+      
+      ~TetrammController.max_frame_rate
+      
+      
+      ~TetrammController.minimum_exposure
+      
+   
+   

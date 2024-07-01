@@ -26,8 +26,6 @@ side-bar.
             :caption: How-to Guides
             :maxdepth: 1
 
-            how-to/create-beamline.rst
-
         +++
 
         Practical step-by-step guides for the more experienced user.

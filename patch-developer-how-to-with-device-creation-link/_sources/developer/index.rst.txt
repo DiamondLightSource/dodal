@@ -34,6 +34,8 @@ side-bar.
             how-to/lint
             how-to/update-tools
             how-to/make-release
+            how-to/create-beamline
+            how-to/zocalo
 
         +++
 
@@ -58,6 +60,7 @@ side-bar.
             :maxdepth: 1
 
             reference/standards
+            reference/device-standards
 
         +++
 

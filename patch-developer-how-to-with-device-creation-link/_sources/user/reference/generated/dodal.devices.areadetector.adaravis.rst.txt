@@ -1,0 +1,36 @@
+dodal.devices.areadetector.adaravis
+===================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.areadetector
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~adaravis.AdAravisDetector
+
+
+
+
+.. automodule:: dodal.devices.areadetector.adaravis
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
