@@ -24,22 +24,6 @@ dodal.devices.i24.I24\_detector\_motion.DetectorMotion
       
       
       
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
    
    
 
@@ -52,30 +36,6 @@ dodal.devices.i24.I24\_detector\_motion.DetectorMotion
       
       
       
-      ~DetectorMotion.component_names
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      ~DetectorMotion.subscriptions
-      
-      
-      
-      ~DetectorMotion.y
-      
-      
-      ~DetectorMotion.z
       
    
    

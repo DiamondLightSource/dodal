@@ -21,23 +21,7 @@ dodal.devices.i24.dual\_backlight.DualBacklight
       
       
       
-      
-      
-      
-      
-      
-      
-      
       ~DualBacklight.set
-      
-      
-      
-      
-      
-      
-      
-      
-      
       
       
       
@@ -53,40 +37,7 @@ dodal.devices.i24.dual\_backlight.DualBacklight
    .. autosummary::
    
       
-      ~DualBacklight.IN
       
-      
-      ~DualBacklight.OUT
-      
-      
-      
-      
-      ~DualBacklight.component_names
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      ~DualBacklight.led1
-      
-      
-      ~DualBacklight.led2
-      
-      
-      
-      
-      ~DualBacklight.pos1
-      
-      
-      
-      
-      
-      
-      ~DualBacklight.subscriptions
       
       
    

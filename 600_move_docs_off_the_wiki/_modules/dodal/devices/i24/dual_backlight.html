@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.i24.dual_backlight &#8212; dodal 1.29.2.dev5+g4aa0b0bd1 documentation</title>
+    <title>dodal.devices.i24.dual_backlight &#8212; dodal 1.29.2.dev9+g1f6de123c documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../../_static/documentation_options.js?v=0e5229b0"></script>
+    <script src="../../../../_static/documentation_options.js?v=905d104f"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -455,22 +455,50 @@ document.write(`
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.i24.dual_backlight</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">ophyd</span> <span class="kn">import</span> <span class="n">Component</span><span class="p">,</span> <span class="n">Device</span><span class="p">,</span> <span class="n">EpicsSignal</span><span class="p">,</span> <span class="n">StatusBase</span>
+<span></span><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+
+<span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="n">AsyncStatus</span><span class="p">,</span> <span class="n">StandardReadable</span>
+<span class="kn">from</span> <span class="nn">ophyd_async.epics.signal</span> <span class="kn">import</span> <span class="n">epics_signal_rw</span>
+
+
+<div class="viewcode-block" id="BacklightPositions">
+<a class="viewcode-back" href="../../../../user/reference/generated/dodal.devices.i24.dual_backlight.BacklightPositions.html#dodal.devices.i24.dual_backlight.BacklightPositions">[docs]</a>
+<span class="k">class</span> <span class="nc">BacklightPositions</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+    <span class="n">OUT</span> <span class="o">=</span> <span class="s2">&quot;Out&quot;</span>
+    <span class="n">IN</span> <span class="o">=</span> <span class="s2">&quot;In&quot;</span>
+    <span class="n">LOAD_CHECK</span> <span class="o">=</span> <span class="s2">&quot;LoadCheck&quot;</span>
+    <span class="n">OAV2</span> <span class="o">=</span> <span class="s2">&quot;OAV2&quot;</span>
+    <span class="n">DIODE</span> <span class="o">=</span> <span class="s2">&quot;Diode&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="LEDStatus">
+<a class="viewcode-back" href="../../../../user/reference/generated/dodal.devices.i24.dual_backlight.LEDStatus.html#dodal.devices.i24.dual_backlight.LEDStatus">[docs]</a>
+<span class="k">class</span> <span class="nc">LEDStatus</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+    <span class="n">OFF</span> <span class="o">=</span> <span class="s2">&quot;OFF&quot;</span>
+    <span class="n">ON</span> <span class="o">=</span> <span class="s2">&quot;ON&quot;</span></div>
+
 
 
 <div class="viewcode-block" id="BacklightPositioner">
 <a class="viewcode-back" href="../../../../user/reference/generated/dodal.devices.i24.dual_backlight.BacklightPositioner.html#dodal.devices.i24.dual_backlight.BacklightPositioner">[docs]</a>
-<span class="k">class</span> <span class="nc">BacklightPositioner</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">BacklightPositioner</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Device to control the backlight position.&quot;&quot;&quot;</span>
 
-    <span class="c1"># String description of the backlight position e.g. &quot;In&quot;, &quot;OAV2&quot;</span>
-    <span class="n">pos_level</span> <span class="o">=</span> <span class="n">Component</span><span class="p">(</span><span class="n">EpicsSignal</span><span class="p">,</span> <span class="s2">&quot;MP:SELECT&quot;</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Enum description of the backlight position e.g. &quot;In&quot;, &quot;OAV2&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pos_level</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">BacklightPositions</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;MP:SELECT&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="n">BacklightPositions</span><span class="p">):</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_level</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="DualBacklight">
 <a class="viewcode-back" href="../../../../user/reference/generated/dodal.devices.i24.dual_backlight.DualBacklight.html#dodal.devices.i24.dual_backlight.DualBacklight">[docs]</a>
-<span class="k">class</span> <span class="nc">DualBacklight</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">DualBacklight</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Device to trigger the dual backlight on I24.</span>
 <span class="sd">    This device is made up by two LEDs:</span>
@@ -479,30 +507,26 @@ document.write(`
 
 <span class="sd">    To set the position for LED1:</span>
 <span class="sd">        b = DualBacklight(name=&quot;backlight)</span>
-<span class="sd">        b.pos1.pos_level.set(&quot;OAV2&quot;)</span>
-
-<span class="sd">    To see get the available position values for LED1:</span>
-<span class="sd">        b.pos1.alowed_backlight_positions</span>
+<span class="sd">        b.backlight_position.set(&quot;OAV2&quot;)</span>
 
 <span class="sd">    Note that the two LED are independently switched on and off. When LED1 is</span>
 <span class="sd">    in &quot;Out&quot; position (switched off), LED2 might still be on.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">OUT</span> <span class="o">=</span> <span class="s2">&quot;Out&quot;</span>
-    <span class="n">IN</span> <span class="o">=</span> <span class="s2">&quot;In&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backlight_state</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">LEDStatus</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-DI-LED-01:TOGGLE&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backlight_position</span> <span class="o">=</span> <span class="n">BacklightPositioner</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-MO-BL-01:&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
-    <span class="n">led1</span> <span class="o">=</span> <span class="n">Component</span><span class="p">(</span><span class="n">EpicsSignal</span><span class="p">,</span> <span class="s2">&quot;-DI-LED-01:TOGGLE&quot;</span><span class="p">)</span>
-    <span class="n">pos1</span> <span class="o">=</span> <span class="n">Component</span><span class="p">(</span><span class="n">BacklightPositioner</span><span class="p">,</span> <span class="s2">&quot;-MO-BL-01:&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frontlight_state</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">LEDStatus</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-DI-LED-02:TOGGLE&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
-    <span class="n">led2</span> <span class="o">=</span> <span class="n">Component</span><span class="p">(</span><span class="n">EpicsSignal</span><span class="p">,</span> <span class="s2">&quot;-DI-LED-02:TOGGLE&quot;</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StatusBase</span><span class="p">:</span>
-        <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos1</span><span class="o">.</span><span class="n">pos_level</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">position</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">OUT</span><span class="p">:</span>
-            <span class="n">status</span> <span class="o">&amp;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">led1</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;OFF&quot;</span><span class="p">)</span>
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="n">BacklightPositions</span><span class="p">):</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlight_position</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">position</span> <span class="o">==</span> <span class="n">BacklightPositions</span><span class="o">.</span><span class="n">OUT</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlight_state</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">LEDStatus</span><span class="o">.</span><span class="n">OFF</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">status</span> <span class="o">&amp;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">led1</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;ON&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">status</span></div>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlight_state</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">LEDStatus</span><span class="o">.</span><span class="n">ON</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 </pre></div>
 

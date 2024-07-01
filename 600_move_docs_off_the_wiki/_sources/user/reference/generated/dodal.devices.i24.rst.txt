@@ -10,6 +10,8 @@ dodal.devices.i24
    :recursive:
 
    dodal.devices.i24.I24_detector_motion
+   dodal.devices.i24.aperture
+   dodal.devices.i24.beamstop
    dodal.devices.i24.dual_backlight
    dodal.devices.i24.i24_vgonio
    dodal.devices.i24.pmac

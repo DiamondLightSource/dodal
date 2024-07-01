@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.i24 &#8212; dodal 1.29.2.dev5+g4aa0b0bd1 documentation</title>
+    <title>dodal.beamlines.i24 &#8212; dodal 1.29.2.dev9+g1f6de123c documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=0e5229b0"></script>
+    <script src="../../../_static/documentation_options.js?v=905d104f"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -462,11 +462,15 @@ document.write(`
 <span class="kn">from</span> <span class="nn">dodal.common.beamlines.beamline_utils</span> <span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_utils_beamline</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.detector</span> <span class="kn">import</span> <span class="n">DetectorParams</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.eiger</span> <span class="kn">import</span> <span class="n">EigerDetector</span>
+<span class="kn">from</span> <span class="nn">dodal.devices.hutch_shutter</span> <span class="kn">import</span> <span class="n">HutchShutter</span>
+<span class="kn">from</span> <span class="nn">dodal.devices.i24.aperture</span> <span class="kn">import</span> <span class="n">Aperture</span>
+<span class="kn">from</span> <span class="nn">dodal.devices.i24.beamstop</span> <span class="kn">import</span> <span class="n">Beamstop</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.i24.dual_backlight</span> <span class="kn">import</span> <span class="n">DualBacklight</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.i24.I24_detector_motion</span> <span class="kn">import</span> <span class="n">DetectorMotion</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.i24.i24_vgonio</span> <span class="kn">import</span> <span class="n">VGonio</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.i24.pmac</span> <span class="kn">import</span> <span class="n">PMAC</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.oav.oav_detector</span> <span class="kn">import</span> <span class="n">OAV</span><span class="p">,</span> <span class="n">OAVConfigParams</span>
+<span class="kn">from</span> <span class="nn">dodal.devices.oav.oav_detector</span> <span class="kn">import</span> <span class="n">OAV</span>
+<span class="kn">from</span> <span class="nn">dodal.devices.oav.oav_parameters</span> <span class="kn">import</span> <span class="n">OAVConfigParams</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.zebra</span> <span class="kn">import</span> <span class="n">Zebra</span>
 <span class="kn">from</span> <span class="nn">dodal.log</span> <span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_log_beamline</span>
 <span class="kn">from</span> <span class="nn">dodal.utils</span> <span class="kn">import</span> <span class="n">get_beamline_name</span><span class="p">,</span> <span class="n">skip_device</span>
@@ -479,6 +483,38 @@ document.write(`
 <span class="n">BL</span> <span class="o">=</span> <span class="n">get_beamline_name</span><span class="p">(</span><span class="s2">&quot;s24&quot;</span><span class="p">)</span>
 <span class="n">set_log_beamline</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>
 <span class="n">set_utils_beamline</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="aperture">
+<a class="viewcode-back" href="../../../user/reference/generated/dodal.beamlines.i24.html#dodal.beamlines.i24.aperture">[docs]</a>
+<span class="k">def</span> <span class="nf">aperture</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Aperture</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i24 aperture device, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i24, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">Aperture</span><span class="p">,</span> <span class="s2">&quot;aperture&quot;</span><span class="p">,</span> <span class="s2">&quot;-AL-APTR-01:&quot;</span><span class="p">,</span> <span class="n">wait_for_connection</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="beamstop">
+<a class="viewcode-back" href="../../../user/reference/generated/dodal.beamlines.i24.html#dodal.beamlines.i24.beamstop">[docs]</a>
+<span class="k">def</span> <span class="nf">beamstop</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Beamstop</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i24 beamstop device, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i24, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">Beamstop</span><span class="p">,</span>
+        <span class="s2">&quot;beamstop&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-MO-BS-01:&quot;</span><span class="p">,</span>
+        <span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
 
 
 <div class="viewcode-block" id="backlight">
@@ -611,6 +647,25 @@ document.write(`
         <span class="n">Zebra</span><span class="p">,</span>
         <span class="s2">&quot;zebra&quot;</span><span class="p">,</span>
         <span class="s2">&quot;-EA-ZEBRA-01:&quot;</span><span class="p">,</span>
+        <span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="shutter">
+<a class="viewcode-back" href="../../../user/reference/generated/dodal.beamlines.i24.html#dodal.beamlines.i24.shutter">[docs]</a>
+<span class="nd">@skip_device</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">BL</span> <span class="o">==</span> <span class="s2">&quot;s24&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">shutter</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HutchShutter</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i24 hutch shutter device, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">HutchShutter</span><span class="p">,</span>
+        <span class="s2">&quot;shutter&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-PS-SHTR-01:&quot;</span><span class="p">,</span>
         <span class="n">wait_for_connection</span><span class="p">,</span>
         <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
     <span class="p">)</span></div>

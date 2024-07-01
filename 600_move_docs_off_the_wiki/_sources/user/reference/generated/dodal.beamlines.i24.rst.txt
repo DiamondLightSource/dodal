@@ -24,11 +24,14 @@ dodal.beamlines.i24
 
    .. autosummary::
    
+      aperture
       backlight
+      beamstop
       detector_motion
       eiger
       oav
       pmac
+      shutter
       vgonio
       zebra
    

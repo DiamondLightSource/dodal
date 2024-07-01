@@ -21,20 +21,7 @@ dodal.devices.i24.dual\_backlight.BacklightPositioner
       
       
       
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
+      ~BacklightPositioner.set
       
       
       
@@ -51,27 +38,6 @@ dodal.devices.i24.dual\_backlight.BacklightPositioner
    
       
       
-      
-      ~BacklightPositioner.component_names
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      ~BacklightPositioner.pos_level
-      
-      
-      
-      
-      
-      
-      ~BacklightPositioner.subscriptions
       
       
    

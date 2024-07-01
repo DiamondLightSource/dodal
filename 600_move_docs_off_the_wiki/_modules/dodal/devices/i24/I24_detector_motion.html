@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.i24.I24_detector_motion &#8212; dodal 1.29.2.dev5+g4aa0b0bd1 documentation</title>
+    <title>dodal.devices.i24.I24_detector_motion &#8212; dodal 1.29.2.dev9+g1f6de123c documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../../_static/documentation_options.js?v=0e5229b0"></script>
+    <script src="../../../../_static/documentation_options.js?v=905d104f"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -455,17 +455,20 @@ document.write(`
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.i24.I24_detector_motion</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">ophyd</span> <span class="kn">import</span> <span class="n">Component</span> <span class="k">as</span> <span class="n">Cpt</span>
-<span class="kn">from</span> <span class="nn">ophyd</span> <span class="kn">import</span> <span class="n">Device</span><span class="p">,</span> <span class="n">EpicsMotor</span>
+<span></span><span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="n">StandardReadable</span>
+<span class="kn">from</span> <span class="nn">ophyd_async.epics.motion</span> <span class="kn">import</span> <span class="n">Motor</span>
 
 
 <div class="viewcode-block" id="DetectorMotion">
 <a class="viewcode-back" href="../../../../user/reference/generated/dodal.devices.i24.I24_detector_motion.DetectorMotion.html#dodal.devices.i24.I24_detector_motion.DetectorMotion">[docs]</a>
-<span class="k">class</span> <span class="nc">DetectorMotion</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">DetectorMotion</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Physical motion for detector travel&quot;&quot;&quot;</span>
 
-    <span class="n">y</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">EpicsMotor</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">)</span>  <span class="c1"># Vertical</span>
-    <span class="n">z</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">EpicsMotor</span><span class="p">,</span> <span class="s2">&quot;Z&quot;</span><span class="p">)</span>  <span class="c1"># Beam</span></div>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;Y&quot;</span><span class="p">)</span>  <span class="c1"># Vertical</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;Z&quot;</span><span class="p">)</span>  <span class="c1"># Beam</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
 
 </pre></div>
 

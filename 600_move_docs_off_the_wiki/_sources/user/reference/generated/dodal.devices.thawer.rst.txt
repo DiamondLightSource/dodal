@@ -16,6 +16,7 @@ dodal.devices.thawer
 
    ~thawer.Thawer
    ~thawer.ThawerStates
+   ~thawer.ThawingTimer
 
 
 
@@ -33,5 +34,11 @@ dodal.devices.thawer
    
 
    
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      ThawingException
    
    
