@@ -1,8 +1,23 @@
 Creating a new beamline
------------------------
+=======================
 
 A beamline is a collection of devices that can be used together to run experiments, they may be read-only or capable of being set.
 They include motors in the experiment hutch, optical components in the optics hutch, the synchrotron "machine" and more.
+
+Beamline Modules
+----------------
+
+Each beamline should have its own file in the ``doodal.beamlines`` folder, in which the particular devices for the 
+beamline are instantiated. The file should be named after the colloquial name for the beamline. For example:
+
+* ``i03.py``
+* ``i04_1.py``
+* ``vmxi.py``
+
+Beamline modules (in ``dodal.beamlines``) are code-as-configuration. They define the set of devices and common device
+settings needed for a particular beamline or group of similar beamlines (e.g. a beamline and its digital twin). Some
+of our tooling depends on the convention of *only* beamline modules going in this package. Common utilities should 
+go somewhere else e.g. ``dodal.utils`` or ``dodal.beamlines.common``.
 
 The following example creates a fictitious beamline ``w41``, with a simulated twin ``s41``.
 ``w41`` needs to monitor the status of the Synchrotron and has an AdAravisDetector.
