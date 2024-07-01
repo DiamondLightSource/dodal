@@ -1,6 +1,18 @@
 API
 ===
 
+.. autosummary::
+    :recursive:
+    :toctree: generated
+
+    dodal.beamlines
+    dodal.common
+    dodal.devices
+    dodal.plans
+
+
+:ref: `modindex`
+
 .. automodule:: dodal
 
     ``dodal``
