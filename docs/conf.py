@@ -5,6 +5,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
 import sys
+from inspect import isclass
 from pathlib import Path
 from subprocess import check_output
 
@@ -32,6 +33,7 @@ else:
 extensions = [
     # Use this for generating API docs
     "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
     # This can parse google style docstrings
     "sphinx.ext.napoleon",
     # For linking to external sphinx documentation
@@ -46,6 +48,8 @@ extensions = [
     "sphinx_design",
     # for the mermaid diagrams#
     "sphinxcontrib.mermaid",
+    # Signatures from type hinting
+    "sphinx_autodoc_typehints",
 ]
 
 # If true, Sphinx will warn about all references where the target cannot
@@ -67,6 +71,7 @@ nitpick_ignore = [
     ("py:class", "typing_extensions.Literal"),
 ]
 
+
 # Both the class’ and the __init__ method’s docstring are concatenated and
 # inserted into the main body of the autoclass directive
 autoclass_content = "both"
@@ -76,6 +81,11 @@ autodoc_member_order = "bysource"
 
 # Don't inherit docstrings from baseclasses
 autodoc_inherit_docstrings = False
+autodoc_class_signature = "separated"
+autodoc_preserve_defaults = True
+
+autosummary_generate = True
+autosummary_imported_members = False
 
 # Output graphviz directive produced images in a scalable format
 graphviz_output_format = "svg"
@@ -85,7 +95,7 @@ graphviz_output_format = "svg"
 default_role = "any"
 
 # The suffix of source filenames.
-source_suffix = ".rst"
+source_suffix = [".rst", ".py"]
 
 # The master toctree document.
 master_doc = "index"
@@ -93,7 +103,7 @@ master_doc = "index"
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # These patterns also affect html_static_path and html_extra_path
-exclude_patterns = ["_build"]
+exclude_patterns = ["_build", "conf.py"]
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "sphinx"
@@ -194,3 +204,27 @@ html_show_copyright = False
 # Logo
 html_logo = "images/dls-logo.svg"
 html_favicon = "images/dls-favicon.ico"
+
+templates_path = ["_templates"]
+
+# options for sphinx-autodoc-typehints
+always_document_param_types = True
+typehints_use_signature = True
+typehints_use_signature_return = True
+typehints_defaults = "comma"
+
+
+def skip_module_classes(app, what, name, obj, skip, options):
+    if name.startswith("_"):
+        # NB would like to include overridden dunder-methods in docs but
+        # sphinx insists on randomly including inherited ones which do not
+        # appear in inherited_members and thus are impossible to exclude
+        return True
+    if what == "module" and isclass(obj):
+        return True
+
+    return skip
+
+
+def setup(app):
+    app.connect("autodoc-skip-member", skip_module_classes)
