@@ -3,7 +3,6 @@ from typing import cast
 from unittest.mock import MagicMock, patch
 
 import pytest
-from bluesky.protocols import Status
 from ophyd.sim import NullStatus
 from ophyd.status import Status
 from ophyd.utils.errors import StatusTimeoutError, WaitTimeoutError
