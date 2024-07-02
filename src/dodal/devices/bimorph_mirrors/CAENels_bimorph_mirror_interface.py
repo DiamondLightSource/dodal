@@ -271,7 +271,7 @@ class CAENelsBimorphMirrorInterface(Device, Movable):
 
         Args:
             target_voltages: An array of length equal to number of channels, with
-                target_voltages[X] being set for channel_X_target_voltage if 
+                target_voltages[X] being set for channel_X_target_voltage if
                 channel_x_target_voltage_readback_value != target_voltage[x]
 
         Returns:
@@ -303,4 +303,4 @@ class CAENelsBimorphMirrorInterface(Device, Movable):
         status = self.diff_set_and_proc_target_voltages(target_voltages)
         settler = StatusBase(settle_time = settle_time)
         settler.set_finished()
-        return status & settler 
+        return status & settler
