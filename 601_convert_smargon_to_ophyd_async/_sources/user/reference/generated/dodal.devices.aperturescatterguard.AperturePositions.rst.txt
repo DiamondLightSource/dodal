@@ -1,0 +1,52 @@
+dodal.devices.aperturescatterguard.AperturePositions
+====================================================
+
+.. currentmodule:: dodal.devices.aperturescatterguard
+
+.. autoclass:: AperturePositions
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~AperturePositions.as_list
+      
+      
+      ~AperturePositions.from_gda_beamline_params
+      
+      
+      ~AperturePositions.get_position_from_gda_aperture_name
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~AperturePositions.UNKNOWN
+      
+      
+      ~AperturePositions.LARGE
+      
+      
+      ~AperturePositions.MEDIUM
+      
+      
+      ~AperturePositions.SMALL
+      
+      
+      ~AperturePositions.ROBOT_LOAD
+      
+      
+      ~AperturePositions.tolerances
+      
+   
+   
