@@ -416,10 +416,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/p38/"
   },
   {
-    "version": "patch-developer-how-to-with-device-creation-link",
-    "url": "https://DiamondLightSource.github.io/dodal/patch-developer-how-to-with-device-creation-link/"
-  },
-  {
     "version": "pin_ophyd_async",
     "url": "https://DiamondLightSource.github.io/dodal/pin_ophyd_async/"
   },
