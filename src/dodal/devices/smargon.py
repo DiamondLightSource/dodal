@@ -1,12 +1,15 @@
+from collections.abc import Generator
+from dataclasses import dataclass
 from enum import Enum
 from math import isclose
-from typing import cast
+from typing import Collection, cast
 
+from bluesky import plan_stubs as bps
+from bluesky.utils import Msg
 from ophyd_async.core import AsyncStatus, Device, StandardReadable, wait_for_value
 from ophyd_async.epics.motion import Motor
 from ophyd_async.epics.signal import epics_signal_r
 
-from dodal.devices.motors import MotorLimitHelper, XYZLimitBundle
 from dodal.devices.util.epics_util import SetWhenEnabled
 
 
@@ -54,6 +57,40 @@ class StubOffsets(Device):
             await self.to_robot_load.set(1)
 
 
+@dataclass
+class AxisLimit:
+    """Represents the minimum and maximum allowable values on an axis"""
+
+    min_value: float
+    max_value: float
+
+    def contains(self, pos: float):
+        """Determine if the specified value is within limits.
+
+        Args:
+            pos: the value to check
+
+        Returns:
+            True if the value does not exceed the limits
+        """
+        return self.min_value <= pos <= self.max_value
+
+
+@dataclass
+class XYZLimits:
+    """The limits of the smargon x, y, z axes."""
+
+    x: AxisLimit
+    y: AxisLimit
+    z: AxisLimit
+
+    def position_valid(self, pos: Collection[float]) -> bool:
+        return all(
+            axis_limits.contains(value)
+            for axis_limits, value in zip([self.x, self.y, self.z], pos)
+        )
+
+
 class Smargon(StandardReadable):
     """
     Real motors added to allow stops following pin load (e.g. real_x1.stop() )
@@ -62,7 +99,7 @@ class Smargon(StandardReadable):
     Robot loading can nudge these and lead to errors.
     """
 
-    def __init__(self, name: str = "", prefix: str = ""):
+    def __init__(self, prefix: str = "", name: str = ""):
         with self.add_children_as_readables():
             self.x = Motor(prefix + "X")
             self.y = Motor(prefix + "Y")
@@ -81,17 +118,20 @@ class Smargon(StandardReadable):
 
         super().__init__(name)
 
-    def get_xyz_limits(self) -> XYZLimitBundle:
-        """Get the limits for the x, y and z axes.
+    def get_xyz_limits(self) -> Generator[Msg, None, XYZLimits]:
+        """Obtain a plan stub that returns the smargon XYZ axis limits
 
-        Note that these limits may not yet be valid until wait_for_connection is called
-        on this MotorBundle.
+        Yields:
+            Bluesky messages
 
         Returns:
-            XYZLimitBundle: The limits for the underlying motors.
+            the axis limits
         """
-        return XYZLimitBundle(
-            MotorLimitHelper(self.x),
-            MotorLimitHelper(self.y),
-            MotorLimitHelper(self.z),
-        )
+        limits = {}
+        for name, pv in [
+            (attr_name, getattr(self, attr_name)) for attr_name in ["x", "y", "z"]
+        ]:
+            min_value = yield from bps.rd(pv.low_limit_travel)
+            max_value = yield from bps.rd(pv.high_limit_travel)
+            limits[name] = AxisLimit(min_value, max_value)
+        return XYZLimits(**limits)
