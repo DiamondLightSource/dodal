@@ -4,11 +4,9 @@ from typing import (
     Callable,
     Dict,
     Final,
-    Generic,
     List,
     Optional,
     Protocol,
-    Type,
     TypeVar,
     cast,
 )

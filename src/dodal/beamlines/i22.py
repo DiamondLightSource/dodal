@@ -4,7 +4,6 @@ from ophyd_async.epics.areadetector import AravisDetector, PilatusDetector
 from ophyd_async.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
-    decorator_name,
     device_factory,
     device_instantiation,
     get_directory_provider,

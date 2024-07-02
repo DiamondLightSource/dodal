@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from functools import _Wrapped, wraps
 from typing import Callable, Dict, Optional, TypeVar
 
@@ -11,7 +10,7 @@ from dodal.common.beamlines.beamline_utils import (
 )
 
 
-class XYZDetector:
+class XYZDetector(OphydV2Device):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -25,36 +24,33 @@ GenericDeviceTypeVar = TypeVar("GenericDeviceTypeVar", bound=OphydV2Device)
 LAZY_DEVICES: Dict[str, OphydV2Device] = {}
 
 
-@dataclass
-class DeviceInitalizationConfig:
-    name: str
-    prefix: str
+class DeviceInitializationConfig:
     lazy: bool = False
-    use_mock: bool = False
-    timeout: float = DEFAULT_CONNECTION_TIMEOUT
-    bl_prefix: bool = True
     set_name: bool = True
+    timeout: float = DEFAULT_CONNECTION_TIMEOUT  # todo possibly delete, as its already the default argument to connect
+    use_mock: bool = (
+        False  # todo possibly delete, as its already the default argument to connect
+    )
+
+    def __init__(self, **kwargs):
+        self.lazy = kwargs.get("lazy", False)
+        self.set_name = kwargs.get("set_name", True)
+        self.timeout = kwargs.get("timeout", 0)
+        self.use_mock = kwargs.get("use_mock", False)
 
 
-@dataclass
-class DeviceArguments:
-    # todo how to sort this out?
-    name: str
-    prefix: str
-
-
-class DeviceInitalizationController:
+class DeviceInitializationController:
     device: Optional[OphydV2Device] = None
-    config: Optional[DeviceInitalizationConfig] = None
+    config: Optional[DeviceInitializationConfig] = None
 
-    def __init__(self, config: DeviceInitalizationConfig) -> None:
+    def __init__(self, config: DeviceInitializationConfig) -> None:
         self.config = config
         super().__init__()
 
     # TODO right now the cache is in a global variable ACTIVE_DEVICES, that should change
     def see_if_device_is_in_cache(self, name: str) -> Optional[GenericDeviceTypeVar]:
         d = ACTIVE_DEVICES.get(name)
-        assert d is OphydV2Device
+        assert isinstance(d, OphydV2Device) or d is None
         return d
 
     def add_device_to_cache(self, device: GenericDeviceTypeVar) -> None:
@@ -62,20 +58,23 @@ class DeviceInitalizationController:
 
     # TODO right now the lazy devices are in a global variable LAZY_DEVICES, that should change
     def add_device_to_lazy_cache(self, device: OphydV2Device) -> None:
-        print(f"Device {device.name} is lazy, not initalizing now")
+        print(f"Device {device.name} is lazy, not initializing now")
         LAZY_DEVICES[device.name] = device
 
-    def initalize_device(
+    def initialize_device(
         self,
         factory: Callable[[], GenericDeviceTypeVar],
     ) -> GenericDeviceTypeVar:
         assert self.config is not None
 
         device: GenericDeviceTypeVar = (
-            self.see_if_device_is_in_cache(self.config.name) or factory()
+            # todo if we do not pass the name to the factory, we can not check if the device is in the cache.
+            # there are many devices from the same factory
+            self.see_if_device_is_in_cache(factory.__name__) or factory()
         )
 
         if self.config.set_name:
+            # todo what if we have multiple devices from the same factory?
             device.set_name(factory.__name__)
 
         if self.config.lazy:
@@ -88,23 +87,27 @@ class DeviceInitalizationController:
         return device
 
 
-def instance_behavior(
-    config: DeviceInitalizationConfig,
+def device_instance_behavior(
+    **config_kwargs,
 ) -> Callable[[Callable[[], GenericDeviceTypeVar]], _Wrapped]:
-    def decorator(device_specific_subclass):
-        controller = DeviceInitalizationController(config=config)
+    config = DeviceInitializationConfig(**config_kwargs)
 
-        @wraps(device_specific_subclass)
+    def decorator(factory):
+        controller = DeviceInitializationController(config=config)
+
+        @wraps(factory)
         def wrapper(*args, **kwargs) -> GenericDeviceTypeVar:
-            return controller.initalize_device(device_specific_subclass)
+            return controller.initialize_device(factory, *args, **kwargs)
 
         return wrapper
 
     return decorator
 
 
-@instance_behavior(
-    config=DeviceInitalizationConfig(lazy=True, use_mock=True, timeout=10),
-)
-def detector_xyz() -> XYZDetector:
-    return XYZDetector(name="det1", prefix="xyz:")
+beamline_prefix = "example:"
+
+
+@device_instance_behavior(lazy=True, use_mock=True, timeout=10)
+def detector_xyz():
+    """Create an XYZ detector with specific settings."""
+    return XYZDetector(name="det1", prefix=f"{beamline_prefix}xyz:")
