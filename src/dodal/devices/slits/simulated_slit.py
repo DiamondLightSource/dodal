@@ -17,11 +17,11 @@ class SimulatedSlit(GapAndCenterSlit2d):
     x_plus = SynAxis(name="x_plus")
     x_minus = SynAxis(name="x_minus")
 
-    y_size = SynAxis(name="slit_y_size")
-    y_center = SynAxis(name="slit_y_center")
+    y_size = SynAxis(name="slit_y_size_readback_value")
+    y_center = SynAxis(name="slit_y_center_readback_value")
 
-    x_size = SynAxis(name="slit_x_size")
-    x_center = SynAxis(name="slit_x_center")
+    x_size = SynAxis(name="slit_x_size_readback_value")
+    x_center = SynAxis(name="slit_x_center_readback_value")
 
     def set(self, position_tuple: tuple[float, float, float, float]):
         """Method to set position of slit.
