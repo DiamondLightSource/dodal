@@ -1,8 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Any, Generator, Generic, TypeVar, cast
+from typing import Any, Generic, TypeVar
 
 import numpy as np
-from bluesky import Msg
 from bluesky.plan_stubs import mv
 from numpy import ndarray
 from ophyd_async.core import (
@@ -24,7 +23,6 @@ from ophyd_async.epics.signal import (
 from pydantic import validator
 from pydantic.dataclasses import dataclass
 
-from dodal.devices.smargon import Smargon
 from dodal.log import LOGGER
 from dodal.parameters.experiment_parameter_base import AbstractExperimentWithBeamParams
 
@@ -112,33 +110,6 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
     @validator("z_axis", always=True)
     def _get_z_axis(cls, z_axis: GridAxis, values: dict[str, Any]) -> GridAxis:
         return GridAxis(values["z2_start"], values["z_step_size"], values["z_steps"])
-
-    def validate_against_hardware(self, composite) -> Generator[Msg, Any, Any]:
-        """Validates the parameters against smargon motor limits."""
-        yield from super().validate_against_hardware(composite)
-
-        smargon = cast(Smargon, composite.smargon)
-        limits = yield from smargon.get_xyz_limits()
-        x_in_limits = limits.x.contains(self.x_axis.start) and limits.x.contains(
-            self.x_axis.end
-        )
-        y_in_limits = limits.y.contains(self.y_axis.start) and limits.y.contains(
-            self.y_axis.end
-        )
-        z_in_limits = limits.z.contains(self.z_axis.start) and limits.z.contains(
-            self.z_axis.end
-        )
-
-        first_grid_in_limits = (
-            x_in_limits and y_in_limits and limits.z.contains(self.z1_start)
-        )
-
-        second_grid_in_limits = (
-            x_in_limits and z_in_limits and limits.y.contains(self.y2_start)
-        )
-
-        if not first_grid_in_limits or not second_grid_in_limits:
-            raise ValueError("Invalid grid parameters")
 
     def get_num_images(self):
         return self.x_steps * self.y_steps + self.x_steps * self.z_steps
