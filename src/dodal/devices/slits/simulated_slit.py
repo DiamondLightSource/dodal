@@ -1,7 +1,6 @@
 from ophyd.sim import SynAxis
 
 from dodal.devices.slits.gap_and_center_slit_base_classes import GapAndCenterSlit2d
-from dodal.devices.slits.slit_motor import SlitMotor
 
 
 class SimulatedSlit(GapAndCenterSlit2d):
