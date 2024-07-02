@@ -46,6 +46,8 @@ extensions = [
     "sphinx_copybutton",
     # For the card element
     "sphinx_design",
+    # for the mermaid diagrams#
+    "sphinxcontrib.mermaid",
     # Signatures from type hinting
     "sphinx_autodoc_typehints",
 ]
