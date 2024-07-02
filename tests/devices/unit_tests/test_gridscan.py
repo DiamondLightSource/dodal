@@ -1,11 +1,11 @@
 from asyncio import wait_for
+from dataclasses import dataclass
 
 import numpy as np
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky import preprocessors as bpp
 from bluesky.run_engine import RunEngine
-from ophyd.sim import make_fake_device
 from ophyd.status import DeviceStatus, Status
 from ophyd_async.core import DeviceCollector, get_mock_put, set_mock_value
 
@@ -152,18 +152,27 @@ async def test_running_finished_with_all_images_done_then_complete_status_finish
     assert complete_status.exception() is None
 
 
-def create_motor_bundle_with_limits(low_limit, high_limit) -> Smargon:
-    FakeSmargon = make_fake_device(Smargon)
-    grid_scan_motor_bundle: Smargon = FakeSmargon(name="test fake Smargon")
-    grid_scan_motor_bundle.wait_for_connection()
+@pytest.fixture
+def motor_bundle_with_limits(smargon) -> Smargon:
     for axis in [
-        grid_scan_motor_bundle.x,
-        grid_scan_motor_bundle.y,
-        grid_scan_motor_bundle.z,
+        smargon.x,
+        smargon.y,
+        smargon.z,
     ]:
-        axis.low_limit_travel.sim_put(low_limit)  # type: ignore
-        axis.high_limit_travel.sim_put(high_limit)  # type: ignore
-    return grid_scan_motor_bundle
+        set_mock_value(axis.low_limit_travel, 0)
+        set_mock_value(axis.high_limit_travel, 10)
+
+    return smargon
+
+
+@dataclass
+class CompositeWithSmargon:
+    smargon: Smargon
+
+
+@pytest.fixture
+def composite_with_smargon(motor_bundle_with_limits):
+    return CompositeWithSmargon(motor_bundle_with_limits)
 
 
 @pytest.mark.parametrize(
@@ -174,9 +183,14 @@ def create_motor_bundle_with_limits(low_limit, high_limit) -> Smargon:
         (5, True),
     ],
 )
-def test_within_limits_check(position, expected_in_limit):
-    limits = create_motor_bundle_with_limits(0.0, 10).get_xyz_limits()
-    assert limits.x.is_within(position) == expected_in_limit
+async def test_within_limits_check(
+    RE: RunEngine, motor_bundle_with_limits, position, expected_in_limit
+):
+    def check_limits_plan():
+        limits = yield from motor_bundle_with_limits.get_xyz_limits()
+        assert limits.x.contains(position) == expected_in_limit
+
+    RE(check_limits_plan())
 
 
 PASSING_LINE_1 = (1, 5, 1)
@@ -184,6 +198,14 @@ PASSING_LINE_2 = (0, 10, 0.5)
 FAILING_LINE_1 = (-1, 20, 0.5)
 PASSING_CONST = 6
 FAILING_CONST = 15
+
+
+def check_parameter_validation(params, composite, expected_in_limits):
+    if expected_in_limits:
+        yield from params.validate_against_hardware(composite)
+    else:
+        with pytest.raises(ValueError):
+            yield from params.validate_against_hardware(composite)
 
 
 @pytest.mark.parametrize(
@@ -199,12 +221,18 @@ FAILING_CONST = 15
         (5, 20, 0.6, False),
     ],
 )
-def test_scan_within_limits_1d(start, steps, size, expected_in_limits):
-    motor_bundle = create_motor_bundle_with_limits(0.0, 10.0)
+def test_scan_within_limits_1d(
+    RE: RunEngine, composite_with_smargon, start, steps, size, expected_in_limits
+):
     grid_params = ZebraGridScanParams(
         transmission_fraction=0.01, x_start=start, x_steps=steps, x_step_size=size
     )
-    assert grid_params.is_valid(motor_bundle.get_xyz_limits()) == expected_in_limits
+
+    RE(
+        check_parameter_validation(
+            grid_params, composite_with_smargon, expected_in_limits
+        )
+    )
 
 
 @pytest.mark.parametrize(
@@ -216,9 +244,17 @@ def test_scan_within_limits_1d(start, steps, size, expected_in_limits):
     ],
 )
 def test_scan_within_limits_2d(
-    x_start, x_steps, x_size, y1_start, y_steps, y_size, z1_start, expected_in_limits
+    RE: RunEngine,
+    composite_with_smargon,
+    x_start,
+    x_steps,
+    x_size,
+    y1_start,
+    y_steps,
+    y_size,
+    z1_start,
+    expected_in_limits,
 ):
-    motor_bundle = create_motor_bundle_with_limits(0.0, 10.0)
     grid_params = ZebraGridScanParams(
         transmission_fraction=0.01,
         x_start=x_start,
@@ -229,7 +265,12 @@ def test_scan_within_limits_2d(
         y_step_size=y_size,
         z1_start=z1_start,
     )
-    assert grid_params.is_valid(motor_bundle.get_xyz_limits()) == expected_in_limits
+
+    RE(
+        check_parameter_validation(
+            grid_params, composite_with_smargon, expected_in_limits
+        )
+    )
 
 
 @pytest.mark.parametrize(
@@ -274,8 +315,9 @@ def test_scan_within_limits_3d(
     z_size,
     y2_start,
     expected_in_limits,
+    composite_with_smargon,
+    RE: RunEngine,
 ):
-    motor_bundle = create_motor_bundle_with_limits(0.0, 10.0)
     grid_params = ZebraGridScanParams(
         transmission_fraction=0.01,
         x_start=x_start,
@@ -290,7 +332,11 @@ def test_scan_within_limits_3d(
         z_step_size=z_size,
         y2_start=y2_start,
     )
-    assert grid_params.is_valid(motor_bundle.get_xyz_limits()) == expected_in_limits
+    RE(
+        check_parameter_validation(
+            grid_params, composite_with_smargon, expected_in_limits
+        )
+    )
 
 
 @pytest.fixture

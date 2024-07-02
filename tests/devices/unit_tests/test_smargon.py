@@ -11,7 +11,7 @@ from dodal.devices.smargon import Smargon, StubPosition
 @pytest.fixture
 async def smargon() -> Smargon:
     async with DeviceCollector(mock=True):
-        smargon = Smargon("smargon")
+        smargon = Smargon(name="smargon")
     return smargon
 
 
