@@ -20,7 +20,7 @@ class XYZDetector:
         raise NotImplementedError
 
 
-T = TypeVar("T", bound=OphydV2Device)
+GenericDeviceTypeVar = TypeVar("GenericDeviceTypeVar", bound=OphydV2Device)
 
 LAZY_DEVICES: Dict[str, OphydV2Device] = {}
 
@@ -30,9 +30,17 @@ class DeviceInitalizationConfig:
     name: str
     prefix: str
     lazy: bool = False
-    fake: bool = False
+    use_mock: bool = False
     timeout: float = DEFAULT_CONNECTION_TIMEOUT
     bl_prefix: bool = True
+    set_name: bool = True
+
+
+@dataclass
+class DeviceArguments:
+    # todo how to sort this out?
+    name: str
+    prefix: str
 
 
 class DeviceInitalizationController:
@@ -44,50 +52,51 @@ class DeviceInitalizationController:
         super().__init__()
 
     # TODO right now the cache is in a global variable ACTIVE_DEVICES, that should change
-    def see_if_device_is_in_cache(self, name: str) -> Optional[OphydV2Device]:
+    def see_if_device_is_in_cache(self, name: str) -> Optional[GenericDeviceTypeVar]:
         d = ACTIVE_DEVICES.get(name)
         assert d is OphydV2Device
-        # todo temporarily throw an error if the device is from v1
         return d
 
-    # todo splitting the logic for initalizing the device and the logic for caching the device
-    # potentially more features too
+    def add_device_to_cache(self, device: GenericDeviceTypeVar) -> None:
+        ACTIVE_DEVICES[device.name] = device
+
+    # TODO right now the lazy devices are in a global variable LAZY_DEVICES, that should change
+    def add_device_to_lazy_cache(self, device: OphydV2Device) -> None:
+        print(f"Device {device.name} is lazy, not initalizing now")
+        LAZY_DEVICES[device.name] = device
+
     def initalize_device(
         self,
-        factory: Callable[[], T],
-        post_create: Optional[Callable[[T], None]] = None,
-    ) -> T:
+        factory: Callable[[], GenericDeviceTypeVar],
+    ) -> GenericDeviceTypeVar:
         assert self.config is not None
 
-        # todo add fake and cache logic
-        cached_device = self.see_if_device_is_in_cache(self.config.name)
-        # todo should we run the post-create again if we recover from cache?
-        if self.config.fake:
-            # todo not sure what is the ophyd-2 faking logic
-            pass
-        device = factory()
+        device: GenericDeviceTypeVar = (
+            self.see_if_device_is_in_cache(self.config.name) or factory()
+        )
+
+        if self.config.set_name:
+            device.set_name(factory.__name__)
+
         if self.config.lazy:
-            print(f"Device {factory.__name__} is lazy, not initalizing now")
-            LAZY_DEVICES[self.config.name] = device
+            self.add_device_to_lazy_cache(device)
         else:
-            call_in_bluesky_event_loop(device.connect(timeout=self.config.timeout))
-        if self.config.fake:
-            print("Running in fake mode")
-        if post_create:
-            post_create(device)
+            self.add_device_to_cache(device)
+            call_in_bluesky_event_loop(
+                device.connect(timeout=self.config.timeout, mock=self.config.use_mock)
+            )
         return device
 
 
 def instance_behavior(
     config: DeviceInitalizationConfig,
-    post_create: Optional[Callable[[T], None]] = None,
-) -> Callable[[Callable[[], T]], _Wrapped]:
+) -> Callable[[Callable[[], GenericDeviceTypeVar]], _Wrapped]:
     def decorator(device_specific_subclass):
         controller = DeviceInitalizationController(config=config)
 
         @wraps(device_specific_subclass)
-        def wrapper(*args, **kwargs) -> OphydV2Device:
-            return controller.initalize_device(device_specific_subclass, post_create)
+        def wrapper(*args, **kwargs) -> GenericDeviceTypeVar:
+            return controller.initalize_device(device_specific_subclass)
 
         return wrapper
 
@@ -95,10 +104,7 @@ def instance_behavior(
 
 
 @instance_behavior(
-    config=DeviceInitalizationConfig(
-        name="det1", prefix="xyz:", lazy=True, fake=True, timeout=10
-    ),
-    post_create=None,
+    config=DeviceInitalizationConfig(lazy=True, use_mock=True, timeout=10),
 )
 def detector_xyz() -> XYZDetector:
-    return XYZDetector()
+    return XYZDetector(name="det1", prefix="xyz:")
