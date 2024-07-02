@@ -4,6 +4,7 @@ from ophyd_async.epics.areadetector import AravisDetector, PilatusDetector
 from ophyd_async.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
+    device_factory,
     device_instantiation,
     get_directory_provider,
     set_directory_provider,
@@ -41,15 +42,12 @@ set_directory_provider(
 )
 
 
-def saxs(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> PilatusDetector:
-    return device_instantiation(
-        NXSasPilatus,
-        "saxs",
+@device_factory(lazy=True)
+def saxs() -> PilatusDetector:
+    return NXSasPilatus(
         "-EA-PILAT-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+        name="saxs",
+        directory_provider=get_directory_provider(),
         drv_suffix="CAM:",
         hdf_suffix="HDF5:",
         metadata_holder=NXSasMetadataHolder(
@@ -61,7 +59,6 @@ def saxs(
             sensor_thickness=(0.45, "mm"),
             distance=(4711.833684146172, "mm"),
         ),
-        directory_provider=get_directory_provider(),
     )
 
 
@@ -377,3 +374,4 @@ def linkam(
         wait_for_connection,
         fake_with_ophyd_sim,
     )
+
