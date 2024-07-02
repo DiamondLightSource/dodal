@@ -360,6 +360,7 @@ def oav(
             x_pixel_size=(3.45e-3, "mm"),  # Double check this figure
             y_pixel_size=(3.45e-3, "mm"),
             description="AVT Mako G-507B",
+            distance=(-1.0, "m"),
         ),
         directory_provider=get_directory_provider(),
     )
