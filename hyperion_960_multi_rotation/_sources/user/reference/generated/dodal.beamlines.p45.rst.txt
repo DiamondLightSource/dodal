@@ -1,0 +1,34 @@
+dodal.beamlines.p45
+===================
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.beamlines.p45
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      choppers
+      sample
+   
+   
+
+   
+   
+   

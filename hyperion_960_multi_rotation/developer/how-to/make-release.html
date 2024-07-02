@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Make a release &#8212; dodal 1.28.1.dev17+g695e9b2b9 documentation</title>
+    <title>Make a release &#8212; dodal 1.29.2.dev8+g5d4b7c0c8 documentation</title>
   
   
   
@@ -18,12 +18,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
-<link href="../../_static/styles/bootstrap.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
 
   
-  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
@@ -34,11 +34,11 @@
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=87e54e7c" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
-  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../_static/documentation_options.js?v=91bc1ee6"></script>
+    <script src="../../_static/documentation_options.js?v=b84660c2"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -46,7 +46,7 @@
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'developer/how-to/make-release';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.15.3';
+        DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://DiamondLightSource.github.io/dodal/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'hyperion_960_multi_rotation';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
@@ -54,7 +54,7 @@
     <link rel="icon" href="../../_static/dls-favicon.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Architectural Decision Records" href="../explanations/decisions.html" />
+    <link rel="next" title="Creating a new beamline" href="create-beamline.html" />
     <link rel="prev" title="Update the tools" href="update-tools.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -111,7 +111,7 @@
   
     <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -120,6 +120,8 @@
     
       <div class="navbar-item">
 
+  
+    
   
 
 <a class="navbar-brand logo" href="../../index.html">
@@ -148,24 +150,24 @@
     <div class="me-auto navbar-header-items__center">
       
         <div class="navbar-item">
-<nav class="navbar-nav">
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-<li class="nav-item pst-header-nav-item">
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../user/index.html">
     User Guide
   </a>
 </li>
 
 
-<li class="nav-item pst-header-nav-item current active">
+<li class="nav-item current active">
   <a class="nav-link nav-internal" href="../index.html">
     Developer Guide
   </a>
 </li>
 
 
-<li class="nav-item pst-header-nav-item">
+<li class="nav-item ">
   <a class="nav-link nav-external" href="https://github.com/DiamondLightSource/dodal/releases">
     Release Notes
   </a>
@@ -184,7 +186,7 @@
 
  <script>
  document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
     <span class="search-button__default-text">Search</span>
     <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -198,15 +200,15 @@
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
   </button>
 `);
 </script></div>
       
-        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+        <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
         <li class="nav-item">
           
@@ -217,7 +219,7 @@ document.write(`
           
           
           
-          <a href="https://github.com/DiamondLightSource/dodal" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i></span>
+          <a href="https://github.com/DiamondLightSource/dodal" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
             <span class="sr-only">GitHub</span></a>
         </li>
         <li class="nav-item">
@@ -229,7 +231,7 @@ document.write(`
           
           
           
-          <a href="https://pypi.org/project/dodal" title="PyPI" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fas fa-cube fa-lg" aria-hidden="true"></i></span>
+          <a href="https://pypi.org/project/dodal" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
             <span class="sr-only">PyPI</span></a>
         </li>
 </ul></div>
@@ -240,7 +242,7 @@ document.write(`
   <div class="version-switcher__container dropdown">
     <button id="pst-version-switcher-button-2"
       type="button"
-      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
+      class="version-switcher__button btn btn-sm dropdown-toggle"
       data-bs-toggle="dropdown"
       aria-haspopup="listbox"
       aria-controls="pst-version-switcher-list-2"
@@ -267,7 +269,7 @@ document.write(`
 
  <script>
  document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass"></i>
     <span class="search-button__default-text">Search</span>
     <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -278,7 +280,7 @@ document.write(`
   
 
   
-    <button class="sidebar-toggle secondary-toggle" aria-label="On this page">
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
       <span class="fa-solid fa-outdent"></span>
     </button>
   
@@ -304,24 +306,24 @@ document.write(`
           
           
             <div class="navbar-item">
-<nav class="navbar-nav">
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-<li class="nav-item pst-header-nav-item">
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../user/index.html">
     User Guide
   </a>
 </li>
 
 
-<li class="nav-item pst-header-nav-item current active">
+<li class="nav-item current active">
   <a class="nav-link nav-internal" href="../index.html">
     Developer Guide
   </a>
 </li>
 
 
-<li class="nav-item pst-header-nav-item">
+<li class="nav-item ">
   <a class="nav-link nav-external" href="https://github.com/DiamondLightSource/dodal/releases">
     Release Notes
   </a>
@@ -341,15 +343,15 @@ document.write(`
 
 <script>
 document.write(`
-  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
-    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
   </button>
 `);
 </script></div>
         
-          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+          <div class="navbar-item"><ul class="navbar-icon-links"
     aria-label="Icon Links">
         <li class="nav-item">
           
@@ -360,7 +362,7 @@ document.write(`
           
           
           
-          <a href="https://github.com/DiamondLightSource/dodal" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i></span>
+          <a href="https://github.com/DiamondLightSource/dodal" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
             <span class="sr-only">GitHub</span></a>
         </li>
         <li class="nav-item">
@@ -372,7 +374,7 @@ document.write(`
           
           
           
-          <a href="https://pypi.org/project/dodal" title="PyPI" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fas fa-cube fa-lg" aria-hidden="true"></i></span>
+          <a href="https://pypi.org/project/dodal" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
             <span class="sr-only">PyPI</span></a>
         </li>
 </ul></div>
@@ -383,7 +385,7 @@ document.write(`
   <div class="version-switcher__container dropdown">
     <button id="pst-version-switcher-button-3"
       type="button"
-      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
+      class="version-switcher__button btn btn-sm dropdown-toggle"
       data-bs-toggle="dropdown"
       aria-haspopup="listbox"
       aria-controls="pst-version-switcher-list-3"
@@ -420,10 +422,13 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="move-code.html">Moving code from another repo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="build-docs.html">Build the docs using sphinx</a></li>
 <li class="toctree-l1"><a class="reference internal" href="run-tests.html">Run the tests using pytest</a></li>
+<li class="toctree-l1"><a class="reference internal" href="make-new-ophyd-async-device.html">Decision Flowchart for Creating a New ophyd_async Device</a></li>
 <li class="toctree-l1"><a class="reference internal" href="static-analysis.html">Run static analysis using mypy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="lint.html">Run linting using pre-commit</a></li>
 <li class="toctree-l1"><a class="reference internal" href="update-tools.html">Update the tools</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Make a release</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create-beamline.html">Creating a new beamline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zocalo.html">Zocalo Interaction</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Explanations</span></p>
 <ul class="nav bd-sidenav">
@@ -435,7 +440,8 @@ document.write(`
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../reference/standards.html">Standards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/standards.html">General Coding Standards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/device-standards.html">Device Standards</a></li>
 </ul>
 </div>
 </nav></div>
@@ -495,17 +501,31 @@ document.write(`
                   
   <section id="make-a-release">
 <h1>Make a release<a class="headerlink" href="#make-a-release" title="Link to this heading">#</a></h1>
+<p>Releases are created through the Github release interface.</p>
 <p>To make a new release, please follow this checklist:</p>
 <ul class="simple">
-<li><p>Choose a new PEP440 compliant release number (see <a class="reference external" href="https://peps.python.org/pep-0440/">https://peps.python.org/pep-0440/</a>)</p></li>
+<li><p>Choose a new PEP440 compliant release number (see <a class="reference external" href="https://peps.python.org/pep-0440/">https://peps.python.org/pep-0440/</a>) (The release version should
+look like <code class="docutils literal notranslate"><span class="pre">{major}.{minor}.{patch}</span></code>). See <a class="reference internal" href="#deciding-release-numbers">Deciding release numbers</a> if you’re unsure on what the release version
+should be.</p></li>
 <li><p>Go to the GitHub <a class="reference external" href="https://github.com/DiamondLightSource/dodal/releases">release</a> page</p></li>
 <li><p>Choose <code class="docutils literal notranslate"><span class="pre">Draft</span> <span class="pre">New</span> <span class="pre">Release</span></code></p></li>
 <li><p>Click <code class="docutils literal notranslate"><span class="pre">Choose</span> <span class="pre">Tag</span></code> and supply the new tag you chose (click create new tag)</p></li>
-<li><p>Click <code class="docutils literal notranslate"><span class="pre">Generate</span> <span class="pre">release</span> <span class="pre">notes</span></code>, review and edit these notes</p></li>
-<li><p>Choose a title and click <code class="docutils literal notranslate"><span class="pre">Publish</span> <span class="pre">Release</span></code></p></li>
+<li><p>Click <code class="docutils literal notranslate"><span class="pre">Generate</span> <span class="pre">release</span> <span class="pre">notes</span></code>, review and edit these notes. Confirm they do not omit anything important and make sense (to a user, not just a developer).</p></li>
+<li><p>Choose a title and click <code class="docutils literal notranslate"><span class="pre">Publish</span> <span class="pre">Release</span></code>. This will create a release on <code class="docutils literal notranslate"><span class="pre">pypi</span></code> automatically and post to the
+<code class="docutils literal notranslate"><span class="pre">bluesky</span></code> slack channel.</p></li>
+<li><p>Manually confirm that the <code class="docutils literal notranslate"><span class="pre">pypi</span></code> version has been updated (after all tests have run) and that slack is notified.</p></li>
 </ul>
 <p>Note that tagging and pushing to the main branch has the same effect except that
 you will not get the option to edit the release notes.</p>
+<section id="deciding-release-numbers">
+<h2>Deciding release numbers<a class="headerlink" href="#deciding-release-numbers" title="Link to this heading">#</a></h2>
+<p>Releases should obviously be versioned higher than the previous latest release. Otherwise you should follow this guide:</p>
+<ul class="simple">
+<li><p><strong>Major</strong> - Changes that have the potential to break plans</p></li>
+<li><p><strong>Minor</strong> - New features</p></li>
+<li><p><strong>Patch</strong> - Bug fixes</p></li>
+</ul>
+</section>
 </section>
 
 
@@ -528,11 +548,11 @@ you will not get the option to edit the release notes.</p>
       </div>
     </a>
     <a class="right-next"
-       href="../explanations/decisions.html"
+       href="create-beamline.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Architectural Decision Records</p>
+        <p class="prev-next-title">Creating a new beamline</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -545,6 +565,18 @@ you will not get the option to edit the release notes.</p>
               
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deciding-release-numbers">Deciding release numbers</a></li>
+</ul>
+  </nav></div>
 
   <div class="sidebar-secondary-item">
 
@@ -584,8 +616,8 @@ you will not get the option to edit the release notes.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341"></script>
-<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341"></script>
+  <script src="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -596,7 +628,7 @@ you will not get the option to edit the release notes.</p>
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.3.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
 </p></div>
       
     </div>

@@ -1,0 +1,23 @@
+dodal.common.types.UpdatingDirectoryProvider
+============================================
+
+.. currentmodule:: dodal.common.types
+
+.. autoclass:: UpdatingDirectoryProvider
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~UpdatingDirectoryProvider.update
+      
+   
+   
+
+   
+   
+   
