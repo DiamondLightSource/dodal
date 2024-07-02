@@ -23,7 +23,6 @@ from ophyd_async.epics.signal import (
 from pydantic import validator
 from pydantic.dataclasses import dataclass
 
-from dodal.devices.motors import XYZLimitBundle
 from dodal.log import LOGGER
 from dodal.parameters.experiment_parameter_base import AbstractExperimentWithBeamParams
 
@@ -111,35 +110,6 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
     @validator("z_axis", always=True)
     def _get_z_axis(cls, z_axis: GridAxis, values: dict[str, Any]) -> GridAxis:
         return GridAxis(values["z2_start"], values["z_step_size"], values["z_steps"])
-
-    def is_valid(self, limits: XYZLimitBundle) -> bool:
-        """
-        Validates scan parameters
-
-        :param limits: The motor limits against which to validate
-                       the parameters
-        :return: True if the scan is valid
-        """
-        x_in_limits = limits.x.is_within(self.x_axis.start) and limits.x.is_within(
-            self.x_axis.end
-        )
-        y_in_limits = limits.y.is_within(self.y_axis.start) and limits.y.is_within(
-            self.y_axis.end
-        )
-
-        first_grid_in_limits = (
-            x_in_limits and y_in_limits and limits.z.is_within(self.z1_start)
-        )
-
-        z_in_limits = limits.z.is_within(self.z_axis.start) and limits.z.is_within(
-            self.z_axis.end
-        )
-
-        second_grid_in_limits = (
-            x_in_limits and z_in_limits and limits.y.is_within(self.y2_start)
-        )
-
-        return first_grid_in_limits and second_grid_in_limits
 
     def get_num_images(self):
         return self.x_steps * self.y_steps + self.x_steps * self.z_steps
