@@ -1,0 +1,23 @@
+dodal.devices.oav.pin\_image\_recognition.utils.MxSampleDetect
+==============================================================
+
+.. currentmodule:: dodal.devices.oav.pin_image_recognition.utils
+
+.. autoclass:: MxSampleDetect
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~MxSampleDetect.processArray
+      
+   
+   
+
+   
+   
+   
