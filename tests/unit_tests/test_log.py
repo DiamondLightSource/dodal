@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, call, patch
 import pytest
 from graypy import GELFTCPHandler
 from ophyd import log as ophyd_log
-from ophyd_async.core import soft_signal_rw
+from ophyd_async.core import Device, soft_signal_rw
 
 from dodal import log
 from dodal.log import (
@@ -14,6 +14,7 @@ from dodal.log import (
     BeamlineFilter,
     CircularMemoryHandler,
     clear_all_loggers_and_handlers,
+    do_default_logging_setup,
     get_logging_file_path,
     integrate_bluesky_and_ophyd_logging,
     set_up_all_logging_handlers,
@@ -28,7 +29,7 @@ def mock_logger():
 
 @pytest.fixture()
 def dodal_logger_for_tests():
-    logger = logging.getLogger("test_dodal")
+    logger = logging.getLogger("Dodal")
     logger.handlers.clear()
     return logger
 
@@ -224,5 +225,25 @@ async def test_ophyd_async_logger_integrated(caplog, dodal_logger_for_tests):
     integrate_bluesky_and_ophyd_logging(dodal_logger_for_tests)
     test_signal = soft_signal_rw(int, 0, "test_signal")
     await test_signal.connect()
-    print("test")
     assert "Connecting to soft://test_signal" in caplog.text
+
+
+async def test_ophyd_async_logger_configured(dodal_logger_for_tests):
+    integrate_bluesky_and_ophyd_logging(dodal_logger_for_tests)
+    do_default_logging_setup(True)
+    stream_handler: logging.StreamHandler = dodal_logger_for_tests.handlers[0]
+    stream_handler.level = logging.DEBUG
+    stream_handler.stream.write = MagicMock()
+    test_signal_name = "TEST SIGNAL NAME"
+    test_device_name = "TEST DEVICE NAME"
+
+    class _Device(Device):
+        def __init__(self, name: str = test_device_name) -> None:
+            super().__init__(name)
+            self.test_signal = soft_signal_rw(int, 0, test_signal_name)
+
+    device = _Device()
+    await device.connect()
+    assert f"[{test_signal_name}]" in stream_handler.stream.write.call_args.args[0]
+    device.log.debug("test message")
+    assert f"[{test_device_name}]" in stream_handler.stream.write.call_args.args[0]
