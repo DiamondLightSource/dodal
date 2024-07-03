@@ -29,10 +29,13 @@ side-bar.
             how-to/move-code
             how-to/build-docs
             how-to/run-tests
+            how-to/make-new-ophyd-async-device
             how-to/static-analysis
             how-to/lint
             how-to/update-tools
             how-to/make-release
+            how-to/create-beamline
+            how-to/zocalo
 
         +++
 
@@ -57,6 +60,7 @@ side-bar.
             :maxdepth: 1
 
             reference/standards
+            reference/device-standards
 
         +++
 
