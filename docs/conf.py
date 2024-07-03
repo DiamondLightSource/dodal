@@ -71,7 +71,6 @@ nitpick_ignore = [
     ("py:class", "typing_extensions.Literal"),
 ]
 
-
 # Both the class’ and the __init__ method’s docstring are concatenated and
 # inserted into the main body of the autoclass directive
 autoclass_content = "both"
@@ -118,6 +117,7 @@ inheritance_graph_attrs = {"rankdir": "TB"}
 # Common links that should be available on every page
 rst_epilog = """
 .. _Diamond Light Source: http://www.diamond.ac.uk
+.. _black: https://github.com/psf/black
 .. _ruff: https://beta.ruff.rs/docs/
 .. _mypy: http://mypy-lang.org/
 .. _pre-commit: https://pre-commit.com/
@@ -137,7 +137,7 @@ copybutton_prompt_is_regexp = True
 # a list of builtin themes.
 #
 html_theme = "pydata_sphinx_theme"
-github_repo = project
+github_repo = "dodal"
 github_user = "DiamondLightSource"
 switcher_json = f"https://{github_user}.github.io/{github_repo}/switcher.json"
 switcher_exists = requests.get(switcher_json).ok

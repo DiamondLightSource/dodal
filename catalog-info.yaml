@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: dls-dodal
+  title: dodal
+  description: Ophyd devices and other utils that could be used across DLS beamlines
+spec:
+  type: documentation
+  lifecycle: experimental
+  owner: user:yqf46943

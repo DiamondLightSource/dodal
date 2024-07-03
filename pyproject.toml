@@ -38,6 +38,7 @@ requires-python = ">=3.10"
 
 [project.optional-dependencies]
 dev = [
+    "black",
     "mypy",
     "mockito",
     "pipdeptree",
@@ -94,6 +95,15 @@ addopts = """
     --cov=dodal --cov-report term --cov-report xml:cov.xml
     --tb=native -vv --doctest-modules --doctest-glob="*.rst"
     """
+# https://iscinumpy.gitlab.io/post/bound-version-constraints/#watch-for-warnings
+filterwarnings = [
+    "error",
+    # Ignore deprecation warning from ophyd_async
+    "ignore:dep_util is Deprecated. Use functions from setuptools instead.:DeprecationWarning",
+    # Ignore deprecation warning from zocalo
+    "ignore:.*pkg_resources.*:DeprecationWarning"
+    
+]
 # Doctest python code in docs, python code in src docstrings, test functions in tests
 testpaths = "docs src tests"
 

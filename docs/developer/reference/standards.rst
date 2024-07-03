@@ -9,7 +9,8 @@ Code Standards
 
 The code in this repository conforms to standards set by the following tools:
 
-- ruff_ for style checks and code formatting
+- black_ for code formatting
+- ruff_ for style checks
 - mypy_ for static type checking
 
 .. seealso::

@@ -1,7 +1,7 @@
 Run linting using pre-commit
 ============================
 
-Code linting is handled by ruff_ run under pre-commit_.
+Code linting is handled by black_ and ruff_ run under pre-commit_.
 
 Running pre-commit
 ------------------
@@ -21,8 +21,12 @@ This will result in pre-commits being enabled on every repo your user clones fro
 Fixing issues
 -------------
 
-If ruff reports an issue you can tell it to reformat all the files in the
+If black reports an issue you can tell it to reformat all the files in the
 repository::
+
+    $ black .
+
+Likewise with ruff::
 
     $ ruff check --fix .
 
@@ -31,4 +35,5 @@ Ruff may not be able to automatically fix all issues; in this case, you will hav
 VSCode support
 --------------
 
-The ``.vscode/settings.json`` will run formatting as well as ruff checking on save. Issues will be highlighted in the editor window.
+The ``.vscode/settings.json`` will run black formatting as well as
+ruff checking on save. Issues will be highlighted in the editor window.

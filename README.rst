@@ -1,5 +1,5 @@
 dodal
-============
+=============================================================================
 
 |code_ci| |docs_ci| |coverage| |pypi_version| |license|
 
@@ -53,6 +53,7 @@ For more options, including a list of valid beamlines, type
 .. |license| image:: https://img.shields.io/badge/License-Apache%202.0-blue.svg
     :target: https://opensource.org/licenses/Apache-2.0
     :alt: Apache License
+
 
 ..
     Anything below this line is used when viewing README.rst and will be replaced

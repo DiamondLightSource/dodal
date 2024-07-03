@@ -1,0 +1,14 @@
+# Changes here will be overwritten by Copier
+_commit: 1.0.0
+_src_path: gh:DiamondLightSource/python-copier-template
+author_email: dominic.oram@diamond.ac.uk
+author_name: Dominic Oram
+component_owner: user:yqf46943
+description: Ophyd devices and other utils that could be used across DLS beamlines
+distribution_name: dls-dodal
+docker: false
+docs_type: sphinx
+git_platform: github.com
+github_org: DiamondLightSource
+package_name: dodal
+repo_name: dodal

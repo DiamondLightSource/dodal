@@ -26,6 +26,8 @@ side-bar.
             :caption: How-to Guides
             :maxdepth: 1
 
+            how-to/run-container
+
         +++
 
         Practical step-by-step guides for the more experienced user.
