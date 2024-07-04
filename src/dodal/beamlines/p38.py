@@ -15,6 +15,7 @@ from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
 from dodal.devices.i22.fswitch import FSwitch
 from dodal.devices.linkam3 import Linkam3
+from dodal.devices.pressure_jump_cell import PressureJumpCell
 from dodal.devices.slits import Slits
 from dodal.devices.tetramm import TetrammDetector
 from dodal.devices.undulator import Undulator
@@ -317,4 +318,18 @@ def linkam(
         "-EA-LINKM-02:",
         wait_for_connection,
         fake_with_ophyd_sim,
+    )
+
+
+def high_pressure_xray_cell(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> PressureJumpCell:
+    return device_instantiation(
+        PressureJumpCell,
+        "high_pressure_xray_cell",
+        "-EA-HPXC-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        adc1_prefix=f"{BeamlinePrefix(BL).beamline_prefix}-EA-ADC-01:",
+        adc2_prefix=f"{BeamlinePrefix(BL).beamline_prefix}-EA-ADC-02:",
     )
