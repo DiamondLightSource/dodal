@@ -1,0 +1,37 @@
+dodal.devices.motors.XYZLimitBundle
+===================================
+
+.. currentmodule:: dodal.devices.motors
+
+.. autoclass:: XYZLimitBundle
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~XYZLimitBundle.position_valid
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~XYZLimitBundle.x
+      
+      
+      ~XYZLimitBundle.y
+      
+      
+      ~XYZLimitBundle.z
+      
+   
+   

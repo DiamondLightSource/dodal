@@ -1,0 +1,96 @@
+dodal.devices.i23.gonio.Gonio
+=============================
+
+.. currentmodule:: dodal.devices.i23.gonio
+
+.. autoclass:: Gonio
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~Gonio.get_xyz_limits
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      ~Gonio.component_names
+      
+      
+      
+      
+      
+      
+      
+      ~Gonio.kappa
+      
+      
+      
+      
+      
+      ~Gonio.omega
+      
+      
+      
+      ~Gonio.phi
+      
+      
+      
+      
+      
+      
+      ~Gonio.subscriptions
+      
+      
+      
+      ~Gonio.x
+      
+      
+      ~Gonio.y
+      
+      
+      ~Gonio.z
+      
+   
+   

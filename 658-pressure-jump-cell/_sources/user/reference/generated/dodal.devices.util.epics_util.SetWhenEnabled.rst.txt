@@ -1,0 +1,84 @@
+dodal.devices.util.epics\_util.SetWhenEnabled
+=============================================
+
+.. currentmodule:: dodal.devices.util.epics_util
+
+.. autoclass:: SetWhenEnabled
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~SetWhenEnabled.set
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      ~SetWhenEnabled.component_names
+      
+      
+      
+      
+      ~SetWhenEnabled.disp
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~SetWhenEnabled.proc
+      
+      
+      
+      
+      
+      
+      ~SetWhenEnabled.subscriptions
+      
+      
+   
+   

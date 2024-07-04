@@ -1,0 +1,23 @@
+dodal.devices.tetramm.TetrammShapeProvider
+==========================================
+
+.. currentmodule:: dodal.devices.tetramm
+
+.. autoclass:: TetrammShapeProvider
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~TetrammShapeProvider.max_channels
+      
+   
+   

@@ -1,0 +1,26 @@
+dodal.devices.pressure\_jump\_cell.PressureJumpCellStopValue
+============================================================
+
+.. currentmodule:: dodal.devices.pressure_jump_cell
+
+.. autoclass:: PressureJumpCellStopValue
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~PressureJumpCellStopValue.CONTINUE
+      
+      
+      ~PressureJumpCellStopValue.STOP
+      
+   
+   

@@ -1,0 +1,26 @@
+dodal.devices.pressure\_jump\_cell.PressureJumpCellBusyStatus
+=============================================================
+
+.. currentmodule:: dodal.devices.pressure_jump_cell
+
+.. autoclass:: PressureJumpCellBusyStatus
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~PressureJumpCellBusyStatus.BUSY
+      
+      
+      ~PressureJumpCellBusyStatus.IDLE
+      
+   
+   

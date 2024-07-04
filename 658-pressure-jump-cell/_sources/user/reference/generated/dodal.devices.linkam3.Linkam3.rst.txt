@@ -1,0 +1,68 @@
+dodal.devices.linkam3.Linkam3
+=============================
+
+.. currentmodule:: dodal.devices.linkam3
+
+.. autoclass:: Linkam3
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      ~Linkam3.at_setpoint
+      
+      
+      
+      
+      
+      
+      ~Linkam3.heater_on
+      
+      
+      ~Linkam3.in_error
+      
+      
+      ~Linkam3.locate
+      
+      
+      ~Linkam3.pump_auto
+      
+      
+      ~Linkam3.pump_on
+      
+      
+      
+      
+      ~Linkam3.set
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~Linkam3.settle_time
+      
+      
+      ~Linkam3.tolerance
+      
+   
+   

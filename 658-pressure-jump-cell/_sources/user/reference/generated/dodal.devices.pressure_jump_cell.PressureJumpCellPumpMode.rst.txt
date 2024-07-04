@@ -1,0 +1,29 @@
+dodal.devices.pressure\_jump\_cell.PressureJumpCellPumpMode
+===========================================================
+
+.. currentmodule:: dodal.devices.pressure_jump_cell
+
+.. autoclass:: PressureJumpCellPumpMode
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~PressureJumpCellPumpMode.AUTO_POSITION
+      
+      
+      ~PressureJumpCellPumpMode.AUTO_PRESSURE
+      
+      
+      ~PressureJumpCellPumpMode.MANUAL
+      
+   
+   

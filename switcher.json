@@ -268,6 +268,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/604_ophyd_async_device_for_mirror_voltages/"
   },
   {
+    "version": "658-pressure-jump-cell",
+    "url": "https://DiamondLightSource.github.io/dodal/658-pressure-jump-cell/"
+  },
+  {
     "version": "76_make_stage_synchronous_if_arming_not_started",
     "url": "https://DiamondLightSource.github.io/dodal/76_make_stage_synchronous_if_arming_not_started/"
   },
@@ -358,10 +362,6 @@
   {
     "version": "hyperion_1336_move_aperture_before_rotation",
     "url": "https://DiamondLightSource.github.io/dodal/hyperion_1336_move_aperture_before_rotation/"
-  },
-  {
-    "version": "hyperion_1421_add_device_name_to_logs",
-    "url": "https://DiamondLightSource.github.io/dodal/hyperion_1421_add_device_name_to_logs/"
   },
   {
     "version": "hyperion_1439_cache_lower_gonio",

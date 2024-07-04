@@ -1,0 +1,26 @@
+dodal.devices.pressure\_jump\_cell.PressureJumpCellTimerState
+=============================================================
+
+.. currentmodule:: dodal.devices.pressure_jump_cell
+
+.. autoclass:: PressureJumpCellTimerState
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~PressureJumpCellTimerState.COUNTDOWN
+      
+      
+      ~PressureJumpCellTimerState.TIMEOUT
+      
+   
+   
