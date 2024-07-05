@@ -1,15 +1,14 @@
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from dodal.devices.detector import DetectorParams
 
 
-def create_detector_params_with_directory(directory):
+def create_det_params_with_dir_and_prefix(directory, prefix="test"):
     return DetectorParams(
-        current_energy_ev=100,
+        expected_energy_ev=100,
         exposure_time=1.0,
         directory=directory,
-        prefix="test",
-        run_number=0,
+        prefix=prefix,
         detector_distance=1.0,
         omega_start=0.0,
         omega_increment=0.0,
@@ -18,16 +17,16 @@ def create_detector_params_with_directory(directory):
         use_roi_mode=False,
         det_dist_to_beam_converter_path="tests/devices/unit_tests/test_lookup_table.txt",
         detector_size_constants="EIGER2_X_16M",
-    )
+    )  # type: ignore
 
 
 def test_if_trailing_slash_not_provided_then_appended():
-    params = create_detector_params_with_directory("test/dir")
+    params = create_det_params_with_dir_and_prefix("test/dir")
     assert params.directory == "test/dir/"
 
 
 def test_if_trailing_slash_provided_then_not_appended():
-    params = create_detector_params_with_directory("test/dir/")
+    params = create_det_params_with_dir_and_prefix("test/dir/")
     assert params.directory == "test/dir/"
 
 
@@ -95,3 +94,17 @@ def test_run_number_correct_when_specified(mocked_parse_table, tmpdir):
         detector_size_constants="EIGER2_X_16M",
     )
     assert params.run_number == 6
+
+
+@patch("os.listdir")
+def test_prefix_is_used_to_determine_run_number(mock_listdir: MagicMock):
+    foos = (f"foo_{i}.nxs" for i in range(4))
+    bars = (f"bar_{i}.nxs" for i in range(7))
+    bazs = (f"baz_{i}.nxs" for i in range(23, 29))
+    files = [*foos, *bars, *bazs]
+    mock_listdir.return_value = files
+
+    assert create_det_params_with_dir_and_prefix("dir", "foo").run_number == 4
+    assert create_det_params_with_dir_and_prefix("dir", "bar").run_number == 7
+    assert create_det_params_with_dir_and_prefix("dir", "baz").run_number == 29
+    assert create_det_params_with_dir_and_prefix("dir", "qux").run_number == 1
