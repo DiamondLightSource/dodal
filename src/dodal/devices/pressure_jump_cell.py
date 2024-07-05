@@ -23,9 +23,39 @@ class PressureJumpCellStopValue:
     STOP = "STOP"
 
 
+class PressureJumpCellValveControlRequest:
+    OPEN = "Open"
+    CLOSE = "Close"
+    RESET = "Reset"
+    ARM = "Arm"
+    DISARM = "Disarm"
+    # TODO the nones may not be required but FVST and SXST set
+    NONE1 = ""
+    NONE2 = ""
+
+
+class PressureJumpCellPumpMotorControlRequest:
+    ENABLE = "Enable"
+    DISABLE = "Disable"
+    RESET = "Reset"
+    FORWARD = "Forward"
+    REVERSE = "Reverse"
+
+
+class PressureJumpCellPumpMotorDirection:
+    ZERO = "0"
+    FORWARD = "Forward"
+    REVERSE = "Reverse"
+    THREE = "3"
+    FOUR = "4"
+    FIVE = "5"
+    SIX = "6"
+    SEVEN = "7"
+
+
 class PressureJumpCell(StandardReadable):
     """
-    High pressure X-ray cell, used to apply pressure or pressure jupmps to a sample.
+    High pressure X-ray cell, used to apply pressure or pressure jumps to a sample.
     """
 
     def __init__(
@@ -53,6 +83,10 @@ class PressureJumpCell(StandardReadable):
             self.pump_position = epics_signal_r(float, prefix + "POS")
             self.pump_forward_limit = epics_signal_r(float, prefix + "D74IN1")
             self.pump_backward_limit = epics_signal_r(float, prefix + "D74IN0")
+            self.pump_position = epics_signal_r(
+                PressureJumpCellPumpMotorDirection, prefix + "MTRDIR"
+            )
+            self.pump_speed_rbv = epics_signal_r(int, prefix + "MSPEED_RBV")
 
             ## Pressure Transducer 1 ##
             self.pressuretransducer1_omron_pressure = epics_signal_r(
@@ -96,7 +130,7 @@ class PressureJumpCell(StandardReadable):
                 float, adc1_prefix + "CH1"
             )
 
-            ##Control Common##
+            ## Control Common ##
             self.control_gotobusy = epics_signal_r(
                 PressureJumpCellBusyStatus, prefix + "CTRL:GOTOBUSY"
             )
@@ -112,12 +146,39 @@ class PressureJumpCell(StandardReadable):
             self.control_iteration = epics_signal_r(int, prefix + "CTRL:ITER")
 
         with self.add_children_as_readables(ConfigSignal):
+            ## Valves ##
+            self.valve1_open = epics_signal_rw(bool, prefix + "V1:OPENSEQ")
+            self.valve1_control = epics_signal_rw(
+                PressureJumpCellValveControlRequest, prefix + "V1:CON"
+            )
+
+            self.valve3_open = epics_signal_rw(bool, prefix + "V3:OPENSEQ")
+            self.valve3_control = epics_signal_rw(
+                PressureJumpCellValveControlRequest, prefix + "V3:CON"
+            )
+
+            self.valve5_open = epics_signal_rw(bool, prefix + "V5:OPENSEQ")
+            self.valve5_control = epics_signal_rw(
+                PressureJumpCellValveControlRequest, prefix + "V5:CON"
+            )
+
+            self.valve6_open = epics_signal_rw(bool, prefix + "V6:OPENSEQ")
+            self.valve6_control = epics_signal_rw(
+                PressureJumpCellValveControlRequest, prefix + "V6CON"
+            )
+
             ## Pump ##
             self.pump_mode = epics_signal_rw(
                 PressureJumpCellPumpMode, prefix + "SP:AUTO"
             )
+            self.pump_speed = epics_signal_rw(float, prefix + "MSPEED")
+            self.pump_move_forward = epics_signal_rw(bool, prefix + "M1:FORW")
+            self.pump_move_backward = epics_signal_rw(bool, prefix + "M1:BACKW")
+            self.pump_move_backward = epics_signal_rw(
+                PressureJumpCellPumpMotorControlRequest, prefix + "M1:CON"
+            )
 
-            ##Control Common##
+            ## Control Common ##
             self.control_stop = epics_signal_rw(
                 PressureJumpCellStopValue, prefix + "CTRL:STOP"
             )
