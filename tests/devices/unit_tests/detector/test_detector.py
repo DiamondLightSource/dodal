@@ -20,14 +20,17 @@ def create_det_params_with_dir_and_prefix(directory, prefix="test"):
     )  # type: ignore
 
 
-def test_if_trailing_slash_not_provided_then_appended():
-    params = create_det_params_with_dir_and_prefix("test/dir")
-    assert params.directory == "test/dir/"
+def test_if_trailing_slash_not_provided_then_appended(tmp_path):
+    assert not (_dir := str(tmp_path)).endswith("/")
+    params = create_det_params_with_dir_and_prefix(_dir)
+    assert params.directory == _dir + "/"
 
 
-def test_if_trailing_slash_provided_then_not_appended():
-    params = create_det_params_with_dir_and_prefix("test/dir/")
-    assert params.directory == "test/dir/"
+def test_if_trailing_slash_provided_then_not_appended(tmp_path):
+    assert not (_dir := str(tmp_path)).endswith("/")
+    params = create_det_params_with_dir_and_prefix(_dir + "/")
+    assert params.directory == _dir + "/"
+    assert not params.directory.endswith("//")
 
 
 @patch(
