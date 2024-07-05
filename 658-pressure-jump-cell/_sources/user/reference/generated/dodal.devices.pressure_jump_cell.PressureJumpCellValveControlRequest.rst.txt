@@ -1,0 +1,41 @@
+dodal.devices.pressure\_jump\_cell.PressureJumpCellValveControlRequest
+======================================================================
+
+.. currentmodule:: dodal.devices.pressure_jump_cell
+
+.. autoclass:: PressureJumpCellValveControlRequest
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~PressureJumpCellValveControlRequest.ARM
+      
+      
+      ~PressureJumpCellValveControlRequest.CLOSE
+      
+      
+      ~PressureJumpCellValveControlRequest.DISARM
+      
+      
+      ~PressureJumpCellValveControlRequest.NONE1
+      
+      
+      ~PressureJumpCellValveControlRequest.NONE2
+      
+      
+      ~PressureJumpCellValveControlRequest.OPEN
+      
+      
+      ~PressureJumpCellValveControlRequest.RESET
+      
+   
+   

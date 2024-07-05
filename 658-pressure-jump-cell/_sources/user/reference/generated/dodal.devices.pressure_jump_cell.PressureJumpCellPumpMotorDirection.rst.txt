@@ -1,0 +1,44 @@
+dodal.devices.pressure\_jump\_cell.PressureJumpCellPumpMotorDirection
+=====================================================================
+
+.. currentmodule:: dodal.devices.pressure_jump_cell
+
+.. autoclass:: PressureJumpCellPumpMotorDirection
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~PressureJumpCellPumpMotorDirection.FIVE
+      
+      
+      ~PressureJumpCellPumpMotorDirection.FORWARD
+      
+      
+      ~PressureJumpCellPumpMotorDirection.FOUR
+      
+      
+      ~PressureJumpCellPumpMotorDirection.REVERSE
+      
+      
+      ~PressureJumpCellPumpMotorDirection.SEVEN
+      
+      
+      ~PressureJumpCellPumpMotorDirection.SIX
+      
+      
+      ~PressureJumpCellPumpMotorDirection.THREE
+      
+      
+      ~PressureJumpCellPumpMotorDirection.ZERO
+      
+   
+   

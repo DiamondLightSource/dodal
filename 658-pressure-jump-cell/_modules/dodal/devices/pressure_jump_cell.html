@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.pressure_jump_cell &#8212; dodal 1.29.2.dev7+gf41bfbab6 documentation</title>
+    <title>dodal.devices.pressure_jump_cell &#8212; dodal 1.29.2.dev8+g4a0c51b20 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=2bf40911"></script>
+    <script src="../../../_static/documentation_options.js?v=be9dd378"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -494,11 +494,50 @@ document.write(`
 
 
 
+<div class="viewcode-block" id="PressureJumpCellValveControlRequest">
+<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.pressure_jump_cell.PressureJumpCellValveControlRequest.html#dodal.devices.pressure_jump_cell.PressureJumpCellValveControlRequest">[docs]</a>
+<span class="k">class</span> <span class="nc">PressureJumpCellValveControlRequest</span><span class="p">:</span>
+    <span class="n">OPEN</span> <span class="o">=</span> <span class="s2">&quot;Open&quot;</span>
+    <span class="n">CLOSE</span> <span class="o">=</span> <span class="s2">&quot;Close&quot;</span>
+    <span class="n">RESET</span> <span class="o">=</span> <span class="s2">&quot;Reset&quot;</span>
+    <span class="n">ARM</span> <span class="o">=</span> <span class="s2">&quot;Arm&quot;</span>
+    <span class="n">DISARM</span> <span class="o">=</span> <span class="s2">&quot;Disarm&quot;</span>
+    <span class="c1"># TODO the nones may not be required but FVST and SXST set</span>
+    <span class="n">NONE1</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">NONE2</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="PressureJumpCellPumpMotorControlRequest">
+<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.pressure_jump_cell.PressureJumpCellPumpMotorControlRequest.html#dodal.devices.pressure_jump_cell.PressureJumpCellPumpMotorControlRequest">[docs]</a>
+<span class="k">class</span> <span class="nc">PressureJumpCellPumpMotorControlRequest</span><span class="p">:</span>
+    <span class="n">ENABLE</span> <span class="o">=</span> <span class="s2">&quot;Enable&quot;</span>
+    <span class="n">DISABLE</span> <span class="o">=</span> <span class="s2">&quot;Disable&quot;</span>
+    <span class="n">RESET</span> <span class="o">=</span> <span class="s2">&quot;Reset&quot;</span>
+    <span class="n">FORWARD</span> <span class="o">=</span> <span class="s2">&quot;Forward&quot;</span>
+    <span class="n">REVERSE</span> <span class="o">=</span> <span class="s2">&quot;Reverse&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="PressureJumpCellPumpMotorDirection">
+<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.pressure_jump_cell.PressureJumpCellPumpMotorDirection.html#dodal.devices.pressure_jump_cell.PressureJumpCellPumpMotorDirection">[docs]</a>
+<span class="k">class</span> <span class="nc">PressureJumpCellPumpMotorDirection</span><span class="p">:</span>
+    <span class="n">ZERO</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span>
+    <span class="n">FORWARD</span> <span class="o">=</span> <span class="s2">&quot;Forward&quot;</span>
+    <span class="n">REVERSE</span> <span class="o">=</span> <span class="s2">&quot;Reverse&quot;</span>
+    <span class="n">THREE</span> <span class="o">=</span> <span class="s2">&quot;3&quot;</span>
+    <span class="n">FOUR</span> <span class="o">=</span> <span class="s2">&quot;4&quot;</span>
+    <span class="n">FIVE</span> <span class="o">=</span> <span class="s2">&quot;5&quot;</span>
+    <span class="n">SIX</span> <span class="o">=</span> <span class="s2">&quot;6&quot;</span>
+    <span class="n">SEVEN</span> <span class="o">=</span> <span class="s2">&quot;7&quot;</span></div>
+
+
+
 <div class="viewcode-block" id="PressureJumpCell">
 <a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.pressure_jump_cell.PressureJumpCell.html#dodal.devices.pressure_jump_cell.PressureJumpCell">[docs]</a>
 <span class="k">class</span> <span class="nc">PressureJumpCell</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    High pressure X-ray cell, used to apply pressure or pressure jupmps to a sample.</span>
+<span class="sd">    High pressure X-ray cell, used to apply pressure or pressure jumps to a sample.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -526,6 +565,10 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">pump_position</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;POS&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pump_forward_limit</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;D74IN1&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pump_backward_limit</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;D74IN0&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pump_position</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
+                <span class="n">PressureJumpCellPumpMotorDirection</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;MTRDIR&quot;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pump_speed_rbv</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;MSPEED_RBV&quot;</span><span class="p">)</span>
 
             <span class="c1">## Pressure Transducer 1 ##</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pressuretransducer1_omron_pressure</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
@@ -569,7 +612,7 @@ document.write(`
                 <span class="nb">float</span><span class="p">,</span> <span class="n">adc1_prefix</span> <span class="o">+</span> <span class="s2">&quot;CH1&quot;</span>
             <span class="p">)</span>
 
-            <span class="c1">##Control Common##</span>
+            <span class="c1">## Control Common ##</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">control_gotobusy</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
                 <span class="n">PressureJumpCellBusyStatus</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;CTRL:GOTOBUSY&quot;</span>
             <span class="p">)</span>
@@ -585,12 +628,39 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">control_iteration</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;CTRL:ITER&quot;</span><span class="p">)</span>
 
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">ConfigSignal</span><span class="p">):</span>
+            <span class="c1">## Valves ##</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">valve1_open</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;V1:OPENSEQ&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">valve1_control</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span>
+                <span class="n">PressureJumpCellValveControlRequest</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;V1:CON&quot;</span>
+            <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">valve3_open</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;V3:OPENSEQ&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">valve3_control</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span>
+                <span class="n">PressureJumpCellValveControlRequest</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;V3:CON&quot;</span>
+            <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">valve5_open</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;V5:OPENSEQ&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">valve5_control</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span>
+                <span class="n">PressureJumpCellValveControlRequest</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;V5:CON&quot;</span>
+            <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">valve6_open</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;V6:OPENSEQ&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">valve6_control</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span>
+                <span class="n">PressureJumpCellValveControlRequest</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;V6CON&quot;</span>
+            <span class="p">)</span>
+
             <span class="c1">## Pump ##</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pump_mode</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span>
                 <span class="n">PressureJumpCellPumpMode</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;SP:AUTO&quot;</span>
             <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pump_speed</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;MSPEED&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pump_move_forward</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;M1:FORW&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pump_move_backward</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;M1:BACKW&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pump_move_backward</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span>
+                <span class="n">PressureJumpCellPumpMotorControlRequest</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;M1:CON&quot;</span>
+            <span class="p">)</span>
 
-            <span class="c1">##Control Common##</span>
+            <span class="c1">## Control Common ##</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">control_stop</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span>
                 <span class="n">PressureJumpCellStopValue</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;CTRL:STOP&quot;</span>
             <span class="p">)</span>

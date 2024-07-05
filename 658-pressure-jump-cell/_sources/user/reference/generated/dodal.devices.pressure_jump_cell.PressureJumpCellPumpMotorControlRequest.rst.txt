@@ -1,0 +1,35 @@
+dodal.devices.pressure\_jump\_cell.PressureJumpCellPumpMotorControlRequest
+==========================================================================
+
+.. currentmodule:: dodal.devices.pressure_jump_cell
+
+.. autoclass:: PressureJumpCellPumpMotorControlRequest
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~PressureJumpCellPumpMotorControlRequest.DISABLE
+      
+      
+      ~PressureJumpCellPumpMotorControlRequest.ENABLE
+      
+      
+      ~PressureJumpCellPumpMotorControlRequest.FORWARD
+      
+      
+      ~PressureJumpCellPumpMotorControlRequest.RESET
+      
+      
+      ~PressureJumpCellPumpMotorControlRequest.REVERSE
+      
+   
+   

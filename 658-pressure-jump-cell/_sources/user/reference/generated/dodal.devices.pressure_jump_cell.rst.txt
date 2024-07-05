@@ -17,8 +17,11 @@ dodal.devices.pressure\_jump\_cell
    ~pressure_jump_cell.PressureJumpCell
    ~pressure_jump_cell.PressureJumpCellBusyStatus
    ~pressure_jump_cell.PressureJumpCellPumpMode
+   ~pressure_jump_cell.PressureJumpCellPumpMotorControlRequest
+   ~pressure_jump_cell.PressureJumpCellPumpMotorDirection
    ~pressure_jump_cell.PressureJumpCellStopValue
    ~pressure_jump_cell.PressureJumpCellTimerState
+   ~pressure_jump_cell.PressureJumpCellValveControlRequest
 
 
 
