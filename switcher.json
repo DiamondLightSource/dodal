@@ -268,6 +268,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/604_ophyd_async_device_for_mirror_voltages/"
   },
   {
+    "version": "643_improve_default_run_number",
+    "url": "https://DiamondLightSource.github.io/dodal/643_improve_default_run_number/"
+  },
+  {
     "version": "658-pressure-jump-cell",
     "url": "https://DiamondLightSource.github.io/dodal/658-pressure-jump-cell/"
   },

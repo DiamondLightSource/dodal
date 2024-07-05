@@ -1,0 +1,31 @@
+dodal.devices.motors.MotorLimitHelper
+=====================================
+
+.. currentmodule:: dodal.devices.motors
+
+.. autoclass:: MotorLimitHelper
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~MotorLimitHelper.is_within
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~MotorLimitHelper.motor
+      
+   
+   

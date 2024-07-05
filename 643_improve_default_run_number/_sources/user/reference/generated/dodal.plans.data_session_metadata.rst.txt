@@ -1,0 +1,34 @@
+dodal.plans.data\_session\_metadata
+===================================
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.plans.data_session_metadata
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      attach_data_session_metadata_decorator
+      attach_data_session_metadata_wrapper
+   
+   
+
+   
+   
+   

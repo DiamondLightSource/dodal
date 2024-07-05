@@ -1,0 +1,54 @@
+dodal.devices.aperturescatterguard
+==================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~aperturescatterguard.ApertureFiveDimensionalLocation
+   ~aperturescatterguard.AperturePositionGDANames
+   ~aperturescatterguard.AperturePositions
+   ~aperturescatterguard.ApertureScatterguard
+   ~aperturescatterguard.ApertureScatterguardTolerances
+   ~aperturescatterguard.SingleAperturePosition
+
+
+
+
+.. automodule:: dodal.devices.aperturescatterguard
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      position_from_params
+      tolerances_from_params
+   
+   
+
+   
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      InvalidApertureMove
+   
+   

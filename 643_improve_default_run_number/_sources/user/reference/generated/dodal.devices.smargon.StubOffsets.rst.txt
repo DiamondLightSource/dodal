@@ -1,0 +1,84 @@
+dodal.devices.smargon.StubOffsets
+=================================
+
+.. currentmodule:: dodal.devices.smargon
+
+.. autoclass:: StubOffsets
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~StubOffsets.set
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      ~StubOffsets.center_at_current_position
+      
+      
+      ~StubOffsets.component_names
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~StubOffsets.subscriptions
+      
+      
+      ~StubOffsets.to_robot_load
+      
+      
+   
+   
