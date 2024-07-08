@@ -21,6 +21,7 @@ dodal.devices.i24.pmac
    ~pmac.PMACStringLaser
    ~pmac.PMACStringMove
    ~pmac.ProgramRunner
+   ~pmac.ScanState
 
 
 

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.i24.pmac.ProgramRunner &#8212; dodal 1.29.2.dev9+g01cfdc161 documentation</title>
+    <title>dodal.devices.i24.pmac.ProgramRunner &#8212; dodal 1.29.2.dev10+g4a861b4e9 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=418f1944"></script>
+    <script src="../../../_static/documentation_options.js?v=4507a6f4"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="icon" href="../../../_static/dls-favicon.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="dodal.devices.ipin" href="dodal.devices.ipin.html" />
+    <link rel="next" title="dodal.devices.i24.pmac.ScanState" href="dodal.devices.i24.pmac.ScanState.html" />
     <link rel="prev" title="dodal.devices.i24.pmac.PMACStringMove" href="dodal.devices.i24.pmac.PMACStringMove.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -823,10 +823,13 @@ document.write(`
 <dt class="sig sig-object py" id="dodal.devices.i24.pmac.ProgramRunner">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.i24.pmac.</span></span><span class="sig-name descname"><span class="pre">ProgramRunner</span></span><a class="reference internal" href="../../../_modules/dodal/devices/i24/pmac.html#ProgramRunner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.i24.pmac.ProgramRunner" title="Link to this definition">#</a></dt>
 <dd><p>Trigger the collection by setting the program number on the PMAC string.</p>
+<p>Once the program number has been set, wait for the collection to be complete.
+This will only be true when the status becomes 0.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>pmac_str_sig</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">SignalRW</span></code></span>)</p></li>
+<li><p><strong>status_sig</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">SignalR</span></code></span>)</p></li>
 <li><p><strong>backend</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">SignalBackend</span></code></span>)</p></li>
 <li><p><strong>timeout</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">10.0</span></code>)</p></li>
 <li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">''</span></code>)</p></li>
@@ -876,11 +879,11 @@ document.write(`
       </div>
     </a>
     <a class="right-next"
-       href="dodal.devices.ipin.html"
+       href="dodal.devices.i24.pmac.ScanState.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">dodal.devices.ipin</p>
+        <p class="prev-next-title">dodal.devices.i24.pmac.ScanState</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

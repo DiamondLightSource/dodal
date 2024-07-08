@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.i24.pmac &#8212; dodal 1.29.2.dev9+g01cfdc161 documentation</title>
+    <title>dodal.devices.i24.pmac &#8212; dodal 1.29.2.dev10+g4a861b4e9 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../../_static/documentation_options.js?v=418f1944"></script>
+    <script src="../../../../_static/documentation_options.js?v=4507a6f4"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -457,11 +457,11 @@ document.write(`
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.i24.pmac</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span></span><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">IntEnum</span>
 
 <span class="kn">from</span> <span class="nn">bluesky.protocols</span> <span class="kn">import</span> <span class="n">Triggerable</span>
-<span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="n">AsyncStatus</span><span class="p">,</span> <span class="n">StandardReadable</span>
-<span class="kn">from</span> <span class="nn">ophyd_async.core.signal</span> <span class="kn">import</span> <span class="n">SignalRW</span>
+<span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="n">AsyncStatus</span><span class="p">,</span> <span class="n">StandardReadable</span><span class="p">,</span> <span class="n">observe_value</span>
+<span class="kn">from</span> <span class="nn">ophyd_async.core.signal</span> <span class="kn">import</span> <span class="n">SignalR</span><span class="p">,</span> <span class="n">SignalRW</span>
 <span class="kn">from</span> <span class="nn">ophyd_async.core.signal_backend</span> <span class="kn">import</span> <span class="n">SignalBackend</span>
 <span class="kn">from</span> <span class="nn">ophyd_async.core.soft_signal_backend</span> <span class="kn">import</span> <span class="n">SoftSignalBackend</span>
 <span class="kn">from</span> <span class="nn">ophyd_async.core.utils</span> <span class="kn">import</span> <span class="n">DEFAULT_TIMEOUT</span>
@@ -470,6 +470,14 @@ document.write(`
 
 <span class="n">HOME_STR</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;\#1hmz\#2hmz\#3hmz&quot;</span>  <span class="c1"># Command to home the PMAC motors</span>
 <span class="n">ZERO_STR</span> <span class="o">=</span> <span class="s2">&quot;!x0y0z0&quot;</span>  <span class="c1"># Command to blend any ongoing move into new position</span>
+
+
+<div class="viewcode-block" id="ScanState">
+<a class="viewcode-back" href="../../../../user/reference/generated/dodal.devices.i24.pmac.ScanState.html#dodal.devices.i24.pmac.ScanState">[docs]</a>
+<span class="k">class</span> <span class="nc">ScanState</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="n">RUNNING</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">DONE</span> <span class="o">=</span> <span class="mi">0</span></div>
+
 
 
 <div class="viewcode-block" id="LaserSettings">
@@ -551,7 +559,7 @@ document.write(`
 <div class="viewcode-block" id="PMACStringEncReset">
 <a class="viewcode-back" href="../../../../user/reference/generated/dodal.devices.i24.pmac.PMACStringEncReset.html#dodal.devices.i24.pmac.PMACStringEncReset">[docs]</a>
 <span class="k">class</span> <span class="nc">PMACStringEncReset</span><span class="p">(</span><span class="n">SignalRW</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set a pmac_string to control the encoder channels in the controller.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -572,22 +580,31 @@ document.write(`
 <div class="viewcode-block" id="ProgramRunner">
 <a class="viewcode-back" href="../../../../user/reference/generated/dodal.devices.i24.pmac.ProgramRunner.html#dodal.devices.i24.pmac.ProgramRunner">[docs]</a>
 <span class="k">class</span> <span class="nc">ProgramRunner</span><span class="p">(</span><span class="n">SignalRW</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Trigger the collection by setting the program number on the PMAC string.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Trigger the collection by setting the program number on the PMAC string.</span>
+
+<span class="sd">    Once the program number has been set, wait for the collection to be complete.</span>
+<span class="sd">    This will only be true when the status becomes 0.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">pmac_str_sig</span><span class="p">:</span> <span class="n">SignalRW</span><span class="p">,</span>
+        <span class="n">status_sig</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">,</span>
         <span class="n">backend</span><span class="p">:</span> <span class="n">SignalBackend</span><span class="p">,</span>
         <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">DEFAULT_TIMEOUT</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">signal</span> <span class="o">=</span> <span class="n">pmac_str_sig</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">status_sig</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prog_num</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
         <span class="n">prog_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&amp;2b</span><span class="si">{</span><span class="n">prog_num</span><span class="si">}</span><span class="s2">r&quot;</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">prog_str</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">prog_str</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">for</span> <span class="n">reading</span> <span class="ow">in</span> <span class="n">observe_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">reading</span> <span class="o">==</span> <span class="n">ScanState</span><span class="o">.</span><span class="n">DONE</span><span class="p">:</span>
+                <span class="k">return</span></div>
 
 
 
@@ -610,10 +627,6 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">pmac_string</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">SoftSignalBackend</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
         <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">run_program</span> <span class="o">=</span> <span class="n">ProgramRunner</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">pmac_string</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">SoftSignalBackend</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
-        <span class="p">)</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;X&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;Y&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;Z&quot;</span><span class="p">)</span>
@@ -622,6 +635,10 @@ document.write(`
         <span class="c1"># program.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scanstatus</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;BL24I-MO-STEP-14:signal:P2401&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;BL24I-MO-STEP-14:signal:P2402&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_program</span> <span class="o">=</span> <span class="n">ProgramRunner</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pmac_string</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scanstatus</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">SoftSignalBackend</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+        <span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
 
