@@ -61,9 +61,9 @@ def run_functions_without_blocking(
     # Wrap each function by first checking the previous status and attaching a callback
     # to the next function in the chain
     def wrap_func(
-        old_status: Status, current_func: Callable[[], StatusBase], next_func
+        old_status: Status | None, current_func: Callable[[], StatusBase], next_func
     ):
-        if old_status.exception() is not None:
+        if old_status is not None and old_status.exception() is not None:
             set_global_exception_and_log(old_status)
             return
 
@@ -105,10 +105,8 @@ def run_functions_without_blocking(
             )
         )
 
-    starting_status = Status(done=True, success=True)
-
     # Initiate the chain of functions
-    wrap_func(starting_status, functions_to_chain[0], wrapped_funcs[-1])
+    wrap_func(None, functions_to_chain[0], wrapped_funcs[-1])
     return full_status
 
 

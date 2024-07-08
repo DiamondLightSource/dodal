@@ -11,6 +11,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from bluesky.run_engine import RunEngine
+from ophyd.status import Status
 
 from dodal.beamlines import i03
 from dodal.common.beamlines import beamline_utils
@@ -114,3 +115,9 @@ def run_engine_documents(RE: RunEngine) -> Mapping[str, list[dict]]:
 
     RE.subscribe(append_and_print)
     return docs
+
+
+def failed_status(failure: Exception) -> Status:
+    status = Status()
+    status.set_exception(failure)
+    return status

@@ -3,9 +3,11 @@ from unittest.mock import MagicMock, call, patch
 
 import pytest
 from mockito import ANY, mock, verify, when
-from ophyd.sim import make_fake_device
+from ophyd.sim import NullStatus, make_fake_device
 from ophyd.status import Status
+from ophyd.utils import UnknownStatusFailure
 
+from conftest import failed_status
 from dodal.devices.detector import DetectorParams, TriggerMode
 from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
 from dodal.devices.eiger import TEST_1169_FIX, EigerDetector
@@ -225,7 +227,7 @@ def test_stage_enables_roi_mode_correctly(
     when(fake_eiger.odin).check_odin_initialised().thenReturn((True, ""))
 
     fake_eiger.detector_params.use_roi_mode = roi_mode
-    mock_await.return_value = Status(done=True)
+    mock_await.return_value = failed_status(UnknownStatusFailure("Test Exception"))
     change_roi_mode_status = Status()
     fake_eiger.change_roi_mode = MagicMock(return_value=change_roi_mode_status)
 
@@ -360,12 +362,9 @@ def test_stage_runs_successfully(mock_await, fake_eiger: EigerDetector):
     fake_eiger.arming_status.wait(1)  # This should complete long before 1s
 
 
-@patch("dodal.devices.eiger.await_value")
 def test_given_stale_parameters_goes_high_before_callbacks_then_stale_parameters_waited_on(
-    mock_await,
     fake_eiger: EigerDetector,
 ):
-    mock_await.return_value = Status(done=True)
     set_up_eiger_to_stage_happily(fake_eiger)
 
     mock_eiger_odin_statuses(fake_eiger)
@@ -638,9 +637,9 @@ def test_unwrapped_arm_chain_functions_are_not_called_outside_util(
     call_func: MagicMock,
     fake_eiger: EigerDetector,
 ):
-    fake_eiger.odin.stop = MagicMock(return_value=Status(done=True, success=True))
+    fake_eiger.odin.stop = MagicMock(return_value=NullStatus())
     fake_eiger.detector_params.use_roi_mode = True
-    done_status = Status(done=True, success=True)
+    done_status = NullStatus()
 
     call_func.return_value = done_status
     fake_eiger.enable_roi_mode = MagicMock(name="enable_roi_mode")

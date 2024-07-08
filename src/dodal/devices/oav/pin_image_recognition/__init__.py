@@ -5,6 +5,7 @@ import numpy as np
 from numpy.typing import NDArray
 from ophyd_async.core import (
     AsyncStatus,
+    HintedSignal,
     StandardReadable,
     observe_value,
     soft_signal_r_and_setter,
@@ -77,12 +78,13 @@ class PinTipDetection(StandardReadable):
         self.min_tip_height = soft_signal_rw(int, 5, name="min_tip_height")
         self.validity_timeout = soft_signal_rw(float, 5.0, name="validity_timeout")
 
-        self.set_readable_signals(
-            read=[
+        self.add_readables(
+            [
                 self.triggered_tip,
                 self.triggered_top_edge,
                 self.triggered_bottom_edge,
             ],
+            wrapper=HintedSignal,
         )
 
         super().__init__(name=name)
@@ -154,7 +156,7 @@ class PinTipDetection(StandardReadable):
                     location = await self._get_tip_and_edge_data(value)
                     self._set_triggered_values(location)
                 except Exception as e:
-                    LOGGER.warn(
+                    LOGGER.warning(
                         f"Failed to detect pin-tip location, will retry with next image: {e}"
                     )
                 else:

@@ -318,7 +318,9 @@ class EigerDetector(Device):
 
     def _finish_arm(self) -> Status:
         LOGGER.info("Eiger staging: Finishing arming")
-        return Status(done=True, success=True)
+        status = Status()
+        status.set_finished()
+        return status
 
     def forward_bit_depth_to_filewriter(self):
         bit_depth = self.bit_depth.get()
