@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import cast
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -116,7 +115,7 @@ async def test_given_disp_high_when_set_SetWhenEnabled_then_proc_not_set_until_d
     set_mock_value(device.disp, 1)
     proc_mock = get_mock_put(device.proc)
     proc_mock.return_value = NullStatus()
-    status: AsyncStatus = cast(AsyncStatus, device.set(1))
+    status: AsyncStatus = device.set(1)
     assert not status.done
     proc_mock.assert_not_called()
     set_mock_value(device.disp, 0)

@@ -2,10 +2,11 @@ from functools import partial
 from typing import Callable
 
 from bluesky.protocols import Movable
-from ophyd import Component, Device, EpicsSignal
+from ophyd import Component, EpicsSignal
+from ophyd import Device as OphydDevice
 from ophyd.status import Status, StatusBase
-from ophyd_async import core
 from ophyd_async.core import AsyncStatus, wait_for_value
+from ophyd_async.core import Device as OphydAsyncDevice
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
 from dodal.log import LOGGER
@@ -27,7 +28,7 @@ def epics_signal_put_wait(pv_name: str, wait: float = 3.0) -> Component[EpicsSig
 def run_functions_without_blocking(
     functions_to_chain: list[Callable[[], StatusBase]],
     timeout: float = 60.0,
-    associated_obj: Device | None = None,
+    associated_obj: OphydDevice | None = None,
 ) -> Status:
     """Creates and initiates an asynchronous chaining of functions which return a status
 
@@ -115,7 +116,7 @@ def call_func(func: Callable[[], StatusBase]) -> StatusBase:
     return func()
 
 
-class SetWhenEnabled(core.Device, Movable):
+class SetWhenEnabled(OphydAsyncDevice, Movable):
     """A device that sets the proc field of a PV when it becomes enabled."""
 
     def __init__(self, name: str = "", prefix: str = ""):
