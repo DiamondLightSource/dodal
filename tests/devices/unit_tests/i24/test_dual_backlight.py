@@ -52,7 +52,7 @@ async def test_when_backlight_out_it_switches_off(
 async def test_when_backlight_not_out_it_switches_on(
     fake_backlight: DualBacklight, RE: RunEngine
 ):
-    RE(bps.abs_set(fake_backlight, "OAV2"))
+    RE(bps.abs_set(fake_backlight, "OAV2", wait=True))
     assert await fake_backlight.backlight_state.get_value() == "ON"
 
 

@@ -11,6 +11,7 @@ from ophyd_async.core import StandardReadable
 from dodal.beamlines import i03
 from dodal.common.beamlines import beamline_utils
 from dodal.devices.aperturescatterguard import ApertureScatterguard
+from dodal.devices.qbpm1 import QBPM1
 from dodal.devices.smargon import Smargon
 from dodal.devices.zebra import Zebra
 from dodal.utils import make_all_devices
@@ -52,11 +53,11 @@ def test_instantiating_different_device_with_same_name():
 
 
 def test_instantiate_v1_function_fake_makes_fake():
-    smargon: Smargon = beamline_utils.device_instantiation(
-        i03.Smargon, "smargon", "", True, True, None
+    qbpm: QBPM1 = beamline_utils.device_instantiation(
+        QBPM1, "qbpm", "", True, True, None
     )
-    assert isinstance(smargon, Device)
-    assert isinstance(smargon.disabled, FakeEpicsSignal)
+    assert isinstance(qbpm, Device)
+    assert isinstance(qbpm.intensity, FakeEpicsSignal)
 
 
 def test_instantiate_v2_function_fake_makes_fake():
