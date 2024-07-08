@@ -95,6 +95,25 @@ class PMACStringEncReset(SignalRW):
         await self.signal.set(enc_string.value, wait=True)
 
 
+class ProgramRunner(SignalRW):
+    """Trigger the collection by setting the program number on the PMAC string."""
+
+    def __init__(
+        self,
+        pmac_str_sig: SignalRW,
+        backend: SignalBackend,
+        timeout: float | None = DEFAULT_TIMEOUT,
+        name: str = "",
+    ) -> None:
+        self.signal = pmac_str_sig
+        super().__init__(backend, timeout, name)
+
+    @AsyncStatus.wrap
+    async def set(self, prog_num: int):
+        prog_str = f"&2b{prog_num}r"
+        await self.signal.set(prog_str, wait=True)
+
+
 class PMAC(StandardReadable):
     """Device to control the chip stage on I24."""
 
@@ -109,6 +128,10 @@ class PMAC(StandardReadable):
         self.laser = PMACStringLaser(self.pmac_string, backend=SoftSignalBackend(str))
 
         self.enc_reset = PMACStringEncReset(
+            self.pmac_string, backend=SoftSignalBackend(str)
+        )
+
+        self.run_program = ProgramRunner(
             self.pmac_string, backend=SoftSignalBackend(str)
         )
 
