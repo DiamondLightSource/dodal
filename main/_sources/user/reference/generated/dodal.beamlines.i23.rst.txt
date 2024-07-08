@@ -24,7 +24,6 @@ dodal.beamlines.i23
 
    .. autosummary::
    
-      gonio
       oav_pin_tip_detection
    
    

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.motors &#8212; dodal 1.29.2.dev8+g4dd766bac documentation</title>
+    <title>dodal.devices.motors &#8212; dodal 1.29.2.dev9+g49c4ab1c4 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=210ba63c"></script>
+    <script src="../../../_static/documentation_options.js?v=37774e45"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="icon" href="../../../_static/dls-favicon.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="dodal.devices.motors.MotorLimitHelper" href="dodal.devices.motors.MotorLimitHelper.html" />
+    <link rel="next" title="dodal.devices.motors.XYZPositioner" href="dodal.devices.motors.XYZPositioner.html" />
     <link rel="prev" title="dodal.devices.logging_ophyd_device.InfoLoggingDevice" href="dodal.devices.logging_ophyd_device.InfoLoggingDevice.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -574,10 +574,6 @@ document.write(`
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.devices.i03.html">dodal.devices.i03</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.devices.i20_1.html">dodal.devices.i20_1</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.i23.html">dodal.devices.i23</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i23.gonio.html">dodal.devices.i23.gonio</a></li>
-</ul>
-</details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.i24.html">dodal.devices.i24</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.i24.I24_detector_motion.html">dodal.devices.i24.I24_detector_motion</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.i24.aperture.html">dodal.devices.i24.aperture</a></li>
@@ -601,8 +597,6 @@ document.write(`
 </ul>
 </details></li>
 <li class="toctree-l3 current active has-children"><a class="current reference internal" href="#">dodal.devices.motors</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.MotorLimitHelper.html">dodal.devices.motors.MotorLimitHelper</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZLimitBundle.html">dodal.devices.motors.XYZLimitBundle</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZPositioner.html">dodal.devices.motors.XYZPositioner</a></li>
 </ul>
 </details></li>
@@ -650,9 +644,11 @@ document.write(`
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.smargon.html">dodal.devices.smargon</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.smargon.AxisLimit.html">dodal.devices.smargon.AxisLimit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.smargon.Smargon.html">dodal.devices.smargon.Smargon</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.smargon.StubOffsets.html">dodal.devices.smargon.StubOffsets</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.smargon.StubPosition.html">dodal.devices.smargon.StubPosition</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.smargon.XYZLimits.html">dodal.devices.smargon.XYZLimits</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.devices.status.html">dodal.devices.status</a></li>
@@ -822,12 +818,6 @@ document.write(`
 <p class="rubric">Classes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.motors.MotorLimitHelper.html#dodal.devices.motors.MotorLimitHelper" title="dodal.devices.motors.MotorLimitHelper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MotorLimitHelper</span></code></a></p></td>
-<td><p>Represents motor limit(s)</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.motors.XYZLimitBundle.html#dodal.devices.motors.XYZLimitBundle" title="dodal.devices.motors.XYZLimitBundle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">XYZLimitBundle</span></code></a></p></td>
-<td><p>Holder for limits reflecting an x, y, z bundle</p></td>
-</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.motors.XYZPositioner.html#dodal.devices.motors.XYZPositioner" title="dodal.devices.motors.XYZPositioner"><code class="xref py py-obj docutils literal notranslate"><span class="pre">XYZPositioner</span></code></a></p></td>
 <td><p><dl class="field-list simple">
 <dt class="field-odd">param prefix<span class="colon">:</span></dt>
@@ -860,11 +850,11 @@ document.write(`
       </div>
     </a>
     <a class="right-next"
-       href="dodal.devices.motors.MotorLimitHelper.html"
+       href="dodal.devices.motors.XYZPositioner.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">dodal.devices.motors.MotorLimitHelper</p>
+        <p class="prev-next-title">dodal.devices.motors.XYZPositioner</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

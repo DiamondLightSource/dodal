@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.beamlines.i23 &#8212; dodal 1.29.2.dev8+g4dd766bac documentation</title>
+    <title>dodal.beamlines.i23 &#8212; dodal 1.29.2.dev9+g49c4ab1c4 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=210ba63c"></script>
+    <script src="../../../_static/documentation_options.js?v=37774e45"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -574,10 +574,6 @@ document.write(`
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.devices.i03.html">dodal.devices.i03</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.devices.i20_1.html">dodal.devices.i20_1</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.i23.html">dodal.devices.i23</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i23.gonio.html">dodal.devices.i23.gonio</a></li>
-</ul>
-</details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.i24.html">dodal.devices.i24</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.i24.I24_detector_motion.html">dodal.devices.i24.I24_detector_motion</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.i24.aperture.html">dodal.devices.i24.aperture</a></li>
@@ -601,8 +597,6 @@ document.write(`
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.motors.html">dodal.devices.motors</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.MotorLimitHelper.html">dodal.devices.motors.MotorLimitHelper</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZLimitBundle.html">dodal.devices.motors.XYZLimitBundle</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZPositioner.html">dodal.devices.motors.XYZPositioner</a></li>
 </ul>
 </details></li>
@@ -650,9 +644,11 @@ document.write(`
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.smargon.html">dodal.devices.smargon</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.smargon.AxisLimit.html">dodal.devices.smargon.AxisLimit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.smargon.Smargon.html">dodal.devices.smargon.Smargon</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.smargon.StubOffsets.html">dodal.devices.smargon.StubOffsets</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.smargon.StubPosition.html">dodal.devices.smargon.StubPosition</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.smargon.XYZLimits.html">dodal.devices.smargon.XYZLimits</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.devices.status.html">dodal.devices.status</a></li>
@@ -822,32 +818,12 @@ document.write(`
 <p class="rubric">Functions</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i23.gonio" title="dodal.beamlines.i23.gonio"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gonio</span></code></a>([wait_for_connection, fake_with_ophyd_sim])</p></td>
-<td><p>Get the i23 goniometer device</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i23.oav_pin_tip_detection" title="dodal.beamlines.i23.oav_pin_tip_detection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">oav_pin_tip_detection</span></code></a>([wait_for_connection, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i23.oav_pin_tip_detection" title="dodal.beamlines.i23.oav_pin_tip_detection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">oav_pin_tip_detection</span></code></a>([wait_for_connection, ...])</p></td>
 <td><p>Get the i23 OAV pin-tip detection device</p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<dl class="py function">
-<dt class="sig sig-object py" id="dodal.beamlines.i23.gonio">
-<span class="sig-prename descclassname"><span class="pre">dodal.beamlines.i23.</span></span><span class="sig-name descname"><span class="pre">gonio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wait_for_connection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fake_with_ophyd_sim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="dodal.devices.i23.gonio.Gonio.html#dodal.devices.i23.gonio.Gonio" title="dodal.devices.i23.gonio.Gonio"><span class="pre">Gonio</span></a></span></span><a class="reference internal" href="../../../_modules/dodal/beamlines/i23.html#gonio"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.beamlines.i23.gonio" title="Link to this definition">#</a></dt>
-<dd><p>Get the i23 goniometer device</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>wait_for_connection</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
-<li><p><strong>fake_with_ophyd_sim</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.i23.gonio.Gonio.html#dodal.devices.i23.gonio.Gonio" title="dodal.devices.i23.gonio.Gonio"><code class="xref py py-class docutils literal notranslate"><span class="pre">Gonio</span></code></a></span></p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="dodal.beamlines.i23.oav_pin_tip_detection">
 <span class="sig-prename descclassname"><span class="pre">dodal.beamlines.i23.</span></span><span class="sig-name descname"><span class="pre">oav_pin_tip_detection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wait_for_connection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fake_with_ophyd_sim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="dodal.devices.oav.pin_image_recognition.PinTipDetection.html#dodal.devices.oav.pin_image_recognition.PinTipDetection" title="dodal.devices.oav.pin_image_recognition.PinTipDetection"><span class="pre">PinTipDetection</span></a></span></span><a class="reference internal" href="../../../_modules/dodal/beamlines/i23.html#oav_pin_tip_detection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.beamlines.i23.oav_pin_tip_detection" title="Link to this definition">#</a></dt>
@@ -913,7 +889,6 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.beamlines.i23.gonio"><code class="docutils literal notranslate"><span class="pre">gonio()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.beamlines.i23.oav_pin_tip_detection"><code class="docutils literal notranslate"><span class="pre">oav_pin_tip_detection()</span></code></a></li>
 </ul>
   </nav></div>
