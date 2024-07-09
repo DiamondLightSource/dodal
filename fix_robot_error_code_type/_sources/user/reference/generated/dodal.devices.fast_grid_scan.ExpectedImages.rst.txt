@@ -1,0 +1,42 @@
+dodal.devices.fast\_grid\_scan.ExpectedImages
+=============================================
+
+.. currentmodule:: dodal.devices.fast_grid_scan
+
+.. autoclass:: ExpectedImages
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~ExpectedImages.get_value
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

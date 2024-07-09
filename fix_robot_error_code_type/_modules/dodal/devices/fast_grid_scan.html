@@ -1,0 +1,889 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dodal.devices.fast_grid_scan &#8212; dodal 1.29.3.dev1+g0f5d5e271 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=87e54e7c" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../../_static/documentation_options.js?v=0f5888af"></script>
+    <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=30646c52"></script>
+    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="https://unpkg.com/mermaid@10.2.0/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({startOnLoad:true});</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/dodal/devices/fast_grid_scan';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://DiamondLightSource.github.io/dodal/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'fix_robot_error_code_type';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
+    <link rel="icon" href="../../../_static/dls-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/dls-logo.svg" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../../../_static/dls-logo.svg" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">dodal</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../user/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../developer/index.html">
+    Developer Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/DiamondLightSource/dodal/releases">
+    Release Notes
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/DiamondLightSource/dodal" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/dodal" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../user/index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../developer/index.html">
+    Developer Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/DiamondLightSource/dodal/releases">
+    Release Notes
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/DiamondLightSource/dodal" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/dodal" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-3"
+      type="button"
+      class="version-switcher__button btn btn-sm dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-3"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-3"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-3">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">dodal.device...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for dodal.devices.fast_grid_scan</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">TypeVar</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">bluesky.plan_stubs</span> <span class="kn">import</span> <span class="n">mv</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">ndarray</span>
+<span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AsyncStatus</span><span class="p">,</span>
+    <span class="n">Device</span><span class="p">,</span>
+    <span class="n">Signal</span><span class="p">,</span>
+    <span class="n">SignalR</span><span class="p">,</span>
+    <span class="n">SignalRW</span><span class="p">,</span>
+    <span class="n">SoftSignalBackend</span><span class="p">,</span>
+    <span class="n">StandardReadable</span><span class="p">,</span>
+    <span class="n">wait_for_value</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">ophyd_async.epics.signal</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">epics_signal_r</span><span class="p">,</span>
+    <span class="n">epics_signal_rw</span><span class="p">,</span>
+    <span class="n">epics_signal_rw_rbv</span><span class="p">,</span>
+    <span class="n">epics_signal_x</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">validator</span>
+<span class="kn">from</span> <span class="nn">pydantic.dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+
+<span class="kn">from</span> <span class="nn">dodal.log</span> <span class="kn">import</span> <span class="n">LOGGER</span>
+<span class="kn">from</span> <span class="nn">dodal.parameters.experiment_parameter_base</span> <span class="kn">import</span> <span class="n">AbstractExperimentWithBeamParams</span>
+
+
+<div class="viewcode-block" id="GridAxis">
+<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.fast_grid_scan.GridAxis.html#dodal.devices.fast_grid_scan.GridAxis">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">GridAxis</span><span class="p">:</span>
+    <span class="n">start</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">step_size</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">full_steps</span><span class="p">:</span> <span class="nb">int</span>
+
+<div class="viewcode-block" id="GridAxis.steps_to_motor_position">
+<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.fast_grid_scan.GridAxis.html#dodal.devices.fast_grid_scan.GridAxis.steps_to_motor_position">[docs]</a>
+    <span class="k">def</span> <span class="nf">steps_to_motor_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">steps</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gives the motor position based on steps, where steps are 0 indexed&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_size</span> <span class="o">*</span> <span class="n">steps</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">end</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gives the point where the final frame is taken&quot;&quot;&quot;</span>
+        <span class="c1"># Note that full_steps is one indexed e.g. if there is one step then the end is</span>
+        <span class="c1"># refering to the first position</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">steps_to_motor_position</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">full_steps</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">is_within</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">steps</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">steps</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">full_steps</span></div>
+
+
+
+<div class="viewcode-block" id="GridScanParamsCommon">
+<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.fast_grid_scan.GridScanParamsCommon.html#dodal.devices.fast_grid_scan.GridScanParamsCommon">[docs]</a>
+<span class="k">class</span> <span class="nc">GridScanParamsCommon</span><span class="p">(</span><span class="n">AbstractExperimentWithBeamParams</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Common holder class for the parameters of a grid scan in a similar</span>
+<span class="sd">    layout to EPICS. The parameters and functions of this class are common</span>
+<span class="sd">    to both the zebra and panda triggered fast grid scans.</span>
+
+<span class="sd">    The grid specified is where data is taken e.g. it can be assumed the first frame is</span>
+<span class="sd">    at x_start, y1_start, z1_start and subsequent frames are N*step_size away.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">x_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">y_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">z_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">x_step_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">y_step_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">z_step_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">x_start</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">y1_start</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">y2_start</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">z1_start</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">z2_start</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">x_axis</span><span class="p">:</span> <span class="n">GridAxis</span> <span class="o">=</span> <span class="n">GridAxis</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">y_axis</span><span class="p">:</span> <span class="n">GridAxis</span> <span class="o">=</span> <span class="n">GridAxis</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">z_axis</span><span class="p">:</span> <span class="n">GridAxis</span> <span class="o">=</span> <span class="n">GridAxis</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># Whether to set the stub offsets after centering</span>
+    <span class="n">set_stub_offsets</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">get_param_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;x_steps&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_steps</span><span class="p">,</span>
+            <span class="s2">&quot;y_steps&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_steps</span><span class="p">,</span>
+            <span class="s2">&quot;z_steps&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_steps</span><span class="p">,</span>
+            <span class="s2">&quot;x_step_size&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_step_size</span><span class="p">,</span>
+            <span class="s2">&quot;y_step_size&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_step_size</span><span class="p">,</span>
+            <span class="s2">&quot;z_step_size&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_step_size</span><span class="p">,</span>
+            <span class="s2">&quot;x_start&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_start</span><span class="p">,</span>
+            <span class="s2">&quot;y1_start&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y1_start</span><span class="p">,</span>
+            <span class="s2">&quot;y2_start&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y2_start</span><span class="p">,</span>
+            <span class="s2">&quot;z1_start&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">z1_start</span><span class="p">,</span>
+            <span class="s2">&quot;z2_start&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">z2_start</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>
+        <span class="n">arbitrary_types_allowed</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;x_axis&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;exclude&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+            <span class="s2">&quot;y_axis&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;exclude&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+            <span class="s2">&quot;z_axis&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;exclude&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+        <span class="p">}</span>
+
+    <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;x_axis&quot;</span><span class="p">,</span> <span class="n">always</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_get_x_axis</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x_axis</span><span class="p">:</span> <span class="n">GridAxis</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">GridAxis</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">GridAxis</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="s2">&quot;x_start&quot;</span><span class="p">],</span> <span class="n">values</span><span class="p">[</span><span class="s2">&quot;x_step_size&quot;</span><span class="p">],</span> <span class="n">values</span><span class="p">[</span><span class="s2">&quot;x_steps&quot;</span><span class="p">])</span>
+
+    <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;y_axis&quot;</span><span class="p">,</span> <span class="n">always</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_get_y_axis</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">y_axis</span><span class="p">:</span> <span class="n">GridAxis</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">GridAxis</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">GridAxis</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="s2">&quot;y1_start&quot;</span><span class="p">],</span> <span class="n">values</span><span class="p">[</span><span class="s2">&quot;y_step_size&quot;</span><span class="p">],</span> <span class="n">values</span><span class="p">[</span><span class="s2">&quot;y_steps&quot;</span><span class="p">])</span>
+
+    <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;z_axis&quot;</span><span class="p">,</span> <span class="n">always</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_get_z_axis</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">z_axis</span><span class="p">:</span> <span class="n">GridAxis</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">GridAxis</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">GridAxis</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="s2">&quot;z2_start&quot;</span><span class="p">],</span> <span class="n">values</span><span class="p">[</span><span class="s2">&quot;z_step_size&quot;</span><span class="p">],</span> <span class="n">values</span><span class="p">[</span><span class="s2">&quot;z_steps&quot;</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">get_num_images</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_steps</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_steps</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_steps</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_steps</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_3d_grid_scan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_steps</span> <span class="o">&gt;</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="GridScanParamsCommon.grid_position_to_motor_position">
+<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.fast_grid_scan.GridScanParamsCommon.html#dodal.devices.fast_grid_scan.GridScanParamsCommon.grid_position_to_motor_position">[docs]</a>
+    <span class="k">def</span> <span class="nf">grid_position_to_motor_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grid_position</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts a grid position, given as steps in the x, y, z grid,</span>
+<span class="sd">        to a real motor position.</span>
+
+<span class="sd">        :param grid_position: The x, y, z position in grid steps</span>
+<span class="sd">        :return: The motor position this corresponds to.</span>
+<span class="sd">        :raises: IndexError if the desired position is outside the grid.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">position</span><span class="p">,</span> <span class="n">axis</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+            <span class="n">grid_position</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_axis</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_axis</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_axis</span><span class="p">]</span>
+        <span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">axis</span><span class="o">.</span><span class="n">is_within</span><span class="p">(</span><span class="n">position</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">grid_position</span><span class="si">}</span><span class="s2"> is outside the bounds of the grid&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">x_axis</span><span class="o">.</span><span class="n">steps_to_motor_position</span><span class="p">(</span><span class="n">grid_position</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">y_axis</span><span class="o">.</span><span class="n">steps_to_motor_position</span><span class="p">(</span><span class="n">grid_position</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">z_axis</span><span class="o">.</span><span class="n">steps_to_motor_position</span><span class="p">(</span><span class="n">grid_position</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
+            <span class="p">]</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<span class="n">ParamType</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;ParamType&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">GridScanParamsCommon</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ZebraGridScanParams">
+<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.fast_grid_scan.ZebraGridScanParams.html#dodal.devices.fast_grid_scan.ZebraGridScanParams">[docs]</a>
+<span class="k">class</span> <span class="nc">ZebraGridScanParams</span><span class="p">(</span><span class="n">GridScanParamsCommon</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Params for standard Zebra FGS. Adds on the dwell time</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">dwell_time_ms</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span>
+
+    <span class="k">def</span> <span class="nf">get_param_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">param_positions</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_param_positions</span><span class="p">()</span>
+        <span class="n">param_positions</span><span class="p">[</span><span class="s2">&quot;dwell_time_ms&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dwell_time_ms</span>
+        <span class="k">return</span> <span class="n">param_positions</span>
+
+    <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;dwell_time_ms&quot;</span><span class="p">,</span> <span class="n">always</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">check_fields</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">non_integer_dwell_time</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dwell_time_ms</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="n">dwell_time_floor_rounded</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">dwell_time_ms</span><span class="p">)</span>
+        <span class="n">dwell_time_is_close</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span>
+            <span class="n">dwell_time_ms</span><span class="p">,</span> <span class="n">dwell_time_floor_rounded</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-3</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">dwell_time_is_close</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Dwell time of </span><span class="si">{</span><span class="n">dwell_time_ms</span><span class="si">}</span><span class="s2">ms is not an integer value. Fast Grid Scan only accepts integer values&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">dwell_time_ms</span></div>
+
+
+
+<div class="viewcode-block" id="PandAGridScanParams">
+<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.fast_grid_scan.PandAGridScanParams.html#dodal.devices.fast_grid_scan.PandAGridScanParams">[docs]</a>
+<span class="k">class</span> <span class="nc">PandAGridScanParams</span><span class="p">(</span><span class="n">GridScanParamsCommon</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Params for panda constant-motion scan. Adds on the goniometer run-up distance</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">run_up_distance_mm</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.17</span>
+
+    <span class="k">def</span> <span class="nf">get_param_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">param_positions</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_param_positions</span><span class="p">()</span>
+        <span class="n">param_positions</span><span class="p">[</span><span class="s2">&quot;run_up_distance_mm&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_up_distance_mm</span>
+        <span class="k">return</span> <span class="n">param_positions</span></div>
+
+
+
+<div class="viewcode-block" id="MotionProgram">
+<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.fast_grid_scan.MotionProgram.html#dodal.devices.fast_grid_scan.MotionProgram">[docs]</a>
+<span class="k">class</span> <span class="nc">MotionProgram</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">running</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PROGBITS&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">program_number</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;CS1:PROG_NUM&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ExpectedImages">
+<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.fast_grid_scan.ExpectedImages.html#dodal.devices.fast_grid_scan.ExpectedImages">[docs]</a>
+<span class="k">class</span> <span class="nc">ExpectedImages</span><span class="p">(</span><span class="n">SignalR</span><span class="p">[</span><span class="nb">int</span><span class="p">]):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="s2">&quot;FastGridScanCommon&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">SoftSignalBackend</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">:</span> <span class="s2">&quot;FastGridScanCommon&quot;</span> <span class="o">=</span> <span class="n">parent</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">x_steps</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">y_steps</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">z_steps</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="n">first_grid</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span>
+        <span class="n">second_grid</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">z</span>
+        <span class="k">return</span> <span class="n">first_grid</span> <span class="o">+</span> <span class="n">second_grid</span></div>
+
+
+
+<div class="viewcode-block" id="FastGridScanCommon">
+<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.fast_grid_scan.FastGridScanCommon.html#dodal.devices.fast_grid_scan.FastGridScanCommon">[docs]</a>
+<span class="k">class</span> <span class="nc">FastGridScanCommon</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">ParamType</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Device for a general fast grid scan</span>
+
+<span class="sd">    When the motion program is started, the goniometer will move in a snake-like grid trajectory,</span>
+<span class="sd">    with X as the fast axis and Y as the slow axis. If Z steps isn&#39;t 0, the goniometer will</span>
+<span class="sd">    then rotate in the omega direction such that it moves from the X-Y, to the X-Z plane then</span>
+<span class="sd">    do a second grid scan. The detector is triggered after every x step.</span>
+<span class="sd">    See https://github.com/DiamondLightSource/hyperion/wiki/Coordinate-Systems for more</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">smargon_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_steps</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">X_NUM_STEPS&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_steps</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span>
+            <span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Y_NUM_STEPS&quot;</span>
+        <span class="p">)</span>  <span class="c1"># Number of vertical steps during the first grid scan</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z_steps</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span>
+            <span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Z_NUM_STEPS&quot;</span>
+        <span class="p">)</span>  <span class="c1"># Number of vertical steps during the second grid scan, after the rotation in omega</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_step_size</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">X_STEP_SIZE&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_step_size</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Y_STEP_SIZE&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z_step_size</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Z_STEP_SIZE&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_start</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">X_START&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y1_start</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Y_START&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y2_start</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Y2_START&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z1_start</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Z_START&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z2_start</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Z2_START&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">scan_invalid</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">SCAN_INVALID&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_cmd</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">RUN.PROC&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">SCAN_STATUS&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">expected_images</span> <span class="o">=</span> <span class="n">ExpectedImages</span><span class="p">(</span><span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">motion_program</span> <span class="o">=</span> <span class="n">MotionProgram</span><span class="p">(</span><span class="n">smargon_prefix</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">position_counter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_position_counter</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+
+        <span class="c1"># Kickoff timeout in seconds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">KICKOFF_TIMEOUT</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5.0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">COMPLETE_STATUS</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">60.0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">movable_params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Signal</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;x_steps&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_steps</span><span class="p">,</span>
+            <span class="s2">&quot;y_steps&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_steps</span><span class="p">,</span>
+            <span class="s2">&quot;z_steps&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_steps</span><span class="p">,</span>
+            <span class="s2">&quot;x_step_size&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_step_size</span><span class="p">,</span>
+            <span class="s2">&quot;y_step_size&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_step_size</span><span class="p">,</span>
+            <span class="s2">&quot;z_step_size&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_step_size</span><span class="p">,</span>
+            <span class="s2">&quot;x_start&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_start</span><span class="p">,</span>
+            <span class="s2">&quot;y1_start&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y1_start</span><span class="p">,</span>
+            <span class="s2">&quot;y2_start&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y2_start</span><span class="p">,</span>
+            <span class="s2">&quot;z1_start&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">z1_start</span><span class="p">,</span>
+            <span class="s2">&quot;z2_start&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">z2_start</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">kickoff</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">curr_prog</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motion_program</span><span class="o">.</span><span class="n">program_number</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="n">running</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">motion_program</span><span class="o">.</span><span class="n">running</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">running</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Motion program </span><span class="si">{</span><span class="n">curr_prog</span><span class="si">}</span><span class="s2"> still running, waiting...&quot;</span><span class="p">)</span>
+            <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">motion_program</span><span class="o">.</span><span class="n">running</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">KICKOFF_TIMEOUT</span><span class="p">)</span>
+
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Running scan&quot;</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_cmd</span><span class="o">.</span><span class="n">trigger</span><span class="p">()</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Waiting for FGS to start&quot;</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">KICKOFF_TIMEOUT</span><span class="p">)</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;FGS kicked off&quot;</span><span class="p">)</span>
+
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">complete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">COMPLETE_STATUS</span><span class="p">)</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_create_position_counter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SignalRW</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="ZebraFastGridScan">
+<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.fast_grid_scan.ZebraFastGridScan.html#dodal.devices.fast_grid_scan.ZebraFastGridScan">[docs]</a>
+<span class="k">class</span> <span class="nc">ZebraFastGridScan</span><span class="p">(</span><span class="n">FastGridScanCommon</span><span class="p">[</span><span class="n">ZebraGridScanParams</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Device for standard Zebra FGS. In this scan, the goniometer&#39;s velocity profile follows a parabolic shape between X steps,</span>
+<span class="sd">    with the slowest points occuring at each X step.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">full_prefix</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;FGS:&quot;</span>
+        <span class="c1"># Time taken to travel between X steps</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dwell_time_ms</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">full_prefix</span><span class="si">}</span><span class="s2">DWELL_TIME&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_counter</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">full_prefix</span><span class="si">}</span><span class="s2">X_COUNTER&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_counter</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">full_prefix</span><span class="si">}</span><span class="s2">Y_COUNTER&quot;</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">full_prefix</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">movable_params</span><span class="p">[</span><span class="s2">&quot;dwell_time_ms&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dwell_time_ms</span>
+
+    <span class="k">def</span> <span class="nf">_create_position_counter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">epics_signal_rw</span><span class="p">(</span>
+            <span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">POS_COUNTER&quot;</span><span class="p">,</span> <span class="n">write_pv</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">POS_COUNTER_WRITE&quot;</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="PandAFastGridScan">
+<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.fast_grid_scan.PandAFastGridScan.html#dodal.devices.fast_grid_scan.PandAFastGridScan">[docs]</a>
+<span class="k">class</span> <span class="nc">PandAFastGridScan</span><span class="p">(</span><span class="n">FastGridScanCommon</span><span class="p">[</span><span class="n">PandAGridScanParams</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Device for panda constant-motion scan&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">full_prefix</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PGS:&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_between_x_steps_ms</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">epics_signal_rw_rbv</span><span class="p">(</span>  <span class="c1"># Used by motion controller to set goniometer velocity</span>
+                <span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">full_prefix</span><span class="si">}</span><span class="s2">TIME_BETWEEN_X_STEPS&quot;</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Distance before and after the grid given to allow goniometer to reach desired speed while it is within the</span>
+        <span class="c1"># grid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_up_distance_mm</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span>
+            <span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">full_prefix</span><span class="si">}</span><span class="s2">RUNUP_DISTANCE&quot;</span>
+        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">full_prefix</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">movable_params</span><span class="p">[</span><span class="s2">&quot;run_up_distance_mm&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_up_distance_mm</span>
+
+    <span class="k">def</span> <span class="nf">_create_position_counter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">Y_COUNTER&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="set_fast_grid_scan_params">
+<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.fast_grid_scan.html#dodal.devices.fast_grid_scan.set_fast_grid_scan_params">[docs]</a>
+<span class="k">def</span> <span class="nf">set_fast_grid_scan_params</span><span class="p">(</span><span class="n">scan</span><span class="p">:</span> <span class="n">FastGridScanCommon</span><span class="p">[</span><span class="n">ParamType</span><span class="p">],</span> <span class="n">params</span><span class="p">:</span> <span class="n">ParamType</span><span class="p">):</span>
+    <span class="n">to_move</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Create arguments for bps.mv</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">scan</span><span class="o">.</span><span class="n">movable_params</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">to_move</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">scan</span><span class="o">.</span><span class="n">movable_params</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">params</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]])</span>
+
+    <span class="c1"># Counter should always start at 0</span>
+    <span class="n">to_move</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">scan</span><span class="o">.</span><span class="n">position_counter</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">yield from</span> <span class="n">mv</span><span class="p">(</span><span class="o">*</span><span class="n">to_move</span><span class="p">)</span></div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
