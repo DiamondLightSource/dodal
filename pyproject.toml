@@ -90,6 +90,7 @@ ignore_missing_imports = true # Ignore missing stubs in imported modules
 asyncio_mode = "auto"
 markers = [
     "s03: marks tests as requiring the s03 simulator running (deselect with '-m \"not s03\"')",
+    "skip_in_pycharm: marks test as not working in pycharm testrunner"
 ]
 addopts = """
     --cov=dodal --cov-report term --cov-report xml:cov.xml

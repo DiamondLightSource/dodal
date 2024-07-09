@@ -10,7 +10,7 @@ import workflows.recipe
 import workflows.transport
 from bluesky.protocols import Descriptor, Triggerable
 from numpy.typing import NDArray
-from ophyd_async.core import StandardReadable, soft_signal_r_and_setter
+from ophyd_async.core import HintedSignal, StandardReadable, soft_signal_r_and_setter
 from ophyd_async.core.async_status import AsyncStatus
 from workflows.transport.common_transport import CommonTransport
 
@@ -88,14 +88,15 @@ class ZocaloResults(StandardReadable, Triggerable):
         )
         self.ispyb_dcid, _ = soft_signal_r_and_setter(int, name="ispyb_dcid")
         self.ispyb_dcgid, _ = soft_signal_r_and_setter(int, name="ispyb_dcgid")
-        self.set_readable_signals(
-            read=[
+        self.add_readables(
+            [
                 self.results,
                 self.centres_of_mass,
                 self.bbox_sizes,
                 self.ispyb_dcid,
                 self.ispyb_dcgid,
-            ]
+            ],
+            wrapper=HintedSignal,
         )
         super().__init__(name)
 

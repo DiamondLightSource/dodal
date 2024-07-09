@@ -20,6 +20,8 @@ from dodal.devices.focusing_mirror import (
 )
 from dodal.log import LOGGER
 
+from ...conftest import failed_status
+
 
 @pytest.fixture
 def vfm_mirror_voltages_not_ok(vfm_mirror_voltages) -> VFMMirrorVoltages:

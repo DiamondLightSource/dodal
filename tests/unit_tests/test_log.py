@@ -67,8 +67,12 @@ def test_dev_mode_sets_correct_graypy_handler(
     mock_logger: MagicMock,
 ):
     mock_GELFTCPHandler.return_value.level = logging.INFO
-    set_up_all_logging_handlers(mock_logger, Path("tmp/dev"), "dodal.log", True, 10000)
+    handler_config = set_up_all_logging_handlers(
+        mock_logger, Path("tmp/dev"), "dodal.log", True, 10000
+    )
     mock_GELFTCPHandler.assert_called_once_with("localhost", 5555)
+    for handler in handler_config.values():
+        handler.close()
 
 
 @patch("dodal.log.GELFTCPHandler", autospec=True)
@@ -77,10 +81,14 @@ def test_prod_mode_sets_correct_graypy_handler(
     mock_logger: MagicMock,
 ):
     mock_GELFTCPHandler.return_value.level = logging.INFO
-    set_up_all_logging_handlers(mock_logger, Path("tmp/dev"), "dodal.log", False, 10000)
+    handler_config = set_up_all_logging_handlers(
+        mock_logger, Path("tmp/dev"), "dodal.log", False, 10000
+    )
     mock_GELFTCPHandler.assert_called_once_with(
         "graylog-log-target.diamond.ac.uk", 12231
     )
+    for handler in handler_config.values():
+        handler.close()
 
 
 @patch("dodal.log.GELFTCPHandler", autospec=True)
@@ -96,7 +104,7 @@ def test_no_env_variable_sets_correct_file_handler(
     mock_file_handler.return_value.level = logging.INFO
     mock_GELFTCPHandler.return_value.level = logging.INFO
     clear_all_loggers_and_handlers()
-    _ = set_up_all_logging_handlers(
+    handler_config = set_up_all_logging_handlers(
         LOGGER, get_logging_file_path(), "dodal.log", True, ERROR_LOG_BUFFER_LINES
     )
     integrate_bluesky_and_ophyd_logging(LOGGER)
@@ -107,6 +115,8 @@ def test_no_env_variable_sets_correct_file_handler(
     ]
 
     mock_file_handler.assert_has_calls(expected_calls, any_order=True)
+    for handler in handler_config.values():
+        handler.close()
 
 
 def test_beamline_filter_adds_dev_if_no_beamline():
