@@ -6,7 +6,7 @@ from ophyd.status import AndStatus, Status, SubscriptionStatus
 
 from dodal.devices.detector import DetectorParams, TriggerMode
 from dodal.devices.eiger_odin import EigerOdin
-from dodal.devices.status import await_value
+from dodal.devices.status import await_value, await_value_and_warn_if_long
 from dodal.devices.util.epics_util import run_functions_without_blocking
 from dodal.log import LOGGER
 
@@ -38,6 +38,8 @@ class EigerDetector(Device):
 
     STALE_PARAMS_TIMEOUT = 60
     GENERAL_STATUS_TIMEOUT = 10
+    META_READY_WARN_AT = 10
+    META_READY_TIMEOUT = 30
     ALL_FRAMES_TIMEOUT = 120
     ARMING_TIMEOUT = 60
 
@@ -295,7 +297,7 @@ class EigerDetector(Device):
 
         return status
 
-    def _wait_for_odin_status(self) -> Status:
+    def _wait_for_odin_status(self):
         self.forward_bit_depth_to_filewriter()
         await_value(self.odin.meta.active, 1).wait(self.GENERAL_STATUS_TIMEOUT)
 
@@ -303,12 +305,16 @@ class EigerDetector(Device):
             1, timeout=self.GENERAL_STATUS_TIMEOUT
         )
         LOGGER.info("Eiger staging: awaiting odin metadata")
-        status &= await_value(
-            self.odin.meta.ready, 1, timeout=self.GENERAL_STATUS_TIMEOUT
+        status &= await_value_and_warn_if_long(
+            self.odin.meta.ready,
+            1,
+            timeout=self.META_READY_TIMEOUT,
+            warn_at=self.META_READY_WARN_AT,
+            warning_extra_msg="This may be because of filesystem slowdown.",
         )
         return status
 
-    def _wait_fan_ready(self) -> Status:
+    def _wait_fan_ready(self):
         self.filewriters_finished = self.odin.create_finished_status()
         LOGGER.info("Eiger staging: awaiting odin fan ready")
         return await_value(self.odin.fan.ready, 1, self.GENERAL_STATUS_TIMEOUT)
