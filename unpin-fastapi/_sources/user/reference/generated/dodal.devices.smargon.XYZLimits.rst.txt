@@ -1,0 +1,37 @@
+dodal.devices.smargon.XYZLimits
+===============================
+
+.. currentmodule:: dodal.devices.smargon
+
+.. autoclass:: XYZLimits
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~XYZLimits.position_valid
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~XYZLimits.x
+      
+      
+      ~XYZLimits.y
+      
+      
+      ~XYZLimits.z
+      
+   
+   

@@ -1,0 +1,90 @@
+dodal.devices.eiger\_odin.OdinMetaListener
+==========================================
+
+.. currentmodule:: dodal.devices.eiger_odin
+
+.. autoclass:: OdinMetaListener
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~OdinMetaListener.active
+      
+      
+      
+      ~OdinMetaListener.component_names
+      
+      
+      
+      
+      
+      
+      ~OdinMetaListener.file_name
+      
+      
+      
+      ~OdinMetaListener.initialised
+      
+      
+      
+      
+      
+      
+      
+      ~OdinMetaListener.ready
+      
+      
+      
+      
+      
+      ~OdinMetaListener.stop_writing
+      
+      
+      ~OdinMetaListener.subscriptions
+      
+      
+   
+   

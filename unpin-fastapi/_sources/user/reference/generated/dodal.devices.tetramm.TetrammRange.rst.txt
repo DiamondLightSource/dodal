@@ -1,0 +1,78 @@
+dodal.devices.tetramm.TetrammRange
+==================================
+
+.. currentmodule:: dodal.devices.tetramm
+
+.. autoclass:: TetrammRange
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~TetrammRange.uA
+      
+      
+      ~TetrammRange.nA
+      
+   
+   

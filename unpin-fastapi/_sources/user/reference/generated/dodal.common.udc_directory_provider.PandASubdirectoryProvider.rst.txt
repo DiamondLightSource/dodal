@@ -1,0 +1,31 @@
+dodal.common.udc\_directory\_provider.PandASubdirectoryProvider
+===============================================================
+
+.. currentmodule:: dodal.common.udc_directory_provider
+
+.. autoclass:: PandASubdirectoryProvider
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~PandASubdirectoryProvider.update
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~PandASubdirectoryProvider.resource_dir
+      
+   
+   

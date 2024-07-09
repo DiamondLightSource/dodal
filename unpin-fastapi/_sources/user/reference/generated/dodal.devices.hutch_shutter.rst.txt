@@ -1,0 +1,45 @@
+dodal.devices.hutch\_shutter
+============================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~hutch_shutter.HutchInterlock
+   ~hutch_shutter.HutchShutter
+   ~hutch_shutter.ShutterDemand
+   ~hutch_shutter.ShutterState
+
+
+
+
+.. automodule:: dodal.devices.hutch_shutter
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      ShutterNotSafeToOperateError
+   
+   
