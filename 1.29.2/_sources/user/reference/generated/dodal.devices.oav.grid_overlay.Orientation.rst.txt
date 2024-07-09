@@ -1,0 +1,26 @@
+dodal.devices.oav.grid\_overlay.Orientation
+===========================================
+
+.. currentmodule:: dodal.devices.oav.grid_overlay
+
+.. autoclass:: Orientation
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~Orientation.horizontal
+      
+      
+      ~Orientation.vertical
+      
+   
+   

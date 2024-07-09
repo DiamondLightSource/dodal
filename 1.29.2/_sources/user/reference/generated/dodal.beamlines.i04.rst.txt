@@ -1,0 +1,55 @@
+dodal.beamlines.i04
+===================
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.beamlines.i04
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      aperture_scatterguard
+      attenuator
+      backlight
+      beamstop
+      dcm
+      detector_motion
+      eiger
+      flux
+      gonio_positioner
+      ipin
+      oav
+      robot
+      s4_slit_gaps
+      sample_delivery_system
+      sample_shutter
+      smargon
+      synchrotron
+      thawer
+      transfocator
+      undulator
+      xbpm_feedback
+      zebra
+      zebra_fast_grid_scan
+   
+   
+
+   
+   
+   

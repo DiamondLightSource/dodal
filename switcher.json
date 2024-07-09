@@ -4,6 +4,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/main/"
   },
   {
+    "version": "1.29.2",
+    "url": "https://DiamondLightSource.github.io/dodal/1.29.2/"
+  },
+  {
     "version": "1.29.1",
     "url": "https://DiamondLightSource.github.io/dodal/1.29.1/"
   },
@@ -446,9 +450,5 @@
   {
     "version": "tom_testing",
     "url": "https://DiamondLightSource.github.io/dodal/tom_testing/"
-  },
-  {
-    "version": "unpin-fastapi",
-    "url": "https://DiamondLightSource.github.io/dodal/unpin-fastapi/"
   }
 ]

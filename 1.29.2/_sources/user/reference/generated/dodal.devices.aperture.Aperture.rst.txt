@@ -1,0 +1,41 @@
+dodal.devices.aperture.Aperture
+===============================
+
+.. currentmodule:: dodal.devices.aperture
+
+.. autoclass:: Aperture
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   
