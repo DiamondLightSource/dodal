@@ -1,0 +1,59 @@
+dodal.devices.zebra
+===================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~zebra.ArmDemand
+   ~zebra.ArmSource
+   ~zebra.ArmingDevice
+   ~zebra.EncEnum
+   ~zebra.GateControl
+   ~zebra.GateType
+   ~zebra.I03Axes
+   ~zebra.I24Axes
+   ~zebra.LogicGateConfiguration
+   ~zebra.LogicGateConfigurer
+   ~zebra.PositionCompare
+   ~zebra.PulseOutput
+   ~zebra.RotationDirection
+   ~zebra.SoftInState
+   ~zebra.SoftInputs
+   ~zebra.TrigSource
+   ~zebra.Zebra
+   ~zebra.ZebraOutputPanel
+
+
+
+
+.. automodule:: dodal.devices.zebra
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      boolean_array_to_integer
+   
+   
+
+   
+   
+   
