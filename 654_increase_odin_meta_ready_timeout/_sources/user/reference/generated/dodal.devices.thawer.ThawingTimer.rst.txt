@@ -1,0 +1,37 @@
+dodal.devices.thawer.ThawingTimer
+=================================
+
+.. currentmodule:: dodal.devices.thawer
+
+.. autoclass:: ThawingTimer
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      ~ThawingTimer.set
+      
+      
+      
+      ~ThawingTimer.stop
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   

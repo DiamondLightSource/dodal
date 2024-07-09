@@ -1,0 +1,40 @@
+dodal.common.visit
+==================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.common
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~visit.DataCollectionIdentifier
+   ~visit.DirectoryServiceClient
+   ~visit.DirectoryServiceClientBase
+   ~visit.LocalDirectoryServiceClient
+   ~visit.StaticVisitDirectoryProvider
+
+
+
+
+.. automodule:: dodal.common.visit
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

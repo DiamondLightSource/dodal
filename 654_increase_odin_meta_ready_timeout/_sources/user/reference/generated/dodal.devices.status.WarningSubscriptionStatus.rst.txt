@@ -1,0 +1,40 @@
+dodal.devices.status.WarningSubscriptionStatus
+==============================================
+
+.. currentmodule:: dodal.devices.status
+
+.. autoclass:: WarningSubscriptionStatus
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~WarningSubscriptionStatus.set_finished
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+   
+   

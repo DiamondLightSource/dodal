@@ -1,0 +1,42 @@
+dodal.beamlines.i24
+===================
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.beamlines.i24
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      aperture
+      backlight
+      beamstop
+      detector_motion
+      eiger
+      oav
+      pmac
+      shutter
+      vgonio
+      zebra
+   
+   
+
+   
+   
+   

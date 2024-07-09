@@ -1,0 +1,44 @@
+dodal.devices.i24.dual\_backlight.DualBacklight
+===============================================
+
+.. currentmodule:: dodal.devices.i24.dual_backlight
+
+.. autoclass:: DualBacklight
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~DualBacklight.set
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

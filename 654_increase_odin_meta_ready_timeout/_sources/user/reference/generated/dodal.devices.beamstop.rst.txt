@@ -1,0 +1,36 @@
+dodal.devices.beamstop
+======================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~beamstop.BeamStop
+
+
+
+
+.. automodule:: dodal.devices.beamstop
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
