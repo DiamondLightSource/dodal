@@ -260,10 +260,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/564_organise_testing_utils/"
   },
   {
-    "version": "601_convert_smargon_to_ophyd_async",
-    "url": "https://DiamondLightSource.github.io/dodal/601_convert_smargon_to_ophyd_async/"
-  },
-  {
     "version": "604_ophyd_async_device_for_mirror_voltages",
     "url": "https://DiamondLightSource.github.io/dodal/604_ophyd_async_device_for_mirror_voltages/"
   },
@@ -450,5 +446,9 @@
   {
     "version": "tom_testing",
     "url": "https://DiamondLightSource.github.io/dodal/tom_testing/"
+  },
+  {
+    "version": "unpin-fastapi",
+    "url": "https://DiamondLightSource.github.io/dodal/unpin-fastapi/"
   }
 ]
