@@ -71,3 +71,6 @@ lockfiles/
 
 # ruff cache
 .ruff_cache/
+
+# pycharm project files
+.idea/
