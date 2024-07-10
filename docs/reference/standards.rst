@@ -18,7 +18,10 @@ The code in this repository conforms to standards set by the following tools:
 
     How-to guides `../how-to/lint` and `../how-to/static-analysis`
 
-.. _documentation_standards:
+.. _ruff: https://docs.astral.sh/ruff/
+.. _flake8: https://flake8.pycqa.org/en/latest/
+.. _isort: https://pycqa.github.io/isort/
+.. _pyright: https://github.com/microsoft/pyright
 
 Supported Python Versions
 -------------------------
@@ -27,6 +30,8 @@ As a standard for the python versions to support, we should be matching the depr
 https://numpy.org/neps/nep-0029-deprecation_policy.html.
 
 Currently supported versions are: 3.10, 3.11.
+
+.. _documentation_standards:
 
 Documentation Standards
 -----------------------

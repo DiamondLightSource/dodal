@@ -1,6 +1,15 @@
 # API
 
 ```{eval-rst}
+.. autosummary::
+    :recursive:
+    :toctree: generated
+
+    dodal.beamlines
+    dodal.common
+    dodal.devices
+    dodal.plans
+
 .. automodule:: dodal
 
     ``dodal``

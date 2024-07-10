@@ -1,7 +1,7 @@
 Zocalo Interaction
 ==================
 
-.. image:: ../../assets/zocalo.png
+.. image:: ../assets/zocalo.png
   :alt: Diagram of zocalo
 
 Zocalo jobs are triggered based on their ISPyB DCID using the ``ZocaloTrigger`` class in a callback subscribed to the 
