@@ -1,5 +1,6 @@
 import logging
 from pathlib import Path, PosixPath
+from typing import cast
 from unittest.mock import MagicMock, call, patch
 
 import pytest
@@ -13,6 +14,7 @@ from dodal.log import (
     LOGGER,
     BeamlineFilter,
     CircularMemoryHandler,
+    DodalLogHandlers,
     clear_all_loggers_and_handlers,
     do_default_logging_setup,
     get_logging_file_path,
@@ -74,8 +76,7 @@ def test_dev_mode_sets_correct_graypy_handler(
         mock_logger, Path("tmp/dev"), "dodal.log", True, 10000
     )
     mock_GELFTCPHandler.assert_called_once_with("localhost", 5555)
-    for handler in handler_config.values():
-        handler.close()
+    _close_all_handlers(handler_config)
 
 
 @patch("dodal.log.GELFTCPHandler", autospec=True)
@@ -90,8 +91,7 @@ def test_prod_mode_sets_correct_graypy_handler(
     mock_GELFTCPHandler.assert_called_once_with(
         "graylog-log-target.diamond.ac.uk", 12231
     )
-    for handler in handler_config.values():
-        handler.close()
+    _close_all_handlers(handler_config)
 
 
 @patch("dodal.log.GELFTCPHandler", autospec=True)
@@ -118,8 +118,7 @@ def test_no_env_variable_sets_correct_file_handler(
     ]
 
     mock_file_handler.assert_has_calls(expected_calls, any_order=True)
-    for handler in handler_config.values():
-        handler.close()
+    _close_all_handlers(handler_config)
 
 
 def test_beamline_filter_adds_dev_if_no_beamline():
@@ -261,3 +260,8 @@ async def test_ophyd_async_logger_configured(dodal_logger_for_tests):
     assert f"[{test_signal_name}]" in stream_handler.stream.write.call_args.args[0]
     device.log.debug("test message")
     assert f"[{test_device_name}]" in stream_handler.stream.write.call_args.args[0]
+
+
+def _close_all_handlers(handler_config: DodalLogHandlers):
+    for handler in handler_config.values():
+        cast(logging.Handler, handler).close()

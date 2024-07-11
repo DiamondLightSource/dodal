@@ -56,17 +56,15 @@ class EigerDetector(Device):
         cls,
         params: DetectorParams,
         name: str = "EigerDetector",
-        *args,
-        **kwargs,
     ):
-        det = cls(name=name, *args, **kwargs)
+        det = cls(name=name)
         det.set_detector_parameters(params)
         return det
 
     def set_detector_parameters(self, detector_params: DetectorParams):
         self.detector_params = detector_params
         if self.detector_params is None:
-            raise Exception("Parameters for scan must be specified")
+            raise ValueError("Parameters for scan must be specified")
 
         to_check = [
             (

@@ -163,7 +163,7 @@ def test_check_detector_variables(
         try:
             fake_eiger.set_detector_parameters(detector_params)
         except Exception as e:
-            assert False, f"exception was raised {e}"
+            raise AssertionError(f"exception was raised {e}") from e
 
 
 # Tests transition from set_odin_pvs_after_file_writer_set to set_mx_settings_pvs
@@ -218,11 +218,12 @@ def test_stage_raises_exception_if_odin_initialisation_status_not_ok(fake_eiger)
 
 
 @pytest.mark.parametrize(
-    "roi_mode, expected_num_change_roi_calls", [(True, 1), (False, 0)]
+    "roi_mode, expected_num_change_roi_calls, expected_exception",
+    [(True, 1, "Test Exception 2"), (False, 0, "Test Exception 1")],
 )
 @patch("dodal.devices.eiger.await_value")
 def test_stage_enables_roi_mode_correctly(
-    mock_await, fake_eiger, roi_mode, expected_num_change_roi_calls
+    mock_await, fake_eiger, roi_mode, expected_num_change_roi_calls, expected_exception
 ):
     when(fake_eiger.odin.nodes).clear_odin_errors().thenReturn(None)
     when(fake_eiger.odin).check_odin_initialised().thenReturn((True, ""))
@@ -237,9 +238,10 @@ def test_stage_enables_roi_mode_correctly(
     assert fake_eiger.change_roi_mode.call_count == expected_num_change_roi_calls
 
     # Tidy up async staging
-    change_roi_mode_status.set_exception(Exception)
-    with pytest.raises(Exception):
+    change_roi_mode_status.set_exception(UnknownStatusFailure("Test Exception 2"))
+    with pytest.raises(UnknownStatusFailure) as e:
         returned_status.wait(0.1)
+        assert e.args[0] == expected_exception
 
 
 def test_disable_roi_mode_sets_correct_roi_mode(fake_eiger):
@@ -544,7 +546,7 @@ def test_given_in_free_run_mode_and_not_all_frames_collected_in_time_when_unstag
 
     fake_eiger.detector_params.trigger_mode = TriggerMode.FREE_RUN
     fake_eiger.ALL_FRAMES_TIMEOUT = 0.1
-    with pytest.raises(Exception):
+    with pytest.raises(TimeoutError):
         fake_eiger.unstage()
 
     assert fake_eiger.odin.meta.stop_writing.get() == 1
@@ -605,7 +607,7 @@ def test_given_detector_arming_status_failed_when_unstage_then_detector_still_di
     fake_eiger.cam.acquire.sim_put(1)  # type: ignore
 
     fake_eiger.arming_status = get_bad_status()
-    with pytest.raises(Exception):
+    with pytest.raises(RuntimeError):
         fake_eiger.unstage()
 
     assert fake_eiger.cam.acquire.get() == 0
@@ -639,7 +641,7 @@ def test_unwrapped_arm_chain_functions_are_not_called_outside_util(
     fake_eiger: EigerDetector,
 ):
     fake_eiger.odin.stop = MagicMock(return_value=NullStatus())
-    fake_eiger.detector_params.use_roi_mode = True
+    fake_eiger.detector_params.use_roi_mode = True  # type: ignore
     done_status = NullStatus()
 
     call_func.return_value = done_status
