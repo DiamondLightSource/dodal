@@ -1,0 +1,956 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>dodal.devices.flux.Flux &#8212; dodal 1.29.3 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=87e54e7c" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../../_static/documentation_options.js?v=540b6b8e"></script>
+    <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=30646c52"></script>
+    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'user/reference/generated/dodal.devices.flux.Flux';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://DiamondLightSource.github.io/dodal/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '1.29.3';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
+    <link rel="icon" href="../../../_static/dls-favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="dodal.devices.focusing_mirror" href="dodal.devices.focusing_mirror.html" />
+    <link rel="prev" title="dodal.devices.flux" href="dodal.devices.flux.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/dls-logo.svg" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../../../_static/dls-logo.svg" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">dodal</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../developer/index.html">
+    Developer Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/DiamondLightSource/dodal/releases">
+    Release Notes
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/DiamondLightSource/dodal" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/dodal" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../index.html">
+    User Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../developer/index.html">
+    Developer Guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/DiamondLightSource/dodal/releases">
+    Release Notes
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/DiamondLightSource/dodal" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/dodal" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-3"
+      type="button"
+      class="version-switcher__button btn btn-sm dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-3"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-3"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-3">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/get_started.html">Getting Started</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Explanations</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../explanations/docs-structure.html">About the documentation</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../api.html">API</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="dodal.beamlines.html">dodal.beamlines</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i03.html">dodal.beamlines.i03</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i04.html">dodal.beamlines.i04</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i04_1.html">dodal.beamlines.i04_1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i20_1.html">dodal.beamlines.i20_1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i22.html">dodal.beamlines.i22</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i23.html">dodal.beamlines.i23</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i24.html">dodal.beamlines.i24</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.p38.html">dodal.beamlines.p38</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.p45.html">dodal.beamlines.p45</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="dodal.common.html">dodal.common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.common.beamlines.html">dodal.common.beamlines</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.common.beamlines.beamline_parameters.html">dodal.common.beamlines.beamline_parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.common.beamlines.beamline_utils.html">dodal.common.beamlines.beamline_utils</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.common.beamlines.device_helpers.html">dodal.common.beamlines.device_helpers</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="dodal.common.coordination.html">dodal.common.coordination</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dodal.common.maths.html">dodal.common.maths</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.common.types.html">dodal.common.types</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.common.types.UpdatingDirectoryProvider.html">dodal.common.types.UpdatingDirectoryProvider</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.common.udc_directory_provider.html">dodal.common.udc_directory_provider</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.common.udc_directory_provider.PandASubdirectoryProvider.html">dodal.common.udc_directory_provider.PandASubdirectoryProvider</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.common.visit.html">dodal.common.visit</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.common.visit.DataCollectionIdentifier.html">dodal.common.visit.DataCollectionIdentifier</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.common.visit.DirectoryServiceClient.html">dodal.common.visit.DirectoryServiceClient</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.common.visit.DirectoryServiceClientBase.html">dodal.common.visit.DirectoryServiceClientBase</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.common.visit.LocalDirectoryServiceClient.html">dodal.common.visit.LocalDirectoryServiceClient</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.common.visit.StaticVisitDirectoryProvider.html">dodal.common.visit.StaticVisitDirectoryProvider</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="dodal.devices.html">dodal.devices</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.CTAB.html">dodal.devices.CTAB</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.CTAB.CTAB.html">dodal.devices.CTAB.CTAB</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.adsim.html">dodal.devices.adsim</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.adsim.SimStage.html">dodal.devices.adsim.SimStage</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.aperture.html">dodal.devices.aperture</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.aperture.Aperture.html">dodal.devices.aperture.Aperture</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.aperturescatterguard.html">dodal.devices.aperturescatterguard</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.aperturescatterguard.ApertureFiveDimensionalLocation.html">dodal.devices.aperturescatterguard.ApertureFiveDimensionalLocation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.aperturescatterguard.AperturePositionGDANames.html">dodal.devices.aperturescatterguard.AperturePositionGDANames</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.aperturescatterguard.AperturePositions.html">dodal.devices.aperturescatterguard.AperturePositions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.aperturescatterguard.ApertureScatterguard.html">dodal.devices.aperturescatterguard.ApertureScatterguard</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.aperturescatterguard.ApertureScatterguardTolerances.html">dodal.devices.aperturescatterguard.ApertureScatterguardTolerances</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.aperturescatterguard.SingleAperturePosition.html">dodal.devices.aperturescatterguard.SingleAperturePosition</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.areadetector.html">dodal.devices.areadetector</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.areadetector.adaravis.html">dodal.devices.areadetector.adaravis</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.areadetector.adsim.html">dodal.devices.areadetector.adsim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.areadetector.adutils.html">dodal.devices.areadetector.adutils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.attenuator.html">dodal.devices.attenuator</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.attenuator.Attenuator.html">dodal.devices.attenuator.Attenuator</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.backlight.html">dodal.devices.backlight</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.backlight.Backlight.html">dodal.devices.backlight.Backlight</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.backlight.BacklightPosition.html">dodal.devices.backlight.BacklightPosition</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.backlight.BacklightPower.html">dodal.devices.backlight.BacklightPower</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.beamstop.html">dodal.devices.beamstop</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.beamstop.BeamStop.html">dodal.devices.beamstop.BeamStop</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.cryostream.html">dodal.devices.cryostream</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.cryostream.Cryo.html">dodal.devices.cryostream.Cryo</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.dcm.html">dodal.devices.dcm</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.dcm.DCM.html">dodal.devices.dcm.DCM</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.detector.html">dodal.devices.detector</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.detector.det_dim_constants.html">dodal.devices.detector.det_dim_constants</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.detector.det_dist_to_beam_converter.html">dodal.devices.detector.det_dist_to_beam_converter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.detector.det_resolution.html">dodal.devices.detector.det_resolution</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.detector.detector.html">dodal.devices.detector.detector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.detector.detector_motion.html">dodal.devices.detector.detector_motion</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.eiger.html">dodal.devices.eiger</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.eiger.EigerDetector.html">dodal.devices.eiger.EigerDetector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.eiger.InternalEigerTriggerMode.html">dodal.devices.eiger.InternalEigerTriggerMode</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.eiger_odin.html">dodal.devices.eiger_odin</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.eiger_odin.EigerFan.html">dodal.devices.eiger_odin.EigerFan</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.eiger_odin.EigerOdin.html">dodal.devices.eiger_odin.EigerOdin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.eiger_odin.OdinFileWriter.html">dodal.devices.eiger_odin.OdinFileWriter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.eiger_odin.OdinMetaListener.html">dodal.devices.eiger_odin.OdinMetaListener</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.eiger_odin.OdinNode.html">dodal.devices.eiger_odin.OdinNode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.eiger_odin.OdinNodesStatus.html">dodal.devices.eiger_odin.OdinNodesStatus</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.fast_grid_scan.html">dodal.devices.fast_grid_scan</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_grid_scan.ExpectedImages.html">dodal.devices.fast_grid_scan.ExpectedImages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_grid_scan.FastGridScanCommon.html">dodal.devices.fast_grid_scan.FastGridScanCommon</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_grid_scan.GridAxis.html">dodal.devices.fast_grid_scan.GridAxis</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_grid_scan.GridScanParamsCommon.html">dodal.devices.fast_grid_scan.GridScanParamsCommon</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_grid_scan.MotionProgram.html">dodal.devices.fast_grid_scan.MotionProgram</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_grid_scan.PandAFastGridScan.html">dodal.devices.fast_grid_scan.PandAFastGridScan</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_grid_scan.PandAGridScanParams.html">dodal.devices.fast_grid_scan.PandAGridScanParams</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_grid_scan.ZebraFastGridScan.html">dodal.devices.fast_grid_scan.ZebraFastGridScan</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fast_grid_scan.ZebraGridScanParams.html">dodal.devices.fast_grid_scan.ZebraGridScanParams</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.fluorescence_detector_motion.html">dodal.devices.fluorescence_detector_motion</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fluorescence_detector_motion.FluorescenceDetector.html">dodal.devices.fluorescence_detector_motion.FluorescenceDetector</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 current active has-children"><a class="reference internal" href="dodal.devices.flux.html">dodal.devices.flux</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l4 current active"><a class="current reference internal" href="#">dodal.devices.flux.Flux</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.focusing_mirror.html">dodal.devices.focusing_mirror</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.focusing_mirror.FocusingMirror.html">dodal.devices.focusing_mirror.FocusingMirror</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.focusing_mirror.FocusingMirrorWithStripes.html">dodal.devices.focusing_mirror.FocusingMirrorWithStripes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.focusing_mirror.MirrorStripe.html">dodal.devices.focusing_mirror.MirrorStripe</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.focusing_mirror.MirrorType.html">dodal.devices.focusing_mirror.MirrorType</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.focusing_mirror.MirrorVoltageDemand.html">dodal.devices.focusing_mirror.MirrorVoltageDemand</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.focusing_mirror.MirrorVoltageDevice.html">dodal.devices.focusing_mirror.MirrorVoltageDevice</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.focusing_mirror.VFMMirrorVoltages.html">dodal.devices.focusing_mirror.VFMMirrorVoltages</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.hutch_shutter.html">dodal.devices.hutch_shutter</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.hutch_shutter.HutchInterlock.html">dodal.devices.hutch_shutter.HutchInterlock</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.hutch_shutter.HutchShutter.html">dodal.devices.hutch_shutter.HutchShutter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.hutch_shutter.ShutterDemand.html">dodal.devices.hutch_shutter.ShutterDemand</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.hutch_shutter.ShutterState.html">dodal.devices.hutch_shutter.ShutterState</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="dodal.devices.i03.html">dodal.devices.i03</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dodal.devices.i20_1.html">dodal.devices.i20_1</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.i24.html">dodal.devices.i24</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i24.I24_detector_motion.html">dodal.devices.i24.I24_detector_motion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i24.aperture.html">dodal.devices.i24.aperture</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i24.beamstop.html">dodal.devices.i24.beamstop</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i24.dual_backlight.html">dodal.devices.i24.dual_backlight</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i24.i24_vgonio.html">dodal.devices.i24.i24_vgonio</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i24.pmac.html">dodal.devices.i24.pmac</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.ipin.html">dodal.devices.ipin</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.ipin.IPin.html">dodal.devices.ipin.IPin</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.linkam3.html">dodal.devices.linkam3</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.linkam3.Linkam3.html">dodal.devices.linkam3.Linkam3</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.linkam3.PumpControl.html">dodal.devices.linkam3.PumpControl</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.logging_ophyd_device.html">dodal.devices.logging_ophyd_device</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.logging_ophyd_device.InfoLoggingDevice.html">dodal.devices.logging_ophyd_device.InfoLoggingDevice</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.motors.html">dodal.devices.motors</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZPositioner.html">dodal.devices.motors.XYZPositioner</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.oav.html">dodal.devices.oav</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.oav.grid_overlay.html">dodal.devices.oav.grid_overlay</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.oav.oav_calculations.html">dodal.devices.oav.oav_calculations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.oav.oav_detector.html">dodal.devices.oav.oav_detector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.oav.oav_errors.html">dodal.devices.oav.oav_errors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.oav.oav_parameters.html">dodal.devices.oav.oav_parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.oav.pin_image_recognition.html">dodal.devices.oav.pin_image_recognition</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.oav.utils.html">dodal.devices.oav.utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.p45.html">dodal.devices.p45</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.p45.Choppers.html">dodal.devices.p45.Choppers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.p45.SampleTheta.html">dodal.devices.p45.SampleTheta</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.p45.SampleY.html">dodal.devices.p45.SampleY</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.p45.TomoStageWithStretchAndSkew.html">dodal.devices.p45.TomoStageWithStretchAndSkew</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.qbpm1.html">dodal.devices.qbpm1</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.qbpm1.QBPM1.html">dodal.devices.qbpm1.QBPM1</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.robot.html">dodal.devices.robot</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.robot.BartRobot.html">dodal.devices.robot.BartRobot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.robot.PinMounted.html">dodal.devices.robot.PinMounted</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.robot.SampleLocation.html">dodal.devices.robot.SampleLocation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.s4_slit_gaps.html">dodal.devices.s4_slit_gaps</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.s4_slit_gaps.S4SlitGaps.html">dodal.devices.s4_slit_gaps.S4SlitGaps</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.scatterguard.html">dodal.devices.scatterguard</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.scatterguard.Scatterguard.html">dodal.devices.scatterguard.Scatterguard</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.scintillator.html">dodal.devices.scintillator</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.scintillator.Scintillator.html">dodal.devices.scintillator.Scintillator</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.slits.html">dodal.devices.slits</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.slits.Slits.html">dodal.devices.slits.Slits</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.smargon.html">dodal.devices.smargon</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.smargon.AxisLimit.html">dodal.devices.smargon.AxisLimit</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.smargon.Smargon.html">dodal.devices.smargon.Smargon</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.smargon.StubOffsets.html">dodal.devices.smargon.StubOffsets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.smargon.StubPosition.html">dodal.devices.smargon.StubPosition</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.smargon.XYZLimits.html">dodal.devices.smargon.XYZLimits</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="dodal.devices.status.html">dodal.devices.status</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.synchrotron.html">dodal.devices.synchrotron</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.synchrotron.Prefix.html">dodal.devices.synchrotron.Prefix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.synchrotron.Suffix.html">dodal.devices.synchrotron.Suffix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.synchrotron.Synchrotron.html">dodal.devices.synchrotron.Synchrotron</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.synchrotron.SynchrotronMode.html">dodal.devices.synchrotron.SynchrotronMode</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.tetramm.html">dodal.devices.tetramm</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammChannels.html">dodal.devices.tetramm.TetrammChannels</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammController.html">dodal.devices.tetramm.TetrammController</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammDetector.html">dodal.devices.tetramm.TetrammDetector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammDriver.html">dodal.devices.tetramm.TetrammDriver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammGeometry.html">dodal.devices.tetramm.TetrammGeometry</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammRange.html">dodal.devices.tetramm.TetrammRange</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammResolution.html">dodal.devices.tetramm.TetrammResolution</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammShapeProvider.html">dodal.devices.tetramm.TetrammShapeProvider</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammTrigger.html">dodal.devices.tetramm.TetrammTrigger</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.thawer.html">dodal.devices.thawer</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.thawer.Thawer.html">dodal.devices.thawer.Thawer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.thawer.ThawerStates.html">dodal.devices.thawer.ThawerStates</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.thawer.ThawingTimer.html">dodal.devices.thawer.ThawingTimer</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.turbo_slit.html">dodal.devices.turbo_slit</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.turbo_slit.TurboSlit.html">dodal.devices.turbo_slit.TurboSlit</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.undulator.html">dodal.devices.undulator</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.undulator.Undulator.html">dodal.devices.undulator.Undulator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.undulator.UndulatorGapAccess.html">dodal.devices.undulator.UndulatorGapAccess</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.undulator_dcm.html">dodal.devices.undulator_dcm</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.undulator_dcm.UndulatorDCM.html">dodal.devices.undulator_dcm.UndulatorDCM</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.util.html">dodal.devices.util</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.util.adjuster_plans.html">dodal.devices.util.adjuster_plans</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.util.epics_util.html">dodal.devices.util.epics_util</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.util.lookup_tables.html">dodal.devices.util.lookup_tables</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.util.motor_utils.html">dodal.devices.util.motor_utils</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.webcam.html">dodal.devices.webcam</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.webcam.Webcam.html">dodal.devices.webcam.Webcam</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.xbpm_feedback.html">dodal.devices.xbpm_feedback</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.xbpm_feedback.Pause.html">dodal.devices.xbpm_feedback.Pause</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.xbpm_feedback.XBPMFeedback.html">dodal.devices.xbpm_feedback.XBPMFeedback</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.xbpm_feedback.XBPMFeedbackI04.html">dodal.devices.xbpm_feedback.XBPMFeedbackI04</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.zebra.html">dodal.devices.zebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.zebra.ArmDemand.html">dodal.devices.zebra.ArmDemand</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.zebra.ArmSource.html">dodal.devices.zebra.ArmSource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.zebra.ArmingDevice.html">dodal.devices.zebra.ArmingDevice</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.zebra.EncEnum.html">dodal.devices.zebra.EncEnum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.zebra.GateControl.html">dodal.devices.zebra.GateControl</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.zebra.GateType.html">dodal.devices.zebra.GateType</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.zebra.I03Axes.html">dodal.devices.zebra.I03Axes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.zebra.I24Axes.html">dodal.devices.zebra.I24Axes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.zebra.LogicGateConfiguration.html">dodal.devices.zebra.LogicGateConfiguration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.zebra.LogicGateConfigurer.html">dodal.devices.zebra.LogicGateConfigurer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.zebra.PositionCompare.html">dodal.devices.zebra.PositionCompare</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.zebra.PulseOutput.html">dodal.devices.zebra.PulseOutput</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.zebra.RotationDirection.html">dodal.devices.zebra.RotationDirection</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.zebra.SoftInState.html">dodal.devices.zebra.SoftInState</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.zebra.SoftInputs.html">dodal.devices.zebra.SoftInputs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.zebra.TrigSource.html">dodal.devices.zebra.TrigSource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.zebra.Zebra.html">dodal.devices.zebra.Zebra</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.zebra.ZebraOutputPanel.html">dodal.devices.zebra.ZebraOutputPanel</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.zebra_controlled_shutter.html">dodal.devices.zebra_controlled_shutter</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.zebra_controlled_shutter.ZebraShutter.html">dodal.devices.zebra_controlled_shutter.ZebraShutter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.zebra_controlled_shutter.ZebraShutterState.html">dodal.devices.zebra_controlled_shutter.ZebraShutterState</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.zocalo.html">dodal.devices.zocalo</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.zocalo.zocalo_interaction.html">dodal.devices.zocalo.zocalo_interaction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.zocalo.zocalo_results.html">dodal.devices.zocalo.zocalo_results</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="dodal.plans.html">dodal.plans</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="dodal.plans.check_topup.html">dodal.plans.check_topup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dodal.plans.data_session_metadata.html">dodal.plans.data_session_metadata</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../genindex.html">Index</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">User Guide</a></li>
+    
+    
+    <li class="breadcrumb-item"><i class="fa-solid fa-ellipsis"></i></li>
+    
+    
+    <li class="breadcrumb-item"><a href="dodal.devices.flux.html" class="nav-link">dodal.devices.flux</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">dodal.device...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="dodal-devices-flux-flux">
+<h1>dodal.devices.flux.Flux<a class="headerlink" href="#dodal-devices-flux-flux" title="Link to this heading">#</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="dodal.devices.flux.Flux">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.flux.</span></span><span class="sig-name descname"><span class="pre">Flux</span></span><a class="reference internal" href="../../../_modules/dodal/devices/flux.html#Flux"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.flux.Flux" title="Link to this definition">#</a></dt>
+<dd><p>Simple device to get the flux reading</p>
+<p class="rubric">Methods</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<tbody>
+</tbody>
+</table>
+</div>
+<p class="rubric">Attributes</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">component_names</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">flux_reading</span></code></p></td>
+<td><p>A descriptor representing a device component (or signal)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">subscriptions</span></code></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="dodal.devices.flux.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">dodal.devices.flux</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="dodal.devices.focusing_mirror.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">dodal.devices.focusing_mirror</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.flux.Flux"><code class="docutils literal notranslate"><span class="pre">Flux</span></code></a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/DiamondLightSource/dodal/edit/1.29.3/docs/user/reference/generated/dodal.devices.flux.Flux.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../../_sources/user/reference/generated/dodal.devices.flux.Flux.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

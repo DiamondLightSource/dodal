@@ -1,0 +1,41 @@
+dodal.devices.synchrotron.Synchrotron
+=====================================
+
+.. currentmodule:: dodal.devices.synchrotron
+
+.. autoclass:: Synchrotron
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

@@ -1,0 +1,42 @@
+dodal.devices.aperturescatterguard.ApertureFiveDimensionalLocation
+==================================================================
+
+.. currentmodule:: dodal.devices.aperturescatterguard
+
+.. autoclass:: ApertureFiveDimensionalLocation
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~ApertureFiveDimensionalLocation.aperture_x
+      
+      
+      ~ApertureFiveDimensionalLocation.aperture_y
+      
+      
+      ~ApertureFiveDimensionalLocation.aperture_z
+      
+      
+      ~ApertureFiveDimensionalLocation.scatterguard_x
+      
+      
+      ~ApertureFiveDimensionalLocation.scatterguard_y
+      
+   
+   
