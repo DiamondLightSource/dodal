@@ -60,7 +60,7 @@ class DetectorParams(BaseModel):
             values["det_dist_to_beam_converter_path"]
         )
         if values.get("run_number") is None:
-            values["run_number"] = get_run_number(values["directory"])
+            values["run_number"] = get_run_number(values["directory"], values["prefix"])
         return values
 
     @validator("detector_size_constants", pre=True)
