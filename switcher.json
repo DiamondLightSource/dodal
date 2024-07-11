@@ -268,10 +268,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/564_organise_testing_utils/"
   },
   {
-    "version": "643_improve_default_run_number",
-    "url": "https://DiamondLightSource.github.io/dodal/643_improve_default_run_number/"
-  },
-  {
     "version": "650_PMAC-run-program",
     "url": "https://DiamondLightSource.github.io/dodal/650_PMAC-run-program/"
   },
@@ -354,6 +350,10 @@
   {
     "version": "fix_missing_oav_snapshot_microns_per_pixel_hook",
     "url": "https://DiamondLightSource.github.io/dodal/fix_missing_oav_snapshot_microns_per_pixel_hook/"
+  },
+  {
+    "version": "fix_pyright_errors",
+    "url": "https://DiamondLightSource.github.io/dodal/fix_pyright_errors/"
   },
   {
     "version": "fix_wrong_return_type",

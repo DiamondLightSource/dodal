@@ -1,0 +1,41 @@
+dodal.devices.scatterguard.Scatterguard
+=======================================
+
+.. currentmodule:: dodal.devices.scatterguard
+
+.. autoclass:: Scatterguard
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   
