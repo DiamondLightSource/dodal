@@ -122,7 +122,7 @@ class BartRobot(StandardReadable, Movable):
             await asyncio.wait_for(
                 self._load_pin_and_puck(sample_location), timeout=self.LOAD_TIMEOUT
             )
-        except asyncio.TimeoutError:
+        except asyncio.TimeoutError as e:
             error_code = await self.error_code.get_value()
             error_string = await self.error_str.get_value()
-            raise RobotLoadFailed(error_code, error_string)
+            raise RobotLoadFailed(error_code, error_string) from e

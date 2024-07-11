@@ -8,7 +8,7 @@ from dodal.utils import BLUESKY_PROTOCOLS, make_all_devices
 
 
 def follows_bluesky_protocols(obj: Any) -> bool:
-    return any((isinstance(obj, protocol) for protocol in BLUESKY_PROTOCOLS))
+    return any(isinstance(obj, protocol) for protocol in BLUESKY_PROTOCOLS)
 
 
 @pytest.mark.parametrize(

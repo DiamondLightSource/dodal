@@ -1,7 +1,6 @@
 import asyncio
 import time
 from enum import Enum
-from typing import Optional
 
 from bluesky.protocols import Location
 from ophyd_async.core import (
@@ -71,7 +70,7 @@ class Linkam3(StandardReadable):
         super().__init__(name=name)
 
     @WatchableAsyncStatus.wrap
-    async def set(self, new_position: float, timeout: Optional[float] = None):
+    async def set(self, new_position: float, timeout: float | None = None):
         # time.monotonic won't go backwards in case of NTP corrections
         start = time.monotonic()
         old_position = await self.set_point.get_value()

@@ -1,8 +1,9 @@
 import asyncio
 from collections import OrderedDict
+from collections.abc import Generator, Sequence
 from enum import Enum
 from queue import Empty, Queue
-from typing import Any, Generator, Sequence, Tuple, TypedDict
+from typing import Any, TypedDict
 
 import bluesky.plan_stubs as bps
 import numpy as np
@@ -243,7 +244,7 @@ class ZocaloResults(StandardReadable, Triggerable):
 
 def get_processing_result(
     zocalo: ZocaloResults,
-) -> Generator[Any, Any, Tuple[np.ndarray, np.ndarray] | Tuple[None, None]]:
+) -> Generator[Any, Any, tuple[np.ndarray, np.ndarray] | tuple[None, None]]:
     """A minimal plan which will extract the top ranked xray centre and crystal bounding
     box size from the zocalo results. Returns (None, None) if no crystals were found."""
 

@@ -6,7 +6,7 @@ from logging import Logger, StreamHandler
 from logging.handlers import TimedRotatingFileHandler
 from os import environ
 from pathlib import Path
-from typing import Deque, Tuple, TypedDict
+from typing import TypedDict
 
 from bluesky.log import logger as bluesky_logger
 from graypy import GELFTCPHandler
@@ -44,7 +44,7 @@ class CircularMemoryHandler(logging.Handler):
 
     def __init__(self, capacity, flushLevel=logging.ERROR, target=None):
         logging.Handler.__init__(self)
-        self.buffer: Deque[logging.LogRecord] = deque(maxlen=capacity)
+        self.buffer: deque[logging.LogRecord] = deque(maxlen=capacity)
         self.flushLevel = flushLevel
         self.target = target
 
@@ -249,7 +249,7 @@ def get_logging_file_path() -> Path:
 
 def get_graylog_configuration(
     dev_mode: bool, graylog_port: int | None = None
-) -> Tuple[str, int]:
+) -> tuple[str, int]:
     """Get the host and port for the graylog handler.
 
     If running in dev mode, this switches to localhost. Otherwise it publishes to the

@@ -1,5 +1,6 @@
+from collections.abc import Callable
 from functools import partial
-from typing import Callable, Sequence
+from typing import Sequence
 
 from bluesky.protocols import Movable
 from ophyd import Component, EpicsSignal
@@ -96,7 +97,7 @@ def run_functions_without_blocking(
     )
 
     # Wrap each function in reverse
-    for num, func in enumerate(list(reversed(functions_to_chain))[1:-1]):
+    for func in list(reversed(functions_to_chain))[1:-1]:
         wrapped_funcs.append(
             partial(
                 wrap_func,

@@ -1,6 +1,6 @@
 import asyncio
+from collections.abc import Sequence
 from enum import Enum
-from typing import Sequence
 
 from bluesky.protocols import Hints
 from ophyd_async.core import (

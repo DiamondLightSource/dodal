@@ -39,6 +39,7 @@ requires-python = ">=3.10"
 [project.optional-dependencies]
 dev = [
     "black",
+    "diff-cover",
     "mypy",
     "mockito",
     # Commented out due to dependency version conflict with pydantic 1.x
@@ -165,3 +166,6 @@ lint.select = [
     "UP", # pyupgrade - https://docs.astral.sh/ruff/rules/#pyupgrade-up
     "I001", # isort
 ]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["dodal.common.coordination.inject"]

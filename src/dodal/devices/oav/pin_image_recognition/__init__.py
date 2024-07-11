@@ -136,9 +136,7 @@ class PinTipDetection(StandardReadable):
         location = sample_detection.processArray(array_data)
         end_time = time.time()
         LOGGER.debug(
-            "Sample location detection took {}ms".format(
-                (end_time - start_time) * 1000.0
-            )
+            f"Sample location detection took {(end_time - start_time) * 1000.0}ms"
         )
         return location
 
