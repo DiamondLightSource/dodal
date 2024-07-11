@@ -30,7 +30,10 @@ def mock_logger():
 @pytest.fixture()
 def dodal_logger_for_tests():
     logger = logging.getLogger("Dodal")
-    logger.handlers.clear()
+    for handler in list(logger.handlers):
+        logger.removeHandler(handler)
+        handler.close()
+
     return logger
 
 
