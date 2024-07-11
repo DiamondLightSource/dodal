@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.common.beamlines.beamline_utils &#8212; dodal 1.29.3.dev14+g824608243 documentation</title>
+    <title>dodal.common.beamlines.beamline_utils &#8212; dodal 1.29.4.dev14+g275b091f6 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=a2515664"></script>
+    <script src="../../../_static/documentation_options.js?v=8f415bd8"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -429,7 +429,6 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i04.html">dodal.beamlines.i04</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i04_1.html">dodal.beamlines.i04_1</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i20_1.html">dodal.beamlines.i20_1</a></li>
-<li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i22.html">dodal.beamlines.i22</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i23.html">dodal.beamlines.i23</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i24.html">dodal.beamlines.i24</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.p38.html">dodal.beamlines.p38</a></li>
@@ -847,21 +846,6 @@ document.write(`
 <tr class="row-even"><td><p><a class="reference internal" href="#dodal.common.beamlines.beamline_utils.decorator_name" title="dodal.common.beamlines.beamline_utils.decorator_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decorator_name</span></code></a>(name, prefix, not_lazy, fake)</p></td>
 <td><p>Method to allow generic creation of singleton devices.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.common.beamlines.beamline_utils.device_factory" title="dodal.common.beamlines.beamline_utils.device_factory"><code class="xref py py-obj docutils literal notranslate"><span class="pre">device_factory</span></code></a>([lazy, set_name])</p></td>
-<td><p><dl class="field-list simple">
-<dt class="field-odd">rtype<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>[[], <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">D</span></code>, bound= <code class="xref py py-class docutils literal notranslate"><span class="pre">Device</span></code>, covariant=True)]], <a class="reference internal" href="dodal.common.beamlines.beamline_utils.DeviceFactory.html#dodal.common.beamlines.beamline_utils.DeviceFactory" title="dodal.common.beamlines.beamline_utils.DeviceFactory"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeviceFactory</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">D</span></code>, bound= <code class="xref py py-class docutils literal notranslate"><span class="pre">Device</span></code>, covariant=True)]]</span></p>
-</dd>
-</dl>
-</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#dodal.common.beamlines.beamline_utils.device_factory2" title="dodal.common.beamlines.beamline_utils.device_factory2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">device_factory2</span></code></a>([lazy, fake, wait])</p></td>
-<td><p><dl class="field-list simple">
-<dt class="field-odd">param lazy<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p></dd>
-</dl>
-</p></td>
-</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#dodal.common.beamlines.beamline_utils.device_instantiation" title="dodal.common.beamlines.beamline_utils.device_instantiation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">device_instantiation</span></code></a>(device_factory, name, ...)</p></td>
 <td><p>Method to allow generic creation of singleton devices.</p></td>
 </tr>
@@ -977,30 +961,6 @@ document.write(`
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="dodal.common.beamlines.beamline_utils.device_factory">
-<span class="sig-prename descclassname"><span class="pre">dodal.common.beamlines.beamline_utils.</span></span><span class="sig-name descname"><span class="pre">device_factory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lazy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.12)"><span class="pre">Callable</span></a><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.12)"><span class="pre">Callable</span></a><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">D</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="dodal.common.beamlines.beamline_utils.DeviceFactory.html#dodal.common.beamlines.beamline_utils.DeviceFactory" title="dodal.common.beamlines.beamline_utils.DeviceFactory"><span class="pre">DeviceFactory</span></a><span class="p"><span class="pre">[</span></span><span class="pre">D</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../_modules/dodal/common/beamlines/beamline_utils.html#device_factory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.common.beamlines.beamline_utils.device_factory" title="Link to this definition">#</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>[[], <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">D</span></code>, bound= <code class="xref py py-class docutils literal notranslate"><span class="pre">Device</span></code>, covariant=True)]], <a class="reference internal" href="dodal.common.beamlines.beamline_utils.DeviceFactory.html#dodal.common.beamlines.beamline_utils.DeviceFactory" title="dodal.common.beamlines.beamline_utils.DeviceFactory"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeviceFactory</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">D</span></code>, bound= <code class="xref py py-class docutils literal notranslate"><span class="pre">Device</span></code>, covariant=True)]]</span></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="dodal.common.beamlines.beamline_utils.device_factory2">
-<span class="sig-prename descclassname"><span class="pre">dodal.common.beamlines.beamline_utils.</span></span><span class="sig-name descname"><span class="pre">device_factory2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lazy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fake</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wait</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/dodal/common/beamlines/beamline_utils.html#device_factory2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.common.beamlines.beamline_utils.device_factory2" title="Link to this definition">#</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>lazy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
-<li><p><strong>fake</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
-<li><p><strong>wait</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
-</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -1149,8 +1109,6 @@ false the complete PV prefix must be supplied.</p></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.common.beamlines.beamline_utils.list_active_devices"><code class="docutils literal notranslate"><span class="pre">list_active_devices()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.common.beamlines.beamline_utils.active_device_is_same_type"><code class="docutils literal notranslate"><span class="pre">active_device_is_same_type()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.common.beamlines.beamline_utils.wait_for_connection"><code class="docutils literal notranslate"><span class="pre">wait_for_connection()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.common.beamlines.beamline_utils.device_factory"><code class="docutils literal notranslate"><span class="pre">device_factory()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.common.beamlines.beamline_utils.device_factory2"><code class="docutils literal notranslate"><span class="pre">device_factory2()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.common.beamlines.beamline_utils.get_device_factories"><code class="docutils literal notranslate"><span class="pre">get_device_factories()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.common.beamlines.beamline_utils.device_instantiation"><code class="docutils literal notranslate"><span class="pre">device_instantiation()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.common.beamlines.beamline_utils.set_directory_provider"><code class="docutils literal notranslate"><span class="pre">set_directory_provider()</span></code></a></li>
