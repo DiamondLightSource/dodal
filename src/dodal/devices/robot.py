@@ -60,7 +60,8 @@ class BartRobot(StandardReadable, Movable):
         self.program_running = epics_signal_r(bool, prefix + "PROGRAM_RUNNING")
         self.program_name = epics_signal_r(str, prefix + "PROGRAM_NAME")
         self.error_str = epics_signal_r(str, prefix + "PRG_ERR_MSG")
-        self.error_code = epics_signal_r(int, prefix + "PRG_ERR_CODE")
+        # Change error_code to int type when https://github.com/bluesky/ophyd-async/issues/280 released
+        self.error_code = epics_signal_r(float, prefix + "PRG_ERR_CODE")
         super().__init__(name=name)
 
     async def pin_mounted_or_no_pin_found(self):
