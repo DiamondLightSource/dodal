@@ -58,6 +58,7 @@ def saxs(
             description="Dectris Pilatus3 2M",
             type="Photon Counting Hybrid Pixel",
             sensor_material="silicon",
+            sensor_thickness=(0.45, "mm"),
             distance=(4711.833684146172, "mm"),
         ),
         directory_provider=get_directory_provider(),
@@ -93,6 +94,7 @@ def waxs(
             description="Dectris Pilatus3 2M",
             type="Photon Counting Hybrid Pixel",
             sensor_material="silicon",
+            sensor_thickness=(0.45, "mm"),
             distance=(175.4199417092314, "mm"),
         ),
         directory_provider=get_directory_provider(),
@@ -172,13 +174,13 @@ def dcm(
             usage="Bragg",
             type="silicon",
             reflection=(1, 1, 1),
-            d_spacing=(3.13475, "mm"),
+            d_spacing=(3.13475, "nm"),
         ),
         crystal_2_metadata=CrystalMetadata(
             usage="Bragg",
             type="silicon",
             reflection=(1, 1, 1),
-            d_spacing=(3.13475, "mm"),
+            d_spacing=(3.13475, "nm"),
         ),
     )
 
@@ -343,7 +345,6 @@ def panda4(
     )
 
 
-@skip_device
 def oav(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> AravisDetector:
@@ -359,7 +360,7 @@ def oav(
             x_pixel_size=(3.45e-3, "mm"),  # Double check this figure
             y_pixel_size=(3.45e-3, "mm"),
             description="AVT Mako G-507B",
-            distance=(0, "m"),  # To get from configuration data after visit begins
+            distance=(-1.0, "m"),
         ),
         directory_provider=get_directory_provider(),
     )

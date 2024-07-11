@@ -49,9 +49,11 @@ dev = [
     "pytest-cov",
     "pytest-random-order",
     "ruff",
-    "sphinx-autobuild==2024.2.4", # Later versions have a clash with fastapi<0.99, remove pin when fastapi is unpinned in blueapi
+    "sphinx-autobuild",
     "sphinx-copybutton",
+    "sphinxcontrib-mermaid",
     "sphinx-design",
+    "sphinx-autodoc-typehints",
     "tox-direct",
     "types-requests",
     "types-mock",
@@ -128,7 +130,7 @@ commands =
     pytest: pytest -m 'not s03' {posargs}
     mypy: mypy src tests -v --ignore-missing-imports --show-traceback --no-strict-optional --check-untyped-defs {posargs}
     pre-commit: pre-commit run --all-files {posargs}
-    docs: sphinx-{posargs:build -EW --keep-going} -T docs build/html
+    docs: sphinx-{posargs:build -E} -T docs build/html
 """
 
 
