@@ -3,7 +3,7 @@ _commit: 2.1.0
 _src_path: gh:DiamondLightSource/python-copier-template
 author_email: dominic.oram@diamond.ac.uk
 author_name: Dominic Oram
-component_owner: user:yqf46943
+component_owner: group:data-acquisition
 description: Ophyd devices and other utils that could be used across DLS beamlines
 distribution_name: dls-dodal
 docker: false

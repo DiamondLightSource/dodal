@@ -5,6 +5,8 @@ metadata:
   title: dodal
   description: Ophyd devices and other utils that could be used across DLS beamlines
 spec:
-  type: documentation
-  lifecycle: experimental
-  owner: user:yqf46943
+  type: library
+  lifecycle: production
+  owner: group:data-acquisition
+  dependsOn:
+    - zocalo
