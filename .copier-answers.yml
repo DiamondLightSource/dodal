@@ -11,6 +11,6 @@ docs_type: sphinx
 git_platform: github.com
 github_org: DiamondLightSource
 package_name: dodal
-pypi: false
+pypi: true
 repo_name: dodal
 type_checker: pyright
