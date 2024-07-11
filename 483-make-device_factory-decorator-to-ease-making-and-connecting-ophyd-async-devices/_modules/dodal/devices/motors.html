@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.motors &#8212; dodal 1.29.2.dev19+g339a0b271 documentation</title>
+    <title>dodal.devices.motors &#8212; dodal 1.29.3.dev14+g824608243 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=314f6322"></script>
+    <script src="../../../_static/documentation_options.js?v=a2515664"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -457,12 +457,7 @@ document.write(`
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.motors</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
-
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">ophyd</span> <span class="kn">import</span> <span class="n">EpicsMotor</span>
-<span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="n">Device</span>
+<span></span><span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="n">Device</span>
 <span class="kn">from</span> <span class="nn">ophyd_async.epics.motion</span> <span class="kn">import</span> <span class="n">Motor</span>
 
 
@@ -474,58 +469,6 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;Y&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;Z&quot;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
-
-
-
-<div class="viewcode-block" id="MotorLimitHelper">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.motors.MotorLimitHelper.html#dodal.devices.motors.MotorLimitHelper">[docs]</a>
-<span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">MotorLimitHelper</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Represents motor limit(s)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">motor</span><span class="p">:</span> <span class="n">EpicsMotor</span>
-
-<div class="viewcode-block" id="MotorLimitHelper.is_within">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.motors.MotorLimitHelper.html#dodal.devices.motors.MotorLimitHelper.is_within">[docs]</a>
-    <span class="k">def</span> <span class="nf">is_within</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks position against limits</span>
-
-<span class="sd">        :param position: The position to check</span>
-<span class="sd">        :return: True if position is within the limits</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">low</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">low_limit_travel</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
-        <span class="n">high</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">motor</span><span class="o">.</span><span class="n">high_limit_travel</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
-        <span class="k">return</span> <span class="n">low</span> <span class="o">&lt;=</span> <span class="n">position</span> <span class="o">&lt;=</span> <span class="n">high</span></div>
-</div>
-
-
-
-<div class="viewcode-block" id="XYZLimitBundle">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.motors.XYZLimitBundle.html#dodal.devices.motors.XYZLimitBundle">[docs]</a>
-<span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">XYZLimitBundle</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Holder for limits reflecting an x, y, z bundle</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">x</span><span class="p">:</span> <span class="n">MotorLimitHelper</span>
-    <span class="n">y</span><span class="p">:</span> <span class="n">MotorLimitHelper</span>
-    <span class="n">z</span><span class="p">:</span> <span class="n">MotorLimitHelper</span>
-
-    <span class="k">def</span> <span class="nf">position_valid</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span>
-    <span class="p">):</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">position</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Position valid expects a 3-vector, got </span><span class="si">{</span><span class="n">position</span><span class="si">}</span><span class="s2"> instead&quot;</span>
-            <span class="p">)</span>
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">is_within</span><span class="p">(</span><span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-            <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">is_within</span><span class="p">(</span><span class="n">position</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-            <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">is_within</span><span class="p">(</span><span class="n">position</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
-        <span class="p">)</span></div>
 
 </pre></div>
 

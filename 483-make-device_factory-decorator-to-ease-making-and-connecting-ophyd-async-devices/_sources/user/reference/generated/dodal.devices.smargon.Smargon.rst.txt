@@ -19,23 +19,7 @@ dodal.devices.smargon.Smargon
       
       
       
-      
-      
-      
-      
       ~Smargon.get_xyz_limits
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
       
       
       
@@ -55,66 +39,6 @@ dodal.devices.smargon.Smargon
       
       
       
-      ~Smargon.chi
-      
-      
-      ~Smargon.component_names
-      
-      
-      
-      
-      ~Smargon.disabled
-      
-      
-      
-      
-      
-      
-      
-      
-      ~Smargon.omega
-      
-      
-      
-      ~Smargon.phi
-      
-      
-      
-      ~Smargon.real_chi
-      
-      
-      ~Smargon.real_phi
-      
-      
-      ~Smargon.real_x1
-      
-      
-      ~Smargon.real_x2
-      
-      
-      ~Smargon.real_y
-      
-      
-      ~Smargon.real_z
-      
-      
-      
-      
-      
-      ~Smargon.stub_offsets
-      
-      
-      ~Smargon.subscriptions
-      
-      
-      
-      ~Smargon.x
-      
-      
-      ~Smargon.y
-      
-      
-      ~Smargon.z
       
    
    
