@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.smargon &#8212; dodal 1.29.2.dev10+g5e3f7ef72 documentation</title>
+    <title>dodal.devices.smargon &#8212; dodal 1.29.4.dev4+geaf7c9c07 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=decebab5"></script>
+    <script src="../../../_static/documentation_options.js?v=d0ae99ee"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -457,17 +457,19 @@ document.write(`
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.smargon</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span></span><span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Generator</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">isclose</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">cast</span>
 
-<span class="kn">from</span> <span class="nn">ophyd</span> <span class="kn">import</span> <span class="n">Component</span> <span class="k">as</span> <span class="n">Cpt</span>
-<span class="kn">from</span> <span class="nn">ophyd</span> <span class="kn">import</span> <span class="n">Device</span><span class="p">,</span> <span class="n">EpicsMotor</span><span class="p">,</span> <span class="n">EpicsSignal</span>
-<span class="kn">from</span> <span class="nn">ophyd.epics_motor</span> <span class="kn">import</span> <span class="n">MotorBundle</span>
-<span class="kn">from</span> <span class="nn">ophyd.status</span> <span class="kn">import</span> <span class="n">StatusBase</span>
+<span class="kn">from</span> <span class="nn">bluesky</span> <span class="kn">import</span> <span class="n">plan_stubs</span> <span class="k">as</span> <span class="n">bps</span>
+<span class="kn">from</span> <span class="nn">bluesky.utils</span> <span class="kn">import</span> <span class="n">Msg</span>
+<span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="n">AsyncStatus</span><span class="p">,</span> <span class="n">Device</span><span class="p">,</span> <span class="n">StandardReadable</span><span class="p">,</span> <span class="n">wait_for_value</span>
+<span class="kn">from</span> <span class="nn">ophyd_async.epics.motion</span> <span class="kn">import</span> <span class="n">Motor</span>
+<span class="kn">from</span> <span class="nn">ophyd_async.epics.signal</span> <span class="kn">import</span> <span class="n">epics_signal_r</span>
 
-<span class="kn">from</span> <span class="nn">dodal.devices.motors</span> <span class="kn">import</span> <span class="n">MotorLimitHelper</span><span class="p">,</span> <span class="n">XYZLimitBundle</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.status</span> <span class="kn">import</span> <span class="n">await_approx_value</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.util.epics_util</span> <span class="kn">import</span> <span class="n">SetWhenEnabled</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.util.motor_utils</span> <span class="kn">import</span> <span class="n">ExtendedEpicsMotor</span>
 
 
 <div class="viewcode-block" id="StubPosition">
@@ -475,6 +477,16 @@ document.write(`
 <span class="k">class</span> <span class="nc">StubPosition</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="n">CURRENT_AS_CENTER</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">RESET_TO_ROBOT_LOAD</span> <span class="o">=</span> <span class="mi">1</span></div>
+
+
+
+<div class="viewcode-block" id="approx_equal_to">
+<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.smargon.html#dodal.devices.smargon.approx_equal_to">[docs]</a>
+<span class="k">def</span> <span class="nf">approx_equal_to</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">deadband</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-9</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">approx_equal_to_target</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">isclose</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">rel_tol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">deadband</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">approx_equal_to_target</span></div>
 
 
 
@@ -489,26 +501,76 @@ document.write(`
 <span class="sd">    set them so that the current position is zero or to pre-defined positions.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">parent</span><span class="p">:</span> <span class="s2">&quot;Smargon&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">center_at_current_position</span> <span class="o">=</span> <span class="n">SetWhenEnabled</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;CENTER_CS&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">to_robot_load</span> <span class="o">=</span> <span class="n">SetWhenEnabled</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;SET_STUBS_TO_RL&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
-    <span class="n">center_at_current_position</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">SetWhenEnabled</span><span class="p">,</span> <span class="s2">&quot;CENTER_CS&quot;</span><span class="p">)</span>
-    <span class="n">to_robot_load</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">SetWhenEnabled</span><span class="p">,</span> <span class="s2">&quot;SET_STUBS_TO_RL&quot;</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="n">StubPosition</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StatusBase</span><span class="p">:</span>
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="n">StubPosition</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">pos</span> <span class="o">==</span> <span class="n">StubPosition</span><span class="o">.</span><span class="n">CURRENT_AS_CENTER</span><span class="p">:</span>
-            <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">center_at_current_position</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-            <span class="n">status</span> <span class="o">&amp;=</span> <span class="n">await_approx_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">deadband</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
-            <span class="n">status</span> <span class="o">&amp;=</span> <span class="n">await_approx_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">deadband</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
-            <span class="n">status</span> <span class="o">&amp;=</span> <span class="n">await_approx_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">deadband</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">status</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">center_at_current_position</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">smargon</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Smargon</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+            <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span>
+                <span class="n">smargon</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span> <span class="n">approx_equal_to</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">),</span> <span class="kc">None</span>
+            <span class="p">)</span>
+            <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span>
+                <span class="n">smargon</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span> <span class="n">approx_equal_to</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">),</span> <span class="kc">None</span>
+            <span class="p">)</span>
+            <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span>
+                <span class="n">smargon</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span> <span class="n">approx_equal_to</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">),</span> <span class="kc">None</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_robot_load</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_robot_load</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="AxisLimit">
+<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.smargon.AxisLimit.html#dodal.devices.smargon.AxisLimit">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">AxisLimit</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents the minimum and maximum allowable values on an axis&quot;&quot;&quot;</span>
+
+    <span class="n">min_value</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">max_value</span><span class="p">:</span> <span class="nb">float</span>
+
+<div class="viewcode-block" id="AxisLimit.contains">
+<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.smargon.AxisLimit.html#dodal.devices.smargon.AxisLimit.contains">[docs]</a>
+    <span class="k">def</span> <span class="nf">contains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determine if the specified value is within limits.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pos: the value to check</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if the value does not exceed the limits</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_value</span> <span class="o">&lt;=</span> <span class="n">pos</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_value</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="XYZLimits">
+<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.smargon.XYZLimits.html#dodal.devices.smargon.XYZLimits">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">XYZLimits</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The limits of the smargon x, y, z axes.&quot;&quot;&quot;</span>
+
+    <span class="n">x</span><span class="p">:</span> <span class="n">AxisLimit</span>
+    <span class="n">y</span><span class="p">:</span> <span class="n">AxisLimit</span>
+    <span class="n">z</span><span class="p">:</span> <span class="n">AxisLimit</span>
+
+    <span class="k">def</span> <span class="nf">position_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="n">Collection</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="n">axis_limits</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">axis_limits</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">],</span> <span class="n">pos</span><span class="p">)</span>
+        <span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="Smargon">
 <a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.smargon.Smargon.html#dodal.devices.smargon.Smargon">[docs]</a>
-<span class="k">class</span> <span class="nc">Smargon</span><span class="p">(</span><span class="n">MotorBundle</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">Smargon</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Real motors added to allow stops following pin load (e.g. real_x1.stop() )</span>
 <span class="sd">    X1 and X2 real motors provide compound chi motion as well as the compound X travel,</span>
@@ -516,40 +578,44 @@ document.write(`
 <span class="sd">    Robot loading can nudge these and lead to errors.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">x</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">ExtendedEpicsMotor</span><span class="p">,</span> <span class="s2">&quot;X&quot;</span><span class="p">)</span>
-    <span class="n">y</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">EpicsMotor</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">)</span>
-    <span class="n">z</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">EpicsMotor</span><span class="p">,</span> <span class="s2">&quot;Z&quot;</span><span class="p">)</span>
-    <span class="n">chi</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">EpicsMotor</span><span class="p">,</span> <span class="s2">&quot;CHI&quot;</span><span class="p">)</span>
-    <span class="n">phi</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">EpicsMotor</span><span class="p">,</span> <span class="s2">&quot;PHI&quot;</span><span class="p">)</span>
-    <span class="n">omega</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">ExtendedEpicsMotor</span><span class="p">,</span> <span class="s2">&quot;OMEGA&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;X&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;Y&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;Z&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chi</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;CHI&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">phi</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PHI&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">omega</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;OMEGA&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">real_x1</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;MOTOR_3&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">real_x2</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;MOTOR_4&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">real_y</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;MOTOR_1&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">real_z</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;MOTOR_2&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">real_phi</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;MOTOR_5&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">real_chi</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;MOTOR_6&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stub_offsets</span> <span class="o">=</span> <span class="n">StubOffsets</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;DISABLED&quot;</span><span class="p">)</span>
 
-    <span class="n">real_x1</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">EpicsMotor</span><span class="p">,</span> <span class="s2">&quot;MOTOR_3&quot;</span><span class="p">)</span>
-    <span class="n">real_x2</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">EpicsMotor</span><span class="p">,</span> <span class="s2">&quot;MOTOR_4&quot;</span><span class="p">)</span>
-    <span class="n">real_y</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">EpicsMotor</span><span class="p">,</span> <span class="s2">&quot;MOTOR_1&quot;</span><span class="p">)</span>
-    <span class="n">real_z</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">EpicsMotor</span><span class="p">,</span> <span class="s2">&quot;MOTOR_2&quot;</span><span class="p">)</span>
-    <span class="n">real_phi</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">EpicsMotor</span><span class="p">,</span> <span class="s2">&quot;MOTOR_5&quot;</span><span class="p">)</span>
-    <span class="n">real_chi</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">EpicsMotor</span><span class="p">,</span> <span class="s2">&quot;MOTOR_6&quot;</span><span class="p">)</span>
-
-    <span class="n">stub_offsets</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">StubOffsets</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-
-    <span class="n">disabled</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">EpicsSignal</span><span class="p">,</span> <span class="s2">&quot;DISABLED&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Smargon.get_xyz_limits">
 <a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.smargon.Smargon.html#dodal.devices.smargon.Smargon.get_xyz_limits">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_xyz_limits</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">XYZLimitBundle</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the limits for the x, y and z axes.</span>
+    <span class="k">def</span> <span class="nf">get_xyz_limits</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Msg</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">XYZLimits</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Obtain a plan stub that returns the smargon XYZ axis limits</span>
 
-<span class="sd">        Note that these limits may not yet be valid until wait_for_connection is called</span>
-<span class="sd">        on this MotorBundle.</span>
+<span class="sd">        Yields:</span>
+<span class="sd">            Bluesky messages</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            XYZLimitBundle: The limits for the underlying motors.</span>
+<span class="sd">            the axis limits</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">XYZLimitBundle</span><span class="p">(</span>
-            <span class="n">MotorLimitHelper</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">),</span>
-            <span class="n">MotorLimitHelper</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">),</span>
-            <span class="n">MotorLimitHelper</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">),</span>
-        <span class="p">)</span></div>
+        <span class="n">limits</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">pv</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">attr_name</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">))</span> <span class="k">for</span> <span class="n">attr_name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">]</span>
+        <span class="p">]:</span>
+            <span class="n">min_value</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">pv</span><span class="o">.</span><span class="n">low_limit_travel</span><span class="p">)</span>
+            <span class="n">max_value</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">pv</span><span class="o">.</span><span class="n">high_limit_travel</span><span class="p">)</span>
+            <span class="n">limits</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">AxisLimit</span><span class="p">(</span><span class="n">min_value</span><span class="p">,</span> <span class="n">max_value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">XYZLimits</span><span class="p">(</span><span class="o">**</span><span class="n">limits</span><span class="p">)</span></div>
 </div>
 
 </pre></div>

@@ -268,10 +268,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/564_organise_testing_utils/"
   },
   {
-    "version": "604_ophyd_async_device_for_mirror_voltages",
-    "url": "https://DiamondLightSource.github.io/dodal/604_ophyd_async_device_for_mirror_voltages/"
-  },
-  {
     "version": "643_improve_default_run_number",
     "url": "https://DiamondLightSource.github.io/dodal/643_improve_default_run_number/"
   },

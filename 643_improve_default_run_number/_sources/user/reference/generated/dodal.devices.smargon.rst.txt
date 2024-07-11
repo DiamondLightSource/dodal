@@ -14,9 +14,11 @@ dodal.devices.smargon
    :toctree:
    :recursive:
 
+   ~smargon.AxisLimit
    ~smargon.Smargon
    ~smargon.StubOffsets
    ~smargon.StubPosition
+   ~smargon.XYZLimits
 
 
 
@@ -30,6 +32,12 @@ dodal.devices.smargon
    
 
    
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      approx_equal_to
    
    
 
