@@ -6,12 +6,11 @@ import sys
 import time
 from os import environ, getenv
 from pathlib import Path
-from typing import Mapping, cast
+from typing import Mapping
 from unittest.mock import MagicMock, patch
 
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd.sim import make_fake_device
 
 from dodal.beamlines import i03
 from dodal.common.beamlines import beamline_utils
@@ -73,17 +72,11 @@ def pytest_runtest_teardown():
 
 
 @pytest.fixture
-def vfm_mirror_voltages() -> VFMMirrorVoltages:
-    voltages = cast(
-        VFMMirrorVoltages,
-        make_fake_device(VFMMirrorVoltages)(
-            name="vfm_mirror_voltages",
-            prefix="BL-I03-MO-PSU-01:",
-            daq_configuration_path=i03.DAQ_CONFIGURATION_PATH,
-        ),
-    )
+def vfm_mirror_voltages(RE: RunEngine) -> VFMMirrorVoltages:
+    voltages = i03.vfm_mirror_voltages(fake_with_ophyd_sim=True)
     voltages.voltage_lookup_table_path = "tests/test_data/test_mirror_focus.json"
-    return voltages
+    yield voltages
+    beamline_utils.clear_devices()
 
 
 s03_epics_server_port = getenv("S03_EPICS_CA_SERVER_PORT")
