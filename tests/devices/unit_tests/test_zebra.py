@@ -1,8 +1,7 @@
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from bluesky.run_engine import RunEngine
-from mockito import mock, verify
 from ophyd_async.core import set_mock_value
 
 from dodal.devices.zebra import (
@@ -100,8 +99,8 @@ async def run_configurer_test(
     configurer = LogicGateConfigurer(prefix="", name="test fake logicconfigurer")
     await configurer.connect(mock=True)
 
-    mock_gate_control = mock()
-    mock_pvs = [mock() for i in range(6)]
+    mock_gate_control = MagicMock()
+    mock_pvs = [MagicMock() for i in range(6)]
     mock_gate_control.enable = mock_pvs[0]
     mock_gate_control.sources = {i: mock_pvs[i] for i in range(1, 5)}
     mock_gate_control.invert = mock_pvs[5]
@@ -113,7 +112,7 @@ async def run_configurer_test(
         configurer.apply_or_gate_config(gate_num, config)
 
     for pv, value in zip(mock_pvs, expected_pv_values):
-        verify(pv).set(value)
+        pv.set.assert_called_once_with(value)
 
 
 async def test_apply_and_logic_gate_configuration_32_and_51_inv_and_1():

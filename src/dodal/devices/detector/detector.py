@@ -54,7 +54,9 @@ class DetectorParams(BaseModel):
             DetectorSizeConstants: lambda d: d.det_type_string,
         }
 
-    @root_validator(pre=True, skip_on_failure=True)  # type: ignore # should be replaced with model_validator once move to pydantic 2 is complete
+    @root_validator(
+        pre=True, skip_on_failure=True
+    )  # should be replaced with model_validator once move to pydantic 2 is complete
     def create_beamxy_and_runnumber(cls, values: dict[str, Any]) -> dict[str, Any]:
         values["beam_xy_converter"] = DetectorDistanceToBeamXYConverter(
             values["det_dist_to_beam_converter_path"]

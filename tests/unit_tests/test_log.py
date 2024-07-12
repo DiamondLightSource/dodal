@@ -54,11 +54,11 @@ def test_handlers_set_at_correct_default_level(
     for handler in handlers.values():
         mock_logger.addHandler.assert_any_call(handler)
 
-    handlers["debug_memory_handler"].setLevel.assert_called_once_with(logging.DEBUG)
-    handlers["graylog_handler"].setLevel.assert_called_once_with(logging.INFO)
-    handlers["info_file_handler"].setLevel.assert_any_call(logging.INFO)
-    handlers["info_file_handler"].setLevel.assert_any_call(logging.DEBUG)
-    handlers["stream_handler"].setLevel.assert_called_once_with(logging.INFO)
+    handlers["debug_memory_handler"].setLevel.assert_called_once_with(logging.DEBUG)  # type: ignore
+    handlers["graylog_handler"].setLevel.assert_called_once_with(logging.INFO)  # type: ignore
+    handlers["info_file_handler"].setLevel.assert_any_call(logging.INFO)  # type: ignore
+    handlers["info_file_handler"].setLevel.assert_any_call(logging.DEBUG)  # type: ignore
+    handlers["stream_handler"].setLevel.assert_called_once_with(logging.INFO)  # type: ignore
 
 
 @patch("dodal.log.GELFTCPHandler", autospec=True)
@@ -134,7 +134,7 @@ def test_messages_logged_from_dodal_get_sent_to_graylog_and_file(
     mock_graylog_handler_class.assert_called_once_with(
         "graylog-log-target.diamond.ac.uk", 12231
     )
-    mock_GELFTCPHandler.handle.assert_called()
+    mock_GELFTCPHandler.handle.assert_called()  # type: ignore
     mock_filehandler_emit.assert_called()
 
 
@@ -172,6 +172,7 @@ def test_various_messages_to_graylog_get_beamline_filter(
     assert mock_GELFTCPHandler.port == 5555
 
     LOGGER.info("test")
+    assert isinstance(mock_GELFTCPHandler.emit, MagicMock)
     mock_GELFTCPHandler.emit.assert_called()
     assert mock_GELFTCPHandler.emit.call_args.args[0].beamline == "dev"
 

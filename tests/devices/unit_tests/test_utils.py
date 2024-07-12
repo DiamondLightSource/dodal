@@ -134,9 +134,8 @@ def test_if_one_status_errors_then_later_functions_not_called():
         NullStatus,
         tester,
     ]
-    expected_obj = "TEST OBJECT"
     returned_status = run_functions_without_blocking(
-        status_calls, associated_obj=expected_obj
+        status_calls, associated_obj=MagicMock()
     )
     with pytest.raises(StatusException):
         returned_status.wait(0.1)
@@ -154,9 +153,8 @@ def test_if_one_status_pending_then_later_functions_not_called():
         NullStatus,
         tester,
     ]
-    expected_obj = "TEST OBJECT"
     returned_status = run_functions_without_blocking(
-        status_calls, associated_obj=expected_obj
+        status_calls, associated_obj=MagicMock()
     )
     with pytest.raises(WaitTimeoutError):
         returned_status.wait(0.1)

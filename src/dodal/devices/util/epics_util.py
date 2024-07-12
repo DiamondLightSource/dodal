@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Callable
+from typing import Callable, Sequence
 
 from bluesky.protocols import Movable
 from ophyd import Component, EpicsSignal
@@ -26,7 +26,7 @@ def epics_signal_put_wait(pv_name: str, wait: float = 3.0) -> Component[EpicsSig
 
 
 def run_functions_without_blocking(
-    functions_to_chain: list[Callable[[], StatusBase]],
+    functions_to_chain: Sequence[Callable[[], StatusBase]],
     timeout: float = 60.0,
     associated_obj: OphydDevice | None = None,
 ) -> Status:
