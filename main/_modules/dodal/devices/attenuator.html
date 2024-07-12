@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.attenuator &#8212; dodal 1.29.4.dev2+ge3a3ba4cd documentation</title>
+    <title>dodal.devices.attenuator &#8212; dodal 1.29.4.dev3+g6f02f54a5 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=b7b9569b"></script>
+    <script src="../../../_static/documentation_options.js?v=aff6d8da"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -511,7 +511,7 @@ document.write(`
 <div class="viewcode-block" id="Attenuator.set">
 <a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.attenuator.Attenuator.html#dodal.devices.attenuator.Attenuator.set">[docs]</a>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transmission</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the transmission to the fractional (0-1) value given.</span>
 
 <span class="sd">        The attenuator IOC will then insert filters to reach the desired transmission for</span>
@@ -521,8 +521,8 @@ document.write(`
 
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Using current energy &quot;</span><span class="p">)</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_current_energy</span><span class="o">.</span><span class="n">trigger</span><span class="p">()</span>
-        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting desired transmission to </span><span class="si">{</span><span class="n">transmission</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_desired_transmission</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">transmission</span><span class="p">)</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting desired transmission to </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_desired_transmission</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Sending change filter command&quot;</span><span class="p">)</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_change</span><span class="o">.</span><span class="n">trigger</span><span class="p">()</span>
 
@@ -530,7 +530,7 @@ document.write(`
             <span class="o">*</span><span class="p">[</span>
                 <span class="n">wait_for_value</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_filters_in_position</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
-                    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculated_filter_states</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span>
+                    <span class="nb">bool</span><span class="p">(</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculated_filter_states</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">get_value</span><span class="p">()),</span>
                     <span class="kc">None</span><span class="p">,</span>
                 <span class="p">)</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>

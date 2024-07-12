@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.eiger &#8212; dodal 1.29.4.dev2+ge3a3ba4cd documentation</title>
+    <title>dodal.devices.eiger &#8212; dodal 1.29.4.dev3+g6f02f54a5 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=b7b9569b"></script>
+    <script src="../../../_static/documentation_options.js?v=aff6d8da"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -461,7 +461,7 @@ document.write(`
 
 <span class="kn">from</span> <span class="nn">ophyd</span> <span class="kn">import</span> <span class="n">Component</span><span class="p">,</span> <span class="n">Device</span><span class="p">,</span> <span class="n">EpicsSignalRO</span><span class="p">,</span> <span class="n">Signal</span>
 <span class="kn">from</span> <span class="nn">ophyd.areadetector.cam</span> <span class="kn">import</span> <span class="n">EigerDetectorCam</span>
-<span class="kn">from</span> <span class="nn">ophyd.status</span> <span class="kn">import</span> <span class="n">AndStatus</span><span class="p">,</span> <span class="n">Status</span><span class="p">,</span> <span class="n">SubscriptionStatus</span>
+<span class="kn">from</span> <span class="nn">ophyd.status</span> <span class="kn">import</span> <span class="n">AndStatus</span><span class="p">,</span> <span class="n">Status</span><span class="p">,</span> <span class="n">StatusBase</span>
 
 <span class="kn">from</span> <span class="nn">dodal.devices.detector</span> <span class="kn">import</span> <span class="n">DetectorParams</span><span class="p">,</span> <span class="n">TriggerMode</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.eiger_odin</span> <span class="kn">import</span> <span class="n">EigerOdin</span>
@@ -491,6 +491,7 @@ document.write(`
 <span class="k">class</span> <span class="nc">EigerDetector</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
     <span class="k">class</span> <span class="nc">ArmingSignal</span><span class="p">(</span><span class="n">Signal</span><span class="p">):</span>
         <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">settle_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="n">EigerDetector</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">async_stage</span><span class="p">()</span>
 
     <span class="n">do_arm</span> <span class="o">=</span> <span class="n">Component</span><span class="p">(</span><span class="n">ArmingSignal</span><span class="p">)</span>
@@ -505,7 +506,7 @@ document.write(`
     <span class="n">ALL_FRAMES_TIMEOUT</span> <span class="o">=</span> <span class="mi">120</span>
     <span class="n">ARMING_TIMEOUT</span> <span class="o">=</span> <span class="mi">60</span>
 
-    <span class="n">filewriters_finished</span><span class="p">:</span> <span class="n">SubscriptionStatus</span>
+    <span class="n">filewriters_finished</span><span class="p">:</span> <span class="n">StatusBase</span>
 
     <span class="n">detector_params</span><span class="p">:</span> <span class="n">DetectorParams</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -622,7 +623,7 @@ document.write(`
     <span class="k">def</span> <span class="nf">enable_roi_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">change_roi_mode</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">change_roi_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">enable</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Status</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">change_roi_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">enable</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StatusBase</span><span class="p">:</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="n">detector_dimensions</span> <span class="o">=</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span><span class="o">.</span><span class="n">detector_size_constants</span><span class="o">.</span><span class="n">roi_size_pixels</span>
@@ -673,7 +674,7 @@ document.write(`
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">status</span>
 
-    <span class="k">def</span> <span class="nf">set_odin_pvs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Status</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">set_odin_pvs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StatusBase</span><span class="p">:</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="n">file_prefix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span><span class="o">.</span><span class="n">full_filename</span>
         <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">odin</span><span class="o">.</span><span class="n">file_writer</span><span class="o">.</span><span class="n">file_path</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
@@ -736,7 +737,7 @@ document.write(`
 
 <div class="viewcode-block" id="EigerDetector.set_num_triggers_and_captures">
 <a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.eiger.EigerDetector.html#dodal.devices.eiger.EigerDetector.set_num_triggers_and_captures">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_num_triggers_and_captures</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Status</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">set_num_triggers_and_captures</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StatusBase</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the number of triggers and the number of images for the Eiger to capture</span>
 <span class="sd">        during the datacollection. The number of images is the number of images per</span>
 <span class="sd">        trigger.</span>
@@ -768,7 +769,7 @@ document.write(`
         <span class="k">return</span> <span class="n">status</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_wait_for_odin_status</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Status</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_wait_for_odin_status</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StatusBase</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">forward_bit_depth_to_filewriter</span><span class="p">()</span>
         <span class="n">await_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">odin</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">active</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">GENERAL_STATUS_TIMEOUT</span><span class="p">)</span>
 
@@ -781,7 +782,7 @@ document.write(`
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">status</span>
 
-    <span class="k">def</span> <span class="nf">_wait_fan_ready</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Status</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_wait_fan_ready</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StatusBase</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filewriters_finished</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">odin</span><span class="o">.</span><span class="n">create_finished_status</span><span class="p">()</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Eiger staging: awaiting odin fan ready&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">await_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">odin</span><span class="o">.</span><span class="n">fan</span><span class="o">.</span><span class="n">ready</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">GENERAL_STATUS_TIMEOUT</span><span class="p">)</span>
@@ -805,6 +806,7 @@ document.write(`
 
     <span class="k">def</span> <span class="nf">do_arming_chain</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Status</span><span class="p">:</span>
         <span class="n">functions_to_do_arm</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span>
         <span class="n">detector_params</span><span class="p">:</span> <span class="n">DetectorParams</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span>
         <span class="k">if</span> <span class="n">detector_params</span><span class="o">.</span><span class="n">use_roi_mode</span><span class="p">:</span>
             <span class="n">functions_to_do_arm</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">enable_roi_mode</span><span class="p">)</span>

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.pin_image_recognition &#8212; dodal 1.29.4.dev2+ge3a3ba4cd documentation</title>
+    <title>dodal.devices.oav.pin_image_recognition &#8212; dodal 1.29.4.dev3+g6f02f54a5 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../../_static/documentation_options.js?v=b7b9569b"></script>
+    <script src="../../../../_static/documentation_options.js?v=aff6d8da"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -511,11 +511,13 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">prefix</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">triggered_tip</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="n">Tip</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;triggered_tip&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">triggered_top_edge</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">triggered_tip</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tip_setter</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span>
+            <span class="n">Tip</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;triggered_tip&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">triggered_top_edge</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_top_edge_setter</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span>
             <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;triggered_top_edge&quot;</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">triggered_bottom_edge</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">triggered_bottom_edge</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bottom_edge_setter</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span>
             <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;triggered_bottom_edge&quot;</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">array_data</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">],</span> <span class="sa">f</span><span class="s2">&quot;pva://</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">PVA:ARRAY&quot;</span><span class="p">)</span>
@@ -546,14 +548,14 @@ document.write(`
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_set_triggered_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">:</span> <span class="n">SampleLocation</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_set_triggered_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">:</span> <span class="n">SampleLocation</span><span class="p">):</span>
         <span class="n">tip</span> <span class="o">=</span> <span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">tip_x</span><span class="p">,</span> <span class="n">results</span><span class="o">.</span><span class="n">tip_y</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">tip</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">INVALID_POSITION</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">InvalidPinException</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">triggered_tip</span><span class="o">.</span><span class="n">_backend</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">tip</span><span class="p">)</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">triggered_top_edge</span><span class="o">.</span><span class="n">_backend</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">edge_top</span><span class="p">)</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">triggered_bottom_edge</span><span class="o">.</span><span class="n">_backend</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">edge_bottom</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_tip_setter</span><span class="p">(</span><span class="n">tip</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_top_edge_setter</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">edge_top</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bottom_edge_setter</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">edge_bottom</span><span class="p">)</span>
 
     <span class="k">async</span> <span class="k">def</span> <span class="nf">_get_tip_and_edge_data</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">array_data</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">]</span>
@@ -611,7 +613,7 @@ document.write(`
             <span class="k">async</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">observe_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array_data</span><span class="p">):</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">location</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tip_and_edge_data</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-                    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_triggered_values</span><span class="p">(</span><span class="n">location</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_set_triggered_values</span><span class="p">(</span><span class="n">location</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                     <span class="n">LOGGER</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                         <span class="sa">f</span><span class="s2">&quot;Failed to detect pin-tip location, will retry with next image: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -627,9 +629,9 @@ document.write(`
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;No tip found in </span><span class="si">{</span><span class="k">await</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">validity_timeout</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span><span class="si">}</span><span class="s2"> seconds.&quot;</span>
             <span class="p">)</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">triggered_tip</span><span class="o">.</span><span class="n">_backend</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">INVALID_POSITION</span><span class="p">)</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">triggered_bottom_edge</span><span class="o">.</span><span class="n">_backend</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([]))</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">triggered_top_edge</span><span class="o">.</span><span class="n">_backend</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([]))</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_tip_setter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">INVALID_POSITION</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_bottom_edge_setter</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([]))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_top_edge_setter</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([]))</span></div>
 
 </pre></div>
 
