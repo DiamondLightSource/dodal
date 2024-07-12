@@ -15,32 +15,7 @@ dodal.devices.util.epics\_util.SetWhenEnabled
       
       
       
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
       ~SetWhenEnabled.set
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
       
       
    
@@ -53,31 +28,6 @@ dodal.devices.util.epics\_util.SetWhenEnabled
    .. autosummary::
    
       
-      
-      
-      ~SetWhenEnabled.component_names
-      
-      
-      
-      
-      ~SetWhenEnabled.disp
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      ~SetWhenEnabled.proc
-      
-      
-      
-      
-      
-      
-      ~SetWhenEnabled.subscriptions
       
       
    

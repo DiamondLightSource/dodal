@@ -352,10 +352,6 @@
     "url": "https://DiamondLightSource.github.io/dodal/fix_missing_oav_snapshot_microns_per_pixel_hook/"
   },
   {
-    "version": "fix_pyright_errors",
-    "url": "https://DiamondLightSource.github.io/dodal/fix_pyright_errors/"
-  },
-  {
     "version": "fix_wrong_return_type",
     "url": "https://DiamondLightSource.github.io/dodal/fix_wrong_return_type/"
   },

@@ -15,32 +15,7 @@ dodal.devices.smargon.StubOffsets
       
       
       
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
       ~StubOffsets.set
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
       
       
    
@@ -53,31 +28,6 @@ dodal.devices.smargon.StubOffsets
    .. autosummary::
    
       
-      
-      
-      ~StubOffsets.center_at_current_position
-      
-      
-      ~StubOffsets.component_names
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      ~StubOffsets.subscriptions
-      
-      
-      ~StubOffsets.to_robot_load
       
       
    

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.i23 &#8212; dodal 1.29.2.dev10+g4a861b4e9 documentation</title>
+    <title>dodal.beamlines.i23 &#8212; dodal 1.29.4.dev6+gf33e4cdc4 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=4507a6f4"></script>
+    <script src="../../../_static/documentation_options.js?v=576f01b9"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -462,7 +462,6 @@ document.write(`
   <h1>Source code for dodal.beamlines.i23</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">dodal.common.beamlines.beamline_utils</span> <span class="kn">import</span> <span class="n">device_instantiation</span>
 <span class="kn">from</span> <span class="nn">dodal.common.beamlines.beamline_utils</span> <span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_utils_beamline</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.i23.gonio</span> <span class="kn">import</span> <span class="n">Gonio</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.oav.pin_image_recognition</span> <span class="kn">import</span> <span class="n">PinTipDetection</span>
 <span class="kn">from</span> <span class="nn">dodal.log</span> <span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_log_beamline</span>
 <span class="kn">from</span> <span class="nn">dodal.utils</span> <span class="kn">import</span> <span class="n">get_beamline_name</span><span class="p">,</span> <span class="n">get_hostname</span><span class="p">,</span> <span class="n">skip_device</span>
@@ -479,20 +478,6 @@ document.write(`
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">hostname</span> <span class="o">=</span> <span class="n">get_hostname</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">hostname</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;i23-ws&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">hostname</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;i23-control&quot;</span><span class="p">)</span>
-
-
-<div class="viewcode-block" id="gonio">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.beamlines.i23.html#dodal.beamlines.i23.gonio">[docs]</a>
-<span class="k">def</span> <span class="nf">gonio</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Gonio</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i23 goniometer device&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
-        <span class="n">Gonio</span><span class="p">,</span>
-        <span class="s2">&quot;Gonio&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;-MO-GONIO-01:&quot;</span><span class="p">,</span>
-        <span class="n">wait_for_connection</span><span class="p">,</span>
-        <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
-    <span class="p">)</span></div>
-
 
 
 <div class="viewcode-block" id="oav_pin_tip_detection">
