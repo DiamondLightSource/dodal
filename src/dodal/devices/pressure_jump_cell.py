@@ -53,6 +53,28 @@ class PressureJumpCellPumpMotorDirection:
     SEVEN = "7"
 
 
+class PressureJumpCellValveState:
+  FAULT = "Fault"
+  OPEN =  "Open"
+  OPENING = "Opening"
+  CLOSED = "Closed"
+  CLOSING = "Closing"
+  NONE5 = ""
+  NONE6 = ""
+
+class PressureJumpCellFastValveState:
+  FAULT = "Fault"
+  OPEN = "Open"
+  OPEN_ARMED = "Open Armed"
+  CLOSED = "Closed"
+  CLOSED_ARMED = "Closed Armed"
+  NONE5 = "Unused"
+  NONE6 = ""
+
+class PressureJumpCellLimitSwitch:
+    OFF = "Off"
+    ON = "On"
+
 class PressureJumpCell(StandardReadable):
     """
     High pressure X-ray cell, used to apply pressure or pressure jumps to a sample.
@@ -67,12 +89,12 @@ class PressureJumpCell(StandardReadable):
     ) -> None:
         with self.add_children_as_readables():
             ## Valves ##
-            self.valve1_state = epics_signal_r(float, prefix + "V1:STA")
+            self.valve1_state = epics_signal_r(PressureJumpCellValveState, prefix + "V1:STA")
             # V2 - valve manual control
-            self.valve3_state = epics_signal_r(float, prefix + "V3:STA")
+            self.valve3_state = epics_signal_r(PressureJumpCellValveState, prefix + "V3:STA")
             # V4 - valve manual control
-            self.valve5_state = epics_signal_r(float, prefix + "V5:STA")
-            self.valve6_state = epics_signal_r(float, prefix + "V6:STA")
+            self.valve5_state = epics_signal_r(PressureJumpCellFastValveState, prefix + "V5:STA")
+            self.valve6_state = epics_signal_r(PressureJumpCellFastValveState, prefix + "V6:STA")
             # V7 - valve manual control
             # V8 - valve manual control
 
@@ -81,9 +103,9 @@ class PressureJumpCell(StandardReadable):
 
             ## Pump ##
             self.pump_position = epics_signal_r(float, prefix + "POS")
-            self.pump_forward_limit = epics_signal_r(float, prefix + "D74IN1")
-            self.pump_backward_limit = epics_signal_r(float, prefix + "D74IN0")
-            self.pump_position = epics_signal_r(
+            self.pump_forward_limit = epics_signal_r(PressureJumpCellLimitSwitch, prefix + "D74IN1")
+            self.pump_backward_limit = epics_signal_r(PressureJumpCellLimitSwitch, prefix + "D74IN0")
+            self.pump_motor_direction = epics_signal_r(
                 PressureJumpCellPumpMotorDirection, prefix + "MTRDIR"
             )
             self.pump_speed_rbv = epics_signal_r(int, prefix + "MSPEED_RBV")
