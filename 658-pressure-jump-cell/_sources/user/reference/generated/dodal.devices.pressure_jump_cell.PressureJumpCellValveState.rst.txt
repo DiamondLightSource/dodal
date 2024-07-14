@@ -1,0 +1,41 @@
+dodal.devices.pressure\_jump\_cell.PressureJumpCellValveState
+=============================================================
+
+.. currentmodule:: dodal.devices.pressure_jump_cell
+
+.. autoclass:: PressureJumpCellValveState
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~PressureJumpCellValveState.CLOSED
+      
+      
+      ~PressureJumpCellValveState.CLOSING
+      
+      
+      ~PressureJumpCellValveState.FAULT
+      
+      
+      ~PressureJumpCellValveState.NONE5
+      
+      
+      ~PressureJumpCellValveState.NONE6
+      
+      
+      ~PressureJumpCellValveState.OPEN
+      
+      
+      ~PressureJumpCellValveState.OPENING
+      
+   
+   
