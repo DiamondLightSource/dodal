@@ -15,6 +15,7 @@ dodal.devices.slits
    :recursive:
 
    ~slits.Slits
+   ~slits.SpecialSlitsi22
 
 
 

@@ -1,0 +1,41 @@
+dodal.devices.slits.SpecialSlitsi22
+===================================
+
+.. currentmodule:: dodal.devices.slits
+
+.. autoclass:: SpecialSlitsi22
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   
