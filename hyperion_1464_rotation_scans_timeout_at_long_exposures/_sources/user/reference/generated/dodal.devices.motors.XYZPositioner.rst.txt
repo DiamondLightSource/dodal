@@ -1,0 +1,31 @@
+dodal.devices.motors.XYZPositioner
+==================================
+
+.. currentmodule:: dodal.devices.motors
+
+.. autoclass:: XYZPositioner
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   

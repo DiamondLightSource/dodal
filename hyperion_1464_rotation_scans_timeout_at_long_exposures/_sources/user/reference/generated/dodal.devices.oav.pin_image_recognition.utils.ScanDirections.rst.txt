@@ -1,0 +1,26 @@
+dodal.devices.oav.pin\_image\_recognition.utils.ScanDirections
+==============================================================
+
+.. currentmodule:: dodal.devices.oav.pin_image_recognition.utils
+
+.. autoclass:: ScanDirections
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~ScanDirections.FORWARD
+      
+      
+      ~ScanDirections.REVERSE
+      
+   
+   

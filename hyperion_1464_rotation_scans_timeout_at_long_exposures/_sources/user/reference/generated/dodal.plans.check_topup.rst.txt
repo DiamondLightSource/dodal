@@ -1,0 +1,43 @@
+dodal.plans.check\_topup
+========================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.plans
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~check_topup.TopupConfig
+
+
+
+
+.. automodule:: dodal.plans.check_topup
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      check_topup_and_wait_if_necessary
+      wait_for_topup_complete
+   
+   
+
+   
+   
+   
