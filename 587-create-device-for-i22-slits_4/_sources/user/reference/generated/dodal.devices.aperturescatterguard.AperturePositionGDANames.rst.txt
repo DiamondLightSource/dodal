@@ -1,0 +1,84 @@
+dodal.devices.aperturescatterguard.AperturePositionGDANames
+===========================================================
+
+.. currentmodule:: dodal.devices.aperturescatterguard
+
+.. autoclass:: AperturePositionGDANames
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~AperturePositionGDANames.LARGE_APERTURE
+      
+      
+      ~AperturePositionGDANames.MEDIUM_APERTURE
+      
+      
+      ~AperturePositionGDANames.SMALL_APERTURE
+      
+      
+      ~AperturePositionGDANames.ROBOT_LOAD
+      
+   
+   

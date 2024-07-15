@@ -1,0 +1,29 @@
+dodal.devices.areadetector.adutils.SingleTriggerV33
+===================================================
+
+.. currentmodule:: dodal.devices.areadetector.adutils
+
+.. autoclass:: SingleTriggerV33
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      ~SingleTriggerV33.trigger
+      
+      
+   
+   
+
+   
+   
+   
