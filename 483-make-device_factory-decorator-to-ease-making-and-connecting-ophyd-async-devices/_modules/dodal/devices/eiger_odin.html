@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.eiger_odin &#8212; dodal 1.29.4.dev14+g275b091f6 documentation</title>
+    <title>dodal.devices.eiger_odin &#8212; dodal 1.29.4.dev17+g80165c4ca documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=8f415bd8"></script>
+    <script src="../../../_static/documentation_options.js?v=3f8c1158"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -462,7 +462,7 @@ document.write(`
 <span class="kn">from</span> <span class="nn">ophyd</span> <span class="kn">import</span> <span class="n">Component</span><span class="p">,</span> <span class="n">Device</span><span class="p">,</span> <span class="n">EpicsSignal</span><span class="p">,</span> <span class="n">EpicsSignalRO</span><span class="p">,</span> <span class="n">EpicsSignalWithRBV</span>
 <span class="kn">from</span> <span class="nn">ophyd.areadetector.plugins</span> <span class="kn">import</span> <span class="n">HDF5Plugin_V22</span>
 <span class="kn">from</span> <span class="nn">ophyd.sim</span> <span class="kn">import</span> <span class="n">NullStatus</span>
-<span class="kn">from</span> <span class="nn">ophyd.status</span> <span class="kn">import</span> <span class="n">Status</span><span class="p">,</span> <span class="n">SubscriptionStatus</span>
+<span class="kn">from</span> <span class="nn">ophyd.status</span> <span class="kn">import</span> <span class="n">StatusBase</span>
 
 <span class="kn">from</span> <span class="nn">dodal.devices.status</span> <span class="kn">import</span> <span class="n">await_value</span>
 
@@ -596,7 +596,7 @@ document.write(`
     <span class="n">meta</span> <span class="o">=</span> <span class="n">Component</span><span class="p">(</span><span class="n">OdinMetaListener</span><span class="p">,</span> <span class="s2">&quot;OD:META:&quot;</span><span class="p">)</span>
     <span class="n">nodes</span> <span class="o">=</span> <span class="n">Component</span><span class="p">(</span><span class="n">OdinNodesStatus</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">create_finished_status</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SubscriptionStatus</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">create_finished_status</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StatusBase</span><span class="p">:</span>
         <span class="n">writing_finished</span> <span class="o">=</span> <span class="n">await_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">ready</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">node_pv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
             <span class="n">writing_finished</span> <span class="o">&amp;=</span> <span class="n">await_value</span><span class="p">(</span><span class="n">node_pv</span><span class="o">.</span><span class="n">writing</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
@@ -635,7 +635,7 @@ document.write(`
 
 <div class="viewcode-block" id="EigerOdin.stop">
 <a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.eiger_odin.EigerOdin.html#dodal.devices.eiger_odin.EigerOdin.stop">[docs]</a>
-    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Status</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StatusBase</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop odin manually&quot;&quot;&quot;</span>
         <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_writer</span><span class="o">.</span><span class="n">capture</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">status</span> <span class="o">&amp;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">stop_writing</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.util.epics_util &#8212; dodal 1.29.4.dev14+g275b091f6 documentation</title>
+    <title>dodal.devices.util.epics_util &#8212; dodal 1.29.4.dev17+g80165c4ca documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../../_static/documentation_options.js?v=8f415bd8"></script>
+    <script src="../../../../_static/documentation_options.js?v=3f8c1158"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -458,7 +458,7 @@ document.write(`
                   
   <h1>Source code for dodal.devices.util.epics_util</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Sequence</span>
 
 <span class="kn">from</span> <span class="nn">bluesky.protocols</span> <span class="kn">import</span> <span class="n">Movable</span>
 <span class="kn">from</span> <span class="nn">ophyd</span> <span class="kn">import</span> <span class="n">Component</span><span class="p">,</span> <span class="n">EpicsSignal</span>
@@ -490,7 +490,7 @@ document.write(`
 <div class="viewcode-block" id="run_functions_without_blocking">
 <a class="viewcode-back" href="../../../../user/reference/generated/dodal.devices.util.epics_util.html#dodal.devices.util.epics_util.run_functions_without_blocking">[docs]</a>
 <span class="k">def</span> <span class="nf">run_functions_without_blocking</span><span class="p">(</span>
-    <span class="n">functions_to_chain</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[],</span> <span class="n">StatusBase</span><span class="p">]],</span>
+    <span class="n">functions_to_chain</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[],</span> <span class="n">StatusBase</span><span class="p">]],</span>
     <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">60.0</span><span class="p">,</span>
     <span class="n">associated_obj</span><span class="p">:</span> <span class="n">OphydDevice</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Status</span><span class="p">:</span>
