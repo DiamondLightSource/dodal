@@ -25,7 +25,7 @@ class SpecialSlitsi22(StandardReadable):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
             self.x_plus = Motor(prefix + "X:PLUS")
-            self.x_minus = Motor(prefix + "Y:MINUS")
-            self.y_plus = Motor(prefix + "X:PLUS")
+            self.x_minus = Motor(prefix + "X:MINUS")
+            self.y_plus = Motor(prefix + "Y:PLUS")
             self.y_minus = Motor(prefix + "Y:MINUS")
         super().__init__(name)
