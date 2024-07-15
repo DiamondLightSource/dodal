@@ -1,0 +1,36 @@
+dodal.devices.flux
+==================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~flux.Flux
+
+
+
+
+.. automodule:: dodal.devices.flux
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
