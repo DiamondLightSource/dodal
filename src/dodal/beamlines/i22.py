@@ -16,7 +16,7 @@ from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
 from dodal.devices.i22.fswitch import FSwitch
 from dodal.devices.i22.nxsas import NXSasMetadataHolder, NXSasOAV, NXSasPilatus
 from dodal.devices.linkam3 import Linkam3
-from dodal.devices.slits import Slits
+from dodal.devices.slits import Slits, SpecialSlitsi22
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.tetramm import TetrammDetector
 from dodal.devices.undulator import Undulator
@@ -239,8 +239,10 @@ def slits_4(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
 ) -> Slits:
-    return numbered_slits(
-        4,
+    return device_instantiation(
+        SpecialSlitsi22,
+        f"slits_{4}",
+        f"-AL-SLITS-{4:02}:",  # todo maybe this is wrong
         wait_for_connection,
         fake_with_ophyd_sim,
     )
