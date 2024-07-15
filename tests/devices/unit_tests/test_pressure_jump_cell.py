@@ -6,12 +6,13 @@ from ophyd_async.core import DeviceCollector, assert_reading, set_mock_value
 from dodal.devices.pressure_jump_cell import (
     PressureJumpCell,
     PressureJumpCellBusyStatus,
+    PressureJumpCellFastValveState,
+    PressureJumpCellLimitSwitch,
     PressureJumpCellPumpMotorDirection,
     PressureJumpCellTimerState,
     PressureJumpCellValveState,
-    PressureJumpCellFastValveState,
-    PressureJumpCellLimitSwitch
 )
+
 
 @pytest.fixture
 async def pressurejumpcell() -> PressureJumpCell:
@@ -26,18 +27,25 @@ async def test_reading_pjumpcell_includes_read_fields(
 ):
     set_mock_value(pressurejumpcell.valve1_state, PressureJumpCellValveState.CLOSED)
     set_mock_value(pressurejumpcell.valve3_state, PressureJumpCellValveState.OPEN)
-    set_mock_value(pressurejumpcell.valve5_state, PressureJumpCellFastValveState.CLOSED_ARMED)
-    set_mock_value(pressurejumpcell.valve6_state, PressureJumpCellFastValveState.OPEN_ARMED)
+    set_mock_value(
+        pressurejumpcell.valve5_state, PressureJumpCellFastValveState.CLOSED_ARMED
+    )
+    set_mock_value(
+        pressurejumpcell.valve6_state, PressureJumpCellFastValveState.OPEN_ARMED
+    )
     set_mock_value(pressurejumpcell.cell_temperature, 12.3)
-    set_mock_value(pressurejumpcell.pump_position,  100)
+    set_mock_value(pressurejumpcell.pump_position, 100)
     set_mock_value(pressurejumpcell.pump_forward_limit, PressureJumpCellLimitSwitch.OFF)
     set_mock_value(pressurejumpcell.pump_backward_limit, PressureJumpCellLimitSwitch.ON)
-    set_mock_value(pressurejumpcell.pump_motor_direction, PressureJumpCellPumpMotorDirection.FORWARD)
+    set_mock_value(
+        pressurejumpcell.pump_motor_direction,
+        PressureJumpCellPumpMotorDirection.FORWARD,
+    )
     set_mock_value(pressurejumpcell.pump_speed_rbv, 100)
     set_mock_value(pressurejumpcell.pressuretransducer1_omron_pressure, 1001)
     set_mock_value(pressurejumpcell.pressuretransducer1_omron_voltage, 2.51)
     set_mock_value(pressurejumpcell.pressuretransducer1_beckhoff_pressure, 1001.1)
-    set_mock_value(pressurejumpcell.pressuretransducer1_beckhoff_voltage,  2.51)
+    set_mock_value(pressurejumpcell.pressuretransducer1_beckhoff_voltage, 2.51)
     set_mock_value(pressurejumpcell.pressuretransducer2_omron_pressure, 1002)
     set_mock_value(pressurejumpcell.pressuretransducer2_omron_voltage, 2.52)
     set_mock_value(pressurejumpcell.pressuretransducer2_beckhoff_pressure, 1002.2)
@@ -50,10 +58,9 @@ async def test_reading_pjumpcell_includes_read_fields(
     set_mock_value(pressurejumpcell.control_timer, PressureJumpCellTimerState.COUNTDOWN)
     set_mock_value(pressurejumpcell.control_counter, 123)
     set_mock_value(pressurejumpcell.control_script_status, "ABC")
-    set_mock_value(pressurejumpcell.control_routine,  "CDE")
+    set_mock_value(pressurejumpcell.control_routine, "CDE")
     set_mock_value(pressurejumpcell.control_state, "EFG")
     set_mock_value(pressurejumpcell.control_iteration, 456)
-
 
     await assert_reading(
         pressurejumpcell,
@@ -205,4 +212,3 @@ async def test_reading_pjumpcell_includes_read_fields(
             },
         },
     )
-
