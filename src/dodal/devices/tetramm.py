@@ -11,8 +11,8 @@ from ophyd_async.core import (
     DirectoryProvider,
     ShapeProvider,
     StandardDetector,
+    set_and_wait_for_value,
     soft_signal_r_and_setter,
-    wait_for_value,
 )
 from ophyd_async.epics.areadetector.utils import stop_busy_record
 from ophyd_async.epics.areadetector.writers import HDFWriter, NDFileHDF
@@ -132,10 +132,9 @@ class TetrammController(DetectorControl):
             self._drv.averaging_time.set(exposure), self.set_exposure(exposure)
         )
 
-        finished_status = self._drv.acquire.set(True)
-        await wait_for_value(self._drv.acquire, True, 10)
+        status = await set_and_wait_for_value(self._drv.acquire, 1)
 
-        return finished_status
+        return status
 
     def _validate_trigger(self, trigger: DetectorTrigger) -> None:
         supported_trigger_types = {
