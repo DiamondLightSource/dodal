@@ -1,0 +1,47 @@
+dodal.devices.oav.pin\_image\_recognition.PinTipDetection
+=========================================================
+
+.. currentmodule:: dodal.devices.oav.pin_image_recognition
+
+.. autoclass:: PinTipDetection
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~PinTipDetection.trigger
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~PinTipDetection.INVALID_POSITION
+      
+      
+      
+      
+      
+   
+   

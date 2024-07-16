@@ -1,0 +1,43 @@
+dodal.devices.detector.det\_dim\_constants
+==========================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.detector
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~det_dim_constants.DetectorSize
+   ~det_dim_constants.DetectorSizeConstants
+
+
+
+
+.. automodule:: dodal.devices.detector.det_dim_constants
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      constants_from_type
+   
+   
+
+   
+   
+   
