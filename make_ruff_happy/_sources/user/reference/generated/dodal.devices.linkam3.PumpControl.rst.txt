@@ -1,0 +1,78 @@
+dodal.devices.linkam3.PumpControl
+=================================
+
+.. currentmodule:: dodal.devices.linkam3
+
+.. autoclass:: PumpControl
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~PumpControl.Manual
+      
+      
+      ~PumpControl.Auto
+      
+   
+   

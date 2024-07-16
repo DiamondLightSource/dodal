@@ -1,0 +1,84 @@
+dodal.devices.tetramm.TetrammTrigger
+====================================
+
+.. currentmodule:: dodal.devices.tetramm
+
+.. autoclass:: TetrammTrigger
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~TetrammTrigger.FreeRun
+      
+      
+      ~TetrammTrigger.ExtTrigger
+      
+      
+      ~TetrammTrigger.ExtBulb
+      
+      
+      ~TetrammTrigger.ExtGate
+      
+   
+   

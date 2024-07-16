@@ -1,0 +1,35 @@
+dodal.devices.aperturescatterguard.ApertureScatterguardTolerances
+=================================================================
+
+.. currentmodule:: dodal.devices.aperturescatterguard
+
+.. autoclass:: ApertureScatterguardTolerances
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~ApertureScatterguardTolerances.ap_x
+      
+      
+      ~ApertureScatterguardTolerances.ap_y
+      
+      
+      ~ApertureScatterguardTolerances.ap_z
+      
+      
+      ~ApertureScatterguardTolerances.sg_x
+      
+      
+      ~ApertureScatterguardTolerances.sg_y
+      
+   
+   

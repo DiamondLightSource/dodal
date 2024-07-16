@@ -1,0 +1,32 @@
+dodal.devices.zebra.I24Axes
+===========================
+
+.. currentmodule:: dodal.devices.zebra
+
+.. autoclass:: I24Axes
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~I24Axes.OMEGA
+      
+      
+      ~I24Axes.VGON_X
+      
+      
+      ~I24Axes.VGON_YH
+      
+      
+      ~I24Axes.VGON_Z
+      
+   
+   

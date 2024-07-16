@@ -428,6 +428,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/jungfrau_commissioning/"
   },
   {
+    "version": "make_ruff_happy",
+    "url": "https://DiamondLightSource.github.io/dodal/make_ruff_happy/"
+  },
+  {
     "version": "mx_115-make-a-dcm-for-i24",
     "url": "https://DiamondLightSource.github.io/dodal/mx_115-make-a-dcm-for-i24/"
   },
