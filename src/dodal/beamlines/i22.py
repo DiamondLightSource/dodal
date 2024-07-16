@@ -28,6 +28,8 @@ BL = get_beamline_name("i22")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
+IS_LAB = BL == "p38"
+
 # Currently we must hard-code the visit, determining the visit at runtime requires
 # infrastructure that is still WIP.
 # Communication with GDA is also WIP so for now we determine an arbitrary scan number
@@ -109,7 +111,7 @@ def i0(
     return device_instantiation(
         TetrammDetector,
         "i0",
-        "-EA-XBPM-02:",
+        f"-EA-XBPM-0{1 if IS_LAB else 2}:",
         wait_for_connection,
         fake_with_ophyd_sim,
         type="Cividec Diamond XBPM",
@@ -374,7 +376,7 @@ def linkam(
     return device_instantiation(
         Linkam3,
         "linkam",
-        "-EA-TEMPC-05",
+        "-EA-TEMPC-05" if IS_LAB else "-EA-TEMPC-05",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
