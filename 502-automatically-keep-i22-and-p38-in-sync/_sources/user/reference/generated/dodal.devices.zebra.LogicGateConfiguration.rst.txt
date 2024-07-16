@@ -1,0 +1,31 @@
+dodal.devices.zebra.LogicGateConfiguration
+==========================================
+
+.. currentmodule:: dodal.devices.zebra
+
+.. autoclass:: LogicGateConfiguration
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~LogicGateConfiguration.add_input
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~LogicGateConfiguration.NUMBER_OF_INPUTS
+      
+   
+   

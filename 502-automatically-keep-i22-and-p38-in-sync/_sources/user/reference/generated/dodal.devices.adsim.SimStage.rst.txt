@@ -1,0 +1,90 @@
+dodal.devices.adsim.SimStage
+============================
+
+.. currentmodule:: dodal.devices.adsim
+
+.. autoclass:: SimStage
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      ~SimStage.component_names
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~SimStage.load
+      
+      
+      
+      
+      
+      
+      
+      
+      ~SimStage.subscriptions
+      
+      
+      ~SimStage.theta
+      
+      
+      
+      ~SimStage.x
+      
+      
+      ~SimStage.y
+      
+      
+      ~SimStage.z
+      
+   
+   

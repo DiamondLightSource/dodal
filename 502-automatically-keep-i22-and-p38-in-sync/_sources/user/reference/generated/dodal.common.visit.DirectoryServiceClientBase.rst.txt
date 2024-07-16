@@ -1,0 +1,26 @@
+dodal.common.visit.DirectoryServiceClientBase
+=============================================
+
+.. currentmodule:: dodal.common.visit
+
+.. autoclass:: DirectoryServiceClientBase
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~DirectoryServiceClientBase.create_new_collection
+      
+      
+      ~DirectoryServiceClientBase.get_current_collection
+      
+   
+   
+
+   
+   
+   

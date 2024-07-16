@@ -1,0 +1,152 @@
+dodal.devices.areadetector.adutils.SynchronisedAdDriverBase
+===========================================================
+
+.. currentmodule:: dodal.devices.areadetector.adutils
+
+.. autoclass:: SynchronisedAdDriverBase
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      ~SynchronisedAdDriverBase.ensure_nonblocking
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~SynchronisedAdDriverBase.stage
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      ~SynchronisedAdDriverBase.adcore_version
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~SynchronisedAdDriverBase.component_names
+      
+      
+      
+      
+      
+      
+      
+      
+      ~SynchronisedAdDriverBase.driver_version
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~SynchronisedAdDriverBase.subscriptions
+      
+      
+      
+      
+      
+      
+      
+      ~SynchronisedAdDriverBase.wait_for_plugins
+      
+   
+   

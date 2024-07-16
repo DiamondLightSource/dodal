@@ -1,0 +1,26 @@
+dodal.devices.detector.det\_dim\_constants.DetectorSize
+=======================================================
+
+.. currentmodule:: dodal.devices.detector.det_dim_constants
+
+.. autoclass:: DetectorSize
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~DetectorSize.width
+      
+      
+      ~DetectorSize.height
+      
+   
+   
