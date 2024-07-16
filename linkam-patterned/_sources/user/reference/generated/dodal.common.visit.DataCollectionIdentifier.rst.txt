@@ -1,0 +1,40 @@
+dodal.common.visit.DataCollectionIdentifier
+===========================================
+
+.. currentmodule:: dodal.common.visit
+
+.. autoclass:: DataCollectionIdentifier
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~DataCollectionIdentifier.collectionNumber
+      
+   
+   

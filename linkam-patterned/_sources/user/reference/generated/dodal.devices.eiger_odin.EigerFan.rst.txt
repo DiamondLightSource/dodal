@@ -1,0 +1,108 @@
+dodal.devices.eiger\_odin.EigerFan
+==================================
+
+.. currentmodule:: dodal.devices.eiger_odin
+
+.. autoclass:: EigerFan
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      ~EigerFan.component_names
+      
+      
+      
+      
+      ~EigerFan.consumers_connected
+      
+      
+      ~EigerFan.dev_shm_enable
+      
+      
+      
+      
+      ~EigerFan.forward_stream
+      
+      
+      ~EigerFan.frames_sent
+      
+      
+      
+      
+      
+      
+      ~EigerFan.offset
+      
+      
+      ~EigerFan.on
+      
+      
+      
+      
+      ~EigerFan.ready
+      
+      
+      
+      
+      ~EigerFan.series
+      
+      
+      
+      ~EigerFan.state
+      
+      
+      ~EigerFan.subscriptions
+      
+      
+      
+      ~EigerFan.zmq_addr
+      
+      
+      ~EigerFan.zmq_port
+      
+   
+   

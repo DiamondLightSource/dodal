@@ -1,0 +1,78 @@
+dodal.devices.flux.Flux
+=======================
+
+.. currentmodule:: dodal.devices.flux
+
+.. autoclass:: Flux
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      ~Flux.component_names
+      
+      
+      
+      
+      
+      
+      ~Flux.flux_reading
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~Flux.subscriptions
+      
+      
+   
+   
