@@ -47,7 +47,7 @@ def test_instantiating_different_device_with_same_name():
         Smargon, "device", "", False, True, None
     )
     assert dev1.name == dev2.name
-    assert type(dev1) != type(dev2)
+    assert type(dev1) is not type(dev2)
     assert dev1 not in beamline_utils.ACTIVE_DEVICES.values()
     assert dev2 in beamline_utils.ACTIVE_DEVICES.values()
 
