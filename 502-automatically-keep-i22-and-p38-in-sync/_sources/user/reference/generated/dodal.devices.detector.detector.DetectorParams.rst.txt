@@ -36,6 +36,17 @@ dodal.devices.detector.detector.DetectorParams
       
       
       
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
    
    
 
@@ -50,6 +61,17 @@ dodal.devices.detector.detector.DetectorParams
       
       
       ~DetectorParams.full_number_of_images
+      
+      
+      ~DetectorParams.model_computed_fields
+      
+      
+      ~DetectorParams.model_config
+      
+      
+      
+      ~DetectorParams.model_fields
+      
       
       
       ~DetectorParams.expected_energy_ev
