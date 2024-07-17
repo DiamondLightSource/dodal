@@ -1,0 +1,37 @@
+dodal.beamlines.example\_beamline.DeviceInitializationController
+================================================================
+
+.. currentmodule:: dodal.beamlines.example_beamline
+
+.. autoclass:: DeviceInitializationController
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~DeviceInitializationController.add_device_to_cache
+      
+      
+      ~DeviceInitializationController.see_if_device_is_in_cache
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~DeviceInitializationController.config
+      
+      
+      ~DeviceInitializationController.device
+      
+   
+   

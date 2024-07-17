@@ -1,0 +1,45 @@
+dodal.beamlines.example\_beamline
+=================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.beamlines
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~example_beamline.ConnectionMode
+   ~example_beamline.DeviceInitializationConfig
+   ~example_beamline.DeviceInitializationController
+   ~example_beamline.XYZDetector
+
+
+
+
+.. automodule:: dodal.beamlines.example_beamline
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      device_instance_behavior
+   
+   
+
+   
+   
+   

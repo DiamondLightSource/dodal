@@ -1,0 +1,34 @@
+dodal.beamlines.example\_beamline.XYZDetector
+=============================================
+
+.. currentmodule:: dodal.beamlines.example_beamline
+
+.. autoclass:: XYZDetector
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~XYZDetector.hints
+      
+      
+      
+      
+   
+   

@@ -1,0 +1,32 @@
+dodal.beamlines.example\_beamline.DeviceInitializationConfig
+============================================================
+
+.. currentmodule:: dodal.beamlines.example_beamline
+
+.. autoclass:: DeviceInitializationConfig
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~DeviceInitializationConfig.default_timeout_for_connect
+      
+      
+      ~DeviceInitializationConfig.default_use_mock_at_connection
+      
+      
+      ~DeviceInitializationConfig.eager
+      
+      
+      ~DeviceInitializationConfig.set_name
+      
+   
+   

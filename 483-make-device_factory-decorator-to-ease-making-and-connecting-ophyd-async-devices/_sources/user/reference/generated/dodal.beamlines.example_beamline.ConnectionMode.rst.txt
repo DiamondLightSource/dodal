@@ -1,0 +1,29 @@
+dodal.beamlines.example\_beamline.ConnectionMode
+================================================
+
+.. currentmodule:: dodal.beamlines.example_beamline
+
+.. autoclass:: ConnectionMode
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~ConnectionMode.LAZY
+      
+      
+      ~ConnectionMode.EAGER
+      
+      
+      ~ConnectionMode.SOMETIMES
+      
+   
+   

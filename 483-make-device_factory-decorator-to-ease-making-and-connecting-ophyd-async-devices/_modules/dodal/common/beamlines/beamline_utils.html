@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.common.beamlines.beamline_utils &#8212; dodal 1.29.4.dev17+g80165c4ca documentation</title>
+    <title>dodal.common.beamlines.beamline_utils &#8212; dodal 1.29.4.dev20+gfa4aaf167 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../../_static/documentation_options.js?v=3f8c1158"></script>
+    <script src="../../../../_static/documentation_options.js?v=60eaaf38"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -458,7 +458,6 @@ document.write(`
                   
   <h1>Source code for dodal.common.beamlines.beamline_utils</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">inspect</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Callable</span><span class="p">,</span>
     <span class="n">Dict</span><span class="p">,</span>
@@ -569,10 +568,12 @@ document.write(`
 
 <span class="n">_device_is_lazy</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">DeviceFactory</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
+
 <div class="viewcode-block" id="get_device_factories">
 <a class="viewcode-back" href="../../../../user/reference/generated/dodal.common.beamlines.beamline_utils.html#dodal.common.beamlines.beamline_utils.get_device_factories">[docs]</a>
 <span class="k">def</span> <span class="nf">get_device_factories</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">DeviceFactory</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]:</span>
     <span class="k">return</span> <span class="n">_device_is_lazy</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+
 
 
 <div class="viewcode-block" id="device_instantiation">
@@ -653,69 +654,6 @@ document.write(`
             <span class="s2">&quot;DirectoryProvider has not been set! Ophyd-async StandardDetectors will not be able to write!&quot;</span>
         <span class="p">)</span>
     <span class="k">return</span> <span class="n">DIRECTORY_PROVIDER</span></div>
-
-
-
-<div class="viewcode-block" id="decorator_name">
-<a class="viewcode-back" href="../../../../user/reference/generated/dodal.common.beamlines.beamline_utils.html#dodal.common.beamlines.beamline_utils.decorator_name">[docs]</a>
-<span class="nd">@skip_device</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">decorator_name</span><span class="p">(</span>
-    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">not_lazy</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-    <span class="n">fake</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-    <span class="n">post_create</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">T</span><span class="p">],</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">DEFAULT_CONNECTION_TIMEOUT</span><span class="p">,</span>
-    <span class="n">bl_prefix</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Method to allow generic creation of singleton devices. Meant to be used to easily</span>
-<span class="sd">    define lists of devices in beamline files. Additional keyword arguments are passed</span>
-<span class="sd">    directly to the device constructor.</span>
-
-<span class="sd">    Arguments:</span>
-<span class="sd">        device_factory: Callable    the device class</span>
-<span class="sd">        name: str                   the name for ophyd</span>
-<span class="sd">        prefix: str                 the PV prefix for the most (usually all) components</span>
-<span class="sd">        wait: bool                  whether to run .wait_for_connection()</span>
-<span class="sd">        fake: bool                  whether to fake with ophyd.sim</span>
-<span class="sd">        post_create: Callable       (optional) a function to be run on the device after</span>
-<span class="sd">                                    creation</span>
-<span class="sd">        bl_prefix: bool             if true, add the beamline prefix when instantiating, if</span>
-<span class="sd">                                    false the complete PV prefix must be supplied.</span>
-<span class="sd">    Returns:</span>
-<span class="sd">        The instance of the device.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">already_existing_device</span><span class="p">:</span> <span class="n">AnyDevice</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">ACTIVE_DEVICES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">fake</span><span class="p">:</span>
-        <span class="n">device_factory</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span> <span class="n">make_fake_device</span><span class="p">(</span><span class="n">device_factory</span><span class="p">))</span>
-    <span class="k">if</span> <span class="n">already_existing_device</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">device_instance</span> <span class="o">=</span> <span class="n">device_factory</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
-            <span class="n">prefix</span><span class="o">=</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="p">(</span><span class="n">BeamlinePrefix</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="p">)</span><span class="si">}{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="k">if</span> <span class="n">bl_prefix</span>
-                <span class="k">else</span> <span class="n">prefix</span>
-            <span class="p">),</span>
-            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">ACTIVE_DEVICES</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">device_instance</span>
-        <span class="k">if</span> <span class="n">not_lazy</span><span class="p">:</span>
-            <span class="n">call_in_bluesky_event_loop</span><span class="p">(</span><span class="n">device_instance</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">))</span>
-
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">active_device_is_same_type</span><span class="p">(</span><span class="n">already_existing_device</span><span class="p">,</span> <span class="n">device_factory</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Can&#39;t instantiate device of type </span><span class="si">{</span><span class="n">device_factory</span><span class="si">}</span><span class="s2"> with the same &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;name as an existing device. Device name &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; already used for &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;a(n) </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">already_existing_device</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="p">)</span>
-        <span class="n">device_instance</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">already_existing_device</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">post_create</span><span class="p">:</span>
-        <span class="n">post_create</span><span class="p">(</span><span class="n">device_instance</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">device_instance</span></div>
-
-
 
 </pre></div>
 

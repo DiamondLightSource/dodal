@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.beamlines.i22 &#8212; dodal 1.29.3.dev14+g824608243 documentation</title>
+    <title>dodal.beamlines.i22 &#8212; dodal 1.29.4.dev20+gfa4aaf167 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=a2515664"></script>
+    <script src="../../../_static/documentation_options.js?v=60eaaf38"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -425,6 +425,13 @@ document.write(`
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../api.html">API</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="dodal.beamlines.html">dodal.beamlines</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.beamlines.example_beamline.html">dodal.beamlines.example_beamline</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.beamlines.example_beamline.ConnectionMode.html">dodal.beamlines.example_beamline.ConnectionMode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.beamlines.example_beamline.DeviceInitializationConfig.html">dodal.beamlines.example_beamline.DeviceInitializationConfig</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.beamlines.example_beamline.DeviceInitializationController.html">dodal.beamlines.example_beamline.DeviceInitializationController</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.beamlines.example_beamline.XYZDetector.html">dodal.beamlines.example_beamline.XYZDetector</a></li>
+</ul>
+</details></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i03.html">dodal.beamlines.i03</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i04.html">dodal.beamlines.i04</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i04_1.html">dodal.beamlines.i04_1</a></li>
@@ -819,120 +826,69 @@ document.write(`
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i22.dcm" title="dodal.beamlines.i22.dcm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dcm</span></code></a>([wait_for_connection, fake_with_ophyd_sim])</p></td>
-<td><p><dl class="field-list simple">
-<dt class="field-odd">param wait_for_connection<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p></dd>
-</dl>
-</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i22.fswitch" title="dodal.beamlines.i22.fswitch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fswitch</span></code></a>([wait_for_connection, ...])</p></td>
-<td><p><dl class="field-list simple">
-<dt class="field-odd">param wait_for_connection<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p></dd>
-</dl>
-</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i22.hfm" title="dodal.beamlines.i22.hfm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hfm</span></code></a>([wait_for_connection, fake_with_ophyd_sim])</p></td>
-<td><p><dl class="field-list simple">
-<dt class="field-odd">param wait_for_connection<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p></dd>
-</dl>
-</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i22.i0" title="dodal.beamlines.i22.i0"><code class="xref py py-obj docutils literal notranslate"><span class="pre">i0</span></code></a>([wait_for_connection, fake_with_ophyd_sim])</p></td>
-<td><p><dl class="field-list simple">
-<dt class="field-odd">param wait_for_connection<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p></dd>
-</dl>
-</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i22.it" title="dodal.beamlines.i22.it"><code class="xref py py-obj docutils literal notranslate"><span class="pre">it</span></code></a>([wait_for_connection, fake_with_ophyd_sim])</p></td>
-<td><p><dl class="field-list simple">
-<dt class="field-odd">param wait_for_connection<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p></dd>
-</dl>
-</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i22.oav" title="dodal.beamlines.i22.oav"><code class="xref py py-obj docutils literal notranslate"><span class="pre">oav</span></code></a>([wait_for_connection, fake_with_ophyd_sim])</p></td>
-<td><p><dl class="field-list simple">
-<dt class="field-odd">param wait_for_connection<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p></dd>
-</dl>
-</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i22.panda1" title="dodal.beamlines.i22.panda1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">panda1</span></code></a>([wait_for_connection, ...])</p></td>
-<td><p><dl class="field-list simple">
-<dt class="field-odd">param wait_for_connection<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p></dd>
-</dl>
-</p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i22.slits_1" title="dodal.beamlines.i22.slits_1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">slits_1</span></code></a>([wait_for_connection, ...])</p></td>
-<td><p><dl class="field-list simple">
-<dt class="field-odd">param wait_for_connection<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p></dd>
-</dl>
-</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i22.saxs" title="dodal.beamlines.i22.saxs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">saxs</span></code></a>()</p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i22.slits_2" title="dodal.beamlines.i22.slits_2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">slits_2</span></code></a>([wait_for_connection, ...])</p></td>
-<td><p><dl class="field-list simple">
-<dt class="field-odd">param wait_for_connection<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p></dd>
-</dl>
-</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i22.slits_1" title="dodal.beamlines.i22.slits_1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">slits_1</span></code></a>([wait_for_connection, ...])</p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i22.slits_3" title="dodal.beamlines.i22.slits_3"><code class="xref py py-obj docutils literal notranslate"><span class="pre">slits_3</span></code></a>([wait_for_connection, ...])</p></td>
-<td><p><dl class="field-list simple">
-<dt class="field-odd">param wait_for_connection<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p></dd>
-</dl>
-</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i22.slits_2" title="dodal.beamlines.i22.slits_2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">slits_2</span></code></a>([wait_for_connection, ...])</p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i22.slits_5" title="dodal.beamlines.i22.slits_5"><code class="xref py py-obj docutils literal notranslate"><span class="pre">slits_5</span></code></a>([wait_for_connection, ...])</p></td>
-<td><p><dl class="field-list simple">
-<dt class="field-odd">param wait_for_connection<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p></dd>
-</dl>
-</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i22.slits_3" title="dodal.beamlines.i22.slits_3"><code class="xref py py-obj docutils literal notranslate"><span class="pre">slits_3</span></code></a>([wait_for_connection, ...])</p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i22.slits_6" title="dodal.beamlines.i22.slits_6"><code class="xref py py-obj docutils literal notranslate"><span class="pre">slits_6</span></code></a>([wait_for_connection, ...])</p></td>
-<td><p><dl class="field-list simple">
-<dt class="field-odd">param wait_for_connection<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p></dd>
-</dl>
-</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i22.slits_5" title="dodal.beamlines.i22.slits_5"><code class="xref py py-obj docutils literal notranslate"><span class="pre">slits_5</span></code></a>([wait_for_connection, ...])</p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i22.synchrotron" title="dodal.beamlines.i22.synchrotron"><code class="xref py py-obj docutils literal notranslate"><span class="pre">synchrotron</span></code></a>([wait_for_connection, ...])</p></td>
-<td><p><dl class="field-list simple">
-<dt class="field-odd">param wait_for_connection<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p></dd>
-</dl>
-</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i22.slits_6" title="dodal.beamlines.i22.slits_6"><code class="xref py py-obj docutils literal notranslate"><span class="pre">slits_6</span></code></a>([wait_for_connection, ...])</p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i22.undulator" title="dodal.beamlines.i22.undulator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">undulator</span></code></a>([wait_for_connection, ...])</p></td>
-<td><p><dl class="field-list simple">
-<dt class="field-odd">param wait_for_connection<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p></dd>
-</dl>
-</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i22.synchrotron" title="dodal.beamlines.i22.synchrotron"><code class="xref py py-obj docutils literal notranslate"><span class="pre">synchrotron</span></code></a>([wait_for_connection, ...])</p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i22.vfm" title="dodal.beamlines.i22.vfm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vfm</span></code></a>([wait_for_connection, fake_with_ophyd_sim])</p></td>
-<td><p><dl class="field-list simple">
-<dt class="field-odd">param wait_for_connection<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p></dd>
-</dl>
-</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i22.undulator" title="dodal.beamlines.i22.undulator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">undulator</span></code></a>([wait_for_connection, ...])</p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i22.waxs" title="dodal.beamlines.i22.waxs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">waxs</span></code></a>([wait_for_connection, fake_with_ophyd_sim])</p></td>
-<td><p><dl class="field-list simple">
-<dt class="field-odd">param wait_for_connection<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p></dd>
-</dl>
-</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i22.vfm" title="dodal.beamlines.i22.vfm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vfm</span></code></a>([wait_for_connection, fake_with_ophyd_sim])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i22.waxs" title="dodal.beamlines.i22.waxs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">waxs</span></code></a>([wait_for_connection, fake_with_ophyd_sim])</p></td>
+<td><p></p></td>
 </tr>
 </tbody>
 </table>
 </div>
+<dl class="py function">
+<dt class="sig sig-object py" id="dodal.beamlines.i22.saxs">
+<span class="sig-prename descclassname"><span class="pre">dodal.beamlines.i22.</span></span><span class="sig-name descname"><span class="pre">saxs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">PilatusDetector</span></span></span><a class="reference internal" href="../../../_modules/dodal/beamlines/i22.html#saxs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.beamlines.i22.saxs" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">PilatusDetector</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="dodal.beamlines.i22.synchrotron">
 <span class="sig-prename descclassname"><span class="pre">dodal.beamlines.i22.</span></span><span class="sig-name descname"><span class="pre">synchrotron</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wait_for_connection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fake_with_ophyd_sim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="dodal.devices.synchrotron.Synchrotron.html#dodal.devices.synchrotron.Synchrotron" title="dodal.devices.synchrotron.Synchrotron"><span class="pre">Synchrotron</span></a></span></span><a class="reference internal" href="../../../_modules/dodal/beamlines/i22.html#synchrotron"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.beamlines.i22.synchrotron" title="Link to this definition">#</a></dt>
@@ -1237,6 +1193,7 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.beamlines.i22.saxs"><code class="docutils literal notranslate"><span class="pre">saxs()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.beamlines.i22.synchrotron"><code class="docutils literal notranslate"><span class="pre">synchrotron()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.beamlines.i22.waxs"><code class="docutils literal notranslate"><span class="pre">waxs()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.beamlines.i22.i0"><code class="docutils literal notranslate"><span class="pre">i0()</span></code></a></li>
