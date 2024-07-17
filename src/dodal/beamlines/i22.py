@@ -241,8 +241,8 @@ def slits_4(
 ) -> Slits:
     return device_instantiation(
         SpecialSlitsi22,
-        f"slits_{4}",
-        f"-AL-SLITS-{4:02}:",  # todo maybe this is wrong
+        "slits_4",
+        "-AL-SLITS-04:",  # todo maybe this is wrong
         wait_for_connection,
         fake_with_ophyd_sim,
     )
