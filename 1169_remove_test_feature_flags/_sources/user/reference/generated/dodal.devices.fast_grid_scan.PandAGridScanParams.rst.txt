@@ -1,0 +1,116 @@
+dodal.devices.fast\_grid\_scan.PandAGridScanParams
+==================================================
+
+.. currentmodule:: dodal.devices.fast_grid_scan
+
+.. autoclass:: PandAGridScanParams
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      ~PandAGridScanParams.get_param_positions
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~PandAGridScanParams.model_computed_fields
+      
+      
+      ~PandAGridScanParams.model_config
+      
+      
+      
+      ~PandAGridScanParams.model_fields
+      
+      
+      
+      ~PandAGridScanParams.run_up_distance_mm
+      
+      
+      ~PandAGridScanParams.x_steps
+      
+      
+      ~PandAGridScanParams.y_steps
+      
+      
+      ~PandAGridScanParams.z_steps
+      
+      
+      ~PandAGridScanParams.x_step_size
+      
+      
+      ~PandAGridScanParams.y_step_size
+      
+      
+      ~PandAGridScanParams.z_step_size
+      
+      
+      ~PandAGridScanParams.x_start
+      
+      
+      ~PandAGridScanParams.y1_start
+      
+      
+      ~PandAGridScanParams.y2_start
+      
+      
+      ~PandAGridScanParams.z1_start
+      
+      
+      ~PandAGridScanParams.z2_start
+      
+      
+      ~PandAGridScanParams.x_axis
+      
+      
+      ~PandAGridScanParams.y_axis
+      
+      
+      ~PandAGridScanParams.z_axis
+      
+      
+      ~PandAGridScanParams.set_stub_offsets
+      
+      
+      ~PandAGridScanParams.transmission_fraction
+      
+   
+   

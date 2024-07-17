@@ -1,0 +1,102 @@
+dodal.devices.eiger\_odin.OdinNode
+==================================
+
+.. currentmodule:: dodal.devices.eiger_odin
+
+.. autoclass:: OdinNode
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      ~OdinNode.clear_errors
+      
+      
+      ~OdinNode.component_names
+      
+      
+      
+      
+      
+      ~OdinNode.error_message
+      
+      
+      ~OdinNode.error_status
+      
+      
+      
+      ~OdinNode.fp_initialised
+      
+      
+      ~OdinNode.fr_initialised
+      
+      
+      ~OdinNode.frames_dropped
+      
+      
+      ~OdinNode.frames_timed_out
+      
+      
+      
+      
+      
+      
+      ~OdinNode.num_captured
+      
+      
+      
+      
+      
+      
+      
+      ~OdinNode.subscriptions
+      
+      
+      
+      ~OdinNode.writing
+      
+   
+   
