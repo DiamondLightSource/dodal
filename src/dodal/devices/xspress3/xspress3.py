@@ -7,7 +7,7 @@ from ophyd_async.core import (
     AsyncStatus,
     Device,
     DeviceVector,
-    wait_for_value,
+    set_and_wait_for_other_value,
 )
 from ophyd_async.epics.signal.signal import (
     epics_signal_r,
@@ -43,6 +43,16 @@ class UpdateRBV(str, Enum):
 class AcquireRBVState(str, Enum):
     DONE = "Done"
     ACQUIRE = "Acquiring"
+
+
+class WritingRBVState(str, Enum):
+    DONE = "Done"
+    CAPTURE = "Capturing"
+
+
+class WritingState(str, Enum):
+    DONE = "Done"
+    CAPTURE = "Capture"
 
 
 class DetectorState(str, Enum):
@@ -115,6 +125,13 @@ class Xspress3(Device, Stageable):
         self.acquire_rbv = epics_signal_r(AcquireRBVState, prefix + "Acquire_RBV")
         self.trigger_mode = epics_signal_rw_rbv(TriggerMode, prefix + "TriggerMode")
 
+        self.file_path = epics_signal_rw_rbv(str, prefix + "HDF5:FilePath")
+        self.file_name = epics_signal_rw_rbv(str, prefix + "HDF5:FileName")
+        self.do_file_writing = epics_signal_rw(WritingState, prefix + "HDF5:Capture")
+        self.file_writing_rbv = epics_signal_r(
+            WritingRBVState, prefix + "HDF5:Capture_RBV"
+        )
+
         self.detector_state = epics_signal_r(
             DetectorState, prefix + "DetectorState_RBV"
         )
@@ -130,21 +147,37 @@ class Xspress3(Device, Stageable):
     @AsyncStatus.wrap
     async def stage(self) -> None:
         LOGGER.info("Arming Xspress3 detector...")
-        await self.trigger_mode.set(TriggerMode.BURST)
-        await wait_for_value(
-            self.detector_state,
-            lambda v: v in self.detector_busy_states,
+        await set_and_wait_for_other_value(
+            self.do_file_writing,
+            WritingState.CAPTURE,
+            self.file_writing_rbv,
+            WritingRBVState.CAPTURE,
             timeout=self.timeout,
         )
-        await self.acquire.set(AcquireState.ACQUIRE)
-        await wait_for_value(
-            self.acquire_rbv, AcquireRBVState.ACQUIRE, timeout=self.timeout
+        await self.trigger_mode.set(TriggerMode.BURST)
+
+        await set_and_wait_for_other_value(
+            self.acquire,
+            AcquireState.ACQUIRE,
+            self.acquire_rbv,
+            AcquireRBVState.ACQUIRE,
+            timeout=self.timeout,
         )
 
     @AsyncStatus.wrap
     async def unstage(self) -> None:
-        await self.acquire.set(AcquireState.DONE)
         LOGGER.info("unstaging Xspress3 detector...")
-        await wait_for_value(
-            self.acquire_rbv, AcquireRBVState.DONE, timeout=self.timeout
+        await set_and_wait_for_other_value(
+            self.do_file_writing,
+            WritingState.DONE,
+            self.file_writing_rbv,
+            WritingRBVState.DONE,
+            timeout=self.timeout,
+        )
+        await set_and_wait_for_other_value(
+            self.acquire,
+            AcquireState.DONE,
+            self.acquire_rbv,
+            AcquireRBVState.DONE,
+            timeout=self.timeout,
         )
