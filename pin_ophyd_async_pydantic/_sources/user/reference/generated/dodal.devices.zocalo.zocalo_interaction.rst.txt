@@ -1,0 +1,37 @@
+dodal.devices.zocalo.zocalo\_interaction
+========================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.zocalo
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~zocalo_interaction.ZocaloStartInfo
+   ~zocalo_interaction.ZocaloTrigger
+
+
+
+
+.. automodule:: dodal.devices.zocalo.zocalo_interaction
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

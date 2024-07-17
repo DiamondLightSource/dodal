@@ -460,6 +460,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/pin_ophyd_async/"
   },
   {
+    "version": "pin_ophyd_async_pydantic",
+    "url": "https://DiamondLightSource.github.io/dodal/pin_ophyd_async_pydantic/"
+  },
+  {
     "version": "release-004-retroactive",
     "url": "https://DiamondLightSource.github.io/dodal/release-004-retroactive/"
   },

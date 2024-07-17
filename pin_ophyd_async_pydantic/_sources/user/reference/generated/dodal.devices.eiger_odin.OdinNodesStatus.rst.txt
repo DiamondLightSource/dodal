@@ -1,0 +1,108 @@
+dodal.devices.eiger\_odin.OdinNodesStatus
+=========================================
+
+.. currentmodule:: dodal.devices.eiger_odin
+
+.. autoclass:: OdinNodesStatus
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      ~OdinNodesStatus.check_frames_dropped
+      
+      
+      ~OdinNodesStatus.check_frames_timed_out
+      
+      
+      ~OdinNodesStatus.check_node_frames_from_attr
+      
+      
+      
+      ~OdinNodesStatus.clear_odin_errors
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~OdinNodesStatus.get_error_state
+      
+      
+      ~OdinNodesStatus.get_init_state
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      ~OdinNodesStatus.component_names
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~OdinNodesStatus.node_0
+      
+      
+      ~OdinNodesStatus.node_1
+      
+      
+      ~OdinNodesStatus.node_2
+      
+      
+      ~OdinNodesStatus.node_3
+      
+      
+      ~OdinNodesStatus.nodes
+      
+      
+      
+      
+      
+      
+      
+      ~OdinNodesStatus.subscriptions
+      
+      
+   
+   

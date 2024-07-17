@@ -1,0 +1,44 @@
+dodal.devices.thawer
+====================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~thawer.Thawer
+   ~thawer.ThawerStates
+   ~thawer.ThawingTimer
+
+
+
+
+.. automodule:: dodal.devices.thawer
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      ThawingException
+   
+   
