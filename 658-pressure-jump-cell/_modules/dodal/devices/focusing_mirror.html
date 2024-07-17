@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.focusing_mirror &#8212; dodal 1.29.2.dev10+g92f4c0ac9 documentation</title>
+    <title>dodal.devices.focusing_mirror &#8212; dodal 1.29.4.dev9+g0d07c25c7 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=b7f5a0d9"></script>
+    <script src="../../../_static/documentation_options.js?v=ce9a5479"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -457,15 +457,19 @@ document.write(`
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.focusing_mirror</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">IntEnum</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
+<span></span><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 
-<span class="kn">from</span> <span class="nn">ophyd</span> <span class="kn">import</span> <span class="n">Component</span><span class="p">,</span> <span class="n">Device</span><span class="p">,</span> <span class="n">EpicsSignal</span>
-<span class="kn">from</span> <span class="nn">ophyd.status</span> <span class="kn">import</span> <span class="n">Status</span><span class="p">,</span> <span class="n">StatusBase</span>
-<span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="n">StandardReadable</span>
+<span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AsyncStatus</span><span class="p">,</span>
+    <span class="n">Device</span><span class="p">,</span>
+    <span class="n">DeviceVector</span><span class="p">,</span>
+    <span class="n">StandardReadable</span><span class="p">,</span>
+    <span class="n">observe_value</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">ophyd_async.core.signal</span> <span class="kn">import</span> <span class="n">soft_signal_r_and_setter</span>
 <span class="kn">from</span> <span class="nn">ophyd_async.epics.motion</span> <span class="kn">import</span> <span class="n">Motor</span>
 <span class="kn">from</span> <span class="nn">ophyd_async.epics.signal</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">epics_signal_r</span><span class="p">,</span>
     <span class="n">epics_signal_rw</span><span class="p">,</span>
     <span class="n">epics_signal_x</span><span class="p">,</span>
 <span class="p">)</span>
@@ -499,11 +503,11 @@ document.write(`
 
 <div class="viewcode-block" id="MirrorVoltageDemand">
 <a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.focusing_mirror.MirrorVoltageDemand.html#dodal.devices.focusing_mirror.MirrorVoltageDemand">[docs]</a>
-<span class="k">class</span> <span class="nc">MirrorVoltageDemand</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
-    <span class="n">N_A</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">OK</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="n">FAIL</span> <span class="o">=</span> <span class="mi">2</span>
-    <span class="n">SLEW</span> <span class="o">=</span> <span class="mi">3</span></div>
+<span class="k">class</span> <span class="nc">MirrorVoltageDemand</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+    <span class="n">N_A</span> <span class="o">=</span> <span class="s2">&quot;N/A&quot;</span>
+    <span class="n">OK</span> <span class="o">=</span> <span class="s2">&quot;OK&quot;</span>
+    <span class="n">FAIL</span> <span class="o">=</span> <span class="s2">&quot;FAIL&quot;</span>
+    <span class="n">SLEW</span> <span class="o">=</span> <span class="s2">&quot;SLEW&quot;</span></div>
 
 
 
@@ -514,16 +518,18 @@ document.write(`
 <span class="sd">    the demanded voltage setpoint is accepted, without blocking the caller as this process can take significant time.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">_actual_v</span><span class="p">:</span> <span class="n">EpicsSignal</span> <span class="o">=</span> <span class="n">Component</span><span class="p">(</span><span class="n">EpicsSignal</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">)</span>
-    <span class="n">_setpoint_v</span><span class="p">:</span> <span class="n">EpicsSignal</span> <span class="o">=</span> <span class="n">Component</span><span class="p">(</span><span class="n">EpicsSignal</span><span class="p">,</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span>
-    <span class="n">_demand_accepted</span><span class="p">:</span> <span class="n">EpicsSignal</span> <span class="o">=</span> <span class="n">Component</span><span class="p">(</span><span class="n">EpicsSignal</span><span class="p">,</span> <span class="s2">&quot;DSEV&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_actual_v</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;R&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setpoint_v</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_demand_accepted</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="n">MirrorVoltageDemand</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;DSEV&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
 
 <div class="viewcode-block" id="MirrorVoltageDevice.set">
 <a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.focusing_mirror.MirrorVoltageDevice.html#dodal.devices.focusing_mirror.MirrorVoltageDevice.set">[docs]</a>
-    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StatusBase</span><span class="p">:</span>
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Combine the following operations into a single set:</span>
 <span class="sd">        1. apply the value to the setpoint PV</span>
-<span class="sd">        2. Return to the caller with a Status future</span>
 <span class="sd">        3. Wait until demand is accepted</span>
 <span class="sd">        4. When either demand is accepted or DEFAULT_SETTLE_TIME expires, signal the result on the Status</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -531,70 +537,64 @@ document.write(`
         <span class="n">setpoint_v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setpoint_v</span>
         <span class="n">demand_accepted</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_demand_accepted</span>
 
-        <span class="k">if</span> <span class="n">demand_accepted</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="o">!=</span> <span class="n">MirrorVoltageDemand</span><span class="o">.</span><span class="n">OK</span><span class="p">:</span>
+        <span class="k">if</span> <span class="k">await</span> <span class="n">demand_accepted</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span> <span class="o">!=</span> <span class="n">MirrorVoltageDemand</span><span class="o">.</span><span class="n">OK</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Attempted to set </span><span class="si">{</span><span class="n">setpoint_v</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> when demand is not accepted.&quot;</span>
             <span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">setpoint_v</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="o">==</span> <span class="n">value</span><span class="p">:</span>
+        <span class="k">if</span> <span class="k">await</span> <span class="n">setpoint_v</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span> <span class="o">==</span> <span class="n">value</span><span class="p">:</span>
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">setpoint_v</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> already at </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2"> - skipping set&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">Status</span><span class="p">(</span><span class="n">success</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">done</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span>
 
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;setting </span><span class="si">{</span><span class="n">setpoint_v</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">demand_accepted_status</span> <span class="o">=</span> <span class="n">Status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">DEFAULT_SETTLE_TIME_S</span><span class="p">)</span>
 
-        <span class="n">subscription</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;handle&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
+        <span class="c1"># Register an observer up front to ensure we don&#39;t miss events after we</span>
+        <span class="c1"># perform the set</span>
+        <span class="n">demand_accepted_iterator</span> <span class="o">=</span> <span class="n">observe_value</span><span class="p">(</span>
+            <span class="n">demand_accepted</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">DEFAULT_SETTLE_TIME_S</span>
+        <span class="p">)</span>
+        <span class="c1"># discard the current value (OK) so we can await a subsequent change</span>
+        <span class="k">await</span> <span class="n">anext</span><span class="p">(</span><span class="n">demand_accepted_iterator</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">setpoint_v</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">demand_check_callback</span><span class="p">(</span><span class="n">old_value</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Got event old=</span><span class="si">{</span><span class="n">old_value</span><span class="si">}</span><span class="s2"> new=</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">setpoint_v</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">old_value</span> <span class="o">!=</span> <span class="n">MirrorVoltageDemand</span><span class="o">.</span><span class="n">OK</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">==</span> <span class="n">MirrorVoltageDemand</span><span class="o">.</span><span class="n">OK</span><span class="p">:</span>
-                <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Demand accepted for </span><span class="si">{</span><span class="n">setpoint_v</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="n">subs_handle</span> <span class="o">=</span> <span class="n">subscription</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;handle&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">subs_handle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;Demand accepted before set attempted&quot;</span><span class="p">)</span>
-                <span class="n">demand_accepted</span><span class="o">.</span><span class="n">unsubscribe</span><span class="p">(</span><span class="n">subs_handle</span><span class="p">)</span>
+        <span class="c1"># The set should always change to SLEW regardless of whether we are</span>
+        <span class="c1"># already at the set point, then change back to OK/FAIL depending on</span>
+        <span class="c1"># success</span>
+        <span class="n">accepted_value</span> <span class="o">=</span> <span class="k">await</span> <span class="n">anext</span><span class="p">(</span><span class="n">demand_accepted_iterator</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">accepted_value</span> <span class="o">==</span> <span class="n">MirrorVoltageDemand</span><span class="o">.</span><span class="n">SLEW</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Demand not accepted for </span><span class="si">{</span><span class="n">setpoint_v</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, waiting for acceptance...&quot;</span>
+        <span class="p">)</span>
+        <span class="k">while</span> <span class="n">MirrorVoltageDemand</span><span class="o">.</span><span class="n">SLEW</span> <span class="o">==</span> <span class="p">(</span>
+            <span class="n">accepted_value</span> <span class="o">:=</span> <span class="k">await</span> <span class="n">anext</span><span class="p">(</span><span class="n">demand_accepted_iterator</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="k">pass</span>
 
-                <span class="n">demand_accepted_status</span><span class="o">.</span><span class="n">set_finished</span><span class="p">()</span>
-            <span class="c1"># else timeout handled by parent demand_accepted_status</span>
-
-        <span class="n">subscription</span><span class="p">[</span><span class="s2">&quot;handle&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">demand_accepted</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">demand_check_callback</span><span class="p">)</span>
-        <span class="n">setpoint_status</span> <span class="o">=</span> <span class="n">setpoint_v</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-        <span class="n">status</span> <span class="o">=</span> <span class="n">setpoint_status</span> <span class="o">&amp;</span> <span class="n">demand_accepted_status</span>
-        <span class="k">return</span> <span class="n">status</span></div>
+        <span class="k">if</span> <span class="n">accepted_value</span> <span class="o">!=</span> <span class="n">MirrorVoltageDemand</span><span class="o">.</span><span class="n">OK</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Voltage slew failed for </span><span class="si">{</span><span class="n">setpoint_v</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, new state=</span><span class="si">{</span><span class="n">accepted_value</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span></div>
 </div>
 
 
 
 <div class="viewcode-block" id="VFMMirrorVoltages">
 <a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.focusing_mirror.VFMMirrorVoltages.html#dodal.devices.focusing_mirror.VFMMirrorVoltages">[docs]</a>
-<span class="k">class</span> <span class="nc">VFMMirrorVoltages</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">daq_configuration_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">VFMMirrorVoltages</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">daq_configuration_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">voltage_lookup_table_path</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">daq_configuration_path</span> <span class="o">+</span> <span class="s2">&quot;/json/mirrorFocus.json&quot;</span>
         <span class="p">)</span>
-
-    <span class="n">_channel14_voltage_device</span> <span class="o">=</span> <span class="n">Component</span><span class="p">(</span><span class="n">MirrorVoltageDevice</span><span class="p">,</span> <span class="s2">&quot;BM:V14&quot;</span><span class="p">)</span>
-    <span class="n">_channel15_voltage_device</span> <span class="o">=</span> <span class="n">Component</span><span class="p">(</span><span class="n">MirrorVoltageDevice</span><span class="p">,</span> <span class="s2">&quot;BM:V15&quot;</span><span class="p">)</span>
-    <span class="n">_channel16_voltage_device</span> <span class="o">=</span> <span class="n">Component</span><span class="p">(</span><span class="n">MirrorVoltageDevice</span><span class="p">,</span> <span class="s2">&quot;BM:V16&quot;</span><span class="p">)</span>
-    <span class="n">_channel17_voltage_device</span> <span class="o">=</span> <span class="n">Component</span><span class="p">(</span><span class="n">MirrorVoltageDevice</span><span class="p">,</span> <span class="s2">&quot;BM:V17&quot;</span><span class="p">)</span>
-    <span class="n">_channel18_voltage_device</span> <span class="o">=</span> <span class="n">Component</span><span class="p">(</span><span class="n">MirrorVoltageDevice</span><span class="p">,</span> <span class="s2">&quot;BM:V18&quot;</span><span class="p">)</span>
-    <span class="n">_channel19_voltage_device</span> <span class="o">=</span> <span class="n">Component</span><span class="p">(</span><span class="n">MirrorVoltageDevice</span><span class="p">,</span> <span class="s2">&quot;BM:V19&quot;</span><span class="p">)</span>
-    <span class="n">_channel20_voltage_device</span> <span class="o">=</span> <span class="n">Component</span><span class="p">(</span><span class="n">MirrorVoltageDevice</span><span class="p">,</span> <span class="s2">&quot;BM:V20&quot;</span><span class="p">)</span>
-    <span class="n">_channel21_voltage_device</span> <span class="o">=</span> <span class="n">Component</span><span class="p">(</span><span class="n">MirrorVoltageDevice</span><span class="p">,</span> <span class="s2">&quot;BM:V21&quot;</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">voltage_channels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">MirrorVoltageDevice</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="p">[</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_channel14_voltage_device</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_channel15_voltage_device</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_channel16_voltage_device</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_channel17_voltage_device</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_channel18_voltage_device</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_channel19_voltage_device</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_channel20_voltage_device</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_channel21_voltage_device</span><span class="p">,</span>
-        <span class="p">]</span></div>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">voltage_channels</span> <span class="o">=</span> <span class="n">DeviceVector</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="n">i</span> <span class="o">-</span> <span class="mi">14</span><span class="p">:</span> <span class="n">MirrorVoltageDevice</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">BM:V</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">22</span><span class="p">)</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
 

@@ -26,9 +26,6 @@ dodal.devices.fast\_grid\_scan.GridScanParamsCommon
       ~GridScanParamsCommon.grid_position_to_motor_position
       
       
-      ~GridScanParamsCommon.is_valid
-      
-      
       
       
       

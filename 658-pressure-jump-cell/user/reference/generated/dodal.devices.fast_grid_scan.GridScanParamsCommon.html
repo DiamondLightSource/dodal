@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.fast_grid_scan.GridScanParamsCommon &#8212; dodal 1.29.2.dev10+g92f4c0ac9 documentation</title>
+    <title>dodal.devices.fast_grid_scan.GridScanParamsCommon &#8212; dodal 1.29.4.dev9+g0d07c25c7 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=b7f5a0d9"></script>
+    <script src="../../../_static/documentation_options.js?v=ce9a5479"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -574,10 +574,6 @@ document.write(`
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.devices.i03.html">dodal.devices.i03</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.devices.i20_1.html">dodal.devices.i20_1</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.i23.html">dodal.devices.i23</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i23.gonio.html">dodal.devices.i23.gonio</a></li>
-</ul>
-</details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.i24.html">dodal.devices.i24</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.i24.I24_detector_motion.html">dodal.devices.i24.I24_detector_motion</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.i24.aperture.html">dodal.devices.i24.aperture</a></li>
@@ -601,8 +597,6 @@ document.write(`
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.motors.html">dodal.devices.motors</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.MotorLimitHelper.html">dodal.devices.motors.MotorLimitHelper</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZLimitBundle.html">dodal.devices.motors.XYZLimitBundle</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZPositioner.html">dodal.devices.motors.XYZPositioner</a></li>
 </ul>
 </details></li>
@@ -664,9 +658,11 @@ document.write(`
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.smargon.html">dodal.devices.smargon</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.smargon.AxisLimit.html">dodal.devices.smargon.AxisLimit</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.smargon.Smargon.html">dodal.devices.smargon.Smargon</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.smargon.StubOffsets.html">dodal.devices.smargon.StubOffsets</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.smargon.StubPosition.html">dodal.devices.smargon.StubPosition</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.smargon.XYZLimits.html">dodal.devices.smargon.XYZLimits</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.devices.status.html">dodal.devices.status</a></li>
@@ -865,9 +861,6 @@ at x_start, y1_start, z1_start and subsequent frames are N*step_size away.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.fast_grid_scan.GridScanParamsCommon.grid_position_to_motor_position" title="dodal.devices.fast_grid_scan.GridScanParamsCommon.grid_position_to_motor_position"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grid_position_to_motor_position</span></code></a>(grid_position)</p></td>
 <td><p>Converts a grid position, given as steps in the x, y, z grid, to a real motor position.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.fast_grid_scan.GridScanParamsCommon.is_valid" title="dodal.devices.fast_grid_scan.GridScanParamsCommon.is_valid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_valid</span></code></a>(limits)</p></td>
-<td><p>Validates scan parameters</p></td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -928,24 +921,6 @@ at x_start, y1_start, z1_start and subsequent frames are N*step_size away.</p>
 </tbody>
 </table>
 </div>
-<dl class="py method">
-<dt class="sig sig-object py" id="dodal.devices.fast_grid_scan.GridScanParamsCommon.is_valid">
-<span class="sig-name descname"><span class="pre">is_valid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">limits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dodal.devices.motors.XYZLimitBundle.html#dodal.devices.motors.XYZLimitBundle" title="dodal.devices.motors.XYZLimitBundle"><span class="pre">XYZLimitBundle</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../../_modules/dodal/devices/fast_grid_scan.html#GridScanParamsCommon.is_valid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.fast_grid_scan.GridScanParamsCommon.is_valid" title="Link to this definition">#</a></dt>
-<dd><p>Validates scan parameters</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>limits</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.motors.XYZLimitBundle.html#dodal.devices.motors.XYZLimitBundle" title="dodal.devices.motors.XYZLimitBundle"><code class="xref py py-class docutils literal notranslate"><span class="pre">XYZLimitBundle</span></code></a></span>) – The motor limits against which to validate
-the parameters</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>True if the scan is valid</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="dodal.devices.fast_grid_scan.GridScanParamsCommon.grid_position_to_motor_position">
 <span class="sig-name descname"><span class="pre">grid_position_to_motor_position</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid_position</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../../../_modules/dodal/devices/fast_grid_scan.html#GridScanParamsCommon.grid_position_to_motor_position"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.fast_grid_scan.GridScanParamsCommon.grid_position_to_motor_position" title="Link to this definition">#</a></dt>
@@ -1018,7 +993,6 @@ to a real motor position.</p>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.fast_grid_scan.GridScanParamsCommon"><code class="docutils literal notranslate"><span class="pre">GridScanParamsCommon</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.fast_grid_scan.GridScanParamsCommon.is_valid"><code class="docutils literal notranslate"><span class="pre">GridScanParamsCommon.is_valid()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.fast_grid_scan.GridScanParamsCommon.grid_position_to_motor_position"><code class="docutils literal notranslate"><span class="pre">GridScanParamsCommon.grid_position_to_motor_position()</span></code></a></li>
 </ul>
 </li>

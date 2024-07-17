@@ -18,6 +18,47 @@ dodal.devices.focusing\_mirror.MirrorVoltageDemand
       
       
       
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
    
    
 
@@ -27,10 +68,6 @@ dodal.devices.focusing\_mirror.MirrorVoltageDemand
 
    .. autosummary::
    
-      
-      
-      
-      
       
       ~MirrorVoltageDemand.N_A
       

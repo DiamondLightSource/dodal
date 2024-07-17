@@ -23,7 +23,6 @@ dodal.devices.fast\_grid\_scan.ZebraGridScanParams
       
       
       
-      
       ~ZebraGridScanParams.non_integer_dwell_time
       
       
