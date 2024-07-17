@@ -14,7 +14,7 @@ description = "Ophyd devices and other utils that could be used across DLS beaml
 dependencies = [
     "click",
     "ophyd",
-    "ophyd-async>=0.3.1,<0.4.0", # Need to pin to <0.4.0 as this requires pydantic>2.0 see https://github.com/DiamondLightSource/dodal/issues/679
+    "ophyd-async<0.4.0",      # Need to pin to <0.4.0 as this requires pydantic>2.0 see https://github.com/DiamondLightSource/dodal/issues/679
     "bluesky",
     "pyepics",
     "dataclasses-json",
@@ -23,10 +23,10 @@ dependencies = [
     "requests",
     "graypy",
     "pydantic",
-    "opencv-python-headless",    # For pin-tip detection.
-    "aioca",                     # Required for CA support with ophyd-async.
-    "p4p",                       # Required for PVA support with ophyd-async.
-    "numpy<2.0",                 # Unpin when https://github.com/bluesky/ophyd-async/issues/387 resolved
+    "opencv-python-headless", # For pin-tip detection.
+    "aioca",                  # Required for CA support with ophyd-async.
+    "p4p",                    # Required for PVA support with ophyd-async.
+    "numpy<2.0",              # Unpin when https://github.com/bluesky/ophyd-async/issues/387 resolved
     "aiofiles",
     "aiohttp",
 ]
