@@ -37,7 +37,6 @@ dodal.devices.oav.utils
       bottom_right_from_top_left
       calculate_x_y_z_of_pixel
       get_move_required_so_that_beam_is_at_pixel
-      save_thumbnail
       wait_for_tip_to_be_found
    
    
