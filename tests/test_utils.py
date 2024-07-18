@@ -159,3 +159,16 @@ def test_run_number_1_given_on_first_nexus_file(
     mock_list_dir.return_value = files
     assert get_run_number("dir") == 1
     mock_find_next_run_number.assert_not_called()
+
+
+@patch("os.listdir")
+def test_get_run_number_uses_prefix(mock_list_dir: MagicMock):
+    foos = (f"foo_{i}.nxs" for i in range(4))
+    bars = (f"bar_{i}.nxs" for i in range(7))
+    bazs = (f"baz_{i}.nxs" for i in range(23, 29))
+    files = [*foos, *bars, *bazs]
+    mock_list_dir.return_value = files
+    assert get_run_number("dir", "foo") == 4
+    assert get_run_number("dir", "bar") == 7
+    assert get_run_number("dir", "baz") == 29
+    assert get_run_number("dir", "qux") == 1

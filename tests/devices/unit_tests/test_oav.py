@@ -1,4 +1,3 @@
-from functools import partial
 from unittest.mock import AsyncMock, MagicMock, call, patch
 
 import numpy as np
@@ -6,12 +5,11 @@ import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from ophyd.sim import instantiate_fake_device, make_fake_device
-from ophyd.status import Status
+from ophyd_async.core import set_mock_value
 from PIL import Image
 from requests import HTTPError, Response
 
 import dodal.devices.oav.utils as oav_utils
-from dodal.beamlines import i03
 from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.oav.pin_image_recognition.utils import SampleLocation
@@ -24,34 +22,6 @@ from dodal.devices.smargon import Smargon
 
 DISPLAY_CONFIGURATION = "tests/devices/unit_tests/test_display.configuration"
 ZOOM_LEVELS_XML = "tests/devices/unit_tests/test_jCameraManZoomLevels.xml"
-
-
-def fake_smargon() -> Smargon:
-    smargon = i03.smargon(fake_with_ophyd_sim=True)
-    smargon.x.user_setpoint._use_limits = False
-    smargon.y.user_setpoint._use_limits = False
-    smargon.z.user_setpoint._use_limits = False
-    smargon.omega.user_setpoint._use_limits = False
-
-    def mock_set(motor, val):
-        motor.user_readback.sim_put(val)  # type: ignore
-        return Status(done=True, success=True)
-
-    def patch_motor(motor):
-        return patch.object(motor, "set", partial(mock_set, motor))
-
-    with (
-        patch_motor(smargon.omega),
-        patch_motor(smargon.x),
-        patch_motor(smargon.y),
-        patch_motor(smargon.z),
-    ):
-        return smargon
-
-
-@pytest.fixture
-def smargon():
-    yield fake_smargon()
 
 
 @pytest.fixture
@@ -117,12 +87,7 @@ def test_snapshot_trigger_saves_to_correct_file(
         st.wait()
         expected_calls_to_save = [
             call(f"test directory/test filename{addition}.png")
-            for addition in [
-                "",
-                "t",
-                "_outer_overlay",
-                "_grid_overlay",
-            ]
+            for addition in ["", "_outer_overlay", "_grid_overlay"]
         ]
         calls_to_save = mock_save.mock_calls
         assert calls_to_save == expected_calls_to_save
@@ -271,7 +236,7 @@ def test_values_for_move_so_that_beam_is_at_pixel(
     fake_oav.parameters.beam_centre_i = beam_centre[0]
     fake_oav.parameters.beam_centre_j = beam_centre[1]
 
-    smargon.omega.user_readback.sim_put(angle)  # type: ignore
+    set_mock_value(smargon.omega.user_readback, angle)
 
     RE = RunEngine(call_returns_result=True)
     pos = RE(
