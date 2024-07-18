@@ -1,0 +1,40 @@
+dodal.plans.motor\_util\_plans
+==============================
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.plans.motor_util_plans
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      home_and_reset_decorator
+      home_and_reset_wrapper
+   
+   
+
+   
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      MoveTooLarge
+   
+   

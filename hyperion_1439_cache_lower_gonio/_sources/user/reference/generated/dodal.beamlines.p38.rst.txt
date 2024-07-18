@@ -1,0 +1,46 @@
+dodal.beamlines.p38
+===================
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.beamlines.p38
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      d12
+      d3
+      dcm
+      fswitch
+      hfm
+      i0
+      slits_1
+      slits_2
+      slits_3
+      slits_4
+      slits_5
+      slits_6
+      undulator
+      vfm
+   
+   
+
+   
+   
+   

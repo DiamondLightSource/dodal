@@ -1,0 +1,32 @@
+dodal.devices.zebra.I03Axes
+===========================
+
+.. currentmodule:: dodal.devices.zebra
+
+.. autoclass:: I03Axes
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~I03Axes.OMEGA
+      
+      
+      ~I03Axes.SMARGON_X1
+      
+      
+      ~I03Axes.SMARGON_Y
+      
+      
+      ~I03Axes.SMARGON_Z
+      
+   
+   
