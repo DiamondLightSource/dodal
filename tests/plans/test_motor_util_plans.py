@@ -154,7 +154,7 @@ def test_given_a_device_where_all_moves_too_small_when_check_and_cache_values_th
         (74, -89, -2),
     ],
 )
-def test_when_home_and_reset_wrapper_called_with_null_plan_then_motos_homed_and_reset(
+def test_when_home_and_reset_wrapper_called_with_null_plan_then_motors_homed_and_reset(
     RE, my_device, initial_x, initial_y, home
 ):
     def my_plan():
@@ -249,7 +249,7 @@ def test_given_an_axis_out_of_range_when_home_and_reset_wrapper_called_then_thro
     get_mock_put(my_device.y.user_setpoint).assert_not_called()
 
 
-def test_given_plan_fails_reset_still(RE, my_device):
+def test_given_home_and_reset_inner_plan_fails_reset_still(RE, my_device):
     initial_x, initial_y, home = 10, 20, 6
 
     def my_plan():
