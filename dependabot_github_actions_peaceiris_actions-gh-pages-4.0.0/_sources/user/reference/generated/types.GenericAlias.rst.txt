@@ -1,0 +1,15 @@
+types.GenericAlias
+==================
+
+.. currentmodule:: types
+
+.. autoclass:: GenericAlias
+   :members:
+
+   
+   
+   
+
+   
+   
+   
