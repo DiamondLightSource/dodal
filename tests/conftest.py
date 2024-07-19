@@ -1,17 +1,19 @@
+import asyncio
 import importlib
 import logging
 import os
 import sys
+import time
 from os import environ, getenv
 from pathlib import Path
-from typing import cast
+from typing import Mapping
 from unittest.mock import MagicMock, patch
 
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd.sim import make_fake_device
 
-from dodal.beamlines import beamline_utils, i03
+from dodal.beamlines import i03
+from dodal.common.beamlines import beamline_utils
 from dodal.devices.focusing_mirror import VFMMirrorVoltages
 from dodal.log import LOGGER, GELFTCPHandler, set_up_all_logging_handlers
 from dodal.utils import make_all_devices
@@ -42,10 +44,12 @@ def module_and_devices_for_beamline(request):
         bl_mod = importlib.import_module("dodal.beamlines." + beamline)
         importlib.reload(bl_mod)
         mock_beamline_module_filepaths(beamline, bl_mod)
-        yield (
+        devices, _ = make_all_devices(
             bl_mod,
-            make_all_devices(bl_mod, include_skipped=True, fake_with_ophyd_sim=True),
+            include_skipped=True,
+            fake_with_ophyd_sim=True,
         )
+        yield (bl_mod, devices)
         beamline_utils.clear_devices()
         del bl_mod
 
@@ -68,17 +72,11 @@ def pytest_runtest_teardown():
 
 
 @pytest.fixture
-def vfm_mirror_voltages() -> VFMMirrorVoltages:
-    voltages = cast(
-        VFMMirrorVoltages,
-        make_fake_device(VFMMirrorVoltages)(
-            name="vfm_mirror_voltages",
-            prefix="BL-I03-MO-PSU-01:",
-            daq_configuration_path=i03.DAQ_CONFIGURATION_PATH,
-        ),
-    )
+def vfm_mirror_voltages(RE: RunEngine) -> VFMMirrorVoltages:
+    voltages = i03.vfm_mirror_voltages(fake_with_ophyd_sim=True)
     voltages.voltage_lookup_table_path = "tests/test_data/test_mirror_focus.json"
-    return voltages
+    yield voltages
+    beamline_utils.clear_devices()
 
 
 s03_epics_server_port = getenv("S03_EPICS_CA_SERVER_PORT")
@@ -93,5 +91,26 @@ if s03_epics_repeater_port is not None:
 
 
 @pytest.fixture
-def RE():
-    return RunEngine()
+async def RE():
+    RE = RunEngine()
+    # make sure the event loop is thoroughly up and running before we try to create
+    # any ophyd_async devices which might need it
+    timeout = time.monotonic() + 1
+    while not RE.loop.is_running():
+        await asyncio.sleep(0)
+        if time.monotonic() > timeout:
+            raise TimeoutError("This really shouldn't happen but just in case...")
+    yield RE
+
+
+@pytest.fixture
+def run_engine_documents(RE: RunEngine) -> Mapping[str, list[dict]]:
+    docs: dict[str, list[dict]] = {}
+
+    def append_and_print(name, doc):
+        if name not in docs:
+            docs[name] = []
+        docs[name] += [doc]
+
+    RE.subscribe(append_and_print)
+    return docs

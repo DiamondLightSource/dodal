@@ -176,10 +176,8 @@ async def test_extraction_plan(mocked_zocalo_device, RE) -> None:
 )
 @patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection", autospec=True)
 async def test_subscribe_only_on_called_stage(
-    mock_connection: MagicMock,
-    mock_wrap_subscribe: MagicMock,
+    mock_connection: MagicMock, mock_wrap_subscribe: MagicMock, RE: RunEngine
 ):
-    RE = RunEngine()
     zocalo_results = ZocaloResults(
         name="zocalo", zocalo_environment="dev_artemis", timeout_s=2
     )
@@ -198,9 +196,8 @@ async def test_subscribe_only_on_called_stage(
 
 @patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection", autospec=True)
 async def test_when_exception_caused_by_zocalo_message_then_exception_propagated(
-    mock_connection,
+    mock_connection, RE: RunEngine
 ):
-    RE = RunEngine()
     zocalo_results = ZocaloResults(
         name="zocalo", zocalo_environment="dev_artemis", timeout_s=0.1
     )

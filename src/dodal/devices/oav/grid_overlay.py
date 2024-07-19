@@ -134,24 +134,27 @@ class SnapshotWithGrid(MJPG):
     last_path_full_overlay = Component(Signal)
 
     def post_processing(self, image: Image.Image):
+        # Save an unmodified image with no suffix
+        self._save_image(image)
+
         top_left_x = self.top_left_x.get()
         top_left_y = self.top_left_y.get()
         box_width = self.box_width.get()
         num_boxes_x = self.num_boxes_x.get()
         num_boxes_y = self.num_boxes_y.get()
-        filename_str = self.filename.get()
-        directory_str = self.directory.get()
+        assert isinstance(filename_str := self.filename.get(), str)
+        assert isinstance(directory_str := self.directory.get(), str)
         add_grid_border_overlay_to_image(
             image, top_left_x, top_left_y, box_width, num_boxes_x, num_boxes_y
         )
         path = path_join(directory_str, f"{filename_str}_outer_overlay.png")
         self.last_path_outer.put(path)
-        LOGGER.info(f"Saving {path}")
+        LOGGER.info(f"Saving grid outer edge at {path}")
         image.save(path)
         add_grid_overlay_to_image(
             image, top_left_x, top_left_y, box_width, num_boxes_x, num_boxes_y
         )
         path = path_join(directory_str, f"{filename_str}_grid_overlay.png")
         self.last_path_full_overlay.put(path)
-        LOGGER.info(f"Saving {path}")
+        LOGGER.info(f"Saving full grid overlay at {path}")
         image.save(path)

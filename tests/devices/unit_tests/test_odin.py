@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock
+
 import pytest
 from mockito import when
 from ophyd.sim import make_fake_device
@@ -120,3 +122,15 @@ def test_wait_for_all_filewriters_to_finish(
     status.wait(1)
     assert status.done
     assert status.success
+
+
+def test_given_error_on_node_1_when_clear_odin_errors_called_then_resets_all_errors(
+    fake_odin: EigerOdin,
+):
+    nodes = fake_odin.nodes
+    nodes.nodes[0].error_message.sim_put("Bad")  # type: ignore
+    for node in nodes.nodes:
+        node.clear_errors.set = MagicMock()
+    nodes.clear_odin_errors()
+    for node in nodes.nodes:
+        node.clear_errors.set.assert_called_once_with(1)

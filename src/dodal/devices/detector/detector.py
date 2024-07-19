@@ -43,6 +43,9 @@ class DetectorParams(BaseModel):
     detector_size_constants: DetectorSizeConstants = EIGER2_X_16M_SIZE
     beam_xy_converter: DetectorDistanceToBeamXYConverter
     run_number: int
+    enable_dev_shm: bool = (
+        False  # Remove in https://github.com/DiamondLightSource/hyperion/issues/1395
+    )
 
     class Config:
         arbitrary_types_allowed = True
@@ -51,20 +54,26 @@ class DetectorParams(BaseModel):
             DetectorSizeConstants: lambda d: d.det_type_string,
         }
 
-    @root_validator(pre=True, skip_on_failure=True)  # type: ignore # should be replaced with model_validator once move to pydantic 2 is complete
+    @root_validator(
+        pre=True, skip_on_failure=True
+    )  # should be replaced with model_validator once move to pydantic 2 is complete
     def create_beamxy_and_runnumber(cls, values: dict[str, Any]) -> dict[str, Any]:
         values["beam_xy_converter"] = DetectorDistanceToBeamXYConverter(
             values["det_dist_to_beam_converter_path"]
         )
         if values.get("run_number") is None:
-            values["run_number"] = get_run_number(values["directory"])
+            values["run_number"] = get_run_number(values["directory"], values["prefix"])
         return values
 
     @validator("detector_size_constants", pre=True)
     def _parse_detector_size_constants(
         cls, det_type: str, values: dict[str, Any]
     ) -> DetectorSizeConstants:
-        return constants_from_type(det_type)
+        return (
+            det_type
+            if isinstance(det_type, DetectorSizeConstants)
+            else constants_from_type(det_type)
+        )
 
     @validator("directory", pre=True)
     def _parse_directory(cls, directory: str, values: dict[str, Any]) -> str:

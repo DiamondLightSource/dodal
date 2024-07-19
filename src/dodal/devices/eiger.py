@@ -2,7 +2,7 @@ from enum import Enum
 
 from ophyd import Component, Device, EpicsSignalRO, Signal
 from ophyd.areadetector.cam import EigerDetectorCam
-from ophyd.status import AndStatus, Status, SubscriptionStatus
+from ophyd.status import AndStatus, Status, StatusBase
 
 from dodal.devices.detector import DetectorParams, TriggerMode
 from dodal.devices.eiger_odin import EigerOdin
@@ -11,6 +11,10 @@ from dodal.devices.util.epics_util import run_functions_without_blocking
 from dodal.log import LOGGER
 
 FREE_RUN_MAX_IMAGES = 1000000
+
+# TODO present for testing purposes, remove
+TEST_1169_FIX = True
+TEST_1169_INJECT = False
 
 
 class InternalEigerTriggerMode(Enum):
@@ -23,6 +27,7 @@ class InternalEigerTriggerMode(Enum):
 class EigerDetector(Device):
     class ArmingSignal(Signal):
         def set(self, value, *, timeout=None, settle_time=None, **kwargs):
+            assert isinstance(self.parent, EigerDetector)
             return self.parent.async_stage()
 
     do_arm = Component(ArmingSignal)
@@ -37,7 +42,7 @@ class EigerDetector(Device):
     ALL_FRAMES_TIMEOUT = 120
     ARMING_TIMEOUT = 60
 
-    filewriters_finished: SubscriptionStatus
+    filewriters_finished: StatusBase
 
     detector_params: DetectorParams | None = None
 
@@ -96,7 +101,7 @@ class EigerDetector(Device):
 
     def stage(self):
         self.wait_on_arming_if_started()
-        if not self.is_armed():
+        if TEST_1169_INJECT or not self.is_armed():
             LOGGER.info("Eiger not armed, arming")
 
             self.async_stage().wait(timeout=self.ARMING_TIMEOUT)
@@ -120,7 +125,7 @@ class EigerDetector(Device):
                 # In free run mode we have to manually stop odin
                 self.stop_odin_when_all_frames_collected()
 
-            self.odin.file_writer.start_timeout.put(1)
+            self.odin.file_writer.start_timeout.set(1).wait(self.GENERAL_STATUS_TIMEOUT)
             LOGGER.info("Waiting on filewriter to finish")
             self.filewriters_finished.wait(30)
 
@@ -136,10 +141,13 @@ class EigerDetector(Device):
         LOGGER.info("Eiger stop() called - cleaning up...")
         self.wait_on_arming_if_started()
         stop_status = self.odin.stop()
-        self.odin.file_writer.start_timeout.put(1)
+        self.odin.file_writer.start_timeout.set(1).wait(self.GENERAL_STATUS_TIMEOUT)
         self.disarm_detector()
         stop_status &= self.disable_roi_mode()
         stop_status.wait(self.GENERAL_STATUS_TIMEOUT)
+        # See https://github.com/DiamondLightSource/hyperion/issues/1395
+        LOGGER.info("Turning off Eiger dev/shm streaming")
+        self.odin.fan.dev_shm_enable.set(0).wait()
         LOGGER.info("Eiger has successfully been stopped")
 
     def disable_roi_mode(self):
@@ -148,7 +156,7 @@ class EigerDetector(Device):
     def enable_roi_mode(self):
         return self.change_roi_mode(True)
 
-    def change_roi_mode(self, enable: bool) -> Status:
+    def change_roi_mode(self, enable: bool) -> StatusBase:
         assert self.detector_params is not None
         detector_dimensions = (
             self.detector_params.detector_size_constants.roi_size_pixels
@@ -199,7 +207,7 @@ class EigerDetector(Device):
         )
         return status
 
-    def set_odin_pvs(self) -> Status:
+    def set_odin_pvs(self) -> StatusBase:
         assert self.detector_params is not None
         file_prefix = self.detector_params.full_filename
         status = self.odin.file_writer.file_path.set(
@@ -257,7 +265,7 @@ class EigerDetector(Device):
             status.set_finished()
             return status
 
-    def set_num_triggers_and_captures(self) -> Status:
+    def set_num_triggers_and_captures(self) -> StatusBase:
         """Sets the number of triggers and the number of images for the Eiger to capture
         during the datacollection. The number of images is the number of images per
         trigger.
@@ -288,8 +296,10 @@ class EigerDetector(Device):
 
         return status
 
-    def _wait_for_odin_status(self) -> Status:
+    def _wait_for_odin_status(self) -> StatusBase:
         self.forward_bit_depth_to_filewriter()
+        await_value(self.odin.meta.active, 1).wait(self.GENERAL_STATUS_TIMEOUT)
+
         status = self.odin.file_writer.capture.set(
             1, timeout=self.GENERAL_STATUS_TIMEOUT
         )
@@ -299,7 +309,7 @@ class EigerDetector(Device):
         )
         return status
 
-    def _wait_fan_ready(self) -> Status:
+    def _wait_fan_ready(self) -> StatusBase:
         self.filewriters_finished = self.odin.create_finished_status()
         LOGGER.info("Eiger staging: awaiting odin fan ready")
         return await_value(self.odin.fan.ready, 1, self.GENERAL_STATUS_TIMEOUT)
@@ -310,31 +320,44 @@ class EigerDetector(Device):
 
     def forward_bit_depth_to_filewriter(self):
         bit_depth = self.bit_depth.get()
-        self.odin.file_writer.data_type.put(f"UInt{bit_depth}")
+        self.odin.file_writer.data_type.set(f"UInt{bit_depth}").wait(
+            self.GENERAL_STATUS_TIMEOUT
+        )
+
+    def change_dev_shm(self, enable_dev_shm: bool):
+        LOGGER.info(f"{'Enabling' if enable_dev_shm else 'Disabling'} dev shm")
+        return self.odin.fan.dev_shm_enable.set(1 if enable_dev_shm else 0)
 
     def disarm_detector(self):
-        self.cam.acquire.put(0)
+        self.cam.acquire.set(0).wait(self.GENERAL_STATUS_TIMEOUT)
 
     def do_arming_chain(self) -> Status:
         functions_to_do_arm = []
+        assert self.detector_params
         detector_params: DetectorParams = self.detector_params
         if detector_params.use_roi_mode:
             functions_to_do_arm.append(self.enable_roi_mode)
 
-        functions_to_do_arm.extend(
-            [
-                lambda: self.set_detector_threshold(detector_params.expected_energy_ev),
-                self.set_cam_pvs,
-                self.set_odin_number_of_frame_chunks,
-                self.set_odin_pvs,
-                self.set_mx_settings_pvs,
-                self.set_num_triggers_and_captures,
-                lambda: await_value(self.stale_params, 0, 60),
-                self._wait_for_odin_status,
-                lambda: self.cam.acquire.set(1, timeout=self.GENERAL_STATUS_TIMEOUT),
-                self._wait_fan_ready,
-                self._finish_arm,
-            ]
-        )
+        arming_sequence_funcs = [
+            lambda: self.change_dev_shm(detector_params.enable_dev_shm),
+            lambda: self.set_detector_threshold(detector_params.expected_energy_ev),
+            self.set_cam_pvs,
+            self.set_odin_number_of_frame_chunks,
+            self.set_odin_pvs,
+            self.set_mx_settings_pvs,
+            self.set_num_triggers_and_captures,
+            lambda: await_value(self.stale_params, 0, 60),
+            self._wait_for_odin_status,
+            lambda: self.cam.acquire.set(1, timeout=self.GENERAL_STATUS_TIMEOUT),
+            self._wait_fan_ready,
+            self._finish_arm,
+        ]
+        if TEST_1169_FIX:
+            # If a beam dump occurs after arming the eiger but prior to eiger staging,
+            # the odin may timeout which will cause the arming sequence to be retried;
+            # if this previously completed successfully we must reset the odin first
+            arming_sequence_funcs.insert(0, self.odin.stop)
+
+        functions_to_do_arm.extend(arming_sequence_funcs)
 
         return run_functions_without_blocking(functions_to_do_arm, associated_obj=self)

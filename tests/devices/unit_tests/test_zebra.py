@@ -1,8 +1,8 @@
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from bluesky.run_engine import RunEngine
-from mockito import mock, verify
+from ophyd_async.core import set_mock_value
 
 from dodal.devices.zebra import (
     ArmDemand,
@@ -13,30 +13,29 @@ from dodal.devices.zebra import (
     LogicGateConfiguration,
     LogicGateConfigurer,
     PositionCompare,
+    RotationDirection,
     TrigSource,
     boolean_array_to_integer,
 )
 
 
-async def test_arming_device():
-    RunEngine()
+async def test_arming_device(RE: RunEngine):
     arming_device = ArmingDevice("", name="fake arming device")
-    await arming_device.connect(sim=True)
+    await arming_device.connect(mock=True)
     status = arming_device.set(ArmDemand.DISARM)
     await status
     assert status.success
     assert await arming_device.disarm_set.get_value() == 1
 
 
-async def test_position_compare_sets_signals():
-    RunEngine()
+async def test_position_compare_sets_signals(RE: RunEngine):
     fake_pc = PositionCompare("", name="fake position compare")
-    await fake_pc.connect(sim=True)
+    await fake_pc.connect(mock=True)
 
     async def mock_arm(demand):
-        await fake_pc.arm.armed._backend.put(demand)  # type: ignore
-        fake_pc.arm.disarm_set._backend._set_value(not demand)  # type: ignore
-        fake_pc.arm.arm_set._backend._set_value(demand)  # type: ignore
+        set_mock_value(fake_pc.arm.armed, demand)
+        set_mock_value(fake_pc.arm.disarm_set, not demand)
+        set_mock_value(fake_pc.arm.arm_set, demand)
 
     fake_pc.arm.arm_set.set = AsyncMock(side_effect=mock_arm)
     fake_pc.arm.disarm_set.set = AsyncMock(side_effect=mock_arm)
@@ -95,17 +94,13 @@ def test_logic_gate_configuration_62_and_34_inv_and_15_inv():
 
 
 async def run_configurer_test(
-    gate_type: GateType,
-    gate_num,
-    config,
-    expected_pv_values,
+    gate_type: GateType, gate_num, config, expected_pv_values
 ):
-    RunEngine()
     configurer = LogicGateConfigurer(prefix="", name="test fake logicconfigurer")
-    await configurer.connect(sim=True)
+    await configurer.connect(mock=True)
 
-    mock_gate_control = mock()
-    mock_pvs = [mock() for i in range(6)]
+    mock_gate_control = MagicMock()
+    mock_pvs = [MagicMock() for i in range(6)]
     mock_gate_control.enable = mock_pvs[0]
     mock_gate_control.sources = {i: mock_pvs[i] for i in range(1, 5)}
     mock_gate_control.invert = mock_pvs[5]
@@ -117,7 +112,7 @@ async def run_configurer_test(
         configurer.apply_or_gate_config(gate_num, config)
 
     for pv, value in zip(mock_pvs, expected_pv_values):
-        verify(pv).set(value)
+        pv.set.assert_called_once_with(value)
 
 
 async def test_apply_and_logic_gate_configuration_32_and_51_inv_and_1():
@@ -154,3 +149,8 @@ def test_logic_gate_configuration_with_too_many_sources_then_error():
 
     with pytest.raises(AssertionError):
         config.add_input(5)
+
+
+def test_direction_multiplier():
+    assert RotationDirection.NEGATIVE.multiplier == -1
+    assert RotationDirection.POSITIVE.multiplier == 1

@@ -12,20 +12,23 @@ classifiers = [
 ]
 description = "Ophyd devices and other utils that could be used across DLS beamlines"
 dependencies = [
+    "click",
     "ophyd",
-    "ophyd-async>=0.3a1",
+    "ophyd-async<0.4.0",      # Need to pin to <0.4.0 as this requires pydantic>2.0 see https://github.com/DiamondLightSource/dodal/issues/679
     "bluesky",
     "pyepics",
     "dataclasses-json",
     "pillow",
-    "zocalo",
+    "zocalo>=0.32.0",
     "requests",
     "graypy",
     "pydantic",
     "opencv-python-headless", # For pin-tip detection.
     "aioca",                  # Required for CA support with ophyd-async.
     "p4p",                    # Required for PVA support with ophyd-async.
-    "numpy",
+    "numpy<2.0",              # Unpin when https://github.com/bluesky/ophyd-async/issues/387 resolved
+    "aiofiles",
+    "aiohttp",
 ]
 
 dynamic = ["version"]
@@ -35,7 +38,6 @@ requires-python = ">=3.10"
 
 [project.optional-dependencies]
 dev = [
-    "black",
     "mypy",
     "mockito",
     "pipdeptree",
@@ -49,12 +51,18 @@ dev = [
     "ruff",
     "sphinx-autobuild",
     "sphinx-copybutton",
+    "sphinxcontrib-mermaid",
     "sphinx-design",
+    "sphinx-autodoc-typehints",
     "tox-direct",
     "types-requests",
     "types-mock",
     "types-PyYAML",
+    "types-aiofiles",
 ]
+
+[project.scripts]
+dodal = "dodal.__main__:main"
 
 [project.urls]
 GitHub = "https://github.com/DiamondLightSource/dodal"
@@ -122,7 +130,7 @@ commands =
     pytest: pytest -m 'not s03' {posargs}
     mypy: mypy src tests -v --ignore-missing-imports --show-traceback --no-strict-optional --check-untyped-defs {posargs}
     pre-commit: pre-commit run --all-files {posargs}
-    docs: sphinx-{posargs:build -EW --keep-going} -T docs build/html
+    docs: sphinx-{posargs:build -E} -T docs build/html
 """
 
 
