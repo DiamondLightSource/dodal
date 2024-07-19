@@ -8,7 +8,6 @@ from ophyd import Component, Device, DeviceStatus, EpicsSignal, EpicsSignalRO, S
 from PIL import Image, ImageDraw
 
 from dodal.devices.oav.oav_parameters import OAVConfigParams
-from dodal.devices.oav.utils import save_thumbnail
 from dodal.log import LOGGER
 
 
@@ -50,9 +49,6 @@ class MJPG(Device, ABC):
 
         LOGGER.info(f"Saving image to {path}")
         image.save(path)
-
-        save_thumbnail(Path(path), image)
-
         self.last_saved_path.put(path)
 
     def trigger(self):

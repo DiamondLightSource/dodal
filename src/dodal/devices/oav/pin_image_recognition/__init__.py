@@ -50,11 +50,13 @@ class PinTipDetection(StandardReadable):
         self._prefix: str = prefix
         self._name = name
 
-        self.triggered_tip, _ = soft_signal_r_and_setter(Tip, name="triggered_tip")
-        self.triggered_top_edge, _ = soft_signal_r_and_setter(
+        self.triggered_tip, self._tip_setter = soft_signal_r_and_setter(
+            Tip, name="triggered_tip"
+        )
+        self.triggered_top_edge, self._top_edge_setter = soft_signal_r_and_setter(
             NDArray[np.uint32], name="triggered_top_edge"
         )
-        self.triggered_bottom_edge, _ = soft_signal_r_and_setter(
+        self.triggered_bottom_edge, self._bottom_edge_setter = soft_signal_r_and_setter(
             NDArray[np.uint32], name="triggered_bottom_edge"
         )
         self.array_data = epics_signal_r(NDArray[np.uint8], f"pva://{prefix}PVA:ARRAY")
@@ -85,14 +87,14 @@ class PinTipDetection(StandardReadable):
 
         super().__init__(name=name)
 
-    async def _set_triggered_values(self, results: SampleLocation):
+    def _set_triggered_values(self, results: SampleLocation):
         tip = (results.tip_x, results.tip_y)
         if tip == self.INVALID_POSITION:
             raise InvalidPinException
         else:
-            await self.triggered_tip._backend.put(tip)
-        await self.triggered_top_edge._backend.put(results.edge_top)
-        await self.triggered_bottom_edge._backend.put(results.edge_bottom)
+            self._tip_setter(tip)
+        self._top_edge_setter(results.edge_top)
+        self._bottom_edge_setter(results.edge_bottom)
 
     async def _get_tip_and_edge_data(
         self, array_data: NDArray[np.uint8]
@@ -150,7 +152,7 @@ class PinTipDetection(StandardReadable):
             async for value in observe_value(self.array_data):
                 try:
                     location = await self._get_tip_and_edge_data(value)
-                    await self._set_triggered_values(location)
+                    self._set_triggered_values(location)
                 except Exception as e:
                     LOGGER.warn(
                         f"Failed to detect pin-tip location, will retry with next image: {e}"
@@ -166,6 +168,6 @@ class PinTipDetection(StandardReadable):
             LOGGER.error(
                 f"No tip found in {await self.validity_timeout.get_value()} seconds."
             )
-            await self.triggered_tip._backend.put(self.INVALID_POSITION)
-            await self.triggered_bottom_edge._backend.put(np.array([]))
-            await self.triggered_top_edge._backend.put(np.array([]))
+            self._tip_setter(self.INVALID_POSITION)
+            self._bottom_edge_setter(np.array([]))
+            self._top_edge_setter(np.array([]))

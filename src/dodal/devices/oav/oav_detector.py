@@ -46,6 +46,7 @@ class ZoomController(Device):
     sxst = Component(EpicsSignal, "MP:SELECT.SXST")
 
     def set_flatfield_on_zoom_level_one(self, value):
+        self.parent: "OAV"
         flat_applied = self.parent.proc.port_name.get()
         no_flat_applied = self.parent.cam.port_name.get()
         return self.parent.grid_snapshot.input_plugin.set(

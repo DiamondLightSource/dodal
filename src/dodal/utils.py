@@ -322,10 +322,15 @@ def _find_next_run_number_from_files(file_names: List[str]) -> int:
     return max(valid_numbers) + 1 if valid_numbers else 1
 
 
-def get_run_number(directory: str) -> int:
-    """Looks at the numbers coming from all nexus files with the format "xxx_(any number}.nxs", and returns the highest number + 1,
-    or 1 if there are no numbers found"""
-    nexus_file_names = [file for file in os.listdir(directory) if file.endswith(".nxs")]
+def get_run_number(directory: str, prefix: str = "") -> int:
+    """Looks at the numbers coming from all nexus files with the format
+    "{prefix}_(any number}.nxs", and returns the highest number + 1, or 1 if there are
+    no matching numbers found. If no prefix is given, considers all files in the dir."""
+    nexus_file_names = [
+        file
+        for file in os.listdir(directory)
+        if file.endswith(".nxs") and file.startswith(prefix)
+    ]
 
     if len(nexus_file_names) == 0:
         return 1
