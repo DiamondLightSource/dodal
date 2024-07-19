@@ -1,0 +1,15 @@
+types.UnionType
+===============
+
+.. currentmodule:: types
+
+.. autoclass:: UnionType
+   :members:
+
+   
+   
+   
+
+   
+   
+   
