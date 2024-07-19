@@ -1,0 +1,48 @@
+types
+=====
+
+
+
+
+
+
+
+.. currentmodule:: types
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~types.DynamicClassAttribute
+   ~types.GenericAlias
+   ~types.SimpleNamespace
+   ~types.UnionType
+
+
+
+
+.. automodule:: types
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      coroutine
+      new_class
+      prepare_class
+      resolve_bases
+   
+   
+
+   
+   
+   
