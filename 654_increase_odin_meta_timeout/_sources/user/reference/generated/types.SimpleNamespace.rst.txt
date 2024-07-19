@@ -1,0 +1,15 @@
+types.SimpleNamespace
+=====================
+
+.. currentmodule:: types
+
+.. autoclass:: SimpleNamespace
+   :members:
+
+   
+   
+   
+
+   
+   
+   

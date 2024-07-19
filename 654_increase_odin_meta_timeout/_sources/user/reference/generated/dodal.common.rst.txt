@@ -9,12 +9,12 @@
    :toctree:
    :recursive:
 
-   dodal.common.beamlines
-   dodal.common.coordination
-   dodal.common.maths
-   dodal.common.types
-   dodal.common.udc_directory_provider
-   dodal.common.visit
+   beamlines
+   coordination
+   maths
+   types
+   udc_directory_provider
+   visit
 
 
 
