@@ -39,6 +39,8 @@ class EigerDetector(Device):
 
     STALE_PARAMS_TIMEOUT = 60
     GENERAL_STATUS_TIMEOUT = 10
+    # Long timeout for meta file to compensate for filesystem issues
+    META_FILE_READY_TIMEOUT = 30
     ALL_FRAMES_TIMEOUT = 120
     ARMING_TIMEOUT = 60
 
@@ -305,7 +307,7 @@ class EigerDetector(Device):
         )
         LOGGER.info("Eiger staging: awaiting odin metadata")
         status &= await_value(
-            self.odin.meta.ready, 1, timeout=self.GENERAL_STATUS_TIMEOUT
+            self.odin.meta.ready, 1, timeout=self.META_FILE_READY_TIMEOUT
         )
         return status
 
