@@ -14,7 +14,7 @@ description = "Ophyd devices and other utils that could be used across DLS beaml
 dependencies = [
     "click",
     "ophyd",
-    "ophyd-async<0.4.0",      # Need to pin to <0.4.0 as this requires pydantic>2.0 see https://github.com/DiamondLightSource/dodal/issues/679
+    "ophyd-async<0.5.0",      # Need to pin to <0.4.0 as this requires pydantic>2.0 see https://github.com/DiamondLightSource/dodal/issues/679
     "bluesky",
     "pyepics",
     "dataclasses-json",
