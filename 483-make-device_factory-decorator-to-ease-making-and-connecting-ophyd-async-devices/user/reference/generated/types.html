@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.plans &#8212; dodal 1.29.5.dev33+g4e5b2630d documentation</title>
+    <title>types &#8212; dodal 1.29.5.dev33+g4e5b2630d documentation</title>
   
   
   
@@ -44,7 +44,7 @@
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=30646c52"></script>
     <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'user/reference/generated/dodal.plans';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'user/reference/generated/types';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://DiamondLightSource.github.io/dodal/switcher.json';
@@ -54,8 +54,8 @@
     <link rel="icon" href="../../../_static/dls-favicon.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="API Index" href="../../../genindex.html" />
-    <link rel="prev" title="zocalo" href="zocalo.html" />
+    <link rel="next" title="types.DynamicClassAttribute" href="types.DynamicClassAttribute.html" />
+    <link rel="prev" title="dodal.common" href="dodal.common.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -425,8 +425,8 @@ document.write(`
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../api.html">API</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="dodal.beamlines.html">dodal.beamlines</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="dodal.common.html">dodal.common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3 has-children"><a class="reference internal" href="types.html">types</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="dodal.common.html">dodal.common</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3 current active has-children"><a class="current reference internal" href="#">types</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="types.DynamicClassAttribute.html">types.DynamicClassAttribute</a></li>
 <li class="toctree-l4"><a class="reference internal" href="types.GenericAlias.html">types.GenericAlias</a></li>
 <li class="toctree-l4"><a class="reference internal" href="types.SimpleNamespace.html">types.SimpleNamespace</a></li>
@@ -439,7 +439,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="zocalo.html">zocalo</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">dodal.plans</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dodal.plans.html">dodal.plans</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../genindex.html">Index</a></li>
@@ -472,6 +472,8 @@ document.write(`
 
 
 
+
+
 <nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
@@ -484,9 +486,12 @@ document.write(`
     <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">User Guide</a></li>
     
     
-    <li class="breadcrumb-item"><a href="../api.html" class="nav-link">API</a></li>
+    <li class="breadcrumb-item"><i class="fa-solid fa-ellipsis"></i></li>
     
-    <li class="breadcrumb-item active" aria-current="page">dodal.plans</li>
+    
+    <li class="breadcrumb-item"><a href="dodal.common.html" class="nav-link">dodal.common</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">types</li>
   </ul>
 </nav>
 </div>
@@ -503,14 +508,75 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="dodal-plans">
-<h1>dodal.plans<a class="headerlink" href="#dodal-plans" title="Link to this heading">#</a></h1>
-<p class="rubric">Modules</p>
+  <section id="types">
+<h1>types<a class="headerlink" href="#types" title="Link to this heading">#</a></h1>
+<p class="rubric">Classes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="types.DynamicClassAttribute.html#types.DynamicClassAttribute" title="types.DynamicClassAttribute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DynamicClassAttribute</span></code></a></p></td>
+<td><p>Route attribute access on a class to __getattr__.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="types.GenericAlias.html#types.GenericAlias" title="types.GenericAlias"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GenericAlias</span></code></a></p></td>
+<td><p>Represent a PEP 585 generic type</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="types.SimpleNamespace.html#types.SimpleNamespace" title="types.SimpleNamespace"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimpleNamespace</span></code></a></p></td>
+<td><p>A simple attribute-based namespace.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="types.UnionType.html#types.UnionType" title="types.UnionType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UnionType</span></code></a></p></td>
+<td><p>Represent a PEP 604 union type</p></td>
+</tr>
 </tbody>
 </table>
 </div>
+<p id="module-types">Define names for built-in types that aren’t directly accessible as a builtin.</p>
+<p class="rubric">Functions</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#types.coroutine" title="types.coroutine"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coroutine</span></code></a>(func)</p></td>
+<td><p>Convert regular generator function to a coroutine.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#types.new_class" title="types.new_class"><code class="xref py py-obj docutils literal notranslate"><span class="pre">new_class</span></code></a>(name[, bases, kwds, exec_body])</p></td>
+<td><p>Create a class object dynamically using the appropriate metaclass.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#types.prepare_class" title="types.prepare_class"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare_class</span></code></a>(name[, bases, kwds])</p></td>
+<td><p>Call the __prepare__ method of the appropriate metaclass.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#types.resolve_bases" title="types.resolve_bases"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resolve_bases</span></code></a>(bases)</p></td>
+<td><p>Resolve MRO entries dynamically as specified by PEP 560.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="types.new_class">
+<span class="sig-prename descclassname"><span class="pre">types.</span></span><span class="sig-name descname"><span class="pre">new_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exec_body</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/types.html#new_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#types.new_class" title="Link to this definition">#</a></dt>
+<dd><p>Create a class object dynamically using the appropriate metaclass.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="types.resolve_bases">
+<span class="sig-prename descclassname"><span class="pre">types.</span></span><span class="sig-name descname"><span class="pre">resolve_bases</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bases</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/types.html#resolve_bases"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#types.resolve_bases" title="Link to this definition">#</a></dt>
+<dd><p>Resolve MRO entries dynamically as specified by PEP 560.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="types.prepare_class">
+<span class="sig-prename descclassname"><span class="pre">types.</span></span><span class="sig-name descname"><span class="pre">prepare_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/types.html#prepare_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#types.prepare_class" title="Link to this definition">#</a></dt>
+<dd><p>Call the __prepare__ method of the appropriate metaclass.</p>
+<p>Returns (metaclass, namespace, kwds) as a 3-tuple</p>
+<p><em>metaclass</em> is the appropriate metaclass
+<em>namespace</em> is the prepared class namespace
+<em>kwds</em> is an updated copy of the passed in kwds argument with any
+‘metaclass’ entry removed. If no kwds argument is passed in, this will
+be an empty dict.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="types.coroutine">
+<span class="sig-prename descclassname"><span class="pre">types.</span></span><span class="sig-name descname"><span class="pre">coroutine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/types.html#coroutine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#types.coroutine" title="Link to this definition">#</a></dt>
+<dd><p>Convert regular generator function to a coroutine.</p>
+</dd></dl>
+
 </section>
 
 
@@ -524,20 +590,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="zocalo.html"
+       href="dodal.common.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">zocalo</p>
+        <p class="prev-next-title">dodal.common</p>
       </div>
     </a>
     <a class="right-next"
-       href="../../../genindex.html"
+       href="types.DynamicClassAttribute.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">API Index</p>
+        <p class="prev-next-title">types.DynamicClassAttribute</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -552,10 +618,25 @@ document.write(`
 
 
   <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#types.new_class"><code class="docutils literal notranslate"><span class="pre">new_class()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#types.resolve_bases"><code class="docutils literal notranslate"><span class="pre">resolve_bases()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#types.prepare_class"><code class="docutils literal notranslate"><span class="pre">prepare_class()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#types.coroutine"><code class="docutils literal notranslate"><span class="pre">coroutine()</span></code></a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
 
   
   <div class="tocsection editthispage">
-    <a href="https://github.com/DiamondLightSource/dodal/edit/483-make-device_factory-decorator-to-ease-making-and-connecting-ophyd-async-devices/docs/user/reference/generated/dodal.plans.rst">
+    <a href="https://github.com/DiamondLightSource/dodal/edit/483-make-device_factory-decorator-to-ease-making-and-connecting-ophyd-async-devices/docs/user/reference/generated/types.rst">
       <i class="fa-solid fa-pencil"></i>
       
       
@@ -570,7 +651,7 @@ document.write(`
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../../../_sources/user/reference/generated/dodal.plans.rst.txt">
+    <a href="../../../_sources/user/reference/generated/types.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>
