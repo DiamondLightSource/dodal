@@ -478,5 +478,9 @@
   {
     "version": "tom_testing",
     "url": "https://DiamondLightSource.github.io/dodal/tom_testing/"
+  },
+  {
+    "version": "use_wraps",
+    "url": "https://DiamondLightSource.github.io/dodal/use_wraps/"
   }
 ]
