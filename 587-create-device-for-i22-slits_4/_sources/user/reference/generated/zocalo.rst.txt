@@ -1,0 +1,45 @@
+zocalo
+======
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   cli
+   configuration
+   service
+   util
+   wrapper
+
+
+
+
+
+
+
+
+.. automodule:: zocalo
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      ConfigurationError
+   
+   
