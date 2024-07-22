@@ -1,7 +1,11 @@
 from enum import Enum, IntEnum
 
 from bluesky.protocols import Triggerable
-from ophyd_async.core import AsyncStatus, StandardReadable, observe_value
+from ophyd_async.core import (
+    AsyncStatus,
+    StandardReadable,
+    wait_for_value,
+)
 from ophyd_async.core.signal import SignalR, SignalRW
 from ophyd_async.core.signal_backend import SignalBackend
 from ophyd_async.core.soft_signal_backend import SoftSignalBackend
@@ -120,12 +124,13 @@ class ProgramRunner(SignalRW):
         super().__init__(backend, timeout, name)
 
     @AsyncStatus.wrap
-    async def set(self, prog_num: int):
+    async def set(self, prog_num: int, timeout: float):
         prog_str = f"&2b{prog_num}r"
         await self.signal.set(prog_str, wait=True)
-        async for reading in observe_value(self.status):
-            if reading == ScanState.DONE:
-                return
+        wait_for_value(self.status, ScanState.DONE, timeout)
+        # async for reading in observe_value(self.status):
+        #     if reading == ScanState.DONE:
+        #         return
 
 
 class PMAC(StandardReadable):

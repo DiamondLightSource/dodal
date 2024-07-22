@@ -67,6 +67,6 @@ async def test_set_pmac_string_for_enc_reset(fake_pmac: PMAC, RE):
 async def test_run_proogram(fake_pmac: PMAC, RE):
     set_mock_value(fake_pmac.scanstatus, 0)
     prog_num = 10
-    RE(bps.abs_set(fake_pmac.run_program, prog_num, wait=True))
+    RE(bps.abs_set(fake_pmac.run_program, prog_num, timeout=1, wait=True))
 
     assert await fake_pmac.pmac_string.get_value() == f"&2b{prog_num}r"
