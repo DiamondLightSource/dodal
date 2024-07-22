@@ -74,14 +74,12 @@ class UndulatorDCM(StandardReadable, Movable):
             daq_configuration_path + "/domain/beamlineParameters"
         )["DCM_Perp_Offset_FIXED"]
 
-    def set(self, value: float) -> AsyncStatus:
-        async def _set():
-            await asyncio.gather(
-                self._set_dcm_energy(value),
-                self._set_undulator_gap_if_required(value),
-            )
-
-        return AsyncStatus(_set())
+    @AsyncStatus.wrap
+    async def set(self, value: float):
+        await asyncio.gather(
+            self._set_dcm_energy(value),
+            self._set_undulator_gap_if_required(value),
+        )
 
     async def _set_dcm_energy(self, energy_kev: float) -> None:
         access_level = await self.undulator.gap_access.get_value()

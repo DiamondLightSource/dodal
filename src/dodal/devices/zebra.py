@@ -110,10 +110,9 @@ class ArmingDevice(StandardReadable):
             if reading == demand.value:
                 return
 
-    def set(self, demand: ArmDemand) -> AsyncStatus:
-        return AsyncStatus(
-            asyncio.wait_for(self._set_armed(demand), timeout=self.TIMEOUT)
-        )
+    @AsyncStatus.wrap
+    async def set(self, demand: ArmDemand):
+        await asyncio.wait_for(self._set_armed(demand), timeout=self.TIMEOUT)
 
 
 class PositionCompare(StandardReadable):

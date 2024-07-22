@@ -199,12 +199,13 @@ class ApertureScatterguard(StandardReadable, Movable):
         LOGGER.info(f"{self.name} loaded in {positions}")
         self.aperture_positions = positions
 
-    def set(self, pos: SingleAperturePosition) -> AsyncStatus:
+    @AsyncStatus.wrap
+    async def set(self, pos: SingleAperturePosition):
         assert isinstance(self.aperture_positions, AperturePositions)
         if pos not in self.aperture_positions.as_list():
             raise InvalidApertureMove(f"Unknown aperture: {pos}")
 
-        return AsyncStatus(self._safe_move_within_datacollection_range(pos.location))
+        await self._safe_move_within_datacollection_range(pos.location)
 
     def _get_motor_list(self):
         return [
