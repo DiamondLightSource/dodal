@@ -1,0 +1,29 @@
+types.DynamicClassAttribute
+===========================
+
+.. currentmodule:: types
+
+.. autoclass:: DynamicClassAttribute
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~DynamicClassAttribute.deleter
+      
+      
+      ~DynamicClassAttribute.getter
+      
+      
+      ~DynamicClassAttribute.setter
+      
+   
+   
+
+   
+   
+   

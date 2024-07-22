@@ -296,6 +296,10 @@
     "url": "https://DiamondLightSource.github.io/dodal/658-pressure-jump-cell/"
   },
   {
+    "version": "685_convert_beamstop_to_ophyd_async",
+    "url": "https://DiamondLightSource.github.io/dodal/685_convert_beamstop_to_ophyd_async/"
+  },
+  {
     "version": "76_make_stage_synchronous_if_arming_not_started",
     "url": "https://DiamondLightSource.github.io/dodal/76_make_stage_synchronous_if_arming_not_started/"
   },
