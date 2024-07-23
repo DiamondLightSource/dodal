@@ -95,7 +95,7 @@ reportMissingImports = false # Ignore missing stubs in imported modules
 asyncio_mode = "auto"
 markers = [
     "s03: marks tests as requiring the s03 simulator running (deselect with '-m \"not s03\"')",
-    "skip_in_pycharm: marks test as not working in pycharm testrunner"
+    "skip_in_pycharm: marks test as not working in pycharm testrunner",
 ]
 addopts = """
     --cov=dodal --cov-report term --cov-report xml:cov.xml
@@ -108,10 +108,13 @@ filterwarnings = [
     "ignore:dep_util is Deprecated. Use functions from setuptools instead.:DeprecationWarning",
     # Ignore deprecation warning from zocalo
     "ignore:.*pkg_resources.*:DeprecationWarning",
-    # Ignore Pydantic v2 warnings about deprecated @root-validators and config
-    "ignore::pydantic.warnings.PydanticDeprecatedSince20",
-    "ignore:Valid config keys have changed in V2.*:UserWarning"
-    
+    # All following ignores are from Pydantic v2 warnings about deprecation - remove in #679
+    "ignore:Pydantic V1 style:DeprecationWarning",
+    "ignore:Deprecated in Pydantic V2.0",
+    "ignore:`json_encoders` is deprecated.",
+    "ignore:Support for class-based `config`",
+    "ignore:Valid config keys have changed in V2.*:UserWarning",
+
 ]
 # Doctest python code in docs, python code in src docstrings, test functions in tests
 testpaths = "docs src tests"
@@ -161,13 +164,13 @@ lint.extend-ignore = [
     "F811", # support typing.overload decorator
 ]
 lint.select = [
-    "B",  # flake8-bugbear - https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+    "B",    # flake8-bugbear - https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
     "C4",   # flake8-comprehensions - https://beta.ruff.rs/docs/rules/#flake8-comprehensions-c4
     "E",    # pycodestyle errors - https://beta.ruff.rs/docs/rules/#error-e
     "F",    # pyflakes rules - https://beta.ruff.rs/docs/rules/#pyflakes-f
-    "I",  # isort - https://docs.astral.sh/ruff/rules/#isort-i
+    "I",    # isort - https://docs.astral.sh/ruff/rules/#isort-i
     "W",    # pycodestyle warnings - https://beta.ruff.rs/docs/rules/#warning-w
-    "UP", # pyupgrade - https://docs.astral.sh/ruff/rules/#pyupgrade-up
+    "UP",   # pyupgrade - https://docs.astral.sh/ruff/rules/#pyupgrade-up
     "I001", # isort
 ]
 
