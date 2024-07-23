@@ -3,6 +3,7 @@ from unittest.mock import ANY, Mock
 
 import bluesky.plan_stubs as bps
 import pytest
+from bluesky import FailedStatus
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import (
     DeviceCollector,
@@ -69,7 +70,7 @@ async def test_stage_fail_on_detector_not_busy_state(
     mock_xspress3mini.timeout = 0.1
     with pytest.raises(TimeoutError):
         await mock_xspress3mini.stage()
-    with pytest.raises(Exception):
+    with pytest.raises(FailedStatus):
         RE(bps.stage(mock_xspress3mini, wait=True))
     await asyncio.sleep(0.2)
     assert 2 == get_mock_put(mock_xspress3mini.trigger_mode).call_count
@@ -85,7 +86,7 @@ async def test_stage_fail_to_acquire_timeout(
     mock_xspress3mini.timeout = 0.1
     with pytest.raises(TimeoutError):
         await mock_xspress3mini.stage()
-    with pytest.raises(Exception):
+    with pytest.raises(FailedStatus):
         RE(bps.stage(mock_xspress3mini, wait=True))
     await asyncio.sleep(0.2)
     assert 2 == get_mock_put(mock_xspress3mini.trigger_mode).call_count

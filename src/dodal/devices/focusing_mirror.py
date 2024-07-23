@@ -2,8 +2,10 @@ from enum import Enum
 
 from ophyd_async.core import (
     AsyncStatus,
+    ConfigSignal,
     Device,
     DeviceVector,
+    HintedSignal,
     StandardReadable,
     observe_value,
 )
@@ -144,10 +146,8 @@ class FocusingMirror(StandardReadable):
         # regardless of orientation of the mirror
         self.incident_angle = Motor(prefix + "PITCH")
 
-        self.set_readable_signals(
-            read=[self.incident_angle.user_readback],
-            config=[self.type],
-        )
+        self.add_readables([self.incident_angle.user_readback], wrapper=HintedSignal)
+        self.add_readables([self.type], wrapper=ConfigSignal)
         super().__init__(name)
 
 

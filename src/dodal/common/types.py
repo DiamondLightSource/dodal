@@ -1,8 +1,7 @@
 from abc import ABC, abstractmethod
+from collections.abc import Callable, Generator
 from typing import (
     Any,
-    Callable,
-    Generator,
 )
 
 from bluesky.utils import Msg

@@ -1,7 +1,7 @@
 import json
-import xml.etree.cElementTree as et
+import xml.etree.ElementTree as et
 from collections import ChainMap
-from typing import Any, Tuple
+from typing import Any
 
 from dodal.devices.oav.oav_errors import (
     OAVError_BeamPositionNotFound,
@@ -65,11 +65,11 @@ class OAVParameters:
             try:
                 param = param_type(param)
                 return param
-            except AssertionError:
+            except AssertionError as e:
                 raise TypeError(
                     f"OAV param {name} from the OAV centring params json file has the "
                     f"wrong type, should be {param_type} but is {type(param)}."
-                )
+                ) from e
 
         self.exposure: float = update("exposure", float)
         self.acquire_period: float = update("acqPeriod", float)
@@ -155,7 +155,7 @@ class OAVConfigParams:
 
     def get_beam_position_from_zoom(
         self, zoom: float, xsize: int, ysize: int
-    ) -> Tuple[int, int]:
+    ) -> tuple[int, int]:
         """
         Extracts the beam location in pixels `xCentre` `yCentre`, for a requested zoom \
         level. The beam location is manually inputted by the beamline operator on GDA \
@@ -164,7 +164,7 @@ class OAVConfigParams:
         """
         crosshair_x_line = None
         crosshair_y_line = None
-        with open(self.display_config, "r") as f:
+        with open(self.display_config) as f:
             file_lines = f.readlines()
             for i in range(len(file_lines)):
                 if file_lines[i].startswith("zoomLevel = " + str(zoom)):
@@ -188,7 +188,7 @@ class OAVConfigParams:
 
     def calculate_beam_distance(
         self, horizontal_pixels: int, vertical_pixels: int
-    ) -> Tuple[int, int]:
+    ) -> tuple[int, int]:
         """
         Calculates the distance between the beam centre and the given (horizontal, vertical).
 

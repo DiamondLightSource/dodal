@@ -16,12 +16,23 @@ from dodal.devices.undulator_dcm import (
     UndulatorDCM,
     _get_closest_gap_for_energy,
 )
+from dodal.log import LOGGER
 
 from ...conftest import MOCK_DAQ_CONFIG_PATH
 
 ID_GAP_LOOKUP_TABLE_PATH: str = (
     "./tests/devices/unit_tests/test_beamline_undulator_to_gap_lookup_table.txt"
 )
+
+
+@pytest.fixture(autouse=True)
+def flush_event_loop_on_finish(event_loop):
+    # wait for the test function to complete
+    yield None
+
+    if pending_tasks := asyncio.all_tasks(event_loop):
+        LOGGER.warning(f"Waiting for pending tasks to complete {pending_tasks}")
+        event_loop.run_until_complete(asyncio.gather(*pending_tasks))
 
 
 @pytest.fixture
