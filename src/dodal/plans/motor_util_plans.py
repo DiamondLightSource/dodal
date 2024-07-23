@@ -1,5 +1,5 @@
 import uuid
-from typing import Any, Dict, Generator
+from typing import Any, Dict, Generator, TypeVar
 
 from bluesky import plan_stubs as bps
 from bluesky.preprocessors import finalize_wrapper, pchain
@@ -9,10 +9,12 @@ from ophyd_async.epics.motion import Motor
 
 from dodal.common import MsgGenerator
 
+AnyDevice = TypeVar("AnyDevice", bound=Device)
+
 
 class MoveTooLarge(Exception):
     def __init__(
-        self, axis: Motor, maximum_move: float, position: float, *args: object
+        self, axis: Device, maximum_move: float, position: float, *args: object
     ) -> None:
         self.axis = axis
         self.maximum_move = maximum_move
@@ -21,22 +23,20 @@ class MoveTooLarge(Exception):
 
 
 def _check_and_cache_values(
-    device: Device,
+    devices_and_positions: Dict[AnyDevice, float],
     smallest_move: float,
     maximum_move: float,
-    home_position: float = 0,
-) -> Generator[Msg, Any, Dict[Motor, float]]:
+) -> Generator[Msg, Any, Dict[AnyDevice, float]]:
     """Caches the positions of all Motors on specified device if they are within
     smallest_move of home_position. Throws MoveTooLarge if they are outside maximum_move
     of the home_position
     """
     positions = {}
-    motors_to_move = [axis for _, axis in device.children() if isinstance(axis, Motor)]
-    for axis in motors_to_move:
+    for axis, new_position in devices_and_positions.items():
         position = yield from bps.rd(axis)
-        if abs(position - home_position) > maximum_move:
+        if abs(position - new_position) > maximum_move:
             raise MoveTooLarge(axis, maximum_move, position)
-        if abs(position - home_position) > smallest_move:
+        if abs(position - new_position) > smallest_move:
             positions[axis] = position
     return positions
 
@@ -44,7 +44,22 @@ def _check_and_cache_values(
 def home_and_reset_wrapper(
     plan: MsgGenerator,
     device: Device,
-    home_position: float,
+    smallest_move: float,
+    maximum_move: float,
+    group: str | None = None,
+    wait_for_all: bool = True,
+) -> MsgGenerator:
+    home_positions = {
+        axis: 0.0 for _, axis in device.children() if isinstance(axis, Motor)
+    }
+    return move_and_reset_wrapper(
+        plan, home_positions, smallest_move, maximum_move, group, wait_for_all
+    )
+
+
+def move_and_reset_wrapper(
+    plan: MsgGenerator,
+    device_and_positions: Dict[AnyDevice, float],
     smallest_move: float,
     maximum_move: float,
     group: str | None = None,
@@ -72,13 +87,14 @@ def home_and_reset_wrapper(
                                        them. Defaults to True.
     """
     initial_positions = yield from _check_and_cache_values(
-        device, smallest_move, maximum_move, home_position
+        device_and_positions, smallest_move, maximum_move
     )
 
     def move_to_home():
         home_group = f"home-{group if group else str(uuid.uuid4())[:6]}"
-        for axis, _ in initial_positions.items():
-            yield from bps.abs_set(axis, home_position, group=home_group)
+        for axis, position in device_and_positions.items():
+            if axis in initial_positions.keys():
+                yield from bps.abs_set(axis, position, group=home_group)
         if wait_for_all:
             yield from bps.wait(home_group)
 
