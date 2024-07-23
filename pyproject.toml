@@ -107,7 +107,10 @@ filterwarnings = [
     # Ignore deprecation warning from ophyd_async
     "ignore:dep_util is Deprecated. Use functions from setuptools instead.:DeprecationWarning",
     # Ignore deprecation warning from zocalo
-    "ignore:.*pkg_resources.*:DeprecationWarning"
+    "ignore:.*pkg_resources.*:DeprecationWarning",
+    # Ignore Pydantic v2 warnings about deprecated @root-validators and config
+    "ignore::pydantic.warnings.PydanticDeprecatedSince20",
+    "ignore:Valid config keys have changed in V2.*:UserWarning"
     
 ]
 # Doctest python code in docs, python code in src docstrings, test functions in tests
