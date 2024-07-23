@@ -3,6 +3,7 @@ from unittest.mock import ANY, MagicMock, call, patch
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
+from bluesky.utils import FailedStatus
 from ophyd_async.core import Device, DeviceCollector, get_mock_put, set_mock_value
 from ophyd_async.core.signal import soft_signal_rw
 from ophyd_async.epics.motion import Motor
@@ -312,7 +313,7 @@ def test_given_move_to_home_fails_reset_still(RE, my_device, move_that_failed):
         getattr(my_device, move_that_failed).user_setpoint
     ).side_effect = MyException()
 
-    with pytest.raises(MyException):
+    with pytest.raises(FailedStatus) as e:
         RE(
             home_and_reset_wrapper(
                 my_plan(),
@@ -321,6 +322,8 @@ def test_given_move_to_home_fails_reset_still(RE, my_device, move_that_failed):
                 1000,
             )
         )
+
+    assert isinstance(e.value.__cause__, MyException)
 
     get_mock_put(my_device.x.user_setpoint).assert_has_calls(
         [call(0.0, wait=ANY, timeout=ANY), call(initial_x, wait=ANY, timeout=ANY)]
