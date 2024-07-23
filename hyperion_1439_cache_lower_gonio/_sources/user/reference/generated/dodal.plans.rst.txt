@@ -9,9 +9,9 @@
    :toctree:
    :recursive:
 
-   dodal.plans.check_topup
-   dodal.plans.data_session_metadata
-   dodal.plans.motor_util_plans
+   check_topup
+   data_session_metadata
+   motor_util_plans
 
 
 
