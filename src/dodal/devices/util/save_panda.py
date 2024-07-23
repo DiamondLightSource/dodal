@@ -3,7 +3,7 @@ import sys
 from argparse import ArgumentParser
 from typing import cast
 
-from bluesky import RunEngine
+from bluesky.run_engine import RunEngine
 from ophyd_async.core import Device, save_device
 from ophyd_async.panda import phase_sorter
 
