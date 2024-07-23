@@ -69,6 +69,7 @@ dev = [
 
 [project.scripts]
 dodal = "dodal.__main__:main"
+save-panda = "dodal.devices.util.save_panda"
 
 [project.urls]
 GitHub = "https://github.com/DiamondLightSource/dodal"
