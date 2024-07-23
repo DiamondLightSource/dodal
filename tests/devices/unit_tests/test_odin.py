@@ -38,7 +38,7 @@ def test_check_odin_state(
     if is_initialised:
         assert fake_odin.check_odin_state() == expected_state
     else:
-        with pytest.raises(Exception):
+        with pytest.raises(RuntimeError):
             fake_odin.check_odin_state()
 
 

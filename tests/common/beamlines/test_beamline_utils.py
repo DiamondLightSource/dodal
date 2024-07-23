@@ -1,4 +1,5 @@
-from unittest.mock import ANY, MagicMock, patch
+import asyncio
+from unittest.mock import ANY, AsyncMock, MagicMock, patch
 
 import pytest
 from bluesky.run_engine import RunEngine as RE
@@ -14,9 +15,20 @@ from dodal.devices.aperturescatterguard import ApertureScatterguard
 from dodal.devices.qbpm1 import QBPM1
 from dodal.devices.smargon import Smargon
 from dodal.devices.zebra import Zebra
+from dodal.log import LOGGER
 from dodal.utils import make_all_devices
 
 from ...conftest import mock_beamline_module_filepaths
+
+
+@pytest.fixture(autouse=True)
+def flush_event_loop_on_finish(event_loop):
+    # wait for the test function to complete
+    yield None
+
+    if pending_tasks := asyncio.all_tasks(event_loop):
+        LOGGER.warning(f"Waiting for pending tasks to complete {pending_tasks}")
+        event_loop.run_until_complete(asyncio.gather(*pending_tasks))
 
 
 @pytest.fixture(autouse=True)
@@ -107,10 +119,11 @@ def test_wait_for_v1_device_connection_passes_through_timeout(kwargs, expected_t
 @pytest.mark.parametrize(
     "kwargs,expected_timeout", [({}, 5.0), ({"timeout": 15.0}, 15.0)]
 )
-@patch.object(beamline_utils, "call_in_bluesky_event_loop", spec=callable)
-def test_wait_for_v2_device_connection_passes_through_timeout(
-    call_in_bluesky_el, kwargs, expected_timeout
-):
+@patch(
+    "dodal.common.beamlines.beamline_utils.v2_device_wait_for_connection",
+    new=AsyncMock(),
+)
+def test_wait_for_v2_device_connection_passes_through_timeout(kwargs, expected_timeout):
     RE()
     device = OphydV2Device()
     device.connect = MagicMock()

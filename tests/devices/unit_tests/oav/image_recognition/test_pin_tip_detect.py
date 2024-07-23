@@ -159,7 +159,7 @@ async def test_given_find_tip_fails_twice_when_triggered_then_tip_invalid_and_tr
         assert mock_process_array.call_count > 1
 
 
-@patch("dodal.devices.oav.pin_image_recognition.LOGGER.warn")
+@patch("dodal.devices.oav.pin_image_recognition.LOGGER.warning")
 @patch("dodal.devices.oav.pin_image_recognition.observe_value")
 async def test_given_tip_invalid_then_loop_keeps_retrying_until_valid(
     mock_image_read: MagicMock,

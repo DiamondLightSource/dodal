@@ -3,7 +3,7 @@ All the methods in this module return a bluesky plan generator that adjusts a va
 according to some criteria either via feedback, preset positions, lookup tables etc.
 """
 
-from typing import Callable, Generator
+from collections.abc import Callable, Generator
 
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import Msg

@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import pytest
+from bluesky.run_engine import RunEngine
 from ophyd_async.core import (
     DirectoryInfo,
     DirectoryProvider,
@@ -23,7 +24,7 @@ def static_directory_provider(tmp_path: Path) -> DirectoryProvider:
 
 
 @pytest.fixture
-def smargon():
+def smargon(RE: RunEngine):
     smargon = i03.smargon(fake_with_ophyd_sim=True)
 
     for motor in [smargon.omega, smargon.x, smargon.y, smargon.z]:

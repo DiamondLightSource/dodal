@@ -1,8 +1,8 @@
-from collections.abc import Generator
+from collections.abc import Collection, Generator
 from dataclasses import dataclass
 from enum import Enum
 from math import isclose
-from typing import Collection, cast
+from typing import cast
 
 from bluesky import plan_stubs as bps
 from bluesky.utils import Msg
@@ -87,7 +87,7 @@ class XYZLimits:
     def position_valid(self, pos: Collection[float]) -> bool:
         return all(
             axis_limits.contains(value)
-            for axis_limits, value in zip([self.x, self.y, self.z], pos)
+            for axis_limits, value in zip([self.x, self.y, self.z], pos, strict=False)
         )
 
 

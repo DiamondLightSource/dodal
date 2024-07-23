@@ -1,7 +1,7 @@
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 
-from ophyd import Component as Cpt
-from ophyd import DetectorBase, EpicsSignal, Signal
+from ophyd import EpicsSignal, Signal
 from ophyd.areadetector.base import ADComponent as Cpt
 from ophyd.areadetector.detectors import DetectorBase
 
@@ -75,7 +75,7 @@ class AdAravisDetector(SingleTriggerV33, DetectorBase):
         self._prime_hdf()
 
         # Now calling the super method should set the acquire period
-        super(AdAravisDetector, self).stage(*args, **kwargs)
+        super().stage(*args, **kwargs)
 
     def _prime_hdf(self) -> None:
         """

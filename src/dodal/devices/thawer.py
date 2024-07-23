@@ -15,7 +15,7 @@ class ThawerStates(str, Enum):
     ON = "On"
 
 
-class ThawingTimer(Device):
+class ThawingTimer(Device, Stoppable):
     def __init__(self, control_signal: SignalRW[ThawerStates]) -> None:
         self._control_signal = control_signal
         self._thawing_task: Task | None = None
@@ -32,7 +32,8 @@ class ThawingTimer(Device):
         finally:
             await self._control_signal.set(ThawerStates.OFF)
 
-    async def stop(self):
+    @AsyncStatus.wrap
+    async def stop(self, *args, **kwargs):
         if self._thawing_task:
             self._thawing_task.cancel()
 
@@ -43,6 +44,7 @@ class Thawer(StandardReadable, Stoppable):
         self.thaw_for_time_s = ThawingTimer(self.control)
         super().__init__(name)
 
-    async def stop(self):
+    @AsyncStatus.wrap
+    async def stop(self, *args, **kwargs):
         await self.thaw_for_time_s.stop()
         await self.control.set(ThawerStates.OFF)

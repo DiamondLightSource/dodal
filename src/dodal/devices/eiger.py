@@ -12,10 +12,6 @@ from dodal.log import LOGGER
 
 FREE_RUN_MAX_IMAGES = 1000000
 
-# TODO present for testing purposes, remove
-TEST_1169_FIX = True
-TEST_1169_INJECT = False
-
 
 class InternalEigerTriggerMode(Enum):
     INTERNAL_SERIES = 0
@@ -39,6 +35,8 @@ class EigerDetector(Device):
 
     STALE_PARAMS_TIMEOUT = 60
     GENERAL_STATUS_TIMEOUT = 10
+    # Long timeout for meta file to compensate for filesystem issues
+    META_FILE_READY_TIMEOUT = 30
     ALL_FRAMES_TIMEOUT = 120
     ARMING_TIMEOUT = 60
 
@@ -54,17 +52,15 @@ class EigerDetector(Device):
         cls,
         params: DetectorParams,
         name: str = "EigerDetector",
-        *args,
-        **kwargs,
     ):
-        det = cls(name=name, *args, **kwargs)
+        det = cls(name=name)
         det.set_detector_parameters(params)
         return det
 
     def set_detector_parameters(self, detector_params: DetectorParams):
         self.detector_params = detector_params
         if self.detector_params is None:
-            raise Exception("Parameters for scan must be specified")
+            raise ValueError("Parameters for scan must be specified")
 
         to_check = [
             (
@@ -101,7 +97,7 @@ class EigerDetector(Device):
 
     def stage(self):
         self.wait_on_arming_if_started()
-        if TEST_1169_INJECT or not self.is_armed():
+        if not self.is_armed():
             LOGGER.info("Eiger not armed, arming")
 
             self.async_stage().wait(timeout=self.ARMING_TIMEOUT)
@@ -305,7 +301,7 @@ class EigerDetector(Device):
         )
         LOGGER.info("Eiger staging: awaiting odin metadata")
         status &= await_value(
-            self.odin.meta.ready, 1, timeout=self.GENERAL_STATUS_TIMEOUT
+            self.odin.meta.ready, 1, timeout=self.META_FILE_READY_TIMEOUT
         )
         return status
 
@@ -316,7 +312,9 @@ class EigerDetector(Device):
 
     def _finish_arm(self) -> Status:
         LOGGER.info("Eiger staging: Finishing arming")
-        return Status(done=True, success=True)
+        status = Status()
+        status.set_finished()
+        return status
 
     def forward_bit_depth_to_filewriter(self):
         bit_depth = self.bit_depth.get()
@@ -339,6 +337,10 @@ class EigerDetector(Device):
             functions_to_do_arm.append(self.enable_roi_mode)
 
         arming_sequence_funcs = [
+            # If a beam dump occurs after arming the eiger but prior to eiger staging,
+            # the odin may timeout which will cause the arming sequence to be retried;
+            # if this previously completed successfully we must reset the odin first
+            self.odin.stop,
             lambda: self.change_dev_shm(detector_params.enable_dev_shm),
             lambda: self.set_detector_threshold(detector_params.expected_energy_ev),
             self.set_cam_pvs,
@@ -352,11 +354,6 @@ class EigerDetector(Device):
             self._wait_fan_ready,
             self._finish_arm,
         ]
-        if TEST_1169_FIX:
-            # If a beam dump occurs after arming the eiger but prior to eiger staging,
-            # the odin may timeout which will cause the arming sequence to be retried;
-            # if this previously completed successfully we must reset the odin first
-            arming_sequence_funcs.insert(0, self.odin.stop)
 
         functions_to_do_arm.extend(arming_sequence_funcs)
 

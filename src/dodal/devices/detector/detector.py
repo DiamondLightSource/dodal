@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from typing import Any, Tuple
+from typing import Any
 
 from pydantic import BaseModel, root_validator, validator
 
@@ -54,9 +54,8 @@ class DetectorParams(BaseModel):
             DetectorSizeConstants: lambda d: d.det_type_string,
         }
 
-    @root_validator(
-        pre=True, skip_on_failure=True
-    )  # should be replaced with model_validator once move to pydantic 2 is complete
+    # should be replaced with model_validator once move to pydantic 2 is complete
+    @root_validator(pre=True)
     def create_beamxy_and_runnumber(cls, values: dict[str, Any]) -> dict[str, Any]:
         values["beam_xy_converter"] = DetectorDistanceToBeamXYConverter(
             values["det_dist_to_beam_converter_path"]
@@ -81,7 +80,7 @@ class DetectorParams(BaseModel):
             directory += "/"
         return directory
 
-    def get_beam_position_mm(self, detector_distance: float) -> Tuple[float, float]:
+    def get_beam_position_mm(self, detector_distance: float) -> tuple[float, float]:
         x_beam_mm = self.beam_xy_converter.get_beam_xy_from_det_dist(
             detector_distance, Axis.X_AXIS
         )
@@ -106,7 +105,7 @@ class DetectorParams(BaseModel):
         roi_size = self.detector_size_constants.roi_size_pixels
         return roi_size if self.use_roi_mode else full_size
 
-    def get_beam_position_pixels(self, detector_distance: float) -> Tuple[float, float]:
+    def get_beam_position_pixels(self, detector_distance: float) -> tuple[float, float]:
         full_size_pixels = self.detector_size_constants.det_size_pixels
         roi_size_pixels = self.get_detector_size_pizels()
 

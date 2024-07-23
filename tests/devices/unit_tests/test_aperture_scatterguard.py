@@ -1,12 +1,13 @@
+from collections.abc import Sequence
 from contextlib import ExitStack
 from dataclasses import asdict
-from typing import Sequence
 from unittest.mock import ANY, MagicMock, call
 
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import (
+    DeviceCollector,
     get_mock_put,
     set_mock_value,
 )
@@ -35,10 +36,10 @@ def get_all_motors(ap_sg: ApertureScatterguard):
 
 
 @pytest.fixture
-async def ap_sg_and_call_log(aperture_positions: AperturePositions):
+async def ap_sg_and_call_log(RE: RunEngine, aperture_positions: AperturePositions):
     call_log = MagicMock()
-    ap_sg = ApertureScatterguard(name="test_ap_sg")
-    await ap_sg.connect(mock=True)
+    async with DeviceCollector(mock=True):
+        ap_sg = ApertureScatterguard(name="test_ap_sg")
     ap_sg.load_aperture_positions(aperture_positions)
     with ExitStack() as motor_patch_stack:
         for motor in get_all_motors(ap_sg):
@@ -114,17 +115,18 @@ def _assert_patched_ap_sg_has_call(
     for motor, pos in zip(
         get_all_motors(ap_sg),
         position,
+        strict=False,
     ):
         get_mock_put(motor.user_setpoint).assert_called_with(
             pos, wait=True, timeout=ANY
         )
 
 
-def test_aperture_scatterguard_rejects_unknown_position(aperture_in_medium_pos):
+async def test_aperture_scatterguard_rejects_unknown_position(aperture_in_medium_pos):
     position_to_reject = ApertureFiveDimensionalLocation(0, 0, 0, 0, 0)
 
     with pytest.raises(InvalidApertureMove):
-        aperture_in_medium_pos.set(
+        await aperture_in_medium_pos.set(
             SingleAperturePosition("test", "GDA_NAME", 10, position_to_reject)
         )
 
@@ -192,6 +194,7 @@ def set_underlying_motors(
     for motor, pos in zip(
         get_all_motors(ap_sg),
         position,
+        strict=False,
     ):
         motor.set(pos)
 
