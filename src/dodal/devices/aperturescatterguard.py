@@ -4,7 +4,7 @@ from dataclasses import asdict, dataclass
 from enum import Enum
 
 from bluesky.protocols import Movable, Reading
-from ophyd_async.core import AsyncStatus, SignalR, StandardReadable
+from ophyd_async.core import AsyncStatus, HintedSignal, SignalR, StandardReadable
 from ophyd_async.core.soft_signal_backend import SoftConverter, SoftSignalBackend
 
 from dodal.devices.aperture import Aperture
@@ -155,11 +155,7 @@ class ApertureScatterguard(StandardReadable, Movable):
         )
         aperture_backend.converter = self.ApertureConverter()
         self.selected_aperture = self.SelectedAperture(backend=aperture_backend)
-        self.set_readable_signals(
-            read=[
-                self.selected_aperture,
-            ]
-        )
+        self.add_readables([self.selected_aperture], wrapper=HintedSignal)
         super().__init__(name)
 
     class ApertureConverter(SoftConverter):

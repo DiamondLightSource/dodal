@@ -3,7 +3,7 @@ import os
 import time
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, Tuple
+from typing import Any
 
 import ispyb.sqlalchemy
 import pika
@@ -56,7 +56,7 @@ def load_configuration_file(filename):
     return conf
 
 
-def get_dcgid_and_prefix(dcid: int, Session) -> Tuple[int, str]:
+def get_dcgid_and_prefix(dcid: int, Session) -> tuple[int, str]:
     try:
         with Session() as session:
             query = (

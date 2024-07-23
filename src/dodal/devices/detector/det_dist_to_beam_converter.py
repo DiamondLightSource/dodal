@@ -47,7 +47,7 @@ class DetectorDistanceToBeamXYConverter:
 
     def parse_table(self) -> list:
         rows = loadtxt(self.lookup_file, delimiter=" ", comments=["#", "Units"])
-        columns = list(zip(*rows))
+        columns = list(zip(*rows, strict=False))
 
         return columns
 

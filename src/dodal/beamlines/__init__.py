@@ -1,7 +1,7 @@
 import importlib.util
+from collections.abc import Iterable, Mapping
 from functools import lru_cache
 from pathlib import Path
-from typing import Iterable, Mapping
 
 # Where beamline names (per the ${BEAMLINE} environment variable don't always
 # match up, we have to map between them bidirectionally). The most common use case is

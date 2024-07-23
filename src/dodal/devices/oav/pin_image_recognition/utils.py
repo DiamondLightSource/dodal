@@ -1,6 +1,7 @@
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
-from typing import Callable, Final, Tuple
+from typing import Final
 
 import cv2
 import numpy as np
@@ -103,7 +104,7 @@ class SampleLocation:
     edge_bottom: np.ndarray
 
 
-class MxSampleDetect(object):
+class MxSampleDetect:
     def __init__(
         self,
         *,
@@ -161,7 +162,7 @@ class MxSampleDetect(object):
     @staticmethod
     def _first_and_last_nonzero_by_columns(
         arr: np.ndarray,
-    ) -> Tuple[np.ndarray, np.ndarray]:
+    ) -> tuple[np.ndarray, np.ndarray]:
         """
         Finds the indexes of the first & last non-zero values by column in a 2d array.
 
@@ -243,9 +244,7 @@ class MxSampleDetect(object):
             bottom[x + 1 :] = NONE_VALUE
 
         LOGGER.info(
-            "pin-tip detection: Successfully located pin tip at (x={}, y={})".format(
-                tip_x, tip_y
-            )
+            f"pin-tip detection: Successfully located pin tip at (x={tip_x}, y={tip_y})"
         )
         return SampleLocation(
             tip_x=tip_x, tip_y=tip_y, edge_bottom=bottom, edge_top=top

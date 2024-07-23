@@ -1,4 +1,4 @@
-from typing import Dict, Generic, TypeVar
+from typing import Generic, TypeVar
 
 from pydantic.dataclasses import dataclass
 
@@ -11,7 +11,7 @@ class DetectorSize(Generic[T]):
     height: T
 
 
-ALL_DETECTORS: Dict[str, "DetectorSizeConstants"] = {}
+ALL_DETECTORS: dict[str, "DetectorSizeConstants"] = {}
 
 
 @dataclass

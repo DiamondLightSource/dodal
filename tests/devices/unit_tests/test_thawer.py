@@ -50,14 +50,18 @@ async def test_given_thawing_already_triggered_when_triggered_again_then_fails(
     mock_sleep: AsyncMock,
     thawer: Thawer,
 ):
-    patch_sleep(mock_sleep)
+    release_sleep = patch_sleep(mock_sleep)
 
-    thawer.thaw_for_time_s.set(10)
+    status = thawer.thaw_for_time_s.set(10)
 
-    await asyncio.sleep(0.01)
+    try:
+        await asyncio.sleep(0.01)
 
-    with pytest.raises(ThawingException):
-        await thawer.thaw_for_time_s.set(10)
+        with pytest.raises(ThawingException):
+            await thawer.thaw_for_time_s.set(10)
+    finally:
+        release_sleep.set()
+        await status
 
 
 @patch("dodal.devices.thawer.sleep")

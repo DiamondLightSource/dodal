@@ -1,6 +1,6 @@
+from collections.abc import Sequence
 from contextlib import ExitStack
 from dataclasses import asdict
-from typing import Sequence
 from unittest.mock import ANY, MagicMock, call
 
 import bluesky.plan_stubs as bps
@@ -116,6 +116,7 @@ def _assert_patched_ap_sg_has_call(
     for motor, pos in zip(
         get_all_motors(ap_sg),
         position,
+        strict=False,
     ):
         get_mock_put(motor.user_setpoint).assert_called_with(
             pos, wait=True, timeout=ANY
@@ -194,6 +195,7 @@ def set_underlying_motors(
     for motor, pos in zip(
         get_all_motors(ap_sg),
         position,
+        strict=False,
     ):
         motor.set(pos)
 

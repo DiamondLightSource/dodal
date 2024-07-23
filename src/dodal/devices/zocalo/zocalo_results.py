@@ -1,8 +1,9 @@
 import asyncio
 from collections import OrderedDict
+from collections.abc import Generator, Sequence
 from enum import Enum
 from queue import Empty, Queue
-from typing import Any, Generator, Sequence, Tuple, TypedDict
+from typing import Any, TypedDict
 
 import bluesky.plan_stubs as bps
 import numpy as np
@@ -10,7 +11,7 @@ import workflows.recipe
 import workflows.transport
 from bluesky.protocols import Descriptor, Triggerable
 from numpy.typing import NDArray
-from ophyd_async.core import StandardReadable, soft_signal_r_and_setter
+from ophyd_async.core import HintedSignal, StandardReadable, soft_signal_r_and_setter
 from ophyd_async.core.async_status import AsyncStatus
 from workflows.transport.common_transport import CommonTransport
 
@@ -88,14 +89,15 @@ class ZocaloResults(StandardReadable, Triggerable):
         )
         self.ispyb_dcid, _ = soft_signal_r_and_setter(int, name="ispyb_dcid")
         self.ispyb_dcgid, _ = soft_signal_r_and_setter(int, name="ispyb_dcgid")
-        self.set_readable_signals(
-            read=[
+        self.add_readables(
+            [
                 self.results,
                 self.centres_of_mass,
                 self.bbox_sizes,
                 self.ispyb_dcid,
                 self.ispyb_dcgid,
-            ]
+            ],
+            wrapper=HintedSignal,
         )
         super().__init__(name)
 
@@ -242,7 +244,7 @@ class ZocaloResults(StandardReadable, Triggerable):
 
 def get_processing_result(
     zocalo: ZocaloResults,
-) -> Generator[Any, Any, Tuple[np.ndarray, np.ndarray] | Tuple[None, None]]:
+) -> Generator[Any, Any, tuple[np.ndarray, np.ndarray] | tuple[None, None]]:
     """A minimal plan which will extract the top ranked xray centre and crystal bounding
     box size from the zocalo results. Returns (None, None) if no crystals were found."""
 

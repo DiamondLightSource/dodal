@@ -3,7 +3,6 @@ from __future__ import annotations
 import asyncio
 from enum import Enum
 from functools import partialmethod
-from typing import List
 
 from ophyd_async.core import (
     AsyncStatus,
@@ -165,7 +164,7 @@ class ZebraOutputPanel(StandardReadable):
         super().__init__(name)
 
 
-def boolean_array_to_integer(values: List[bool]) -> int:
+def boolean_array_to_integer(values: list[bool]) -> int:
     """Converts a boolean array to integer by interpretting it in binary with LSB 0 bit
     numbering.
 
@@ -244,8 +243,8 @@ class LogicGateConfiguration:
     NUMBER_OF_INPUTS = 4
 
     def __init__(self, input_source: int, invert: bool = False) -> None:
-        self.sources: List[int] = []
-        self.invert: List[bool] = []
+        self.sources: list[int] = []
+        self.invert: list[bool] = []
         self.add_input(input_source, invert)
 
     def add_input(
@@ -270,7 +269,9 @@ class LogicGateConfiguration:
 
     def __str__(self) -> str:
         input_strings = []
-        for input, (source, invert) in enumerate(zip(self.sources, self.invert)):
+        for input, (source, invert) in enumerate(
+            zip(self.sources, self.invert, strict=False)
+        ):
             input_strings.append(f"INP{input+1}={'!' if invert else ''}{source}")
 
         return ", ".join(input_strings)

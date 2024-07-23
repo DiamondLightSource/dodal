@@ -1,4 +1,3 @@
-from typing import List
 from unittest.mock import call
 
 import bluesky.plan_stubs as bps
@@ -61,7 +60,7 @@ async def test_shutter_raises_error_on_set_if_hutch_not_interlocked(
 )
 async def test_shutter_operations(
     demand: ShutterDemand,
-    expected_calls: List,
+    expected_calls: list,
     expected_state: ShutterState,
     fake_shutter: HutchShutter,
     RE,

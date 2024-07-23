@@ -1,6 +1,7 @@
 import time
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Dict, Literal, Sequence
+from typing import Literal
 
 from bluesky.protocols import Reading
 from event_model.documents.event_descriptor import DataKey
@@ -127,7 +128,7 @@ class DoubleCrystalMonochromator(StandardReadable):
 
         super().__init__(name)
 
-    async def describe(self) -> Dict[str, DataKey]:
+    async def describe(self) -> dict[str, DataKey]:
         default_describe = await super().describe()
         return {
             f"{self.name}-wavelength": DataKey(
@@ -139,7 +140,7 @@ class DoubleCrystalMonochromator(StandardReadable):
             **default_describe,
         }
 
-    async def read(self) -> Dict[str, Reading]:
+    async def read(self) -> dict[str, Reading]:
         default_reading = await super().read()
         energy: float = default_reading[f"{self.name}-energy"]["value"]
         if energy > 0.0:
