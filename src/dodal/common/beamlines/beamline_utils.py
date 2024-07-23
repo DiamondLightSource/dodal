@@ -1,5 +1,6 @@
 import inspect
-from typing import Callable, Dict, Final, List, Optional, TypeVar, cast
+from collections.abc import Callable
+from typing import Final, TypeVar, cast
 
 from bluesky.run_engine import call_in_bluesky_event_loop
 from ophyd import Device as OphydV1Device
@@ -12,7 +13,7 @@ from dodal.utils import AnyDevice, BeamlinePrefix, skip_device
 
 DEFAULT_CONNECTION_TIMEOUT: Final[float] = 5.0
 
-ACTIVE_DEVICES: Dict[str, AnyDevice] = {}
+ACTIVE_DEVICES: dict[str, AnyDevice] = {}
 BL = ""
 DIRECTORY_PROVIDER: UpdatingDirectoryProvider | None = None
 
@@ -33,7 +34,7 @@ def clear_device(name: str):
     del ACTIVE_DEVICES[name]
 
 
-def list_active_devices() -> List[str]:
+def list_active_devices() -> list[str]:
     global ACTIVE_DEVICES
     return list(ACTIVE_DEVICES.keys())
 
@@ -59,7 +60,7 @@ def wait_for_connection(
         )
     else:
         raise TypeError(
-            "Invalid type {} in _wait_for_connection".format(device.__class__.__name__)
+            f"Invalid type {device.__class__.__name__} in _wait_for_connection"
         )
 
 
@@ -73,7 +74,7 @@ def device_instantiation(
     prefix: str,
     wait: bool,
     fake: bool,
-    post_create: Optional[Callable[[T], None]] = None,
+    post_create: Callable[[T], None] | None = None,
     bl_prefix: bool = True,
     **kwargs,
 ) -> T:

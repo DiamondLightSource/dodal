@@ -4,6 +4,7 @@ import os
 import re
 import socket
 import string
+from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass
 from functools import wraps
 from importlib import import_module
@@ -12,13 +13,6 @@ from os import environ
 from types import ModuleType
 from typing import (
     Any,
-    Callable,
-    Dict,
-    Iterable,
-    List,
-    Mapping,
-    Tuple,
-    Type,
     TypeVar,
 )
 
@@ -46,7 +40,7 @@ import dodal.log
 try:
     from typing import TypeAlias
 except ImportError:
-    from typing_extensions import TypeAlias
+    from typing import TypeAlias
 
 
 #: Protocols defining interface to hardware
@@ -110,7 +104,7 @@ def skip_device(precondition=lambda: True):
 
 def make_all_devices(
     module: str | ModuleType | None = None, include_skipped: bool = False, **kwargs
-) -> Tuple[Dict[str, AnyDevice], Dict[str, Exception]]:
+) -> tuple[dict[str, AnyDevice], dict[str, Exception]]:
     """Makes all devices in the given beamline module.
 
     In cases of device interdependencies it ensures a device is created before any which
@@ -129,7 +123,7 @@ def make_all_devices(
     if isinstance(module, str) or module is None:
         module = import_module(module or __name__)
     factories = collect_factories(module, include_skipped)
-    devices: Tuple[Dict[str, AnyDevice], Dict[str, Exception]] = invoke_factories(
+    devices: tuple[dict[str, AnyDevice], dict[str, Exception]] = invoke_factories(
         factories, **kwargs
     )
 
@@ -139,7 +133,7 @@ def make_all_devices(
 def invoke_factories(
     factories: Mapping[str, AnyDeviceFactory],
     **kwargs,
-) -> Tuple[Dict[str, AnyDevice], Dict[str, Exception]]:
+) -> tuple[dict[str, AnyDevice], dict[str, Exception]]:
     """Call device factory functions in the correct order to resolve dependencies.
     Inspect function signatures to work out dependencies and execute functions in
     correct order.
@@ -259,15 +253,13 @@ def is_any_device_factory(func: Callable) -> bool:
     return is_v1_device_factory(func) or is_v2_device_factory(func)
 
 
-def is_v2_device_type(obj: Type[Any]) -> bool:
+def is_v2_device_type(obj: type[Any]) -> bool:
     return inspect.isclass(obj) and issubclass(obj, OphydV2Device)
 
 
-def is_v1_device_type(obj: Type[Any]) -> bool:
+def is_v1_device_type(obj: type[Any]) -> bool:
     is_class = inspect.isclass(obj)
-    follows_protocols = any(
-        (isinstance(obj, protocol) for protocol in BLUESKY_PROTOCOLS)
-    )
+    follows_protocols = any(isinstance(obj, protocol) for protocol in BLUESKY_PROTOCOLS)
     return is_class and follows_protocols and not is_v2_device_type(obj)
 
 
@@ -292,13 +284,11 @@ def get_beamline_based_on_environment_variable() -> ModuleType:
         or any(c not in valid_characters for c in beamline)
     ):
         raise ValueError(
-            "Invalid BEAMLINE variable - module name is not a permissible python module name, got '{}'".format(
-                beamline
-            )
+            f"Invalid BEAMLINE variable - module name is not a permissible python module name, got '{beamline}'"
         )
 
     try:
-        return importlib.import_module("dodal.beamlines.{}".format(beamline))
+        return importlib.import_module(f"dodal.beamlines.{beamline}")
     except ImportError as e:
         raise ValueError(
             f"Failed to import beamline-specific dodal module 'dodal.beamlines.{beamline}'."
@@ -306,7 +296,7 @@ def get_beamline_based_on_environment_variable() -> ModuleType:
         ) from e
 
 
-def _find_next_run_number_from_files(file_names: List[str]) -> int:
+def _find_next_run_number_from_files(file_names: list[str]) -> int:
     valid_numbers = []
 
     for file_name in file_names:

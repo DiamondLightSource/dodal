@@ -1,4 +1,4 @@
-from typing import Any, Tuple, cast
+from typing import Any, cast
 
 from dodal.log import LOGGER
 from dodal.utils import get_beamline_name
@@ -31,7 +31,7 @@ class GDABeamlineParameters:
             for line in config_lines_nocomments
         ]
         config_pairs: list[tuple[str, Any]] = [
-            cast(Tuple[str, Any], param)
+            cast(tuple[str, Any], param)
             for param in config_lines_sep_key_and_value
             if len(param) == 2
         ]

@@ -1,5 +1,5 @@
 import asyncio
-from unittest.mock import ANY, AsyncMock, MagicMock, call, patch
+from unittest.mock import ANY, AsyncMock, call, patch
 
 import pytest
 from ophyd_async.core import DeviceCollector, get_mock_put
@@ -50,14 +50,18 @@ async def test_given_thawing_already_triggered_when_triggered_again_then_fails(
     mock_sleep: AsyncMock,
     thawer: Thawer,
 ):
-    patch_sleep(mock_sleep)
+    release_sleep = patch_sleep(mock_sleep)
 
-    thawer.thaw_for_time_s.set(10)
+    status = thawer.thaw_for_time_s.set(10)
 
-    await asyncio.sleep(0.01)
+    try:
+        await asyncio.sleep(0.01)
 
-    with pytest.raises(ThawingException):
-        await thawer.thaw_for_time_s.set(10)
+        with pytest.raises(ThawingException):
+            await thawer.thaw_for_time_s.set(10)
+    finally:
+        release_sleep.set()
+        await status
 
 
 @patch("dodal.devices.thawer.sleep")
@@ -87,7 +91,7 @@ async def test_given_thawing_already_triggered_when_stop_called_then_stop_thawin
 async def test_calling_stop_on_thawer_stops_thawing_timer_and_turns_thawer_off(
     thawer: Thawer,
 ):
-    thawer.thaw_for_time_s = MagicMock(spec=ThawingTimer)
+    thawer.thaw_for_time_s.stop = AsyncMock(spec=ThawingTimer)
     await thawer.stop()
     thawer.thaw_for_time_s.stop.assert_called_once()
     get_mock_put(thawer.control).assert_called_once_with(

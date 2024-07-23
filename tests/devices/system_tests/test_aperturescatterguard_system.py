@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Tuple, cast
+from typing import Any, cast
 
 import bluesky.plan_stubs as bps
 import pytest
@@ -20,7 +20,7 @@ BEAMLINE_PARAMETER_KEYWORDS = ["FB", "FULL", "deadtime"]
 
 
 class GDABeamlineParameters:
-    params: Dict[str, Any]
+    params: dict[str, Any]
 
     def __repr__(self) -> str:
         return repr(self.params)
@@ -39,11 +39,11 @@ class GDABeamlineParameters:
             for line in config_lines_nocomments
         ]
         config_pairs: list[tuple[str, Any]] = [
-            cast(Tuple[str, Any], param)
+            cast(tuple[str, Any], param)
             for param in config_lines_sep_key_and_value
             if len(param) == 2
         ]
-        for i, (param, value) in enumerate(config_pairs):
+        for i, (_, value) in enumerate(config_pairs):
             if value == "Yes":
                 config_pairs[i] = (config_pairs[i][0], True)
             elif value == "No":
@@ -131,7 +131,7 @@ class MonitorCallback(CallbackBase):
 
     t_ap_y: float = 0
     t_sg_y: float = 0
-    event_docs: List[Dict] = []
+    event_docs: list[dict] = []
 
     def event(self, doc):
         self.event_docs.append(doc)

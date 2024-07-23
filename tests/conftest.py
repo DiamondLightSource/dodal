@@ -4,13 +4,14 @@ import logging
 import os
 import sys
 import time
+from collections.abc import Mapping
 from os import environ, getenv
 from pathlib import Path
-from typing import Mapping
 from unittest.mock import MagicMock, patch
 
 import pytest
 from bluesky.run_engine import RunEngine
+from ophyd.status import Status
 
 from dodal.beamlines import i03
 from dodal.common.beamlines import beamline_utils
@@ -30,6 +31,18 @@ mock_attributes_table = {
     "i04": mock_paths,
     "s04": mock_paths,
 }
+
+# Prevent pytest from catching exceptions when debugging in vscode so that break on
+# exception works correctly (see: https://github.com/pytest-dev/pytest/issues/7409)
+if os.getenv("PYTEST_RAISE", "0") == "1":
+
+    @pytest.hookimpl(tryfirst=True)
+    def pytest_exception_interact(call):
+        raise call.excinfo.value
+
+    @pytest.hookimpl(tryfirst=True)
+    def pytest_internalerror(excinfo):
+        raise excinfo.value
 
 
 def mock_beamline_module_filepaths(bl_name, bl_module):
@@ -114,3 +127,9 @@ def run_engine_documents(RE: RunEngine) -> Mapping[str, list[dict]]:
 
     RE.subscribe(append_and_print)
     return docs
+
+
+def failed_status(failure: Exception) -> Status:
+    status = Status()
+    status.set_exception(failure)
+    return status

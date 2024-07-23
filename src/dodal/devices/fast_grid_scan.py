@@ -126,7 +126,7 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
         :return: The motor position this corresponds to.
         :raises: IndexError if the desired position is outside the grid."""
         for position, axis in zip(
-            grid_position, [self.x_axis, self.y_axis, self.z_axis]
+            grid_position, [self.x_axis, self.y_axis, self.z_axis], strict=False
         ):
             if not axis.is_within(position):
                 raise IndexError(f"{grid_position} is outside the bounds of the grid")
@@ -191,7 +191,7 @@ class MotionProgram(Device):
 class ExpectedImages(SignalR[int]):
     def __init__(self, parent: "FastGridScanCommon") -> None:
         super().__init__(SoftSignalBackend(int))
-        self.parent: "FastGridScanCommon" = parent
+        self.parent: FastGridScanCommon = parent
 
     async def get_value(self):
         x = await self.parent.x_steps.get_value()

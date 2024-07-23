@@ -111,7 +111,7 @@ async def run_configurer_test(
     else:
         configurer.apply_or_gate_config(gate_num, config)
 
-    for pv, value in zip(mock_pvs, expected_pv_values):
+    for pv, value in zip(mock_pvs, expected_pv_values, strict=False):
         pv.set.assert_called_once_with(value)
 
 
