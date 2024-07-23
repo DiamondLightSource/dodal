@@ -19,7 +19,7 @@ dependencies = [
     "pyepics",
     "dataclasses-json",
     "pillow",
-    "zocalo>=0.32.0",
+    "zocalo>=0.32.0,<1.0.0",  # TODO remove pin against <1.0.0, see #679
     "requests",
     "graypy",
     "pydantic",
@@ -107,11 +107,7 @@ filterwarnings = [
     # Ignore deprecation warning from ophyd_async
     "ignore:dep_util is Deprecated. Use functions from setuptools instead.:DeprecationWarning",
     # Ignore deprecation warning from zocalo
-    "ignore:.*pkg_resources.*:DeprecationWarning",
-    # Ignore Pydantic v2 warnings about deprecated @root-validators and config
-    "ignore::pydantic.warnings.PydanticDeprecatedSince20",
-    "ignore:Valid config keys have changed in V2.*:UserWarning"
-    
+    "ignore:.*pkg_resources.*:DeprecationWarning"
 ]
 # Doctest python code in docs, python code in src docstrings, test functions in tests
 testpaths = "docs src tests"
