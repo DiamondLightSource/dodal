@@ -1,11 +1,10 @@
-from typing import Dict, List
 from unittest.mock import ANY, MagicMock, call, patch
 
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import Device, DeviceCollector, get_mock_put, set_mock_value
-from ophyd_async.core.signal import Signal, soft_signal_rw
+from ophyd_async.core.signal import soft_signal_rw
 from ophyd_async.epics.motion import Motor
 
 from dodal.devices.util.test_utils import patch_motor
@@ -16,12 +15,7 @@ from dodal.plans.motor_util_plans import (
 )
 
 
-class TestMotorDevice(Device):
-    motors: List[Motor]
-    not_motors: List[Signal]
-
-
-class DeviceWithOnlyMotors(TestMotorDevice):
+class DeviceWithOnlyMotors(Device):
     def __init__(self):
         self.x = Motor("X")
         self.y = Motor("Y")
@@ -79,7 +73,7 @@ def test_given_a_device_when_check_and_cache_values_then_motor_values_returned(
     for i, motor in enumerate(my_device.motors, start=1):
         set_mock_value(motor.user_readback, i * 100)
 
-    motors_and_positions: Dict[Motor, float] = RE(
+    motors_and_positions: dict[Motor, float] = RE(
         _check_and_cache_values(
             {motor_obj: 0.0 for motor_obj in my_device.motors}, 0, 1000
         )
@@ -135,7 +129,7 @@ def test_given_a_device_where_one_move_too_small_when_check_and_cache_values_the
         motor_obj: new_position for motor_obj in my_device.motors
     }
 
-    motors_and_positions: Dict[Motor, float] = RE(
+    motors_and_positions: dict[Motor, float] = RE(
         _check_and_cache_values(motors_and_new_positions, min, 1000)
     ).plan_result  # type: ignore
     cached_positions = motors_and_positions.values()
@@ -155,7 +149,7 @@ def test_given_a_device_where_all_moves_too_small_when_check_and_cache_values_th
 
     motors_and_new_positions = {motor_obj: 0.0 for motor_obj in my_device.motors}
 
-    motors_and_positions: Dict[Motor, float] = RE(
+    motors_and_positions: dict[Motor, float] = RE(
         _check_and_cache_values(motors_and_new_positions, 40, 1000)
     ).plan_result  # type: ignore
     cached_positions = motors_and_positions.values()
@@ -268,17 +262,21 @@ def test_given_an_axis_out_of_range_when_home_and_reset_wrapper_called_then_thro
     get_mock_put(my_device.y.user_setpoint).assert_not_called()
 
 
+class MyException(Exception):
+    pass
+
+
 def test_given_home_and_reset_inner_plan_fails_reset_still(RE, my_device):
     initial_x, initial_y = 10, 20
 
     def my_plan():
         yield from bps.null()
-        raise Exception()
+        raise MyException()
 
     patch_motor(my_device.x, initial_x)
     patch_motor(my_device.y, initial_y)
 
-    with pytest.raises(Exception):
+    with pytest.raises(MyException):
         RE(
             home_and_reset_wrapper(
                 my_plan(),
@@ -312,9 +310,9 @@ def test_given_move_to_home_fails_reset_still(RE, my_device, move_that_failed):
     patch_motor(my_device.y, initial_y)
     get_mock_put(
         getattr(my_device, move_that_failed).user_setpoint
-    ).side_effect = Exception()
+    ).side_effect = MyException()
 
-    with pytest.raises(Exception):
+    with pytest.raises(MyException):
         RE(
             home_and_reset_wrapper(
                 my_plan(),
