@@ -127,10 +127,7 @@ class ProgramRunner(SignalRW):
     async def set(self, prog_num: int, timeout: float):
         prog_str = f"&2b{prog_num}r"
         await self.signal.set(prog_str, wait=True)
-        wait_for_value(self.status, ScanState.DONE, timeout)
-        # async for reading in observe_value(self.status):
-        #     if reading == ScanState.DONE:
-        #         return
+        await wait_for_value(self.status, ScanState.DONE, timeout)
 
 
 class PMAC(StandardReadable):
