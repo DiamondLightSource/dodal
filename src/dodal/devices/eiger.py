@@ -56,17 +56,15 @@ class EigerDetector(Device):
         cls,
         params: DetectorParams,
         name: str = "EigerDetector",
-        *args,
-        **kwargs,
     ):
-        det = cls(name=name, *args, **kwargs)
+        det = cls(name=name)
         det.set_detector_parameters(params)
         return det
 
     def set_detector_parameters(self, detector_params: DetectorParams):
         self.detector_params = detector_params
         if self.detector_params is None:
-            raise Exception("Parameters for scan must be specified")
+            raise ValueError("Parameters for scan must be specified")
 
         to_check = [
             (
@@ -318,7 +316,9 @@ class EigerDetector(Device):
 
     def _finish_arm(self) -> Status:
         LOGGER.info("Eiger staging: Finishing arming")
-        return Status(done=True, success=True)
+        status = Status()
+        status.set_finished()
+        return status
 
     def forward_bit_depth_to_filewriter(self):
         bit_depth = self.bit_depth.get()

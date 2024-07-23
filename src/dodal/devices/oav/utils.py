@@ -1,5 +1,5 @@
+from collections.abc import Generator
 from enum import IntEnum
-from typing import Generator, Tuple
 
 import bluesky.plan_stubs as bps
 import numpy as np
@@ -10,7 +10,7 @@ from dodal.devices.oav.oav_detector import OAVConfigParams
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.smargon import Smargon
 
-Pixel = Tuple[int, int]
+Pixel = tuple[int, int]
 
 
 class PinNotFoundException(Exception):

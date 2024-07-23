@@ -1,9 +1,7 @@
-from typing import Tuple
-
 import numpy as np
 
 
-def step_to_num(start: float, stop: float, step: float) -> Tuple[float, float, int]:
+def step_to_num(start: float, stop: float, step: float) -> tuple[float, float, int]:
     """
     Standard handling for converting from start, stop, step to start, stop, num
     Forces step to be same direction as length

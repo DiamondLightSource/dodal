@@ -23,9 +23,11 @@ def discard_status(status: Status):
 
 
 def reset_logs():
-    for handler in LOGGER.handlers:
+    old_handlers = list(LOGGER.handlers)
+    for handler in old_handlers:
         handler.close()
-    LOGGER.handlers = []
+        LOGGER.removeHandler(handler)
+
     mock_graylog_handler_class = MagicMock(spec=GELFTCPHandler)
     mock_graylog_handler_class.return_value.level = logging.DEBUG
     with patch("dodal.log.GELFTCPHandler", mock_graylog_handler_class):
@@ -60,7 +62,6 @@ def test_full_status_gives_error_if_intermediate_status_fails():
 
 def test_check_call_back_error_gives_correct_error():
     LOGGER.error = MagicMock()
-    returned_status = Status(done=True, success=True)
     with pytest.raises(StatusException):
         returned_status = run_functions_without_blocking([get_bad_status])
         returned_status.wait(0.1)
@@ -86,7 +87,6 @@ def test_wrap_function_callback_errors_on_wrong_return_type(caplog):
         return status
 
     dummy_func = MagicMock(return_value=3)
-    returned_status = Status(done=True, success=True)
     returned_status = run_functions_without_blocking(
         [lambda: get_good_status(), dummy_func], timeout=0.05
     )
@@ -126,7 +126,7 @@ async def test_given_disp_high_when_set_SetWhenEnabled_then_proc_not_set_until_d
 
 
 def test_if_one_status_errors_then_later_functions_not_called():
-    tester = MagicMock(return_value=Status(done=True, success=True))
+    tester = MagicMock(return_value=NullStatus())
     status_calls = [
         NullStatus,
         NullStatus,
@@ -144,7 +144,7 @@ def test_if_one_status_errors_then_later_functions_not_called():
 
 
 def test_if_one_status_pending_then_later_functions_not_called():
-    tester = MagicMock(return_value=Status(done=True, success=True))
+    tester = MagicMock(return_value=NullStatus())
     pending_status = Status()
     status_calls = [
         NullStatus,

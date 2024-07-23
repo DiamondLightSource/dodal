@@ -1,4 +1,4 @@
-from typing import Mapping
+from collections.abc import Mapping
 from unittest.mock import ANY
 
 import bluesky.plans as bp

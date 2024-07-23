@@ -1,5 +1,6 @@
 import json
-from typing import Any, Awaitable, Callable, Dict, List
+from collections.abc import Awaitable, Callable
+from typing import Any
 
 import bluesky.plan_stubs as bps
 import pytest
@@ -21,7 +22,7 @@ PROBE = "x-ray"
 TYPE = "Synchrotron X-ray Source"
 NUMBER = "number"
 STRING = "string"
-EMPTY_LIST: List = []
+EMPTY_LIST: list = []
 
 READINGS = [CURRENT, ENERGY]
 CONFIGS = [PROBE, MODE.value, TYPE]
@@ -164,16 +165,16 @@ async def test_synchrotron_count(RE: RunEngine, sim_synchrotron: Synchrotron):
     assert len(docs) == 4
     assert sim_synchrotron.name in docs[1]["configuration"]
     cfg_data_keys = docs[1]["configuration"][sim_synchrotron.name]["data_keys"]
-    for sig, addr in zip(CONFIG_SIGNALS, CONFIG_ADDRESSES):
+    for sig, addr in zip(CONFIG_SIGNALS, CONFIG_ADDRESSES, strict=False):
         assert sig in cfg_data_keys
         assert cfg_data_keys[sig][DESCRIPTION_FIELDS[0]] == addr
         assert cfg_data_keys[sig][DESCRIPTION_FIELDS[1]] == STRING
         assert cfg_data_keys[sig][DESCRIPTION_FIELDS[2]] == EMPTY_LIST
     cfg_data = docs[1]["configuration"][sim_synchrotron.name]["data"]
-    for sig, value in zip(CONFIG_SIGNALS, CONFIGS):
+    for sig, value in zip(CONFIG_SIGNALS, CONFIGS, strict=False):
         assert cfg_data[sig] == value
     data_keys = docs[1]["data_keys"]
-    for sig, addr in zip(READ_SIGNALS, READING_ADDRESSES):
+    for sig, addr in zip(READ_SIGNALS, READING_ADDRESSES, strict=False):
         assert sig in data_keys
         assert data_keys[sig][DESCRIPTION_FIELDS[0]] == addr
         assert data_keys[sig][DESCRIPTION_FIELDS[1]] == NUMBER
@@ -181,15 +182,15 @@ async def test_synchrotron_count(RE: RunEngine, sim_synchrotron: Synchrotron):
 
     data = docs[2]["data"]
     assert len(data) == len(READ_SIGNALS)
-    for sig, value in zip(READ_SIGNALS, READINGS):
+    for sig, value in zip(READ_SIGNALS, READINGS, strict=False):
         assert sig in data
         assert data[sig] == value
 
 
 async def verify(
-    func: Callable[[], Awaitable[Dict[str, Any]]],
-    signals: List[str],
-    fields: List[str],
+    func: Callable[[], Awaitable[dict[str, Any]]],
+    signals: list[str],
+    fields: list[str],
     expectation: str,
 ):
     expected = json.loads(expectation)

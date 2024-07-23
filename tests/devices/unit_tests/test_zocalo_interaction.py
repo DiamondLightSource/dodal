@@ -1,7 +1,7 @@
 import getpass
 import socket
+from collections.abc import Callable
 from functools import partial
-from typing import Callable, Dict
 from unittest.mock import MagicMock, patch
 
 from pytest import mark, raises
@@ -64,9 +64,9 @@ def normally(function_to_run, mock_transport):
 
 
 def with_exception(function_to_run, mock_transport):
-    mock_transport.send.side_effect = Exception()
+    mock_transport.send.side_effect = AssertionError("Test exception")
 
-    with raises(Exception):
+    with raises(AssertionError):
         function_to_run()
 
 
@@ -83,7 +83,7 @@ zc = ZocaloTrigger(environment=SIM_ZOCALO_ENV)
         ),
     ],
 )
-def test_run_start(function_wrapper: Callable, expected_message: Dict):
+def test_run_start(function_wrapper: Callable, expected_message: dict):
     """
     Args:
         function_wrapper (Callable): A wrapper used to test for expected exceptions
@@ -102,7 +102,7 @@ def test_run_start(function_wrapper: Callable, expected_message: Dict):
         (with_exception, EXPECTED_RUN_END_MESSAGE),
     ],
 )
-def test__run_start_and_end(function_wrapper: Callable, expected_message: Dict):
+def test__run_start_and_end(function_wrapper: Callable, expected_message: dict):
     """
     Args:
         function_wrapper (Callable): A wrapper used to test for expected exceptions

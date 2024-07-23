@@ -1,5 +1,3 @@
-from typing import List, Tuple
-
 from ophyd import Component, Device, EpicsSignal, EpicsSignalRO, EpicsSignalWithRBV
 from ophyd.areadetector.plugins import HDF5Plugin_V22
 from ophyd.sim import NullStatus
@@ -59,12 +57,12 @@ class OdinNodesStatus(Device):
     node_3 = Component(OdinNode, "OD4:")
 
     @property
-    def nodes(self) -> List[OdinNode]:
+    def nodes(self) -> list[OdinNode]:
         return [self.node_0, self.node_1, self.node_2, self.node_3]
 
     def check_node_frames_from_attr(
         self, node_get_func, error_message_verb: str
-    ) -> Tuple[bool, str]:
+    ) -> tuple[bool, str]:
         nodes_frames_values = [0] * len(self.nodes)
         frames_details = []
         for node_number, node_pv in enumerate(self.nodes):
@@ -75,17 +73,17 @@ class OdinNodesStatus(Device):
         bad_frames = any(v != 0 for v in nodes_frames_values)
         return bad_frames, "\n".join(frames_details)
 
-    def check_frames_timed_out(self) -> Tuple[bool, str]:
+    def check_frames_timed_out(self) -> tuple[bool, str]:
         return self.check_node_frames_from_attr(
             lambda node: node.frames_timed_out.get(), "timed out"
         )
 
-    def check_frames_dropped(self) -> Tuple[bool, str]:
+    def check_frames_dropped(self) -> tuple[bool, str]:
         return self.check_node_frames_from_attr(
             lambda node: node.frames_dropped.get(), "dropped"
         )
 
-    def get_error_state(self) -> Tuple[bool, str]:
+    def get_error_state(self) -> tuple[bool, str]:
         is_error = []
         error_messages = []
         for node_number, node_pv in enumerate(self.nodes):
@@ -99,7 +97,7 @@ class OdinNodesStatus(Device):
 
     def get_init_state(self) -> bool:
         is_initialised = []
-        for node_number, node_pv in enumerate(self.nodes):
+        for node_pv in self.nodes:
             is_initialised.append(node_pv.fr_initialised.get())
             is_initialised.append(node_pv.fp_initialised.get())
         return all(is_initialised)
@@ -132,7 +130,7 @@ class EigerOdin(Device):
         frames_timed_out, frames_timed_out_details = self.nodes.check_frames_timed_out()
 
         if not is_initialised:
-            raise Exception(error_message)
+            raise RuntimeError(error_message)
         if frames_dropped:
             self.log.error(f"Frames dropped: {frames_dropped_details}")
         if frames_timed_out:
@@ -140,7 +138,7 @@ class EigerOdin(Device):
 
         return is_initialised and not frames_dropped and not frames_timed_out
 
-    def check_odin_initialised(self) -> Tuple[bool, str]:
+    def check_odin_initialised(self) -> tuple[bool, str]:
         is_error_state, error_messages = self.nodes.get_error_state()
         to_check = [
             (not self.fan.consumers_connected.get(), "EigerFan is not connected"),

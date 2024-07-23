@@ -37,6 +37,9 @@ async def test_given_filename_and_directory_when_trigger_and_read_then_returns_e
     webcam: Webcam,
 ):
     mock_get.return_value.__aenter__.return_value = AsyncMock()
+    mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
+    # raise_for_status should be MagicMock() not AsyncMock()
+    mock_response.raise_for_status = MagicMock()
     await webcam.filename.set(filename)
     await webcam.directory.set(directory)
     await webcam.trigger()
@@ -50,6 +53,8 @@ async def test_given_data_returned_from_url_when_trigger_then_data_written(
     mock_get: MagicMock, mock_aiofiles, webcam: Webcam
 ):
     mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
+    # raise_for_status should be MagicMock() not AsyncMock()
+    mock_response.raise_for_status = MagicMock()
     mock_response.read.return_value = (test_web_data := "TEST")
     mock_open = mock_aiofiles.open
     mock_open.return_value.__aenter__.return_value = (mock_file := AsyncMock())

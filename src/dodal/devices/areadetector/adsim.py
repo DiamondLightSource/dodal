@@ -1,4 +1,3 @@
-from ophyd import Component as Cpt
 from ophyd.areadetector.base import ADComponent as Cpt
 from ophyd.areadetector.detectors import DetectorBase
 
@@ -45,4 +44,4 @@ class AdSimDetector(SingleTriggerV33, DetectorBase):
         self.stage_sigs[self.cam.acquire_period] = acquire_time
 
         # Now calling the super method should set the acquire period
-        super(AdSimDetector, self).stage(*args, **kwargs)
+        super().stage(*args, **kwargs)

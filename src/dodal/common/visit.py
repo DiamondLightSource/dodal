@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Optional
 
 from aiohttp import ClientSession
 from ophyd_async.core import DirectoryInfo
@@ -105,7 +104,7 @@ class StaticVisitDirectoryProvider(UpdatingDirectoryProvider):
         self,
         beamline: str,
         root: Path,
-        client: Optional[DirectoryServiceClientBase] = None,
+        client: DirectoryServiceClientBase | None = None,
     ):
         self._beamline = beamline
         self._client = client or DirectoryServiceClient(f"{beamline}-control:8088/api")
