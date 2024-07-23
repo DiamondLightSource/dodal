@@ -18,7 +18,7 @@ def _save_panda_to_file(RE: RunEngine, panda: Device, path: str):
     RE(save_to_file())
 
 
-def _main():
+def main():
     parser = ArgumentParser(description="Save an ophyd_async device to yaml")
     parser.add_argument(
         "--beamline", help="beamline to save from e.g. i03. Defaults to BEAMLINE"
@@ -34,6 +34,12 @@ def _main():
 
     if beamline:
         os.environ["BEAMLINE"] = beamline
+    else:
+        beamline = os.environ["BEAMLINE"]
+
+    if not beamline:
+        print(f"BEAMLINE not set and --beamline not specified")
+        return 1
 
     RE = RunEngine()
 
@@ -51,4 +57,4 @@ def _main():
 
 
 if __name__ == "__main__":
-    sys.exit(_main())
+    sys.exit(main())
