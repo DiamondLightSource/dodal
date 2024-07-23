@@ -1,5 +1,6 @@
 import uuid
-from typing import Any, Dict, Generator, TypeVar
+from collections.abc import Generator
+from typing import Any, TypeVar
 
 from bluesky import plan_stubs as bps
 from bluesky.preprocessors import finalize_wrapper, pchain
@@ -23,10 +24,10 @@ class MoveTooLarge(Exception):
 
 
 def _check_and_cache_values(
-    devices_and_positions: Dict[AnyDevice, float],
+    devices_and_positions: dict[AnyDevice, float],
     smallest_move: float,
     maximum_move: float,
-) -> Generator[Msg, Any, Dict[AnyDevice, float]]:
+) -> Generator[Msg, Any, dict[AnyDevice, float]]:
     """Caches the positions of all Motors on specified device if they are within
     smallest_move of home_position. Throws MoveTooLarge if they are outside maximum_move
     of the home_position
@@ -59,7 +60,7 @@ def home_and_reset_wrapper(
 
 def move_and_reset_wrapper(
     plan: MsgGenerator,
-    device_and_positions: Dict[AnyDevice, float],
+    device_and_positions: dict[AnyDevice, float],
     smallest_move: float,
     maximum_move: float,
     group: str | None = None,
