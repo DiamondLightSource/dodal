@@ -1,6 +1,5 @@
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from functools import partial
-from typing import Sequence
 
 from bluesky.protocols import Movable
 from ophyd import Component, EpicsSignal

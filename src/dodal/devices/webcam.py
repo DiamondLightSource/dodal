@@ -24,7 +24,7 @@ class Webcam(StandardReadable, Triggerable):
                 response.raise_for_status()
                 LOGGER.info(f"Saving webcam image from {self.url} to {file_path}")
                 async with aiofiles.open(file_path, "wb") as file:
-                    await file.write((await response.read()))
+                    await file.write(await response.read())
 
     @AsyncStatus.wrap
     async def trigger(self) -> None:

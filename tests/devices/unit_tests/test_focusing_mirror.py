@@ -20,8 +20,6 @@ from dodal.devices.focusing_mirror import (
 )
 from dodal.log import LOGGER
 
-from ...conftest import failed_status
-
 
 @pytest.fixture
 def vfm_mirror_voltages_not_ok(vfm_mirror_voltages) -> VFMMirrorVoltages:
@@ -118,7 +116,7 @@ def test_mirror_set_voltage_sets_and_waits_happy_path(
     RE: RunEngine,
     vfm_mirror_voltages_with_set: VFMMirrorVoltages,
 ):
-    async def completed():
+    def completed():
         pass
 
     mock_put = get_mock_put(
@@ -144,7 +142,7 @@ def test_mirror_set_voltage_sets_and_waits_happy_path_spin_while_waiting_for_sle
     RE: RunEngine,
     vfm_mirror_voltages_with_set_multiple_spins: VFMMirrorVoltages,
 ):
-    async def completed():
+    def completed():
         pass
 
     mock_put = get_mock_put(

@@ -1,6 +1,5 @@
 from collections.abc import Generator
 from enum import IntEnum
-from typing import Generator
 
 import bluesky.plan_stubs as bps
 import numpy as np

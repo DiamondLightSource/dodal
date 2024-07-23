@@ -2,8 +2,10 @@ from enum import Enum
 
 from ophyd_async.core import (
     AsyncStatus,
+    ConfigSignal,
     Device,
     DeviceVector,
+    HintedSignal,
     StandardReadable,
     observe_value,
 )
