@@ -120,9 +120,9 @@ class ProgramRunner(SignalRW):
         super().__init__(backend, timeout, name)
 
     @AsyncStatus.wrap
-    async def set(self, value: int, timeout: float):
+    async def set(self, value: int, timeout: float, wait: bool = True):
         prog_num_str = f"&2b{value}r"
-        await self.signal.set(prog_num_str, wait=True)
+        await self.signal.set(prog_num_str, wait=wait)
         await wait_for_value(self.status, ScanState.DONE, timeout)
 
 
