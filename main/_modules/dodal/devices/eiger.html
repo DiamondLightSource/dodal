@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.eiger &#8212; dodal 1.29.4.dev6+g1eb1c5c48 documentation</title>
+    <title>dodal.devices.eiger &#8212; dodal 1.29.5.dev6+gcfcea2e9e documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=9f007cc8"></script>
+    <script src="../../../_static/documentation_options.js?v=5ee04e52"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'main';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
-    <link rel="icon" href="../../../_static/dls-favicon.ico"/>
+    <link rel="icon" href="../../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -153,22 +153,29 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../user/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../tutorials.html">
+    Tutorials
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../developer/index.html">
-    Developer Guide
+  <a class="nav-link nav-internal" href="../../../how-to.html">
+    How-to Guides
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-external" href="https://github.com/DiamondLightSource/dodal/releases">
-    Release Notes
+  <a class="nav-link nav-internal" href="../../../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference.html">
+    Reference
   </a>
 </li>
 
@@ -307,22 +314,29 @@ document.write(`
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../user/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../tutorials.html">
+    Tutorials
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../developer/index.html">
-    Developer Guide
+  <a class="nav-link nav-internal" href="../../../how-to.html">
+    How-to Guides
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-external" href="https://github.com/DiamondLightSource/dodal/releases">
-    Release Notes
+  <a class="nav-link nav-internal" href="../../../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference.html">
+    Reference
   </a>
 </li>
 
@@ -471,13 +485,9 @@ document.write(`
 
 <span class="n">FREE_RUN_MAX_IMAGES</span> <span class="o">=</span> <span class="mi">1000000</span>
 
-<span class="c1"># TODO present for testing purposes, remove</span>
-<span class="n">TEST_1169_FIX</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="n">TEST_1169_INJECT</span> <span class="o">=</span> <span class="kc">False</span>
-
 
 <div class="viewcode-block" id="InternalEigerTriggerMode">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.eiger.InternalEigerTriggerMode.html#dodal.devices.eiger.InternalEigerTriggerMode">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.eiger.InternalEigerTriggerMode.html#dodal.devices.eiger.InternalEigerTriggerMode">[docs]</a>
 <span class="k">class</span> <span class="nc">InternalEigerTriggerMode</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="n">INTERNAL_SERIES</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">INTERNAL_ENABLE</span> <span class="o">=</span> <span class="mi">1</span>
@@ -487,7 +497,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="EigerDetector">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.eiger.EigerDetector.html#dodal.devices.eiger.EigerDetector">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.eiger.EigerDetector.html#dodal.devices.eiger.EigerDetector">[docs]</a>
 <span class="k">class</span> <span class="nc">EigerDetector</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
     <span class="k">class</span> <span class="nc">ArmingSignal</span><span class="p">(</span><span class="n">Signal</span><span class="p">):</span>
         <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">settle_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -503,6 +513,8 @@ document.write(`
 
     <span class="n">STALE_PARAMS_TIMEOUT</span> <span class="o">=</span> <span class="mi">60</span>
     <span class="n">GENERAL_STATUS_TIMEOUT</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="c1"># Long timeout for meta file to compensate for filesystem issues</span>
+    <span class="n">META_FILE_READY_TIMEOUT</span> <span class="o">=</span> <span class="mi">30</span>
     <span class="n">ALL_FRAMES_TIMEOUT</span> <span class="o">=</span> <span class="mi">120</span>
     <span class="n">ARMING_TIMEOUT</span> <span class="o">=</span> <span class="mi">60</span>
 
@@ -518,17 +530,15 @@ document.write(`
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">params</span><span class="p">:</span> <span class="n">DetectorParams</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;EigerDetector&quot;</span><span class="p">,</span>
-        <span class="o">*</span><span class="n">args</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="n">det</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">det</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
         <span class="n">det</span><span class="o">.</span><span class="n">set_detector_parameters</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">det</span>
 
     <span class="k">def</span> <span class="nf">set_detector_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">detector_params</span><span class="p">:</span> <span class="n">DetectorParams</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span> <span class="o">=</span> <span class="n">detector_params</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Parameters for scan must be specified&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parameters for scan must be specified&quot;</span><span class="p">)</span>
 
         <span class="n">to_check</span> <span class="o">=</span> <span class="p">[</span>
             <span class="p">(</span>
@@ -565,7 +575,7 @@ document.write(`
 
     <span class="k">def</span> <span class="nf">stage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">wait_on_arming_if_started</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">TEST_1169_INJECT</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_armed</span><span class="p">():</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_armed</span><span class="p">():</span>
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Eiger not armed, arming&quot;</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">async_stage</span><span class="p">()</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ARMING_TIMEOUT</span><span class="p">)</span>
@@ -601,7 +611,7 @@ document.write(`
         <span class="k">return</span> <span class="n">status_ok</span>
 
 <div class="viewcode-block" id="EigerDetector.stop">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.eiger.EigerDetector.html#dodal.devices.eiger.EigerDetector.stop">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.eiger.EigerDetector.html#dodal.devices.eiger.EigerDetector.stop">[docs]</a>
     <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Emergency stop the device, mainly used to clean up after error.&quot;&quot;&quot;</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Eiger stop() called - cleaning up...&quot;</span><span class="p">)</span>
@@ -714,7 +724,7 @@ document.write(`
         <span class="k">return</span> <span class="n">status</span>
 
 <div class="viewcode-block" id="EigerDetector.set_detector_threshold">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.eiger.EigerDetector.html#dodal.devices.eiger.EigerDetector.set_detector_threshold">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.eiger.EigerDetector.html#dodal.devices.eiger.EigerDetector.set_detector_threshold">[docs]</a>
     <span class="k">def</span> <span class="nf">set_detector_threshold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Status</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Ensures the energy threshold on the detector is set to the specified energy (in eV),</span>
 <span class="sd">        within the specified tolerance.</span>
@@ -736,7 +746,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="EigerDetector.set_num_triggers_and_captures">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.eiger.EigerDetector.html#dodal.devices.eiger.EigerDetector.set_num_triggers_and_captures">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.eiger.EigerDetector.html#dodal.devices.eiger.EigerDetector.set_num_triggers_and_captures">[docs]</a>
     <span class="k">def</span> <span class="nf">set_num_triggers_and_captures</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StatusBase</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the number of triggers and the number of images for the Eiger to capture</span>
 <span class="sd">        during the datacollection. The number of images is the number of images per</span>
@@ -778,7 +788,7 @@ document.write(`
         <span class="p">)</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Eiger staging: awaiting odin metadata&quot;</span><span class="p">)</span>
         <span class="n">status</span> <span class="o">&amp;=</span> <span class="n">await_value</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">odin</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">ready</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">GENERAL_STATUS_TIMEOUT</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">odin</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">ready</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">META_FILE_READY_TIMEOUT</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">status</span>
 
@@ -789,7 +799,9 @@ document.write(`
 
     <span class="k">def</span> <span class="nf">_finish_arm</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Status</span><span class="p">:</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Eiger staging: Finishing arming&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">Status</span><span class="p">(</span><span class="n">done</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="n">Status</span><span class="p">()</span>
+        <span class="n">status</span><span class="o">.</span><span class="n">set_finished</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">status</span>
 
     <span class="k">def</span> <span class="nf">forward_bit_depth_to_filewriter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">bit_depth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bit_depth</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
@@ -812,6 +824,10 @@ document.write(`
             <span class="n">functions_to_do_arm</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">enable_roi_mode</span><span class="p">)</span>
 
         <span class="n">arming_sequence_funcs</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="c1"># If a beam dump occurs after arming the eiger but prior to eiger staging,</span>
+            <span class="c1"># the odin may timeout which will cause the arming sequence to be retried;</span>
+            <span class="c1"># if this previously completed successfully we must reset the odin first</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">odin</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span>
             <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">change_dev_shm</span><span class="p">(</span><span class="n">detector_params</span><span class="o">.</span><span class="n">enable_dev_shm</span><span class="p">),</span>
             <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_detector_threshold</span><span class="p">(</span><span class="n">detector_params</span><span class="o">.</span><span class="n">expected_energy_ev</span><span class="p">),</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_cam_pvs</span><span class="p">,</span>
@@ -825,11 +841,6 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">_wait_fan_ready</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_finish_arm</span><span class="p">,</span>
         <span class="p">]</span>
-        <span class="k">if</span> <span class="n">TEST_1169_FIX</span><span class="p">:</span>
-            <span class="c1"># If a beam dump occurs after arming the eiger but prior to eiger staging,</span>
-            <span class="c1"># the odin may timeout which will cause the arming sequence to be retried;</span>
-            <span class="c1"># if this previously completed successfully we must reset the odin first</span>
-            <span class="n">arming_sequence_funcs</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">odin</span><span class="o">.</span><span class="n">stop</span><span class="p">)</span>
 
         <span class="n">functions_to_do_arm</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">arming_sequence_funcs</span><span class="p">)</span>
 

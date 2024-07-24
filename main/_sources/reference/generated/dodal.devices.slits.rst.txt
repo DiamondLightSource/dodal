@@ -1,0 +1,36 @@
+dodal.devices.slits
+===================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~slits.Slits
+
+
+
+
+.. automodule:: dodal.devices.slits
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

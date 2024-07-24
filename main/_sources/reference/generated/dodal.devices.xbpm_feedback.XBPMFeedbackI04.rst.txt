@@ -1,0 +1,95 @@
+dodal.devices.xbpm\_feedback.XBPMFeedbackI04
+============================================
+
+.. currentmodule:: dodal.devices.xbpm_feedback
+
+.. autoclass:: XBPMFeedbackI04
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~XBPMFeedbackI04.trigger
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~XBPMFeedbackI04.PAUSE
+      
+      
+      ~XBPMFeedbackI04.RUN
+      
+      
+      
+      
+      ~XBPMFeedbackI04.component_names
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~XBPMFeedbackI04.pause_feedback
+      
+      
+      ~XBPMFeedbackI04.pos_ok
+      
+      
+      
+      
+      
+      
+      ~XBPMFeedbackI04.subscriptions
+      
+      
+      
+      ~XBPMFeedbackI04.x
+      
+      
+      ~XBPMFeedbackI04.y
+      
+   
+   

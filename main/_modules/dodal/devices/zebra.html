@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.zebra &#8212; dodal 1.29.4.dev6+g1eb1c5c48 documentation</title>
+    <title>dodal.devices.zebra &#8212; dodal 1.29.5.dev6+gcfcea2e9e documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=9f007cc8"></script>
+    <script src="../../../_static/documentation_options.js?v=5ee04e52"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'main';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
-    <link rel="icon" href="../../../_static/dls-favicon.ico"/>
+    <link rel="icon" href="../../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -153,22 +153,29 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../user/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../tutorials.html">
+    Tutorials
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../developer/index.html">
-    Developer Guide
+  <a class="nav-link nav-internal" href="../../../how-to.html">
+    How-to Guides
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-external" href="https://github.com/DiamondLightSource/dodal/releases">
-    Release Notes
+  <a class="nav-link nav-internal" href="../../../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference.html">
+    Reference
   </a>
 </li>
 
@@ -307,22 +314,29 @@ document.write(`
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../user/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../tutorials.html">
+    Tutorials
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../developer/index.html">
-    Developer Guide
+  <a class="nav-link nav-internal" href="../../../how-to.html">
+    How-to Guides
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-external" href="https://github.com/DiamondLightSource/dodal/releases">
-    Release Notes
+  <a class="nav-link nav-internal" href="../../../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference.html">
+    Reference
   </a>
 </li>
 
@@ -462,7 +476,6 @@ document.write(`
 <span class="kn">import</span> <span class="nn">asyncio</span>
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partialmethod</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
 
 <span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
@@ -499,7 +512,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="ArmSource">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.zebra.ArmSource.html#dodal.devices.zebra.ArmSource">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.ArmSource.html#dodal.devices.zebra.ArmSource">[docs]</a>
 <span class="k">class</span> <span class="nc">ArmSource</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
     <span class="n">SOFT</span> <span class="o">=</span> <span class="s2">&quot;Soft&quot;</span>
     <span class="n">EXTERNAL</span> <span class="o">=</span> <span class="s2">&quot;External&quot;</span></div>
@@ -507,7 +520,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="TrigSource">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.zebra.TrigSource.html#dodal.devices.zebra.TrigSource">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.TrigSource.html#dodal.devices.zebra.TrigSource">[docs]</a>
 <span class="k">class</span> <span class="nc">TrigSource</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
     <span class="n">POSITION</span> <span class="o">=</span> <span class="s2">&quot;Position&quot;</span>
     <span class="n">TIME</span> <span class="o">=</span> <span class="s2">&quot;Time&quot;</span>
@@ -516,7 +529,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="EncEnum">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.zebra.EncEnum.html#dodal.devices.zebra.EncEnum">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.EncEnum.html#dodal.devices.zebra.EncEnum">[docs]</a>
 <span class="k">class</span> <span class="nc">EncEnum</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
     <span class="n">Enc1</span> <span class="o">=</span> <span class="s2">&quot;Enc1&quot;</span>
     <span class="n">Enc2</span> <span class="o">=</span> <span class="s2">&quot;Enc2&quot;</span>
@@ -527,7 +540,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="I03Axes">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.zebra.I03Axes.html#dodal.devices.zebra.I03Axes">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.I03Axes.html#dodal.devices.zebra.I03Axes">[docs]</a>
 <span class="k">class</span> <span class="nc">I03Axes</span><span class="p">:</span>
     <span class="n">SMARGON_X1</span> <span class="o">=</span> <span class="n">EncEnum</span><span class="o">.</span><span class="n">Enc1</span>
     <span class="n">SMARGON_Y</span> <span class="o">=</span> <span class="n">EncEnum</span><span class="o">.</span><span class="n">Enc2</span>
@@ -537,7 +550,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="I24Axes">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.zebra.I24Axes.html#dodal.devices.zebra.I24Axes">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.I24Axes.html#dodal.devices.zebra.I24Axes">[docs]</a>
 <span class="k">class</span> <span class="nc">I24Axes</span><span class="p">:</span>
     <span class="n">VGON_Z</span> <span class="o">=</span> <span class="n">EncEnum</span><span class="o">.</span><span class="n">Enc1</span>
     <span class="n">OMEGA</span> <span class="o">=</span> <span class="n">EncEnum</span><span class="o">.</span><span class="n">Enc2</span>
@@ -547,7 +560,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="RotationDirection">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.zebra.RotationDirection.html#dodal.devices.zebra.RotationDirection">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.RotationDirection.html#dodal.devices.zebra.RotationDirection">[docs]</a>
 <span class="k">class</span> <span class="nc">RotationDirection</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
     <span class="n">POSITIVE</span> <span class="o">=</span> <span class="s2">&quot;Positive&quot;</span>
     <span class="n">NEGATIVE</span> <span class="o">=</span> <span class="s2">&quot;Negative&quot;</span>
@@ -559,7 +572,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="ArmDemand">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.zebra.ArmDemand.html#dodal.devices.zebra.ArmDemand">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.ArmDemand.html#dodal.devices.zebra.ArmDemand">[docs]</a>
 <span class="k">class</span> <span class="nc">ArmDemand</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="n">ARM</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">DISARM</span> <span class="o">=</span> <span class="mi">0</span></div>
@@ -567,7 +580,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="SoftInState">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.zebra.SoftInState.html#dodal.devices.zebra.SoftInState">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.SoftInState.html#dodal.devices.zebra.SoftInState">[docs]</a>
 <span class="k">class</span> <span class="nc">SoftInState</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
     <span class="n">YES</span> <span class="o">=</span> <span class="s2">&quot;Yes&quot;</span>
     <span class="n">NO</span> <span class="o">=</span> <span class="s2">&quot;No&quot;</span></div>
@@ -575,7 +588,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="ArmingDevice">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.zebra.ArmingDevice.html#dodal.devices.zebra.ArmingDevice">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.ArmingDevice.html#dodal.devices.zebra.ArmingDevice">[docs]</a>
 <span class="k">class</span> <span class="nc">ArmingDevice</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A useful device that can abstract some of the logic of arming.</span>
 <span class="sd">    Allows a user to just call arm.set(ArmDemand.ARM)&quot;&quot;&quot;</span>
@@ -595,15 +608,14 @@ document.write(`
             <span class="k">if</span> <span class="n">reading</span> <span class="o">==</span> <span class="n">demand</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
                 <span class="k">return</span>
 
-    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">demand</span><span class="p">:</span> <span class="n">ArmDemand</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncStatus</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">AsyncStatus</span><span class="p">(</span>
-            <span class="n">asyncio</span><span class="o">.</span><span class="n">wait_for</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_set_armed</span><span class="p">(</span><span class="n">demand</span><span class="p">),</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">TIMEOUT</span><span class="p">)</span>
-        <span class="p">)</span></div>
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">demand</span><span class="p">:</span> <span class="n">ArmDemand</span><span class="p">):</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait_for</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_set_armed</span><span class="p">(</span><span class="n">demand</span><span class="p">),</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">TIMEOUT</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="PositionCompare">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.zebra.PositionCompare.html#dodal.devices.zebra.PositionCompare">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.PositionCompare.html#dodal.devices.zebra.PositionCompare">[docs]</a>
 <span class="k">class</span> <span class="nc">PositionCompare</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_gates</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PC_GATE_NGATE&quot;</span><span class="p">)</span>
@@ -635,7 +647,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="PulseOutput">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.zebra.PulseOutput.html#dodal.devices.zebra.PulseOutput">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.PulseOutput.html#dodal.devices.zebra.PulseOutput">[docs]</a>
 <span class="k">class</span> <span class="nc">PulseOutput</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Zebra pulse output panel.&quot;&quot;&quot;</span>
 
@@ -648,7 +660,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="ZebraOutputPanel">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.zebra.ZebraOutputPanel.html#dodal.devices.zebra.ZebraOutputPanel">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.ZebraOutputPanel.html#dodal.devices.zebra.ZebraOutputPanel">[docs]</a>
 <span class="k">class</span> <span class="nc">ZebraOutputPanel</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pulse_1</span> <span class="o">=</span> <span class="n">PulseOutput</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PULSE1&quot;</span><span class="p">)</span>
@@ -662,8 +674,8 @@ document.write(`
 
 
 <div class="viewcode-block" id="boolean_array_to_integer">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.zebra.html#dodal.devices.zebra.boolean_array_to_integer">[docs]</a>
-<span class="k">def</span> <span class="nf">boolean_array_to_integer</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.html#dodal.devices.zebra.boolean_array_to_integer">[docs]</a>
+<span class="k">def</span> <span class="nf">boolean_array_to_integer</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts a boolean array to integer by interpretting it in binary with LSB 0 bit</span>
 <span class="sd">    numbering.</span>
 
@@ -678,7 +690,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="GateControl">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.zebra.GateControl.html#dodal.devices.zebra.GateControl">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.GateControl.html#dodal.devices.zebra.GateControl">[docs]</a>
 <span class="k">class</span> <span class="nc">GateControl</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">enable</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;_ENA&quot;</span><span class="p">)</span>
@@ -691,7 +703,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="GateType">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.zebra.GateType.html#dodal.devices.zebra.GateType">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.GateType.html#dodal.devices.zebra.GateType">[docs]</a>
 <span class="k">class</span> <span class="nc">GateType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="n">AND</span> <span class="o">=</span> <span class="s2">&quot;AND&quot;</span>
     <span class="n">OR</span> <span class="o">=</span> <span class="s2">&quot;OR&quot;</span></div>
@@ -699,7 +711,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="LogicGateConfigurer">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.zebra.LogicGateConfigurer.html#dodal.devices.zebra.LogicGateConfigurer">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.LogicGateConfigurer.html#dodal.devices.zebra.LogicGateConfigurer">[docs]</a>
 <span class="k">class</span> <span class="nc">LogicGateConfigurer</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
     <span class="n">DEFAULT_SOURCE_IF_GATE_NOT_USED</span> <span class="o">=</span> <span class="mi">0</span>
 
@@ -720,7 +732,7 @@ document.write(`
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
 <div class="viewcode-block" id="LogicGateConfigurer.apply_logic_gate_config">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.zebra.LogicGateConfigurer.html#dodal.devices.zebra.LogicGateConfigurer.apply_logic_gate_config">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.LogicGateConfigurer.html#dodal.devices.zebra.LogicGateConfigurer.apply_logic_gate_config">[docs]</a>
     <span class="k">def</span> <span class="nf">apply_logic_gate_config</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">:</span> <span class="n">GateType</span><span class="p">,</span> <span class="n">gate_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">LogicGateConfiguration</span>
     <span class="p">):</span>
@@ -752,17 +764,17 @@ document.write(`
 
 
 <div class="viewcode-block" id="LogicGateConfiguration">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.zebra.LogicGateConfiguration.html#dodal.devices.zebra.LogicGateConfiguration">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.LogicGateConfiguration.html#dodal.devices.zebra.LogicGateConfiguration">[docs]</a>
 <span class="k">class</span> <span class="nc">LogicGateConfiguration</span><span class="p">:</span>
     <span class="n">NUMBER_OF_INPUTS</span> <span class="o">=</span> <span class="mi">4</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_source</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">invert</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">invert</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">invert</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_input</span><span class="p">(</span><span class="n">input_source</span><span class="p">,</span> <span class="n">invert</span><span class="p">)</span>
 
 <div class="viewcode-block" id="LogicGateConfiguration.add_input">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.zebra.LogicGateConfiguration.html#dodal.devices.zebra.LogicGateConfiguration.add_input">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.LogicGateConfiguration.html#dodal.devices.zebra.LogicGateConfiguration.add_input">[docs]</a>
     <span class="k">def</span> <span class="nf">add_input</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">input_source</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">invert</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LogicGateConfiguration</span><span class="p">:</span>
@@ -786,7 +798,9 @@ document.write(`
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">input_strings</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="nb">input</span><span class="p">,</span> <span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">invert</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">invert</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="nb">input</span><span class="p">,</span> <span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">invert</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+            <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">invert</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="p">):</span>
             <span class="n">input_strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;INP</span><span class="si">{</span><span class="nb">input</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="s1">&#39;!&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">invert</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}{</span><span class="n">source</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">input_strings</span><span class="p">)</span></div>
@@ -794,7 +808,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="SoftInputs">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.zebra.SoftInputs.html#dodal.devices.zebra.SoftInputs">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.SoftInputs.html#dodal.devices.zebra.SoftInputs">[docs]</a>
 <span class="k">class</span> <span class="nc">SoftInputs</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">soft_in_1</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">SoftInState</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;SOFT_IN:B0&quot;</span><span class="p">)</span>
@@ -806,7 +820,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="Zebra">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.zebra.Zebra.html#dodal.devices.zebra.Zebra">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.Zebra.html#dodal.devices.zebra.Zebra">[docs]</a>
 <span class="k">class</span> <span class="nc">Zebra</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The Zebra device.&quot;&quot;&quot;</span>
 

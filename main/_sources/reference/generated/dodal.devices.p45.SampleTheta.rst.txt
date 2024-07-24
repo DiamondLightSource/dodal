@@ -1,0 +1,87 @@
+dodal.devices.p45.SampleTheta
+=============================
+
+.. currentmodule:: dodal.devices.p45
+
+.. autoclass:: SampleTheta
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      ~SampleTheta.base
+      
+      
+      ~SampleTheta.bottom
+      
+      
+      ~SampleTheta.component_names
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~SampleTheta.skew
+      
+      
+      ~SampleTheta.subscriptions
+      
+      
+      ~SampleTheta.top
+      
+      
+   
+   

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.i04 &#8212; dodal 1.29.4.dev6+g1eb1c5c48 documentation</title>
+    <title>dodal.beamlines.i04 &#8212; dodal 1.29.5.dev6+gcfcea2e9e documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=9f007cc8"></script>
+    <script src="../../../_static/documentation_options.js?v=5ee04e52"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'main';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
-    <link rel="icon" href="../../../_static/dls-favicon.ico"/>
+    <link rel="icon" href="../../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -153,22 +153,29 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../user/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../tutorials.html">
+    Tutorials
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../developer/index.html">
-    Developer Guide
+  <a class="nav-link nav-internal" href="../../../how-to.html">
+    How-to Guides
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-external" href="https://github.com/DiamondLightSource/dodal/releases">
-    Release Notes
+  <a class="nav-link nav-internal" href="../../../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference.html">
+    Reference
   </a>
 </li>
 
@@ -307,22 +314,29 @@ document.write(`
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../user/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../tutorials.html">
+    Tutorials
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../developer/index.html">
-    Developer Guide
+  <a class="nav-link nav-internal" href="../../../how-to.html">
+    How-to Guides
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-external" href="https://github.com/DiamondLightSource/dodal/releases">
-    Release Notes
+  <a class="nav-link nav-internal" href="../../../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference.html">
+    Reference
   </a>
 </li>
 
@@ -500,7 +514,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="smargon">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.smargon">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.smargon">[docs]</a>
 <span class="k">def</span> <span class="nf">smargon</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Smargon</span><span class="p">:</span>
@@ -518,7 +532,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="gonio_positioner">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.gonio_positioner">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.gonio_positioner">[docs]</a>
 <span class="k">def</span> <span class="nf">gonio_positioner</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">XYZPositioner</span><span class="p">:</span>
@@ -536,7 +550,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="sample_delivery_system">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.sample_delivery_system">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.sample_delivery_system">[docs]</a>
 <span class="k">def</span> <span class="nf">sample_delivery_system</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">XYZPositioner</span><span class="p">:</span>
@@ -554,7 +568,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="ipin">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.ipin">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.ipin">[docs]</a>
 <span class="k">def</span> <span class="nf">ipin</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IPin</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i04 ipin device, instantiate it if it hasn&#39;t already been.</span>
 <span class="sd">    If this is called when already instantiated in i04, it will return the existing object.</span>
@@ -570,7 +584,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="beamstop">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.beamstop">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.beamstop">[docs]</a>
 <span class="k">def</span> <span class="nf">beamstop</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BeamStop</span><span class="p">:</span>
@@ -588,7 +602,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="sample_shutter">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.sample_shutter">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.sample_shutter">[docs]</a>
 <span class="k">def</span> <span class="nf">sample_shutter</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ZebraShutter</span><span class="p">:</span>
@@ -606,7 +620,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="attenuator">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.attenuator">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.attenuator">[docs]</a>
 <span class="k">def</span> <span class="nf">attenuator</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Attenuator</span><span class="p">:</span>
@@ -624,7 +638,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="transfocator">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.transfocator">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.transfocator">[docs]</a>
 <span class="k">def</span> <span class="nf">transfocator</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Transfocator</span><span class="p">:</span>
@@ -642,7 +656,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="xbpm_feedback">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.xbpm_feedback">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.xbpm_feedback">[docs]</a>
 <span class="k">def</span> <span class="nf">xbpm_feedback</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">XBPMFeedbackI04</span><span class="p">:</span>
@@ -660,7 +674,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="flux">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.flux">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.flux">[docs]</a>
 <span class="k">def</span> <span class="nf">flux</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Flux</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i04 flux device, instantiate it if it hasn&#39;t already been.</span>
 <span class="sd">    If this is called when already instantiated in i04, it will return the existing object.</span>
@@ -676,7 +690,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="dcm">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.dcm">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.dcm">[docs]</a>
 <span class="k">def</span> <span class="nf">dcm</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DCM</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i04 DCM device, instantiate it if it hasn&#39;t already been.</span>
 <span class="sd">    If this is called when already instantiated in i04, it will return the existing object.</span>
@@ -692,7 +706,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="backlight">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.backlight">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.backlight">[docs]</a>
 <span class="k">def</span> <span class="nf">backlight</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Backlight</span><span class="p">:</span>
@@ -710,7 +724,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="aperture_scatterguard">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.aperture_scatterguard">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.aperture_scatterguard">[docs]</a>
 <span class="k">def</span> <span class="nf">aperture_scatterguard</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -737,7 +751,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="eiger">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.eiger">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.eiger">[docs]</a>
 <span class="nd">@skip_device</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">BL</span> <span class="o">==</span> <span class="s2">&quot;s04&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">eiger</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -765,7 +779,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="zebra_fast_grid_scan">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.zebra_fast_grid_scan">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.zebra_fast_grid_scan">[docs]</a>
 <span class="k">def</span> <span class="nf">zebra_fast_grid_scan</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ZebraFastGridScan</span><span class="p">:</span>
@@ -783,7 +797,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="s4_slit_gaps">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.s4_slit_gaps">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.s4_slit_gaps">[docs]</a>
 <span class="k">def</span> <span class="nf">s4_slit_gaps</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">S4SlitGaps</span><span class="p">:</span>
@@ -801,7 +815,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="undulator">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.undulator">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.undulator">[docs]</a>
 <span class="k">def</span> <span class="nf">undulator</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Undulator</span><span class="p">:</span>
@@ -820,7 +834,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="synchrotron">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.synchrotron">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.synchrotron">[docs]</a>
 <span class="nd">@skip_device</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">BL</span> <span class="o">==</span> <span class="s2">&quot;s04&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">synchrotron</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
@@ -840,7 +854,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="zebra">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.zebra">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.zebra">[docs]</a>
 <span class="k">def</span> <span class="nf">zebra</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Zebra</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i04 zebra device, instantiate it if it hasn&#39;t already been.</span>
 <span class="sd">    If this is called when already instantiated in i04, it will return the existing object.</span>
@@ -856,7 +870,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="oav">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.oav">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.oav">[docs]</a>
 <span class="nd">@skip_device</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">BL</span> <span class="o">==</span> <span class="s2">&quot;s04&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">oav</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OAV</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i04 OAV device, instantiate it if it hasn&#39;t already been.</span>
@@ -874,7 +888,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="detector_motion">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.detector_motion">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.detector_motion">[docs]</a>
 <span class="nd">@skip_device</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">BL</span> <span class="o">==</span> <span class="s2">&quot;s04&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">detector_motion</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
@@ -893,7 +907,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="thawer">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.thawer">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.thawer">[docs]</a>
 <span class="k">def</span> <span class="nf">thawer</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Thawer</span><span class="p">:</span>
@@ -911,7 +925,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="robot">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.robot">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.robot">[docs]</a>
 <span class="k">def</span> <span class="nf">robot</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BartRobot</span><span class="p">:</span>

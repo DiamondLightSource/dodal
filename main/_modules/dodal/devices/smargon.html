@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.smargon &#8212; dodal 1.29.4.dev6+g1eb1c5c48 documentation</title>
+    <title>dodal.devices.smargon &#8212; dodal 1.29.5.dev6+gcfcea2e9e documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=9f007cc8"></script>
+    <script src="../../../_static/documentation_options.js?v=5ee04e52"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'main';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
-    <link rel="icon" href="../../../_static/dls-favicon.ico"/>
+    <link rel="icon" href="../../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -153,22 +153,29 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../user/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../tutorials.html">
+    Tutorials
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../developer/index.html">
-    Developer Guide
+  <a class="nav-link nav-internal" href="../../../how-to.html">
+    How-to Guides
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-external" href="https://github.com/DiamondLightSource/dodal/releases">
-    Release Notes
+  <a class="nav-link nav-internal" href="../../../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference.html">
+    Reference
   </a>
 </li>
 
@@ -307,22 +314,29 @@ document.write(`
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../user/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../tutorials.html">
+    Tutorials
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../developer/index.html">
-    Developer Guide
+  <a class="nav-link nav-internal" href="../../../how-to.html">
+    How-to Guides
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-external" href="https://github.com/DiamondLightSource/dodal/releases">
-    Release Notes
+  <a class="nav-link nav-internal" href="../../../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference.html">
+    Reference
   </a>
 </li>
 
@@ -457,11 +471,11 @@ document.write(`
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.smargon</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Generator</span>
+<span></span><span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">Generator</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">isclose</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">cast</span>
 
 <span class="kn">from</span> <span class="nn">bluesky</span> <span class="kn">import</span> <span class="n">plan_stubs</span> <span class="k">as</span> <span class="n">bps</span>
 <span class="kn">from</span> <span class="nn">bluesky.utils</span> <span class="kn">import</span> <span class="n">Msg</span>
@@ -473,7 +487,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="StubPosition">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.smargon.StubPosition.html#dodal.devices.smargon.StubPosition">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.smargon.StubPosition.html#dodal.devices.smargon.StubPosition">[docs]</a>
 <span class="k">class</span> <span class="nc">StubPosition</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="n">CURRENT_AS_CENTER</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">RESET_TO_ROBOT_LOAD</span> <span class="o">=</span> <span class="mi">1</span></div>
@@ -481,7 +495,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="approx_equal_to">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.smargon.html#dodal.devices.smargon.approx_equal_to">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.smargon.html#dodal.devices.smargon.approx_equal_to">[docs]</a>
 <span class="k">def</span> <span class="nf">approx_equal_to</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">deadband</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-9</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">approx_equal_to_target</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">isclose</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">rel_tol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="n">deadband</span><span class="p">)</span>
@@ -491,7 +505,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="StubOffsets">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.smargon.StubOffsets.html#dodal.devices.smargon.StubOffsets">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.smargon.StubOffsets.html#dodal.devices.smargon.StubOffsets">[docs]</a>
 <span class="k">class</span> <span class="nc">StubOffsets</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Stub offsets are used to change the internal co-ordinate system of the smargon by</span>
 <span class="sd">    adding an offset to x, y, z.</span>
@@ -526,7 +540,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="AxisLimit">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.smargon.AxisLimit.html#dodal.devices.smargon.AxisLimit">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.smargon.AxisLimit.html#dodal.devices.smargon.AxisLimit">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">AxisLimit</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents the minimum and maximum allowable values on an axis&quot;&quot;&quot;</span>
@@ -535,7 +549,7 @@ document.write(`
     <span class="n">max_value</span><span class="p">:</span> <span class="nb">float</span>
 
 <div class="viewcode-block" id="AxisLimit.contains">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.smargon.AxisLimit.html#dodal.devices.smargon.AxisLimit.contains">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.smargon.AxisLimit.html#dodal.devices.smargon.AxisLimit.contains">[docs]</a>
     <span class="k">def</span> <span class="nf">contains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Determine if the specified value is within limits.</span>
 
@@ -551,7 +565,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="XYZLimits">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.smargon.XYZLimits.html#dodal.devices.smargon.XYZLimits">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.smargon.XYZLimits.html#dodal.devices.smargon.XYZLimits">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">XYZLimits</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The limits of the smargon x, y, z axes.&quot;&quot;&quot;</span>
@@ -563,13 +577,13 @@ document.write(`
     <span class="k">def</span> <span class="nf">position_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="n">Collection</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">all</span><span class="p">(</span>
             <span class="n">axis_limits</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">axis_limits</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">],</span> <span class="n">pos</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">axis_limits</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">],</span> <span class="n">pos</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="Smargon">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.smargon.Smargon.html#dodal.devices.smargon.Smargon">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.smargon.Smargon.html#dodal.devices.smargon.Smargon">[docs]</a>
 <span class="k">class</span> <span class="nc">Smargon</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Real motors added to allow stops following pin load (e.g. real_x1.stop() )</span>
@@ -598,7 +612,7 @@ document.write(`
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Smargon.get_xyz_limits">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.smargon.Smargon.html#dodal.devices.smargon.Smargon.get_xyz_limits">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.smargon.Smargon.html#dodal.devices.smargon.Smargon.get_xyz_limits">[docs]</a>
     <span class="k">def</span> <span class="nf">get_xyz_limits</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Msg</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">XYZLimits</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Obtain a plan stub that returns the smargon XYZ axis limits</span>
 

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.fast_grid_scan &#8212; dodal 1.29.4.dev6+g1eb1c5c48 documentation</title>
+    <title>dodal.devices.fast_grid_scan &#8212; dodal 1.29.5.dev6+gcfcea2e9e documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=9f007cc8"></script>
+    <script src="../../../_static/documentation_options.js?v=5ee04e52"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'main';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
-    <link rel="icon" href="../../../_static/dls-favicon.ico"/>
+    <link rel="icon" href="../../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -153,22 +153,29 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../user/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../tutorials.html">
+    Tutorials
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../developer/index.html">
-    Developer Guide
+  <a class="nav-link nav-internal" href="../../../how-to.html">
+    How-to Guides
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-external" href="https://github.com/DiamondLightSource/dodal/releases">
-    Release Notes
+  <a class="nav-link nav-internal" href="../../../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference.html">
+    Reference
   </a>
 </li>
 
@@ -307,22 +314,29 @@ document.write(`
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../user/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../tutorials.html">
+    Tutorials
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../developer/index.html">
-    Developer Guide
+  <a class="nav-link nav-internal" href="../../../how-to.html">
+    How-to Guides
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-external" href="https://github.com/DiamondLightSource/dodal/releases">
-    Release Notes
+  <a class="nav-link nav-internal" href="../../../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference.html">
+    Reference
   </a>
 </li>
 
@@ -487,7 +501,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="GridAxis">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.fast_grid_scan.GridAxis.html#dodal.devices.fast_grid_scan.GridAxis">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.GridAxis.html#dodal.devices.fast_grid_scan.GridAxis">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">GridAxis</span><span class="p">:</span>
     <span class="n">start</span><span class="p">:</span> <span class="nb">float</span>
@@ -495,7 +509,7 @@ document.write(`
     <span class="n">full_steps</span><span class="p">:</span> <span class="nb">int</span>
 
 <div class="viewcode-block" id="GridAxis.steps_to_motor_position">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.fast_grid_scan.GridAxis.html#dodal.devices.fast_grid_scan.GridAxis.steps_to_motor_position">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.GridAxis.html#dodal.devices.fast_grid_scan.GridAxis.steps_to_motor_position">[docs]</a>
     <span class="k">def</span> <span class="nf">steps_to_motor_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">steps</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Gives the motor position based on steps, where steps are 0 indexed&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_size</span> <span class="o">*</span> <span class="n">steps</span></div>
@@ -514,7 +528,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="GridScanParamsCommon">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.fast_grid_scan.GridScanParamsCommon.html#dodal.devices.fast_grid_scan.GridScanParamsCommon">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.GridScanParamsCommon.html#dodal.devices.fast_grid_scan.GridScanParamsCommon">[docs]</a>
 <span class="k">class</span> <span class="nc">GridScanParamsCommon</span><span class="p">(</span><span class="n">AbstractExperimentWithBeamParams</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Common holder class for the parameters of a grid scan in a similar</span>
@@ -586,7 +600,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_steps</span> <span class="o">&gt;</span> <span class="mi">0</span>
 
 <div class="viewcode-block" id="GridScanParamsCommon.grid_position_to_motor_position">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.fast_grid_scan.GridScanParamsCommon.html#dodal.devices.fast_grid_scan.GridScanParamsCommon.grid_position_to_motor_position">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.GridScanParamsCommon.html#dodal.devices.fast_grid_scan.GridScanParamsCommon.grid_position_to_motor_position">[docs]</a>
     <span class="k">def</span> <span class="nf">grid_position_to_motor_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grid_position</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts a grid position, given as steps in the x, y, z grid,</span>
 <span class="sd">        to a real motor position.</span>
@@ -595,7 +609,7 @@ document.write(`
 <span class="sd">        :return: The motor position this corresponds to.</span>
 <span class="sd">        :raises: IndexError if the desired position is outside the grid.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">position</span><span class="p">,</span> <span class="n">axis</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
-            <span class="n">grid_position</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_axis</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_axis</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_axis</span><span class="p">]</span>
+            <span class="n">grid_position</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">x_axis</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_axis</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_axis</span><span class="p">],</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span>
         <span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">axis</span><span class="o">.</span><span class="n">is_within</span><span class="p">(</span><span class="n">position</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">grid_position</span><span class="si">}</span><span class="s2"> is outside the bounds of the grid&quot;</span><span class="p">)</span>
@@ -615,7 +629,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="ZebraGridScanParams">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.fast_grid_scan.ZebraGridScanParams.html#dodal.devices.fast_grid_scan.ZebraGridScanParams">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.ZebraGridScanParams.html#dodal.devices.fast_grid_scan.ZebraGridScanParams">[docs]</a>
 <span class="k">class</span> <span class="nc">ZebraGridScanParams</span><span class="p">(</span><span class="n">GridScanParamsCommon</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Params for standard Zebra FGS. Adds on the dwell time</span>
@@ -643,7 +657,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="PandAGridScanParams">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.fast_grid_scan.PandAGridScanParams.html#dodal.devices.fast_grid_scan.PandAGridScanParams">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.PandAGridScanParams.html#dodal.devices.fast_grid_scan.PandAGridScanParams">[docs]</a>
 <span class="k">class</span> <span class="nc">PandAGridScanParams</span><span class="p">(</span><span class="n">GridScanParamsCommon</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Params for panda constant-motion scan. Adds on the goniometer run-up distance</span>
@@ -659,7 +673,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="MotionProgram">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.fast_grid_scan.MotionProgram.html#dodal.devices.fast_grid_scan.MotionProgram">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.MotionProgram.html#dodal.devices.fast_grid_scan.MotionProgram">[docs]</a>
 <span class="k">class</span> <span class="nc">MotionProgram</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
@@ -669,11 +683,11 @@ document.write(`
 
 
 <div class="viewcode-block" id="ExpectedImages">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.fast_grid_scan.ExpectedImages.html#dodal.devices.fast_grid_scan.ExpectedImages">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.ExpectedImages.html#dodal.devices.fast_grid_scan.ExpectedImages">[docs]</a>
 <span class="k">class</span> <span class="nc">ExpectedImages</span><span class="p">(</span><span class="n">SignalR</span><span class="p">[</span><span class="nb">int</span><span class="p">]):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="s2">&quot;FastGridScanCommon&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">SoftSignalBackend</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">:</span> <span class="s2">&quot;FastGridScanCommon&quot;</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">:</span> <span class="n">FastGridScanCommon</span> <span class="o">=</span> <span class="n">parent</span>
 
     <span class="k">async</span> <span class="k">def</span> <span class="nf">get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">x</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">x_steps</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
@@ -686,7 +700,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="FastGridScanCommon">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.fast_grid_scan.FastGridScanCommon.html#dodal.devices.fast_grid_scan.FastGridScanCommon">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.FastGridScanCommon.html#dodal.devices.fast_grid_scan.FastGridScanCommon">[docs]</a>
 <span class="k">class</span> <span class="nc">FastGridScanCommon</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">ParamType</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Device for a general fast grid scan</span>
 
@@ -770,7 +784,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="ZebraFastGridScan">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.fast_grid_scan.ZebraFastGridScan.html#dodal.devices.fast_grid_scan.ZebraFastGridScan">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.ZebraFastGridScan.html#dodal.devices.fast_grid_scan.ZebraFastGridScan">[docs]</a>
 <span class="k">class</span> <span class="nc">ZebraFastGridScan</span><span class="p">(</span><span class="n">FastGridScanCommon</span><span class="p">[</span><span class="n">ZebraGridScanParams</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Device for standard Zebra FGS. In this scan, the goniometer&#39;s velocity profile follows a parabolic shape between X steps,</span>
 <span class="sd">    with the slowest points occuring at each X step.</span>
@@ -796,7 +810,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="PandAFastGridScan">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.fast_grid_scan.PandAFastGridScan.html#dodal.devices.fast_grid_scan.PandAFastGridScan">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.PandAFastGridScan.html#dodal.devices.fast_grid_scan.PandAFastGridScan">[docs]</a>
 <span class="k">class</span> <span class="nc">PandAFastGridScan</span><span class="p">(</span><span class="n">FastGridScanCommon</span><span class="p">[</span><span class="n">PandAGridScanParams</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Device for panda constant-motion scan&quot;&quot;&quot;</span>
 
@@ -823,7 +837,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="set_fast_grid_scan_params">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.fast_grid_scan.html#dodal.devices.fast_grid_scan.set_fast_grid_scan_params">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.html#dodal.devices.fast_grid_scan.set_fast_grid_scan_params">[docs]</a>
 <span class="k">def</span> <span class="nf">set_fast_grid_scan_params</span><span class="p">(</span><span class="n">scan</span><span class="p">:</span> <span class="n">FastGridScanCommon</span><span class="p">[</span><span class="n">ParamType</span><span class="p">],</span> <span class="n">params</span><span class="p">:</span> <span class="n">ParamType</span><span class="p">):</span>
     <span class="n">to_move</span> <span class="o">=</span> <span class="p">[]</span>
 

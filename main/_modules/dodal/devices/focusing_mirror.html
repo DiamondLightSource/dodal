@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.focusing_mirror &#8212; dodal 1.29.4.dev6+g1eb1c5c48 documentation</title>
+    <title>dodal.devices.focusing_mirror &#8212; dodal 1.29.5.dev6+gcfcea2e9e documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=9f007cc8"></script>
+    <script src="../../../_static/documentation_options.js?v=5ee04e52"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'main';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
-    <link rel="icon" href="../../../_static/dls-favicon.ico"/>
+    <link rel="icon" href="../../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -153,22 +153,29 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../user/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../tutorials.html">
+    Tutorials
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../developer/index.html">
-    Developer Guide
+  <a class="nav-link nav-internal" href="../../../how-to.html">
+    How-to Guides
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-external" href="https://github.com/DiamondLightSource/dodal/releases">
-    Release Notes
+  <a class="nav-link nav-internal" href="../../../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference.html">
+    Reference
   </a>
 </li>
 
@@ -307,22 +314,29 @@ document.write(`
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../user/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../tutorials.html">
+    Tutorials
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../developer/index.html">
-    Developer Guide
+  <a class="nav-link nav-internal" href="../../../how-to.html">
+    How-to Guides
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-external" href="https://github.com/DiamondLightSource/dodal/releases">
-    Release Notes
+  <a class="nav-link nav-internal" href="../../../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference.html">
+    Reference
   </a>
 </li>
 
@@ -461,8 +475,10 @@ document.write(`
 
 <span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
+    <span class="n">ConfigSignal</span><span class="p">,</span>
     <span class="n">Device</span><span class="p">,</span>
     <span class="n">DeviceVector</span><span class="p">,</span>
+    <span class="n">HintedSignal</span><span class="p">,</span>
     <span class="n">StandardReadable</span><span class="p">,</span>
     <span class="n">observe_value</span><span class="p">,</span>
 <span class="p">)</span>
@@ -483,7 +499,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="MirrorType">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.focusing_mirror.MirrorType.html#dodal.devices.focusing_mirror.MirrorType">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.focusing_mirror.MirrorType.html#dodal.devices.focusing_mirror.MirrorType">[docs]</a>
 <span class="k">class</span> <span class="nc">MirrorType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;See https://manual.nexusformat.org/classes/base_classes/NXmirror.html&quot;&quot;&quot;</span>
 
@@ -493,7 +509,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="MirrorStripe">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.focusing_mirror.MirrorStripe.html#dodal.devices.focusing_mirror.MirrorStripe">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.focusing_mirror.MirrorStripe.html#dodal.devices.focusing_mirror.MirrorStripe">[docs]</a>
 <span class="k">class</span> <span class="nc">MirrorStripe</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
     <span class="n">RHODIUM</span> <span class="o">=</span> <span class="s2">&quot;Rhodium&quot;</span>
     <span class="n">BARE</span> <span class="o">=</span> <span class="s2">&quot;Bare&quot;</span>
@@ -502,7 +518,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="MirrorVoltageDemand">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.focusing_mirror.MirrorVoltageDemand.html#dodal.devices.focusing_mirror.MirrorVoltageDemand">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.focusing_mirror.MirrorVoltageDemand.html#dodal.devices.focusing_mirror.MirrorVoltageDemand">[docs]</a>
 <span class="k">class</span> <span class="nc">MirrorVoltageDemand</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
     <span class="n">N_A</span> <span class="o">=</span> <span class="s2">&quot;N/A&quot;</span>
     <span class="n">OK</span> <span class="o">=</span> <span class="s2">&quot;OK&quot;</span>
@@ -512,7 +528,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="MirrorVoltageDevice">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.focusing_mirror.MirrorVoltageDevice.html#dodal.devices.focusing_mirror.MirrorVoltageDevice">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.focusing_mirror.MirrorVoltageDevice.html#dodal.devices.focusing_mirror.MirrorVoltageDevice">[docs]</a>
 <span class="k">class</span> <span class="nc">MirrorVoltageDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract the bimorph mirror voltage PVs into a single device that can be set asynchronously and returns when</span>
 <span class="sd">    the demanded voltage setpoint is accepted, without blocking the caller as this process can take significant time.</span>
@@ -525,7 +541,7 @@ document.write(`
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
 
 <div class="viewcode-block" id="MirrorVoltageDevice.set">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.focusing_mirror.MirrorVoltageDevice.html#dodal.devices.focusing_mirror.MirrorVoltageDevice.set">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.focusing_mirror.MirrorVoltageDevice.html#dodal.devices.focusing_mirror.MirrorVoltageDevice.set">[docs]</a>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Combine the following operations into a single set:</span>
@@ -579,7 +595,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="VFMMirrorVoltages">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.focusing_mirror.VFMMirrorVoltages.html#dodal.devices.focusing_mirror.VFMMirrorVoltages">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.focusing_mirror.VFMMirrorVoltages.html#dodal.devices.focusing_mirror.VFMMirrorVoltages">[docs]</a>
 <span class="k">class</span> <span class="nc">VFMMirrorVoltages</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">daq_configuration_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
@@ -599,7 +615,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="FocusingMirror">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.focusing_mirror.FocusingMirror.html#dodal.devices.focusing_mirror.FocusingMirror">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.focusing_mirror.FocusingMirror.html#dodal.devices.focusing_mirror.FocusingMirror">[docs]</a>
 <span class="k">class</span> <span class="nc">FocusingMirror</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Focusing Mirror&quot;&quot;&quot;</span>
 
@@ -623,16 +639,14 @@ document.write(`
         <span class="c1"># regardless of orientation of the mirror</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">incident_angle</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PITCH&quot;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_readable_signals</span><span class="p">(</span>
-            <span class="n">read</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">incident_angle</span><span class="o">.</span><span class="n">user_readback</span><span class="p">],</span>
-            <span class="n">config</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">],</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_readables</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">incident_angle</span><span class="o">.</span><span class="n">user_readback</span><span class="p">],</span> <span class="n">wrapper</span><span class="o">=</span><span class="n">HintedSignal</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_readables</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">],</span> <span class="n">wrapper</span><span class="o">=</span><span class="n">ConfigSignal</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="FocusingMirrorWithStripes">
-<a class="viewcode-back" href="../../../user/reference/generated/dodal.devices.focusing_mirror.FocusingMirrorWithStripes.html#dodal.devices.focusing_mirror.FocusingMirrorWithStripes">[docs]</a>
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.focusing_mirror.FocusingMirrorWithStripes.html#dodal.devices.focusing_mirror.FocusingMirrorWithStripes">[docs]</a>
 <span class="k">class</span> <span class="nc">FocusingMirrorWithStripes</span><span class="p">(</span><span class="n">FocusingMirror</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A focusing mirror where the stripe material can be changed. This is usually done</span>
 <span class="sd">    based on the energy of the beamline.&quot;&quot;&quot;</span>

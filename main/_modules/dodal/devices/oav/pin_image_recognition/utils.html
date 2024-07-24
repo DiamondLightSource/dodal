@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.pin_image_recognition.utils &#8212; dodal 1.29.4.dev6+g1eb1c5c48 documentation</title>
+    <title>dodal.devices.oav.pin_image_recognition.utils &#8212; dodal 1.29.5.dev6+gcfcea2e9e documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../../../_static/documentation_options.js?v=9f007cc8"></script>
+    <script src="../../../../../_static/documentation_options.js?v=5ee04e52"></script>
     <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -52,7 +52,7 @@
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'main';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
-    <link rel="icon" href="../../../../../_static/dls-favicon.ico"/>
+    <link rel="icon" href="../../../../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -153,22 +153,29 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../../user/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../../../tutorials.html">
+    Tutorials
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../../developer/index.html">
-    Developer Guide
+  <a class="nav-link nav-internal" href="../../../../../how-to.html">
+    How-to Guides
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-external" href="https://github.com/DiamondLightSource/dodal/releases">
-    Release Notes
+  <a class="nav-link nav-internal" href="../../../../../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../reference.html">
+    Reference
   </a>
 </li>
 
@@ -307,22 +314,29 @@ document.write(`
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../../user/index.html">
-    User Guide
+  <a class="nav-link nav-internal" href="../../../../../tutorials.html">
+    Tutorials
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../../../developer/index.html">
-    Developer Guide
+  <a class="nav-link nav-internal" href="../../../../../how-to.html">
+    How-to Guides
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-external" href="https://github.com/DiamondLightSource/dodal/releases">
-    Release Notes
+  <a class="nav-link nav-internal" href="../../../../../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../reference.html">
+    Reference
   </a>
 </li>
 
@@ -460,9 +474,10 @@ document.write(`
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.oav.pin_image_recognition.utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span></span><span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Final</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Final</span>
 
 <span class="kn">import</span> <span class="nn">cv2</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -471,7 +486,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="ScanDirections">
-<a class="viewcode-back" href="../../../../../user/reference/generated/dodal.devices.oav.pin_image_recognition.utils.ScanDirections.html#dodal.devices.oav.pin_image_recognition.utils.ScanDirections">[docs]</a>
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.oav.pin_image_recognition.utils.ScanDirections.html#dodal.devices.oav.pin_image_recognition.utils.ScanDirections">[docs]</a>
 <span class="k">class</span> <span class="nc">ScanDirections</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="n">FORWARD</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">REVERSE</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span></div>
@@ -479,14 +494,14 @@ document.write(`
 
 
 <div class="viewcode-block" id="identity">
-<a class="viewcode-back" href="../../../../../user/reference/generated/dodal.devices.oav.pin_image_recognition.utils.html#dodal.devices.oav.pin_image_recognition.utils.identity">[docs]</a>
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.oav.pin_image_recognition.utils.html#dodal.devices.oav.pin_image_recognition.utils.identity">[docs]</a>
 <span class="k">def</span> <span class="nf">identity</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
     <span class="k">return</span> <span class="k">lambda</span> <span class="n">arr</span><span class="p">:</span> <span class="n">arr</span></div>
 
 
 
 <div class="viewcode-block" id="erode">
-<a class="viewcode-back" href="../../../../../user/reference/generated/dodal.devices.oav.pin_image_recognition.utils.html#dodal.devices.oav.pin_image_recognition.utils.erode">[docs]</a>
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.oav.pin_image_recognition.utils.html#dodal.devices.oav.pin_image_recognition.utils.erode">[docs]</a>
 <span class="k">def</span> <span class="nf">erode</span><span class="p">(</span><span class="n">ksize</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
     <span class="n">element</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">getStructuringElement</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">MORPH_RECT</span><span class="p">,</span> <span class="p">(</span><span class="n">ksize</span><span class="p">,</span> <span class="n">ksize</span><span class="p">))</span>
     <span class="k">return</span> <span class="k">lambda</span> <span class="n">arr</span><span class="p">:</span> <span class="n">cv2</span><span class="o">.</span><span class="n">erode</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">iterations</span><span class="o">=</span><span class="n">iterations</span><span class="p">)</span></div>
@@ -494,7 +509,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="dilate">
-<a class="viewcode-back" href="../../../../../user/reference/generated/dodal.devices.oav.pin_image_recognition.utils.html#dodal.devices.oav.pin_image_recognition.utils.dilate">[docs]</a>
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.oav.pin_image_recognition.utils.html#dodal.devices.oav.pin_image_recognition.utils.dilate">[docs]</a>
 <span class="k">def</span> <span class="nf">dilate</span><span class="p">(</span><span class="n">ksize</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
     <span class="n">element</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">getStructuringElement</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">MORPH_RECT</span><span class="p">,</span> <span class="p">(</span><span class="n">ksize</span><span class="p">,</span> <span class="n">ksize</span><span class="p">))</span>
     <span class="k">return</span> <span class="k">lambda</span> <span class="n">arr</span><span class="p">:</span> <span class="n">cv2</span><span class="o">.</span><span class="n">dilate</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">iterations</span><span class="o">=</span><span class="n">iterations</span><span class="p">)</span></div>
@@ -509,49 +524,49 @@ document.write(`
 
 
 <div class="viewcode-block" id="open_morph">
-<a class="viewcode-back" href="../../../../../user/reference/generated/dodal.devices.oav.pin_image_recognition.utils.html#dodal.devices.oav.pin_image_recognition.utils.open_morph">[docs]</a>
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.oav.pin_image_recognition.utils.html#dodal.devices.oav.pin_image_recognition.utils.open_morph">[docs]</a>
 <span class="k">def</span> <span class="nf">open_morph</span><span class="p">(</span><span class="n">ksize</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
     <span class="k">return</span> <span class="n">_morph</span><span class="p">(</span><span class="n">ksize</span><span class="o">=</span><span class="n">ksize</span><span class="p">,</span> <span class="n">iterations</span><span class="o">=</span><span class="n">iterations</span><span class="p">,</span> <span class="n">morph_type</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">MORPH_OPEN</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="close">
-<a class="viewcode-back" href="../../../../../user/reference/generated/dodal.devices.oav.pin_image_recognition.utils.html#dodal.devices.oav.pin_image_recognition.utils.close">[docs]</a>
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.oav.pin_image_recognition.utils.html#dodal.devices.oav.pin_image_recognition.utils.close">[docs]</a>
 <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="n">ksize</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
     <span class="k">return</span> <span class="n">_morph</span><span class="p">(</span><span class="n">ksize</span><span class="o">=</span><span class="n">ksize</span><span class="p">,</span> <span class="n">iterations</span><span class="o">=</span><span class="n">iterations</span><span class="p">,</span> <span class="n">morph_type</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">MORPH_CLOSE</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="gradient">
-<a class="viewcode-back" href="../../../../../user/reference/generated/dodal.devices.oav.pin_image_recognition.utils.html#dodal.devices.oav.pin_image_recognition.utils.gradient">[docs]</a>
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.oav.pin_image_recognition.utils.html#dodal.devices.oav.pin_image_recognition.utils.gradient">[docs]</a>
 <span class="k">def</span> <span class="nf">gradient</span><span class="p">(</span><span class="n">ksize</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
     <span class="k">return</span> <span class="n">_morph</span><span class="p">(</span><span class="n">ksize</span><span class="o">=</span><span class="n">ksize</span><span class="p">,</span> <span class="n">iterations</span><span class="o">=</span><span class="n">iterations</span><span class="p">,</span> <span class="n">morph_type</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">MORPH_GRADIENT</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="top_hat">
-<a class="viewcode-back" href="../../../../../user/reference/generated/dodal.devices.oav.pin_image_recognition.utils.html#dodal.devices.oav.pin_image_recognition.utils.top_hat">[docs]</a>
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.oav.pin_image_recognition.utils.html#dodal.devices.oav.pin_image_recognition.utils.top_hat">[docs]</a>
 <span class="k">def</span> <span class="nf">top_hat</span><span class="p">(</span><span class="n">ksize</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
     <span class="k">return</span> <span class="n">_morph</span><span class="p">(</span><span class="n">ksize</span><span class="o">=</span><span class="n">ksize</span><span class="p">,</span> <span class="n">iterations</span><span class="o">=</span><span class="n">iterations</span><span class="p">,</span> <span class="n">morph_type</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">MORPH_TOPHAT</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="black_hat">
-<a class="viewcode-back" href="../../../../../user/reference/generated/dodal.devices.oav.pin_image_recognition.utils.html#dodal.devices.oav.pin_image_recognition.utils.black_hat">[docs]</a>
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.oav.pin_image_recognition.utils.html#dodal.devices.oav.pin_image_recognition.utils.black_hat">[docs]</a>
 <span class="k">def</span> <span class="nf">black_hat</span><span class="p">(</span><span class="n">ksize</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
     <span class="k">return</span> <span class="n">_morph</span><span class="p">(</span><span class="n">ksize</span><span class="o">=</span><span class="n">ksize</span><span class="p">,</span> <span class="n">iterations</span><span class="o">=</span><span class="n">iterations</span><span class="p">,</span> <span class="n">morph_type</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">MORPH_BLACKHAT</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="blur">
-<a class="viewcode-back" href="../../../../../user/reference/generated/dodal.devices.oav.pin_image_recognition.utils.html#dodal.devices.oav.pin_image_recognition.utils.blur">[docs]</a>
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.oav.pin_image_recognition.utils.html#dodal.devices.oav.pin_image_recognition.utils.blur">[docs]</a>
 <span class="k">def</span> <span class="nf">blur</span><span class="p">(</span><span class="n">ksize</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
     <span class="k">return</span> <span class="k">lambda</span> <span class="n">arr</span><span class="p">:</span> <span class="n">cv2</span><span class="o">.</span><span class="n">blur</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">ksize</span><span class="o">=</span><span class="p">(</span><span class="n">ksize</span><span class="p">,</span> <span class="n">ksize</span><span class="p">))</span></div>
 
 
 
 <div class="viewcode-block" id="gaussian_blur">
-<a class="viewcode-back" href="../../../../../user/reference/generated/dodal.devices.oav.pin_image_recognition.utils.html#dodal.devices.oav.pin_image_recognition.utils.gaussian_blur">[docs]</a>
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.oav.pin_image_recognition.utils.html#dodal.devices.oav.pin_image_recognition.utils.gaussian_blur">[docs]</a>
 <span class="k">def</span> <span class="nf">gaussian_blur</span><span class="p">(</span><span class="n">ksize</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
     <span class="c1"># Kernel size should be odd.</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">ksize</span> <span class="o">%</span> <span class="mi">2</span><span class="p">:</span>
@@ -561,7 +576,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="median_blur">
-<a class="viewcode-back" href="../../../../../user/reference/generated/dodal.devices.oav.pin_image_recognition.utils.html#dodal.devices.oav.pin_image_recognition.utils.median_blur">[docs]</a>
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.oav.pin_image_recognition.utils.html#dodal.devices.oav.pin_image_recognition.utils.median_blur">[docs]</a>
 <span class="k">def</span> <span class="nf">median_blur</span><span class="p">(</span><span class="n">ksize</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">ksize</span> <span class="o">%</span> <span class="mi">2</span><span class="p">:</span>
         <span class="n">ksize</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -590,7 +605,7 @@ document.write(`
 
 
 <div class="viewcode-block" id="SampleLocation">
-<a class="viewcode-back" href="../../../../../user/reference/generated/dodal.devices.oav.pin_image_recognition.utils.SampleLocation.html#dodal.devices.oav.pin_image_recognition.utils.SampleLocation">[docs]</a>
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.oav.pin_image_recognition.utils.SampleLocation.html#dodal.devices.oav.pin_image_recognition.utils.SampleLocation">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">SampleLocation</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -605,8 +620,8 @@ document.write(`
 
 
 <div class="viewcode-block" id="MxSampleDetect">
-<a class="viewcode-back" href="../../../../../user/reference/generated/dodal.devices.oav.pin_image_recognition.utils.MxSampleDetect.html#dodal.devices.oav.pin_image_recognition.utils.MxSampleDetect">[docs]</a>
-<span class="k">class</span> <span class="nc">MxSampleDetect</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<a class="viewcode-back" href="../../../../../reference/generated/dodal.devices.oav.pin_image_recognition.utils.MxSampleDetect.html#dodal.devices.oav.pin_image_recognition.utils.MxSampleDetect">[docs]</a>
+<span class="k">class</span> <span class="nc">MxSampleDetect</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -664,7 +679,7 @@ document.write(`
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_first_and_last_nonzero_by_columns</span><span class="p">(</span>
         <span class="n">arr</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Finds the indexes of the first &amp; last non-zero values by column in a 2d array.</span>
 
@@ -746,9 +761,7 @@ document.write(`
             <span class="n">bottom</span><span class="p">[</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">NONE_VALUE</span>
 
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-            <span class="s2">&quot;pin-tip detection: Successfully located pin tip at (x=</span><span class="si">{}</span><span class="s2">, y=</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">tip_x</span><span class="p">,</span> <span class="n">tip_y</span>
-            <span class="p">)</span>
+            <span class="sa">f</span><span class="s2">&quot;pin-tip detection: Successfully located pin tip at (x=</span><span class="si">{</span><span class="n">tip_x</span><span class="si">}</span><span class="s2">, y=</span><span class="si">{</span><span class="n">tip_y</span><span class="si">}</span><span class="s2">)&quot;</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">SampleLocation</span><span class="p">(</span>
             <span class="n">tip_x</span><span class="o">=</span><span class="n">tip_x</span><span class="p">,</span> <span class="n">tip_y</span><span class="o">=</span><span class="n">tip_y</span><span class="p">,</span> <span class="n">edge_bottom</span><span class="o">=</span><span class="n">bottom</span><span class="p">,</span> <span class="n">edge_top</span><span class="o">=</span><span class="n">top</span>
