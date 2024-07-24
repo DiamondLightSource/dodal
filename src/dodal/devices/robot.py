@@ -45,6 +45,9 @@ class BartRobot(StandardReadable, Movable):
     LOAD_TIMEOUT = 60
     NO_PIN_ERROR_CODE = 25
 
+    # How far the gonio position can be out before loading will fail
+    LOAD_TOLERANCE_MM = 0.02
+
     def __init__(
         self,
         name: str,

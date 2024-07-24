@@ -20,8 +20,7 @@ from dodal.devices.aperturescatterguard import (
     InvalidApertureMove,
     SingleAperturePosition,
 )
-
-from .conftest import patch_motor
+from dodal.devices.util.test_utils import patch_motor
 
 ApSgAndLog = tuple[ApertureScatterguard, MagicMock]
 
