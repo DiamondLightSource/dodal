@@ -21,12 +21,6 @@ class XYZDetector(OphydV2Device):
         raise NotImplementedError
 
 
-class ConnectionMode(Enum):
-    LAZY = 0
-    EAGER = 1
-    SOMETIMES = 2
-
-
 class DeviceInitializationConfig:
     """
     eager ones all connect at the beginning in blueapi startup. if they fail to connect we get an error
@@ -119,3 +113,9 @@ def detector_xyz():
 def detector_xyz_variant():
     """Create an XYZ detector with specific settings."""
     return XYZDetector(name="det2-variant", prefix=f"{beamline_prefix}xyz:")
+
+
+cached_controllers: dict[str, DeviceInitializationController] = {
+    'det1': detector_xyz,
+    'det2': detector_xyz_variant,
+}
