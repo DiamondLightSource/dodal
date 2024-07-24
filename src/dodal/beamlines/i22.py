@@ -98,7 +98,7 @@ def waxs(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> PilatusDetector:
     return device_instantiation(
-        AravisDetector if IS_LAB else   NXSasPilatus,
+        AravisDetector if IS_LAB else NXSasPilatus,
         "d12" if IS_LAB else "waxs",
         "-DI-DCAM-04:" if IS_LAB else "-EA-PILAT-03:",
         wait_for_connection,
