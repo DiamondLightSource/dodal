@@ -11,6 +11,7 @@
 
    check_topup
    data_session_metadata
+   motor_util_plans
 
 
 
