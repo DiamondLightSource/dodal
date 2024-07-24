@@ -93,7 +93,7 @@ class DeviceInitializationController:
         return device
 
 
-def device_instance_behavior(
+def instantiation_behaviour(
     **config_kwargs,
 ) -> Callable[[Callable[[], AnyDevice]], DeviceInitializationController]:
     config = DeviceInitializationConfig(**config_kwargs)
@@ -109,13 +109,13 @@ def device_instance_behavior(
 beamline_prefix = "example:"
 
 
-@device_instance_behavior(lazy=True, use_mock=True, timeout=10)
+@instantiation_behaviour(use_mock=True, timeout=10)
 def detector_xyz():
     """Create an XYZ detector with specific settings."""
     return XYZDetector(name="det1", prefix=f"{beamline_prefix}xyz:")
 
 
-@device_instance_behavior(lazy=True, use_mock=True, timeout=10)
+@instantiation_behaviour(eager=True, use_mock=True, timeout=10)
 def detector_xyz_variant():
     """Create an XYZ detector with specific settings."""
     return XYZDetector(name="det2-variant", prefix=f"{beamline_prefix}xyz:")
