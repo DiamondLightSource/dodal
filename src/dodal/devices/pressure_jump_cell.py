@@ -249,18 +249,23 @@ class PressureJumpCell(StandardReadable):
     def __init__(
         self,
         prefix: str = "",
-        adc1_prefix: str = "",
-        adc2_prefix: str = "",
+        cell_prefix: str = "",
+        adc_prefix: str = "",
         name: str = "",
     ):
-        self.valves = PressureJumpCellControlValves(prefix, name)
-        self.pump = PressureJumpCellPump(prefix, name)
+        cellFullPrefix = prefix + cell_prefix 
+        adcFullPrefix = prefix + adc_prefix
+
+        self.valves = PressureJumpCellControlValves(cellFullPrefix, name)
+        self.pump = PressureJumpCellPump(cellFullPrefix, name)
         self.transducers = PressureJumpCellPressureTransducers(
-            prefix, name, adc1_prefix, adc2_prefix
+            cellFullPrefix, name,  
+            adc1_prefix= adcFullPrefix + "-01:", 
+            adc2_prefix= adcFullPrefix + "-02:",
         )
-        self.controller = PressureJumpCellController(prefix, name)
+        self.controller = PressureJumpCellController(cellFullPrefix, name)
 
         with self.add_children_as_readables():
-            self.cell_temperature = epics_signal_r(float, prefix + "TEMP")
+            self.cell_temperature = epics_signal_r(float, cellFullPrefix + "TEMP")
 
         super().__init__(name)
