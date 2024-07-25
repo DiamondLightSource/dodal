@@ -154,7 +154,7 @@ class ZocaloResults(StandardReadable, Triggerable):
             )
 
             raw_results = self._raw_results_received.get(timeout=self.timeout_s)
-            LOGGER.info(f"Zocalo: found {len(raw_results)} crystals.")
+            LOGGER.info(f"Zocalo: found {len(raw_results['results'])} crystals.")
             # Sort from strongest to weakest in case of multiple crystals
             await self._put_results(
                 sorted(
