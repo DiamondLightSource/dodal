@@ -78,20 +78,9 @@ class PressureJumpCellLimitSwitch:
     ON = "On"
 
 
-class PressureJumpCell(StandardReadable):
-    """
-    High pressure X-ray cell, used to apply pressure or pressure jumps to a sample.
-    """
-
-    def __init__(
-        self,
-        prefix: str = "",
-        adc1_prefix: str = "",
-        adc2_prefix: str = "",
-        name: str = "",
-    ) -> None:
+class PressureJumpCellControlValves(StandardReadable):
+    def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
-            ## Valves ##
             self.valve1_state = epics_signal_r(
                 PressureJumpCellValveState, prefix + "V1:STA"
             )
@@ -109,10 +98,33 @@ class PressureJumpCell(StandardReadable):
             # V7 - valve manual control
             # V8 - valve manual control
 
-            ## Cell ##
-            self.cell_temperature = epics_signal_r(float, prefix + "TEMP")
+        with self.add_children_as_readables(ConfigSignal):
+            self.valve1_open = epics_signal_rw(bool, prefix + "V1:OPENSEQ")
+            self.valve1_control = epics_signal_rw(
+                PressureJumpCellValveControlRequest, prefix + "V1:CON"
+            )
 
-            ## Pump ##
+            self.valve3_open = epics_signal_rw(bool, prefix + "V3:OPENSEQ")
+            self.valve3_control = epics_signal_rw(
+                PressureJumpCellValveControlRequest, prefix + "V3:CON"
+            )
+
+            self.valve5_open = epics_signal_rw(bool, prefix + "V5:OPENSEQ")
+            self.valve5_control = epics_signal_rw(
+                PressureJumpCellValveControlRequest, prefix + "V5:CON"
+            )
+
+            self.valve6_open = epics_signal_rw(bool, prefix + "V6:OPENSEQ")
+            self.valve6_control = epics_signal_rw(
+                PressureJumpCellValveControlRequest, prefix + "V6CON"
+            )
+
+        super().__init__(name)
+
+
+class PressureJumpCellPump(StandardReadable):
+    def __init__(self, prefix: str, name: str = "") -> None:
+        with self.add_children_as_readables():
             self.pump_position = epics_signal_r(float, prefix + "POS")
             self.pump_forward_limit = epics_signal_r(
                 PressureJumpCellLimitSwitch, prefix + "D74IN1"
@@ -125,6 +137,25 @@ class PressureJumpCell(StandardReadable):
             )
             self.pump_speed_rbv = epics_signal_r(int, prefix + "MSPEED_RBV")
 
+        with self.add_children_as_readables(ConfigSignal):
+            self.pump_mode = epics_signal_rw(
+                PressureJumpCellPumpMode, prefix + "SP:AUTO"
+            )
+            self.pump_speed = epics_signal_rw(float, prefix + "MSPEED")
+            self.pump_move_forward = epics_signal_rw(bool, prefix + "M1:FORW")
+            self.pump_move_backward = epics_signal_rw(bool, prefix + "M1:BACKW")
+            self.pump_move_backward = epics_signal_rw(
+                PressureJumpCellPumpMotorControlRequest, prefix + "M1:CON"
+            )
+
+        super().__init__(name)
+
+
+class PressureJumpCellPressureTransducers(StandardReadable):
+    def __init__(
+        self, prefix: str, name: str = "", adc1_prefix: str = "", adc2_prefix: str = ""
+    ) -> None:
+        with self.add_children_as_readables():
             ## Pressure Transducer 1 ##
             self.pressuretransducer1_omron_pressure = epics_signal_r(
                 float, prefix + "PP1:PRES"
@@ -167,7 +198,12 @@ class PressureJumpCell(StandardReadable):
                 float, adc1_prefix + "CH1"
             )
 
-            ## Control Common ##
+        super().__init__(name)
+
+
+class PressureJumpCellController(StandardReadable):
+    def __init__(self, prefix: str, name: str = "") -> None:
+        with self.add_children_as_readables():
             self.control_gotobusy = epics_signal_r(
                 PressureJumpCellBusyStatus, prefix + "CTRL:GOTOBUSY"
             )
@@ -183,44 +219,10 @@ class PressureJumpCell(StandardReadable):
             self.control_iteration = epics_signal_r(int, prefix + "CTRL:ITER")
 
         with self.add_children_as_readables(ConfigSignal):
-            ## Valves ##
-            self.valve1_open = epics_signal_rw(bool, prefix + "V1:OPENSEQ")
-            self.valve1_control = epics_signal_rw(
-                PressureJumpCellValveControlRequest, prefix + "V1:CON"
-            )
-
-            self.valve3_open = epics_signal_rw(bool, prefix + "V3:OPENSEQ")
-            self.valve3_control = epics_signal_rw(
-                PressureJumpCellValveControlRequest, prefix + "V3:CON"
-            )
-
-            self.valve5_open = epics_signal_rw(bool, prefix + "V5:OPENSEQ")
-            self.valve5_control = epics_signal_rw(
-                PressureJumpCellValveControlRequest, prefix + "V5:CON"
-            )
-
-            self.valve6_open = epics_signal_rw(bool, prefix + "V6:OPENSEQ")
-            self.valve6_control = epics_signal_rw(
-                PressureJumpCellValveControlRequest, prefix + "V6CON"
-            )
-
-            ## Pump ##
-            self.pump_mode = epics_signal_rw(
-                PressureJumpCellPumpMode, prefix + "SP:AUTO"
-            )
-            self.pump_speed = epics_signal_rw(float, prefix + "MSPEED")
-            self.pump_move_forward = epics_signal_rw(bool, prefix + "M1:FORW")
-            self.pump_move_backward = epics_signal_rw(bool, prefix + "M1:BACKW")
-            self.pump_move_backward = epics_signal_rw(
-                PressureJumpCellPumpMotorControlRequest, prefix + "M1:CON"
-            )
-
-            ## Control Common ##
             self.control_stop = epics_signal_rw(
                 PressureJumpCellStopValue, prefix + "CTRL:STOP"
             )
 
-            ## Control Pressure ##
             self.control_target_pressure = epics_signal_rw(
                 float, prefix + "CTRL:TARGET"
             )
@@ -235,5 +237,30 @@ class PressureJumpCell(StandardReadable):
                 float, prefix + "CTRL:JUMPT"
             )
             self.control_jump_set = epics_signal_rw(bool, prefix + "CTRL:SETJUMP")
+
+        super().__init__(name)
+
+
+class PressureJumpCell(StandardReadable):
+    """
+    High pressure X-ray cell, used to apply pressure or pressure jumps to a sample.
+    """
+
+    def __init__(
+        self,
+        prefix: str = "",
+        adc1_prefix: str = "",
+        adc2_prefix: str = "",
+        name: str = "",
+    ):
+        self.valves = PressureJumpCellControlValves(prefix, name)
+        self.pump = PressureJumpCellPump(prefix, name)
+        self.transducers = PressureJumpCellPressureTransducers(
+            prefix, name, adc1_prefix, adc2_prefix
+        )
+        self.controller = PressureJumpCellController(prefix, name)
+
+        with self.add_children_as_readables():
+            self.cell_temperature = epics_signal_r(float, prefix + "TEMP")
 
         super().__init__(name)
