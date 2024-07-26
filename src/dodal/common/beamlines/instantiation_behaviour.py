@@ -106,7 +106,7 @@ beamline_prefix = "example:"
 @instantiation_behaviour(
     default_use_mock_at_connection=True, default_timeout_for_connect=10
 )
-def detector_xyz():
+def new_detector_xyz():
     """Create an XYZ detector with specific settings."""
     return XYZDetector(name="det1", prefix=f"{beamline_prefix}xyz:")
 
@@ -120,6 +120,6 @@ def detector_xyz_variant():
 
 
 cached_devices: dict[str, AnyDevice] = {
-    "det1": detector_xyz(),
+    "det1": new_detector_xyz(),
     "det2": detector_xyz_variant(),
 }
