@@ -59,27 +59,23 @@ class DeviceInitializationController:
     def add_device_to_cache(self, device: AnyDevice) -> None:
         ACTIVE_DEVICES[device.name] = device
 
-    def __call__(
-        self,
-        factory: Callable[[], AnyDevice],
-    ) -> AnyDevice:
-        assert self.config is not None
-
+    def __call__(self, connect=False, mock: bool | None = None, timeout: float | None = None) -> AnyDevice
         device: AnyDevice = (
             # todo if we do not pass the name to the factory, we can not check if the device is in the cache.
             # there are many devices from the same factory
             self.see_if_device_is_in_cache(factory.__name__) or factory()
         )
-
+        
         if self.config.set_name:
             device.set_name(factory.__name__)
+            
+        self.add_device_to_cache(device)
 
-        if self.config.eager:
-            self.add_device_to_cache(device)
+        if connect:
             call_in_bluesky_event_loop(
                 device.connect(
-                    timeout=self.config.default_timeout_for_connect,
-                    mock=self.config.default_use_mock_at_connection,
+                    timeout=self.config.default_timeout_for_connect if timeout is None else timeout,
+                    mock=self.config.default_use_mock_at_connection if mock is None else mock,
                 )
             )
 
