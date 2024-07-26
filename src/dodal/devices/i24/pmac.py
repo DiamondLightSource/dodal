@@ -122,7 +122,9 @@ class ProgramRunner(SignalRW):
     @AsyncStatus.wrap
     async def set(self, value: int, wait=True, timeout=0.0):
         prog_str = f"&2b{value}r"
-        assert isinstance(timeout, float)
+        assert (
+            isinstance(timeout, float) or timeout is None
+        ), "ProgramRunner does not support calculating timeout itself"
         await self.signal.set(prog_str, wait=wait)
         await wait_for_value(self.status, ScanState.DONE, timeout)
 
