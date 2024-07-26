@@ -66,7 +66,7 @@ def test_check_odin_initialised(
     fake_odin.nodes.get_error_state = Mock(
         return_value=[node_error, "node error" if node_error else ""]
     )
-    fake_odin.nodes.get_init_state = Mock(node_init)
+    fake_odin.nodes.get_init_state = Mock(return_value=node_init)
 
     error_state, error_message = fake_odin.check_odin_initialised()
     assert error_state == expected_state
