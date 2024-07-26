@@ -30,7 +30,8 @@ def panda(
     return device_instantiation(
         device_factory=HDFPanda,
         name="panda",
-        prefix="-EA-PANDA-01-0:",
+        prefix="-EA-PANDA-01",
+        # prefix="-EA-PANDA-01:CLOCK:PVI_PV",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
         directory_provider=static_directory_provider,
@@ -53,37 +54,23 @@ def panda(
 #         bl_prefix=False,
 #     )
 
-# def panda(
+
+# todo this should use the right URL
+# def webcam(
 #     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-# ) -> HDFPanda:
-#     """Get the i03 panda device, instantiate it if it hasn't already been.
+# ) -> Webcam:
+#     """Get the i03 webcam, instantiate it if it hasn't already been.
 #     If this is called when already instantiated in i03, it will return the existing object.
 #     """
 #     return device_instantiation(
-#         HDFPanda,
-#         "panda",
-#         "-EA-PANDA-01:",
+#         Webcam,
+#         "webcam",
+#         "",
 #         wait_for_connection,
 #         fake_with_ophyd_sim,
-#         directory_provider=get_directory_provider(),
+#         url="http://i03-webcam1/axis-cgi/jpg/image.cgi",
 #     )
-
-
-def webcam(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Webcam:
-    """Get the i03 webcam, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i03, it will return the existing object.
-    """
-    return device_instantiation(
-        Webcam,
-        "webcam",
-        "",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-        url="http://i03-webcam1/axis-cgi/jpg/image.cgi",
-    )
-
+# 
 
 # def manta(
 #     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
