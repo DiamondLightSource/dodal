@@ -4,8 +4,7 @@ from bluesky.run_engine import RunEngine
 from ophyd_async.core import set_mock_value
 
 from dodal.devices.i24.pmac import HOME_STR, PMAC, EncReset, LaserSettings
-
-from ..conftest import patch_motor
+from dodal.devices.util.test_utils import patch_motor
 
 
 @pytest.fixture
