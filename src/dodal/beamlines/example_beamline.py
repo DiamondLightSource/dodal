@@ -46,7 +46,8 @@ class DeviceInitializationController:
     device: AnyDevice | None = None
     config: DeviceInitializationConfig | None = None
 
-    def __init__(self, config: DeviceInitializationConfig) -> None:
+    def __init__(self, config: DeviceInitializationConfig, factory: Callable[[], AnyDevice]) -> None:
+        self.factory = factory
         self.config = config
         super().__init__()
 
