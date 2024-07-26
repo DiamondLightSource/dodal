@@ -1,17 +1,16 @@
-from ophyd_async.epics.areadetector import AravisDetector
+from ophyd_async.core import StaticDirectoryProvider
+from ophyd_async.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
     device_instantiation,
-    set_directory_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.udc_directory_provider import PandASubdirectoryProvider
 from dodal.devices.webcam import Webcam
 from dodal.log import set_beamline as set_log_beamline
-from dodal.utils import BeamlinePrefix, get_beamline_name
-from ophyd_async.core import StaticDirectoryProvider
+from dodal.utils import get_beamline_name
 
-BL = get_beamline_name("BL01C")
+# BL = get_beamline_name("BL01C")
+BL = "c01"
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
@@ -21,20 +20,21 @@ static_directory_provider = StaticDirectoryProvider("/tmp/bluesky_test_static")
 
 
 
-# def panda_fast_grid_scan(
-#     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-# ) -> PandAFastGridScan:
-#     """Get the i03 panda_fast_grid_scan device, instantiate it if it hasn't already been.
-#     If this is called when already instantiated in i03, it will return the existing object.
-#     This is used instead of the zebra_fast_grid_scan device when using the PandA.
-#     """
-#     return device_instantiation(
-#         device_factory=PandAFastGridScan,
-#         name="panda_fast_grid_scan",
-#         prefix="-MO-SGON-01:",
-#         wait=wait_for_connection,
-#         fake=fake_with_ophyd_sim,
-#     )
+def panda(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> HDFPanda:
+    """Get the i03 panda_fast_grid_scan device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    This is used instead of the zebra_fast_grid_scan device when using the PandA.
+    """
+    return device_instantiation(
+        device_factory=HDFPanda,
+        name="panda",
+        prefix="-EA-PANDA-01-0:",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+        directory_provider=static_directory_provider,
+    )
 
 
 # @skip_device(lambda: BL == "s03")
