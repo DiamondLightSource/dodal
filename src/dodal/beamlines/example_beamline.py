@@ -49,7 +49,6 @@ class DeviceInitializationController:
     def __init__(self, config: DeviceInitializationConfig, factory: Callable[[], AnyDevice]) -> None:
         self.factory = factory
         self.config = config
-        super().__init__()
 
     # TODO right now the cache is in a global variable ACTIVE_DEVICES, that should change
     def see_if_device_is_in_cache(self, name: str) -> AnyDevice | None:
