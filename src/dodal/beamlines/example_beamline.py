@@ -87,13 +87,15 @@ class DeviceInitializationController:
 
 
 def instantiation_behaviour(
-    **config_kwargs,
+    eager: bool = True
+    set_name: bool = True
+    default_timeout_for_connect: float = DEFAULT_TIMEOUT
+    default_use_mock_at_connection: bool = False
 ) -> Callable[[Callable[[], AnyDevice]], DeviceInitializationController]:
-    config = DeviceInitializationConfig(**config_kwargs)
+    config = DeviceInitializationConfig(eager, set_name, default_timeout_for_connect, default_use_mock_at_connection)
 
-    def decorator(factory, *args, **kwargs):
-        controller = DeviceInitializationController(config=config)
-        controller(factory, *args, **kwargs)
+    def decorator(factory: Callable[[], AnyDevice]) -> DeviceInitializationController:
+        controller = DeviceInitializationController(config, factory)
         return controller
 
     return decorator
