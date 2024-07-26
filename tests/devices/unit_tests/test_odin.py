@@ -46,8 +46,8 @@ def test_check_odin_state(
     [
         (True, True, True, False, True, 0, True),
         (False, True, True, False, True, 1, False),
-        (False, False, False, True, False, 4, False),
-        (True, True, False, False, False, 1, False),
+        (False, False, False, True, False, 5, False),
+        (True, True, False, False, False, 2, False),
     ],
 )
 def test_check_odin_initialised(
