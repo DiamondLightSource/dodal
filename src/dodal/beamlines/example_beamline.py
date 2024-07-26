@@ -1,5 +1,4 @@
-from enum import Enum
-from typing import Callable, Optional
+from collections.abc import Callable
 
 from bluesky.run_engine import call_in_bluesky_event_loop
 from ophyd_async.core import DEFAULT_TIMEOUT
@@ -44,15 +43,15 @@ class DeviceInitializationConfig:
 
 
 class DeviceInitializationController:
-    device: Optional[AnyDevice] = None
-    config: Optional[DeviceInitializationConfig] = None
+    device: AnyDevice | None = None
+    config: DeviceInitializationConfig | None = None
 
     def __init__(self, config: DeviceInitializationConfig) -> None:
         self.config = config
         super().__init__()
 
     # TODO right now the cache is in a global variable ACTIVE_DEVICES, that should change
-    def see_if_device_is_in_cache(self, name: str) -> Optional[AnyDevice]:
+    def see_if_device_is_in_cache(self, name: str) -> AnyDevice | None:
         d = ACTIVE_DEVICES.get(name)
         assert isinstance(d, AnyDevice) or d is None
         return d
@@ -116,6 +115,6 @@ def detector_xyz_variant():
 
 
 cached_controllers: dict[str, DeviceInitializationController] = {
-    'det1': detector_xyz,
-    'det2': detector_xyz_variant,
+    "det1": detector_xyz,
+    "det2": detector_xyz_variant,
 }
