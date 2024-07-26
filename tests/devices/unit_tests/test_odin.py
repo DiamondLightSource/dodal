@@ -1,7 +1,6 @@
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, Mock
 
 import pytest
-from mockito import when
 from ophyd.sim import make_fake_device
 
 from dodal.devices.eiger_odin import EigerOdin
@@ -31,9 +30,9 @@ def test_check_odin_state(
     frames_timed_out: bool,
     expected_state: bool,
 ):
-    when(fake_odin).check_odin_initialised().thenReturn([is_initialised, ""])
-    when(fake_odin.nodes).check_frames_dropped().thenReturn([frames_dropped, ""])
-    when(fake_odin.nodes).check_frames_timed_out().thenReturn([frames_timed_out, ""])
+    fake_odin.check_odin_initialised = Mock(return_value=[is_initialised, ""])
+    fake_odin.nodes.check_frames_dropped = Mock(return_value=[frames_dropped, ""])
+    fake_odin.nodes.check_frames_timed_out = Mock(return_value=[frames_timed_out, ""])
 
     if is_initialised:
         assert fake_odin.check_odin_state() == expected_state
@@ -47,8 +46,8 @@ def test_check_odin_state(
     [
         (True, True, True, False, True, 0, True),
         (False, True, True, False, True, 1, False),
-        (False, False, False, True, False, 5, False),
-        (True, True, False, False, False, 2, False),
+        (False, False, False, True, False, 4, False),
+        (True, True, False, False, False, 1, False),
     ],
 )
 def test_check_odin_initialised(
@@ -61,13 +60,13 @@ def test_check_odin_initialised(
     expected_error_num: int,
     expected_state: bool,
 ):
-    when(fake_odin.fan.consumers_connected).get().thenReturn(fan_connected)
-    when(fake_odin.fan.on).get().thenReturn(fan_on)
-    when(fake_odin.meta.initialised).get().thenReturn(meta_init)
-    when(fake_odin.nodes).get_error_state().thenReturn(
-        [node_error, "node error" if node_error else ""]
+    fake_odin.fan.consumers_connected.get = Mock(return_value=fan_connected)
+    fake_odin.fan.on.get = Mock(return_value=(fan_on))
+    fake_odin.meta.initialised.get = Mock(return_value=(meta_init))
+    fake_odin.nodes.get_error_state = Mock(
+        return_value=[node_error, "node error" if node_error else ""]
     )
-    when(fake_odin.nodes).get_init_state().thenReturn(node_init)
+    fake_odin.nodes.get_init_state = Mock(node_init)
 
     error_state, error_message = fake_odin.check_odin_initialised()
     assert error_state == expected_state

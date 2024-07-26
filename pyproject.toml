@@ -41,7 +41,6 @@ dev = [
     "black",
     "diff-cover",
     "mypy",
-    "mockito",
     # Commented out due to dependency version conflict with pydantic 1.x
     # "copier",
     "myst-parser",
