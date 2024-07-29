@@ -1,5 +1,5 @@
 from functools import partial
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, call, patch
 
 import bluesky.plan_stubs as bps
 import numpy as np
@@ -7,6 +7,7 @@ import pytest
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
 from ophyd_async.core.async_status import AsyncStatus
+from workflows.recipe import RecipeWrapper
 
 from dodal.devices.zocalo.zocalo_results import (
     ZOCALO_READING_PLAN_NAME,
@@ -192,6 +193,49 @@ async def test_subscribe_only_on_called_stage(
     zocalo_results._raw_results_received.put([])
     RE(bps.trigger(zocalo_results))
     mock_wrap_subscribe.assert_called_once()
+
+
+@patch("dodal.devices.zocalo.zocalo_results.LOGGER")
+@patch(
+    "dodal.devices.zocalo.zocalo_results.workflows.recipe.wrap_subscribe", autospec=True
+)
+@patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection", new=MagicMock())
+async def test_zocalo_results_trigger_log_message(
+    mock_wrap_subscribe, mock_logger, RE: RunEngine
+):
+    zocalo_results = ZocaloResults(
+        name="zocalo", zocalo_environment="dev_artemis", timeout_s=2
+    )
+
+    def zocalo_plan():
+        yield from bps.stage(zocalo_results)
+        receive_result = mock_wrap_subscribe.mock_calls[0].args[2]
+        receive_result(
+            MagicMock(autospec=RecipeWrapper),
+            {},
+            {
+                "results": [
+                    {
+                        "centre_of_mass": [
+                            2.207133058984911,
+                            1.4175240054869684,
+                            13.317215363511659,
+                        ],
+                        "max_voxel": [2, 1, 13],
+                        "max_count": 702.0,
+                        "n_voxels": 12,
+                        "total_count": 5832.0,
+                        "bounding_box": [[1, 0, 12], [4, 3, 15]],
+                    }
+                ],
+                "status": "success",
+                "type": "3d",
+            },
+        )
+        yield from bps.trigger(zocalo_results)
+
+    RE(zocalo_plan())
+    mock_logger.info.assert_has_calls([call("Zocalo: found 1 crystals.")])
 
 
 @patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection", autospec=True)
