@@ -26,14 +26,12 @@ def test_converter_eq():
     test_converter_dupe = DetectorDistanceToBeamXYConverter(test_file)
     test_file_2 = "tests/devices/unit_tests/test_lookup_table_2.txt"
     test_converter_2 = DetectorDistanceToBeamXYConverter(test_file_2)
-
+    assert test_converter != 1
     assert test_converter == test_converter_dupe
     assert test_converter != test_converter_2
 
     previous_value = test_converter_dupe.lookup_table_values[0]
     test_converter_dupe.lookup_table_values[0] = (7.5, 23.5)
-
-    assert test_converter != test_converter_2
 
     test_converter_dupe.lookup_table_values[0] = previous_value
 
