@@ -1,8 +1,11 @@
-from ophyd import Component as Cpt
-from ophyd import Device, EpicsSignalRO, Kind
+from ophyd_async.core import HintedSignal, StandardReadable
+from ophyd_async.epics.signal import epics_signal_r
 
 
-class IPin(Device):
+class IPinAsync(StandardReadable):
     """Simple device to get the ipin reading"""
 
-    reading = Cpt(EpicsSignalRO, "I", kind=Kind.hinted)
+    def __init__(self, prefix: str, name: str = "") -> None:
+        pin_readback = epics_signal_r(float, prefix + "I")
+        self.add_readables([pin_readback], wrapper=HintedSignal)
+        super().__init__(name)
