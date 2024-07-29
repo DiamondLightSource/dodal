@@ -253,15 +253,16 @@ class PressureJumpCell(StandardReadable):
         adc_prefix: str = "",
         name: str = "",
     ):
-        cellFullPrefix = prefix + cell_prefix 
+        cellFullPrefix = prefix + cell_prefix
         adcFullPrefix = prefix + adc_prefix
 
         self.valves = PressureJumpCellControlValves(cellFullPrefix, name)
         self.pump = PressureJumpCellPump(cellFullPrefix, name)
         self.transducers = PressureJumpCellPressureTransducers(
-            cellFullPrefix, name,  
-            adc1_prefix= adcFullPrefix + "-01:", 
-            adc2_prefix= adcFullPrefix + "-02:",
+            cellFullPrefix,
+            name,
+            adc1_prefix=adcFullPrefix + "-01:",
+            adc2_prefix=adcFullPrefix + "-02:",
         )
         self.controller = PressureJumpCellController(cellFullPrefix, name)
 
