@@ -1,8 +1,9 @@
-from enum import Enum
+from enum import Enum, IntEnum
+from typing import SupportsFloat
 
 from bluesky.protocols import Triggerable
-from ophyd_async.core import AsyncStatus, StandardReadable
-from ophyd_async.core.signal import SignalRW
+from ophyd_async.core import AsyncStatus, StandardReadable, wait_for_value
+from ophyd_async.core.signal import SignalR, SignalRW
 from ophyd_async.core.signal_backend import SignalBackend
 from ophyd_async.core.soft_signal_backend import SoftSignalBackend
 from ophyd_async.core.utils import DEFAULT_TIMEOUT
@@ -11,6 +12,11 @@ from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
 HOME_STR = r"\#1hmz\#2hmz\#3hmz"  # Command to home the PMAC motors
 ZERO_STR = "!x0y0z0"  # Command to blend any ongoing move into new position
+
+
+class ScanState(IntEnum):
+    RUNNING = 1
+    DONE = 0
 
 
 class LaserSettings(str, Enum):
@@ -78,7 +84,7 @@ class PMACStringLaser(SignalRW):
 
 
 class PMACStringEncReset(SignalRW):
-    """"""
+    """Set a pmac_string to control the encoder channels in the controller."""
 
     def __init__(
         self,
@@ -93,6 +99,35 @@ class PMACStringEncReset(SignalRW):
     @AsyncStatus.wrap
     async def set(self, enc_string: EncReset):
         await self.signal.set(enc_string.value, wait=True)
+
+
+class ProgramRunner(SignalRW):
+    """Trigger the collection by setting the program number on the PMAC string.
+
+    Once the program number has been set, wait for the collection to be complete.
+    This will only be true when the status becomes 0.
+    """
+
+    def __init__(
+        self,
+        pmac_str_sig: SignalRW,
+        status_sig: SignalR,
+        backend: SignalBackend,
+        timeout: float | None = DEFAULT_TIMEOUT,
+        name: str = "",
+    ) -> None:
+        self.signal = pmac_str_sig
+        self.status = status_sig
+        super().__init__(backend, timeout, name)
+
+    @AsyncStatus.wrap
+    async def set(self, value: int, wait=True, timeout=None):
+        prog_str = f"&2b{value}r"
+        assert isinstance(timeout, SupportsFloat) or (
+            timeout is None
+        ), f"ProgramRunner does not support calculating timeout itself, {timeout=}"
+        await self.signal.set(prog_str, wait=wait)
+        await wait_for_value(self.status, ScanState.DONE, timeout)
 
 
 class PMAC(StandardReadable):
@@ -120,5 +155,9 @@ class PMAC(StandardReadable):
         # program.
         self.scanstatus = epics_signal_r(float, "BL24I-MO-STEP-14:signal:P2401")
         self.counter = epics_signal_r(float, "BL24I-MO-STEP-14:signal:P2402")
+
+        self.run_program = ProgramRunner(
+            self.pmac_string, self.scanstatus, backend=SoftSignalBackend(str)
+        )
 
         super().__init__(name)

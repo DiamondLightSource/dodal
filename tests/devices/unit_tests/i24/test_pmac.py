@@ -1,6 +1,7 @@
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
+from ophyd_async.core import set_mock_value
 
 from dodal.devices.i24.pmac import HOME_STR, PMAC, EncReset, LaserSettings
 from dodal.devices.util.test_utils import patch_motor
@@ -60,3 +61,11 @@ async def test_set_pmac_string_for_enc_reset(fake_pmac: PMAC, RE):
     RE(bps.abs_set(fake_pmac.enc_reset, EncReset.ENC7, wait=True))
 
     assert await fake_pmac.pmac_string.get_value() == "m708=100 m709=150"
+
+
+async def test_run_proogram(fake_pmac: PMAC, RE):
+    set_mock_value(fake_pmac.scanstatus, 0)
+    prog_num = 10
+    RE(bps.abs_set(fake_pmac.run_program, prog_num, timeout=1, wait=True))
+
+    assert await fake_pmac.pmac_string.get_value() == f"&2b{prog_num}r"
