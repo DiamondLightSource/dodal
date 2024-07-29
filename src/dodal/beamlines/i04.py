@@ -11,7 +11,7 @@ from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import ZebraFastGridScan
 from dodal.devices.flux import Flux
 from dodal.devices.i04.transfocator import Transfocator
-from dodal.devices.ipin import IPin
+from dodal.devices.ipin import IPinAsync
 from dodal.devices.motors import XYZPositioner
 from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
 from dodal.devices.robot import BartRobot
@@ -82,12 +82,14 @@ def sample_delivery_system(
     )
 
 
-def ipin(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> IPin:
+def ipin(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> IPinAsync:
     """Get the i04 ipin device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
     return device_instantiation(
-        IPin,
+        IPinAsync,
         "ipin",
         "-EA-PIN-01:",
         wait_for_connection,
