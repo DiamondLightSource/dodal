@@ -1,4 +1,5 @@
 from enum import Enum
+
 from ophyd_async.core import ConfigSignal, StandardReadable
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
@@ -30,9 +31,6 @@ class PressureJumpCellValveControlRequest(str, Enum):
     RESET = "Reset"
     ARM = "Arm"
     DISARM = "Disarm"
-    # TODO the nones may not be required but FVST and SXST set
-    NONE1 = ""
-    NONE2 = ""
 
 
 class PressureJumpCellPumpMotorControlRequest(str, Enum):
@@ -60,8 +58,6 @@ class PressureJumpCellValveState(str, Enum):
     OPENING = "Opening"
     CLOSED = "Closed"
     CLOSING = "Closing"
-    NONE5 = ""
-    NONE6 = ""
 
 
 class PressureJumpCellFastValveState(str, Enum):
@@ -71,7 +67,6 @@ class PressureJumpCellFastValveState(str, Enum):
     CLOSED = "Closed"
     CLOSED_ARMED = "Closed Armed"
     NONE5 = "Unused"
-    NONE6 = ""
 
 
 class PressureJumpCellLimitSwitch(str, Enum):
