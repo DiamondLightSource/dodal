@@ -27,6 +27,7 @@ def all_beamline_modules() -> Iterable[str]:
     # premature importing
     spec = importlib.util.find_spec(__name__)
     if spec is not None:
+        assert spec.submodule_search_locations
         search_paths = [Path(path) for path in spec.submodule_search_locations]
         for path in search_paths:
             for subpath in path.glob("**/*"):

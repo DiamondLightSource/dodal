@@ -7,8 +7,9 @@ from asyncio import TimeoutError
 from unittest.mock import DEFAULT, patch
 
 import pytest
-from bluesky import FailedStatus, RunEngine
 from bluesky import plan_stubs as bps
+from bluesky.run_engine import RunEngine
+from bluesky.utils import FailedStatus
 from ophyd_async.core import get_mock_put, set_mock_value
 
 from dodal.devices.focusing_mirror import (

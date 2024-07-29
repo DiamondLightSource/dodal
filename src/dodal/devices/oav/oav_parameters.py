@@ -2,6 +2,7 @@ import json
 import xml.etree.ElementTree as et
 from collections import ChainMap
 from typing import Any
+from xml.etree.ElementTree import Element
 
 from dodal.devices.oav.oav_errors import (
     OAVError_BeamPositionNotFound,
@@ -18,6 +19,13 @@ DEFAULT_OAV_WINDOW = (1024, 768)
 OAV_CONFIG_JSON = (
     "/dls_sw/i03/software/daq_configuration/json/OAVCentring_hyperion.json"
 )
+
+
+def _get_element_as_float(node: Element, element_name: str) -> float:
+    element = node.find(element_name)
+    assert element is not None, f"{element_name} not found in {node}"
+    assert element.text
+    return float(element.text)
 
 
 class OAVParameters:
@@ -134,14 +142,14 @@ class OAVConfigParams:
         root = tree.getroot()
         levels = root.findall(".//zoomLevel")
         for node in levels:
-            if float(node.find("level").text) == zoom:
+            if _get_element_as_float(node, "level") == zoom:
                 self.micronsPerXPixel = (
-                    float(node.find("micronsPerXPixel").text)
+                    _get_element_as_float(node, "micronsPerXPixel")
                     * DEFAULT_OAV_WINDOW[0]
                     / xsize
                 )
                 self.micronsPerYPixel = (
-                    float(node.find("micronsPerYPixel").text)
+                    _get_element_as_float(node, "micronsPerYPixel")
                     * DEFAULT_OAV_WINDOW[1]
                     / ysize
                 )

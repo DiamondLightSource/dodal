@@ -6,6 +6,8 @@ import bluesky.plan_stubs as bps
 import pytest
 from bluesky.callbacks import CallbackBase
 from bluesky.run_engine import RunEngine
+from event_model import Event
+from ophyd_async.core import DeviceCollector
 
 from dodal.devices.aperturescatterguard import (
     AperturePositions,
@@ -57,8 +59,9 @@ class GDABeamlineParameters:
 
 
 @pytest.fixture
-def ap_sg():
-    ap_sg = ApertureScatterguard(prefix="BL03S", name="ap_sg")
+async def ap_sg():
+    async with DeviceCollector():
+        ap_sg = ApertureScatterguard(prefix="BL03S", name="ap_sg")
     ap_sg.load_aperture_positions(
         AperturePositions.from_gda_beamline_params(
             GDABeamlineParameters.from_file(I03_BEAMLINE_PARAMETER_PATH)
@@ -69,42 +72,45 @@ def ap_sg():
 
 @pytest.fixture
 def move_to_large(ap_sg: ApertureScatterguard):
+    assert ap_sg.aperture_positions is not None
     yield from bps.abs_set(ap_sg, ap_sg.aperture_positions.LARGE)
 
 
 @pytest.fixture
 def move_to_medium(ap_sg: ApertureScatterguard):
+    assert ap_sg.aperture_positions is not None
     yield from bps.abs_set(ap_sg, ap_sg.aperture_positions.MEDIUM)
 
 
 @pytest.fixture
 def move_to_small(ap_sg: ApertureScatterguard):
+    assert ap_sg.aperture_positions is not None
     yield from bps.abs_set(ap_sg, ap_sg.aperture_positions.SMALL)
 
 
 @pytest.fixture
 def move_to_robotload(ap_sg: ApertureScatterguard):
+    assert ap_sg.aperture_positions is not None
     yield from bps.abs_set(ap_sg, ap_sg.aperture_positions.ROBOT_LOAD)
 
 
 @pytest.mark.s03
-def test_aperturescatterguard_setup(ap_sg: ApertureScatterguard):
-    ap_sg.wait_for_connection()
+async def test_aperturescatterguard_setup(ap_sg: ApertureScatterguard):
     assert ap_sg.aperture_positions is not None
 
 
 @pytest.mark.s03
-def test_aperturescatterguard_move_in_plan(
+async def test_aperturescatterguard_move_in_plan(
     ap_sg: ApertureScatterguard,
     move_to_large,
     move_to_medium,
     move_to_small,
     move_to_robotload,
+    RE,
 ):
-    RE = RunEngine({})
-    ap_sg.wait_for_connection()
+    assert ap_sg.aperture_positions is not None
 
-    ap_sg.aperture.z.set(ap_sg.aperture_positions.LARGE[2], wait=True)
+    await ap_sg.aperture.z.set(ap_sg.aperture_positions.LARGE.location[2])
 
     RE(move_to_large)
     RE(move_to_medium)
@@ -113,13 +119,10 @@ def test_aperturescatterguard_move_in_plan(
 
 
 @pytest.mark.s03
-def test_move_fails_when_not_in_good_starting_pos(
-    ap_sg: ApertureScatterguard, move_to_large
+async def test_move_fails_when_not_in_good_starting_pos(
+    ap_sg: ApertureScatterguard, move_to_large, RE
 ):
-    RE = RunEngine({})
-    ap_sg.wait_for_connection()
-
-    ap_sg.aperture.z.set(0, wait=True)
+    await ap_sg.aperture.z.set(0)
 
     with pytest.raises(InvalidApertureMove):
         RE(move_to_large)
@@ -129,9 +132,9 @@ class MonitorCallback(CallbackBase):
     # holds on to the most recent time a motor move completed for aperture and
     # scatterguard y
 
-    t_ap_y: float = 0
-    t_sg_y: float = 0
-    event_docs: list[dict] = []
+    t_ap_y: float | None = 0
+    t_sg_y: float | None = 0
+    event_docs: list[Event] = []
 
     def event(self, doc):
         self.event_docs.append(doc)
@@ -139,11 +142,12 @@ class MonitorCallback(CallbackBase):
             self.t_ap_y = doc["timestamps"].get("ap_sg_aperture_y_motor_done_move")
         if doc["data"].get("ap_sg_scatterguard_y_motor_done_move") == 1:
             self.t_sg_y = doc["timestamps"].get("ap_sg_scatterguard_y_motor_done_move")
+        return doc
 
 
 @pytest.mark.s03
 @pytest.mark.parametrize(
-    "pos1,pos2,sg_first",
+    "pos_name_1,pos_name_2,sg_first",
     [
         ("L", "M", True),
         ("L", "S", True),
@@ -159,23 +163,23 @@ class MonitorCallback(CallbackBase):
         ("R", "S", True),
     ],
 )
-def test_aperturescatterguard_moves_in_correct_order(
-    pos1, pos2, sg_first, ap_sg: ApertureScatterguard
+async def test_aperturescatterguard_moves_in_correct_order(
+    pos_name_1, pos_name_2, sg_first, ap_sg: ApertureScatterguard
 ):
     cb = MonitorCallback()
+    assert ap_sg.aperture_positions
     positions = {
         "L": ap_sg.aperture_positions.LARGE,
         "M": ap_sg.aperture_positions.MEDIUM,
         "S": ap_sg.aperture_positions.SMALL,
         "R": ap_sg.aperture_positions.ROBOT_LOAD,
     }
-    pos1 = positions[pos1]
-    pos2 = positions[pos2]
+    pos1 = positions[pos_name_1]
+    pos2 = positions[pos_name_2]
     RE = RunEngine({})
     RE.subscribe(cb)
 
-    ap_sg.wait_for_connection()
-    ap_sg.aperture.z.set(pos1[2], wait=True)
+    await ap_sg.aperture.z.set(pos1.location[2])
 
     def monitor_and_moves():
         yield from bps.open_run()
@@ -187,4 +191,6 @@ def test_aperturescatterguard_moves_in_correct_order(
 
     RE(monitor_and_moves())
 
+    assert cb.t_sg_y
+    assert cb.t_ap_y
     assert (cb.t_sg_y < cb.t_ap_y) == sg_first
