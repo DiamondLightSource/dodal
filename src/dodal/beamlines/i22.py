@@ -80,7 +80,7 @@ def saxs(
     )
 
 
-# todo this is not available at p38
+@skip_device(IS_LAB)
 def synchrotron(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> Synchrotron:
@@ -355,14 +355,11 @@ def panda3(
     )
 
 
-@skip_device()
+@skip_device(IS_LAB)
 def panda4(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
 ) -> HDFPanda:
-    # todo skip if at p38
-    if IS_LAB:
-        raise SystemError("no panda4 at the p38 lab")
     return device_instantiation(
         HDFPanda,
         "panda4",
