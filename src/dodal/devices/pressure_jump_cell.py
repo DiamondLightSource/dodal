@@ -1,29 +1,30 @@
+from enum import Enum
 from ophyd_async.core import ConfigSignal, StandardReadable
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
 
-class PressureJumpCellPumpMode:
+class PressureJumpCellPumpMode(str, Enum):
     MANUAL = "Manual"
     AUTO_PRESSURE = "Auto Pressure"
     AUTO_POSITION = "Auto Position"
 
 
-class PressureJumpCellBusyStatus:
+class PressureJumpCellBusyStatus(str, Enum):
     IDLE = "Idle"
     BUSY = "Busy"
 
 
-class PressureJumpCellTimerState:
+class PressureJumpCellTimerState(str, Enum):
     TIMEOUT = "TIMEOUT"
     COUNTDOWN = "COUNTDOWN"
 
 
-class PressureJumpCellStopValue:
+class PressureJumpCellStopValue(str, Enum):
     CONTINUE = "CONTINUE"
     STOP = "STOP"
 
 
-class PressureJumpCellValveControlRequest:
+class PressureJumpCellValveControlRequest(str, Enum):
     OPEN = "Open"
     CLOSE = "Close"
     RESET = "Reset"
@@ -34,7 +35,7 @@ class PressureJumpCellValveControlRequest:
     NONE2 = ""
 
 
-class PressureJumpCellPumpMotorControlRequest:
+class PressureJumpCellPumpMotorControlRequest(str, Enum):
     ENABLE = "Enable"
     DISABLE = "Disable"
     RESET = "Reset"
@@ -42,7 +43,7 @@ class PressureJumpCellPumpMotorControlRequest:
     REVERSE = "Reverse"
 
 
-class PressureJumpCellPumpMotorDirection:
+class PressureJumpCellPumpMotorDirection(str, Enum):
     ZERO = "0"
     FORWARD = "Forward"
     REVERSE = "Reverse"
@@ -53,7 +54,7 @@ class PressureJumpCellPumpMotorDirection:
     SEVEN = "7"
 
 
-class PressureJumpCellValveState:
+class PressureJumpCellValveState(str, Enum):
     FAULT = "Fault"
     OPEN = "Open"
     OPENING = "Opening"
@@ -63,7 +64,7 @@ class PressureJumpCellValveState:
     NONE6 = ""
 
 
-class PressureJumpCellFastValveState:
+class PressureJumpCellFastValveState(str, Enum):
     FAULT = "Fault"
     OPEN = "Open"
     OPEN_ARMED = "Open Armed"
@@ -73,7 +74,7 @@ class PressureJumpCellFastValveState:
     NONE6 = ""
 
 
-class PressureJumpCellLimitSwitch:
+class PressureJumpCellLimitSwitch(str, Enum):
     OFF = "Off"
     ON = "On"
 
