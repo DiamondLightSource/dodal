@@ -1,6 +1,11 @@
 from enum import Enum
 
-from ophyd_async.core import ConfigSignal, StandardReadable
+from ophyd_async.core import (
+    ConfigSignal,
+    DeviceVector,
+    SignalR,
+    StandardReadable,
+)
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
 
@@ -75,44 +80,51 @@ class PressureJumpCellLimitSwitch(str, Enum):
 
 
 class PressureJumpCellControlValves(StandardReadable):
+    """
+    valves 2, 4, 7, 8 are not controlled by the IOC,
+    as they are under manual control.
+    """
+
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
-            self.valve1_state = epics_signal_r(
-                PressureJumpCellValveState, prefix + "V1:STA"
+            self.valve_states: DeviceVector[SignalR[PressureJumpCellValveState]] = (
+                DeviceVector(
+                    {
+                        i: epics_signal_r(
+                            PressureJumpCellValveState, f"{prefix}V{i}:STA"
+                        )
+                        for i in [1, 3]
+                    }
+                )
             )
-            # V2 - valve manual control
-            self.valve3_state = epics_signal_r(
-                PressureJumpCellValveState, prefix + "V3:STA"
+            self.fast_valve_states: DeviceVector[
+                SignalR[PressureJumpCellFastValveState]
+            ] = DeviceVector(
+                {
+                    i: epics_signal_r(
+                        PressureJumpCellFastValveState, f"{prefix}V{i}:STA"
+                    )
+                    for i in [5, 6]
+                }
             )
-            # V4 - valve manual control
-            self.valve5_state = epics_signal_r(
-                PressureJumpCellFastValveState, prefix + "V5:STA"
-            )
-            self.valve6_state = epics_signal_r(
-                PressureJumpCellFastValveState, prefix + "V6:STA"
-            )
-            # V7 - valve manual control
-            # V8 - valve manual control
 
         with self.add_children_as_readables(ConfigSignal):
-            self.valve1_open = epics_signal_rw(bool, prefix + "V1:OPENSEQ")
-            self.valve1_control = epics_signal_rw(
-                PressureJumpCellValveControlRequest, prefix + "V1:CON"
+            self.valves_open: DeviceVector[SignalR[bool]] = DeviceVector(
+                {
+                    i: epics_signal_rw(bool, f"{prefix}V{i}:OPENSEQ")
+                    for i in [1, 3, 5, 6]
+                }
             )
 
-            self.valve3_open = epics_signal_rw(bool, prefix + "V3:OPENSEQ")
-            self.valve3_control = epics_signal_rw(
-                PressureJumpCellValveControlRequest, prefix + "V3:CON"
-            )
-
-            self.valve5_open = epics_signal_rw(bool, prefix + "V5:OPENSEQ")
-            self.valve5_control = epics_signal_rw(
-                PressureJumpCellValveControlRequest, prefix + "V5:CON"
-            )
-
-            self.valve6_open = epics_signal_rw(bool, prefix + "V6:OPENSEQ")
-            self.valve6_control = epics_signal_rw(
-                PressureJumpCellValveControlRequest, prefix + "V6CON"
+            self.valve_control: DeviceVector[
+                SignalR[PressureJumpCellValveControlRequest]
+            ] = DeviceVector(
+                {
+                    i: epics_signal_rw(
+                        PressureJumpCellValveControlRequest, f"{prefix}V{i}:CON"
+                    )
+                    for i in [1, 3, 5, 6]
+                }
             )
 
         super().__init__(name)
@@ -147,51 +159,33 @@ class PressureJumpCellPump(StandardReadable):
         super().__init__(name)
 
 
+class PressureJumpCellPressureTransducer(StandardReadable):
+    def __init__(self, prefix: str, name: str = "", adc_prefix: str = "") -> None:
+        with self.add_children_as_readables():
+            self.omron_pressure = epics_signal_r(float, prefix + "PP:PRES")
+            self.omron_voltage = epics_signal_r(float, prefix + "PP:RAW")
+            self.beckhoff_pressure = epics_signal_r(
+                float, prefix + "STATP:MeanValue_RBV"
+            )
+            self.beckhoff_voltage = epics_signal_r(float, adc_prefix + "CH1")
+            # todo this channel might be liable to change
+
+        super().__init__(name)
+
+
 class PressureJumpCellPressureTransducers(StandardReadable):
     def __init__(
         self, prefix: str, name: str = "", adc1_prefix: str = "", adc2_prefix: str = ""
     ) -> None:
         with self.add_children_as_readables():
-            ## Pressure Transducer 1 ##
-            self.pressuretransducer1_omron_pressure = epics_signal_r(
-                float, prefix + "PP1:PRES"
+            self.pressure_transducer_1 = PressureJumpCellPressureTransducer(
+                prefix + "PP1:", name="Pressure Transducer 1", adc_prefix=adc1_prefix
             )
-            self.pressuretransducer1_omron_voltage = epics_signal_r(
-                float, prefix + "PP1:RAW"
+            self.pressure_transducer_2 = PressureJumpCellPressureTransducer(
+                prefix + "PP2:", name="Pressure Transducer 2", adc_prefix=adc2_prefix
             )
-            self.pressuretransducer1_beckhoff_pressure = epics_signal_r(
-                float, prefix + "STATP1:MeanValue_RBV"
-            )
-            self.pressuretransducer1_beckhoff_voltage = epics_signal_r(
-                float, adc2_prefix + "CH1"
-            )
-
-            ## Pressure Transducer 2 ##
-            self.pressuretransducer2_omron_pressure = epics_signal_r(
-                float, prefix + "PP2:PRES"
-            )
-            self.pressuretransducer2_omron_voltage = epics_signal_r(
-                float, prefix + "PP2:RAW"
-            )
-            self.pressuretransducer2_beckhoff_pressure = epics_signal_r(
-                float, prefix + "STATP2:MeanValue_RBV"
-            )
-            self.pressuretransducer2_beckhoff_voltage = epics_signal_r(
-                float, adc1_prefix + "CH2"
-            )
-
-            ## Pressure Transducer 3 ##
-            self.pressuretransducer3_omron_pressure = epics_signal_r(
-                float, prefix + "PP3:PRES"
-            )
-            self.pressuretransducer3_omron_voltage = epics_signal_r(
-                float, prefix + "PP3:RAW"
-            )
-            self.pressuretransducer3_beckhoff_pressure = epics_signal_r(
-                float, prefix + "STATP3:MeanValue_RBV"
-            )
-            self.pressuretransducer3_beckhoff_voltage = epics_signal_r(
-                float, adc1_prefix + "CH1"
+            self.pressure_transducer_3 = PressureJumpCellPressureTransducer(
+                prefix + "PP3:", name="Pressure Transducer 3", adc_prefix=adc1_prefix
             )
 
         super().__init__(name)
