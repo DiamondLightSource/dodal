@@ -9,28 +9,28 @@ from ophyd_async.core import (
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
 
-class PressureJumpCellPumpMode(str, Enum):
+class PumpState(str, Enum):
     MANUAL = "Manual"
     AUTO_PRESSURE = "Auto Pressure"
     AUTO_POSITION = "Auto Position"
 
 
-class PressureJumpCellBusyStatus(str, Enum):
+class BusyState(str, Enum):
     IDLE = "Idle"
     BUSY = "Busy"
 
 
-class PressureJumpCellTimerState(str, Enum):
+class TimerState(str, Enum):
     TIMEOUT = "TIMEOUT"
     COUNTDOWN = "COUNTDOWN"
 
 
-class PressureJumpCellStopValue(str, Enum):
+class StopState(str, Enum):
     CONTINUE = "CONTINUE"
     STOP = "STOP"
 
 
-class PressureJumpCellValveControlRequest(str, Enum):
+class ValveControlRequest(str, Enum):
     OPEN = "Open"
     CLOSE = "Close"
     RESET = "Reset"
@@ -38,7 +38,7 @@ class PressureJumpCellValveControlRequest(str, Enum):
     DISARM = "Disarm"
 
 
-class PressureJumpCellPumpMotorControlRequest(str, Enum):
+class PumpMotorControlRequest(str, Enum):
     ENABLE = "Enable"
     DISABLE = "Disable"
     RESET = "Reset"
@@ -46,7 +46,7 @@ class PressureJumpCellPumpMotorControlRequest(str, Enum):
     REVERSE = "Reverse"
 
 
-class PressureJumpCellPumpMotorDirection(str, Enum):
+class PumpMotorDirectionState(str, Enum):
     ZERO = "0"
     FORWARD = "Forward"
     REVERSE = "Reverse"
@@ -57,7 +57,7 @@ class PressureJumpCellPumpMotorDirection(str, Enum):
     SEVEN = "7"
 
 
-class PressureJumpCellValveState(str, Enum):
+class ValveState(str, Enum):
     FAULT = "Fault"
     OPEN = "Open"
     OPENING = "Opening"
@@ -65,7 +65,7 @@ class PressureJumpCellValveState(str, Enum):
     CLOSING = "Closing"
 
 
-class PressureJumpCellFastValveState(str, Enum):
+class FastValveState(str, Enum):
     FAULT = "Fault"
     OPEN = "Open"
     OPEN_ARMED = "Open Armed"
@@ -74,12 +74,12 @@ class PressureJumpCellFastValveState(str, Enum):
     NONE5 = "Unused"
 
 
-class PressureJumpCellLimitSwitch(str, Enum):
+class LimitSwitchState(str, Enum):
     OFF = "Off"
     ON = "On"
 
 
-class PressureJumpCellControlValves(StandardReadable):
+class ControlValves(StandardReadable):
     """
     valves 2, 4, 7, 8 are not controlled by the IOC,
     as they are under manual control.
@@ -87,25 +87,16 @@ class PressureJumpCellControlValves(StandardReadable):
 
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
-            self.valve_states: DeviceVector[SignalR[PressureJumpCellValveState]] = (
+            self.valve_states: DeviceVector[SignalR[ValveState]] = DeviceVector(
+                {i: epics_signal_r(ValveState, f"{prefix}V{i}:STA") for i in [1, 3]}
+            )
+            self.fast_valve_states: DeviceVector[SignalR[FastValveState]] = (
                 DeviceVector(
                     {
-                        i: epics_signal_r(
-                            PressureJumpCellValveState, f"{prefix}V{i}:STA"
-                        )
-                        for i in [1, 3]
+                        i: epics_signal_r(FastValveState, f"{prefix}V{i}:STA")
+                        for i in [5, 6]
                     }
                 )
-            )
-            self.fast_valve_states: DeviceVector[
-                SignalR[PressureJumpCellFastValveState]
-            ] = DeviceVector(
-                {
-                    i: epics_signal_r(
-                        PressureJumpCellFastValveState, f"{prefix}V{i}:STA"
-                    )
-                    for i in [5, 6]
-                }
             )
 
         with self.add_children_as_readables(ConfigSignal):
@@ -116,50 +107,50 @@ class PressureJumpCellControlValves(StandardReadable):
                 }
             )
 
-            self.valve_control: DeviceVector[
-                SignalR[PressureJumpCellValveControlRequest]
-            ] = DeviceVector(
-                {
-                    i: epics_signal_rw(
-                        PressureJumpCellValveControlRequest, f"{prefix}V{i}:CON"
-                    )
-                    for i in [1, 3, 5, 6]
-                }
+            self.valve_control: DeviceVector[SignalR[ValveControlRequest]] = (
+                DeviceVector(
+                    {
+                        i: epics_signal_rw(ValveControlRequest, f"{prefix}V{i}:CON")
+                        for i in [1, 3, 5, 6]
+                    }
+                )
             )
 
         super().__init__(name)
 
 
-class PressureJumpCellPump(StandardReadable):
+class Pump(StandardReadable):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
             self.pump_position = epics_signal_r(float, prefix + "POS")
             self.pump_forward_limit = epics_signal_r(
-                PressureJumpCellLimitSwitch, prefix + "D74IN1"
+                LimitSwitchState, prefix + "D74IN1"
             )
             self.pump_backward_limit = epics_signal_r(
-                PressureJumpCellLimitSwitch, prefix + "D74IN0"
+                LimitSwitchState, prefix + "D74IN0"
             )
             self.pump_motor_direction = epics_signal_r(
-                PressureJumpCellPumpMotorDirection, prefix + "MTRDIR"
+                PumpMotorDirectionState, prefix + "MTRDIR"
             )
             self.pump_speed_rbv = epics_signal_r(int, prefix + "MSPEED_RBV")
 
         with self.add_children_as_readables(ConfigSignal):
-            self.pump_mode = epics_signal_rw(
-                PressureJumpCellPumpMode, prefix + "SP:AUTO"
-            )
+            self.pump_mode = epics_signal_rw(PumpState, prefix + "SP:AUTO")
             self.pump_speed = epics_signal_rw(float, prefix + "MSPEED")
             self.pump_move_forward = epics_signal_rw(bool, prefix + "M1:FORW")
             self.pump_move_backward = epics_signal_rw(bool, prefix + "M1:BACKW")
             self.pump_move_backward = epics_signal_rw(
-                PressureJumpCellPumpMotorControlRequest, prefix + "M1:CON"
+                PumpMotorControlRequest, prefix + "M1:CON"
             )
 
         super().__init__(name)
 
 
-class PressureJumpCellPressureTransducer(StandardReadable):
+class PressureTransducer(StandardReadable):
+    """
+    todo does this do?
+    """
+
     def __init__(self, prefix: str, name: str = "", adc_prefix: str = "") -> None:
         with self.add_children_as_readables():
             self.omron_pressure = epics_signal_r(float, prefix + "PP:PRES")
@@ -173,18 +164,18 @@ class PressureJumpCellPressureTransducer(StandardReadable):
         super().__init__(name)
 
 
-class PressureJumpCellPressureTransducers(StandardReadable):
+class PressureTransducers(StandardReadable):
     def __init__(
         self, prefix: str, name: str = "", adc1_prefix: str = "", adc2_prefix: str = ""
     ) -> None:
         with self.add_children_as_readables():
-            self.pressure_transducer_1 = PressureJumpCellPressureTransducer(
+            self.pressure_transducer_1 = PressureTransducer(
                 prefix + "PP1:", name="Pressure Transducer 1", adc_prefix=adc1_prefix
             )
-            self.pressure_transducer_2 = PressureJumpCellPressureTransducer(
+            self.pressure_transducer_2 = PressureTransducer(
                 prefix + "PP2:", name="Pressure Transducer 2", adc_prefix=adc2_prefix
             )
-            self.pressure_transducer_3 = PressureJumpCellPressureTransducer(
+            self.pressure_transducer_3 = PressureTransducer(
                 prefix + "PP3:", name="Pressure Transducer 3", adc_prefix=adc1_prefix
             )
 
@@ -194,14 +185,9 @@ class PressureJumpCellPressureTransducers(StandardReadable):
 class PressureJumpCellController(StandardReadable):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
-            self.control_gotobusy = epics_signal_r(
-                PressureJumpCellBusyStatus, prefix + "CTRL:GOTOBUSY"
-            )
+            self.control_gotobusy = epics_signal_r(BusyState, prefix + "CTRL:GOTOBUSY")
 
-            ## Control Pressure ##
-            self.control_timer = epics_signal_r(
-                PressureJumpCellTimerState, prefix + "CTRL:TIMER"
-            )
+            self.control_timer = epics_signal_r(TimerState, prefix + "CTRL:TIMER")
             self.control_counter = epics_signal_r(float, prefix + "CTRL:COUNTER")
             self.control_script_status = epics_signal_r(str, prefix + "CTRL:RESULT")
             self.control_routine = epics_signal_r(str, prefix + "CTRL:METHOD")
@@ -209,9 +195,7 @@ class PressureJumpCellController(StandardReadable):
             self.control_iteration = epics_signal_r(int, prefix + "CTRL:ITER")
 
         with self.add_children_as_readables(ConfigSignal):
-            self.control_stop = epics_signal_rw(
-                PressureJumpCellStopValue, prefix + "CTRL:STOP"
-            )
+            self.control_stop = epics_signal_rw(StopState, prefix + "CTRL:STOP")
 
             self.control_target_pressure = epics_signal_rw(
                 float, prefix + "CTRL:TARGET"
@@ -219,7 +203,7 @@ class PressureJumpCellController(StandardReadable):
             self.control_timeout = epics_signal_rw(float, prefix + "CTRL:TIMER.HIGH")
             self.control_go = epics_signal_rw(bool, prefix + "CTRL:GO")
 
-            ## Control Jump ##
+            ## Jump logic ##
             self.control_jump_from_pressure = epics_signal_rw(
                 float, prefix + "CTRL:JUMPF"
             )
@@ -243,20 +227,28 @@ class PressureJumpCell(StandardReadable):
         adc_prefix: str = "",
         name: str = "",
     ):
-        cellFullPrefix = prefix + cell_prefix
-        adcFullPrefix = prefix + adc_prefix
+        self.valves = ControlValves(f"{prefix}{cell_prefix}", name)
+        self.pump = Pump(f"{prefix}{cell_prefix}", name)
 
-        self.valves = PressureJumpCellControlValves(cellFullPrefix, name)
-        self.pump = PressureJumpCellPump(cellFullPrefix, name)
-        self.transducers = PressureJumpCellPressureTransducers(
-            cellFullPrefix,
-            name,
-            adc1_prefix=adcFullPrefix + "-01:",
-            adc2_prefix=adcFullPrefix + "-02:",
+        self.pressure_transducer_1 = PressureTransducer(
+            prefix + "PP1:",
+            name="Pressure Transducer 1",
+            adc_prefix=f"{prefix}{adc_prefix}-01:",
         )
-        self.controller = PressureJumpCellController(cellFullPrefix, name)
+        self.pressure_transducer_2 = PressureTransducer(
+            prefix + "PP2:",
+            name="Pressure Transducer 2",
+            adc_prefix=f"{prefix}{adc_prefix}-02:",
+        )
+        self.pressure_transducer_3 = PressureTransducer(
+            prefix + "PP3:",
+            name="Pressure Transducer 3",
+            adc_prefix=f"{prefix}{adc_prefix}-01:",
+        )
+
+        self.controller = PressureJumpCellController(f"{prefix}{cell_prefix}", name)
 
         with self.add_children_as_readables():
-            self.cell_temperature = epics_signal_r(float, cellFullPrefix + "TEMP")
+            self.cell_temperature = epics_signal_r(float, f"{prefix}{cell_prefix}TEMP")
 
         super().__init__(name)
