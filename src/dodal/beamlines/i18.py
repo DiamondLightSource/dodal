@@ -3,10 +3,10 @@ from pathlib import Path
 from ophyd_async.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
-    device_instantiation,
-    get_directory_provider,
-    set_directory_provider,
-)
+		device_instantiation,
+		get_directory_provider,
+		set_directory_provider,
+		)
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import numbered_slits
 from dodal.common.visit import DirectoryServiceClient, StaticVisitDirectoryProvider
@@ -23,30 +23,60 @@ BL = get_beamline_name("i18")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
+
+# MO-DCM-01 instead of DCSM
+# 
+# MO table is ok
+# 
+# xpress3 
+# undulator?
+# 
+# ionchamber prefixes
+# 
+# pinhole PVs?
+# -AL-APTR-01:TEMP1
+# 
+# DCM motion prefix? tem,pereature prefix? creystal Germanium metadta?
+# 
+# 
+# mirrors:
+# - vfm
+# - hfm
+# -OP-KBM-01:VFM:X.VAL
+# 
+# for ophyd-async new
+# 
+# table again, t1 theta and d7bdiode
+# 
+# 
+# diode is ok, there are A and B variants
+# motors A and B
+# camera not used
+# 
+# diode reading and also DRAIN
+
 # Currently we must hard-code the visit, determining the visit at runtime requires
 # infrastructure that is still WIP.
 # Communication with GDA is also WIP so for now we determine an arbitrary scan number
 # locally and write the commissioning directory. The scan number is not guaranteed to
 # be unique and the data is at risk - this configuration is for testing only.
 set_directory_provider(
-    StaticVisitDirectoryProvider(
-        BL,
-        Path("/dls/i18/data/2024/cm37264-2/bluesky"),
-        client=DirectoryServiceClient("http://i18-control:8088/api"),
-    )
+	StaticVisitDirectoryProvider(
+		BL,
+		Path("/dls/i18/data/2024/cm37264-2/bluesky"),
+		client=DirectoryServiceClient("http://i18-control:8088/api"),
+	)
 )
 
 
-def synchrotron(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Synchrotron:
+def synchrotron( wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> Synchrotron:
     return device_instantiation(
-        Synchrotron,
-        "synchrotron",
-        "",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
+	Synchrotron,
+	"synchrotron",
+	"",
+	wait_for_connection,
+	fake_with_ophyd_sim,
+)
 
 
 def undulator(
@@ -57,7 +87,7 @@ def undulator(
         Undulator,
         "undulator",
         f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
-# add CURRGAPD
+        # add CURRGAPD
         wait_for_connection,
         fake_with_ophyd_sim,
         bl_prefix=False,
@@ -87,7 +117,7 @@ def panda1(
     return device_instantiation(
         HDFPanda,
         "panda1",
-        "-EA-PANDA-01:",
+        "-MO-PANDA-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
         directory_provider=get_directory_provider(),
@@ -100,13 +130,14 @@ def xspress3(
     """
     16 channels Xspress3 detector
 	-EA-XPS-02:CAM:MaxSizeX_RBV
-also ArraySize
-also :CONNECTED
+      also ArraySize
+      also :CONNECTED
     """
 
     return device_instantiation(
         Xspress3,
-        prefix="-EA-DET-03:",
+        # prefix="-EA-DET-03:",
+        prefix="-EA-XPS-02:",
         name="Xspress3",
         num_channels=16,
         wait=wait_for_connection,
@@ -150,7 +181,7 @@ def i0(
         TetrammDetector,
         "i0",
         "-EA-XBPM-02:",
-# -DI-XBPM-02:DEV:Firmware
+        # -DI-XBPM-02:DEV:Firmware
         wait_for_connection,
         fake_with_ophyd_sim,
         type="Cividec Diamond XBPM",
