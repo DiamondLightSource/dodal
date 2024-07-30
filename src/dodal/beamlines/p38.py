@@ -232,13 +232,13 @@ def dcm(
             usage="Bragg",
             type="silicon",
             reflection=(1, 1, 1),
-            d_spacing=(3.13475, "mm"),
+            d_spacing=(3.13475, "nm"),
         ),
         crystal_2_metadata=CrystalMetadata(
             usage="Bragg",
             type="silicon",
             reflection=(1, 1, 1),
-            d_spacing=(3.13475, "mm"),
+            d_spacing=(3.13475, "nm"),
         ),
     )
 
