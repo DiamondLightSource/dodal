@@ -79,11 +79,16 @@ class DeviceInitializationController:
                     else mock,
                 )
             )
+            CONTROLLERS[self.factory.__name__] = self
 
         return device
 
 
+CONTROLLERS: dict[str, DeviceInitializationController] = {}
+
+
 def instantiation_behaviour(
+    *,
     eager: bool = True,
     set_name: bool = True,
     default_timeout_for_connect: float = DEFAULT_TIMEOUT,
@@ -117,9 +122,3 @@ def new_detector_xyz():
 def detector_xyz_variant():
     """Create an XYZ detector with specific settings."""
     return XYZDetector(name="det2-variant", prefix=f"{beamline_prefix}xyz:")
-
-
-cached_devices: dict[str, AnyDevice] = {
-    "det1": new_detector_xyz(),
-    "det2": detector_xyz_variant(),
-}
