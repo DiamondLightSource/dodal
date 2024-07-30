@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.zocalo.zocalo_results &#8212; dodal 1.29.5.dev9+g1f7e9d256 documentation</title>
+    <title>dodal.devices.zocalo.zocalo_results &#8212; dodal 1.29.5.dev10+gbe0f6bacb documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../../_static/documentation_options.js?v=df9ad671"></script>
+    <script src="../../../../_static/documentation_options.js?v=e1ec3f25"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -564,15 +564,21 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_raw_results_received</span><span class="p">:</span> <span class="n">Queue</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="p">:</span> <span class="n">CommonTransport</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="nb">list</span><span class="p">[</span><span class="n">XrcResult</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;results&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">centres_of_mass</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results_setter</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span>
+            <span class="nb">list</span><span class="p">[</span><span class="n">XrcResult</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;results&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">centres_of_mass</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_com_setter</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span>
             <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;centres_of_mass&quot;</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bbox_sizes</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bbox_sizes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bbox_setter</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span>
             <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">],</span> <span class="s2">&quot;bbox_sizes&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ispyb_dcid</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ispyb_dcid&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ispyb_dcgid</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ispyb_dcgid&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ispyb_dcid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ispyb_dcid_setter</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span>
+            <span class="nb">int</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ispyb_dcid&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ispyb_dcgid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ispyb_dcgid_setter</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span>
+            <span class="nb">int</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ispyb_dcgid&quot;</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_readables</span><span class="p">(</span>
             <span class="p">[</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">,</span>
@@ -586,13 +592,13 @@ document.write(`
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
     <span class="k">async</span> <span class="k">def</span> <span class="nf">_put_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">XrcResult</span><span class="p">],</span> <span class="n">ispyb_ids</span><span class="p">):</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">_backend</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">results</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_results_setter</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">results</span><span class="p">))</span>
         <span class="n">centres_of_mass</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;centre_of_mass&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">])</span>
         <span class="n">bbox_sizes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">bbox_size</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">])</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">centres_of_mass</span><span class="o">.</span><span class="n">_backend</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">centres_of_mass</span><span class="p">)</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">bbox_sizes</span><span class="o">.</span><span class="n">_backend</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">bbox_sizes</span><span class="p">)</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">ispyb_dcid</span><span class="o">.</span><span class="n">_backend</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">ispyb_ids</span><span class="p">[</span><span class="s2">&quot;dcid&quot;</span><span class="p">])</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">ispyb_dcgid</span><span class="o">.</span><span class="n">_backend</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">ispyb_ids</span><span class="p">[</span><span class="s2">&quot;dcgid&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_com_setter</span><span class="p">(</span><span class="n">centres_of_mass</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bbox_setter</span><span class="p">(</span><span class="n">bbox_sizes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ispyb_dcid_setter</span><span class="p">(</span><span class="n">ispyb_ids</span><span class="p">[</span><span class="s2">&quot;dcid&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ispyb_dcgid_setter</span><span class="p">(</span><span class="n">ispyb_ids</span><span class="p">[</span><span class="s2">&quot;dcgid&quot;</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">_clear_old_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Clearing queue&quot;</span><span class="p">)</span>

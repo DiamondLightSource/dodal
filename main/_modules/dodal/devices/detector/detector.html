@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.detector.detector &#8212; dodal 1.29.5.dev9+g1f7e9d256 documentation</title>
+    <title>dodal.devices.detector.detector &#8212; dodal 1.29.5.dev10+gbe0f6bacb documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../../_static/documentation_options.js?v=df9ad671"></script>
+    <script src="../../../../_static/documentation_options.js?v=e1ec3f25"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -519,8 +519,8 @@ document.write(`
     <span class="n">det_dist_to_beam_converter_path</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">trigger_mode</span><span class="p">:</span> <span class="n">TriggerMode</span> <span class="o">=</span> <span class="n">TriggerMode</span><span class="o">.</span><span class="n">SET_FRAMES</span>
     <span class="n">detector_size_constants</span><span class="p">:</span> <span class="n">DetectorSizeConstants</span> <span class="o">=</span> <span class="n">EIGER2_X_16M_SIZE</span>
-    <span class="n">beam_xy_converter</span><span class="p">:</span> <span class="n">DetectorDistanceToBeamXYConverter</span>
-    <span class="n">run_number</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">beam_xy_converter</span><span class="p">:</span> <span class="n">DetectorDistanceToBeamXYConverter</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># type: ignore # Filled in by validator</span>
+    <span class="n">run_number</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># type: ignore # Filled in by validator</span>
     <span class="n">enable_dev_shm</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="p">(</span>
         <span class="kc">False</span>  <span class="c1"># Remove in https://github.com/DiamondLightSource/hyperion/issues/1395</span>
     <span class="p">)</span>

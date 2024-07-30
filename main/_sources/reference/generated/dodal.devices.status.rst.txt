@@ -24,9 +24,7 @@ dodal.devices.status
 
    .. autosummary::
    
-      await_approx_value
       await_value
-      await_value_in_list
    
    
 

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.aperturescatterguard &#8212; dodal 1.29.5.dev9+g1f7e9d256 documentation</title>
+    <title>dodal.devices.aperturescatterguard &#8212; dodal 1.29.5.dev10+gbe0f6bacb documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=df9ad671"></script>
+    <script src="../../../_static/documentation_options.js?v=e1ec3f25"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -472,11 +472,12 @@ document.write(`
                   
   <h1>Source code for dodal.devices.aperturescatterguard</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">asyncio</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span><span class="p">,</span> <span class="n">namedtuple</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">asdict</span><span class="p">,</span> <span class="n">dataclass</span>
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 
 <span class="kn">from</span> <span class="nn">bluesky.protocols</span> <span class="kn">import</span> <span class="n">Movable</span><span class="p">,</span> <span class="n">Reading</span>
+<span class="kn">from</span> <span class="nn">event_model.documents.event_descriptor</span> <span class="kn">import</span> <span class="n">DataKey</span>
 <span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="n">AsyncStatus</span><span class="p">,</span> <span class="n">HintedSignal</span><span class="p">,</span> <span class="n">SignalR</span><span class="p">,</span> <span class="n">StandardReadable</span>
 <span class="kn">from</span> <span class="nn">ophyd_async.core.soft_signal_backend</span> <span class="kn">import</span> <span class="n">SoftConverter</span><span class="p">,</span> <span class="n">SoftSignalBackend</span>
 
@@ -665,24 +666,20 @@ document.write(`
     <span class="k">class</span> <span class="nc">SelectedAperture</span><span class="p">(</span><span class="n">SignalR</span><span class="p">):</span>
         <span class="k">async</span> <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="n">ApertureScatterguard</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_get_current_aperture_position</span><span class="p">())</span>
             <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span><span class="o">.</span><span class="n">get_reading</span><span class="p">()}</span>
 
-        <span class="k">async</span> <span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">OrderedDict</span><span class="p">(</span>
-                <span class="p">[</span>
-                    <span class="p">(</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span>
-                        <span class="p">{</span>
-                            <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span><span class="o">.</span><span class="n">source</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">),</span>  <span class="c1"># type: ignore</span>
-                            <span class="s2">&quot;dtype&quot;</span><span class="p">:</span> <span class="s2">&quot;array&quot;</span><span class="p">,</span>
-                            <span class="s2">&quot;shape&quot;</span><span class="p">:</span> <span class="p">[</span>
-                                <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
-                            <span class="p">],</span>  <span class="c1"># TODO describe properly - see https://github.com/DiamondLightSource/dodal/issues/253</span>
-                        <span class="p">},</span>
-                    <span class="p">),</span>
-                <span class="p">],</span>
-            <span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataKey</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">:</span> <span class="n">DataKey</span><span class="p">(</span>
+                    <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;array&quot;</span><span class="p">,</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="p">[</span>
+                        <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+                    <span class="p">],</span>  <span class="c1"># TODO describe properly - see https://github.com/DiamondLightSource/dodal/issues/253,</span>
+                    <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_backend</span><span class="o">.</span><span class="n">source</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">),</span>  <span class="c1"># type: ignore</span>
+                <span class="p">)</span>
+            <span class="p">}</span>
 
     <span class="k">def</span> <span class="nf">load_aperture_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">positions</span><span class="p">:</span> <span class="n">AperturePositions</span><span class="p">):</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> loaded in </span><span class="si">{</span><span class="n">positions</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>

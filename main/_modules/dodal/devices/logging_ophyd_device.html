@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.logging_ophyd_device &#8212; dodal 1.29.5.dev9+g1f7e9d256 documentation</title>
+    <title>dodal.devices.logging_ophyd_device &#8212; dodal 1.29.5.dev10+gbe0f6bacb documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=df9ad671"></script>
+    <script src="../../../_static/documentation_options.js?v=e1ec3f25"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -478,7 +478,7 @@ document.write(`
 <div class="viewcode-block" id="InfoLoggingDevice">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.logging_ophyd_device.InfoLoggingDevice.html#dodal.devices.logging_ophyd_device.InfoLoggingDevice">[docs]</a>
 <span class="k">class</span> <span class="nc">InfoLoggingDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">wait_for_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">all_signals</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">wait_for_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">all_signals</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">2.0</span><span class="p">):</span>
         <span class="n">class_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="n">ophyd_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">class_name</span><span class="si">}</span><span class="s2"> waiting for connection, </span><span class="si">{</span><span class="s1">&#39;not&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">all_signals</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2"> waiting for all signals, timeout = </span><span class="si">{</span><span class="n">timeout</span><span class="si">}</span><span class="s2">s.&quot;</span><span class="p">,</span>

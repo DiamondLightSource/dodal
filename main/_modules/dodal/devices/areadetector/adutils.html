@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.areadetector.adutils &#8212; dodal 1.29.5.dev9+g1f7e9d256 documentation</title>
+    <title>dodal.devices.areadetector.adutils &#8212; dodal 1.29.5.dev10+gbe0f6bacb documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../../_static/documentation_options.js?v=df9ad671"></script>
+    <script src="../../../../_static/documentation_options.js?v=e1ec3f25"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -474,7 +474,7 @@ document.write(`
 <span></span><span class="kn">import</span> <span class="nn">time</span> <span class="k">as</span> <span class="nn">ttime</span>
 
 <span class="kn">from</span> <span class="nn">ophyd</span> <span class="kn">import</span> <span class="n">Component</span> <span class="k">as</span> <span class="n">Cpt</span>
-<span class="kn">from</span> <span class="nn">ophyd</span> <span class="kn">import</span> <span class="n">EpicsSignal</span><span class="p">,</span> <span class="n">EpicsSignalRO</span><span class="p">,</span> <span class="n">Staged</span>
+<span class="kn">from</span> <span class="nn">ophyd</span> <span class="kn">import</span> <span class="n">DetectorBase</span><span class="p">,</span> <span class="n">Device</span><span class="p">,</span> <span class="n">EpicsSignal</span><span class="p">,</span> <span class="n">EpicsSignalRO</span><span class="p">,</span> <span class="n">Staged</span>
 <span class="kn">from</span> <span class="nn">ophyd.areadetector</span> <span class="kn">import</span> <span class="n">ADTriggerStatus</span><span class="p">,</span> <span class="n">TriggerBase</span>
 <span class="kn">from</span> <span class="nn">ophyd.areadetector.cam</span> <span class="kn">import</span> <span class="n">AreaDetectorCam</span>
 <span class="kn">from</span> <span class="nn">ophyd.areadetector.filestore_mixins</span> <span class="kn">import</span> <span class="n">FileStoreHDF5</span><span class="p">,</span> <span class="n">FileStoreIterativeWrite</span>
@@ -489,6 +489,8 @@ document.write(`
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">image_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">image_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Ensure that this mixin is part of valid device with name</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Device</span><span class="p">)</span>
             <span class="n">image_name</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;image&quot;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_image_name</span> <span class="o">=</span> <span class="n">image_name</span>
 
@@ -509,7 +511,9 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">_status</span><span class="o">.</span><span class="n">_finished</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_acquisition_signal</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">use_complete</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">_acq_done</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_image_name</span><span class="p">,</span> <span class="n">ttime</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+        <span class="c1"># Ensure that this mixin is part of valid Detector with generate_datum</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">DetectorBase</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">generate_datum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_image_name</span><span class="p">,</span> <span class="n">ttime</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_status</span></div>
 </div>
 
@@ -535,18 +539,21 @@ document.write(`
 
     <span class="k">def</span> <span class="nf">ensure_nonblocking</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stage_sigs</span><span class="p">[</span><span class="s2">&quot;wait_for_plugins&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Yes&quot;</span>
-        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">component_names</span><span class="p">:</span>
-            <span class="n">cpt</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">cpt</span> <span class="ow">is</span> <span class="bp">self</span><span class="p">:</span>
-                <span class="k">continue</span>
-            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cpt</span><span class="p">,</span> <span class="s2">&quot;ensure_nonblocking&quot;</span><span class="p">):</span>
-                <span class="n">cpt</span><span class="o">.</span><span class="n">ensure_nonblocking</span><span class="p">()</span></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">component_names</span><span class="p">:</span>
+                <span class="n">cpt</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">cpt</span> <span class="ow">is</span> <span class="bp">self</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cpt</span><span class="p">,</span> <span class="s2">&quot;ensure_nonblocking&quot;</span><span class="p">):</span>
+                    <span class="n">cpt</span><span class="o">.</span><span class="n">ensure_nonblocking</span><span class="p">()</span></div>
 
 
 
+<span class="c1"># ophyd code to be removed, only used for adim</span>
+<span class="c1"># https://github.com/DiamondLightSource/dodal/issues/404</span>
 <div class="viewcode-block" id="Hdf5Writer">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.areadetector.adutils.Hdf5Writer.html#dodal.devices.areadetector.adutils.Hdf5Writer">[docs]</a>
-<span class="k">class</span> <span class="nc">Hdf5Writer</span><span class="p">(</span><span class="n">HDF5Plugin</span><span class="p">,</span> <span class="n">FileStoreHDF5</span><span class="p">,</span> <span class="n">FileStoreIterativeWrite</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">Hdf5Writer</span><span class="p">(</span><span class="n">HDF5Plugin</span><span class="p">,</span> <span class="n">FileStoreHDF5</span><span class="p">,</span> <span class="n">FileStoreIterativeWrite</span><span class="p">):</span>  <span class="c1"># type: ignore</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
 
     <span class="n">pool_max_buffers</span> <span class="o">=</span> <span class="kc">None</span>
@@ -554,6 +561,7 @@ document.write(`
     <span class="n">file_number_write</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">get_frames_per_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="n">DetectorBase</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">num_images</span><span class="o">.</span><span class="n">get</span><span class="p">()</span></div>
 
 </pre></div>

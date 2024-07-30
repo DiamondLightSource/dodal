@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.oav_parameters &#8212; dodal 1.29.5.dev9+g1f7e9d256 documentation</title>
+    <title>dodal.devices.oav.oav_parameters &#8212; dodal 1.29.5.dev10+gbe0f6bacb documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../../_static/documentation_options.js?v=df9ad671"></script>
+    <script src="../../../../_static/documentation_options.js?v=e1ec3f25"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -475,6 +475,7 @@ document.write(`
 <span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="k">as</span> <span class="nn">et</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">ChainMap</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span> <span class="nn">xml.etree.ElementTree</span> <span class="kn">import</span> <span class="n">Element</span>
 
 <span class="kn">from</span> <span class="nn">dodal.devices.oav.oav_errors</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">OAVError_BeamPositionNotFound</span><span class="p">,</span>
@@ -491,6 +492,13 @@ document.write(`
 <span class="n">OAV_CONFIG_JSON</span> <span class="o">=</span> <span class="p">(</span>
     <span class="s2">&quot;/dls_sw/i03/software/daq_configuration/json/OAVCentring_hyperion.json&quot;</span>
 <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_get_element_as_float</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">Element</span><span class="p">,</span> <span class="n">element_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="n">element</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">element_name</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">element</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">element_name</span><span class="si">}</span><span class="s2"> not found in </span><span class="si">{</span><span class="n">node</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">assert</span> <span class="n">element</span><span class="o">.</span><span class="n">text</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="OAVParameters">
@@ -620,14 +628,14 @@ document.write(`
         <span class="n">root</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
         <span class="n">levels</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;.//zoomLevel&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">levels</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;level&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">)</span> <span class="o">==</span> <span class="n">zoom</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">_get_element_as_float</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;level&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="n">zoom</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">micronsPerXPixel</span> <span class="o">=</span> <span class="p">(</span>
-                    <span class="nb">float</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;micronsPerXPixel&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+                    <span class="n">_get_element_as_float</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;micronsPerXPixel&quot;</span><span class="p">)</span>
                     <span class="o">*</span> <span class="n">DEFAULT_OAV_WINDOW</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                     <span class="o">/</span> <span class="n">xsize</span>
                 <span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">micronsPerYPixel</span> <span class="o">=</span> <span class="p">(</span>
-                    <span class="nb">float</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;micronsPerYPixel&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+                    <span class="n">_get_element_as_float</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;micronsPerYPixel&quot;</span><span class="p">)</span>
                     <span class="o">*</span> <span class="n">DEFAULT_OAV_WINDOW</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
                     <span class="o">/</span> <span class="n">ysize</span>
                 <span class="p">)</span>

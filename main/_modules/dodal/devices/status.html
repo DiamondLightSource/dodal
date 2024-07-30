@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.status &#8212; dodal 1.29.5.dev9+g1f7e9d256 documentation</title>
+    <title>dodal.devices.status &#8212; dodal 1.29.5.dev10+gbe0f6bacb documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=df9ad671"></script>
+    <script src="../../../_static/documentation_options.js?v=e1ec3f25"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -471,55 +471,20 @@ document.write(`
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.status</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">TypeVar</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
 
 <span class="kn">from</span> <span class="nn">ophyd.status</span> <span class="kn">import</span> <span class="n">SubscriptionStatus</span>
-
-<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="await_value">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.status.html#dodal.devices.status.await_value">[docs]</a>
 <span class="k">def</span> <span class="nf">await_value</span><span class="p">(</span>
-    <span class="n">subscribable</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">expected_value</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="kc">None</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">subscribable</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">expected_value</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="kc">None</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SubscriptionStatus</span><span class="p">:</span>
     <span class="k">def</span> <span class="nf">value_is</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">_</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">value</span> <span class="o">==</span> <span class="n">expected_value</span>
 
     <span class="k">return</span> <span class="n">SubscriptionStatus</span><span class="p">(</span><span class="n">subscribable</span><span class="p">,</span> <span class="n">value_is</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span></div>
-
-
-
-<div class="viewcode-block" id="await_value_in_list">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.status.html#dodal.devices.status.await_value_in_list">[docs]</a>
-<span class="k">def</span> <span class="nf">await_value_in_list</span><span class="p">(</span>
-    <span class="n">subscribable</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">expected_value</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="kc">None</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SubscriptionStatus</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a status which is completed when the subscriptable contains a value</span>
-<span class="sd">    within the expected_value list&quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">value_is</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">_</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">expected_value</span>
-
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">expected_value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;expected value </span><span class="si">{</span><span class="n">expected_value</span><span class="si">}</span><span class="s2"> is not a list&quot;</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">SubscriptionStatus</span><span class="p">(</span><span class="n">subscribable</span><span class="p">,</span> <span class="n">value_is</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span></div>
-
-
-
-<div class="viewcode-block" id="await_approx_value">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.status.html#dodal.devices.status.await_approx_value">[docs]</a>
-<span class="k">def</span> <span class="nf">await_approx_value</span><span class="p">(</span>
-    <span class="n">subscribable</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-    <span class="n">expected_value</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span>
-    <span class="n">deadband</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-09</span><span class="p">,</span>
-    <span class="n">timeout</span><span class="p">:</span> <span class="kc">None</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SubscriptionStatus</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">value_is_approx</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">_</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">value</span> <span class="o">-</span> <span class="n">expected_value</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">deadband</span>
-
-    <span class="k">return</span> <span class="n">SubscriptionStatus</span><span class="p">(</span><span class="n">subscribable</span><span class="p">,</span> <span class="n">value_is_approx</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span></div>
 
 </pre></div>
 

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.tetramm &#8212; dodal 1.29.5.dev9+g1f7e9d256 documentation</title>
+    <title>dodal.devices.tetramm &#8212; dodal 1.29.5.dev10+gbe0f6bacb documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=df9ad671"></script>
+    <script src="../../../_static/documentation_options.js?v=e1ec3f25"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -608,7 +608,7 @@ document.write(`
     <span class="k">async</span> <span class="k">def</span> <span class="nf">arm</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">num</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">trigger</span><span class="p">:</span> <span class="n">DetectorTrigger</span><span class="p">,</span>
+        <span class="n">trigger</span><span class="p">:</span> <span class="n">DetectorTrigger</span> <span class="o">=</span> <span class="n">DetectorTrigger</span><span class="o">.</span><span class="n">edge_trigger</span><span class="p">,</span>
         <span class="n">exposure</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncStatus</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">exposure</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -625,7 +625,7 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">_drv</span><span class="o">.</span><span class="n">averaging_time</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">exposure</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_exposure</span><span class="p">(</span><span class="n">exposure</span><span class="p">)</span>
         <span class="p">)</span>
 
-        <span class="n">status</span> <span class="o">=</span> <span class="k">await</span> <span class="n">set_and_wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_drv</span><span class="o">.</span><span class="n">acquire</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="k">await</span> <span class="n">set_and_wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_drv</span><span class="o">.</span><span class="n">acquire</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">status</span>
 
@@ -643,7 +643,7 @@ document.write(`
             <span class="p">)</span>
 
     <span class="k">async</span> <span class="k">def</span> <span class="nf">disarm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">await</span> <span class="n">stop_busy_record</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_drv</span><span class="o">.</span><span class="n">acquire</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">stop_busy_record</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_drv</span><span class="o">.</span><span class="n">acquire</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
 <div class="viewcode-block" id="TetrammController.set_exposure">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.tetramm.TetrammController.html#dodal.devices.tetramm.TetrammController.set_exposure">[docs]</a>
