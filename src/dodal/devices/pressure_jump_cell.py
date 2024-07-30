@@ -79,7 +79,7 @@ class LimitSwitchState(str, Enum):
     ON = "On"
 
 
-class ControlValves(StandardReadable):
+class AllValvesControl(StandardReadable):
     """
     valves 2, 4, 7, 8 are not controlled by the IOC,
     as they are under manual control.
@@ -227,7 +227,7 @@ class PressureJumpCell(StandardReadable):
         adc_prefix: str = "",
         name: str = "",
     ):
-        self.valves = ControlValves(f"{prefix}{cell_prefix}", name)
+        self.all_valves_control = AllValvesControl(f"{prefix}{cell_prefix}", name)
         self.pump = Pump(f"{prefix}{cell_prefix}", name)
 
         self.pressure_transducer_1 = PressureTransducer(
