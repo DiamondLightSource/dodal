@@ -4,13 +4,13 @@ import pytest
 from ophyd_async.core import DeviceCollector, assert_reading, set_mock_value
 
 from dodal.devices.pressure_jump_cell import (
+    BusyState,
+    FastValveState,
+    LimitSwitchState,
     PressureJumpCell,
-    PressureJumpCellBusyStatus,
-    PressureJumpCellFastValveState,
-    PressureJumpCellLimitSwitch,
-    PressureJumpCellPumpMotorDirection,
-    PressureJumpCellTimerState,
-    PressureJumpCellValveState,
+    PumpMotorDirectionState,
+    TimerState,
+    ValveState,
 )
 
 
@@ -25,40 +25,34 @@ async def pressurejumpcell() -> PressureJumpCell:
 async def test_reading_pjumpcell_includes_read_fields_valves(
     pressurejumpcell: PressureJumpCell,
 ):
-    set_mock_value(
-        pressurejumpcell.valves.valve1_state, PressureJumpCellValveState.CLOSED
-    )
-    set_mock_value(
-        pressurejumpcell.valves.valve3_state, PressureJumpCellValveState.OPEN
-    )
+    set_mock_value(pressurejumpcell.valves.valve1_state, ValveState.CLOSED)
+    set_mock_value(pressurejumpcell.valves.valve3_state, ValveState.OPEN)
     set_mock_value(
         pressurejumpcell.valves.valve5_state,
-        PressureJumpCellFastValveState.CLOSED_ARMED,
+        FastValveState.CLOSED_ARMED,
     )
-    set_mock_value(
-        pressurejumpcell.valves.valve6_state, PressureJumpCellFastValveState.OPEN_ARMED
-    )
+    set_mock_value(pressurejumpcell.valves.valve6_state, FastValveState.OPEN_ARMED)
 
     await assert_reading(
         pressurejumpcell.valves,
         {
             "pjump-valves-valve1_state": {
-                "value": PressureJumpCellValveState.CLOSED,
+                "value": ValveState.CLOSED,
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
             "pjump-valves-valve3_state": {
-                "value": PressureJumpCellValveState.OPEN,
+                "value": ValveState.OPEN,
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
             "pjump-valves-valve5_state": {
-                "value": PressureJumpCellFastValveState.CLOSED_ARMED,
+                "value": FastValveState.CLOSED_ARMED,
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
             "pjump-valves-valve6_state": {
-                "value": PressureJumpCellFastValveState.OPEN_ARMED,
+                "value": FastValveState.OPEN_ARMED,
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
@@ -70,15 +64,11 @@ async def test_reading_pjumpcell_includes_read_fields_pump(
     pressurejumpcell: PressureJumpCell,
 ):
     set_mock_value(pressurejumpcell.pump.pump_position, 100)
-    set_mock_value(
-        pressurejumpcell.pump.pump_forward_limit, PressureJumpCellLimitSwitch.OFF
-    )
-    set_mock_value(
-        pressurejumpcell.pump.pump_backward_limit, PressureJumpCellLimitSwitch.ON
-    )
+    set_mock_value(pressurejumpcell.pump.pump_forward_limit, LimitSwitchState.OFF)
+    set_mock_value(pressurejumpcell.pump.pump_backward_limit, LimitSwitchState.ON)
     set_mock_value(
         pressurejumpcell.pump.pump_motor_direction,
-        PressureJumpCellPumpMotorDirection.FORWARD,
+        PumpMotorDirectionState.FORWARD,
     )
     set_mock_value(pressurejumpcell.pump.pump_speed_rbv, 100)
 
@@ -91,17 +81,17 @@ async def test_reading_pjumpcell_includes_read_fields_pump(
                 "alarm_severity": 0,
             },
             "pjump-pump-pump_forward_limit": {
-                "value": PressureJumpCellLimitSwitch.OFF,
+                "value": LimitSwitchState.OFF,
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
             "pjump-pump-pump_backward_limit": {
-                "value": PressureJumpCellLimitSwitch.ON,
+                "value": LimitSwitchState.ON,
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
             "pjump-pump-pump_motor_direction": {
-                "value": PressureJumpCellPumpMotorDirection.FORWARD,
+                "value": PumpMotorDirectionState.FORWARD,
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
@@ -218,12 +208,8 @@ async def test_reading_pjumpcell_includes_read_fields_transducers(
 async def test_reading_pjumpcell_includes_read_fields_controller(
     pressurejumpcell: PressureJumpCell,
 ):
-    set_mock_value(
-        pressurejumpcell.controller.control_gotobusy, PressureJumpCellBusyStatus.IDLE
-    )
-    set_mock_value(
-        pressurejumpcell.controller.control_timer, PressureJumpCellTimerState.COUNTDOWN
-    )
+    set_mock_value(pressurejumpcell.controller.control_gotobusy, BusyState.IDLE)
+    set_mock_value(pressurejumpcell.controller.control_timer, TimerState.COUNTDOWN)
     set_mock_value(pressurejumpcell.controller.control_counter, 123)
     set_mock_value(pressurejumpcell.controller.control_script_status, "ABC")
     set_mock_value(pressurejumpcell.controller.control_routine, "CDE")
@@ -234,12 +220,12 @@ async def test_reading_pjumpcell_includes_read_fields_controller(
         pressurejumpcell.controller,
         {
             "pjump-controller-control_gotobusy": {
-                "value": PressureJumpCellBusyStatus.IDLE,
+                "value": BusyState.IDLE,
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
             "pjump-controller-control_timer": {
-                "value": PressureJumpCellTimerState.COUNTDOWN,
+                "value": TimerState.COUNTDOWN,
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
