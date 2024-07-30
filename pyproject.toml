@@ -49,13 +49,12 @@ dev = [
     "psutil",
     "pydata-sphinx-theme>=0.12",
     "pyright",
-    "pyright_diff_quality_plugin @ git+https://github.com/DiamondLightSource/pyright_diff_quality_plugin.git",
     "pytest",
     "pytest-asyncio",
     "pytest-cov",
     "pytest-random-order",
     "ruff",
-    "sphinx<7.4.6",  #  pinned due to https://github.com/sphinx-doc/sphinx/issues/12660
+    "sphinx<7.4.6",              #  pinned due to https://github.com/sphinx-doc/sphinx/issues/12660
     "sphinx-autobuild",
     "sphinx-copybutton",
     "sphinxcontrib-mermaid",
@@ -95,7 +94,7 @@ reportMissingImports = false # Ignore missing stubs in imported modules
 asyncio_mode = "auto"
 markers = [
     "s03: marks tests as requiring the s03 simulator running (deselect with '-m \"not s03\"')",
-    "skip_in_pycharm: marks test as not working in pycharm testrunner"
+    "skip_in_pycharm: marks test as not working in pycharm testrunner",
 ]
 addopts = """
     --cov=dodal --cov-report term --cov-report xml:cov.xml
@@ -107,7 +106,7 @@ filterwarnings = [
     # Ignore deprecation warning from ophyd_async
     "ignore:dep_util is Deprecated. Use functions from setuptools instead.:DeprecationWarning",
     # Ignore deprecation warning from zocalo
-    "ignore:.*pkg_resources.*:DeprecationWarning"
+    "ignore:.*pkg_resources.*:DeprecationWarning",
 ]
 # Doctest python code in docs, python code in src docstrings, test functions in tests
 testpaths = "docs src tests"
@@ -131,7 +130,7 @@ legacy_tox_ini = """
 [tox]
 skipsdist=True
 
-[testenv:{pre-commit,type-checking,tests,docs,diff-quality}]
+[testenv:{pre-commit,type-checking,tests,docs}]
 # Don't create a virtualenv for the command, requires tox-direct plugin
 direct = True
 passenv = *
@@ -146,7 +145,6 @@ commands =
     type-checking: pyright src tests {posargs}
     pre-commit: pre-commit run --all-files --show-diff-on-failure {posargs}
     docs: sphinx-{posargs:build -E} -T docs build/html
-    diff-quality: diff-quality --violations=pyright --fail-under=100
 """
 
 [tool.ruff]
@@ -157,13 +155,13 @@ lint.extend-ignore = [
     "F811", # support typing.overload decorator
 ]
 lint.select = [
-    "B",  # flake8-bugbear - https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+    "B",    # flake8-bugbear - https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
     "C4",   # flake8-comprehensions - https://beta.ruff.rs/docs/rules/#flake8-comprehensions-c4
     "E",    # pycodestyle errors - https://beta.ruff.rs/docs/rules/#error-e
     "F",    # pyflakes rules - https://beta.ruff.rs/docs/rules/#pyflakes-f
-    "I",  # isort - https://docs.astral.sh/ruff/rules/#isort-i
+    "I",    # isort - https://docs.astral.sh/ruff/rules/#isort-i
     "W",    # pycodestyle warnings - https://beta.ruff.rs/docs/rules/#warning-w
-    "UP", # pyupgrade - https://docs.astral.sh/ruff/rules/#pyupgrade-up
+    "UP",   # pyupgrade - https://docs.astral.sh/ruff/rules/#pyupgrade-up
     "I001", # isort
 ]
 
