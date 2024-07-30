@@ -57,6 +57,7 @@ def undulator(
         Undulator,
         "undulator",
         f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
+# add CURRGAPD
         wait_for_connection,
         fake_with_ophyd_sim,
         bl_prefix=False,
@@ -71,6 +72,7 @@ def slits_1(
 ) -> Slits:
     return numbered_slits(
         1,
+	# BL18I-AL-SLITS-01
         wait_for_connection,
         fake_with_ophyd_sim,
     )
@@ -97,6 +99,9 @@ def xspress3(
 ) -> Xspress3:
     """
     16 channels Xspress3 detector
+	-EA-XPS-02:CAM:MaxSizeX_RBV
+also ArraySize
+also :CONNECTED
     """
 
     return device_instantiation(
@@ -145,6 +150,7 @@ def i0(
         TetrammDetector,
         "i0",
         "-EA-XBPM-02:",
+# -DI-XBPM-02:DEV:Firmware
         wait_for_connection,
         fake_with_ophyd_sim,
         type="Cividec Diamond XBPM",
