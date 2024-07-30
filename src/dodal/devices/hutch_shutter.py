@@ -74,20 +74,20 @@ class HutchShutter(StandardReadable, Movable):
         super().__init__(name)
 
     @AsyncStatus.wrap
-    async def set(self, position_demand: ShutterDemand):
+    async def set(self, value: ShutterDemand):
         interlock_state = await self.interlock.shutter_safe_to_operate()
         if not interlock_state:
             raise ShutterNotSafeToOperateError(
                 "The hutch has not been locked, not operating shutter."
             )
-        if position_demand == ShutterDemand.OPEN:
+        if value == ShutterDemand.OPEN:
             await self.control.set(ShutterDemand.RESET, wait=True)
-            await self.control.set(position_demand, wait=True)
+            await self.control.set(value, wait=True)
             return await wait_for_value(
                 self.status, match=ShutterState.OPEN, timeout=DEFAULT_TIMEOUT
             )
         else:
-            await self.control.set(position_demand, wait=True)
+            await self.control.set(value, wait=True)
             return await wait_for_value(
                 self.status, match=ShutterState.CLOSED, timeout=DEFAULT_TIMEOUT
             )

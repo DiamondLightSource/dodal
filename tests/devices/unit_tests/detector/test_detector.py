@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 from dodal.devices.detector import DetectorParams
+from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
 
 
 def create_det_params_with_dir_and_prefix(directory, prefix="test"):
@@ -16,8 +17,8 @@ def create_det_params_with_dir_and_prefix(directory, prefix="test"):
         num_triggers=1,
         use_roi_mode=False,
         det_dist_to_beam_converter_path="tests/devices/unit_tests/test_lookup_table.txt",
-        detector_size_constants="EIGER2_X_16M",
-    )  # type: ignore
+        detector_size_constants=EIGER2_X_16M_SIZE,
+    )
 
 
 def test_if_trailing_slash_not_provided_then_appended(tmp_path):
@@ -50,7 +51,7 @@ def test_correct_det_dist_to_beam_converter_path_passed_in(mocked_parse_table):
         num_triggers=1,
         use_roi_mode=False,
         det_dist_to_beam_converter_path="a fake directory",
-        detector_size_constants="EIGER2_X_16M",
+        detector_size_constants=EIGER2_X_16M_SIZE,
     )
     params.json()
     assert params.beam_xy_converter.lookup_file == "a fake directory"
@@ -72,7 +73,7 @@ def test_run_number_correct_when_not_specified(mocked_parse_table, tmpdir):
         num_triggers=1,
         use_roi_mode=False,
         det_dist_to_beam_converter_path="a fake directory",
-        detector_size_constants="EIGER2_X_16M",
+        detector_size_constants=EIGER2_X_16M_SIZE,
     )
     assert params.run_number == 1
 
@@ -94,7 +95,7 @@ def test_run_number_correct_when_specified(mocked_parse_table, tmpdir):
         num_triggers=1,
         use_roi_mode=False,
         det_dist_to_beam_converter_path="a fake directory",
-        detector_size_constants="EIGER2_X_16M",
+        detector_size_constants=EIGER2_X_16M_SIZE,
     )
     assert params.run_number == 6
 

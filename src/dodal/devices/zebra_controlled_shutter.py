@@ -29,10 +29,10 @@ class ZebraShutter(StandardReadable, Movable):
         super().__init__(name=name)
 
     @AsyncStatus.wrap
-    async def set(self, desired_position: ZebraShutterState):
-        await self.position_setpoint.set(desired_position)
+    async def set(self, value: ZebraShutterState):
+        await self.position_setpoint.set(value)
         return await wait_for_value(
             signal=self.position_readback,
-            match=desired_position,
+            match=value,
             timeout=DEFAULT_TIMEOUT,
         )

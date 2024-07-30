@@ -6,7 +6,7 @@ according to some criteria either via feedback, preset positions, lookup tables 
 from collections.abc import Callable, Generator
 
 from bluesky import plan_stubs as bps
-from bluesky.run_engine import Msg
+from bluesky.utils import Msg
 from ophyd.epics_motor import EpicsMotor
 from ophyd_async.epics.motion import Motor
 

@@ -15,7 +15,6 @@ from ophyd.status import Status
 
 from dodal.beamlines import i03
 from dodal.common.beamlines import beamline_utils
-from dodal.devices.focusing_mirror import VFMMirrorVoltages
 from dodal.log import LOGGER, GELFTCPHandler, set_up_all_logging_handlers
 from dodal.utils import make_all_devices
 
@@ -85,7 +84,7 @@ def pytest_runtest_teardown():
 
 
 @pytest.fixture
-def vfm_mirror_voltages(RE: RunEngine) -> VFMMirrorVoltages:
+def vfm_mirror_voltages(RE: RunEngine):
     voltages = i03.vfm_mirror_voltages(fake_with_ophyd_sim=True)
     voltages.voltage_lookup_table_path = "tests/test_data/test_mirror_focus.json"
     yield voltages
