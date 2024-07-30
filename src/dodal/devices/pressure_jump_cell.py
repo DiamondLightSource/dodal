@@ -164,24 +164,6 @@ class PressureTransducer(StandardReadable):
         super().__init__(name)
 
 
-class PressureTransducers(StandardReadable):
-    def __init__(
-        self, prefix: str, name: str = "", adc1_prefix: str = "", adc2_prefix: str = ""
-    ) -> None:
-        with self.add_children_as_readables():
-            self.pressure_transducer_1 = PressureTransducer(
-                prefix + "PP1:", name="Pressure Transducer 1", adc_prefix=adc1_prefix
-            )
-            self.pressure_transducer_2 = PressureTransducer(
-                prefix + "PP2:", name="Pressure Transducer 2", adc_prefix=adc2_prefix
-            )
-            self.pressure_transducer_3 = PressureTransducer(
-                prefix + "PP3:", name="Pressure Transducer 3", adc_prefix=adc1_prefix
-            )
-
-        super().__init__(name)
-
-
 class PressureJumpCellController(StandardReadable):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
