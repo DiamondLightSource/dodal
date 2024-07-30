@@ -115,7 +115,7 @@ class TetrammController(DetectorControl):
     async def arm(
         self,
         num: int,
-        trigger: DetectorTrigger,
+        trigger: DetectorTrigger = DetectorTrigger.edge_trigger,
         exposure: float | None = None,
     ) -> AsyncStatus:
         if exposure is None:
