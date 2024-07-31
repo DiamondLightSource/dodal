@@ -103,7 +103,7 @@ def saxs(
     )
 
 
-@skip_device(lambda: BL == LAB_NAME)
+@skip_device(lambda _: BL == LAB_NAME)
 def synchrotron(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> Synchrotron:
@@ -378,7 +378,7 @@ def panda3(
     )
 
 
-@skip_device(lambda: BL == LAB_NAME)
+@skip_device(lambda _: BL == LAB_NAME)
 def panda4(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
