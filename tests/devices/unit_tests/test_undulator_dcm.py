@@ -10,11 +10,14 @@ from ophyd_async.core import (
 )
 
 from dodal.devices.dcm import DCM
-from dodal.devices.undulator import Undulator, UndulatorGapAccess
+from dodal.devices.undulator import (
+    Undulator,
+    UndulatorGapAccess,
+    _get_closest_gap_for_energy,
+)
 from dodal.devices.undulator_dcm import (
     AccessError,
     UndulatorDCM,
-    _get_closest_gap_for_energy,
 )
 from dodal.log import LOGGER
 
@@ -42,13 +45,13 @@ async def fake_undulator_dcm() -> UndulatorDCM:
             "UND-01",
             name="undulator",
             poles=80,
+            id_gap_lookup_table_path=ID_GAP_LOOKUP_TABLE_PATH,
             length=2.0,
         )
         dcm = DCM("DCM-01", name="dcm")
         undulator_dcm = UndulatorDCM(
             undulator,
             dcm,
-            id_gap_lookup_table_path=ID_GAP_LOOKUP_TABLE_PATH,
             daq_configuration_path=MOCK_DAQ_CONFIG_PATH,
             name="undulator_dcm",
         )
@@ -56,7 +59,10 @@ async def fake_undulator_dcm() -> UndulatorDCM:
 
 
 def test_lookup_table_paths_passed(fake_undulator_dcm: UndulatorDCM):
-    assert fake_undulator_dcm.id_gap_lookup_table_path == ID_GAP_LOOKUP_TABLE_PATH
+    assert (
+        fake_undulator_dcm.undulator.id_gap_lookup_table_path
+        == ID_GAP_LOOKUP_TABLE_PATH
+    )
     assert (
         fake_undulator_dcm.pitch_energy_table_path
         == MOCK_DAQ_CONFIG_PATH + "/lookup/BeamLineEnergy_DCM_Pitch_converter.txt"
@@ -91,7 +97,7 @@ def test_correct_closest_distance_to_energy_from_table(dcm_energy, expected_outp
 
 
 @patch("dodal.devices.util.lookup_tables.loadtxt")
-@patch("dodal.devices.undulator_dcm.LOGGER")
+@patch("dodal.devices.undulator.LOGGER")
 async def test_if_gap_is_wrong_then_logger_info_is_called_and_gap_is_set_correctly(
     mock_logger: MagicMock, mock_load: MagicMock, fake_undulator_dcm: UndulatorDCM
 ):
@@ -110,8 +116,9 @@ async def test_if_gap_is_wrong_then_logger_info_is_called_and_gap_is_set_correct
 
 
 @patch("dodal.devices.util.lookup_tables.loadtxt")
-@patch("dodal.devices.undulator_dcm.LOGGER")
+@patch("dodal.devices.undulator.LOGGER")
 @patch("dodal.devices.undulator_dcm.TEST_MODE", True)
+@patch("dodal.devices.undulator.TEST_MODE", True)
 async def test_when_gap_access_is_not_checked_if_test_mode_enabled(
     mock_logger: MagicMock, mock_load: MagicMock, fake_undulator_dcm: UndulatorDCM
 ):
@@ -137,7 +144,7 @@ async def test_when_gap_access_is_not_checked_if_test_mode_enabled(
 
 
 @patch("dodal.devices.util.lookup_tables.loadtxt")
-@patch("dodal.devices.undulator_dcm.LOGGER")
+@patch("dodal.devices.undulator.LOGGER")
 async def test_if_gap_is_already_correct_then_dont_move_gap(
     mock_logger: MagicMock, mock_load: MagicMock, fake_undulator_dcm: UndulatorDCM
 ):
