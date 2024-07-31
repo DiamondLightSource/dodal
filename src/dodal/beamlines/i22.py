@@ -70,6 +70,8 @@ def oav(
         hdf_suffix="HDF5:",
         directory_provider=get_directory_provider(),
     )
+
+
 set_directory_provider(directory_provider)
 
 
@@ -172,11 +174,13 @@ def i0(
         directory_provider=get_directory_provider(),
     )
 
+
 #
 # The following devices are fake by default since P38 has no optics,
 # but having mock devices here means they will be reflected in downstream data
 # processing, where they may be required.
 #
+
 
 def it(
     wait_for_connection: bool = True,
@@ -263,8 +267,6 @@ def undulator(
     )
 
 
-
-
 def slits_1(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = IS_LAB,
@@ -296,6 +298,7 @@ def slits_3(
         wait_for_connection,
         fake_with_ophyd_sim,
     )
+
 
 # todo this is not available at p38
 @skip_device()
@@ -410,9 +413,16 @@ def panda4(
         directory_provider=get_directory_provider(),
     )
 
+
 LINKAM_IS_IN_LAB = False
 
-@skip_device(lambda: BL == LAB_NAME and not LINKAM_IS_IN_LAB or BL != LAB_NAME and LINKAM_IS_IN_LAB)
+
+@skip_device(
+    lambda: BL == LAB_NAME
+    and not LINKAM_IS_IN_LAB
+    or BL != LAB_NAME
+    and LINKAM_IS_IN_LAB
+)
 def linkam(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> Linkam3:

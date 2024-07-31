@@ -17,5 +17,4 @@ PlanGenerator = Callable[..., MsgGenerator]
 
 class UpdatingDirectoryProvider(DirectoryProvider, ABC):
     @abstractmethod
-    async def update(self, **kwargs) -> None:
-        ...
+    async def update(self, **kwargs) -> None: ...
