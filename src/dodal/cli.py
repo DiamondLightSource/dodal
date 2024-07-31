@@ -8,7 +8,8 @@ from dodal.beamlines import all_beamline_names, module_name_for_beamline
 from dodal.utils import make_all_devices
 
 from . import __version__
-
+LAB_FLAG = False
+LAB_NAME = "p38"
 
 @click.group(invoke_without_command=True)
 @click.version_option(version=__version__, message="%(version)s")
@@ -28,7 +29,7 @@ def main(ctx: click.Context) -> None:
     "-a",
     "--all",
     is_flag=True,
-    help="Attempt to connect to devices marked as skipped",
+    help="collect_factoriesAttempt to connect to devices marked as skipped",
     default=False,
 )
 @click.option(
@@ -46,9 +47,13 @@ def main(ctx: click.Context) -> None:
     help="Connect to a lab environment paired with the beamline. For instance i22 and p38",
     default=False   
 )
-def connect(beamline: str, all: bool, sim_backend: bool) -> None:
+def connect(beamline: str, all: bool, sim_backend: bool, lab_mode: bool) -> None:
     """Initialises a beamline module, connects to all devices, reports
     any connection issues."""
+    if lab_mode:
+        global LAB_FLAG
+        LAB_FLAG = True
+        print(f"Lab mode enabled for {beamline}")
 
     os.environ["BEAMLINE"] = beamline
 
@@ -58,9 +63,11 @@ def connect(beamline: str, all: bool, sim_backend: bool) -> None:
     # We need to make a RunEngine to allow ophyd-async devices to connect.
     # See https://blueskyproject.io/ophyd-async/main/explanations/event-loop-choice.html
     RunEngine()
+    real_connection_target = LAB_NAME if LAB_FLAG else beamline
 
-    print(f"Attempting connection to {beamline} (using {full_module_path})")
+    print(f"Attempting connection to {real_connection_target} (using {full_module_path})")
     devices, exceptions = make_all_devices(
+
         full_module_path,
         include_skipped=all,
         fake_with_ophyd_sim=sim_backend,
