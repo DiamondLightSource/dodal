@@ -39,6 +39,13 @@ def main(ctx: click.Context) -> None:
     "attempt any I/O. Useful as a a dry-run.",
     default=False,
 )
+@click.option(
+    "-l",
+    "--lab-mode",
+    is_flag=True,
+    help="Connect to a lab environment paired with the beamline. For instance i22 and p38",
+    default=False   
+)
 def connect(beamline: str, all: bool, sim_backend: bool) -> None:
     """Initialises a beamline module, connects to all devices, reports
     any connection issues."""
