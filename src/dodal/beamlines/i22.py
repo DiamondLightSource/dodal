@@ -4,6 +4,7 @@ from ophyd_async.epics.adaravis import AravisDetector
 from ophyd_async.epics.adpilatus import PilatusDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
+from dodal.cli import LAB_FLAG, LAB_NAME
 from dodal.common.beamlines.beamline_utils import (
     device_instantiation,
     get_path_provider,
@@ -27,8 +28,6 @@ from dodal.devices.tetramm import TetrammDetector
 from dodal.devices.undulator import Undulator
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
-from dodal.cli import LAB_NAME, LAB_FLAG
-
 
 BL = LAB_NAME if LAB_FLAG else get_beamline_name("i22")
 print("BL NAME: ", BL)
@@ -36,7 +35,7 @@ set_log_beamline(BL)
 set_utils_beamline(BL)
 
 IS_LAB = LAB_FLAG and BL == LAB_NAME
-print("is this lab? : ",IS_LAB)
+print("is this lab? : ", IS_LAB)
 
 # Currently we must hard-code the visit, determining the visit at runtime requires
 # infrastructure that is still WIP.
@@ -62,15 +61,14 @@ set_path_provider(
 def saxs(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> AravisDetector | NXSasPilatus:
-
     if IS_LAB:
         return device_instantiation(
-            AravisDetector ,
+            AravisDetector,
             "d11",
             "-DI-DCAM-03:",
             wait_for_connection,
             fake_with_ophyd_sim,
-            drv_suffix="DET:" ,
+            drv_suffix="DET:",
             hdf_suffix="HDF5:",
             # metadata_holder=NXSasMetadataHolder(
             #     x_pixel_size=(1.72e-1, "mm"),
@@ -85,8 +83,8 @@ def saxs(
         )
 
     return device_instantiation(
-         NXSasPilatus,
-         "saxs",
+        NXSasPilatus,
+        "saxs",
         "-EA-PILAT-01:",
         wait_for_connection,
         fake_with_ophyd_sim,

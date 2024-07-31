@@ -8,8 +8,10 @@ from dodal.beamlines import all_beamline_names, module_name_for_beamline
 from dodal.utils import make_all_devices
 
 from . import __version__
+
 LAB_FLAG = False
 LAB_NAME = "p38"
+
 
 @click.group(invoke_without_command=True)
 @click.version_option(version=__version__, message="%(version)s")
@@ -45,7 +47,7 @@ def main(ctx: click.Context) -> None:
     "--lab-mode",
     is_flag=True,
     help="Connect to a lab environment paired with the beamline. For instance i22 and p38",
-    default=False   
+    default=False,
 )
 def connect(beamline: str, all: bool, sim_backend: bool, lab_mode: bool) -> None:
     """Initialises a beamline module, connects to all devices, reports
@@ -65,9 +67,10 @@ def connect(beamline: str, all: bool, sim_backend: bool, lab_mode: bool) -> None
     RunEngine()
     real_connection_target = LAB_NAME if LAB_FLAG else beamline
 
-    print(f"Attempting connection to {real_connection_target} (using {full_module_path})")
+    print(
+        f"Attempting connection to {real_connection_target} (using {full_module_path})"
+    )
     devices, exceptions = make_all_devices(
-
         full_module_path,
         include_skipped=all,
         fake_with_ophyd_sim=sim_backend,
