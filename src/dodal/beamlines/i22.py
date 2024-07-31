@@ -55,10 +55,26 @@ directory_provider = (
     )
 )
 
+
+# d3 at p38
+def oav(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> AravisDetector:
+    return device_instantiation(
+        AravisDetector if IS_LAB else NXSasOAV,
+        "d3" if IS_LAB else "oav",
+        f"-DI-{'DCAM' if IS_LAB else 'OAV'}-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        drv_suffix="DET:",
+        hdf_suffix="HDF5:",
+        directory_provider=get_directory_provider(),
+    )
 set_directory_provider(directory_provider)
 
 
 # d11 at p38, but disconnected
+@skip_device(lambda: BL == LAB_NAME)
 def saxs(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> AravisDetector | NXSasPilatus:
@@ -104,7 +120,7 @@ def saxs(
     )
 
 
-@skip_device(lambda _: BL == LAB_NAME)
+@skip_device(lambda: BL == LAB_NAME)
 def synchrotron(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> Synchrotron:
@@ -156,10 +172,15 @@ def i0(
         directory_provider=get_directory_provider(),
     )
 
+#
+# The following devices are fake by default since P38 has no optics,
+# but having mock devices here means they will be reflected in downstream data
+# processing, where they may be required.
+#
 
 def it(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
+    fake_with_ophyd_sim: bool = IS_LAB,
 ) -> TetrammDetector:
     return device_instantiation(
         TetrammDetector,
@@ -174,7 +195,7 @@ def it(
 
 def vfm(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
+    fake_with_ophyd_sim: bool = IS_LAB,
 ) -> FocusingMirror:
     return device_instantiation(
         FocusingMirror,
@@ -187,7 +208,7 @@ def vfm(
 
 def hfm(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
+    fake_with_ophyd_sim: bool = IS_LAB,
 ) -> FocusingMirror:
     return device_instantiation(
         FocusingMirror,
@@ -200,7 +221,7 @@ def hfm(
 
 def dcm(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
+    fake_with_ophyd_sim: bool = IS_LAB,
 ) -> DoubleCrystalMonochromator:
     return device_instantiation(
         DoubleCrystalMonochromator,
@@ -228,7 +249,7 @@ def dcm(
 
 def undulator(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
+    fake_with_ophyd_sim: bool = IS_LAB,
 ) -> Undulator:
     return device_instantiation(
         Undulator,
@@ -242,16 +263,11 @@ def undulator(
     )
 
 
-#
-# The following devices are fake by default since P38 has no optics,
-# but having mock devices here means they will be reflected in downstream data
-# processing, where they may be required.
-#
 
 
 def slits_1(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
+    fake_with_ophyd_sim: bool = IS_LAB,
 ) -> Slits:
     return numbered_slits(
         1,
@@ -262,7 +278,7 @@ def slits_1(
 
 def slits_2(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
+    fake_with_ophyd_sim: bool = IS_LAB,
 ) -> Slits:
     return numbered_slits(
         2,
@@ -273,7 +289,7 @@ def slits_2(
 
 def slits_3(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
+    fake_with_ophyd_sim: bool = IS_LAB,
 ) -> Slits:
     return numbered_slits(
         3,
@@ -281,11 +297,11 @@ def slits_3(
         fake_with_ophyd_sim,
     )
 
-
+# todo this is not available at p38
 @skip_device()
 def slits_4(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
+    fake_with_ophyd_sim: bool = IS_LAB,
 ) -> Slits:
     return numbered_slits(
         4,
@@ -296,7 +312,7 @@ def slits_4(
 
 def slits_5(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
+    fake_with_ophyd_sim: bool = IS_LAB,
 ) -> Slits:
     return numbered_slits(
         5,
@@ -307,7 +323,7 @@ def slits_5(
 
 def slits_6(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
+    fake_with_ophyd_sim: bool = IS_LAB,
 ) -> Slits:
     return numbered_slits(
         6,
@@ -318,7 +334,7 @@ def slits_6(
 
 def fswitch(
     wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
+    fake_with_ophyd_sim: bool = IS_LAB,
 ) -> FSwitch:
     return device_instantiation(
         FSwitch,
@@ -335,6 +351,7 @@ def fswitch(
 # Must find which PandA IOC(s) are compatible
 # Must document what PandAs are physically connected to
 # See: https://github.com/bluesky/ophyd-async/issues/284
+@skip_device(lambda: BL == LAB_NAME)
 def panda1(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
@@ -379,7 +396,7 @@ def panda3(
     )
 
 
-@skip_device(lambda _: BL == LAB_NAME)
+@skip_device(lambda: BL == LAB_NAME)
 def panda4(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
@@ -393,30 +410,9 @@ def panda4(
         directory_provider=get_directory_provider(),
     )
 
+LINKAM_IS_IN_LAB = False
 
-# d3 at p38
-def oav(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> AravisDetector:
-    return device_instantiation(
-        AravisDetector if IS_LAB else NXSasOAV,
-        "d3" if IS_LAB else "oav",
-        f"-DI-{'DCAM' if IS_LAB else 'OAV'}-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-        drv_suffix="DET:",
-        hdf_suffix="HDF5:",
-        metadata_holder=NXSasMetadataHolder(
-            x_pixel_size=(3.45e-3, "mm"),  # Double check this figure
-            y_pixel_size=(3.45e-3, "mm"),
-            description="AVT Mako G-507B",
-            distance=(-1.0, "m"),
-        ),
-        directory_provider=get_directory_provider(),
-    )
-
-
-@skip_device()
+@skip_device(lambda: BL == LAB_NAME and not LINKAM_IS_IN_LAB or BL != LAB_NAME and LINKAM_IS_IN_LAB)
 def linkam(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> Linkam3:
