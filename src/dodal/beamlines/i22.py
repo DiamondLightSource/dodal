@@ -27,12 +27,16 @@ from dodal.devices.tetramm import TetrammDetector
 from dodal.devices.undulator import Undulator
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
+from dodal.cli import LAB_NAME, LAB_FLAG
 
-BL = get_beamline_name("i22")
+
+BL = LAB_NAME if LAB_FLAG else get_beamline_name("i22")
+print("BL NAME: ", BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
-IS_LAB = BL == "p38"
+IS_LAB = LAB_FLAG and BL == LAB_NAME
+print("is this lab? : ",IS_LAB)
 
 # Currently we must hard-code the visit, determining the visit at runtime requires
 # infrastructure that is still WIP.
@@ -68,15 +72,15 @@ def saxs(
             fake_with_ophyd_sim,
             drv_suffix="DET:" ,
             hdf_suffix="HDF5:",
-            metadata_holder=NXSasMetadataHolder(
-                x_pixel_size=(1.72e-1, "mm"),
-                y_pixel_size=(1.72e-1, "mm"),
-                description="Dectris Pilatus3 2M",
-                type="Photon Counting Hybrid Pixel",
-                sensor_material="silicon",
-                sensor_thickness=(0.45, "mm"),
-                distance=(4711.833684146172, "mm"),
-            ),
+            # metadata_holder=NXSasMetadataHolder(
+            #     x_pixel_size=(1.72e-1, "mm"),
+            #     y_pixel_size=(1.72e-1, "mm"),
+            #     description="Dectris Pilatus3 2M",
+            #     type="Photon Counting Hybrid Pixel",
+            #     sensor_material="silicon",
+            #     sensor_thickness=(0.45, "mm"),
+            #     distance=(4711.833684146172, "mm"),
+            # ),
             directory_provider=get_directory_provider(),
         )
 
@@ -101,7 +105,7 @@ def saxs(
     )
 
 
-@skip_device(IS_LAB)
+@skip_device(lambda: BL == LAB_NAME)
 def synchrotron(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> Synchrotron:
@@ -376,7 +380,7 @@ def panda3(
     )
 
 
-@skip_device(IS_LAB)
+@skip_device(lambda: BL == LAB_NAME)
 def panda4(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
