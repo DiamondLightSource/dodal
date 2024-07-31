@@ -57,14 +57,36 @@ set_path_provider(
 # d11 at p38, but disconnected
 def saxs(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> PilatusDetector:
+) -> AravisDetector | NXSasPilatus:
+
+    if IS_LAB:
+        return device_instantiation(
+            AravisDetector ,
+            "d11",
+            "-DI-DCAM-03:",
+            wait_for_connection,
+            fake_with_ophyd_sim,
+            drv_suffix="DET:" ,
+            hdf_suffix="HDF5:",
+            metadata_holder=NXSasMetadataHolder(
+                x_pixel_size=(1.72e-1, "mm"),
+                y_pixel_size=(1.72e-1, "mm"),
+                description="Dectris Pilatus3 2M",
+                type="Photon Counting Hybrid Pixel",
+                sensor_material="silicon",
+                sensor_thickness=(0.45, "mm"),
+                distance=(4711.833684146172, "mm"),
+            ),
+            directory_provider=get_directory_provider(),
+        )
+
     return device_instantiation(
-        AravisDetector if IS_LAB else NXSasPilatus,
-        "d11" if IS_LAB else "saxs",
-        "-DI-DCAM-03:" if IS_LAB else "-EA-PILAT-01:",
+         NXSasPilatus,
+         "saxs",
+        "-EA-PILAT-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        drv_suffix="DET:" if IS_LAB else "CAM:",
+        drv_suffix="CAM:",
         hdf_suffix="HDF5:",
         metadata_holder=NXSasMetadataHolder(
             x_pixel_size=(1.72e-1, "mm"),
