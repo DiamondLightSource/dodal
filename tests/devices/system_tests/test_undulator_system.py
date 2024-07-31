@@ -13,7 +13,7 @@ ID_GAP_LOOKUP_TABLE_PATH: str = (
 @pytest.mark.s03
 def test_undulator_connects():
     with DeviceCollector():
-        undulator = Undulator(
+        undulator = Undulator(  # noqa: F841
             f"{SIM_INSERTION_PREFIX}-MO-SERVC-01:",
             id_gap_lookup_table_path=ID_GAP_LOOKUP_TABLE_PATH,
-        )  # noqa: F841
+        )
