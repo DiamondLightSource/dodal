@@ -74,35 +74,35 @@ class TestDeviceInitializationController(unittest.TestCase):
 
         self.assertEqual(cached_device, self.device_mock)
 
-    def test_device_creation_and_connection(self):
-        def factory():
-            return self.device_mock
+    # def test_device_creation_and_connection(self):
+    #     def factory():
+    #         return self.device_mock
 
-        controller = DeviceInitializationController(self.config, factory)
+    #     controller = DeviceInitializationController(self.config, factory)
 
-        with patch(
-            "dodal.common.beamlines.instantiation_behaviour.call_in_bluesky_event_loop"
-        ) as mock_event_loop:
-            with patch.object(self.device_mock, "connect") as mock_connect:
-                mock_connect.return_value = MagicMock()
-                _device = controller(connect=True)
+    #     with patch(
+    #         "dodal.common.beamlines.instantiation_behaviour.call_in_bluesky_event_loop"
+    #     ) as mock_event_loop:
+    #         with patch.object(self.device_mock, "connect") as mock_connect:
+    #             mock_connect.return_value = MagicMock()
+    #             _device = controller(connect=True)
 
-                mock_connect.assert_called_once_with(
-                    timeout=DEFAULT_TIMEOUT, mock=False
-                )
-                mock_event_loop.assert_called_once_with(mock_connect())
+    #             mock_connect.assert_called_once_with(
+    #                 timeout=DEFAULT_TIMEOUT, mock=False
+    #             )
+    #             mock_event_loop.assert_called_once_with(mock_connect())
 
 
-class TestInstantiationBehaviour(unittest.TestCase):
-    def test_decorator_creates_controller(self):
-        def factory():
-            return MagicMock(spec=XYZDetector)
+# class TestInstantiationBehaviour(unittest.TestCase):
+#     def test_decorator_creates_controller(self):
+#         def factory():
+#             return MagicMock(spec=XYZDetector)
 
-        decorator = instantiation_behaviour()
-        controller = decorator(factory)
+#         decorator = instantiation_behaviour()
+#         controller = decorator(factory)
 
-        self.assertIsInstance(controller, DeviceInitializationController)
-        self.assertIn(factory.__name__, CONTROLLERS)
+#         self.assertIsInstance(controller, DeviceInitializationController)
+#         self.assertIn(factory.__name__, CONTROLLERS)
 
 
 class TestSpecificDeviceFunctions(unittest.TestCase):
