@@ -7,5 +7,5 @@ class IPin(StandardReadable):
 
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables(wrapper=HintedSignal):
-            pin_readback = epics_signal_r(float, prefix + "I")
+            self.pin_readback = epics_signal_r(float, prefix + "I")
         super().__init__(name)
