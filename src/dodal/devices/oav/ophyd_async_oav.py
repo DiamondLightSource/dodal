@@ -33,8 +33,8 @@ class OAV(StandardReadable):
         self.array_data = epics_signal_r(
             NDArray[np.uint8], f"pva://{prefix}-DI-OAV-01:PVA:ARRAY"
         )
-        self.x_size = epics_signal_r(float, prefix + "-DI-OAV-01:MJPG:ArraySize1_RBV")
-        self.y_size = epics_signal_r(float, prefix + "-DI-OAV-01:MJPG:ArraySize2_RBV")
+        self.x_size = epics_signal_r(int, prefix + "-DI-OAV-01:MJPG:ArraySize1_RBV")
+        self.y_size = epics_signal_r(int, prefix + "-DI-OAV-01:MJPG:ArraySize2_RBV")
         self.parameters = params
         self.cb = None
 
