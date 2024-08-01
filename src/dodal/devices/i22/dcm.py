@@ -1,4 +1,5 @@
 import time
+from collections.abc import Sequence
 
 import numpy as np
 from bluesky.protocols import Reading
