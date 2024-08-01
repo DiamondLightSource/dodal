@@ -64,8 +64,8 @@ class CrystalMetadata:
                 "Invalid reflection plane format. Expected format is 'TypeXYZ'."
             )
         indices = plane[2:]
-        h, k, l = int(indices[0]), int(indices[1]), int(indices[2])
-        return h, k, l
+        h_index, k_index, l_index = int(indices[0]), int(indices[1]), int(indices[2])
+        return h_index, k_index, l_index
 
     @staticmethod
     def calculate_d_spacing(
