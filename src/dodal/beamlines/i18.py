@@ -9,9 +9,10 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import numbered_slits
+from dodal.common.crystal_metadata import CrystalMetadata
 from dodal.common.visit import DirectoryServiceClient, StaticVisitDirectoryProvider
 from dodal.devices.focusing_mirror import FocusingMirror
-from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
+from dodal.devices.i22.dcm import DoubleCrystalMonochromator
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.tetramm import TetrammDetector
@@ -24,17 +25,6 @@ BL = get_beamline_name("i18")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
-#
-# table again, t1 theta and d7bdiode
-# MO table is ok
-#
-# pinhole PVs?
-# -AL-APTR-01:TEMP1
-#
-# diode reading and also DRAIN
-# diode is ok, there are A and B variants
-# motors A and B
-# camera not used
 
 # Currently we must hard-code the visit, determining the visit at runtime requires
 # infrastructure that is still WIP.
@@ -70,7 +60,6 @@ def undulator(
         Undulator,
         "undulator",
         f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
-        # add CURRGAPD
         wait_for_connection,
         fake_with_ophyd_sim,
         bl_prefix=False,
@@ -86,7 +75,6 @@ def slits_1(
 ) -> Slits:
     return numbered_slits(
         1,
-        # BL18I-AL-SLITS-01
         wait_for_connection,
         fake_with_ophyd_sim,
     )
@@ -115,20 +103,23 @@ def xspress3(
 ) -> Xspress3:
     """
     16 channels Xspress3 detector
-        -EA-XPS-02:CAM:MaxSizeX_RBV
-      also ArraySize
-      also :CONNECTED
     """
 
     return device_instantiation(
         Xspress3,
-        # prefix="-EA-DET-03:",
         prefix="-EA-XPS-02:",
         name="Xspress3",
         num_channels=16,
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )
+
+
+crystal_1_metadata = CrystalMetadata("Si111")
+crystal_2_metadata = CrystalMetadata("Si111")
+
+_unused_crystal_metadata_1 = CrystalMetadata("Si311")
+_unused_crystal_metadata_2 = CrystalMetadata("Si333")
 
 
 def dcm(
@@ -144,18 +135,8 @@ def dcm(
         bl_prefix=False,
         motion_prefix=f"{BeamlinePrefix(BL).beamline_prefix}-MO-DCM-01:",
         temperature_prefix=f"{BeamlinePrefix(BL).beamline_prefix}-DI-DCM-01:",
-        crystal_1_metadata=CrystalMetadata(
-            usage="Bragg",
-            type="silicon",
-            reflection=(1, 1, 1),
-            d_spacing=(3.13475, "nm"),
-        ),
-        crystal_2_metadata=CrystalMetadata(
-            usage="Bragg",
-            type="silicon",
-            reflection=(1, 1, 1),
-            d_spacing=(3.13475, "nm"),
-        ),
+        crystal_1_metadata=crystal_1_metadata,
+        crystal_2_metadata=crystal_2_metadata,
     )
 
 
@@ -168,7 +149,6 @@ def i0(
         TetrammDetector,
         "i0",
         "-EA-XBPM-02:",
-        # -DI-XBPM-02:DEV:Firmware
         wait_for_connection,
         fake_with_ophyd_sim,
         type="Cividec Diamond XBPM",
@@ -192,6 +172,7 @@ def it(
     )
 
 
+@skip_device
 def vfm(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
@@ -199,12 +180,13 @@ def vfm(
     return device_instantiation(
         FocusingMirror,
         "vfm",
-        "-OP-KBM-01:VFM:",
+        "-OP-VFM-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
 
 
+@skip_device
 def hfm(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
@@ -212,7 +194,7 @@ def hfm(
     return device_instantiation(
         FocusingMirror,
         "hfm",
-        "-OP-KBM-01:HFM:",
+        "-OP-HFM-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
