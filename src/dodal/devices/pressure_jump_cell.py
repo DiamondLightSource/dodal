@@ -29,17 +29,20 @@ class StopState(str, Enum):
     CONTINUE = "CONTINUE"
     STOP = "STOP"
 
-class FastValveControlRequest(str, Enum): 
+
+class FastValveControlRequest(str, Enum):
     OPEN = "Open"
     CLOSE = "Close"
     RESET = "Reset"
     ARM = "Arm"
     DISARM = "Disarm"
 
+
 class ValveControlRequest(str, Enum):
     OPEN = "Open"
     CLOSE = "Close"
     RESET = "Reset"
+
 
 class PumpMotorControlRequest(str, Enum):
     ENABLE = "Enable"
@@ -50,7 +53,7 @@ class PumpMotorControlRequest(str, Enum):
 
 
 class PumpMotorDirectionState(str, Enum):
-    EMPTY = "" 
+    EMPTY = ""
     FORWARD = "Forward"
     REVERSE = "Reverse"
 
@@ -99,10 +102,7 @@ class AllValvesControl(StandardReadable):
 
         with self.add_children_as_readables(ConfigSignal):
             self.valves_open: DeviceVector[SignalR[int]] = DeviceVector(
-                {
-                    i: epics_signal_rw(int, f"{prefix}V{i}:OPENSEQ")
-                    for i in [1, 3, 5, 6]
-                }
+                {i: epics_signal_rw(int, f"{prefix}V{i}:OPENSEQ") for i in [1, 3, 5, 6]}
             )
 
             self.valve_control: DeviceVector[SignalR[ValveControlRequest]] = (
@@ -118,7 +118,7 @@ class AllValvesControl(StandardReadable):
                 DeviceVector(
                     {
                         i: epics_signal_rw(FastValveControlRequest, f"{prefix}V{i}:CON")
-                        for i in [ 5, 6]
+                        for i in [5, 6]
                     }
                 )
             )
@@ -146,7 +146,7 @@ class Pump(StandardReadable):
             self.pump_speed = epics_signal_rw(float, prefix + "MSPEED")
             self.pump_move_forward = epics_signal_rw(int, prefix + "M1:FORW")
             self.pump_move_backward = epics_signal_rw(bool, prefix + "M1:BACKW")
-            self.pump_move_backward = epics_signal_rw(
+            self.pump_connection = epics_signal_rw(
                 PumpMotorControlRequest, prefix + "M1:CON"
             )
 
@@ -155,10 +155,12 @@ class Pump(StandardReadable):
 
 class PressureTransducer(StandardReadable):
     """
-    reads pressure 
+    reads pressure
     """
 
-    def __init__(self, prefix: str, number: int, name: str = "", adc_prefix: str = "" ) -> None:
+    def __init__(
+        self, prefix: str, number: int, name: str = "", adc_prefix: str = ""
+    ) -> None:
         with self.add_children_as_readables():
             self.omron_pressure = epics_signal_r(float, f"{prefix}PP{number}:PRES")
             self.omron_voltage = epics_signal_r(float, f"{prefix}PP{number}:RAW")
@@ -204,22 +206,6 @@ class PressureJumpCellController(StandardReadable):
         super().__init__(name)
 
 
-# h_pressure_xray_cell: NotConnected:
-#     coros: NotConnected:
-#         pressure_transducer_1: NotConnected:
-#             omron_pressure: NotConnected: ca://-HPXC-01:PP1:PRES
-#             omron_voltage: NotConnected: ca://-HPXC-01:PP1:RAW
-#             beckhoff_pressure: NotConnected: ca://-HPXC-01:PP1:STATP:MeanValue_RBV
-#         pressure_transducer_2: NotConnected:
-#             omron_pressure: NotConnected: ca://-HPXC-01:PP2:PRES
-#             omron_voltage: NotConnected: ca://-HPXC-01:PP2:RAW
-#             beckhoff_pressure: NotConnected: ca://-HPXC-01:PP2:STATP:MeanValue_RBV
-#         pressure_transducer_3: NotConnected:
-#             omron_pressure: NotConnected: ca://-HPXC-01:PP3:PRES
-#             omron_voltage: NotConnected: ca://-HPXC-01:PP3:RAW
-#             beckhoff_pressure: NotConnected: ca://-HPXC-01:PP3:STATP:MeanValue_RBV
-
-
 class PressureJumpCell(StandardReadable):
     """
     High pressure X-ray cell, used to apply pressure or pressure jumps to a sample.
@@ -235,28 +221,20 @@ class PressureJumpCell(StandardReadable):
         self.all_valves_control = AllValvesControl(f"{prefix}{cell_prefix}", name)
         self.pump = Pump(f"{prefix}{cell_prefix}", name)
 
-        self.pressure_transducer_1 = PressureTransducer(
-            prefix=f"{prefix}{cell_prefix}",
-            name="Pressure Transducer 1",
-            adc_prefix=f"{prefix}{adc_prefix}-01:",
-            number=1
-        )
-        self.pressure_transducer_2 = PressureTransducer(
-            prefix=f"{prefix}{cell_prefix}",
-            name="Pressure Transducer 2",
-            adc_prefix=f"{prefix}{adc_prefix}-02:",
-            number=2
-        )
-        self.pressure_transducer_3 = PressureTransducer(
-            prefix=f"{prefix}{cell_prefix}",
-            name="Pressure Transducer 3",
-            adc_prefix=f"{prefix}{adc_prefix}-01:",
-            number=3
-        )
-
         self.controller = PressureJumpCellController(f"{prefix}{cell_prefix}", name)
 
         with self.add_children_as_readables():
+            self.pressure_transducers: DeviceVector[PressureTransducer] = DeviceVector(
+                {
+                    i: PressureTransducer(
+                        prefix=f"{prefix}{cell_prefix}",
+                        number=i,
+                        adc_prefix=f"{prefix}{adc_prefix}-0{i}:",
+                    )
+                    for i in [1, 2, 3]
+                }
+            )
+
             self.cell_temperature = epics_signal_r(float, f"{prefix}{cell_prefix}TEMP")
 
         super().__init__(name)
