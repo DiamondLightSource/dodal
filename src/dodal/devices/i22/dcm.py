@@ -1,7 +1,5 @@
 import time
 from collections.abc import Sequence
-from dataclasses import dataclass
-from typing import Literal
 
 from bluesky.protocols import Reading
 from event_model.documents.event_descriptor import DataKey
@@ -9,22 +7,11 @@ from ophyd_async.core import ConfigSignal, StandardReadable, soft_signal_r_and_s
 from ophyd_async.epics.motion import Motor
 from ophyd_async.epics.signal import epics_signal_r
 
+from dodal.common.crystal_metadata import CrystalMetadata
+
 # Conversion constant for energy and wavelength, taken from the X-Ray data booklet
 # Converts between energy in KeV and wavelength in angstrom
 _CONVERSION_CONSTANT = 12.3984
-
-
-@dataclass(frozen=True, unsafe_hash=True)
-class CrystalMetadata:
-    """
-    Metadata used in the NeXus format,
-    see https://manual.nexusformat.org/classes/base_classes/NXcrystal.html
-    """
-
-    usage: Literal["Bragg", "Laue"] | None = None
-    type: str | None = None
-    reflection: tuple[int, int, int] | None = None
-    d_spacing: tuple[float, str] | None = None
 
 
 class DoubleCrystalMonochromator(StandardReadable):
