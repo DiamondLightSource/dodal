@@ -234,7 +234,6 @@ def slits_3(
     )
 
 
-@skip_device()
 def slits_4(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
@@ -242,7 +241,7 @@ def slits_4(
     return device_instantiation(
         SpecialSlitsi22,
         "slits_4",
-        "-AL-SLITS-04:",  # todo maybe this is wrong
+        "-AL-SLITS-04:",
         wait_for_connection,
         fake_with_ophyd_sim,
     )

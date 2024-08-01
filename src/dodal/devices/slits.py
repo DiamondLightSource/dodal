@@ -19,13 +19,13 @@ class Slits(StandardReadable):
 
 class SpecialSlitsi22(StandardReadable):
     """
-    TODO uncertain
+    these are unlikely to be moved during a scan
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
-            self.x_plus = Motor(prefix + "X:PLUS")
-            self.x_minus = Motor(prefix + "X:MINUS")
-            self.y_plus = Motor(prefix + "Y:PLUS")
-            self.y_minus = Motor(prefix + "Y:MINUS")
+            self.x = Motor(prefix + "X")
+            self.y = Motor(prefix + "Y")
+            self.horizontal_dso = Motor(prefix + "HDSO")
+            self.vertical_dso = Motor(prefix + "VDSO")
         super().__init__(name)
