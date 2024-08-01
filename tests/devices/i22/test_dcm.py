@@ -58,8 +58,8 @@ async def test_crystal_metadata_not_propagated_when_not_supplied():
         dcm = DoubleCrystalMonochromator(
             motion_prefix="FOO-MO",
             temperature_prefix="FOO-DI",
-            crystal_1_metadata=None,
-            crystal_2_metadata=None,
+            crystal_1_metadata=CrystalMetadata("Si111"),
+            crystal_2_metadata=CrystalMetadata("Si111"),
         )
 
     configuration = await dcm.read_configuration()
