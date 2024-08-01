@@ -1,5 +1,6 @@
 from ophyd_async.core import StaticDirectoryProvider
 from ophyd_async.panda import HDFPanda
+from ophyd_async.epics.areadetector import AravisDetector
 
 from dodal.common.beamlines.beamline_utils import (
     device_instantiation,
@@ -65,5 +66,7 @@ def manta(
          wait_for_connection,
          fake_with_ophyd_sim,
          directory_provider=static_directory_provider,
+         drv_suffix="CAM:",
+         hdf_suffix="HDF5:",
      )
 
