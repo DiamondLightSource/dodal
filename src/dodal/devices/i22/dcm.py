@@ -57,8 +57,8 @@ class DoubleCrystalMonochromator(StandardReadable):
 
         # Soft metadata
         # If supplied include crystal details in output of read_configuration
-        crystal_1_metadata = crystal_1_metadata or CrystalMetadata()
-        crystal_2_metadata = crystal_2_metadata or CrystalMetadata()
+        crystal_1_metadata = crystal_1_metadata or CrystalMetadata("Si111")
+        crystal_2_metadata = crystal_2_metadata or CrystalMetadata("Si111")
         with self.add_children_as_readables(ConfigSignal):
             if crystal_1_metadata.usage is not None:
                 self.crystal_1_usage, _ = soft_signal_r_and_setter(
