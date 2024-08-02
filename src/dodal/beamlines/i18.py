@@ -12,6 +12,8 @@ from dodal.common.beamlines.device_helpers import numbered_slits
 from dodal.common.crystal_metadata import CrystalMetadata
 from dodal.common.visit import DirectoryServiceClient, StaticVisitDirectoryProvider
 from dodal.devices.focusing_mirror import FocusingMirror
+from dodal.devices.i18.diode import Diode
+from dodal.devices.i18.table import Table
 from dodal.devices.i22.dcm import DoubleCrystalMonochromator
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
@@ -195,6 +197,26 @@ def hfm(
         FocusingMirror,
         "hfm",
         "-OP-HFM-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+def diode(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> Diode:
+    return device_instantiation(
+        Diode,
+        "diodad7bdiode",
+        "-DI-PHDGN-07:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+def table(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> Table:
+    return device_instantiation(
+        Table,
+        "table",
+        "-MO-TABLE-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
