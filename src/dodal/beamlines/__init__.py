@@ -19,6 +19,10 @@ _BEAMLINE_NAME_OVERRIDES = {
     "p49": "training_rig",
 }
 
+BEAMLINE_LAB_MAPPINGS: dict[str, str] = {
+    "i22": "p38",
+}
+
 
 def all_beamline_modules() -> Iterable[str]:
     """
@@ -89,3 +93,35 @@ def module_name_for_beamline(beamline: str) -> str:
     """
 
     return _BEAMLINE_NAME_OVERRIDES.get(beamline, beamline)
+
+
+def get_module_by_beamline_name(name: str) -> Iterable[str]:
+    """
+    Get the names of specific importable modules that match the beamline name.
+
+    Args:
+        name (str): The beamline name to filter modules.
+
+    Returns:
+        Iterable[str]: An iterable of matching beamline module names.
+    """
+
+    # This is done by inspecting file names rather than modules to avoid
+    # premature importing
+    spec = importlib.util.find_spec(__name__)
+    if spec is not None:
+        assert spec.submodule_search_locations
+        search_paths = [Path(path) for path in spec.submodule_search_locations]
+
+        for path in search_paths:
+            for subpath in path.glob("**/*"):
+                if (
+                    subpath.name.endswith(".py")
+                    and subpath.name != "__init__.py"
+                    and ("__pycache__" not in str(subpath))
+                ):
+                    module_name = subpath.with_suffix("").name
+                    if name in module_name:
+                        yield module_name
+    else:
+        raise KeyError(f"Unable to find {__name__} module")

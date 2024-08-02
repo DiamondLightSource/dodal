@@ -1,8 +1,9 @@
 from typing import Any
+from unittest.mock import patch
 
 import pytest
 
-from dodal.beamlines import all_beamline_modules
+from dodal.beamlines import BEAMLINE_LAB_MAPPINGS, all_beamline_modules
 from dodal.common.beamlines import beamline_utils
 from dodal.utils import BLUESKY_PROTOCOLS, make_all_devices
 
@@ -21,7 +22,7 @@ def test_device_creation(RE, module_and_devices_for_beamline):
     Ensures that for every beamline all device factories are using valid args
     and creating types that conform to Bluesky protocols.
     """
-    module, devices = module_and_devices_for_beamline
+    _, devices = module_and_devices_for_beamline
     for device_name, device in devices.items():
         assert device_name in beamline_utils.ACTIVE_DEVICES, (
             f"No device named {device_name} was created for {module}, "
@@ -29,6 +30,29 @@ def test_device_creation(RE, module_and_devices_for_beamline):
         )
         assert follows_bluesky_protocols(device)
     assert len(beamline_utils.ACTIVE_DEVICES) == len(devices)
+
+
+@pytest.mark.parametrize(
+    "module_and_devices_for_beamline",
+    set(BEAMLINE_LAB_MAPPINGS),
+    indirect=True,
+)
+def test_lab_version_of_a_beamline(RE, module_and_devices_for_beamline):
+    """
+    Ensures that for every lab beamline all device factories are using valid args
+    and creating types that conform to Bluesky protocols.
+    """
+    # todo mock this import boolean flag as true
+    # from dodal.cli import LAB_FLAG
+    with patch("dodal.cli.LAB_FLAG", True):
+        _, devices = module_and_devices_for_beamline
+        for device_name, device in devices.items():
+            assert device_name in beamline_utils.ACTIVE_DEVICES, (
+                f"No device named {device_name} was created, devices "
+                f"are {beamline_utils.ACTIVE_DEVICES.keys()}"
+            )
+            assert follows_bluesky_protocols(device)
+        assert len(beamline_utils.ACTIVE_DEVICES) == len(devices)
 
 
 @pytest.mark.parametrize(

@@ -4,7 +4,7 @@ from ophyd_async.epics.adaravis import AravisDetector
 from ophyd_async.epics.adpilatus import PilatusDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
-from dodal.cli import LAB_FLAG, LAB_NAME
+from dodal.cli import LAB_FLAG
 from dodal.common.beamlines.beamline_utils import (
     device_instantiation,
     get_path_provider,
@@ -28,6 +28,8 @@ from dodal.devices.tetramm import TetrammDetector
 from dodal.devices.undulator import Undulator
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
+
+LAB_NAME = "p38"
 
 BL = LAB_NAME if LAB_FLAG else get_beamline_name("i22")
 print("BL NAME: ", BL)

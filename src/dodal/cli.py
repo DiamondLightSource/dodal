@@ -4,13 +4,16 @@ import click
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import NotConnected
 
-from dodal.beamlines import all_beamline_names, module_name_for_beamline
+from dodal.beamlines import (
+    BEAMLINE_LAB_MAPPINGS,
+    all_beamline_names,
+    module_name_for_beamline,
+)
 from dodal.utils import make_all_devices
 
 from . import __version__
 
 LAB_FLAG = False
-LAB_NAME = "p38"
 
 
 @click.group(invoke_without_command=True)
@@ -65,7 +68,7 @@ def connect(beamline: str, all: bool, sim_backend: bool, lab_mode: bool) -> None
     # We need to make a RunEngine to allow ophyd-async devices to connect.
     # See https://blueskyproject.io/ophyd-async/main/explanations/event-loop-choice.html
     RunEngine()
-    real_connection_target = LAB_NAME if LAB_FLAG else beamline
+    real_connection_target = BEAMLINE_LAB_MAPPINGS[beamline] if LAB_FLAG else beamline
 
     print(
         f"Attempting connection to {real_connection_target} (using {full_module_path})"
