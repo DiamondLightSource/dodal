@@ -10,6 +10,7 @@ from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import ZebraFastGridScan
 from dodal.devices.flux import Flux
+from dodal.devices.i04.murko_results import MurkoResults
 from dodal.devices.i04.transfocator import Transfocator
 from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZPositioner
@@ -411,4 +412,21 @@ def ophyd_async_oav(
         wait_for_connection,
         fake_with_ophyd_sim,
         params=OAVConfigParams(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+    )
+
+
+def murko_results(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> MurkoResults:
+    """Get the i04 ophyd_async OAV, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i04, it will return the existing object.
+    """
+    return device_instantiation(
+        MurkoResults,
+        "murko_results",
+        "",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        host="i04-control.diamond.ac.uk",
+        db=7,
     )
