@@ -3,6 +3,7 @@ from pathlib import Path
 from ophyd_async.epics.areadetector import AravisDetector, PilatusDetector
 from ophyd_async.panda import HDFPanda
 
+from dodal.beamlines import BEAMLINE_LAB_MAPPING
 from dodal.cli import LAB_FLAG
 from dodal.common.beamlines.beamline_utils import (
     device_instantiation,
@@ -28,7 +29,7 @@ from dodal.devices.undulator import Undulator
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
 
-LAB_NAME = "p38"
+LAB_NAME = BEAMLINE_LAB_MAPPING.get("i22", "i22")
 
 BL = LAB_NAME if LAB_FLAG else get_beamline_name("i22")
 print("BL NAME: ", BL)

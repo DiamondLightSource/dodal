@@ -1,11 +1,48 @@
+import importlib.util
+from collections.abc import Iterable
+from pathlib import Path
 from typing import Any
 from unittest.mock import patch
 
 import pytest
 
-from dodal.beamlines import BEAMLINE_LAB_MAPPINGS, all_beamline_modules
+from dodal.beamlines import BEAMLINE_LAB_MAPPING, all_beamline_modules
 from dodal.common.beamlines import beamline_utils
 from dodal.utils import BLUESKY_PROTOCOLS, make_all_devices
+
+
+def get_module_by_beamline_name(name: str) -> Iterable[str]:
+    """
+    Get the names of specific importable modules that match the beamline name.
+
+    Args:
+        name (str): The beamline name to filter modules.
+
+    Returns:
+        Iterable[str]: An iterable of matching beamline module names.
+    """
+
+    # This is done by inspecting file names rather than modules to avoid
+    # premature importing
+    spec = importlib.util.find_spec("dodal.beamlines")
+    if spec is not None:
+        assert spec.submodule_search_locations
+        search_paths = [Path(path) for path in spec.submodule_search_locations]
+        # todo the error is here in the search paths
+        # possibly has to do with the execution location, in dodal.beamlines this worked, not here
+
+        for path in search_paths:
+            for subpath in path.glob("**/*"):
+                if (
+                    subpath.name.endswith(".py")
+                    and subpath.name != "__init__.py"
+                    and ("__pycache__" not in str(subpath))
+                ):
+                    module_name = subpath.with_suffix("").name
+                    if name in module_name:
+                        yield module_name
+    else:
+        raise KeyError(f"Unable to find {__name__} module")
 
 
 def follows_bluesky_protocols(obj: Any) -> bool:
@@ -33,19 +70,19 @@ def test_device_creation(RE, module_and_devices_for_beamline):
 
 
 @pytest.mark.parametrize(
-    "module_and_devices_for_beamline",
-    set(BEAMLINE_LAB_MAPPINGS),
+    "mappings",
+    set(BEAMLINE_LAB_MAPPING),
     indirect=True,
 )
-def test_lab_version_of_a_beamline(RE, module_and_devices_for_beamline):
+def test_lab_version_of_a_beamline(RE, mappings):
     """
     Ensures that for every lab beamline all device factories are using valid args
     and creating types that conform to Bluesky protocols.
     """
-    # todo mock this import boolean flag as true
-    # from dodal.cli import LAB_FLAG
     with patch("dodal.cli.LAB_FLAG", True):
-        _, devices = module_and_devices_for_beamline
+        # get the devices file for the beamline namespace
+        # but instantiate using the IS_FLAG logic
+        module, devices = get_module_by_beamline_name(mappings[0])
         for device_name, device in devices.items():
             assert device_name in beamline_utils.ACTIVE_DEVICES, (
                 f"No device named {device_name} was created, devices "

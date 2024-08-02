@@ -5,7 +5,7 @@ from bluesky.run_engine import RunEngine
 from ophyd_async.core import NotConnected
 
 from dodal.beamlines import (
-    BEAMLINE_LAB_MAPPINGS,
+    BEAMLINE_LAB_MAPPING,
     all_beamline_names,
     module_name_for_beamline,
 )
@@ -68,7 +68,7 @@ def connect(beamline: str, all: bool, sim_backend: bool, lab_mode: bool) -> None
     # We need to make a RunEngine to allow ophyd-async devices to connect.
     # See https://blueskyproject.io/ophyd-async/main/explanations/event-loop-choice.html
     RunEngine()
-    real_connection_target = BEAMLINE_LAB_MAPPINGS[beamline] if LAB_FLAG else beamline
+    real_connection_target = BEAMLINE_LAB_MAPPING[beamline] if LAB_FLAG else beamline
 
     print(
         f"Attempting connection to {real_connection_target} (using {full_module_path})"
