@@ -14,13 +14,13 @@ from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beam
 from dodal.common.beamlines.device_helpers import numbered_slits
 from dodal.common.visit import (
     DirectoryServiceClient,
-    LocalDirectoryServiceClient,
     StaticVisitDirectoryProvider,
 )
 from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
 from dodal.devices.i22.fswitch import FSwitch
 from dodal.devices.i22.nxsas import NXSasMetadataHolder, NXSasOAV, NXSasPilatus
+from dodal.devices.i22.NXSasAravis import NXSasAravis
 from dodal.devices.linkam3 import Linkam3
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
@@ -39,6 +39,7 @@ set_utils_beamline(BL)
 IS_LAB = LAB_FLAG and BL == LAB_NAME
 print("is this lab? : ", IS_LAB)
 
+LINKAM_IS_IN_LAB = False
 # Currently we must hard-code the visit, determining the visit at runtime requires
 # infrastructure that is still WIP.
 # Communication with GDA is also WIP so for now we determine an arbitrary scan number
@@ -48,7 +49,7 @@ directory_provider = (
     StaticVisitDirectoryProvider(
         BL,
         Path("/dls/p38/data/2024/cm37282-2/bluesky"),
-        client=LocalDirectoryServiceClient(),
+        client=DirectoryServiceClient("https://p38-control:8088/api"),
     )
     if IS_LAB
     else StaticVisitDirectoryProvider(
@@ -58,23 +59,6 @@ directory_provider = (
     )
 )
 
-
-# d3 at p38
-def oav(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> AravisDetector:
-    return device_instantiation(
-        AravisDetector if IS_LAB else NXSasOAV,
-        "d3" if IS_LAB else "oav",
-        f"-DI-{'DCAM' if IS_LAB else 'OAV'}-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-        drv_suffix="DET:",
-        hdf_suffix="HDF5:",
-        directory_provider=get_directory_provider(),
-    )
-
-
 set_directory_provider(directory_provider)
 
 
@@ -82,25 +66,26 @@ set_directory_provider(directory_provider)
 @skip_device(lambda: BL == LAB_NAME)
 def saxs(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> AravisDetector | NXSasPilatus:
+) -> NXSasAravis | NXSasPilatus:
     if IS_LAB:
         return device_instantiation(
-            AravisDetector,
-            "d11",
+            NXSasAravis,
+            "saxs",
             "-DI-DCAM-03:",
             wait_for_connection,
             fake_with_ophyd_sim,
             drv_suffix="DET:",
             hdf_suffix="HDF5:",
-            # metadata_holder=NXSasMetadataHolder(
-            #     x_pixel_size=(1.72e-1, "mm"),
-            #     y_pixel_size=(1.72e-1, "mm"),
-            #     description="Dectris Pilatus3 2M",
-            #     type="Photon Counting Hybrid Pixel",
-            #     sensor_material="silicon",
-            #     sensor_thickness=(0.45, "mm"),
-            #     distance=(4711.833684146172, "mm"),
-            # ),
+            # todo double check the metadata
+            metadata_holder=NXSasMetadataHolder(
+                x_pixel_size=(1.72e-1, "mm"),
+                y_pixel_size=(1.72e-1, "mm"),
+                description="Dectris Pilatus3 2M",
+                type="Photon Counting Hybrid Pixel",
+                sensor_material="silicon",
+                sensor_thickness=(0.45, "mm"),
+                distance=(4711.833684146172, "mm"),
+            ),
             directory_provider=get_directory_provider(),
         )
 
@@ -144,7 +129,7 @@ def waxs(
 ) -> PilatusDetector:
     return device_instantiation(
         AravisDetector if IS_LAB else NXSasPilatus,
-        "d12" if IS_LAB else "waxs",
+        "waxs",
         "-DI-DCAM-04:" if IS_LAB else "-EA-PILAT-03:",
         wait_for_connection,
         fake_with_ophyd_sim,
@@ -417,14 +402,35 @@ def panda4(
     )
 
 
-LINKAM_IS_IN_LAB = False
+# d3 at p38
+def oav(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> AravisDetector:
+    return device_instantiation(
+        AravisDetector if IS_LAB else NXSasOAV,
+        "oav",
+        f"-DI-{'DCAM' if IS_LAB else 'OAV'}-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        drv_suffix="DET:",
+        hdf_suffix="HDF5:",
+        metadata_holder=None
+        if IS_LAB
+        else NXSasMetadataHolder(
+            x_pixel_size=(1.72e-1, "mm"),
+            y_pixel_size=(1.72e-1, "mm"),
+            description="Dectris Pilatus3 2M",
+            type="Photon Counting Hybrid Pixel",
+            sensor_material="silicon",
+            sensor_thickness=(0.45, "mm"),
+            distance=(4711.833684146172, "mm"),
+        ),
+        directory_provider=get_directory_provider(),
+    )
 
 
 @skip_device(
-    lambda: BL == LAB_NAME
-    and not LINKAM_IS_IN_LAB
-    or BL != LAB_NAME
-    and LINKAM_IS_IN_LAB
+    lambda: IS_LAB != LINKAM_IS_IN_LAB
 )
 def linkam(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
