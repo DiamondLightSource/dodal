@@ -243,7 +243,7 @@ def test_values_for_move_so_that_beam_is_at_pixel(
         get_move_required_so_that_beam_is_at_pixel(
             smargon, pixel_to_move_to, fake_oav.parameters
         )
-    ).plan_result
+    ).plan_result  # type: ignore
 
     assert pos == pytest.approx(expected_xyz)
 

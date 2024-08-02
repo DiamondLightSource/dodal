@@ -3,7 +3,7 @@ from typing import SupportsFloat
 
 from bluesky.protocols import Triggerable
 from ophyd_async.core import AsyncStatus, StandardReadable, wait_for_value
-from ophyd_async.core.signal import SignalR, SignalRW
+from ophyd_async.core.signal import CalculateTimeout, SignalR, SignalRW
 from ophyd_async.core.signal_backend import SignalBackend
 from ophyd_async.core.soft_signal_backend import SoftSignalBackend
 from ophyd_async.core.utils import DEFAULT_TIMEOUT
@@ -79,8 +79,8 @@ class PMACStringLaser(SignalRW):
         super().__init__(backend, timeout, name)
 
     @AsyncStatus.wrap
-    async def set(self, laser_setting: LaserSettings):
-        await self.signal.set(laser_setting.value, wait=True)
+    async def set(self, value: LaserSettings, wait=True, timeout=CalculateTimeout):
+        await self.signal.set(value.value, wait, timeout)
 
 
 class PMACStringEncReset(SignalRW):
@@ -97,8 +97,8 @@ class PMACStringEncReset(SignalRW):
         super().__init__(backend, timeout, name)
 
     @AsyncStatus.wrap
-    async def set(self, enc_string: EncReset):
-        await self.signal.set(enc_string.value, wait=True)
+    async def set(self, value: EncReset, wait=True, timeout=CalculateTimeout):
+        await self.signal.set(value.value, wait, timeout)
 
 
 class ProgramRunner(SignalRW):

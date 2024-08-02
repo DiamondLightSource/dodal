@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from ophyd_async.epics.areadetector import AravisDetector
 from ophyd_async.panda import HDFPanda
 
@@ -18,7 +20,7 @@ set_utils_beamline(BL)
 set_directory_provider(
     StaticVisitDirectoryProvider(
         BL,
-        "/data/2024/cm37283-2/",  # latest commissioning visit
+        Path("/data/2024/cm37283-2/"),  # latest commissioning visit
     )
 )
 

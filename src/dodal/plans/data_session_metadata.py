@@ -37,6 +37,7 @@ def attach_data_session_metadata_wrapper(
     directory_info: DirectoryInfo = provider()
     # https://github.com/DiamondLightSource/dodal/issues/452
     # As part of 452, write each dataCollection into their own folder, then can use resource_dir directly
+    assert directory_info.prefix is not None
     data_session = directory_info.prefix.removesuffix("-")
     yield from bpp.inject_md_wrapper(plan, md={DATA_SESSION: data_session})
 

@@ -66,7 +66,7 @@ def test_check_call_back_error_gives_correct_error():
         returned_status = run_functions_without_blocking([get_bad_status])
         returned_status.wait(0.1)
 
-    assert isinstance(returned_status.exception(), StatusException)
+        assert isinstance(returned_status.exception(), StatusException)
 
     LOGGER.error.assert_called()
 

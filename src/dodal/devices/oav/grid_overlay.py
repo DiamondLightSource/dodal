@@ -1,3 +1,4 @@
+# type: ignore # OAV will soon be ophyd-async, see https://github.com/DiamondLightSource/dodal/issues/716
 from enum import Enum
 from functools import partial
 from os.path import join as path_join

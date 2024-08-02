@@ -1,3 +1,4 @@
+# type: ignore # OAV will soon be ophyd-async, see https://github.com/DiamondLightSource/dodal/issues/716
 from functools import partial
 
 from ophyd import ADComponent as ADC

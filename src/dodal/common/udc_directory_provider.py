@@ -23,7 +23,7 @@ class PandASubdirectoryProvider(UpdatingDirectoryProvider):
             else None
         )
 
-    def update(self, directory: Path):
+    async def update(self, *, directory: Path, **kwargs):
         self._directory_info = DirectoryInfo(
             root=directory, resource_dir=self.resource_dir
         )
