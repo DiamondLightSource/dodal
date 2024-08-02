@@ -34,7 +34,7 @@ def main(ctx: click.Context) -> None:
     "-a",
     "--all",
     is_flag=True,
-    help="collect_factoriesAttempt to connect to devices marked as skipped",
+    help="Attempt to connect to devices marked as skipped",
     default=False,
 )
 @click.option(
