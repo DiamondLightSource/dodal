@@ -2,7 +2,7 @@ import asyncio
 import json
 
 import redis.asyncio as redis
-from bluesky.protocols import Flyable
+from bluesky.protocols import Flyable, Collectable
 from ophyd_async.core import StandardReadable
 from ophyd_async.core.async_status import AsyncStatus
 from ophyd_async.core.signal import soft_signal_r_and_setter
@@ -18,9 +18,9 @@ class MurkoResult:
     omega: float
 
 
-class MurkoResults(StandardReadable, Flyable):
+class MurkoResults(StandardReadable, Flyable, Collectable):
     def __init__(self, name="", prefix="", host="localhost", port=6379, db=0):
-        self.redis_client = redis.StrictRedis(host=host, port=port, db=db)
+        self.redis_client = redis.StrictRedis(host=host, password="", port=port, db=db)
         self.listening_task = None
         with self.add_children_as_readables():
             self.results, self._results_setter = soft_signal_r_and_setter(
@@ -63,3 +63,6 @@ class MurkoResults(StandardReadable, Flyable):
     async def complete(self):
         assert self.listening_task
         self.listening_task.cancel()
+
+    async def describe_collect(self) -> dict:
+        return {"stream_name": {}}
