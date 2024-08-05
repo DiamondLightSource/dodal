@@ -4,8 +4,6 @@ from ophyd_async.epics.adaravis import AravisDetector
 from ophyd_async.epics.adpilatus import PilatusDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
-from dodal.beamlines import BEAMLINE_LAB_MAPPING
-from dodal.cli import LAB_FLAG
 from dodal.common.beamlines.beamline_utils import (
     device_instantiation,
     get_path_provider,
@@ -31,14 +29,14 @@ from dodal.devices.undulator import Undulator
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
 
-LAB_NAME = BEAMLINE_LAB_MAPPING.get("i22", "i22")
-
-BL = LAB_NAME if LAB_FLAG else get_beamline_name("i22")
+BL = get_beamline_name("i22")
 print("BL NAME: ", BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
-IS_LAB = LAB_FLAG and BL == LAB_NAME
+_LAB_NAME = "p38"
+
+IS_LAB = BL == _LAB_NAME
 print("is this lab? : ", IS_LAB)
 
 LINKAM_IS_IN_LAB = False
@@ -63,7 +61,7 @@ set_path_provider(
 
 
 # d11 at p38, but disconnected
-@skip_device(lambda: BL == LAB_NAME)
+@skip_device(lambda: BL == _LAB_NAME)
 def saxs(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> NXSasAravis | NXSasPilatus:
@@ -109,7 +107,7 @@ def saxs(
     )
 
 
-@skip_device(lambda: BL == LAB_NAME)
+@skip_device(lambda: BL == _LAB_NAME)
 def synchrotron(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> Synchrotron:
@@ -340,7 +338,7 @@ def fswitch(
 # Must find which PandA IOC(s) are compatible
 # Must document what PandAs are physically connected to
 # See: https://github.com/bluesky/ophyd-async/issues/284
-@skip_device(lambda: BL == LAB_NAME)
+@skip_device(lambda: BL == _LAB_NAME)
 def panda1(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
@@ -385,7 +383,7 @@ def panda3(
     )
 
 
-@skip_device(lambda: BL == LAB_NAME)
+@skip_device(lambda: BL == _LAB_NAME)
 def panda4(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,

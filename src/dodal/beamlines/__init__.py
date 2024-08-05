@@ -19,10 +19,6 @@ _BEAMLINE_NAME_OVERRIDES = {
     "p49": "training_rig",
 }
 
-BEAMLINE_LAB_MAPPING: dict[str, str] = {
-    "i22": "p38",
-}
-
 
 def all_beamline_modules() -> Iterable[str]:
     """
