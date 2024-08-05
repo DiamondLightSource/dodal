@@ -99,6 +99,7 @@ def panda1(
     )
 
 
+# NOTE: the reason for skipping is that the odin detectors are not yet supported
 @skip_device()
 def xspress3(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
@@ -109,7 +110,7 @@ def xspress3(
 
     return device_instantiation(
         Xspress3,
-        prefix="-EA-XPS-02:",
+        prefix="-EA-XSP-02:",
         name="Xspress3",
         num_channels=16,
         wait=wait_for_connection,
@@ -150,7 +151,7 @@ def i0(
     return device_instantiation(
         TetrammDetector,
         "i0",
-        "-EA-XBPM-02:",
+        "-DI-XBPM-02:",
         wait_for_connection,
         fake_with_ophyd_sim,
         type="Cividec Diamond XBPM",
@@ -166,10 +167,10 @@ def it(
     return device_instantiation(
         TetrammDetector,
         "it",
-        "-EA-TTRM-02:",
+        "-DI-XBPM-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        type="PIN Diode",
+        type="Tetramm",
         directory_provider=get_directory_provider(),
     )
 
