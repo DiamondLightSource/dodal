@@ -4,7 +4,7 @@ from dodal.devices.backlight import Backlight
 from dodal.devices.detector import DetectorParams
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
-from dodal.devices.s4_slit_gaps import S4SlitGaps
+from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import Undulator
 from dodal.devices.zebra import Zebra
@@ -81,12 +81,12 @@ def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
 
 def s4_slit_gaps(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> S4SlitGaps:
+) -> Slits:
     """Get the i04_1 s4_slit_gaps device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04_1, it will return the existing object.
     """
     return device_instantiation(
-        S4SlitGaps,
+        Slits,
         "s4_slit_gaps",
         "-AL-SLITS-04:",
         wait_for_connection,
