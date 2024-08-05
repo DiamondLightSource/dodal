@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 from ophyd_async.panda import HDFPanda
@@ -13,6 +14,8 @@ from dodal.common.crystal_metadata import CrystalMetadata
 from dodal.common.visit import DirectoryServiceClient, StaticVisitDirectoryProvider
 from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.i18.diode import Diode
+from dodal.devices.i18.sim_detector import SimDetector
+from dodal.devices.i18.sim_raster_stage import RasterStage
 from dodal.devices.i18.table import Table
 from dodal.devices.i22.dcm import DoubleCrystalMonochromator
 from dodal.devices.slits import Slits
@@ -22,6 +25,9 @@ from dodal.devices.undulator import Undulator
 from dodal.devices.xspress3.xspress3 import Xspress3
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
+
+# Make sure EPICS_CA_SERVER_PORT is set to correct value (6064 for DLS sim area detector and motors, 5064 on beamlines)
+os.environ["EPICS_CA_SERVER_PORT"] = "6064"
 
 BL = get_beamline_name("i18")
 set_log_beamline(BL)
@@ -218,6 +224,28 @@ def table(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -
         Table,
         "table",
         "-MO-TABLE-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+def raster_stage(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> RasterStage:
+    return device_instantiation(
+        RasterStage,
+        "raster_stage",
+        "-MO-SIM-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+def sim_detector(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False):
+    return device_instantiation(
+        SimDetector,
+        "sim_detector",
+        "-MO-SIM-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
