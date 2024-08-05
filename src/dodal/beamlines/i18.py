@@ -129,7 +129,7 @@ def xspress3(
 ) -> Xspress3:
     """
     16 channels Xspress3 detector
-	-EA-XPS-02:CAM:MaxSizeX_RBV
+	-EA-XSP-02:CAM:MaxSizeX_RBV
       also ArraySize
       also :CONNECTED
     """
@@ -137,7 +137,7 @@ def xspress3(
     return device_instantiation(
         Xspress3,
         # prefix="-EA-DET-03:",
-        prefix="-EA-XPS-02:",
+        prefix="-EA-XSP-02:",
         name="Xspress3",
         num_channels=16,
         wait=wait_for_connection,
