@@ -80,15 +80,15 @@ def test_lab_version_of_a_beamline(RE, mappings):
     and creating types that conform to Bluesky protocols.
     """
     # todo patch the environment
-    with patch("dodal.cli.LAB_FLAG", True):
+    with patch.dict(os.environ, {"BEAMLINE": mappings[1]}):
         # get the devices file for the beamline namespace
         module, devices = get_module_by_beamline_name(mappings[0])
-        # for device_name, device in devices.items():
-        #     assert device_name in beamline_utils.ACTIVE_DEVICES, (
-        #         f"No device named {device_name} was created, devices "
-        #         f"are {beamline_utils.ACTIVE_DEVICES.keys()}"
-        #     )
-        #     assert follows_bluesky_protocols(device)
+        for device_name, device in devices.items():
+            assert device_name in beamline_utils.ACTIVE_DEVICES, (
+                f"No device named {device_name} was created, devices "
+                f"are {beamline_utils.ACTIVE_DEVICES.keys()}"
+            )
+            assert follows_bluesky_protocols(device)
         assert len(beamline_utils.ACTIVE_DEVICES) == len(devices)
 
 
