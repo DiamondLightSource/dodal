@@ -12,13 +12,14 @@ from dodal.utils import make_all_devices
 
 
 def main():
-    """CLI Utility to save ophyd_async devices. This is originally intended to save the
-    panda configuration but should work with other devices too."""
-    parser = ArgumentParser(description="Save an ophyd_async device to yaml")
+    """CLI Utility to save the panda configuration."""
+    parser = ArgumentParser(description="Save an ophyd_async panda to yaml")
     parser.add_argument(
         "--beamline", help="beamline to save from e.g. i03. Defaults to BEAMLINE"
     )
-    parser.add_argument("device_name", help="name of the device e.g. panda")
+    parser.add_argument(
+        "device_name", help="name of the device e.g. panda", default="panda"
+    )
     parser.add_argument("output_file", help="output filename")
 
     # this exit()s with message/help unless args parsed successfully
