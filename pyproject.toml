@@ -29,6 +29,7 @@ dependencies = [
     "numpy<2.0",              # Unpin when https://github.com/bluesky/ophyd-async/issues/387 resolved
     "aiofiles",
     "aiohttp",
+    "redis",
 ]
 
 dynamic = ["version"]
