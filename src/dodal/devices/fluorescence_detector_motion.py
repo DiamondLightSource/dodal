@@ -15,3 +15,4 @@ class FluorescenceDetector(StandardReadable):
             self.pos = epics_signal_r(
                 FluorescenceDetectorControlState, "-EA-FLU-01:CTRL"
             )
+        super().__init__(name)
