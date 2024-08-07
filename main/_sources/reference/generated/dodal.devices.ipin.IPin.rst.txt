@@ -24,22 +24,6 @@ dodal.devices.ipin.IPin
       
       
       
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
    
    
 
@@ -51,27 +35,6 @@ dodal.devices.ipin.IPin
    
       
       
-      
-      ~IPin.component_names
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      ~IPin.reading
-      
-      
-      
-      
-      
-      ~IPin.subscriptions
       
       
    
