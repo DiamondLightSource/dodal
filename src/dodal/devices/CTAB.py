@@ -20,22 +20,22 @@ class CTAB(StandardReadable):
 
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
-            self.inboard_y = Motor("-MO-TABLE-01:INBOARDY")
-            self.outboard_y = Motor("-MO-TABLE-01:OUTBOARDY")
-            self.upstream_y = Motor("-MO-TABLE-01:UPSTREAMY")
-            self.combined_downstream_y = Motor("-MO-TABLE-01:DOWNSTREAMY")
-            self.combined_all_y = Motor("-MO-TABLE-01:Y")
+            self.inboard_y = Motor(prefix + "-MO-TABLE-01:INBOARDY")
+            self.outboard_y = Motor(prefix + "-MO-TABLE-01:OUTBOARDY")
+            self.upstream_y = Motor(prefix + "-MO-TABLE-01:UPSTREAMY")
+            self.combined_downstream_y = Motor(prefix + "-MO-TABLE-01:DOWNSTREAMY")
+            self.combined_all_y = Motor(prefix + "-MO-TABLE-01:Y")
 
-            self.downstream_x = Motor("-MO-TABLE-01:DOWNSTREAMX")
-            self.upstream_x = Motor("-MO-TABLE-01:UPSTREAMX")
-            self.combined_all_x = Motor("-MO-TABLE-01:X")
+            self.downstream_x = Motor(prefix + "-MO-TABLE-01:DOWNSTREAMX")
+            self.upstream_x = Motor(prefix + "-MO-TABLE-01:UPSTREAMX")
+            self.combined_all_x = Motor(prefix + "-MO-TABLE-01:X")
 
-            self.pitch = Motor("-MO-TABLE-01:PITCH")
-            self.roll = Motor("-MO-TABLE-01:ROLL")
-            self.yaw = Motor("-MO-TABLE-01:YAW")
+            self.pitch = Motor(prefix + "-MO-TABLE-01:PITCH")
+            self.roll = Motor(prefix + "-MO-TABLE-01:ROLL")
+            self.yaw = Motor(prefix + "-MO-TABLE-01:YAW")
 
             self.crate_power = epics_signal_r(
-                int, "-MO-PMAC-02:CRATE2_HEALTHY"
+                int, prefix + "-MO-PMAC-02:CRATE2_HEALTHY"
             )  # returns 0 if no power
 
             super().__init__(name)
