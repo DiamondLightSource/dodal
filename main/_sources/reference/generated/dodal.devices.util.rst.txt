@@ -13,6 +13,7 @@ dodal.devices.util
    dodal.devices.util.epics_util
    dodal.devices.util.lookup_tables
    dodal.devices.util.motor_utils
+   dodal.devices.util.save_panda
    dodal.devices.util.test_utils
 
 
