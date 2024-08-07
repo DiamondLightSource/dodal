@@ -93,13 +93,13 @@ class Undulator(StandardReadable, Movable):
         super().__init__(name)
 
     @AsyncStatus.wrap
-    async def set(self, value: float):
+    async def set(self, energy_value_kev: float):
         await asyncio.gather(
-            self._set_undulator_gap(value),
+            self._set_undulator_gap(energy_value_kev),
         )
 
     async def _set_undulator_gap(self, energy_kev: float) -> None:
-        LOGGER.info(f"Setting DCM energy to {energy_kev:.2f} kev")
+        LOGGER.info(f"Setting undulator gap to {energy_kev:.2f} kev")
         gap_to_match_dcm_energy = await self._gap_to_match_dcm_energy(energy_kev)
 
         # Check if undulator gap is close enough to the value from the DCM

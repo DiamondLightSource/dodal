@@ -63,7 +63,7 @@ class UndulatorDCM(StandardReadable, Movable):
     async def set(self, value: float):
         await asyncio.gather(
             self._set_dcm_energy(value),
-            self.undulator._set_undulator_gap(value),
+            self.undulator.set(value),
         )
 
     async def _set_dcm_energy(self, energy_kev: float) -> None:
