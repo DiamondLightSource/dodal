@@ -119,7 +119,8 @@ def test_file_exists_check(
     if force:
         argv.insert(1, "--force")
 
-    return_value = main(argv)
+    with patch.dict("os.environ"):
+        return_value = main(argv)
 
     mock_path.assert_called_with("test_output_file.yml")
     exists.assert_called_once()
