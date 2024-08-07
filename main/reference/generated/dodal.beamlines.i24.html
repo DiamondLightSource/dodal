@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.beamlines.i24 &#8212; dodal 1.29.5.dev13+g61800334e documentation</title>
+    <title>dodal.beamlines.i24 &#8212; dodal 1.29.5.dev14+g48a0abe2c documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../_static/documentation_options.js?v=7bd7230a"></script>
+    <script src="../../_static/documentation_options.js?v=58133810"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -580,11 +580,11 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="dodal.devices.i03.html">dodal.devices.i03</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.devices.i20_1.html">dodal.devices.i20_1</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.i24.html">dodal.devices.i24</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i24.I24_detector_motion.html">dodal.devices.i24.I24_detector_motion</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.i24.aperture.html">dodal.devices.i24.aperture</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.i24.beamstop.html">dodal.devices.i24.beamstop</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.i24.dcm.html">dodal.devices.i24.dcm</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.i24.dual_backlight.html">dodal.devices.i24.dual_backlight</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.i24.i24_detector_motion.html">dodal.devices.i24.i24_detector_motion</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.i24.i24_vgonio.html">dodal.devices.i24.i24_vgonio</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.i24.pmac.html">dodal.devices.i24.pmac</a></li>
 </ul>
@@ -921,7 +921,7 @@ If this is called when already instantiated in i24, it will return the existing 
 
 <dl class="py function">
 <dt class="sig sig-object py" id="dodal.beamlines.i24.detector_motion">
-<span class="sig-prename descclassname"><span class="pre">dodal.beamlines.i24.</span></span><span class="sig-name descname"><span class="pre">detector_motion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wait_for_connection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fake_with_ophyd_sim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="dodal.devices.i24.I24_detector_motion.DetectorMotion.html#dodal.devices.i24.I24_detector_motion.DetectorMotion" title="dodal.devices.i24.I24_detector_motion.DetectorMotion"><span class="pre">DetectorMotion</span></a></span></span><a class="reference internal" href="../../_modules/dodal/beamlines/i24.html#detector_motion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.beamlines.i24.detector_motion" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">dodal.beamlines.i24.</span></span><span class="sig-name descname"><span class="pre">detector_motion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wait_for_connection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fake_with_ophyd_sim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="dodal.devices.i24.i24_detector_motion.DetectorMotion.html#dodal.devices.i24.i24_detector_motion.DetectorMotion" title="dodal.devices.i24.i24_detector_motion.DetectorMotion"><span class="pre">DetectorMotion</span></a></span></span><a class="reference internal" href="../../_modules/dodal/beamlines/i24.html#detector_motion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.beamlines.i24.detector_motion" title="Link to this definition">#</a></dt>
 <dd><p>Get the i24 detector motion device, instantiate it if it hasn’t already been.
 If this is called when already instantiated in i24, it will return the existing object.</p>
 <dl class="field-list simple">
@@ -932,7 +932,7 @@ If this is called when already instantiated in i24, it will return the existing 
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.i24.I24_detector_motion.DetectorMotion.html#dodal.devices.i24.I24_detector_motion.DetectorMotion" title="dodal.devices.i24.I24_detector_motion.DetectorMotion"><code class="xref py py-class docutils literal notranslate"><span class="pre">DetectorMotion</span></code></a></span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.i24.i24_detector_motion.DetectorMotion.html#dodal.devices.i24.i24_detector_motion.DetectorMotion" title="dodal.devices.i24.i24_detector_motion.DetectorMotion"><code class="xref py py-class docutils literal notranslate"><span class="pre">DetectorMotion</span></code></a></span></p>
 </dd>
 </dl>
 </dd></dl>
