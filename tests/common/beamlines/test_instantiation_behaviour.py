@@ -10,7 +10,6 @@ from dodal.common.beamlines.instantiation_behaviour import (
     DeviceInitializationController,
     XYZDetector,
     detector_xyz_variant,
-    instantiation_behaviour,
     new_detector_xyz,
 )
 
