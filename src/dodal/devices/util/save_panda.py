@@ -10,7 +10,7 @@ from ophyd_async.core import Device, save_device
 from ophyd_async.panda import phase_sorter
 
 from dodal.beamlines import module_name_for_beamline
-from dodal.utils import make_all_devices
+from dodal.utils import make_device
 
 
 def main(argv: list[str]):
@@ -65,11 +65,9 @@ def _save_panda(beamline, device_name, output_file):
     RE = RunEngine()
     print("Creating devices...")
     module_name = module_name_for_beamline(beamline)
-    devices, exceptions = make_all_devices(
-        f"dodal.beamlines.{module_name}", include_skipped=False
-    )
-
-    if error := exceptions.get(device_name, None):
+    try:
+        devices = make_device(f"dodal.beamlines.{module_name}", device_name)
+    except Exception as error:
         sys.stderr.write(f"Couldn't create device {device_name}: {error}\n")
         sys.exit(1)
 

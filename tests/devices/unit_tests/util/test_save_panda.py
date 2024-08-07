@@ -13,9 +13,8 @@ def test_save_panda():
     panda = MagicMock()
     with (
         patch(
-            "dodal.devices.util.save_panda.make_all_devices",
-            return_value=({"panda": panda}, {}),
-        ) as mock_make_all_devices,
+            "dodal.devices.util.save_panda.make_device", return_value={"panda": panda}
+        ) as mock_make_device,
         patch(
             "dodal.devices.util.save_panda.RunEngine",
             return_value=MagicMock(side_effect=sim_run_engine.simulate_plan),
@@ -24,9 +23,7 @@ def test_save_panda():
     ):
         _save_panda("i03", "panda", "test/file.yml")
 
-        mock_make_all_devices.assert_called_with(
-            "dodal.beamlines.i03", include_skipped=False
-        )
+        mock_make_device.assert_called_with("dodal.beamlines.i03", "panda")
         mock_save_device.assert_called_with(panda, "test/file.yml", sorter=phase_sorter)
 
 
