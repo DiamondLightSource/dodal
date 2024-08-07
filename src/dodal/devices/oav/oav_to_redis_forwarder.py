@@ -1,7 +1,6 @@
 import asyncio
 import io
 import pickle
-import time
 import uuid
 
 import numpy as np
@@ -16,7 +15,24 @@ from redis.asyncio import StrictRedis
 from dodal.log import LOGGER
 
 
+async def get_next_jpeg(response: ClientResponse) -> bytes:
+    JPEG_START_BYTE = b"\xff\xd8"
+    JPEG_STOP_BYTE = b"\xff\xd9"
+    while True:
+        line = await response.content.readline()
+        if line.startswith(JPEG_START_BYTE):
+            return line + await response.content.readuntil(JPEG_STOP_BYTE)
+
+
 class OAVToRedisForwarder(StandardReadable, Flyable):
+    """Forwards OAV image data to redis. To use call:
+
+    > bps.kickoff(oav_forwarder)
+    > bps.monitor(oav_forwarder.uuid)
+    > bps.complete(oav_forwarder)
+
+    """
+
     def __init__(
         self,
         prefix: str,
@@ -24,7 +40,19 @@ class OAVToRedisForwarder(StandardReadable, Flyable):
         redis_password: str,
         redis_db: int = 0,
         name: str = "",
+        redis_key: str = "test-image",
     ) -> None:
+        """Reads image data from the MJPEG stream on an OAV and forwards it into a
+        redis database. This is currently only used for murko integration.
+
+        Arguments:
+            prefix: str             the PV prefix of the OAV
+            redis_host: str         the host where the redis database is running
+            redis_password: str     the password for the redis database
+            redis_db: int           which redis database to connect to, defaults to 0
+            name: str               the name of this device
+            redis_key: str          the key to store data in, defaults to "test-image"
+        """
         self.stream_url = epics_signal_r(str, f"{prefix}-DI-OAV-01:MJPG:HOST_RBV")
 
         with self.add_children_as_readables():
@@ -34,39 +62,37 @@ class OAVToRedisForwarder(StandardReadable, Flyable):
         self.redis_client = StrictRedis(
             host=redis_host, password=redis_password, db=redis_db
         )
+
+        self.redis_key = redis_key
+
+        # The uuid that images are being saved under, this should be monitored for
+        # callbacks to correlate the data
         self.uuid, self.uuid_setter = soft_signal_r_and_setter(str)
 
         super().__init__(name=name)
 
-    async def _get_next_jpeg(self, response: ClientResponse) -> bytes:
-        JPEG_START_BYTE = b"\xff\xd8"
-        JPEG_STOP_BYTE = b"\xff\xd9"
-        while True:
-            line = await response.content.readline()
-            if line.startswith(JPEG_START_BYTE):
-                return line + await response.content.readuntil(JPEG_STOP_BYTE)
+    async def _get_frame_and_put_to_redis(self, response: ClientResponse):
+        """Converts the data that comes in as a jpeg byte stream into a numpy array of
+        RGB values, pickles this array then writes it to redis.
+        """
+        jpeg_bytes = await get_next_jpeg(response)
+        self.uuid_setter(image_uuid := str(uuid.uuid4()))
+        img = Image.open(io.BytesIO(jpeg_bytes))
+        image_data = pickle.dumps(np.asarray(img))
+        await self.redis_client.hset(self.redis_key, image_uuid, image_data)  # type: ignore
+        LOGGER.debug(f"Sent frame to redis key {self.redis_key} with uuid {image_uuid}")
 
-    async def forward_to_redis(self):
-        last_time = time.time()
+    async def _stream_to_redis(self):
         stream_url = await self.stream_url.get_value()
         async with ClientSession() as session:
             async with session.get(stream_url) as response:
                 while True:
-                    jpeg_bytes = await self._get_next_jpeg(response)
-                    image_uuid = str(uuid.uuid4())
-                    self.uuid_setter(image_uuid)
-                    img = Image.open(io.BytesIO(jpeg_bytes))
-                    image_data = pickle.dumps(np.asarray(img))
-                    await self.redis_client.hset("test-image", image_uuid, image_data)  # type: ignore
-                    LOGGER.info(
-                        f"Sent frame to redis. Frame speed {1/(time.time()-last_time)} Hz"
-                    )
-                    last_time = time.time()
+                    await self._get_frame_and_put_to_redis(response)
                     await asyncio.sleep(0.01)
 
     @AsyncStatus.wrap
     async def kickoff(self):
-        self.forwarding_task = asyncio.create_task(self.forward_to_redis())
+        self.forwarding_task = asyncio.create_task(self._stream_to_redis())
 
     @AsyncStatus.wrap
     async def complete(self):
