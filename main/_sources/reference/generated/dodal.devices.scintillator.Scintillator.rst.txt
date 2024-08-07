@@ -24,22 +24,6 @@ dodal.devices.scintillator.Scintillator
       
       
       
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
    
    
 
@@ -52,30 +36,6 @@ dodal.devices.scintillator.Scintillator
       
       
       
-      ~Scintillator.component_names
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      ~Scintillator.subscriptions
-      
-      
-      
-      ~Scintillator.y
-      
-      
-      ~Scintillator.z
       
    
    
