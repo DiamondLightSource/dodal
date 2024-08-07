@@ -83,5 +83,5 @@ def _save_panda_to_file(RE: RunEngine, panda: Device, path: str):
     RE(save_to_file())
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     sys.exit(main(sys.argv))

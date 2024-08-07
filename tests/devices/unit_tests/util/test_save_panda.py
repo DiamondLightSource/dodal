@@ -27,6 +27,21 @@ def test_save_panda():
         mock_save_device.assert_called_with(panda, "test/file.yml", sorter=phase_sorter)
 
 
+@patch(
+    "dodal.devices.util.save_panda.sys.exit",
+    side_effect=AssertionError("This exception expected"),
+)
+def test_save_panda_failure_to_create_device_exits_with_failure_code(mock_exit):
+    with patch(
+        "dodal.devices.util.save_panda.make_device",
+        side_effect=ValueError("device does not exist"),
+    ):
+        with pytest.raises(AssertionError):
+            _save_panda("i03", "panda", "test/file.yml")
+
+    assert mock_exit.called_once_with(1)
+
+
 @patch("dodal.devices.util.save_panda._save_panda")
 @pytest.mark.parametrize(
     "beamline, args, expected_beamline, expected_device_name, expected_output_file, "
