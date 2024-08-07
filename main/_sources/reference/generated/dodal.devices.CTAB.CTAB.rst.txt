@@ -24,22 +24,6 @@ dodal.devices.CTAB.CTAB
       
       
       
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
    
    
 
@@ -52,60 +36,6 @@ dodal.devices.CTAB.CTAB
       
       
       
-      ~CTAB.combined_all_x
-      
-      
-      ~CTAB.combined_all_y
-      
-      
-      ~CTAB.combined_downstream_y
-      
-      
-      ~CTAB.component_names
-      
-      
-      
-      
-      ~CTAB.crate_power
-      
-      
-      
-      ~CTAB.downstream_x
-      
-      
-      
-      
-      ~CTAB.inboard_y
-      
-      
-      
-      
-      
-      ~CTAB.outboard_y
-      
-      
-      
-      ~CTAB.pitch
-      
-      
-      
-      
-      ~CTAB.roll
-      
-      
-      
-      
-      ~CTAB.subscriptions
-      
-      
-      
-      ~CTAB.upstream_x
-      
-      
-      ~CTAB.upstream_y
-      
-      
-      ~CTAB.yaw
       
    
    
