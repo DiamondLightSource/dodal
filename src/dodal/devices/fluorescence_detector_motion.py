@@ -13,6 +13,6 @@ class FluorescenceDetector(StandardReadable):
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
             self.pos = epics_signal_r(
-                FluorescenceDetectorControlState, "-EA-FLU-01:CTRL"
+                FluorescenceDetectorControlState, prefix + "-EA-FLU-01:CTRL"
             )
         super().__init__(name)
