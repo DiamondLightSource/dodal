@@ -24,22 +24,6 @@ dodal.devices.fluorescence\_detector\_motion.FluorescenceDetector
       
       
       
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
    
    
 
@@ -50,34 +34,7 @@ dodal.devices.fluorescence\_detector\_motion.FluorescenceDetector
    .. autosummary::
    
       
-      ~FluorescenceDetector.IN
       
-      
-      ~FluorescenceDetector.OUT
-      
-      
-      
-      
-      ~FluorescenceDetector.component_names
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      ~FluorescenceDetector.pos
-      
-      
-      
-      
-      
-      
-      ~FluorescenceDetector.subscriptions
       
       
    

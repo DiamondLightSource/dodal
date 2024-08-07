@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.fluorescence_detector_motion.FluorescenceDetector &#8212; dodal 1.29.5.dev11+g505af556b documentation</title>
+    <title>dodal.devices.fluorescence_detector_motion.FluorescenceDetector &#8212; dodal 1.29.5.dev12+g5c8c4d7ad documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../_static/documentation_options.js?v=2d32e923"></script>
+    <script src="../../_static/documentation_options.js?v=6be6a463"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="icon" href="../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="dodal.devices.flux" href="dodal.devices.flux.html" />
+    <link rel="next" title="dodal.devices.fluorescence_detector_motion.FluorescenceDetectorControlState" href="dodal.devices.fluorescence_detector_motion.FluorescenceDetectorControlState.html" />
     <link rel="prev" title="dodal.devices.fluorescence_detector_motion" href="dodal.devices.fluorescence_detector_motion.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -553,6 +553,7 @@ document.write(`
 </details></li>
 <li class="toctree-l3 current active has-children"><a class="reference internal" href="dodal.devices.fluorescence_detector_motion.html">dodal.devices.fluorescence_detector_motion</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l4 current active"><a class="current reference internal" href="#">dodal.devices.fluorescence_detector_motion.FluorescenceDetector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.fluorescence_detector_motion.FluorescenceDetectorControlState.html">dodal.devices.fluorescence_detector_motion.FluorescenceDetectorControlState</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.flux.html">dodal.devices.flux</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -828,7 +829,15 @@ document.write(`
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.fluorescence_detector_motion.FluorescenceDetector">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.fluorescence_detector_motion.</span></span><span class="sig-name descname"><span class="pre">FluorescenceDetector</span></span><a class="reference internal" href="../../_modules/dodal/devices/fluorescence_detector_motion.html#FluorescenceDetector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.fluorescence_detector_motion.FluorescenceDetector" title="Link to this definition">#</a></dt>
-<dd><p class="rubric">Methods</p>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prefix</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">''</span></code>)</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
 </tbody>
@@ -837,21 +846,6 @@ document.write(`
 <p class="rubric">Attributes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">IN</span></code></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">OUT</span></code></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">component_names</span></code></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pos</span></code></p></td>
-<td><p>A descriptor representing a device component (or signal)</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">subscriptions</span></code></p></td>
-<td><p></p></td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -879,11 +873,11 @@ document.write(`
       </div>
     </a>
     <a class="right-next"
-       href="dodal.devices.flux.html"
+       href="dodal.devices.fluorescence_detector_motion.FluorescenceDetectorControlState.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">dodal.devices.flux</p>
+        <p class="prev-next-title">dodal.devices.fluorescence_detector_motion.FluorescenceDetectorControlState</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
