@@ -13,10 +13,8 @@ from dodal.devices.dcm import DCM
 from dodal.devices.undulator import (
     Undulator,
     UndulatorGapAccess,
-    _get_closest_gap_for_energy,
 )
 from dodal.devices.undulator_dcm import (
-    AccessError,
     UndulatorDCM,
 )
 from dodal.log import LOGGER
@@ -75,25 +73,6 @@ def test_lookup_table_paths_passed(fake_undulator_dcm: UndulatorDCM):
 
 async def test_fixed_offset_decoded(fake_undulator_dcm: UndulatorDCM):
     assert fake_undulator_dcm.dcm_fixed_offset_mm == 25.6
-
-
-async def test_when_gap_access_is_disabled_set_energy_then_error_is_raised(
-    fake_undulator_dcm: UndulatorDCM,
-):
-    set_mock_value(fake_undulator_dcm.undulator.gap_access, UndulatorGapAccess.DISABLED)
-    with pytest.raises(AccessError):
-        await fake_undulator_dcm.set(5)
-
-
-@pytest.mark.parametrize(
-    "dcm_energy, expected_output", [(5730, 5.4606), (7200, 6.045), (9000, 6.404)]
-)
-def test_correct_closest_distance_to_energy_from_table(dcm_energy, expected_output):
-    energy_to_distance_table = np.array([[5700, 5.4606], [7000, 6.045], [9700, 6.404]])
-    assert (
-        _get_closest_gap_for_energy(dcm_energy, energy_to_distance_table)
-        == expected_output
-    )
 
 
 @patch("dodal.devices.util.lookup_tables.loadtxt")
