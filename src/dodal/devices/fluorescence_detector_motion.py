@@ -1,9 +1,18 @@
-from ophyd import Component as Cpt
-from ophyd import Device, EpicsSignal
+from enum import Enum
+
+from ophyd_async.core import StandardReadable
+from ophyd_async.epics.signal import epics_signal_r
 
 
-class FluorescenceDetector(Device):
+class FluorescenceDetectorControlState(Enum):
     OUT = 0
     IN = 1
 
-    pos = Cpt(EpicsSignal, "-EA-FLU-01:CTRL")
+
+class FluorescenceDetector(StandardReadable):
+    def __init__(self, prefix: str, name: str = ""):
+        with self.add_children_as_readables():
+            self.pos = epics_signal_r(
+                FluorescenceDetectorControlState, prefix + "-EA-FLU-01:CTRL"
+            )
+        super().__init__(name)
