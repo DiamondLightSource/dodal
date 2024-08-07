@@ -1,7 +1,6 @@
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import pytest
-from mockito import when
 
 from dodal.devices.detector.det_dist_to_beam_converter import (
     Axis,
@@ -27,15 +26,12 @@ def test_converter_eq():
     test_converter_dupe = DetectorDistanceToBeamXYConverter(test_file)
     test_file_2 = "tests/devices/unit_tests/test_lookup_table_2.txt"
     test_converter_2 = DetectorDistanceToBeamXYConverter(test_file_2)
-
+    assert test_converter != 1
     assert test_converter == test_converter_dupe
     assert test_converter != test_converter_2
-
     previous_value = test_converter_dupe.lookup_table_values[0]
     test_converter_dupe.lookup_table_values[0] = (7.5, 23.5)
-
-    assert test_converter != test_converter_2
-
+    assert test_converter != test_converter_dupe
     test_converter_dupe.lookup_table_values[0] = previous_value
 
 
@@ -71,12 +67,15 @@ def test_get_beam_in_pixels(fake_converter: DetectorDistanceToBeamXYConverter):
     interpolated_x_value = 150.0
     interpolated_y_value = 160.0
 
-    when(fake_converter).get_beam_xy_from_det_dist(100.0, Axis.Y_AXIS).thenReturn(
-        interpolated_y_value
-    )
-    when(fake_converter).get_beam_xy_from_det_dist(100.0, Axis.X_AXIS).thenReturn(
-        interpolated_x_value
-    )
+    def mock_callback(dist: float, axis: Axis):
+        match axis:
+            case Axis.X_AXIS:
+                return interpolated_x_value
+            case Axis.Y_AXIS:
+                return interpolated_y_value
+
+    fake_converter.get_beam_xy_from_det_dist = Mock()
+    fake_converter.get_beam_xy_from_det_dist.side_effect = mock_callback
     expected_y_value = interpolated_y_value * image_size_pixels / detector_dimensions
     expected_x_value = interpolated_x_value * image_size_pixels / detector_dimensions
 

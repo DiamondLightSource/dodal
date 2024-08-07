@@ -40,7 +40,7 @@ class MetadataHolder:
         }
 
     async def read(self, parent_name: str) -> dict[str, Reading]:
-        def reading(value):
+        def reading(value) -> Reading:
             if isinstance(value, tuple):
                 return reading(value[0])
             return {"timestamp": -1, "value": value}

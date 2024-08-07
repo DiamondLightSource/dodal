@@ -3,7 +3,7 @@ from enum import Enum
 import ophyd
 from bluesky.protocols import Triggerable
 from ophyd import Component, EpicsSignal, EpicsSignalRO
-from ophyd.status import StatusBase, SubscriptionStatus
+from ophyd.status import DeviceStatus, SubscriptionStatus
 from ophyd_async.core import Device, observe_value
 from ophyd_async.core.async_status import AsyncStatus
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
@@ -45,7 +45,7 @@ class XBPMFeedbackI04(ophyd.Device):
     x = Component(EpicsSignalRO, "-EA-XBPM-02:PosX:MeanValue_RBV")
     y = Component(EpicsSignalRO, "-EA-XBPM-02:PosY:MeanValue_RBV")
 
-    def trigger(self) -> StatusBase:
+    def trigger(self) -> DeviceStatus:
         return SubscriptionStatus(
             self.pos_ok,
             lambda *, old_value, value, **kwargs: value == 1,
