@@ -128,7 +128,12 @@ class ZocaloResults(StandardReadable, Triggerable):
         before triggering processing for the experiment"""
 
         LOGGER.info("Subscribing to results queue")
-        self._subscribe_to_results()
+        try:
+            self._subscribe_to_results()
+        except Exception as e:
+            print(f"GOT {e}")
+            raise
+
         await asyncio.sleep(CLEAR_QUEUE_WAIT_S)
         self._clear_old_results()
 
