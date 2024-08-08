@@ -18,6 +18,11 @@ from dodal.log import LOGGER
 
 from .util.lookup_tables import energy_distance_table
 
+
+class AccessError(Exception):
+    pass
+
+
 # Enable to allow testing when the beamline is down, do not change in production!
 TEST_MODE = False
 
@@ -105,6 +110,9 @@ class Undulator(StandardReadable, Movable):
         )
 
     async def _set_undulator_gap(self, energy_kev: float) -> None:
+        access_level = await self.gap_access.get_value()
+        if access_level is UndulatorGapAccess.DISABLED and not TEST_MODE:
+            raise AccessError("Undulator gap access is disabled. Contact Control Room")
         LOGGER.info(f"Setting undulator gap to {energy_kev:.2f} kev")
         gap_to_match_dcm_energy = await self._gap_to_match_dcm_energy(energy_kev)
 
