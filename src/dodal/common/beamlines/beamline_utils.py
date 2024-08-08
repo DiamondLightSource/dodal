@@ -39,6 +39,11 @@ def list_active_devices() -> list[str]:
     return list(ACTIVE_DEVICES.keys())
 
 
+def get_all_active_devices() -> dict[str, AnyDevice]:
+    global ACTIVE_DEVICES
+    return ACTIVE_DEVICES
+
+
 def active_device_is_same_type(
     active_device: AnyDevice, device: Callable[..., AnyDevice]
 ) -> bool:
