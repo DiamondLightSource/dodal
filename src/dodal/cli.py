@@ -58,10 +58,13 @@ def connect(beamline: str, all: bool, sim_backend: bool) -> None:
         include_skipped=all,
         fake_with_ophyd_sim=sim_backend,
     )
-    sim_statement = "(sim mode)" if sim_backend else ""
+    sim_statement = " (sim mode)" if sim_backend else ""
 
-    print(f"{len(devices)} devices connected {sim_statement}:")
-    print("\n".join([f"\t{device_name}" for device_name in devices.keys()]))
+    print(f"{len(devices)} devices connected{sim_statement}:")
+    connected_devices = "\n".join(
+        sorted([f"\t{device_name}" for device_name in devices.keys()])
+    )
+    print(connected_devices)
 
     # If exceptions have occurred, this will print details of the relevant PVs
     if len(exceptions) > 0:

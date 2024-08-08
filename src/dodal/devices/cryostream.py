@@ -1,9 +1,21 @@
-from ophyd import Component as Cpt
-from ophyd import Device, EpicsSignal, EpicsSignalRO
+from enum import Enum
+
+from ophyd_async.core import StandardReadable
+from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
 
-class Cryo(Device):
-    course = Cpt(EpicsSignal, "-EA-CJET-01:COARSE:CTRL")
-    fine = Cpt(EpicsSignal, "-EA-CJET-01:FINE:CTRL")
-    temp = Cpt(EpicsSignalRO, "-EA-CSTRM-01:TEMP")
-    backpress = Cpt(EpicsSignalRO, "-EA-CSTRM-01:BACKPRESS")
+class InOut(str, Enum):
+    IN = "In"
+    OUT = "Out"
+
+
+class CryoStream(StandardReadable):
+    def __init__(self, prefix: str, name: str = ""):
+        self.course = epics_signal_rw(InOut, f"{prefix}-EA-CJET-01:COARSE:CTRL")
+        self.fine = epics_signal_rw(InOut, f"{prefix}-EA-CJET-01:FINE:CTRL")
+        self.temperature_k = epics_signal_r(float, f"{prefix}-EA-CSTRM-01:TEMP")
+        self.back_pressure_bar = epics_signal_r(
+            float, f"{prefix}-EA-CSTRM-01:BACKPRESS"
+        )
+
+        super().__init__(name)
