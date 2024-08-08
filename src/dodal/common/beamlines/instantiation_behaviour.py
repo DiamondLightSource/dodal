@@ -53,9 +53,6 @@ class DeviceInitializationController:
         assert isinstance(d, AnyDevice) or d is None
         return d
 
-    def add_device_to_cache(self, device: AnyDevice) -> None:
-        ACTIVE_DEVICES[device.name] = device
-
     def __call__(
         self, connect=False, mock: bool | None = None, timeout: float | None = None
     ) -> AnyDevice:
@@ -66,7 +63,7 @@ class DeviceInitializationController:
         )
         if self.config.set_name:
             device.set_name(self.factory.__name__)
-        self.add_device_to_cache(device)
+        ACTIVE_DEVICES[self.factory.__name__] = device
 
         if connect:
             call_in_bluesky_event_loop(
