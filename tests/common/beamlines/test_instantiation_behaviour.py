@@ -63,45 +63,18 @@ class TestDeviceInitializationController(unittest.TestCase):
     def test_device_caching(self):
         ACTIVE_DEVICES.clear()
 
-        def factory():
+        def my_device():
             return self.device_mock
 
-        controller = DeviceInitializationController(self.config, factory)
+        print(my_device.__name__)
+        print(self.device_mock)
+        controller = DeviceInitializationController(self.config, my_device)
 
         controller.add_device_to_cache(self.device_mock)
         cached_device = controller.see_if_device_is_in_cache(self.device_mock.name)
+        print(cached_device)
 
         self.assertEqual(cached_device, self.device_mock)
-
-    # def test_device_creation_and_connection(self):
-    #     def factory():
-    #         return self.device_mock
-
-    #     controller = DeviceInitializationController(self.config, factory)
-
-    #     with patch(
-    #         "dodal.common.beamlines.instantiation_behaviour.call_in_bluesky_event_loop"
-    #     ) as mock_event_loop:
-    #         with patch.object(self.device_mock, "connect") as mock_connect:
-    #             mock_connect.return_value = MagicMock()
-    #             _device = controller(connect=True)
-
-    #             mock_connect.assert_called_once_with(
-    #                 timeout=DEFAULT_TIMEOUT, mock=False
-    #             )
-    #             mock_event_loop.assert_called_once_with(mock_connect())
-
-
-# class TestInstantiationBehaviour(unittest.TestCase):
-#     def test_decorator_creates_controller(self):
-#         def factory():
-#             return MagicMock(spec=XYZDetector)
-
-#         decorator = instantiation_behaviour()
-#         controller = decorator(factory)
-
-#         self.assertIsInstance(controller, DeviceInitializationController)
-#         self.assertIn(factory.__name__, CONTROLLERS)
 
 
 class TestSpecificDeviceFunctions(unittest.TestCase):
