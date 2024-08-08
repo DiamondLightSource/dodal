@@ -13,6 +13,7 @@ from dodal.utils import (
     get_hostname,
     get_run_number,
     make_all_devices,
+    make_device,
 )
 
 
@@ -88,6 +89,46 @@ def test_some_devices_when_some_factories_raise_exceptions() -> None:
     assert len(exceptions) == 1 and all(
         isinstance(e, Exception) for e in exceptions.values()
     )
+
+
+def test_make_device_with_dependency():
+    import tests.fake_beamline_dependencies as fake_beamline
+
+    devices = make_device(fake_beamline, "device_z")
+    assert devices.keys() == {"device_x", "device_y", "device_z"}
+
+
+def test_make_device_no_dependency():
+    import tests.fake_beamline_dependencies as fake_beamline
+
+    devices = make_device(fake_beamline, "device_x")
+    assert devices.keys() == {"device_x"}
+
+
+def test_make_device_with_exception():
+    import tests.fake_beamline_all_devices_raise_exception as fake_beamline
+
+    with pytest.raises(ValueError):
+        make_device(fake_beamline, "device_c")
+
+
+def test_make_device_with_module_name():
+    devices = make_device("tests.fake_beamline", "device_a")
+    assert {"device_a"} == devices.keys()
+
+
+def test_make_device_no_factory():
+    import tests.fake_beamline_dependencies as fake_beamline
+
+    with pytest.raises(ValueError):
+        make_device(fake_beamline, "this_device_does_not_exist")
+
+
+def test_make_device_dependency_throws():
+    import tests.fake_beamline_broken_dependency as fake_beamline
+
+    with pytest.raises(RuntimeError):
+        make_device(fake_beamline, "device_z")
 
 
 def device_a() -> Readable:
