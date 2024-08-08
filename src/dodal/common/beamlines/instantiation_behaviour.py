@@ -48,8 +48,8 @@ class DeviceInitializationController:
         CONTROLLERS[self.factory.__name__] = self
 
     # TODO right now the cache is in a global variable ACTIVE_DEVICES, that should change
-    def see_if_device_is_in_cache(self, name: str) -> AnyDevice | None:
-        d = ACTIVE_DEVICES.get(name)
+    def see_if_device_is_in_cache(self, factory_name: str) -> AnyDevice | None:
+        d = ACTIVE_DEVICES.get(factory_name)
         assert isinstance(d, AnyDevice) or d is None
         return d
 
@@ -63,7 +63,7 @@ class DeviceInitializationController:
         )
         if self.config.set_name:
             device.set_name(self.factory.__name__)
-        ACTIVE_DEVICES[self.factory.__name__] = device
+        self.add_device_to_cache(device)
 
         if connect:
             call_in_bluesky_event_loop(
@@ -79,6 +79,9 @@ class DeviceInitializationController:
             CONTROLLERS[self.factory.__name__] = self
 
         return device
+
+    def add_device_to_cache(self, device: AnyDevice) -> None:
+        ACTIVE_DEVICES[self.factory.__name__] = device
 
 
 CONTROLLERS: dict[str, DeviceInitializationController] = {}
