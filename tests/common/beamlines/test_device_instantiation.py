@@ -9,10 +9,14 @@ import pytest
 
 from dodal.beamlines import all_beamline_modules
 from dodal.common.beamlines import beamline_utils
-from dodal.utils import BLUESKY_PROTOCOLS, make_all_devices
+from dodal.utils import (
+    BLUESKY_PROTOCOLS,
+    get_beamline_based_on_environment_variable,
+    make_all_devices,
+)
 
 
-def get_module_by_beamline_name(name: str) -> Iterable[str]:
+def get_module_name_by_beamline_name(name: str) -> Iterable[str]:
     """
     Get the names of specific importable modules that match the beamline name.
 
@@ -82,8 +86,9 @@ def test_lab_version_of_a_beamline(RE, mappings):
     """
     # todo patch the environment
     with patch.dict(os.environ, {"BEAMLINE": mappings[1]}):
+        module = get_beamline_based_on_environment_variable()
         # get the devices file for the beamline namespace
-        module, devices = get_module_by_beamline_name(mappings[0])
+        _, devices = get_module_name_by_beamline_name(mappings[0])
         for device_name, device in devices.items():
             assert device_name in beamline_utils.ACTIVE_DEVICES, (
                 f"No device named {device_name} was created, devices "
