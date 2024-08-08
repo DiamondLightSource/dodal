@@ -4,7 +4,10 @@ import click
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import NotConnected
 
-from dodal.beamlines import all_beamline_names, module_name_for_beamline
+from dodal.beamlines import (
+    all_beamline_names,
+    module_name_for_beamline,
+)
 from dodal.utils import make_all_devices
 
 from . import __version__
@@ -51,7 +54,6 @@ def connect(beamline: str, all: bool, sim_backend: bool) -> None:
     # We need to make a RunEngine to allow ophyd-async devices to connect.
     # See https://blueskyproject.io/ophyd-async/main/explanations/event-loop-choice.html
     RunEngine()
-
     print(f"Attempting connection to {beamline} (using {full_module_path})")
     devices, exceptions = make_all_devices(
         full_module_path,
