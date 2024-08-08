@@ -93,9 +93,15 @@ class Undulator(StandardReadable, Movable):
         super().__init__(name)
 
     @AsyncStatus.wrap
-    async def set(self, energy_value_kev: float):
+    async def set(self, value: float):
+        """
+        set the undulator gap to a given ENERGY
+
+        Args:
+            value: energy in keV
+        """
         await asyncio.gather(
-            self._set_undulator_gap(energy_value_kev),
+            self._set_undulator_gap(value),
         )
 
     async def _set_undulator_gap(self, energy_kev: float) -> None:
