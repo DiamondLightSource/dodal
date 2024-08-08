@@ -10,11 +10,11 @@ from ophyd_async.core import (
 )
 
 from dodal.devices.undulator import (
+    AccessError,
     Undulator,
     UndulatorGapAccess,
     _get_closest_gap_for_energy,
 )
-from dodal.devices.undulator_dcm import AccessError
 
 ID_GAP_LOOKUP_TABLE_PATH: str = (
     "./tests/devices/unit_tests/test_beamline_undulator_to_gap_lookup_table.txt"
