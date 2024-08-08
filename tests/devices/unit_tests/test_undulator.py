@@ -130,4 +130,5 @@ async def test_when_gap_access_is_disabled_set_energy_then_error_is_raised(
 ):
     set_mock_value(undulator.gap_access, UndulatorGapAccess.DISABLED)
     with pytest.raises(AccessError):
+        # AccessError("Undulator gap access is disabled. Contact Control Room")
         await undulator.set(5)
