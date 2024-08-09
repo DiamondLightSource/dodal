@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.xbpm_feedback &#8212; dodal 1.29.5.dev17+ge19bf4784 documentation</title>
+    <title>dodal.devices.xbpm_feedback &#8212; dodal 1.29.5.dev18+g394eaf7ef documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=c0c8ffe9"></script>
+    <script src="../../../_static/documentation_options.js?v=3c083f87"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -473,10 +473,7 @@ document.write(`
   <h1>Source code for dodal.devices.xbpm_feedback</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 
-<span class="kn">import</span> <span class="nn">ophyd</span>
 <span class="kn">from</span> <span class="nn">bluesky.protocols</span> <span class="kn">import</span> <span class="n">Triggerable</span>
-<span class="kn">from</span> <span class="nn">ophyd</span> <span class="kn">import</span> <span class="n">Component</span><span class="p">,</span> <span class="n">EpicsSignal</span><span class="p">,</span> <span class="n">EpicsSignalRO</span>
-<span class="kn">from</span> <span class="nn">ophyd.status</span> <span class="kn">import</span> <span class="n">DeviceStatus</span><span class="p">,</span> <span class="n">SubscriptionStatus</span>
 <span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="n">Device</span><span class="p">,</span> <span class="n">observe_value</span>
 <span class="kn">from</span> <span class="nn">ophyd_async.core.async_status</span> <span class="kn">import</span> <span class="n">AsyncStatus</span>
 <span class="kn">from</span> <span class="nn">ophyd_async.epics.signal</span> <span class="kn">import</span> <span class="n">epics_signal_r</span><span class="p">,</span> <span class="n">epics_signal_rw</span>
@@ -509,29 +506,6 @@ document.write(`
         <span class="k">async</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">observe_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos_stable</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">value</span><span class="p">:</span>
                 <span class="k">return</span></div>
-
-
-
-<div class="viewcode-block" id="XBPMFeedbackI04">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.xbpm_feedback.XBPMFeedbackI04.html#dodal.devices.xbpm_feedback.XBPMFeedbackI04">[docs]</a>
-<span class="k">class</span> <span class="nc">XBPMFeedbackI04</span><span class="p">(</span><span class="n">ophyd</span><span class="o">.</span><span class="n">Device</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The I04 version of this device has a slightly different trigger method&quot;&quot;&quot;</span>
-
-    <span class="c1"># Values to set to pause_feedback</span>
-    <span class="n">PAUSE</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">RUN</span> <span class="o">=</span> <span class="mi">1</span>
-
-    <span class="n">pos_ok</span> <span class="o">=</span> <span class="n">Component</span><span class="p">(</span><span class="n">EpicsSignalRO</span><span class="p">,</span> <span class="s2">&quot;-EA-FDBK-01:XBPM2POSITION_OK&quot;</span><span class="p">)</span>
-    <span class="n">pause_feedback</span> <span class="o">=</span> <span class="n">Component</span><span class="p">(</span><span class="n">EpicsSignal</span><span class="p">,</span> <span class="s2">&quot;-EA-FDBK-01:FB_PAUSE&quot;</span><span class="p">)</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">Component</span><span class="p">(</span><span class="n">EpicsSignalRO</span><span class="p">,</span> <span class="s2">&quot;-EA-XBPM-02:PosX:MeanValue_RBV&quot;</span><span class="p">)</span>
-    <span class="n">y</span> <span class="o">=</span> <span class="n">Component</span><span class="p">(</span><span class="n">EpicsSignalRO</span><span class="p">,</span> <span class="s2">&quot;-EA-XBPM-02:PosY:MeanValue_RBV&quot;</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DeviceStatus</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">SubscriptionStatus</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">pos_ok</span><span class="p">,</span>
-            <span class="k">lambda</span> <span class="o">*</span><span class="p">,</span> <span class="n">old_value</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">value</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span>
-            <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
-        <span class="p">)</span></div>
 
 </pre></div>
 

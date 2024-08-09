@@ -16,7 +16,6 @@ dodal.devices.xbpm\_feedback
 
    ~xbpm_feedback.Pause
    ~xbpm_feedback.XBPMFeedback
-   ~xbpm_feedback.XBPMFeedbackI04
 
 
 
