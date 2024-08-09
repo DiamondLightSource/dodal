@@ -35,6 +35,7 @@ dodal.beamlines.i04
       gonio_positioner
       ipin
       oav
+      oav_to_redis_forwarder
       robot
       s4_slit_gaps
       sample_delivery_system
