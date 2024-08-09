@@ -1,3 +1,5 @@
+import asyncio
+from dataclasses import dataclass
 from enum import Enum
 
 from bluesky.protocols import Movable
@@ -8,7 +10,7 @@ from ophyd_async.core import (
     StandardReadable,
     wait_for_value,
 )
-from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
+from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw, epics_signal_w
 
 
 class UndulatorGatestatus(str, Enum):
@@ -17,13 +19,25 @@ class UndulatorGatestatus(str, Enum):
 
 
 class UndulatorGap(StandardReadable, Movable):
-    """A collection of epics signals to control Apple 2 undulator gap motion.
+    """A device with a collection of epics signals to set Apple 2 undulator gap motion.
     Only PV used by beamline are added the full list is here:
     /dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDGapVelocityControl.template
     /dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDPhaseSoftMotor.template
     """
 
     def __init__(self, prefix: str, name: str = ""):
+        """
+        Constructs all the necessary PV for the pundulatorGap.
+
+        Parameters
+        ----------
+            prefix : str
+                Beamline specific part of the PV
+            name : str
+                Name of the Id device
+
+        """
+
         # Gap demand set point and readback
         self.user_setpoint = epics_signal_rw(
             str, prefix + "GAPSET.B", prefix + "BLGSET"
@@ -67,3 +81,92 @@ class UndulatorGap(StandardReadable, Movable):
         cur_pos = await self.user_readback.get_value()
         target_pos = float(await self.user_setpoint.get_value())
         return abs((target_pos - cur_pos) * 2.0 / vel)
+
+
+@dataclass
+class PhaseAxisPv:
+    """
+    This is use to adjust different pv on different beamlines.
+
+    Format:
+        $(prefix)$(set_pv/read_pv):BL$(axis_pv)MTR
+
+    example:
+        SR10I-MO-SERVC-01:BLRPQ1SET -> for setting
+        SR10I-MO-SERVO-03:MOT.RBV   -> for getting
+
+        set_pv = "SERVC-01"
+        read_pv: "SERVO-03"
+        axis_pv = "RPQ1"
+    """
+
+    set_pv: str
+    read_pv: str
+    axis_pv: str
+
+
+class UndulatorPhaseMotor(StandardReadable):
+    """A collection of epics signals for ID phase motion.
+    Only PV used by beamline are added the full list is here:
+    /dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDPhaseSoftMotor.template
+
+
+    """
+
+    def __init__(self, prefix: str, infix: PhaseAxisPv, name: str = ""):
+        """
+        Parameters
+        ----------
+
+        prefix : str
+            The setting prefix PV.
+        infix: PhaseAxisPv, : str
+            Collection of pv that are different between beamlines
+        name : str
+            Name of the Id phase device
+        """
+
+        self.user_setpoint = epics_signal_w(
+            str, prefix + infix.set_pv + ":BL" + infix.axis_pv + "SET"
+        )
+        self.user_setpoint_readback = epics_signal_r(
+            float, prefix + infix.read_pv + ":MOT"
+        )
+        with self.add_children_as_readables(HintedSignal):
+            self.user_readback = epics_signal_r(
+                float, prefix + infix.read_pv + ":MOT.RBV"
+            )
+        super().__init__(name=name)
+
+
+class UndlatorPhaseAxes(StandardReadable, Movable):
+    """A collection of 4 phase Motor to make up"""
+
+    def __init__(
+        self,
+        prefix: str,
+        top_outer: PhaseAxisPv,
+        top_inner: PhaseAxisPv,
+        btm_outer: PhaseAxisPv,
+        btm_inner: PhaseAxisPv,
+        name: str = "",
+    ):
+        # Gap demand set point and readback
+        with self.add_children_as_readables():
+            self.top_outer = UndulatorPhaseMotor(prefix=prefix, infix=top_outer)
+            self.top_inner = UndulatorPhaseMotor(prefix=prefix, infix=top_inner)
+            self.btm_outer = UndulatorPhaseMotor(prefix=prefix, infix=btm_outer)
+            self.btm_inner = UndulatorPhaseMotor(prefix=prefix, infix=btm_inner)
+        # Nothing move until this is set to 1 and it will return to 0 when done
+        self.set_move = epics_signal_rw(int, prefix + top_inner.set_pv + ":BLGSETP")
+        super().__init__(name=name)
+
+    @AsyncStatus.wrap
+    async def set(self, value: list) -> None:
+        await asyncio.gather(
+            self.top_outer.user_setpoint.set(value[0]),
+            self.top_inner.user_setpoint.set(value[1]),
+            self.btm_outer.user_setpoint.set(value[2]),
+            self.btm_inner.user_setpoint.set(value[3]),
+        )
+        await self.set_move.set(value=1)
