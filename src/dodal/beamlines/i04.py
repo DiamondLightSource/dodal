@@ -14,6 +14,7 @@ from dodal.devices.i04.transfocator import Transfocator
 from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZPositioner
 from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
+from dodal.devices.oav.oav_to_redis_forwarder import OAVToRedisForwarder
 from dodal.devices.robot import BartRobot
 from dodal.devices.s4_slit_gaps import S4SlitGaps
 from dodal.devices.smargon import Smargon
@@ -31,6 +32,10 @@ ZOOM_PARAMS_FILE = (
 )
 DISPLAY_CONFIG = "/dls_sw/i04/software/gda_versions/var/display.configuration"
 DAQ_CONFIGURATION_PATH = "/dls_sw/i04/software/daq_configuration"
+
+REDIS_HOST = "i04-control.diamond.ac.uk"
+REDIS_PASSWORD = "not_telling"
+MURKO_REDIS_DB = 7
 
 BL = get_beamline_name("s04")
 set_log_beamline(BL)
@@ -394,4 +399,20 @@ def robot(
         "-MO-ROBOT-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+    )
+
+
+def oav_to_redis_forwarder(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> OAVToRedisForwarder:
+    """Get the i04 OAV to redis forwarder, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i04, it will return the existing object.
+    """
+    return device_instantiation(
+        OAVToRedisForwarder,
+        "oav_to_redis",
+        "",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        params=OAVConfigParams(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
     )
