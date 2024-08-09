@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 from bluesky.protocols import Readable
 from ophyd import EpicsMotor
 
-from dodal.devices.cryostream import Cryo
+from dodal.devices.cryostream import CryoStream
 
 
 def device_x() -> Readable:
@@ -14,7 +14,7 @@ def device_y() -> EpicsMotor:
     raise AssertionError("Test failure")
 
 
-def device_z(device_x: Readable, device_y: EpicsMotor) -> Cryo:
+def device_z(device_x: Readable, device_y: EpicsMotor) -> CryoStream:
     return _mock_with_name("cryo")
 
 
