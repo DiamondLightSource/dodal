@@ -14,7 +14,8 @@ dodal.devices.cryostream
    :toctree:
    :recursive:
 
-   ~cryostream.Cryo
+   ~cryostream.CryoStream
+   ~cryostream.InOut
 
 
 

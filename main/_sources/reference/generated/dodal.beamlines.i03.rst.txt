@@ -27,6 +27,7 @@ dodal.beamlines.i03
       aperture_scatterguard
       attenuator
       backlight
+      cryo_stream
       dcm
       detector_motion
       eiger

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.cryostream &#8212; dodal 1.29.5.dev18+g394eaf7ef documentation</title>
+    <title>dodal.devices.cryostream &#8212; dodal 1.29.5.dev19+g32ff2397a documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=3c083f87"></script>
+    <script src="../../../_static/documentation_options.js?v=bfa818ac"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -471,17 +471,32 @@ document.write(`
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.cryostream</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">ophyd</span> <span class="kn">import</span> <span class="n">Component</span> <span class="k">as</span> <span class="n">Cpt</span>
-<span class="kn">from</span> <span class="nn">ophyd</span> <span class="kn">import</span> <span class="n">Device</span><span class="p">,</span> <span class="n">EpicsSignal</span><span class="p">,</span> <span class="n">EpicsSignalRO</span>
+<span></span><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+
+<span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="n">StandardReadable</span>
+<span class="kn">from</span> <span class="nn">ophyd_async.epics.signal</span> <span class="kn">import</span> <span class="n">epics_signal_r</span><span class="p">,</span> <span class="n">epics_signal_rw</span>
 
 
-<div class="viewcode-block" id="Cryo">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.cryostream.Cryo.html#dodal.devices.cryostream.Cryo">[docs]</a>
-<span class="k">class</span> <span class="nc">Cryo</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
-    <span class="n">course</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">EpicsSignal</span><span class="p">,</span> <span class="s2">&quot;-EA-CJET-01:COARSE:CTRL&quot;</span><span class="p">)</span>
-    <span class="n">fine</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">EpicsSignal</span><span class="p">,</span> <span class="s2">&quot;-EA-CJET-01:FINE:CTRL&quot;</span><span class="p">)</span>
-    <span class="n">temp</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">EpicsSignalRO</span><span class="p">,</span> <span class="s2">&quot;-EA-CSTRM-01:TEMP&quot;</span><span class="p">)</span>
-    <span class="n">backpress</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">EpicsSignalRO</span><span class="p">,</span> <span class="s2">&quot;-EA-CSTRM-01:BACKPRESS&quot;</span><span class="p">)</span></div>
+<div class="viewcode-block" id="InOut">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.cryostream.InOut.html#dodal.devices.cryostream.InOut">[docs]</a>
+<span class="k">class</span> <span class="nc">InOut</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+    <span class="n">IN</span> <span class="o">=</span> <span class="s2">&quot;In&quot;</span>
+    <span class="n">OUT</span> <span class="o">=</span> <span class="s2">&quot;Out&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="CryoStream">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.cryostream.CryoStream.html#dodal.devices.cryostream.CryoStream">[docs]</a>
+<span class="k">class</span> <span class="nc">CryoStream</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">course</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">InOut</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">-EA-CJET-01:COARSE:CTRL&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fine</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">InOut</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">-EA-CJET-01:FINE:CTRL&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">temperature_k</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">-EA-CSTRM-01:TEMP&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">back_pressure_bar</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
+            <span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">-EA-CSTRM-01:BACKPRESS&quot;</span>
+        <span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
 
 </pre></div>
 
