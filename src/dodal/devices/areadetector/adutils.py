@@ -31,7 +31,7 @@ class SingleTriggerV33(TriggerBase):
 
         def _acq_done(*args, **kwargs):
             # TODO sort out if anything useful in here
-            self._status._finished()
+            self._status._finished()  # noqa: SLF001
 
         self._acquisition_signal.put(1, use_complete=True, callback=_acq_done)
         # Ensure that this mixin is part of valid Detector with generate_datum

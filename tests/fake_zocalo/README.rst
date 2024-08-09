@@ -10,4 +10,3 @@ fake_zocalo
 
 * Run `dls_start_fake_zocalo.sh`
 * For Hyperion to connect to this you will need to run `module load dials/latest` in the terminal you're runnign Hyperion in
-

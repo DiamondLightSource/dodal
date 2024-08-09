@@ -203,21 +203,21 @@ async def test_aperture_positions_large(
     ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
 ):
     set_mock_value(ap_sg.aperture.large, 1)
-    assert await ap_sg._get_current_aperture_position() == aperture_positions.LARGE
+    assert await ap_sg.get_current_aperture_position() == aperture_positions.LARGE
 
 
 async def test_aperture_positions_medium(
     ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
 ):
     set_mock_value(ap_sg.aperture.medium, 1)
-    assert await ap_sg._get_current_aperture_position() == aperture_positions.MEDIUM
+    assert await ap_sg.get_current_aperture_position() == aperture_positions.MEDIUM
 
 
 async def test_aperture_positions_small(
     ap_sg: ApertureScatterguard, aperture_positions: AperturePositions
 ):
     set_mock_value(ap_sg.aperture.small, 1)
-    assert await ap_sg._get_current_aperture_position() == aperture_positions.SMALL
+    assert await ap_sg.get_current_aperture_position() == aperture_positions.SMALL
 
 
 async def test_aperture_positions_robot_load(
@@ -227,7 +227,7 @@ async def test_aperture_positions_robot_load(
     set_mock_value(ap_sg.aperture.medium, 0)
     set_mock_value(ap_sg.aperture.small, 0)
     await ap_sg.aperture.y.set(aperture_positions.ROBOT_LOAD.location.aperture_y)
-    assert await ap_sg._get_current_aperture_position() == aperture_positions.ROBOT_LOAD
+    assert await ap_sg.get_current_aperture_position() == aperture_positions.ROBOT_LOAD
 
 
 async def test_aperture_positions_robot_load_within_tolerance(
@@ -239,7 +239,7 @@ async def test_aperture_positions_robot_load_within_tolerance(
     set_mock_value(ap_sg.aperture.medium, 0)
     set_mock_value(ap_sg.aperture.small, 0)
     await ap_sg.aperture.y.set(robot_load_ap_y + tolerance)
-    assert await ap_sg._get_current_aperture_position() == aperture_positions.ROBOT_LOAD
+    assert await ap_sg.get_current_aperture_position() == aperture_positions.ROBOT_LOAD
 
 
 async def test_aperture_positions_robot_load_outside_tolerance(
@@ -252,7 +252,7 @@ async def test_aperture_positions_robot_load_outside_tolerance(
     set_mock_value(ap_sg.aperture.small, 0)
     await ap_sg.aperture.y.set(robot_load_ap_y + tolerance)
     with pytest.raises(InvalidApertureMove):
-        await ap_sg._get_current_aperture_position()
+        await ap_sg.get_current_aperture_position()
 
 
 async def test_aperture_positions_robot_load_unsafe(
@@ -263,7 +263,7 @@ async def test_aperture_positions_robot_load_unsafe(
     set_mock_value(ap_sg.aperture.small, 0)
     await ap_sg.aperture.y.set(50.0)
     with pytest.raises(InvalidApertureMove):
-        await ap_sg._get_current_aperture_position()
+        await ap_sg.get_current_aperture_position()
 
 
 async def test_given_aperture_not_set_through_device_but_motors_in_position_when_device_read_then_position_returned(
