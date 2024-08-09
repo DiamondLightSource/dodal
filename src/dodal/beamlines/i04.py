@@ -21,7 +21,7 @@ from dodal.devices.smargon import Smargon
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.thawer import Thawer
 from dodal.devices.undulator import Undulator
-from dodal.devices.xbpm_feedback import XBPMFeedbackI04
+from dodal.devices.xbpm_feedback import XBPMFeedback
 from dodal.devices.zebra import Zebra
 from dodal.devices.zebra_controlled_shutter import ZebraShutter
 from dodal.log import set_beamline as set_log_beamline
@@ -162,12 +162,12 @@ def transfocator(
 
 def xbpm_feedback(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> XBPMFeedbackI04:
+) -> XBPMFeedback:
     """Get the i04 xbpm_feedback device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
     return device_instantiation(
-        XBPMFeedbackI04,
+        XBPMFeedback,
         "xbpm_feedback",
         "",
         wait_for_connection,
