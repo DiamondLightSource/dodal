@@ -38,9 +38,9 @@ def test_udc_directory_provider_excepts_before_update():
     "initial",
     [Path("."), None],
 )
-def test_udc_directory_provider_after_update(initial, tmp_path):
+async def test_udc_directory_provider_after_update(initial, tmp_path):
     provider = PandASubdirectoryProvider(initial)
-    provider.update(tmp_path)
+    await provider.update(directory=tmp_path)
     directory_info = provider()
     assert directory_info.root == tmp_path
     assert directory_info.resource_dir == Path("panda")

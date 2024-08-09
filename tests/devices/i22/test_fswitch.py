@@ -2,8 +2,8 @@ from unittest import mock
 
 import pytest
 from bluesky.plans import count
-from bluesky.protocols import DataKey
 from bluesky.run_engine import RunEngine
+from event_model import DataKey
 from ophyd_async.core import DeviceCollector, set_mock_value
 
 from dodal.devices.i22.fswitch import FilterState, FSwitch
@@ -23,9 +23,9 @@ async def fswitch() -> FSwitch:
 
 
 async def test_reading_fswitch(fswitch: FSwitch):
-    set_mock_value(fswitch.filters.get(0), FilterState.OUT_BEAM)
-    set_mock_value(fswitch.filters.get(1), FilterState.OUT_BEAM)
-    set_mock_value(fswitch.filters.get(2), FilterState.OUT_BEAM)
+    set_mock_value(fswitch.filters[0], FilterState.OUT_BEAM)
+    set_mock_value(fswitch.filters[1], FilterState.OUT_BEAM)
+    set_mock_value(fswitch.filters[2], FilterState.OUT_BEAM)
 
     reading = await fswitch.read()
     assert reading == {

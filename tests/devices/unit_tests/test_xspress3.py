@@ -3,8 +3,8 @@ from unittest.mock import ANY, Mock
 
 import bluesky.plan_stubs as bps
 import pytest
-from bluesky import FailedStatus
 from bluesky.run_engine import RunEngine
+from bluesky.utils import FailedStatus
 from ophyd_async.core import (
     DeviceCollector,
     callback_on_mock_put,
