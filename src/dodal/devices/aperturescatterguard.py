@@ -174,7 +174,7 @@ class ApertureScatterguard(StandardReadable, Movable):
         async def read(self, *args, **kwargs):
             assert isinstance(self.parent, ApertureScatterguard)
             assert self._backend
-            await self._backend.put(await self.parent._get_current_aperture_position())
+            await self._backend.put(await self.parent.get_current_aperture_position())
             return {self.name: await self._backend.get_reading()}
 
         async def describe(self) -> dict[str, DataKey]:
@@ -224,7 +224,7 @@ class ApertureScatterguard(StandardReadable, Movable):
             self.scatterguard.y.set(scatterguard_y),
         )
 
-    async def _get_current_aperture_position(self) -> SingleAperturePosition:
+    async def get_current_aperture_position(self) -> SingleAperturePosition:
         """
         Returns the current aperture position using readback values
         for SMALL, MEDIUM, LARGE. ROBOT_LOAD position defined when
