@@ -79,4 +79,3 @@ The following example creates a fictitious beamline ``w41``, with a simulated tw
 This test checks that the function returns a type that conforms to Bluesky protocols, 
 that it always returns the same instance of the device and that the arguments passed 
 into the Device class constructor are valid.
-
