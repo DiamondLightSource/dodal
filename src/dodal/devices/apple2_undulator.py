@@ -2,6 +2,7 @@ import asyncio
 from dataclasses import dataclass
 from enum import Enum
 
+import numpy as np
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
@@ -16,6 +17,14 @@ from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw, epics_sign
 class UndulatorGatestatus(str, Enum):
     open = "Open"
     close = "Closed"
+
+
+@dataclass
+class Apple2Phases:
+    top_outer: str
+    top_inner: str
+    btm_outer: str
+    btm_inner: str
 
 
 class UndulatorGap(StandardReadable, Movable):
@@ -45,7 +54,7 @@ class UndulatorGap(StandardReadable, Movable):
         # Nothing move until this is set to 1 and it will return to 0 when done
         self.set_move = epics_signal_rw(int, prefix + "BLGSETP")
         # Gate keeper open when move is requested, closed when move is completed
-        # self.gate = epics_signal_r(UndulatorGatestatus, prefix + "BLGATE")
+        self.gate = epics_signal_r(UndulatorGatestatus, prefix + "BLGATE")
         # These are gap velocity limit.
         self.max_velocity = epics_signal_r(float, prefix + "BLGSETVEL.HOPR")
         self.min_velocity = epics_signal_r(float, prefix + "BLGSETVEL.LOPR")
@@ -60,8 +69,6 @@ class UndulatorGap(StandardReadable, Movable):
             self.motor_egu = epics_signal_r(str, prefix + "BLGAPMTR.EGU")
             # Gap velocity
             self.velocity = epics_signal_rw(float, prefix + "BLGSETVEL")
-            # Gate keeper
-            self.gate = epics_signal_r(UndulatorGatestatus, prefix + "BLGATE")
         with self.add_children_as_readables(HintedSignal):
             # Gap readback value
             self.user_readback = epics_signal_r(float, prefix + "CURRGAPD")
@@ -92,16 +99,13 @@ class PhaseAxisPv:
         $(prefix)$(set_pv/read_pv):BL$(axis_pv)MTR
 
     example:
-        SR10I-MO-SERVC-01:BLRPQ1SET -> for setting
-        SR10I-MO-SERVO-03:MOT.RBV   -> for getting
+        SR10I-MO-SERVC-01:BLRPQ1SET
 
         set_pv = "SERVC-01"
-        read_pv: "SERVO-03"
         axis_pv = "RPQ1"
     """
 
     set_pv: str
-    read_pv: str
     axis_pv: str
 
 
@@ -125,17 +129,24 @@ class UndulatorPhaseMotor(StandardReadable):
         name : str
             Name of the Id phase device
         """
-
-        self.user_setpoint = epics_signal_w(
-            str, prefix + infix.set_pv + ":BL" + infix.axis_pv + "SET"
-        )
-        self.user_setpoint_readback = epics_signal_r(
-            float, prefix + infix.read_pv + ":MOT"
-        )
+        fullPV = prefix + infix.set_pv + ":BL" + infix.axis_pv + "MTR"
+        self.user_setpoint = epics_signal_w(str, fullPV[:-3] + "SET")
+        self.user_setpoint_demand_readback = epics_signal_r(float, fullPV[:-3] + "DMD")
         with self.add_children_as_readables(HintedSignal):
-            self.user_readback = epics_signal_r(
-                float, prefix + infix.read_pv + ":MOT.RBV"
-            )
+            self.user_setpoint_readback = epics_signal_r(float, fullPV + ".RBV")
+
+        with self.add_children_as_readables(ConfigSignal):
+            self.motor_egu = epics_signal_r(str, fullPV + ".EGU")
+            self.velocity = epics_signal_rw(float, fullPV + ".VELO")
+
+            self.max_velocity = epics_signal_r(float, fullPV + ".VMAX")
+            self.acceleration_time = epics_signal_rw(float, fullPV + ".ACCL")
+            self.precision = epics_signal_r(int, fullPV + ".PREC")
+            self.deadband = epics_signal_r(float, fullPV + ".RDBD")
+            self.motor_done_move = epics_signal_r(int, fullPV + ".DMOV")
+            self.low_limit_travel = epics_signal_rw(float, fullPV + ".LLM")
+            self.high_limit_travel = epics_signal_rw(float, fullPV + ".HLM")
+
         super().__init__(name=name)
 
 
@@ -159,14 +170,45 @@ class UndlatorPhaseAxes(StandardReadable, Movable):
             self.btm_inner = UndulatorPhaseMotor(prefix=prefix, infix=btm_inner)
         # Nothing move until this is set to 1 and it will return to 0 when done
         self.set_move = epics_signal_rw(int, prefix + top_inner.set_pv + ":BLGSETP")
+        self.gate = epics_signal_r(
+            UndulatorGatestatus, prefix + top_inner.set_pv + ":BLGATE"
+        )
         super().__init__(name=name)
 
     @AsyncStatus.wrap
-    async def set(self, value: list) -> None:
+    async def set(self, value: Apple2Phases) -> None:
+        if await self.gate.get_value() == UndulatorGatestatus.open:
+            raise RuntimeError(f"{self.name} is already in motion.")
         await asyncio.gather(
-            self.top_outer.user_setpoint.set(value[0]),
-            self.top_inner.user_setpoint.set(value[1]),
-            self.btm_outer.user_setpoint.set(value[2]),
-            self.btm_inner.user_setpoint.set(value[3]),
+            self.top_outer.user_setpoint.set(value=value.top_outer),
+            self.top_inner.user_setpoint.set(value=value.top_inner),
+            self.btm_outer.user_setpoint.set(value=value.btm_outer),
+            self.btm_inner.user_setpoint.set(value=value.btm_inner),
         )
+        timeout = await self._cal_timeout()
         await self.set_move.set(value=1)
+        # Todo need to deal with timeout.
+        await wait_for_value(self.gate, UndulatorGatestatus.close, timeout=timeout)
+
+    async def _cal_timeout(self) -> float:
+        velos = await asyncio.gather(
+            self.top_outer.velocity.get_value(),
+            self.top_inner.velocity.get_value(),
+            self.btm_outer.velocity.get_value(),
+            self.btm_inner.velocity.get_value(),
+        )
+        cur_pos = await asyncio.gather(
+            self.top_outer.user_setpoint_demand_readback.get_value(),
+            self.top_inner.user_setpoint_demand_readback.get_value(),
+            self.btm_outer.user_setpoint_demand_readback.get_value(),
+            self.btm_inner.user_setpoint_demand_readback.get_value(),
+        )
+        target_pos = await asyncio.gather(
+            self.top_outer.user_setpoint_readback.get_value(),
+            self.top_inner.user_setpoint_readback.get_value(),
+            self.btm_outer.user_setpoint_readback.get_value(),
+            self.btm_inner.user_setpoint_readback.get_value(),
+        )
+        move_time = np.abs(np.divide(tuple(np.subtract(target_pos, cur_pos)), velos))
+
+        return move_time.max() * 2
