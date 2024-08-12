@@ -46,10 +46,11 @@ async def test_udc_directory_provider_after_update(initial, tmp_path):
     assert directory_info.resource_dir == Path("panda")
 
 
-async def test_udc_directory_provider_no_suffix():
+async def test_udc_directory_provider_no_suffix(tmp_path):
     initial = Path("initial")
     provider = PandASubdirectoryProvider(initial)
-    root_path = Path("/tmp/my_data")
+    root_path = tmp_path / "my_data"
+    root_path.mkdir()
     await provider.update(directory=root_path)
     directory_info = provider()
     assert directory_info.root == root_path
@@ -57,10 +58,11 @@ async def test_udc_directory_provider_no_suffix():
     assert directory_info.suffix == ""
 
 
-async def test_udc_directory_provider_with_suffix():
+async def test_udc_directory_provider_with_suffix(tmp_path):
     initial = Path("initial")
     provider = PandASubdirectoryProvider(initial)
-    root_path = Path("/tmp/my_data")
+    root_path = tmp_path / "my_data"
+    root_path.mkdir()
     await provider.update(directory=root_path, suffix="_123")
     directory_info = provider()
     assert directory_info.root == root_path
