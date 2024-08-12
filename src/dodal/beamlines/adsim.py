@@ -13,7 +13,7 @@ set_log_beamline(BL)
 set_utils_beamline(BL)
 
 
-def stage(
+def sim_motors(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> SimStage:
     return device_instantiation(
