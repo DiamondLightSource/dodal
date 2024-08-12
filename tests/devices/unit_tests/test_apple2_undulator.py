@@ -14,8 +14,7 @@ from ophyd_async.core import (
 )
 
 from dodal.devices.apple2_undulator import (
-    Apple2Phases,
-    PhaseAxisPv,
+    Apple2PhasesVal,
     UndlatorPhaseAxes,
     UndulatorGap,
     UndulatorGatestatus,
@@ -38,11 +37,11 @@ async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
 async def mock_phaseAxes(prefix: str = "BLXX-EA-DET-007:") -> UndlatorPhaseAxes:
     async with DeviceCollector(mock=True):
         mock_phaseAxes = UndlatorPhaseAxes(
-            prefix="SR10I-MO-",
-            top_outer=PhaseAxisPv(set_pv="SERVC-21", axis_pv="RPQ1"),
-            top_inner=PhaseAxisPv(set_pv="SERVC-21", axis_pv="RPQ2"),
-            btm_outer=PhaseAxisPv(set_pv="SERVC-21", axis_pv="RPQ3"),
-            btm_inner=PhaseAxisPv(set_pv="SERVC-21", axis_pv="RPQ4"),
+            prefix=prefix,
+            top_outer="RPQ1",
+            top_inner="RPQ2",
+            btm_outer="RPQ3",
+            btm_inner="RPQ4",
         )
     assert mock_phaseAxes.name == "mock_phaseAxes"
     set_mock_value(mock_phaseAxes.gate, UndulatorGatestatus.close)
@@ -68,7 +67,7 @@ async def test_in_motion_error(
     with pytest.raises(RuntimeError):
         await mock_id_gap.set("2")
     set_mock_value(mock_phaseAxes.gate, UndulatorGatestatus.open)
-    setValue = Apple2Phases("3", "2", "5", "7")
+    setValue = Apple2PhasesVal("3", "2", "5", "7")
     with pytest.raises(RuntimeError):
         await mock_phaseAxes.set(setValue)
 
@@ -92,7 +91,7 @@ async def test_gap_cal_timout(
     set_mock_value(mock_id_gap.user_readback, readback)
     set_mock_value(mock_id_gap.user_setpoint, str(target))
 
-    assert await mock_id_gap._cal_timeout() == pytest.approx(expected_timeout, rel=0.1)
+    assert await mock_id_gap.get_timeout() == pytest.approx(expected_timeout, rel=0.1)
 
 
 async def test_gap_time_out_error(mock_id_gap: UndulatorGap, RE: RunEngine):
@@ -103,28 +102,6 @@ async def test_gap_time_out_error(mock_id_gap: UndulatorGap, RE: RunEngine):
     set_mock_value(mock_id_gap.velocity, 1000)
     with pytest.raises(TimeoutError):
         await mock_id_gap.set("2")
-
-
-# async def test_gap_success_set(mock_id_gap: UndulatorGap, RE: RunEngine):
-#     expected_value = 20.0
-#     callback_on_mock_put(
-#         mock_id_gap.user_setpoint,
-#         lambda *_, **__: set_mock_value(mock_id_gap.gate, UndulatorGatestatus.open),
-#     )
-
-#     def set_complete_move():
-#         set_mock_value(mock_id_gap.user_readback, expected_value)
-#         set_mock_value(mock_id_gap.gate, UndulatorGatestatus.close)
-
-#     callback_on_mock_put(mock_id_gap.set_move, lambda *_, **__: set_complete_move())
-#     RE(bps.abs_set(mock_id_gap, expected_value))
-#     get_mock_put(mock_id_gap.set_move).assert_called_once_with(
-#         1, wait=True, timeout=10.0
-#     )
-#     get_mock_put(mock_id_gap.user_setpoint).assert_called_once_with(
-#         str(expected_value), wait=True, timeout=10.0
-#     )
-#     assert await mock_id_gap.user_readback.get_value() == expected_value
 
 
 async def test_gap_success_scan(mock_id_gap: UndulatorGap, RE: RunEngine):
@@ -156,7 +133,7 @@ async def test_gap_success_scan(mock_id_gap: UndulatorGap, RE: RunEngine):
 
 
 async def test_phase_time_out_error(mock_phaseAxes: UndlatorPhaseAxes, RE: RunEngine):
-    setValue = Apple2Phases("3", "2", "5", "7")
+    setValue = Apple2PhasesVal("3", "2", "5", "7")
 
     callback_on_mock_put(
         mock_phaseAxes.top_outer.user_setpoint,
@@ -198,13 +175,13 @@ async def test_phase_cal_timout(
     set_mock_value(mock_phaseAxes.btm_inner.user_setpoint_demand_readback, target[2])
     set_mock_value(mock_phaseAxes.btm_outer.user_setpoint_demand_readback, target[3])
 
-    assert await mock_phaseAxes._cal_timeout() == pytest.approx(
+    assert await mock_phaseAxes.get_timeout() == pytest.approx(
         expected_timeout, rel=0.1
     )
 
 
 async def test_phase_success_set(mock_phaseAxes: UndlatorPhaseAxes, RE: RunEngine):
-    set_value = Apple2Phases("3", "2", "5", "7")
+    set_value = Apple2PhasesVal("3", "2", "5", "7")
     expected_value = [3, 2, 5, 7]
     callback_on_mock_put(
         mock_phaseAxes.top_inner.user_setpoint,
