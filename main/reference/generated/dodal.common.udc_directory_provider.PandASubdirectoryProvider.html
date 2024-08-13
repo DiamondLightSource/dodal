@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.common.udc_directory_provider.PandASubdirectoryProvider &#8212; dodal 1.29.5.dev19+g32ff2397a documentation</title>
+    <title>dodal.common.udc_directory_provider.PandASubdirectoryProvider &#8212; dodal 1.29.5.dev20+g19c6659e0 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../_static/documentation_options.js?v=bfa818ac"></script>
+    <script src="../../_static/documentation_options.js?v=e15d7580"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -832,7 +832,7 @@ document.write(`
 <dt class="sig sig-object py" id="dodal.common.udc_directory_provider.PandASubdirectoryProvider">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.common.udc_directory_provider.</span></span><span class="sig-name descname"><span class="pre">PandASubdirectoryProvider</span></span><a class="reference internal" href="../../_modules/dodal/common/udc_directory_provider.html#PandASubdirectoryProvider"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.common.udc_directory_provider.PandASubdirectoryProvider" title="Link to this definition">#</a></dt>
 <dd><p>Directory provider for the HDFPanda. Points to a panda subdirectory within the
-directory path provided, which must exist before attempting to arm the PCAP block</p>
+directory path provided</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>directory</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p>
@@ -841,8 +841,8 @@ directory path provided, which must exist before attempting to arm the PCAP bloc
 <p class="rubric">Methods</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code>(*, directory, **kwargs)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.common.udc_directory_provider.PandASubdirectoryProvider.update" title="dodal.common.udc_directory_provider.PandASubdirectoryProvider.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a>(*, directory[, suffix])</p></td>
+<td><p>Update the root directory into which panda pcap files are written. This will result in the panda subdirectory being created if it does not already exist. Args:      directory: Path instance that identifies the root folder. This folder must exist. The panda will         attempt to write into the &quot;panda&quot; subdirectory which will be created if not already present. suffix: Optional str that will be appended to the panda device name along with the file         type extension to construct the output filename.</p></td>
 </tr>
 </tbody>
 </table>
@@ -856,6 +856,32 @@ directory path provided, which must exist before attempting to arm the PCAP bloc
 </tbody>
 </table>
 </div>
+<dl class="py method">
+<dt class="sig sig-object py" id="dodal.common.udc_directory_provider.PandASubdirectoryProvider.update">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">Path</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/common/udc_directory_provider.html#PandASubdirectoryProvider.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.common.udc_directory_provider.PandASubdirectoryProvider.update" title="Link to this definition">#</a></dt>
+<dd><p>Update the root directory into which panda pcap files are written. This will result in the panda
+subdirectory being created if it does not already exist.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>directory: Path instance that identifies the root folder. This folder must exist. The panda will</dt><dd><p>attempt to write into the “panda” subdirectory which will be created if not already present.</p>
+</dd>
+<dt>suffix: Optional str that will be appended to the panda device name along with the file</dt><dd><p>type extension to construct the output filename</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>directory</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a></span>)</p></li>
+<li><p><strong>suffix</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -906,7 +932,10 @@ directory path provided, which must exist before attempting to arm the PCAP bloc
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.common.udc_directory_provider.PandASubdirectoryProvider"><code class="docutils literal notranslate"><span class="pre">PandASubdirectoryProvider</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.common.udc_directory_provider.PandASubdirectoryProvider"><code class="docutils literal notranslate"><span class="pre">PandASubdirectoryProvider</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.common.udc_directory_provider.PandASubdirectoryProvider.update"><code class="docutils literal notranslate"><span class="pre">PandASubdirectoryProvider.update()</span></code></a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 

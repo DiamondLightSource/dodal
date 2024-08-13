@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.common.udc_directory_provider &#8212; dodal 1.29.5.dev19+g32ff2397a documentation</title>
+    <title>dodal.common.udc_directory_provider &#8212; dodal 1.29.5.dev20+g19c6659e0 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=bfa818ac"></script>
+    <script src="../../../_static/documentation_options.js?v=e15d7580"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -483,7 +483,7 @@ document.write(`
 <a class="viewcode-back" href="../../../reference/generated/dodal.common.udc_directory_provider.PandASubdirectoryProvider.html#dodal.common.udc_directory_provider.PandASubdirectoryProvider">[docs]</a>
 <span class="k">class</span> <span class="nc">PandASubdirectoryProvider</span><span class="p">(</span><span class="n">UpdatingDirectoryProvider</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Directory provider for the HDFPanda. Points to a panda subdirectory within the</span>
-<span class="sd">    directory path provided, which must exist before attempting to arm the PCAP block&quot;&quot;&quot;</span>
+<span class="sd">    directory path provided&quot;&quot;&quot;</span>
 
     <span class="n">resource_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;panda&quot;</span><span class="p">)</span>
 
@@ -498,10 +498,24 @@ document.write(`
             <span class="k">else</span> <span class="kc">None</span>
         <span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">directory</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="PandASubdirectoryProvider.update">
+<a class="viewcode-back" href="../../../reference/generated/dodal.common.udc_directory_provider.PandASubdirectoryProvider.html#dodal.common.udc_directory_provider.PandASubdirectoryProvider.update">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">directory</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the root directory into which panda pcap files are written. This will result in the panda</span>
+<span class="sd">        subdirectory being created if it does not already exist.</span>
+<span class="sd">         Args:</span>
+<span class="sd">             directory: Path instance that identifies the root folder. This folder must exist. The panda will</span>
+<span class="sd">                attempt to write into the &quot;panda&quot; subdirectory which will be created if not already present.</span>
+<span class="sd">             suffix: Optional str that will be appended to the panda device name along with the file</span>
+<span class="sd">                type extension to construct the output filename</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">output_directory</span> <span class="o">=</span> <span class="n">directory</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_dir</span>
+        <span class="n">output_directory</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_directory_info</span> <span class="o">=</span> <span class="n">DirectoryInfo</span><span class="p">(</span>
-            <span class="n">root</span><span class="o">=</span><span class="n">directory</span><span class="p">,</span> <span class="n">resource_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resource_dir</span>
-        <span class="p">)</span>
+            <span class="n">root</span><span class="o">=</span><span class="n">directory</span><span class="p">,</span> <span class="n">resource_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resource_dir</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span>
+        <span class="p">)</span></div>
+
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DirectoryInfo</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_directory_info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
