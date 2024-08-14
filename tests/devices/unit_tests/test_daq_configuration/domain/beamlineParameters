@@ -137,4 +137,3 @@ attenuation_optimisation_multiplier = 2
 attenuation_optimisation_target_count = 2000
 attenuation_optimisation_upper_limit = 50000
 attenuation_optimisation_lower_limit = 20000
-
