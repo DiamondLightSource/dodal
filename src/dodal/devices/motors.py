@@ -20,11 +20,10 @@ class XYZPositioner(Device):
     -----
     Example usage::
         async with DeviceCollector():
-            xyz_stage = ThreeAxisStage("BLXX-MO-STAGE-XX:")
+            xyz_stage = XYZPositioner("BLXX-MO-STAGE-XX:")
     Or::
         with DeviceCollector():
-            xyz_stage = ThreeAxisStage("BLXX-MO-STAGE-XX:", suffix = [".any",
-              ".there", ".motorPv"])
+            xyz_stage = XYZPositioner("BLXX-MO-STAGE-XX:", suffix = ["A", "B", "C"])
 
     """
 
