@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.areadetector.adutils &#8212; dodal 1.29.5.dev21+g3c8a93457 documentation</title>
+    <title>dodal.devices.areadetector.adutils &#8212; dodal 1.29.5.dev22+gac220bbfb documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../../_static/documentation_options.js?v=b49158b6"></script>
+    <script src="../../../../_static/documentation_options.js?v=6bd708b0"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -508,7 +508,7 @@ document.write(`
 
         <span class="k">def</span> <span class="nf">_acq_done</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="c1"># TODO sort out if anything useful in here</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_status</span><span class="o">.</span><span class="n">_finished</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_status</span><span class="o">.</span><span class="n">_finished</span><span class="p">()</span>  <span class="c1"># noqa: SLF001</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_acquisition_signal</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">use_complete</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="n">_acq_done</span><span class="p">)</span>
         <span class="c1"># Ensure that this mixin is part of valid Detector with generate_datum</span>

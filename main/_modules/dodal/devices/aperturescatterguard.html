@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.aperturescatterguard &#8212; dodal 1.29.5.dev21+g3c8a93457 documentation</title>
+    <title>dodal.devices.aperturescatterguard &#8212; dodal 1.29.5.dev22+gac220bbfb documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=b49158b6"></script>
+    <script src="../../../_static/documentation_options.js?v=6bd708b0"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -667,7 +667,7 @@ document.write(`
         <span class="k">async</span> <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="n">ApertureScatterguard</span><span class="p">)</span>
             <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">_get_current_aperture_position</span><span class="p">())</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">get_current_aperture_position</span><span class="p">())</span>
             <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend</span><span class="o">.</span><span class="n">get_reading</span><span class="p">()}</span>
 
         <span class="k">async</span> <span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataKey</span><span class="p">]:</span>
@@ -717,7 +717,9 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">scatterguard</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">scatterguard_y</span><span class="p">),</span>
         <span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_get_current_aperture_position</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingleAperturePosition</span><span class="p">:</span>
+<div class="viewcode-block" id="ApertureScatterguard.get_current_aperture_position">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.aperturescatterguard.ApertureScatterguard.html#dodal.devices.aperturescatterguard.ApertureScatterguard.get_current_aperture_position">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">get_current_aperture_position</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingleAperturePosition</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the current aperture position using readback values</span>
 <span class="sd">        for SMALL, MEDIUM, LARGE. ROBOT_LOAD position defined when</span>
@@ -736,7 +738,8 @@ document.write(`
         <span class="k">elif</span> <span class="n">current_ap_y</span> <span class="o">&lt;=</span> <span class="n">robot_load_ap_y</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">aperture_positions</span><span class="o">.</span><span class="n">tolerances</span><span class="o">.</span><span class="n">ap_y</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">aperture_positions</span><span class="o">.</span><span class="n">ROBOT_LOAD</span>
 
-        <span class="k">raise</span> <span class="n">InvalidApertureMove</span><span class="p">(</span><span class="s2">&quot;Current aperture/scatterguard state unrecognised&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">InvalidApertureMove</span><span class="p">(</span><span class="s2">&quot;Current aperture/scatterguard state unrecognised&quot;</span><span class="p">)</span></div>
+
 
     <span class="k">async</span> <span class="k">def</span> <span class="nf">_safe_move_within_datacollection_range</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="n">ApertureFiveDimensionalLocation</span>
