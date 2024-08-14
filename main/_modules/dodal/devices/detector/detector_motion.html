@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.detector.detector_motion &#8212; dodal 1.29.5.dev20+g19c6659e0 documentation</title>
+    <title>dodal.devices.detector.detector_motion &#8212; dodal 1.29.5.dev21+g3c8a93457 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../../_static/documentation_options.js?v=e15d7580"></script>
+    <script src="../../../../_static/documentation_options.js?v=b49158b6"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -471,48 +471,55 @@ document.write(`
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.detector.detector_motion</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">IntEnum</span>
+<span></span><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 
-<span class="kn">from</span> <span class="nn">ophyd</span> <span class="kn">import</span> <span class="n">Component</span> <span class="k">as</span> <span class="n">Cpt</span>
-<span class="kn">from</span> <span class="nn">ophyd</span> <span class="kn">import</span> <span class="n">Device</span><span class="p">,</span> <span class="n">EpicsMotor</span><span class="p">,</span> <span class="n">EpicsSignal</span><span class="p">,</span> <span class="n">EpicsSignalRO</span>
+<span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="n">Device</span>
+<span class="kn">from</span> <span class="nn">ophyd_async.epics.motion</span> <span class="kn">import</span> <span class="n">Motor</span>
+<span class="kn">from</span> <span class="nn">ophyd_async.epics.signal</span> <span class="kn">import</span> <span class="n">epics_signal_r</span><span class="p">,</span> <span class="n">epics_signal_rw</span>
 
 
 <div class="viewcode-block" id="ShutterState">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.detector.detector_motion.ShutterState.html#dodal.devices.detector.detector_motion.ShutterState">[docs]</a>
-<span class="k">class</span> <span class="nc">ShutterState</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
-    <span class="n">CLOSED</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">OPEN</span> <span class="o">=</span> <span class="mi">1</span></div>
+<span class="k">class</span> <span class="nc">ShutterState</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+    <span class="n">CLOSED</span> <span class="o">=</span> <span class="s2">&quot;Closed&quot;</span>
+    <span class="n">OPEN</span> <span class="o">=</span> <span class="s2">&quot;Open&quot;</span></div>
 
 
 
 <div class="viewcode-block" id="DetectorMotion">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.detector.detector_motion.DetectorMotion.html#dodal.devices.detector.detector_motion.DetectorMotion">[docs]</a>
 <span class="k">class</span> <span class="nc">DetectorMotion</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Physical motion and interlocks for detector travel&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="n">device_prefix</span> <span class="o">=</span> <span class="s2">&quot;-MO-DET-01:&quot;</span>
+        <span class="n">pmac_prefix</span> <span class="o">=</span> <span class="s2">&quot;-MO-PMAC-02:&quot;</span>
 
-    <span class="n">upstream_x</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">EpicsMotor</span><span class="p">,</span> <span class="s2">&quot;-MO-DET-01:UPSTREAMX&quot;</span><span class="p">)</span>
-    <span class="n">downstream_x</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">EpicsMotor</span><span class="p">,</span> <span class="s2">&quot;-MO-DET-01:DOWNSTREAMX&quot;</span><span class="p">)</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">EpicsMotor</span><span class="p">,</span> <span class="s2">&quot;-MO-DET-01:X&quot;</span><span class="p">)</span>
-    <span class="n">y</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">EpicsMotor</span><span class="p">,</span> <span class="s2">&quot;-MO-DET-01:Y&quot;</span><span class="p">)</span>
-    <span class="n">z</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">EpicsMotor</span><span class="p">,</span> <span class="s2">&quot;-MO-DET-01:Z&quot;</span><span class="p">)</span>
-    <span class="n">yaw</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">EpicsMotor</span><span class="p">,</span> <span class="s2">&quot;-MO-DET-01:YAW&quot;</span><span class="p">)</span>
-    <span class="n">shutter</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span><span class="n">EpicsSignal</span><span class="p">,</span> <span class="s2">&quot;-MO-DET-01:SET_SHUTTER_STATE&quot;</span><span class="p">)</span>  <span class="c1"># 0=closed, 1=open</span>
-    <span class="c1">#   monitors</span>
-    <span class="n">shutter_closed_lim</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span>
-        <span class="n">EpicsSignalRO</span><span class="p">,</span> <span class="s2">&quot;-MO-DET-01:CLOSE_LIMIT&quot;</span>
-    <span class="p">)</span>  <span class="c1"># on limit = 1, off = 0</span>
-    <span class="n">shutter_open_lim</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span>
-        <span class="n">EpicsSignalRO</span><span class="p">,</span> <span class="s2">&quot;-MO-DET-01:OPEN_LIMIT&quot;</span>
-    <span class="p">)</span>  <span class="c1"># on limit = 1, off = 0</span>
-    <span class="n">z_disabled</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span>
-        <span class="n">EpicsSignalRO</span><span class="p">,</span> <span class="s2">&quot;-MO-DET-01:Z:DISABLED&quot;</span>
-    <span class="p">)</span>  <span class="c1"># robot interlock, 0=ok to move, 1=blocked</span>
-    <span class="n">crate_power</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span>
-        <span class="n">EpicsSignalRO</span><span class="p">,</span> <span class="s2">&quot;-MO-PMAC-02:CRATE2_HEALTHY&quot;</span>
-    <span class="p">)</span>  <span class="c1"># returns 0 if no power</span>
-    <span class="n">in_robot_load_safe_position</span> <span class="o">=</span> <span class="n">Cpt</span><span class="p">(</span>
-        <span class="n">EpicsSignalRO</span><span class="p">,</span> <span class="s2">&quot;-MO-PMAC-02:GPIO_INP_BITS.B2&quot;</span>
-    <span class="p">)</span>  <span class="c1"># returns 1 if safe</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">upstream_x</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">device_prefix</span><span class="si">}</span><span class="s2">UPSTREAMX&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">downstream_x</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">device_prefix</span><span class="si">}</span><span class="s2">DOWNSTREAMX&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">device_prefix</span><span class="si">}</span><span class="s2">X&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">device_prefix</span><span class="si">}</span><span class="s2">Y&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">device_prefix</span><span class="si">}</span><span class="s2">Z&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yaw</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">device_prefix</span><span class="si">}</span><span class="s2">YAW&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">shutter</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span>
+            <span class="n">ShutterState</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">device_prefix</span><span class="si">}</span><span class="s2">SET_SHUTTER_STATE&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shutter_closed_lim</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
+            <span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">device_prefix</span><span class="si">}</span><span class="s2">CLOSE_LIMIT&quot;</span>
+        <span class="p">)</span>  <span class="c1"># on limit = 1, off = 0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shutter_open_lim</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
+            <span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">device_prefix</span><span class="si">}</span><span class="s2">OPEN_LIMIT&quot;</span>
+        <span class="p">)</span>  <span class="c1"># on limit = 1, off = 0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z_disabled</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
+            <span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">device_prefix</span><span class="si">}</span><span class="s2">Z:DISABLED&quot;</span>
+        <span class="p">)</span>  <span class="c1"># robot interlock, 0=ok to move, 1=blocked</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">crate_power</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
+            <span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">pmac_prefix</span><span class="si">}</span><span class="s2">CRATE2_HEALTHY&quot;</span>
+        <span class="p">)</span>  <span class="c1"># returns 0 if no power</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">in_robot_load_safe_position</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
+            <span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">pmac_prefix</span><span class="si">}</span><span class="s2">GPIO_INP_BITS.B2&quot;</span>
+        <span class="p">)</span>  <span class="c1"># returns 1 if safe</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
 
 </pre></div>
 

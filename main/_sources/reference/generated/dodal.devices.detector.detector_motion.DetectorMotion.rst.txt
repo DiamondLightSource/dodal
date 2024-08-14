@@ -15,31 +15,6 @@ dodal.devices.detector.detector\_motion.DetectorMotion
       
       
       
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
    
    
 
@@ -51,61 +26,6 @@ dodal.devices.detector.detector\_motion.DetectorMotion
    
       
       
-      
-      ~DetectorMotion.component_names
-      
-      
-      
-      
-      ~DetectorMotion.crate_power
-      
-      
-      
-      ~DetectorMotion.downstream_x
-      
-      
-      
-      
-      ~DetectorMotion.in_robot_load_safe_position
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      ~DetectorMotion.shutter
-      
-      
-      ~DetectorMotion.shutter_closed_lim
-      
-      
-      ~DetectorMotion.shutter_open_lim
-      
-      
-      
-      ~DetectorMotion.subscriptions
-      
-      
-      
-      ~DetectorMotion.upstream_x
-      
-      
-      ~DetectorMotion.x
-      
-      
-      ~DetectorMotion.y
-      
-      
-      ~DetectorMotion.yaw
-      
-      
-      ~DetectorMotion.z
-      
-      
-      ~DetectorMotion.z_disabled
       
    
    

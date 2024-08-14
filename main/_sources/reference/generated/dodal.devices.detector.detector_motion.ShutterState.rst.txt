@@ -18,6 +18,47 @@ dodal.devices.detector.detector\_motion.ShutterState
       
       
       
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
    
    
 
@@ -27,10 +68,6 @@ dodal.devices.detector.detector\_motion.ShutterState
 
    .. autosummary::
    
-      
-      
-      
-      
       
       ~ShutterState.CLOSED
       
