@@ -1,9 +1,16 @@
-from threading import Timer
-from unittest.mock import DEFAULT, MagicMock, patch
+import asyncio
+
+# prevent python 3.10 exception doppelganger stupidity
+# see https://docs.python.org/3.10/library/asyncio-exceptions.html
+# https://github.com/python/cpython/issues?q=is%3Aissue+timeouterror++alias+
+from asyncio import TimeoutError
+from unittest.mock import DEFAULT, patch
 
 import pytest
-from ophyd.sim import NullStatus
-from ophyd.status import Status, StatusBase
+from bluesky import plan_stubs as bps
+from bluesky.run_engine import RunEngine
+from bluesky.utils import FailedStatus
+from ophyd_async.core import get_mock_put, set_mock_value
 
 from dodal.devices.focusing_mirror import (
     FocusingMirrorWithStripes,
@@ -12,121 +19,242 @@ from dodal.devices.focusing_mirror import (
     MirrorVoltageDevice,
     VFMMirrorVoltages,
 )
+from dodal.log import LOGGER
 
 
 @pytest.fixture
 def vfm_mirror_voltages_not_ok(vfm_mirror_voltages) -> VFMMirrorVoltages:
-    vfm_mirror_voltages._channel14_voltage_device._demand_accepted.sim_put(
-        MirrorVoltageDemand.FAIL
+    set_mock_value(
+        vfm_mirror_voltages.voltage_channels[0]._demand_accepted,
+        MirrorVoltageDemand.FAIL,
     )
     return vfm_mirror_voltages
 
 
 @pytest.fixture
 def vfm_mirror_voltages_with_set(vfm_mirror_voltages) -> VFMMirrorVoltages:
-    def not_ok_then_ok(_):
-        vfm_mirror_voltages._channel14_voltage_device._demand_accepted.sim_put(
-            MirrorVoltageDemand.SLEW
+    return vfm_mirror_voltages_with_set_to_value(
+        vfm_mirror_voltages, MirrorVoltageDemand.OK
+    )
+
+
+@pytest.fixture
+def vfm_mirror_voltages_with_set_multiple_spins(
+    vfm_mirror_voltages,
+) -> VFMMirrorVoltages:
+    return vfm_mirror_voltages_with_set_to_value(
+        vfm_mirror_voltages, MirrorVoltageDemand.OK, 3
+    )
+
+
+@pytest.fixture
+def vfm_mirror_voltages_with_set_accepted_fail(
+    vfm_mirror_voltages,
+) -> VFMMirrorVoltages:
+    return vfm_mirror_voltages_with_set_to_value(
+        vfm_mirror_voltages, MirrorVoltageDemand.FAIL
+    )
+
+
+def vfm_mirror_voltages_with_set_to_value(
+    vfm_mirror_voltages, new_value: MirrorVoltageDemand, spins: int = 0
+) -> VFMMirrorVoltages:
+    async def set_demand_accepted_after_delay():
+        await asyncio.sleep(0.1)
+        nonlocal spins
+        if spins > 0:
+            set_mock_value(
+                vfm_mirror_voltages.voltage_channels[0]._demand_accepted,
+                MirrorVoltageDemand.SLEW,
+            )
+            spins -= 1
+            asyncio.create_task(set_demand_accepted_after_delay())
+        else:
+            set_mock_value(
+                vfm_mirror_voltages.voltage_channels[0]._demand_accepted,
+                new_value,
+            )
+        LOGGER.debug("DEMAND ACCEPTED OK")
+
+    def not_ok_then_other_value(*args, **kwargs):
+        set_mock_value(
+            vfm_mirror_voltages.voltage_channels[0]._demand_accepted,
+            MirrorVoltageDemand.SLEW,
         )
-        Timer(
-            0.1,
-            lambda: vfm_mirror_voltages._channel14_voltage_device._demand_accepted.sim_put(
-                MirrorVoltageDemand.OK
-            ),
-        ).start()
+        asyncio.create_task(set_demand_accepted_after_delay())
         return DEFAULT
 
-    vfm_mirror_voltages._channel14_voltage_device._setpoint_v.set = MagicMock(
-        side_effect=not_ok_then_ok
-    )
-    vfm_mirror_voltages._channel14_voltage_device._demand_accepted.sim_put(
-        MirrorVoltageDemand.OK
+    get_mock_put(
+        vfm_mirror_voltages.voltage_channels[0]._setpoint_v
+    ).side_effect = not_ok_then_other_value
+    set_mock_value(
+        vfm_mirror_voltages.voltage_channels[0]._demand_accepted,
+        MirrorVoltageDemand.OK,
     )
     return vfm_mirror_voltages
 
 
 @pytest.fixture
 def vfm_mirror_voltages_with_set_timing_out(vfm_mirror_voltages) -> VFMMirrorVoltages:
-    def not_ok(_):
-        vfm_mirror_voltages._channel14_voltage_device._demand_accepted.sim_put(
-            MirrorVoltageDemand.SLEW
+    def not_ok(*args, **kwargs):
+        set_mock_value(
+            vfm_mirror_voltages.voltage_channels[0]._demand_accepted,
+            MirrorVoltageDemand.SLEW,
         )
         return DEFAULT
 
-    vfm_mirror_voltages._channel14_voltage_device._setpoint_v.set = MagicMock(
-        side_effect=not_ok
-    )
-    vfm_mirror_voltages._channel14_voltage_device._demand_accepted.sim_put(
-        MirrorVoltageDemand.OK
+    get_mock_put(
+        vfm_mirror_voltages.voltage_channels[0]._setpoint_v
+    ).side_effect = not_ok
+    set_mock_value(
+        vfm_mirror_voltages.voltage_channels[0]._demand_accepted,
+        MirrorVoltageDemand.OK,
     )
     return vfm_mirror_voltages
 
 
 def test_mirror_set_voltage_sets_and_waits_happy_path(
+    RE: RunEngine,
     vfm_mirror_voltages_with_set: VFMMirrorVoltages,
 ):
-    vfm_mirror_voltages_with_set._channel14_voltage_device._setpoint_v.set.return_value = NullStatus()
-    vfm_mirror_voltages_with_set._channel14_voltage_device._demand_accepted.sim_put(
-        MirrorVoltageDemand.OK
+    def completed():
+        pass
+
+    mock_put = get_mock_put(
+        vfm_mirror_voltages_with_set.voltage_channels[0]._setpoint_v
+    )
+    mock_put.return_value = completed()
+    set_mock_value(
+        vfm_mirror_voltages_with_set.voltage_channels[0]._demand_accepted,
+        MirrorVoltageDemand.OK,
     )
 
-    status: StatusBase = vfm_mirror_voltages_with_set.voltage_channels[0].set(100)
-    status.wait()
-    vfm_mirror_voltages_with_set._channel14_voltage_device._setpoint_v.set.assert_called_with(
-        100
+    def plan():
+        yield from bps.abs_set(
+            vfm_mirror_voltages_with_set.voltage_channels[0], 100, wait=True
+        )
+
+    RE(plan())
+
+    mock_put.assert_called_with(100, wait=True, timeout=10.0)
+
+
+def test_mirror_set_voltage_sets_and_waits_happy_path_spin_while_waiting_for_slew(
+    RE: RunEngine,
+    vfm_mirror_voltages_with_set_multiple_spins: VFMMirrorVoltages,
+):
+    def completed():
+        pass
+
+    mock_put = get_mock_put(
+        vfm_mirror_voltages_with_set_multiple_spins.voltage_channels[0]._setpoint_v
     )
-    assert status.success
+    mock_put.return_value = completed()
+    set_mock_value(
+        vfm_mirror_voltages_with_set_multiple_spins.voltage_channels[
+            0
+        ]._demand_accepted,
+        MirrorVoltageDemand.OK,
+    )
+
+    def plan():
+        yield from bps.abs_set(
+            vfm_mirror_voltages_with_set_multiple_spins.voltage_channels[0],
+            100,
+            wait=True,
+        )
+
+    RE(plan())
+
+    mock_put.assert_called_with(100, wait=True, timeout=10.0)
 
 
 def test_mirror_set_voltage_set_rejected_when_not_ok(
+    RE: RunEngine,
     vfm_mirror_voltages_not_ok: VFMMirrorVoltages,
 ):
-    with pytest.raises(AssertionError):
-        vfm_mirror_voltages_not_ok.voltage_channels[0].set(100)
+    def plan():
+        with pytest.raises(FailedStatus) as e:
+            yield from bps.abs_set(
+                vfm_mirror_voltages_not_ok.voltage_channels[0], 100, wait=True
+            )
+
+        assert isinstance(e.value.args[0].exception(), AssertionError)
+
+    RE(plan())
 
 
 def test_mirror_set_voltage_sets_and_waits_set_fail(
+    RE: RunEngine,
     vfm_mirror_voltages_with_set: VFMMirrorVoltages,
 ):
-    vfm_mirror_voltages_with_set._channel14_voltage_device._setpoint_v.set.return_value = Status(
-        success=False, done=True
-    )
+    def failed(*args, **kwargs):
+        raise AssertionError("Test Failure")
 
-    status: StatusBase = vfm_mirror_voltages_with_set.voltage_channels[0].set(100)
-    with pytest.raises(Exception):
-        status.wait()
+    get_mock_put(
+        vfm_mirror_voltages_with_set.voltage_channels[0]._setpoint_v
+    ).side_effect = failed
 
-    assert not status.success
+    def plan():
+        with pytest.raises(FailedStatus) as e:
+            yield from bps.abs_set(
+                vfm_mirror_voltages_with_set.voltage_channels[0], 100, wait=True
+            )
+
+        assert isinstance(e.value.args[0].exception(), AssertionError)
+
+    RE(plan())
+
+
+def test_mirror_set_voltage_sets_and_waits_demand_accepted_fail(
+    RE: RunEngine, vfm_mirror_voltages_with_set_accepted_fail
+):
+    def plan():
+        with pytest.raises(FailedStatus) as e:
+            yield from bps.abs_set(
+                vfm_mirror_voltages_with_set_accepted_fail.voltage_channels[0],
+                100,
+                wait=True,
+            )
+
+        assert isinstance(e.value.args[0].exception(), AssertionError)
+
+    RE(plan())
 
 
 @patch("dodal.devices.focusing_mirror.DEFAULT_SETTLE_TIME_S", 3)
 def test_mirror_set_voltage_sets_and_waits_settle_timeout_expires(
+    RE: RunEngine,
     vfm_mirror_voltages_with_set_timing_out: VFMMirrorVoltages,
 ):
-    vfm_mirror_voltages_with_set_timing_out._channel14_voltage_device._setpoint_v.set.return_value = NullStatus()
+    def plan():
+        with pytest.raises(Exception) as excinfo:
+            yield from bps.abs_set(
+                vfm_mirror_voltages_with_set_timing_out.voltage_channels[0],
+                100,
+                wait=True,
+            )
+        assert isinstance(excinfo.value.args[0].exception(), TimeoutError)
 
-    status: StatusBase = vfm_mirror_voltages_with_set_timing_out.voltage_channels[
-        0
-    ].set(100)
-
-    with pytest.raises(Exception) as excinfo:
-        status.wait()
-
-    # Cannot assert because ophyd discards the original exception
-    # assert isinstance(excinfo.value, WaitTimeoutError)
-    assert excinfo.value
+    RE(plan())
 
 
 def test_mirror_set_voltage_returns_immediately_if_voltage_already_demanded(
+    RE: RunEngine,
     vfm_mirror_voltages_with_set: VFMMirrorVoltages,
 ):
-    vfm_mirror_voltages_with_set._channel14_voltage_device._setpoint_v.sim_put(100)
+    set_mock_value(vfm_mirror_voltages_with_set.voltage_channels[0]._setpoint_v, 100)
 
-    status: StatusBase = vfm_mirror_voltages_with_set.voltage_channels[0].set(100)
-    status.wait()
+    def plan():
+        yield from bps.abs_set(
+            vfm_mirror_voltages_with_set.voltage_channels[0], 100, wait=True
+        )
 
-    assert status.success
-    vfm_mirror_voltages_with_set._channel14_voltage_device._setpoint_v.set.assert_not_called()
+    RE(plan())
+
+    get_mock_put(
+        vfm_mirror_voltages_with_set.voltage_channels[0]._setpoint_v
+    ).assert_not_called()
 
 
 def test_mirror_populates_voltage_channels(

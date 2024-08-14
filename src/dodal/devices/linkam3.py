@@ -1,10 +1,15 @@
 import asyncio
 import time
 from enum import Enum
-from typing import Optional
 
 from bluesky.protocols import Location
-from ophyd_async.core import StandardReadable, WatchableAsyncStatus, observe_value
+from ophyd_async.core import (
+    ConfigSignal,
+    HintedSignal,
+    StandardReadable,
+    WatchableAsyncStatus,
+    observe_value,
+)
 from ophyd_async.core.utils import WatcherUpdate
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
@@ -57,14 +62,15 @@ class Linkam3(StandardReadable):
         # status is a bitfield stored in a double?
         self.status = epics_signal_r(float, prefix + "STATUS:")
 
-        self.set_readable_signals(
-            read=(self.temp,), config=(self.ramp_rate, self.speed, self.set_point)
+        self.add_readables((self.temp,), wrapper=HintedSignal)
+        self.add_readables(
+            (self.ramp_rate, self.speed, self.set_point), wrapper=ConfigSignal
         )
 
         super().__init__(name=name)
 
     @WatchableAsyncStatus.wrap
-    async def set(self, new_position: float, timeout: Optional[float] = None):
+    async def set(self, new_position: float, timeout: float | None = None):
         # time.monotonic won't go backwards in case of NTP corrections
         start = time.monotonic()
         old_position = await self.set_point.get_value()

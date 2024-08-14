@@ -4,18 +4,17 @@ import logging
 import os
 import sys
 import time
+from collections.abc import Mapping
 from os import environ, getenv
 from pathlib import Path
-from typing import Mapping, cast
 from unittest.mock import MagicMock, patch
 
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd.sim import make_fake_device
+from ophyd.status import Status
 
 from dodal.beamlines import i03
 from dodal.common.beamlines import beamline_utils
-from dodal.devices.focusing_mirror import VFMMirrorVoltages
 from dodal.log import LOGGER, GELFTCPHandler, set_up_all_logging_handlers
 from dodal.utils import make_all_devices
 
@@ -31,6 +30,18 @@ mock_attributes_table = {
     "i04": mock_paths,
     "s04": mock_paths,
 }
+
+# Prevent pytest from catching exceptions when debugging in vscode so that break on
+# exception works correctly (see: https://github.com/pytest-dev/pytest/issues/7409)
+if os.getenv("PYTEST_RAISE", "0") == "1":
+
+    @pytest.hookimpl(tryfirst=True)
+    def pytest_exception_interact(call):
+        raise call.excinfo.value
+
+    @pytest.hookimpl(tryfirst=True)
+    def pytest_internalerror(excinfo):
+        raise excinfo.value
 
 
 def mock_beamline_module_filepaths(bl_name, bl_module):
@@ -73,17 +84,11 @@ def pytest_runtest_teardown():
 
 
 @pytest.fixture
-def vfm_mirror_voltages() -> VFMMirrorVoltages:
-    voltages = cast(
-        VFMMirrorVoltages,
-        make_fake_device(VFMMirrorVoltages)(
-            name="vfm_mirror_voltages",
-            prefix="BL-I03-MO-PSU-01:",
-            daq_configuration_path=i03.DAQ_CONFIGURATION_PATH,
-        ),
-    )
+def vfm_mirror_voltages(RE: RunEngine):
+    voltages = i03.vfm_mirror_voltages(fake_with_ophyd_sim=True)
     voltages.voltage_lookup_table_path = "tests/test_data/test_mirror_focus.json"
-    return voltages
+    yield voltages
+    beamline_utils.clear_devices()
 
 
 s03_epics_server_port = getenv("S03_EPICS_CA_SERVER_PORT")
@@ -121,3 +126,9 @@ def run_engine_documents(RE: RunEngine) -> Mapping[str, list[dict]]:
 
     RE.subscribe(append_and_print)
     return docs
+
+
+def failed_status(failure: Exception) -> Status:
+    status = Status()
+    status.set_exception(failure)
+    return status

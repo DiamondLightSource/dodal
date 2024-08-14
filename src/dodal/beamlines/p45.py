@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from ophyd_async.epics.areadetector import AravisDetector
 from ophyd_async.panda import HDFPanda
 
@@ -18,7 +20,7 @@ set_utils_beamline(BL)
 set_directory_provider(
     StaticVisitDirectoryProvider(
         BL,
-        "/data/2024/cm37283-2/",  # latest commissioning visit
+        Path("/data/2024/cm37283-2/"),  # latest commissioning visit
     )
 )
 
@@ -48,7 +50,7 @@ def choppers(
 
 
 # Disconnected
-@skip_device
+@skip_device()
 def det(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> AravisDetector:
@@ -65,7 +67,7 @@ def det(
 
 
 # Disconnected
-@skip_device
+@skip_device()
 def diff(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> AravisDetector:
@@ -84,7 +86,7 @@ def diff(
 # Must find which PandA IOC(s) are compatible
 # Must document what PandAs are physically connected to
 # See: https://github.com/bluesky/ophyd-async/issues/284
-@skip_device
+@skip_device()
 def panda1(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
@@ -99,7 +101,7 @@ def panda1(
     )
 
 
-@skip_device
+@skip_device()
 def panda2(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,

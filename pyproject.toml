@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=64", "setuptools_scm[toml]>=6.2", "wheel"]
+requires = ["setuptools>=64", "setuptools_scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -14,12 +14,12 @@ description = "Ophyd devices and other utils that could be used across DLS beaml
 dependencies = [
     "click",
     "ophyd",
-    "ophyd-async>=0.3.1",
+    "ophyd-async<0.4.0",      # Need to pin to <0.4.0 as this requires pydantic>2.0 see https://github.com/DiamondLightSource/dodal/issues/679
     "bluesky",
     "pyepics",
     "dataclasses-json",
     "pillow",
-    "zocalo",
+    "zocalo>=0.32.0,<1.0.0",  # TODO remove pin against <1.0.0, see #679
     "requests",
     "graypy",
     "pydantic",
@@ -29,29 +29,38 @@ dependencies = [
     "numpy<2.0",              # Unpin when https://github.com/bluesky/ophyd-async/issues/387 resolved
     "aiofiles",
     "aiohttp",
+    "redis",
 ]
 
 dynamic = ["version"]
 license.file = "LICENSE"
-readme = "README.rst"
+readme = "README.md"
 requires-python = ">=3.10"
 
 [project.optional-dependencies]
 dev = [
+    "black",
+    "diff-cover",
     "mypy",
-    "mockito",
+    # Commented out due to dependency version conflict with pydantic 1.x
+    # "copier",
+    "myst-parser",
     "pipdeptree",
     "pre-commit",
     "psutil",
     "pydata-sphinx-theme>=0.12",
+    "pyright",
     "pytest",
     "pytest-asyncio",
     "pytest-cov",
     "pytest-random-order",
     "ruff",
-    "sphinx-autobuild==2024.2.4", # Later versions have a clash with fastapi<0.99, remove pin when fastapi is unpinned in blueapi
+    "sphinx<7.4.6",              #  pinned due to https://github.com/sphinx-doc/sphinx/issues/12660
+    "sphinx-autobuild",
     "sphinx-copybutton",
+    "sphinxcontrib-mermaid",
     "sphinx-design",
+    "sphinx-autodoc-typehints",
     "tox-direct",
     "types-requests",
     "types-mock",
@@ -61,6 +70,7 @@ dev = [
 
 [project.scripts]
 dodal = "dodal.__main__:main"
+save-panda = "dodal.devices.util.save_panda:main"
 
 [project.urls]
 GitHub = "https://github.com/DiamondLightSource/dodal"
@@ -78,20 +88,28 @@ dodal = ["*.txt"]
 [tool.setuptools_scm]
 write_to = "src/dodal/_version.py"
 
-[tool.mypy]
-plugins = ["pydantic.mypy"]
-ignore_missing_imports = true # Ignore missing stubs in imported modules
+[tool.pyright]
+reportMissingImports = false # Ignore missing stubs in imported modules
 
 [tool.pytest.ini_options]
 # Run pytest with all our checkers, and don't spam us with massive tracebacks on error
 asyncio_mode = "auto"
 markers = [
     "s03: marks tests as requiring the s03 simulator running (deselect with '-m \"not s03\"')",
+    "skip_in_pycharm: marks test as not working in pycharm testrunner",
 ]
 addopts = """
     --cov=dodal --cov-report term --cov-report xml:cov.xml
     --tb=native -vv --doctest-modules --doctest-glob="*.rst"
     """
+# https://iscinumpy.gitlab.io/post/bound-version-constraints/#watch-for-warnings
+filterwarnings = [
+    "error",
+    # Ignore deprecation warning from ophyd_async
+    "ignore:dep_util is Deprecated. Use functions from setuptools instead.:DeprecationWarning",
+    # Ignore deprecation warning from zocalo
+    "ignore:.*pkg_resources.*:DeprecationWarning",
+]
 # Doctest python code in docs, python code in src docstrings, test functions in tests
 testpaths = "docs src tests"
 
@@ -114,23 +132,22 @@ legacy_tox_ini = """
 [tox]
 skipsdist=True
 
-[testenv:{pre-commit,mypy,pytest,docs}]
+[testenv:{pre-commit,type-checking,tests,docs}]
 # Don't create a virtualenv for the command, requires tox-direct plugin
 direct = True
 passenv = *
 allowlist_externals =
     pytest
     pre-commit
-    mypy
+    pyright
     sphinx-build
     sphinx-autobuild
 commands =
-    pytest: pytest -m 'not s03' {posargs}
-    mypy: mypy src tests -v --ignore-missing-imports --show-traceback --no-strict-optional --check-untyped-defs {posargs}
-    pre-commit: pre-commit run --all-files {posargs}
-    docs: sphinx-{posargs:build -EW --keep-going} -T docs build/html
+    tests: pytest -m 'not s03' --cov=dodal --cov-report term --cov-report xml:cov.xml {posargs}
+    type-checking: pyright src tests {posargs}
+    pre-commit: pre-commit run --all-files --show-diff-on-failure {posargs}
+    docs: sphinx-{posargs:build -E} -T docs build/html
 """
-
 
 [tool.ruff]
 src = ["src", "tests"]
@@ -140,9 +157,15 @@ lint.extend-ignore = [
     "F811", # support typing.overload decorator
 ]
 lint.select = [
+    "B",    # flake8-bugbear - https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
     "C4",   # flake8-comprehensions - https://beta.ruff.rs/docs/rules/#flake8-comprehensions-c4
     "E",    # pycodestyle errors - https://beta.ruff.rs/docs/rules/#error-e
     "F",    # pyflakes rules - https://beta.ruff.rs/docs/rules/#pyflakes-f
+    "I",    # isort - https://docs.astral.sh/ruff/rules/#isort-i
     "W",    # pycodestyle warnings - https://beta.ruff.rs/docs/rules/#warning-w
+    "UP",   # pyupgrade - https://docs.astral.sh/ruff/rules/#pyupgrade-up
     "I001", # isort
 ]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["dodal.common.coordination.inject"]

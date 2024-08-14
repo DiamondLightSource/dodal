@@ -55,7 +55,7 @@ def d3(
 
 
 # Disconnected
-@skip_device
+@skip_device()
 def d11(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> AravisDetector:
@@ -232,13 +232,13 @@ def dcm(
             usage="Bragg",
             type="silicon",
             reflection=(1, 1, 1),
-            d_spacing=3.13475,
+            d_spacing=(3.13475, "nm"),
         ),
         crystal_2_metadata=CrystalMetadata(
             usage="Bragg",
             type="silicon",
             reflection=(1, 1, 1),
-            d_spacing=3.13475,
+            d_spacing=(3.13475, "nm"),
         ),
     )
 
@@ -262,7 +262,7 @@ def undulator(
 # Must find which PandA IOC(s) are compatible
 # Must document what PandAs are physically connected to
 # See: https://github.com/bluesky/ophyd-async/issues/284
-@skip_device
+@skip_device()
 def panda1(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
@@ -277,7 +277,7 @@ def panda1(
     )
 
 
-@skip_device
+@skip_device()
 def panda2(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
@@ -292,7 +292,7 @@ def panda2(
     )
 
 
-@skip_device
+@skip_device()
 def panda3(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
@@ -307,7 +307,7 @@ def panda3(
     )
 
 
-@skip_device
+@skip_device()
 def linkam(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> Linkam3:

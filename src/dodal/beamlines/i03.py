@@ -10,6 +10,7 @@ from dodal.common.udc_directory_provider import PandASubdirectoryProvider
 from dodal.devices.aperturescatterguard import AperturePositions, ApertureScatterguard
 from dodal.devices.attenuator import Attenuator
 from dodal.devices.backlight import Backlight
+from dodal.devices.cryostream import CryoStream
 from dodal.devices.dcm import DCM
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.detector_motion import DetectorMotion
@@ -498,7 +499,7 @@ def thawer(
     )
 
 
-def lower_gonio_positioner(
+def lower_gonio(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> XYZPositioner:
     """Get the i03 lower gonio device, instantiate it if it hasn't already been.
@@ -506,8 +507,23 @@ def lower_gonio_positioner(
     """
     return device_instantiation(
         XYZPositioner,
-        "lower_gonio_positioner",
+        "lower_gonio",
         "-MO-GONP-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+def cryo_stream(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> CryoStream:
+    """Get the i03 cryostream device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        CryoStream,
+        "cryo_stream",
+        "",
         wait_for_connection,
         fake_with_ophyd_sim,
     )

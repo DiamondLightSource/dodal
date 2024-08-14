@@ -1,6 +1,6 @@
 import asyncio
+from collections.abc import Sequence
 from enum import Enum
-from typing import Sequence
 
 from bluesky.protocols import Hints
 from ophyd_async.core import (
@@ -115,7 +115,7 @@ class TetrammController(DetectorControl):
     async def arm(
         self,
         num: int,
-        trigger: DetectorTrigger,
+        trigger: DetectorTrigger = DetectorTrigger.edge_trigger,
         exposure: float | None = None,
     ) -> AsyncStatus:
         if exposure is None:
@@ -132,7 +132,7 @@ class TetrammController(DetectorControl):
             self._drv.averaging_time.set(exposure), self.set_exposure(exposure)
         )
 
-        status = await set_and_wait_for_value(self._drv.acquire, 1)
+        status = await set_and_wait_for_value(self._drv.acquire, True)
 
         return status
 
@@ -150,7 +150,7 @@ class TetrammController(DetectorControl):
             )
 
     async def disarm(self):
-        await stop_busy_record(self._drv.acquire, 0, timeout=1)
+        await stop_busy_record(self._drv.acquire, False, timeout=1)
 
     async def set_exposure(self, exposure: float):
         """Tries to set the exposure time of a single frame.

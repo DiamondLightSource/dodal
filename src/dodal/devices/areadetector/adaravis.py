@@ -1,7 +1,7 @@
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 
-from ophyd import Component as Cpt
-from ophyd import DetectorBase, EpicsSignal, Signal
+from ophyd import EpicsSignal, Signal
 from ophyd.areadetector.base import ADComponent as Cpt
 from ophyd.areadetector.detectors import DetectorBase
 
@@ -60,7 +60,7 @@ class AdAravisDetector(SingleTriggerV33, DetectorBase):
                 signal.put_complete = True
         self.cam.acquire.put_complete = True
 
-    def stage(self, *args, **kwargs):
+    def stage(self, *args, **kwargs) -> list[object]:
         # We have to manually set the acquire period bcause the EPICS driver
         # doesn't do it for us. If acquire time is a staged signal, we use the
         # stage value to calculate the acquire period, otherwise we perform
@@ -69,13 +69,15 @@ class AdAravisDetector(SingleTriggerV33, DetectorBase):
             acquire_time = self.stage_sigs[self.cam.acquire_time]
         else:
             acquire_time = self.cam.acquire_time.get()
-        self.stage_sigs[self.cam.acquire_period] = acquire_time + _ACQUIRE_BUFFER_PERIOD
+        self.stage_sigs[self.cam.acquire_period] = (
+            float(acquire_time) + _ACQUIRE_BUFFER_PERIOD
+        )
 
         # Ensure detector warmed up
         self._prime_hdf()
 
         # Now calling the super method should set the acquire period
-        super(AdAravisDetector, self).stage(*args, **kwargs)
+        return super().stage(*args, **kwargs)
 
     def _prime_hdf(self) -> None:
         """

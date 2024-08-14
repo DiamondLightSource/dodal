@@ -1,9 +1,12 @@
 {
-    "python.testing.pytestArgs": [],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
     "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit"
+    },
     "[python]": {
+        "editor.defaultFormatter": "charliermarsh.ruff",
         "editor.rulers": [
             88
         ],
@@ -15,5 +18,5 @@
     "python.analysis.extraPaths": [
         "./src"
     ],
-    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.typeCheckingMode": "basic"
 }

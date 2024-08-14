@@ -1,7 +1,7 @@
 import importlib.util
+from collections.abc import Iterable, Mapping
 from functools import lru_cache
 from pathlib import Path
-from typing import Iterable, Mapping
 
 # Where beamline names (per the ${BEAMLINE} environment variable don't always
 # match up, we have to map between them bidirectionally). The most common use case is
@@ -27,6 +27,7 @@ def all_beamline_modules() -> Iterable[str]:
     # premature importing
     spec = importlib.util.find_spec(__name__)
     if spec is not None:
+        assert spec.submodule_search_locations
         search_paths = [Path(path) for path in spec.submodule_search_locations]
         for path in search_paths:
             for subpath in path.glob("**/*"):

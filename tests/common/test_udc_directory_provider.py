@@ -38,9 +38,42 @@ def test_udc_directory_provider_excepts_before_update():
     "initial",
     [Path("."), None],
 )
-def test_udc_directory_provider_after_update(initial, tmp_path):
+async def test_udc_directory_provider_after_update(initial, tmp_path):
     provider = PandASubdirectoryProvider(initial)
-    provider.update(tmp_path)
+    await provider.update(directory=tmp_path)
     directory_info = provider()
     assert directory_info.root == tmp_path
     assert directory_info.resource_dir == Path("panda")
+
+
+async def test_udc_directory_provider_no_suffix(tmp_path):
+    initial = Path("initial")
+    provider = PandASubdirectoryProvider(initial)
+    root_path = tmp_path / "my_data"
+    root_path.mkdir()
+    await provider.update(directory=root_path)
+    directory_info = provider()
+    assert directory_info.root == root_path
+    assert directory_info.resource_dir == Path("panda")
+    assert directory_info.suffix == ""
+
+
+async def test_udc_directory_provider_with_suffix(tmp_path):
+    initial = Path("initial")
+    provider = PandASubdirectoryProvider(initial)
+    root_path = tmp_path / "my_data"
+    root_path.mkdir()
+    await provider.update(directory=root_path, suffix="_123")
+    directory_info = provider()
+    assert directory_info.root == root_path
+    assert directory_info.resource_dir == Path("panda")
+    assert directory_info.suffix == "_123"
+
+
+async def test_udc_directory_provider_creates_subdirectory_if_not_exists(tmp_path):
+    root = tmp_path
+    subdir = root / Path("panda")
+    assert not subdir.exists()
+    provider = PandASubdirectoryProvider(Path("initial"))
+    await provider.update(directory=root)
+    assert subdir.exists()

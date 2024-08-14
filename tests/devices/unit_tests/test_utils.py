@@ -2,9 +2,10 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-from ophyd.sim import NullStatus, make_fake_device
+from ophyd.sim import NullStatus
 from ophyd.status import Status
 from ophyd.utils.errors import StatusTimeoutError, WaitTimeoutError
+from ophyd_async.core import AsyncStatus, get_mock_put, set_mock_value
 
 from dodal.devices.util.epics_util import SetWhenEnabled, run_functions_without_blocking
 from dodal.log import LOGGER, GELFTCPHandler, logging, set_up_all_logging_handlers
@@ -22,9 +23,11 @@ def discard_status(status: Status):
 
 
 def reset_logs():
-    for handler in LOGGER.handlers:
+    old_handlers = list(LOGGER.handlers)
+    for handler in old_handlers:
         handler.close()
-    LOGGER.handlers = []
+        LOGGER.removeHandler(handler)
+
     mock_graylog_handler_class = MagicMock(spec=GELFTCPHandler)
     mock_graylog_handler_class.return_value.level = logging.DEBUG
     with patch("dodal.log.GELFTCPHandler", mock_graylog_handler_class):
@@ -59,12 +62,11 @@ def test_full_status_gives_error_if_intermediate_status_fails():
 
 def test_check_call_back_error_gives_correct_error():
     LOGGER.error = MagicMock()
-    returned_status = Status(done=True, success=True)
     with pytest.raises(StatusException):
         returned_status = run_functions_without_blocking([get_bad_status])
         returned_status.wait(0.1)
 
-    assert isinstance(returned_status.exception(), StatusException)
+        assert isinstance(returned_status.exception(), StatusException)
 
     LOGGER.error.assert_called()
 
@@ -85,7 +87,6 @@ def test_wrap_function_callback_errors_on_wrong_return_type(caplog):
         return status
 
     dummy_func = MagicMock(return_value=3)
-    returned_status = Status(done=True, success=True)
     returned_status = run_functions_without_blocking(
         [lambda: get_good_status(), dummy_func], timeout=0.05
     )
@@ -108,20 +109,24 @@ def test_status_points_to_provided_device_object():
     assert returned_status.obj == expected_obj
 
 
-def test_given_disp_high_when_set_SetWhenEnabled_then_proc_not_set_until_disp_low():
-    signal: SetWhenEnabled = make_fake_device(SetWhenEnabled)(name="test")
-    signal.disp.sim_put(1)  # type: ignore
-    signal.proc.set = MagicMock(return_value=Status(done=True, success=True))
+async def test_given_disp_high_when_set_SetWhenEnabled_then_proc_not_set_until_disp_low():
+    device: SetWhenEnabled = SetWhenEnabled(name="test")
+    await device.connect(True)
+    set_mock_value(device.disp, 1)
+    proc_mock = get_mock_put(device.proc)
+    proc_mock.return_value = NullStatus()
+    status: AsyncStatus = device.set(1)
+    assert not status.done
+    proc_mock.assert_not_called()
+    set_mock_value(device.disp, 0)
 
-    status = signal.set(1)
-    signal.proc.set.assert_not_called()
-    signal.disp.sim_put(0)  # type: ignore
-    status.wait()
-    signal.proc.set.assert_called_once()
+    await status
+    proc_mock.assert_called_once()
+    assert status.success
 
 
 def test_if_one_status_errors_then_later_functions_not_called():
-    tester = MagicMock(return_value=Status(done=True, success=True))
+    tester = MagicMock(return_value=NullStatus())
     status_calls = [
         NullStatus,
         NullStatus,
@@ -129,9 +134,8 @@ def test_if_one_status_errors_then_later_functions_not_called():
         NullStatus,
         tester,
     ]
-    expected_obj = "TEST OBJECT"
     returned_status = run_functions_without_blocking(
-        status_calls, associated_obj=expected_obj
+        status_calls, associated_obj=MagicMock()
     )
     with pytest.raises(StatusException):
         returned_status.wait(0.1)
@@ -140,7 +144,7 @@ def test_if_one_status_errors_then_later_functions_not_called():
 
 
 def test_if_one_status_pending_then_later_functions_not_called():
-    tester = MagicMock(return_value=Status(done=True, success=True))
+    tester = MagicMock(return_value=NullStatus())
     pending_status = Status()
     status_calls = [
         NullStatus,
@@ -149,9 +153,8 @@ def test_if_one_status_pending_then_later_functions_not_called():
         NullStatus,
         tester,
     ]
-    expected_obj = "TEST OBJECT"
     returned_status = run_functions_without_blocking(
-        status_calls, associated_obj=expected_obj
+        status_calls, associated_obj=MagicMock()
     )
     with pytest.raises(WaitTimeoutError):
         returned_status.wait(0.1)

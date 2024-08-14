@@ -1,7 +1,8 @@
 import json
-import xml.etree.cElementTree as et
+import xml.etree.ElementTree as et
 from collections import ChainMap
-from typing import Any, Tuple
+from typing import Any
+from xml.etree.ElementTree import Element
 
 from dodal.devices.oav.oav_errors import (
     OAVError_BeamPositionNotFound,
@@ -18,6 +19,13 @@ DEFAULT_OAV_WINDOW = (1024, 768)
 OAV_CONFIG_JSON = (
     "/dls_sw/i03/software/daq_configuration/json/OAVCentring_hyperion.json"
 )
+
+
+def _get_element_as_float(node: Element, element_name: str) -> float:
+    element = node.find(element_name)
+    assert element is not None, f"{element_name} not found in {node}"
+    assert element.text
+    return float(element.text)
 
 
 class OAVParameters:
@@ -65,11 +73,11 @@ class OAVParameters:
             try:
                 param = param_type(param)
                 return param
-            except AssertionError:
+            except AssertionError as e:
                 raise TypeError(
                     f"OAV param {name} from the OAV centring params json file has the "
                     f"wrong type, should be {param_type} but is {type(param)}."
-                )
+                ) from e
 
         self.exposure: float = update("exposure", float)
         self.acquire_period: float = update("acqPeriod", float)
@@ -134,14 +142,14 @@ class OAVConfigParams:
         root = tree.getroot()
         levels = root.findall(".//zoomLevel")
         for node in levels:
-            if float(node.find("level").text) == zoom:
+            if _get_element_as_float(node, "level") == zoom:
                 self.micronsPerXPixel = (
-                    float(node.find("micronsPerXPixel").text)
+                    _get_element_as_float(node, "micronsPerXPixel")
                     * DEFAULT_OAV_WINDOW[0]
                     / xsize
                 )
                 self.micronsPerYPixel = (
-                    float(node.find("micronsPerYPixel").text)
+                    _get_element_as_float(node, "micronsPerYPixel")
                     * DEFAULT_OAV_WINDOW[1]
                     / ysize
                 )
@@ -155,7 +163,7 @@ class OAVConfigParams:
 
     def get_beam_position_from_zoom(
         self, zoom: float, xsize: int, ysize: int
-    ) -> Tuple[int, int]:
+    ) -> tuple[int, int]:
         """
         Extracts the beam location in pixels `xCentre` `yCentre`, for a requested zoom \
         level. The beam location is manually inputted by the beamline operator on GDA \
@@ -164,7 +172,7 @@ class OAVConfigParams:
         """
         crosshair_x_line = None
         crosshair_y_line = None
-        with open(self.display_config, "r") as f:
+        with open(self.display_config) as f:
             file_lines = f.readlines()
             for i in range(len(file_lines)):
                 if file_lines[i].startswith("zoomLevel = " + str(zoom)):
@@ -188,7 +196,7 @@ class OAVConfigParams:
 
     def calculate_beam_distance(
         self, horizontal_pixels: int, vertical_pixels: int
-    ) -> Tuple[int, int]:
+    ) -> tuple[int, int]:
         """
         Calculates the distance between the beam centre and the given (horizontal, vertical).
 

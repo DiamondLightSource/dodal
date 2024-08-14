@@ -1,5 +1,5 @@
 import asyncio
-from asyncio import FIRST_COMPLETED, Task
+from asyncio import FIRST_COMPLETED, CancelledError, Task
 from dataclasses import dataclass
 from enum import Enum
 
@@ -45,6 +45,9 @@ class BartRobot(StandardReadable, Movable):
     LOAD_TIMEOUT = 60
     NO_PIN_ERROR_CODE = 25
 
+    # How far the gonio position can be out before loading will fail
+    LOAD_TOLERANCE_MM = 0.02
+
     def __init__(
         self,
         name: str,
@@ -60,7 +63,8 @@ class BartRobot(StandardReadable, Movable):
         self.program_running = epics_signal_r(bool, prefix + "PROGRAM_RUNNING")
         self.program_name = epics_signal_r(str, prefix + "PROGRAM_NAME")
         self.error_str = epics_signal_r(str, prefix + "PRG_ERR_MSG")
-        self.error_code = epics_signal_r(int, prefix + "PRG_ERR_CODE")
+        # Change error_code to int type when https://github.com/bluesky/ophyd-async/issues/280 released
+        self.error_code = epics_signal_r(float, prefix + "PRG_ERR_CODE")
         super().__init__(name=name)
 
     async def pin_mounted_or_no_pin_found(self):
@@ -73,19 +77,28 @@ class BartRobot(StandardReadable, Movable):
             await wait_for_value(self.error_code, self.NO_PIN_ERROR_CODE, None)
             raise RobotLoadFailed(self.NO_PIN_ERROR_CODE, "Pin was not detected")
 
-        finished, unfinished = await asyncio.wait(
-            [
-                Task(raise_if_no_pin()),
-                Task(
-                    wait_for_value(self.gonio_pin_sensor, PinMounted.PIN_MOUNTED, None)
-                ),
-            ],
-            return_when=FIRST_COMPLETED,
-        )
-        for task in unfinished:
-            task.cancel()
-        for task in finished:
-            await task
+        async def wfv():
+            await wait_for_value(self.gonio_pin_sensor, PinMounted.PIN_MOUNTED, None)
+
+        tasks = [
+            (Task(raise_if_no_pin())),
+            (Task(wfv())),
+        ]
+        try:
+            finished, unfinished = await asyncio.wait(
+                tasks,
+                return_when=FIRST_COMPLETED,
+            )
+            for task in unfinished:
+                task.cancel()
+            for task in finished:
+                await task
+        except CancelledError:
+            # If the outer enclosing task cancels after LOAD_TIMEOUT, this causes CancelledError to be raised
+            # in the current task, when it propagates to here we should cancel all pending tasks before bubbling up
+            for task in tasks:
+                task.cancel()
+            raise
 
     async def _load_pin_and_puck(self, sample_location: SampleLocation):
         LOGGER.info(f"Loading pin {sample_location}")
@@ -107,12 +120,12 @@ class BartRobot(StandardReadable, Movable):
         await self.pin_mounted_or_no_pin_found()
 
     @AsyncStatus.wrap
-    async def set(self, sample_location: SampleLocation):
+    async def set(self, value: SampleLocation):
         try:
             await asyncio.wait_for(
-                self._load_pin_and_puck(sample_location), timeout=self.LOAD_TIMEOUT
+                self._load_pin_and_puck(value), timeout=self.LOAD_TIMEOUT
             )
-        except asyncio.TimeoutError:
+        except asyncio.TimeoutError as e:
             error_code = await self.error_code.get_value()
             error_string = await self.error_str.get_value()
-            raise RobotLoadFailed(error_code, error_string)
+            raise RobotLoadFailed(int(error_code), error_string) from e

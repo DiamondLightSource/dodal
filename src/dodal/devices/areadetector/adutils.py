@@ -1,7 +1,7 @@
 import time as ttime
 
 from ophyd import Component as Cpt
-from ophyd import EpicsSignal, EpicsSignalRO, Staged
+from ophyd import DetectorBase, Device, EpicsSignal, EpicsSignalRO, Staged
 from ophyd.areadetector import ADTriggerStatus, TriggerBase
 from ophyd.areadetector.cam import AreaDetectorCam
 from ophyd.areadetector.filestore_mixins import FileStoreHDF5, FileStoreIterativeWrite
@@ -14,6 +14,8 @@ class SingleTriggerV33(TriggerBase):
     def __init__(self, *args, image_name=None, **kwargs):
         super().__init__(*args, **kwargs)
         if image_name is None:
+            # Ensure that this mixin is part of valid device with name
+            assert isinstance(self, Device)
             image_name = "_".join([self.name, "image"])
         self._image_name = image_name
 
@@ -32,7 +34,9 @@ class SingleTriggerV33(TriggerBase):
             self._status._finished()
 
         self._acquisition_signal.put(1, use_complete=True, callback=_acq_done)
-        self.dispatch(self._image_name, ttime.time())
+        # Ensure that this mixin is part of valid Detector with generate_datum
+        assert isinstance(self, DetectorBase)
+        self.generate_datum(self._image_name, ttime.time())
         return self._status
 
 
@@ -54,15 +58,18 @@ class SynchronisedAdDriverBase(AreaDetectorCam):
 
     def ensure_nonblocking(self):
         self.stage_sigs["wait_for_plugins"] = "Yes"
-        for c in self.parent.component_names:
-            cpt = getattr(self.parent, c)
-            if cpt is self:
-                continue
-            if hasattr(cpt, "ensure_nonblocking"):
-                cpt.ensure_nonblocking()
+        if self.parent is not None:
+            for c in self.parent.component_names:
+                cpt = getattr(self.parent, c)
+                if cpt is self:
+                    continue
+                if hasattr(cpt, "ensure_nonblocking"):
+                    cpt.ensure_nonblocking()
 
 
-class Hdf5Writer(HDF5Plugin, FileStoreHDF5, FileStoreIterativeWrite):
+# ophyd code to be removed, only used for adim
+# https://github.com/DiamondLightSource/dodal/issues/404
+class Hdf5Writer(HDF5Plugin, FileStoreHDF5, FileStoreIterativeWrite):  # type: ignore
     """ """
 
     pool_max_buffers = None
@@ -70,4 +77,5 @@ class Hdf5Writer(HDF5Plugin, FileStoreHDF5, FileStoreIterativeWrite):
     file_number_write = None
 
     def get_frames_per_point(self):
+        assert isinstance(self.parent, DetectorBase)
         return self.parent.cam.num_images.get()

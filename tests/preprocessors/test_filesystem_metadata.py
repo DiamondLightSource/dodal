@@ -6,7 +6,6 @@ import bluesky.plan_stubs as bps
 import bluesky.plans as bp
 import pytest
 from aiohttp import ClientResponseError
-from bluesky import RunEngine
 from bluesky.preprocessors import (
     run_decorator,
     run_wrapper,
@@ -14,17 +13,10 @@ from bluesky.preprocessors import (
     set_run_key_wrapper,
     stage_wrapper,
 )
-from bluesky.protocols import (
-    HasName,
-    Readable,
-    Reading,
-    Status,
-    Triggerable,
-)
+from bluesky.protocols import HasName, Readable, Reading, Triggerable
 from bluesky.run_engine import RunEngine
 from event_model.documents.event_descriptor import DataKey
-from ophyd.status import StatusBase
-from ophyd_async.core import DeviceCollector, DirectoryProvider
+from ophyd_async.core import AsyncStatus, DeviceCollector, DirectoryProvider
 from pydantic import BaseModel
 
 from dodal.common.types import MsgGenerator, UpdatingDirectoryProvider
@@ -75,10 +67,9 @@ class FakeDetector(Readable, HasName, Triggerable):
             }
         }
 
-    def trigger(self) -> Status:
-        status = StatusBase()
-        status.set_finished()
-        return status
+    @AsyncStatus.wrap
+    async def trigger(self):
+        pass
 
     @property
     def name(self) -> str:

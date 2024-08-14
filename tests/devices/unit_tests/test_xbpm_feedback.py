@@ -1,6 +1,6 @@
 import pytest
-from bluesky import RunEngine
 from bluesky import plan_stubs as bps
+from bluesky.run_engine import RunEngine
 from ophyd_async.core import DeviceCollector, set_mock_value
 
 from dodal.devices.xbpm_feedback import XBPMFeedback

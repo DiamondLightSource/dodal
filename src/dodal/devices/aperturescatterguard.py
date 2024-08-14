@@ -1,10 +1,11 @@
 import asyncio
-from collections import OrderedDict, namedtuple
+from collections import namedtuple
 from dataclasses import asdict, dataclass
 from enum import Enum
 
 from bluesky.protocols import Movable, Reading
-from ophyd_async.core import AsyncStatus, SignalR, StandardReadable
+from event_model.documents.event_descriptor import DataKey
+from ophyd_async.core import AsyncStatus, HintedSignal, SignalR, StandardReadable
 from ophyd_async.core.soft_signal_backend import SoftConverter, SoftSignalBackend
 
 from dodal.devices.aperture import Aperture
@@ -155,11 +156,7 @@ class ApertureScatterguard(StandardReadable, Movable):
         )
         aperture_backend.converter = self.ApertureConverter()
         self.selected_aperture = self.SelectedAperture(backend=aperture_backend)
-        self.set_readable_signals(
-            read=[
-                self.selected_aperture,
-            ]
-        )
+        self.add_readables([self.selected_aperture], wrapper=HintedSignal)
         super().__init__(name)
 
     class ApertureConverter(SoftConverter):
@@ -176,35 +173,32 @@ class ApertureScatterguard(StandardReadable, Movable):
     class SelectedAperture(SignalR):
         async def read(self, *args, **kwargs):
             assert isinstance(self.parent, ApertureScatterguard)
+            assert self._backend
             await self._backend.put(await self.parent._get_current_aperture_position())
             return {self.name: await self._backend.get_reading()}
 
-        async def describe(self):
-            return OrderedDict(
-                [
-                    (
-                        self._name,
-                        {
-                            "source": self._backend.source(self._name),  # type: ignore
-                            "dtype": "array",
-                            "shape": [
-                                -1,
-                            ],  # TODO describe properly - see https://github.com/DiamondLightSource/dodal/issues/253
-                        },
-                    ),
-                ],
-            )
+        async def describe(self) -> dict[str, DataKey]:
+            return {
+                self._name: DataKey(
+                    dtype="array",
+                    shape=[
+                        -1,
+                    ],  # TODO describe properly - see https://github.com/DiamondLightSource/dodal/issues/253,
+                    source=self._backend.source(self._name),  # type: ignore
+                )
+            }
 
     def load_aperture_positions(self, positions: AperturePositions):
         LOGGER.info(f"{self.name} loaded in {positions}")
         self.aperture_positions = positions
 
-    def set(self, pos: SingleAperturePosition) -> AsyncStatus:
+    @AsyncStatus.wrap
+    async def set(self, value: SingleAperturePosition):
         assert isinstance(self.aperture_positions, AperturePositions)
-        if pos not in self.aperture_positions.as_list():
-            raise InvalidApertureMove(f"Unknown aperture: {pos}")
+        if value not in self.aperture_positions.as_list():
+            raise InvalidApertureMove(f"Unknown aperture: {value}")
 
-        return AsyncStatus(self._safe_move_within_datacollection_range(pos.location))
+        await self._safe_move_within_datacollection_range(value.location)
 
     def _get_motor_list(self):
         return [

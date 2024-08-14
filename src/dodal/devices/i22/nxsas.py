@@ -1,5 +1,4 @@
 from dataclasses import dataclass, fields
-from typing import Dict
 
 from bluesky.protocols import Reading
 from event_model.documents.event_descriptor import DataKey
@@ -13,7 +12,7 @@ ValueAndUnits = tuple[float, str]
 @dataclass
 class MetadataHolder:
     # TODO: just in case this is useful more widely...
-    async def describe(self, parent_name: str) -> Dict[str, DataKey]:
+    async def describe(self, parent_name: str) -> dict[str, DataKey]:
         def datakey(value) -> DataKey:
             if isinstance(value, tuple):
                 return {"units": value[1], **datakey(value[0])}
@@ -40,8 +39,8 @@ class MetadataHolder:
             if getattr(self, field.name, None) is not None
         }
 
-    async def read(self, parent_name: str) -> Dict[str, Reading]:
-        def reading(value):
+    async def read(self, parent_name: str) -> dict[str, Reading]:
+        def reading(value) -> Reading:
             if isinstance(value, tuple):
                 return reading(value[0])
             return {"timestamp": -1, "value": value}
@@ -101,25 +100,21 @@ class NXSasPilatus(PilatusDetector):
         )
         self._metadata_holder = metadata_holder
 
-    async def read_configuration(self) -> Dict[str, Reading]:
+    async def read_configuration(self) -> dict[str, Reading]:
         return await merge_gathered_dicts(
-            (
-                r
-                for r in (
-                    super().read_configuration(),
-                    self._metadata_holder.read(self.name),
-                )
+            r
+            for r in (
+                super().read_configuration(),
+                self._metadata_holder.read(self.name),
             )
         )
 
-    async def describe_configuration(self) -> Dict[str, DataKey]:
+    async def describe_configuration(self) -> dict[str, DataKey]:
         return await merge_gathered_dicts(
-            (
-                r
-                for r in (
-                    super().describe_configuration(),
-                    self._metadata_holder.describe(self.name),
-                )
+            r
+            for r in (
+                super().describe_configuration(),
+                self._metadata_holder.describe(self.name),
             )
         )
 
@@ -150,24 +145,20 @@ class NXSasOAV(AravisDetector):
         )
         self._metadata_holder = metadata_holder
 
-    async def read_configuration(self) -> Dict[str, Reading]:
+    async def read_configuration(self) -> dict[str, Reading]:
         return await merge_gathered_dicts(
-            (
-                r
-                for r in (
-                    super().read_configuration(),
-                    self._metadata_holder.read(self.name),
-                )
+            r
+            for r in (
+                super().read_configuration(),
+                self._metadata_holder.read(self.name),
             )
         )
 
-    async def describe_configuration(self) -> Dict[str, DataKey]:
+    async def describe_configuration(self) -> dict[str, DataKey]:
         return await merge_gathered_dicts(
-            (
-                r
-                for r in (
-                    super().describe_configuration(),
-                    self._metadata_holder.describe(self.name),
-                )
+            r
+            for r in (
+                super().describe_configuration(),
+                self._metadata_holder.describe(self.name),
             )
         )

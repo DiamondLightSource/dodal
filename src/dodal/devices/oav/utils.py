@@ -1,19 +1,16 @@
+from collections.abc import Generator
 from enum import IntEnum
-from pathlib import Path
-from typing import Generator, Tuple
 
 import bluesky.plan_stubs as bps
 import numpy as np
 from bluesky.utils import Msg
-from PIL.Image import Image
 
 from dodal.devices.oav.oav_calculations import camera_coordinates_to_xyz
-from dodal.devices.oav.oav_parameters import OAVConfigParams
+from dodal.devices.oav.oav_detector import OAVConfigParams
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.smargon import Smargon
-from dodal.log import LOGGER
 
-Pixel = Tuple[int, int]
+Pixel = tuple[int, int]
 
 
 class PinNotFoundException(Exception):
@@ -110,14 +107,3 @@ def wait_for_tip_to_be_found(
         raise PinNotFoundException(f"No pin found after {timeout} seconds")
 
     return found_tip  # type: ignore
-
-
-def save_thumbnail(full_file_path: Path, full_image: Image, new_height=192):
-    """Scales an image down to have the height specified in new_height and saves it
-    to the same location as the full image with a t appended to the filename"""
-    thumbnail_path = full_file_path.with_stem(full_file_path.stem + "t")
-    LOGGER.info(f"Saving thumbnail to {thumbnail_path}")
-    full_size = full_image.size
-    new_width = (new_height / full_size[1]) * full_size[0]
-    full_image.thumbnail((new_width, new_height))
-    full_image.save(thumbnail_path.as_posix())

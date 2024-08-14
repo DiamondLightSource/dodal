@@ -3,9 +3,8 @@ All the public methods in this module return a lookup table of some kind that
 converts the source value s to a target value t for different values of s.
 """
 
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from io import StringIO
-from typing import Callable
 
 import aiofiles
 import numpy as np
@@ -36,7 +35,7 @@ async def energy_distance_table(lookup_table_path: str) -> np.ndarray:
 def linear_interpolation_lut(filename: str) -> Callable[[float], float]:
     """Returns a callable that converts values by linear interpolation of lookup table values"""
     LOGGER.info(f"Using lookup table {filename}")
-    s_and_t_vals = zip(*loadtxt(filename, comments=["#", "Units"]))
+    s_and_t_vals = zip(*loadtxt(filename, comments=["#", "Units"]), strict=False)
 
     s_values: Sequence
     t_values: Sequence

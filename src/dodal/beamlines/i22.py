@@ -234,7 +234,7 @@ def slits_3(
     )
 
 
-@skip_device
+@skip_device()
 def slits_4(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
@@ -300,7 +300,7 @@ def panda1(
     )
 
 
-@skip_device
+@skip_device()
 def panda2(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
@@ -315,7 +315,7 @@ def panda2(
     )
 
 
-@skip_device
+@skip_device()
 def panda3(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
@@ -330,7 +330,7 @@ def panda3(
     )
 
 
-@skip_device
+@skip_device()
 def panda4(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
@@ -366,7 +366,7 @@ def oav(
     )
 
 
-@skip_device
+@skip_device()
 def linkam(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> Linkam3:

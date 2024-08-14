@@ -1,4 +1,3 @@
-from ophyd import Component as Cpt
 from ophyd.areadetector.base import ADComponent as Cpt
 from ophyd.areadetector.detectors import DetectorBase
 
@@ -33,7 +32,7 @@ class AdSimDetector(SingleTriggerV33, DetectorBase):
             **self.stage_sigs,  # type: ignore
         }
 
-    def stage(self, *args, **kwargs):
+    def stage(self, *args, **kwargs) -> list[object]:
         # We have to manually set the acquire period bcause the EPICS driver
         # doesn't do it for us. If acquire time is a staged signal, we use the
         # stage value to calculate the acquire period, otherwise we perform
@@ -45,4 +44,4 @@ class AdSimDetector(SingleTriggerV33, DetectorBase):
         self.stage_sigs[self.cam.acquire_period] = acquire_time
 
         # Now calling the super method should set the acquire period
-        super(AdSimDetector, self).stage(*args, **kwargs)
+        return super().stage(*args, **kwargs)

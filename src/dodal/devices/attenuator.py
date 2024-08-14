@@ -48,7 +48,7 @@ class Attenuator(StandardReadable, Movable):
         super().__init__(name)
 
     @AsyncStatus.wrap
-    async def set(self, transmission: float):
+    async def set(self, value: float):
         """Set the transmission to the fractional (0-1) value given.
 
         The attenuator IOC will then insert filters to reach the desired transmission for
@@ -58,8 +58,8 @@ class Attenuator(StandardReadable, Movable):
 
         LOGGER.debug("Using current energy ")
         await self._use_current_energy.trigger()
-        LOGGER.info(f"Setting desired transmission to {transmission}")
-        await self._desired_transmission.set(transmission)
+        LOGGER.info(f"Setting desired transmission to {value}")
+        await self._desired_transmission.set(value)
         LOGGER.debug("Sending change filter command")
         await self._change.trigger()
 
@@ -67,7 +67,7 @@ class Attenuator(StandardReadable, Movable):
             *[
                 wait_for_value(
                     self._filters_in_position[i],
-                    await self._calculated_filter_states[i].get_value(),
+                    bool(await self._calculated_filter_states[i].get_value()),
                     None,
                 )
                 for i in range(16)

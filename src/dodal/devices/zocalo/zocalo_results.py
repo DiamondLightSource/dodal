@@ -1,8 +1,9 @@
 import asyncio
 from collections import OrderedDict
+from collections.abc import Generator, Sequence
 from enum import Enum
 from queue import Empty, Queue
-from typing import Any, Generator, Sequence, Tuple, TypedDict
+from typing import Any, TypedDict
 
 import bluesky.plan_stubs as bps
 import numpy as np
@@ -10,7 +11,7 @@ import workflows.recipe
 import workflows.transport
 from bluesky.protocols import Descriptor, Triggerable
 from numpy.typing import NDArray
-from ophyd_async.core import StandardReadable, soft_signal_r_and_setter
+from ophyd_async.core import HintedSignal, StandardReadable, soft_signal_r_and_setter
 from ophyd_async.core.async_status import AsyncStatus
 from workflows.transport.common_transport import CommonTransport
 
@@ -79,34 +80,41 @@ class ZocaloResults(StandardReadable, Triggerable):
         self._raw_results_received: Queue = Queue()
         self.transport: CommonTransport | None = None
 
-        self.results, _ = soft_signal_r_and_setter(list[XrcResult], name="results")
-        self.centres_of_mass, _ = soft_signal_r_and_setter(
+        self.results, self._results_setter = soft_signal_r_and_setter(
+            list[XrcResult], name="results"
+        )
+        self.centres_of_mass, self._com_setter = soft_signal_r_and_setter(
             NDArray[np.uint64], name="centres_of_mass"
         )
-        self.bbox_sizes, _ = soft_signal_r_and_setter(
+        self.bbox_sizes, self._bbox_setter = soft_signal_r_and_setter(
             NDArray[np.uint64], "bbox_sizes", self.name
         )
-        self.ispyb_dcid, _ = soft_signal_r_and_setter(int, name="ispyb_dcid")
-        self.ispyb_dcgid, _ = soft_signal_r_and_setter(int, name="ispyb_dcgid")
-        self.set_readable_signals(
-            read=[
+        self.ispyb_dcid, self._ispyb_dcid_setter = soft_signal_r_and_setter(
+            int, name="ispyb_dcid"
+        )
+        self.ispyb_dcgid, self._ispyb_dcgid_setter = soft_signal_r_and_setter(
+            int, name="ispyb_dcgid"
+        )
+        self.add_readables(
+            [
                 self.results,
                 self.centres_of_mass,
                 self.bbox_sizes,
                 self.ispyb_dcid,
                 self.ispyb_dcgid,
-            ]
+            ],
+            wrapper=HintedSignal,
         )
         super().__init__(name)
 
     async def _put_results(self, results: Sequence[XrcResult], ispyb_ids):
-        await self.results._backend.put(list(results))
+        self._results_setter(list(results))
         centres_of_mass = np.array([r["centre_of_mass"] for r in results])
         bbox_sizes = np.array([bbox_size(r) for r in results])
-        await self.centres_of_mass._backend.put(centres_of_mass)
-        await self.bbox_sizes._backend.put(bbox_sizes)
-        await self.ispyb_dcid._backend.put(ispyb_ids["dcid"])
-        await self.ispyb_dcgid._backend.put(ispyb_ids["dcgid"])
+        self._com_setter(centres_of_mass)
+        self._bbox_setter(bbox_sizes)
+        self._ispyb_dcid_setter(ispyb_ids["dcid"])
+        self._ispyb_dcgid_setter(ispyb_ids["dcgid"])
 
     def _clear_old_results(self):
         LOGGER.info("Clearing queue")
@@ -152,7 +160,7 @@ class ZocaloResults(StandardReadable, Triggerable):
             )
 
             raw_results = self._raw_results_received.get(timeout=self.timeout_s)
-            LOGGER.info(f"Zocalo: found {len(raw_results)} crystals.")
+            LOGGER.info(f"Zocalo: found {len(raw_results['results'])} crystals.")
             # Sort from strongest to weakest in case of multiple crystals
             await self._put_results(
                 sorted(
@@ -242,7 +250,7 @@ class ZocaloResults(StandardReadable, Triggerable):
 
 def get_processing_result(
     zocalo: ZocaloResults,
-) -> Generator[Any, Any, Tuple[np.ndarray, np.ndarray] | Tuple[None, None]]:
+) -> Generator[Any, Any, tuple[np.ndarray, np.ndarray] | tuple[None, None]]:
     """A minimal plan which will extract the top ranked xray centre and crystal bounding
     box size from the zocalo results. Returns (None, None) if no crystals were found."""
 
