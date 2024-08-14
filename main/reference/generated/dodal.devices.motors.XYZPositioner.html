@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.motors.XYZPositioner &#8212; dodal 1.29.5.dev22+gac220bbfb documentation</title>
+    <title>dodal.devices.motors.XYZPositioner &#8212; dodal 1.29.5.dev23+gf8c493e4d documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../_static/documentation_options.js?v=6bd708b0"></script>
+    <script src="../../_static/documentation_options.js?v=890f598b"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -438,6 +438,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.i24.html">dodal.beamlines.i24</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.p38.html">dodal.beamlines.p38</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.p45.html">dodal.beamlines.p45</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.p99.html">dodal.beamlines.p99</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="dodal.common.html">dodal.common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -623,6 +624,10 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.p45.SampleTheta.html">dodal.devices.p45.SampleTheta</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.p45.SampleY.html">dodal.devices.p45.SampleY</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.p45.TomoStageWithStretchAndSkew.html">dodal.devices.p45.TomoStageWithStretchAndSkew</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.p99.html">dodal.devices.p99</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.p99.sample_stage.html">dodal.devices.p99.sample_stage</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.qbpm1.html">dodal.devices.qbpm1</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -831,12 +836,28 @@ document.write(`
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.motors.XYZPositioner">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.motors.</span></span><span class="sig-name descname"><span class="pre">XYZPositioner</span></span><a class="reference internal" href="../../_modules/dodal/devices/motors.html#XYZPositioner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.motors.XYZPositioner" title="Link to this definition">#</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Standard ophyd_async xyz motor stage, by combining 3 Motors,
+with added infix for extra flexibliy to allow different axes other than x,y,z.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>prefix</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
-<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>prefix</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – EPICS PV (Common part up to and including :).</p></li>
+<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – name for the stage.</p></li>
+<li><p><strong>infix</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">None</span></code>) – EPICS PV, default is the [“X”, “Y”, “Z”].</p></li>
 </ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<dl class="simple">
+<dt>Example usage::</dt><dd><dl class="simple">
+<dt>async with DeviceCollector():</dt><dd><p>xyz_stage = XYZPositioner(“BLXX-MO-STAGE-XX:”)</p>
+</dd>
+</dl>
+</dd>
+<dt>Or::</dt><dd><dl class="simple">
+<dt>with DeviceCollector():</dt><dd><p>xyz_stage = XYZPositioner(“BLXX-MO-STAGE-XX:”, suffix = [“A”, “B”, “C”])</p>
+</dd>
+</dl>
 </dd>
 </dl>
 <p class="rubric">Methods</p>

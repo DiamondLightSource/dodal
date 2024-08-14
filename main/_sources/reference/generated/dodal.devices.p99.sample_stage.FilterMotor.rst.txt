@@ -1,0 +1,31 @@
+dodal.devices.p99.sample\_stage.FilterMotor
+===========================================
+
+.. currentmodule:: dodal.devices.p99.sample_stage
+
+.. autoclass:: FilterMotor
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   
