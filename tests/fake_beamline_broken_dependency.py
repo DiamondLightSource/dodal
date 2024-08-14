@@ -11,7 +11,7 @@ def device_x() -> Readable:
 
 
 def device_y() -> EpicsMotor:
-    return _mock_with_name("motor")
+    raise AssertionError("Test failure")
 
 
 def device_z(device_x: Readable, device_y: EpicsMotor) -> CryoStream:
