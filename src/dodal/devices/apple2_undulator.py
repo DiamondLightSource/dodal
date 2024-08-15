@@ -224,6 +224,11 @@ class Apple2Undlator(StandardReadable, Movable):
         infix: Apple2PhasesPv,
         energy_gap_table_path: Path,
         energy_phase_table_path: Path,
+        source: tuple[str, str] | None = None,
+        mode: str = "Mode",
+        min_energy: str = "MinEnergy",
+        max_energy: str = "MaxEnergy",
+        poly_deg: int = 8,
         name: str = "",
     ) -> None:
         with self.add_children_as_readables():
@@ -236,15 +241,39 @@ class Apple2Undlator(StandardReadable, Movable):
                 btm_outer=infix.btm_outer,
             )
         super().__init__(name)
-        self.lookup_table_path = {
-            "energy": energy_gap_table_path,
-            "phase": energy_phase_table_path,
+        self.lookup_table_config = {
+            "path": {
+                "Gap": energy_gap_table_path,
+                "Phase": energy_phase_table_path,
+            },
+            "source": source,
+            "mode": mode,
+            "min_energy": min_energy,
+            "max_energy": max_energy,
+            "poly_deg": poly_deg,
         }
-        self.lookup_table_gap = {}
-        self.update_poly()
+        self.lookup_table = {}
+        self._update_poly()
+        self._available_pol = list(self.lookup_table["Gap"].keys())
+        self.detune = 0
+        self._pol = None
+
+    @property
+    def pol(self):
+        return self._pol
+
+    @pol.setter
+    def pol(self, pol: str):
+        if pol in self._available_pol:
+            self._pol = pol
+        else:
+            raise ValueError(
+                f"Polarisation {pol} is not available:"
+                + f"/n Polarisations available:  {self._available_pol}"
+            )
 
     @AsyncStatus.wrap
-    async def set(self, value: Apple2Val) -> None:
+    async def _set(self, value: Apple2Val) -> None:
         if await self.gap.gate.get_value() == UndulatorGatestatus.open:
             raise RuntimeError(f"{self.name} is already in motion.")
         await asyncio.gather(
@@ -260,16 +289,69 @@ class Apple2Undlator(StandardReadable, Movable):
         await self.gap.set_move.set(value=1)
         await wait_for_value(self.gap.gate, UndulatorGatestatus.close, timeout=timeout)
 
-    def update_poly(self):
-        for key, path in self.lookup_table_path.items():
+    @AsyncStatus.wrap
+    async def set(self, value: float) -> None:
+        gap, phase = self._get_id_gap_phase(value)
+        id_set_val = Apple2Val(
+            top_outer=str(phase),
+            top_inner="0.0",
+            btm_inner=str(-phase),
+            btm_outer="0.0",
+            gap=str(gap),
+        )
+        await self._set(value=id_set_val)
+
+    def _get_id_gap_phase(self, energy) -> tuple[float, float]:
+        """
+        Converts energy and polarisation to  gap and phase.
+        """
+        new_energy = energy + self.detune
+        gap_poly = self._get_poly(
+            lookup_table=self.lookup_table["Gap"], new_energy=new_energy
+        )
+        phase_poly = self._get_poly(
+            lookup_table=self.lookup_table["Phase"], new_energy=new_energy
+        )
+        return gap_poly(new_energy), phase_poly(new_energy)
+
+    def _get_poly(self, new_energy, lookup_table) -> np.poly1d:
+        print(lookup_table.keys())
+        if (
+            new_energy < lookup_table[self.pol]["Energy"]["Limits"]["Minimum"]
+            or new_energy > lookup_table[self.pol]["Energy"]["Limits"]["Maximum"]
+        ):
+            raise ValueError(
+                "Demanding energy must lie between {} and {} eV!".format(
+                    lookup_table[self.pol]["Energy"]["Limits"]["Minimum"],
+                    lookup_table[self.pol]["Energy"]["Limits"]["Maximum"],
+                )
+            )
+        else:
+            for energy_range in lookup_table[self.pol]["Energy"]["Energies"].values():
+                if (
+                    new_energy >= energy_range["Low"]
+                    and new_energy < energy_range["High"]
+                ):
+                    return energy_range["Poly"]
+
+        raise Exception(
+            "Cannot find polynomial coefficients for your requested energy."
+            + "There might be gap in the calibration lookup table."
+        )
+
+    def _update_poly(self):
+        for key, path in self.lookup_table_config["path"].items():
             if path.exists():
-                pd.read_csv(path)
-                self.lookupTable = {key: pd.read_csv(path)}
+                self.lookup_table[key] = convert_csv_to_lookup(
+                    file=path,
+                    source=self.lookup_table_config["source"],
+                    mode=self.lookup_table_config["mode"],
+                    min_energy=self.lookup_table_config["min_energy"],
+                    max_energy=self.lookup_table_config["max_energy"],
+                    poly_deg=self.lookup_table_config["poly_deg"],
+                )
             else:
                 raise FileNotFoundError(f"{key} look up table is not in path: {path}")
-
-    def _get_poly(self, param: list, e_low: float, ehigh: float) -> np.poly1d:
-        return np.poly1d(param)
 
 
 def convert_csv_to_lookup(
@@ -300,12 +382,14 @@ def convert_csv_to_lookup(
             "Minimum": temp_df.iloc[0][min_energy],
             "Maximum": temp_df.iloc[-1][max_energy],
         }
-
+        look_up_table[i]["Energy"]["Energies"] = {}
         for index, row in temp_df.iterrows():
             poly = np.poly1d(row.values[::-1][:poly_deg])
-            look_up_table[i]["Energy"][index] = {
-                "Energy": row[max_energy],
-                "poly": poly,
+
+            look_up_table[i]["Energy"]["Energies"][index] = {
+                "Low": row[min_energy],
+                "High": row[max_energy],
+                "Poly": poly,
             }
 
     return look_up_table
