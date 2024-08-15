@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.zocalo.zocalo_interaction &#8212; dodal 1.29.5.dev24+g608d913cd documentation</title>
+    <title>dodal.devices.zocalo.zocalo_interaction &#8212; dodal 1.29.5.dev25+g15845425f documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../../_static/documentation_options.js?v=651adfcd"></script>
+    <script src="../../../../_static/documentation_options.js?v=0d9b5250"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -473,6 +473,7 @@ document.write(`
   <h1>Source code for dodal.devices.zocalo.zocalo_interaction</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">dataclasses</span>
 <span class="kn">import</span> <span class="nn">getpass</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">socket</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
 
@@ -513,6 +514,12 @@ document.write(`
 
 
 
+<span class="k">def</span> <span class="nf">_get_zocalo_headers</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ZOCALO_GO_USER&quot;</span><span class="p">,</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getuser</span><span class="p">())</span>
+    <span class="n">hostname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ZOCALO_GO_HOSTNAME&quot;</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">user</span><span class="p">,</span> <span class="n">hostname</span>
+
+
 <div class="viewcode-block" id="ZocaloTrigger">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.zocalo.zocalo_interaction.ZocaloTrigger.html#dodal.devices.zocalo.zocalo_interaction.ZocaloTrigger">[docs]</a>
 <span class="k">class</span> <span class="nc">ZocaloTrigger</span><span class="p">:</span>
@@ -533,9 +540,10 @@ document.write(`
                 <span class="s2">&quot;recipes&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;mimas&quot;</span><span class="p">],</span>
                 <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="n">parameters</span><span class="p">,</span>
             <span class="p">}</span>
+            <span class="n">user</span><span class="p">,</span> <span class="n">hostname</span> <span class="o">=</span> <span class="n">_get_zocalo_headers</span><span class="p">()</span>
             <span class="n">header</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;zocalo.go.user&quot;</span><span class="p">:</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getuser</span><span class="p">(),</span>
-                <span class="s2">&quot;zocalo.go.host&quot;</span><span class="p">:</span> <span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">(),</span>
+                <span class="s2">&quot;zocalo.go.user&quot;</span><span class="p">:</span> <span class="n">user</span><span class="p">,</span>
+                <span class="s2">&quot;zocalo.go.host&quot;</span><span class="p">:</span> <span class="n">hostname</span><span class="p">,</span>
             <span class="p">}</span>
             <span class="n">transport</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s2">&quot;processing_recipe&quot;</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">header</span><span class="p">)</span>
         <span class="k">finally</span><span class="p">:</span>
