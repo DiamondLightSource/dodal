@@ -1,8 +1,10 @@
 import asyncio
 from dataclasses import dataclass
 from enum import Enum
+from pathlib import Path
 
 import numpy as np
+import pandas as pd
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
@@ -216,7 +218,14 @@ class UndlatorPhaseAxes(StandardReadable, Movable):
 
 
 class Apple2Undlator(StandardReadable, Movable):
-    def __init__(self, prefix: str, infix: Apple2PhasesPv, name: str = "") -> None:
+    def __init__(
+        self,
+        prefix: str,
+        infix: Apple2PhasesPv,
+        energy_gap_table_path: Path,
+        energy_phase_table_path: Path,
+        name: str = "",
+    ) -> None:
         with self.add_children_as_readables():
             self.gap = UndulatorGap(prefix=prefix)
             self.phase = UndlatorPhaseAxes(
@@ -227,6 +236,12 @@ class Apple2Undlator(StandardReadable, Movable):
                 btm_outer=infix.btm_outer,
             )
         super().__init__(name)
+        self.lookup_table_path = {
+            "energy": energy_gap_table_path,
+            "phase": energy_phase_table_path,
+        }
+        self.lookup_table_gap = {}
+        self.update_poly()
 
     @AsyncStatus.wrap
     async def set(self, value: Apple2Val) -> None:
@@ -244,3 +259,53 @@ class Apple2Undlator(StandardReadable, Movable):
         )
         await self.gap.set_move.set(value=1)
         await wait_for_value(self.gap.gate, UndulatorGatestatus.close, timeout=timeout)
+
+    def update_poly(self):
+        for key, path in self.lookup_table_path.items():
+            if path.exists():
+                pd.read_csv(path)
+                self.lookupTable = {key: pd.read_csv(path)}
+            else:
+                raise FileNotFoundError(f"{key} look up table is not in path: {path}")
+
+    def _get_poly(self, param: list, e_low: float, ehigh: float) -> np.poly1d:
+        return np.poly1d(param)
+
+
+def convert_csv_to_lookup(
+    file,
+    source: tuple[str, str] | None = None,
+    mode: str = "Mode",
+    min_energy: str = "MinEnergy",
+    max_energy: str = "MaxEnergy",
+    poly_deg: int = 8,
+):
+    df = pd.read_csv(file)
+    look_up_table = {}
+    if source is not None:
+        # If there are multipu source only do one
+        df = df.loc[df[source[0]] == source[1]].drop(source[0], axis=1)
+    id_modes = df[mode].unique()  # Get mode from the lookup table
+    for i in id_modes:
+        # work on one pol/mode at a time.
+        temp_df = (
+            df.loc[df[mode] == i]
+            .drop(mode, axis=1)
+            .sort_values(by=min_energy)
+            .reset_index()
+        )
+        look_up_table[i] = {}
+        look_up_table[i]["Energy"] = {}
+        look_up_table[i]["Energy"]["Limits"] = {
+            "Minimum": temp_df.iloc[0][min_energy],
+            "Maximum": temp_df.iloc[-1][max_energy],
+        }
+
+        for index, row in temp_df.iterrows():
+            poly = np.poly1d(row.values[::-1][:poly_deg])
+            look_up_table[i]["Energy"][index] = {
+                "Energy": row[max_energy],
+                "poly": poly,
+            }
+
+    return look_up_table
