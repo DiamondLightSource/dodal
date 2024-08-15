@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.i03 &#8212; dodal 1.29.5.dev23+gf8c493e4d documentation</title>
+    <title>dodal.beamlines.i03 &#8212; dodal 1.29.5.dev24+g608d913cd documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=890f598b"></script>
+    <script src="../../../_static/documentation_options.js?v=651adfcd"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -497,7 +497,6 @@ document.write(`
 <span class="kn">from</span> <span class="nn">dodal.devices.motors</span> <span class="kn">import</span> <span class="n">XYZPositioner</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.oav.oav_detector</span> <span class="kn">import</span> <span class="n">OAV</span><span class="p">,</span> <span class="n">OAVConfigParams</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.oav.pin_image_recognition</span> <span class="kn">import</span> <span class="n">PinTipDetection</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.qbpm1</span> <span class="kn">import</span> <span class="n">QBPM1</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.robot</span> <span class="kn">import</span> <span class="n">BartRobot</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.s4_slit_gaps</span> <span class="kn">import</span> <span class="n">S4SlitGaps</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.smargon</span> <span class="kn">import</span> <span class="n">Smargon</span>
@@ -584,20 +583,6 @@ document.write(`
         <span class="s2">&quot;-MO-DCM-01:&quot;</span><span class="p">,</span>
         <span class="n">wait_for_connection</span><span class="p">,</span>
         <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
-    <span class="p">)</span></div>
-
-
-
-<div class="viewcode-block" id="qbpm1">
-<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.qbpm1">[docs]</a>
-<span class="nd">@skip_device</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">BL</span> <span class="o">==</span> <span class="s2">&quot;s03&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">qbpm1</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QBPM1</span><span class="p">:</span>
-    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
-        <span class="n">device_factory</span><span class="o">=</span><span class="n">QBPM1</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;qbpm1&quot;</span><span class="p">,</span>
-        <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="n">wait</span><span class="o">=</span><span class="n">wait_for_connection</span><span class="p">,</span>
-        <span class="n">fake</span><span class="o">=</span><span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 

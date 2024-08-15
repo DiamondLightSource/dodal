@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.beamlines.i03 &#8212; dodal 1.29.5.dev23+gf8c493e4d documentation</title>
+    <title>dodal.beamlines.i03 &#8212; dodal 1.29.5.dev24+g608d913cd documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../_static/documentation_options.js?v=890f598b"></script>
+    <script src="../../_static/documentation_options.js?v=651adfcd"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -630,10 +630,6 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.p99.sample_stage.html">dodal.devices.p99.sample_stage</a></li>
 </ul>
 </details></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.qbpm1.html">dodal.devices.qbpm1</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.qbpm1.QBPM1.html">dodal.devices.qbpm1.QBPM1</a></li>
-</ul>
-</details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.robot.html">dodal.devices.robot</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.robot.BartRobot.html">dodal.devices.robot.BartRobot</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.robot.PinMounted.html">dodal.devices.robot.PinMounted</a></li>
@@ -875,55 +871,52 @@ document.write(`
 <tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i03.pin_tip_detection" title="dodal.beamlines.i03.pin_tip_detection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pin_tip_detection</span></code></a>([wait_for_connection, ...])</p></td>
 <td><p>Get the i03 pin tip detection device, instantiate it if it hasn't already been.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i03.qbpm1" title="dodal.beamlines.i03.qbpm1"><code class="xref py py-obj docutils literal notranslate"><span class="pre">qbpm1</span></code></a>([wait_for_connection, fake_with_ophyd_sim])</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i03.robot" title="dodal.beamlines.i03.robot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">robot</span></code></a>([wait_for_connection, fake_with_ophyd_sim])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i03.robot" title="dodal.beamlines.i03.robot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">robot</span></code></a>([wait_for_connection, fake_with_ophyd_sim])</p></td>
 <td><p>Get the i03 robot device, instantiate it if it hasn't already been.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i03.s4_slit_gaps" title="dodal.beamlines.i03.s4_slit_gaps"><code class="xref py py-obj docutils literal notranslate"><span class="pre">s4_slit_gaps</span></code></a>([wait_for_connection, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i03.s4_slit_gaps" title="dodal.beamlines.i03.s4_slit_gaps"><code class="xref py py-obj docutils literal notranslate"><span class="pre">s4_slit_gaps</span></code></a>([wait_for_connection, ...])</p></td>
 <td><p>Get the i03 s4_slit_gaps device, instantiate it if it hasn't already been.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i03.sample_shutter" title="dodal.beamlines.i03.sample_shutter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sample_shutter</span></code></a>([wait_for_connection, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i03.sample_shutter" title="dodal.beamlines.i03.sample_shutter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sample_shutter</span></code></a>([wait_for_connection, ...])</p></td>
 <td><p>Get the i03 sample shutter device, instantiate it if it hasn't already been.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i03.smargon" title="dodal.beamlines.i03.smargon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">smargon</span></code></a>([wait_for_connection, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i03.smargon" title="dodal.beamlines.i03.smargon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">smargon</span></code></a>([wait_for_connection, ...])</p></td>
 <td><p>Get the i03 Smargon device, instantiate it if it hasn't already been.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i03.synchrotron" title="dodal.beamlines.i03.synchrotron"><code class="xref py py-obj docutils literal notranslate"><span class="pre">synchrotron</span></code></a>([wait_for_connection, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i03.synchrotron" title="dodal.beamlines.i03.synchrotron"><code class="xref py py-obj docutils literal notranslate"><span class="pre">synchrotron</span></code></a>([wait_for_connection, ...])</p></td>
 <td><p>Get the i03 synchrotron device, instantiate it if it hasn't already been.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i03.thawer" title="dodal.beamlines.i03.thawer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">thawer</span></code></a>([wait_for_connection, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i03.thawer" title="dodal.beamlines.i03.thawer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">thawer</span></code></a>([wait_for_connection, ...])</p></td>
 <td><p>Get the i03 thawer, instantiate it if it hasn't already been.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i03.undulator" title="dodal.beamlines.i03.undulator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">undulator</span></code></a>([wait_for_connection, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i03.undulator" title="dodal.beamlines.i03.undulator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">undulator</span></code></a>([wait_for_connection, ...])</p></td>
 <td><p>Get the i03 undulator device, instantiate it if it hasn't already been.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i03.undulator_dcm" title="dodal.beamlines.i03.undulator_dcm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">undulator_dcm</span></code></a>([wait_for_connection, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i03.undulator_dcm" title="dodal.beamlines.i03.undulator_dcm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">undulator_dcm</span></code></a>([wait_for_connection, ...])</p></td>
 <td><p>Get the i03 undulator DCM device, instantiate it if it hasn't already been.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i03.vfm" title="dodal.beamlines.i03.vfm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vfm</span></code></a>([wait_for_connection, fake_with_ophyd_sim])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i03.vfm" title="dodal.beamlines.i03.vfm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vfm</span></code></a>([wait_for_connection, fake_with_ophyd_sim])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i03.vfm_mirror_voltages" title="dodal.beamlines.i03.vfm_mirror_voltages"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vfm_mirror_voltages</span></code></a>([wait_for_connection, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i03.vfm_mirror_voltages" title="dodal.beamlines.i03.vfm_mirror_voltages"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vfm_mirror_voltages</span></code></a>([wait_for_connection, ...])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i03.webcam" title="dodal.beamlines.i03.webcam"><code class="xref py py-obj docutils literal notranslate"><span class="pre">webcam</span></code></a>([wait_for_connection, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i03.webcam" title="dodal.beamlines.i03.webcam"><code class="xref py py-obj docutils literal notranslate"><span class="pre">webcam</span></code></a>([wait_for_connection, ...])</p></td>
 <td><p>Get the i03 webcam, instantiate it if it hasn't already been.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i03.xbpm_feedback" title="dodal.beamlines.i03.xbpm_feedback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xbpm_feedback</span></code></a>([wait_for_connection, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i03.xbpm_feedback" title="dodal.beamlines.i03.xbpm_feedback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xbpm_feedback</span></code></a>([wait_for_connection, ...])</p></td>
 <td><p>Get the i03 XBPM feeback device, instantiate it if it hasn't already been.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i03.xspress3mini" title="dodal.beamlines.i03.xspress3mini"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xspress3mini</span></code></a>([wait_for_connection, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i03.xspress3mini" title="dodal.beamlines.i03.xspress3mini"><code class="xref py py-obj docutils literal notranslate"><span class="pre">xspress3mini</span></code></a>([wait_for_connection, ...])</p></td>
 <td><p>Get the i03 Xspress3Mini device, instantiate it if it hasn't already been.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i03.zebra" title="dodal.beamlines.i03.zebra"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zebra</span></code></a>([wait_for_connection, fake_with_ophyd_sim])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i03.zebra" title="dodal.beamlines.i03.zebra"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zebra</span></code></a>([wait_for_connection, fake_with_ophyd_sim])</p></td>
 <td><p>Get the i03 zebra device, instantiate it if it hasn't already been.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i03.zebra_fast_grid_scan" title="dodal.beamlines.i03.zebra_fast_grid_scan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zebra_fast_grid_scan</span></code></a>([wait_for_connection, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i03.zebra_fast_grid_scan" title="dodal.beamlines.i03.zebra_fast_grid_scan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zebra_fast_grid_scan</span></code></a>([wait_for_connection, ...])</p></td>
 <td><p>Get the i03 zebra_fast_grid_scan device, instantiate it if it hasn't already been.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i03.zocalo" title="dodal.beamlines.i03.zocalo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zocalo</span></code></a>([wait_for_connection, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i03.zocalo" title="dodal.beamlines.i03.zocalo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">zocalo</span></code></a>([wait_for_connection, ...])</p></td>
 <td><p>Get the i03 ZocaloResults device, instantiate it if it hasn't already been.</p></td>
 </tr>
 </tbody>
@@ -981,22 +974,6 @@ If this is called when already instantiated in i03, it will return the existing 
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.dcm.DCM.html#dodal.devices.dcm.DCM" title="dodal.devices.dcm.DCM"><code class="xref py py-class docutils literal notranslate"><span class="pre">DCM</span></code></a></span></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="dodal.beamlines.i03.qbpm1">
-<span class="sig-prename descclassname"><span class="pre">dodal.beamlines.i03.</span></span><span class="sig-name descname"><span class="pre">qbpm1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wait_for_connection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fake_with_ophyd_sim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="dodal.devices.qbpm1.QBPM1.html#dodal.devices.qbpm1.QBPM1" title="dodal.devices.qbpm1.QBPM1"><span class="pre">QBPM1</span></a></span></span><a class="reference internal" href="../../_modules/dodal/beamlines/i03.html#qbpm1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.beamlines.i03.qbpm1" title="Link to this definition">#</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>wait_for_connection</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
-<li><p><strong>fake_with_ophyd_sim</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.qbpm1.QBPM1.html#dodal.devices.qbpm1.QBPM1" title="dodal.devices.qbpm1.QBPM1"><code class="xref py py-class docutils literal notranslate"><span class="pre">QBPM1</span></code></a></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1520,7 +1497,6 @@ If this is called when already instantiated in i03, it will return the existing 
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.beamlines.i03.aperture_scatterguard"><code class="docutils literal notranslate"><span class="pre">aperture_scatterguard()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.beamlines.i03.attenuator"><code class="docutils literal notranslate"><span class="pre">attenuator()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.beamlines.i03.dcm"><code class="docutils literal notranslate"><span class="pre">dcm()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.beamlines.i03.qbpm1"><code class="docutils literal notranslate"><span class="pre">qbpm1()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.beamlines.i03.vfm"><code class="docutils literal notranslate"><span class="pre">vfm()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.beamlines.i03.vfm_mirror_voltages"><code class="docutils literal notranslate"><span class="pre">vfm_mirror_voltages()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.beamlines.i03.backlight"><code class="docutils literal notranslate"><span class="pre">backlight()</span></code></a></li>

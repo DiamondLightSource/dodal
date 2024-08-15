@@ -37,7 +37,6 @@
    dodal.devices.oav
    dodal.devices.p45
    dodal.devices.p99
-   dodal.devices.qbpm1
    dodal.devices.robot
    dodal.devices.s4_slit_gaps
    dodal.devices.scatterguard
