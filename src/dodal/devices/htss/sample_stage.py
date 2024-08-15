@@ -3,7 +3,7 @@ from ophyd_async.epics.motion import Motor
 
 
 class TrainingRigSampleStage(StandardReadable):
-    def __init__(self, prefix: str, name: str):
+    def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
             self.x = Motor(prefix + "X")
             self.theta = Motor(prefix + "A")
