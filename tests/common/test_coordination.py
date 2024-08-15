@@ -16,7 +16,7 @@ def test_group_uid(group: str):
 
 
 def test_type_checking_ignores_inject():
-    def example_function(x: Movable = inject("foo")) -> MsgGenerator:
+    def example_function(x: Movable = inject("foo")) -> MsgGenerator:  # noqa: B008
         yield from {}
 
     # These asserts are sanity checks

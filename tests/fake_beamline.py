@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 from bluesky.protocols import Readable
 from ophyd import EpicsMotor
 
-from dodal.devices.cryostream import Cryo
+from dodal.devices.cryostream import CryoStream
 
 
 def device_a() -> Readable:
@@ -14,7 +14,7 @@ def device_b() -> EpicsMotor:
     return _mock_with_name("motor")
 
 
-def device_c() -> Cryo:
+def device_c() -> CryoStream:
     return _mock_with_name("cryo")
 
 
