@@ -100,7 +100,7 @@ class Undulator(StandardReadable, Movable):
     @AsyncStatus.wrap
     async def set(self, value: float):
         """
-        set the undulator gap to a given ENERGY
+        Set the undulator gap to a given energy in keV
 
         Args:
             value: energy in keV
@@ -114,22 +114,22 @@ class Undulator(StandardReadable, Movable):
         if access_level is UndulatorGapAccess.DISABLED and not TEST_MODE:
             raise AccessError("Undulator gap access is disabled. Contact Control Room")
         LOGGER.info(f"Setting undulator gap to {energy_kev:.2f} kev")
-        gap_to_match_dcm_energy = await self._gap_to_match_dcm_energy(energy_kev)
+        target_gap = await self._get_gap_to_match_energy(energy_kev)
 
         # Check if undulator gap is close enough to the value from the DCM
         current_gap = await self.current_gap.get_value()
         tolerance = await self.gap_discrepancy_tolerance_mm.get_value()
-        difference = abs(gap_to_match_dcm_energy - current_gap)
+        difference = abs(target_gap - current_gap)
         if difference > tolerance:
             LOGGER.info(
                 f"Undulator gap mismatch. {difference:.3f}mm is outside tolerance.\
-                Moving gap to nominal value, {gap_to_match_dcm_energy:.3f}mm"
+                Moving gap to nominal value, {target_gap:.3f}mm"
             )
             if not TEST_MODE:
                 # Only move if the gap is sufficiently different to the value from the
                 # DCM lookup table AND we're not in TEST_MODE
                 await self.gap_motor.set(
-                    gap_to_match_dcm_energy,
+                    target_gap,
                     timeout=STATUS_TIMEOUT_S,
                 )
             else:
@@ -140,8 +140,11 @@ class Undulator(StandardReadable, Movable):
                 f"{energy_kev}, no need to ask it to move"
             )
 
-    async def _gap_to_match_dcm_energy(self, energy_kev: float) -> float:
-        # from lookup table a get a 2d np.array converting energies to undulator gap distance
+    async def _get_gap_to_match_energy(self, energy_kev: float) -> float:
+        """
+        get a 2d np.array from lookup table that
+        converts energies to undulator gap distance
+        """
         energy_to_distance_table: np.ndarray = await energy_distance_table(
             self.id_gap_lookup_table_path
         )

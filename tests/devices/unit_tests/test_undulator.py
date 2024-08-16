@@ -115,13 +115,12 @@ async def test_length_not_propagated_if_not_supplied():
 
 
 @pytest.mark.parametrize(
-    "dcm_energy, expected_output", [(5730, 5.4606), (7200, 6.045), (9000, 6.404)]
+    "energy, expected_output", [(5730, 5.4606), (7200, 6.045), (9000, 6.404)]
 )
-def test_correct_closest_distance_to_energy_from_table(dcm_energy, expected_output):
+def test_correct_closest_distance_to_energy_from_table(energy, expected_output):
     energy_to_distance_table = np.array([[5700, 5.4606], [7000, 6.045], [9700, 6.404]])
     assert (
-        _get_closest_gap_for_energy(dcm_energy, energy_to_distance_table)
-        == expected_output
+        _get_closest_gap_for_energy(energy, energy_to_distance_table) == expected_output
     )
 
 
@@ -130,5 +129,4 @@ async def test_when_gap_access_is_disabled_set_energy_then_error_is_raised(
 ):
     set_mock_value(undulator.gap_access, UndulatorGapAccess.DISABLED)
     with pytest.raises(AccessError):
-        # AccessError("Undulator gap access is disabled. Contact Control Room")
         await undulator.set(5)
