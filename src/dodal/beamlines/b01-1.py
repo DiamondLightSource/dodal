@@ -1,14 +1,12 @@
 from ophyd_async.core import StaticDirectoryProvider
-from ophyd_async.panda import HDFPanda
 from ophyd_async.epics.areadetector import AravisDetector
+from ophyd_async.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
     device_instantiation,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.webcam import Webcam
 from dodal.log import set_beamline as set_log_beamline
-from dodal.utils import get_beamline_name
 
 # BL = get_beamline_name("BL01C")
 BL = "c01"
