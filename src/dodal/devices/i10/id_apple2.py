@@ -1,5 +1,6 @@
 import asyncio
 import csv
+import warnings
 from pathlib import Path
 
 import numpy as np
@@ -36,7 +37,7 @@ class I10Apple2(StandardReadable, Movable):
         mode: str = "Mode",
         min_energy: str = "MinEnergy",
         max_energy: str = "MaxEnergy",
-        poly_deg: int = 8,
+        poly_deg: list | None = None,
         name: str = "",
     ) -> None:
         with self.add_children_as_readables():
@@ -123,19 +124,19 @@ class I10Apple2(StandardReadable, Movable):
         return gap_poly(new_energy), phase_poly(new_energy)
 
     def _get_poly(self, new_energy, lookup_table) -> np.poly1d:
-        print(lookup_table.keys())
         if (
-            new_energy < lookup_table[self.pol]["Energy"]["Limits"]["Minimum"]
-            or new_energy > lookup_table[self.pol]["Energy"]["Limits"]["Maximum"]
+            new_energy < lookup_table[self.pol]["Limit"]["Minimum"]
+            or new_energy > lookup_table[self.pol]["Limit"]["Maximum"]
         ):
             raise ValueError(
                 "Demanding energy must lie between {} and {} eV!".format(
-                    lookup_table[self.pol]["Energy"]["Limits"]["Minimum"],
-                    lookup_table[self.pol]["Energy"]["Limits"]["Maximum"],
+                    lookup_table[self.pol]["Limit"]["Minimum"],
+                    lookup_table[self.pol]["Limit"]["Maximum"],
                 )
             )
         else:
-            for energy_range in lookup_table[self.pol]["Energy"]["Energies"].values():
+            for energy_range in lookup_table[self.pol]["Energies"].values():
+                print(energy_range)
                 if (
                     new_energy >= energy_range["Low"]
                     and new_energy < energy_range["High"]
@@ -191,39 +192,53 @@ def convert_csv_to_lookup(
         reader = sorted(reader, key=lambda d: float(d[min_energy]))
         for row in reader:
             if source is not None:
-                # If there are multipu source only do one
+                # If there are multiple source only do one
                 if row[source[0]] == source[1]:
                     if row[mode] not in pol:
                         pol.append(row[mode])
                         look_up_table[row[mode]] = {}
                         look_up_table[row[mode]]["Energies"] = {}
-                        look_up_table[row[mode]]["Energies"]["Minimum"] = float(
+                        look_up_table[row[mode]]["Limit"] = {}
+                        look_up_table[row[mode]]["Limit"]["Minimum"] = float(
                             row[min_energy]
                         )
-                        look_up_table[row[mode]]["Energies"]["Maximum"] = float(
+                        look_up_table[row[mode]]["Limit"]["Maximum"] = float(
                             row[max_energy]
                         )
-                        # look_up_table[row[mode]]["Energy"]["Energies"] = {}
-
+                    # calculate polynomial energy to gap/phase
                     cof = [float(row[x]) for x in poly_deg]
                     poly = np.poly1d(cof)
-
+                    energy_range = np.arange(
+                        float(row[min_energy]), float(row[max_energy]), 0.5
+                    )
+                    y = poly(energy_range)
+                    # calculate polynomial gap/phase to energy
+                    with warnings.catch_warnings():  # the fitting warning can be ignored as we checking the fit later
+                        warnings.filterwarnings(
+                            "ignore", "Polyfit may be poorly conditioned"
+                        )
+                        inverse_poly = np.poly1d(
+                            np.polyfit(x=y, y=energy_range, deg=len(cof))
+                        )
+                    inverse_y = inverse_poly(y)
+                    # check fit
+                    np.testing.assert_almost_equal(energy_range, inverse_y, 0)
                     look_up_table[row[mode]]["Energies"][row[min_energy]] = {
                         "Low": float(row[min_energy]),
                         "High": float(row[max_energy]),
                         "Poly": poly,
+                        "Inverse poly": inverse_poly,
                     }
-                    print(look_up_table[row[mode]]["Energies"]["Minimum"])
-                    if look_up_table[row[mode]]["Energies"]["Minimum"] > float(
+                    if look_up_table[row[mode]]["Limit"]["Minimum"] > float(
                         row[min_energy]
                     ):
-                        look_up_table[row[mode]]["Energies"]["Minimum"] = float(
+                        look_up_table[row[mode]]["Limit"]["Minimum"] = float(
                             row[min_energy]
                         )
-                    if look_up_table[row[mode]]["Energies"]["Maximum"] < float(
+                    if look_up_table[row[mode]]["Limit"]["Maximum"] < float(
                         row[min_energy]
                     ):
-                        look_up_table[row[mode]]["Energies"]["Maximum"] = float(
+                        look_up_table[row[mode]]["Limit"]["Maximum"] = float(
                             row[max_energy]
                         )
     return look_up_table
