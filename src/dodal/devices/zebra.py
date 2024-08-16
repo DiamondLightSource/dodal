@@ -94,7 +94,7 @@ class ArmingDevice(StandardReadable):
     """A useful device that can abstract some of the logic of arming.
     Allows a user to just call arm.set(ArmDemand.ARM)"""
 
-    TIMEOUT = 3
+    TIMEOUT: float = 3
 
     def __init__(self, prefix: str, name: str = "") -> None:
         self.arm_set = epics_signal_rw(float, prefix + "PC_ARM")
