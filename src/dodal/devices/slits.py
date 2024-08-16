@@ -21,12 +21,13 @@ class SlitWithDefiningSlitOpening(StandardReadable):
     """
     these are unlikely to be moved during a scan
     Only HDSO and VDSO are recorded in the scan
+    DSO means Defining Slit Opening
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
             self.x = Motor(prefix + "X")
             self.y = Motor(prefix + "Y")
-            self.horizontal_defining_slit_opening = Motor(prefix + "HDSO")
-            self.vertical_definiting_slit_opening = Motor(prefix + "VDSO")
+            self.x_gap = Motor(prefix + "HDSO")
+            self.y_gap = Motor(prefix + "VDSO")
         super().__init__(name)

@@ -237,7 +237,7 @@ def slits_3(
 def slits_4(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
-) -> Slits:
+) -> SlitWithDefiningSlitOpening:
     return device_instantiation(
         SlitWithDefiningSlitOpening,
         "slits_4",
