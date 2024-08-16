@@ -17,15 +17,16 @@ class Slits(StandardReadable):
         super().__init__(name)
 
 
-class SpecialSlitsi22(StandardReadable):
+class SlitWithDefiningSlitOpening(StandardReadable):
     """
     these are unlikely to be moved during a scan
+    Only HDSO and VDSO are recorded in the scan
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
             self.x = Motor(prefix + "X")
             self.y = Motor(prefix + "Y")
-            self.horizontal_dso = Motor(prefix + "HDSO")
-            self.vertical_dso = Motor(prefix + "VDSO")
+            self.horizontal_defining_slit_opening = Motor(prefix + "HDSO")
+            self.vertical_definiting_slit_opening = Motor(prefix + "VDSO")
         super().__init__(name)
