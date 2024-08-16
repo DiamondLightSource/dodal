@@ -109,38 +109,40 @@ async def test_reading_pjumpcell_includes_read_fields_pump(
 async def test_reading_pjumpcell_includes_read_fields_transducers(
     cell: PressureJumpCell,
 ):
-    set_mock_value(cell.pressure_transducer_1.omron_pressure, 1001)
-    set_mock_value(cell.pressure_transducer_1.omron_voltage, 2.51)
-    set_mock_value(cell.pressure_transducer_1.beckhoff_pressure, 1001.1)
-    set_mock_value(cell.pressure_transducer_1.beckhoff_voltage, 2.51)
-    set_mock_value(cell.pressure_transducer_2.omron_pressure, 1002)
-    set_mock_value(cell.pressure_transducer_2.omron_voltage, 2.52)
-    set_mock_value(cell.pressure_transducer_2.beckhoff_pressure, 1002.2)
-    set_mock_value(cell.pressure_transducer_2.beckhoff_voltage, 2.52)
-    set_mock_value(cell.pressure_transducer_3.omron_pressure, 1003)
-    set_mock_value(cell.pressure_transducer_3.omron_voltage, 2.53)
-    set_mock_value(cell.pressure_transducer_3.beckhoff_pressure, 1003.3)
-    set_mock_value(cell.pressure_transducer_3.beckhoff_voltage, 2.53)
+    set_mock_value(cell.pressure_transducers[1].omron_pressure, 1001)
+    set_mock_value(cell.pressure_transducers[1].omron_voltage, 2.51)
+    set_mock_value(cell.pressure_transducers[1].beckhoff_pressure, 1001.1)
+    set_mock_value(cell.pressure_transducers[1].beckhoff_voltage, 2.51)
+
+    set_mock_value(cell.pressure_transducers[2].omron_pressure, 1002)
+    set_mock_value(cell.pressure_transducers[2].omron_voltage, 2.52)
+    set_mock_value(cell.pressure_transducers[2].beckhoff_pressure, 1002.2)
+    set_mock_value(cell.pressure_transducers[2].beckhoff_voltage, 2.52)
+
+    set_mock_value(cell.pressure_transducers[3].omron_pressure, 1003)
+    set_mock_value(cell.pressure_transducers[3].omron_voltage, 2.53)
+    set_mock_value(cell.pressure_transducers[3].beckhoff_pressure, 1003.3)
+    set_mock_value(cell.pressure_transducers[3].beckhoff_voltage, 2.53)
 
     await assert_reading(
-        cell.pressure_transducer_1,
+        cell.pressure_transducers[1],
         {
-            "pjump-pressure_transducer_1-omron_pressure": {
+            "pjump-pressure_transducers-1-omron_pressure": {
                 "value": 1001,
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
-            "pjump-pressure_transducer_1-omron_voltage": {
+            "pjump-pressure_transducers-1-omron_voltage": {
                 "value": 2.51,
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
-            "pjump-pressure_transducer_1-beckhoff_pressure": {
+            "pjump-pressure_transducers-1-beckhoff_pressure": {
                 "value": 1001.1,
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
-            "pjump-pressure_transducer_1-beckhoff_voltage": {
+            "pjump-pressure_transducers-1-beckhoff_voltage": {
                 "value": 2.51,
                 "timestamp": ANY,
                 "alarm_severity": 0,
@@ -148,24 +150,24 @@ async def test_reading_pjumpcell_includes_read_fields_transducers(
         },
     )
     await assert_reading(
-        cell.pressure_transducer_2,
+        cell.pressure_transducers[2],
         {
-            "pjump-pressure_transducer_2-omron_pressure": {
+            "pjump-pressure_transducers-2-omron_pressure": {
                 "value": 1002,
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
-            "pjump-pressure_transducer_2-omron_voltage": {
+            "pjump-pressure_transducers-2-omron_voltage": {
                 "value": 2.52,
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
-            "pjump-pressure_transducer_2-beckhoff_pressure": {
+            "pjump-pressure_transducers-2-beckhoff_pressure": {
                 "value": 1002.2,
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
-            "pjump-pressure_transducer_2-beckhoff_voltage": {
+            "pjump-pressure_transducers-2-beckhoff_voltage": {
                 "value": 2.52,
                 "timestamp": ANY,
                 "alarm_severity": 0,
@@ -173,24 +175,24 @@ async def test_reading_pjumpcell_includes_read_fields_transducers(
         },
     )
     await assert_reading(
-        cell.pressure_transducer_3,
+        cell.pressure_transducers[3],
         {
-            "pjump-pressure_transducer_3-omron_pressure": {
+            "pjump-pressure_transducers-3-omron_pressure": {
                 "value": 1003,
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
-            "pjump-pressure_transducer_3-omron_voltage": {
+            "pjump-pressure_transducers-3-omron_voltage": {
                 "value": 2.53,
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
-            "pjump-pressure_transducer_3-beckhoff_pressure": {
+            "pjump-pressure_transducers-3-beckhoff_pressure": {
                 "value": 1003.3,
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
-            "pjump-pressure_transducer_3-beckhoff_voltage": {
+            "pjump-pressure_transducers-3-beckhoff_voltage": {
                 "value": 2.53,
                 "timestamp": ANY,
                 "alarm_severity": 0,
@@ -258,7 +260,7 @@ async def test_reading_pjumpcell_includes_read_fields(
     set_mock_value(cell.cell_temperature, 12.3)
 
     await assert_reading(
-        cell,
+        cell.cell_temperature,
         {
             "pjump-cell_temperature": {
                 "value": 12.3,
