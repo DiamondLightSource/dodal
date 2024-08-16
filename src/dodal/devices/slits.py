@@ -26,8 +26,8 @@ class SlitWithDefiningSlitOpening(StandardReadable):
 
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
-            self.x = Motor(prefix + "X")
-            self.y = Motor(prefix + "Y")
             self.x_gap = Motor(prefix + "HDSO")
             self.y_gap = Motor(prefix + "VDSO")
+            self.x_centre = Motor(prefix + "X")
+            self.y_centre = Motor(prefix + "Y")
         super().__init__(name)
