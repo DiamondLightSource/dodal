@@ -18,7 +18,6 @@ static_directory_provider = StaticDirectoryProvider("/tmp/bluesky_test_static")
 # set_directory_provider(PandASubdirectoryProvider())
 
 
-
 def panda(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> HDFPanda:
@@ -54,16 +53,15 @@ def panda(
 
 
 def manta(
-     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
- ) -> AravisDetector:
-     return device_instantiation(
-         AravisDetector,
-         "manta",
-         "-DI-DCAM-02:",
-         wait_for_connection,
-         fake_with_ophyd_sim,
-         directory_provider=static_directory_provider,
-         drv_suffix="CAM:",
-         hdf_suffix="HDF5:",
-     )
-
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> AravisDetector:
+    return device_instantiation(
+        AravisDetector,
+        "manta",
+        "-DI-DCAM-02:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        directory_provider=static_directory_provider,
+        drv_suffix="CAM:",
+        hdf_suffix="HDF5:",
+    )
