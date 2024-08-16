@@ -1,8 +1,8 @@
 import asyncio
+import csv
 from pathlib import Path
 
 import numpy as np
-import pandas as pd
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
@@ -168,36 +168,62 @@ def convert_csv_to_lookup(
     mode: str = "Mode",
     min_energy: str = "MinEnergy",
     max_energy: str = "MaxEnergy",
-    poly_deg: int = 8,
+    poly_deg: list | None = None,
 ):
-    df = pd.read_csv(file)
+    if poly_deg is None:
+        poly_deg = [
+            "7th-order",
+            "6th-order",
+            "5th-order",
+            "4th-order",
+            "3rd-order",
+            "2nd-order",
+            "1st-order",
+            "b",
+        ]
     look_up_table = {}
-    if source is not None:
-        # If there are multipu source only do one
-        df = df.loc[df[source[0]] == source[1]].drop(source[0], axis=1)
-    id_modes = df[mode].unique()  # Get mode from the lookup table
-    for i in id_modes:
-        # work on one pol/mode at a time.
-        temp_df = (
-            df.loc[df[mode] == i]
-            .drop(mode, axis=1)
-            .sort_values(by=min_energy)
-            .reset_index()
-        )
-        look_up_table[i] = {}
-        look_up_table[i]["Energy"] = {}
-        look_up_table[i]["Energy"]["Limits"] = {
-            "Minimum": temp_df.iloc[0][min_energy],
-            "Maximum": temp_df.iloc[-1][max_energy],
-        }
-        look_up_table[i]["Energy"]["Energies"] = {}
-        for index, row in temp_df.iterrows():
-            poly = np.poly1d(row.values[::-1][:poly_deg])
+    pol = []
+    with open(
+        "/workspaces/dodal/tests/devices/i10/lookupTables/IDEnergy2GapCalibrations.csv",
+        newline="",
+    ) as csvfile:
+        reader = csv.DictReader(csvfile)
+        reader = sorted(reader, key=lambda d: float(d[min_energy]))
+        for row in reader:
+            if source is not None:
+                # If there are multipu source only do one
+                if row[source[0]] == source[1]:
+                    if row[mode] not in pol:
+                        pol.append(row[mode])
+                        look_up_table[row[mode]] = {}
+                        look_up_table[row[mode]]["Energies"] = {}
+                        look_up_table[row[mode]]["Energies"]["Minimum"] = float(
+                            row[min_energy]
+                        )
+                        look_up_table[row[mode]]["Energies"]["Maximum"] = float(
+                            row[max_energy]
+                        )
+                        # look_up_table[row[mode]]["Energy"]["Energies"] = {}
 
-            look_up_table[i]["Energy"]["Energies"][index] = {
-                "Low": row[min_energy],
-                "High": row[max_energy],
-                "Poly": poly,
-            }
+                    cof = [float(row[x]) for x in poly_deg]
+                    poly = np.poly1d(cof)
 
+                    look_up_table[row[mode]]["Energies"][row[min_energy]] = {
+                        "Low": float(row[min_energy]),
+                        "High": float(row[max_energy]),
+                        "Poly": poly,
+                    }
+                    print(look_up_table[row[mode]]["Energies"]["Minimum"])
+                    if look_up_table[row[mode]]["Energies"]["Minimum"] > float(
+                        row[min_energy]
+                    ):
+                        look_up_table[row[mode]]["Energies"]["Minimum"] = float(
+                            row[min_energy]
+                        )
+                    if look_up_table[row[mode]]["Energies"]["Maximum"] < float(
+                        row[min_energy]
+                    ):
+                        look_up_table[row[mode]]["Energies"]["Maximum"] = float(
+                            row[max_energy]
+                        )
     return look_up_table
