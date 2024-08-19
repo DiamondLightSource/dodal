@@ -12,8 +12,8 @@ from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beam
 from dodal.common.beamlines.device_helpers import numbered_slits
 from dodal.common.crystal_metadata import CrystalMetadata
 from dodal.common.visit import DirectoryServiceClient, StaticVisitDirectoryProvider
-from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.i18.diode import Diode
+from dodal.devices.i18.KBMirror import KBMirror
 from dodal.devices.i18.sim_detector import SimDetector
 from dodal.devices.i18.sim_raster_stage import RasterStage
 from dodal.devices.i18.table import Table
@@ -185,9 +185,9 @@ def it(
 def vfm(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
-) -> FocusingMirror:
+) -> KBMirror:
     return device_instantiation(
-        FocusingMirror,
+        KBMirror,
         "vfm",
         "-OP-VFM-01:",
         wait_for_connection,
@@ -195,13 +195,12 @@ def vfm(
     )
 
 
-@skip_device
 def hfm(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
-) -> FocusingMirror:
+) -> KBMirror:
     return device_instantiation(
-        FocusingMirror,
+        KBMirror,
         "hfm",
         "-OP-HFM-01:",
         wait_for_connection,
