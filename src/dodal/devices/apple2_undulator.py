@@ -76,9 +76,13 @@ class UndulatorGap(StandardReadable, Movable):
         self.max_velocity = epics_signal_r(float, prefix + "BLGSETVEL.HOPR")
         self.min_velocity = epics_signal_r(float, prefix + "BLGSETVEL.LOPR")
         # These are gap limit.
-        self.high_limit = epics_signal_r(float, prefix + "BLGAPMTR.HLM")
-        self.low_limit = epics_signal_r(float, prefix + "BLGAPMTR.LLM")
-
+        self.high_limit_travel = epics_signal_r(float, prefix + "BLGAPMTR.HLM")
+        self.low_limit_travel = epics_signal_r(float, prefix + "BLGAPMTR.LLM")
+        split_pv = prefix.split("-")
+        self.fault = epics_signal_r(
+            float,
+            split_pv[0] + "-" + split_pv[1] + "-STAT" + "-" + split_pv[3] + "ANYFAULT",
+        )
         # This is calculated acceleration from speed
         self.acceleration_time = epics_signal_r(float, prefix + "IDGSETACC")
         with self.add_children_as_readables(ConfigSignal):
@@ -93,6 +97,8 @@ class UndulatorGap(StandardReadable, Movable):
 
     @AsyncStatus.wrap
     async def set(self, value) -> None:
+        if await self.fault.get_value() != 0:
+            raise RuntimeError(f"{self.name} is in fault state")
         if await self.gate.get_value() == UndulatorGatestatus.open:
             raise RuntimeError(f"{self.name} is already in motion.")
         await self.user_setpoint.set(value=str(value))
@@ -140,14 +146,13 @@ class UndulatorPhaseMotor(StandardReadable):
             self.motor_egu = epics_signal_r(str, fullPV + ".EGU")
             self.velocity = epics_signal_rw(float, fullPV + ".VELO")
 
-            self.max_velocity = epics_signal_r(float, fullPV + ".VMAX")
-            self.acceleration_time = epics_signal_rw(float, fullPV + ".ACCL")
-            self.precision = epics_signal_r(int, fullPV + ".PREC")
-            self.deadband = epics_signal_r(float, fullPV + ".RDBD")
-            self.motor_done_move = epics_signal_r(int, fullPV + ".DMOV")
-            self.low_limit_travel = epics_signal_rw(float, fullPV + ".LLM")
-            self.high_limit_travel = epics_signal_rw(float, fullPV + ".HLM")
-
+        self.max_velocity = epics_signal_r(float, fullPV + ".VMAX")
+        self.acceleration_time = epics_signal_rw(float, fullPV + ".ACCL")
+        self.precision = epics_signal_r(int, fullPV + ".PREC")
+        self.deadband = epics_signal_r(float, fullPV + ".RDBD")
+        self.motor_done_move = epics_signal_r(int, fullPV + ".DMOV")
+        self.low_limit_travel = epics_signal_rw(float, fullPV + ".LLM")
+        self.high_limit_travel = epics_signal_rw(float, fullPV + ".HLM")
         super().__init__(name=name)
 
 
@@ -172,10 +177,17 @@ class UndlatorPhaseAxes(StandardReadable, Movable):
         # Nothing move until this is set to 1 and it will return to 0 when done
         self.set_move = epics_signal_rw(int, prefix + "BLGSETP")
         self.gate = epics_signal_r(UndulatorGatestatus, prefix + "BLGATE")
+        split_pv = prefix.split("-")
+        self.fault = epics_signal_r(
+            float,
+            split_pv[0] + "-" + split_pv[1] + "-STAT" + "-" + split_pv[3] + "ANYFAULT",
+        )
         super().__init__(name=name)
 
     @AsyncStatus.wrap
     async def set(self, value: Apple2PhasesVal) -> None:
+        if await self.fault.get_value() != 0:
+            raise RuntimeError(f"{self.name} is in fault state")
         if await self.gate.get_value() == UndulatorGatestatus.open:
             raise RuntimeError(f"{self.name} is already in motion.")
         await asyncio.gather(

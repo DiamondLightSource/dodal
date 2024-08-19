@@ -30,6 +30,7 @@ async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
     set_mock_value(mock_id_gap.velocity, 1)
     set_mock_value(mock_id_gap.user_readback, 1)
     set_mock_value(mock_id_gap.user_setpoint, "1")
+    set_mock_value(mock_id_gap.fault, 0)
     return mock_id_gap
 
 
@@ -57,6 +58,7 @@ async def mock_phaseAxes(prefix: str = "BLXX-EA-DET-007:") -> UndlatorPhaseAxes:
     set_mock_value(mock_phaseAxes.top_inner.user_setpoint_demand_readback, 2)
     set_mock_value(mock_phaseAxes.btm_outer.user_setpoint_demand_readback, 2)
     set_mock_value(mock_phaseAxes.btm_inner.user_setpoint_demand_readback, 2)
+    set_mock_value(mock_phaseAxes.fault, 0)
     return mock_phaseAxes
 
 
@@ -104,6 +106,13 @@ async def test_gap_time_out_error(mock_id_gap: UndulatorGap, RE: RunEngine):
         await mock_id_gap.set("2")
 
 
+async def test_gap_status_error(mock_id_gap: UndulatorGap, RE: RunEngine):
+    setValue = Apple2PhasesVal("3", "2", "5", "7")
+    set_mock_value(mock_id_gap.fault, 1.0)
+    with pytest.raises(RuntimeError):
+        await mock_id_gap.set(setValue)
+
+
 async def test_gap_success_scan(mock_id_gap: UndulatorGap, RE: RunEngine):
     callback_on_mock_put(
         mock_id_gap.user_setpoint,
@@ -141,6 +150,13 @@ async def test_phase_time_out_error(mock_phaseAxes: UndlatorPhaseAxes, RE: RunEn
     )
     set_mock_value(mock_phaseAxes.top_inner.velocity, 1000)
     with pytest.raises(TimeoutError):
+        await mock_phaseAxes.set(setValue)
+
+
+async def test_phase_status_error(mock_phaseAxes: UndlatorPhaseAxes, RE: RunEngine):
+    setValue = Apple2PhasesVal("3", "2", "5", "7")
+    set_mock_value(mock_phaseAxes.fault, 1.0)
+    with pytest.raises(RuntimeError):
         await mock_phaseAxes.set(setValue)
 
 
