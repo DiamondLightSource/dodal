@@ -9,6 +9,17 @@ from dodal.devices.training_rig.sample_stage import TrainingRigSampleStage
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import get_beamline_name
 
+#
+# HTSS Training Rig
+#
+# A mock-beamline design that is employed at Diamond, consisting of a pair of
+# simple motors, a GigE camera and a PandA.
+# Since there are multiple rigs whose PVs are identical aside from the prefix,
+# this module can be used for any rig. It should fill in the prefix automatically
+# if the ${BEAMLINE} environment variable is correctly set. It currently defaults
+# to p47.
+#
+
 BL = get_beamline_name("p47")
 set_log_beamline(BL)
 set_utils_beamline(BL)
