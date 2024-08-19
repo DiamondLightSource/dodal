@@ -14,7 +14,7 @@ async def stage() -> TrainingRigSampleStage:
     return stage
 
 
-async def test_reading_fswitch(stage: TrainingRigSampleStage):
+async def test_reading_training_rig(stage: TrainingRigSampleStage):
     reading = await stage.read()
     assert reading == {
         "stage-theta": {
