@@ -35,7 +35,7 @@ def test_convert_csv_to_lookup(fileName, expected_dict, source):
         file=fileName,
         source=source,
     )
+
     with open(expected_dict, "rb") as f:
         loaded_dict = pickle.load(f)
-    print(loaded_dict)
     assert data == loaded_dict

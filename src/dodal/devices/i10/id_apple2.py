@@ -1,6 +1,5 @@
 import asyncio
 import csv
-import warnings
 from pathlib import Path
 
 import numpy as np
@@ -164,7 +163,7 @@ class I10Apple2(StandardReadable, Movable):
 
 
 def convert_csv_to_lookup(
-    file,
+    file: str,
     source: tuple[str, str] | None = None,
     mode: str = "Mode",
     min_energy: str = "MinEnergy",
@@ -185,7 +184,7 @@ def convert_csv_to_lookup(
     look_up_table = {}
     pol = []
     with open(
-        "/workspaces/dodal/tests/devices/i10/lookupTables/IDEnergy2GapCalibrations.csv",
+        file,
         newline="",
     ) as csvfile:
         reader = csv.DictReader(csvfile)
@@ -208,26 +207,10 @@ def convert_csv_to_lookup(
                     # calculate polynomial energy to gap/phase
                     cof = [float(row[x]) for x in poly_deg]
                     poly = np.poly1d(cof)
-                    energy_range = np.arange(
-                        float(row[min_energy]), float(row[max_energy]), 0.5
-                    )
-                    y = poly(energy_range)
-                    # calculate polynomial gap/phase to energy
-                    with warnings.catch_warnings():  # the fitting warning can be ignored as we checking the fit later
-                        warnings.filterwarnings(
-                            "ignore", "Polyfit may be poorly conditioned"
-                        )
-                        inverse_poly = np.poly1d(
-                            np.polyfit(x=y, y=energy_range, deg=len(cof))
-                        )
-                    inverse_y = inverse_poly(y)
-                    # check fit
-                    np.testing.assert_almost_equal(energy_range, inverse_y, 0)
                     look_up_table[row[mode]]["Energies"][row[min_energy]] = {
                         "Low": float(row[min_energy]),
                         "High": float(row[max_energy]),
                         "Poly": poly,
-                        "Inverse poly": inverse_poly,
                     }
                     if look_up_table[row[mode]]["Limit"]["Minimum"] > float(
                         row[min_energy]
