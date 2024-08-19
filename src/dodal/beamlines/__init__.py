@@ -13,10 +13,10 @@ _BEAMLINE_NAME_OVERRIDES = {
     "i13-1": "i13_1",
     "i20-1": "i20_1",
     "s03": "i03",
-    "p46": "htss",
-    "p47": "htss",
-    "p48": "htss",
-    "p49": "htss",
+    "p46": "training_rig",
+    "p47": "training_rig",
+    "p48": "training_rig",
+    "p49": "training_rig",
 }
 
 

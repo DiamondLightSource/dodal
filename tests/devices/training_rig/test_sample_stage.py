@@ -3,7 +3,7 @@ from unittest import mock
 import pytest
 from ophyd_async.core import DeviceCollector
 
-from dodal.devices.htss.sample_stage import TrainingRigSampleStage
+from dodal.devices.training_rig.sample_stage import TrainingRigSampleStage
 
 
 @pytest.fixture
