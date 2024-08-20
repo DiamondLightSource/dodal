@@ -164,10 +164,6 @@ class ApertureScatterguard(StandardReadable, Movable):
                 )
             }
 
-    def reload_positions(self):
-        self._loaded_positions = load_positions_from_beamline_parameters()
-        self._tolerences = load_tolerances_from_beamline_params()
-
     def get_position_from_gda_aperture_name(
         self, gda_aperture_name: AperturePositionGDANames
     ) -> AperturePosition:
