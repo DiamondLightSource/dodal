@@ -20,7 +20,6 @@ from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
 from dodal.devices.i22.fswitch import FSwitch
 from dodal.devices.i22.nxsas import NXSasMetadataHolder, NXSasOAV, NXSasPilatus
-from dodal.devices.i22.NXSasAravis import NXSasAravis
 from dodal.devices.linkam3 import Linkam3
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
@@ -30,14 +29,12 @@ from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
 
 BL = get_beamline_name("i22")
-print("BL NAME: ", BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
 _LAB_NAME = "p38"
 
 IS_LAB = BL == _LAB_NAME
-print("is this lab? : ", IS_LAB)
 
 LINKAM_IS_IN_LAB = False
 # Currently we must hard-code the visit, determining the visit at runtime requires
@@ -64,10 +61,10 @@ set_path_provider(
 @skip_device(lambda: BL == _LAB_NAME)
 def saxs(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> NXSasAravis | NXSasPilatus:
+) -> NXSasOAV | NXSasPilatus:
     if IS_LAB:
         return device_instantiation(
-            NXSasAravis,
+            NXSasOAV,
             "saxs",
             "-DI-DCAM-03:",
             wait_for_connection,
@@ -109,7 +106,7 @@ def saxs(
 
 @skip_device(lambda: BL == _LAB_NAME)
 def synchrotron(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = IS_LAB
 ) -> Synchrotron:
     return device_instantiation(
         Synchrotron,
@@ -124,13 +121,34 @@ def synchrotron(
 def waxs(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> PilatusDetector:
+    if IS_LAB:
+        return device_instantiation(
+            AravisDetector,
+            "waxs",
+            "-DI-DCAM-04:",
+            wait_for_connection,
+            fake_with_ophyd_sim,
+            drv_suffix="DET:",
+            hdf_suffix="HDF5:",
+            metadata_holder=NXSasMetadataHolder(
+                x_pixel_size=(1.72e-1, "mm"),
+                y_pixel_size=(1.72e-1, "mm"),
+                description="Dectris Pilatus3 2M",
+                type="Photon Counting Hybrid Pixel",
+                sensor_material="silicon",
+                sensor_thickness=(0.45, "mm"),
+                distance=(175.4199417092314, "mm"),
+            ),
+            directory_provider=get_directory_provider(),
+        )
+
     return device_instantiation(
-        AravisDetector if IS_LAB else NXSasPilatus,
+        NXSasPilatus,
         "waxs",
-        "-DI-DCAM-04:" if IS_LAB else "-EA-PILAT-03:",
+        "-EA-PILAT-03:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        drv_suffix="DET:" if IS_LAB else "CAM:",
+        drv_suffix="CAM:",
         hdf_suffix="HDF5:",
         metadata_holder=NXSasMetadataHolder(
             x_pixel_size=(1.72e-1, "mm"),
@@ -335,10 +353,9 @@ def fswitch(
     )
 
 
-# Must find which PandA IOC(s) are compatible
 # Must document what PandAs are physically connected to
 # See: https://github.com/bluesky/ophyd-async/issues/284
-@skip_device(lambda: BL == _LAB_NAME)
+@skip_device(lambda: IS_LAB)
 def panda1(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
@@ -353,7 +370,7 @@ def panda1(
     )
 
 
-@skip_device()
+@skip_device(lambda: IS_LAB)
 def panda2(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
@@ -368,7 +385,7 @@ def panda2(
     )
 
 
-@skip_device()
+@skip_device(lambda: IS_LAB)
 def panda3(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
@@ -413,13 +430,10 @@ def oav(
         metadata_holder=None
         if IS_LAB
         else NXSasMetadataHolder(
-            x_pixel_size=(1.72e-1, "mm"),
-            y_pixel_size=(1.72e-1, "mm"),
-            description="Dectris Pilatus3 2M",
-            type="Photon Counting Hybrid Pixel",
-            sensor_material="silicon",
-            sensor_thickness=(0.45, "mm"),
-            distance=(4711.833684146172, "mm"),
+            x_pixel_size=(3.45e-3, "mm"),
+            y_pixel_size=(3.45e-3, "mm"),
+            description="AVT Mako G-507B",
+            distance=(-1.0, "m"),
         ),
         directory_provider=get_path_provider(),
     )
@@ -429,11 +443,18 @@ def oav(
 def linkam(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> Linkam3:
+    if IS_LAB:
+        return device_instantiation(
+            Linkam3,
+            "linkam",
+            "-EA-LINKM-02",
+            wait_for_connection,
+            fake_with_ophyd_sim,
+        )
     return device_instantiation(
         Linkam3,
         "linkam",
-        "-EA-TEMPC-05" if IS_LAB else "-EA-TEMPC-05",
-        # note alternatively -EA-LINKM-02:
+        "-EA-TEMPC-05",
         wait_for_connection,
         fake_with_ophyd_sim,
     )

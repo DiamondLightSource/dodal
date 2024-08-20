@@ -75,20 +75,20 @@ def test_device_creation(RE, module_and_devices_for_beamline):
 
 
 @pytest.mark.parametrize(
-    "mappings",
+    "module_and_devices_for_beamline",
     set({"i22": "p38"}),
     indirect=True,
 )
-def test_lab_version_of_a_beamline(RE, mappings):
+def test_lab_version_of_a_beamline(RE, module_and_devices_for_beamline):
     """
     Ensures that for every lab beamline all device factories are using valid args
     and creating types that conform to Bluesky protocols.
     """
     # todo patch the environment
-    with patch.dict(os.environ, {"BEAMLINE": mappings[1]}):
+    with patch.dict(os.environ, {"BEAMLINE": module_and_devices_for_beamline[1]}):
         module = get_beamline_based_on_environment_variable()
         # get the devices file for the beamline namespace
-        _, devices = get_module_name_by_beamline_name(mappings[0])
+        _, devices = get_module_name_by_beamline_name(module_and_devices_for_beamline[0])
         for device_name, device in devices.items():
             assert device_name in beamline_utils.ACTIVE_DEVICES, (
                 f"No device named {device_name} was created, devices "
