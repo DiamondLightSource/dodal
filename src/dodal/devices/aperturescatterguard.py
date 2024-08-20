@@ -190,22 +190,24 @@ class ApertureScatterguard(StandardReadable, Movable):
     async def set(self, value: InOutAndPosition):
         in_out, position = value
         if in_out == ApertureInOut.OUT:
-            robot_load_y = self._loaded_positions[
+            out_y = self._loaded_positions[
                 AperturePosition.ROBOT_LOAD
             ].location.aperture_y
             if position:
                 location = self._loaded_positions[position].location
                 out_location = ApertureFiveDimensionalLocation(
                     location.aperture_x,
-                    robot_load_y,
+                    out_y,
                     location.aperture_z,
                     location.scatterguard_x,
                     location.scatterguard_y,
                 )
                 return await self._set_raw_unsafe(out_location)
             else:
-                return await self._aperture.y.set(robot_load_y)
-        if position:
+                return await self._aperture.y.set(out_y)
+        elif in_out == ApertureInOut.IN:
+            if not position:
+                raise InvalidApertureMove("Cannot move in without a selected aperture")
             position_detail = self._loaded_positions[position]
             await self._safe_move_within_datacollection_range(position_detail.location)
 
