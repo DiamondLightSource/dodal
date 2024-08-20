@@ -174,6 +174,10 @@ class ApertureScatterguard(StandardReadable, Movable):
             f"Tried to convert unknown aperture name {gda_aperture_name} to a SingleAperturePosition"
         )
 
+    def get_gda_name_for_position(self, position: AperturePosition) -> str:
+        detailed_position = self._loaded_positions[position]
+        return detailed_position.GDA_name
+
     @AsyncStatus.wrap
     async def set(self, value: AperturePosition):
         position = self._loaded_positions[value]

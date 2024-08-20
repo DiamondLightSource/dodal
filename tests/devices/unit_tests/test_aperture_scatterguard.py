@@ -329,14 +329,12 @@ async def test_ap_sg_in_runengine(
 
 async def test_ap_sg_descriptor(
     aperture_in_medium_pos: ApertureScatterguard,
-    RE: RunEngine,
 ):
     description = await aperture_in_medium_pos.describe()
     assert description
 
 
 def test_get_position_from_gda_aperture_name(
-    RE: RunEngine,
     ap_sg: ApertureScatterguard,
 ):
     assert (
@@ -365,3 +363,7 @@ def test_get_position_from_gda_aperture_name(
         ap_sg.get_position_from_gda_aperture_name(
             "VERY TINY APERTURE"  # type: ignore
         )
+
+
+def test_ap_sg_returns_GDA_name_correctly(ap_sg: ApertureScatterguard):
+    assert ap_sg.get_gda_name_for_position(AperturePosition.SMALL) == "SMALL_APERTURE"
