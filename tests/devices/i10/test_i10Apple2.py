@@ -79,7 +79,6 @@ async def mock_id(
             energy_phase_table_path=Path(
                 "tests/devices/i10/lookupTables/IDEnergy2PhaseCalibrations.csv"
             ),
-            pgm=i10_pgm,
         )
         return i10_id
 
@@ -109,7 +108,7 @@ async def mock_id(
         ),
     ],
 )
-def test_convert_csv_to_lookup(fileName, expected_dict, source):
+def test_convert_csv_to_lookup_success(fileName, expected_dict, source):
     data = convert_csv_to_lookup(
         file=fileName,
         source=source,
@@ -118,3 +117,20 @@ def test_convert_csv_to_lookup(fileName, expected_dict, source):
     with open(expected_dict, "rb") as f:
         loaded_dict = pickle.load(f)
     assert data == loaded_dict
+
+
+@pytest.mark.parametrize(
+    "fileName, source",
+    [
+        (
+            "tests/devices/i10/lookupTables/IDEnergy2GapCalibrations.csv",
+            ("Source", "idw"),
+        ),
+    ],
+)
+def test_convert_csv_to_lookup_failed(fileName, source):
+    with pytest.raises(RuntimeError):
+        convert_csv_to_lookup(
+            file=fileName,
+            source=source,
+        )

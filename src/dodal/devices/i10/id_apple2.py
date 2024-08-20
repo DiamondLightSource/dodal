@@ -8,6 +8,7 @@ from ophyd_async.core import (
     AsyncStatus,
     HintedSignal,
     StandardReadable,
+    soft_signal_r_and_setter,
     soft_signal_rw,
     wait_for_value,
 )
@@ -19,9 +20,11 @@ from dodal.devices.apple2_undulator import (
     UndulatorGatestatus,
 )
 from dodal.devices.monochromator import PGM
+from dodal.log import LOGGER
 
 ROW_PHASE_MOTOR_TOLERANCE = 0.004
 MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
+MAXIMUM_GAP_MOTOR_POSITION = 200
 
 
 class I10Apple2(StandardReadable, Movable):
@@ -37,7 +40,6 @@ class I10Apple2(StandardReadable, Movable):
         id_phase: UndlatorPhaseAxes,
         energy_gap_table_path: Path,
         energy_phase_table_path: Path,
-        pgm: PGM,
         source: tuple[str, str] | None = None,
         prefix: str = "",
         mode: str = "Mode",
@@ -49,11 +51,18 @@ class I10Apple2(StandardReadable, Movable):
         with self.add_children_as_readables():
             self.gap = id_gap
             self.phase = id_phase
-            self.pgm = pgm
         with self.add_children_as_readables(HintedSignal):
-            self.polarisation = soft_signal_rw(str, initial_value=None)
+            # Store the polarisation for readback
+            self.polarisation, self._polarisation_set = soft_signal_r_and_setter(
+                str, initial_value=None
+            )
+            # Store the set energy for readback
+            self.energy, self._energy_set = soft_signal_r_and_setter(
+                float, initial_value=None
+            )
 
         super().__init__(name)
+        # The path to the look up table and teh column names expected.
         self.lookup_table_config = {
             "path": {
                 "Gap": energy_gap_table_path,
@@ -72,8 +81,6 @@ class I10Apple2(StandardReadable, Movable):
         self.update_poly()
         self._available_pol = list(self.lookup_tables["Gap"].keys())
         self._pol = None
-        self._detune = 0
-        self.hamonoic = 1
 
     @property
     def pol(self):
@@ -101,37 +108,16 @@ class I10Apple2(StandardReadable, Movable):
             raise ValueError(f"Energy off-set must be float, {value} is given.")
 
     @AsyncStatus.wrap
-    async def _set(self, value: Apple2Val, energy: float) -> None:
-        # Only need to check gap as they phase motors share both fault and gate with gap.
-        if await self.gap.fault.get_value() != 0:
-            raise RuntimeError(f"{self.name} is in fault state")
-        if await self.gap.gate.get_value() == UndulatorGatestatus.open:
-            raise RuntimeError(f"{self.name} is already in motion.")
-        if self.pol == "lh3":
-            self.hamonoic = 3
-        await asyncio.gather(
-            self.phase.top_outer.user_setpoint.set(value=value.top_outer),
-            self.phase.top_inner.user_setpoint.set(value=value.top_inner),
-            self.phase.btm_outer.user_setpoint.set(value=value.btm_outer),
-            self.phase.btm_inner.user_setpoint.set(value=value.btm_inner),
-            self.gap.user_setpoint.set(value=value.gap),
-            self.pgm.energy.set(new_position=self.hamonoic * energy),
-        )
-        timeout = np.max(
-            await asyncio.gather(self.gap.get_timeout(), self.phase.get_timeout())
-        )
-        await self.gap.set_move.set(value=1)
-        await wait_for_value(self.gap.gate, UndulatorGatestatus.close, timeout=timeout)
-
-    @AsyncStatus.wrap
     async def set(self, value: float) -> None:
         if self.pol is None:
+            LOGGER.info("Polarisation not set attempting to read from hardware")
             pol, phase = await self.determinePhaseFromHardware()
             if pol is None:
-                raise ValueError(f"Pol is not set for {self.name}")
+                raise ValueError(f"Pol is not set for {self.name} and ")
             else:
                 self.pol = pol
-        self.polarisation.set(self.pol)
+        LOGGER.info(f"Seting polarisation to {self.pol}")
+        self._polarisation_set(self.pol)
 
         gap, phase = self._get_id_gap_phase(value)
         id_set_val = Apple2Val(
@@ -142,6 +128,30 @@ class I10Apple2(StandardReadable, Movable):
             gap=str(gap),
         )
         await self._set(value=id_set_val, energy=value)
+
+    @AsyncStatus.wrap
+    async def _set(self, value: Apple2Val, energy: float) -> None:
+        # Only need to check gap as the phase motors share both fault and gate with gap.
+        if await self.gap.fault.get_value() != 0:
+            raise RuntimeError(f"{self.name} is in fault state")
+        if await self.gap.gate.get_value() == UndulatorGatestatus.open:
+            raise RuntimeError(f"{self.name} is already in motion.")
+        await asyncio.gather(
+            self.phase.top_outer.user_setpoint.set(value=value.top_outer),
+            self.phase.top_inner.user_setpoint.set(value=value.top_inner),
+            self.phase.btm_outer.user_setpoint.set(value=value.btm_outer),
+            self.phase.btm_inner.user_setpoint.set(value=value.btm_inner),
+            self.gap.user_setpoint.set(value=value.gap),
+        )
+        timeout = np.max(
+            await asyncio.gather(self.gap.get_timeout(), self.phase.get_timeout())
+        )
+        LOGGER.info(
+            f"Moving f{self.name} energy to {energy} with {value}, timeout = {timeout}"
+        )
+        await self.gap.set_move.set(value=1)
+        await wait_for_value(self.gap.gate, UndulatorGatestatus.close, timeout=timeout)
+        self._energy_set(energy)
 
     def _get_id_gap_phase(self, energy) -> tuple[float, float]:
         """
@@ -182,6 +192,7 @@ class I10Apple2(StandardReadable, Movable):
         )
 
     def update_poly(self):
+        LOGGER.info("Updating lookup dictionary from file.")
         for key, path in self.lookup_table_config["path"].items():
             if path.exists():
                 self.lookup_tables[key] = convert_csv_to_lookup(
@@ -264,19 +275,71 @@ class I10Apple2(StandardReadable, Movable):
             phase = rowphase2
             return polarisation, phase
         # UNKNOWN default to LH
+
         polarisation = None
         phase = 0.0
         return (polarisation, phase)
 
 
+class I10Apple2PGM(StandardReadable, Movable):
+    def __init__(self, id: I10Apple2, pgm: PGM, name: str = "") -> None:
+        with self.add_children_as_readables():
+            self.id = id
+            self.pgm = pgm
+            self.harmonicOrder, self._harmonicOrder_set = soft_signal_r_and_setter(
+                float, initial_value=1
+            )
+            self.energy_offset = soft_signal_rw(float, initial_value=0)
+        super().__init__(name)
+
+    @AsyncStatus.wrap
+    async def set(self, value: float) -> None:
+        asyncio.gather(
+            self.id.set(value=value + await self.energy_offset.get_value()),
+            self.pgm.energy.set(value * await self.harmonicOrder.get_value()),
+        )
+
+
+class I10Apple2Pol(StandardReadable, Movable):
+    def __init__(self, id: I10Apple2, name: str = "") -> None:
+        with self.add_children_as_readables():
+            self.id = id
+        super().__init__(name)
+
+    @AsyncStatus.wrap
+    async def set(self, value: str) -> None:
+        self.id.pol = value  # change polarisation.
+        self.id.set(await self.id.energy.get_value())  # Move id to new polarisation
+
+
 def convert_csv_to_lookup(
     file: str,
-    source: tuple[str, str] | None = None,
+    source: tuple[str, str],
     mode: str = "Mode",
     min_energy: str = "MinEnergy",
     max_energy: str = "MaxEnergy",
     poly_deg: list | None = None,
 ):
+    """
+    Convert csv to a dictionary that can be read by Apple2 ID device.
+
+    Parameters
+    -----------
+    file: str
+        File path.
+    source: tuple[str, str]
+        Tuple(column name, source name)
+        e.g. ("Source", "idu").
+    mode: str = "Mode"
+        Column name for the available modes, "lv","lh","pc","nc" etc
+    min_energy: str = "MinEnergy":
+        Column name for min energy for the polynomial.
+    max_energy: str = "MaxEnergy",
+        Column name for max energy for the polynomial.
+    poly_deg: list | None = None,
+        Column names for the parameters for the polynomial, starting with the least significant.
+
+    """
     if poly_deg is None:
         poly_deg = [
             "7th-order",
@@ -290,46 +353,37 @@ def convert_csv_to_lookup(
         ]
     look_up_table = {}
     pol = []
-    with open(
-        file,
-        newline="",
-    ) as csvfile:
+
+    def data2dict(row):
+        # logical for the conversion for each row of data.
+        if row[mode] not in pol:
+            pol.append(row[mode])
+            look_up_table[row[mode]] = {}
+            look_up_table[row[mode]]["Energies"] = {}
+            look_up_table[row[mode]]["Limit"] = {}
+            look_up_table[row[mode]]["Limit"]["Minimum"] = float(row[min_energy])
+            look_up_table[row[mode]]["Limit"]["Maximum"] = float(row[max_energy])
+        # calculate polynomial energy to gap/phase
+        cof = [float(row[x]) for x in poly_deg]
+        poly = np.poly1d(cof)
+
+        look_up_table[row[mode]]["Energies"][row[min_energy]] = {
+            "Low": float(row[min_energy]),
+            "High": float(row[max_energy]),
+            "Poly": poly,
+        }
+        if look_up_table[row[mode]]["Limit"]["Minimum"] > float(row[min_energy]):
+            look_up_table[row[mode]]["Limit"]["Minimum"] = float(row[min_energy])
+        if look_up_table[row[mode]]["Limit"]["Maximum"] < float(row[min_energy]):
+            look_up_table[row[mode]]["Limit"]["Maximum"] = float(row[max_energy])
+
+    with open(file, newline="") as csvfile:
         reader = csv.DictReader(csvfile)
         reader = sorted(reader, key=lambda d: float(d[min_energy]))
         for row in reader:
-            if source is not None:
-                # If there are multiple source only do one
-                if row[source[0]] == source[1]:
-                    if row[mode] not in pol:
-                        pol.append(row[mode])
-                        look_up_table[row[mode]] = {}
-                        look_up_table[row[mode]]["Energies"] = {}
-                        look_up_table[row[mode]]["Limit"] = {}
-                        look_up_table[row[mode]]["Limit"]["Minimum"] = float(
-                            row[min_energy]
-                        )
-                        look_up_table[row[mode]]["Limit"]["Maximum"] = float(
-                            row[max_energy]
-                        )
-                    # calculate polynomial energy to gap/phase
-                    cof = [float(row[x]) for x in poly_deg]
-                    poly = np.poly1d(cof)
-
-                    look_up_table[row[mode]]["Energies"][row[min_energy]] = {
-                        "Low": float(row[min_energy]),
-                        "High": float(row[max_energy]),
-                        "Poly": poly,
-                    }
-                    if look_up_table[row[mode]]["Limit"]["Minimum"] > float(
-                        row[min_energy]
-                    ):
-                        look_up_table[row[mode]]["Limit"]["Minimum"] = float(
-                            row[min_energy]
-                        )
-                    if look_up_table[row[mode]]["Limit"]["Maximum"] < float(
-                        row[min_energy]
-                    ):
-                        look_up_table[row[mode]]["Limit"]["Maximum"] = float(
-                            row[max_energy]
-                        )
+            # If there are multiple source only convert requested.
+            if row[source[0]] == source[1]:
+                data2dict(row=row)
+    if not look_up_table:
+        raise RuntimeError(f"Unable to convert lookup table:/n/t{file}")
     return look_up_table
