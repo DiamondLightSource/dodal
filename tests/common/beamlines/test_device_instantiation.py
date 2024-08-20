@@ -73,22 +73,32 @@ def test_device_creation(RE, module_and_devices_for_beamline):
     assert len(beamline_utils.ACTIVE_DEVICES) == len(devices)
 
 
+def get_module_and_devices_for_beamline(beamline):
+    bl_mod = importlib.import_module("dodal.beamlines." + beamline)
+    importlib.reload(bl_mod)
+    devices, _ = make_all_devices(
+        bl_mod,
+        include_skipped=True,
+        fake_with_ophyd_sim=True,
+    )
+    yield (bl_mod, devices)
+    beamline_utils.clear_devices()
+    del bl_mod
+
+
 @pytest.mark.parametrize(
-    "module_and_devices_for_beamline",
-    set({"i22": "p38"}),
-    indirect=True,
+    "mapping",
+    [{"beamline": "i22", "lab": "p38"}],
 )
-def test_lab_version_of_a_beamline(RE, module_and_devices_for_beamline):
+def test_lab_version_of_a_beamline(RE, mapping):
     """
     Ensures that for every lab beamline all device factories are using valid args
     and creating types that conform to Bluesky protocols.
     """
-    # todo patch the environment
-    with patch.dict(os.environ, {"BEAMLINE": module_and_devices_for_beamline[1]}):
+    with patch.dict(os.environ, {"BEAMLINE": mapping["lab"]}):
         # get the devices file for the beamline namespace
-        _, devices = get_module_name_by_beamline_name(
-            module_and_devices_for_beamline[0]
-        )
+        result = get_module_and_devices_for_beamline(mapping["beamline"])
+        _, devices = next(result)
         for device_name, device in devices.items():
             assert device_name in beamline_utils.ACTIVE_DEVICES, (
                 f"No device named {device_name} was created, devices "
