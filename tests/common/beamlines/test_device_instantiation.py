@@ -11,7 +11,6 @@ from dodal.beamlines import all_beamline_modules
 from dodal.common.beamlines import beamline_utils
 from dodal.utils import (
     BLUESKY_PROTOCOLS,
-    get_beamline_based_on_environment_variable,
     make_all_devices,
 )
 
@@ -64,7 +63,7 @@ def test_device_creation(RE, module_and_devices_for_beamline):
     Ensures that for every beamline all device factories are using valid args
     and creating types that conform to Bluesky protocols.
     """
-    _, devices = module_and_devices_for_beamline
+    module, devices = module_and_devices_for_beamline
     for device_name, device in devices.items():
         assert device_name in beamline_utils.ACTIVE_DEVICES, (
             f"No device named {device_name} was created for {module}, "
@@ -86,9 +85,10 @@ def test_lab_version_of_a_beamline(RE, module_and_devices_for_beamline):
     """
     # todo patch the environment
     with patch.dict(os.environ, {"BEAMLINE": module_and_devices_for_beamline[1]}):
-        module = get_beamline_based_on_environment_variable()
         # get the devices file for the beamline namespace
-        _, devices = get_module_name_by_beamline_name(module_and_devices_for_beamline[0])
+        _, devices = get_module_name_by_beamline_name(
+            module_and_devices_for_beamline[0]
+        )
         for device_name, device in devices.items():
             assert device_name in beamline_utils.ACTIVE_DEVICES, (
                 f"No device named {device_name} was created, devices "
