@@ -280,7 +280,7 @@ def is_any_device_factory(func: Callable) -> bool:
 
 
 def is_v2_device_type(obj: type[Any]) -> bool:
-    return inspect.isclass(obj) and issubclass(obj, OphydV2Device)
+    return inspect.isclass(obj) and isinstance(obj, OphydV2Device)
 
 
 def is_v1_device_type(obj: type[Any]) -> bool:

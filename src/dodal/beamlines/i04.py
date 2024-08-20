@@ -1,6 +1,11 @@
+from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.common.beamlines.beamline_utils import device_instantiation
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.aperturescatterguard import AperturePositions, ApertureScatterguard
+from dodal.devices.aperturescatterguard import (
+    ApertureScatterguard,
+    load_positions_from_beamline_parameters,
+    load_tolerances_from_beamline_params,
+)
 from dodal.devices.attenuator import Attenuator
 from dodal.devices.backlight import Backlight
 from dodal.devices.beamstop import BeamStop
@@ -219,24 +224,20 @@ def backlight(
 def aperture_scatterguard(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
-    aperture_positions: AperturePositions | None = None,
 ) -> ApertureScatterguard:
     """Get the i04 aperture and scatterguard device, instantiate it if it hasn't already
     been. If this is called when already instantiated in i04, it will return the existing
-    object. If aperture_positions is specified, it will update them.
+    object.
     """
-
-    def load_positions(a_s: ApertureScatterguard):
-        if aperture_positions is not None:
-            a_s.load_aperture_positions(aperture_positions)
-
+    params = get_beamline_parameters()
     return device_instantiation(
         device_factory=ApertureScatterguard,
         name="aperture_scatterguard",
         prefix="",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
-        post_create=load_positions,
+        loaded_positions=load_positions_from_beamline_parameters(params),
+        tolerances=load_tolerances_from_beamline_params(params),
     )
 
 
