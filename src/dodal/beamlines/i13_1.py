@@ -13,8 +13,7 @@ from dodal.devices.motors import XYZPositioner
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import get_beamline_name
 
-
-BL = get_beamline_name("i13_1")
+BL = get_beamline_name("i13-1")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 set_directory_provider(
@@ -29,10 +28,12 @@ def sample_xyz_stage(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> XYZPositioner:
     return device_instantiation(
-        prefix="-MO-PI-02:",
+        XYZPositioner,
+        prefix="BL13J-MO-PI-02:",
         name="sample_xyz_stage",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
+        bl_prefix=False,
     )
 
 
@@ -40,11 +41,12 @@ def sample_xyz_lab_fa_stage(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> XYZPositioner:
     return device_instantiation(
-        FilterMotor,
-        prefix="-MO-STAGE-02:FIXANG:",
+        XYZPositioner,
+        prefix="BL13J-MO-PI-02:FIXANG:",
         name="sample_xyz_lab_fa_stage",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
+        bl_prefix=False,
     )
 
 
@@ -53,8 +55,9 @@ def side_camera(
 ) -> AravisDetector:
     return device_instantiation(
         AravisDetector,
-        prefix="-OP-FLOAT-03:",
+        prefix="BL13J-OP-FLOAT-03:",
         name="side_camera",
+        bl_prefix=False,
         drv_suffix="CAM:",
         hdf_suffix="HDF5:",
         directory_provider=get_directory_provider(),
