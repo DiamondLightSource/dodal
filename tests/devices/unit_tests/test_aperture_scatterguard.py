@@ -14,6 +14,7 @@ from ophyd_async.core import (
 
 from dodal.devices.aperturescatterguard import (
     ApertureFiveDimensionalLocation,
+    ApertureInOut,
     AperturePosition,
     AperturePositionGDANames,
     ApertureScatterguard,
@@ -148,7 +149,7 @@ async def test_aperture_scatterguard_select_bottom_moves_sg_down_then_assembly_u
 ):
     ap_sg, call_log = aperture_in_medium_pos_w_call_log
 
-    await ap_sg.set(AperturePosition.SMALL)
+    await ap_sg.set((ApertureInOut.IN, AperturePosition.SMALL))
 
     call_log.assert_has_calls(_call_list((5.3375, -3.55, 2.43, 48.974, 15.8)))
 
@@ -167,7 +168,7 @@ async def test_aperture_scatterguard_select_top_moves_assembly_down_then_sg_up(
 ):
     ap_sg = aperture_in_medium_pos
 
-    await ap_sg.set(AperturePosition.LARGE)
+    await ap_sg.set((ApertureInOut.IN, AperturePosition.LARGE))
 
     _assert_patched_ap_sg_has_call(ap_sg, (2.389, 40.986, 15.8, 5.25, 4.43))
 
@@ -303,7 +304,7 @@ async def test_when_aperture_set_and_device_read_then_position_returned(
     aperture_in_medium_pos: ApertureScatterguard,
     aperture_positions: dict[AperturePosition, SingleAperturePosition],
 ):
-    await aperture_in_medium_pos.set(AperturePosition.MEDIUM)
+    await aperture_in_medium_pos.set((ApertureInOut.IN, AperturePosition.MEDIUM))
     selected_aperture = await aperture_in_medium_pos.read()
     assert selected_aperture["test_ap_sg-selected_aperture"]["value"] == asdict(
         aperture_positions[AperturePosition.MEDIUM]
@@ -319,7 +320,7 @@ async def test_ap_sg_in_runengine(
     ap = ap_sg._aperture
     sg = ap_sg._scatterguard
     test_loc = aperture_positions[AperturePosition.SMALL].location
-    RE(bps.abs_set(ap_sg, AperturePosition.SMALL, wait=True))
+    RE(bps.abs_set(ap_sg, (ApertureInOut.IN, AperturePosition.SMALL), wait=True))
     assert await ap.x.user_readback.get_value() == test_loc.aperture_x
     assert await ap.y.user_readback.get_value() == test_loc.aperture_y
     assert await ap.z.user_readback.get_value() == test_loc.aperture_z
@@ -367,3 +368,16 @@ def test_get_position_from_gda_aperture_name(
 
 def test_ap_sg_returns_GDA_name_correctly(ap_sg: ApertureScatterguard):
     assert ap_sg.get_gda_name_for_position(AperturePosition.SMALL) == "SMALL_APERTURE"
+
+
+async def test_when_move_out_and_none_then_mini_apt_y_moves_to_robot_load_position_and_no_other_axes_move(
+    ap_sg: ApertureScatterguard,
+):
+    await ap_sg.set((ApertureInOut.OUT, None))
+    get_mock_put(ap_sg._aperture.y.user_setpoint).assert_called_once_with(
+        31.40, wait=ANY, timeout=ANY
+    )
+    get_mock_put(ap_sg._aperture.x.user_setpoint).assert_not_called()
+    get_mock_put(ap_sg._aperture.z.user_setpoint).assert_not_called()
+    get_mock_put(ap_sg._scatterguard.x.user_setpoint).assert_not_called()
+    get_mock_put(ap_sg._scatterguard.y.user_setpoint).assert_not_called()
