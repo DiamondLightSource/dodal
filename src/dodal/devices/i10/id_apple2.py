@@ -24,7 +24,7 @@ from dodal.log import LOGGER
 
 ROW_PHASE_MOTOR_TOLERANCE = 0.004
 MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
-MAXIMUM_GAP_MOTOR_POSITION = 200
+MAXIMUM_GAP_MOTOR_POSITION = 100
 
 
 class I10Apple2(StandardReadable, Movable):
@@ -96,17 +96,6 @@ class I10Apple2(StandardReadable, Movable):
                 + f"/n Polarisations available:  {self._available_pol}"
             )
 
-    @property
-    def detune(self):
-        return self._detune
-
-    @detune.setter
-    def detune(self, value: float):
-        if isinstance(value, float):
-            self._detune = value
-        else:
-            raise ValueError(f"Energy off-set must be float, {value} is given.")
-
     @AsyncStatus.wrap
     async def set(self, value: float) -> None:
         if self.pol is None:
@@ -134,7 +123,7 @@ class I10Apple2(StandardReadable, Movable):
         # Only need to check gap as the phase motors share both fault and gate with gap.
         if await self.gap.fault.get_value() != 0:
             raise RuntimeError(f"{self.name} is in fault state")
-        if await self.gap.gate.get_value() == UndulatorGatestatus.open:
+        if await self.gap.gate.get_value() != UndulatorGatestatus.close:
             raise RuntimeError(f"{self.name} is already in motion.")
         await asyncio.gather(
             self.phase.top_outer.user_setpoint.set(value=value.top_outer),
@@ -157,14 +146,13 @@ class I10Apple2(StandardReadable, Movable):
         """
         Converts energy and polarisation to  gap and phase.
         """
-        new_energy = energy + self.detune
         gap_poly = self._get_poly(
-            lookup_table=self.lookup_tables["Gap"], new_energy=new_energy
+            lookup_table=self.lookup_tables["Gap"], new_energy=energy
         )
         phase_poly = self._get_poly(
-            lookup_table=self.lookup_tables["Phase"], new_energy=new_energy
+            lookup_table=self.lookup_tables["Phase"], new_energy=energy
         )
-        return gap_poly(new_energy), phase_poly(new_energy)
+        return gap_poly(energy), phase_poly(energy)
 
     def _get_poly(self, new_energy, lookup_table) -> np.poly1d:
         if (
@@ -186,7 +174,7 @@ class I10Apple2(StandardReadable, Movable):
                 ):
                     return energy_range["Poly"]
 
-        raise Exception(
+        raise ValueError(
             "Cannot find polynomial coefficients for your requested energy."
             + "There might be gap in the calibration lookup table."
         )
@@ -211,10 +199,15 @@ class I10Apple2(StandardReadable, Movable):
 
     async def determinePhaseFromHardware(self) -> tuple[str | None, float]:
         cur_loc = await self.read()
-        rowphase1 = cur_loc["id10-phase-top_inner-user_setpoint_readback"]["value"]
-        rowphase2 = cur_loc["id10-phase-top_outer-user_setpoint_readback"]["value"]
-        rowphase3 = cur_loc["id10-phase-btm_inner-user_setpoint_readback"]["value"]
-        rowphase4 = cur_loc["id10-phase-btm_outer-user_setpoint_readback"]["value"]
+        rowphase1 = cur_loc[self.phase.top_inner.user_setpoint_readback.name]["value"]
+        rowphase2 = cur_loc[self.phase.top_outer.user_setpoint_readback.name]["value"]
+        rowphase3 = cur_loc[self.phase.btm_inner.user_setpoint_readback.name]["value"]
+        rowphase4 = cur_loc[self.phase.btm_outer.user_setpoint_readback.name]["value"]
+        gap = cur_loc[self.gap.user_readback.name]["value"]
+        if gap > MAXIMUM_GAP_MOTOR_POSITION:
+            raise RuntimeError(
+                f"{self.name} is not in use, close gap or set polarisation to use this ID"
+            )
         # determine polarisation and phase value using row phase motor position pattern, However there is no way to return lh3 polarisation
         if (
             self._motorPositionEqual(rowphase1, 0.0)
@@ -286,17 +279,15 @@ class I10Apple2PGM(StandardReadable, Movable):
         with self.add_children_as_readables():
             self.id = id
             self.pgm = pgm
-            self.harmonicOrder, self._harmonicOrder_set = soft_signal_r_and_setter(
-                float, initial_value=1
-            )
+        with self.add_children_as_readables(HintedSignal):
             self.energy_offset = soft_signal_rw(float, initial_value=0)
-        super().__init__(name)
+        super().__init__(name=name)
 
     @AsyncStatus.wrap
     async def set(self, value: float) -> None:
-        asyncio.gather(
+        await asyncio.gather(
             self.id.set(value=value + await self.energy_offset.get_value()),
-            self.pgm.energy.set(value * await self.harmonicOrder.get_value()),
+            self.pgm.energy.set(value),
         )
 
 
@@ -304,7 +295,7 @@ class I10Apple2Pol(StandardReadable, Movable):
     def __init__(self, id: I10Apple2, name: str = "") -> None:
         with self.add_children_as_readables():
             self.id = id
-        super().__init__(name)
+        super().__init__(name=name)
 
     @AsyncStatus.wrap
     async def set(self, value: str) -> None:
@@ -379,7 +370,6 @@ def convert_csv_to_lookup(
 
     with open(file, newline="") as csvfile:
         reader = csv.DictReader(csvfile)
-        reader = sorted(reader, key=lambda d: float(d[min_energy]))
         for row in reader:
             # If there are multiple source only convert requested.
             if row[source[0]] == source[1]:
