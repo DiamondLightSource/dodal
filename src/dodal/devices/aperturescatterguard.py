@@ -89,11 +89,19 @@ def load_tolerances_from_beamline_params(
     )
 
 
+class ApertureInOut(Enum):
+    OUT = 0
+    IN = 1
+
+
 class AperturePosition(Enum):
     ROBOT_LOAD = 0
     SMALL = 1
     MEDIUM = 2
     LARGE = 3
+
+
+InOutAndPosition = tuple[ApertureInOut, AperturePosition | None]
 
 
 def load_positions_from_beamline_parameters(
@@ -179,9 +187,16 @@ class ApertureScatterguard(StandardReadable, Movable):
         return detailed_position.GDA_name
 
     @AsyncStatus.wrap
-    async def set(self, value: AperturePosition):
-        position = self._loaded_positions[value]
-        await self._safe_move_within_datacollection_range(position.location)
+    async def set(self, value: InOutAndPosition):
+        in_out, position = value
+        if in_out == ApertureInOut.OUT and not position:
+            robot_load_y = self._loaded_positions[
+                AperturePosition.ROBOT_LOAD
+            ].location.aperture_y
+            return await self._aperture.y.set(robot_load_y)
+        if position:
+            position_detail = self._loaded_positions[position]
+            await self._safe_move_within_datacollection_range(position_detail.location)
 
     def _get_motor_list(self):
         return [
