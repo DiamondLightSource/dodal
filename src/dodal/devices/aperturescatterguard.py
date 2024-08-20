@@ -189,11 +189,22 @@ class ApertureScatterguard(StandardReadable, Movable):
     @AsyncStatus.wrap
     async def set(self, value: InOutAndPosition):
         in_out, position = value
-        if in_out == ApertureInOut.OUT and not position:
+        if in_out == ApertureInOut.OUT:
             robot_load_y = self._loaded_positions[
                 AperturePosition.ROBOT_LOAD
             ].location.aperture_y
-            return await self._aperture.y.set(robot_load_y)
+            if position:
+                location = self._loaded_positions[position].location
+                out_location = ApertureFiveDimensionalLocation(
+                    location.aperture_x,
+                    robot_load_y,
+                    location.aperture_z,
+                    location.scatterguard_x,
+                    location.scatterguard_y,
+                )
+                return await self._set_raw_unsafe(out_location)
+            else:
+                return await self._aperture.y.set(robot_load_y)
         if position:
             position_detail = self._loaded_positions[position]
             await self._safe_move_within_datacollection_range(position_detail.location)
