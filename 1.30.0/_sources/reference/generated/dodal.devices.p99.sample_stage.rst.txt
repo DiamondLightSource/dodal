@@ -1,0 +1,38 @@
+dodal.devices.p99.sample\_stage
+===============================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.p99
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~sample_stage.FilterMotor
+   ~sample_stage.SampleAngleStage
+   ~sample_stage.p99StageSelections
+
+
+
+
+.. automodule:: dodal.devices.p99.sample_stage
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

@@ -1,0 +1,32 @@
+dodal.devices.aperturescatterguard.AperturePosition
+===================================================
+
+.. currentmodule:: dodal.devices.aperturescatterguard
+
+.. autoclass:: AperturePosition
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~AperturePosition.ROBOT_LOAD
+      
+      
+      ~AperturePosition.SMALL
+      
+      
+      ~AperturePosition.MEDIUM
+      
+      
+      ~AperturePosition.LARGE
+      
+   
+   

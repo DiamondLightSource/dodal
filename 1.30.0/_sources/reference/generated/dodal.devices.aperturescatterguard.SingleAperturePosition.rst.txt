@@ -1,0 +1,32 @@
+dodal.devices.aperturescatterguard.SingleAperturePosition
+=========================================================
+
+.. currentmodule:: dodal.devices.aperturescatterguard
+
+.. autoclass:: SingleAperturePosition
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~SingleAperturePosition.name
+      
+      
+      ~SingleAperturePosition.GDA_name
+      
+      
+      ~SingleAperturePosition.radius_microns
+      
+      
+      ~SingleAperturePosition.location
+      
+   
+   
