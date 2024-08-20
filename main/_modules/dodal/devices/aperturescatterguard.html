@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.aperturescatterguard &#8212; dodal 1.29.5.dev27+g696ccf0ed documentation</title>
+    <title>dodal.devices.aperturescatterguard &#8212; dodal 1.29.5.dev28+gb39f55c62 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=4ad3f8df"></script>
+    <script src="../../../_static/documentation_options.js?v=b7a7bd91"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -481,9 +481,9 @@ document.write(`
 <span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="n">AsyncStatus</span><span class="p">,</span> <span class="n">HintedSignal</span><span class="p">,</span> <span class="n">SignalR</span><span class="p">,</span> <span class="n">StandardReadable</span>
 <span class="kn">from</span> <span class="nn">ophyd_async.core.soft_signal_backend</span> <span class="kn">import</span> <span class="n">SoftConverter</span><span class="p">,</span> <span class="n">SoftSignalBackend</span>
 
+<span class="kn">from</span> <span class="nn">dodal.common.beamlines.beamline_parameters</span> <span class="kn">import</span> <span class="n">GDABeamlineParameters</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.aperture</span> <span class="kn">import</span> <span class="n">Aperture</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.scatterguard</span> <span class="kn">import</span> <span class="n">Scatterguard</span>
-<span class="kn">from</span> <span class="nn">dodal.log</span> <span class="kn">import</span> <span class="n">LOGGER</span>
 
 
 <span class="k">class</span> <span class="nc">InvalidApertureMove</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
@@ -518,14 +518,10 @@ document.write(`
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.aperturescatterguard.SingleAperturePosition.html#dodal.devices.aperturescatterguard.SingleAperturePosition">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">SingleAperturePosition</span><span class="p">:</span>
-    <span class="c1"># Default values are needed as ophyd_async sim does not respect initial_values of</span>
-    <span class="c1"># soft signal backends see https://github.com/bluesky/ophyd-async/issues/266</span>
-    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-    <span class="n">GDA_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-    <span class="n">radius_microns</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">location</span><span class="p">:</span> <span class="n">ApertureFiveDimensionalLocation</span> <span class="o">=</span> <span class="n">ApertureFiveDimensionalLocation</span><span class="p">(</span>
-        <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
-    <span class="p">)</span></div>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">GDA_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">radius_microns</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">location</span><span class="p">:</span> <span class="n">ApertureFiveDimensionalLocation</span></div>
 
 
 
@@ -549,7 +545,7 @@ document.write(`
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">GDA_name</span><span class="p">:</span> <span class="n">AperturePositionGDANames</span><span class="p">,</span>
     <span class="n">radius_microns</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="n">params</span><span class="p">:</span> <span class="n">GDABeamlineParameters</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingleAperturePosition</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">SingleAperturePosition</span><span class="p">(</span>
         <span class="n">name</span><span class="p">,</span>
@@ -566,9 +562,11 @@ document.write(`
 
 
 
-<div class="viewcode-block" id="tolerances_from_params">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.aperturescatterguard.html#dodal.devices.aperturescatterguard.tolerances_from_params">[docs]</a>
-<span class="k">def</span> <span class="nf">tolerances_from_params</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ApertureScatterguardTolerances</span><span class="p">:</span>
+<div class="viewcode-block" id="load_tolerances_from_beamline_params">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.aperturescatterguard.html#dodal.devices.aperturescatterguard.load_tolerances_from_beamline_params">[docs]</a>
+<span class="k">def</span> <span class="nf">load_tolerances_from_beamline_params</span><span class="p">(</span>
+    <span class="n">params</span><span class="p">:</span> <span class="n">GDABeamlineParameters</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ApertureScatterguardTolerances</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">ApertureScatterguardTolerances</span><span class="p">(</span>
         <span class="n">ap_x</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;miniap_x_tolerance&quot;</span><span class="p">],</span>
         <span class="n">ap_y</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;miniap_y_tolerance&quot;</span><span class="p">],</span>
@@ -579,73 +577,54 @@ document.write(`
 
 
 
-<div class="viewcode-block" id="AperturePositions">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.aperturescatterguard.AperturePositions.html#dodal.devices.aperturescatterguard.AperturePositions">[docs]</a>
-<span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">AperturePositions</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Holds the motor positions needed to select a particular aperture size. This class should be instantiated with definitions for its sizes</span>
-<span class="sd">    using from_gda_beamline_params&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="AperturePosition">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.aperturescatterguard.AperturePosition.html#dodal.devices.aperturescatterguard.AperturePosition">[docs]</a>
+<span class="k">class</span> <span class="nc">AperturePosition</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">ROBOT_LOAD</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">SMALL</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">MEDIUM</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">LARGE</span> <span class="o">=</span> <span class="mi">3</span></div>
 
-    <span class="n">LARGE</span><span class="p">:</span> <span class="n">SingleAperturePosition</span>
-    <span class="n">MEDIUM</span><span class="p">:</span> <span class="n">SingleAperturePosition</span>
-    <span class="n">SMALL</span><span class="p">:</span> <span class="n">SingleAperturePosition</span>
-    <span class="n">ROBOT_LOAD</span><span class="p">:</span> <span class="n">SingleAperturePosition</span>
 
-    <span class="n">tolerances</span><span class="p">:</span> <span class="n">ApertureScatterguardTolerances</span>
 
-    <span class="n">UNKNOWN</span> <span class="o">=</span> <span class="n">SingleAperturePosition</span><span class="p">(</span>
-        <span class="s2">&quot;Unknown&quot;</span><span class="p">,</span> <span class="s2">&quot;UNKNOWN&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ApertureFiveDimensionalLocation</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="p">)</span>
-
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_gda_beamline_params</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">LARGE</span><span class="o">=</span><span class="n">position_from_params</span><span class="p">(</span>
-                <span class="s2">&quot;Large&quot;</span><span class="p">,</span> <span class="n">AperturePositionGDANames</span><span class="o">.</span><span class="n">LARGE_APERTURE</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">params</span>
-            <span class="p">),</span>
-            <span class="n">MEDIUM</span><span class="o">=</span><span class="n">position_from_params</span><span class="p">(</span>
-                <span class="s2">&quot;Medium&quot;</span><span class="p">,</span> <span class="n">AperturePositionGDANames</span><span class="o">.</span><span class="n">MEDIUM_APERTURE</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="n">params</span>
-            <span class="p">),</span>
-            <span class="n">SMALL</span><span class="o">=</span><span class="n">position_from_params</span><span class="p">(</span>
-                <span class="s2">&quot;Small&quot;</span><span class="p">,</span> <span class="n">AperturePositionGDANames</span><span class="o">.</span><span class="n">SMALL_APERTURE</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">params</span>
-            <span class="p">),</span>
-            <span class="n">ROBOT_LOAD</span><span class="o">=</span><span class="n">position_from_params</span><span class="p">(</span>
-                <span class="s2">&quot;Robot load&quot;</span><span class="p">,</span> <span class="n">AperturePositionGDANames</span><span class="o">.</span><span class="n">ROBOT_LOAD</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">params</span>
-            <span class="p">),</span>
-            <span class="n">tolerances</span><span class="o">=</span><span class="n">tolerances_from_params</span><span class="p">(</span><span class="n">params</span><span class="p">),</span>
-        <span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">get_position_from_gda_aperture_name</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">gda_aperture_name</span><span class="p">:</span> <span class="n">AperturePositionGDANames</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SingleAperturePosition</span><span class="p">:</span>
-        <span class="n">apertures</span> <span class="o">=</span> <span class="p">[</span><span class="n">ap</span> <span class="k">for</span> <span class="n">ap</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_list</span><span class="p">()</span> <span class="k">if</span> <span class="n">ap</span><span class="o">.</span><span class="n">GDA_name</span> <span class="o">==</span> <span class="n">gda_aperture_name</span><span class="p">]</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">apertures</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Tried to convert unknown aperture name </span><span class="si">{</span><span class="n">gda_aperture_name</span><span class="si">}</span><span class="s2"> to a SingleAperturePosition&quot;</span>
-            <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">apertures</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
-    <span class="k">def</span> <span class="nf">as_list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">SingleAperturePosition</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="p">[</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">LARGE</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">MEDIUM</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">SMALL</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">ROBOT_LOAD</span><span class="p">,</span>
-        <span class="p">]</span></div>
+<div class="viewcode-block" id="load_positions_from_beamline_parameters">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.aperturescatterguard.html#dodal.devices.aperturescatterguard.load_positions_from_beamline_parameters">[docs]</a>
+<span class="k">def</span> <span class="nf">load_positions_from_beamline_parameters</span><span class="p">(</span>
+    <span class="n">params</span><span class="p">:</span> <span class="n">GDABeamlineParameters</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">AperturePosition</span><span class="p">,</span> <span class="n">SingleAperturePosition</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="n">AperturePosition</span><span class="o">.</span><span class="n">ROBOT_LOAD</span><span class="p">:</span> <span class="n">position_from_params</span><span class="p">(</span>
+            <span class="s2">&quot;Robot load&quot;</span><span class="p">,</span> <span class="n">AperturePositionGDANames</span><span class="o">.</span><span class="n">ROBOT_LOAD</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">params</span>
+        <span class="p">),</span>
+        <span class="n">AperturePosition</span><span class="o">.</span><span class="n">SMALL</span><span class="p">:</span> <span class="n">position_from_params</span><span class="p">(</span>
+            <span class="s2">&quot;Small&quot;</span><span class="p">,</span> <span class="n">AperturePositionGDANames</span><span class="o">.</span><span class="n">SMALL_APERTURE</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">params</span>
+        <span class="p">),</span>
+        <span class="n">AperturePosition</span><span class="o">.</span><span class="n">MEDIUM</span><span class="p">:</span> <span class="n">position_from_params</span><span class="p">(</span>
+            <span class="s2">&quot;Medium&quot;</span><span class="p">,</span> <span class="n">AperturePositionGDANames</span><span class="o">.</span><span class="n">MEDIUM_APERTURE</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="n">params</span>
+        <span class="p">),</span>
+        <span class="n">AperturePosition</span><span class="o">.</span><span class="n">LARGE</span><span class="p">:</span> <span class="n">position_from_params</span><span class="p">(</span>
+            <span class="s2">&quot;Large&quot;</span><span class="p">,</span> <span class="n">AperturePositionGDANames</span><span class="o">.</span><span class="n">LARGE_APERTURE</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">params</span>
+        <span class="p">),</span>
+    <span class="p">}</span></div>
 
 
 
 <div class="viewcode-block" id="ApertureScatterguard">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.aperturescatterguard.ApertureScatterguard.html#dodal.devices.aperturescatterguard.ApertureScatterguard">[docs]</a>
 <span class="k">class</span> <span class="nc">ApertureScatterguard</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span> <span class="o">=</span> <span class="n">Aperture</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-MO-MAPT-01:&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">scatterguard</span> <span class="o">=</span> <span class="n">Scatterguard</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-MO-SCAT-01:&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">aperture_positions</span><span class="p">:</span> <span class="n">AperturePositions</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">TOLERANCE_STEPS</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># Number of MRES steps</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">loaded_positions</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">AperturePosition</span><span class="p">,</span> <span class="n">SingleAperturePosition</span><span class="p">],</span>
+        <span class="n">tolerances</span><span class="p">:</span> <span class="n">ApertureScatterguardTolerances</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_aperture</span> <span class="o">=</span> <span class="n">Aperture</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-MO-MAPT-01:&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scatterguard</span> <span class="o">=</span> <span class="n">Scatterguard</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-MO-SCAT-01:&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_positions</span> <span class="o">=</span> <span class="n">loaded_positions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tolerances</span> <span class="o">=</span> <span class="n">tolerances</span>
         <span class="n">aperture_backend</span> <span class="o">=</span> <span class="n">SoftSignalBackend</span><span class="p">(</span>
-            <span class="n">SingleAperturePosition</span><span class="p">,</span> <span class="n">AperturePositions</span><span class="o">.</span><span class="n">UNKNOWN</span>
+            <span class="n">SingleAperturePosition</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_positions</span><span class="p">[</span><span class="n">AperturePosition</span><span class="o">.</span><span class="n">ROBOT_LOAD</span><span class="p">]</span>
         <span class="p">)</span>
         <span class="n">aperture_backend</span><span class="o">.</span><span class="n">converter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ApertureConverter</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">selected_aperture</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SelectedAperture</span><span class="p">(</span><span class="n">backend</span><span class="o">=</span><span class="n">aperture_backend</span><span class="p">)</span>
@@ -681,25 +660,32 @@ document.write(`
                 <span class="p">)</span>
             <span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">load_aperture_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">positions</span><span class="p">:</span> <span class="n">AperturePositions</span><span class="p">):</span>
-        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> loaded in </span><span class="si">{</span><span class="n">positions</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">aperture_positions</span> <span class="o">=</span> <span class="n">positions</span>
+    <span class="k">def</span> <span class="nf">get_position_from_gda_aperture_name</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">gda_aperture_name</span><span class="p">:</span> <span class="n">AperturePositionGDANames</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AperturePosition</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">aperture</span><span class="p">,</span> <span class="n">detail</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_positions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">detail</span><span class="o">.</span><span class="n">GDA_name</span> <span class="o">==</span> <span class="n">gda_aperture_name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">aperture</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Tried to convert unknown aperture name </span><span class="si">{</span><span class="n">gda_aperture_name</span><span class="si">}</span><span class="s2"> to a SingleAperturePosition&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_gda_name_for_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="n">AperturePosition</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">detailed_position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_positions</span><span class="p">[</span><span class="n">position</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">detailed_position</span><span class="o">.</span><span class="n">GDA_name</span>
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">SingleAperturePosition</span><span class="p">):</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aperture_positions</span><span class="p">,</span> <span class="n">AperturePositions</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">aperture_positions</span><span class="o">.</span><span class="n">as_list</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="n">InvalidApertureMove</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown aperture: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_safe_move_within_datacollection_range</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">location</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">AperturePosition</span><span class="p">):</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_positions</span><span class="p">[</span><span class="n">value</span><span class="p">]</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_safe_move_within_datacollection_range</span><span class="p">(</span><span class="n">position</span><span class="o">.</span><span class="n">location</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_motor_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">z</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">scatterguard</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">scatterguard</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_aperture</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_aperture</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_aperture</span><span class="o">.</span><span class="n">z</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_scatterguard</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_scatterguard</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
         <span class="p">]</span>
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
@@ -710,11 +696,11 @@ document.write(`
         <span class="n">aperture_x</span><span class="p">,</span> <span class="n">aperture_y</span><span class="p">,</span> <span class="n">aperture_z</span><span class="p">,</span> <span class="n">scatterguard_x</span><span class="p">,</span> <span class="n">scatterguard_y</span> <span class="o">=</span> <span class="n">positions</span>
 
         <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">aperture_x</span><span class="p">),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">aperture_y</span><span class="p">),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">aperture_z</span><span class="p">),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">scatterguard</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">scatterguard_x</span><span class="p">),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">scatterguard</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">scatterguard_y</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_aperture</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">aperture_x</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_aperture</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">aperture_y</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_aperture</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">aperture_z</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_scatterguard</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">scatterguard_x</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_scatterguard</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">scatterguard_y</span><span class="p">),</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="ApertureScatterguard.get_current_aperture_position">
@@ -726,17 +712,18 @@ document.write(`
 <span class="sd">        mini aperture y &lt;= ROBOT_LOAD.location.aperture_y + tolerance.</span>
 <span class="sd">        If no position is found then raises InvalidApertureMove.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aperture_positions</span><span class="p">,</span> <span class="n">AperturePositions</span><span class="p">)</span>
-        <span class="n">current_ap_y</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">user_readback</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">cached</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="n">robot_load_ap_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">aperture_positions</span><span class="o">.</span><span class="n">ROBOT_LOAD</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">aperture_y</span>
-        <span class="k">if</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">large</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">cached</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">aperture_positions</span><span class="o">.</span><span class="n">LARGE</span>
-        <span class="k">elif</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">medium</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">cached</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">aperture_positions</span><span class="o">.</span><span class="n">MEDIUM</span>
-        <span class="k">elif</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">small</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">cached</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">aperture_positions</span><span class="o">.</span><span class="n">SMALL</span>
-        <span class="k">elif</span> <span class="n">current_ap_y</span> <span class="o">&lt;=</span> <span class="n">robot_load_ap_y</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">aperture_positions</span><span class="o">.</span><span class="n">tolerances</span><span class="o">.</span><span class="n">ap_y</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">aperture_positions</span><span class="o">.</span><span class="n">ROBOT_LOAD</span>
+        <span class="n">current_ap_y</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aperture</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">user_readback</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">cached</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">robot_load_ap_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_positions</span><span class="p">[</span>
+            <span class="n">AperturePosition</span><span class="o">.</span><span class="n">ROBOT_LOAD</span>
+        <span class="p">]</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">aperture_y</span>
+        <span class="k">if</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aperture</span><span class="o">.</span><span class="n">large</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">cached</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_positions</span><span class="p">[</span><span class="n">AperturePosition</span><span class="o">.</span><span class="n">LARGE</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aperture</span><span class="o">.</span><span class="n">medium</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">cached</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_positions</span><span class="p">[</span><span class="n">AperturePosition</span><span class="o">.</span><span class="n">MEDIUM</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aperture</span><span class="o">.</span><span class="n">small</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">cached</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_positions</span><span class="p">[</span><span class="n">AperturePosition</span><span class="o">.</span><span class="n">SMALL</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">current_ap_y</span> <span class="o">&lt;=</span> <span class="n">robot_load_ap_y</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tolerances</span><span class="o">.</span><span class="n">ap_y</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_positions</span><span class="p">[</span><span class="n">AperturePosition</span><span class="o">.</span><span class="n">ROBOT_LOAD</span><span class="p">]</span>
 
         <span class="k">raise</span> <span class="n">InvalidApertureMove</span><span class="p">(</span><span class="s2">&quot;Current aperture/scatterguard state unrecognised&quot;</span><span class="p">)</span></div>
 
@@ -749,48 +736,48 @@ document.write(`
 <span class="sd">        See https://github.com/DiamondLightSource/hyperion/wiki/Aperture-Scatterguard-Collisions</span>
 <span class="sd">        for why this is required.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">aperture_positions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_positions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="c1"># unpacking the position</span>
         <span class="n">aperture_x</span><span class="p">,</span> <span class="n">aperture_y</span><span class="p">,</span> <span class="n">aperture_z</span><span class="p">,</span> <span class="n">scatterguard_x</span><span class="p">,</span> <span class="n">scatterguard_y</span> <span class="o">=</span> <span class="n">pos</span>
 
-        <span class="n">ap_z_in_position</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">motor_done_move</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="n">ap_z_in_position</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aperture</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">motor_done_move</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">ap_z_in_position</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">InvalidApertureMove</span><span class="p">(</span>
                 <span class="s2">&quot;ApertureScatterguard z is still moving. Wait for it to finish &quot;</span>
                 <span class="s2">&quot;before triggering another move.&quot;</span>
             <span class="p">)</span>
 
-        <span class="n">current_ap_z</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">user_readback</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="n">current_ap_z</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aperture</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">user_readback</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
         <span class="n">diff_on_z</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">current_ap_z</span> <span class="o">-</span> <span class="n">aperture_z</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">diff_on_z</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">aperture_positions</span><span class="o">.</span><span class="n">tolerances</span><span class="o">.</span><span class="n">ap_z</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">diff_on_z</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tolerances</span><span class="o">.</span><span class="n">ap_z</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">InvalidApertureMove</span><span class="p">(</span>
                 <span class="s2">&quot;ApertureScatterguard safe move is not yet defined for positions &quot;</span>
                 <span class="s2">&quot;outside of LARGE, MEDIUM, SMALL, ROBOT_LOAD. &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Current aperture z (</span><span class="si">{</span><span class="n">current_ap_z</span><span class="si">}</span><span class="s2">), outside of tolerance (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">aperture_positions</span><span class="o">.</span><span class="n">tolerances</span><span class="o">.</span><span class="n">ap_z</span><span class="si">}</span><span class="s2">) from target (</span><span class="si">{</span><span class="n">aperture_z</span><span class="si">}</span><span class="s2">).&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Current aperture z (</span><span class="si">{</span><span class="n">current_ap_z</span><span class="si">}</span><span class="s2">), outside of tolerance (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_tolerances</span><span class="o">.</span><span class="n">ap_z</span><span class="si">}</span><span class="s2">) from target (</span><span class="si">{</span><span class="n">aperture_z</span><span class="si">}</span><span class="s2">).&quot;</span>
             <span class="p">)</span>
 
-        <span class="n">current_ap_y</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">user_readback</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="n">current_ap_y</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_aperture</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">user_readback</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">aperture_y</span> <span class="o">&gt;</span> <span class="n">current_ap_y</span><span class="p">:</span>
             <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">scatterguard</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">scatterguard_x</span><span class="p">),</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">scatterguard</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">scatterguard_y</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_scatterguard</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">scatterguard_x</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_scatterguard</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">scatterguard_y</span><span class="p">),</span>
             <span class="p">)</span>
             <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">aperture_x</span><span class="p">),</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">aperture_y</span><span class="p">),</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">aperture_z</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_aperture</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">aperture_x</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_aperture</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">aperture_y</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_aperture</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">aperture_z</span><span class="p">),</span>
             <span class="p">)</span>
             <span class="k">return</span>
         <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">aperture_x</span><span class="p">),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">aperture_y</span><span class="p">),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">aperture_z</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_aperture</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">aperture_x</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_aperture</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">aperture_y</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_aperture</span><span class="o">.</span><span class="n">z</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">aperture_z</span><span class="p">),</span>
         <span class="p">)</span>
 
         <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">scatterguard</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">scatterguard_x</span><span class="p">),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">scatterguard</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">scatterguard_y</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_scatterguard</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">scatterguard_x</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_scatterguard</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">scatterguard_y</span><span class="p">),</span>
         <span class="p">)</span></div>
 
 </pre></div>

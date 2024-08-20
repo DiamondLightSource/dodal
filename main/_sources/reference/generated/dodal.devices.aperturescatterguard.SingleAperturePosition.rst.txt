@@ -17,16 +17,16 @@ dodal.devices.aperturescatterguard.SingleAperturePosition
    .. autosummary::
    
       
-      ~SingleAperturePosition.GDA_name
-      
-      
-      ~SingleAperturePosition.location
-      
-      
       ~SingleAperturePosition.name
       
       
+      ~SingleAperturePosition.GDA_name
+      
+      
       ~SingleAperturePosition.radius_microns
+      
+      
+      ~SingleAperturePosition.location
       
    
    

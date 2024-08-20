@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.aperturescatterguard.SingleAperturePosition &#8212; dodal 1.29.5.dev27+g696ccf0ed documentation</title>
+    <title>dodal.devices.aperturescatterguard.SingleAperturePosition &#8212; dodal 1.29.5.dev28+gb39f55c62 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../_static/documentation_options.js?v=4ad3f8df"></script>
+    <script src="../../_static/documentation_options.js?v=b7a7bd91"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -484,8 +484,8 @@ document.write(`
 </details></li>
 <li class="toctree-l3 current active has-children"><a class="reference internal" href="dodal.devices.aperturescatterguard.html">dodal.devices.aperturescatterguard</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.aperturescatterguard.ApertureFiveDimensionalLocation.html">dodal.devices.aperturescatterguard.ApertureFiveDimensionalLocation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.aperturescatterguard.AperturePosition.html">dodal.devices.aperturescatterguard.AperturePosition</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.aperturescatterguard.AperturePositionGDANames.html">dodal.devices.aperturescatterguard.AperturePositionGDANames</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.aperturescatterguard.AperturePositions.html">dodal.devices.aperturescatterguard.AperturePositions</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.aperturescatterguard.ApertureScatterguard.html">dodal.devices.aperturescatterguard.ApertureScatterguard</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.aperturescatterguard.ApertureScatterguardTolerances.html">dodal.devices.aperturescatterguard.ApertureScatterguardTolerances</a></li>
 <li class="toctree-l4 current active"><a class="current reference internal" href="#">dodal.devices.aperturescatterguard.SingleAperturePosition</a></li>
@@ -833,30 +833,30 @@ document.write(`
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.aperturescatterguard.SingleAperturePosition">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.aperturescatterguard.</span></span><span class="sig-name descname"><span class="pre">SingleAperturePosition</span></span><a class="reference internal" href="../../_modules/dodal/devices/aperturescatterguard.html#SingleAperturePosition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.aperturescatterguard.SingleAperturePosition" title="Link to this definition">#</a></dt>
-<dd><p>SingleAperturePosition(name: str = ‘’, GDA_name: str = ‘’, radius_microns: float | None = None, location: dodal.devices.aperturescatterguard.ApertureFiveDimensionalLocation = ApertureFiveDimensionalLocation(aperture_x=0, aperture_y=0, aperture_z=0, scatterguard_x=0, scatterguard_y=0))</p>
+<dd><p>SingleAperturePosition(name: str, GDA_name: str, radius_microns: float | None, location: dodal.devices.aperturescatterguard.ApertureFiveDimensionalLocation)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">''</span></code>)</p></li>
-<li><p><strong>GDA_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">''</span></code>)</p></li>
-<li><p><strong>radius_microns</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
-<li><p><strong>location</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.aperturescatterguard.ApertureFiveDimensionalLocation.html#dodal.devices.aperturescatterguard.ApertureFiveDimensionalLocation" title="dodal.devices.aperturescatterguard.ApertureFiveDimensionalLocation"><code class="xref py py-class docutils literal notranslate"><span class="pre">ApertureFiveDimensionalLocation</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">ApertureFiveDimensionalLocation(aperture_x=0,</span> <span class="pre">aperture_y=0,</span> <span class="pre">aperture_z=0,</span> <span class="pre">scatterguard_x=0,</span> <span class="pre">scatterguard_y=0)</span></code>)</p></li>
+<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>GDA_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>radius_microns</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+<li><p><strong>location</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.aperturescatterguard.ApertureFiveDimensionalLocation.html#dodal.devices.aperturescatterguard.ApertureFiveDimensionalLocation" title="dodal.devices.aperturescatterguard.ApertureFiveDimensionalLocation"><code class="xref py py-class docutils literal notranslate"><span class="pre">ApertureFiveDimensionalLocation</span></code></a></span>)</p></li>
 </ul>
 </dd>
 </dl>
 <p class="rubric">Attributes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">GDA_name</span></code></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">location</span></code></p></td>
-<td><p></p></td>
-</tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">radius_microns</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">GDA_name</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">radius_microns</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">location</span></code></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
