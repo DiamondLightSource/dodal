@@ -374,10 +374,35 @@ async def test_when_move_out_and_none_then_mini_apt_y_moves_to_robot_load_positi
     ap_sg: ApertureScatterguard,
 ):
     await ap_sg.set((ApertureInOut.OUT, None))
-    get_mock_put(ap_sg._aperture.y.user_setpoint).assert_called_once_with(
+    get_mock_put(ap_sg._aperture.y.user_readback).assert_called_once_with(
         31.40, wait=ANY, timeout=ANY
     )
-    get_mock_put(ap_sg._aperture.x.user_setpoint).assert_not_called()
-    get_mock_put(ap_sg._aperture.z.user_setpoint).assert_not_called()
-    get_mock_put(ap_sg._scatterguard.x.user_setpoint).assert_not_called()
-    get_mock_put(ap_sg._scatterguard.y.user_setpoint).assert_not_called()
+    get_mock_put(ap_sg._aperture.x.user_readback).assert_not_called()
+    get_mock_put(ap_sg._aperture.z.user_readback).assert_not_called()
+    get_mock_put(ap_sg._scatterguard.x.user_readback).assert_not_called()
+    get_mock_put(ap_sg._scatterguard.y.user_readback).assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "position",
+    [
+        AperturePosition.SMALL,
+        AperturePosition.MEDIUM,
+        AperturePosition.LARGE,
+    ],
+)
+async def test_when_move_out_and_a_position_then_mini_apt_y_moves_to_robot_load_y_and_other_axes_move_to_aperture_position(
+    ap_sg: ApertureScatterguard, position: AperturePosition
+):
+    location = ap_sg._loaded_positions[position].location
+
+    await ap_sg.set((ApertureInOut.OUT, position))
+    assert await ap_sg._aperture.y.user_readback.get_value() == 31.40
+    assert await ap_sg._aperture.x.user_readback.get_value() == location.aperture_x
+    assert await ap_sg._aperture.z.user_readback.get_value() == location.aperture_z
+    assert (
+        await ap_sg._scatterguard.x.user_readback.get_value() == location.scatterguard_x
+    )
+    assert (
+        await ap_sg._scatterguard.y.user_readback.get_value() == location.scatterguard_y
+    )
