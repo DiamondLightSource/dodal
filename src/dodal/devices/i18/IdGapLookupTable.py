@@ -16,10 +16,9 @@ class LookupTable(StandardReadable, Movable):
         super().__init__(name)
 
     @AsyncStatus.wrap
-    async def set(self, transmission: float):
+    async def set(self, value: float):
+        """
+        value: transmission
+        """
         LOGGER.debug("Updating the lookup table ")
-        await self._use_current_energy.trigger()
-        LOGGER.info(f"Setting desired transmission to {transmission}")
-        await self._desired_transmission.set(transmission)
-        LOGGER.debug("Sending change filter command")
-        await self._change.trigger()
+        pass
