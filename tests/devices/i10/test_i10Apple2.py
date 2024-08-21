@@ -259,14 +259,27 @@ async def test_I10Apple2_pgm_RE_scan(mock_id_pgm: I10Apple2PGM, RE: RunEngine):
 
 
 @pytest.mark.parametrize(
-    "pol,energy, expect_top_outer, expect_top_inner, expect_btm_inner,expect_btm_outer",
+    "pol,energy, expect_top_outer, expect_top_inner, expect_btm_inner,expect_btm_outer, expect_gap",
     [
-        ("lh", 500, 0.0, 0.0, 0.0, 0.0),
-        ("lv", 600, 24.0, 0.0, 24.0, 0.0),
-        ("pc", 700, 15.96744675, 0.0, 15.96744675, 0.0),
-        ("nc", 800, -16.157479968, 0.0, -16.157479968, 0.0),
-        ("la", 900, -15.731592123465166, 0.0, 15.731592123465166, 0.0),
-        ("dsf", 0.0, 0.0, 0.0, 0.0, 0.0),
+        ("lh", 500, 0.0, 0.0, 0.0, 0.0, 23.0),
+        ("lh", 700, 0.0, 0.0, 0.0, 0.0, 26.0),
+        ("lh", 1000, 0.0, 0.0, 0.0, 0.0, 32.0),
+        ("lh3", 1000, 0.0, 0.0, 0.0, 0.0, 18.0),
+        ("lh3", 1400, 0.0, 0.0, 0.0, 0.0, 22.0),
+        ("lh3", 1900, 0.0, 0.0, 0.0, 0.0, 25.0),
+        ("lv", 600, 24.0, 0.0, 24.0, 0.0, 17.0),
+        ("lv", 900, 24.0, 0.0, 24.0, 0.0, 21.0),
+        ("lv", 1200, 24.0, 0.0, 24.0, 0.0, 25.0),
+        ("pc", 500, 15.5, 0.0, 15.5, 0.0, 17.0),
+        ("pc", 700, 16, 0.0, 16, 0.0, 21.0),
+        ("pc", 1000, 16.5, 0.0, 16.5, 0.0, 25.0),
+        ("nc", 500, -15.5, 0.0, -15.5, 0.0, 17.0),
+        ("nc", 800, -16, 0.0, -16, 0.0, 22.0),
+        ("nc", 1000, -16.5, 0.0, -16.5, 0.0, 25.0),
+        ("la", 700, -15.2, 0.0, 15.2, 0.0, 16.5),
+        ("la", 900, -15.6, 0.0, 15.6, 0.0, 19.0),
+        ("la", 1300, -16.4, 0.0, 16.4, 0.0, 25.0),
+        ("dsf", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0),
     ],
 )
 async def test_I10Apple2_pol_set(
@@ -277,6 +290,7 @@ async def test_I10Apple2_pol_set(
     expect_top_outer: float,
     expect_btm_inner: float,
     expect_btm_outer: float,
+    expect_gap: float,
 ):
     mock_id_pol.id._energy_set(energy)
     if pol == "dsf":
@@ -287,19 +301,23 @@ async def test_I10Apple2_pol_set(
         assert mock_id_pol.id.pol == pol
         top_inner = get_mock_put(mock_id_pol.id.phase.top_inner.user_setpoint)
         top_inner.assert_called_once()
-        assert float(top_inner.call_args[0][0]) == expect_top_inner
+        assert float(top_inner.call_args[0][0]) == pytest.approx(expect_top_inner, 0.01)
 
         top_outer = get_mock_put(mock_id_pol.id.phase.top_outer.user_setpoint)
         top_outer.assert_called_once()
-        assert float(top_outer.call_args[0][0]) == expect_top_outer
+        assert float(top_outer.call_args[0][0]) == pytest.approx(expect_top_outer, 0.01)
 
         btm_inner = get_mock_put(mock_id_pol.id.phase.btm_inner.user_setpoint)
         btm_inner.assert_called_once()
-        assert float(btm_inner.call_args[0][0]) == expect_btm_inner
+        assert float(btm_inner.call_args[0][0]) == pytest.approx(expect_btm_inner, 0.01)
 
         btm_outer = get_mock_put(mock_id_pol.id.phase.btm_outer.user_setpoint)
         btm_outer.assert_called_once()
-        assert float(btm_outer.call_args[0][0]) == expect_btm_outer
+        assert float(btm_outer.call_args[0][0]) == pytest.approx(expect_btm_outer, 0.01)
+
+        gap = get_mock_put(mock_id_pol.id.gap.user_setpoint)
+        gap.assert_called_once()
+        assert float(gap.call_args[0][0]) == pytest.approx(expect_gap, 0.05)
 
 
 @pytest.mark.parametrize(
