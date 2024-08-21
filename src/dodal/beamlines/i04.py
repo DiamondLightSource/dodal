@@ -1,11 +1,7 @@
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.common.beamlines.beamline_utils import device_instantiation
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.aperturescatterguard import (
-    ApertureScatterguard,
-    load_positions_from_beamline_parameters,
-    load_tolerances_from_beamline_params,
-)
+from dodal.devices.aperturescatterguard import ApertureConfigData, ApertureScatterguard
 from dodal.devices.attenuator import Attenuator
 from dodal.devices.backlight import Backlight
 from dodal.devices.beamstop import BeamStop
@@ -236,8 +232,7 @@ def aperture_scatterguard(
         prefix="",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
-        loaded_positions=load_positions_from_beamline_parameters(params),
-        tolerances=load_tolerances_from_beamline_params(params),
+        configuration_data=ApertureConfigData(params),
     )
 
 

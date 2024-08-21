@@ -29,6 +29,17 @@ ApertureFiveDimensionalLocation = namedtuple(
 )
 
 
+class ApertureInOut(Enum):
+    OUT = 0
+    IN = 1
+
+
+class AperturePosition(Enum):
+    SMALL = 1
+    MEDIUM = 2
+    LARGE = 3
+
+
 @dataclass
 class ApertureScatterguardTolerances:
     ap_x: float
@@ -77,40 +88,10 @@ def position_from_params(
     )
 
 
-def load_tolerances_from_beamline_params(
-    params: GDABeamlineParameters,
-) -> ApertureScatterguardTolerances:
-    return ApertureScatterguardTolerances(
-        ap_x=params["miniap_x_tolerance"],
-        ap_y=params["miniap_y_tolerance"],
-        ap_z=params["miniap_z_tolerance"],
-        sg_x=params["sg_x_tolerance"],
-        sg_y=params["sg_y_tolerance"],
-    )
-
-
-class ApertureInOut(Enum):
-    OUT = 0
-    IN = 1
-
-
-class AperturePosition(Enum):
-    ROBOT_LOAD = 0
-    SMALL = 1
-    MEDIUM = 2
-    LARGE = 3
-
-
-InOutAndPosition = tuple[ApertureInOut, AperturePosition | None]
-
-
 def load_positions_from_beamline_parameters(
     params: GDABeamlineParameters,
 ) -> dict[AperturePosition, SingleAperturePosition]:
     return {
-        AperturePosition.ROBOT_LOAD: position_from_params(
-            "Robot load", AperturePositionGDANames.ROBOT_LOAD, None, params
-        ),
         AperturePosition.SMALL: position_from_params(
             "Small", AperturePositionGDANames.SMALL_APERTURE, 20, params
         ),
@@ -123,20 +104,52 @@ def load_positions_from_beamline_parameters(
     }
 
 
+def load_tolerances_from_beamline_params(
+    params: GDABeamlineParameters,
+) -> ApertureScatterguardTolerances:
+    return ApertureScatterguardTolerances(
+        ap_x=params["miniap_x_tolerance"],
+        ap_y=params["miniap_y_tolerance"],
+        ap_z=params["miniap_z_tolerance"],
+        sg_x=params["sg_x_tolerance"],
+        sg_y=params["sg_y_tolerance"],
+    )
+
+
+InOutAndPosition = tuple[ApertureInOut, AperturePosition | None]
+
+
+@dataclass
+class ApertureConfigData:
+    """Data about the apertures, loaded from beamline parameters"""
+
+    tolerances: ApertureScatterguardTolerances
+    positions: dict[AperturePosition, SingleAperturePosition]
+    robot_load_position: SingleAperturePosition
+
+    def __init__(self, beamline_parameters: GDABeamlineParameters):
+        self.tolerances = load_tolerances_from_beamline_params(beamline_parameters)
+        self.positions = load_positions_from_beamline_parameters(beamline_parameters)
+        self.robot_load_position = position_from_params(
+            "Robot load", AperturePositionGDANames.ROBOT_LOAD, None, beamline_parameters
+        )
+
+
 class ApertureScatterguard(StandardReadable, Movable):
     def __init__(
         self,
-        loaded_positions: dict[AperturePosition, SingleAperturePosition],
-        tolerances: ApertureScatterguardTolerances,
+        configuration_data: ApertureConfigData,
         prefix: str = "",
         name: str = "",
     ) -> None:
         self._aperture = Aperture(prefix + "-MO-MAPT-01:")
         self._scatterguard = Scatterguard(prefix + "-MO-SCAT-01:")
-        self._loaded_positions = loaded_positions
-        self._tolerances = tolerances
+        self._config_data = configuration_data
+        self._loaded_positions = configuration_data.positions
+        self._tolerances = configuration_data.tolerances
+        self._out_y = configuration_data.robot_load_position.location.aperture_y
         aperture_backend = SoftSignalBackend(
-            SingleAperturePosition, self._loaded_positions[AperturePosition.ROBOT_LOAD]
+            SingleAperturePosition, configuration_data.robot_load_position
         )
         aperture_backend.converter = self.ApertureConverter()
         self.selected_aperture = self.SelectedAperture(backend=aperture_backend)
@@ -190,21 +203,18 @@ class ApertureScatterguard(StandardReadable, Movable):
     async def set(self, value: InOutAndPosition):
         in_out, position = value
         if in_out == ApertureInOut.OUT:
-            out_y = self._loaded_positions[
-                AperturePosition.ROBOT_LOAD
-            ].location.aperture_y
             if position:
                 location = self._loaded_positions[position].location
                 out_location = ApertureFiveDimensionalLocation(
                     location.aperture_x,
-                    out_y,
+                    self._out_y,
                     location.aperture_z,
                     location.scatterguard_x,
                     location.scatterguard_y,
                 )
                 return await self._set_raw_unsafe(out_location)
             else:
-                return await self._aperture.y.set(out_y)
+                return await self._aperture.y.set(self._out_y)
         elif in_out == ApertureInOut.IN:
             if not position:
                 raise InvalidApertureMove("Cannot move in without a selected aperture")
@@ -243,17 +253,14 @@ class ApertureScatterguard(StandardReadable, Movable):
         If no position is found then raises InvalidApertureMove.
         """
         current_ap_y = await self._aperture.y.user_readback.get_value(cached=False)
-        robot_load_ap_y = self._loaded_positions[
-            AperturePosition.ROBOT_LOAD
-        ].location.aperture_y
         if await self._aperture.large.get_value(cached=False) == 1:
             return self._loaded_positions[AperturePosition.LARGE]
         elif await self._aperture.medium.get_value(cached=False) == 1:
             return self._loaded_positions[AperturePosition.MEDIUM]
         elif await self._aperture.small.get_value(cached=False) == 1:
             return self._loaded_positions[AperturePosition.SMALL]
-        elif current_ap_y <= robot_load_ap_y + self._tolerances.ap_y:
-            return self._loaded_positions[AperturePosition.ROBOT_LOAD]
+        elif current_ap_y <= self._out_y + self._tolerances.ap_y:
+            return self._config_data.robot_load_position
 
         raise InvalidApertureMove("Current aperture/scatterguard state unrecognised")
 
@@ -281,7 +288,7 @@ class ApertureScatterguard(StandardReadable, Movable):
         if diff_on_z > self._tolerances.ap_z:
             raise InvalidApertureMove(
                 "ApertureScatterguard safe move is not yet defined for positions "
-                "outside of LARGE, MEDIUM, SMALL, ROBOT_LOAD. "
+                "outside of LARGE, MEDIUM, SMALL. "
                 f"Current aperture z ({current_ap_z}), outside of tolerance ({self._tolerances.ap_z}) from target ({aperture_z})."
             )
 

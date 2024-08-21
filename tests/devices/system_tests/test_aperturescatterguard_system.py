@@ -10,11 +10,10 @@ from event_model import Event
 from ophyd_async.core import DeviceCollector
 
 from dodal.devices.aperturescatterguard import (
+    ApertureConfigData,
     AperturePosition,
     ApertureScatterguard,
     InvalidApertureMove,
-    load_positions_from_beamline_parameters,
-    load_tolerances_from_beamline_params,
 )
 
 I03_BEAMLINE_PARAMETER_PATH = (
@@ -63,15 +62,12 @@ class GDABeamlineParameters:
 @pytest.fixture
 async def ap_sg():
     params = GDABeamlineParameters.from_file(I03_BEAMLINE_PARAMETER_PATH)
-    positions = load_positions_from_beamline_parameters(params)  # type:ignore
-    tolerances = load_tolerances_from_beamline_params(params)  # type:ignore
 
     async with DeviceCollector():
         ap_sg = ApertureScatterguard(
             prefix="BL03S",
             name="ap_sg",
-            loaded_positions=positions,
-            tolerances=tolerances,
+            configuration_data=ApertureConfigData(params),  # type:ignore
         )
     return ap_sg
 
@@ -92,12 +88,6 @@ def move_to_medium(ap_sg: ApertureScatterguard):
 def move_to_small(ap_sg: ApertureScatterguard):
     assert ap_sg._loaded_positions is not None
     yield from bps.abs_set(ap_sg, AperturePosition.SMALL)
-
-
-@pytest.fixture
-def move_to_robotload(ap_sg: ApertureScatterguard):
-    assert ap_sg._loaded_positions is not None
-    yield from bps.abs_set(ap_sg, AperturePosition.ROBOT_LOAD)
 
 
 @pytest.mark.s03
@@ -179,7 +169,6 @@ async def test_aperturescatterguard_moves_in_correct_order(
         "L": ap_sg._loaded_positions[AperturePosition.LARGE],
         "M": ap_sg._loaded_positions[AperturePosition.MEDIUM],
         "S": ap_sg._loaded_positions[AperturePosition.SMALL],
-        "R": ap_sg._loaded_positions[AperturePosition.ROBOT_LOAD],
     }
     pos1 = positions[pos_name_1]
     pos2 = positions[pos_name_2]
