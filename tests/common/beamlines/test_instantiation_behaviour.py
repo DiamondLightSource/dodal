@@ -66,15 +66,30 @@ class TestDeviceInitializationController(unittest.TestCase):
         def my_device():
             return self.device_mock
 
-        print(my_device.__name__)
-        print(self.device_mock)
         controller = DeviceInitializationController(self.config, my_device)
 
         controller.add_device_to_cache(self.device_mock)
         cached_device = controller.see_if_device_is_in_cache("my_device")
-        print(cached_device)
+        assert cached_device is not None
 
         self.assertEqual(cached_device, self.device_mock)
+
+    def test_device_caching_with_name_override(self):
+        ACTIVE_DEVICES.clear()
+
+        def my_device():
+            self.device_mock.name = "foo"
+            return self.device_mock
+
+        self.config.set_name = False
+        controller = DeviceInitializationController(self.config, my_device)
+
+        controller.add_device_to_cache(self.device_mock)
+        cached_device = controller.see_if_device_is_in_cache("my_device")
+
+        assert cached_device is not None
+        self.assertEqual(cached_device, self.device_mock)
+        assert cached_device.name == "foo"
 
 
 class TestSpecificDeviceFunctions(unittest.TestCase):
