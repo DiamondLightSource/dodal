@@ -29,9 +29,32 @@ MAXIMUM_GAP_MOTOR_POSITION = 100
 
 class I10Apple2(StandardReadable, Movable):
     """
-    Apple2 id with both phase and gap motion for i10.
+    Apple2 id with both phase and gap motion for i10(Only part that is kind of I10 specific is the set).
     A pair of look up tables are needed to provide the conversion between motor position and energy.
-    Set is in energy in eV.
+    Set is in energy(eV).
+
+    Parameters
+    ----------
+    id_gap:
+        An UndulatorGap device.
+    id_phase:
+        An UndlatorPhaseAxes device.
+    energy_gap_table_path:
+        The path to id gap look up table.
+    energy_phase_table_path:
+        The path to id phase look up table.
+    source:
+        The column name and the name of the source in look up table. e.g. ("source", "idu")
+    mode:
+        The column name of the mode in look up table.
+    min_energy:
+        The column name that contain the maximum energy in look up table.
+    max_energy: str = "MaxEnergy",
+        The column name that contain the maximum energy in look up table.
+    poly_deg:
+        The column names for the parameters for the energy conversion polynomial, starting with the least significant.
+    prefix:
+        Not in use but needed for device_instantiation.
     """
 
     def __init__(
@@ -52,17 +75,17 @@ class I10Apple2(StandardReadable, Movable):
             self.gap = id_gap
             self.phase = id_phase
         with self.add_children_as_readables(HintedSignal):
-            # Store the polarisation for readback
+            # Store the polarisation for readback.
             self.polarisation, self._polarisation_set = soft_signal_r_and_setter(
                 str, initial_value=None
             )
-            # Store the set energy for readback
+            # Store the set energy for readback.
             self.energy, self._energy_set = soft_signal_r_and_setter(
                 float, initial_value=None
             )
 
         super().__init__(name)
-        # The path to the look up table and teh column names expected.
+        # A dictionary contains the path to the look up table and the expected column names.
         self.lookup_table_config = {
             "path": {
                 "Gap": energy_gap_table_path,
@@ -75,12 +98,9 @@ class I10Apple2(StandardReadable, Movable):
             "poly_deg": poly_deg,
         }
         self.lookup_tables = {}
-        self._startup()
-
-    def _startup(self):
-        self.update_poly()
-        self._available_pol = list(self.lookup_tables["Gap"].keys())
+        self._available_pol = []
         self._pol = None
+        self.update_poly()
 
     @property
     def pol(self):
@@ -98,6 +118,10 @@ class I10Apple2(StandardReadable, Movable):
 
     @AsyncStatus.wrap
     async def set(self, value: float) -> None:
+        """
+        Check polarisation state and use it together with the energy(value)
+        to calculate required gap and phase before setting it.
+        """
         if self.pol is None:
             LOGGER.info("Polarisation not set attempting to read from hardware")
             pol, phase = await self.determinePhaseFromHardware()
@@ -105,7 +129,7 @@ class I10Apple2(StandardReadable, Movable):
                 raise ValueError(f"Pol is not set for {self.name} and ")
             else:
                 self.pol = pol
-        LOGGER.info(f"Seting polarisation to {self.pol}")
+
         self._polarisation_set(self.pol)
 
         gap, phase = self._get_id_gap_phase(value)
@@ -117,10 +141,15 @@ class I10Apple2(StandardReadable, Movable):
             btm_outer="0.0",
             gap=str(gap),
         )
+        LOGGER.info(f"Seting polarisation to {self.pol}, with {id_set_val}")
         await self._set(value=id_set_val, energy=value)
 
-    @AsyncStatus.wrap
     async def _set(self, value: Apple2Val, energy: float) -> None:
+        """
+        Check ID is in a movable state and set all the demand value before moving.
+
+        """
+
         # Only need to check gap as the phase motors share both fault and gate with gap.
         if await self.gap.fault.get_value() != 0:
             raise RuntimeError(f"{self.name} is in fault state")
@@ -141,11 +170,11 @@ class I10Apple2(StandardReadable, Movable):
         )
         await self.gap.set_move.set(value=1)
         await wait_for_value(self.gap.gate, UndulatorGatestatus.close, timeout=timeout)
-        self._energy_set(energy)
+        self._energy_set(energy)  # Update energy for readback.
 
     def _get_id_gap_phase(self, energy) -> tuple[float, float]:
         """
-        Converts energy and polarisation to  gap and phase.
+        Converts energy and polarisation to gap and phase.
         """
         gap_poly = self._get_poly(
             lookup_table=self.lookup_tables["Gap"], new_energy=energy
@@ -156,6 +185,10 @@ class I10Apple2(StandardReadable, Movable):
         return gap_poly(energy), phase_poly(energy)
 
     def _get_poly(self, new_energy, lookup_table) -> np.poly1d:
+        """
+        Get the correct polynomial for a given energy.
+        """
+
         if (
             new_energy < lookup_table[self.pol]["Limit"]["Minimum"]
             or new_energy > lookup_table[self.pol]["Limit"]["Maximum"]
@@ -168,7 +201,6 @@ class I10Apple2(StandardReadable, Movable):
             )
         else:
             for energy_range in lookup_table[self.pol]["Energies"].values():
-                print(energy_range)
                 if (
                     new_energy >= energy_range["Low"]
                     and new_energy < energy_range["High"]
@@ -181,6 +213,10 @@ class I10Apple2(StandardReadable, Movable):
         )
 
     def update_poly(self):
+        """
+        Update the stored lookup tabled from file.
+
+        """
         LOGGER.info("Updating lookup dictionary from file.")
         for key, path in self.lookup_table_config["path"].items():
             if path.exists():
@@ -194,88 +230,108 @@ class I10Apple2(StandardReadable, Movable):
                 )
             else:
                 raise FileNotFoundError(f"{key} look up table is not in path: {path}")
+        self._available_pol = list(self.lookup_tables["Gap"].keys())
 
     def _motorPositionEqual(self, a, b):
         return abs(a - b) < ROW_PHASE_MOTOR_TOLERANCE
 
     async def determinePhaseFromHardware(self) -> tuple[str | None, float]:
+        """
+        Try to determine polarisation and phase value using row phase motor position pattern.
+        However there is no way to return lh3 polarisation or higher harmonic setting.
+        """
         cur_loc = await self.read()
-        rowphase1 = cur_loc[self.phase.top_outer.user_setpoint_readback.name]["value"]
-        rowphase2 = cur_loc[self.phase.top_inner.user_setpoint_readback.name]["value"]
-        rowphase3 = cur_loc[self.phase.btm_inner.user_setpoint_readback.name]["value"]
-        rowphase4 = cur_loc[self.phase.btm_outer.user_setpoint_readback.name]["value"]
+        top_outer = cur_loc[self.phase.top_outer.user_setpoint_readback.name]["value"]
+        top_inner = cur_loc[self.phase.top_inner.user_setpoint_readback.name]["value"]
+        btm_inner = cur_loc[self.phase.btm_inner.user_setpoint_readback.name]["value"]
+        btm_outer = cur_loc[self.phase.btm_outer.user_setpoint_readback.name]["value"]
         gap = cur_loc[self.gap.user_readback.name]["value"]
         if gap > MAXIMUM_GAP_MOTOR_POSITION:
             raise RuntimeError(
                 f"{self.name} is not in use, close gap or set polarisation to use this ID"
             )
-        # determine polarisation and phase value using row phase motor position pattern, However there is no way to return lh3 polarisation
+
         if (
-            self._motorPositionEqual(rowphase1, 0.0)
-            and self._motorPositionEqual(rowphase2, 0.0)
-            and self._motorPositionEqual(rowphase3, 0.0)
-            and self._motorPositionEqual(rowphase4, 0.0)
+            self._motorPositionEqual(top_outer, 0.0)
+            and self._motorPositionEqual(top_inner, 0.0)
+            and self._motorPositionEqual(btm_inner, 0.0)
+            and self._motorPositionEqual(btm_outer, 0.0)
         ):
             # Linear Horizontal
             polarisation = "lh"
             phase = 0.0
             return polarisation, phase
         if (
-            self._motorPositionEqual(rowphase1, MAXIMUM_ROW_PHASE_MOTOR_POSITION)
-            and self._motorPositionEqual(rowphase2, 0.0)
-            and self._motorPositionEqual(rowphase3, MAXIMUM_ROW_PHASE_MOTOR_POSITION)
-            and self._motorPositionEqual(rowphase4, 0.0)
+            self._motorPositionEqual(top_outer, MAXIMUM_ROW_PHASE_MOTOR_POSITION)
+            and self._motorPositionEqual(top_inner, 0.0)
+            and self._motorPositionEqual(btm_inner, MAXIMUM_ROW_PHASE_MOTOR_POSITION)
+            and self._motorPositionEqual(btm_outer, 0.0)
         ):
             # Linear Vertical
             polarisation = "lv"
             phase = MAXIMUM_ROW_PHASE_MOTOR_POSITION
             return polarisation, phase
         if (
-            self._motorPositionEqual(rowphase1, rowphase3)
-            and rowphase1 > 0.0
-            and self._motorPositionEqual(rowphase2, 0.0)
-            and self._motorPositionEqual(rowphase4, 0.0)
+            self._motorPositionEqual(top_outer, btm_inner)
+            and top_outer > 0.0
+            and self._motorPositionEqual(top_inner, 0.0)
+            and self._motorPositionEqual(btm_outer, 0.0)
         ):
             # Positive Circular
             polarisation = "pc"
-            phase = rowphase1
+            phase = top_outer
             return polarisation, phase
         if (
-            self._motorPositionEqual(rowphase1, rowphase3)
-            and rowphase1 < 0.0
-            and self._motorPositionEqual(rowphase2, 0.0)
-            and self._motorPositionEqual(rowphase4, 0.0)
+            self._motorPositionEqual(top_outer, btm_inner)
+            and top_outer < 0.0
+            and self._motorPositionEqual(top_inner, 0.0)
+            and self._motorPositionEqual(btm_outer, 0.0)
         ):
             # Negative Circular
             polarisation = "nc"
-            phase = rowphase1
+            phase = top_outer
             return polarisation, phase
         if (
-            self._motorPositionEqual(rowphase1, -rowphase3)
-            and self._motorPositionEqual(rowphase2, 0.0)
-            and self._motorPositionEqual(rowphase4, 0.0)
+            self._motorPositionEqual(top_outer, -btm_inner)
+            and self._motorPositionEqual(top_inner, 0.0)
+            and self._motorPositionEqual(btm_outer, 0.0)
         ):
             # Positive Linear Arbitrary
             polarisation = "la"
-            phase = rowphase1
+            phase = top_outer
             return polarisation, phase
         if (
-            self._motorPositionEqual(rowphase2, -rowphase4)
-            and self._motorPositionEqual(rowphase1, 0.0)
-            and self._motorPositionEqual(rowphase3, 0.0)
+            self._motorPositionEqual(top_inner, -btm_outer)
+            and self._motorPositionEqual(top_outer, 0.0)
+            and self._motorPositionEqual(btm_inner, 0.0)
         ):
             # Negative Linear Arbitrary
             polarisation = "la"
-            phase = rowphase2
+            phase = top_inner
             return polarisation, phase
-        # UNKNOWN default to LH
-
+        # UNKNOWN default
         polarisation = None
         phase = 0.0
         return (polarisation, phase)
 
 
 class I10Apple2PGM(StandardReadable, Movable):
+    """
+    Compound device to set both ID and PGM energy at the sample time,
+    with the possibility of having id energy offset to that of the pgm.
+
+    Parameters
+    ----------
+    id:
+        An I10Apple2 device.
+    pgm:
+        A PGM/mono device.
+    prefix:
+        Not in use but needed for device_instantiation.
+    name:
+        New device name.
+    """
+
     def __init__(
         self, id: I10Apple2, pgm: PGM, prefix: str = "", name: str = ""
     ) -> None:
@@ -295,6 +351,19 @@ class I10Apple2PGM(StandardReadable, Movable):
 
 
 class I10Apple2Pol(StandardReadable, Movable):
+    """
+    Compound device to set polorisation of the ID.
+
+    Parameters
+    ----------
+    id:
+        An I10Apple2 device.
+    prefix:
+        Not in use but needed for device_instantiation.
+    name:
+        New device name.
+    """
+
     def __init__(self, id: I10Apple2, prefix: str = "", name: str = "") -> None:
         with self.add_children_as_readables():
             self.id = id
@@ -359,7 +428,7 @@ def convert_csv_to_lookup(
             look_up_table[row[mode]]["Limit"] = {}
             look_up_table[row[mode]]["Limit"]["Minimum"] = float(row[min_energy])
             look_up_table[row[mode]]["Limit"]["Maximum"] = float(row[max_energy])
-        # calculate polynomial energy to gap/phase
+        # create polynomial object for energy to gap/phase
         cof = [float(row[x]) for x in poly_deg]
         poly = np.poly1d(cof)
 
