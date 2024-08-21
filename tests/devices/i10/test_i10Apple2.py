@@ -105,7 +105,7 @@ async def mock_id_pgm(mock_id: I10Apple2, mock_pgm: PGM) -> I10Apple2PGM:
 
 
 @pytest.fixture
-async def mock_id_pol(mock_id: I10Apple2, mock_pgm: PGM) -> I10Apple2Pol:
+async def mock_id_pol(mock_id: I10Apple2) -> I10Apple2Pol:
     async with DeviceCollector(mock=True):
         mock_id_pol = I10Apple2Pol(id=mock_id)
 

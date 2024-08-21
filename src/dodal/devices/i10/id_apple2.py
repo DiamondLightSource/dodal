@@ -276,7 +276,9 @@ class I10Apple2(StandardReadable, Movable):
 
 
 class I10Apple2PGM(StandardReadable, Movable):
-    def __init__(self, id: I10Apple2, pgm: PGM, name: str = "") -> None:
+    def __init__(
+        self, id: I10Apple2, pgm: PGM, prefix: str = "", name: str = ""
+    ) -> None:
         with self.add_children_as_readables():
             self.id = id
             self.pgm = pgm
@@ -293,7 +295,7 @@ class I10Apple2PGM(StandardReadable, Movable):
 
 
 class I10Apple2Pol(StandardReadable, Movable):
-    def __init__(self, id: I10Apple2, name: str = "") -> None:
+    def __init__(self, id: I10Apple2, prefix: str = "", name: str = "") -> None:
         with self.add_children_as_readables():
             self.id = id
         super().__init__(name=name)

@@ -1,7 +1,186 @@
-from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.log import set_beamline as set_log_beamline
-from dodal.utils import get_beamline_name
+from pathlib import Path
 
-BL = get_beamline_name("10")
+from dodal.common.beamlines.beamline_utils import device_instantiation
+from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.devices.apple2_undulator import UndlatorPhaseAxes, UndulatorGap
+from dodal.devices.i10.i10_pgm import I10Grating
+from dodal.devices.i10.id_apple2 import I10Apple2, I10Apple2PGM, I10Apple2Pol
+from dodal.devices.monochromator import PGM
+from dodal.log import set_beamline as set_log_beamline
+from dodal.utils import BeamlinePrefix, get_beamline_name
+
+BL = get_beamline_name("i10")
 set_log_beamline(BL)
 set_utils_beamline(BL)
+
+
+def idd_gap(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> UndulatorGap:
+    return device_instantiation(
+        device_factory=UndulatorGap,
+        name="idd_gap",
+        prefix=f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+        bl_prefix=False,
+    )
+
+
+def idd_phase(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> UndlatorPhaseAxes:
+    return device_instantiation(
+        device_factory=UndlatorPhaseAxes,
+        name="idd_phase",
+        prefix=f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
+        top_outer="RPQ1",
+        top_inner="RPQ2",
+        btm_outer="RPQ3",
+        btm_inner="RPQ4",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+        bl_prefix=False,
+    )
+
+
+def idu_gap(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> UndulatorGap:
+    return device_instantiation(
+        device_factory=UndulatorGap,
+        name="idu_gap",
+        prefix=f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-21:",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+        bl_prefix=False,
+    )
+
+
+def idu_phase(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> UndlatorPhaseAxes:
+    return device_instantiation(
+        device_factory=UndlatorPhaseAxes,
+        name="idu_phase",
+        prefix=f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-21:",
+        top_outer="RPQ1",
+        top_inner="RPQ2",
+        btm_outer="RPQ3",
+        btm_inner="RPQ4",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+        bl_prefix=False,
+    )
+
+
+def pgm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> PGM:
+    return device_instantiation(
+        device_factory=PGM,
+        name="pgm",
+        prefix="-OP-PGM-01:",
+        grating=I10Grating,
+        gratingPv="NLINES2",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+    )
+
+
+def idu_gap_phase(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> I10Apple2:
+    return device_instantiation(
+        device_factory=I10Apple2,
+        id_gap=idu_gap(),
+        id_phase=idu_phase(),
+        energy_gap_table_path=Path(
+            "/workspaces/dodal/tests/devices/i10/lookupTables/IDEnergy2GapCalibrations.csv",
+            # "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2GapCalibrations.csv",
+        ),
+        energy_phase_table_path=Path(
+            "/workspaces/dodal/tests/devices/i10/lookupTables/IDEnergy2PhaseCalibrations.csv"
+            # "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2PhaseCalibrations.csv",
+        ),
+        source=("Source", "idu"),
+        name="idu_gap_phase",
+        prefix="",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+    )
+
+
+def idd_gap_phase(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> I10Apple2:
+    return device_instantiation(
+        device_factory=I10Apple2,
+        id_gap=idd_gap(),
+        id_phase=idd_phase(),
+        energy_gap_table_path=Path(
+            "/workspaces/dodal/tests/devices/i10/lookupTables/IDEnergy2GapCalibrations.csv",
+            # "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2GapCalibrations.csv",
+        ),
+        energy_phase_table_path=Path(
+            "/workspaces/dodal/tests/devices/i10/lookupTables/IDEnergy2PhaseCalibrations.csv"
+            # "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2PhaseCalibrations.csv",
+        ),
+        source=("Source", "idd"),
+        name="idd_gap_phase",
+        prefix="",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+    )
+
+
+def idu_pol(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> I10Apple2Pol:
+    return device_instantiation(
+        device_factory=I10Apple2Pol,
+        prefix="",
+        id=idu_gap_phase(),
+        name="idu_pol",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+    )
+
+
+def idd_pol(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> I10Apple2Pol:
+    return device_instantiation(
+        device_factory=I10Apple2Pol,
+        prefix="",
+        id=idd_gap_phase(),
+        name="idd_pol",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+    )
+
+
+def idu(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> I10Apple2PGM:
+    return device_instantiation(
+        device_factory=I10Apple2PGM,
+        prefix="",
+        id=idu_gap_phase(),
+        pgm=pgm(),
+        name="idu",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+    )
+
+
+def idd(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> I10Apple2PGM:
+    return device_instantiation(
+        device_factory=I10Apple2PGM,
+        prefix="",
+        id=idd_gap_phase(),
+        pgm=pgm(),
+        name="idd",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+    )
