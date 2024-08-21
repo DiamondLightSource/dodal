@@ -121,7 +121,9 @@ async def mock_id_pol(mock_id: I10Apple2, mock_pgm: PGM) -> I10Apple2Pol:
         ("nc", -12, 0, -12, 0),
         ("la", 12, 0, -12, 0),
         ("la", 0, 12, 0, -12),
+        ("la", -11, 0, 11, 0),
         (None, 8, 12, 2, -12),
+        (None, 11, 0, 10, 0),
     ],
 )
 async def test_I10Apple2_determine_pol(
