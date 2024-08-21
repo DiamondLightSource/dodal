@@ -136,6 +136,11 @@ def make_device(
     return device_collector
 
 
+def make_device_with_behavior_config():
+    # TODO: Implement this function
+    pass
+
+
 def make_all_devices(
     module: str | ModuleType | None = None, include_skipped: bool = False, **kwargs
 ) -> tuple[dict[str, AnyDevice], dict[str, Exception]]:
