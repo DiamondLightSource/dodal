@@ -209,7 +209,7 @@ async def test_reading_pjumpcell_includes_read_fields_controller(
     set_mock_value(cell.controller.control_counter, 123)
     set_mock_value(cell.controller.control_script_status, "ABC")
     set_mock_value(cell.controller.control_routine, "CDE")
-    set_mock_value(cell.controller.control_state, "EFG")
+    set_mock_value(cell.controller.state, "EFG")
     set_mock_value(cell.controller.control_iteration, 456)
 
     await assert_reading(
