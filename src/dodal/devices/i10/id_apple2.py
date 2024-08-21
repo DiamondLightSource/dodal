@@ -109,10 +109,11 @@ class I10Apple2(StandardReadable, Movable):
         self._polarisation_set(self.pol)
 
         gap, phase = self._get_id_gap_phase(value)
+        phase3 = phase if self.pol != "la" else -phase
         id_set_val = Apple2Val(
             top_outer=str(phase),
             top_inner="0.0",
-            btm_inner=str(-phase),
+            btm_inner=str(phase3),
             btm_outer="0.0",
             gap=str(gap),
         )
@@ -199,8 +200,8 @@ class I10Apple2(StandardReadable, Movable):
 
     async def determinePhaseFromHardware(self) -> tuple[str | None, float]:
         cur_loc = await self.read()
-        rowphase1 = cur_loc[self.phase.top_inner.user_setpoint_readback.name]["value"]
-        rowphase2 = cur_loc[self.phase.top_outer.user_setpoint_readback.name]["value"]
+        rowphase1 = cur_loc[self.phase.top_outer.user_setpoint_readback.name]["value"]
+        rowphase2 = cur_loc[self.phase.top_inner.user_setpoint_readback.name]["value"]
         rowphase3 = cur_loc[self.phase.btm_inner.user_setpoint_readback.name]["value"]
         rowphase4 = cur_loc[self.phase.btm_outer.user_setpoint_readback.name]["value"]
         gap = cur_loc[self.gap.user_readback.name]["value"]
@@ -300,7 +301,9 @@ class I10Apple2Pol(StandardReadable, Movable):
     @AsyncStatus.wrap
     async def set(self, value: str) -> None:
         self.id.pol = value  # change polarisation.
-        self.id.set(await self.id.energy.get_value())  # Move id to new polarisation
+        await self.id.set(
+            await self.id.energy.get_value()
+        )  # Move id to new polarisation
 
 
 def convert_csv_to_lookup(
