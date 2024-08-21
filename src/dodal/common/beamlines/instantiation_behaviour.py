@@ -37,6 +37,11 @@ class DeviceInitializationConfig:
 
 
 class DeviceInitializationController:
+    """
+    This class is responsible for the instantiation of a device.
+    The device is then cached here locally, and also in the global variable ACTIVE_DEVICES.
+    """
+
     device: AnyDevice | None = None
     factory: Callable[[], AnyDevice]
 
@@ -46,21 +51,25 @@ class DeviceInitializationController:
         self.factory = factory
         self.config = config
         CONTROLLERS[self.factory.__name__] = self
+        self.device = None
 
     # TODO right now the cache is in a global variable ACTIVE_DEVICES, that should change
-    def see_if_device_is_in_cache(self, factory_name: str) -> AnyDevice | None:
-        d = ACTIVE_DEVICES.get(factory_name)
-        assert isinstance(d, AnyDevice) or d is None
-        return d
+    def see_if_device_is_in_cache(self) -> AnyDevice | None:
+        return self.device
 
     def __call__(
-        self, connect=False, mock: bool | None = None, timeout: float | None = None
+        self,
+        connect=False,
+        mock: bool | None = None,
+        timeout: float | None = None,
+        name: str | None = None,
     ) -> AnyDevice:
         device: AnyDevice = (
             # todo if we do not pass the name to the factory, we can not check if the device is in the cache.
             # there are many devices from the same factory
-            self.see_if_device_is_in_cache(self.factory.__name__) or self.factory()
+            self.see_if_device_is_in_cache() or self.factory()
         )
+        assert device is not None
         if self.config.set_name:
             device.set_name(self.factory.__name__)
         self.add_device_to_cache(device)
@@ -76,12 +85,16 @@ class DeviceInitializationController:
                     else mock,
                 )
             )
-            CONTROLLERS[self.factory.__name__] = self
+            assert self.device is not None
+            CONTROLLERS[self.device.name] = self
 
+        if self.device is not None:
+            CONTROLLERS[self.device.name] = self
         return device
 
     def add_device_to_cache(self, device: AnyDevice) -> None:
-        ACTIVE_DEVICES[self.factory.__name__] = device
+        self.device = device
+        ACTIVE_DEVICES[device.name] = device
 
 
 CONTROLLERS: dict[str, DeviceInitializationController] = {}

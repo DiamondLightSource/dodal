@@ -10,8 +10,46 @@ from dodal.common.beamlines.instantiation_behaviour import (
     DeviceInitializationController,
     XYZDetector,
     detector_xyz_variant,
+    instantiation_behaviour,
     new_detector_xyz,
 )
+
+
+def test_decorator_directly():
+    CONTROLLERS.clear()
+    beamline_prefix = "example:"
+
+    @instantiation_behaviour(
+        eager=True,
+        default_use_mock_at_connection=True,
+        default_timeout_for_connect=10,
+    )
+    def detector_xyz_variant():
+        """Create an XYZ detector with specific settings."""
+        return XYZDetector(name="det2-variant", prefix=f"{beamline_prefix}xyz:")
+
+    device = detector_xyz_variant()
+    assert device is not None
+    assert "detector_xyz_variant" in CONTROLLERS.keys()
+
+
+def test_decorator_directly_with_no_name_override():
+    CONTROLLERS.clear()
+    beamline_prefix = "example:"
+
+    @instantiation_behaviour(
+        eager=True,
+        default_use_mock_at_connection=True,
+        default_timeout_for_connect=10,
+        set_name=False,
+    )
+    def detector_xyz_variant():
+        """Create an XYZ detector with specific settings."""
+        return XYZDetector(name="foo", prefix=f"{beamline_prefix}xyz:")
+
+    device = detector_xyz_variant()
+    assert device is not None
+    assert "foo" in CONTROLLERS.keys()
 
 
 class TestXYZDetector(unittest.TestCase):
@@ -69,27 +107,10 @@ class TestDeviceInitializationController(unittest.TestCase):
         controller = DeviceInitializationController(self.config, my_device)
 
         controller.add_device_to_cache(self.device_mock)
-        cached_device = controller.see_if_device_is_in_cache("my_device")
+        cached_device = controller.see_if_device_is_in_cache()
         assert cached_device is not None
 
         self.assertEqual(cached_device, self.device_mock)
-
-    def test_device_caching_with_name_override(self):
-        ACTIVE_DEVICES.clear()
-
-        def my_device():
-            self.device_mock.name = "foo"
-            return self.device_mock
-
-        self.config.set_name = False
-        controller = DeviceInitializationController(self.config, my_device)
-
-        controller.add_device_to_cache(self.device_mock)
-        cached_device = controller.see_if_device_is_in_cache("my_device")
-
-        assert cached_device is not None
-        self.assertEqual(cached_device, self.device_mock)
-        assert cached_device.name == "foo"
 
 
 class TestSpecificDeviceFunctions(unittest.TestCase):
