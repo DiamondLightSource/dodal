@@ -191,9 +191,10 @@ class MotionProgram(Device):
 class ExpectedImages(SignalR[int]):
     def __init__(self, parent: "FastGridScanCommon") -> None:
         super().__init__(SoftSignalBackend(int))
-        self.parent: FastGridScanCommon = parent
+        self.parent = parent
 
-    async def get_value(self):
+    async def get_value(self, cached: bool | None = None):
+        assert isinstance(self.parent, FastGridScanCommon)
         x = await self.parent.x_steps.get_value()
         y = await self.parent.y_steps.get_value()
         z = await self.parent.z_steps.get_value()

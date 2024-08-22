@@ -1,5 +1,6 @@
 import dataclasses
 import getpass
+import os
 import socket
 from dataclasses import dataclass
 
@@ -37,6 +38,12 @@ class ZocaloStartInfo:
     message_index: int
 
 
+def _get_zocalo_headers() -> tuple[str, str]:
+    user = os.environ.get("ZOCALO_GO_USER", getpass.getuser())
+    hostname = os.environ.get("ZOCALO_GO_HOSTNAME", socket.gethostname())
+    return user, hostname
+
+
 class ZocaloTrigger:
     """This class just sends 'run_start' and 'run_end' messages to zocalo, it is
     intended to be used in bluesky callback classes. To get results from zocalo back
@@ -55,9 +62,10 @@ class ZocaloTrigger:
                 "recipes": ["mimas"],
                 "parameters": parameters,
             }
+            user, hostname = _get_zocalo_headers()
             header = {
-                "zocalo.go.user": getpass.getuser(),
-                "zocalo.go.host": socket.gethostname(),
+                "zocalo.go.user": user,
+                "zocalo.go.host": hostname,
             }
             transport.send("processing_recipe", message, headers=header)
         finally:

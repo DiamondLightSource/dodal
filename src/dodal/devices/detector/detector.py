@@ -41,8 +41,8 @@ class DetectorParams(BaseModel):
     det_dist_to_beam_converter_path: str
     trigger_mode: TriggerMode = TriggerMode.SET_FRAMES
     detector_size_constants: DetectorSizeConstants = EIGER2_X_16M_SIZE
-    beam_xy_converter: DetectorDistanceToBeamXYConverter
-    run_number: int
+    beam_xy_converter: DetectorDistanceToBeamXYConverter = None  # type: ignore # Filled in by validator
+    run_number: int = None  # type: ignore # Filled in by validator
     enable_dev_shm: bool = (
         False  # Remove in https://github.com/DiamondLightSource/hyperion/issues/1395
     )

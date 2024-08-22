@@ -1,3 +1,4 @@
+# type: ignore # Eiger will soon be ophyd-async https://github.com/DiamondLightSource/dodal/issues/700
 import pytest
 
 from dodal.devices.eiger import DetectorParams, EigerDetector

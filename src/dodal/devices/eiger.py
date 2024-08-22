@@ -1,3 +1,4 @@
+# type: ignore # Eiger will soon be ophyd-async https://github.com/DiamondLightSource/dodal/issues/700
 from enum import Enum
 
 from ophyd import Component, Device, EpicsSignalRO, Signal

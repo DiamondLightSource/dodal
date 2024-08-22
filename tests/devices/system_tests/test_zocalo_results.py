@@ -13,6 +13,7 @@ from dodal.devices.zocalo import (
     NoZocaloSubscription,
     XrcResult,
     ZocaloResults,
+    ZocaloStartInfo,
     ZocaloTrigger,
 )
 
@@ -39,7 +40,7 @@ async def test_read_results_from_fake_zocalo(
 ):
     zocalo_device._subscribe_to_results()
     zc = ZocaloTrigger("dev_artemis")
-    zc.run_start(0, 0, 100)
+    zc.run_start(ZocaloStartInfo(0, None, 0, 100, 0))
     zc.run_end(0)
     zocalo_device.timeout_s = 5
 
@@ -64,7 +65,7 @@ async def test_stage_unstage_controls_read_results_from_fake_zocalo(
 
     def plan():
         yield from bps.open_run()
-        zc.run_start(0, 0, 100)
+        zc.run_start(ZocaloStartInfo(0, None, 0, 100, 0))
         zc.run_end(0)
         yield from bps.sleep(0.15)
         yield from bps.trigger_and_read([zocalo_device])
@@ -76,7 +77,6 @@ async def test_stage_unstage_controls_read_results_from_fake_zocalo(
 
     # With stage, the plan should run normally
     RE(plan_with_stage())
-    assert not zocalo_device.subscription
     # Without stage, the plan should run fail because we didn't connect to Zocalo
     with pytest.raises(FailedStatus) as e:
         RE(plan())

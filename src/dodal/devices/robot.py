@@ -45,6 +45,9 @@ class BartRobot(StandardReadable, Movable):
     LOAD_TIMEOUT = 60
     NO_PIN_ERROR_CODE = 25
 
+    # How far the gonio position can be out before loading will fail
+    LOAD_TOLERANCE_MM = 0.02
+
     def __init__(
         self,
         name: str,
@@ -117,12 +120,12 @@ class BartRobot(StandardReadable, Movable):
         await self.pin_mounted_or_no_pin_found()
 
     @AsyncStatus.wrap
-    async def set(self, sample_location: SampleLocation):
+    async def set(self, value: SampleLocation):
         try:
             await asyncio.wait_for(
-                self._load_pin_and_puck(sample_location), timeout=self.LOAD_TIMEOUT
+                self._load_pin_and_puck(value), timeout=self.LOAD_TIMEOUT
             )
         except asyncio.TimeoutError as e:
             error_code = await self.error_code.get_value()
             error_string = await self.error_str.get_value()
-            raise RobotLoadFailed(error_code, error_string) from e
+            raise RobotLoadFailed(int(error_code), error_string) from e
