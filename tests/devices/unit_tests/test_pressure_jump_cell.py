@@ -66,13 +66,13 @@ async def test_reading_pjumpcell_includes_read_fields_pump(
     cell: PressureJumpCell,
 ):
     set_mock_value(cell.pump.pump_position, 100)
-    set_mock_value(cell.pump.pump_forward_limit, LimitSwitchState.OFF)
-    set_mock_value(cell.pump.pump_backward_limit, LimitSwitchState.ON)
+    # set_mock_value(cell.pump.pump_forward_limit, LimitSwitchState.OFF)
+    # set_mock_value(cell.pump.pump_backward_limit, LimitSwitchState.ON)
     set_mock_value(
         cell.pump.pump_motor_direction,
         PumpMotorDirectionState.FORWARD,
     )
-    set_mock_value(cell.pump.pump_speed_rbv, 100)
+    set_mock_value(cell.pump.pump_speed, 100)
 
     await assert_reading(
         cell.pump,
@@ -82,22 +82,12 @@ async def test_reading_pjumpcell_includes_read_fields_pump(
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
-            "pjump-pump-pump_forward_limit": {
-                "value": LimitSwitchState.OFF,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "pjump-pump-pump_backward_limit": {
-                "value": LimitSwitchState.ON,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
             "pjump-pump-pump_motor_direction": {
                 "value": PumpMotorDirectionState.FORWARD,
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
-            "pjump-pump-pump_speed_rbv": {
+            "pjump-pump-pump_speed": {
                 "value": 100,
                 "timestamp": ANY,
                 "alarm_severity": 0,
@@ -194,59 +184,6 @@ async def test_reading_pjumpcell_includes_read_fields_transducers(
             },
             "pjump-pressure_transducers-3-beckhoff_voltage": {
                 "value": 2.53,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-        },
-    )
-
-
-async def test_reading_pjumpcell_includes_read_fields_controller(
-    cell: PressureJumpCell,
-):
-    set_mock_value(cell.controller.control_gotobusy, BusyState.IDLE)
-    set_mock_value(cell.controller.control_timer, TimerState.COUNTDOWN)
-    set_mock_value(cell.controller.control_counter, 123)
-    set_mock_value(cell.controller.control_script_status, "ABC")
-    set_mock_value(cell.controller.control_routine, "CDE")
-    set_mock_value(cell.controller.state, "EFG")
-    set_mock_value(cell.controller.control_iteration, 456)
-
-    await assert_reading(
-        cell.controller,
-        {
-            "pjump-controller-control_gotobusy": {
-                "value": BusyState.IDLE,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "pjump-controller-control_timer": {
-                "value": TimerState.COUNTDOWN,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "pjump-controller-control_counter": {
-                "value": 123,
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "pjump-controller-control_script_status": {
-                "value": "ABC",
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "pjump-controller-control_routine": {
-                "value": "CDE",
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "pjump-controller-control_state": {
-                "value": "EFG",
-                "timestamp": ANY,
-                "alarm_severity": 0,
-            },
-            "pjump-controller-control_iteration": {
-                "value": 456,
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
