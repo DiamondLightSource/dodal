@@ -72,6 +72,10 @@ class I10Apple2(StandardReadable, Movable):
         poly_deg: list | None = None,
         name: str = "",
     ) -> None:
+        super().__init__(name)
+
+        # Attributes are set after super call so they are not renamed to
+        # <name>-undulator, etc.
         with self.add_children_as_readables():
             self.gap = id_gap
             self.phase = id_phase
@@ -85,7 +89,6 @@ class I10Apple2(StandardReadable, Movable):
                 float, initial_value=None
             )
 
-        super().__init__(name)
         # A dictionary contains the path to the look up table and the expected column names.
         self.lookup_table_config = {
             "path": {
@@ -341,12 +344,12 @@ class I10Apple2PGM(StandardReadable, Movable):
     def __init__(
         self, id: I10Apple2, pgm: PGM, prefix: str = "", name: str = ""
     ) -> None:
+        super().__init__(name=name)
         with self.add_children_as_readables():
             self.id = id
             self.pgm = pgm
         with self.add_children_as_readables(HintedSignal):
             self.energy_offset = soft_signal_rw(float, initial_value=0)
-        super().__init__(name=name)
 
     @AsyncStatus.wrap
     async def set(self, value: float) -> None:
@@ -372,9 +375,9 @@ class I10Apple2Pol(StandardReadable, Movable):
     """
 
     def __init__(self, id: I10Apple2, prefix: str = "", name: str = "") -> None:
+        super().__init__(name=name)
         with self.add_children_as_readables():
             self.id = id
-        super().__init__(name=name)
 
     @AsyncStatus.wrap
     async def set(self, value: str) -> None:
