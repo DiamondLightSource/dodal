@@ -53,7 +53,6 @@ class DeviceInitializationController:
         CONTROLLERS[self.factory.__name__] = self
         self.device = None
 
-    # TODO right now the cache is in a global variable ACTIVE_DEVICES, that should change
     def see_if_device_is_in_cache(self) -> AnyDevice | None:
         return self.device
 
@@ -64,12 +63,7 @@ class DeviceInitializationController:
         timeout: float | None = None,
         name: str | None = None,
     ) -> AnyDevice:
-        device: AnyDevice = (
-            # todo if we do not pass the name to the factory, we can not check if the device is in the cache.
-            # there are many devices from the same factory
-            self.see_if_device_is_in_cache() or self.factory()
-        )
-        assert device is not None
+        device = self.see_if_device_is_in_cache() or self.factory()
         if self.config.set_name:
             device.set_name(self.factory.__name__)
         self.add_device_to_cache(device)
