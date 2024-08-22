@@ -102,6 +102,32 @@ def skip_device(precondition=lambda: True):
     return decorator
 
 
+def make_device(
+    module: str | ModuleType,
+    device_name: str,
+    **kwargs,
+) -> dict[str, AnyDevice]:
+    """Make a single named device and its dependencies from the given beamline module.
+
+    Args:
+        module (str | ModuleType): The module to make devices from.
+        device_name: Name of the device to construct
+        **kwargs: Arguments passed on to every device factory
+
+    Returns:
+        dict[str, AnyDevice]: A dict mapping device names to the constructed devices
+    """
+    if isinstance(module, str):
+        module = import_module(module)
+
+    device_collector = {}
+    factories = collect_factories(module)
+    device_collector[device_name] = _make_one_device(
+        module, device_name, device_collector, factories, **kwargs
+    )
+    return device_collector
+
+
 def make_all_devices(
     module: str | ModuleType | None = None, include_skipped: bool = False, **kwargs
 ) -> tuple[dict[str, AnyDevice], dict[str, Exception]]:
@@ -254,7 +280,7 @@ def is_any_device_factory(func: Callable) -> bool:
 
 
 def is_v2_device_type(obj: type[Any]) -> bool:
-    return inspect.isclass(obj) and issubclass(obj, OphydV2Device)
+    return inspect.isclass(obj) and isinstance(obj, OphydV2Device)
 
 
 def is_v1_device_type(obj: type[Any]) -> bool:
@@ -326,3 +352,30 @@ def get_run_number(directory: str, prefix: str = "") -> int:
         return 1
     else:
         return _find_next_run_number_from_files(nexus_file_names)
+
+
+def _make_one_device(
+    module: ModuleType,
+    device_name: str,
+    devices: dict[str, AnyDevice],
+    factories: dict[str, AnyDeviceFactory],
+    **kwargs,
+) -> AnyDevice:
+    factory = factories.get(device_name)
+    if not factory:
+        raise ValueError(f"Unable to find factory for {device_name}")
+
+    dependencies = list(extract_dependencies(factories, device_name))
+    for dependency_name in dependencies:
+        if dependency_name not in devices:
+            try:
+                devices[dependency_name] = _make_one_device(
+                    module, dependency_name, devices, factories, **kwargs
+                )
+            except Exception as e:
+                raise RuntimeError(
+                    f"Unable to construct device {dependency_name}"
+                ) from e
+
+    params = {name: devices[name] for name in dependencies}
+    return factory(**params, **kwargs)
