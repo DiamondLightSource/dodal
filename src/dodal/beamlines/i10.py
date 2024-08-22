@@ -6,11 +6,12 @@ from dodal.devices.apple2_undulator import UndlatorPhaseAxes, UndulatorGap
 from dodal.devices.i10.i10_pgm import I10Grating
 from dodal.devices.i10.id_apple2 import I10Apple2, I10Apple2PGM, I10Apple2Pol
 from dodal.devices.monochromator import PGM
-from dodal.log import set_beamline as set_log_beamline
+
+# from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("i10")
-set_log_beamline(BL)
+# set_log_beamline(BL)
 set_utils_beamline(BL)
 
 
@@ -91,8 +92,8 @@ def idu_gap_phase(
 ) -> I10Apple2:
     return device_instantiation(
         device_factory=I10Apple2,
-        id_gap=idu_gap(),
-        id_phase=idu_phase(),
+        id_gap=idu_gap(wait_for_connection, fake_with_ophyd_sim),
+        id_phase=idu_phase(wait_for_connection, fake_with_ophyd_sim),
         energy_gap_table_path=Path(
             "tests/devices/i10/lookupTables/IDEnergy2GapCalibrations.csv"
             # "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2GapCalibrations.csv",
@@ -114,8 +115,8 @@ def idd_gap_phase(
 ) -> I10Apple2:
     return device_instantiation(
         device_factory=I10Apple2,
-        id_gap=idd_gap(),
-        id_phase=idd_phase(),
+        id_gap=idd_gap(wait_for_connection, fake_with_ophyd_sim),
+        id_phase=idd_phase(wait_for_connection, fake_with_ophyd_sim),
         energy_gap_table_path=Path(
             "tests/devices/i10/lookupTables/IDEnergy2GapCalibrations.csv"
             # "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2GapCalibrations.csv",
@@ -138,7 +139,7 @@ def idu_pol(
     return device_instantiation(
         device_factory=I10Apple2Pol,
         prefix="",
-        id=idu_gap_phase(),
+        id=idu_gap_phase(wait_for_connection, fake_with_ophyd_sim),
         name="idu_pol",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
@@ -151,7 +152,7 @@ def idd_pol(
     return device_instantiation(
         device_factory=I10Apple2Pol,
         prefix="",
-        id=idd_gap_phase(),
+        id=idd_gap_phase(wait_for_connection, fake_with_ophyd_sim),
         name="idd_pol",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
@@ -164,8 +165,8 @@ def idu(
     return device_instantiation(
         device_factory=I10Apple2PGM,
         prefix="",
-        id=idu_gap_phase(),
-        pgm=pgm(),
+        id=idu_gap_phase(wait_for_connection, fake_with_ophyd_sim),
+        pgm=pgm(wait_for_connection, fake_with_ophyd_sim),
         name="idu",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
@@ -178,8 +179,8 @@ def idd(
     return device_instantiation(
         device_factory=I10Apple2PGM,
         prefix="",
-        id=idd_gap_phase(),
-        pgm=pgm(),
+        id=idd_gap_phase(wait_for_connection, fake_with_ophyd_sim),
+        pgm=pgm(wait_for_connection, fake_with_ophyd_sim),
         name="idd",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
