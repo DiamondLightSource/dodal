@@ -4,12 +4,9 @@ import pytest
 from ophyd_async.core import DeviceCollector, assert_reading, set_mock_value
 
 from dodal.devices.pressure_jump_cell import (
-    BusyState,
     FastValveState,
-    LimitSwitchState,
     PressureJumpCell,
     PumpMotorDirectionState,
-    TimerState,
     ValveState,
 )
 
