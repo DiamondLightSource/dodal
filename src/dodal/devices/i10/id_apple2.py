@@ -33,6 +33,7 @@ class I10Apple2(StandardReadable, Movable):
     A pair of look up tables are needed to provide the conversion between motor position and energy.
     Set is in energy(eV).
 
+
     Parameters
     ----------
     id_gap:
@@ -100,6 +101,7 @@ class I10Apple2(StandardReadable, Movable):
         self.lookup_tables = {}
         self._available_pol = []
         self._pol = None
+        # Run at start up to load lookup tables and set available_pol.
         self.update_poly()
 
     @property
@@ -108,6 +110,7 @@ class I10Apple2(StandardReadable, Movable):
 
     @pol.setter
     def pol(self, pol: str):
+        # This set the pol but does not actually move hardware.
         if pol in self._available_pol:
             self._pol = pol
         else:
@@ -120,13 +123,13 @@ class I10Apple2(StandardReadable, Movable):
     async def set(self, value: float) -> None:
         """
         Check polarisation state and use it together with the energy(value)
-        to calculate required gap and phase before setting it.
+        to calculate the required gap and phases before setting it.
         """
         if self.pol is None:
-            LOGGER.info("Polarisation not set attempting to read from hardware")
+            LOGGER.warning("Polarisation not set attempting to read from hardware")
             pol, phase = await self.determinePhaseFromHardware()
             if pol is None:
-                raise ValueError(f"Pol is not set for {self.name} and ")
+                raise ValueError(f"Pol is not set for {self.name}")
             else:
                 self.pol = pol
 
@@ -158,19 +161,20 @@ class I10Apple2(StandardReadable, Movable):
         await asyncio.gather(
             self.phase.top_outer.user_setpoint.set(value=value.top_outer),
             self.phase.top_inner.user_setpoint.set(value=value.top_inner),
-            self.phase.btm_outer.user_setpoint.set(value=value.btm_outer),
             self.phase.btm_inner.user_setpoint.set(value=value.btm_inner),
+            self.phase.btm_outer.user_setpoint.set(value=value.btm_outer),
             self.gap.user_setpoint.set(value=value.gap),
         )
         timeout = np.max(
             await asyncio.gather(self.gap.get_timeout(), self.phase.get_timeout())
         )
         LOGGER.info(
-            f"Moving f{self.name} energy to {energy} with {value}, timeout = {timeout}"
+            f"Moving f{self.name} energy and polorisation to {energy}, {self.pol}"
+            + f"with motor position {value}, timeout = {timeout}"
         )
         await self.gap.set_move.set(value=1)
         await wait_for_value(self.gap.gate, UndulatorGatestatus.close, timeout=timeout)
-        self._energy_set(energy)  # Update energy for readback.
+        self._energy_set(energy)  # Update energy for after move for readback.
 
     def _get_id_gap_phase(self, energy) -> tuple[float, float]:
         """
@@ -239,6 +243,8 @@ class I10Apple2(StandardReadable, Movable):
         """
         Try to determine polarisation and phase value using row phase motor position pattern.
         However there is no way to return lh3 polarisation or higher harmonic setting.
+        (May be for future one can use the inverse poly to work out the energy and try to match it with the current energy
+        to workout the polarisation but during my test the inverse poly is too unstable for general use.)
         """
         cur_loc = await self.read()
         top_outer = cur_loc[self.phase.top_outer.user_setpoint_readback.name]["value"]
@@ -318,7 +324,7 @@ class I10Apple2(StandardReadable, Movable):
 class I10Apple2PGM(StandardReadable, Movable):
     """
     Compound device to set both ID and PGM energy at the sample time,
-    with the possibility of having id energy offset to that of the pgm.
+    with the possibility of having id energy offset relative to the pgm.
 
     Parameters
     ----------
@@ -344,6 +350,7 @@ class I10Apple2PGM(StandardReadable, Movable):
 
     @AsyncStatus.wrap
     async def set(self, value: float) -> None:
+        LOGGER.info(f"Moving f{self.name} energy to {value}.")
         await asyncio.gather(
             self.id.set(value=value + await self.energy_offset.get_value()),
             self.pgm.energy.set(value),
@@ -352,7 +359,7 @@ class I10Apple2PGM(StandardReadable, Movable):
 
 class I10Apple2Pol(StandardReadable, Movable):
     """
-    Compound device to set polorisation of the ID.
+    Compound device to set polorisation of ID.
 
     Parameters
     ----------
@@ -372,6 +379,7 @@ class I10Apple2Pol(StandardReadable, Movable):
     @AsyncStatus.wrap
     async def set(self, value: str) -> None:
         self.id.pol = value  # change polarisation.
+        LOGGER.info(f"Changing f{self.name} polarisation to {value}.")
         await self.id.set(
             await self.id.energy.get_value()
         )  # Move id to new polarisation
