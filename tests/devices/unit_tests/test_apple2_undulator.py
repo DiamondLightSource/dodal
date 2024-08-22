@@ -197,8 +197,9 @@ async def test_phase_cal_timout(
 
 
 async def test_phase_success_set(mock_phaseAxes: UndlatorPhaseAxes, RE: RunEngine):
-    set_value = Apple2PhasesVal("3", "2", "5", "7")
-    expected_value = [3, 2, 5, 7]
+    set_value = Apple2PhasesVal(
+        top_inner="3", top_outer="2", btm_inner="5", btm_outer="7"
+    )
     callback_on_mock_put(
         mock_phaseAxes.top_inner.user_setpoint,
         lambda *_, **__: set_mock_value(mock_phaseAxes.gate, UndulatorGatestatus.open),
@@ -206,16 +207,20 @@ async def test_phase_success_set(mock_phaseAxes: UndlatorPhaseAxes, RE: RunEngin
 
     def set_complete_move():
         set_mock_value(
-            mock_phaseAxes.top_inner.user_setpoint_readback, expected_value[0]
+            mock_phaseAxes.top_inner.user_setpoint_readback,
+            3,
         )
         set_mock_value(
-            mock_phaseAxes.top_outer.user_setpoint_readback, expected_value[1]
+            mock_phaseAxes.top_outer.user_setpoint_readback,
+            2,
         )
         set_mock_value(
-            mock_phaseAxes.btm_inner.user_setpoint_readback, expected_value[2]
+            mock_phaseAxes.btm_inner.user_setpoint_readback,
+            5,
         )
         set_mock_value(
-            mock_phaseAxes.btm_outer.user_setpoint_readback, expected_value[3]
+            mock_phaseAxes.btm_outer.user_setpoint_readback,
+            7,
         )
         set_mock_value(mock_phaseAxes.gate, UndulatorGatestatus.close)
 
@@ -248,13 +253,13 @@ async def test_phase_success_set(mock_phaseAxes: UndlatorPhaseAxes, RE: RunEngin
             "timestamp": ANY,
             "alarm_severity": 0,
         },
-        "mock_phaseAxes-btm_outer-user_setpoint_readback": {
-            "value": 7,
+        "mock_phaseAxes-btm_inner-user_setpoint_readback": {
+            "value": 5,
             "timestamp": ANY,
             "alarm_severity": 0,
         },
-        "mock_phaseAxes-btm_inner-user_setpoint_readback": {
-            "value": 5,
+        "mock_phaseAxes-btm_outer-user_setpoint_readback": {
+            "value": 7,
             "timestamp": ANY,
             "alarm_severity": 0,
         },

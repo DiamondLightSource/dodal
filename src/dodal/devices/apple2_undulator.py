@@ -189,10 +189,12 @@ class UndlatorPhaseAxes(StandardReadable, Movable):
     @AsyncStatus.wrap
     async def set(self, value: Apple2PhasesVal) -> None:
         LOGGER.info(f"Setting {self.name} to {value}")
+
         if await self.fault.get_value() != 0:
             raise RuntimeError(f"{self.name} is in fault state")
         if await self.gate.get_value() == UndulatorGatestatus.open:
             raise RuntimeError(f"{self.name} is already in motion.")
+
         await asyncio.gather(
             self.top_outer.user_setpoint.set(value=value.top_outer),
             self.top_inner.user_setpoint.set(value=value.top_inner),
@@ -200,7 +202,6 @@ class UndlatorPhaseAxes(StandardReadable, Movable):
             self.btm_outer.user_setpoint.set(value=value.btm_outer),
         )
         timeout = await self._cal_timeout()
-        LOGGER.info(f"Moving {self.name} to {value} with timeout = {timeout}")
         await self.set_move.set(value=1)
         await wait_for_value(self.gate, UndulatorGatestatus.close, timeout=timeout)
 
