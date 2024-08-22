@@ -13,6 +13,8 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw, epics_signal_w
 
+from dodal.log import LOGGER
+
 
 class UndulatorGatestatus(str, Enum):
     open = "Open"
@@ -23,16 +25,8 @@ class UndulatorGatestatus(str, Enum):
 class Apple2PhasesVal:
     top_outer: str
     top_inner: str
-    btm_outer: str
     btm_inner: str
-
-
-@dataclass
-class Apple2PhasesPv:
-    top_outer: str
-    top_inner: str
     btm_outer: str
-    btm_inner: str
 
 
 @dataclass
@@ -40,8 +34,8 @@ class Apple2Val:
     gap: str
     top_outer: str
     top_inner: str
-    btm_outer: str
     btm_inner: str
+    btm_outer: str
 
 
 class UndulatorGap(StandardReadable, Movable):
@@ -53,7 +47,6 @@ class UndulatorGap(StandardReadable, Movable):
 
     def __init__(self, prefix: str, name: str = ""):
         """
-        Constructs all the necessary PV for the pundulatorGap.
 
         Parameters
         ----------
@@ -97,12 +90,14 @@ class UndulatorGap(StandardReadable, Movable):
 
     @AsyncStatus.wrap
     async def set(self, value) -> None:
+        LOGGER.info(f"Setting {self.name} to {value}")
         if await self.fault.get_value() != 0:
             raise RuntimeError(f"{self.name} is in fault state")
         if await self.gate.get_value() == UndulatorGatestatus.open:
             raise RuntimeError(f"{self.name} is already in motion.")
         await self.user_setpoint.set(value=str(value))
         timeout = await self._cal_timeout()
+        LOGGER.info(f"Moving {self.name} to {value} with timeout = {timeout}")
         await self.set_move.set(value=1)
         await wait_for_value(self.gate, UndulatorGatestatus.close, timeout=timeout)
 
@@ -157,23 +152,30 @@ class UndulatorPhaseMotor(StandardReadable):
 
 
 class UndlatorPhaseAxes(StandardReadable, Movable):
-    """A collection of 4 phase Motor to make up"""
+    """
+    A collection of 4 phase Motor to make up the full id phase motion. We are using the diamond pv convention.
+    e.g. top_outer == Q1
+         top_inner == Q2
+         btm_inner == q3
+         btm_outer == q4
+
+    """
 
     def __init__(
         self,
         prefix: str,
         top_outer: str,
         top_inner: str,
-        btm_outer: str,
         btm_inner: str,
+        btm_outer: str,
         name: str = "",
     ):
         # Gap demand set point and readback
         with self.add_children_as_readables():
             self.top_outer = UndulatorPhaseMotor(prefix=prefix, infix=top_outer)
             self.top_inner = UndulatorPhaseMotor(prefix=prefix, infix=top_inner)
-            self.btm_outer = UndulatorPhaseMotor(prefix=prefix, infix=btm_outer)
             self.btm_inner = UndulatorPhaseMotor(prefix=prefix, infix=btm_inner)
+            self.btm_outer = UndulatorPhaseMotor(prefix=prefix, infix=btm_outer)
         # Nothing move until this is set to 1 and it will return to 0 when done
         self.set_move = epics_signal_rw(int, prefix + "BLGSETP")
         self.gate = epics_signal_r(UndulatorGatestatus, prefix + "BLGATE")
@@ -186,6 +188,7 @@ class UndlatorPhaseAxes(StandardReadable, Movable):
 
     @AsyncStatus.wrap
     async def set(self, value: Apple2PhasesVal) -> None:
+        LOGGER.info(f"Setting {self.name} to {value}")
         if await self.fault.get_value() != 0:
             raise RuntimeError(f"{self.name} is in fault state")
         if await self.gate.get_value() == UndulatorGatestatus.open:
@@ -193,10 +196,11 @@ class UndlatorPhaseAxes(StandardReadable, Movable):
         await asyncio.gather(
             self.top_outer.user_setpoint.set(value=value.top_outer),
             self.top_inner.user_setpoint.set(value=value.top_inner),
-            self.btm_outer.user_setpoint.set(value=value.btm_outer),
             self.btm_inner.user_setpoint.set(value=value.btm_inner),
+            self.btm_outer.user_setpoint.set(value=value.btm_outer),
         )
         timeout = await self._cal_timeout()
+        LOGGER.info(f"Moving {self.name} to {value} with timeout = {timeout}")
         await self.set_move.set(value=1)
         await wait_for_value(self.gate, UndulatorGatestatus.close, timeout=timeout)
 
@@ -204,20 +208,20 @@ class UndlatorPhaseAxes(StandardReadable, Movable):
         velos = await asyncio.gather(
             self.top_outer.velocity.get_value(),
             self.top_inner.velocity.get_value(),
-            self.btm_outer.velocity.get_value(),
             self.btm_inner.velocity.get_value(),
+            self.btm_outer.velocity.get_value(),
         )
         cur_pos = await asyncio.gather(
             self.top_outer.user_setpoint_demand_readback.get_value(),
             self.top_inner.user_setpoint_demand_readback.get_value(),
-            self.btm_outer.user_setpoint_demand_readback.get_value(),
             self.btm_inner.user_setpoint_demand_readback.get_value(),
+            self.btm_outer.user_setpoint_demand_readback.get_value(),
         )
         target_pos = await asyncio.gather(
             self.top_outer.user_setpoint_readback.get_value(),
             self.top_inner.user_setpoint_readback.get_value(),
-            self.btm_outer.user_setpoint_readback.get_value(),
             self.btm_inner.user_setpoint_readback.get_value(),
+            self.btm_outer.user_setpoint_readback.get_value(),
         )
         move_time = np.abs(np.divide(tuple(np.subtract(target_pos, cur_pos)), velos))
 

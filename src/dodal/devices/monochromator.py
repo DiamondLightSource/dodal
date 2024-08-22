@@ -35,6 +35,6 @@ class PGM(StandardReadable):
             self.energy = Motor(prefix + "ENERGY")
         with self.add_children_as_readables(ConfigSignal):
             self.grating = epics_signal_rw(grating, prefix + gratingPv)
-            self.fcc = epics_signal_rw(float, prefix + "CFF")
+            self.cff = epics_signal_rw(float, prefix + "CFF")
 
         super().__init__(name=name)
