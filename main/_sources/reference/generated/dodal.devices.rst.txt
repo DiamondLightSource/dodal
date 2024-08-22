@@ -47,6 +47,7 @@
    dodal.devices.synchrotron
    dodal.devices.tetramm
    dodal.devices.thawer
+   dodal.devices.training_rig
    dodal.devices.turbo_slit
    dodal.devices.undulator
    dodal.devices.undulator_dcm

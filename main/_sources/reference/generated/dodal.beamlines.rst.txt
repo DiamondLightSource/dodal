@@ -20,6 +20,7 @@
    dodal.beamlines.p38
    dodal.beamlines.p45
    dodal.beamlines.p99
+   dodal.beamlines.training_rig
 
 
 

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices &#8212; dodal 1.29.5.dev28+gb39f55c62 documentation</title>
+    <title>dodal.devices &#8212; dodal 1.30.1.dev1+gd4685c08e documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../_static/documentation_options.js?v=b7a7bd91"></script>
+    <script src="../../_static/documentation_options.js?v=9674ad65"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -440,6 +440,7 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.p38.html">dodal.beamlines.p38</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.p45.html">dodal.beamlines.p45</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.p99.html">dodal.beamlines.p99</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dodal.beamlines.training_rig.html">dodal.beamlines.training_rig</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="dodal.common.html">dodal.common</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -685,6 +686,10 @@ document.write(`
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.thawer.Thawer.html">dodal.devices.thawer.Thawer</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.thawer.ThawerStates.html">dodal.devices.thawer.ThawerStates</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.thawer.ThawingTimer.html">dodal.devices.thawer.ThawingTimer</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.training_rig.html">dodal.devices.training_rig</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.training_rig.sample_stage.html">dodal.devices.training_rig.sample_stage</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.turbo_slit.html">dodal.devices.turbo_slit</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -942,31 +947,34 @@ document.write(`
 <tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.thawer.html#module-dodal.devices.thawer" title="dodal.devices.thawer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.thawer</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.turbo_slit.html#module-dodal.devices.turbo_slit" title="dodal.devices.turbo_slit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.turbo_slit</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.training_rig.html#module-dodal.devices.training_rig" title="dodal.devices.training_rig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.training_rig</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.undulator.html#module-dodal.devices.undulator" title="dodal.devices.undulator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.undulator</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.turbo_slit.html#module-dodal.devices.turbo_slit" title="dodal.devices.turbo_slit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.turbo_slit</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.undulator_dcm.html#module-dodal.devices.undulator_dcm" title="dodal.devices.undulator_dcm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.undulator_dcm</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.undulator.html#module-dodal.devices.undulator" title="dodal.devices.undulator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.undulator</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.util.html#module-dodal.devices.util" title="dodal.devices.util"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.util</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.undulator_dcm.html#module-dodal.devices.undulator_dcm" title="dodal.devices.undulator_dcm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.undulator_dcm</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.webcam.html#module-dodal.devices.webcam" title="dodal.devices.webcam"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.webcam</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.util.html#module-dodal.devices.util" title="dodal.devices.util"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.util</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.xbpm_feedback.html#module-dodal.devices.xbpm_feedback" title="dodal.devices.xbpm_feedback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.xbpm_feedback</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.webcam.html#module-dodal.devices.webcam" title="dodal.devices.webcam"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.webcam</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.zebra.html#module-dodal.devices.zebra" title="dodal.devices.zebra"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.zebra</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.xbpm_feedback.html#module-dodal.devices.xbpm_feedback" title="dodal.devices.xbpm_feedback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.xbpm_feedback</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.zebra_controlled_shutter.html#module-dodal.devices.zebra_controlled_shutter" title="dodal.devices.zebra_controlled_shutter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.zebra_controlled_shutter</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.zebra.html#module-dodal.devices.zebra" title="dodal.devices.zebra"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.zebra</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.zocalo.html#module-dodal.devices.zocalo" title="dodal.devices.zocalo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.zocalo</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.zebra_controlled_shutter.html#module-dodal.devices.zebra_controlled_shutter" title="dodal.devices.zebra_controlled_shutter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.zebra_controlled_shutter</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.zocalo.html#module-dodal.devices.zocalo" title="dodal.devices.zocalo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dodal.devices.zocalo</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
