@@ -95,12 +95,10 @@ def idu_gap_phase(
         id_gap=idu_gap(wait_for_connection, fake_with_ophyd_sim),
         id_phase=idu_phase(wait_for_connection, fake_with_ophyd_sim),
         energy_gap_table_path=Path(
-            "tests/devices/i10/lookupTables/IDEnergy2GapCalibrations.csv"
-            # "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2GapCalibrations.csv",
+            "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2GapCalibrations.csv",
         ),
         energy_phase_table_path=Path(
-            "tests/devices/i10/lookupTables/IDEnergy2PhaseCalibrations.csv"
-            # "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2PhaseCalibrations.csv",
+            "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2PhaseCalibrations.csv",
         ),
         source=("Source", "idu"),
         name="idu_gap_phase",
@@ -118,12 +116,10 @@ def idd_gap_phase(
         id_gap=idd_gap(wait_for_connection, fake_with_ophyd_sim),
         id_phase=idd_phase(wait_for_connection, fake_with_ophyd_sim),
         energy_gap_table_path=Path(
-            "tests/devices/i10/lookupTables/IDEnergy2GapCalibrations.csv"
-            # "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2GapCalibrations.csv",
+            "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2GapCalibrations.csv",
         ),
         energy_phase_table_path=Path(
-            "tests/devices/i10/lookupTables/IDEnergy2PhaseCalibrations.csv"
-            # "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2PhaseCalibrations.csv",
+            "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2PhaseCalibrations.csv",
         ),
         source=("Source", "idd"),
         name="idd_gap_phase",
