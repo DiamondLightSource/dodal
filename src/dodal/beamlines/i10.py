@@ -91,15 +91,13 @@ def idu_gap_phase(
 ) -> I10Apple2:
     return device_instantiation(
         device_factory=I10Apple2,
-        id_gap=idu_gap(),
-        id_phase=idu_phase(),
+        id_gap=idu_gap,
+        id_phase=idu_phase,
         energy_gap_table_path=Path(
-            "/workspaces/dodal/tests/devices/i10/lookupTables/IDEnergy2GapCalibrations.csv",
-            # "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2GapCalibrations.csv",
+            "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2GapCalibrations.csv",
         ),
         energy_phase_table_path=Path(
-            "/workspaces/dodal/tests/devices/i10/lookupTables/IDEnergy2PhaseCalibrations.csv"
-            # "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2PhaseCalibrations.csv",
+            "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2PhaseCalibrations.csv",
         ),
         source=("Source", "idu"),
         name="idu_gap_phase",
@@ -114,15 +112,13 @@ def idd_gap_phase(
 ) -> I10Apple2:
     return device_instantiation(
         device_factory=I10Apple2,
-        id_gap=idd_gap(),
-        id_phase=idd_phase(),
+        id_gap=idd_gap,
+        id_phase=idd_phase,
         energy_gap_table_path=Path(
-            "/workspaces/dodal/tests/devices/i10/lookupTables/IDEnergy2GapCalibrations.csv",
-            # "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2GapCalibrations.csv",
+            "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2GapCalibrations.csv",
         ),
         energy_phase_table_path=Path(
-            "/workspaces/dodal/tests/devices/i10/lookupTables/IDEnergy2PhaseCalibrations.csv"
-            # "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2PhaseCalibrations.csv",
+            "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2PhaseCalibrations.csv",
         ),
         source=("Source", "idd"),
         name="idd_gap_phase",
@@ -138,7 +134,7 @@ def idu_pol(
     return device_instantiation(
         device_factory=I10Apple2Pol,
         prefix="",
-        id=idu_gap_phase(),
+        id=idu_gap_phase,
         name="idu_pol",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
@@ -151,7 +147,7 @@ def idd_pol(
     return device_instantiation(
         device_factory=I10Apple2Pol,
         prefix="",
-        id=idd_gap_phase(),
+        id=idd_gap_phase,
         name="idd_pol",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
@@ -164,8 +160,8 @@ def idu(
     return device_instantiation(
         device_factory=I10Apple2PGM,
         prefix="",
-        id=idu_gap_phase(),
-        pgm=pgm(),
+        id=idu_gap_phase,
+        pgm=pgm,
         name="idu",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
@@ -178,8 +174,8 @@ def idd(
     return device_instantiation(
         device_factory=I10Apple2PGM,
         prefix="",
-        id=idd_gap_phase(),
-        pgm=pgm(),
+        id=idd_gap_phase,
+        pgm=pgm,
         name="idd",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
