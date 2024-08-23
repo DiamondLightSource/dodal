@@ -139,7 +139,7 @@ class I10Apple2(StandardReadable, Movable):
         self._polarisation_set(self.pol)
 
         gap, phase = self._get_id_gap_phase(value)
-        phase3 = phase if self.pol != "la" else -phase
+        phase3 = -phase if self.pol == "la" else phase
         id_set_val = Apple2Val(
             top_outer=str(phase),
             top_inner="0.0",
