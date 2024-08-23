@@ -19,7 +19,7 @@ from dodal.devices.apple2_undulator import (
     UndulatorGap,
     UndulatorGateStatus,
 )
-from dodal.devices.monochromator import PGM
+from dodal.devices.pgm import PGM
 from dodal.log import LOGGER
 
 ROW_PHASE_MOTOR_TOLERANCE = 0.004
@@ -29,10 +29,18 @@ MAXIMUM_GAP_MOTOR_POSITION = 100
 
 class I10Apple2(StandardReadable, Movable):
     """
-    Apple2 id with both phase and gap motion for i10(Only part that is kind of I10 specific is the set).
+    Apple 2 ID/undulator has 4 extra degrees of freedom compare to the standard Undulator,
+     each bank of magnet can move independently to each other,
+     which allow the production of different x-ray polarisation as well as energy.
+     This type of ID is use on I10, I21,I09, I17 and I06 for soft x-ray.
+
+    I10Apple2 is the i10 version of such ID.
+    The set and convert_csv_to_lookup should be the only part that is I10 specific.
+    For example, i09 require polarisation to be set back to linear horizontal before changing
+     to other polarisation but this restriction does not apply to I10.
+
     A pair of look up tables are needed to provide the conversion between motor position and energy.
     Set is in energy(eV).
-
 
     Parameters
     ----------

@@ -5,7 +5,7 @@ from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beam
 from dodal.devices.apple2_undulator import UndlatorPhaseAxes, UndulatorGap
 from dodal.devices.i10.i10_pgm import I10Grating
 from dodal.devices.i10.id_apple2 import I10Apple2, I10Apple2PGM, I10Apple2Pol
-from dodal.devices.monochromator import PGM
+from dodal.devices.pgm import PGM
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -14,8 +14,8 @@ set_log_beamline(BL)
 set_utils_beamline(BL)
 
 """
-I10 hase two insertion devices one up(idu) and one down stream(idd).
-It is worth nothing the down stream deivce is slightly longer,
+I10 has two insertion devices one up(idu) and one down stream(idd).
+It is worth noting that the down stream device is slightly longer,
  so it can reach Mn edge for linear arbitrary.
 """
 

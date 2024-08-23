@@ -27,7 +27,7 @@ from dodal.devices.i10.id_apple2 import (
     I10Apple2Pol,
     convert_csv_to_lookup,
 )
-from dodal.devices.monochromator import PGM
+from dodal.devices.pgm import PGM
 
 ID_GAP_LOOKUP_TABLE = "tests/devices/i10/lookupTables/IDEnergy2GapCalibrations.csv"
 ID_PHASE_LOOKUP_TABLE = "tests/devices/i10/lookupTables/IDEnergy2PhaseCalibrations.csv"
