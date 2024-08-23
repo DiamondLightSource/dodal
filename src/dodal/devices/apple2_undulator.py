@@ -16,7 +16,7 @@ from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw, epics_sign
 from dodal.log import LOGGER
 
 
-class UndulatorGatestatus(str, Enum):
+class UndulatorGateStatus(str, Enum):
     open = "Open"
     close = "Closed"
 
@@ -64,7 +64,7 @@ class UndulatorGap(StandardReadable, Movable):
         # Nothing move until this is set to 1 and it will return to 0 when done
         self.set_move = epics_signal_rw(int, prefix + "BLGSETP")
         # Gate keeper open when move is requested, closed when move is completed
-        self.gate = epics_signal_r(UndulatorGatestatus, prefix + "BLGATE")
+        self.gate = epics_signal_r(UndulatorGateStatus, prefix + "BLGATE")
         # These are gap velocity limit.
         self.max_velocity = epics_signal_r(float, prefix + "BLGSETVEL.HOPR")
         self.min_velocity = epics_signal_r(float, prefix + "BLGSETVEL.LOPR")
@@ -91,21 +91,24 @@ class UndulatorGap(StandardReadable, Movable):
     @AsyncStatus.wrap
     async def set(self, value) -> None:
         LOGGER.info(f"Setting {self.name} to {value}")
-        if await self.fault.get_value() != 0:
-            raise RuntimeError(f"{self.name} is in fault state")
-        if await self.gate.get_value() == UndulatorGatestatus.open:
-            raise RuntimeError(f"{self.name} is already in motion.")
+        await self.check_id_status()
         await self.user_setpoint.set(value=str(value))
         timeout = await self._cal_timeout()
         LOGGER.info(f"Moving {self.name} to {value} with timeout = {timeout}")
         await self.set_move.set(value=1)
-        await wait_for_value(self.gate, UndulatorGatestatus.close, timeout=timeout)
+        await wait_for_value(self.gate, UndulatorGateStatus.close, timeout=timeout)
 
     async def _cal_timeout(self) -> float:
         vel = await self.velocity.get_value()
         cur_pos = await self.user_readback.get_value()
         target_pos = float(await self.user_setpoint.get_value())
         return abs((target_pos - cur_pos) * 2.0 / vel)
+
+    async def check_id_status(self) -> None:
+        if await self.fault.get_value() != 0:
+            raise RuntimeError(f"{self.name} is in fault state")
+        if await self.gate.get_value() == UndulatorGateStatus.open:
+            raise RuntimeError(f"{self.name} is already in motion.")
 
     async def get_timeout(self) -> float:
         return await self._cal_timeout()
@@ -131,9 +134,11 @@ class UndulatorPhaseMotor(StandardReadable):
         name : str
             Name of the Id phase device
         """
-        fullPV = prefix + "BL" + infix + "MTR"
-        self.user_setpoint = epics_signal_w(str, fullPV[:-3] + "SET")
-        self.user_setpoint_demand_readback = epics_signal_r(float, fullPV[:-3] + "DMD")
+        fullPV = f"{prefix}BL{infix}"
+        self.user_setpoint = epics_signal_w(str, "SET")
+        self.user_setpoint_demand_readback = epics_signal_r(float, "DMD")
+
+        fullPV = fullPV + "MTR"
         with self.add_children_as_readables(HintedSignal):
             self.user_setpoint_readback = epics_signal_r(float, fullPV + ".RBV")
 
@@ -178,22 +183,17 @@ class UndlatorPhaseAxes(StandardReadable, Movable):
             self.btm_outer = UndulatorPhaseMotor(prefix=prefix, infix=btm_outer)
         # Nothing move until this is set to 1 and it will return to 0 when done
         self.set_move = epics_signal_rw(int, prefix + "BLGSETP")
-        self.gate = epics_signal_r(UndulatorGatestatus, prefix + "BLGATE")
+        self.gate = epics_signal_r(UndulatorGateStatus, prefix + "BLGATE")
         split_pv = prefix.split("-")
-        self.fault = epics_signal_r(
-            float,
-            split_pv[0] + "-" + split_pv[1] + "-STAT" + "-" + split_pv[3] + "ANYFAULT",
-        )
+        temp_pv = f"{split_pv[0]}-{split_pv[1]}-STAT-{split_pv[3]}ANYFAULT"
+        self.fault = epics_signal_r(float, temp_pv)
         super().__init__(name=name)
 
     @AsyncStatus.wrap
     async def set(self, value: Apple2PhasesVal) -> None:
         LOGGER.info(f"Setting {self.name} to {value}")
 
-        if await self.fault.get_value() != 0:
-            raise RuntimeError(f"{self.name} is in fault state")
-        if await self.gate.get_value() == UndulatorGatestatus.open:
-            raise RuntimeError(f"{self.name} is already in motion.")
+        await self.check_id_status()
 
         await asyncio.gather(
             self.top_outer.user_setpoint.set(value=value.top_outer),
@@ -203,30 +203,40 @@ class UndlatorPhaseAxes(StandardReadable, Movable):
         )
         timeout = await self._cal_timeout()
         await self.set_move.set(value=1)
-        await wait_for_value(self.gate, UndulatorGatestatus.close, timeout=timeout)
+        await wait_for_value(self.gate, UndulatorGateStatus.close, timeout=timeout)
 
     async def _cal_timeout(self) -> float:
+        """
+        Get all four motor speed, current positions and target positions to calculate required timeout.
+        """
         velos = await asyncio.gather(
             self.top_outer.velocity.get_value(),
             self.top_inner.velocity.get_value(),
             self.btm_inner.velocity.get_value(),
             self.btm_outer.velocity.get_value(),
         )
-        cur_pos = await asyncio.gather(
+        target_pos = await asyncio.gather(
             self.top_outer.user_setpoint_demand_readback.get_value(),
             self.top_inner.user_setpoint_demand_readback.get_value(),
             self.btm_inner.user_setpoint_demand_readback.get_value(),
             self.btm_outer.user_setpoint_demand_readback.get_value(),
         )
-        target_pos = await asyncio.gather(
+        cur_pos = await asyncio.gather(
             self.top_outer.user_setpoint_readback.get_value(),
             self.top_inner.user_setpoint_readback.get_value(),
             self.btm_inner.user_setpoint_readback.get_value(),
             self.btm_outer.user_setpoint_readback.get_value(),
         )
-        move_time = np.abs(np.divide(tuple(np.subtract(target_pos, cur_pos)), velos))
+        move_distances = tuple(np.subtract(target_pos, cur_pos))
+        move_times = np.abs(np.divide(move_distances, velos))
+        longest_move_time = np.max(move_times)
+        return longest_move_time * 2
 
-        return move_time.max() * 2
+    async def check_id_status(self) -> None:
+        if await self.fault.get_value() != 0:
+            raise RuntimeError(f"{self.name} is in fault state")
+        if await self.gate.get_value() == UndulatorGateStatus.open:
+            raise RuntimeError(f"{self.name} is already in motion.")
 
     async def get_timeout(self) -> float:
         return await self._cal_timeout()

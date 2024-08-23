@@ -17,7 +17,7 @@ from dodal.devices.apple2_undulator import (
     Apple2PhasesVal,
     UndlatorPhaseAxes,
     UndulatorGap,
-    UndulatorGatestatus,
+    UndulatorGateStatus,
 )
 
 
@@ -26,7 +26,7 @@ async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
     async with DeviceCollector(mock=True):
         mock_id_gap = UndulatorGap(prefix, "mock_id_gap")
     assert mock_id_gap.name == "mock_id_gap"
-    set_mock_value(mock_id_gap.gate, UndulatorGatestatus.close)
+    set_mock_value(mock_id_gap.gate, UndulatorGateStatus.close)
     set_mock_value(mock_id_gap.velocity, 1)
     set_mock_value(mock_id_gap.user_readback, 1)
     set_mock_value(mock_id_gap.user_setpoint, "1")
@@ -45,7 +45,7 @@ async def mock_phaseAxes(prefix: str = "BLXX-EA-DET-007:") -> UndlatorPhaseAxes:
             btm_inner="RPQ4",
         )
     assert mock_phaseAxes.name == "mock_phaseAxes"
-    set_mock_value(mock_phaseAxes.gate, UndulatorGatestatus.close)
+    set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.close)
     set_mock_value(mock_phaseAxes.top_outer.velocity, 2)
     set_mock_value(mock_phaseAxes.top_inner.velocity, 2)
     set_mock_value(mock_phaseAxes.btm_outer.velocity, 2)
@@ -65,10 +65,10 @@ async def mock_phaseAxes(prefix: str = "BLXX-EA-DET-007:") -> UndlatorPhaseAxes:
 async def test_in_motion_error(
     mock_id_gap: UndulatorGap, mock_phaseAxes: UndlatorPhaseAxes, RE: RunEngine
 ):
-    set_mock_value(mock_id_gap.gate, UndulatorGatestatus.open)
+    set_mock_value(mock_id_gap.gate, UndulatorGateStatus.open)
     with pytest.raises(RuntimeError):
         await mock_id_gap.set("2")
-    set_mock_value(mock_phaseAxes.gate, UndulatorGatestatus.open)
+    set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.open)
     setValue = Apple2PhasesVal("3", "2", "5", "7")
     with pytest.raises(RuntimeError):
         await mock_phaseAxes.set(setValue)
@@ -99,7 +99,7 @@ async def test_gap_cal_timout(
 async def test_gap_time_out_error(mock_id_gap: UndulatorGap, RE: RunEngine):
     callback_on_mock_put(
         mock_id_gap.user_setpoint,
-        lambda *_, **__: set_mock_value(mock_id_gap.gate, UndulatorGatestatus.open),
+        lambda *_, **__: set_mock_value(mock_id_gap.gate, UndulatorGateStatus.open),
     )
     set_mock_value(mock_id_gap.velocity, 1000)
     with pytest.raises(TimeoutError):
@@ -116,7 +116,7 @@ async def test_gap_status_error(mock_id_gap: UndulatorGap, RE: RunEngine):
 async def test_gap_success_scan(mock_id_gap: UndulatorGap, RE: RunEngine):
     callback_on_mock_put(
         mock_id_gap.user_setpoint,
-        lambda *_, **__: set_mock_value(mock_id_gap.gate, UndulatorGatestatus.open),
+        lambda *_, **__: set_mock_value(mock_id_gap.gate, UndulatorGateStatus.open),
     )
     output = range(0, 11, 1)
 
@@ -127,7 +127,7 @@ async def test_gap_success_scan(mock_id_gap: UndulatorGap, RE: RunEngine):
 
     def set_complete_move():
         set_mock_value(mock_id_gap.user_readback, next(pos))
-        set_mock_value(mock_id_gap.gate, UndulatorGatestatus.close)
+        set_mock_value(mock_id_gap.gate, UndulatorGateStatus.close)
 
     callback_on_mock_put(mock_id_gap.set_move, lambda *_, **__: set_complete_move())
     docs = defaultdict(list)
@@ -146,7 +146,7 @@ async def test_phase_time_out_error(mock_phaseAxes: UndlatorPhaseAxes, RE: RunEn
 
     callback_on_mock_put(
         mock_phaseAxes.top_outer.user_setpoint,
-        lambda *_, **__: set_mock_value(mock_phaseAxes.gate, UndulatorGatestatus.open),
+        lambda *_, **__: set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.open),
     )
     set_mock_value(mock_phaseAxes.top_inner.velocity, 1000)
     with pytest.raises(TimeoutError):
@@ -202,7 +202,7 @@ async def test_phase_success_set(mock_phaseAxes: UndlatorPhaseAxes, RE: RunEngin
     )
     callback_on_mock_put(
         mock_phaseAxes.top_inner.user_setpoint,
-        lambda *_, **__: set_mock_value(mock_phaseAxes.gate, UndulatorGatestatus.open),
+        lambda *_, **__: set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.open),
     )
 
     def set_complete_move():
@@ -222,7 +222,7 @@ async def test_phase_success_set(mock_phaseAxes: UndlatorPhaseAxes, RE: RunEngin
             mock_phaseAxes.btm_outer.user_setpoint_readback,
             7,
         )
-        set_mock_value(mock_phaseAxes.gate, UndulatorGatestatus.close)
+        set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.close)
 
     callback_on_mock_put(mock_phaseAxes.set_move, lambda *_, **__: set_complete_move())
     RE(bps.abs_set(mock_phaseAxes, set_value))

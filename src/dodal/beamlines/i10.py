@@ -6,13 +6,18 @@ from dodal.devices.apple2_undulator import UndlatorPhaseAxes, UndulatorGap
 from dodal.devices.i10.i10_pgm import I10Grating
 from dodal.devices.i10.id_apple2 import I10Apple2, I10Apple2PGM, I10Apple2Pol
 from dodal.devices.monochromator import PGM
-
-# from dodal.log import set_beamline as set_log_beamline
+from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("i10")
-# set_log_beamline(BL)
+set_log_beamline(BL)
 set_utils_beamline(BL)
+
+"""
+I10 hase two insertion devices one up(idu) and one down stream(idd).
+It is worth nothing the down stream deivce is slightly longer,
+ so it can reach Mn edge for linear arbitrary.
+"""
 
 
 def idd_gap(
@@ -28,12 +33,12 @@ def idd_gap(
     )
 
 
-def idd_phase(
+def idd_phase_axes(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> UndlatorPhaseAxes:
     return device_instantiation(
         device_factory=UndlatorPhaseAxes,
-        name="idd_phase",
+        name="idd_phase_axes",
         prefix=f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
         top_outer="RPQ1",
         top_inner="RPQ2",
@@ -58,12 +63,12 @@ def idu_gap(
     )
 
 
-def idu_phase(
+def idu_phase_axes(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> UndlatorPhaseAxes:
     return device_instantiation(
         device_factory=UndlatorPhaseAxes,
-        name="idu_phase",
+        name="idu_phase_axes",
         prefix=f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-21:",
         top_outer="RPQ1",
         top_inner="RPQ2",
@@ -93,7 +98,7 @@ def idu_gap_phase(
     return device_instantiation(
         device_factory=I10Apple2,
         id_gap=idu_gap(wait_for_connection, fake_with_ophyd_sim),
-        id_phase=idu_phase(wait_for_connection, fake_with_ophyd_sim),
+        id_phase=idu_phase_axes(wait_for_connection, fake_with_ophyd_sim),
         energy_gap_table_path=Path(
             "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2GapCalibrations.csv",
         ),
@@ -114,7 +119,7 @@ def idd_gap_phase(
     return device_instantiation(
         device_factory=I10Apple2,
         id_gap=idd_gap(wait_for_connection, fake_with_ophyd_sim),
-        id_phase=idd_phase(wait_for_connection, fake_with_ophyd_sim),
+        id_phase=idd_phase_axes(wait_for_connection, fake_with_ophyd_sim),
         energy_gap_table_path=Path(
             "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2GapCalibrations.csv",
         ),

@@ -18,7 +18,7 @@ from ophyd_async.core import (
 from dodal.devices.apple2_undulator import (
     UndlatorPhaseAxes,
     UndulatorGap,
-    UndulatorGatestatus,
+    UndulatorGateStatus,
 )
 from dodal.devices.i10.i10_pgm import I10Grating
 from dodal.devices.i10.id_apple2 import (
@@ -29,8 +29,8 @@ from dodal.devices.i10.id_apple2 import (
 )
 from dodal.devices.monochromator import PGM
 
-IDGAPLOOKUPTABLE = "tests/devices/i10/lookupTables/IDEnergy2GapCalibrations.csv"
-IDPHASELOOKUPTABLE = "tests/devices/i10/lookupTables/IDEnergy2PhaseCalibrations.csv"
+ID_GAP_LOOKUP_TABLE = "tests/devices/i10/lookupTables/IDEnergy2GapCalibrations.csv"
+ID_PHASE_LOOKUP_TABLE = "tests/devices/i10/lookupTables/IDEnergy2PhaseCalibrations.csv"
 
 
 @pytest.fixture
@@ -38,7 +38,7 @@ async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
     async with DeviceCollector(mock=True):
         mock_id_gap = UndulatorGap(prefix, "mock_id_gap")
     assert mock_id_gap.name == "mock_id_gap"
-    set_mock_value(mock_id_gap.gate, UndulatorGatestatus.close)
+    set_mock_value(mock_id_gap.gate, UndulatorGateStatus.close)
     set_mock_value(mock_id_gap.velocity, 1)
     set_mock_value(mock_id_gap.user_readback, 20)
     set_mock_value(mock_id_gap.user_setpoint, "20")
@@ -57,7 +57,7 @@ async def mock_phaseAxes(prefix: str = "BLXX-EA-DET-007:") -> UndlatorPhaseAxes:
             btm_inner="RPQ4",
         )
     assert mock_phaseAxes.name == "mock_phaseAxes"
-    set_mock_value(mock_phaseAxes.gate, UndulatorGatestatus.close)
+    set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.close)
     set_mock_value(mock_phaseAxes.top_outer.velocity, 2)
     set_mock_value(mock_phaseAxes.top_inner.velocity, 2)
     set_mock_value(mock_phaseAxes.btm_outer.velocity, 2)
@@ -89,8 +89,8 @@ async def mock_id(
         mock_id = I10Apple2(
             id_gap=mock_id_gap,
             id_phase=mock_phaseAxes,
-            energy_gap_table_path=Path(IDGAPLOOKUPTABLE),
-            energy_phase_table_path=Path(IDPHASELOOKUPTABLE),
+            energy_gap_table_path=Path(ID_GAP_LOOKUP_TABLE),
+            energy_phase_table_path=Path(ID_PHASE_LOOKUP_TABLE),
             source=("Source", "idu"),
         )
         return mock_id
@@ -157,7 +157,7 @@ async def test_fail_I10Apple2_no_lookup(
             id_gap=mock_id_gap,
             id_phase=mock_phaseAxes,
             energy_gap_table_path=wrong_path,
-            energy_phase_table_path=Path(IDPHASELOOKUPTABLE),
+            energy_phase_table_path=Path(ID_PHASE_LOOKUP_TABLE),
             source=("Source", "idu"),
         )
     assert str(e.value) == f"Gap look up table is not in path: {wrong_path}"
@@ -195,8 +195,8 @@ async def test_fail_I10Apple2_set_lookup_gap_pol(mock_id: I10Apple2):
         await mock_id.set(555)
     assert (
         str(e.value)
-        == "Cannot find polynomial coefficients for your requested energy."
-        + "There might be gap in the calibration lookup table."
+        == """Cannot find polynomial coefficients for your requested energy.
+        There might be gap in the calibration lookup table."""
     )
 
 
@@ -214,12 +214,12 @@ async def test_fail_I10Apple2_set_id_not_ready(mock_id: I10Apple2):
     set_mock_value(mock_id.gap.fault, 1)
     with pytest.raises(RuntimeError) as e:
         await mock_id.set(600)
-    assert str(e.value) == mock_id.name + " is in fault state"
+    assert str(e.value) == mock_id.gap.name + " is in fault state"
     set_mock_value(mock_id.gap.fault, 0)
-    set_mock_value(mock_id.gap.gate, UndulatorGatestatus.open)
+    set_mock_value(mock_id.gap.gate, UndulatorGateStatus.open)
     with pytest.raises(RuntimeError) as e:
         await mock_id.set(600)
-    assert str(e.value) == mock_id.name + " is already in motion."
+    assert str(e.value) == mock_id.gap.name + " is already in motion."
 
 
 async def test_I10Apple2_RE_scan(mock_id: I10Apple2, RE: RunEngine):
@@ -324,22 +324,22 @@ async def test_I10Apple2_pol_set(
     "fileName, expected_dict, source",
     [
         (
-            IDGAPLOOKUPTABLE,
+            ID_GAP_LOOKUP_TABLE,
             "tests/devices/i10/lookupTables/expectedIDEnergy2GapCalibrationsIdu.pkl",
             ("Source", "idu"),
         ),
         (
-            IDGAPLOOKUPTABLE,
+            ID_GAP_LOOKUP_TABLE,
             "tests/devices/i10/lookupTables/expectedIDEnergy2GapCalibrationsIdd.pkl",
             ("Source", "idd"),
         ),
         (
-            IDPHASELOOKUPTABLE,
+            ID_PHASE_LOOKUP_TABLE,
             "tests/devices/i10/lookupTables/expectedIDEnergy2PhaseCalibrationsidu.pkl",
             ("Source", "idu"),
         ),
         (
-            IDPHASELOOKUPTABLE,
+            ID_PHASE_LOOKUP_TABLE,
             "tests/devices/i10/lookupTables/expectedIDEnergy2PhaseCalibrationsidd.pkl",
             ("Source", "idd"),
         ),
@@ -363,6 +363,6 @@ def test_convert_csv_to_lookup_success(
 def test_convert_csv_to_lookup_failed():
     with pytest.raises(RuntimeError):
         convert_csv_to_lookup(
-            file=IDGAPLOOKUPTABLE,
+            file=ID_GAP_LOOKUP_TABLE,
             source=("Source", "idw"),
         )
