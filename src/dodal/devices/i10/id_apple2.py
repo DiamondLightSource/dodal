@@ -32,7 +32,7 @@ class I10Apple2(StandardReadable, Movable):
     Apple 2 ID/undulator has 4 extra degrees of freedom compare to the standard Undulator,
      each bank of magnet can move independently to each other,
      which allow the production of different x-ray polarisation as well as energy.
-     This type of ID is use on I10, I21,I09, I17 and I06 for soft x-ray.
+     This type of ID is use on I10, I21, I09, I17 and I06 for soft x-ray.
 
     I10Apple2 is the i10 version of such ID.
     The set and convert_csv_to_lookup should be the only part that is I10 specific.
@@ -111,7 +111,7 @@ class I10Apple2(StandardReadable, Movable):
         }
         self.lookup_tables = {}
         self._available_pol = []
-        # The polarisation state of the id that are use for internal checking before settting.
+        # The polarisation state of the id that are use for internal checking before setting.
         self._pol = None
         # Run at start up to load lookup tables and set available_pol.
         self.update_poly()
