@@ -118,8 +118,6 @@ class UndulatorPhaseMotor(StandardReadable):
     """A collection of epics signals for ID phase motion.
     Only PV used by beamline are added the full list is here:
     /dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDPhaseSoftMotor.template
-
-
     """
 
     def __init__(self, prefix: str, infix: str, name: str = ""):
