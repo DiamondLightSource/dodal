@@ -234,7 +234,6 @@ def slits_3(
     )
 
 
-@skip_device()
 def slits_4(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
