@@ -184,17 +184,16 @@ class PressureTransducer(StandardReadable):
 
 class PressureJumpCellController(HasName):
     def __init__(self, prefix: str, name: str = "") -> None:
-        PREFIX = prefix + "CTRL:"
-        self.stop = epics_signal_rw(StopState, f"{PREFIX}STOP")
+        self.stop = epics_signal_rw(StopState, f"{prefix}STOP")
 
-        self.target_pressure = epics_signal_rw(float, f"{PREFIX}TARGET")
-        self.timeout = epics_signal_rw(float, f"{PREFIX}TIMER.HIGH")
-        self.go = epics_signal_rw(bool, f"{PREFIX}GO")
+        self.target_pressure = epics_signal_rw(float, f"{prefix}TARGET")
+        self.timeout = epics_signal_rw(float, f"{prefix}TIMER.HIGH")
+        self.go = epics_signal_rw(bool, f"{prefix}GO")
 
         ## Jump logic ##
-        self.start_pressure = epics_signal_rw(float, f"{PREFIX}JUMPF")
-        self.target_pressure = epics_signal_rw(float, f"{PREFIX}JUMPT")
-        self.jump_ready = epics_signal_rw(bool, f"{PREFIX}SETJUMP")
+        self.start_pressure = epics_signal_rw(float, f"{prefix}JUMPF")
+        self.target_pressure = epics_signal_rw(float, f"{prefix}JUMPT")
+        self.jump_ready = epics_signal_rw(bool, f"{prefix}SETJUMP")
 
         self._name = name
         super().__init__()
@@ -211,9 +210,10 @@ class PressureJumpCell(StandardReadable):
 
     def __init__(
         self,
-        beamline_prefix: str = "",
-        cell_prefix: str = "",
-        adc_prefix: str = "",
+        beamline_prefix: str,
+        cell_prefix: str = "-HPXC-01:",
+        adc_prefix: str = "-ADC",
+        ctrl_prefix: str = "CTRL:",
         name: str = "",
     ):
         self.all_valves_control = AllValvesControl(
@@ -222,7 +222,7 @@ class PressureJumpCell(StandardReadable):
         self.pump = Pump(f"{beamline_prefix}{cell_prefix}", name)
 
         self.controller = PressureJumpCellController(
-            f"{beamline_prefix}{cell_prefix}", name
+            f"{beamline_prefix}{cell_prefix}{ctrl_prefix}", name
         )
 
         with self.add_children_as_readables():
