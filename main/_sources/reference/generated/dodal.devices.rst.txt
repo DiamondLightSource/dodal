@@ -16,7 +16,6 @@
    dodal.devices.areadetector
    dodal.devices.attenuator
    dodal.devices.backlight
-   dodal.devices.beamstop
    dodal.devices.cryostream
    dodal.devices.dcm
    dodal.devices.detector
