@@ -335,7 +335,10 @@ class Apple2(StandardReadable, Movable):
             self.polarisation, self._polarisation_set = soft_signal_r_and_setter(
                 str, initial_value=None
             )
-            # Store the set energy for readback.I10Apple2PGM
+            # Store the set energy for readback.
+            self.energy, self._energy_set = soft_signal_r_and_setter(
+                float, initial_value=None
+            )
         # This store two lookup tables, Gap and Phase in the Lookuptable format
         self.lookup_tables: dict[str, dict[str | None, dict[str, dict[str, Any]]]] = {
             "Gap": {},

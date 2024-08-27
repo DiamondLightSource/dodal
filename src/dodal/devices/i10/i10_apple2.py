@@ -155,7 +155,7 @@ class I10Apple2PGM(StandardReadable, Movable):
     Parameters
     ----------
     id:
-        An I10Apple2 device.
+        An Apple2 device.
     pgm:
         A PGM/mono device.
     prefix:
