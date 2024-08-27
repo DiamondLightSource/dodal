@@ -11,8 +11,8 @@ from ophyd_async.core import StandardReadable
 
 from dodal.beamlines import i03
 from dodal.common.beamlines import beamline_utils
-from dodal.devices.beamstop import BeamStop
 from dodal.devices.eiger import EigerDetector
+from dodal.devices.motors import XYZPositioner
 from dodal.devices.smargon import Smargon
 from dodal.devices.zebra import Zebra
 from dodal.log import LOGGER
@@ -38,7 +38,7 @@ def setup():
 
 
 def test_instantiate_function_makes_supplied_device():
-    device_types = [Zebra, BeamStop, Smargon]
+    device_types = [Zebra, XYZPositioner, Smargon]
     for device in device_types:
         dev = beamline_utils.device_instantiation(
             device, device.__name__, "", False, True, None
