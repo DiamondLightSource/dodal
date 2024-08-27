@@ -267,8 +267,23 @@ class LookupTableEntries(BaseModel):
     Limit: EnergyMinMax
 
 
-# BaseModel class for the lookup table.
 class Lookuptable(BaseModel):
+    """
+    BaseModel class for the lookup table.
+    Appl2 lookup table should be in this format.
+
+    {mode: {'Energies': {Any: {'Low': float,
+                            'High': float,
+                            'Poly':np.poly1d
+                            }
+                        }
+            'Limit': {'Minimum': float,
+                    'Maximum': float
+                    }
+        }
+    }
+    """
+
     __root__: dict[str, LookupTableEntries]
 
 
@@ -285,7 +300,9 @@ class Apple2(StandardReadable, Movable):
      This type of ID is use on I10, I21, I09, I17 and I06 for soft x-ray.
 
     A pair of look up tables are needed to provide the conversion between motor position and energy.
-    Set is in energy(eV).
+
+    An new definition of Set and update_lookuptable method is required.
+
 
     Parameters
     ----------
@@ -327,10 +344,14 @@ class Apple2(StandardReadable, Movable):
             "Gap": {},
             "Phase": {},
         }
+        # List of available polarisation according to the lookup table.
         self._available_pol = []
         # The polarisation state of the id that are use for internal checking before setting.
         self._pol = None
-        # Run at start up to load lookup tables and set available_pol.
+        """
+        Abstract method that run at start up to load lookup tables into  self.lookup_tables
+         and set available_pol.
+        """
         self.update_lookuptable()
 
     @property
@@ -392,7 +413,8 @@ class Apple2(StandardReadable, Movable):
         lookup_table: dict[str | None, dict[str, dict[str, Any]]],
     ) -> np.poly1d:
         """
-        Get the correct polynomial for a given energy.
+        Get the correct polynomial for a given energy form lookuptable
+         for any given polarisation.
         """
 
         if (
@@ -422,9 +444,9 @@ class Apple2(StandardReadable, Movable):
     def update_lookuptable(self) -> None:
         """
         Abstract method to update the stored lookup tabled from file.
-        This function should include check that the lookuptable is in the correct format:
+        This function should include check to ensure the lookuptable is in the correct format:
             # ensure the importing lookup table is the correct format
-            Lookuptable.parse_obj(loockuptable)
+            Lookuptable.parse_obj(<loockuptable>)
 
         """
 
@@ -508,7 +530,7 @@ class Apple2(StandardReadable, Movable):
         return (polarisation, phase)
 
 
-def motor_position_equal(a, b):
+def motor_position_equal(a, b) -> bool:
     """
     Check motor is within tolerance.
     """

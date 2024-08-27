@@ -1,6 +1,7 @@
 import asyncio
 import csv
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 from bluesky.protocols import Movable
@@ -27,11 +28,12 @@ MAXIMUM_GAP_MOTOR_POSITION = 100
 
 
 class I10Apple2(Apple2):
-    """I10Apple2 is the i10 version of such ID.
-    The set and convert_csv_to_lookup should be the only part that is I10 specific.
-    For example, i09 require polarisation to be set back to linear horizontal before changing
-     to other polarisation but this restriction does not apply to I10.
-    A pair of look up tables are needed to provide the conversion between motor position and energy.
+    """
+    I10Apple2 is the i10 version of such ID.
+    The set and update_lookuptable should be the only part that is I10 specific.
+
+    A pair of look up tables are needed to provide the conversion
+     between motor position and energy.
     Set is in energy(eV).
 
     Parameters
@@ -209,13 +211,6 @@ class I10Apple2Pol(StandardReadable, Movable):
         )  # Move id to new polarisation
 
 
-def motor_position_equal(a, b):
-    """
-    Check motor is within tolerance.
-    """
-    return abs(a - b) < ROW_PHASE_MOTOR_TOLERANCE
-
-
 def convert_csv_to_lookup(
     file: str,
     source: tuple[str, str],
@@ -223,7 +218,7 @@ def convert_csv_to_lookup(
     min_energy: str = "MinEnergy",
     max_energy: str = "MaxEnergy",
     poly_deg: list | None = None,
-):
+) -> dict[str | None, dict[str, dict[str, dict[str, Any]]]]:
     """
     Convert csv to a dictionary that can be read by Apple2 ID device.
 
@@ -243,6 +238,20 @@ def convert_csv_to_lookup(
     poly_deg: list | None = None,
         Column names for the parameters for the polynomial, starting with the least significant.
 
+    return
+    ------
+        return a dictionary that conform to Apple2 lookup table format:
+
+        {mode: {'Energies': {Any: {'Low': float,
+                                'High': float,
+                                'Poly':np.poly1d
+                                }
+                            }
+                'Limit': {'Minimum': float,
+                        'Maximum': float
+                        }
+            }
+        }
     """
     if poly_deg is None:
         poly_deg = [
