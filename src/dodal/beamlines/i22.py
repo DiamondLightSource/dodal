@@ -57,8 +57,6 @@ set_path_provider(
 )
 
 
-# d11 at p38, but disconnected
-@skip_device(lambda: BL == _LAB_NAME)
 def saxs(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> NXSasOAV | NXSasPilatus:
