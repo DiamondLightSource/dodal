@@ -97,18 +97,31 @@ class AllValvesControl(StandardReadable, Movable):
     """
     valves 2, 4, 7, 8 are not controlled by the IOC,
     as they are under manual control.
+    fast_valves: tuple[int, ...] = (5, 6)
+    slow_valves: tuple[int, ...] = (1, 3)
     """
 
-    def __init__(self, prefix: str, name: str = "") -> None:
+    def __init__(
+        self,
+        prefix: str,
+        name: str = "",
+        fast_valves: tuple[int, ...] = (5, 6),
+        slow_valves: tuple[int, ...] = (1, 3),
+    ) -> None:
+        self.fast_valves = fast_valves
+        self.slow_valves = slow_valves
         with self.add_children_as_readables():
             self.valve_states: DeviceVector[SignalR[ValveState]] = DeviceVector(
-                {i: epics_signal_r(ValveState, f"{prefix}V{i}:STA") for i in [1, 3]}
+                {
+                    i: epics_signal_r(ValveState, f"{prefix}V{i}:STA")
+                    for i in self.slow_valves
+                }
             )
             self.fast_valve_states: DeviceVector[SignalR[FastValveState]] = (
                 DeviceVector(
                     {
                         i: epics_signal_r(FastValveState, f"{prefix}V{i}:STA")
-                        for i in [5, 6]
+                        for i in self.fast_valves
                     }
                 )
             )
@@ -117,7 +130,7 @@ class AllValvesControl(StandardReadable, Movable):
             DeviceVector(
                 {
                     i: epics_signal_rw(FastValveControlRequest, f"{prefix}V{i}:CON")
-                    for i in [5, 6]
+                    for i in self.fast_valves
                 }
             )
         )
@@ -125,7 +138,7 @@ class AllValvesControl(StandardReadable, Movable):
         self.valve_control: DeviceVector[SignalRW[ValveControlRequest]] = DeviceVector(
             {
                 i: epics_signal_rw(ValveControlRequest, f"{prefix}V{i}:CON")
-                for i in [1, 3]
+                for i in self.slow_valves
             }
         )
 
@@ -134,9 +147,9 @@ class AllValvesControl(StandardReadable, Movable):
     async def set_valve(
         self, valve: int, value: ValveControlRequest | FastValveControlRequest
     ):
-        if valve in [1, 3] and isinstance(value, ValveControlRequest):
+        if valve in self.slow_valves and isinstance(value, ValveControlRequest):
             await self.valve_control[valve].set(value)
-        elif valve in [5, 6] and isinstance(value, FastValveControlRequest):
+        elif valve in self.fast_valves and isinstance(value, FastValveControlRequest):
             await self.fast_valve_control[valve].set(value)
 
     @AsyncStatus.wrap
@@ -158,7 +171,7 @@ class Pump(StandardReadable):
                 PumpMotorDirectionState, prefix + "MTRDIR"
             )
             self.pump_speed = epics_signal_rw(
-                float, write_pv=prefix + "MSPEED", read_pv="MSPEED_RBV"
+                float, write_pv=prefix + "MSPEED", read_pv=prefix + "MSPEED_RBV"
             )
 
         with self.add_children_as_readables(ConfigSignal):
