@@ -26,7 +26,7 @@ from dodal.devices.i10.i10_apple2 import (
     I10Apple2Pol,
     convert_csv_to_lookup,
 )
-from dodal.devices.i10.i10_pgm import I10Grating
+from dodal.devices.i10.i10_setting_data import I10Grating
 from dodal.devices.pgm import PGM
 
 ID_GAP_LOOKUP_TABLE = "tests/devices/i10/lookupTables/IDEnergy2GapCalibrations.csv"

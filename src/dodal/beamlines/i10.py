@@ -4,7 +4,7 @@ from dodal.common.beamlines.beamline_utils import device_instantiation
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.apple2_undulator import UndlatorPhaseAxes, UndulatorGap
 from dodal.devices.i10.i10_apple2 import I10Apple2, I10Apple2PGM, I10Apple2Pol
-from dodal.devices.i10.i10_pgm import I10Grating
+from dodal.devices.i10.i10_setting_data import I10Grating
 from dodal.devices.pgm import PGM
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
