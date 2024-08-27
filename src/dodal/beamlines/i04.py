@@ -8,7 +8,6 @@ from dodal.devices.aperturescatterguard import (
 )
 from dodal.devices.attenuator import Attenuator
 from dodal.devices.backlight import Backlight
-from dodal.devices.beamstop import BeamStop
 from dodal.devices.dcm import DCM
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.detector_motion import DetectorMotion
@@ -107,14 +106,14 @@ def ipin(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) ->
 
 def beamstop(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> BeamStop:
+) -> XYZPositioner:
     """Get the i04 beamstop device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
     return device_instantiation(
-        BeamStop,
+        XYZPositioner,
         "beamstop",
-        "",
+        "-MO-BS-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
