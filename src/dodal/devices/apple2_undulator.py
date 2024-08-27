@@ -137,8 +137,8 @@ class UndulatorPhaseMotor(StandardReadable):
             Name of the Id phase device
         """
         fullPV = f"{prefix}BL{infix}"
-        self.user_setpoint = epics_signal_w(str, "SET")
-        self.user_setpoint_demand_readback = epics_signal_r(float, "DMD")
+        self.user_setpoint = epics_signal_w(str, fullPV + "SET")
+        self.user_setpoint_demand_readback = epics_signal_r(float, fullPV + "DMD")
 
         fullPV = fullPV + "MTR"
         with self.add_children_as_readables(HintedSignal):
@@ -335,10 +335,7 @@ class Apple2(StandardReadable, Movable):
             self.polarisation, self._polarisation_set = soft_signal_r_and_setter(
                 str, initial_value=None
             )
-            # Store the set energy for readback.
-            self.energy, self._energy_set = soft_signal_r_and_setter(
-                float, initial_value=None
-            )
+            # Store the set energy for readback.I10Apple2PGM
         # This store two lookup tables, Gap and Phase in the Lookuptable format
         self.lookup_tables: dict[str, dict[str | None, dict[str, dict[str, Any]]]] = {
             "Gap": {},
