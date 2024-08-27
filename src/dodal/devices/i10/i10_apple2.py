@@ -29,7 +29,7 @@ MAXIMUM_GAP_MOTOR_POSITION = 100
 
 class I10Apple2(Apple2):
     """
-    I10Apple2 is the i10 version of such ID.
+    I10Apple2 is the i10 version of Apple2 ID.
     The set and update_lookuptable should be the only part that is I10 specific.
 
     A pair of look up tables are needed to provide the conversion

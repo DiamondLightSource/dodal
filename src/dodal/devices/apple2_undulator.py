@@ -270,7 +270,7 @@ class LookupTableEntries(BaseModel):
 class Lookuptable(BaseModel):
     """
     BaseModel class for the lookup table.
-    Appl2 lookup table should be in this format.
+    Apple2 lookup table should be in this format.
 
     {mode: {'Energies': {Any: {'Low': float,
                             'High': float,
@@ -299,10 +299,10 @@ class Apple2(StandardReadable, Movable):
      which allow the production of different x-ray polarisation as well as energy.
      This type of ID is use on I10, I21, I09, I17 and I06 for soft x-ray.
 
-    A pair of look up tables are needed to provide the conversion between motor position and energy.
-
-    An new definition of Set and update_lookuptable method is required.
-
+    A pair of look up tables are needed to provide the conversion between motor position
+     and energy.
+    This conversion (update_lookuptable) and the way the id move (set) are two abstract
+     methods that are beamline specific and need to be implemented.
 
     Parameters
     ----------
