@@ -107,7 +107,7 @@ class TestDeviceInitializationController(unittest.TestCase):
         controller = DeviceInitializationController(self.config, my_device)
 
         controller.add_device_to_cache(self.device_mock)
-        cached_device = controller.see_if_device_is_in_cache()
+        cached_device = controller.get_if_device_is_in_cache()
         assert cached_device is not None
 
         self.assertEqual(cached_device, self.device_mock)

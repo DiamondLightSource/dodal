@@ -3,22 +3,11 @@ from dataclasses import dataclass
 
 from bluesky.run_engine import call_in_bluesky_event_loop
 from ophyd_async.core import DEFAULT_TIMEOUT
-from ophyd_async.core import Device as OphydV2Device
 
 from dodal.common.beamlines.beamline_utils import (
     ACTIVE_DEVICES,
 )
 from dodal.utils import AnyDevice
-
-
-class XYZDetector(OphydV2Device):
-    def __init__(self, prefix: str, *args, **kwargs):
-        self.prefix = prefix
-        super().__init__(*args, **kwargs)
-
-    @property
-    def hints(self):
-        raise NotImplementedError
 
 
 @dataclass
@@ -53,17 +42,17 @@ class DeviceInitializationController:
         CONTROLLERS[self.factory.__name__] = self
         self.device = None
 
-    def see_if_device_is_in_cache(self) -> AnyDevice | None:
+    def get_if_device_is_in_cache(self) -> AnyDevice | None:
         return self.device
 
     def __call__(
         self,
-        connect=False,
+        connect: bool = False,
         mock: bool | None = None,
         timeout: float | None = None,
         name: str | None = None,
     ) -> AnyDevice:
-        device = self.see_if_device_is_in_cache() or self.factory()
+        device = self.get_if_device_is_in_cache() or self.factory()
         if self.config.set_name:
             device.set_name(self.factory.__name__)
         self.add_device_to_cache(device)
@@ -110,22 +99,3 @@ def instantiation_behaviour(
         return controller
 
     return decorator
-
-
-beamline_prefix = "example:"
-
-
-@instantiation_behaviour(
-    default_use_mock_at_connection=True, default_timeout_for_connect=10
-)
-def new_detector_xyz():
-    """Create an XYZ detector with specific settings."""
-    return XYZDetector(name="det1", prefix=f"{beamline_prefix}xyz:")
-
-
-@instantiation_behaviour(
-    eager=True, default_use_mock_at_connection=True, default_timeout_for_connect=10
-)
-def detector_xyz_variant():
-    """Create an XYZ detector with specific settings."""
-    return XYZDetector(name="det2-variant", prefix=f"{beamline_prefix}xyz:")
