@@ -1,6 +1,5 @@
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any
 
 from bluesky.run_engine import call_in_bluesky_event_loop
 from ophyd_async.core import DEFAULT_TIMEOUT
