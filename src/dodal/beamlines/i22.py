@@ -51,7 +51,7 @@ set_path_provider(
 )
 
 
-@device_factory(default_use_mock_at_connection=True, default_timeout_for_connect=10)
+@device_factory(default_use_mock_at_connection=True)
 def saxs():
     """Create a SAXS detector with specific settings."""
     metadata_holder = NXSasMetadataHolder(
@@ -74,13 +74,13 @@ def saxs():
     )
 
 
-@device_factory(default_use_mock_at_connection=True, default_timeout_for_connect=10)
+@device_factory(default_use_mock_at_connection=True)
 def synchrotron():
     """Create a Synchrotron instance with specific settings."""
     return Synchrotron(name="synchrotron", prefix="")
 
 
-@device_factory(default_use_mock_at_connection=True, default_timeout_for_connect=10)
+@device_factory(default_use_mock_at_connection=True)
 def waxs():
     """Create a WAXS detector with specific settings."""
     metadata_holder = NXSasMetadataHolder(
@@ -103,7 +103,7 @@ def waxs():
     )
 
 
-@device_factory(default_use_mock_at_connection=True, default_timeout_for_connect=10)
+@device_factory(default_use_mock_at_connection=True)
 def i0():
     """Create an I0 detector with specific settings."""
     return TetrammDetector(
@@ -114,7 +114,7 @@ def i0():
     )
 
 
-@device_factory(default_use_mock_at_connection=True, default_timeout_for_connect=10)
+@device_factory(default_use_mock_at_connection=True)
 def it():
     """Create an IT detector with specific settings."""
     return TetrammDetector(
@@ -125,19 +125,19 @@ def it():
     )
 
 
-@device_factory(default_use_mock_at_connection=True, default_timeout_for_connect=10)
+@device_factory(default_use_mock_at_connection=True)
 def vfm():
     """Create a VFM instance with specific settings."""
     return FocusingMirror(name="vfm", prefix="-OP-KBM-01:VFM:")
 
 
-@device_factory(default_use_mock_at_connection=True, default_timeout_for_connect=10)
+@device_factory(default_use_mock_at_connection=True)
 def hfm():
     """Create an HFM instance with specific settings."""
     return FocusingMirror(name="hfm", prefix="-OP-KBM-01:HFM:")
 
 
-@device_factory(default_use_mock_at_connection=True, default_timeout_for_connect=10)
+@device_factory(default_use_mock_at_connection=True)
 def dcm():
     """Create a DCM instance with specific settings."""
     prefix = BeamlinePrefix(BL).beamline_prefix
@@ -158,7 +158,7 @@ def dcm():
     )
 
 
-@device_factory(default_use_mock_at_connection=True, default_timeout_for_connect=10)
+@device_factory(default_use_mock_at_connection=True)
 def undulator():
     """Create an Undulator instance with specific settings."""
     return Undulator(
@@ -170,19 +170,19 @@ def undulator():
     )
 
 
-@device_factory(default_use_mock_at_connection=True, default_timeout_for_connect=10)
+@device_factory(default_use_mock_at_connection=True)
 def slits_1():
     """Create Slits instance for slot 1."""
     return numbered_slits(1)
 
 
-@device_factory(default_use_mock_at_connection=True, default_timeout_for_connect=10)
+@device_factory(default_use_mock_at_connection=True)
 def slits_2():
     """Create Slits instance for slot 2."""
     return numbered_slits(2)
 
 
-@device_factory(default_use_mock_at_connection=True, default_timeout_for_connect=10)
+@device_factory(default_use_mock_at_connection=True)
 def slits_3():
     """Create Slits instance for slot 3."""
     return numbered_slits(3)
@@ -194,19 +194,19 @@ def slits_4():
     return numbered_slits(4)
 
 
-@device_factory(default_use_mock_at_connection=True, default_timeout_for_connect=10)
+@device_factory(default_use_mock_at_connection=True)
 def slits_5():
     """Create Slits instance for slot 5."""
     return numbered_slits(5)
 
 
-@device_factory(default_use_mock_at_connection=True, default_timeout_for_connect=10)
+@device_factory(default_use_mock_at_connection=True)
 def slits_6():
     """Create Slits instance for slot 6."""
     return numbered_slits(6)
 
 
-@device_factory(default_use_mock_at_connection=True, default_timeout_for_connect=10)
+@device_factory(default_use_mock_at_connection=True)
 def fswitch():
     """Create an FSwitch instance with specific settings."""
     return FSwitch(
@@ -218,7 +218,7 @@ def fswitch():
     )
 
 
-@device_factory(default_use_mock_at_connection=True, default_timeout_for_connect=10)
+@device_factory(default_use_mock_at_connection=True)
 def panda1():
     """Create HDFPanda instance for panda1."""
     return HDFPanda(
@@ -258,7 +258,7 @@ def panda4():
     )
 
 
-@device_factory(default_use_mock_at_connection=True, default_timeout_for_connect=10)
+@device_factory(default_use_mock_at_connection=True)
 def oav():
     """Create OAV instance with specific settings."""
     metadata_holder = NXSasMetadataHolder(
