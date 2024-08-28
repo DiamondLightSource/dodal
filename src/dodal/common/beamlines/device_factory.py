@@ -1,5 +1,6 @@
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import Any
 
 from bluesky.run_engine import call_in_bluesky_event_loop
 from ophyd_async.core import DEFAULT_TIMEOUT
@@ -89,6 +90,7 @@ def device_factory(
     set_name: bool = True,
     default_timeout_for_connect: float = DEFAULT_TIMEOUT,
     default_use_mock_at_connection: bool = False,
+    skip: Callable[..., bool] = lambda: False,
 ) -> Callable[[Callable[[], AnyDevice]], DeviceInitializationController]:
     config = DeviceInitializationConfig(
         eager, set_name, default_timeout_for_connect, default_use_mock_at_connection
@@ -97,5 +99,8 @@ def device_factory(
     def decorator(factory: Callable[[], AnyDevice]) -> DeviceInitializationController:
         controller = DeviceInitializationController(config, factory)
         return controller
+
+    if skip():
+        decorator.__skip__ = True
 
     return decorator
