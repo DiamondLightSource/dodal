@@ -4,13 +4,15 @@ from unittest.mock import MagicMock, patch
 from ophyd_async.core import DEFAULT_TIMEOUT
 
 from dodal.common.beamlines.beamline_utils import ACTIVE_DEVICES
-from dodal.common.beamlines.instantiation_behaviour import (
+from dodal.common.beamlines.device_factory import (
     CONTROLLERS,
     DeviceInitializationConfig,
     DeviceInitializationController,
+    device_factory,
+)
+from dodal.common.beamlines.example_new_instantiation import (
     XYZDetector,
     detector_xyz_variant,
-    instantiation_behaviour,
     new_detector_xyz,
 )
 
@@ -19,7 +21,7 @@ def test_decorator_directly():
     CONTROLLERS.clear()
     beamline_prefix = "example:"
 
-    @instantiation_behaviour(
+    @device_factory(
         eager=True,
         default_use_mock_at_connection=True,
         default_timeout_for_connect=10,
@@ -37,7 +39,7 @@ def test_decorator_directly_with_no_name_override():
     CONTROLLERS.clear()
     beamline_prefix = "example:"
 
-    @instantiation_behaviour(
+    @device_factory(
         eager=True,
         default_use_mock_at_connection=True,
         default_timeout_for_connect=10,
@@ -130,6 +132,4 @@ class TestSpecificDeviceFunctions(unittest.TestCase):
                 name="det2-variant", prefix="example:xyz:"
             )
 
-
-if __name__ == "__main__":
     unittest.main()
