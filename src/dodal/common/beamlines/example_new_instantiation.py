@@ -1,6 +1,6 @@
 from ophyd_async.core import Device as OphydV2Device
 
-from dodal.common.beamlines.instantiation_behaviour import instantiation_behaviour
+from dodal.common.beamlines.device_factory import device_factory
 
 
 class XYZDetector(OphydV2Device):
@@ -16,15 +16,13 @@ class XYZDetector(OphydV2Device):
 beamline_prefix = "example:"
 
 
-@instantiation_behaviour(
-    default_use_mock_at_connection=True, default_timeout_for_connect=10
-)
+@device_factory(default_use_mock_at_connection=True, default_timeout_for_connect=10)
 def new_detector_xyz():
     """Create an XYZ detector with specific settings."""
     return XYZDetector(name="det1", prefix=f"{beamline_prefix}xyz:")
 
 
-@instantiation_behaviour(
+@device_factory(
     eager=True, default_use_mock_at_connection=True, default_timeout_for_connect=10
 )
 def detector_xyz_variant():

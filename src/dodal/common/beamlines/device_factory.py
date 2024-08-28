@@ -83,7 +83,7 @@ class DeviceInitializationController:
 CONTROLLERS: dict[str, DeviceInitializationController] = {}
 
 
-def instantiation_behaviour(
+def device_factory(
     *,
     eager: bool = True,
     set_name: bool = True,
