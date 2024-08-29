@@ -7,6 +7,15 @@ dodal.plans.check\_topup
 
 
 
+.. currentmodule:: dodal.plans
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~check_topup.TopupConfig
+
 
 
 

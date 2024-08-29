@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.plans.check_topup &#8212; dodal 1.30.1.dev3+g851a0027c documentation</title>
+    <title>dodal.plans.check_topup &#8212; dodal 1.30.1.dev4+gc3ad7e429 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=ab39b491"></script>
+    <script src="../../../_static/documentation_options.js?v=fa39d402"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -471,14 +471,36 @@ document.write(`
                 <article class="bd-article">
                   
   <h1>Source code for dodal.plans.check_topup</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">bluesky.plan_stubs</span> <span class="k">as</span> <span class="nn">bps</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
 
+<span class="kn">import</span> <span class="nn">bluesky.plan_stubs</span> <span class="k">as</span> <span class="nn">bps</span>
+
+<span class="kn">from</span> <span class="nn">dodal.common.beamlines.beamline_parameters</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_beamline_parameters</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.synchrotron</span> <span class="kn">import</span> <span class="n">Synchrotron</span><span class="p">,</span> <span class="n">SynchrotronMode</span>
 <span class="kn">from</span> <span class="nn">dodal.log</span> <span class="kn">import</span> <span class="n">LOGGER</span>
 
 <span class="n">ALLOWED_MODES</span> <span class="o">=</span> <span class="p">[</span><span class="n">SynchrotronMode</span><span class="o">.</span><span class="n">USER</span><span class="p">,</span> <span class="n">SynchrotronMode</span><span class="o">.</span><span class="n">SPECIAL</span><span class="p">]</span>
 <span class="n">DECAY_MODE_COUNTDOWN</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># Value of the start_countdown PV when in decay mode</span>
 <span class="n">COUNTDOWN_DURING_TOPUP</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="n">DEFAULT_THRESHOLD_EXPOSURE_S</span> <span class="o">=</span> <span class="mi">120</span>
+<span class="n">DEFAULT_TOPUP_GATE_DELAY_S</span> <span class="o">=</span> <span class="mi">1</span>
+
+
+<div class="viewcode-block" id="TopupConfig">
+<a class="viewcode-back" href="../../../reference/generated/dodal.plans.check_topup.TopupConfig.html#dodal.plans.check_topup.TopupConfig">[docs]</a>
+<span class="k">class</span> <span class="nc">TopupConfig</span><span class="p">:</span>
+    <span class="c1"># For planned exposures less than this value, wait for topup to finish instead of</span>
+    <span class="c1"># collecting throughout topup.</span>
+    <span class="n">THRESHOLD_EXPOSURE_S</span> <span class="o">=</span> <span class="s2">&quot;dodal_topup_threshold_exposure_s&quot;</span>
+    <span class="c1"># Additional configurable safety margin to wait after the end of topup, as the start</span>
+    <span class="c1"># and end countdowns do not have the same precision, and in addition we want to be sure</span>
+    <span class="c1"># that collection does not overlap with any transients that may occur after the</span>
+    <span class="c1"># nominal endpoint.</span>
+    <span class="n">TOPUP_GATE_DELAY_S</span> <span class="o">=</span> <span class="s2">&quot;dodal_topup_end_delay_s&quot;</span></div>
+
 
 
 <span class="k">def</span> <span class="nf">_in_decay_mode</span><span class="p">(</span><span class="n">time_to_topup</span><span class="p">):</span>
@@ -496,15 +518,38 @@ document.write(`
     <span class="k">return</span> <span class="kc">False</span>
 
 
-<span class="k">def</span> <span class="nf">_delay_to_avoid_topup</span><span class="p">(</span><span class="n">total_run_time</span><span class="p">,</span> <span class="n">time_to_topup</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">total_run_time</span> <span class="o">&gt;</span> <span class="n">time_to_topup</span><span class="p">:</span>
-        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            Total run time for this collection exceeds time to next top up.</span>
-<span class="sd">            Collection delayed until top up done.</span>
-<span class="sd">            &quot;&quot;&quot;</span>
+<span class="k">def</span> <span class="nf">_delay_to_avoid_topup</span><span class="p">(</span>
+    <span class="n">total_run_time_s</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">time_to_topup_s</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">topup_configuration</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="n">total_exposure_time_s</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Determine whether we should delay collection until after a topup. Generally</span>
+<span class="sd">    if a topup is due to occur during the collection we will delay collection until after the topup.</span>
+<span class="sd">    However for long-running collections, impact of the topup is potentially less and collection-duration may be</span>
+<span class="sd">    a significant fraction of the topup-interval, therefore we may wish to collect during a topup.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        total_run_time_s: Anticipated time until end of the collection in seconds</span>
+<span class="sd">        time_to_topup_s: Time to the start of the topup as measured from the PV</span>
+<span class="sd">        topup_configuration: configuration dictionary</span>
+<span class="sd">        total_exposure_time_s: Total exposure time of the sample in s&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">total_run_time_s</span> <span class="o">&gt;</span> <span class="n">time_to_topup_s</span><span class="p">:</span>
+        <span class="n">limit_s</span> <span class="o">=</span> <span class="n">topup_configuration</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">TopupConfig</span><span class="o">.</span><span class="n">THRESHOLD_EXPOSURE_S</span><span class="p">,</span> <span class="n">DEFAULT_THRESHOLD_EXPOSURE_S</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="kc">True</span>
+        <span class="n">gate</span> <span class="o">=</span> <span class="n">total_exposure_time_s</span> <span class="o">&lt;</span> <span class="n">limit_s</span>
+        <span class="k">if</span> <span class="n">gate</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                Exposure time of </span><span class="si">{</span><span class="n">total_exposure_time_s</span><span class="si">}</span><span class="s2">s below the threshold of </span><span class="si">{</span><span class="n">limit_s</span><span class="si">}</span><span class="s2">s.</span>
+<span class="s2">                Collection delayed until topup done.</span>
+<span class="s2">                &quot;&quot;&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                Exposure time of </span><span class="si">{</span><span class="n">total_exposure_time_s</span><span class="si">}</span><span class="s2">s meets the threshold of </span><span class="si">{</span><span class="n">limit_s</span><span class="si">}</span><span class="s2">s.</span>
+<span class="s2">                Collection proceeding through topup.</span>
+<span class="s2">                &quot;&quot;&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">gate</span>
     <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Total run time less than time to next topup. Proceeding with collection.</span>
@@ -549,9 +594,17 @@ document.write(`
         <span class="k">return</span>
     <span class="n">tot_run_time</span> <span class="o">=</span> <span class="n">total_exposure_time</span> <span class="o">+</span> <span class="n">ops_time</span>
     <span class="n">end_topup</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">synchrotron</span><span class="o">.</span><span class="n">top_up_end_countdown</span><span class="p">)</span>
-    <span class="n">time_to_wait</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">end_topup</span> <span class="k">if</span> <span class="n">_delay_to_avoid_topup</span><span class="p">(</span><span class="n">tot_run_time</span><span class="p">,</span> <span class="n">time_to_topup</span><span class="p">)</span> <span class="k">else</span> <span class="mf">0.0</span>
+    <span class="n">topup_configuration</span> <span class="o">=</span> <span class="n">_load_topup_configuration_from_properties_file</span><span class="p">()</span>
+    <span class="n">should_wait</span> <span class="o">=</span> <span class="n">_delay_to_avoid_topup</span><span class="p">(</span>
+        <span class="n">tot_run_time</span><span class="p">,</span>
+        <span class="n">time_to_topup</span><span class="p">,</span>
+        <span class="n">topup_configuration</span><span class="p">,</span>
+        <span class="n">total_exposure_time</span><span class="p">,</span>
     <span class="p">)</span>
+    <span class="n">topup_gate_delay</span> <span class="o">=</span> <span class="n">topup_configuration</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="n">TopupConfig</span><span class="o">.</span><span class="n">TOPUP_GATE_DELAY_S</span><span class="p">,</span> <span class="n">DEFAULT_TOPUP_GATE_DELAY_S</span>
+    <span class="p">)</span>
+    <span class="n">time_to_wait</span> <span class="o">=</span> <span class="n">end_topup</span> <span class="o">+</span> <span class="n">topup_gate_delay</span> <span class="k">if</span> <span class="n">should_wait</span> <span class="k">else</span> <span class="mf">0.0</span>
 
     <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">time_to_wait</span><span class="p">)</span>
 
@@ -559,6 +612,11 @@ document.write(`
     <span class="k">if</span> <span class="n">check_start</span> <span class="o">==</span> <span class="n">COUNTDOWN_DURING_TOPUP</span><span class="p">:</span>
         <span class="k">yield from</span> <span class="n">wait_for_topup_complete</span><span class="p">(</span><span class="n">synchrotron</span><span class="p">)</span></div>
 
+
+
+<span class="k">def</span> <span class="nf">_load_topup_configuration_from_properties_file</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">get_beamline_parameters</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">params</span><span class="o">.</span><span class="n">params</span>
 </pre></div>
 
                 </article>
