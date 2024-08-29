@@ -238,7 +238,7 @@ async def test_zocalo_results_trigger_log_message(
         yield from bps.trigger(zocalo_results)
 
     RE(zocalo_plan())
-    mock_logger.info.assert_has_calls([call("Zocalo: found 1 crystals.")])
+    mock_logger.info.assert_has_calls([call("Zocalo results from CPU processing: found 1 crystals.")])
 
 
 @patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection", autospec=True)
