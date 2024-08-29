@@ -61,7 +61,7 @@ class ZocaloResults(StandardReadable, Triggerable):
     be triggered from a plan-subscribed callback using the run_start() and run_end()
     methods on dodal.devices.zocalo.ZocaloTrigger.
 
-    See https://github.com/DiamondLightSource/dodal/wiki/How-to-Interact-with-Zocalo"""
+    See https://diamondlightsource.github.io/dodal/main/how-to/zocalo.html"""
 
     def __init__(
         self,
@@ -71,6 +71,7 @@ class ZocaloResults(StandardReadable, Triggerable):
         sort_key: str = DEFAULT_SORT_KEY.value,
         timeout_s: float = DEFAULT_TIMEOUT,
         prefix: str = "",
+        use_fastest_zocalo_result: bool = False
     ) -> None:
         self.zocalo_environment = zocalo_environment
         self.sort_key = SortKeys[sort_key]
@@ -79,6 +80,7 @@ class ZocaloResults(StandardReadable, Triggerable):
         self._prefix = prefix
         self._raw_results_received: Queue = Queue()
         self.transport: CommonTransport | None = None
+        self.use_fastest_zocalo_result = use_fastest_zocalo_result
 
         self.results, self._results_setter = soft_signal_r_and_setter(
             list[XrcResult], name="results"
@@ -237,9 +239,18 @@ class ZocaloResults(StandardReadable, Triggerable):
             self.transport.ack(header)  # type: ignore # we create transport here
 
             results = message.get("results", [])
-            self._raw_results_received.put(
-                {"results": results, "ispyb_ids": recipe_parameters}
-            )
+
+            if self.use_fastest_zocalo_result:
+                self._raw_results_received.put(
+                    {"results": results, "ispyb_ids": recipe_parameters}
+                )
+            else:
+                #Only add to queue if results are from CPU
+                if recipe_parameters.get('gpu') == None:
+                    self._raw_results_received.put(
+                    {"results": results, "ispyb_ids": recipe_parameters}
+                )
+                
 
         subscription = workflows.recipe.wrap_subscribe(
             self.transport,
