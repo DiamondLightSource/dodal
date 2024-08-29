@@ -65,7 +65,6 @@ def saxs():
     )
 
     return NXSasPilatus(
-        name="saxs",
         prefix="-EA-PILAT-01:",
         drv_suffix="CAM:",
         hdf_suffix="HDF5:",
@@ -77,7 +76,7 @@ def saxs():
 @device_factory()
 def synchrotron():
     """Create a Synchrotron instance with specific settings."""
-    return Synchrotron(name="synchrotron", prefix="")
+    return Synchrotron()
 
 
 @device_factory()
@@ -94,7 +93,6 @@ def waxs():
     )
 
     return NXSasPilatus(
-        name="waxs",
         prefix="-EA-PILAT-03:",
         drv_suffix="CAM:",
         hdf_suffix="HDF5:",
@@ -107,7 +105,6 @@ def waxs():
 def i0():
     """Create an I0 detector with specific settings."""
     return TetrammDetector(
-        name="i0",
         prefix="-EA-XBPM-02:",
         type="Cividec Diamond XBPM",
         path_provider=get_path_provider(),
@@ -118,7 +115,6 @@ def i0():
 def it():
     """Create an IT detector with specific settings."""
     return TetrammDetector(
-        name="it",
         prefix="-EA-TTRM-02:",
         type="PIN Diode",
         path_provider=get_path_provider(),
@@ -149,8 +145,6 @@ def dcm():
     )
 
     return DoubleCrystalMonochromator(
-        name="dcm",
-        prefix="",
         motion_prefix=f"{prefix}-MO-DCM-01:",
         temperature_prefix=f"{prefix}-DI-DCM-01:",
         crystal_1_metadata=silicon_crystal_metadata,
@@ -162,7 +156,6 @@ def dcm():
 def undulator():
     """Create an Undulator instance with specific settings."""
     return Undulator(
-        name="undulator",
         prefix=f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
         poles=80,
         length=2.0,
@@ -210,7 +203,6 @@ def slits_6():
 def fswitch():
     """Create an FSwitch instance with specific settings."""
     return FSwitch(
-        name="fswitch",
         prefix="-MO-FSWT-01:",
         lens_geometry="paraboloid",
         cylindrical=True,
@@ -222,7 +214,6 @@ def fswitch():
 def panda1():
     """Create HDFPanda instance for panda1."""
     return HDFPanda(
-        name="panda1",
         prefix="-EA-PANDA-01:",
         directory_provider=get_directory_provider(),
     )
@@ -232,7 +223,6 @@ def panda1():
 def panda2():
     """Create HDFPanda instance for panda2."""
     return HDFPanda(
-        name="panda2",
         prefix="-EA-PANDA-02:",
         directory_provider=get_directory_provider(),
     )
@@ -242,7 +232,6 @@ def panda2():
 def panda3():
     """Create HDFPanda instance for panda3."""
     return HDFPanda(
-        name="panda3",
         prefix="-EA-PANDA-03:",
         directory_provider=get_directory_provider(),
     )
@@ -252,7 +241,6 @@ def panda3():
 def panda4():
     """Create HDFPanda instance for panda4."""
     return HDFPanda(
-        name="panda4",
         prefix="-EA-PANDA-04:",
         directory_provider=get_directory_provider(),
     )
@@ -269,7 +257,6 @@ def oav():
     )
 
     return NXSasOAV(
-        name="oav",
         prefix="-DI-OAV-01:",
         drv_suffix="DET:",
         hdf_suffix="HDF5:",
@@ -281,4 +268,4 @@ def oav():
 @device_factory()
 def linkam():
     """Create Linkam3 instance with specific settings."""
-    return Linkam3(name="linkam", prefix="-EA-TEMPC-05")
+    return Linkam3(prefix="-EA-TEMPC-05")
