@@ -52,7 +52,7 @@ def _delay_to_avoid_topup(
     if a topup is due to occur during the collection we will delay collection until after the topup.
     However for long-running collections, impact of the topup is potentially less and collection-duration may be
     a significant fraction of the topup-interval, therefore we may wish to collect during a topup.
-    
+
     Args:
         total_run_time_s: Anticipated time until end of the collection in seconds
         time_to_topup_s: Time to the start of the topup as measured from the PV
