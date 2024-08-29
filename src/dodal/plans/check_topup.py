@@ -20,7 +20,10 @@ class TopupConfig:
     # For planned exposures less than this value, wait for topup to finish instead of
     # collecting throughout topup.
     THRESHOLD_EXPOSURE_S = "dodal_topup_threshold_exposure_s"
-    # Additional safety margin to wait after the end of topup.
+    # Additional configurable safety margin to wait after the end of topup, as the start
+    # and end countdowns do not have the same precision, and in addition we want to be sure
+    # that collection does not overlap with any transients that may occur after the
+    # nominal endpoint.
     TOPUP_GATE_DELAY_S = "dodal_topup_end_delay_s"
 
 
@@ -40,12 +43,22 @@ def _gating_permitted(machine_mode: SynchrotronMode):
 
 
 def _delay_to_avoid_topup(
-    total_run_time,
-    time_to_topup,
+    total_run_time_s: float,
+    time_to_topup_s: float,
     topup_configuration: dict,
     total_exposure_time_s: float,
 ) -> bool:
-    if total_run_time > time_to_topup:
+    """Determine whether we should delay collection until after a topup. Generally
+    if a topup is due to occur during the collection we will delay collection until after the topup.
+    However for long-running collections, impact of the topup is potentially less and collection-duration may be
+    a significant fraction of the topup-interval, therefore we may wish to collect during a topup.
+    
+    Args:
+        total_run_time_s: Anticipated time until end of the collection in seconds
+        time_to_topup_s: Time to the start of the topup as measured from the PV
+        topup_configuration: configuration dictionary
+        total_exposure_time_s: Total exposure time of the sample in s"""
+    if total_run_time_s > time_to_topup_s:
         limit_s = topup_configuration.get(
             TopupConfig.THRESHOLD_EXPOSURE_S, DEFAULT_THRESHOLD_EXPOSURE_S
         )
