@@ -36,11 +36,10 @@ def test_terminal_use_case_decorated_motor_mock(RE: RunEngine):
 
 def test_decorator_directly_with_name_override(RE: RunEngine):
     ACTIVE_DEVICES.clear()
-    beamline_prefix = "example:"
 
     @device_factory(mock=True, use_factory_name=False)
     def m2():
-        return Motor(name="foo", prefix=f"{beamline_prefix}xyz:")
+        return Motor(name="foo", prefix="xyz:")
 
     device = m2()
     assert device is not None
@@ -49,11 +48,10 @@ def test_decorator_directly_with_name_override(RE: RunEngine):
 
 def test_decorator_directly_without_name_override(RE: RunEngine):
     ACTIVE_DEVICES.clear()
-    beamline_prefix = "example:"
 
     @device_factory(mock=True)
     def m2():
-        return Motor(name="foo", prefix=f"{beamline_prefix}xyz:")
+        return Motor(name="foo", prefix="xyz:")
 
     device = m2()
     assert device is not None
@@ -67,6 +65,21 @@ def test_custom_values():
         timeout=5.0,
         mock=True,
         skip=True,
+    )
+    assert not config.eager_connect
+    assert not config.use_factory_name
+    assert config.timeout == 5.0
+    assert config.mock
+    assert config.skip
+
+
+def test_config_with_lambda_skip():
+    config = DeviceInitializationConfig(
+        eager_connect=False,
+        use_factory_name=False,
+        timeout=5.0,
+        mock=True,
+        skip=lambda: True,
     )
     assert not config.eager_connect
     assert not config.use_factory_name
