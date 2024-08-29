@@ -31,7 +31,7 @@ from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.tetramm import TetrammDetector
 from dodal.devices.undulator import Undulator
 from dodal.log import set_beamline as set_log_beamline
-from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
+from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("i22")
 set_log_beamline(BL)
@@ -51,7 +51,7 @@ set_path_provider(
 )
 
 
-@device_factory(default_use_mock_at_connection=True)
+@device_factory()
 def saxs():
     """Create a SAXS detector with specific settings."""
     metadata_holder = NXSasMetadataHolder(
@@ -74,13 +74,13 @@ def saxs():
     )
 
 
-@device_factory(default_use_mock_at_connection=True)
+@device_factory()
 def synchrotron():
     """Create a Synchrotron instance with specific settings."""
     return Synchrotron(name="synchrotron", prefix="")
 
 
-@device_factory(default_use_mock_at_connection=True)
+@device_factory()
 def waxs():
     """Create a WAXS detector with specific settings."""
     metadata_holder = NXSasMetadataHolder(
@@ -103,7 +103,7 @@ def waxs():
     )
 
 
-@device_factory(default_use_mock_at_connection=True)
+@device_factory()
 def i0():
     """Create an I0 detector with specific settings."""
     return TetrammDetector(
@@ -114,7 +114,7 @@ def i0():
     )
 
 
-@device_factory(default_use_mock_at_connection=True)
+@device_factory()
 def it():
     """Create an IT detector with specific settings."""
     return TetrammDetector(
@@ -125,19 +125,19 @@ def it():
     )
 
 
-@device_factory(default_use_mock_at_connection=True)
+@device_factory()
 def vfm():
     """Create a VFM instance with specific settings."""
     return FocusingMirror(name="vfm", prefix="-OP-KBM-01:VFM:")
 
 
-@device_factory(default_use_mock_at_connection=True)
+@device_factory()
 def hfm():
     """Create an HFM instance with specific settings."""
     return FocusingMirror(name="hfm", prefix="-OP-KBM-01:HFM:")
 
 
-@device_factory(default_use_mock_at_connection=True)
+@device_factory()
 def dcm():
     """Create a DCM instance with specific settings."""
     prefix = BeamlinePrefix(BL).beamline_prefix
@@ -158,7 +158,7 @@ def dcm():
     )
 
 
-@device_factory(default_use_mock_at_connection=True)
+@device_factory()
 def undulator():
     """Create an Undulator instance with specific settings."""
     return Undulator(
@@ -170,43 +170,43 @@ def undulator():
     )
 
 
-@device_factory(default_use_mock_at_connection=True)
+@device_factory()
 def slits_1():
     """Create Slits instance for slot 1."""
     return numbered_slits(1)
 
 
-@device_factory(default_use_mock_at_connection=True)
+@device_factory()
 def slits_2():
     """Create Slits instance for slot 2."""
     return numbered_slits(2)
 
 
-@device_factory(default_use_mock_at_connection=True)
+@device_factory()
 def slits_3():
     """Create Slits instance for slot 3."""
     return numbered_slits(3)
 
 
-@skip_device()
+@device_factory()
 def slits_4():
     """Create Slits instance for slot 4."""
     return numbered_slits(4)
 
 
-@device_factory(default_use_mock_at_connection=True)
+@device_factory()
 def slits_5():
     """Create Slits instance for slot 5."""
     return numbered_slits(5)
 
 
-@device_factory(default_use_mock_at_connection=True)
+@device_factory()
 def slits_6():
     """Create Slits instance for slot 6."""
     return numbered_slits(6)
 
 
-@device_factory(default_use_mock_at_connection=True)
+@device_factory()
 def fswitch():
     """Create an FSwitch instance with specific settings."""
     return FSwitch(
@@ -218,7 +218,7 @@ def fswitch():
     )
 
 
-@device_factory(default_use_mock_at_connection=True)
+@device_factory()
 def panda1():
     """Create HDFPanda instance for panda1."""
     return HDFPanda(
@@ -228,7 +228,7 @@ def panda1():
     )
 
 
-@skip_device()
+@device_factory(skip=True)
 def panda2():
     """Create HDFPanda instance for panda2."""
     return HDFPanda(
@@ -238,7 +238,7 @@ def panda2():
     )
 
 
-@skip_device()
+@device_factory(skip=True)
 def panda3():
     """Create HDFPanda instance for panda3."""
     return HDFPanda(
@@ -248,7 +248,7 @@ def panda3():
     )
 
 
-@skip_device()
+@device_factory(skip=True)
 def panda4():
     """Create HDFPanda instance for panda4."""
     return HDFPanda(
@@ -258,7 +258,7 @@ def panda4():
     )
 
 
-@device_factory(default_use_mock_at_connection=True)
+@device_factory()
 def oav():
     """Create OAV instance with specific settings."""
     metadata_holder = NXSasMetadataHolder(
@@ -278,7 +278,7 @@ def oav():
     )
 
 
-@skip_device()
+@device_factory()
 def linkam():
     """Create Linkam3 instance with specific settings."""
     return Linkam3(name="linkam", prefix="-EA-TEMPC-05")
