@@ -167,7 +167,7 @@ class ZocaloResults(StandardReadable, Triggerable):
             )
 
             raw_results = self._raw_results_received.get(timeout=self.timeout_s)
-            source_of_results = "CPU" if raw_results["ispyb_ids"]["gpu"] == None else "GPU"
+            source_of_results = "CPU" if not raw_results["ispyb_ids"].get("gpu") else "GPU"
             if source_of_results.equals == "CPU" and self.use_fastest_zocalo_result:
                 LOGGER.warn("Recieved zocalo results from CPU before GPU")
             LOGGER.info(f"Zocalo results from {source_of_results} processing: found {len(raw_results['results'])} crystals.")
