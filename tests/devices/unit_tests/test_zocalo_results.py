@@ -207,11 +207,14 @@ async def test_zocalo_results_trigger_log_message(
         name="zocalo", zocalo_environment="dev_artemis", timeout_s=2
     )
 
+    recipe_wrapper = MagicMock()
+    recipe_wrapper.recipe_step = {"parameters": {}}
+
     def zocalo_plan():
         yield from bps.stage(zocalo_results)
         receive_result = mock_wrap_subscribe.mock_calls[0].args[2]
         receive_result(
-            MagicMock(autospec=RecipeWrapper),
+            recipe_wrapper,
             {},
             {
                 "results": [
