@@ -1,15 +1,16 @@
 import asyncio
-from collections import OrderedDict, namedtuple
+from collections import namedtuple
 from dataclasses import asdict, dataclass
 from enum import Enum
 
 from bluesky.protocols import Movable, Reading
+from event_model.documents.event_descriptor import DataKey
 from ophyd_async.core import AsyncStatus, HintedSignal, SignalR, StandardReadable
 from ophyd_async.core.soft_signal_backend import SoftConverter, SoftSignalBackend
 
+from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
 from dodal.devices.aperture import Aperture
 from dodal.devices.scatterguard import Scatterguard
-from dodal.log import LOGGER
 
 
 class InvalidApertureMove(Exception):
@@ -39,14 +40,10 @@ class ApertureScatterguardTolerances:
 
 @dataclass
 class SingleAperturePosition:
-    # Default values are needed as ophyd_async sim does not respect initial_values of
-    # soft signal backends see https://github.com/bluesky/ophyd-async/issues/266
-    name: str = ""
-    GDA_name: str = ""
-    radius_microns: float | None = None
-    location: ApertureFiveDimensionalLocation = ApertureFiveDimensionalLocation(
-        0, 0, 0, 0, 0
-    )
+    name: str
+    GDA_name: str
+    radius_microns: float | None
+    location: ApertureFiveDimensionalLocation
 
 
 # Use StrEnum once we stop python 3.10 support
@@ -64,7 +61,7 @@ def position_from_params(
     name: str,
     GDA_name: AperturePositionGDANames,
     radius_microns: float | None,
-    params: dict,
+    params: GDABeamlineParameters,
 ) -> SingleAperturePosition:
     return SingleAperturePosition(
         name,
@@ -80,7 +77,9 @@ def position_from_params(
     )
 
 
-def tolerances_from_params(params: dict) -> ApertureScatterguardTolerances:
+def load_tolerances_from_beamline_params(
+    params: GDABeamlineParameters,
+) -> ApertureScatterguardTolerances:
     return ApertureScatterguardTolerances(
         ap_x=params["miniap_x_tolerance"],
         ap_y=params["miniap_y_tolerance"],
@@ -90,68 +89,46 @@ def tolerances_from_params(params: dict) -> ApertureScatterguardTolerances:
     )
 
 
-@dataclass
-class AperturePositions:
-    """Holds the motor positions needed to select a particular aperture size. This class should be instantiated with definitions for its sizes
-    using from_gda_beamline_params"""
+class AperturePosition(Enum):
+    ROBOT_LOAD = 0
+    SMALL = 1
+    MEDIUM = 2
+    LARGE = 3
 
-    LARGE: SingleAperturePosition
-    MEDIUM: SingleAperturePosition
-    SMALL: SingleAperturePosition
-    ROBOT_LOAD: SingleAperturePosition
 
-    tolerances: ApertureScatterguardTolerances
-
-    UNKNOWN = SingleAperturePosition(
-        "Unknown", "UNKNOWN", None, ApertureFiveDimensionalLocation(0, 0, 0, 0, 0)
-    )
-
-    @classmethod
-    def from_gda_beamline_params(cls, params):
-        return cls(
-            LARGE=position_from_params(
-                "Large", AperturePositionGDANames.LARGE_APERTURE, 100, params
-            ),
-            MEDIUM=position_from_params(
-                "Medium", AperturePositionGDANames.MEDIUM_APERTURE, 50, params
-            ),
-            SMALL=position_from_params(
-                "Small", AperturePositionGDANames.SMALL_APERTURE, 20, params
-            ),
-            ROBOT_LOAD=position_from_params(
-                "Robot load", AperturePositionGDANames.ROBOT_LOAD, None, params
-            ),
-            tolerances=tolerances_from_params(params),
-        )
-
-    def get_position_from_gda_aperture_name(
-        self, gda_aperture_name: AperturePositionGDANames
-    ) -> SingleAperturePosition:
-        apertures = [ap for ap in self.as_list() if ap.GDA_name == gda_aperture_name]
-        if not apertures:
-            raise ValueError(
-                f"Tried to convert unknown aperture name {gda_aperture_name} to a SingleAperturePosition"
-            )
-        else:
-            return apertures[0]
-
-    def as_list(self) -> list[SingleAperturePosition]:
-        return [
-            self.LARGE,
-            self.MEDIUM,
-            self.SMALL,
-            self.ROBOT_LOAD,
-        ]
+def load_positions_from_beamline_parameters(
+    params: GDABeamlineParameters,
+) -> dict[AperturePosition, SingleAperturePosition]:
+    return {
+        AperturePosition.ROBOT_LOAD: position_from_params(
+            "Robot load", AperturePositionGDANames.ROBOT_LOAD, None, params
+        ),
+        AperturePosition.SMALL: position_from_params(
+            "Small", AperturePositionGDANames.SMALL_APERTURE, 20, params
+        ),
+        AperturePosition.MEDIUM: position_from_params(
+            "Medium", AperturePositionGDANames.MEDIUM_APERTURE, 50, params
+        ),
+        AperturePosition.LARGE: position_from_params(
+            "Large", AperturePositionGDANames.LARGE_APERTURE, 100, params
+        ),
+    }
 
 
 class ApertureScatterguard(StandardReadable, Movable):
-    def __init__(self, prefix: str = "", name: str = "") -> None:
-        self.aperture = Aperture(prefix + "-MO-MAPT-01:")
-        self.scatterguard = Scatterguard(prefix + "-MO-SCAT-01:")
-        self.aperture_positions: AperturePositions | None = None
-        self.TOLERANCE_STEPS = 3  # Number of MRES steps
+    def __init__(
+        self,
+        loaded_positions: dict[AperturePosition, SingleAperturePosition],
+        tolerances: ApertureScatterguardTolerances,
+        prefix: str = "",
+        name: str = "",
+    ) -> None:
+        self._aperture = Aperture(prefix + "-MO-MAPT-01:")
+        self._scatterguard = Scatterguard(prefix + "-MO-SCAT-01:")
+        self._loaded_positions = loaded_positions
+        self._tolerances = tolerances
         aperture_backend = SoftSignalBackend(
-            SingleAperturePosition, AperturePositions.UNKNOWN
+            SingleAperturePosition, self._loaded_positions[AperturePosition.ROBOT_LOAD]
         )
         aperture_backend.converter = self.ApertureConverter()
         self.selected_aperture = self.SelectedAperture(backend=aperture_backend)
@@ -172,43 +149,47 @@ class ApertureScatterguard(StandardReadable, Movable):
     class SelectedAperture(SignalR):
         async def read(self, *args, **kwargs):
             assert isinstance(self.parent, ApertureScatterguard)
-            await self._backend.put(await self.parent._get_current_aperture_position())
+            assert self._backend
+            await self._backend.put(await self.parent.get_current_aperture_position())
             return {self.name: await self._backend.get_reading()}
 
-        async def describe(self):
-            return OrderedDict(
-                [
-                    (
-                        self._name,
-                        {
-                            "source": self._backend.source(self._name),  # type: ignore
-                            "dtype": "array",
-                            "shape": [
-                                -1,
-                            ],  # TODO describe properly - see https://github.com/DiamondLightSource/dodal/issues/253
-                        },
-                    ),
-                ],
-            )
+        async def describe(self) -> dict[str, DataKey]:
+            return {
+                self._name: DataKey(
+                    dtype="array",
+                    shape=[
+                        -1,
+                    ],  # TODO describe properly - see https://github.com/DiamondLightSource/dodal/issues/253,
+                    source=self._backend.source(self._name),  # type: ignore
+                )
+            }
 
-    def load_aperture_positions(self, positions: AperturePositions):
-        LOGGER.info(f"{self.name} loaded in {positions}")
-        self.aperture_positions = positions
+    def get_position_from_gda_aperture_name(
+        self, gda_aperture_name: AperturePositionGDANames
+    ) -> AperturePosition:
+        for aperture, detail in self._loaded_positions.items():
+            if detail.GDA_name == gda_aperture_name:
+                return aperture
+        raise ValueError(
+            f"Tried to convert unknown aperture name {gda_aperture_name} to a SingleAperturePosition"
+        )
 
-    def set(self, pos: SingleAperturePosition) -> AsyncStatus:
-        assert isinstance(self.aperture_positions, AperturePositions)
-        if pos not in self.aperture_positions.as_list():
-            raise InvalidApertureMove(f"Unknown aperture: {pos}")
+    def get_gda_name_for_position(self, position: AperturePosition) -> str:
+        detailed_position = self._loaded_positions[position]
+        return detailed_position.GDA_name
 
-        return AsyncStatus(self._safe_move_within_datacollection_range(pos.location))
+    @AsyncStatus.wrap
+    async def set(self, value: AperturePosition):
+        position = self._loaded_positions[value]
+        await self._safe_move_within_datacollection_range(position.location)
 
     def _get_motor_list(self):
         return [
-            self.aperture.x,
-            self.aperture.y,
-            self.aperture.z,
-            self.scatterguard.x,
-            self.scatterguard.y,
+            self._aperture.x,
+            self._aperture.y,
+            self._aperture.z,
+            self._scatterguard.x,
+            self._scatterguard.y,
         ]
 
     @AsyncStatus.wrap
@@ -219,31 +200,32 @@ class ApertureScatterguard(StandardReadable, Movable):
         aperture_x, aperture_y, aperture_z, scatterguard_x, scatterguard_y = positions
 
         await asyncio.gather(
-            self.aperture.x.set(aperture_x),
-            self.aperture.y.set(aperture_y),
-            self.aperture.z.set(aperture_z),
-            self.scatterguard.x.set(scatterguard_x),
-            self.scatterguard.y.set(scatterguard_y),
+            self._aperture.x.set(aperture_x),
+            self._aperture.y.set(aperture_y),
+            self._aperture.z.set(aperture_z),
+            self._scatterguard.x.set(scatterguard_x),
+            self._scatterguard.y.set(scatterguard_y),
         )
 
-    async def _get_current_aperture_position(self) -> SingleAperturePosition:
+    async def get_current_aperture_position(self) -> SingleAperturePosition:
         """
         Returns the current aperture position using readback values
         for SMALL, MEDIUM, LARGE. ROBOT_LOAD position defined when
         mini aperture y <= ROBOT_LOAD.location.aperture_y + tolerance.
         If no position is found then raises InvalidApertureMove.
         """
-        assert isinstance(self.aperture_positions, AperturePositions)
-        current_ap_y = await self.aperture.y.user_readback.get_value(cached=False)
-        robot_load_ap_y = self.aperture_positions.ROBOT_LOAD.location.aperture_y
-        if await self.aperture.large.get_value(cached=False) == 1:
-            return self.aperture_positions.LARGE
-        elif await self.aperture.medium.get_value(cached=False) == 1:
-            return self.aperture_positions.MEDIUM
-        elif await self.aperture.small.get_value(cached=False) == 1:
-            return self.aperture_positions.SMALL
-        elif current_ap_y <= robot_load_ap_y + self.aperture_positions.tolerances.ap_y:
-            return self.aperture_positions.ROBOT_LOAD
+        current_ap_y = await self._aperture.y.user_readback.get_value(cached=False)
+        robot_load_ap_y = self._loaded_positions[
+            AperturePosition.ROBOT_LOAD
+        ].location.aperture_y
+        if await self._aperture.large.get_value(cached=False) == 1:
+            return self._loaded_positions[AperturePosition.LARGE]
+        elif await self._aperture.medium.get_value(cached=False) == 1:
+            return self._loaded_positions[AperturePosition.MEDIUM]
+        elif await self._aperture.small.get_value(cached=False) == 1:
+            return self._loaded_positions[AperturePosition.SMALL]
+        elif current_ap_y <= robot_load_ap_y + self._tolerances.ap_y:
+            return self._loaded_positions[AperturePosition.ROBOT_LOAD]
 
         raise InvalidApertureMove("Current aperture/scatterguard state unrecognised")
 
@@ -255,46 +237,46 @@ class ApertureScatterguard(StandardReadable, Movable):
         See https://github.com/DiamondLightSource/hyperion/wiki/Aperture-Scatterguard-Collisions
         for why this is required.
         """
-        assert self.aperture_positions is not None
+        assert self._loaded_positions is not None
         # unpacking the position
         aperture_x, aperture_y, aperture_z, scatterguard_x, scatterguard_y = pos
 
-        ap_z_in_position = await self.aperture.z.motor_done_move.get_value()
+        ap_z_in_position = await self._aperture.z.motor_done_move.get_value()
         if not ap_z_in_position:
             raise InvalidApertureMove(
                 "ApertureScatterguard z is still moving. Wait for it to finish "
                 "before triggering another move."
             )
 
-        current_ap_z = await self.aperture.z.user_readback.get_value()
+        current_ap_z = await self._aperture.z.user_readback.get_value()
         diff_on_z = abs(current_ap_z - aperture_z)
-        if diff_on_z > self.aperture_positions.tolerances.ap_z:
+        if diff_on_z > self._tolerances.ap_z:
             raise InvalidApertureMove(
                 "ApertureScatterguard safe move is not yet defined for positions "
                 "outside of LARGE, MEDIUM, SMALL, ROBOT_LOAD. "
-                f"Current aperture z ({current_ap_z}), outside of tolerance ({self.aperture_positions.tolerances.ap_z}) from target ({aperture_z})."
+                f"Current aperture z ({current_ap_z}), outside of tolerance ({self._tolerances.ap_z}) from target ({aperture_z})."
             )
 
-        current_ap_y = await self.aperture.y.user_readback.get_value()
+        current_ap_y = await self._aperture.y.user_readback.get_value()
 
         if aperture_y > current_ap_y:
             await asyncio.gather(
-                self.scatterguard.x.set(scatterguard_x),
-                self.scatterguard.y.set(scatterguard_y),
+                self._scatterguard.x.set(scatterguard_x),
+                self._scatterguard.y.set(scatterguard_y),
             )
             await asyncio.gather(
-                self.aperture.x.set(aperture_x),
-                self.aperture.y.set(aperture_y),
-                self.aperture.z.set(aperture_z),
+                self._aperture.x.set(aperture_x),
+                self._aperture.y.set(aperture_y),
+                self._aperture.z.set(aperture_z),
             )
             return
         await asyncio.gather(
-            self.aperture.x.set(aperture_x),
-            self.aperture.y.set(aperture_y),
-            self.aperture.z.set(aperture_z),
+            self._aperture.x.set(aperture_x),
+            self._aperture.y.set(aperture_y),
+            self._aperture.z.set(aperture_z),
         )
 
         await asyncio.gather(
-            self.scatterguard.x.set(scatterguard_x),
-            self.scatterguard.y.set(scatterguard_y),
+            self._scatterguard.x.set(scatterguard_x),
+            self._scatterguard.y.set(scatterguard_y),
         )

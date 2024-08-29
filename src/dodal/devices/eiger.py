@@ -1,3 +1,4 @@
+# type: ignore # Eiger will soon be ophyd-async https://github.com/DiamondLightSource/dodal/issues/700
 from enum import Enum
 
 from ophyd import Component, Device, EpicsSignalRO, Signal
@@ -11,10 +12,6 @@ from dodal.devices.util.epics_util import run_functions_without_blocking
 from dodal.log import LOGGER
 
 FREE_RUN_MAX_IMAGES = 1000000
-
-# TODO present for testing purposes, remove
-TEST_1169_FIX = True
-TEST_1169_INJECT = False
 
 
 class InternalEigerTriggerMode(Enum):
@@ -101,7 +98,7 @@ class EigerDetector(Device):
 
     def stage(self):
         self.wait_on_arming_if_started()
-        if TEST_1169_INJECT or not self.is_armed():
+        if not self.is_armed():
             LOGGER.info("Eiger not armed, arming")
 
             self.async_stage().wait(timeout=self.ARMING_TIMEOUT)
@@ -341,6 +338,10 @@ class EigerDetector(Device):
             functions_to_do_arm.append(self.enable_roi_mode)
 
         arming_sequence_funcs = [
+            # If a beam dump occurs after arming the eiger but prior to eiger staging,
+            # the odin may timeout which will cause the arming sequence to be retried;
+            # if this previously completed successfully we must reset the odin first
+            self.odin.stop,
             lambda: self.change_dev_shm(detector_params.enable_dev_shm),
             lambda: self.set_detector_threshold(detector_params.expected_energy_ev),
             self.set_cam_pvs,
@@ -354,11 +355,6 @@ class EigerDetector(Device):
             self._wait_fan_ready,
             self._finish_arm,
         ]
-        if TEST_1169_FIX:
-            # If a beam dump occurs after arming the eiger but prior to eiger staging,
-            # the odin may timeout which will cause the arming sequence to be retried;
-            # if this previously completed successfully we must reset the odin first
-            arming_sequence_funcs.insert(0, self.odin.stop)
 
         functions_to_do_arm.extend(arming_sequence_funcs)
 

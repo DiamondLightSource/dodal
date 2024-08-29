@@ -112,7 +112,7 @@ class StaticVisitDirectoryProvider(UpdatingDirectoryProvider):
         self._current_collection = None
         self._session = None
 
-    async def update(self) -> None:
+    async def update(self, **kwargs) -> None:
         """
         Creates a new data collection in the current visit.
         """

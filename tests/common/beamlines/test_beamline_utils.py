@@ -11,8 +11,8 @@ from ophyd_async.core import StandardReadable
 
 from dodal.beamlines import i03
 from dodal.common.beamlines import beamline_utils
-from dodal.devices.aperturescatterguard import ApertureScatterguard
-from dodal.devices.qbpm1 import QBPM1
+from dodal.devices.eiger import EigerDetector
+from dodal.devices.motors import XYZPositioner
 from dodal.devices.smargon import Smargon
 from dodal.devices.zebra import Zebra
 from dodal.log import LOGGER
@@ -38,7 +38,7 @@ def setup():
 
 
 def test_instantiate_function_makes_supplied_device():
-    device_types = [Zebra, ApertureScatterguard, Smargon]
+    device_types = [Zebra, XYZPositioner, Smargon]
     for device in device_types:
         dev = beamline_utils.device_instantiation(
             device, device.__name__, "", False, True, None
@@ -65,11 +65,11 @@ def test_instantiating_different_device_with_same_name():
 
 
 def test_instantiate_v1_function_fake_makes_fake():
-    qbpm: QBPM1 = beamline_utils.device_instantiation(
-        QBPM1, "qbpm", "", True, True, None
+    eiger: EigerDetector = beamline_utils.device_instantiation(
+        EigerDetector, "eiger", "", True, True, None
     )
-    assert isinstance(qbpm, Device)
-    assert isinstance(qbpm.intensity, FakeEpicsSignal)
+    assert isinstance(eiger, Device)
+    assert isinstance(eiger.stale_params, FakeEpicsSignal)
 
 
 def test_instantiate_v2_function_fake_makes_fake():

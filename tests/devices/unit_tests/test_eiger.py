@@ -1,15 +1,15 @@
+# type: ignore # Eiger will soon be ophyd-async https://github.com/DiamondLightSource/dodal/issues/700
 import threading
-from unittest.mock import MagicMock, call, patch
+from unittest.mock import ANY, MagicMock, Mock, call, create_autospec, patch
 
 import pytest
-from mockito import ANY, mock, verify, when
 from ophyd.sim import NullStatus, make_fake_device
 from ophyd.status import Status
 from ophyd.utils import UnknownStatusFailure
 
 from dodal.devices.detector import DetectorParams, TriggerMode
 from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
-from dodal.devices.eiger import TEST_1169_FIX, EigerDetector
+from dodal.devices.eiger import EigerDetector
 from dodal.devices.status import await_value
 from dodal.devices.util.epics_util import run_functions_without_blocking
 from dodal.log import LOGGER
@@ -30,8 +30,6 @@ TEST_NUM_IMAGES_PER_TRIGGER = 1
 TEST_NUM_TRIGGERS = 2000
 TEST_USE_ROI_MODE = False
 TEST_DET_DIST_TO_BEAM_CONVERTER_PATH = "tests/devices/unit_tests/test_lookup_table.txt"
-
-TEST_1169_FIX = True
 
 
 class StatusException(Exception):
@@ -117,16 +115,19 @@ def test_detector_threshold(
     is_energy_change: bool,
 ):
     status_obj = MagicMock()
-    when(fake_eiger.cam.photon_energy).get().thenReturn(current_energy_ev)
-    when(fake_eiger.cam.photon_energy).set(ANY, timeout=ANY).thenReturn(status_obj)
+
+    fake_eiger.cam.photon_energy.get = create_autospec(
+        fake_eiger.cam.photon_energy.get, return_value=current_energy_ev
+    )
+    fake_eiger.cam.photon_energy.set = Mock(return_value=status_obj)
 
     returned_status = fake_eiger.set_detector_threshold(request_energy)
 
     if is_energy_change:
-        verify(fake_eiger.cam.photon_energy, times=1).set(request_energy, timeout=ANY)
+        fake_eiger.cam.photon_energy.set.assert_called_once_with(ANY, timeout=ANY)
         assert returned_status == status_obj
     else:
-        verify(fake_eiger.cam.photon_energy, times=0).set(ANY, timeout=ANY)
+        fake_eiger.cam.photon_energy.set.assert_not_called()
         returned_status.wait(0.1)
         assert returned_status.success
 
@@ -134,12 +135,12 @@ def test_detector_threshold(
 @pytest.mark.parametrize(
     "detector_params, detector_size_constants, beam_xy_converter, expected_error_number",
     [
-        (mock(), mock(), mock(), 0),
-        (None, mock(), mock(), 1),
-        (mock(), None, mock(), 1),
-        (None, None, mock(), 1),
+        (Mock(), Mock(), Mock(), 0),
+        (None, Mock(), Mock(), 1),
+        (Mock(), None, Mock(), 1),
+        (None, None, Mock(), 1),
         (None, None, None, 1),
-        (mock(), None, None, 2),
+        (Mock(), None, None, 2),
     ],
 )
 def test_check_detector_variables(
@@ -206,10 +207,10 @@ def test_when_set_odin_pvs_called_then_full_filename_written_and_set_mx_settings
 
 
 def test_stage_raises_exception_if_odin_initialisation_status_not_ok(fake_eiger):
-    when(fake_eiger.odin.nodes).clear_odin_errors().thenReturn(None)
+    fake_eiger.odin.nodes.clear_odin_errors = Mock(return_value=None)
     expected_error_message = "Test error"
-    when(fake_eiger.odin).check_odin_initialised().thenReturn(
-        (False, expected_error_message)
+    fake_eiger.odin.check_odin_initialised = Mock(
+        return_value=(False, expected_error_message)
     )
     with pytest.raises(
         Exception, match=f"Odin not initialised: {expected_error_message}"
@@ -225,8 +226,8 @@ def test_stage_raises_exception_if_odin_initialisation_status_not_ok(fake_eiger)
 def test_stage_enables_roi_mode_correctly(
     mock_await, fake_eiger, roi_mode, expected_num_change_roi_calls, expected_exception
 ):
-    when(fake_eiger.odin.nodes).clear_odin_errors().thenReturn(None)
-    when(fake_eiger.odin).check_odin_initialised().thenReturn((True, ""))
+    fake_eiger.odin.nodes.clear_odin_errors = Mock(return_value=None)
+    fake_eiger.odin.check_odin_initialised = Mock(return_value=(True, ""))
 
     fake_eiger.detector_params.use_roi_mode = roi_mode
     mock_await.return_value = failed_status(UnknownStatusFailure("Test Exception"))
