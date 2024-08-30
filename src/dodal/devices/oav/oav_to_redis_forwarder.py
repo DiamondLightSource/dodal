@@ -2,6 +2,7 @@ import asyncio
 import io
 import pickle
 import uuid
+from typing import Callable
 
 import numpy as np
 from aiohttp import ClientResponse, ClientSession
@@ -53,7 +54,7 @@ class OAVToRedisForwarder(StandardReadable, Flyable):
             name: str               the name of this device
             redis_key: str          the key to store data in, defaults to "test-image"
         """
-        self.stream_url = epics_signal_r(str, f"{prefix}-DI-OAV-01:MJPG:HOST_RBV")
+        self.stream_url = epics_signal_r(str, f"{prefix}-DI-OAV-01:MJPG:MJPG_URL_RBV")
 
         with self.add_children_as_readables():
             self.uuid, self.uuid_setter = soft_signal_r_and_setter(str)
@@ -82,17 +83,27 @@ class OAVToRedisForwarder(StandardReadable, Flyable):
         await self.redis_client.hset(self.redis_key, image_uuid, image_data)  # type: ignore
         LOGGER.debug(f"Sent frame to redis key {self.redis_key} with uuid {image_uuid}")
 
-    async def _stream_to_redis(self):
+    async def _open_connection_and_(self, function_to_do: Callable):
         stream_url = await self.stream_url.get_value()
         async with ClientSession() as session:
             async with session.get(stream_url) as response:
-                while True:
-                    await self._get_frame_and_put_to_redis(response)
-                    await asyncio.sleep(0.01)
+                await function_to_do(response, stream_url)
+
+    async def _stream_to_redis(self, response, _):
+        while True:
+            await self._get_frame_and_put_to_redis(response)
+            await asyncio.sleep(0.01)
+
+    async def _confirm_mjpg_stream(self, response, stream_url):
+        if response.content_type != "multipart/x-mixed-replace":
+            raise ValueError(f"{stream_url} is not an MJPG stream")
 
     @AsyncStatus.wrap
     async def kickoff(self):
-        self.forwarding_task = asyncio.create_task(self._stream_to_redis())
+        await self._open_connection_and_(self._confirm_mjpg_stream)
+        self.forwarding_task = asyncio.create_task(
+            self._open_connection_and_(self._stream_to_redis)
+        )
 
     @AsyncStatus.wrap
     async def complete(self):
