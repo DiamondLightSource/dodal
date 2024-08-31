@@ -89,7 +89,7 @@ async def test_when_get_frame_and_put_to_redis_called_then_data_put_in_redis_und
     await oav_forwarder.sample_id.set(SAMPLE_ID)
     await oav_forwarder._get_frame_and_put_to_redis(_mock_response())
     redis_call = oav_forwarder.redis_client.hset.call_args[0]
-    assert redis_call[0] == SAMPLE_ID
+    assert redis_call[0] == str(SAMPLE_ID)
 
 
 async def test_when_get_frame_and_put_to_redis_called_then_data_converted_to_image_and_sent_to_redis(
@@ -108,5 +108,5 @@ async def test_when_get_frame_and_put_to_redis_called_then_data_put_in_redis_wit
     await oav_forwarder.sample_id.set(SAMPLE_ID)
     await oav_forwarder._get_frame_and_put_to_redis(_mock_response())
     redis_expire_call = oav_forwarder.redis_client.expire.call_args[0]
-    assert redis_expire_call[0] == SAMPLE_ID
+    assert redis_expire_call[0] == str(SAMPLE_ID)
     assert redis_expire_call[1] == timedelta(days=oav_forwarder.DATA_EXPIRY_DAYS)
