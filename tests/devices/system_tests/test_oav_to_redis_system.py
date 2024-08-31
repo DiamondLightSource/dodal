@@ -48,4 +48,4 @@ async def test_given_valid_stream_when_kickoff_then_multiple_images_written_to_r
     await oav_to_redis_forwarder.kickoff()
     await asyncio.sleep(0.5)
     await oav_to_redis_forwarder.complete()
-    assert oav_to_redis_forwarder.redis_client.hset.call_count > 1
+    assert oav_to_redis_forwarder.redis_client.hset.call_count > 1  # type:ignore

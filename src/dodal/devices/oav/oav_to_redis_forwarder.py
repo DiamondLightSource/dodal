@@ -81,7 +81,7 @@ class OAVToRedisForwarder(StandardReadable, Flyable):
         self.uuid_setter(image_uuid := str(uuid.uuid4()))
         img = Image.open(io.BytesIO(jpeg_bytes))
         image_data = pickle.dumps(np.asarray(img))
-        sample_id = await self.sample_id.get_value()
+        sample_id = str(await self.sample_id.get_value())
         await self.redis_client.hset(sample_id, image_uuid, image_data)  # type: ignore
         await self.redis_client.expire(sample_id, timedelta(days=self.DATA_EXPIRY_DAYS))
         LOGGER.debug(f"Sent frame to redis key {sample_id} with uuid {image_uuid}")
