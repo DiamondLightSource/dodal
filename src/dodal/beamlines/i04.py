@@ -410,9 +410,11 @@ def oav_to_redis_forwarder(
     """
     return device_instantiation(
         OAVToRedisForwarder,
-        "oav_to_redis",
+        "oav_to_redis_forwarder",
         "",
         wait_for_connection,
         fake_with_ophyd_sim,
-        params=OAVConfigParams(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+        redis_host=REDIS_HOST,
+        redis_password=REDIS_PASSWORD,
+        redis_db=7,
     )
