@@ -2,13 +2,14 @@ import asyncio
 import io
 import pickle
 import uuid
-from typing import Callable
+from collections.abc import Callable
+from datetime import timedelta
 
 import numpy as np
 from aiohttp import ClientResponse, ClientSession
 from bluesky.protocols import Flyable
 from ophyd_async.core import AsyncStatus, StandardReadable
-from ophyd_async.core.signal import soft_signal_r_and_setter
+from ophyd_async.core.signal import soft_signal_r_and_setter, soft_signal_rw
 from ophyd_async.epics.signal import epics_signal_r
 from PIL import Image
 from redis.asyncio import StrictRedis
@@ -34,6 +35,8 @@ class OAVToRedisForwarder(StandardReadable, Flyable):
 
     """
 
+    DATA_EXPIRY_DAYS = 7
+
     def __init__(
         self,
         prefix: str,
@@ -41,7 +44,6 @@ class OAVToRedisForwarder(StandardReadable, Flyable):
         redis_password: str,
         redis_db: int = 0,
         name: str = "",
-        redis_key: str = "test-image",
     ) -> None:
         """Reads image data from the MJPEG stream on an OAV and forwards it into a
         redis database. This is currently only used for murko integration.
@@ -52,7 +54,6 @@ class OAVToRedisForwarder(StandardReadable, Flyable):
             redis_password: str     the password for the redis database
             redis_db: int           which redis database to connect to, defaults to 0
             name: str               the name of this device
-            redis_key: str          the key to store data in, defaults to "test-image"
         """
         self.stream_url = epics_signal_r(str, f"{prefix}-DI-OAV-01:MJPG:MJPG_URL_RBV")
 
@@ -64,7 +65,7 @@ class OAVToRedisForwarder(StandardReadable, Flyable):
             host=redis_host, password=redis_password, db=redis_db
         )
 
-        self.redis_key = redis_key
+        self.sample_id = soft_signal_rw(int)
 
         # The uuid that images are being saved under, this should be monitored for
         # callbacks to correlate the data
@@ -80,8 +81,10 @@ class OAVToRedisForwarder(StandardReadable, Flyable):
         self.uuid_setter(image_uuid := str(uuid.uuid4()))
         img = Image.open(io.BytesIO(jpeg_bytes))
         image_data = pickle.dumps(np.asarray(img))
-        await self.redis_client.hset(self.redis_key, image_uuid, image_data)  # type: ignore
-        LOGGER.debug(f"Sent frame to redis key {self.redis_key} with uuid {image_uuid}")
+        sample_id = await self.sample_id.get_value()
+        await self.redis_client.hset(sample_id, image_uuid, image_data)  # type: ignore
+        await self.redis_client.expire(sample_id, timedelta(days=self.DATA_EXPIRY_DAYS))
+        LOGGER.debug(f"Sent frame to redis key {sample_id} with uuid {image_uuid}")
 
     async def _open_connection_and_(self, function_to_do: Callable):
         stream_url = await self.stream_url.get_value()
