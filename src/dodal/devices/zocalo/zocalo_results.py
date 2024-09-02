@@ -56,6 +56,19 @@ def bbox_size(result: XrcResult):
     ]
 
 
+# TODO this may give uneccessary warnings if dicts are different within rounding errors
+def get_dict_differences(
+    dict1: dict, dict1_source: str, dict2: dict, dict2_source: str
+) -> str:
+    differences_str = ""
+    for key in dict1:
+        if not dict1[key] == dict2[key]:
+            differences_str += f"Results differed in {key}: {dict1_source} contains {dict1[key]} while {dict2_source} contains {dict2[key]} \n"
+    if differences_str:
+        LOGGER.warning(differences_str)
+    return differences_str
+
+
 class ZocaloResults(StandardReadable, Triggerable):
     """An ophyd device which can wait for results from a Zocalo job. These jobs should
     be triggered from a plan-subscribed callback using the run_start() and run_end()
@@ -71,7 +84,7 @@ class ZocaloResults(StandardReadable, Triggerable):
         sort_key: str = DEFAULT_SORT_KEY.value,
         timeout_s: float = DEFAULT_TIMEOUT,
         prefix: str = "",
-        use_fastest_zocalo_result: bool = False
+        use_fastest_zocalo_result: bool = False,
     ) -> None:
         self.zocalo_environment = zocalo_environment
         self.sort_key = SortKeys[sort_key]
@@ -167,10 +180,40 @@ class ZocaloResults(StandardReadable, Triggerable):
             )
 
             raw_results = self._raw_results_received.get(timeout=self.timeout_s)
-            source_of_results = "CPU" if not raw_results["ispyb_ids"].get("gpu") else "GPU"
-            if source_of_results == "CPU" and self.use_fastest_zocalo_result:
-                LOGGER.warn("Recieved zocalo results from CPU before GPU")
-            LOGGER.info(f"Zocalo results from {source_of_results} processing: found {len(raw_results['results'])} crystals.")
+            source_of_first_results, source_of_second_results = (
+                ("CPU", "GPU")
+                if not raw_results["ispyb_ids"].get("gpu")
+                else ("GPU", "CPU")
+            )
+
+            # Wait for results from CPU and GPU, warn and continue if one timed out, error if both time out
+            if self.use_fastest_zocalo_result:
+                if source_of_first_results == "CPU":
+                    LOGGER.warning("Recieved zocalo results from CPU before GPU")
+                raw_results_two_sources = [raw_results]
+                try:
+                    raw_results_two_sources.append(
+                        self._raw_results_received.get(timeout=self.timeout_s / 2)
+                    )
+
+                    # Compare results from both sources and warn if they aren't the same
+                    differences_str = get_dict_differences(
+                        raw_results_two_sources[0]["results"],
+                        source_of_first_results,
+                        raw_results_two_sources[1]["results"],
+                        source_of_second_results,
+                    )
+                    if differences_str:
+                        LOGGER.warning(differences_str)
+
+                except Empty:
+                    LOGGER.warning(
+                        f"Zocalo results from {source_of_second_results} timed out. Using results from {source_of_first_results}"
+                    )
+
+            LOGGER.info(
+                f"Zocalo results from {source_of_first_results} processing: found {len(raw_results['results'])} crystals."
+            )
             # Sort from strongest to weakest in case of multiple crystals
             await self._put_results(
                 sorted(
@@ -248,12 +291,11 @@ class ZocaloResults(StandardReadable, Triggerable):
                     {"results": results, "ispyb_ids": recipe_parameters}
                 )
             else:
-                #Only add to queue if results are from CPU
-                if recipe_parameters.get('gpu') == None:
+                # Only add to queue if results are from CPU
+                if not recipe_parameters.get("gpu"):
                     self._raw_results_received.put(
-                    {"results": results, "ispyb_ids": recipe_parameters}
-                )
-                
+                        {"results": results, "ispyb_ids": recipe_parameters}
+                    )
 
         subscription = workflows.recipe.wrap_subscribe(
             self.transport,

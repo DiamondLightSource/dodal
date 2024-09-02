@@ -1,4 +1,5 @@
 from functools import partial
+from queue import Empty
 from unittest.mock import AsyncMock, MagicMock, call, patch
 
 import bluesky.plan_stubs as bps
@@ -7,13 +8,14 @@ import pytest
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
 from ophyd_async.core.async_status import AsyncStatus
-from workflows.recipe import RecipeWrapper
 
 from dodal.devices.zocalo.zocalo_results import (
     ZOCALO_READING_PLAN_NAME,
+    NoResultsFromZocalo,
     NoZocaloSubscription,
     XrcResult,
     ZocaloResults,
+    get_dict_differences,
     get_processing_result,
 )
 
@@ -238,7 +240,9 @@ async def test_zocalo_results_trigger_log_message(
         yield from bps.trigger(zocalo_results)
 
     RE(zocalo_plan())
-    mock_logger.info.assert_has_calls([call("Zocalo results from CPU processing: found 1 crystals.")])
+    mock_logger.info.assert_has_calls(
+        [call("Zocalo results from CPU processing: found 1 crystals.")]
+    )
 
 
 @patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection", autospec=True)
@@ -253,3 +257,124 @@ async def test_when_exception_caused_by_zocalo_message_then_exception_propagated
         RE(bps.trigger(zocalo_results, wait=True))
 
     assert isinstance(e.value.__cause__, NoZocaloSubscription)
+
+
+@patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection", autospec=True)
+async def test_if_use_fastest_zocalo_results_then_wait_twice_for_results(
+    mock_connection, RE: RunEngine
+):
+    zocalo_results = ZocaloResults(
+        name="zocalo", zocalo_environment="dev_artemis", use_fastest_zocalo_result=True
+    )
+
+    await zocalo_results.connect()
+    await zocalo_results.stage()
+    zocalo_results._raw_results_received.put([])
+    zocalo_results._raw_results_received.put([])
+    zocalo_results._raw_results_received.get = MagicMock()
+    RE(bps.trigger(zocalo_results, wait=False))
+    assert zocalo_results._raw_results_received.get.call_count == 2
+
+
+@patch("dodal.devices.zocalo.zocalo_results.LOGGER")
+@patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection", autospec=True)
+async def test_source_of_zocalo_results_correctly_identified(
+    mock_connection, mock_logger, RE: RunEngine
+):
+    zocalo_results = ZocaloResults(
+        name="zocalo", zocalo_environment="dev_artemis", use_fastest_zocalo_result=False
+    )
+    await zocalo_results.connect()
+    await zocalo_results.stage()
+
+    zocalo_results._raw_results_received.get = MagicMock(
+        return_value={"ispyb_ids": {"test": 0}, "results": []}
+    )
+    RE(bps.trigger(zocalo_results, wait=False))
+    mock_logger.info.assert_has_calls(
+        [call("Zocalo results from CPU processing: found 0 crystals.")]
+    )
+
+    zocalo_results._raw_results_received.get = MagicMock(
+        return_value={"ispyb_ids": {"gpu": True}, "results": []}
+    )
+    RE(bps.trigger(zocalo_results, wait=False))
+    mock_logger.info.assert_has_calls(
+        [call("Zocalo results from GPU processing: found 0 crystals.")]
+    )
+
+
+# TODO figure out how to test the transport bit
+# @patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection", autospec=True)
+# async def test_if_not_use_fastest_zocalo_results_then_only_wait_for_cpu_results(mock_connection, RE: RunEngine):
+#     zocalo_results = ZocaloResults(
+#         name="zocalo", zocalo_environment="dev_artemis", use_fastest_zocalo_result=False
+#     )
+#     await zocalo_results.connect()
+#     await zocalo_results.stage()
+#     zocalo_results._raw_results_received.put([])
+#     pass
+
+
+def test_compare_cpu_and_gpu_results_warns_correctly():
+    dict1 = {"key1": [1, 2, 3], "key2": "test", "key3": [[1, 2], [1, 2]]}
+    dict2 = {"key1": [1, 2, 3], "key2": "test", "key3": [[1, 2], [1, 2]]}
+    assert not get_dict_differences(dict1, "dict1", dict2, "dict2")
+    dict1 = {"key1": [2, 2, 3], "key2": "test", "key3": [[1, 2], [1, 4]]}
+    dict2 = {"key1": [1, 2, 3], "key2": "test", "key3": [[1, 2], [1, 3]]}
+    assert (
+        get_dict_differences(dict1, "dict1", dict2, "dict2")
+        == f"Results differed in key1: dict1 contains {dict1['key1']} while dict2 contains {dict2['key1']} \nResults differed in key3: dict1 contains {dict1['key3']} while dict2 contains {dict2['key3']} \n"
+    )
+
+
+@patch("dodal.devices.zocalo.zocalo_results.LOGGER")
+@patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection", autospec=True)
+async def test_if_zocalo_results_timeout_from_one_source_then_warn(
+    mock_connection, mock_logger, RE: RunEngine
+):
+    zocalo_results = ZocaloResults(
+        name="zocalo", zocalo_environment="dev_artemis", use_fastest_zocalo_result=True
+    )
+    await zocalo_results.connect()
+    await zocalo_results.stage()
+    zocalo_results._raw_results_received.get = MagicMock(
+        side_effect=[{"ispyb_ids": {"test": 0}, "results": []}, Empty]
+    )
+    RE(bps.trigger(zocalo_results, wait=False))
+    mock_logger.warning.assert_called_with(
+        "Zocalo results from GPU timed out. Using results from CPU"
+    )
+
+
+@patch("dodal.devices.zocalo.zocalo_results.LOGGER")
+@patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection", autospec=True)
+async def test_if_cpu_results_arrive_before_gpu_then_warn(
+    mock_connection, mock_logger, RE: RunEngine
+):
+    zocalo_results = ZocaloResults(
+        name="zocalo", zocalo_environment="dev_artemis", use_fastest_zocalo_result=True
+    )
+    await zocalo_results.connect()
+    await zocalo_results.stage()
+    zocalo_results._raw_results_received.get = MagicMock(
+        return_value={"ispyb_ids": {"test": 0}, "results": []}
+    )
+    RE(bps.trigger(zocalo_results, wait=False))
+    mock_logger.warning.assert_called_with(
+        "Recieved zocalo results from CPU before GPU"
+    )
+
+
+@patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection", autospec=True)
+async def test_if_zocalo_results_timeout_before_any_results_then_error(
+    mock_connection, RE: RunEngine
+):
+    zocalo_results = ZocaloResults(
+        name="zocalo", zocalo_environment="dev_artemis", use_fastest_zocalo_result=True
+    )
+    await zocalo_results.connect()
+    await zocalo_results.stage()
+    zocalo_results._raw_results_received.get = MagicMock(side_effect=Empty)
+    with pytest.raises(NoResultsFromZocalo):
+        await zocalo_results.trigger()
