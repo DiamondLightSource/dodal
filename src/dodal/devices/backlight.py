@@ -37,7 +37,7 @@ class Backlight(StandardReadable):
         position so it appears to us to instantly move. In fact it does take some time
         to move completely in/out so we sleep here to simulate this.
         """
-        old_position = self.position.get_value()
+        old_position = await self.position.get_value()
         await self.position.set(position)
         if position == BacklightPosition.OUT:
             await self.power.set(BacklightPower.OFF)
