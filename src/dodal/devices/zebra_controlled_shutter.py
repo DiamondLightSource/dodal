@@ -15,17 +15,26 @@ class ZebraShutterState(str, Enum):
     OPEN = "Open"
 
 
+class ZebraShutterControl(str, Enum):
+    MANUAL = "Manual"
+    AUTO = "Auto"
+
+
 class ZebraShutter(StandardReadable, Movable):
+    """The shutter on most MX beamlines is controlled by the zebra.
+
+    Internally in the zebra there are two AND gates, one for manual control and one for
+    automatic control. A soft input (aliased to control) will switch between
+    which of these AND gates to use. For the manual gate the shutter is then controlled
+    by a different soft input (aliased to position_setpoint). Both these AND gates then
+    feed into an OR gate, which then feeds to the shutter."""
+
     def __init__(self, prefix: str, name: str):
-        self.position_setpoint = epics_signal_w(
-            write_pv=prefix + "CTRL2",
-            datatype=ZebraShutterState,
-        )
+        self.position_setpoint = epics_signal_w(ZebraShutterState, prefix + "CTRL2")
+        self.control = epics_signal_w(ZebraShutterControl, prefix + "CTRL1")
+
         with self.add_children_as_readables():
-            self.position_readback = epics_signal_r(
-                read_pv=prefix + "STA",
-                datatype=ZebraShutterState,
-            )
+            self.position_readback = epics_signal_r(ZebraShutterState, prefix + "STA")
         super().__init__(name=name)
 
     @AsyncStatus.wrap
