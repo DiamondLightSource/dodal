@@ -206,7 +206,10 @@ async def test_zocalo_results_trigger_log_message(
     mock_wrap_subscribe, mock_logger, RE: RunEngine
 ):
     zocalo_results = ZocaloResults(
-        name="zocalo", zocalo_environment="dev_artemis", timeout_s=2
+        name="zocalo",
+        zocalo_environment="dev_artemis",
+        timeout_s=2,
+        use_fastest_zocalo_result=True,
     )
 
     recipe_wrapper = MagicMock()
@@ -366,6 +369,28 @@ async def test_if_cpu_results_arrive_before_gpu_then_warn(
     )
 
 
+@patch("dodal.devices.zocalo.zocalo_results.LOGGER")
+@patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection", autospec=True)
+async def test_warning_if_results_are_different(
+    mock_connection, mock_logger, RE: RunEngine
+):
+    zocalo_results = ZocaloResults(
+        name="zocalo", zocalo_environment="dev_artemis", use_fastest_zocalo_result=True
+    )
+    await zocalo_results.connect()
+    await zocalo_results.stage()
+    zocalo_results._raw_results_received.get = MagicMock(
+        side_effect=[
+            {"ispyb_ids": {}, "results": [{"test": 0}]},
+            {"ispyb_ids": {}, "results": [{"test": 1}]},
+        ]
+    )
+    RE(bps.trigger(zocalo_results, wait=False))
+    mock_logger.warning.assert_called_with(
+        "Results differed in test: CPU contains 0 while GPU contains 1 \n"
+    )
+
+
 @patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection", autospec=True)
 async def test_if_zocalo_results_timeout_before_any_results_then_error(
     mock_connection, RE: RunEngine
@@ -378,3 +403,52 @@ async def test_if_zocalo_results_timeout_before_any_results_then_error(
     zocalo_results._raw_results_received.get = MagicMock(side_effect=Empty)
     with pytest.raises(NoResultsFromZocalo):
         await zocalo_results.trigger()
+
+
+@patch("dodal.devices.zocalo.zocalo_results.LOGGER")
+@patch(
+    "dodal.devices.zocalo.zocalo_results.workflows.recipe.wrap_subscribe", autospec=True
+)
+@patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection", new=MagicMock())
+async def test_gpu_results_ignored_if_toggle_disabled(
+    mock_wrap_subscribe, mock_logger, RE: RunEngine
+):
+    zocalo_results = ZocaloResults(
+        name="zocalo",
+        zocalo_environment="dev_artemis",
+        timeout_s=2,
+        use_fastest_zocalo_result=False,
+    )
+
+    recipe_wrapper = MagicMock()
+    recipe_wrapper.recipe_step = {"parameters": {"gpu": True}}
+
+    def zocalo_plan():
+        yield from bps.stage(zocalo_results)
+        receive_result = mock_wrap_subscribe.mock_calls[0].args[2]
+        receive_result(
+            recipe_wrapper,
+            {},
+            {
+                "results": [
+                    {
+                        "centre_of_mass": [
+                            2.207133058984911,
+                            1.4175240054869684,
+                            13.317215363511659,
+                        ],
+                        "max_voxel": [2, 1, 13],
+                        "max_count": 702.0,
+                        "n_voxels": 12,
+                        "total_count": 5832.0,
+                        "bounding_box": [[1, 0, 12], [4, 3, 15]],
+                    }
+                ],
+                "status": "success",
+                "type": "3d",
+            },
+        )
+        yield from bps.trigger(zocalo_results)
+        mock_logger.warning.assert_called_with("Timed out waiting for zocalo results!")
+
+    RE(zocalo_plan())

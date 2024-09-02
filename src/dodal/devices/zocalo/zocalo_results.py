@@ -61,7 +61,7 @@ def get_dict_differences(
     dict1: dict, dict1_source: str, dict2: dict, dict2_source: str
 ) -> str:
     differences_str = ""
-    for key in dict1:
+    for key in dict1.keys():
         if not dict1[key] == dict2[key]:
             differences_str += f"Results differed in {key}: {dict1_source} contains {dict1[key]} while {dict2_source} contains {dict2[key]} \n"
     if differences_str:
@@ -198,9 +198,9 @@ class ZocaloResults(StandardReadable, Triggerable):
 
                     # Compare results from both sources and warn if they aren't the same
                     differences_str = get_dict_differences(
-                        raw_results_two_sources[0]["results"],
+                        raw_results_two_sources[0]["results"][0],
                         source_of_first_results,
-                        raw_results_two_sources[1]["results"],
+                        raw_results_two_sources[1]["results"][0],
                         source_of_second_results,
                     )
                     if differences_str:
