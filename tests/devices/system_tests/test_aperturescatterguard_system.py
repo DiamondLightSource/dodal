@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Any, cast
-
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.callbacks import CallbackBase
@@ -9,12 +7,13 @@ from bluesky.run_engine import RunEngine
 from event_model import Event
 from ophyd_async.core import DeviceCollector
 
+from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
 from dodal.devices.aperturescatterguard import (
     AperturePosition,
     ApertureScatterguard,
+    ApertureValue,
     InvalidApertureMove,
     load_positions_from_beamline_parameters,
-    load_tolerances_from_beamline_params,
 )
 
 I03_BEAMLINE_PARAMETER_PATH = (
@@ -23,48 +22,11 @@ I03_BEAMLINE_PARAMETER_PATH = (
 BEAMLINE_PARAMETER_KEYWORDS = ["FB", "FULL", "deadtime"]
 
 
-class GDABeamlineParameters:
-    params: dict[str, Any]
-
-    def __repr__(self) -> str:
-        return repr(self.params)
-
-    def __getitem__(self, item: str):
-        return self.params[item]
-
-    @classmethod
-    def from_file(cls, path: str):
-        ob = cls()
-        with open(path) as f:
-            config_lines = f.readlines()
-        config_lines_nocomments = [line.split("#", 1)[0] for line in config_lines]
-        config_lines_sep_key_and_value = [
-            line.translate(str.maketrans("", "", " \n\t\r")).split("=")
-            for line in config_lines_nocomments
-        ]
-        config_pairs: list[tuple[str, Any]] = [
-            cast(tuple[str, Any], param)
-            for param in config_lines_sep_key_and_value
-            if len(param) == 2
-        ]
-        for i, (_, value) in enumerate(config_pairs):
-            if value == "Yes":
-                config_pairs[i] = (config_pairs[i][0], True)
-            elif value == "No":
-                config_pairs[i] = (config_pairs[i][0], False)
-            elif value in BEAMLINE_PARAMETER_KEYWORDS:
-                pass
-            else:
-                config_pairs[i] = (config_pairs[i][0], float(config_pairs[i][1]))
-        ob.params = dict(config_pairs)
-        return ob
-
-
 @pytest.fixture
 async def ap_sg():
     params = GDABeamlineParameters.from_file(I03_BEAMLINE_PARAMETER_PATH)
-    positions = load_positions_from_beamline_parameters(params)  # type:ignore
-    tolerances = load_tolerances_from_beamline_params(params)  # type:ignore
+    positions = load_positions_from_beamline_parameters(params)
+    tolerances = ApertureValue.tolerances_from_gda_params(params)
 
     async with DeviceCollector():
         ap_sg = ApertureScatterguard(
@@ -117,7 +79,7 @@ async def test_aperturescatterguard_move_in_plan(
     assert ap_sg._loaded_positions is not None
     large = ap_sg._loaded_positions[AperturePosition.LARGE]
 
-    await ap_sg._aperture.z.set(large.location[2])
+    await ap_sg.aperture.z.set(large.aperture_z)
 
     RE(move_to_large)
     RE(move_to_medium)
@@ -129,7 +91,7 @@ async def test_aperturescatterguard_move_in_plan(
 async def test_move_fails_when_not_in_good_starting_pos(
     ap_sg: ApertureScatterguard, move_to_large, RE
 ):
-    await ap_sg._aperture.z.set(0)
+    await ap_sg.aperture.z.set(0)
 
     with pytest.raises(InvalidApertureMove):
         RE(move_to_large)
@@ -186,12 +148,12 @@ async def test_aperturescatterguard_moves_in_correct_order(
     RE = RunEngine({})
     RE.subscribe(cb)
 
-    await ap_sg._aperture.z.set(pos1.location[2])
+    await ap_sg.aperture.z.set(pos1.aperture_z)
 
     def monitor_and_moves():
         yield from bps.open_run()
-        yield from bps.monitor(ap_sg._aperture.y.motor_done_move, name="ap_y")
-        yield from bps.monitor(ap_sg._scatterguard.y.motor_done_move, name="sg_y")
+        yield from bps.monitor(ap_sg.aperture.y.motor_done_move, name="ap_y")
+        yield from bps.monitor(ap_sg.scatterguard.y.motor_done_move, name="sg_y")
         yield from bps.mv(ap_sg, pos1)
         yield from bps.mv(ap_sg, pos2)
         yield from bps.close_run()
