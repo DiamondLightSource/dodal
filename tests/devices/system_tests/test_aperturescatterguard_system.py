@@ -10,9 +10,11 @@ from event_model import Event
 from ophyd_async.core import DeviceCollector
 
 from dodal.devices.aperturescatterguard import (
-    AperturePositions,
+    AperturePosition,
     ApertureScatterguard,
     InvalidApertureMove,
+    load_positions_from_beamline_parameters,
+    load_tolerances_from_beamline_params,
 )
 
 I03_BEAMLINE_PARAMETER_PATH = (
@@ -60,43 +62,47 @@ class GDABeamlineParameters:
 
 @pytest.fixture
 async def ap_sg():
+    params = GDABeamlineParameters.from_file(I03_BEAMLINE_PARAMETER_PATH)
+    positions = load_positions_from_beamline_parameters(params)  # type:ignore
+    tolerances = load_tolerances_from_beamline_params(params)  # type:ignore
+
     async with DeviceCollector():
-        ap_sg = ApertureScatterguard(prefix="BL03S", name="ap_sg")
-    ap_sg.load_aperture_positions(
-        AperturePositions.from_gda_beamline_params(
-            GDABeamlineParameters.from_file(I03_BEAMLINE_PARAMETER_PATH)
+        ap_sg = ApertureScatterguard(
+            prefix="BL03S",
+            name="ap_sg",
+            loaded_positions=positions,
+            tolerances=tolerances,
         )
-    )
     return ap_sg
 
 
 @pytest.fixture
 def move_to_large(ap_sg: ApertureScatterguard):
-    assert ap_sg.aperture_positions is not None
-    yield from bps.abs_set(ap_sg, ap_sg.aperture_positions.LARGE)
+    assert ap_sg._loaded_positions is not None
+    yield from bps.abs_set(ap_sg, AperturePosition.LARGE)
 
 
 @pytest.fixture
 def move_to_medium(ap_sg: ApertureScatterguard):
-    assert ap_sg.aperture_positions is not None
-    yield from bps.abs_set(ap_sg, ap_sg.aperture_positions.MEDIUM)
+    assert ap_sg._loaded_positions is not None
+    yield from bps.abs_set(ap_sg, AperturePosition.MEDIUM)
 
 
 @pytest.fixture
 def move_to_small(ap_sg: ApertureScatterguard):
-    assert ap_sg.aperture_positions is not None
-    yield from bps.abs_set(ap_sg, ap_sg.aperture_positions.SMALL)
+    assert ap_sg._loaded_positions is not None
+    yield from bps.abs_set(ap_sg, AperturePosition.SMALL)
 
 
 @pytest.fixture
 def move_to_robotload(ap_sg: ApertureScatterguard):
-    assert ap_sg.aperture_positions is not None
-    yield from bps.abs_set(ap_sg, ap_sg.aperture_positions.ROBOT_LOAD)
+    assert ap_sg._loaded_positions is not None
+    yield from bps.abs_set(ap_sg, AperturePosition.ROBOT_LOAD)
 
 
 @pytest.mark.s03
 async def test_aperturescatterguard_setup(ap_sg: ApertureScatterguard):
-    assert ap_sg.aperture_positions is not None
+    assert ap_sg._loaded_positions is not None
 
 
 @pytest.mark.s03
@@ -108,9 +114,10 @@ async def test_aperturescatterguard_move_in_plan(
     move_to_robotload,
     RE,
 ):
-    assert ap_sg.aperture_positions is not None
+    assert ap_sg._loaded_positions is not None
+    large = ap_sg._loaded_positions[AperturePosition.LARGE]
 
-    await ap_sg.aperture.z.set(ap_sg.aperture_positions.LARGE.location[2])
+    await ap_sg._aperture.z.set(large.location[2])
 
     RE(move_to_large)
     RE(move_to_medium)
@@ -122,7 +129,7 @@ async def test_aperturescatterguard_move_in_plan(
 async def test_move_fails_when_not_in_good_starting_pos(
     ap_sg: ApertureScatterguard, move_to_large, RE
 ):
-    await ap_sg.aperture.z.set(0)
+    await ap_sg._aperture.z.set(0)
 
     with pytest.raises(InvalidApertureMove):
         RE(move_to_large)
@@ -167,24 +174,24 @@ async def test_aperturescatterguard_moves_in_correct_order(
     pos_name_1, pos_name_2, sg_first, ap_sg: ApertureScatterguard
 ):
     cb = MonitorCallback()
-    assert ap_sg.aperture_positions
+    assert ap_sg._loaded_positions
     positions = {
-        "L": ap_sg.aperture_positions.LARGE,
-        "M": ap_sg.aperture_positions.MEDIUM,
-        "S": ap_sg.aperture_positions.SMALL,
-        "R": ap_sg.aperture_positions.ROBOT_LOAD,
+        "L": ap_sg._loaded_positions[AperturePosition.LARGE],
+        "M": ap_sg._loaded_positions[AperturePosition.MEDIUM],
+        "S": ap_sg._loaded_positions[AperturePosition.SMALL],
+        "R": ap_sg._loaded_positions[AperturePosition.ROBOT_LOAD],
     }
     pos1 = positions[pos_name_1]
     pos2 = positions[pos_name_2]
     RE = RunEngine({})
     RE.subscribe(cb)
 
-    await ap_sg.aperture.z.set(pos1.location[2])
+    await ap_sg._aperture.z.set(pos1.location[2])
 
     def monitor_and_moves():
         yield from bps.open_run()
-        yield from bps.monitor(ap_sg.aperture.y.motor_done_move, name="ap_y")
-        yield from bps.monitor(ap_sg.scatterguard.y.motor_done_move, name="sg_y")
+        yield from bps.monitor(ap_sg._aperture.y.motor_done_move, name="ap_y")
+        yield from bps.monitor(ap_sg._scatterguard.y.motor_done_move, name="sg_y")
         yield from bps.mv(ap_sg, pos1)
         yield from bps.mv(ap_sg, pos2)
         yield from bps.close_run()
