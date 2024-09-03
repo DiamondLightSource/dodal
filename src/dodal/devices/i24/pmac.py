@@ -125,7 +125,7 @@ class ProgramRunner(SignalRW):
         prog_str = f"&2b{value}r"
         assert isinstance(timeout, SupportsFloat) or (
             timeout is None
-        ), f"ProgramRunner does not support calculating timeout itself, {timeout=}"
+        ), f"ProgramRunner does not support calculating timeout itself, {timeout}"
         await self.signal.set(prog_str, wait=wait)
         await wait_for_value(self.status, ScanState.DONE, timeout)
 
