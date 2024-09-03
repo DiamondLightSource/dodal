@@ -307,18 +307,6 @@ async def test_source_of_zocalo_results_correctly_identified(
     )
 
 
-# TODO figure out how to test the transport bit
-# @patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection", autospec=True)
-# async def test_if_not_use_fastest_zocalo_results_then_only_wait_for_cpu_results(mock_connection, RE: RunEngine):
-#     zocalo_results = ZocaloResults(
-#         name="zocalo", zocalo_environment="dev_artemis", use_fastest_zocalo_result=False
-#     )
-#     await zocalo_results.connect()
-#     await zocalo_results.stage()
-#     zocalo_results._raw_results_received.put([])
-#     pass
-
-
 def test_compare_cpu_and_gpu_results_warns_correctly():
     dict1 = {"key1": [1, 2, 3], "key2": "test", "key3": [[1, 2], [1, 2]]}
     dict2 = {"key1": [1, 2, 3], "key2": "test", "key3": [[1, 2], [1, 2]]}

@@ -56,7 +56,6 @@ def bbox_size(result: XrcResult):
     ]
 
 
-# TODO this may give uneccessary warnings if dicts are different within rounding errors
 def get_dict_differences(
     dict1: dict, dict1_source: str, dict2: dict, dict2_source: str
 ) -> str:
