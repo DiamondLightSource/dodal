@@ -139,7 +139,7 @@ def _assert_patched_ap_sg_has_call(
 
 
 def _assert_value_in_reading(
-    reading: dict[str, Any], value: ApertureValue, device_name="ap_sg"
+    reading: dict[str, Any], value: ApertureValue, device_name: str
 ):
     if value.radius is not None:
         assert reading[f"{device_name}-radius"]["value"] == value.radius
@@ -328,7 +328,11 @@ async def test_given_aperture_not_set_through_device_but_motors_in_position_when
 ):
     reading = await aperture_in_medium_pos.read()
     assert isinstance(reading, dict)
-    _assert_value_in_reading(reading, aperture_positions[AperturePosition.MEDIUM])
+    _assert_value_in_reading(
+        reading,
+        aperture_positions[AperturePosition.MEDIUM],
+        aperture_in_medium_pos.name,
+    )
 
 
 async def test_when_aperture_set_and_device_read_then_position_returned(
@@ -337,7 +341,11 @@ async def test_when_aperture_set_and_device_read_then_position_returned(
 ):
     await aperture_in_medium_pos.set(AperturePosition.MEDIUM)
     reading = await aperture_in_medium_pos.read()
-    _assert_value_in_reading(reading, aperture_positions[AperturePosition.MEDIUM])
+    _assert_value_in_reading(
+        reading,
+        aperture_positions[AperturePosition.MEDIUM],
+        aperture_in_medium_pos.name,
+    )
 
 
 async def test_ap_sg_in_runengine(
