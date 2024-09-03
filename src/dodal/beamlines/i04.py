@@ -411,7 +411,7 @@ def oav_to_redis_forwarder(
     return device_instantiation(
         OAVToRedisForwarder,
         "oav_to_redis_forwarder",
-        "",
+        "-DI-OAV-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
         redis_host=REDIS_HOST,
