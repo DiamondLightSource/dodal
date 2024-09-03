@@ -61,11 +61,11 @@ def beam_params(
     If this is called when already instantiated in i24, it will return the existing object.
     """
     return device_instantiation(
-        device=ReadOnlyEnergyAndAttenuator,
-        name="beam_params",
-        prefix="",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
+        ReadOnlyEnergyAndAttenuator,
+        "beam_params",
+        "",
+        wait_for_connection,
+        fake_with_ophyd_sim,
     )
 
 
@@ -146,11 +146,11 @@ def jungfrau(
     If this is called when already instantiated in i24, it will return the existing object.
     """
     return device_instantiation(
-        device=JungfrauM1,
-        name="jungfrau_m1",
-        prefix="-EA-JNGFR-01:",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
+        JungfrauM1,
+        "jungfrau_m1",
+        "-EA-JNGFR-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
     )
 
 
