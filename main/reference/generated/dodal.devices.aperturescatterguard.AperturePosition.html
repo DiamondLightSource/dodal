@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.aperturescatterguard.AperturePosition &#8212; dodal 1.30.1.dev5+g8702cc84f documentation</title>
+    <title>dodal.devices.aperturescatterguard.AperturePosition &#8212; dodal 1.30.1.dev6+g148e24d63 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../_static/documentation_options.js?v=d70f6c51"></script>
+    <script src="../../_static/documentation_options.js?v=95199669"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,8 +54,8 @@
     <link rel="icon" href="../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="dodal.devices.aperturescatterguard.AperturePositionGDANames" href="dodal.devices.aperturescatterguard.AperturePositionGDANames.html" />
-    <link rel="prev" title="dodal.devices.aperturescatterguard.ApertureFiveDimensionalLocation" href="dodal.devices.aperturescatterguard.ApertureFiveDimensionalLocation.html" />
+    <link rel="next" title="dodal.devices.aperturescatterguard.ApertureScatterguard" href="dodal.devices.aperturescatterguard.ApertureScatterguard.html" />
+    <link rel="prev" title="dodal.devices.aperturescatterguard" href="dodal.devices.aperturescatterguard.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -484,12 +484,9 @@ document.write(`
 </ul>
 </details></li>
 <li class="toctree-l3 current active has-children"><a class="reference internal" href="dodal.devices.aperturescatterguard.html">dodal.devices.aperturescatterguard</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.aperturescatterguard.ApertureFiveDimensionalLocation.html">dodal.devices.aperturescatterguard.ApertureFiveDimensionalLocation</a></li>
 <li class="toctree-l4 current active"><a class="current reference internal" href="#">dodal.devices.aperturescatterguard.AperturePosition</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.aperturescatterguard.AperturePositionGDANames.html">dodal.devices.aperturescatterguard.AperturePositionGDANames</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.aperturescatterguard.ApertureScatterguard.html">dodal.devices.aperturescatterguard.ApertureScatterguard</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.aperturescatterguard.ApertureScatterguardTolerances.html">dodal.devices.aperturescatterguard.ApertureScatterguardTolerances</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.aperturescatterguard.SingleAperturePosition.html">dodal.devices.aperturescatterguard.SingleAperturePosition</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.aperturescatterguard.ApertureValue.html">dodal.devices.aperturescatterguard.ApertureValue</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.areadetector.html">dodal.devices.areadetector</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -837,19 +834,47 @@ document.write(`
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.aperturescatterguard.AperturePosition">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.aperturescatterguard.</span></span><span class="sig-name descname"><span class="pre">AperturePosition</span></span><a class="reference internal" href="../../_modules/dodal/devices/aperturescatterguard.html#AperturePosition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.aperturescatterguard.AperturePosition" title="Link to this definition">#</a></dt>
-<dd><p class="rubric">Attributes</p>
+<dd><p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises ValidationError if the input data cannot be parsed to form a valid model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ROBOT_LOAD</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_gda_params</span></code>(name, radius, params)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">SMALL</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">tolerances_from_gda_params</span></code>(params)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">MEDIUM</span></code></p></td>
+</tbody>
+</table>
+</div>
+<p class="rubric">Attributes</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">values</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">LARGE</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">aperture_x</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">aperture_y</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">aperture_z</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatterguard_x</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">scatterguard_y</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">radius</span></code></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -870,20 +895,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="dodal.devices.aperturescatterguard.ApertureFiveDimensionalLocation.html"
+       href="dodal.devices.aperturescatterguard.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">dodal.devices.aperturescatterguard.ApertureFiveDimensionalLocation</p>
+        <p class="prev-next-title">dodal.devices.aperturescatterguard</p>
       </div>
     </a>
     <a class="right-next"
-       href="dodal.devices.aperturescatterguard.AperturePositionGDANames.html"
+       href="dodal.devices.aperturescatterguard.ApertureScatterguard.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">dodal.devices.aperturescatterguard.AperturePositionGDANames</p>
+        <p class="prev-next-title">dodal.devices.aperturescatterguard.ApertureScatterguard</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

@@ -8,6 +8,29 @@ dodal.devices.aperturescatterguard.AperturePosition
 
    
    
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      ~AperturePosition.from_gda_params
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~AperturePosition.tolerances_from_gda_params
+      
+      
+      
+   
    
 
    
@@ -17,16 +40,25 @@ dodal.devices.aperturescatterguard.AperturePosition
    .. autosummary::
    
       
-      ~AperturePosition.ROBOT_LOAD
+      ~AperturePosition.values
       
       
-      ~AperturePosition.SMALL
+      ~AperturePosition.aperture_x
       
       
-      ~AperturePosition.MEDIUM
+      ~AperturePosition.aperture_y
       
       
-      ~AperturePosition.LARGE
+      ~AperturePosition.aperture_z
+      
+      
+      ~AperturePosition.scatterguard_x
+      
+      
+      ~AperturePosition.scatterguard_y
+      
+      
+      ~AperturePosition.radius
       
    
    

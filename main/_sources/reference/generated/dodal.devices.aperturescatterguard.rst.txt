@@ -14,12 +14,9 @@ dodal.devices.aperturescatterguard
    :toctree:
    :recursive:
 
-   ~aperturescatterguard.ApertureFiveDimensionalLocation
    ~aperturescatterguard.AperturePosition
-   ~aperturescatterguard.AperturePositionGDANames
    ~aperturescatterguard.ApertureScatterguard
-   ~aperturescatterguard.ApertureScatterguardTolerances
-   ~aperturescatterguard.SingleAperturePosition
+   ~aperturescatterguard.ApertureValue
 
 
 
@@ -39,8 +36,6 @@ dodal.devices.aperturescatterguard
    .. autosummary::
    
       load_positions_from_beamline_parameters
-      load_tolerances_from_beamline_params
-      position_from_params
    
    
 

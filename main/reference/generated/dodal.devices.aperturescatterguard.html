@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.aperturescatterguard &#8212; dodal 1.30.1.dev5+g8702cc84f documentation</title>
+    <title>dodal.devices.aperturescatterguard &#8212; dodal 1.30.1.dev6+g148e24d63 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../_static/documentation_options.js?v=d70f6c51"></script>
+    <script src="../../_static/documentation_options.js?v=95199669"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="icon" href="../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="dodal.devices.aperturescatterguard.ApertureFiveDimensionalLocation" href="dodal.devices.aperturescatterguard.ApertureFiveDimensionalLocation.html" />
+    <link rel="next" title="dodal.devices.aperturescatterguard.AperturePosition" href="dodal.devices.aperturescatterguard.AperturePosition.html" />
     <link rel="prev" title="dodal.devices.aperture.Aperture" href="dodal.devices.aperture.Aperture.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -484,12 +484,9 @@ document.write(`
 </ul>
 </details></li>
 <li class="toctree-l3 current active has-children"><a class="current reference internal" href="#">dodal.devices.aperturescatterguard</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.aperturescatterguard.ApertureFiveDimensionalLocation.html">dodal.devices.aperturescatterguard.ApertureFiveDimensionalLocation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.aperturescatterguard.AperturePosition.html">dodal.devices.aperturescatterguard.AperturePosition</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.aperturescatterguard.AperturePositionGDANames.html">dodal.devices.aperturescatterguard.AperturePositionGDANames</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.aperturescatterguard.ApertureScatterguard.html">dodal.devices.aperturescatterguard.ApertureScatterguard</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.aperturescatterguard.ApertureScatterguardTolerances.html">dodal.devices.aperturescatterguard.ApertureScatterguardTolerances</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.aperturescatterguard.SingleAperturePosition.html">dodal.devices.aperturescatterguard.SingleAperturePosition</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.aperturescatterguard.ApertureValue.html">dodal.devices.aperturescatterguard.ApertureValue</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.areadetector.html">dodal.devices.areadetector</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -837,23 +834,14 @@ document.write(`
 <p class="rubric">Classes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.aperturescatterguard.ApertureFiveDimensionalLocation.html#dodal.devices.aperturescatterguard.ApertureFiveDimensionalLocation" title="dodal.devices.aperturescatterguard.ApertureFiveDimensionalLocation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ApertureFiveDimensionalLocation</span></code></a></p></td>
-<td><p>ApertureFiveDimensionalLocation(aperture_x, aperture_y, aperture_z, scatterguard_x, scatterguard_y)</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.aperturescatterguard.AperturePosition.html#dodal.devices.aperturescatterguard.AperturePosition" title="dodal.devices.aperturescatterguard.AperturePosition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AperturePosition</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.aperturescatterguard.AperturePositionGDANames.html#dodal.devices.aperturescatterguard.AperturePositionGDANames" title="dodal.devices.aperturescatterguard.AperturePositionGDANames"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AperturePositionGDANames</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.aperturescatterguard.AperturePosition.html#dodal.devices.aperturescatterguard.AperturePosition" title="dodal.devices.aperturescatterguard.AperturePosition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AperturePosition</span></code></a></p></td>
+<td><p>Create a new model by parsing and validating input data from keyword arguments.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.aperturescatterguard.ApertureScatterguard.html#dodal.devices.aperturescatterguard.ApertureScatterguard" title="dodal.devices.aperturescatterguard.ApertureScatterguard"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ApertureScatterguard</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.aperturescatterguard.ApertureScatterguardTolerances.html#dodal.devices.aperturescatterguard.ApertureScatterguardTolerances" title="dodal.devices.aperturescatterguard.ApertureScatterguardTolerances"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ApertureScatterguardTolerances</span></code></a></p></td>
-<td><p>ApertureScatterguardTolerances(ap_x: float, ap_y: float, ap_z: float, sg_x: float, sg_y: float)</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.aperturescatterguard.SingleAperturePosition.html#dodal.devices.aperturescatterguard.SingleAperturePosition" title="dodal.devices.aperturescatterguard.SingleAperturePosition"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleAperturePosition</span></code></a></p></td>
-<td><p>SingleAperturePosition(name: str, GDA_name: str, radius_microns: float | None, location: dodal.devices.aperturescatterguard.ApertureFiveDimensionalLocation)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.aperturescatterguard.ApertureValue.html#dodal.devices.aperturescatterguard.ApertureValue" title="dodal.devices.aperturescatterguard.ApertureValue"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ApertureValue</span></code></a></p></td>
+<td><p>Maps from a short usable name to the value name in the GDA Beamline parameters</p></td>
 </tr>
 </tbody>
 </table>
@@ -862,12 +850,6 @@ document.write(`
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.aperturescatterguard.load_positions_from_beamline_parameters" title="dodal.devices.aperturescatterguard.load_positions_from_beamline_parameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_positions_from_beamline_parameters</span></code></a>(params)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.aperturescatterguard.load_tolerances_from_beamline_params" title="dodal.devices.aperturescatterguard.load_tolerances_from_beamline_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_tolerances_from_beamline_params</span></code></a>(params)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.aperturescatterguard.position_from_params" title="dodal.devices.aperturescatterguard.position_from_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">position_from_params</span></code></a>(name, GDA_name, ...)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -883,45 +865,14 @@ document.write(`
 </table>
 </div>
 <dl class="py function">
-<dt class="sig sig-object py" id="dodal.devices.aperturescatterguard.position_from_params">
-<span class="sig-prename descclassname"><span class="pre">dodal.devices.aperturescatterguard.</span></span><span class="sig-name descname"><span class="pre">position_from_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">GDA_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dodal.devices.aperturescatterguard.AperturePositionGDANames.html#dodal.devices.aperturescatterguard.AperturePositionGDANames" title="dodal.devices.aperturescatterguard.AperturePositionGDANames"><span class="pre">AperturePositionGDANames</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius_microns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dodal.common.beamlines.beamline_parameters.GDABeamlineParameters.html#dodal.common.beamlines.beamline_parameters.GDABeamlineParameters" title="dodal.common.beamlines.beamline_parameters.GDABeamlineParameters"><span class="pre">GDABeamlineParameters</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="dodal.devices.aperturescatterguard.SingleAperturePosition.html#dodal.devices.aperturescatterguard.SingleAperturePosition" title="dodal.devices.aperturescatterguard.SingleAperturePosition"><span class="pre">SingleAperturePosition</span></a></span></span><a class="reference internal" href="../../_modules/dodal/devices/aperturescatterguard.html#position_from_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.aperturescatterguard.position_from_params" title="Link to this definition">#</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
-<li><p><strong>GDA_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.aperturescatterguard.AperturePositionGDANames.html#dodal.devices.aperturescatterguard.AperturePositionGDANames" title="dodal.devices.aperturescatterguard.AperturePositionGDANames"><code class="xref py py-class docutils literal notranslate"><span class="pre">AperturePositionGDANames</span></code></a></span>)</p></li>
-<li><p><strong>radius_microns</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
-<li><p><strong>params</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.common.beamlines.beamline_parameters.GDABeamlineParameters.html#dodal.common.beamlines.beamline_parameters.GDABeamlineParameters" title="dodal.common.beamlines.beamline_parameters.GDABeamlineParameters"><code class="xref py py-class docutils literal notranslate"><span class="pre">GDABeamlineParameters</span></code></a></span>)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.aperturescatterguard.SingleAperturePosition.html#dodal.devices.aperturescatterguard.SingleAperturePosition" title="dodal.devices.aperturescatterguard.SingleAperturePosition"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleAperturePosition</span></code></a></span></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="dodal.devices.aperturescatterguard.load_tolerances_from_beamline_params">
-<span class="sig-prename descclassname"><span class="pre">dodal.devices.aperturescatterguard.</span></span><span class="sig-name descname"><span class="pre">load_tolerances_from_beamline_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dodal.common.beamlines.beamline_parameters.GDABeamlineParameters.html#dodal.common.beamlines.beamline_parameters.GDABeamlineParameters" title="dodal.common.beamlines.beamline_parameters.GDABeamlineParameters"><span class="pre">GDABeamlineParameters</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="dodal.devices.aperturescatterguard.ApertureScatterguardTolerances.html#dodal.devices.aperturescatterguard.ApertureScatterguardTolerances" title="dodal.devices.aperturescatterguard.ApertureScatterguardTolerances"><span class="pre">ApertureScatterguardTolerances</span></a></span></span><a class="reference internal" href="../../_modules/dodal/devices/aperturescatterguard.html#load_tolerances_from_beamline_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.aperturescatterguard.load_tolerances_from_beamline_params" title="Link to this definition">#</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>params</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.common.beamlines.beamline_parameters.GDABeamlineParameters.html#dodal.common.beamlines.beamline_parameters.GDABeamlineParameters" title="dodal.common.beamlines.beamline_parameters.GDABeamlineParameters"><code class="xref py py-class docutils literal notranslate"><span class="pre">GDABeamlineParameters</span></code></a></span>)</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.aperturescatterguard.ApertureScatterguardTolerances.html#dodal.devices.aperturescatterguard.ApertureScatterguardTolerances" title="dodal.devices.aperturescatterguard.ApertureScatterguardTolerances"><code class="xref py py-class docutils literal notranslate"><span class="pre">ApertureScatterguardTolerances</span></code></a></span></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="dodal.devices.aperturescatterguard.load_positions_from_beamline_parameters">
-<span class="sig-prename descclassname"><span class="pre">dodal.devices.aperturescatterguard.</span></span><span class="sig-name descname"><span class="pre">load_positions_from_beamline_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dodal.common.beamlines.beamline_parameters.GDABeamlineParameters.html#dodal.common.beamlines.beamline_parameters.GDABeamlineParameters" title="dodal.common.beamlines.beamline_parameters.GDABeamlineParameters"><span class="pre">GDABeamlineParameters</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="dodal.devices.aperturescatterguard.AperturePosition.html#dodal.devices.aperturescatterguard.AperturePosition" title="dodal.devices.aperturescatterguard.AperturePosition"><span class="pre">AperturePosition</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="dodal.devices.aperturescatterguard.SingleAperturePosition.html#dodal.devices.aperturescatterguard.SingleAperturePosition" title="dodal.devices.aperturescatterguard.SingleAperturePosition"><span class="pre">SingleAperturePosition</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/dodal/devices/aperturescatterguard.html#load_positions_from_beamline_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.aperturescatterguard.load_positions_from_beamline_parameters" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">dodal.devices.aperturescatterguard.</span></span><span class="sig-name descname"><span class="pre">load_positions_from_beamline_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dodal.common.beamlines.beamline_parameters.GDABeamlineParameters.html#dodal.common.beamlines.beamline_parameters.GDABeamlineParameters" title="dodal.common.beamlines.beamline_parameters.GDABeamlineParameters"><span class="pre">GDABeamlineParameters</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="dodal.devices.aperturescatterguard.ApertureValue.html#dodal.devices.aperturescatterguard.ApertureValue" title="dodal.devices.aperturescatterguard.ApertureValue"><span class="pre">ApertureValue</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="dodal.devices.aperturescatterguard.AperturePosition.html#dodal.devices.aperturescatterguard.AperturePosition" title="dodal.devices.aperturescatterguard.AperturePosition"><span class="pre">AperturePosition</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/dodal/devices/aperturescatterguard.html#load_positions_from_beamline_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.aperturescatterguard.load_positions_from_beamline_parameters" title="Link to this definition">#</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>params</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.common.beamlines.beamline_parameters.GDABeamlineParameters.html#dodal.common.beamlines.beamline_parameters.GDABeamlineParameters" title="dodal.common.beamlines.beamline_parameters.GDABeamlineParameters"><code class="xref py py-class docutils literal notranslate"><span class="pre">GDABeamlineParameters</span></code></a></span>)</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference internal" href="dodal.devices.aperturescatterguard.AperturePosition.html#dodal.devices.aperturescatterguard.AperturePosition" title="dodal.devices.aperturescatterguard.AperturePosition"><code class="xref py py-class docutils literal notranslate"><span class="pre">AperturePosition</span></code></a>, <a class="reference internal" href="dodal.devices.aperturescatterguard.SingleAperturePosition.html#dodal.devices.aperturescatterguard.SingleAperturePosition" title="dodal.devices.aperturescatterguard.SingleAperturePosition"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleAperturePosition</span></code></a>]</span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference internal" href="dodal.devices.aperturescatterguard.ApertureValue.html#dodal.devices.aperturescatterguard.ApertureValue" title="dodal.devices.aperturescatterguard.ApertureValue"><code class="xref py py-class docutils literal notranslate"><span class="pre">ApertureValue</span></code></a>, <a class="reference internal" href="dodal.devices.aperturescatterguard.AperturePosition.html#dodal.devices.aperturescatterguard.AperturePosition" title="dodal.devices.aperturescatterguard.AperturePosition"><code class="xref py py-class docutils literal notranslate"><span class="pre">AperturePosition</span></code></a>]</span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -948,11 +899,11 @@ document.write(`
       </div>
     </a>
     <a class="right-next"
-       href="dodal.devices.aperturescatterguard.ApertureFiveDimensionalLocation.html"
+       href="dodal.devices.aperturescatterguard.AperturePosition.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">dodal.devices.aperturescatterguard.ApertureFiveDimensionalLocation</p>
+        <p class="prev-next-title">dodal.devices.aperturescatterguard.AperturePosition</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -974,8 +925,6 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.aperturescatterguard.position_from_params"><code class="docutils literal notranslate"><span class="pre">position_from_params()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.aperturescatterguard.load_tolerances_from_beamline_params"><code class="docutils literal notranslate"><span class="pre">load_tolerances_from_beamline_params()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.aperturescatterguard.load_positions_from_beamline_parameters"><code class="docutils literal notranslate"><span class="pre">load_positions_from_beamline_parameters()</span></code></a></li>
 </ul>
   </nav></div>
