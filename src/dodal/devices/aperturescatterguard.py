@@ -118,6 +118,7 @@ class ApertureScatterguard(StandardReadable, Movable):
             ],
             wrapper=HintedSignal,
         )
+        super().__init__(name)
 
     def get_position_from_gda_aperture_name(
         self, gda_aperture_name: str
