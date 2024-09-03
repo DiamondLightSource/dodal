@@ -47,7 +47,7 @@ async def test_given_stream_url_is_real_webpage_but_not_mjpg_when_kickoff_then_e
     URL = "https://www.google.com/"
     set_mock_value(mock_oav_to_redis_forwarder.stream_url, URL)
     with pytest.raises(ValueError) as e:
-        await oav_to_redis_forwarder.kickoff()
+        await mock_oav_to_redis_forwarder.kickoff()
     assert URL in str(e.value)
 
 
