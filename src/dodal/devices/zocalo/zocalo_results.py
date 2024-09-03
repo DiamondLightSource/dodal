@@ -83,7 +83,7 @@ class ZocaloResults(StandardReadable, Triggerable):
         sort_key: str = DEFAULT_SORT_KEY.value,
         timeout_s: float = DEFAULT_TIMEOUT,
         prefix: str = "",
-        use_fastest_zocalo_result: bool = False,
+        use_cpu_and_gpu_zocalo: bool = False,
     ) -> None:
         self.zocalo_environment = zocalo_environment
         self.sort_key = SortKeys[sort_key]
@@ -92,7 +92,7 @@ class ZocaloResults(StandardReadable, Triggerable):
         self._prefix = prefix
         self._raw_results_received: Queue = Queue()
         self.transport: CommonTransport | None = None
-        self.use_fastest_zocalo_result = use_fastest_zocalo_result
+        self.use_cpu_and_gpu_zocalo = use_cpu_and_gpu_zocalo
 
         self.results, self._results_setter = soft_signal_r_and_setter(
             list[XrcResult], name="results"
@@ -186,7 +186,7 @@ class ZocaloResults(StandardReadable, Triggerable):
             )
 
             # Wait for results from CPU and GPU, warn and continue if one timed out, error if both time out
-            if self.use_fastest_zocalo_result:
+            if self.use_cpu_and_gpu_zocalo:
                 if source_of_first_results == "CPU":
                     LOGGER.warning("Recieved zocalo results from CPU before GPU")
                 raw_results_two_sources = [raw_results]
@@ -285,7 +285,7 @@ class ZocaloResults(StandardReadable, Triggerable):
 
             results = message.get("results", [])
 
-            if self.use_fastest_zocalo_result:
+            if self.use_cpu_and_gpu_zocalo:
                 self._raw_results_received.put(
                     {"results": results, "ispyb_ids": recipe_parameters}
                 )

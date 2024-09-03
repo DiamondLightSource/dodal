@@ -209,7 +209,7 @@ async def test_zocalo_results_trigger_log_message(
         name="zocalo",
         zocalo_environment="dev_artemis",
         timeout_s=2,
-        use_fastest_zocalo_result=True,
+        use_cpu_and_gpu_zocalo=True,
     )
 
     recipe_wrapper = MagicMock()
@@ -263,11 +263,11 @@ async def test_when_exception_caused_by_zocalo_message_then_exception_propagated
 
 
 @patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection", autospec=True)
-async def test_if_use_fastest_zocalo_results_then_wait_twice_for_results(
+async def test_if_use_cpu_and_gpu_zocalos_then_wait_twice_for_results(
     mock_connection, RE: RunEngine
 ):
     zocalo_results = ZocaloResults(
-        name="zocalo", zocalo_environment="dev_artemis", use_fastest_zocalo_result=True
+        name="zocalo", zocalo_environment="dev_artemis", use_cpu_and_gpu_zocalo=True
     )
 
     await zocalo_results.connect()
@@ -285,7 +285,7 @@ async def test_source_of_zocalo_results_correctly_identified(
     mock_connection, mock_logger, RE: RunEngine
 ):
     zocalo_results = ZocaloResults(
-        name="zocalo", zocalo_environment="dev_artemis", use_fastest_zocalo_result=False
+        name="zocalo", zocalo_environment="dev_artemis", use_cpu_and_gpu_zocalo=False
     )
     await zocalo_results.connect()
     await zocalo_results.stage()
@@ -325,7 +325,7 @@ async def test_if_zocalo_results_timeout_from_one_source_then_warn(
     mock_connection, mock_logger, RE: RunEngine
 ):
     zocalo_results = ZocaloResults(
-        name="zocalo", zocalo_environment="dev_artemis", use_fastest_zocalo_result=True
+        name="zocalo", zocalo_environment="dev_artemis", use_cpu_and_gpu_zocalo=True
     )
     await zocalo_results.connect()
     await zocalo_results.stage()
@@ -344,7 +344,7 @@ async def test_if_cpu_results_arrive_before_gpu_then_warn(
     mock_connection, mock_logger, RE: RunEngine
 ):
     zocalo_results = ZocaloResults(
-        name="zocalo", zocalo_environment="dev_artemis", use_fastest_zocalo_result=True
+        name="zocalo", zocalo_environment="dev_artemis", use_cpu_and_gpu_zocalo=True
     )
     await zocalo_results.connect()
     await zocalo_results.stage()
@@ -363,7 +363,7 @@ async def test_warning_if_results_are_different(
     mock_connection, mock_logger, RE: RunEngine
 ):
     zocalo_results = ZocaloResults(
-        name="zocalo", zocalo_environment="dev_artemis", use_fastest_zocalo_result=True
+        name="zocalo", zocalo_environment="dev_artemis", use_cpu_and_gpu_zocalo=True
     )
     await zocalo_results.connect()
     await zocalo_results.stage()
@@ -384,7 +384,7 @@ async def test_if_zocalo_results_timeout_before_any_results_then_error(
     mock_connection, RE: RunEngine
 ):
     zocalo_results = ZocaloResults(
-        name="zocalo", zocalo_environment="dev_artemis", use_fastest_zocalo_result=True
+        name="zocalo", zocalo_environment="dev_artemis", use_cpu_and_gpu_zocalo=True
     )
     await zocalo_results.connect()
     await zocalo_results.stage()
@@ -405,7 +405,7 @@ async def test_gpu_results_ignored_if_toggle_disabled(
         name="zocalo",
         zocalo_environment="dev_artemis",
         timeout_s=2,
-        use_fastest_zocalo_result=False,
+        use_cpu_and_gpu_zocalo=False,
     )
 
     recipe_wrapper = MagicMock()
