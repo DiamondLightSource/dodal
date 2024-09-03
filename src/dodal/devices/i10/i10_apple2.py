@@ -16,6 +16,7 @@ from dodal.devices.apple2_undulator import (
     Apple2,
     Apple2Val,
     Lookuptable,
+    UndlatorJawPhase,
     UndlatorPhaseAxes,
     UndulatorGap,
 )
@@ -66,6 +67,7 @@ class I10Apple2(Apple2):
         self,
         id_gap: UndulatorGap,
         id_phase: UndlatorPhaseAxes,
+        id_jaw_phase: UndlatorJawPhase,
         energy_gap_table_path: Path,
         energy_phase_table_path: Path,
         source: tuple[str, str] | None = None,
@@ -94,6 +96,8 @@ class I10Apple2(Apple2):
             prefix=prefix,
             name=name,
         )
+        with self.add_children_as_readables():
+            self.id_jaw_phase = id_jaw_phase
 
     @AsyncStatus.wrap
     async def set(self, value: float) -> None:
@@ -110,7 +114,6 @@ class I10Apple2(Apple2):
                 self.pol = pol
 
         self._polarisation_set(self.pol)
-
         gap, phase = self._get_id_gap_phase(value)
         phase3 = -phase if self.pol == "la" else phase
         id_set_val = Apple2Val(
@@ -122,6 +125,9 @@ class I10Apple2(Apple2):
         )
         LOGGER.info(f"Setting polarisation to {self.pol}, with {id_set_val}")
         await self._set(value=id_set_val, energy=value)
+        if self.pol != "la":
+            await self.id_jaw_phase.set(0)
+            await self.id_jaw_phase.set_move.set(1)
 
     def update_lookuptable(self):
         """

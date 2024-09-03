@@ -16,6 +16,7 @@ from ophyd_async.core import (
 )
 
 from dodal.devices.apple2_undulator import (
+    UndlatorJawPhase,
     UndlatorPhaseAxes,
     UndulatorGap,
     UndulatorGateStatus,
@@ -82,13 +83,27 @@ async def mock_pgm(prefix: str = "BLXX-EA-DET-007:") -> PGM:
 
 
 @pytest.fixture
+async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndlatorJawPhase:
+    async with DeviceCollector(mock=True):
+        mock_jaw_phase = UndlatorJawPhase(prefix=prefix, move_pv="RPQ1", jawPhase="JAW")
+    set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.close)
+    set_mock_value(mock_jaw_phase.jaw_Phase.velocity, 2)
+    set_mock_value(mock_jaw_phase.jaw_Phase.user_setpoint_readback, 0)
+    set_mock_value(mock_jaw_phase.fault, 0)
+    return mock_jaw_phase
+
+
+@pytest.fixture
 async def mock_id(
-    mock_phaseAxes: UndlatorPhaseAxes, mock_id_gap: UndulatorGap
+    mock_phaseAxes: UndlatorPhaseAxes,
+    mock_id_gap: UndulatorGap,
+    mock_jaw_phase: UndlatorJawPhase,
 ) -> I10Apple2:
     async with DeviceCollector(mock=True):
         mock_id = I10Apple2(
             id_gap=mock_id_gap,
             id_phase=mock_phaseAxes,
+            id_jaw_phase=mock_jaw_phase,
             energy_gap_table_path=Path(ID_GAP_LOOKUP_TABLE),
             energy_phase_table_path=Path(ID_PHASE_LOOKUP_TABLE),
             source=("Source", "idu"),
@@ -149,13 +164,16 @@ async def test_I10Apple2_determine_pol(
 
 
 async def test_fail_I10Apple2_no_lookup(
-    mock_phaseAxes: UndlatorPhaseAxes, mock_id_gap: UndulatorGap
+    mock_phaseAxes: UndlatorPhaseAxes,
+    mock_id_gap: UndulatorGap,
+    mock_jaw_phase: UndlatorJawPhase,
 ):
     wrong_path = Path("fnslkfndlsnf")
     with pytest.raises(FileNotFoundError) as e:
         I10Apple2(
             id_gap=mock_id_gap,
             id_phase=mock_phaseAxes,
+            id_jaw_phase=mock_jaw_phase,
             energy_gap_table_path=wrong_path,
             energy_phase_table_path=Path(ID_PHASE_LOOKUP_TABLE),
             source=("Source", "idu"),
