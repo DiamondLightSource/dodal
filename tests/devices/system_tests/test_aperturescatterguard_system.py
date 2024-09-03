@@ -26,7 +26,7 @@ BEAMLINE_PARAMETER_KEYWORDS = ["FB", "FULL", "deadtime"]
 async def ap_sg():
     params = GDABeamlineParameters.from_file(I03_BEAMLINE_PARAMETER_PATH)
     positions = load_positions_from_beamline_parameters(params)
-    tolerances = ApertureValue.tolerances_from_gda_params(params)
+    tolerances = AperturePosition.tolerances_from_gda_params(params)
 
     async with DeviceCollector():
         ap_sg = ApertureScatterguard(
@@ -41,25 +41,25 @@ async def ap_sg():
 @pytest.fixture
 def move_to_large(ap_sg: ApertureScatterguard):
     assert ap_sg._loaded_positions is not None
-    yield from bps.abs_set(ap_sg, AperturePosition.LARGE)
+    yield from bps.abs_set(ap_sg, ApertureValue.LARGE)
 
 
 @pytest.fixture
 def move_to_medium(ap_sg: ApertureScatterguard):
     assert ap_sg._loaded_positions is not None
-    yield from bps.abs_set(ap_sg, AperturePosition.MEDIUM)
+    yield from bps.abs_set(ap_sg, ApertureValue.MEDIUM)
 
 
 @pytest.fixture
 def move_to_small(ap_sg: ApertureScatterguard):
     assert ap_sg._loaded_positions is not None
-    yield from bps.abs_set(ap_sg, AperturePosition.SMALL)
+    yield from bps.abs_set(ap_sg, ApertureValue.SMALL)
 
 
 @pytest.fixture
 def move_to_robotload(ap_sg: ApertureScatterguard):
     assert ap_sg._loaded_positions is not None
-    yield from bps.abs_set(ap_sg, AperturePosition.ROBOT_LOAD)
+    yield from bps.abs_set(ap_sg, ApertureValue.ROBOT_LOAD)
 
 
 @pytest.mark.s03
@@ -77,7 +77,7 @@ async def test_aperturescatterguard_move_in_plan(
     RE,
 ):
     assert ap_sg._loaded_positions is not None
-    large = ap_sg._loaded_positions[AperturePosition.LARGE]
+    large = ap_sg._loaded_positions[ApertureValue.LARGE]
 
     await ap_sg.aperture.z.set(large.aperture_z)
 
@@ -138,10 +138,10 @@ async def test_aperturescatterguard_moves_in_correct_order(
     cb = MonitorCallback()
     assert ap_sg._loaded_positions
     positions = {
-        "L": ap_sg._loaded_positions[AperturePosition.LARGE],
-        "M": ap_sg._loaded_positions[AperturePosition.MEDIUM],
-        "S": ap_sg._loaded_positions[AperturePosition.SMALL],
-        "R": ap_sg._loaded_positions[AperturePosition.ROBOT_LOAD],
+        "L": ap_sg._loaded_positions[ApertureValue.LARGE],
+        "M": ap_sg._loaded_positions[ApertureValue.MEDIUM],
+        "S": ap_sg._loaded_positions[ApertureValue.SMALL],
+        "R": ap_sg._loaded_positions[ApertureValue.ROBOT_LOAD],
     }
     pos1 = positions[pos_name_1]
     pos2 = positions[pos_name_2]
