@@ -18,7 +18,7 @@ class BacklightPosition(str, Enum):
 class Backlight(StandardReadable):
     """Simple device to trigger the pneumatic in/out."""
 
-    TIME_TO_MOVE_S = 1
+    TIME_TO_MOVE_S = 1  # Tested using a stopwatch on the beamline 09/2024
 
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
