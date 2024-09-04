@@ -7,7 +7,12 @@ from dodal.devices.apple2_undulator import (
     UndlatorPhaseAxes,
     UndulatorGap,
 )
-from dodal.devices.i10.i10_apple2 import I10Apple2, I10Apple2PGM, I10Apple2Pol
+from dodal.devices.i10.i10_apple2 import (
+    I10Apple2,
+    I10Apple2PGM,
+    I10Apple2Pol,
+    LinearArbitraryAngle,
+)
 from dodal.devices.i10.i10_setting_data import I10Grating
 from dodal.devices.pgm import PGM
 from dodal.log import set_beamline as set_log_beamline
@@ -57,12 +62,12 @@ def idd_phase_axes(
     )
 
 
-def idd_jaw_phase(
+def idd_jaw(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> UndlatorJawPhase:
     return device_instantiation(
         device_factory=UndlatorJawPhase,
-        name="idd_jaw_phase",
+        name="idd_jaw",
         prefix=f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
         move_pv="RPQ1",
         wait=wait_for_connection,
@@ -101,12 +106,12 @@ def idu_phase_axes(
     )
 
 
-def idu_jaw_phase(
+def idu_jaw(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> UndlatorJawPhase:
     return device_instantiation(
         device_factory=UndlatorJawPhase,
-        name="idu_jaw_phase",
+        name="idu_jaw",
         prefix=f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-21:",
         move_pv="RPQ1",
         wait=wait_for_connection,
@@ -134,7 +139,7 @@ def idu_gap_phase(
         device_factory=I10Apple2,
         id_gap=idu_gap(wait_for_connection, fake_with_ophyd_sim),
         id_phase=idu_phase_axes(wait_for_connection, fake_with_ophyd_sim),
-        id_jaw_phase=idd_jaw_phase(wait_for_connection, fake_with_ophyd_sim),
+        id_jaw_phase=idu_jaw(wait_for_connection, fake_with_ophyd_sim),
         energy_gap_table_path=Path(
             "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2GapCalibrations.csv",
         ),
@@ -156,7 +161,7 @@ def idd_gap_phase(
         device_factory=I10Apple2,
         id_gap=idd_gap(wait_for_connection, fake_with_ophyd_sim),
         id_phase=idd_phase_axes(wait_for_connection, fake_with_ophyd_sim),
-        id_jaw_phase=idd_jaw_phase(wait_for_connection, fake_with_ophyd_sim),
+        id_jaw_phase=idd_jaw(wait_for_connection, fake_with_ophyd_sim),
         energy_gap_table_path=Path(
             "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2GapCalibrations.csv",
         ),
@@ -220,6 +225,32 @@ def idd(
         id=idd_gap_phase(wait_for_connection, fake_with_ophyd_sim),
         pgm=pgm(wait_for_connection, fake_with_ophyd_sim),
         name="idd",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+    )
+
+
+def idu_la_angle(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> LinearArbitraryAngle:
+    return device_instantiation(
+        device_factory=LinearArbitraryAngle,
+        prefix="",
+        id=idu(wait_for_connection, fake_with_ophyd_sim),
+        name="idu_la_angle",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+    )
+
+
+def idd_la_angle(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> LinearArbitraryAngle:
+    return device_instantiation(
+        device_factory=LinearArbitraryAngle,
+        prefix="",
+        id=idu(wait_for_connection, fake_with_ophyd_sim),
+        name="idd_la_angle",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )
