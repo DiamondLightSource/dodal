@@ -33,7 +33,7 @@ class Backlight(StandardReadable):
         """This setter will turn the backlight on when we move it in to the beam and off
         when we move it out.
 
-        Moving the backlight in/out is a pneumatic axis and we have no redback on it's
+        Moving the backlight in/out is a pneumatic axis and we have no readback on its
         position so it appears to us to instantly move. In fact it does take some time
         to move completely in/out so we sleep here to simulate this.
         """
