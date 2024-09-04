@@ -127,6 +127,12 @@ class ProgramRunner(SignalRW):
             timeout is None
         ), f"ProgramRunner does not support calculating timeout itself, {timeout}"
         await self.signal.set(prog_str, wait=wait)
+        # First wait for signal to go to 1, then wait for the scan to finish.
+        await wait_for_value(
+            self.status,
+            ScanState.RUNNING,
+            timeout=DEFAULT_TIMEOUT,
+        )
         await wait_for_value(self.status, ScanState.DONE, timeout)
 
 
