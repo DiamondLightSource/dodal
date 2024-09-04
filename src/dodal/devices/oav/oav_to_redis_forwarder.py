@@ -2,12 +2,12 @@ import asyncio
 import io
 import pickle
 import uuid
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from datetime import timedelta
 
 import numpy as np
 from aiohttp import ClientResponse, ClientSession
-from bluesky.protocols import Flyable
+from bluesky.protocols import Flyable, Stoppable
 from ophyd_async.core import AsyncStatus, StandardReadable
 from ophyd_async.core.signal import soft_signal_r_and_setter, soft_signal_rw
 from ophyd_async.epics.signal import epics_signal_r
@@ -26,7 +26,7 @@ async def get_next_jpeg(response: ClientResponse) -> bytes:
             return line + await response.content.readuntil(JPEG_STOP_BYTE)
 
 
-class OAVToRedisForwarder(StandardReadable, Flyable):
+class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
     """Forwards OAV image data to redis. To use call:
 
     > bps.kickoff(oav_forwarder)
@@ -65,6 +65,8 @@ class OAVToRedisForwarder(StandardReadable, Flyable):
             host=redis_host, password=redis_password, db=redis_db
         )
 
+        self._stop_flag = False
+
         self.sample_id = soft_signal_rw(int, initial_value=0)
 
         # The uuid that images are being saved under, this should be monitored for
@@ -86,14 +88,16 @@ class OAVToRedisForwarder(StandardReadable, Flyable):
         await self.redis_client.expire(sample_id, timedelta(days=self.DATA_EXPIRY_DAYS))
         LOGGER.debug(f"Sent frame to redis key {sample_id} with uuid {image_uuid}")
 
-    async def _open_connection_and_do_function(self, function_to_do: Callable):
+    async def _open_connection_and_do_function(
+        self, function_to_do: Callable[[ClientResponse, str | None], Awaitable]
+    ):
         stream_url = await self.stream_url.get_value()
         async with ClientSession() as session:
             async with session.get(stream_url) as response:
                 await function_to_do(response, stream_url)
 
     async def _stream_to_redis(self, response, _):
-        while True:
+        while not self._stop_flag:
             await self._get_frame_and_put_to_redis(response)
             await asyncio.sleep(0.01)
 
@@ -103,6 +107,7 @@ class OAVToRedisForwarder(StandardReadable, Flyable):
 
     @AsyncStatus.wrap
     async def kickoff(self):
+        self._stop_flag = False
         await self._open_connection_and_do_function(self._confirm_mjpg_stream)
         self.forwarding_task = asyncio.create_task(
             self._open_connection_and_do_function(self._stream_to_redis)
@@ -111,4 +116,10 @@ class OAVToRedisForwarder(StandardReadable, Flyable):
     @AsyncStatus.wrap
     async def complete(self):
         assert self.forwarding_task, "Device not kicked off"
-        self.forwarding_task.cancel()
+        await self.stop()
+
+    @AsyncStatus.wrap
+    async def stop(self, success=True):
+        if self.forwarding_task:
+            self._stop_flag = True
+            await self.forwarding_task

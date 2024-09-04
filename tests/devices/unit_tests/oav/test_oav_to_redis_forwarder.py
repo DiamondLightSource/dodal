@@ -21,6 +21,19 @@ def oav_forwarder(RE):
     return oav_forwarder
 
 
+@pytest.fixture
+def oav_forwarder_with_valid_response(oav_forwarder):
+    client_session_patch = patch(
+        "dodal.devices.oav.oav_to_redis_forwarder.ClientSession.get", autospec=True
+    )
+    mock_get = client_session_patch.start()
+    mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
+    mock_response.content_type = "multipart/x-mixed-replace"
+    oav_forwarder._get_frame_and_put_to_redis = AsyncMock()
+    yield oav_forwarder, mock_response
+    client_session_patch.stop()
+
+
 @patch("dodal.devices.oav.oav_to_redis_forwarder.ClientSession.get", autospec=True)
 async def test_given_response_is_not_mjpeg_when_oav_forwarder_kicked_off_then_exception_raised(
     mock_get, oav_forwarder
@@ -34,15 +47,10 @@ async def test_given_response_is_not_mjpeg_when_oav_forwarder_kicked_off_then_ex
         await oav_forwarder.kickoff()
 
 
-@patch("dodal.devices.oav.oav_to_redis_forwarder.ClientSession.get", autospec=True)
 async def test_when_oav_forwarder_kicked_off_then_connection_open_and_data_streamed(
-    mock_get, oav_forwarder
+    oav_forwarder_with_valid_response,
 ):
-    mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
-
-    mock_response.content_type = "multipart/x-mixed-replace"
-
-    oav_forwarder._get_frame_and_put_to_redis = AsyncMock()
+    oav_forwarder, mock_response = oav_forwarder_with_valid_response
 
     await oav_forwarder.kickoff()
 
@@ -50,6 +58,26 @@ async def test_when_oav_forwarder_kicked_off_then_connection_open_and_data_strea
     oav_forwarder._get_frame_and_put_to_redis.assert_called_once_with(mock_response)
 
     await oav_forwarder.complete()
+
+
+async def test_when_oav_forwarder_kicked_off_then_stopped_forwarding_is_stopped(
+    oav_forwarder_with_valid_response,
+):
+    oav_forwarder, _ = oav_forwarder_with_valid_response
+
+    await oav_forwarder.kickoff()
+    await oav_forwarder.stop()
+    assert oav_forwarder.forwarding_task.done()
+
+
+async def test_when_oav_forwarder_kicked_off_then_completed_forwarding_is_stopped(
+    oav_forwarder_with_valid_response,
+):
+    oav_forwarder, _ = oav_forwarder_with_valid_response
+
+    await oav_forwarder.kickoff()
+    await oav_forwarder.complete()
+    assert oav_forwarder.forwarding_task.done()
 
 
 def get_mock_response(jpeg_bytes):
