@@ -6,7 +6,7 @@ from bluesky import plan_stubs as bps
 from bluesky.preprocessors import finalize_wrapper, pchain
 from bluesky.utils import Msg, make_decorator
 from ophyd_async.core import Device
-from ophyd_async.epics.motion import Motor
+from ophyd_async.epics.motor import Motor
 
 from dodal.common import MsgGenerator
 

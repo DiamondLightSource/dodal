@@ -3,24 +3,37 @@ from pathlib import Path
 import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import (
-    DirectoryInfo,
-    DirectoryProvider,
-    StaticDirectoryProvider,
+    PathInfo,
+    PathProvider,
 )
 
 from dodal.beamlines import i03
 from dodal.common.beamlines.beamline_utils import clear_devices
+from dodal.common.visit import (
+    DirectoryServiceClientBase,
+    LocalDirectoryServiceClient,
+    StaticVisitPathProvider,
+)
 from dodal.devices.util.test_utils import patch_motor
 
-DIRECTORY_INFO_FOR_TESTING: DirectoryInfo = DirectoryInfo(
-    root=Path("/does/not/exist"),
-    resource_dir=Path("/on/this/filesystem"),
+PATH_INFO_FOR_TESTING: PathInfo = PathInfo(
+    directory_path=Path("/does/not/exist"),
+    filename="on_this_filesystem",
 )
 
 
 @pytest.fixture
-def static_directory_provider(tmp_path: Path) -> DirectoryProvider:
-    return StaticDirectoryProvider(tmp_path)
+def dummy_visit_client() -> DirectoryServiceClientBase:
+    return LocalDirectoryServiceClient()
+
+
+@pytest.fixture
+def static_path_provider(
+    tmp_path: Path, dummy_visit_client: DirectoryServiceClientBase
+) -> PathProvider:
+    return StaticVisitPathProvider(
+        beamline="ixx", root=tmp_path, client=dummy_visit_client
+    )
 
 
 @pytest.fixture

@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from bluesky.simulators import RunEngineSimulator
-from ophyd_async.panda import phase_sorter
+from ophyd_async.fastcs.panda import phase_sorter
 
 from dodal.devices.util.save_panda import _save_panda, main
 

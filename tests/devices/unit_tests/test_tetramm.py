@@ -3,11 +3,11 @@ from bluesky.run_engine import RunEngine
 from ophyd_async.core import (
     DetectorTrigger,
     DeviceCollector,
-    DirectoryProvider,
+    PathProvider,
+    TriggerInfo,
     set_mock_value,
 )
-from ophyd_async.core.detector import TriggerInfo
-from ophyd_async.epics.areadetector import FileWriteMode
+from ophyd_async.epics.adcore import FileWriteMode
 
 from dodal.devices.tetramm import (
     TetrammController,
@@ -41,11 +41,11 @@ async def tetramm_controller(
 
 
 @pytest.fixture
-async def tetramm(static_directory_provider: DirectoryProvider) -> TetrammDetector:
+async def tetramm(static_path_provider: PathProvider) -> TetrammDetector:
     async with DeviceCollector(mock=True):
         tetramm = TetrammDetector(
             "MY-TETRAMM:",
-            static_directory_provider,
+            static_path_provider,
             name=TEST_TETRAMM_NAME,
         )
 
@@ -166,10 +166,11 @@ async def test_sample_rate_scales_with_exposure_time(
 ):
     await tetramm.prepare(
         TriggerInfo(
-            100,
-            DetectorTrigger.edge_trigger,
-            2e-5,
-            exposure,
+            number=100,
+            trigger=DetectorTrigger.edge_trigger,
+            deadtime=2e-5,
+            livetime=exposure,
+            frame_timeout=None,
         )
     )
     values_per_reading = await tetramm.drv.values_per_reading.get_value()
@@ -252,10 +253,11 @@ async def test_prepare_with_too_low_a_deadtime_raises_error(
     ):
         await tetramm.prepare(
             TriggerInfo(
-                5,
-                DetectorTrigger.edge_trigger,
-                1.0 / 100_000.0,
-                VALID_TEST_EXPOSURE_TIME,
+                number=5,
+                trigger=DetectorTrigger.edge_trigger,
+                deadtime=1.0 / 100_000.0,
+                livetime=VALID_TEST_EXPOSURE_TIME,
+                frame_timeout=None,
             )
         )
 
@@ -265,10 +267,11 @@ async def test_prepare_arms_tetramm(
 ):
     await tetramm.prepare(
         TriggerInfo(
-            5,
-            DetectorTrigger.edge_trigger,
-            0.1,
-            VALID_TEST_EXPOSURE_TIME,
+            number=5,
+            trigger=DetectorTrigger.edge_trigger,
+            deadtime=0.1,
+            livetime=VALID_TEST_EXPOSURE_TIME,
+            frame_timeout=None,
         )
     )
     await assert_armed(tetramm.drv)

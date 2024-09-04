@@ -2,10 +2,10 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 
 from aiohttp import ClientSession
-from ophyd_async.core import DirectoryInfo
+from ophyd_async.core import FilenameProvider, PathInfo
 from pydantic import BaseModel
 
-from dodal.common.types import UpdatingDirectoryProvider
+from dodal.common.types import UpdatingPathProvider
 from dodal.log import LOGGER
 
 """
@@ -36,6 +36,18 @@ class DirectoryServiceClientBase(ABC):
         """Get current collection"""
 
 
+class DiamondFilenameProvider(FilenameProvider):
+    def __init__(self, beamline: str, client: DirectoryServiceClientBase):
+        self._beamline = beamline
+        self._client = client
+        self.collectionId: DataCollectionIdentifier | None = None
+
+    def __call__(self, device_name: str | None = None):
+        assert device_name, "Diamond filename requires device_name to be passed"
+        assert self.collectionId is not None
+        return f"{self._beamline}-{self.collectionId.collectionNumber}-{device_name}"
+
+
 class DirectoryServiceClient(DirectoryServiceClientBase):
     """Client for the VisitService REST API
     Currently exposed by the GDA Server to co-ordinate unique filenames.
@@ -52,7 +64,7 @@ class DirectoryServiceClient(DirectoryServiceClientBase):
             async with session.post(f"{self._url}/numtracker") as response:
                 response.raise_for_status()
                 json = await response.json()
-                new_collection = DataCollectionIdentifier.parse_obj(json)
+                new_collection = DataCollectionIdentifier.model_validate_json(json)
                 LOGGER.debug("New DataCollection: %s", new_collection)
                 return new_collection
 
@@ -61,7 +73,7 @@ class DirectoryServiceClient(DirectoryServiceClientBase):
             async with session.get(f"{self._url}/numtracker") as response:
                 response.raise_for_status()
                 json = await response.json()
-                current_collection = DataCollectionIdentifier.parse_obj(json)
+                current_collection = DataCollectionIdentifier.model_validate_json(json)
                 LOGGER.debug("Current DataCollection: %s", current_collection)
                 return current_collection
 
@@ -84,21 +96,15 @@ class LocalDirectoryServiceClient(DirectoryServiceClientBase):
         return DataCollectionIdentifier(collectionNumber=self._count)
 
 
-class StaticVisitDirectoryProvider(UpdatingDirectoryProvider):
+class StaticVisitPathProvider(UpdatingPathProvider):
     """
-    Static (single visit) implementation of DirectoryProvider whilst awaiting auth infrastructure to generate necessary information per-scan.
+    Static (single visit) implementation of PathProvider whilst awaiting auth infrastructure to generate necessary information per-scan.
     Allows setting a singular visit into which all run files will be saved.
     update() queries a visit service to get the next DataCollectionIdentifier to increment the suffix of all file writers' next files.
     Requires that all detectors are running with a mutual view on the filesystem.
     Supports a single Visit which should be passed as a Path relative to the root of the Detector IOC mounting.
-    i.e. to write to visit /dls/ixx/data/YYYY/cm12345-1, assuming all detectors are mounted with /data -> /dls/ixx/data, root=/data/YYYY/cm12345-1/
+    i.e. to write to visit /dls/ixx/data/YYYY/cm12345-1
     """
-
-    _beamline: str
-    _root: Path
-    _client: DirectoryServiceClientBase
-    _current_collection: DirectoryInfo | None
-    _session: ClientSession | None
 
     def __init__(
         self,
@@ -108,9 +114,10 @@ class StaticVisitDirectoryProvider(UpdatingDirectoryProvider):
     ):
         self._beamline = beamline
         self._client = client or DirectoryServiceClient(f"{beamline}-control:8088/api")
+        self._filename_provider = DiamondFilenameProvider(self._beamline, self._client)
         self._root = root
-        self._current_collection = None
-        self._session = None
+        self.current_collection: PathInfo | None
+        self._session: ClientSession | None
 
     async def update(self, **kwargs) -> None:
         """
@@ -121,33 +128,22 @@ class StaticVisitDirectoryProvider(UpdatingDirectoryProvider):
         # TODO: DAQ-4827: Pass AuthN information as part of request
 
         try:
-            collection_id_info = await self._client.create_new_collection()
-            self._current_collection = self._generate_directory_info(collection_id_info)
+            self._filename_provider.collectionId = (
+                await self._client.create_new_collection()
+            )
         except Exception:
             LOGGER.error(
                 "Exception while updating data collection, preventing overwriting data by setting current_collection to None"
             )
-            self._current_collection = None
+            self._collection_id_info = None
             raise
 
-    def _generate_directory_info(
-        self,
-        collection_id_info: DataCollectionIdentifier,
-    ) -> DirectoryInfo:
-        return DirectoryInfo(
-            # See DocString of DirectoryInfo. At DLS, root = visit directory, resource_dir is relative to it.
-            root=self._root,
-            # https://github.com/DiamondLightSource/dodal/issues/452
-            # Currently all h5 files written to visit/ directory, as no guarantee that visit/dataCollection/ directory will have been produced. If it is as part of #452, append the resource_dir
-            resource_dir=Path("."),
-            # Diamond standard file naming
-            prefix=f"{self._beamline}-{collection_id_info.collectionNumber}-",
-        )
+    async def data_session(self) -> str:
+        collection = await self._client.get_current_collection()
+        return f"{self._beamline}-{collection.collectionNumber}"
 
-    def __call__(self) -> DirectoryInfo:
-        if self._current_collection is not None:
-            return self._current_collection
-        else:
-            raise ValueError(
-                "No current collection, update() needs to be called at least once"
-            )
+    def __call__(self, device_name: str | None = None) -> PathInfo:
+        assert device_name, "Must call PathProvider with device_name"
+        return PathInfo(
+            directory_path=self._root, filename=self._filename_provider(device_name)
+        )

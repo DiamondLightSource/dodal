@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Generic, TypeVar
+from typing import Generic, TypeVar
 
 import numpy as np
 from bluesky.plan_stubs import mv
@@ -20,7 +20,7 @@ from ophyd_async.epics.signal import (
     epics_signal_rw_rbv,
     epics_signal_x,
 )
-from pydantic import validator
+from pydantic import ConfigDict, Field, ValidationInfo, field_validator
 from pydantic.dataclasses import dataclass
 
 from dodal.log import LOGGER
@@ -69,9 +69,10 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
     y2_start: float = 0.1
     z1_start: float = 0.1
     z2_start: float = 0.1
-    x_axis: GridAxis = GridAxis(0, 0, 0)
-    y_axis: GridAxis = GridAxis(0, 0, 0)
-    z_axis: GridAxis = GridAxis(0, 0, 0)
+    x_axis: GridAxis = Field(default=GridAxis(0, 0, 0), exclude=True)
+    y_axis: GridAxis = Field(default=GridAxis(0, 0, 0), exclude=True)
+    z_axis: GridAxis = Field(default=GridAxis(0, 0, 0), exclude=True)
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     # Whether to set the stub offsets after centering
     set_stub_offsets: bool = False
@@ -91,25 +92,20 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
             "z2_start": self.z2_start,
         }
 
-    class Config:
-        arbitrary_types_allowed = True
-        fields = {
-            "x_axis": {"exclude": True},
-            "y_axis": {"exclude": True},
-            "z_axis": {"exclude": True},
-        }
+    @field_validator("x_axis")
+    @classmethod
+    def _get_x_axis(cls, _: GridAxis, v: ValidationInfo) -> GridAxis:
+        return GridAxis(v.data["x_start"], v.data["x_step_size"], v.data["x_steps"])
 
-    @validator("x_axis", always=True)
-    def _get_x_axis(cls, x_axis: GridAxis, values: dict[str, Any]) -> GridAxis:
-        return GridAxis(values["x_start"], values["x_step_size"], values["x_steps"])
+    @field_validator("y_axis")
+    @classmethod
+    def _get_y_axis(cls, _: GridAxis, v: ValidationInfo) -> GridAxis:
+        return GridAxis(v.data["y1_start"], v.data["y_step_size"], v.data["y_steps"])
 
-    @validator("y_axis", always=True)
-    def _get_y_axis(cls, y_axis: GridAxis, values: dict[str, Any]) -> GridAxis:
-        return GridAxis(values["y1_start"], values["y_step_size"], values["y_steps"])
-
-    @validator("z_axis", always=True)
-    def _get_z_axis(cls, z_axis: GridAxis, values: dict[str, Any]) -> GridAxis:
-        return GridAxis(values["z2_start"], values["z_step_size"], values["z_steps"])
+    @field_validator("z_axis")
+    @classmethod
+    def _get_z_axis(cls, _: GridAxis, v: ValidationInfo) -> GridAxis:
+        return GridAxis(v.data["z2_start"], v.data["z_step_size"], v.data["z_steps"])
 
     def get_num_images(self):
         return self.x_steps * self.y_steps + self.x_steps * self.z_steps
@@ -155,7 +151,8 @@ class ZebraGridScanParams(GridScanParamsCommon):
         param_positions["dwell_time_ms"] = self.dwell_time_ms
         return param_positions
 
-    @validator("dwell_time_ms", always=True, check_fields=True)
+    @field_validator("dwell_time_ms")
+    @classmethod
     def non_integer_dwell_time(cls, dwell_time_ms: float) -> float:
         dwell_time_floor_rounded = np.floor(dwell_time_ms)
         dwell_time_is_close = np.isclose(

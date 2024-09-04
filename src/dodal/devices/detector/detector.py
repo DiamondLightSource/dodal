@@ -1,7 +1,13 @@
 from enum import Enum, auto
 from typing import Any
 
-from pydantic import BaseModel, root_validator, validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    field_serializer,
+    field_validator,
+    model_validator,
+)
 
 from dodal.devices.detector.det_dim_constants import (
     EIGER2_X_16M_SIZE,
@@ -42,20 +48,23 @@ class DetectorParams(BaseModel):
     trigger_mode: TriggerMode = TriggerMode.SET_FRAMES
     detector_size_constants: DetectorSizeConstants = EIGER2_X_16M_SIZE
     beam_xy_converter: DetectorDistanceToBeamXYConverter = None  # type: ignore # Filled in by validator
-    run_number: int = None  # type: ignore # Filled in by validator
+    run_number: int | None = None  # type: ignore # Filled in by validator
     enable_dev_shm: bool = (
         False  # Remove in https://github.com/DiamondLightSource/hyperion/issues/1395
     )
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+    )
 
-    class Config:
-        arbitrary_types_allowed = True
-        json_encoders = {
-            DetectorDistanceToBeamXYConverter: lambda _: None,
-            DetectorSizeConstants: lambda d: d.det_type_string,
-        }
+    @field_serializer("beam_xy_converter")
+    def serialize_beam_xy_converter(self, _: DetectorDistanceToBeamXYConverter):
+        return None
 
-    # should be replaced with model_validator once move to pydantic 2 is complete
-    @root_validator(pre=True)
+    @field_serializer("detector_size_constants")
+    def serialize_detector_size_constants(self, size: DetectorSizeConstants):
+        return size.det_type_string
+
+    @model_validator(mode="before")
     def create_beamxy_and_runnumber(cls, values: dict[str, Any]) -> dict[str, Any]:
         values["beam_xy_converter"] = DetectorDistanceToBeamXYConverter(
             values["det_dist_to_beam_converter_path"]
@@ -64,18 +73,18 @@ class DetectorParams(BaseModel):
             values["run_number"] = get_run_number(values["directory"], values["prefix"])
         return values
 
-    @validator("detector_size_constants", pre=True)
-    def _parse_detector_size_constants(
-        cls, det_type: str, values: dict[str, Any]
-    ) -> DetectorSizeConstants:
+    @field_validator("detector_size_constants", mode="before")
+    @classmethod
+    def _parse_detector_size_constants(cls, det_type: str) -> DetectorSizeConstants:
         return (
             det_type
             if isinstance(det_type, DetectorSizeConstants)
             else constants_from_type(det_type)
         )
 
-    @validator("directory", pre=True)
-    def _parse_directory(cls, directory: str, values: dict[str, Any]) -> str:
+    @field_validator("directory", mode="before")
+    @classmethod
+    def _parse_directory(cls, directory: str) -> str:
         if not directory.endswith("/"):
             directory += "/"
         return directory

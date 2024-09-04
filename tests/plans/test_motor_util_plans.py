@@ -4,9 +4,14 @@ import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
-from ophyd_async.core import Device, DeviceCollector, get_mock_put, set_mock_value
-from ophyd_async.core.signal import soft_signal_rw
-from ophyd_async.epics.motion import Motor
+from ophyd_async.core import (
+    Device,
+    DeviceCollector,
+    get_mock_put,
+    set_mock_value,
+    soft_signal_rw,
+)
+from ophyd_async.epics.motor import Motor
 
 from dodal.devices.util.test_utils import patch_motor
 from dodal.plans.motor_util_plans import (

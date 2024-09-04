@@ -53,7 +53,6 @@ def test_correct_det_dist_to_beam_converter_path_passed_in(mocked_parse_table):
         det_dist_to_beam_converter_path="a fake directory",
         detector_size_constants=EIGER2_X_16M_SIZE,
     )
-    params.json()
     assert params.beam_xy_converter.lookup_file == "a fake directory"
 
 
