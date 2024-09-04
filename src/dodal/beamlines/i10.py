@@ -67,6 +67,7 @@ def idd_jaw_phase(
         move_pv="RPQ1",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
+        bl_prefix=False,
     )
 
 
@@ -110,6 +111,7 @@ def idu_jaw_phase(
         move_pv="RPQ1",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
+        bl_prefix=False,
     )
 
 
