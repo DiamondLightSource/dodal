@@ -2,9 +2,9 @@ from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.common.beamlines.beamline_utils import device_instantiation
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.aperturescatterguard import (
+    AperturePosition,
     ApertureScatterguard,
     load_positions_from_beamline_parameters,
-    load_tolerances_from_beamline_params,
 )
 from dodal.devices.attenuator import Attenuator
 from dodal.devices.backlight import Backlight
@@ -236,7 +236,7 @@ def aperture_scatterguard(
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
         loaded_positions=load_positions_from_beamline_parameters(params),
-        tolerances=load_tolerances_from_beamline_params(params),
+        tolerances=AperturePosition.tolerances_from_gda_params(params),
     )
 
 
@@ -410,9 +410,11 @@ def oav_to_redis_forwarder(
     """
     return device_instantiation(
         OAVToRedisForwarder,
-        "oav_to_redis",
-        "",
+        "oav_to_redis_forwarder",
+        "-DI-OAV-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        params=OAVConfigParams(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+        redis_host=REDIS_HOST,
+        redis_password=REDIS_PASSWORD,
+        redis_db=7,
     )

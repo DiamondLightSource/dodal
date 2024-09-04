@@ -9,9 +9,9 @@ from dodal.common.beamlines.beamline_utils import (
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.udc_directory_provider import PandASubdirectoryProvider
 from dodal.devices.aperturescatterguard import (
+    AperturePosition,
     ApertureScatterguard,
     load_positions_from_beamline_parameters,
-    load_tolerances_from_beamline_params,
 )
 from dodal.devices.attenuator import Attenuator
 from dodal.devices.backlight import Backlight
@@ -71,7 +71,7 @@ def aperture_scatterguard(
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
         loaded_positions=load_positions_from_beamline_parameters(params),
-        tolerances=load_tolerances_from_beamline_params(params),
+        tolerances=AperturePosition.tolerances_from_gda_params(params),
     )
 
 
