@@ -9,6 +9,7 @@ from ophyd_async.core import (
     AsyncStatus,
     HintedSignal,
     StandardReadable,
+    soft_signal_r_and_setter,
     soft_signal_rw,
 )
 
@@ -215,6 +216,57 @@ class I10Apple2Pol(StandardReadable, Movable):
         await self.id.set(
             await self.id.energy.get_value()
         )  # Move id to new polarisation
+
+
+class LinearArbitraryAngle(StandardReadable, Movable):
+    def __init__(
+        self,
+        id: I10Apple2,
+        prefix: str = "",
+        name: str = "",
+        jawphase_limit=12.0,
+        jawphase_poly_param: list
+        | None = None,  # from_angle=Poly([-120.0 / 7.5, 1.0 / 7.5], power0first=True),
+        angle_threshold_deg=30.0,
+    ) -> None:
+        super().__init__(name=name)
+        with self.add_children_as_readables():
+            self.id = id
+        if jawphase_poly_param is None:
+            jawphase_poly_param = [-120.0 / 7.5, 1.0 / 7.5]
+        self.jawphase_from_angle = np.poly1d(jawphase_poly_param, True)
+        self.angle_threshold_deg = angle_threshold_deg
+        self.jawphase_limit = jawphase_limit
+        with self.add_children_as_readables(HintedSignal):
+            self.angle, self._angle_set = soft_signal_r_and_setter(
+                float, initial_value=None
+            )
+
+    @AsyncStatus.wrap
+    async def set(self, value: float) -> None:
+        self._angle_set(value)
+        pol = self.id.pol
+        if pol != "la":
+            raise RuntimeError(
+                f"Angle control is not available in polarisation {pol}' with  {self.id.name}"
+            )
+        temp_angle = await self.angle.get_value()
+        alpha_real = (
+            temp_angle if temp_angle > self.angle_threshold_deg else temp_angle + 180.0
+        )
+
+        alpha_real = (
+            alpha_real
+            if await self.angle.get_value() > self.angle_threshold_deg
+            else await self.angle.get_value() + 180.0
+        )
+        jawphase = self.jawphase_from_angle(alpha_real)
+        if abs(jawphase) > self.jawphase_limit:
+            raise RuntimeError(
+                f"""jawphase position({jawphase}) for angle ({value}) is outside permitted range
+                 [-{self.jawphase_limit}, {self.jawphase_limit}]"""
+            )
+        await self.id.id_jaw_phase.set(jawphase)
 
 
 def convert_csv_to_lookup(
