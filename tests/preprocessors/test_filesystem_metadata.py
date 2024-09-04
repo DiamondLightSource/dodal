@@ -23,7 +23,7 @@ from yarl import URL
 from dodal.common.types import MsgGenerator, UpdatingPathProvider
 from dodal.common.visit import (
     DataCollectionIdentifier,
-    DirectoryServiceClientBase,
+    DirectoryServiceClient,
     LocalDirectoryServiceClient,
     StaticVisitPathProvider,
 )
@@ -103,14 +103,12 @@ class DataEvent(BaseModel):
 
 
 @pytest.fixture
-def client() -> DirectoryServiceClientBase:
+def client() -> DirectoryServiceClient:
     return MockDirectoryServiceClient()
 
 
 @pytest.fixture
-def provider(
-    client: DirectoryServiceClientBase, tmp_path: Path
-) -> UpdatingPathProvider:
+def provider(client: DirectoryServiceClient, tmp_path: Path) -> UpdatingPathProvider:
     return StaticVisitPathProvider("example", tmp_path, client=client)
 
 

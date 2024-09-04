@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
+from typing import Literal
 
 from aiohttp import ClientSession
 from ophyd_async.core import FilenameProvider, PathInfo
@@ -22,7 +23,7 @@ class DataCollectionIdentifier(BaseModel):
     collectionNumber: int
 
 
-class DirectoryServiceClientBase(ABC):
+class DirectoryServiceClient(ABC):
     """
     Object responsible for I/O in determining collection number
     """
@@ -37,7 +38,7 @@ class DirectoryServiceClientBase(ABC):
 
 
 class DiamondFilenameProvider(FilenameProvider):
-    def __init__(self, beamline: str, client: DirectoryServiceClientBase):
+    def __init__(self, beamline: str, client: DirectoryServiceClient):
         self._beamline = beamline
         self._client = client
         self.collectionId: DataCollectionIdentifier | None = None
@@ -48,40 +49,38 @@ class DiamondFilenameProvider(FilenameProvider):
         return f"{self._beamline}-{self.collectionId.collectionNumber}-{device_name}"
 
 
-class DirectoryServiceClient(DirectoryServiceClientBase):
+class RemoteDirectoryServiceClient(DirectoryServiceClient):
     """Client for the VisitService REST API
     Currently exposed by the GDA Server to co-ordinate unique filenames.
     While VisitService is embedded in GDA, url is likely to be `ixx-control:8088/api`
     """
 
-    _url: str
-
     def __init__(self, url: str) -> None:
         self._url = url
 
     async def create_new_collection(self) -> DataCollectionIdentifier:
-        async with ClientSession() as session:
-            async with session.post(f"{self._url}/numtracker") as response:
-                response.raise_for_status()
-                json = await response.json()
-                new_collection = DataCollectionIdentifier.model_validate_json(json)
-                LOGGER.debug("New DataCollection: %s", new_collection)
-                return new_collection
+        return await self._identifier_from_response("POST")
 
     async def get_current_collection(self) -> DataCollectionIdentifier:
-        async with ClientSession() as session:
-            async with session.get(f"{self._url}/numtracker") as response:
-                response.raise_for_status()
-                json = await response.json()
-                current_collection = DataCollectionIdentifier.model_validate_json(json)
-                LOGGER.debug("Current DataCollection: %s", current_collection)
-                return current_collection
+        return await self._identifier_from_response("GET")
+
+    async def _identifier_from_response(
+        self,
+        method: Literal["GET", "POST"],
+    ) -> DataCollectionIdentifier:
+        async with (
+            ClientSession() as session,
+            session.request(method, f"{self._url}/numtracker") as response,
+        ):
+            response.raise_for_status()
+            json = await response.json()
+            new_collection = DataCollectionIdentifier.model_validate_json(json)
+            LOGGER.debug("New DataCollection: %s", new_collection)
+            return new_collection
 
 
-class LocalDirectoryServiceClient(DirectoryServiceClientBase):
+class LocalDirectoryServiceClient(DirectoryServiceClient):
     """Local or dummy impl of VisitService client to co-ordinate unique filenames."""
-
-    _count: int
 
     def __init__(self) -> None:
         self._count = 0
@@ -110,10 +109,12 @@ class StaticVisitPathProvider(UpdatingPathProvider):
         self,
         beamline: str,
         root: Path,
-        client: DirectoryServiceClientBase | None = None,
+        client: DirectoryServiceClient | None = None,
     ):
         self._beamline = beamline
-        self._client = client or DirectoryServiceClient(f"{beamline}-control:8088/api")
+        self._client = client or RemoteDirectoryServiceClient(
+            f"{beamline}-control:8088/api"
+        )
         self._filename_provider = DiamondFilenameProvider(self._beamline, self._client)
         self._root = root
         self.current_collection: PathInfo | None

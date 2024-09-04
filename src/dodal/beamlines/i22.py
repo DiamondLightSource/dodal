@@ -11,7 +11,7 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import numbered_slits
-from dodal.common.visit import DirectoryServiceClient, StaticVisitPathProvider
+from dodal.common.visit import RemoteDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
 from dodal.devices.i22.fswitch import FSwitch
@@ -37,7 +37,7 @@ set_path_provider(
     StaticVisitPathProvider(
         BL,
         Path("/dls/i22/data/2024/cm37271-2/bluesky"),
-        client=DirectoryServiceClient("http://i22-control:8088/api"),
+        client=RemoteDirectoryServiceClient("http://i22-control:8088/api"),
     )
 )
 

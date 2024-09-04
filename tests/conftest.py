@@ -20,7 +20,7 @@ from ophyd_async.core import (
 from dodal.beamlines import i03
 from dodal.common.beamlines import beamline_utils
 from dodal.common.visit import (
-    DirectoryServiceClientBase,
+    DirectoryServiceClient,
     LocalDirectoryServiceClient,
     StaticVisitPathProvider,
 )
@@ -117,13 +117,13 @@ PATH_INFO_FOR_TESTING: PathInfo = PathInfo(
 
 
 @pytest.fixture
-def dummy_visit_client() -> DirectoryServiceClientBase:
+def dummy_visit_client() -> DirectoryServiceClient:
     return LocalDirectoryServiceClient()
 
 
 @pytest.fixture
 async def static_path_provider(
-    tmp_path: Path, dummy_visit_client: DirectoryServiceClientBase
+    tmp_path: Path, dummy_visit_client: DirectoryServiceClient
 ) -> PathProvider:
     svpp = StaticVisitPathProvider(
         beamline="ixx", root=tmp_path, client=dummy_visit_client
