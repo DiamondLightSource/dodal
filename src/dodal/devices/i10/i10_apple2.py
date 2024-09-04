@@ -219,22 +219,41 @@ class I10Apple2Pol(StandardReadable, Movable):
 
 
 class LinearArbitraryAngle(StandardReadable, Movable):
+    """
+    Device to set polorisation angle of the ID. 0 is "lh" and 90 is "lv"
+
+    Parameters
+    ----------
+    id: I10Apple2
+        An I10Apple2 device.
+    prefix: str
+        Not in use but needed for device_instantiation.
+    name: str
+        New device name.
+    jawphase_limit: float
+        The maximum allowed jawphase movement.
+    jawphase_poly_param: list
+        polynomial parameters highest power first.
+    """
+
     def __init__(
         self,
         id: I10Apple2,
         prefix: str = "",
         name: str = "",
-        jawphase_limit=12.0,
-        jawphase_poly_param: list
-        | None = None,  # from_angle=Poly([-120.0 / 7.5, 1.0 / 7.5], power0first=True),
+        jawphase_limit: float = 12.0,
+        jawphase_poly_param: list | None = None,
         angle_threshold_deg=30.0,
     ) -> None:
         super().__init__(name=name)
         with self.add_children_as_readables():
             self.id = id
         if jawphase_poly_param is None:
-            jawphase_poly_param = [-120.0 / 7.5, 1.0 / 7.5]
-        self.jawphase_from_angle = np.poly1d(jawphase_poly_param, True)
+            jawphase_poly_param = [
+                1.0 / 7.5,
+                -120.0 / 7.5,
+            ]
+        self.jawphase_from_angle = np.poly1d(jawphase_poly_param)
         self.angle_threshold_deg = angle_threshold_deg
         self.jawphase_limit = jawphase_limit
         with self.add_children_as_readables(HintedSignal):
@@ -248,23 +267,18 @@ class LinearArbitraryAngle(StandardReadable, Movable):
         pol = self.id.pol
         if pol != "la":
             raise RuntimeError(
-                f"Angle control is not available in polarisation {pol}' with  {self.id.name}"
+                f"Angle control is not available in polarisation {pol} with {self.id.name}"
             )
         temp_angle = await self.angle.get_value()
+        # Moving to real angle which is 210 to 30.
         alpha_real = (
             temp_angle if temp_angle > self.angle_threshold_deg else temp_angle + 180.0
-        )
-
-        alpha_real = (
-            alpha_real
-            if await self.angle.get_value() > self.angle_threshold_deg
-            else await self.angle.get_value() + 180.0
         )
         jawphase = self.jawphase_from_angle(alpha_real)
         if abs(jawphase) > self.jawphase_limit:
             raise RuntimeError(
-                f"""jawphase position({jawphase}) for angle ({value}) is outside permitted range
-                 [-{self.jawphase_limit}, {self.jawphase_limit}]"""
+                f"jawphase position for angle ({value}) is outside permitted range"
+                f" [-{self.jawphase_limit}, {self.jawphase_limit}]"
             )
         await self.id.id_jaw_phase.set(jawphase)
 

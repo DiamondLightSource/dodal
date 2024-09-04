@@ -1,6 +1,7 @@
 import pickle
 from collections import defaultdict
 from pathlib import Path
+from unittest import mock
 from unittest.mock import Mock
 
 import pytest
@@ -25,6 +26,7 @@ from dodal.devices.i10.i10_apple2 import (
     I10Apple2,
     I10Apple2PGM,
     I10Apple2Pol,
+    LinearArbitraryAngle,
     convert_csv_to_lookup,
 )
 from dodal.devices.i10.i10_setting_data import I10Grating
@@ -125,6 +127,15 @@ async def mock_id_pol(mock_id: I10Apple2) -> I10Apple2Pol:
         mock_id_pol = I10Apple2Pol(id=mock_id)
 
     return mock_id_pol
+
+
+@pytest.fixture
+async def mock_linear_arbitrary_angle(
+    mock_id: I10Apple2, prefix: str = "BLXX-EA-DET-007:"
+) -> LinearArbitraryAngle:
+    async with DeviceCollector(mock=True):
+        mock_linear_arbitrary_angle = LinearArbitraryAngle(id=mock_id)
+    return mock_linear_arbitrary_angle
 
 
 @pytest.mark.parametrize(
@@ -336,6 +347,70 @@ async def test_I10Apple2_pol_set(
         gap = get_mock_put(mock_id_pol.id.gap.user_setpoint)
         gap.assert_called_once()
         assert float(gap.call_args[0][0]) == pytest.approx(expect_gap, 0.05)
+
+
+async def test_linear_arbitrary_pol_and_limit_fail(
+    mock_linear_arbitrary_angle: LinearArbitraryAngle,
+):
+    mock_linear_arbitrary_angle.id.pol = "lh"
+    with pytest.raises(RuntimeError) as e:
+        await mock_linear_arbitrary_angle.set(20)
+    assert str(e.value) == (
+        f"Angle control is not available in polarisation"
+        f" {mock_linear_arbitrary_angle.id.pol} with {mock_linear_arbitrary_angle.id.name}"
+    )
+    mock_linear_arbitrary_angle.id.pol = "la"
+    mock_linear_arbitrary_angle.jawphase_from_angle = poly1d([13])
+    with pytest.raises(RuntimeError) as e:
+        await mock_linear_arbitrary_angle.set(20)
+    assert (
+        str(e.value) == f"jawphase position for angle (20) is outside permitted range"
+        f" [-{mock_linear_arbitrary_angle.jawphase_limit}, {mock_linear_arbitrary_angle.jawphase_limit}]"
+    )
+
+
+async def test_linear_arbitrary_RE_scan(
+    mock_linear_arbitrary_angle: LinearArbitraryAngle, RE: RunEngine
+):
+    docs = defaultdict(list)
+    rbv_mocks = Mock()
+    rbv_mocks.get.side_effect = range(0, 181, 10)
+    callback_on_mock_put(
+        mock_linear_arbitrary_angle.id.id_jaw_phase.jaw_Phase.user_setpoint,
+        lambda *_, **__: set_mock_value(
+            mock_linear_arbitrary_angle.id.id_jaw_phase.jaw_Phase.user_setpoint_readback,
+            rbv_mocks.get(),
+        ),
+    )
+
+    def capture_emitted(name, doc):
+        docs[name].append(doc)
+
+    mock_linear_arbitrary_angle.id.pol = "la"
+    RE(
+        scan(
+            [mock_linear_arbitrary_angle], mock_linear_arbitrary_angle, 0, 180, num=11
+        ),
+        capture_emitted,
+    )
+    assert_emitted(docs, start=1, descriptor=1, event=11, stop=1)
+
+    jawphase = get_mock_put(
+        mock_linear_arbitrary_angle.id.id_jaw_phase.jaw_Phase.user_setpoint
+    )
+
+    poly = poly1d([1.0 / 7.5, -120.0 / 7.5])
+    for cnt, data in enumerate(docs["event"]):
+        temp_angle = 18 * cnt
+        assert data["data"]["mock_linear_arbitrary_angle-angle"] == temp_angle
+        alpha_real = (
+            temp_angle
+            if temp_angle > mock_linear_arbitrary_angle.angle_threshold_deg
+            else temp_angle + 180.0
+        )
+        assert jawphase.call_args_list[cnt] == mock.call(
+            str(poly(alpha_real)), wait=True, timeout=mock.ANY
+        )
 
 
 @pytest.mark.parametrize(

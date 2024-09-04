@@ -2,7 +2,11 @@ from pathlib import Path
 
 from dodal.common.beamlines.beamline_utils import device_instantiation
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.apple2_undulator import UndlatorPhaseAxes, UndulatorGap
+from dodal.devices.apple2_undulator import (
+    UndlatorJawPhase,
+    UndlatorPhaseAxes,
+    UndulatorGap,
+)
 from dodal.devices.i10.i10_apple2 import I10Apple2, I10Apple2PGM, I10Apple2Pol
 from dodal.devices.i10.i10_setting_data import I10Grating
 from dodal.devices.pgm import PGM
@@ -17,6 +21,9 @@ set_utils_beamline(BL)
 I10 has two insertion devices one up(idu) and one down stream(idd).
 It is worth noting that the down stream device is slightly longer,
  so it can reach Mn edge for linear arbitrary.
+ idd == id1
+ and
+ idu == id2.
 """
 
 
@@ -50,6 +57,19 @@ def idd_phase_axes(
     )
 
 
+def idd_jaw_phase(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> UndlatorJawPhase:
+    return device_instantiation(
+        device_factory=UndlatorJawPhase,
+        name="idd_jaw_phase",
+        prefix="-MO-SERVC-01:",
+        move_pv="RPQ1",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+    )
+
+
 def idu_gap(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> UndulatorGap:
@@ -80,6 +100,19 @@ def idu_phase_axes(
     )
 
 
+def idu_jaw_phase(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> UndlatorJawPhase:
+    return device_instantiation(
+        device_factory=UndlatorJawPhase,
+        name="idu_jaw_phase",
+        prefix="-MO-SERVC-21:",
+        move_pv="RPQ1",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+    )
+
+
 def pgm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> PGM:
     return device_instantiation(
         device_factory=PGM,
@@ -99,6 +132,7 @@ def idu_gap_phase(
         device_factory=I10Apple2,
         id_gap=idu_gap(wait_for_connection, fake_with_ophyd_sim),
         id_phase=idu_phase_axes(wait_for_connection, fake_with_ophyd_sim),
+        id_jaw_phase=idd_jaw_phase(wait_for_connection, fake_with_ophyd_sim),
         energy_gap_table_path=Path(
             "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2GapCalibrations.csv",
         ),
@@ -120,6 +154,7 @@ def idd_gap_phase(
         device_factory=I10Apple2,
         id_gap=idd_gap(wait_for_connection, fake_with_ophyd_sim),
         id_phase=idd_phase_axes(wait_for_connection, fake_with_ophyd_sim),
+        id_jaw_phase=idd_jaw_phase(wait_for_connection, fake_with_ophyd_sim),
         energy_gap_table_path=Path(
             "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2GapCalibrations.csv",
         ),
