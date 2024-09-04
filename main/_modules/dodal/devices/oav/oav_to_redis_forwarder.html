@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.oav_to_redis_forwarder &#8212; dodal 1.30.1.dev6+g148e24d63 documentation</title>
+    <title>dodal.devices.oav.oav_to_redis_forwarder &#8212; dodal 1.30.1.dev7+gda0bb3c16 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../../_static/documentation_options.js?v=95199669"></script>
+    <script src="../../../../_static/documentation_options.js?v=2232fef3"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -475,12 +475,14 @@ document.write(`
 <span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">pickle</span>
 <span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Awaitable</span><span class="p">,</span> <span class="n">Callable</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">timedelta</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">aiohttp</span> <span class="kn">import</span> <span class="n">ClientResponse</span><span class="p">,</span> <span class="n">ClientSession</span>
-<span class="kn">from</span> <span class="nn">bluesky.protocols</span> <span class="kn">import</span> <span class="n">Flyable</span>
+<span class="kn">from</span> <span class="nn">bluesky.protocols</span> <span class="kn">import</span> <span class="n">Flyable</span><span class="p">,</span> <span class="n">Stoppable</span>
 <span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="n">AsyncStatus</span><span class="p">,</span> <span class="n">StandardReadable</span>
-<span class="kn">from</span> <span class="nn">ophyd_async.core.signal</span> <span class="kn">import</span> <span class="n">soft_signal_r_and_setter</span>
+<span class="kn">from</span> <span class="nn">ophyd_async.core.signal</span> <span class="kn">import</span> <span class="n">soft_signal_r_and_setter</span><span class="p">,</span> <span class="n">soft_signal_rw</span>
 <span class="kn">from</span> <span class="nn">ophyd_async.epics.signal</span> <span class="kn">import</span> <span class="n">epics_signal_r</span>
 <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
 <span class="kn">from</span> <span class="nn">redis.asyncio</span> <span class="kn">import</span> <span class="n">StrictRedis</span>
@@ -502,7 +504,7 @@ document.write(`
 
 <div class="viewcode-block" id="OAVToRedisForwarder">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_to_redis_forwarder.OAVToRedisForwarder.html#dodal.devices.oav.oav_to_redis_forwarder.OAVToRedisForwarder">[docs]</a>
-<span class="k">class</span> <span class="nc">OAVToRedisForwarder</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Flyable</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">OAVToRedisForwarder</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Flyable</span><span class="p">,</span> <span class="n">Stoppable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Forwards OAV image data to redis. To use call:</span>
 
 <span class="sd">    &gt; bps.kickoff(oav_forwarder)</span>
@@ -511,6 +513,8 @@ document.write(`
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="n">DATA_EXPIRY_DAYS</span> <span class="o">=</span> <span class="mi">7</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -518,7 +522,6 @@ document.write(`
         <span class="n">redis_password</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">redis_db</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="n">redis_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;test-image&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Reads image data from the MJPEG stream on an OAV and forwards it into a</span>
 <span class="sd">        redis database. This is currently only used for murko integration.</span>
@@ -529,9 +532,8 @@ document.write(`
 <span class="sd">            redis_password: str     the password for the redis database</span>
 <span class="sd">            redis_db: int           which redis database to connect to, defaults to 0</span>
 <span class="sd">            name: str               the name of this device</span>
-<span class="sd">            redis_key: str          the key to store data in, defaults to &quot;test-image&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">stream_url</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">-DI-OAV-01:MJPG:HOST_RBV&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stream_url</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">MJPG:MJPG_URL_RBV&quot;</span><span class="p">)</span>
 
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid_setter</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
@@ -541,7 +543,9 @@ document.write(`
             <span class="n">host</span><span class="o">=</span><span class="n">redis_host</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">redis_password</span><span class="p">,</span> <span class="n">db</span><span class="o">=</span><span class="n">redis_db</span>
         <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">redis_key</span> <span class="o">=</span> <span class="n">redis_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stop_flag</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_id</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
         <span class="c1"># The uuid that images are being saved under, this should be monitored for</span>
         <span class="c1"># callbacks to correlate the data</span>
@@ -557,25 +561,46 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">uuid_setter</span><span class="p">(</span><span class="n">image_uuid</span> <span class="o">:=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()))</span>
         <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">jpeg_bytes</span><span class="p">))</span>
         <span class="n">image_data</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">img</span><span class="p">))</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_client</span><span class="o">.</span><span class="n">hset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_key</span><span class="p">,</span> <span class="n">image_uuid</span><span class="p">,</span> <span class="n">image_data</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
-        <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sent frame to redis key </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">redis_key</span><span class="si">}</span><span class="s2"> with uuid </span><span class="si">{</span><span class="n">image_uuid</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">sample_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_id</span><span class="o">.</span><span class="n">get_value</span><span class="p">())</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_client</span><span class="o">.</span><span class="n">hset</span><span class="p">(</span><span class="n">sample_id</span><span class="p">,</span> <span class="n">image_uuid</span><span class="p">,</span> <span class="n">image_data</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_client</span><span class="o">.</span><span class="n">expire</span><span class="p">(</span><span class="n">sample_id</span><span class="p">,</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA_EXPIRY_DAYS</span><span class="p">))</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sent frame to redis key </span><span class="si">{</span><span class="n">sample_id</span><span class="si">}</span><span class="s2"> with uuid </span><span class="si">{</span><span class="n">image_uuid</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_stream_to_redis</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_open_connection_and_do_function</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">function_to_do</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">ClientResponse</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">],</span> <span class="n">Awaitable</span><span class="p">]</span>
+    <span class="p">):</span>
         <span class="n">stream_url</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_url</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
         <span class="k">async</span> <span class="k">with</span> <span class="n">ClientSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
             <span class="k">async</span> <span class="k">with</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">stream_url</span><span class="p">)</span> <span class="k">as</span> <span class="n">response</span><span class="p">:</span>
-                <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-                    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_frame_and_put_to_redis</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
-                    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+                <span class="k">await</span> <span class="n">function_to_do</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">stream_url</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_stream_to_redis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stop_flag</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_frame_and_put_to_redis</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+            <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_confirm_mjpg_stream</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">stream_url</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">content_type</span> <span class="o">!=</span> <span class="s2">&quot;multipart/x-mixed-replace&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stream_url</span><span class="si">}</span><span class="s2"> is not an MJPG stream&quot;</span><span class="p">)</span>
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span> <span class="nf">kickoff</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">forwarding_task</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_stream_to_redis</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stop_flag</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open_connection_and_do_function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_confirm_mjpg_stream</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">forwarding_task</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_open_connection_and_do_function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_stream_to_redis</span><span class="p">)</span>
+        <span class="p">)</span>
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span> <span class="nf">complete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">forwarding_task</span><span class="p">,</span> <span class="s2">&quot;Device not kicked off&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">forwarding_task</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span></div>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">forwarding_task</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_stop_flag</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">forwarding_task</span></div>
 
 </pre></div>
 

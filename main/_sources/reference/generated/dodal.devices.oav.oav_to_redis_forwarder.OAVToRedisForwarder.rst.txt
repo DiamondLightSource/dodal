@@ -30,6 +30,9 @@ dodal.devices.oav.oav\_to\_redis\_forwarder.OAVToRedisForwarder
       
       
       
+      ~OAVToRedisForwarder.stop
+      
+      
    
    
 
@@ -39,6 +42,9 @@ dodal.devices.oav.oav\_to\_redis\_forwarder.OAVToRedisForwarder
 
    .. autosummary::
    
+      
+      ~OAVToRedisForwarder.DATA_EXPIRY_DAYS
+      
       
       
       
