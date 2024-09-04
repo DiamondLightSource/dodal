@@ -13,7 +13,8 @@ ValueAndUnits = tuple[float, str]
 T = TypeVar("T")
 
 
-# Temporarily duplicated non-public method from ophyd_async
+# TODO: Remove this file as part of github.com/DiamondLightSource/dodal/issues/595
+# Until which, temporarily duplicated non-public method from ophyd_async
 async def _merge_gathered_dicts(
     coros: Iterable[Awaitable[dict[str, T]]],
 ) -> dict[str, T]:
