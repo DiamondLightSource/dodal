@@ -7,13 +7,16 @@ BEAMLINE_PARAMETER_KEYWORDS = ["FB", "FULL", "deadtime"]
 
 BEAMLINE_PARAMETER_PATHS = {
     "i03": "/dls_sw/i03/software/daq_configuration/domain/beamlineParameters",
-    "i04": "/dls_sw/i04/software/gda_versions/gda_9_29/workspace_git/gda-mx.git/configurations/i04-config/scripts/beamlineParameters",
+    "i04": "/dls_sw/i04/software/gda_versions/gda_9_34/workspace_git/gda-mx.git/configurations/i04-config/scripts/beamlineParameters",
     "s03": "tests/test_data/test_beamline_parameters.txt",
 }
 
 
 class GDABeamlineParameters:
     params: dict[str, Any]
+
+    def __init__(self, params: dict[str, Any]):
+        self.params = params
 
     def __repr__(self) -> str:
         return repr(self.params)
@@ -23,7 +26,6 @@ class GDABeamlineParameters:
 
     @classmethod
     def from_lines(cls, file_name: str, config_lines: list[str]):
-        ob = cls()
         config_lines_nocomments = [line.split("#", 1)[0] for line in config_lines]
         config_lines_sep_key_and_value = [
             # XXX removes all whitespace instead of just trim
@@ -46,8 +48,7 @@ class GDABeamlineParameters:
             except Exception as e:
                 LOGGER.warning(f"Unable to parse {file_name} line {i}: {e}")
 
-        ob.params = dict(config_pairs)
-        return ob
+        return cls(params=dict(config_pairs))
 
     @classmethod
     def from_file(cls, path: str):
