@@ -3,7 +3,6 @@ from pathlib import Path
 
 from pydantic import (
     BaseModel,
-    ConfigDict,
     field_serializer,
     field_validator,
 )
@@ -44,13 +43,11 @@ class DetectorParams(BaseModel):
     num_triggers: int
     use_roi_mode: bool
     det_dist_to_beam_converter_path: str
+    override_run_number: int | None = None
     trigger_mode: TriggerMode = TriggerMode.SET_FRAMES
     detector_size_constants: DetectorSizeConstants = EIGER2_X_16M_SIZE
     enable_dev_shm: bool = (
         False  # Remove in https://github.com/DiamondLightSource/hyperion/issues/1395
-    )
-    model_config = ConfigDict(
-        arbitrary_types_allowed=True,
     )
 
     @property
@@ -59,7 +56,7 @@ class DetectorParams(BaseModel):
 
     @property
     def run_number(self) -> int:
-        return get_run_number(self.directory, self.prefix)
+        return self.override_run_number or get_run_number(self.directory, self.prefix)
 
     @field_serializer("detector_size_constants")
     def serialize_detector_size_constants(self, size: DetectorSizeConstants):

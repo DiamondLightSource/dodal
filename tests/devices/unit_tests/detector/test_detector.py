@@ -84,8 +84,8 @@ def test_run_number_correct_when_specified(mocked_parse_table, tmpdir):
     params = DetectorParams(
         expected_energy_ev=100,
         exposure_time=1.0,
-        directory=str(tmpdir),
-        run_number=6,
+        directory=tmpdir,
+        override_run_number=6,
         prefix="test",
         detector_distance=1.0,
         omega_start=0.0,
