@@ -263,17 +263,13 @@ class LinearArbitraryAngle(StandardReadable, Movable):
 
     @AsyncStatus.wrap
     async def set(self, value: float) -> None:
-        self._angle_set(value)
         pol = self.id.pol
         if pol != "la":
             raise RuntimeError(
                 f"Angle control is not available in polarisation {pol} with {self.id.name}"
             )
-        temp_angle = await self.angle.get_value()
         # Moving to real angle which is 210 to 30.
-        alpha_real = (
-            temp_angle if temp_angle > self.angle_threshold_deg else temp_angle + 180.0
-        )
+        alpha_real = value if value > self.angle_threshold_deg else value + 180.0
         jawphase = self.jawphase_from_angle(alpha_real)
         if abs(jawphase) > self.jawphase_limit:
             raise RuntimeError(
@@ -281,6 +277,7 @@ class LinearArbitraryAngle(StandardReadable, Movable):
                 f" [-{self.jawphase_limit}, {self.jawphase_limit}]"
             )
         await self.id.id_jaw_phase.set(jawphase)
+        self._angle_set(value)
 
 
 def convert_csv_to_lookup(

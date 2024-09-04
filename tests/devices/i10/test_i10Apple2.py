@@ -349,7 +349,7 @@ async def test_I10Apple2_pol_set(
         assert float(gap.call_args[0][0]) == pytest.approx(expect_gap, 0.05)
 
 
-async def test_linear_arbitrary_pol_and_limit_fail(
+async def test_linear_arbitrary_pol_fail(
     mock_linear_arbitrary_angle: LinearArbitraryAngle,
 ):
     mock_linear_arbitrary_angle.id.pol = "lh"
@@ -359,8 +359,17 @@ async def test_linear_arbitrary_pol_and_limit_fail(
         f"Angle control is not available in polarisation"
         f" {mock_linear_arbitrary_angle.id.pol} with {mock_linear_arbitrary_angle.id.name}"
     )
+
+
+@pytest.mark.parametrize(
+    "poly",
+    [18, -18, 12.01, -12.01],
+)
+async def test_linear_arbitrary_limit_fail(
+    mock_linear_arbitrary_angle: LinearArbitraryAngle, poly: float
+):
     mock_linear_arbitrary_angle.id.pol = "la"
-    mock_linear_arbitrary_angle.jawphase_from_angle = poly1d([13])
+    mock_linear_arbitrary_angle.jawphase_from_angle = poly1d([poly])
     with pytest.raises(RuntimeError) as e:
         await mock_linear_arbitrary_angle.set(20)
     assert (
