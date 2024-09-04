@@ -99,6 +99,29 @@ def test_run_number_correct_when_specified(mocked_parse_table, tmpdir):
     assert params.run_number == 6
 
 
+@patch(
+    "src.dodal.devices.detector.DetectorDistanceToBeamXYConverter.parse_table",
+)
+def test_detector_params_is_serialisable(mocked_parse_table, tmpdir):
+    params = DetectorParams(
+        expected_energy_ev=100,
+        exposure_time=1.0,
+        directory=str(tmpdir),
+        prefix="test",
+        detector_distance=1.0,
+        omega_start=0.0,
+        omega_increment=0.0,
+        num_images_per_trigger=1,
+        num_triggers=1,
+        use_roi_mode=False,
+        det_dist_to_beam_converter_path="a fake directory",
+        detector_size_constants=EIGER2_X_16M_SIZE,
+    )
+    json = params.model_dump_json()
+    new_params = DetectorParams.model_validate_json(json)
+    assert new_params == params
+
+
 @patch("os.listdir")
 def test_prefix_is_used_to_determine_run_number(mock_listdir: MagicMock):
     foos = (f"foo_{i}.nxs" for i in range(4))
