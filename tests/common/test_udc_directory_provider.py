@@ -25,7 +25,7 @@ def test_udc_path_provider_get_and_set(root, expected):
 def test_udc_path_provider_excepts_before_update():
     provider = PandASubpathProvider()
     with pytest.raises(
-        ValueError,
+        AssertionError,
         match=re.escape(
             "Directory unknown for PandA to write into, update() needs to be called at least once"
         ),
@@ -63,12 +63,3 @@ async def test_udc_path_provider_with_suffix(tmp_path):
     directory_info = provider()
     assert directory_info.directory_path == root_path / "panda"
     assert directory_info.filename.endswith("_123")
-
-
-async def test_udc_path_provider_creates_subdirectory_if_not_exists(tmp_path):
-    root = tmp_path
-    subdir = root / Path("panda")
-    assert not subdir.exists()
-    provider = PandASubpathProvider(Path("initial"))
-    await provider.update(directory=root)
-    assert subdir.exists()

@@ -5,7 +5,7 @@ from typing import Any
 import bluesky.plan_stubs as bps
 import bluesky.plans as bp
 import pytest
-from aiohttp import ClientResponseError
+from aiohttp import ClientResponseError, RequestInfo
 from bluesky.preprocessors import (
     run_decorator,
     run_wrapper,
@@ -18,6 +18,7 @@ from bluesky.run_engine import RunEngine
 from event_model.documents.event_descriptor import DataKey
 from ophyd_async.core import AsyncStatus, DeviceCollector, PathProvider
 from pydantic import BaseModel
+from yarl import URL
 
 from dodal.common.types import MsgGenerator, UpdatingPathProvider
 from dodal.common.visit import (
@@ -77,19 +78,21 @@ class FakeDetector(Readable, HasName, Triggerable):
 
 
 class MockDirectoryServiceClient(LocalDirectoryServiceClient):
+    fake_request = RequestInfo(URL(), "GET", headers={}, real_url=URL())  # type: ignore
+
     def __init__(self):
         self.fail = False
         super().__init__()
 
     async def create_new_collection(self) -> DataCollectionIdentifier:
         if self.fail:
-            raise ClientResponseError(None, ())  # type: ignore
+            raise ClientResponseError(self.fake_request, ())
 
         return await super().create_new_collection()
 
     async def get_current_collection(self) -> DataCollectionIdentifier:
         if self.fail:
-            raise ClientResponseError(None, ())  # type: ignore
+            raise ClientResponseError(self.fake_request, ())
 
         return await super().get_current_collection()
 
@@ -319,7 +322,7 @@ def test_visit_path_provider_fails(
     client: MockDirectoryServiceClient,
 ) -> None:
     client.fail = True
-    with pytest.raises(ValueError):
+    with pytest.raises(ClientResponseError):
         collect_docs(
             RE,
             simple_run(detectors),
@@ -339,7 +342,7 @@ def test_visit_path_provider_fails_after_one_sucess(
         provider,
     )
     client.fail = True
-    with pytest.raises(ValueError):
+    with pytest.raises(ClientResponseError):
         collect_docs(
             RE,
             simple_run(detectors),

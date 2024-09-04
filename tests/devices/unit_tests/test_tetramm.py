@@ -52,6 +52,17 @@ async def tetramm(static_path_provider: PathProvider) -> TetrammDetector:
     return tetramm
 
 
+@pytest.fixture
+def supported_trigger_info() -> TriggerInfo:
+    return TriggerInfo(
+        number=1,
+        trigger=DetectorTrigger.constant_gate,
+        deadtime=1.0,
+        livetime=0.02,
+        frame_timeout=None,
+    )
+
+
 async def test_max_frame_rate_is_calculated_correctly(
     tetramm_controller: TetrammController,
 ):
@@ -164,6 +175,8 @@ async def test_sample_rate_scales_with_exposure_time(
     exposure: float,
     expected_values_per_reading: int,
 ):
+    set_mock_value(tetramm.hdf.file_path_exists, True)
+
     await tetramm.prepare(
         TriggerInfo(
             number=100,
@@ -265,6 +278,7 @@ async def test_prepare_with_too_low_a_deadtime_raises_error(
 async def test_prepare_arms_tetramm(
     tetramm: TetrammDetector,
 ):
+    set_mock_value(tetramm.hdf.file_path_exists, True)
     await tetramm.prepare(
         TriggerInfo(
             number=5,
@@ -277,11 +291,12 @@ async def test_prepare_arms_tetramm(
     await assert_armed(tetramm.drv)
 
 
-async def test_stage_sets_up_writer(
-    tetramm: TetrammDetector,
+async def test_prepare_sets_up_writer(
+    tetramm: TetrammDetector, supported_trigger_info: TriggerInfo
 ):
     set_mock_value(tetramm.hdf.file_path_exists, True)
     await tetramm.stage()
+    await tetramm.prepare(supported_trigger_info)
 
     assert (await tetramm.hdf.num_capture.get_value()) == 0
     assert (await tetramm.hdf.num_extra_dims.get_value()) == 0
@@ -292,17 +307,19 @@ async def test_stage_sets_up_writer(
 
 
 async def test_stage_sets_up_accurate_describe_output(
-    tetramm: TetrammDetector,
+    tetramm: TetrammDetector, supported_trigger_info: TriggerInfo
 ):
     assert await tetramm.describe() == {}
 
     set_mock_value(tetramm.hdf.file_path_exists, True)
     await tetramm.stage()
+    await tetramm.prepare(supported_trigger_info)
 
     assert await tetramm.describe() == {
         TEST_TETRAMM_NAME: {
             "source": "mock+ca://MY-TETRAMM:HDF5:FullFileName_RBV",
-            "shape": (11, 1000),
+            "shape": (11, 400),
+            "dtype_numpy": "<f8",
             "dtype": "array",
             "external": "STREAM:",
         }

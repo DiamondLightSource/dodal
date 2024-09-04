@@ -85,7 +85,12 @@ class PMACStringLaser(SignalRW):
         super().__init__(backend, timeout, name)
 
     @AsyncStatus.wrap
-    async def set(self, value: LaserSettings, wait=True, timeout=CalculateTimeout):
+    async def set(
+        self,
+        value: LaserSettings,
+        wait=True,
+        timeout=CalculateTimeout,
+    ):
         await self.signal.set(value.value, wait, timeout)
 
 
@@ -103,7 +108,12 @@ class PMACStringEncReset(SignalRW):
         super().__init__(backend, timeout, name)
 
     @AsyncStatus.wrap
-    async def set(self, value: EncReset, wait=True, timeout=CalculateTimeout):
+    async def set(
+        self,
+        value: EncReset,
+        wait=True,
+        timeout=CalculateTimeout,
+    ):
         await self.signal.set(value.value, wait, timeout)
 
 
@@ -127,7 +137,7 @@ class ProgramRunner(SignalRW):
         super().__init__(backend, timeout, name)
 
     @AsyncStatus.wrap
-    async def set(self, value: int, wait: bool = True, timeout: float | None = None):
+    async def set(self, value: int, wait=True, timeout=None):
         prog_str = f"&2b{value}r"
         assert isinstance(timeout, SupportsFloat) or (
             timeout is None

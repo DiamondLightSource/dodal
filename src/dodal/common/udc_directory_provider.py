@@ -20,8 +20,10 @@ class PandASubpathProvider(UpdatingPathProvider):
 
     resource_dir = Path("panda")
 
-    def __init__(self, directory: Path | None = None, suffix: str = ""):
-        self._output_directory: Path | None = directory
+    def __init__(self, root_directory: Path | None = None, suffix: str = ""):
+        self._output_directory: Path | None = (
+            root_directory / self.resource_dir if root_directory else None
+        )
         self._filename_provider = PandAFilenameProvider(suffix=suffix)
         if self._output_directory is None:
             LOGGER.debug(
@@ -44,7 +46,7 @@ class PandASubpathProvider(UpdatingPathProvider):
         self._filename_provider.suffix = suffix
 
     def __call__(self, device_name: str | None = None) -> PathInfo:
-        assert self._output_directory
+        assert self._output_directory, "Directory unknown for PandA to write into, update() needs to be called at least once"
         return PathInfo(
             directory_path=self._output_directory,
             filename=self._filename_provider(device_name),

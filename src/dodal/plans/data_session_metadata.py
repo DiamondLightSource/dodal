@@ -33,7 +33,8 @@ def attach_data_session_metadata_wrapper(
     if provider is None:
         provider = beamline_utils.get_path_provider()
     yield from bps.wait_for([provider.update])
-    data_session = (yield from bps.wait_for([provider.data_session]))[0].result()
+    ress = yield from bps.wait_for([provider.data_session])
+    data_session = ress[0].result()
     # https://github.com/DiamondLightSource/dodal/issues/452
     # As part of 452, write each dataCollection into their own folder, then can use resource_dir directly
     yield from bpp.inject_md_wrapper(plan, md={DATA_SESSION: data_session})

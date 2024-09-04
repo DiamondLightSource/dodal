@@ -4,11 +4,11 @@ from enum import Enum
 from bluesky.protocols import Hints
 from ophyd_async.core import (
     AsyncStatus,
+    DatasetDescriber,
     DetectorControl,
     DetectorTrigger,
     Device,
     PathProvider,
-    ShapeProvider,
     StandardDetector,
     set_and_wait_for_value,
     soft_signal_r_and_setter,
@@ -205,13 +205,16 @@ class TetrammController(DetectorControl):
         )
 
 
-class TetrammShapeProvider(ShapeProvider):
+class TetrammDatasetDescriber(DatasetDescriber):
     max_channels = 11
 
     def __init__(self, controller: TetrammController) -> None:
         self.controller = controller
 
-    async def __call__(self) -> tuple[int, int]:
+    async def np_datatype(self) -> str:
+        return "<f8"  # IEEE 754 double precision floating point
+
+    async def shape(self) -> tuple[int, int]:
         return (self.max_channels, self.controller.readings_per_frame)
 
 
@@ -244,7 +247,7 @@ class TetrammDetector(StandardDetector):
                 self.hdf,
                 path_provider,
                 lambda: self.name,
-                TetrammShapeProvider(controller),
+                TetrammDatasetDescriber(controller),
                 **scalar_sigs,
             ),
             config_signals,

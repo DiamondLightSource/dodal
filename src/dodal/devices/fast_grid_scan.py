@@ -20,7 +20,7 @@ from ophyd_async.epics.signal import (
     epics_signal_rw_rbv,
     epics_signal_x,
 )
-from pydantic import ConfigDict, Field, ValidationInfo, field_validator
+from pydantic import field_validator
 from pydantic.dataclasses import dataclass
 
 from dodal.log import LOGGER
@@ -69,10 +69,6 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
     y2_start: float = 0.1
     z1_start: float = 0.1
     z2_start: float = 0.1
-    x_axis: GridAxis = Field(default=GridAxis(0, 0, 0), exclude=True)
-    y_axis: GridAxis = Field(default=GridAxis(0, 0, 0), exclude=True)
-    z_axis: GridAxis = Field(default=GridAxis(0, 0, 0), exclude=True)
-    model_config = ConfigDict(arbitrary_types_allowed=True)
 
     # Whether to set the stub offsets after centering
     set_stub_offsets: bool = False
@@ -92,23 +88,20 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
             "z2_start": self.z2_start,
         }
 
-    @field_validator("x_axis")
-    @classmethod
-    def _get_x_axis(cls, _: GridAxis, v: ValidationInfo) -> GridAxis:
-        return GridAxis(v.data["x_start"], v.data["x_step_size"], v.data["x_steps"])
+    @property
+    def x_axis(self) -> GridAxis:
+        return GridAxis(self.x_start, self.x_step_size, self.x_steps)
 
-    @field_validator("y_axis")
-    @classmethod
-    def _get_y_axis(cls, _: GridAxis, v: ValidationInfo) -> GridAxis:
-        return GridAxis(v.data["y1_start"], v.data["y_step_size"], v.data["y_steps"])
+    @property
+    def y_axis(self) -> GridAxis:
+        return GridAxis(self.y1_start, self.y_step_size, self.y_steps)
 
-    @field_validator("z_axis")
-    @classmethod
-    def _get_z_axis(cls, _: GridAxis, v: ValidationInfo) -> GridAxis:
-        return GridAxis(v.data["z2_start"], v.data["z_step_size"], v.data["z_steps"])
+    @property
+    def z_axis(self) -> GridAxis:
+        return GridAxis(self.z2_start, self.z_step_size, self.z_steps)
 
     def get_num_images(self):
-        return self.x_steps * self.y_steps + self.x_steps * self.z_steps
+        return self.x_steps * (self.y_steps + self.z_steps)
 
     @property
     def is_3d_grid_scan(self):
