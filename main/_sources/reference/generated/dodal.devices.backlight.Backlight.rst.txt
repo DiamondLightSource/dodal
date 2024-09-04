@@ -37,6 +37,9 @@ dodal.devices.backlight.Backlight
    .. autosummary::
    
       
+      ~Backlight.TIME_TO_MOVE_S
+      
+      
       
       
       
