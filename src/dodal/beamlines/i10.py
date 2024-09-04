@@ -63,7 +63,7 @@ def idd_jaw_phase(
     return device_instantiation(
         device_factory=UndlatorJawPhase,
         name="idd_jaw_phase",
-        prefix="-MO-SERVC-01:",
+        prefix=f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
         move_pv="RPQ1",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
@@ -106,7 +106,7 @@ def idu_jaw_phase(
     return device_instantiation(
         device_factory=UndlatorJawPhase,
         name="idu_jaw_phase",
-        prefix="-MO-SERVC-21:",
+        prefix=f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-21:",
         move_pv="RPQ1",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
