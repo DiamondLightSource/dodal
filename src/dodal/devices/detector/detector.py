@@ -76,9 +76,10 @@ class DetectorParams(BaseModel):
 
     @field_validator("directory", mode="before")
     @classmethod
-    def _parse_directory(cls, directory: Path) -> Path:
-        assert directory.is_dir
-        return directory
+    def _parse_directory(cls, directory: str) -> Path:
+        path = Path(directory)
+        assert path.is_dir
+        return path
 
     def get_beam_position_mm(self, detector_distance: float) -> tuple[float, float]:
         x_beam_mm = self.beam_xy_converter.get_beam_xy_from_det_dist(
