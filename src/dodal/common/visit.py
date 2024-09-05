@@ -59,10 +59,14 @@ class RemoteDirectoryServiceClient(DirectoryServiceClient):
         self._url = url
 
     async def create_new_collection(self) -> DataCollectionIdentifier:
-        return await self._identifier_from_response("POST")
+        new_collection = await self._identifier_from_response("POST")
+        LOGGER.debug("New DataCollection: %s", new_collection)
+        return new_collection
 
     async def get_current_collection(self) -> DataCollectionIdentifier:
-        return await self._identifier_from_response("GET")
+        current_collection = await self._identifier_from_response("GET")
+        LOGGER.debug("Current DataCollection: %s", current_collection)
+        return current_collection
 
     async def _identifier_from_response(
         self,
@@ -74,9 +78,7 @@ class RemoteDirectoryServiceClient(DirectoryServiceClient):
         ):
             response.raise_for_status()
             json = await response.json()
-            new_collection = DataCollectionIdentifier.model_validate_json(json)
-            LOGGER.debug("New DataCollection: %s", new_collection)
-            return new_collection
+            return DataCollectionIdentifier.model_validate_json(json)
 
 
 class LocalDirectoryServiceClient(DirectoryServiceClient):
