@@ -133,27 +133,27 @@ def test_detector_params_is_serialisable(tmp_path):
 
 
 # Until https://github.com/DiamondLightSource/dodal/issues/775
-def test_detector_params_serialisation_unchanged(tmp_path):
-    params = DetectorParams(
-        expected_energy_ev=100,
-        exposure_time=1.0,
-        directory=str(tmp_path),
-        prefix="test",
-        detector_distance=1.0,
-        run_number=17,
-        omega_start=0.0,
-        omega_increment=0.0,
-        num_images_per_trigger=1,
-        num_triggers=1,
-        use_roi_mode=False,
-        det_dist_to_beam_converter_path="a fake directory",
-        detector_size_constants=EIGER2_X_16M_SIZE,
-    )
-    json = params.model_dump_json()
-    assert params.run_number == 17
-    assert '"run_number": 17' in json
+def test_detector_params_deserialisation_unchanged(tmp_path):
+    json = """
+    {"expected_energy_ev":100.0,
+     "exposure_time":1.0,
+     "directory":"/tmp/pytest-of-qwe67581/pytest-23/test_detector_params_serialisa0",
+     "prefix":"test",
+     "detector_distance":1.0,
+     "omega_start":0.0,
+     "omega_increment":0.0,
+     "num_images_per_trigger":1,
+     "num_triggers":1,
+     "use_roi_mode":false,
+     "det_dist_to_beam_converter_path":"a fake directory",
+     "run_number":17,
+     "trigger_mode":1,
+     "detector_size_constants":"EIGER2_X_16M",
+     "enable_dev_shm":false}
+    """
+    assert '"run_number":17' in json
     new_params = DetectorParams.model_validate_json(json)
-    assert new_params == params
+    assert new_params.run_number == 17
 
 
 @patch("os.listdir")

@@ -1,12 +1,7 @@
 from enum import Enum, auto
 from pathlib import Path
 
-from pydantic import (
-    BaseModel,
-    Field,
-    field_serializer,
-    field_validator,
-)
+from pydantic import BaseModel, Field, field_serializer, field_validator
 
 from dodal.devices.detector.det_dim_constants import (
     EIGER2_X_16M_SIZE,
@@ -32,6 +27,9 @@ class TriggerMode(Enum):
 class DetectorParams(BaseModel):
     """Holds parameters for the detector. Provides access to a list of Dectris detector
     sizes and a converter for distance to beam centre."""
+
+    # https://github.com/pydantic/pydantic/issues/8379
+    # Must use model_dump(by_alias=True) if serialising!
 
     expected_energy_ev: float | None = None
     exposure_time: float
