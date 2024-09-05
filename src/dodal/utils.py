@@ -10,7 +10,6 @@ from functools import wraps
 from importlib import import_module
 from inspect import signature
 from os import environ
-from pathlib import Path
 from types import ModuleType
 from typing import (
     Any,

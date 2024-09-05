@@ -127,6 +127,31 @@ def test_detector_params_is_serialisable(tmp_path):
         detector_size_constants=EIGER2_X_16M_SIZE,
     )
     json = params.model_dump_json()
+    assert '"run_number"' not in json
+    new_params = DetectorParams.model_validate_json(json)
+    assert new_params == params
+
+
+# Until https://github.com/DiamondLightSource/dodal/issues/775
+def test_detector_params_serialisation_unchanged(tmp_path):
+    params = DetectorParams(
+        expected_energy_ev=100,
+        exposure_time=1.0,
+        directory=str(tmp_path),
+        prefix="test",
+        detector_distance=1.0,
+        run_number=17,
+        omega_start=0.0,
+        omega_increment=0.0,
+        num_images_per_trigger=1,
+        num_triggers=1,
+        use_roi_mode=False,
+        det_dist_to_beam_converter_path="a fake directory",
+        detector_size_constants=EIGER2_X_16M_SIZE,
+    )
+    json = params.model_dump_json()
+    assert params.run_number == 17
+    assert '"run_number": 17' in json
     new_params = DetectorParams.model_validate_json(json)
     assert new_params == params
 
