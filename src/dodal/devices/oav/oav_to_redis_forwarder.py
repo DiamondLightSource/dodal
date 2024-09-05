@@ -2,12 +2,14 @@ import asyncio
 import io
 import pickle
 import uuid
+from collections.abc import Awaitable, Callable
+from datetime import timedelta
 
 import numpy as np
 from aiohttp import ClientResponse, ClientSession
-from bluesky.protocols import Flyable
+from bluesky.protocols import Flyable, Stoppable
 from ophyd_async.core import AsyncStatus, StandardReadable
-from ophyd_async.core.signal import soft_signal_r_and_setter
+from ophyd_async.core.signal import soft_signal_r_and_setter, soft_signal_rw
 from ophyd_async.epics.signal import epics_signal_r
 from PIL import Image
 from redis.asyncio import StrictRedis
@@ -24,7 +26,7 @@ async def get_next_jpeg(response: ClientResponse) -> bytes:
             return line + await response.content.readuntil(JPEG_STOP_BYTE)
 
 
-class OAVToRedisForwarder(StandardReadable, Flyable):
+class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
     """Forwards OAV image data to redis. To use call:
 
     > bps.kickoff(oav_forwarder)
@@ -33,6 +35,8 @@ class OAVToRedisForwarder(StandardReadable, Flyable):
 
     """
 
+    DATA_EXPIRY_DAYS = 7
+
     def __init__(
         self,
         prefix: str,
@@ -40,7 +44,6 @@ class OAVToRedisForwarder(StandardReadable, Flyable):
         redis_password: str,
         redis_db: int = 0,
         name: str = "",
-        redis_key: str = "test-image",
     ) -> None:
         """Reads image data from the MJPEG stream on an OAV and forwards it into a
         redis database. This is currently only used for murko integration.
@@ -51,9 +54,8 @@ class OAVToRedisForwarder(StandardReadable, Flyable):
             redis_password: str     the password for the redis database
             redis_db: int           which redis database to connect to, defaults to 0
             name: str               the name of this device
-            redis_key: str          the key to store data in, defaults to "test-image"
         """
-        self.stream_url = epics_signal_r(str, f"{prefix}-DI-OAV-01:MJPG:HOST_RBV")
+        self.stream_url = epics_signal_r(str, f"{prefix}MJPG:MJPG_URL_RBV")
 
         with self.add_children_as_readables():
             self.uuid, self.uuid_setter = soft_signal_r_and_setter(str)
@@ -63,7 +65,9 @@ class OAVToRedisForwarder(StandardReadable, Flyable):
             host=redis_host, password=redis_password, db=redis_db
         )
 
-        self.redis_key = redis_key
+        self._stop_flag = False
+
+        self.sample_id = soft_signal_rw(int, initial_value=0)
 
         # The uuid that images are being saved under, this should be monitored for
         # callbacks to correlate the data
@@ -79,22 +83,43 @@ class OAVToRedisForwarder(StandardReadable, Flyable):
         self.uuid_setter(image_uuid := str(uuid.uuid4()))
         img = Image.open(io.BytesIO(jpeg_bytes))
         image_data = pickle.dumps(np.asarray(img))
-        await self.redis_client.hset(self.redis_key, image_uuid, image_data)  # type: ignore
-        LOGGER.debug(f"Sent frame to redis key {self.redis_key} with uuid {image_uuid}")
+        sample_id = str(await self.sample_id.get_value())
+        await self.redis_client.hset(sample_id, image_uuid, image_data)  # type: ignore
+        await self.redis_client.expire(sample_id, timedelta(days=self.DATA_EXPIRY_DAYS))
+        LOGGER.debug(f"Sent frame to redis key {sample_id} with uuid {image_uuid}")
 
-    async def _stream_to_redis(self):
+    async def _open_connection_and_do_function(
+        self, function_to_do: Callable[[ClientResponse, str | None], Awaitable]
+    ):
         stream_url = await self.stream_url.get_value()
         async with ClientSession() as session:
             async with session.get(stream_url) as response:
-                while True:
-                    await self._get_frame_and_put_to_redis(response)
-                    await asyncio.sleep(0.01)
+                await function_to_do(response, stream_url)
+
+    async def _stream_to_redis(self, response, _):
+        while not self._stop_flag:
+            await self._get_frame_and_put_to_redis(response)
+            await asyncio.sleep(0.01)
+
+    async def _confirm_mjpg_stream(self, response, stream_url):
+        if response.content_type != "multipart/x-mixed-replace":
+            raise ValueError(f"{stream_url} is not an MJPG stream")
 
     @AsyncStatus.wrap
     async def kickoff(self):
-        self.forwarding_task = asyncio.create_task(self._stream_to_redis())
+        self._stop_flag = False
+        await self._open_connection_and_do_function(self._confirm_mjpg_stream)
+        self.forwarding_task = asyncio.create_task(
+            self._open_connection_and_do_function(self._stream_to_redis)
+        )
 
     @AsyncStatus.wrap
     async def complete(self):
         assert self.forwarding_task, "Device not kicked off"
-        self.forwarding_task.cancel()
+        await self.stop()
+
+    @AsyncStatus.wrap
+    async def stop(self, success=True):
+        if self.forwarding_task:
+            self._stop_flag = True
+            await self.forwarding_task
