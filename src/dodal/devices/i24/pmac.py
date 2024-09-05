@@ -136,6 +136,30 @@ class ProgramRunner(SignalRW):
         await wait_for_value(self.status, ScanState.DONE, timeout)
 
 
+class ProgramAbort(Triggerable):
+    """Abort a data collection by setting the PMAC string and then wait for the \
+        status value to go back to 0.
+    """
+
+    def __init__(
+        self,
+        pmac_str_sig: SignalRW,
+        status_sig: SignalR,
+    ) -> None:
+        self.signal = pmac_str_sig
+        self.status = status_sig
+
+    @AsyncStatus.wrap
+    async def trigger(self):
+        await self.signal.set("A", wait=True)
+        await self.signal.set("P2401=0", wait=True)
+        await wait_for_value(
+            self.status,
+            ScanState.DONE,
+            timeout=DEFAULT_TIMEOUT,
+        )
+
+
 class PMAC(StandardReadable):
     """Device to control the chip stage on I24."""
 
@@ -165,5 +189,6 @@ class PMAC(StandardReadable):
         self.run_program = ProgramRunner(
             self.pmac_string, self.scanstatus, backend=SoftSignalBackend(str)
         )
+        self.abort_program = ProgramAbort(self.pmac_string, self.scanstatus)
 
         super().__init__(name)
