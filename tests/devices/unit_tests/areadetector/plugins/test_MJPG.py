@@ -17,6 +17,7 @@ def test_given_snapshot_triggered_then_crosshair_drawn(
     patch_requests, patch_image_draw, patch_os, patch_image
 ):
     patch_line = MagicMock()
+    patch_requests.get.return_value.content = b""
     params = OAVConfigParams(ZOOM_LEVELS_XML, DISPLAY_CONFIGURATION)
     params.update_on_zoom(1.0, 100, 100)
 
