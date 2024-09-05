@@ -10,6 +10,7 @@ import numpy as np
 import workflows.recipe
 import workflows.transport
 from bluesky.protocols import Descriptor, Triggerable
+from deepdiff import DeepDiff
 from numpy.typing import NDArray
 from ophyd_async.core import HintedSignal, StandardReadable, soft_signal_r_and_setter
 from ophyd_async.core.async_status import AsyncStatus
@@ -60,11 +61,21 @@ def get_dict_differences(
     dict1: dict, dict1_source: str, dict2: dict, dict2_source: str
 ) -> str:
     differences_str = ""
-    for key in dict1.keys():
-        if not dict1[key] == dict2[key]:
-            differences_str += f"Results differed in {key}: {dict1_source} contains {dict1[key]} while {dict2_source} contains {dict2[key]} \n"
-    if differences_str:
-        LOGGER.warning(differences_str)
+    diff = DeepDiff(dict1, dict2, math_epsilon=1e-5, ignore_numeric_type_changes=True)
+    # diff is None if there are no differences, otherwise a dictionary with various keys depending
+    # on the type of difference detected. Eg 'values_changed', dictionary_item_added', 'iterable_item_added'
+
+    if diff:
+        differences_str += (
+            f"Differences found between {dict1_source} and {dict2_source} results:\n"
+        )
+
+    # Format the difference more nicely in a string
+    for key, value in diff.items():
+        if key == "values_changed":
+            differences_str += f"   {key}: {str(value).replace('old_value', dict1_source).replace('new_value', dict2_source)}\n"
+        else:
+            differences_str += f"  {key}: {value}\n"
     return differences_str
 
 

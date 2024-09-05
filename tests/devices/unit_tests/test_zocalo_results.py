@@ -357,10 +357,48 @@ async def test_if_cpu_results_arrive_before_gpu_then_warn(
     )
 
 
+@pytest.mark.parametrize(
+    "dict1,dict2,output",
+    [
+        (
+            {"ispyb_ids": {"gpu": True}, "results": [{"test": 0}]},
+            {"ispyb_ids": {}, "results": [{"test": 1}]},
+            "Differences found between GPU and CPU results:\n   values_changed: {\"root['test']\": {'CPU': 1, 'GPU': 0}}\n",
+        ),
+        (
+            {
+                "ispyb_ids": {"gpu": True},
+                "results": [{"test": [[1, 2 + 1e-6, 3], [1, 2, 3]]}],
+            },
+            {"ispyb_ids": {}, "results": [{"test": [[1, 2, 3], [1, 2, 3]]}]},
+            None,
+        ),
+        (
+            {
+                "ispyb_ids": {"gpu": True},
+                "results": [
+                    {"test": [[1, 2 + 1e-6, 3], [1, 2, 3]], "extra_key": "test"}
+                ],
+            },
+            {"ispyb_ids": {}, "results": [{"test": [[1, 2, 3], [1, 2, 3]]}]},
+            "Differences found between GPU and CPU results:\n  dictionary_item_removed: SetOrdered([\"root['extra_key']\"])\n",
+        ),
+        (
+            {
+                "ispyb_ids": {"gpu": False},
+                "results": [
+                    {"test": [[1, 2 + 1e-6, 3], [1, 2, 3]], "extra_key": "test"}
+                ],
+            },
+            {"ispyb_ids": {}, "results": [{"test": [[1, 3, 3], [1, 2, 3]]}]},
+            "Differences found between CPU and GPU results:\n  dictionary_item_removed: SetOrdered([\"root['extra_key']\"])\n   values_changed: {\"root['test'][0][1]\": {'GPU': 3, 'CPU': 2.000001}}\n",
+        ),
+    ],
+)
 @patch("dodal.devices.zocalo.zocalo_results.LOGGER")
 @patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection", autospec=True)
 async def test_warning_if_results_are_different(
-    mock_connection, mock_logger, RE: RunEngine
+    mock_connection, mock_logger, RE: RunEngine, dict1, dict2, output
 ):
     zocalo_results = ZocaloResults(
         name="zocalo", zocalo_environment="dev_artemis", use_cpu_and_gpu_zocalo=True
@@ -369,14 +407,14 @@ async def test_warning_if_results_are_different(
     await zocalo_results.stage()
     zocalo_results._raw_results_received.get = MagicMock(
         side_effect=[
-            {"ispyb_ids": {}, "results": [{"test": 0}]},
-            {"ispyb_ids": {}, "results": [{"test": 1}]},
+            dict1,
+            dict2,
         ]
     )
     RE(bps.trigger(zocalo_results, wait=False))
     mock_logger.warning.assert_called_with(
-        "Results differed in test: CPU contains 0 while GPU contains 1 \n"
-    )
+        output
+    ) if output else mock_logger.warning.assert_not_called()
 
 
 @patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection", autospec=True)

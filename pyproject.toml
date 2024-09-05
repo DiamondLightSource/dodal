@@ -67,6 +67,7 @@ dev = [
     "types-mock",
     "types-PyYAML",
     "types-aiofiles",
+    "deepdiff",
 ]
 
 [project.scripts]
