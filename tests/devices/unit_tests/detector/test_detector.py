@@ -133,25 +133,28 @@ def test_detector_params_is_serialisable(tmp_path):
 
 
 # Until https://github.com/DiamondLightSource/dodal/issues/775
-def test_detector_params_deserialisation_unchanged(tmp_path):
-    json = """
-    {"expected_energy_ev":100.0,
-     "exposure_time":1.0,
-     "directory":"/tmp/pytest-of-qwe67581/pytest-23/test_detector_params_serialisa0",
-     "prefix":"test",
-     "detector_distance":1.0,
-     "omega_start":0.0,
-     "omega_increment":0.0,
-     "num_images_per_trigger":1,
-     "num_triggers":1,
-     "use_roi_mode":false,
-     "det_dist_to_beam_converter_path":"a fake directory",
-     "run_number":17,
-     "trigger_mode":1,
-     "detector_size_constants":"EIGER2_X_16M",
-     "enable_dev_shm":false}
-    """
-    assert '"run_number":17' in json
+def test_detector_params_deserialisation_unchanged(tmp_path: Path):
+    # The `directory` parameter in the `create_det_params_with_dir_and_prefix` function is used to
+    # specify the directory path where the detector data will be saved. This function creates an
+    # instance of `DetectorParams` with the provided directory path and other default parameters. The
+    # `directory` parameter can accept either a string or a `Path` object, and it is used to set the
+    # `directory` attribute of the `DetectorParams` instance.
+    json = f'{{"expected_energy_ev": 100.0, \
+    "exposure_time": 1.0, \
+    "directory": "{tmp_path}", \
+    "prefix": "test", \
+    "detector_distance": 1.0, \
+    "omega_start": 0.0, \
+    "omega_increment": 0.0, \
+    "num_images_per_trigger": 1, \
+    "num_triggers": 1, \
+    "use_roi_mode": false, \
+    "det_dist_to_beam_converter_path": "a fake directory", \
+    "run_number": 17, \
+    "trigger_mode": 1, \
+    "detector_size_constants": "EIGER2_X_16M", \
+    "enable_dev_shm": false}}'
+    assert '"run_number": 17' in json
     new_params = DetectorParams.model_validate_json(json)
     assert new_params.run_number == 17
 
