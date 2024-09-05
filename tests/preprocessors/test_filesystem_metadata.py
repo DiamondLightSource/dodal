@@ -78,6 +78,7 @@ class FakeDetector(Readable, HasName, Triggerable):
 class MockDirectoryServiceClient(LocalDirectoryServiceClient):
     def __init__(self):
         self.fail = False
+        super().__init__()
 
     async def create_new_collection(self) -> DataCollectionIdentifier:
         if self.fail:

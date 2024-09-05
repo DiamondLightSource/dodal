@@ -339,7 +339,7 @@ def _find_next_run_number_from_files(file_names: list[str]) -> int:
     return max(valid_numbers) + 1 if valid_numbers else 1
 
 
-def get_run_number(directory: Path, prefix: str = "") -> int:
+def get_run_number(directory: str, prefix: str = "") -> int:
     """Looks at the numbers coming from all nexus files with the format
     "{prefix}_(any number}.nxs", and returns the highest number + 1, or 1 if there are
     no matching numbers found. If no prefix is given, considers all files in the dir."""

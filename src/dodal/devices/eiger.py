@@ -208,7 +208,7 @@ class EigerDetector(Device):
         assert self.detector_params is not None
         file_prefix = self.detector_params.full_filename
         status = self.odin.file_writer.file_path.set(
-            str(self.detector_params.directory), timeout=self.GENERAL_STATUS_TIMEOUT
+            self.detector_params.directory, timeout=self.GENERAL_STATUS_TIMEOUT
         )
         status &= self.odin.file_writer.file_name.set(
             file_prefix, timeout=self.GENERAL_STATUS_TIMEOUT

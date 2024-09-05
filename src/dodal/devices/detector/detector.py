@@ -3,6 +3,7 @@ from pathlib import Path
 
 from pydantic import (
     BaseModel,
+    Field,
     field_serializer,
     field_validator,
 )
@@ -34,7 +35,7 @@ class DetectorParams(BaseModel):
 
     expected_energy_ev: float | None = None
     exposure_time: float
-    directory: Path
+    directory: str  # : Path https://github.com/DiamondLightSource/dodal/issues/774
     prefix: str
     detector_distance: float
     omega_start: float
@@ -43,7 +44,7 @@ class DetectorParams(BaseModel):
     num_triggers: int
     use_roi_mode: bool
     det_dist_to_beam_converter_path: str
-    override_run_number: int | None = None
+    override_run_number: int | None = Field(default=None, alias="run_number")
     trigger_mode: TriggerMode = TriggerMode.SET_FRAMES
     detector_size_constants: DetectorSizeConstants = EIGER2_X_16M_SIZE
     enable_dev_shm: bool = (
@@ -56,7 +57,11 @@ class DetectorParams(BaseModel):
 
     @property
     def run_number(self) -> int:
-        return self.override_run_number or get_run_number(self.directory, self.prefix)
+        return (
+            get_run_number(self.directory, self.prefix)
+            if self.override_run_number is None
+            else self.override_run_number
+        )
 
     @field_serializer("detector_size_constants")
     def serialize_detector_size_constants(self, size: DetectorSizeConstants):
@@ -73,10 +78,10 @@ class DetectorParams(BaseModel):
 
     @field_validator("directory", mode="before")
     @classmethod
-    def _parse_directory(cls, directory: str) -> Path:
+    def _parse_directory(cls, directory: str | Path) -> str:
         path = Path(directory)
-        assert path.is_dir
-        return path
+        assert path.is_dir()
+        return str(path)
 
     def get_beam_position_mm(self, detector_distance: float) -> tuple[float, float]:
         x_beam_mm = self.beam_xy_converter.get_beam_xy_from_det_dist(
