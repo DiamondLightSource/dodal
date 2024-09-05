@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.zebra_controlled_shutter.ZebraShutter &#8212; dodal 1.30.1.dev8+g08c27643f documentation</title>
+    <title>dodal.devices.zebra_controlled_shutter.ZebraShutter &#8212; dodal 1.30.1.dev9+g4130b0f22 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../_static/documentation_options.js?v=46c7185e"></script>
+    <script src="../../_static/documentation_options.js?v=97cb9826"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="icon" href="../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="dodal.devices.zebra_controlled_shutter.ZebraShutterState" href="dodal.devices.zebra_controlled_shutter.ZebraShutterState.html" />
+    <link rel="next" title="dodal.devices.zebra_controlled_shutter.ZebraShutterControl" href="dodal.devices.zebra_controlled_shutter.ZebraShutterControl.html" />
     <link rel="prev" title="dodal.devices.zebra_controlled_shutter" href="dodal.devices.zebra_controlled_shutter.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -739,6 +739,7 @@ document.write(`
 </details></li>
 <li class="toctree-l3 current active has-children"><a class="reference internal" href="dodal.devices.zebra_controlled_shutter.html">dodal.devices.zebra_controlled_shutter</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l4 current active"><a class="current reference internal" href="#">dodal.devices.zebra_controlled_shutter.ZebraShutter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.zebra_controlled_shutter.ZebraShutterControl.html">dodal.devices.zebra_controlled_shutter.ZebraShutterControl</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.zebra_controlled_shutter.ZebraShutterState.html">dodal.devices.zebra_controlled_shutter.ZebraShutterState</a></li>
 </ul>
 </details></li>
@@ -834,7 +835,13 @@ document.write(`
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.zebra_controlled_shutter.ZebraShutter">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.zebra_controlled_shutter.</span></span><span class="sig-name descname"><span class="pre">ZebraShutter</span></span><a class="reference internal" href="../../_modules/dodal/devices/zebra_controlled_shutter.html#ZebraShutter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.zebra_controlled_shutter.ZebraShutter" title="Link to this definition">#</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>The shutter on most MX beamlines is controlled by the zebra.</p>
+<p>Internally in the zebra there are two AND gates, one for manual control and one for
+automatic control. A soft input (aliased to control_mode) will switch between
+which of these AND gates to use. For the manual gate the shutter is then controlled
+by a different soft input (aliased to _manual_position_setpoint). Both these AND
+gates then feed into an OR gate, which then feeds to the shutter.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>prefix</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
@@ -881,11 +888,11 @@ document.write(`
       </div>
     </a>
     <a class="right-next"
-       href="dodal.devices.zebra_controlled_shutter.ZebraShutterState.html"
+       href="dodal.devices.zebra_controlled_shutter.ZebraShutterControl.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">dodal.devices.zebra_controlled_shutter.ZebraShutterState</p>
+        <p class="prev-next-title">dodal.devices.zebra_controlled_shutter.ZebraShutterControl</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

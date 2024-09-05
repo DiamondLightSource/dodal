@@ -15,6 +15,7 @@ dodal.devices.zebra\_controlled\_shutter
    :recursive:
 
    ~zebra_controlled_shutter.ZebraShutter
+   ~zebra_controlled_shutter.ZebraShutterControl
    ~zebra_controlled_shutter.ZebraShutterState
 
 
