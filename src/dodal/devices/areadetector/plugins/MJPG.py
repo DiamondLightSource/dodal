@@ -1,6 +1,7 @@
 import os
 import threading
 from abc import ABC, abstractmethod
+from io import BytesIO
 from pathlib import Path
 
 import requests
@@ -70,7 +71,7 @@ class MJPG(Device, ABC):
             try:
                 response = requests.get(url_str, stream=True)
                 response.raise_for_status()
-                with Image.open(response.raw) as image:
+                with Image.open(BytesIO(response.content)) as image:
                     self.post_processing(image)
                     st.set_finished()
             except requests.HTTPError as e:

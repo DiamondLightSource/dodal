@@ -31,7 +31,7 @@ def take_snapshot_with_grid(oav: OAV, snapshot_filename, snapshot_directory):
 def test_grid_overlay(RE: RunEngine):
     beamline = "BL03I"
     oav_params = OAVConfigParams(ZOOM_LEVELS_XML, DISPLAY_CONFIGURATION)
-    oav = OAV(name="oav", prefix=f"{beamline}-DI-OAV-01", params=oav_params)
+    oav = OAV(name="oav", prefix=f"{beamline}", params=oav_params)
     snapshot_filename = "snapshot"
     snapshot_directory = "."
     RE(take_snapshot_with_grid(oav, snapshot_filename, snapshot_directory))
