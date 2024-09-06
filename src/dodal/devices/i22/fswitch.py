@@ -4,8 +4,12 @@ from enum import Enum
 
 from bluesky.protocols import Reading
 from event_model import DataKey
-from ophyd_async.core import ConfigSignal, StandardReadable, soft_signal_r_and_setter
-from ophyd_async.core.device import DeviceVector
+from ophyd_async.core import (
+    ConfigSignal,
+    DeviceVector,
+    StandardReadable,
+    soft_signal_r_and_setter,
+)
 from ophyd_async.epics.signal import epics_signal_r
 
 

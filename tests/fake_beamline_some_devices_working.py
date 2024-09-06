@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock
 
 from bluesky.protocols import Readable
-from ophyd_async.epics.motion import Motor
+from ophyd_async.epics.motor import Motor
 
 from dodal.devices.undulator import Undulator
 

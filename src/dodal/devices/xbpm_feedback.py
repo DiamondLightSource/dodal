@@ -1,8 +1,7 @@
 from enum import Enum
 
 from bluesky.protocols import Triggerable
-from ophyd_async.core import Device, observe_value
-from ophyd_async.core.async_status import AsyncStatus
+from ophyd_async.core import AsyncStatus, Device, observe_value
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
 
