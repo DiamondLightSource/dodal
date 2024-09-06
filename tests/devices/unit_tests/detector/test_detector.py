@@ -28,7 +28,7 @@ def create_det_params_with_dir_and_prefix(directory: str | Path, prefix="test"):
 def test_if_string_provided_check_is_dir(tmp_path: Path):
     assert not (_dir := str(tmp_path)).endswith("/")
     params = create_det_params_with_dir_and_prefix(_dir)
-    assert params.directory == str(tmp_path)
+    assert params.directory == f"{tmp_path}/"
     file_path = tmp_path / "foo.h5"
     file_path.touch()
     with pytest.raises(ValidationError):
@@ -37,7 +37,7 @@ def test_if_string_provided_check_is_dir(tmp_path: Path):
 
 def test_if_path_provided_check_is_dir(tmp_path: Path):
     params = create_det_params_with_dir_and_prefix(tmp_path)
-    assert params.directory == str(tmp_path)
+    assert params.directory == f"{tmp_path}/"
     file_path = tmp_path / "foo.h5"
     file_path.touch()
     with pytest.raises(ValidationError):
