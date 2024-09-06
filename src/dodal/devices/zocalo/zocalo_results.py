@@ -69,7 +69,7 @@ def bbox_size(result: XrcResult):
 def get_dict_differences(
     dict1: dict, dict1_source: str, dict2: dict, dict2_source: str
 ) -> str | None:
-    """Returns dict1 and dict2 as a string if differences between them are found greater than a
+    """Returns a string containing dict1 and dict2 if there are differences between them, greater than a
     1e-5 tolerance. If dictionaries are identical, return None"""
 
     diff = DeepDiff(dict1, dict2, math_epsilon=1e-5, ignore_numeric_type_changes=True)
