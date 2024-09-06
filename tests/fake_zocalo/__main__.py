@@ -115,7 +115,7 @@ def main() -> None:
 
     def on_request(ch: BlockingChannel, method, props, body):
         print(
-            f"received message: \n properties: \n\n {method} \n\n {props} \n\n{body}\n"
+            f"Received message: \n properties: \n\n {method} \n\n {props} \n\n{body}\n"
         )
         try:
             message = json.loads(body)

@@ -15,6 +15,7 @@ from dodal.devices.zocalo.zocalo_results import (
     NoZocaloSubscription,
     XrcResult,
     ZocaloResults,
+    ZocaloSource,
     get_processing_result,
 )
 
@@ -207,7 +208,7 @@ async def test_zocalo_results_trigger_log_message(
     zocalo_results = ZocaloResults(
         name="zocalo",
         zocalo_environment="dev_artemis",
-        timeout_s=2,
+        timeout_s=0,
         use_cpu_and_gpu=True,
     )
 
@@ -243,7 +244,11 @@ async def test_zocalo_results_trigger_log_message(
 
     RE(zocalo_plan())
     mock_logger.info.assert_has_calls(
-        [call("Zocalo results from CPU processing: found 1 crystals.")]
+        [
+            call(
+                f"Zocalo results from {ZocaloSource.CPU.value} processing: found 1 crystals."
+            )
+        ]
     )
 
 
@@ -294,7 +299,11 @@ async def test_source_of_zocalo_results_correctly_identified(
     )
     RE(bps.trigger(zocalo_results, wait=False))
     mock_logger.info.assert_has_calls(
-        [call("Zocalo results from CPU processing: found 0 crystals.")]
+        [
+            call(
+                f"Zocalo results from {ZocaloSource.CPU.value} processing: found 0 crystals."
+            )
+        ]
     )
 
     zocalo_results._raw_results_received.get = MagicMock(
@@ -321,7 +330,7 @@ async def test_if_zocalo_results_timeout_from_one_source_then_warn(
     )
     RE(bps.trigger(zocalo_results, wait=False))
     mock_logger.warning.assert_called_with(
-        "Zocalo results from GPU timed out. Using results from CPU"
+        f"Zocalo results from GPU timed out. Using results from {ZocaloSource.CPU.value}"
     )
 
 
@@ -340,7 +349,7 @@ async def test_if_cpu_results_arrive_before_gpu_then_warn(
     )
     RE(bps.trigger(zocalo_results, wait=False))
     mock_logger.warning.assert_called_with(
-        "received zocalo results from CPU before GPU"
+        f"Received zocalo results from {ZocaloSource.CPU.value} before {ZocaloSource.GPU.value}"
     )
 
 
@@ -416,23 +425,27 @@ async def test_if_zocalo_results_timeout_before_any_results_then_error(
         await zocalo_results.trigger()
 
 
+@pytest.mark.parametrize(
+    "gpu,",
+    [(True), (False)],
+)
 @patch("dodal.devices.zocalo.zocalo_results.LOGGER")
 @patch(
     "dodal.devices.zocalo.zocalo_results.workflows.recipe.wrap_subscribe", autospec=True
 )
 @patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection", new=MagicMock())
-async def test_gpu_results_ignored_if_toggle_disabled(
-    mock_wrap_subscribe, mock_logger, RE: RunEngine
+async def test_gpu_results_ignored_and_cpu_results_used_if_toggle_disabled(
+    mock_wrap_subscribe, mock_logger, RE: RunEngine, gpu: bool
 ):
     zocalo_results = ZocaloResults(
         name="zocalo",
         zocalo_environment="dev_artemis",
-        timeout_s=2,
+        timeout_s=0,
         use_cpu_and_gpu=False,
     )
 
     recipe_wrapper = MagicMock()
-    recipe_wrapper.recipe_step = {"parameters": {"gpu": True}}
+    recipe_wrapper.recipe_step = {"parameters": {"gpu": gpu}}
 
     def zocalo_plan():
         yield from bps.stage(zocalo_results)
@@ -460,6 +473,13 @@ async def test_gpu_results_ignored_if_toggle_disabled(
             },
         )
         yield from bps.trigger(zocalo_results)
-        mock_logger.warning.assert_called_with("Timed out waiting for zocalo results!")
+        if gpu:
+            mock_logger.warning.assert_called_with(
+                "Timed out waiting for zocalo results!"
+            )
+        else:
+            mock_logger.info.assert_called_with(
+                f"Zocalo results from {ZocaloSource.CPU.value} processing: found 1 crystals."
+            )
 
     RE(zocalo_plan())

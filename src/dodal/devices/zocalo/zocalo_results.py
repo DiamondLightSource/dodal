@@ -216,7 +216,7 @@ class ZocaloResults(StandardReadable, Triggerable):
             # Wait for results from CPU and GPU, warn and continue if one timed out, error if both time out
             if self.use_cpu_and_gpu:
                 if source_of_first_results == ZocaloSource.CPU:
-                    LOGGER.warning("received zocalo results from CPU before GPU")
+                    LOGGER.warning("Received zocalo results from CPU before GPU")
                 raw_results_two_sources = [raw_results]
                 try:
                     raw_results_two_sources.append(
