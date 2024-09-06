@@ -1,13 +1,13 @@
-from ophyd_async.panda import HDFPanda
+from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.common.beamlines.beamline_utils import (
     device_instantiation,
-    get_directory_provider,
-    set_directory_provider,
+    get_path_provider,
+    set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.udc_directory_provider import PandASubdirectoryProvider
+from dodal.common.udc_directory_provider import PandASubpathProvider
 from dodal.devices.aperturescatterguard import (
     AperturePosition,
     ApertureScatterguard,
@@ -52,7 +52,7 @@ BL = get_beamline_name("s03")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
-set_directory_provider(PandASubdirectoryProvider())
+set_path_provider(PandASubpathProvider())
 
 
 def aperture_scatterguard(
@@ -378,7 +378,7 @@ def panda(
         "-EA-PANDA-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        directory_provider=get_directory_provider(),
+        path_provider=get_path_provider(),
     )
 
 

@@ -1,7 +1,7 @@
 from enum import Enum
 
 from ophyd_async.core import ConfigSignal, StandardReadable, soft_signal_r_and_setter
-from ophyd_async.epics.motion import Motor
+from ophyd_async.epics.motor import Motor
 from ophyd_async.epics.signal import epics_signal_r
 
 # The acceptable difference, in mm, between the undulator gap and the DCM

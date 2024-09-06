@@ -27,11 +27,12 @@ def take_snapshot_with_grid(oav: OAV, snapshot_filename, snapshot_directory):
     yield from bps.trigger(oav.grid_snapshot, wait=True)
 
 
+# We need to find a better way of integrating this, see https://github.com/DiamondLightSource/mx-bluesky/issues/183
 @pytest.mark.skip(reason="Don't want to actually take snapshots during testing.")
 def test_grid_overlay(RE: RunEngine):
     beamline = "BL03I"
     oav_params = OAVConfigParams(ZOOM_LEVELS_XML, DISPLAY_CONFIGURATION)
-    oav = OAV(name="oav", prefix=f"{beamline}-DI-OAV-01", params=oav_params)
+    oav = OAV(name="oav", prefix=f"{beamline}", params=oav_params)
     snapshot_filename = "snapshot"
     snapshot_directory = "."
     RE(take_snapshot_with_grid(oav, snapshot_filename, snapshot_directory))

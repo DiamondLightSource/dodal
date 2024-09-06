@@ -8,14 +8,14 @@ from ophyd.sim import make_fake_device
 from ophyd_async.core import Device as OphydV2Device
 from ophyd_async.core import wait_for_connection as v2_device_wait_for_connection
 
-from dodal.common.types import UpdatingDirectoryProvider
+from dodal.common.types import UpdatingPathProvider
 from dodal.utils import AnyDevice, BeamlinePrefix, skip_device
 
 DEFAULT_CONNECTION_TIMEOUT: Final[float] = 5.0
 
 ACTIVE_DEVICES: dict[str, AnyDevice] = {}
 BL = ""
-DIRECTORY_PROVIDER: UpdatingDirectoryProvider | None = None
+PATH_PROVIDER: UpdatingPathProvider | None = None
 
 
 def set_beamline(beamline: str):
@@ -125,15 +125,15 @@ def device_instantiation(
     return device_instance
 
 
-def set_directory_provider(provider: UpdatingDirectoryProvider):
-    global DIRECTORY_PROVIDER
+def set_path_provider(provider: UpdatingPathProvider):
+    global PATH_PROVIDER
 
-    DIRECTORY_PROVIDER = provider
+    PATH_PROVIDER = provider
 
 
-def get_directory_provider() -> UpdatingDirectoryProvider:
-    if DIRECTORY_PROVIDER is None:
+def get_path_provider() -> UpdatingPathProvider:
+    if PATH_PROVIDER is None:
         raise ValueError(
-            "DirectoryProvider has not been set! Ophyd-async StandardDetectors will not be able to write!"
+            "PathProvider has not been set! Ophyd-async StandardDetectors will not be able to write!"
         )
-    return DIRECTORY_PROVIDER
+    return PATH_PROVIDER
