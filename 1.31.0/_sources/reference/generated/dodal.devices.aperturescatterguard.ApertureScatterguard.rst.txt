@@ -1,0 +1,50 @@
+dodal.devices.aperturescatterguard.ApertureScatterguard
+=======================================================
+
+.. currentmodule:: dodal.devices.aperturescatterguard
+
+.. autoclass:: ApertureScatterguard
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~ApertureScatterguard.get_current_aperture_position
+      
+      
+      ~ApertureScatterguard.get_position_from_gda_aperture_name
+      
+      
+      
+      
+      ~ApertureScatterguard.set
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

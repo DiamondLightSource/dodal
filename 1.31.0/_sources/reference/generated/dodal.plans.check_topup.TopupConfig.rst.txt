@@ -1,0 +1,26 @@
+dodal.plans.check\_topup.TopupConfig
+====================================
+
+.. currentmodule:: dodal.plans.check_topup
+
+.. autoclass:: TopupConfig
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~TopupConfig.THRESHOLD_EXPOSURE_S
+      
+      
+      ~TopupConfig.TOPUP_GATE_DELAY_S
+      
+   
+   

@@ -1,0 +1,119 @@
+dodal.devices.util.motor\_utils.ExtendedEpicsMotor
+==================================================
+
+.. currentmodule:: dodal.devices.util.motor_utils
+
+.. autoclass:: ExtendedEpicsMotor
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~ExtendedEpicsMotor.component_names
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~ExtendedEpicsMotor.max_velocity
+      
+      
+      
+      
+      
+      ~ExtendedEpicsMotor.motor_resolution
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~ExtendedEpicsMotor.subscriptions
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   

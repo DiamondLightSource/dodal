@@ -1,0 +1,44 @@
+dodal.devices.i24.pmac.ProgramRunner
+====================================
+
+.. currentmodule:: dodal.devices.i24.pmac
+
+.. autoclass:: ProgramRunner
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      ~ProgramRunner.set
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

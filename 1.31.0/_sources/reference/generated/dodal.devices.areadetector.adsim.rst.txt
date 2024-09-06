@@ -1,0 +1,36 @@
+dodal.devices.areadetector.adsim
+================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.areadetector
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~adsim.AdSimDetector
+
+
+
+
+.. automodule:: dodal.devices.areadetector.adsim
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

@@ -1,0 +1,47 @@
+dodal.devices.backlight.Backlight
+=================================
+
+.. currentmodule:: dodal.devices.backlight
+
+.. autoclass:: Backlight
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~Backlight.set
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~Backlight.TIME_TO_MOVE_S
+      
+      
+      
+      
+      
+   
+   

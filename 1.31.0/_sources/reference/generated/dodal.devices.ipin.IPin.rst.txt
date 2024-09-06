@@ -1,0 +1,41 @@
+dodal.devices.ipin.IPin
+=======================
+
+.. currentmodule:: dodal.devices.ipin
+
+.. autoclass:: IPin
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

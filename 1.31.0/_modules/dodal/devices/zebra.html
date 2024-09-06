@@ -1,0 +1,889 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dodal.devices.zebra &#8212; dodal 1.31.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../../_static/documentation_options.js?v=497d83b4"></script>
+    <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=30646c52"></script>
+    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="https://unpkg.com/mermaid@10.2.0/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({startOnLoad:true});</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/dodal/devices/zebra';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://DiamondLightSource.github.io/dodal/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '1.31.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
+    <link rel="icon" href="../../../_static/dls-logo.svg"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/dls-logo.svg" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../../../_static/dls-logo.svg" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">dodal</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/DiamondLightSource/dodal" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/dodal" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/DiamondLightSource/dodal" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/dodal" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-3"
+      type="button"
+      class="version-switcher__button btn btn-sm dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-3"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-3"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-3">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">dodal.devices.zebra</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for dodal.devices.zebra</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span> <span class="nn">asyncio</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partialmethod</span>
+
+<span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AsyncStatus</span><span class="p">,</span>
+    <span class="n">DeviceVector</span><span class="p">,</span>
+    <span class="n">SignalRW</span><span class="p">,</span>
+    <span class="n">StandardReadable</span><span class="p">,</span>
+    <span class="n">observe_value</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">ophyd_async.epics.signal</span> <span class="kn">import</span> <span class="n">epics_signal_r</span><span class="p">,</span> <span class="n">epics_signal_rw</span>
+
+<span class="c1"># Sources</span>
+<span class="n">DISCONNECT</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">IN1_TTL</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">IN2_TTL</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">IN3_TTL</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">IN4_TTL</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">PC_ARM</span> <span class="o">=</span> <span class="mi">29</span>
+<span class="n">PC_GATE</span> <span class="o">=</span> <span class="mi">30</span>
+<span class="n">PC_PULSE</span> <span class="o">=</span> <span class="mi">31</span>
+<span class="n">AND3</span> <span class="o">=</span> <span class="mi">34</span>
+<span class="n">AND4</span> <span class="o">=</span> <span class="mi">35</span>
+<span class="n">OR1</span> <span class="o">=</span> <span class="mi">36</span>
+<span class="n">PULSE1</span> <span class="o">=</span> <span class="mi">52</span>
+<span class="n">PULSE2</span> <span class="o">=</span> <span class="mi">53</span>
+<span class="n">SOFT_IN1</span> <span class="o">=</span> <span class="mi">60</span>
+<span class="n">SOFT_IN2</span> <span class="o">=</span> <span class="mi">61</span>
+<span class="n">SOFT_IN3</span> <span class="o">=</span> <span class="mi">62</span>
+
+<span class="c1"># Instrument specific</span>
+<span class="n">TTL_DETECTOR</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">TTL_SHUTTER</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">TTL_XSPRESS3</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">TTL_PANDA</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="c1"># The AND gate that controls the automatic shutter</span>
+<span class="n">AUTO_SHUTTER_GATE</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="c1"># The input that triggers the automatic shutter</span>
+<span class="n">AUTO_SHUTTER_INPUT</span> <span class="o">=</span> <span class="mi">1</span>
+
+
+<div class="viewcode-block" id="ArmSource">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.ArmSource.html#dodal.devices.zebra.ArmSource">[docs]</a>
+<span class="k">class</span> <span class="nc">ArmSource</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+    <span class="n">SOFT</span> <span class="o">=</span> <span class="s2">&quot;Soft&quot;</span>
+    <span class="n">EXTERNAL</span> <span class="o">=</span> <span class="s2">&quot;External&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="TrigSource">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.TrigSource.html#dodal.devices.zebra.TrigSource">[docs]</a>
+<span class="k">class</span> <span class="nc">TrigSource</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+    <span class="n">POSITION</span> <span class="o">=</span> <span class="s2">&quot;Position&quot;</span>
+    <span class="n">TIME</span> <span class="o">=</span> <span class="s2">&quot;Time&quot;</span>
+    <span class="n">EXTERNAL</span> <span class="o">=</span> <span class="s2">&quot;External&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="EncEnum">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.EncEnum.html#dodal.devices.zebra.EncEnum">[docs]</a>
+<span class="k">class</span> <span class="nc">EncEnum</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+    <span class="n">Enc1</span> <span class="o">=</span> <span class="s2">&quot;Enc1&quot;</span>
+    <span class="n">Enc2</span> <span class="o">=</span> <span class="s2">&quot;Enc2&quot;</span>
+    <span class="n">Enc3</span> <span class="o">=</span> <span class="s2">&quot;Enc3&quot;</span>
+    <span class="n">Enc4</span> <span class="o">=</span> <span class="s2">&quot;Enc4&quot;</span>
+    <span class="n">Enc1_4Av</span> <span class="o">=</span> <span class="s2">&quot;Enc1-4Av&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="I03Axes">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.I03Axes.html#dodal.devices.zebra.I03Axes">[docs]</a>
+<span class="k">class</span> <span class="nc">I03Axes</span><span class="p">:</span>
+    <span class="n">SMARGON_X1</span> <span class="o">=</span> <span class="n">EncEnum</span><span class="o">.</span><span class="n">Enc1</span>
+    <span class="n">SMARGON_Y</span> <span class="o">=</span> <span class="n">EncEnum</span><span class="o">.</span><span class="n">Enc2</span>
+    <span class="n">SMARGON_Z</span> <span class="o">=</span> <span class="n">EncEnum</span><span class="o">.</span><span class="n">Enc3</span>
+    <span class="n">OMEGA</span> <span class="o">=</span> <span class="n">EncEnum</span><span class="o">.</span><span class="n">Enc4</span></div>
+
+
+
+<div class="viewcode-block" id="I24Axes">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.I24Axes.html#dodal.devices.zebra.I24Axes">[docs]</a>
+<span class="k">class</span> <span class="nc">I24Axes</span><span class="p">:</span>
+    <span class="n">VGON_Z</span> <span class="o">=</span> <span class="n">EncEnum</span><span class="o">.</span><span class="n">Enc1</span>
+    <span class="n">OMEGA</span> <span class="o">=</span> <span class="n">EncEnum</span><span class="o">.</span><span class="n">Enc2</span>
+    <span class="n">VGON_X</span> <span class="o">=</span> <span class="n">EncEnum</span><span class="o">.</span><span class="n">Enc3</span>
+    <span class="n">VGON_YH</span> <span class="o">=</span> <span class="n">EncEnum</span><span class="o">.</span><span class="n">Enc4</span></div>
+
+
+
+<div class="viewcode-block" id="RotationDirection">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.RotationDirection.html#dodal.devices.zebra.RotationDirection">[docs]</a>
+<span class="k">class</span> <span class="nc">RotationDirection</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+    <span class="n">POSITIVE</span> <span class="o">=</span> <span class="s2">&quot;Positive&quot;</span>
+    <span class="n">NEGATIVE</span> <span class="o">=</span> <span class="s2">&quot;Negative&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">multiplier</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">1</span> <span class="k">if</span> <span class="bp">self</span> <span class="o">==</span> <span class="n">RotationDirection</span><span class="o">.</span><span class="n">POSITIVE</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span></div>
+
+
+
+<div class="viewcode-block" id="ArmDemand">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.ArmDemand.html#dodal.devices.zebra.ArmDemand">[docs]</a>
+<span class="k">class</span> <span class="nc">ArmDemand</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">ARM</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">DISARM</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+
+
+<div class="viewcode-block" id="SoftInState">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.SoftInState.html#dodal.devices.zebra.SoftInState">[docs]</a>
+<span class="k">class</span> <span class="nc">SoftInState</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+    <span class="n">YES</span> <span class="o">=</span> <span class="s2">&quot;Yes&quot;</span>
+    <span class="n">NO</span> <span class="o">=</span> <span class="s2">&quot;No&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="ArmingDevice">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.ArmingDevice.html#dodal.devices.zebra.ArmingDevice">[docs]</a>
+<span class="k">class</span> <span class="nc">ArmingDevice</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A useful device that can abstract some of the logic of arming.</span>
+<span class="sd">    Allows a user to just call arm.set(ArmDemand.ARM)&quot;&quot;&quot;</span>
+
+    <span class="n">TIMEOUT</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">arm_set</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PC_ARM&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">disarm_set</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PC_DISARM&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">armed</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PC_ARM_OUT&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_set_armed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">demand</span><span class="p">:</span> <span class="n">ArmDemand</span><span class="p">):</span>
+        <span class="n">signal_to_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">arm_set</span> <span class="k">if</span> <span class="n">demand</span> <span class="o">==</span> <span class="n">ArmDemand</span><span class="o">.</span><span class="n">ARM</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">disarm_set</span>
+        <span class="k">await</span> <span class="n">signal_to_set</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">for</span> <span class="n">reading</span> <span class="ow">in</span> <span class="n">observe_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">armed</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">reading</span> <span class="o">==</span> <span class="n">demand</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="k">return</span>
+
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">demand</span><span class="p">:</span> <span class="n">ArmDemand</span><span class="p">):</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait_for</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_set_armed</span><span class="p">(</span><span class="n">demand</span><span class="p">),</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">TIMEOUT</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="PositionCompare">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.PositionCompare.html#dodal.devices.zebra.PositionCompare">[docs]</a>
+<span class="k">class</span> <span class="nc">PositionCompare</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_gates</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PC_GATE_NGATE&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gate_trigger</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">EncEnum</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PC_ENC&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gate_source</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">TrigSource</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PC_GATE_SEL&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gate_input</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PC_GATE_INP&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gate_width</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PC_GATE_WID&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gate_start</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PC_GATE_START&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gate_step</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PC_GATE_STEP&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pulse_source</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">TrigSource</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PC_PULSE_SEL&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pulse_input</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PC_PULSE_INP&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pulse_start</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PC_PULSE_START&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pulse_width</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PC_PULSE_WID&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pulse_step</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PC_PULSE_STEP&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pulse_max</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PC_PULSE_MAX&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dir</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">RotationDirection</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PC_DIR&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">arm_source</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">ArmSource</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PC_ARM_SEL&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;SYS_RESET.PROC&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">arm</span> <span class="o">=</span> <span class="n">ArmingDevice</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">is_armed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">arm_state</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">arm</span><span class="o">.</span><span class="n">armed</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">arm_state</span> <span class="o">==</span> <span class="mi">1</span></div>
+
+
+
+<div class="viewcode-block" id="PulseOutput">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.PulseOutput.html#dodal.devices.zebra.PulseOutput">[docs]</a>
+<span class="k">class</span> <span class="nc">PulseOutput</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Zebra pulse output panel.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;_INP&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delay</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;_DLY&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;_WID&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ZebraOutputPanel">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.ZebraOutputPanel.html#dodal.devices.zebra.ZebraOutputPanel">[docs]</a>
+<span class="k">class</span> <span class="nc">ZebraOutputPanel</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pulse_1</span> <span class="o">=</span> <span class="n">PulseOutput</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PULSE1&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pulse_2</span> <span class="o">=</span> <span class="n">PulseOutput</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PULSE2&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_pvs</span><span class="p">:</span> <span class="n">DeviceVector</span><span class="p">[</span><span class="n">SignalRW</span><span class="p">]</span> <span class="o">=</span> <span class="n">DeviceVector</span><span class="p">(</span>
+            <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;OUT</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">_TTL&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)}</span>
+        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="boolean_array_to_integer">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.html#dodal.devices.zebra.boolean_array_to_integer">[docs]</a>
+<span class="k">def</span> <span class="nf">boolean_array_to_integer</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts a boolean array to integer by interpretting it in binary with LSB 0 bit</span>
+<span class="sd">    numbering.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        values (List[bool]): The list of booleans to convert.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: The interpretted integer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">v</span> <span class="o">&lt;&lt;</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">values</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="GateControl">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.GateControl.html#dodal.devices.zebra.GateControl">[docs]</a>
+<span class="k">class</span> <span class="nc">GateControl</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enable</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;_ENA&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sources</span> <span class="o">=</span> <span class="n">DeviceVector</span><span class="p">(</span>
+            <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;_INP</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)}</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">invert</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;_INV&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="GateType">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.GateType.html#dodal.devices.zebra.GateType">[docs]</a>
+<span class="k">class</span> <span class="nc">GateType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">AND</span> <span class="o">=</span> <span class="s2">&quot;AND&quot;</span>
+    <span class="n">OR</span> <span class="o">=</span> <span class="s2">&quot;OR&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="LogicGateConfigurer">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.LogicGateConfigurer.html#dodal.devices.zebra.LogicGateConfigurer">[docs]</a>
+<span class="k">class</span> <span class="nc">LogicGateConfigurer</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
+    <span class="n">DEFAULT_SOURCE_IF_GATE_NOT_USED</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">and_gates</span><span class="p">:</span> <span class="n">DeviceVector</span><span class="p">[</span><span class="n">GateControl</span><span class="p">]</span> <span class="o">=</span> <span class="n">DeviceVector</span><span class="p">(</span>
+            <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">GateControl</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;AND</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)}</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">or_gates</span><span class="p">:</span> <span class="n">DeviceVector</span><span class="p">[</span><span class="n">GateControl</span><span class="p">]</span> <span class="o">=</span> <span class="n">DeviceVector</span><span class="p">(</span>
+            <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">GateControl</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;OR</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)}</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_gates</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">GateType</span><span class="o">.</span><span class="n">AND</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">and_gates</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
+            <span class="n">GateType</span><span class="o">.</span><span class="n">OR</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">or_gates</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
+        <span class="p">}</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LogicGateConfigurer.apply_logic_gate_config">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.LogicGateConfigurer.html#dodal.devices.zebra.LogicGateConfigurer.apply_logic_gate_config">[docs]</a>
+    <span class="k">def</span> <span class="nf">apply_logic_gate_config</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">:</span> <span class="n">GateType</span><span class="p">,</span> <span class="n">gate_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">LogicGateConfiguration</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Uses the specified `LogicGateConfiguration` to configure a gate on the Zebra.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            type (GateType): The type of gate e.g. AND/OR</span>
+<span class="sd">            gate_number (int): Which gate to configure.</span>
+<span class="sd">            config (LogicGateConfiguration): A configuration for the gate.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">gate</span><span class="p">:</span> <span class="n">GateControl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_gates</span><span class="p">[</span><span class="nb">type</span><span class="p">][</span><span class="n">gate_number</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">gate</span><span class="o">.</span><span class="n">enable</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">boolean_array_to_integer</span><span class="p">([</span><span class="kc">True</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">sources</span><span class="p">)))</span>
+
+        <span class="c1"># Input Source</span>
+        <span class="k">for</span> <span class="n">source_number</span><span class="p">,</span> <span class="n">source_pv</span> <span class="ow">in</span> <span class="n">gate</span><span class="o">.</span><span class="n">sources</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">source_pv</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">sources</span><span class="p">[</span><span class="n">source_number</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+                <span class="n">source_pv</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_SOURCE_IF_GATE_NOT_USED</span><span class="p">)</span>
+
+        <span class="c1"># Invert</span>
+        <span class="n">gate</span><span class="o">.</span><span class="n">invert</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">boolean_array_to_integer</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">invert</span><span class="p">))</span></div>
+
+
+    <span class="n">apply_and_gate_config</span> <span class="o">=</span> <span class="n">partialmethod</span><span class="p">(</span><span class="n">apply_logic_gate_config</span><span class="p">,</span> <span class="n">GateType</span><span class="o">.</span><span class="n">AND</span><span class="p">)</span>
+    <span class="n">apply_or_gate_config</span> <span class="o">=</span> <span class="n">partialmethod</span><span class="p">(</span><span class="n">apply_logic_gate_config</span><span class="p">,</span> <span class="n">GateType</span><span class="o">.</span><span class="n">OR</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="LogicGateConfiguration">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.LogicGateConfiguration.html#dodal.devices.zebra.LogicGateConfiguration">[docs]</a>
+<span class="k">class</span> <span class="nc">LogicGateConfiguration</span><span class="p">:</span>
+    <span class="n">NUMBER_OF_INPUTS</span> <span class="o">=</span> <span class="mi">4</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_source</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">invert</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">invert</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_input</span><span class="p">(</span><span class="n">input_source</span><span class="p">,</span> <span class="n">invert</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LogicGateConfiguration.add_input">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.LogicGateConfiguration.html#dodal.devices.zebra.LogicGateConfiguration.add_input">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_input</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">input_source</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">invert</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LogicGateConfiguration</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add an input to the gate. This will throw an assertion error if more than 4</span>
+<span class="sd">        inputs are added to the Zebra.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            input_source (int): The source for the input (must be between 0 and 63).</span>
+<span class="sd">            invert (bool, optional): Whether the input should be inverted. Default</span>
+<span class="sd">                False.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            LogicGateConfiguration: A description of the gate configuration.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">4</span>
+        <span class="k">assert</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">input_source</span> <span class="o">&lt;=</span> <span class="mi">63</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">input_source</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">invert</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">invert</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">input_strings</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="nb">input</span><span class="p">,</span> <span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">invert</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+            <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">invert</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="n">input_strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;INP</span><span class="si">{</span><span class="nb">input</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="s1">&#39;!&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">invert</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}{</span><span class="n">source</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">input_strings</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="SoftInputs">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.SoftInputs.html#dodal.devices.zebra.SoftInputs">[docs]</a>
+<span class="k">class</span> <span class="nc">SoftInputs</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">soft_in_1</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">SoftInState</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;SOFT_IN:B0&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">soft_in_2</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">SoftInState</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;SOFT_IN:B1&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">soft_in_3</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">SoftInState</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;SOFT_IN:B2&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">soft_in_4</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">SoftInState</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;SOFT_IN:B3&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Zebra">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.Zebra.html#dodal.devices.zebra.Zebra">[docs]</a>
+<span class="k">class</span> <span class="nc">Zebra</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The Zebra device.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pc</span> <span class="o">=</span> <span class="n">PositionCompare</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="n">ZebraOutputPanel</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span> <span class="o">=</span> <span class="n">SoftInputs</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logic_gates</span> <span class="o">=</span> <span class="n">LogicGateConfigurer</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
