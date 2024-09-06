@@ -340,7 +340,7 @@ async def test_if_cpu_results_arrive_before_gpu_then_warn(
     )
     RE(bps.trigger(zocalo_results, wait=False))
     mock_logger.warning.assert_called_with(
-        "Recieved zocalo results from CPU before GPU"
+        "received zocalo results from CPU before GPU"
     )
 
 

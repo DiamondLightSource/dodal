@@ -169,7 +169,7 @@ class ZocaloResults(StandardReadable, Triggerable):
     @AsyncStatus.wrap
     async def stage(self):
         """Stages the Zocalo device by: subscribing to the queue, doing a background
-        sleep for a few seconds to wait for any stale messages to be recieved, then
+        sleep for a few seconds to wait for any stale messages to be received, then
         clearing the queue. Plans using this device should wait on ZOCALO_STAGE_GROUP
         before triggering processing for the experiment"""
 
@@ -216,7 +216,7 @@ class ZocaloResults(StandardReadable, Triggerable):
             # Wait for results from CPU and GPU, warn and continue if one timed out, error if both time out
             if self.use_cpu_and_gpu:
                 if source_of_first_results == ZocaloSource.CPU:
-                    LOGGER.warning("Recieved zocalo results from CPU before GPU")
+                    LOGGER.warning("received zocalo results from CPU before GPU")
                 raw_results_two_sources = [raw_results]
                 try:
                     raw_results_two_sources.append(
