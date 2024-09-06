@@ -15,9 +15,6 @@ dodal.devices.detector.detector.DetectorParams
       
       
       
-      ~DetectorParams.create_beamxy_and_runnumber
-      
-      
       
       
       ~DetectorParams.get_beam_position_mm
@@ -36,6 +33,20 @@ dodal.devices.detector.detector.DetectorParams
       
       
       
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~DetectorParams.serialize_detector_size_constants
+      
+      
+      
    
    
 
@@ -46,10 +57,27 @@ dodal.devices.detector.detector.DetectorParams
    .. autosummary::
    
       
+      ~DetectorParams.beam_xy_converter
+      
+      
       ~DetectorParams.full_filename
       
       
       ~DetectorParams.full_number_of_images
+      
+      
+      ~DetectorParams.model_computed_fields
+      
+      
+      ~DetectorParams.model_config
+      
+      
+      
+      ~DetectorParams.model_fields
+      
+      
+      
+      ~DetectorParams.run_number
       
       
       ~DetectorParams.expected_energy_ev
@@ -85,16 +113,13 @@ dodal.devices.detector.detector.DetectorParams
       ~DetectorParams.det_dist_to_beam_converter_path
       
       
+      ~DetectorParams.override_run_number
+      
+      
       ~DetectorParams.trigger_mode
       
       
       ~DetectorParams.detector_size_constants
-      
-      
-      ~DetectorParams.beam_xy_converter
-      
-      
-      ~DetectorParams.run_number
       
       
       ~DetectorParams.enable_dev_shm

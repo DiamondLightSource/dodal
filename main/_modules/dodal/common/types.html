@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.common.types &#8212; dodal 1.30.1.dev10+gc4051bafa documentation</title>
+    <title>dodal.common.types &#8212; dodal 1.30.1.dev11+g350ca7230 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=a1d25afc"></script>
+    <script src="../../../_static/documentation_options.js?v=750ab095"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -478,7 +478,7 @@ document.write(`
 <span class="p">)</span>
 
 <span class="kn">from</span> <span class="nn">bluesky.utils</span> <span class="kn">import</span> <span class="n">Msg</span>
-<span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="n">DirectoryProvider</span>
+<span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="n">PathProvider</span>
 
 <span class="c1"># String identifier used by &#39;wait&#39; or stubs that await</span>
 <span class="n">Group</span> <span class="o">=</span> <span class="nb">str</span>
@@ -488,9 +488,11 @@ document.write(`
 <span class="n">PlanGenerator</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">MsgGenerator</span><span class="p">]</span>
 
 
-<div class="viewcode-block" id="UpdatingDirectoryProvider">
-<a class="viewcode-back" href="../../../reference/generated/dodal.common.types.UpdatingDirectoryProvider.html#dodal.common.types.UpdatingDirectoryProvider">[docs]</a>
-<span class="k">class</span> <span class="nc">UpdatingDirectoryProvider</span><span class="p">(</span><span class="n">DirectoryProvider</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
+<div class="viewcode-block" id="UpdatingPathProvider">
+<a class="viewcode-back" href="../../../reference/generated/dodal.common.types.UpdatingPathProvider.html#dodal.common.types.UpdatingPathProvider">[docs]</a>
+<span class="k">class</span> <span class="nc">UpdatingPathProvider</span><span class="p">(</span><span class="n">PathProvider</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">data_session</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span> <span class="o">...</span>
     <span class="nd">@abstractmethod</span>
     <span class="k">async</span> <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span> <span class="o">...</span></div>
 

@@ -15,10 +15,11 @@ dodal.common.visit
    :recursive:
 
    ~visit.DataCollectionIdentifier
+   ~visit.DiamondFilenameProvider
    ~visit.DirectoryServiceClient
-   ~visit.DirectoryServiceClientBase
    ~visit.LocalDirectoryServiceClient
-   ~visit.StaticVisitDirectoryProvider
+   ~visit.RemoteDirectoryServiceClient
+   ~visit.StaticVisitPathProvider
 
 
 

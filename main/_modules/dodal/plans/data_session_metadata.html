@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.plans.data_session_metadata &#8212; dodal 1.30.1.dev10+gc4051bafa documentation</title>
+    <title>dodal.plans.data_session_metadata &#8212; dodal 1.30.1.dev11+g350ca7230 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=a1d25afc"></script>
+    <script src="../../../_static/documentation_options.js?v=750ab095"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -474,10 +474,9 @@ document.write(`
 <span></span><span class="kn">from</span> <span class="nn">bluesky</span> <span class="kn">import</span> <span class="n">plan_stubs</span> <span class="k">as</span> <span class="n">bps</span>
 <span class="kn">from</span> <span class="nn">bluesky</span> <span class="kn">import</span> <span class="n">preprocessors</span> <span class="k">as</span> <span class="n">bpp</span>
 <span class="kn">from</span> <span class="nn">bluesky.utils</span> <span class="kn">import</span> <span class="n">make_decorator</span>
-<span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="n">DirectoryInfo</span>
 
 <span class="kn">from</span> <span class="nn">dodal.common.beamlines</span> <span class="kn">import</span> <span class="n">beamline_utils</span>
-<span class="kn">from</span> <span class="nn">dodal.common.types</span> <span class="kn">import</span> <span class="n">MsgGenerator</span><span class="p">,</span> <span class="n">UpdatingDirectoryProvider</span>
+<span class="kn">from</span> <span class="nn">dodal.common.types</span> <span class="kn">import</span> <span class="n">MsgGenerator</span><span class="p">,</span> <span class="n">UpdatingPathProvider</span>
 
 <span class="n">DATA_SESSION</span> <span class="o">=</span> <span class="s2">&quot;data_session&quot;</span>
 <span class="n">DATA_GROUPS</span> <span class="o">=</span> <span class="s2">&quot;data_groups&quot;</span>
@@ -486,19 +485,19 @@ document.write(`
 <div class="viewcode-block" id="attach_data_session_metadata_wrapper">
 <a class="viewcode-back" href="../../../reference/generated/dodal.plans.data_session_metadata.html#dodal.plans.data_session_metadata.attach_data_session_metadata_wrapper">[docs]</a>
 <span class="k">def</span> <span class="nf">attach_data_session_metadata_wrapper</span><span class="p">(</span>
-    <span class="n">plan</span><span class="p">:</span> <span class="n">MsgGenerator</span><span class="p">,</span> <span class="n">provider</span><span class="p">:</span> <span class="n">UpdatingDirectoryProvider</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">plan</span><span class="p">:</span> <span class="n">MsgGenerator</span><span class="p">,</span> <span class="n">provider</span><span class="p">:</span> <span class="n">UpdatingPathProvider</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Attach data session metadata to the runs within a plan and make it correlate</span>
-<span class="sd">    with an ophyd-async DirectoryProvider.</span>
+<span class="sd">    with an ophyd-async PathProvider.</span>
 
-<span class="sd">    This updates the directory provider (which in turn makes a call to to a service</span>
+<span class="sd">    This updates the path provider (which in turn makes a call to to a service</span>
 <span class="sd">    to figure out which scan number we are using for such a scan), and ensures the</span>
 <span class="sd">    start document contains the correct data session.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        plan: The plan to preprocess</span>
-<span class="sd">        provider: The directory provider that participating detectors are aware of.</span>
+<span class="sd">        provider: The path provider that participating detectors are aware of.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        MsgGenerator: A plan</span>
@@ -507,13 +506,12 @@ document.write(`
 <span class="sd">        Iterator[Msg]: Plan messages</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">provider</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">provider</span> <span class="o">=</span> <span class="n">beamline_utils</span><span class="o">.</span><span class="n">get_directory_provider</span><span class="p">()</span>
+        <span class="n">provider</span> <span class="o">=</span> <span class="n">beamline_utils</span><span class="o">.</span><span class="n">get_path_provider</span><span class="p">()</span>
     <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">wait_for</span><span class="p">([</span><span class="n">provider</span><span class="o">.</span><span class="n">update</span><span class="p">])</span>
-    <span class="n">directory_info</span><span class="p">:</span> <span class="n">DirectoryInfo</span> <span class="o">=</span> <span class="n">provider</span><span class="p">()</span>
+    <span class="n">ress</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">wait_for</span><span class="p">([</span><span class="n">provider</span><span class="o">.</span><span class="n">data_session</span><span class="p">])</span>
+    <span class="n">data_session</span> <span class="o">=</span> <span class="n">ress</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
     <span class="c1"># https://github.com/DiamondLightSource/dodal/issues/452</span>
     <span class="c1"># As part of 452, write each dataCollection into their own folder, then can use resource_dir directly</span>
-    <span class="k">assert</span> <span class="n">directory_info</span><span class="o">.</span><span class="n">prefix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-    <span class="n">data_session</span> <span class="o">=</span> <span class="n">directory_info</span><span class="o">.</span><span class="n">prefix</span><span class="o">.</span><span class="n">removesuffix</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
     <span class="k">yield from</span> <span class="n">bpp</span><span class="o">.</span><span class="n">inject_md_wrapper</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="p">{</span><span class="n">DATA_SESSION</span><span class="p">:</span> <span class="n">data_session</span><span class="p">})</span></div>
 
 

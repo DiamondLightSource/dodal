@@ -14,7 +14,7 @@ dodal.common.types
    :toctree:
    :recursive:
 
-   ~types.UpdatingDirectoryProvider
+   ~types.UpdatingPathProvider
 
 
 

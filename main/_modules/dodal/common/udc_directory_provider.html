@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.common.udc_directory_provider &#8212; dodal 1.30.1.dev10+gc4051bafa documentation</title>
+    <title>dodal.common.udc_directory_provider &#8212; dodal 1.30.1.dev11+g350ca7230 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=a1d25afc"></script>
+    <script src="../../../_static/documentation_options.js?v=750ab095"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -473,33 +473,46 @@ document.write(`
   <h1>Source code for dodal.common.udc_directory_provider</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="n">DirectoryInfo</span>
+<span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="n">FilenameProvider</span><span class="p">,</span> <span class="n">PathInfo</span>
 
-<span class="kn">from</span> <span class="nn">dodal.common.types</span> <span class="kn">import</span> <span class="n">UpdatingDirectoryProvider</span>
+<span class="kn">from</span> <span class="nn">dodal.common.types</span> <span class="kn">import</span> <span class="n">UpdatingPathProvider</span>
 <span class="kn">from</span> <span class="nn">dodal.log</span> <span class="kn">import</span> <span class="n">LOGGER</span>
 
 
-<div class="viewcode-block" id="PandASubdirectoryProvider">
-<a class="viewcode-back" href="../../../reference/generated/dodal.common.udc_directory_provider.PandASubdirectoryProvider.html#dodal.common.udc_directory_provider.PandASubdirectoryProvider">[docs]</a>
-<span class="k">class</span> <span class="nc">PandASubdirectoryProvider</span><span class="p">(</span><span class="n">UpdatingDirectoryProvider</span><span class="p">):</span>
+<div class="viewcode-block" id="PandAFilenameProvider">
+<a class="viewcode-back" href="../../../reference/generated/dodal.common.udc_directory_provider.PandAFilenameProvider.html#dodal.common.udc_directory_provider.PandAFilenameProvider">[docs]</a>
+<span class="k">class</span> <span class="nc">PandAFilenameProvider</span><span class="p">(</span><span class="n">FilenameProvider</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">suffix</span> <span class="o">=</span> <span class="n">suffix</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">device_name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="PandASubpathProvider">
+<a class="viewcode-back" href="../../../reference/generated/dodal.common.udc_directory_provider.PandASubpathProvider.html#dodal.common.udc_directory_provider.PandASubpathProvider">[docs]</a>
+<span class="k">class</span> <span class="nc">PandASubpathProvider</span><span class="p">(</span><span class="n">UpdatingPathProvider</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Directory provider for the HDFPanda. Points to a panda subdirectory within the</span>
 <span class="sd">    directory path provided&quot;&quot;&quot;</span>
 
     <span class="n">resource_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;panda&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">directory</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root_directory</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_output_directory</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">root_directory</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_dir</span> <span class="k">if</span> <span class="n">root_directory</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_filename_provider</span> <span class="o">=</span> <span class="n">PandAFilenameProvider</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_directory</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> instantiated with no root path, update() must be called before writing data!&quot;</span>
             <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_directory_info</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">DirectoryInfo</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">directory</span><span class="p">,</span> <span class="n">resource_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resource_dir</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">directory</span>
-            <span class="k">else</span> <span class="kc">None</span>
-        <span class="p">)</span>
 
-<div class="viewcode-block" id="PandASubdirectoryProvider.update">
-<a class="viewcode-back" href="../../../reference/generated/dodal.common.udc_directory_provider.PandASubdirectoryProvider.html#dodal.common.udc_directory_provider.PandASubdirectoryProvider.update">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">data_session</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filename_provider</span><span class="o">.</span><span class="n">suffix</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+
+<div class="viewcode-block" id="PandASubpathProvider.update">
+<a class="viewcode-back" href="../../../reference/generated/dodal.common.udc_directory_provider.PandASubpathProvider.html#dodal.common.udc_directory_provider.PandASubpathProvider.update">[docs]</a>
     <span class="k">async</span> <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">directory</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the root directory into which panda pcap files are written. This will result in the panda</span>
 <span class="sd">        subdirectory being created if it does not already exist.</span>
@@ -509,20 +522,17 @@ document.write(`
 <span class="sd">             suffix: Optional str that will be appended to the panda device name along with the file</span>
 <span class="sd">                type extension to construct the output filename</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">output_directory</span> <span class="o">=</span> <span class="n">directory</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_dir</span>
-        <span class="n">output_directory</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_output_directory</span> <span class="o">=</span> <span class="n">directory</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_filename_provider</span><span class="o">.</span><span class="n">suffix</span> <span class="o">=</span> <span class="n">suffix</span></div>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_directory_info</span> <span class="o">=</span> <span class="n">DirectoryInfo</span><span class="p">(</span>
-            <span class="n">root</span><span class="o">=</span><span class="n">directory</span><span class="p">,</span> <span class="n">resource_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resource_dir</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="n">suffix</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PathInfo</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_directory</span><span class="p">,</span> <span class="s2">&quot;Directory unknown for PandA to write into, update() needs to be called at least once&quot;</span>
+        <span class="k">return</span> <span class="n">PathInfo</span><span class="p">(</span>
+            <span class="n">directory_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_directory</span><span class="p">,</span>
+            <span class="n">filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_filename_provider</span><span class="p">(</span><span class="n">device_name</span><span class="p">),</span>
+            <span class="n">create_dir_depth</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>  <span class="c1"># allows PandA HDFWriter to make any number of dirs</span>
         <span class="p">)</span></div>
-
-
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DirectoryInfo</span><span class="p">:</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_directory_info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Directory unknown for PandA to write into, update() needs to be called at least once&quot;</span>
-            <span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_directory_info</span></div>
 
 </pre></div>
 

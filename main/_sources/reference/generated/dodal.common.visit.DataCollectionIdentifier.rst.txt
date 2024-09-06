@@ -24,6 +24,17 @@ dodal.common.visit.DataCollectionIdentifier
       
       
       
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
    
    
 
@@ -33,6 +44,17 @@ dodal.common.visit.DataCollectionIdentifier
 
    .. autosummary::
    
+      
+      ~DataCollectionIdentifier.model_computed_fields
+      
+      
+      ~DataCollectionIdentifier.model_config
+      
+      
+      
+      ~DataCollectionIdentifier.model_fields
+      
+      
       
       ~DataCollectionIdentifier.collectionNumber
       

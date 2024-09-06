@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.tetramm &#8212; dodal 1.30.1.dev10+gc4051bafa documentation</title>
+    <title>dodal.devices.tetramm &#8212; dodal 1.30.1.dev11+g350ca7230 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=a1d25afc"></script>
+    <script src="../../../_static/documentation_options.js?v=750ab095"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -472,25 +472,26 @@ document.write(`
                   
   <h1>Source code for dodal.devices.tetramm</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">asyncio</span>
-<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Sequence</span>
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 
 <span class="kn">from</span> <span class="nn">bluesky.protocols</span> <span class="kn">import</span> <span class="n">Hints</span>
 <span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
+    <span class="n">DatasetDescriber</span><span class="p">,</span>
     <span class="n">DetectorControl</span><span class="p">,</span>
     <span class="n">DetectorTrigger</span><span class="p">,</span>
     <span class="n">Device</span><span class="p">,</span>
-    <span class="n">DirectoryProvider</span><span class="p">,</span>
-    <span class="n">ShapeProvider</span><span class="p">,</span>
+    <span class="n">PathProvider</span><span class="p">,</span>
     <span class="n">StandardDetector</span><span class="p">,</span>
     <span class="n">set_and_wait_for_value</span><span class="p">,</span>
     <span class="n">soft_signal_r_and_setter</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ophyd_async.epics.areadetector.utils</span> <span class="kn">import</span> <span class="n">stop_busy_record</span>
-<span class="kn">from</span> <span class="nn">ophyd_async.epics.areadetector.writers</span> <span class="kn">import</span> <span class="n">HDFWriter</span><span class="p">,</span> <span class="n">NDFileHDF</span>
-<span class="kn">from</span> <span class="nn">ophyd_async.epics.signal</span> <span class="kn">import</span> <span class="n">epics_signal_r</span><span class="p">,</span> <span class="n">epics_signal_rw</span>
-<span class="kn">from</span> <span class="nn">ophyd_async.epics.signal.signal</span> <span class="kn">import</span> <span class="n">epics_signal_rw_rbv</span>
+<span class="kn">from</span> <span class="nn">ophyd_async.epics.adcore</span> <span class="kn">import</span> <span class="n">ADHDFWriter</span><span class="p">,</span> <span class="n">NDFileHDFIO</span><span class="p">,</span> <span class="n">stop_busy_record</span>
+<span class="kn">from</span> <span class="nn">ophyd_async.epics.signal</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">epics_signal_r</span><span class="p">,</span>
+    <span class="n">epics_signal_rw</span><span class="p">,</span>
+    <span class="n">epics_signal_rw_rbv</span><span class="p">,</span>
+<span class="p">)</span>
 
 
 <div class="viewcode-block" id="TetrammRange">
@@ -601,7 +602,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">minimum_values_per_reading</span> <span class="o">=</span> <span class="n">minimum_values_per_reading</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">readings_per_frame</span> <span class="o">=</span> <span class="n">readings_per_frame</span>
 
-    <span class="k">def</span> <span class="nf">get_deadtime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exposure</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">get_deadtime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exposure</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="c1"># 2 internal clock cycles. Best effort approximation</span>
         <span class="k">return</span> <span class="mi">2</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_sample_rate</span>
 
@@ -701,16 +702,19 @@ document.write(`
 
 
 
-<div class="viewcode-block" id="TetrammShapeProvider">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.tetramm.TetrammShapeProvider.html#dodal.devices.tetramm.TetrammShapeProvider">[docs]</a>
-<span class="k">class</span> <span class="nc">TetrammShapeProvider</span><span class="p">(</span><span class="n">ShapeProvider</span><span class="p">):</span>
+<div class="viewcode-block" id="TetrammDatasetDescriber">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.tetramm.TetrammDatasetDescriber.html#dodal.devices.tetramm.TetrammDatasetDescriber">[docs]</a>
+<span class="k">class</span> <span class="nc">TetrammDatasetDescriber</span><span class="p">(</span><span class="n">DatasetDescriber</span><span class="p">):</span>
     <span class="n">max_channels</span> <span class="o">=</span> <span class="mi">11</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">:</span> <span class="n">TetrammController</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">controller</span> <span class="o">=</span> <span class="n">controller</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">max_channels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">readings_per_frame</span><span class="p">]</span></div>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">np_datatype</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;&lt;f8&quot;</span>  <span class="c1"># IEEE 754 double precision floating point</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_channels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">readings_per_frame</span><span class="p">)</span></div>
 
 
 
@@ -721,13 +725,13 @@ document.write(`
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">directory_provider</span><span class="p">:</span> <span class="n">DirectoryProvider</span><span class="p">,</span>
+        <span class="n">path_provider</span><span class="p">:</span> <span class="n">PathProvider</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">scalar_sigs</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">drv</span> <span class="o">=</span> <span class="n">TetrammDriver</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;DRV:&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">hdf</span> <span class="o">=</span> <span class="n">NDFileHDF</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;HDF5:&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hdf</span> <span class="o">=</span> <span class="n">NDFileHDFIO</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;HDF5:&quot;</span><span class="p">)</span>
         <span class="n">controller</span> <span class="o">=</span> <span class="n">TetrammController</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">drv</span><span class="p">)</span>
         <span class="n">config_signals</span> <span class="o">=</span> <span class="p">[</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">drv</span><span class="o">.</span><span class="n">values_per_reading</span><span class="p">,</span>
@@ -741,11 +745,11 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">controller</span><span class="p">,</span>
-            <span class="n">HDFWriter</span><span class="p">(</span>
+            <span class="n">ADHDFWriter</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">hdf</span><span class="p">,</span>
-                <span class="n">directory_provider</span><span class="p">,</span>
+                <span class="n">path_provider</span><span class="p">,</span>
                 <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                <span class="n">TetrammShapeProvider</span><span class="p">(</span><span class="n">controller</span><span class="p">),</span>
+                <span class="n">TetrammDatasetDescriber</span><span class="p">(</span><span class="n">controller</span><span class="p">),</span>
                 <span class="o">**</span><span class="n">scalar_sigs</span><span class="p">,</span>
             <span class="p">),</span>
             <span class="n">config_signals</span><span class="p">,</span>

@@ -29,6 +29,17 @@ dodal.devices.fast\_grid\_scan.PandAGridScanParams
       
       
       
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
    
    
 
@@ -38,6 +49,20 @@ dodal.devices.fast\_grid\_scan.PandAGridScanParams
 
    .. autosummary::
    
+      
+      
+      ~PandAGridScanParams.model_computed_fields
+      
+      
+      ~PandAGridScanParams.model_config
+      
+      
+      
+      ~PandAGridScanParams.model_fields
+      
+      
+      
+      
       
       
       ~PandAGridScanParams.run_up_distance_mm
@@ -74,15 +99,6 @@ dodal.devices.fast\_grid\_scan.PandAGridScanParams
       
       
       ~PandAGridScanParams.z2_start
-      
-      
-      ~PandAGridScanParams.x_axis
-      
-      
-      ~PandAGridScanParams.y_axis
-      
-      
-      ~PandAGridScanParams.z_axis
       
       
       ~PandAGridScanParams.set_stub_offsets

@@ -23,6 +23,17 @@ dodal.devices.fast\_grid\_scan.ZebraGridScanParams
       
       
       
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       ~ZebraGridScanParams.non_integer_dwell_time
       
       
@@ -41,6 +52,20 @@ dodal.devices.fast\_grid\_scan.ZebraGridScanParams
 
    .. autosummary::
    
+      
+      
+      ~ZebraGridScanParams.model_computed_fields
+      
+      
+      ~ZebraGridScanParams.model_config
+      
+      
+      
+      ~ZebraGridScanParams.model_fields
+      
+      
+      
+      
       
       
       ~ZebraGridScanParams.dwell_time_ms
@@ -77,15 +102,6 @@ dodal.devices.fast\_grid\_scan.ZebraGridScanParams
       
       
       ~ZebraGridScanParams.z2_start
-      
-      
-      ~ZebraGridScanParams.x_axis
-      
-      
-      ~ZebraGridScanParams.y_axis
-      
-      
-      ~ZebraGridScanParams.z_axis
       
       
       ~ZebraGridScanParams.set_stub_offsets

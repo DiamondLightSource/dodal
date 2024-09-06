@@ -28,10 +28,10 @@ dodal.common.beamlines.beamline\_utils
       clear_device
       clear_devices
       device_instantiation
-      get_directory_provider
+      get_path_provider
       list_active_devices
       set_beamline
-      set_directory_provider
+      set_path_provider
       wait_for_connection
    
    

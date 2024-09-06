@@ -1,0 +1,26 @@
+dodal.common.visit.RemoteDirectoryServiceClient
+===============================================
+
+.. currentmodule:: dodal.common.visit
+
+.. autoclass:: RemoteDirectoryServiceClient
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~RemoteDirectoryServiceClient.create_new_collection
+      
+      
+      ~RemoteDirectoryServiceClient.get_current_collection
+      
+   
+   
+
+   
+   
+   

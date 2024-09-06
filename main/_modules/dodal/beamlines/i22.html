@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.i22 &#8212; dodal 1.30.1.dev10+gc4051bafa documentation</title>
+    <title>dodal.beamlines.i22 &#8212; dodal 1.30.1.dev11+g350ca7230 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=a1d25afc"></script>
+    <script src="../../../_static/documentation_options.js?v=750ab095"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -476,17 +476,18 @@ document.write(`
   <h1>Source code for dodal.beamlines.i22</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span> <span class="nn">ophyd_async.epics.areadetector</span> <span class="kn">import</span> <span class="n">AravisDetector</span><span class="p">,</span> <span class="n">PilatusDetector</span>
-<span class="kn">from</span> <span class="nn">ophyd_async.panda</span> <span class="kn">import</span> <span class="n">HDFPanda</span>
+<span class="kn">from</span> <span class="nn">ophyd_async.epics.adaravis</span> <span class="kn">import</span> <span class="n">AravisDetector</span>
+<span class="kn">from</span> <span class="nn">ophyd_async.epics.adpilatus</span> <span class="kn">import</span> <span class="n">PilatusDetector</span>
+<span class="kn">from</span> <span class="nn">ophyd_async.fastcs.panda</span> <span class="kn">import</span> <span class="n">HDFPanda</span>
 
 <span class="kn">from</span> <span class="nn">dodal.common.beamlines.beamline_utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">device_instantiation</span><span class="p">,</span>
-    <span class="n">get_directory_provider</span><span class="p">,</span>
-    <span class="n">set_directory_provider</span><span class="p">,</span>
+    <span class="n">get_path_provider</span><span class="p">,</span>
+    <span class="n">set_path_provider</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">dodal.common.beamlines.beamline_utils</span> <span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_utils_beamline</span>
 <span class="kn">from</span> <span class="nn">dodal.common.beamlines.device_helpers</span> <span class="kn">import</span> <span class="n">numbered_slits</span>
-<span class="kn">from</span> <span class="nn">dodal.common.visit</span> <span class="kn">import</span> <span class="n">DirectoryServiceClient</span><span class="p">,</span> <span class="n">StaticVisitDirectoryProvider</span>
+<span class="kn">from</span> <span class="nn">dodal.common.visit</span> <span class="kn">import</span> <span class="n">RemoteDirectoryServiceClient</span><span class="p">,</span> <span class="n">StaticVisitPathProvider</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.focusing_mirror</span> <span class="kn">import</span> <span class="n">FocusingMirror</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.i22.dcm</span> <span class="kn">import</span> <span class="n">CrystalMetadata</span><span class="p">,</span> <span class="n">DoubleCrystalMonochromator</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.i22.fswitch</span> <span class="kn">import</span> <span class="n">FSwitch</span>
@@ -508,11 +509,11 @@ document.write(`
 <span class="c1"># Communication with GDA is also WIP so for now we determine an arbitrary scan number</span>
 <span class="c1"># locally and write the commissioning directory. The scan number is not guaranteed to</span>
 <span class="c1"># be unique and the data is at risk - this configuration is for testing only.</span>
-<span class="n">set_directory_provider</span><span class="p">(</span>
-    <span class="n">StaticVisitDirectoryProvider</span><span class="p">(</span>
+<span class="n">set_path_provider</span><span class="p">(</span>
+    <span class="n">StaticVisitPathProvider</span><span class="p">(</span>
         <span class="n">BL</span><span class="p">,</span>
         <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/dls/i22/data/2024/cm37271-2/bluesky&quot;</span><span class="p">),</span>
-        <span class="n">client</span><span class="o">=</span><span class="n">DirectoryServiceClient</span><span class="p">(</span><span class="s2">&quot;http://i22-control:8088/api&quot;</span><span class="p">),</span>
+        <span class="n">client</span><span class="o">=</span><span class="n">RemoteDirectoryServiceClient</span><span class="p">(</span><span class="s2">&quot;http://i22-control:8088/api&quot;</span><span class="p">),</span>
     <span class="p">)</span>
 <span class="p">)</span>
 
@@ -539,7 +540,7 @@ document.write(`
             <span class="n">sensor_thickness</span><span class="o">=</span><span class="p">(</span><span class="mf">0.45</span><span class="p">,</span> <span class="s2">&quot;mm&quot;</span><span class="p">),</span>
             <span class="n">distance</span><span class="o">=</span><span class="p">(</span><span class="mf">4711.833684146172</span><span class="p">,</span> <span class="s2">&quot;mm&quot;</span><span class="p">),</span>
         <span class="p">),</span>
-        <span class="n">directory_provider</span><span class="o">=</span><span class="n">get_directory_provider</span><span class="p">(),</span>
+        <span class="n">path_provider</span><span class="o">=</span><span class="n">get_path_provider</span><span class="p">(),</span>
     <span class="p">)</span></div>
 
 
@@ -581,7 +582,7 @@ document.write(`
             <span class="n">sensor_thickness</span><span class="o">=</span><span class="p">(</span><span class="mf">0.45</span><span class="p">,</span> <span class="s2">&quot;mm&quot;</span><span class="p">),</span>
             <span class="n">distance</span><span class="o">=</span><span class="p">(</span><span class="mf">175.4199417092314</span><span class="p">,</span> <span class="s2">&quot;mm&quot;</span><span class="p">),</span>
         <span class="p">),</span>
-        <span class="n">directory_provider</span><span class="o">=</span><span class="n">get_directory_provider</span><span class="p">(),</span>
+        <span class="n">path_provider</span><span class="o">=</span><span class="n">get_path_provider</span><span class="p">(),</span>
     <span class="p">)</span></div>
 
 
@@ -599,7 +600,7 @@ document.write(`
         <span class="n">wait_for_connection</span><span class="p">,</span>
         <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
         <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;Cividec Diamond XBPM&quot;</span><span class="p">,</span>
-        <span class="n">directory_provider</span><span class="o">=</span><span class="n">get_directory_provider</span><span class="p">(),</span>
+        <span class="n">path_provider</span><span class="o">=</span><span class="n">get_path_provider</span><span class="p">(),</span>
     <span class="p">)</span></div>
 
 
@@ -617,7 +618,7 @@ document.write(`
         <span class="n">wait_for_connection</span><span class="p">,</span>
         <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
         <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;PIN Diode&quot;</span><span class="p">,</span>
-        <span class="n">directory_provider</span><span class="o">=</span><span class="n">get_directory_provider</span><span class="p">(),</span>
+        <span class="n">path_provider</span><span class="o">=</span><span class="n">get_path_provider</span><span class="p">(),</span>
     <span class="p">)</span></div>
 
 
@@ -821,7 +822,7 @@ document.write(`
         <span class="s2">&quot;-EA-PANDA-01:&quot;</span><span class="p">,</span>
         <span class="n">wait_for_connection</span><span class="p">,</span>
         <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
-        <span class="n">directory_provider</span><span class="o">=</span><span class="n">get_directory_provider</span><span class="p">(),</span>
+        <span class="n">path_provider</span><span class="o">=</span><span class="n">get_path_provider</span><span class="p">(),</span>
     <span class="p">)</span></div>
 
 
@@ -839,7 +840,7 @@ document.write(`
         <span class="s2">&quot;-EA-PANDA-02:&quot;</span><span class="p">,</span>
         <span class="n">wait_for_connection</span><span class="p">,</span>
         <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
-        <span class="n">directory_provider</span><span class="o">=</span><span class="n">get_directory_provider</span><span class="p">(),</span>
+        <span class="n">path_provider</span><span class="o">=</span><span class="n">get_path_provider</span><span class="p">(),</span>
     <span class="p">)</span></div>
 
 
@@ -857,7 +858,7 @@ document.write(`
         <span class="s2">&quot;-EA-PANDA-03:&quot;</span><span class="p">,</span>
         <span class="n">wait_for_connection</span><span class="p">,</span>
         <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
-        <span class="n">directory_provider</span><span class="o">=</span><span class="n">get_directory_provider</span><span class="p">(),</span>
+        <span class="n">path_provider</span><span class="o">=</span><span class="n">get_path_provider</span><span class="p">(),</span>
     <span class="p">)</span></div>
 
 
@@ -875,7 +876,7 @@ document.write(`
         <span class="s2">&quot;-EA-PANDA-04:&quot;</span><span class="p">,</span>
         <span class="n">wait_for_connection</span><span class="p">,</span>
         <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
-        <span class="n">directory_provider</span><span class="o">=</span><span class="n">get_directory_provider</span><span class="p">(),</span>
+        <span class="n">path_provider</span><span class="o">=</span><span class="n">get_path_provider</span><span class="p">(),</span>
     <span class="p">)</span></div>
 
 
@@ -899,7 +900,7 @@ document.write(`
             <span class="n">description</span><span class="o">=</span><span class="s2">&quot;AVT Mako G-507B&quot;</span><span class="p">,</span>
             <span class="n">distance</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;m&quot;</span><span class="p">),</span>
         <span class="p">),</span>
-        <span class="n">directory_provider</span><span class="o">=</span><span class="n">get_directory_provider</span><span class="p">(),</span>
+        <span class="n">path_provider</span><span class="o">=</span><span class="n">get_path_provider</span><span class="p">(),</span>
     <span class="p">)</span></div>
 
 

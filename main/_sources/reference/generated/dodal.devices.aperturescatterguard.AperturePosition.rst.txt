@@ -26,6 +26,17 @@ dodal.devices.aperturescatterguard.AperturePosition
       
       
       
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       ~AperturePosition.tolerances_from_gda_params
       
       
@@ -39,6 +50,17 @@ dodal.devices.aperturescatterguard.AperturePosition
 
    .. autosummary::
    
+      
+      ~AperturePosition.model_computed_fields
+      
+      
+      ~AperturePosition.model_config
+      
+      
+      
+      ~AperturePosition.model_fields
+      
+      
       
       ~AperturePosition.values
       

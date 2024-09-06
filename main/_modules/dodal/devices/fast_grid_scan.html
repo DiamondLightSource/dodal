@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.fast_grid_scan &#8212; dodal 1.30.1.dev10+gc4051bafa documentation</title>
+    <title>dodal.devices.fast_grid_scan &#8212; dodal 1.30.1.dev11+g350ca7230 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=a1d25afc"></script>
+    <script src="../../../_static/documentation_options.js?v=750ab095"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -472,7 +472,7 @@ document.write(`
                   
   <h1>Source code for dodal.devices.fast_grid_scan</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">TypeVar</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">TypeVar</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">bluesky.plan_stubs</span> <span class="kn">import</span> <span class="n">mv</span>
@@ -493,7 +493,7 @@ document.write(`
     <span class="n">epics_signal_rw_rbv</span><span class="p">,</span>
     <span class="n">epics_signal_x</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">validator</span>
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">field_validator</span>
 <span class="kn">from</span> <span class="nn">pydantic.dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
 
 <span class="kn">from</span> <span class="nn">dodal.log</span> <span class="kn">import</span> <span class="n">LOGGER</span>
@@ -550,9 +550,6 @@ document.write(`
     <span class="n">y2_start</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>
     <span class="n">z1_start</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>
     <span class="n">z2_start</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>
-    <span class="n">x_axis</span><span class="p">:</span> <span class="n">GridAxis</span> <span class="o">=</span> <span class="n">GridAxis</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="n">y_axis</span><span class="p">:</span> <span class="n">GridAxis</span> <span class="o">=</span> <span class="n">GridAxis</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="n">z_axis</span><span class="p">:</span> <span class="n">GridAxis</span> <span class="o">=</span> <span class="n">GridAxis</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
     <span class="c1"># Whether to set the stub offsets after centering</span>
     <span class="n">set_stub_offsets</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
@@ -572,28 +569,20 @@ document.write(`
             <span class="s2">&quot;z2_start&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">z2_start</span><span class="p">,</span>
         <span class="p">}</span>
 
-    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>
-        <span class="n">arbitrary_types_allowed</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="n">fields</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;x_axis&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;exclude&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
-            <span class="s2">&quot;y_axis&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;exclude&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
-            <span class="s2">&quot;z_axis&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;exclude&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
-        <span class="p">}</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">x_axis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridAxis</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">GridAxis</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_step_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_steps</span><span class="p">)</span>
 
-    <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;x_axis&quot;</span><span class="p">,</span> <span class="n">always</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_get_x_axis</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">x_axis</span><span class="p">:</span> <span class="n">GridAxis</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">GridAxis</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">GridAxis</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="s2">&quot;x_start&quot;</span><span class="p">],</span> <span class="n">values</span><span class="p">[</span><span class="s2">&quot;x_step_size&quot;</span><span class="p">],</span> <span class="n">values</span><span class="p">[</span><span class="s2">&quot;x_steps&quot;</span><span class="p">])</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">y_axis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridAxis</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">GridAxis</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y1_start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_step_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_steps</span><span class="p">)</span>
 
-    <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;y_axis&quot;</span><span class="p">,</span> <span class="n">always</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_get_y_axis</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">y_axis</span><span class="p">:</span> <span class="n">GridAxis</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">GridAxis</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">GridAxis</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="s2">&quot;y1_start&quot;</span><span class="p">],</span> <span class="n">values</span><span class="p">[</span><span class="s2">&quot;y_step_size&quot;</span><span class="p">],</span> <span class="n">values</span><span class="p">[</span><span class="s2">&quot;y_steps&quot;</span><span class="p">])</span>
-
-    <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;z_axis&quot;</span><span class="p">,</span> <span class="n">always</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">_get_z_axis</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">z_axis</span><span class="p">:</span> <span class="n">GridAxis</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">GridAxis</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">GridAxis</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="s2">&quot;z2_start&quot;</span><span class="p">],</span> <span class="n">values</span><span class="p">[</span><span class="s2">&quot;z_step_size&quot;</span><span class="p">],</span> <span class="n">values</span><span class="p">[</span><span class="s2">&quot;z_steps&quot;</span><span class="p">])</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">z_axis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GridAxis</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">GridAxis</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">z2_start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_step_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_steps</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get_num_images</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_steps</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_steps</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_steps</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_steps</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_steps</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_steps</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_steps</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_3d_grid_scan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -642,7 +631,8 @@ document.write(`
         <span class="n">param_positions</span><span class="p">[</span><span class="s2">&quot;dwell_time_ms&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dwell_time_ms</span>
         <span class="k">return</span> <span class="n">param_positions</span>
 
-    <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;dwell_time_ms&quot;</span><span class="p">,</span> <span class="n">always</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">check_fields</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;dwell_time_ms&quot;</span><span class="p">)</span>
+    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">non_integer_dwell_time</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dwell_time_ms</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="n">dwell_time_floor_rounded</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">dwell_time_ms</span><span class="p">)</span>
         <span class="n">dwell_time_is_close</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span>

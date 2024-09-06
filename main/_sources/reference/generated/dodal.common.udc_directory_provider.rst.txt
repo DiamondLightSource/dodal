@@ -14,7 +14,8 @@ dodal.common.udc\_directory\_provider
    :toctree:
    :recursive:
 
-   ~udc_directory_provider.PandASubdirectoryProvider
+   ~udc_directory_provider.PandAFilenameProvider
+   ~udc_directory_provider.PandASubpathProvider
 
 
 

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.common.visit.DataCollectionIdentifier &#8212; dodal 1.30.1.dev10+gc4051bafa documentation</title>
+    <title>dodal.common.visit.DataCollectionIdentifier &#8212; dodal 1.30.1.dev11+g350ca7230 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../_static/documentation_options.js?v=a1d25afc"></script>
+    <script src="../../_static/documentation_options.js?v=750ab095"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="icon" href="../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="dodal.common.visit.DirectoryServiceClient" href="dodal.common.visit.DirectoryServiceClient.html" />
+    <link rel="next" title="dodal.common.visit.DiamondFilenameProvider" href="dodal.common.visit.DiamondFilenameProvider.html" />
     <link rel="prev" title="dodal.common.visit" href="dodal.common.visit.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -453,19 +453,21 @@ document.write(`
 <li class="toctree-l3"><a class="reference internal" href="dodal.common.coordination.html">dodal.common.coordination</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.common.maths.html">dodal.common.maths</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.common.types.html">dodal.common.types</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="dodal.common.types.UpdatingDirectoryProvider.html">dodal.common.types.UpdatingDirectoryProvider</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.common.types.UpdatingPathProvider.html">dodal.common.types.UpdatingPathProvider</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.common.udc_directory_provider.html">dodal.common.udc_directory_provider</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="dodal.common.udc_directory_provider.PandASubdirectoryProvider.html">dodal.common.udc_directory_provider.PandASubdirectoryProvider</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.common.udc_directory_provider.PandAFilenameProvider.html">dodal.common.udc_directory_provider.PandAFilenameProvider</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.common.udc_directory_provider.PandASubpathProvider.html">dodal.common.udc_directory_provider.PandASubpathProvider</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 current active has-children"><a class="reference internal" href="dodal.common.visit.html">dodal.common.visit</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l4 current active"><a class="current reference internal" href="#">dodal.common.visit.DataCollectionIdentifier</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.common.visit.DiamondFilenameProvider.html">dodal.common.visit.DiamondFilenameProvider</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.common.visit.DirectoryServiceClient.html">dodal.common.visit.DirectoryServiceClient</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.common.visit.DirectoryServiceClientBase.html">dodal.common.visit.DirectoryServiceClientBase</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.common.visit.LocalDirectoryServiceClient.html">dodal.common.visit.LocalDirectoryServiceClient</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.common.visit.StaticVisitDirectoryProvider.html">dodal.common.visit.StaticVisitDirectoryProvider</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.common.visit.RemoteDirectoryServiceClient.html">dodal.common.visit.RemoteDirectoryServiceClient</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.common.visit.StaticVisitPathProvider.html">dodal.common.visit.StaticVisitPathProvider</a></li>
 </ul>
 </details></li>
 </ul>
@@ -666,12 +668,12 @@ document.write(`
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.tetramm.html">dodal.devices.tetramm</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammChannels.html">dodal.devices.tetramm.TetrammChannels</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammController.html">dodal.devices.tetramm.TetrammController</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammDatasetDescriber.html">dodal.devices.tetramm.TetrammDatasetDescriber</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammDetector.html">dodal.devices.tetramm.TetrammDetector</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammDriver.html">dodal.devices.tetramm.TetrammDriver</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammGeometry.html">dodal.devices.tetramm.TetrammGeometry</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammRange.html">dodal.devices.tetramm.TetrammRange</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammResolution.html">dodal.devices.tetramm.TetrammResolution</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammShapeProvider.html">dodal.devices.tetramm.TetrammShapeProvider</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.tetramm.TetrammTrigger.html">dodal.devices.tetramm.TetrammTrigger</a></li>
 </ul>
 </details></li>
@@ -843,7 +845,9 @@ Should be always incrementing, unique per-visit, co-ordinated with any other sca
 </dd>
 </dl>
 <p>Create a new model by parsing and validating input data from keyword arguments.</p>
-<p>Raises ValidationError if the input data cannot be parsed to form a valid model.</p>
+<p>Raises [<code class="xref any docutils literal notranslate"><span class="pre">ValidationError</span></code>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><code class="xref any docutils literal notranslate"><span class="pre">self</span></code> is explicitly positional-only to allow <code class="xref any docutils literal notranslate"><span class="pre">self</span></code> as a field name.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p>
@@ -858,7 +862,16 @@ Should be always incrementing, unique per-visit, co-ordinated with any other sca
 <p class="rubric">Attributes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">collectionNumber</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_computed_fields</span></code></p></td>
+<td><p>A dictionary of computed field names and their corresponding <code class="xref any docutils literal notranslate"><span class="pre">ComputedFieldInfo</span></code> objects.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_config</span></code></p></td>
+<td><p>Configuration for the model, should be a dictionary conforming to [<code class="xref any docutils literal notranslate"><span class="pre">ConfigDict</span></code>][pydantic.config.ConfigDict].</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">model_fields</span></code></p></td>
+<td><p>Metadata about the fields defined on the model, mapping of field names to [<code class="xref any docutils literal notranslate"><span class="pre">FieldInfo</span></code>][pydantic.fields.FieldInfo] objects.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">collectionNumber</span></code></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -888,11 +901,11 @@ Should be always incrementing, unique per-visit, co-ordinated with any other sca
       </div>
     </a>
     <a class="right-next"
-       href="dodal.common.visit.DirectoryServiceClient.html"
+       href="dodal.common.visit.DiamondFilenameProvider.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">dodal.common.visit.DirectoryServiceClient</p>
+        <p class="prev-next-title">dodal.common.visit.DiamondFilenameProvider</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

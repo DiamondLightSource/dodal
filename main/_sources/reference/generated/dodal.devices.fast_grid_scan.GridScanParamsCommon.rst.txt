@@ -33,6 +33,17 @@ dodal.devices.fast\_grid\_scan.GridScanParamsCommon
       
       
       
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
    
    
 
@@ -44,6 +55,26 @@ dodal.devices.fast\_grid\_scan.GridScanParamsCommon
    
       
       ~GridScanParamsCommon.is_3d_grid_scan
+      
+      
+      ~GridScanParamsCommon.model_computed_fields
+      
+      
+      ~GridScanParamsCommon.model_config
+      
+      
+      
+      ~GridScanParamsCommon.model_fields
+      
+      
+      
+      ~GridScanParamsCommon.x_axis
+      
+      
+      ~GridScanParamsCommon.y_axis
+      
+      
+      ~GridScanParamsCommon.z_axis
       
       
       ~GridScanParamsCommon.x_steps
@@ -77,15 +108,6 @@ dodal.devices.fast\_grid\_scan.GridScanParamsCommon
       
       
       ~GridScanParamsCommon.z2_start
-      
-      
-      ~GridScanParamsCommon.x_axis
-      
-      
-      ~GridScanParamsCommon.y_axis
-      
-      
-      ~GridScanParamsCommon.z_axis
       
       
       ~GridScanParamsCommon.set_stub_offsets

@@ -16,12 +16,12 @@ dodal.devices.tetramm
 
    ~tetramm.TetrammChannels
    ~tetramm.TetrammController
+   ~tetramm.TetrammDatasetDescriber
    ~tetramm.TetrammDetector
    ~tetramm.TetrammDriver
    ~tetramm.TetrammGeometry
    ~tetramm.TetrammRange
    ~tetramm.TetrammResolution
-   ~tetramm.TetrammShapeProvider
    ~tetramm.TetrammTrigger
 
 
