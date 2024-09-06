@@ -5,7 +5,6 @@ from typing import Any
 import bluesky.plan_stubs as bps
 import bluesky.plans as bp
 import pytest
-from aiohttp import ClientResponseError
 from bluesky.preprocessors import (
     run_decorator,
     run_wrapper,
@@ -16,15 +15,15 @@ from bluesky.preprocessors import (
 from bluesky.protocols import HasName, Readable, Reading, Triggerable
 from bluesky.run_engine import RunEngine
 from event_model.documents.event_descriptor import DataKey
-from ophyd_async.core import AsyncStatus, DeviceCollector, DirectoryProvider
+from ophyd_async.core import AsyncStatus, DeviceCollector, PathProvider
 from pydantic import BaseModel
 
-from dodal.common.types import MsgGenerator, UpdatingDirectoryProvider
+from dodal.common.types import MsgGenerator, UpdatingPathProvider
 from dodal.common.visit import (
     DataCollectionIdentifier,
-    DirectoryServiceClientBase,
+    DirectoryServiceClient,
     LocalDirectoryServiceClient,
-    StaticVisitDirectoryProvider,
+    StaticVisitPathProvider,
 )
 from dodal.plans.data_session_metadata import (
     DATA_SESSION,
@@ -34,12 +33,12 @@ from dodal.plans.data_session_metadata import (
 
 class FakeDetector(Readable, HasName, Triggerable):
     _name: str
-    _provider: DirectoryProvider
+    _provider: PathProvider
 
     def __init__(
         self,
         name: str,
-        provider: DirectoryProvider,
+        provider: PathProvider,
     ) -> None:
         self._name = name
         self._provider = provider
@@ -53,12 +52,8 @@ class FakeDetector(Readable, HasName, Triggerable):
         }
 
     async def describe(self) -> dict[str, DataKey]:
-        directory_info = self._provider()
-        source = str(
-            directory_info.root
-            / directory_info.resource_dir
-            / f"{directory_info.prefix}{self.name}{directory_info.suffix}.h5"
-        )
+        directory_info = self._provider(self.name)
+        source = str(directory_info.directory_path / f"{directory_info.filename}.h5")
         return {
             f"{self.name}_data": {
                 "dtype": "string",
@@ -87,13 +82,13 @@ class MockDirectoryServiceClient(LocalDirectoryServiceClient):
 
     async def create_new_collection(self) -> DataCollectionIdentifier:
         if self.fail:
-            raise ClientResponseError(None, ())  # type: ignore
+            raise ValueError()
 
         return await super().create_new_collection()
 
     async def get_current_collection(self) -> DataCollectionIdentifier:
         if self.fail:
-            raise ClientResponseError(None, ())  # type: ignore
+            raise ValueError()
 
         return await super().get_current_collection()
 
@@ -104,19 +99,17 @@ class DataEvent(BaseModel):
 
 
 @pytest.fixture
-def client() -> DirectoryServiceClientBase:
+def client() -> DirectoryServiceClient:
     return MockDirectoryServiceClient()
 
 
 @pytest.fixture
-def provider(
-    client: DirectoryServiceClientBase, tmp_path: Path
-) -> UpdatingDirectoryProvider:
-    return StaticVisitDirectoryProvider("example", tmp_path, client=client)
+def provider(client: DirectoryServiceClient, tmp_path: Path) -> UpdatingPathProvider:
+    return StaticVisitPathProvider("example", tmp_path, client=client)
 
 
 @pytest.fixture(params=[1, 2])
-def detectors(request, provider: UpdatingDirectoryProvider) -> list[Readable]:
+def detectors(request, provider: UpdatingPathProvider) -> list[Readable]:
     number_of_detectors = request.param
     with DeviceCollector(mock=True):
         dets: list[Readable] = [
@@ -185,7 +178,7 @@ def nested_run_without_metadata(
 def test_simple_run_gets_scan_number(
     RE: RunEngine,
     detectors: list[Readable],
-    provider: UpdatingDirectoryProvider,
+    provider: UpdatingPathProvider,
     tmp_path: Path,
 ) -> None:
     docs = collect_docs(
@@ -203,7 +196,7 @@ def test_multi_run_gets_scan_numbers(
     RE: RunEngine,
     detectors: list[Readable],
     plan: Callable[[list[Readable]], MsgGenerator],
-    provider: UpdatingDirectoryProvider,
+    provider: UpdatingPathProvider,
     tmp_path: Path,
 ) -> None:
     """Test is here to demonstrate that multi run plans will overwrite files."""
@@ -222,7 +215,7 @@ def test_multi_run_gets_scan_numbers(
 def test_multi_run_single_stage(
     RE: RunEngine,
     detectors: list[Readable],
-    provider: UpdatingDirectoryProvider,
+    provider: UpdatingPathProvider,
     tmp_path: Path,
 ) -> None:
     docs = collect_docs(
@@ -248,7 +241,7 @@ def test_multi_run_single_stage(
 def test_multi_run_single_stage_multi_group(
     RE: RunEngine,
     detectors: list[Readable],
-    provider: UpdatingDirectoryProvider,
+    provider: UpdatingPathProvider,
     tmp_path: Path,
 ) -> None:
     docs = collect_docs(
@@ -273,7 +266,7 @@ def test_multi_run_single_stage_multi_group(
 def test_nested_run_with_metadata(
     RE: RunEngine,
     detectors: list[Readable],
-    provider: UpdatingDirectoryProvider,
+    provider: UpdatingPathProvider,
     tmp_path: Path,
 ) -> None:
     """Test is here to demonstrate that nested runs will be treated as a single run.
@@ -296,7 +289,7 @@ def test_nested_run_with_metadata(
 def test_nested_run_without_metadata(
     RE: RunEngine,
     detectors: list[Readable],
-    provider: UpdatingDirectoryProvider,
+    provider: UpdatingPathProvider,
     tmp_path: Path,
 ) -> None:
     """Test is here to demonstrate that nested runs will be treated as a single run.
@@ -316,10 +309,10 @@ def test_nested_run_without_metadata(
     assert_all_detectors_used_collection_numbers(tmp_path, docs, detectors, ["1", "1"])
 
 
-def test_visit_directory_provider_fails(
+def test_visit_path_provider_fails(
     RE: RunEngine,
     detectors: list[Readable],
-    provider: UpdatingDirectoryProvider,
+    provider: UpdatingPathProvider,
     client: MockDirectoryServiceClient,
 ) -> None:
     client.fail = True
@@ -331,10 +324,10 @@ def test_visit_directory_provider_fails(
         )
 
 
-def test_visit_directory_provider_fails_after_one_sucess(
+def test_visit_path_provider_fails_after_one_sucess(
     RE: RunEngine,
     detectors: list[Readable],
-    provider: UpdatingDirectoryProvider,
+    provider: UpdatingPathProvider,
     client: MockDirectoryServiceClient,
 ) -> None:
     collect_docs(
@@ -354,7 +347,7 @@ def test_visit_directory_provider_fails_after_one_sucess(
 def collect_docs(
     RE: RunEngine,
     plan: MsgGenerator,
-    provider: UpdatingDirectoryProvider,
+    provider: UpdatingPathProvider,
 ) -> list[DataEvent]:
     events = []
 

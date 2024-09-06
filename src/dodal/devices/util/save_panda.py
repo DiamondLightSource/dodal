@@ -7,7 +7,7 @@ from typing import cast
 
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import Device, save_device
-from ophyd_async.panda import phase_sorter
+from ophyd_async.fastcs.panda import phase_sorter
 
 from dodal.beamlines import module_name_for_beamline
 from dodal.utils import make_device

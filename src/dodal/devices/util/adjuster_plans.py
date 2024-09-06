@@ -8,7 +8,7 @@ from collections.abc import Callable, Generator
 from bluesky import plan_stubs as bps
 from bluesky.utils import Msg
 from ophyd.epics_motor import EpicsMotor
-from ophyd_async.epics.motion import Motor
+from ophyd_async.epics.motor import Motor
 
 from dodal.log import LOGGER
 

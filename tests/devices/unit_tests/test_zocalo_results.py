@@ -7,7 +7,8 @@ import numpy as np
 import pytest
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
-from ophyd_async.core.async_status import AsyncStatus
+from ophyd_async.core import AsyncStatus
+from workflows.recipe import RecipeWrapper
 
 from dodal.devices.zocalo.zocalo_results import (
     ZOCALO_READING_PLAN_NAME,

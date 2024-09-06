@@ -1,4 +1,4 @@
-from unittest.mock import ANY
+from unittest.mock import ANY, AsyncMock, patch
 
 import pytest
 from bluesky import plan_stubs as bps
@@ -35,17 +35,37 @@ async def test_backlight_can_be_written_and_read_from(fake_backlight: Backlight)
     )
 
 
+@patch("dodal.devices.backlight.sleep", autospec=True)
 async def test_when_backlight_moved_out_it_switches_off(
-    fake_backlight: Backlight, RE: RunEngine
+    mock_sleep: AsyncMock, fake_backlight: Backlight, RE: RunEngine
 ):
     RE(bps.mv(fake_backlight, BacklightPosition.OUT))
     assert await fake_backlight.position.get_value() == BacklightPosition.OUT
     assert await fake_backlight.power.get_value() == BacklightPower.OFF
 
 
+@patch("dodal.devices.backlight.sleep", autospec=True)
 async def test_when_backlight_moved_in_it_switches_on(
-    fake_backlight: Backlight, RE: RunEngine
+    mock_sleep, fake_backlight: Backlight, RE: RunEngine
 ):
     RE(bps.mv(fake_backlight, BacklightPosition.IN))
     assert await fake_backlight.position.get_value() == BacklightPosition.IN
     assert await fake_backlight.power.get_value() == BacklightPower.ON
+
+
+@patch("dodal.devices.backlight.sleep", autospec=True)
+async def test_given_backlight_in_when_backlight_moved_in_it_does_not_sleep(
+    mock_sleep: AsyncMock, fake_backlight: Backlight, RE: RunEngine
+):
+    set_mock_value(fake_backlight.position, BacklightPosition.IN)
+    RE(bps.mv(fake_backlight, BacklightPosition.IN))
+    mock_sleep.assert_not_awaited()
+
+
+@patch("dodal.devices.backlight.sleep", autospec=True)
+async def test_given_backlight_out_when_backlight_moved_in_it_sleeps(
+    mock_sleep: AsyncMock, fake_backlight: Backlight, RE: RunEngine
+):
+    set_mock_value(fake_backlight.position, BacklightPosition.OUT)
+    RE(bps.mv(fake_backlight, BacklightPosition.IN))
+    mock_sleep.assert_awaited_once()

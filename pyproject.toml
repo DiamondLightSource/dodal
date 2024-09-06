@@ -15,15 +15,15 @@ description = "Ophyd devices and other utils that could be used across DLS beaml
 dependencies = [
     "click",
     "ophyd",
-    "ophyd-async<0.4.0",      # Need to pin to <0.4.0 as this requires pydantic>2.0 see https://github.com/DiamondLightSource/dodal/issues/679
+    "ophyd-async>=0.5.2",
     "bluesky",
     "pyepics",
     "dataclasses-json",
     "pillow",
-    "zocalo>=0.32.0,<1.0.0",  # TODO remove pin against <1.0.0, see #679
+    "zocalo>=1.0.0",
     "requests",
     "graypy",
-    "pydantic",
+    "pydantic>=2.0",
     "opencv-python-headless", # For pin-tip detection.
     "aioca",                  # Required for CA support with ophyd-async.
     "p4p",                    # Required for PVA support with ophyd-async.
@@ -111,6 +111,8 @@ filterwarnings = [
     "ignore:dep_util is Deprecated. Use functions from setuptools instead.:DeprecationWarning",
     # Ignore deprecation warning from zocalo
     "ignore:.*pkg_resources.*:DeprecationWarning",
+    # Ignore deprecation warning from setuptools_dso (remove when https://github.com/epics-base/setuptools_dso/issues/36 is released)
+    "ignore::DeprecationWarning:wheel",
 ]
 # Doctest python code in docs, python code in src docstrings, test functions in tests
 testpaths = "docs src tests"

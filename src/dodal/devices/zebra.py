@@ -37,6 +37,11 @@ TTL_SHUTTER = 2
 TTL_XSPRESS3 = 3
 TTL_PANDA = 4
 
+# The AND gate that controls the automatic shutter
+AUTO_SHUTTER_GATE = 2
+# The input that triggers the automatic shutter
+AUTO_SHUTTER_INPUT = 1
+
 
 class ArmSource(str, Enum):
     SOFT = "Soft"
