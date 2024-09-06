@@ -15,7 +15,6 @@ from dodal.devices.zocalo.zocalo_results import (
     NoZocaloSubscription,
     XrcResult,
     ZocaloResults,
-    get_dict_differences,
     get_processing_result,
 )
 
@@ -79,7 +78,7 @@ TEST_READING = {
     },
 }
 
-test_ispyb_ids = {"dcid": 0, "dcgid": 0}
+test_recipe_parameters = {"dcid": 0, "dcgid": 0}
 
 
 @patch("dodal.devices.zocalo_results._get_zocalo_connection")
@@ -90,7 +89,7 @@ async def mocked_zocalo_device(RE):
 
         @AsyncStatus.wrap
         async def mock_trigger(results):
-            await zd._put_results(results, test_ispyb_ids)
+            await zd._put_results(results, test_recipe_parameters)
 
         zd.trigger = MagicMock(side_effect=partial(mock_trigger, results))  # type: ignore
         await zd.connect()
@@ -113,7 +112,7 @@ async def test_put_result_read_results(
     RE,
 ) -> None:
     zocalo_device = await mocked_zocalo_device([], run_setup=True)
-    await zocalo_device._put_results(TEST_RESULTS, test_ispyb_ids)
+    await zocalo_device._put_results(TEST_RESULTS, test_recipe_parameters)
     reading = await zocalo_device.read()
     results: list[XrcResult] = reading["zocalo-results"]["value"]
     centres: list[XrcResult] = reading["zocalo-centres_of_mass"]["value"]
@@ -128,7 +127,7 @@ async def test_rd_top_results(
     RE,
 ):
     zocalo_device = await mocked_zocalo_device([], run_setup=True)
-    await zocalo_device._put_results(TEST_RESULTS, test_ispyb_ids)
+    await zocalo_device._put_results(TEST_RESULTS, test_recipe_parameters)
 
     def test_plan():
         bbox_size = yield from bps.rd(zocalo_device.bbox_sizes)
@@ -182,7 +181,7 @@ async def test_subscribe_only_on_called_stage(
     mock_connection: MagicMock, mock_wrap_subscribe: MagicMock, RE: RunEngine
 ):
     zocalo_results = ZocaloResults(
-        name="zocalo", zocalo_environment="dev_artemis", timeout_s=2
+        name="zocalo", zocalo_environment="dev_artemis", timeout_s=0
     )
     mock_wrap_subscribe.assert_not_called()
     await zocalo_results.stage()
@@ -209,7 +208,7 @@ async def test_zocalo_results_trigger_log_message(
         name="zocalo",
         zocalo_environment="dev_artemis",
         timeout_s=2,
-        use_cpu_and_gpu_zocalo=True,
+        use_cpu_and_gpu=True,
     )
 
     recipe_wrapper = MagicMock()
@@ -267,7 +266,7 @@ async def test_if_use_cpu_and_gpu_zocalos_then_wait_twice_for_results(
     mock_connection, RE: RunEngine
 ):
     zocalo_results = ZocaloResults(
-        name="zocalo", zocalo_environment="dev_artemis", use_cpu_and_gpu_zocalo=True
+        name="zocalo", zocalo_environment="dev_artemis", use_cpu_and_gpu=True
     )
 
     await zocalo_results.connect()
@@ -285,13 +284,13 @@ async def test_source_of_zocalo_results_correctly_identified(
     mock_connection, mock_logger, RE: RunEngine
 ):
     zocalo_results = ZocaloResults(
-        name="zocalo", zocalo_environment="dev_artemis", use_cpu_and_gpu_zocalo=False
+        name="zocalo", zocalo_environment="dev_artemis", use_cpu_and_gpu=False
     )
     await zocalo_results.connect()
     await zocalo_results.stage()
 
     zocalo_results._raw_results_received.get = MagicMock(
-        return_value={"ispyb_ids": {"test": 0}, "results": []}
+        return_value={"recipe_parameters": {"test": 0}, "results": []}
     )
     RE(bps.trigger(zocalo_results, wait=False))
     mock_logger.info.assert_has_calls(
@@ -299,23 +298,11 @@ async def test_source_of_zocalo_results_correctly_identified(
     )
 
     zocalo_results._raw_results_received.get = MagicMock(
-        return_value={"ispyb_ids": {"gpu": True}, "results": []}
+        return_value={"recipe_parameters": {"gpu": True}, "results": []}
     )
     RE(bps.trigger(zocalo_results, wait=False))
     mock_logger.info.assert_has_calls(
         [call("Zocalo results from GPU processing: found 0 crystals.")]
-    )
-
-
-def test_compare_cpu_and_gpu_results_warns_correctly():
-    dict1 = {"key1": [1, 2, 3], "key2": "test", "key3": [[1, 2], [1, 2]]}
-    dict2 = {"key1": [1, 2, 3], "key2": "test", "key3": [[1, 2], [1, 2]]}
-    assert not get_dict_differences(dict1, "dict1", dict2, "dict2")
-    dict1 = {"key1": [2, 2, 3], "key2": "test", "key3": [[1, 2], [1, 4]]}
-    dict2 = {"key1": [1, 2, 3], "key2": "test", "key3": [[1, 2], [1, 3]]}
-    assert (
-        get_dict_differences(dict1, "dict1", dict2, "dict2")
-        == f"Results differed in key1: dict1 contains {dict1['key1']} while dict2 contains {dict2['key1']} \nResults differed in key3: dict1 contains {dict1['key3']} while dict2 contains {dict2['key3']} \n"
     )
 
 
@@ -325,12 +312,12 @@ async def test_if_zocalo_results_timeout_from_one_source_then_warn(
     mock_connection, mock_logger, RE: RunEngine
 ):
     zocalo_results = ZocaloResults(
-        name="zocalo", zocalo_environment="dev_artemis", use_cpu_and_gpu_zocalo=True
+        name="zocalo", zocalo_environment="dev_artemis", use_cpu_and_gpu=True
     )
     await zocalo_results.connect()
     await zocalo_results.stage()
     zocalo_results._raw_results_received.get = MagicMock(
-        side_effect=[{"ispyb_ids": {"test": 0}, "results": []}, Empty]
+        side_effect=[{"recipe_parameters": {"test": 0}, "results": []}, Empty]
     )
     RE(bps.trigger(zocalo_results, wait=False))
     mock_logger.warning.assert_called_with(
@@ -344,12 +331,12 @@ async def test_if_cpu_results_arrive_before_gpu_then_warn(
     mock_connection, mock_logger, RE: RunEngine
 ):
     zocalo_results = ZocaloResults(
-        name="zocalo", zocalo_environment="dev_artemis", use_cpu_and_gpu_zocalo=True
+        name="zocalo", zocalo_environment="dev_artemis", use_cpu_and_gpu=True
     )
     await zocalo_results.connect()
     await zocalo_results.stage()
     zocalo_results._raw_results_received.get = MagicMock(
-        return_value={"ispyb_ids": {"test": 0}, "results": []}
+        return_value={"recipe_parameters": {"test": 0}, "results": []}
     )
     RE(bps.trigger(zocalo_results, wait=False))
     mock_logger.warning.assert_called_with(
@@ -361,37 +348,35 @@ async def test_if_cpu_results_arrive_before_gpu_then_warn(
     "dict1,dict2,output",
     [
         (
-            {"ispyb_ids": {"gpu": True}, "results": [{"test": 0}]},
-            {"ispyb_ids": {}, "results": [{"test": 1}]},
-            "Differences found between GPU and CPU results:\n   values_changed: {\"root['test']\": {'CPU': 1, 'GPU': 0}}\n",
+            {"recipe_parameters": {"gpu": True}, "results": [{"test": 0}]},
+            {"recipe_parameters": {}, "results": [{"test": 1}]},
+            "Zocalo results from GPU and CPU are not identical.\n Results from GPU: {'test': 0}\n Results from CPU: {'test': 1}",
         ),
         (
             {
-                "ispyb_ids": {"gpu": True},
+                "recipe_parameters": {"gpu": True},
                 "results": [{"test": [[1, 2 + 1e-6, 3], [1, 2, 3]]}],
             },
-            {"ispyb_ids": {}, "results": [{"test": [[1, 2, 3], [1, 2, 3]]}]},
+            {"recipe_parameters": {}, "results": [{"test": [[1, 2, 3], [1, 2, 3]]}]},
             None,
         ),
         (
             {
-                "ispyb_ids": {"gpu": True},
+                "recipe_parameters": {"gpu": True},
                 "results": [
                     {"test": [[1, 2 + 1e-6, 3], [1, 2, 3]], "extra_key": "test"}
                 ],
             },
-            {"ispyb_ids": {}, "results": [{"test": [[1, 2, 3], [1, 2, 3]]}]},
-            "Differences found between GPU and CPU results:\n  dictionary_item_removed: SetOrdered([\"root['extra_key']\"])\n",
+            {"recipe_parameters": {}, "results": [{"test": [[1, 2, 3], [1, 2, 3]]}]},
+            "Zocalo results from GPU and CPU are not identical.\n Results from GPU: {'test': [[1, 2.000001, 3], [1, 2, 3]], 'extra_key': 'test'}\n Results from CPU: {'test': [[1, 2, 3], [1, 2, 3]]}",
         ),
         (
             {
-                "ispyb_ids": {"gpu": False},
-                "results": [
-                    {"test": [[1, 2 + 1e-6, 3], [1, 2, 3]], "extra_key": "test"}
-                ],
+                "recipe_parameters": {"gpu": False},
+                "results": [{"test": [[1, 2 + 1e-6, 3], [1, 2, 3]]}],
             },
-            {"ispyb_ids": {}, "results": [{"test": [[1, 3, 3], [1, 2, 3]]}]},
-            "Differences found between CPU and GPU results:\n  dictionary_item_removed: SetOrdered([\"root['extra_key']\"])\n   values_changed: {\"root['test'][0][1]\": {'GPU': 3, 'CPU': 2.000001}}\n",
+            {"recipe_parameters": {}, "results": [{"test": [[1, 3, 3], [1, 2, 3]]}]},
+            "Zocalo results from CPU and CPU are not identical.\n Results from CPU: {'test': [[1, 2.000001, 3], [1, 2, 3]]}\n Results from CPU: {'test': [[1, 3, 3], [1, 2, 3]]}",
         ),
     ],
 )
@@ -401,7 +386,7 @@ async def test_warning_if_results_are_different(
     mock_connection, mock_logger, RE: RunEngine, dict1, dict2, output
 ):
     zocalo_results = ZocaloResults(
-        name="zocalo", zocalo_environment="dev_artemis", use_cpu_and_gpu_zocalo=True
+        name="zocalo", zocalo_environment="dev_artemis", use_cpu_and_gpu=True
     )
     await zocalo_results.connect()
     await zocalo_results.stage()
@@ -422,7 +407,7 @@ async def test_if_zocalo_results_timeout_before_any_results_then_error(
     mock_connection, RE: RunEngine
 ):
     zocalo_results = ZocaloResults(
-        name="zocalo", zocalo_environment="dev_artemis", use_cpu_and_gpu_zocalo=True
+        name="zocalo", zocalo_environment="dev_artemis", use_cpu_and_gpu=True
     )
     await zocalo_results.connect()
     await zocalo_results.stage()
@@ -443,7 +428,7 @@ async def test_gpu_results_ignored_if_toggle_disabled(
         name="zocalo",
         zocalo_environment="dev_artemis",
         timeout_s=2,
-        use_cpu_and_gpu_zocalo=False,
+        use_cpu_and_gpu=False,
     )
 
     recipe_wrapper = MagicMock()

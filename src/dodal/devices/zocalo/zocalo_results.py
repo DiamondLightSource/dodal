@@ -34,6 +34,11 @@ class SortKeys(str, Enum):
     n_voxels = "n_voxels"
 
 
+class ZocaloSource(str, Enum):
+    CPU = "CPU"
+    GPU = "GPU"
+
+
 DEFAULT_TIMEOUT = 180
 DEFAULT_SORT_KEY = SortKeys.max_count
 ZOCALO_READING_PLAN_NAME = "zocalo reading"
@@ -59,24 +64,22 @@ def bbox_size(result: XrcResult):
 
 def get_dict_differences(
     dict1: dict, dict1_source: str, dict2: dict, dict2_source: str
-) -> str:
-    differences_str = ""
+) -> str | None:
+    """Returns dict1 and dict2 as a string if differences between them are found greater than a
+    1e-5 tolerance. If dictionaries are identical, return None"""
+
     diff = DeepDiff(dict1, dict2, math_epsilon=1e-5, ignore_numeric_type_changes=True)
-    # diff is None if there are no differences, otherwise a dictionary with various keys depending
-    # on the type of difference detected. Eg 'values_changed', dictionary_item_added', 'iterable_item_added'
 
     if diff:
-        differences_str += (
-            f"Differences found between {dict1_source} and {dict2_source} results:\n"
-        )
+        return f"Zocalo results from {dict1_source} and {dict2_source} are not identical.\n Results from {dict1_source}: {dict1}\n Results from {dict2_source}: {dict2}"
 
-    # Format the difference more nicely in a string
-    for key, value in diff.items():
-        if key == "values_changed":
-            differences_str += f"   {key}: {str(value).replace('old_value', dict1_source).replace('new_value', dict2_source)}\n"
-        else:
-            differences_str += f"  {key}: {value}\n"
-    return differences_str
+
+def source_from_results(results):
+    return (
+        ZocaloSource.GPU.value
+        if results["recipe_parameters"].get("gpu")
+        else ZocaloSource.CPU.value
+    )
 
 
 class ZocaloResults(StandardReadable, Triggerable):
@@ -84,7 +87,25 @@ class ZocaloResults(StandardReadable, Triggerable):
     be triggered from a plan-subscribed callback using the run_start() and run_end()
     methods on dodal.devices.zocalo.ZocaloTrigger.
 
-    See https://diamondlightsource.github.io/dodal/main/how-to/zocalo.html"""
+    See https://diamondlightsource.github.io/dodal/main/how-to/zocalo.html
+
+    Args:
+        name (str): Name of the device
+
+        zocalo_environment (str): How zocalo is configured. Defaults to i03's development configuration
+
+        channel (str): Name for the results Queue
+
+        sort_key (str): How results are ranked. Defaults to sorting by highest counts
+
+        timeout_s (float): Maximum time to wait for the Queue to be filled by an object, starting
+        from when the ZocaloResults device is triggered
+
+        prefix (str): EPICS PV prefix for the device
+
+        use_cpu_and_gpu (bool): When True, ZocaloResults will wait for results from the CPU and the GPU, compare them, and provide a warning if the results differ. When False, ZocaloResults will only use results from the CPU
+
+    """
 
     def __init__(
         self,
@@ -94,7 +115,7 @@ class ZocaloResults(StandardReadable, Triggerable):
         sort_key: str = DEFAULT_SORT_KEY.value,
         timeout_s: float = DEFAULT_TIMEOUT,
         prefix: str = "",
-        use_cpu_and_gpu_zocalo: bool = False,
+        use_cpu_and_gpu: bool = False,
     ) -> None:
         self.zocalo_environment = zocalo_environment
         self.sort_key = SortKeys[sort_key]
@@ -103,7 +124,7 @@ class ZocaloResults(StandardReadable, Triggerable):
         self._prefix = prefix
         self._raw_results_received: Queue = Queue()
         self.transport: CommonTransport | None = None
-        self.use_cpu_and_gpu_zocalo = use_cpu_and_gpu_zocalo
+        self.use_cpu_and_gpu = use_cpu_and_gpu
 
         self.results, self._results_setter = soft_signal_r_and_setter(
             list[XrcResult], name="results"
@@ -132,14 +153,14 @@ class ZocaloResults(StandardReadable, Triggerable):
         )
         super().__init__(name)
 
-    async def _put_results(self, results: Sequence[XrcResult], ispyb_ids):
+    async def _put_results(self, results: Sequence[XrcResult], recipe_parameters):
         self._results_setter(list(results))
         centres_of_mass = np.array([r["centre_of_mass"] for r in results])
         bbox_sizes = np.array([bbox_size(r) for r in results])
         self._com_setter(centres_of_mass)
         self._bbox_setter(bbox_sizes)
-        self._ispyb_dcid_setter(ispyb_ids["dcid"])
-        self._ispyb_dcgid_setter(ispyb_ids["dcgid"])
+        self._ispyb_dcid_setter(recipe_parameters["dcid"])
+        self._ispyb_dcgid_setter(recipe_parameters["dcgid"])
 
     def _clear_old_results(self):
         LOGGER.info("Clearing queue")
@@ -190,20 +211,19 @@ class ZocaloResults(StandardReadable, Triggerable):
             )
 
             raw_results = self._raw_results_received.get(timeout=self.timeout_s)
-            source_of_first_results, source_of_second_results = (
-                ("CPU", "GPU")
-                if not raw_results["ispyb_ids"].get("gpu")
-                else ("GPU", "CPU")
-            )
+            source_of_first_results = source_from_results(raw_results)
 
             # Wait for results from CPU and GPU, warn and continue if one timed out, error if both time out
-            if self.use_cpu_and_gpu_zocalo:
-                if source_of_first_results == "CPU":
+            if self.use_cpu_and_gpu:
+                if source_of_first_results == ZocaloSource.CPU:
                     LOGGER.warning("Recieved zocalo results from CPU before GPU")
                 raw_results_two_sources = [raw_results]
                 try:
                     raw_results_two_sources.append(
                         self._raw_results_received.get(timeout=self.timeout_s / 2)
+                    )
+                    source_of_second_results = source_from_results(
+                        raw_results_two_sources[1]
                     )
 
                     # Compare results from both sources and warn if they aren't the same
@@ -217,8 +237,13 @@ class ZocaloResults(StandardReadable, Triggerable):
                         LOGGER.warning(differences_str)
 
                 except Empty:
+                    source_of_missing_results = (
+                        ZocaloSource.CPU.value
+                        if source_of_first_results == ZocaloSource.GPU.value
+                        else ZocaloSource.GPU.value
+                    )
                     LOGGER.warning(
-                        f"Zocalo results from {source_of_second_results} timed out. Using results from {source_of_first_results}"
+                        f"Zocalo results from {source_of_missing_results} timed out. Using results from {source_of_first_results}"
                     )
 
             LOGGER.info(
@@ -231,7 +256,7 @@ class ZocaloResults(StandardReadable, Triggerable):
                     key=lambda d: d[self.sort_key.value],
                     reverse=True,
                 ),
-                raw_results["ispyb_ids"],
+                raw_results["recipe_parameters"],
             )
         except Empty as timeout_exception:
             LOGGER.warning("Timed out waiting for zocalo results!")
@@ -296,15 +321,15 @@ class ZocaloResults(StandardReadable, Triggerable):
 
             results = message.get("results", [])
 
-            if self.use_cpu_and_gpu_zocalo:
+            if self.use_cpu_and_gpu:
                 self._raw_results_received.put(
-                    {"results": results, "ispyb_ids": recipe_parameters}
+                    {"results": results, "recipe_parameters": recipe_parameters}
                 )
             else:
                 # Only add to queue if results are from CPU
                 if not recipe_parameters.get("gpu"):
                     self._raw_results_received.put(
-                        {"results": results, "ispyb_ids": recipe_parameters}
+                        {"results": results, "recipe_parameters": recipe_parameters}
                     )
 
         subscription = workflows.recipe.wrap_subscribe(
