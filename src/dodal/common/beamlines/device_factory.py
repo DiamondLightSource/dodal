@@ -15,11 +15,11 @@ _skip = bool | Callable[[], bool]
 @dataclass
 class DeviceInitializationConfig:
     """
-    default_eager: connect or raise Exception at startup
-    default_set_name: use factory name as name of device
-    default_timeout: timeout for connecting to the device
-    default_mock: use Signals with mock backends for device
-    default_skip: mark the factory to be (conditionally) skipped
+    eager_connect: connect or raise Exception at startup
+    use_factory_name: use factory name as name of device
+    timeout: timeout for connecting to the device
+    mock: use Signals with mock backends for device
+    skip: mark the factory to be (conditionally) skipped
     """
 
     eager_connect: bool
