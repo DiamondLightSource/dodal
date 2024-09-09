@@ -1,3 +1,4 @@
+from asyncio import sleep
 from enum import Enum, IntEnum
 from typing import SupportsFloat
 
@@ -168,6 +169,7 @@ class ProgramAbort(Triggerable):
     @AsyncStatus.wrap
     async def trigger(self):
         await self.signal.set("A", wait=True)
+        await sleep(1.0)  # TODO Check with scientist what this sleep is really for.
         await self.signal.set("P2401=0", wait=True)
         await wait_for_value(
             self.status,
