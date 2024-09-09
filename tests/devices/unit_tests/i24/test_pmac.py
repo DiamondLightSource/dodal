@@ -1,9 +1,10 @@
 import asyncio
+from unittest.mock import ANY, call
 
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import callback_on_mock_put, set_mock_value
+from ophyd_async.core import callback_on_mock_put, get_mock_put, set_mock_value
 
 from dodal.devices.i24.pmac import HOME_STR, PMAC, EncReset, LaserSettings
 from dodal.devices.util.test_utils import patch_motor
@@ -79,3 +80,16 @@ async def test_run_proogram(fake_pmac: PMAC, RE):
     RE(bps.abs_set(fake_pmac.run_program, prog_num, timeout=1, wait=True))
 
     assert await fake_pmac.pmac_string.get_value() == f"&2b{prog_num}r"
+
+
+async def test_abort_program(fake_pmac: PMAC, RE):
+    set_mock_value(fake_pmac.scanstatus, 0)
+    RE(bps.trigger(fake_pmac.abort_program, wait=True))
+
+    mock_pmac_string = get_mock_put(fake_pmac.pmac_string)
+    mock_pmac_string.assert_has_calls(
+        [
+            call("A", wait=True, timeout=ANY),
+            call("P2401=0", wait=True, timeout=ANY),
+        ]
+    )
