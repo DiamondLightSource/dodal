@@ -82,7 +82,7 @@ async def test_run_proogram(fake_pmac: PMAC, RE):
     assert await fake_pmac.pmac_string.get_value() == f"&2b{prog_num}r"
 
 
-@patch("dodal.devices.i24.pmac.asyncio.sleep")
+@patch("dodal.devices.i24.pmac.sleep")
 async def test_abort_program(mock_sleep, fake_pmac: PMAC, RE):
     set_mock_value(fake_pmac.scanstatus, 0)
     RE(bps.trigger(fake_pmac.abort_program, wait=True))
