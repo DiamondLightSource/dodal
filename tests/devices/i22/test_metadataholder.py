@@ -1,14 +1,12 @@
-from pathlib import Path
-
 import pytest
-from ophyd_async.core import DeviceCollector, StaticDirectoryProvider
-from ophyd_async.epics.areadetector import PilatusDetector
+from ophyd_async.core import DeviceCollector, PathProvider
+from ophyd_async.epics.adpilatus import PilatusDetector
 
 from dodal.devices.i22.nxsas import NXSasMetadataHolder, NXSasPilatus
 
 
 @pytest.fixture
-def saxs(tmp_path: Path, RE) -> PilatusDetector:
+def saxs(static_path_provider: PathProvider, RE) -> PilatusDetector:
     with DeviceCollector(mock=True):
         saxs = NXSasPilatus(
             prefix="-EA-PILAT-01:",
@@ -22,7 +20,7 @@ def saxs(tmp_path: Path, RE) -> PilatusDetector:
                     "m",
                 ),  # To get from configuration data after visit begins
             ),
-            directory_provider=StaticDirectoryProvider(tmp_path),
+            path_provider=static_path_provider,
         )
     return saxs
 

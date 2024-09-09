@@ -1,4 +1,3 @@
-import uuid
 from inspect import Parameter, signature
 
 import pytest
@@ -7,8 +6,10 @@ from bluesky.protocols import Movable
 from dodal.common.coordination import group_uuid, inject
 from dodal.common.types import MsgGenerator
 
+static_uuid = "51aef931-33b4-4b33-b7ad-a8287f541202"
 
-@pytest.mark.parametrize("group", ["foo", "bar", "baz", str(uuid.uuid4())])
+
+@pytest.mark.parametrize("group", ["foo", "bar", "baz", static_uuid])
 def test_group_uid(group: str):
     gid = group_uuid(group)
     assert gid.startswith(f"{group}-")

@@ -1,7 +1,7 @@
 from enum import Enum, auto
-from typing import Any
+from pathlib import Path
 
-from pydantic import BaseModel, root_validator, validator
+from pydantic import BaseModel, Field, field_serializer, field_validator
 
 from dodal.devices.detector.det_dim_constants import (
     EIGER2_X_16M_SIZE,
@@ -28,9 +28,12 @@ class DetectorParams(BaseModel):
     """Holds parameters for the detector. Provides access to a list of Dectris detector
     sizes and a converter for distance to beam centre."""
 
+    # https://github.com/pydantic/pydantic/issues/8379
+    # Must use model_dump(by_alias=True) if serialising!
+
     expected_energy_ev: float | None = None
     exposure_time: float
-    directory: str
+    directory: str  # : Path https://github.com/DiamondLightSource/dodal/issues/774
     prefix: str
     detector_distance: float
     omega_start: float
@@ -39,46 +42,44 @@ class DetectorParams(BaseModel):
     num_triggers: int
     use_roi_mode: bool
     det_dist_to_beam_converter_path: str
+    override_run_number: int | None = Field(default=None, alias="run_number")
     trigger_mode: TriggerMode = TriggerMode.SET_FRAMES
     detector_size_constants: DetectorSizeConstants = EIGER2_X_16M_SIZE
-    beam_xy_converter: DetectorDistanceToBeamXYConverter = None  # type: ignore # Filled in by validator
-    run_number: int = None  # type: ignore # Filled in by validator
     enable_dev_shm: bool = (
         False  # Remove in https://github.com/DiamondLightSource/hyperion/issues/1395
     )
 
-    class Config:
-        arbitrary_types_allowed = True
-        json_encoders = {
-            DetectorDistanceToBeamXYConverter: lambda _: None,
-            DetectorSizeConstants: lambda d: d.det_type_string,
-        }
+    @property
+    def beam_xy_converter(self) -> DetectorDistanceToBeamXYConverter:
+        return DetectorDistanceToBeamXYConverter(self.det_dist_to_beam_converter_path)
 
-    # should be replaced with model_validator once move to pydantic 2 is complete
-    @root_validator(pre=True)
-    def create_beamxy_and_runnumber(cls, values: dict[str, Any]) -> dict[str, Any]:
-        values["beam_xy_converter"] = DetectorDistanceToBeamXYConverter(
-            values["det_dist_to_beam_converter_path"]
+    @property
+    def run_number(self) -> int:
+        return (
+            get_run_number(self.directory, self.prefix)
+            if self.override_run_number is None
+            else self.override_run_number
         )
-        if values.get("run_number") is None:
-            values["run_number"] = get_run_number(values["directory"], values["prefix"])
-        return values
 
-    @validator("detector_size_constants", pre=True)
-    def _parse_detector_size_constants(
-        cls, det_type: str, values: dict[str, Any]
-    ) -> DetectorSizeConstants:
+    @field_serializer("detector_size_constants")
+    def serialize_detector_size_constants(self, size: DetectorSizeConstants):
+        return size.det_type_string
+
+    @field_validator("detector_size_constants", mode="before")
+    @classmethod
+    def _parse_detector_size_constants(cls, det_type: str) -> DetectorSizeConstants:
         return (
             det_type
             if isinstance(det_type, DetectorSizeConstants)
             else constants_from_type(det_type)
         )
 
-    @validator("directory", pre=True)
-    def _parse_directory(cls, directory: str, values: dict[str, Any]) -> str:
-        if not directory.endswith("/"):
-            directory += "/"
-        return directory
+    @field_validator("directory", mode="before")
+    @classmethod
+    def _parse_directory(cls, directory: str | Path) -> str:
+        path = Path(directory)
+        assert path.is_dir()
+        return f"{path}/"
 
     def get_beam_position_mm(self, detector_distance: float) -> tuple[float, float]:
         x_beam_mm = self.beam_xy_converter.get_beam_xy_from_det_dist(

@@ -9,7 +9,7 @@ from ophyd_async.core import (
     DeviceVector,
     wait_for_value,
 )
-from ophyd_async.epics.signal.signal import (
+from ophyd_async.epics.signal import (
     epics_signal_r,
     epics_signal_rw,
     epics_signal_rw_rbv,

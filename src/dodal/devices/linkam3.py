@@ -8,9 +8,9 @@ from ophyd_async.core import (
     HintedSignal,
     StandardReadable,
     WatchableAsyncStatus,
+    WatcherUpdate,
     observe_value,
 )
-from ophyd_async.core.utils import WatcherUpdate
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
 
