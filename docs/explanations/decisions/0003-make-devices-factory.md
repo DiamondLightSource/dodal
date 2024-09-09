@@ -16,7 +16,7 @@ DAQ members led us to this proposal:
 
 - ophyd-async: make Device.connect(mock, timeout, force=False) be idempotent
 - ophyd-async: make ensure_connected(\*devices) plan stub
-- dodal: make device_factory(startup_connect=False) decorator that makes, names, caches and optionally connects a device
+- dodal: make device_factory(eager=False) decorator that makes, names, caches and optionally connects a device
 - dodal: make get_device_factories() that returns all device factories and whether they should be connected at startup
 - blueapi: call get_device_factories(), make all the Devices, connect the ones that should be connected at startup in parallel and log those that fail
 - blueapi: when plan is called, run ensure_connected on all plan args and defaults that are Devices
