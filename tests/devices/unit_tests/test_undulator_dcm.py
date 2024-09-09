@@ -58,11 +58,11 @@ async def fake_undulator_dcm() -> UndulatorDCM:
 def test_lookup_table_paths_passed(fake_undulator_dcm: UndulatorDCM):
     assert fake_undulator_dcm.id_gap_lookup_table_path == ID_GAP_LOOKUP_TABLE_PATH
     assert (
-        fake_undulator_dcm.dcm_pitch_converter_lookup_table_path
+        fake_undulator_dcm.pitch_energy_table_path
         == MOCK_DAQ_CONFIG_PATH + "/lookup/BeamLineEnergy_DCM_Pitch_converter.txt"
     )
     assert (
-        fake_undulator_dcm.dcm_roll_converter_lookup_table_path
+        fake_undulator_dcm.roll_energy_table_path
         == MOCK_DAQ_CONFIG_PATH + "/lookup/BeamLineEnergy_DCM_Roll_converter.txt"
     )
 
