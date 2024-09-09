@@ -25,6 +25,8 @@ class AccessError(Exception):
 
 # Enable to allow testing when the beamline is down, do not change in production!
 TEST_MODE = False
+# will be made more generic in https://github.com/DiamondLightSource/dodal/issues/754
+
 
 # The acceptable difference, in mm, between the undulator gap and the DCM
 # energy, when the latter is converted to mm using lookup tables
