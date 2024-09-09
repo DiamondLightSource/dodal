@@ -10,8 +10,7 @@ from ophyd_async.core import (
     set_and_wait_for_value,
     wait_for_value,
 )
-from ophyd_async.epics.signal import epics_signal_r, epics_signal_x
-from ophyd_async.epics.signal.signal import epics_signal_rw_rbv
+from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw_rbv, epics_signal_x
 
 from dodal.log import LOGGER
 

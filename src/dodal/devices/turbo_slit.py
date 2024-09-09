@@ -1,5 +1,5 @@
 from ophyd_async.core import Device
-from ophyd_async.epics.motion.motor import Motor
+from ophyd_async.epics.motor import Motor
 
 
 class TurboSlit(Device):

@@ -1,4 +1,6 @@
-from unittest.mock import MagicMock, patch
+from pathlib import Path
+from unittest import mock
+from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
 from numpy import isclose
@@ -10,11 +12,11 @@ from dodal.devices.detector.det_resolution import (
 
 
 @pytest.fixture(scope="function")
-def detector_params(request):
+def detector_params(request, tmp_path: Path):
     return DetectorParams(
         expected_energy_ev=100,
         exposure_time=1.0,
-        directory="test/dir",
+        directory=str(tmp_path),
         prefix="test",
         run_number=0,
         detector_distance=1.0,
@@ -42,13 +44,17 @@ def test_resolution(
     det_distance_mm,
     expected_res,
 ):
-    detector_params.detector_distance = det_distance_mm
-    detector_params.beam_xy_converter.get_beam_xy_from_det_dist = MagicMock(
-        side_effect=[212.51, 219.98]
-    )
-    detector_params.use_roi_mode = roi
-    get_detector_max_size.return_value = 434.6
-    actual_res = resolution(detector_params, wavelength_angstroms, det_distance_mm)
+    with mock.patch(
+        "dodal.devices.detector.DetectorParams.beam_xy_converter",
+        new_callable=PropertyMock,
+    ) as prop_patch:
+        beam_xy_converter = MagicMock()
+        beam_xy_converter.get_beam_xy_from_det_dist.side_effect = [212.51, 219.98]
+        prop_patch.return_value = beam_xy_converter
+        detector_params.detector_distance = det_distance_mm
+        detector_params.use_roi_mode = roi
+        get_detector_max_size.return_value = 434.6
+        actual_res = resolution(detector_params, wavelength_angstroms, det_distance_mm)
     assert isclose(
         expected_res, actual_res
     ), f"expected={expected_res}, actual={actual_res}"
@@ -70,14 +76,17 @@ def test_resolution_with_roi(
     det_distance_mm,
     expected_res,
 ):
-    detector_params.use_roi_mode = roi
-    detector_params.detector_distance = det_distance_mm
-    detector_params.beam_xy_converter.get_beam_xy_from_det_dist = MagicMock(
-        side_effect=[212.51, 219.98]
-    )
-    get_detector_max_size.return_value = 434.6
-
-    actual_res = resolution(detector_params, wavelength_angstroms, det_distance_mm)
+    with mock.patch(
+        "dodal.devices.detector.DetectorParams.beam_xy_converter",
+        new_callable=PropertyMock,
+    ) as prop_patch:
+        beam_xy_converter = MagicMock()
+        beam_xy_converter.get_beam_xy_from_det_dist.side_effect = [212.51, 219.98]
+        prop_patch.return_value = beam_xy_converter
+        detector_params.detector_distance = det_distance_mm
+        detector_params.use_roi_mode = roi
+        get_detector_max_size.return_value = 434.6
+        actual_res = resolution(detector_params, wavelength_angstroms, det_distance_mm)
 
     assert isclose(
         actual_res,

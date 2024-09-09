@@ -2,12 +2,18 @@ from enum import Enum, IntEnum
 from typing import SupportsFloat
 
 from bluesky.protocols import Triggerable
-from ophyd_async.core import AsyncStatus, StandardReadable, wait_for_value
-from ophyd_async.core.signal import CalculateTimeout, SignalR, SignalRW
-from ophyd_async.core.signal_backend import SignalBackend
-from ophyd_async.core.soft_signal_backend import SoftSignalBackend
-from ophyd_async.core.utils import DEFAULT_TIMEOUT
-from ophyd_async.epics.motion import Motor
+from ophyd_async.core import (
+    DEFAULT_TIMEOUT,
+    AsyncStatus,
+    CalculateTimeout,
+    SignalBackend,
+    SignalR,
+    SignalRW,
+    SoftSignalBackend,
+    StandardReadable,
+    wait_for_value,
+)
+from ophyd_async.epics.motor import Motor
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
 HOME_STR = r"\#1hmz\#2hmz\#3hmz"  # Command to home the PMAC motors
@@ -79,7 +85,12 @@ class PMACStringLaser(SignalRW):
         super().__init__(backend, timeout, name)
 
     @AsyncStatus.wrap
-    async def set(self, value: LaserSettings, wait=True, timeout=CalculateTimeout):
+    async def set(
+        self,
+        value: LaserSettings,
+        wait=True,
+        timeout=CalculateTimeout,
+    ):
         await self.signal.set(value.value, wait, timeout)
 
 
@@ -97,7 +108,12 @@ class PMACStringEncReset(SignalRW):
         super().__init__(backend, timeout, name)
 
     @AsyncStatus.wrap
-    async def set(self, value: EncReset, wait=True, timeout=CalculateTimeout):
+    async def set(
+        self,
+        value: EncReset,
+        wait=True,
+        timeout=CalculateTimeout,
+    ):
         await self.signal.set(value.value, wait, timeout)
 
 

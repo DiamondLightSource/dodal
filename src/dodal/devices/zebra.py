@@ -37,6 +37,11 @@ TTL_SHUTTER = 2
 TTL_XSPRESS3 = 3
 TTL_PANDA = 4
 
+# The AND gate that controls the automatic shutter
+AUTO_SHUTTER_GATE = 2
+# The input that triggers the automatic shutter
+AUTO_SHUTTER_INPUT = 1
+
 
 class ArmSource(str, Enum):
     SOFT = "Soft"
@@ -94,7 +99,7 @@ class ArmingDevice(StandardReadable):
     """A useful device that can abstract some of the logic of arming.
     Allows a user to just call arm.set(ArmDemand.ARM)"""
 
-    TIMEOUT = 3
+    TIMEOUT: float = 3
 
     def __init__(self, prefix: str, name: str = "") -> None:
         self.arm_set = epics_signal_rw(float, prefix + "PC_ARM")

@@ -1,23 +1,24 @@
 import asyncio
-from collections.abc import Sequence
 from enum import Enum
 
 from bluesky.protocols import Hints
 from ophyd_async.core import (
     AsyncStatus,
+    DatasetDescriber,
     DetectorControl,
     DetectorTrigger,
     Device,
-    DirectoryProvider,
-    ShapeProvider,
+    PathProvider,
     StandardDetector,
     set_and_wait_for_value,
     soft_signal_r_and_setter,
 )
-from ophyd_async.epics.areadetector.utils import stop_busy_record
-from ophyd_async.epics.areadetector.writers import HDFWriter, NDFileHDF
-from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
-from ophyd_async.epics.signal.signal import epics_signal_rw_rbv
+from ophyd_async.epics.adcore import ADHDFWriter, NDFileHDFIO, stop_busy_record
+from ophyd_async.epics.signal import (
+    epics_signal_r,
+    epics_signal_rw,
+    epics_signal_rw_rbv,
+)
 
 
 class TetrammRange(str, Enum):
@@ -108,7 +109,7 @@ class TetrammController(DetectorControl):
         self.minimum_values_per_reading = minimum_values_per_reading
         self.readings_per_frame = readings_per_frame
 
-    def get_deadtime(self, exposure: float) -> float:
+    def get_deadtime(self, exposure: float | None) -> float:
         # 2 internal clock cycles. Best effort approximation
         return 2 / self.base_sample_rate
 
@@ -204,14 +205,17 @@ class TetrammController(DetectorControl):
         )
 
 
-class TetrammShapeProvider(ShapeProvider):
+class TetrammDatasetDescriber(DatasetDescriber):
     max_channels = 11
 
     def __init__(self, controller: TetrammController) -> None:
         self.controller = controller
 
-    async def __call__(self) -> Sequence[int]:
-        return [self.max_channels, self.controller.readings_per_frame]
+    async def np_datatype(self) -> str:
+        return "<f8"  # IEEE 754 double precision floating point
+
+    async def shape(self) -> tuple[int, int]:
+        return (self.max_channels, self.controller.readings_per_frame)
 
 
 # TODO: Support MeanValue signals https://github.com/DiamondLightSource/dodal/issues/337
@@ -219,13 +223,13 @@ class TetrammDetector(StandardDetector):
     def __init__(
         self,
         prefix: str,
-        directory_provider: DirectoryProvider,
+        path_provider: PathProvider,
         name: str,
         type: str | None = None,
         **scalar_sigs: str,
     ) -> None:
         self.drv = TetrammDriver(prefix + "DRV:")
-        self.hdf = NDFileHDF(prefix + "HDF5:")
+        self.hdf = NDFileHDFIO(prefix + "HDF5:")
         controller = TetrammController(self.drv)
         config_signals = [
             self.drv.values_per_reading,
@@ -239,11 +243,11 @@ class TetrammDetector(StandardDetector):
             self.type = None
         super().__init__(
             controller,
-            HDFWriter(
+            ADHDFWriter(
                 self.hdf,
-                directory_provider,
+                path_provider,
                 lambda: self.name,
-                TetrammShapeProvider(controller),
+                TetrammDatasetDescriber(controller),
                 **scalar_sigs,
             ),
             config_signals,

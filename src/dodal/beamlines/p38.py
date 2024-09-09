@@ -1,16 +1,16 @@
 from pathlib import Path
 
-from ophyd_async.epics.areadetector import AravisDetector
-from ophyd_async.panda import HDFPanda
+from ophyd_async.epics.adaravis import AravisDetector
+from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
     device_instantiation,
-    get_directory_provider,
-    set_directory_provider,
+    get_path_provider,
+    set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import numbered_slits
-from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitDirectoryProvider
+from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
 from dodal.devices.i22.fswitch import FSwitch
@@ -30,8 +30,8 @@ set_utils_beamline(BL)
 # Communication with GDA is also WIP so for now we determine an arbitrary scan number
 # locally and write the commissioning directory. The scan number is not guaranteed to
 # be unique and the data is at risk - this configuration is for testing only.
-set_directory_provider(
-    StaticVisitDirectoryProvider(
+set_path_provider(
+    StaticVisitPathProvider(
         BL,
         Path("/dls/p38/data/2024/cm37282-2/bluesky"),
         client=LocalDirectoryServiceClient(),
@@ -50,7 +50,7 @@ def d3(
         fake_with_ophyd_sim,
         drv_suffix="DET:",
         hdf_suffix="HDF5:",
-        directory_provider=get_directory_provider(),
+        path_provider=get_path_provider(),
     )
 
 
@@ -67,7 +67,7 @@ def d11(
         fake_with_ophyd_sim,
         drv_suffix="DET:",
         hdf_suffix="HDF5:",
-        directory_provider=get_directory_provider(),
+        path_provider=get_path_provider(),
     )
 
 
@@ -82,7 +82,7 @@ def d12(
         fake_with_ophyd_sim,
         drv_suffix="DET:",
         hdf_suffix="HDF5:",
-        directory_provider=get_directory_provider(),
+        path_provider=get_path_provider(),
     )
 
 
@@ -96,7 +96,7 @@ def i0(
         "-EA-XBPM-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        directory_provider=get_directory_provider(),
+        path_provider=get_path_provider(),
     )
 
 
@@ -273,7 +273,7 @@ def panda1(
         "-EA-PANDA-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        directory_provider=get_directory_provider(),
+        path_provider=get_path_provider(),
     )
 
 
@@ -288,7 +288,7 @@ def panda2(
         "-EA-PANDA-02:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        directory_provider=get_directory_provider(),
+        path_provider=get_path_provider(),
     )
 
 
@@ -303,7 +303,7 @@ def panda3(
         "-EA-PANDA-03:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        directory_provider=get_directory_provider(),
+        path_provider=get_path_provider(),
     )
 
 

@@ -1,13 +1,18 @@
-from ophyd_async.panda import HDFPanda
+from ophyd_async.fastcs.panda import HDFPanda
 
+from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.common.beamlines.beamline_utils import (
     device_instantiation,
-    get_directory_provider,
-    set_directory_provider,
+    get_path_provider,
+    set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.udc_directory_provider import PandASubdirectoryProvider
-from dodal.devices.aperturescatterguard import AperturePositions, ApertureScatterguard
+from dodal.common.udc_directory_provider import PandASubpathProvider
+from dodal.devices.aperturescatterguard import (
+    AperturePosition,
+    ApertureScatterguard,
+    load_positions_from_beamline_parameters,
+)
 from dodal.devices.attenuator import Attenuator
 from dodal.devices.backlight import Backlight
 from dodal.devices.cryostream import CryoStream
@@ -21,7 +26,6 @@ from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, VFMMirrorVo
 from dodal.devices.motors import XYZPositioner
 from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
-from dodal.devices.qbpm1 import QBPM1
 from dodal.devices.robot import BartRobot
 from dodal.devices.s4_slit_gaps import S4SlitGaps
 from dodal.devices.smargon import Smargon
@@ -48,30 +52,26 @@ BL = get_beamline_name("s03")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
-set_directory_provider(PandASubdirectoryProvider())
+set_path_provider(PandASubpathProvider())
 
 
 def aperture_scatterguard(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
-    aperture_positions: AperturePositions | None = None,
 ) -> ApertureScatterguard:
     """Get the i03 aperture and scatterguard device, instantiate it if it hasn't already
     been. If this is called when already instantiated in i03, it will return the existing
-    object. If aperture_positions is specified, it will update them.
+    object.
     """
-
-    def load_positions(a_s: ApertureScatterguard):
-        if aperture_positions is not None:
-            a_s.load_aperture_positions(aperture_positions)
-
+    params = get_beamline_parameters()
     return device_instantiation(
         device_factory=ApertureScatterguard,
         name="aperture_scatterguard",
         prefix="",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
-        post_create=load_positions,
+        loaded_positions=load_positions_from_beamline_parameters(params),
+        tolerances=AperturePosition.tolerances_from_gda_params(params),
     )
 
 
@@ -100,17 +100,6 @@ def dcm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
         "-MO-DCM-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-    )
-
-
-@skip_device(lambda: BL == "s03")
-def qbpm1(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> QBPM1:
-    return device_instantiation(
-        device_factory=QBPM1,
-        name="qbpm1",
-        prefix="",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
     )
 
 
@@ -389,7 +378,7 @@ def panda(
         "-EA-PANDA-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        directory_provider=get_directory_provider(),
+        path_provider=get_path_provider(),
     )
 
 

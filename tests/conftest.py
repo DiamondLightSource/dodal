@@ -12,9 +12,18 @@ from unittest.mock import MagicMock, patch
 import pytest
 from bluesky.run_engine import RunEngine
 from ophyd.status import Status
+from ophyd_async.core import (
+    PathInfo,
+    PathProvider,
+)
 
 from dodal.beamlines import i03
 from dodal.common.beamlines import beamline_utils
+from dodal.common.visit import (
+    DirectoryServiceClient,
+    LocalDirectoryServiceClient,
+    StaticVisitPathProvider,
+)
 from dodal.log import LOGGER, GELFTCPHandler, set_up_all_logging_handlers
 from dodal.utils import make_all_devices
 
@@ -100,6 +109,27 @@ if s03_epics_server_port is not None:
 if s03_epics_repeater_port is not None:
     environ["EPICS_CA_REPEATER_PORT"] = s03_epics_repeater_port
     print(f"[EPICS_CA_REPEATER_PORT] = {s03_epics_repeater_port}")
+
+PATH_INFO_FOR_TESTING: PathInfo = PathInfo(
+    directory_path=Path("/does/not/exist"),
+    filename="on_this_filesystem",
+)
+
+
+@pytest.fixture
+def dummy_visit_client() -> DirectoryServiceClient:
+    return LocalDirectoryServiceClient()
+
+
+@pytest.fixture
+async def static_path_provider(
+    tmp_path: Path, dummy_visit_client: DirectoryServiceClient
+) -> PathProvider:
+    svpp = StaticVisitPathProvider(
+        beamline="ixx", root=tmp_path, client=dummy_visit_client
+    )
+    await svpp.update()
+    return svpp
 
 
 @pytest.fixture

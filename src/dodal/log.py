@@ -8,27 +8,49 @@ from os import environ
 from pathlib import Path
 from typing import TypedDict
 
+import colorlog
 from bluesky.log import logger as bluesky_logger
 from graypy import GELFTCPHandler
 from ophyd.log import logger as ophyd_logger
-from ophyd_async.log import (
-    DEFAULT_DATE_FORMAT,
-    DEFAULT_FORMAT,
-    DEFAULT_LOG_COLORS,
-    ColoredFormatterWithDeviceName,
-)
-from ophyd_async.log import logger as ophyd_async_logger
 
 LOGGER = logging.getLogger("Dodal")
+# Temporarily duplicated https://github.com/bluesky/ophyd-async/issues/550
+ophyd_async_logger = logging.getLogger("ophyd_async")
 LOGGER.setLevel(logging.DEBUG)
 
-DEFAULT_FORMATTER = ColoredFormatterWithDeviceName(
-    fmt=DEFAULT_FORMAT, datefmt=DEFAULT_DATE_FORMAT, log_colors=DEFAULT_LOG_COLORS
-)
 ERROR_LOG_BUFFER_LINES = 20000
 INFO_LOG_DAYS = 30
 DEBUG_LOG_FILES_TO_KEEP = 7
 DEFAULT_GRAYLOG_PORT = 12231
+
+# Temporarily duplicated https://github.com/bluesky/ophyd-async/issues/550
+DEFAULT_FORMAT = (
+    "%(log_color)s[%(levelname)1.1s %(asctime)s.%(msecs)03d "
+    "%(module)s:%(lineno)d] %(message)s"
+)
+
+DEFAULT_DATE_FORMAT = "%y%m%d %H:%M:%S"
+
+DEFAULT_LOG_COLORS = {
+    "DEBUG": "cyan",
+    "INFO": "green",
+    "WARNING": "yellow",
+    "ERROR": "red",
+    "CRITICAL": "red,bg_white",
+}
+
+
+class ColoredFormatterWithDeviceName(colorlog.ColoredFormatter):
+    def format(self, record):
+        message = super().format(record)
+        if device_name := getattr(record, "ophyd_async_device_name", None):
+            message = f"[{device_name}]{message}"
+        return message
+
+
+DEFAULT_FORMATTER = ColoredFormatterWithDeviceName(
+    fmt=DEFAULT_FORMAT, datefmt=DEFAULT_DATE_FORMAT, log_colors=DEFAULT_LOG_COLORS
+)
 
 
 class CircularMemoryHandler(logging.Handler):

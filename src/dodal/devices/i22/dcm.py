@@ -6,7 +6,7 @@ from typing import Literal
 from bluesky.protocols import Reading
 from event_model.documents.event_descriptor import DataKey
 from ophyd_async.core import ConfigSignal, StandardReadable, soft_signal_r_and_setter
-from ophyd_async.epics.motion import Motor
+from ophyd_async.epics.motor import Motor
 from ophyd_async.epics.signal import epics_signal_r
 
 # Conversion constant for energy and wavelength, taken from the X-Ray data booklet

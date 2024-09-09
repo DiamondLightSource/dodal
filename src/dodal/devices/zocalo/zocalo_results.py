@@ -11,8 +11,12 @@ import workflows.recipe
 import workflows.transport
 from bluesky.protocols import Descriptor, Triggerable
 from numpy.typing import NDArray
-from ophyd_async.core import HintedSignal, StandardReadable, soft_signal_r_and_setter
-from ophyd_async.core.async_status import AsyncStatus
+from ophyd_async.core import (
+    AsyncStatus,
+    HintedSignal,
+    StandardReadable,
+    soft_signal_r_and_setter,
+)
 from workflows.transport.common_transport import CommonTransport
 
 from dodal.devices.zocalo.zocalo_interaction import _get_zocalo_connection
@@ -128,7 +132,12 @@ class ZocaloResults(StandardReadable, Triggerable):
         before triggering processing for the experiment"""
 
         LOGGER.info("Subscribing to results queue")
-        self._subscribe_to_results()
+        try:
+            self._subscribe_to_results()
+        except Exception as e:
+            print(f"GOT {e}")
+            raise
+
         await asyncio.sleep(CLEAR_QUEUE_WAIT_S)
         self._clear_old_results()
 

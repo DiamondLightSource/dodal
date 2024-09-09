@@ -1,5 +1,6 @@
 # type: ignore # Eiger will soon be ophyd-async https://github.com/DiamondLightSource/dodal/issues/700
 import threading
+from pathlib import Path
 from unittest.mock import ANY, MagicMock, Mock, call, create_autospec, patch
 
 import pytest
@@ -20,7 +21,6 @@ TEST_DETECTOR_SIZE_CONSTANTS = EIGER2_X_16M_SIZE
 
 TEST_EXPECTED_ENERGY = 100.0
 TEST_EXPOSURE_TIME = 1.0
-TEST_DIR = "/test/dir"
 TEST_PREFIX = "test"
 TEST_RUN_NUMBER = 0
 TEST_DETECTOR_DISTANCE = 1.0
@@ -36,11 +36,12 @@ class StatusException(Exception):
     pass
 
 
-def create_new_params() -> DetectorParams:
+@pytest.fixture
+def params(tmp_path: Path) -> DetectorParams:
     return DetectorParams(
         expected_energy_ev=TEST_EXPECTED_ENERGY,
         exposure_time=TEST_EXPOSURE_TIME,
-        directory=TEST_DIR,
+        directory=str(tmp_path),
         prefix=TEST_PREFIX,
         run_number=TEST_RUN_NUMBER,
         detector_distance=TEST_DETECTOR_DISTANCE,
@@ -55,10 +56,10 @@ def create_new_params() -> DetectorParams:
 
 
 @pytest.fixture
-def fake_eiger(request):
+def fake_eiger(request, params: DetectorParams):
     FakeEigerDetector: EigerDetector = make_fake_device(EigerDetector)
     fake_eiger: EigerDetector = FakeEigerDetector.with_params(
-        params=create_new_params(), name=f"test fake Eiger: {request.node.name}"
+        params=params, name=f"test fake Eiger: {request.node.name}"
     )
     return fake_eiger
 

@@ -3,11 +3,11 @@ from bluesky.run_engine import RunEngine
 from ophyd_async.core import (
     DetectorTrigger,
     DeviceCollector,
-    DirectoryProvider,
+    PathProvider,
+    TriggerInfo,
     set_mock_value,
 )
-from ophyd_async.core.detector import TriggerInfo
-from ophyd_async.epics.areadetector import FileWriteMode
+from ophyd_async.epics.adcore import FileWriteMode
 
 from dodal.devices.tetramm import (
     TetrammController,
@@ -41,15 +41,26 @@ async def tetramm_controller(
 
 
 @pytest.fixture
-async def tetramm(static_directory_provider: DirectoryProvider) -> TetrammDetector:
+async def tetramm(static_path_provider: PathProvider) -> TetrammDetector:
     async with DeviceCollector(mock=True):
         tetramm = TetrammDetector(
             "MY-TETRAMM:",
-            static_directory_provider,
+            static_path_provider,
             name=TEST_TETRAMM_NAME,
         )
 
     return tetramm
+
+
+@pytest.fixture
+def supported_trigger_info() -> TriggerInfo:
+    return TriggerInfo(
+        number=1,
+        trigger=DetectorTrigger.constant_gate,
+        deadtime=1.0,
+        livetime=0.02,
+        frame_timeout=None,
+    )
 
 
 async def test_max_frame_rate_is_calculated_correctly(
@@ -164,12 +175,15 @@ async def test_sample_rate_scales_with_exposure_time(
     exposure: float,
     expected_values_per_reading: int,
 ):
+    set_mock_value(tetramm.hdf.file_path_exists, True)
+
     await tetramm.prepare(
         TriggerInfo(
-            100,
-            DetectorTrigger.edge_trigger,
-            2e-5,
-            exposure,
+            number=100,
+            trigger=DetectorTrigger.edge_trigger,
+            deadtime=2e-5,
+            livetime=exposure,
+            frame_timeout=None,
         )
     )
     values_per_reading = await tetramm.drv.values_per_reading.get_value()
@@ -252,10 +266,11 @@ async def test_prepare_with_too_low_a_deadtime_raises_error(
     ):
         await tetramm.prepare(
             TriggerInfo(
-                5,
-                DetectorTrigger.edge_trigger,
-                1.0 / 100_000.0,
-                VALID_TEST_EXPOSURE_TIME,
+                number=5,
+                trigger=DetectorTrigger.edge_trigger,
+                deadtime=1.0 / 100_000.0,
+                livetime=VALID_TEST_EXPOSURE_TIME,
+                frame_timeout=None,
             )
         )
 
@@ -263,22 +278,25 @@ async def test_prepare_with_too_low_a_deadtime_raises_error(
 async def test_prepare_arms_tetramm(
     tetramm: TetrammDetector,
 ):
+    set_mock_value(tetramm.hdf.file_path_exists, True)
     await tetramm.prepare(
         TriggerInfo(
-            5,
-            DetectorTrigger.edge_trigger,
-            0.1,
-            VALID_TEST_EXPOSURE_TIME,
+            number=5,
+            trigger=DetectorTrigger.edge_trigger,
+            deadtime=0.1,
+            livetime=VALID_TEST_EXPOSURE_TIME,
+            frame_timeout=None,
         )
     )
     await assert_armed(tetramm.drv)
 
 
-async def test_stage_sets_up_writer(
-    tetramm: TetrammDetector,
+async def test_prepare_sets_up_writer(
+    tetramm: TetrammDetector, supported_trigger_info: TriggerInfo
 ):
     set_mock_value(tetramm.hdf.file_path_exists, True)
     await tetramm.stage()
+    await tetramm.prepare(supported_trigger_info)
 
     assert (await tetramm.hdf.num_capture.get_value()) == 0
     assert (await tetramm.hdf.num_extra_dims.get_value()) == 0
@@ -289,17 +307,19 @@ async def test_stage_sets_up_writer(
 
 
 async def test_stage_sets_up_accurate_describe_output(
-    tetramm: TetrammDetector,
+    tetramm: TetrammDetector, supported_trigger_info: TriggerInfo
 ):
     assert await tetramm.describe() == {}
 
     set_mock_value(tetramm.hdf.file_path_exists, True)
     await tetramm.stage()
+    await tetramm.prepare(supported_trigger_info)
 
     assert await tetramm.describe() == {
         TEST_TETRAMM_NAME: {
             "source": "mock+ca://MY-TETRAMM:HDF5:FullFileName_RBV",
-            "shape": (11, 1000),
+            "shape": (11, 400),
+            "dtype_numpy": "<f8",
             "dtype": "array",
             "external": "STREAM:",
         }

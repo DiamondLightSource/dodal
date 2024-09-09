@@ -1,15 +1,17 @@
 # type: ignore # Eiger will soon be ophyd-async https://github.com/DiamondLightSource/dodal/issues/700
+from pathlib import Path
+
 import pytest
 
 from dodal.devices.eiger import DetectorParams, EigerDetector
 
 
 @pytest.fixture()
-def eiger():
+def eiger(tmp_path: Path):
     detector_params: DetectorParams = DetectorParams(
         expected_energy_ev=100,
         exposure_time=0.1,
-        directory="/tmp",
+        directory=str(tmp_path),
         prefix="file_name",
         detector_distance=100.0,
         omega_start=0.0,

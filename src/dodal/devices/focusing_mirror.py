@@ -8,9 +8,9 @@ from ophyd_async.core import (
     HintedSignal,
     StandardReadable,
     observe_value,
+    soft_signal_r_and_setter,
 )
-from ophyd_async.core.signal import soft_signal_r_and_setter
-from ophyd_async.epics.motion import Motor
+from ophyd_async.epics.motor import Motor
 from ophyd_async.epics.signal import (
     epics_signal_r,
     epics_signal_rw,

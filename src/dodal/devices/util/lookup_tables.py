@@ -27,7 +27,7 @@ async def energy_distance_table(lookup_table_path: str) -> np.ndarray:
 
     # Slight cheat to make the file IO async, numpy doesn't do any real IO now, just
     # decodes the text
-    async with aiofiles.open(lookup_table_path, "r") as stream:
+    async with aiofiles.open(lookup_table_path) as stream:
         raw_table = await stream.read()
     return loadtxt(StringIO(raw_table), comments=["#", "Units"])
 
