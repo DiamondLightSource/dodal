@@ -40,6 +40,21 @@ class DeviceInitializationController(Generic[P, T]):
     def skip(self) -> bool:
         return self._config.skip() if callable(self._config.skip) else self._config.skip
 
+    def __repr__(self) -> str:
+        config_details = f"""
+        Device:
+            - factory: {self._factory.__name__}
+            - name: {self._factory.__name__}
+            - device object: {self.device}
+        Config settings:
+          - eager_connect: {self._config.eager_connect}
+          - use_factory_name: {self._config.use_factory_name}
+          - timeout: {self._config.timeout}
+          - mock: {self._config.mock}
+          - skip: {self._config.skip}
+        """
+        return f"Device initalization controller with:\n{config_details}"
+
     @property
     def device(self) -> T | None:
         return self._cached_device
