@@ -1,6 +1,6 @@
 from bluesky.run_engine import RunEngine
 from ophyd_async.epics.motor import Motor
-from ophyd_async.plan_stubs.ensure_connected import ensure_connected
+from ophyd_async.plan_stubs import ensure_connected
 
 from dodal.common.beamlines.beamline_utils import ACTIVE_DEVICES
 from dodal.common.beamlines.device_factory import (
