@@ -245,7 +245,7 @@ async def test_phase_success_set(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngi
         set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.close)
 
     callback_on_mock_put(mock_phaseAxes.set_move, lambda *_, **__: set_complete_move())
-    RE(bps.abs_set(mock_phaseAxes, set_value))
+    RE(bps.abs_set(mock_phaseAxes, set_value, wait=True))
     get_mock_put(mock_phaseAxes.set_move).assert_called_once_with(
         1, wait=True, timeout=ANY
     )
