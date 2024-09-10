@@ -2,7 +2,6 @@ from pathlib import Path
 
 from ophyd_async.epics.adaravis import AravisDetector
 from ophyd_async.epics.adpilatus import PilatusDetector
-from ophyd_async.epics.areadetector import AravisDetector, PilatusDetector
 from ophyd_async.fastcs.panda import HDFPanda
 from ophyd_async.panda import HDFPanda
 
@@ -125,7 +124,7 @@ def hfm() -> FocusingMirror:
 @device_factory()
 def dcm() -> DoubleCrystalMonochromator:
     prefix = BeamlinePrefix(BL).beamline_prefix
-    silicon_111= CrystalMetadata(
+    silicon_111 = CrystalMetadata(
         usage="Bragg",
         type="silicon",
         reflection=(1, 1, 1),
