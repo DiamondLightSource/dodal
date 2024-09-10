@@ -1,0 +1,41 @@
+dodal.devices.training\_rig.sample\_stage.TrainingRigSampleStage
+================================================================
+
+.. currentmodule:: dodal.devices.training_rig.sample_stage
+
+.. autoclass:: TrainingRigSampleStage
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

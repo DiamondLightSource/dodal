@@ -1,0 +1,43 @@
+dodal.devices.fast\_grid\_scan.GridAxis
+=======================================
+
+.. currentmodule:: dodal.devices.fast_grid_scan
+
+.. autoclass:: GridAxis
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~GridAxis.is_within
+      
+      
+      ~GridAxis.steps_to_motor_position
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~GridAxis.end
+      
+      
+      ~GridAxis.start
+      
+      
+      ~GridAxis.step_size
+      
+      
+      ~GridAxis.full_steps
+      
+   
+   

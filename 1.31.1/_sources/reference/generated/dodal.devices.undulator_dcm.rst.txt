@@ -1,0 +1,42 @@
+dodal.devices.undulator\_dcm
+============================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~undulator_dcm.UndulatorDCM
+
+
+
+
+.. automodule:: dodal.devices.undulator_dcm
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      AccessError
+   
+   

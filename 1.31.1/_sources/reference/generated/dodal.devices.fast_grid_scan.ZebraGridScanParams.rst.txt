@@ -1,0 +1,113 @@
+dodal.devices.fast\_grid\_scan.ZebraGridScanParams
+==================================================
+
+.. currentmodule:: dodal.devices.fast_grid_scan
+
+.. autoclass:: ZebraGridScanParams
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      ~ZebraGridScanParams.get_param_positions
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~ZebraGridScanParams.non_integer_dwell_time
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~ZebraGridScanParams.model_computed_fields
+      
+      
+      ~ZebraGridScanParams.model_config
+      
+      
+      
+      ~ZebraGridScanParams.model_fields
+      
+      
+      
+      
+      
+      
+      ~ZebraGridScanParams.dwell_time_ms
+      
+      
+      ~ZebraGridScanParams.x_steps
+      
+      
+      ~ZebraGridScanParams.y_steps
+      
+      
+      ~ZebraGridScanParams.z_steps
+      
+      
+      ~ZebraGridScanParams.x_step_size
+      
+      
+      ~ZebraGridScanParams.y_step_size
+      
+      
+      ~ZebraGridScanParams.z_step_size
+      
+      
+      ~ZebraGridScanParams.x_start
+      
+      
+      ~ZebraGridScanParams.y1_start
+      
+      
+      ~ZebraGridScanParams.y2_start
+      
+      
+      ~ZebraGridScanParams.z1_start
+      
+      
+      ~ZebraGridScanParams.z2_start
+      
+      
+      ~ZebraGridScanParams.set_stub_offsets
+      
+      
+      ~ZebraGridScanParams.transmission_fraction
+      
+   
+   

@@ -1,0 +1,53 @@
+dodal.devices.oav.oav\_to\_redis\_forwarder.OAVToRedisForwarder
+===============================================================
+
+.. currentmodule:: dodal.devices.oav.oav_to_redis_forwarder
+
+.. autoclass:: OAVToRedisForwarder
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      ~OAVToRedisForwarder.complete
+      
+      
+      
+      
+      
+      ~OAVToRedisForwarder.kickoff
+      
+      
+      
+      
+      
+      
+      
+      ~OAVToRedisForwarder.stop
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~OAVToRedisForwarder.DATA_EXPIRY_DAYS
+      
+      
+      
+      
+      
+   
+   
