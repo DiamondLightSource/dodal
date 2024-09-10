@@ -219,7 +219,7 @@ class TetrammDetector(StandardDetector):
         self,
         prefix: str,
         path_provider: PathProvider,
-        name: str,
+        name: str = "",
         type: str | None = None,
         **scalar_sigs: str,
     ) -> None:
