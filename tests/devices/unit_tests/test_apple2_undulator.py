@@ -15,10 +15,10 @@ from ophyd_async.core import (
 
 from dodal.devices.apple2_undulator import (
     Apple2PhasesVal,
-    UndlatorJawPhase,
-    UndlatorPhaseAxes,
     UndulatorGap,
     UndulatorGateStatus,
+    UndulatorJawPhase,
+    UndulatorPhaseAxes,
 )
 
 
@@ -36,9 +36,9 @@ async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
 
 
 @pytest.fixture
-async def mock_phaseAxes(prefix: str = "BLXX-EA-DET-007:") -> UndlatorPhaseAxes:
+async def mock_phaseAxes(prefix: str = "BLXX-EA-DET-007:") -> UndulatorPhaseAxes:
     async with DeviceCollector(mock=True):
-        mock_phaseAxes = UndlatorPhaseAxes(
+        mock_phaseAxes = UndulatorPhaseAxes(
             prefix=prefix,
             top_outer="RPQ1",
             top_inner="RPQ2",
@@ -64,9 +64,9 @@ async def mock_phaseAxes(prefix: str = "BLXX-EA-DET-007:") -> UndlatorPhaseAxes:
 
 
 @pytest.fixture
-async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndlatorJawPhase:
+async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndulatorJawPhase:
     async with DeviceCollector(mock=True):
-        mock_jaw_phase = UndlatorJawPhase(
+        mock_jaw_phase = UndulatorJawPhase(
             prefix=prefix, move_pv="RPQ1", jaw_phase="JAW"
         )
     set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.close)
@@ -79,8 +79,8 @@ async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndlatorJawPhase:
 
 async def test_in_motion_error(
     mock_id_gap: UndulatorGap,
-    mock_phaseAxes: UndlatorPhaseAxes,
-    mock_jaw_phase: UndlatorJawPhase,
+    mock_phaseAxes: UndulatorPhaseAxes,
+    mock_jaw_phase: UndulatorJawPhase,
 ):
     set_mock_value(mock_id_gap.gate, UndulatorGateStatus.open)
     with pytest.raises(RuntimeError):
@@ -161,7 +161,7 @@ async def test_gap_success_scan(mock_id_gap: UndulatorGap, RE: RunEngine):
         assert docs["event"][i]["data"]["mock_id_gap-user_readback"] == i
 
 
-async def test_phase_time_out_error(mock_phaseAxes: UndlatorPhaseAxes, RE: RunEngine):
+async def test_phase_time_out_error(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngine):
     setValue = Apple2PhasesVal("3", "2", "5", "7")
 
     callback_on_mock_put(
@@ -173,7 +173,7 @@ async def test_phase_time_out_error(mock_phaseAxes: UndlatorPhaseAxes, RE: RunEn
         await mock_phaseAxes.set(setValue)
 
 
-async def test_phase_status_error(mock_phaseAxes: UndlatorPhaseAxes, RE: RunEngine):
+async def test_phase_status_error(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngine):
     setValue = Apple2PhasesVal("3", "2", "5", "7")
     set_mock_value(mock_phaseAxes.fault, 1.0)
     with pytest.raises(RuntimeError):
@@ -190,7 +190,7 @@ async def test_phase_status_error(mock_phaseAxes: UndlatorPhaseAxes, RE: RunEngi
     ],
 )
 async def test_phase_cal_timout(
-    mock_phaseAxes: UndlatorPhaseAxes,
+    mock_phaseAxes: UndulatorPhaseAxes,
     velocity: list,
     readback: list,
     target: list,
@@ -216,7 +216,7 @@ async def test_phase_cal_timout(
     )
 
 
-async def test_phase_success_set(mock_phaseAxes: UndlatorPhaseAxes, RE: RunEngine):
+async def test_phase_success_set(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngine):
     set_value = Apple2PhasesVal(
         top_inner="3", top_outer="2", btm_inner="5", btm_outer="7"
     )
@@ -286,7 +286,7 @@ async def test_phase_success_set(mock_phaseAxes: UndlatorPhaseAxes, RE: RunEngin
     }
 
 
-async def test_jaw_phase_time_out_error(mock_jaw_phase: UndlatorJawPhase):
+async def test_jaw_phase_time_out_error(mock_jaw_phase: UndulatorJawPhase):
     callback_on_mock_put(
         mock_jaw_phase.jaw_Phase.user_setpoint,
         lambda *_, **__: set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.open),
@@ -296,7 +296,7 @@ async def test_jaw_phase_time_out_error(mock_jaw_phase: UndlatorJawPhase):
         await mock_jaw_phase.set(2)
 
 
-async def test_jaw_phase_status_error(mock_jaw_phase: UndlatorJawPhase):
+async def test_jaw_phase_status_error(mock_jaw_phase: UndulatorJawPhase):
     setValue = 5
     set_mock_value(mock_jaw_phase.fault, 1.0)
     with pytest.raises(RuntimeError):
@@ -312,7 +312,7 @@ async def test_jaw_phase_status_error(mock_jaw_phase: UndlatorJawPhase):
     ],
 )
 async def test_jaw_phase_cal_timout(
-    mock_jaw_phase: UndlatorJawPhase,
+    mock_jaw_phase: UndulatorJawPhase,
     velocity: float,
     readback: float,
     target: float,
@@ -327,7 +327,7 @@ async def test_jaw_phase_cal_timout(
     )
 
 
-async def test_jaw_phase_success_scan(mock_jaw_phase: UndlatorJawPhase, RE: RunEngine):
+async def test_jaw_phase_success_scan(mock_jaw_phase: UndulatorJawPhase, RE: RunEngine):
     callback_on_mock_put(
         mock_jaw_phase.jaw_Phase.user_setpoint,
         lambda *_, **__: set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.open),

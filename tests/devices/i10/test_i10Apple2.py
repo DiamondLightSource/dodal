@@ -18,10 +18,10 @@ from ophyd_async.core import (
 )
 
 from dodal.devices.apple2_undulator import (
-    UndlatorJawPhase,
-    UndlatorPhaseAxes,
     UndulatorGap,
     UndulatorGateStatus,
+    UndulatorJawPhase,
+    UndulatorPhaseAxes,
 )
 from dodal.devices.i10.i10_apple2 import (
     DEFAULT_JAW_PHASE_POLY_PARAMS,
@@ -52,9 +52,9 @@ async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
 
 
 @pytest.fixture
-async def mock_phaseAxes(prefix: str = "BLXX-EA-DET-007:") -> UndlatorPhaseAxes:
+async def mock_phaseAxes(prefix: str = "BLXX-EA-DET-007:") -> UndulatorPhaseAxes:
     async with DeviceCollector(mock=True):
-        mock_phaseAxes = UndlatorPhaseAxes(
+        mock_phaseAxes = UndulatorPhaseAxes(
             prefix=prefix,
             top_outer="RPQ1",
             top_inner="RPQ2",
@@ -87,9 +87,9 @@ async def mock_pgm(prefix: str = "BLXX-EA-DET-007:") -> PGM:
 
 
 @pytest.fixture
-async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndlatorJawPhase:
+async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndulatorJawPhase:
     async with DeviceCollector(mock=True):
-        mock_jaw_phase = UndlatorJawPhase(
+        mock_jaw_phase = UndulatorJawPhase(
             prefix=prefix, move_pv="RPQ1", jaw_phase="JAW"
         )
     set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.close)
@@ -101,9 +101,9 @@ async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndlatorJawPhase:
 
 @pytest.fixture
 async def mock_id(
-    mock_phaseAxes: UndlatorPhaseAxes,
+    mock_phaseAxes: UndulatorPhaseAxes,
     mock_id_gap: UndulatorGap,
-    mock_jaw_phase: UndlatorJawPhase,
+    mock_jaw_phase: UndulatorJawPhase,
 ) -> I10Apple2:
     async with DeviceCollector(mock=True):
         mock_id = I10Apple2(
@@ -179,9 +179,9 @@ async def test_I10Apple2_determine_pol(
 
 
 async def test_fail_I10Apple2_no_lookup(
-    mock_phaseAxes: UndlatorPhaseAxes,
+    mock_phaseAxes: UndulatorPhaseAxes,
     mock_id_gap: UndulatorGap,
-    mock_jaw_phase: UndlatorJawPhase,
+    mock_jaw_phase: UndulatorJawPhase,
 ):
     wrong_path = Path("fnslkfndlsnf")
     with pytest.raises(FileNotFoundError) as e:

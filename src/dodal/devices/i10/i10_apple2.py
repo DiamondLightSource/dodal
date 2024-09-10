@@ -18,9 +18,9 @@ from dodal.devices.apple2_undulator import (
     Apple2,
     Apple2Val,
     Lookuptable,
-    UndlatorJawPhase,
-    UndlatorPhaseAxes,
     UndulatorGap,
+    UndulatorJawPhase,
+    UndulatorPhaseAxes,
 )
 from dodal.devices.pgm import PGM
 from dodal.log import LOGGER
@@ -62,7 +62,7 @@ class I10Apple2(Apple2):
     id_gap:
         An UndulatorGap device.
     id_phase:
-        An UndlatorPhaseAxes device.
+        An UndulatorPhaseAxes device.
     energy_gap_table_path:
         The path to id gap look up table.
     energy_phase_table_path:
@@ -86,8 +86,8 @@ class I10Apple2(Apple2):
     def __init__(
         self,
         id_gap: UndulatorGap,
-        id_phase: UndlatorPhaseAxes,
-        id_jaw_phase: UndlatorJawPhase,
+        id_phase: UndulatorPhaseAxes,
+        id_jaw_phase: UndulatorJawPhase,
         energy_gap_table_path: Path,
         energy_phase_table_path: Path,
         source: tuple[str, str],
@@ -98,7 +98,7 @@ class I10Apple2(Apple2):
         poly_deg: list | None = None,
         name: str = "",
     ) -> None:
-        # A dictionary contains the path to the look up table and the expected column names.
+        # A dataclass contains the path to the look up table and the expected column names.
         self.lookup_table_config = LookupTableConfig(
             path=LookupPath(Gap=energy_gap_table_path, Phase=energy_phase_table_path),
             source=source,
@@ -261,7 +261,7 @@ class LinearArbitraryAngle(StandardReadable, Movable):
         prefix: str = "",
         name: str = "",
         jaw_phase_limit: float = 12.0,
-        jaw_phase_poly_param: list = DEFAULT_JAW_PHASE_POLY_PARAMS,
+        jaw_phase_poly_param: list[float] = DEFAULT_JAW_PHASE_POLY_PARAMS,
         angle_threshold_deg=30.0,
     ) -> None:
         super().__init__(name=name)

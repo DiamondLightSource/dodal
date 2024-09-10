@@ -158,7 +158,7 @@ class UndulatorPhaseMotor(StandardReadable):
         super().__init__(name=name)
 
 
-class UndlatorPhaseAxes(StandardReadable, Movable):
+class UndulatorPhaseAxes(StandardReadable, Movable):
     """
     A collection of 4 phase Motor to make up the full id phase motion. We are using the diamond pv convention.
     e.g. top_outer == Q1
@@ -244,7 +244,7 @@ class UndlatorPhaseAxes(StandardReadable, Movable):
         return await self._cal_timeout()
 
 
-class UndlatorJawPhase(StandardReadable, Movable):
+class UndulatorJawPhase(StandardReadable, Movable):
     """
     A JawPhase movable, this is use for moving the jaw phase which is use to control the
     linear arbitrary polarisation but only one some of the beamline.
@@ -369,7 +369,7 @@ class Apple2(StandardReadable, Movable):
     id_gap:
         An UndulatorGap device.
     id_phase:
-        An UndlatorPhaseAxes device.
+        An UndulatorPhaseAxes device.
     prefix:
         Not in use but needed for device_instantiation.
     name:
@@ -379,7 +379,7 @@ class Apple2(StandardReadable, Movable):
     def __init__(
         self,
         id_gap: UndulatorGap,
-        id_phase: UndlatorPhaseAxes,
+        id_phase: UndulatorPhaseAxes,
         prefix: str = "",
         name: str = "",
     ) -> None:

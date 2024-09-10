@@ -3,9 +3,9 @@ from pathlib import Path
 from dodal.common.beamlines.beamline_utils import device_instantiation
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.apple2_undulator import (
-    UndlatorJawPhase,
-    UndlatorPhaseAxes,
     UndulatorGap,
+    UndulatorJawPhase,
+    UndulatorPhaseAxes,
 )
 from dodal.devices.i10.i10_apple2 import (
     I10Apple2,
@@ -47,9 +47,9 @@ def idd_gap(
 
 def idd_phase_axes(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> UndlatorPhaseAxes:
+) -> UndulatorPhaseAxes:
     return device_instantiation(
-        device_factory=UndlatorPhaseAxes,
+        device_factory=UndulatorPhaseAxes,
         name="idd_phase_axes",
         prefix=f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
         top_outer="RPQ1",
@@ -64,9 +64,9 @@ def idd_phase_axes(
 
 def idd_jaw(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> UndlatorJawPhase:
+) -> UndulatorJawPhase:
     return device_instantiation(
-        device_factory=UndlatorJawPhase,
+        device_factory=UndulatorJawPhase,
         name="idd_jaw",
         prefix=f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
         move_pv="RPQ1",
@@ -91,9 +91,9 @@ def idu_gap(
 
 def idu_phase_axes(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> UndlatorPhaseAxes:
+) -> UndulatorPhaseAxes:
     return device_instantiation(
-        device_factory=UndlatorPhaseAxes,
+        device_factory=UndulatorPhaseAxes,
         name="idu_phase_axes",
         prefix=f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-21:",
         top_outer="RPQ1",
@@ -108,9 +108,9 @@ def idu_phase_axes(
 
 def idu_jaw(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> UndlatorJawPhase:
+) -> UndulatorJawPhase:
     return device_instantiation(
-        device_factory=UndlatorJawPhase,
+        device_factory=UndulatorJawPhase,
         name="idu_jaw",
         prefix=f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-21:",
         move_pv="RPQ1",
