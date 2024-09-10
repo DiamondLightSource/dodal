@@ -3,7 +3,6 @@ from pathlib import Path
 from ophyd_async.epics.adaravis import AravisDetector
 from ophyd_async.epics.adpilatus import PilatusDetector
 from ophyd_async.fastcs.panda import HDFPanda
-from ophyd_async.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
     get_path_provider,
