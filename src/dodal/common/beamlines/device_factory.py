@@ -20,6 +20,7 @@ class DeviceInitializationConfig:
     timeout: timeout for connecting to the device
     mock: use Signals with mock backends for device
     skip: mark the factory to be (conditionally) skipped
+    when beamline is imported by external program
     """
 
     eager_connect: bool

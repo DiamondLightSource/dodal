@@ -125,18 +125,26 @@ def hfm() -> FocusingMirror:
 @device_factory()
 def dcm() -> DoubleCrystalMonochromator:
     prefix = BeamlinePrefix(BL).beamline_prefix
-    silicon_crystal_metadata = CrystalMetadata(
+    silicon_111= CrystalMetadata(
         usage="Bragg",
         type="silicon",
         reflection=(1, 1, 1),
         d_spacing=(3.13475, "nm"),
     )
 
+    silicon_311 = CrystalMetadata(
+        usage="Bragg",
+        type="silicon",
+        reflection=(3, 1, 1),
+        # todo update
+        d_spacing=(3.13475, "nm"),
+    )
+
     return DoubleCrystalMonochromator(
         motion_prefix=f"{prefix}-MO-DCM-01:",
         temperature_prefix=f"{prefix}-DI-DCM-01:",
-        crystal_1_metadata=silicon_crystal_metadata,
-        crystal_2_metadata=silicon_crystal_metadata,
+        crystal_1_metadata=silicon_111,
+        crystal_2_metadata=silicon_311,
     )
 
 
