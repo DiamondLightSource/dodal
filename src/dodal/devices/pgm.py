@@ -4,7 +4,7 @@ from ophyd_async.core import (
     ConfigSignal,
     StandardReadable,
 )
-from ophyd_async.epics.motion import Motor
+from ophyd_async.epics.motor import Motor
 from ophyd_async.epics.signal import epics_signal_rw
 
 

@@ -87,7 +87,9 @@ async def mock_pgm(prefix: str = "BLXX-EA-DET-007:") -> PGM:
 @pytest.fixture
 async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndlatorJawPhase:
     async with DeviceCollector(mock=True):
-        mock_jaw_phase = UndlatorJawPhase(prefix=prefix, move_pv="RPQ1", jawPhase="JAW")
+        mock_jaw_phase = UndlatorJawPhase(
+            prefix=prefix, move_pv="RPQ1", jaw_phase="JAW"
+        )
     set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.close)
     set_mock_value(mock_jaw_phase.jaw_Phase.velocity, 2)
     set_mock_value(mock_jaw_phase.jaw_Phase.user_setpoint_readback, 0)

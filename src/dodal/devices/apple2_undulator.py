@@ -334,7 +334,7 @@ class LookupTableEntries(BaseModel):
     Limit: EnergyMinMax
 
 
-class Lookuptable(BaseModel):
+class Lookuptable(RootModel):
     """
     BaseModel class for the lookup table.
     Apple2 lookup table should be in this format.
@@ -351,7 +351,7 @@ class Lookuptable(BaseModel):
     }
     """
 
-    __root__: dict[str, LookupTableEntries]
+    root: dict[str, LookupTableEntries]
 
 
 ROW_PHASE_MOTOR_TOLERANCE = 0.004
@@ -517,7 +517,7 @@ class Apple2(StandardReadable, Movable):
         Abstract method to update the stored lookup tabled from file.
         This function should include check to ensure the lookuptable is in the correct format:
             # ensure the importing lookup table is the correct format
-            Lookuptable.parse_obj(<loockuptable>)
+            Lookuptable.model_validate(<loockuptable>)
 
         """
 

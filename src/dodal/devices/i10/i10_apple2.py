@@ -147,7 +147,7 @@ class I10Apple2(Apple2):
                     poly_deg=self.lookup_table_config["poly_deg"],
                 )
                 # ensure the importing lookup table is the correct format
-                Lookuptable.parse_obj(self.lookup_tables[key])
+                Lookuptable.model_validate(self.lookup_tables[key])
             else:
                 raise FileNotFoundError(f"{key} look up table is not in path: {path}")
 
