@@ -9,7 +9,6 @@ from ophyd_async.core import (
     AsyncStatus,
     HintedSignal,
     StandardReadable,
-    soft_signal_r_and_setter,
     soft_signal_rw,
 )
 
@@ -124,11 +123,11 @@ class I10Apple2(Apple2):
             btm_outer="0.0",
             gap=str(gap),
         )
-        LOGGER.info(f"Setting polarisation to {self.pol}, with {id_set_val}")
-        await self._set(value=id_set_val, energy=value)
         if self.pol != "la":
             await self.id_jaw_phase.set(0)
             await self.id_jaw_phase.set_move.set(1)
+        LOGGER.info(f"Setting polarisation to {self.pol}, with {id_set_val}")
+        await self._set(value=id_set_val, energy=value)
 
     def update_lookuptable(self):
         """
@@ -216,73 +215,6 @@ class I10Apple2Pol(StandardReadable, Movable):
         await self.id.set(
             await self.id.energy.get_value()
         )  # Move id to new polarisation
-
-
-class LinearArbitraryAngle(StandardReadable, Movable):
-    """
-    Device to set polorisation angle of the ID. Linear Arbitrary Angle (laa)
-     is the direction of the magnetic field which can be change by varying the jaw_phase
-     in (linear arbitrary (la) mode,
-     The angle of 0 is equivalent to linear horizontal "lh" (sigma) and
-      90 is linear vertical "lv" (pi).
-    This device require a jaw_phase to angle conversion which is done via a polynomial.
-
-    Parameters
-    ----------
-    id: I10Apple2
-        An I10Apple2 device.
-    prefix: str
-        Not in use but needed for device_instantiation.
-    name: str
-        New device name.
-    jaw_phase_limit: float
-        The maximum allowed jaw_phase movement.
-    jaw_phase_poly_param: list
-        polynomial parameters highest power first.
-    """
-
-    def __init__(
-        self,
-        id: I10Apple2,
-        prefix: str = "",
-        name: str = "",
-        jaw_phase_limit: float = 12.0,
-        jaw_phase_poly_param: list | None = None,
-        angle_threshold_deg=30.0,
-    ) -> None:
-        super().__init__(name=name)
-        with self.add_children_as_readables():
-            self.id = id
-        if jaw_phase_poly_param is None:
-            jaw_phase_poly_param = [
-                1.0 / 7.5,
-                -120.0 / 7.5,
-            ]
-        self.jaw_phase_from_angle = np.poly1d(jaw_phase_poly_param)
-        self.angle_threshold_deg = angle_threshold_deg
-        self.jaw_phase_limit = jaw_phase_limit
-        with self.add_children_as_readables(HintedSignal):
-            self.angle, self._angle_set = soft_signal_r_and_setter(
-                float, initial_value=None
-            )
-
-    @AsyncStatus.wrap
-    async def set(self, value: float) -> None:
-        pol = self.id.pol
-        if pol != "la":
-            raise RuntimeError(
-                f"Angle control is not available in polarisation {pol} with {self.id.name}"
-            )
-        # Moving to real angle which is 210 to 30.
-        alpha_real = value if value > self.angle_threshold_deg else value + 180.0
-        jaw_phase = self.jaw_phase_from_angle(alpha_real)
-        if abs(jaw_phase) > self.jaw_phase_limit:
-            raise RuntimeError(
-                f"jaw_phase position for angle ({value}) is outside permitted range"
-                f" [-{self.jaw_phase_limit}, {self.jaw_phase_limit}]"
-            )
-        await self.id.id_jaw_phase.set(jaw_phase)
-        self._angle_set(value)
 
 
 def convert_csv_to_lookup(

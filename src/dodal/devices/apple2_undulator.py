@@ -15,7 +15,7 @@ from ophyd_async.core import (
     wait_for_value,
 )
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw, epics_signal_w
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, RootModel
 
 from dodal.log import LOGGER
 
@@ -254,12 +254,12 @@ class UndlatorJawPhase(StandardReadable, Movable):
         self,
         prefix: str,
         move_pv: str,
-        jawPhase: str = "JAW",
+        jaw_phase: str = "JAW",
         name: str = "",
     ):
         # Gap demand set point and readback
         with self.add_children_as_readables():
-            self.jaw_Phase = UndulatorPhaseMotor(prefix=prefix, infix=jawPhase)
+            self.jaw_Phase = UndulatorPhaseMotor(prefix=prefix, infix=jaw_phase)
         # Nothing move until this is set to 1 and it will return to 0 when done
         self.set_move = epics_signal_rw(int, f"{prefix}BL{move_pv}" + "MOVE")
         self.gate = epics_signal_r(UndulatorGateStatus, prefix + "BLGATE")
@@ -312,16 +312,21 @@ class EnergyMinMax(BaseModel):
 
 
 class EnergyCoverageEntry(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
     Low: float
     High: float
     Poly: np.poly1d
 
-    class Config:
-        arbitrary_types_allowed = True
+    # class Config:
+    #     arbitrary_types_allowed = True
 
 
-class EnergyCoverage(BaseModel):
-    __root__: dict[str, EnergyCoverageEntry]
+# class EnergyCoverage(BaseModel):
+#     __root__: dict[str, EnergyCoverageEntry]
+
+
+class EnergyCoverage(RootModel):
+    root: dict[str, EnergyCoverageEntry]
 
 
 class LookupTableEntries(BaseModel):

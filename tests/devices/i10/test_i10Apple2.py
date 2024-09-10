@@ -369,12 +369,12 @@ async def test_linear_arbitrary_limit_fail(
     mock_linear_arbitrary_angle: LinearArbitraryAngle, poly: float
 ):
     mock_linear_arbitrary_angle.id.pol = "la"
-    mock_linear_arbitrary_angle.jawphase_from_angle = poly1d([poly])
+    mock_linear_arbitrary_angle.jaw_phase_from_angle = poly1d([poly])
     with pytest.raises(RuntimeError) as e:
         await mock_linear_arbitrary_angle.set(20)
     assert (
-        str(e.value) == f"jawphase position for angle (20) is outside permitted range"
-        f" [-{mock_linear_arbitrary_angle.jawphase_limit}, {mock_linear_arbitrary_angle.jawphase_limit}]"
+        str(e.value) == f"jaw_phase position for angle (20) is outside permitted range"
+        f" [-{mock_linear_arbitrary_angle.jaw_phase_limit}, {mock_linear_arbitrary_angle.jaw_phase_limit}]"
     )
 
 
@@ -404,7 +404,7 @@ async def test_linear_arbitrary_RE_scan(
     )
     assert_emitted(docs, start=1, descriptor=1, event=11, stop=1)
 
-    jawphase = get_mock_put(
+    jaw_phase = get_mock_put(
         mock_linear_arbitrary_angle.id.id_jaw_phase.jaw_Phase.user_setpoint
     )
 
@@ -417,7 +417,7 @@ async def test_linear_arbitrary_RE_scan(
             if temp_angle > mock_linear_arbitrary_angle.angle_threshold_deg
             else temp_angle + 180.0
         )
-        assert jawphase.call_args_list[cnt] == mock.call(
+        assert jaw_phase.call_args_list[cnt] == mock.call(
             str(poly(alpha_real)), wait=True, timeout=mock.ANY
         )
 
