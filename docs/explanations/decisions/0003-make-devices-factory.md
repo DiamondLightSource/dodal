@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-We should add a decorator to support verfied device connection.
+We should add a decorator to support verified device connection.
 
 ## Decision
 
