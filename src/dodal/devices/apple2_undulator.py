@@ -317,13 +317,6 @@ class EnergyCoverageEntry(BaseModel):
     High: float
     Poly: np.poly1d
 
-    # class Config:
-    #     arbitrary_types_allowed = True
-
-
-# class EnergyCoverage(BaseModel):
-#     __root__: dict[str, EnergyCoverageEntry]
-
 
 class EnergyCoverage(RootModel):
     root: dict[str, EnergyCoverageEntry]

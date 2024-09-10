@@ -1,5 +1,6 @@
 import asyncio
 import csv
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -27,6 +28,24 @@ from dodal.log import LOGGER
 ROW_PHASE_MOTOR_TOLERANCE = 0.004
 MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
 MAXIMUM_GAP_MOTOR_POSITION = 100
+DEFAULT_JAW_PHASE_POLY_PARAMS = [1.0 / 7.5, -120.0 / 7.5]
+
+
+# data class to store the lookup table configuration that is use in convert_csv_to_lookup
+@dataclass
+class LookupPath:
+    Gap: Path
+    Phase: Path
+
+
+@dataclass
+class LookupTableConfig:
+    path: LookupPath
+    source: tuple[str, str]
+    mode: str | None
+    min_energy: str | None
+    max_energy: str | None
+    poly_deg: list | None
 
 
 class I10Apple2(Apple2):
@@ -71,7 +90,7 @@ class I10Apple2(Apple2):
         id_jaw_phase: UndlatorJawPhase,
         energy_gap_table_path: Path,
         energy_phase_table_path: Path,
-        source: tuple[str, str] | None = None,
+        source: tuple[str, str],
         prefix: str = "",
         mode: str = "Mode",
         min_energy: str = "MinEnergy",
@@ -80,17 +99,15 @@ class I10Apple2(Apple2):
         name: str = "",
     ) -> None:
         # A dictionary contains the path to the look up table and the expected column names.
-        self.lookup_table_config = {
-            "path": {
-                "Gap": energy_gap_table_path,
-                "Phase": energy_phase_table_path,
-            },
-            "source": source,
-            "mode": mode,
-            "min_energy": min_energy,
-            "max_energy": max_energy,
-            "poly_deg": poly_deg,
-        }
+        self.lookup_table_config = LookupTableConfig(
+            path=LookupPath(Gap=energy_gap_table_path, Phase=energy_phase_table_path),
+            source=source,
+            mode=mode,
+            min_energy=min_energy,
+            max_energy=max_energy,
+            poly_deg=poly_deg,
+        )
+
         super().__init__(
             id_gap=id_gap,
             id_phase=id_phase,
@@ -136,15 +153,15 @@ class I10Apple2(Apple2):
 
         """
         LOGGER.info("Updating lookup dictionary from file.")
-        for key, path in self.lookup_table_config["path"].items():
+        for key, path in self.lookup_table_config.path.__dict__.items():
             if path.exists():
                 self.lookup_tables[key] = convert_csv_to_lookup(
                     file=path,
-                    source=self.lookup_table_config["source"],
-                    mode=self.lookup_table_config["mode"],
-                    min_energy=self.lookup_table_config["min_energy"],
-                    max_energy=self.lookup_table_config["max_energy"],
-                    poly_deg=self.lookup_table_config["poly_deg"],
+                    source=self.lookup_table_config.source,
+                    mode=self.lookup_table_config.mode,
+                    min_energy=self.lookup_table_config.min_energy,
+                    max_energy=self.lookup_table_config.max_energy,
+                    poly_deg=self.lookup_table_config.poly_deg,
                 )
                 # ensure the importing lookup table is the correct format
                 Lookuptable.model_validate(self.lookup_tables[key])
@@ -156,10 +173,7 @@ class I10Apple2(Apple2):
 
 class I10Apple2PGM(StandardReadable, Movable):
     """
-    Compound device to set both ID and PGM energy at the sample time,
-    with the possibility of having id energy offset relative to the pgm.
-
-    Parameters
+    Compound device to set both ID and PGM energy at the sample time,poly_deg
     ----------
     id:
         An Apple2 device.
@@ -247,17 +261,12 @@ class LinearArbitraryAngle(StandardReadable, Movable):
         prefix: str = "",
         name: str = "",
         jaw_phase_limit: float = 12.0,
-        jaw_phase_poly_param: list | None = None,
+        jaw_phase_poly_param: list = DEFAULT_JAW_PHASE_POLY_PARAMS,
         angle_threshold_deg=30.0,
     ) -> None:
         super().__init__(name=name)
         with self.add_children_as_readables():
             self.id = id
-        if jaw_phase_poly_param is None:
-            jaw_phase_poly_param = [
-                1.0 / 7.5,
-                -120.0 / 7.5,
-            ]
         self.jaw_phase_from_angle = np.poly1d(jaw_phase_poly_param)
         self.angle_threshold_deg = angle_threshold_deg
         self.jaw_phase_limit = jaw_phase_limit
@@ -288,9 +297,9 @@ class LinearArbitraryAngle(StandardReadable, Movable):
 def convert_csv_to_lookup(
     file: str,
     source: tuple[str, str],
-    mode: str = "Mode",
-    min_energy: str = "MinEnergy",
-    max_energy: str = "MaxEnergy",
+    mode: str | None = "Mode",
+    min_energy: str | None = "MinEnergy",
+    max_energy: str | None = "MaxEnergy",
     poly_deg: list | None = None,
 ) -> dict[str | None, dict[str, dict[str, dict[str, Any]]]]:
     """

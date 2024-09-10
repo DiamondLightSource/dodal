@@ -4,6 +4,7 @@ from pathlib import Path
 from unittest import mock
 from unittest.mock import Mock
 
+import numpy as np
 import pytest
 from bluesky.plans import scan
 from bluesky.run_engine import RunEngine
@@ -23,6 +24,7 @@ from dodal.devices.apple2_undulator import (
     UndulatorGateStatus,
 )
 from dodal.devices.i10.i10_apple2 import (
+    DEFAULT_JAW_PHASE_POLY_PARAMS,
     I10Apple2,
     I10Apple2PGM,
     I10Apple2Pol,
@@ -380,86 +382,97 @@ async def test_linear_arbitrary_limit_fail(
     )
 
 
+@pytest.mark.parametrize(
+    "start, stop, num_point",
+    [
+        (0, 180, 11),
+        (-20, 170, 31),
+        (-90, -25, 18),
+    ],
+)
 async def test_linear_arbitrary_RE_scan(
-    mock_linear_arbitrary_angle: LinearArbitraryAngle, RE: RunEngine
+    mock_linear_arbitrary_angle: LinearArbitraryAngle,
+    RE: RunEngine,
+    start: float,
+    stop: float,
+    num_point: int,
 ):
+    angles = np.linspace(start, stop, num_point, endpoint=True)
     docs = defaultdict(list)
-    rbv_mocks = Mock()
-    rbv_mocks.get.side_effect = range(0, 181, 10)
-    callback_on_mock_put(
-        mock_linear_arbitrary_angle.id.id_jaw_phase.jaw_Phase.user_setpoint,
-        lambda *_, **__: set_mock_value(
-            mock_linear_arbitrary_angle.id.id_jaw_phase.jaw_Phase.user_setpoint_readback,
-            rbv_mocks.get(),
-        ),
-    )
 
     def capture_emitted(name, doc):
         docs[name].append(doc)
 
     mock_linear_arbitrary_angle.id.pol = "la"
+
     RE(
         scan(
-            [mock_linear_arbitrary_angle], mock_linear_arbitrary_angle, 0, 180, num=11
+            [mock_linear_arbitrary_angle],
+            mock_linear_arbitrary_angle,
+            start,
+            stop,
+            num=num_point,
         ),
         capture_emitted,
     )
-    assert_emitted(docs, start=1, descriptor=1, event=11, stop=1)
+    assert_emitted(docs, start=1, descriptor=1, event=num_point, stop=1)
 
     jaw_phase = get_mock_put(
         mock_linear_arbitrary_angle.id.id_jaw_phase.jaw_Phase.user_setpoint
     )
 
-    poly = poly1d([1.0 / 7.5, -120.0 / 7.5])
+    poly = poly1d(
+        DEFAULT_JAW_PHASE_POLY_PARAMS
+    )  # default setting for i10 jaw phase to angle
     for cnt, data in enumerate(docs["event"]):
-        temp_angle = 18 * cnt
+        temp_angle = angles[cnt]
         assert data["data"]["mock_linear_arbitrary_angle-angle"] == temp_angle
         alpha_real = (
             temp_angle
             if temp_angle > mock_linear_arbitrary_angle.angle_threshold_deg
             else temp_angle + 180.0
-        )
+        )  # convert angle to jawphase.
         assert jaw_phase.call_args_list[cnt] == mock.call(
             str(poly(alpha_real)), wait=True, timeout=mock.ANY
         )
 
 
 @pytest.mark.parametrize(
-    "fileName, expected_dict, source",
+    "fileName, expected_dict_file_name, source",
     [
         (
             ID_GAP_LOOKUP_TABLE,
-            "tests/devices/i10/lookupTables/expectedIDEnergy2GapCalibrationsIdu.pkl",
+            "expectedIDEnergy2GapCalibrationsIdu.pkl",
             ("Source", "idu"),
         ),
         (
             ID_GAP_LOOKUP_TABLE,
-            "tests/devices/i10/lookupTables/expectedIDEnergy2GapCalibrationsIdd.pkl",
+            "expectedIDEnergy2GapCalibrationsIdd.pkl",
             ("Source", "idd"),
         ),
         (
             ID_PHASE_LOOKUP_TABLE,
-            "tests/devices/i10/lookupTables/expectedIDEnergy2PhaseCalibrationsidu.pkl",
+            "expectedIDEnergy2PhaseCalibrationsidu.pkl",
             ("Source", "idu"),
         ),
         (
             ID_PHASE_LOOKUP_TABLE,
-            "tests/devices/i10/lookupTables/expectedIDEnergy2PhaseCalibrationsidd.pkl",
+            "expectedIDEnergy2PhaseCalibrationsidd.pkl",
             ("Source", "idd"),
         ),
     ],
 )
 def test_convert_csv_to_lookup_success(
     fileName: str,
-    expected_dict: str,
+    expected_dict_file_name: str,
     source: tuple[str, str],
 ):
     data = convert_csv_to_lookup(
         file=fileName,
         source=source,
     )
-
-    with open(expected_dict, "rb") as f:
+    path = "tests/devices/i10/lookupTables/"
+    with open(path + expected_dict_file_name, "rb") as f:
         loaded_dict = pickle.load(f)
     assert data == loaded_dict
 
