@@ -10,7 +10,7 @@ from dodal.common.beamlines.device_factory import (
 
 
 def test_terminal_use_case_decorated_motor_not_mock(RE: RunEngine):
-    @device_factory()
+    @device_factory(mock=True)
     def motor(name: str = "motor", prefix: str = "motor:"):
         return Motor(name=name, prefix=prefix)
 
@@ -19,7 +19,7 @@ def test_terminal_use_case_decorated_motor_not_mock(RE: RunEngine):
     assert m is not None
     assert m.name == "foo"
 
-    RE(ensure_connected(m))
+    RE(ensure_connected(m, mock=True))
 
 
 def test_terminal_use_case_decorated_motor_mock(RE: RunEngine):
@@ -28,7 +28,7 @@ def test_terminal_use_case_decorated_motor_mock(RE: RunEngine):
         return Motor(name=name, prefix=prefix)
 
     m = motor()
-    RE(ensure_connected(m))
+    RE(ensure_connected(m, mock=True))
 
     assert m is not None
     assert m.name == "motor"
