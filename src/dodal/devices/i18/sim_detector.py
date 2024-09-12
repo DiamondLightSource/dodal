@@ -1,5 +1,5 @@
-from ophyd_async.epics.motion import Motor
-from ophyd_async.sim import PatternGenerator
+from ophyd_async.epics import Motor
+from ophyd_async.sim.demo import PatternGenerator
 
 
 class SimDetector:
