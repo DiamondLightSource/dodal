@@ -13,6 +13,7 @@ from os import environ
 from types import ModuleType
 from typing import (
     Any,
+    TypeGuard,
     TypeVar,
 )
 
@@ -275,7 +276,7 @@ def is_v2_device_factory(func: Callable) -> bool:
         return False
 
 
-def is_any_device_factory(func: Callable) -> bool:
+def is_any_device_factory(func: Callable) -> TypeGuard[AnyDeviceFactory]:
     return is_v1_device_factory(func) or is_v2_device_factory(func)
 
 
