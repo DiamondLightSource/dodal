@@ -1,23 +1,27 @@
 import os
 from pathlib import Path
 
+from ophyd_async.fastcs.panda import HDFPanda
 from ophyd_async.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
     device_instantiation,
-    get_directory_provider,
-    set_directory_provider,
+    get_path_provider,
+    set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import numbered_slits
 from dodal.common.crystal_metadata import CrystalMetadata
-from dodal.common.visit import DirectoryServiceClient, StaticVisitDirectoryProvider
+from dodal.common.visit import (
+    LocalDirectoryServiceClient,
+    StaticVisitPathProvider,
+)
 from dodal.devices.i18.diode import Diode
 from dodal.devices.i18.KBMirror import KBMirror
 from dodal.devices.i18.sim_detector import SimDetector
 from dodal.devices.i18.sim_raster_stage import RasterStage
 from dodal.devices.i18.table import Table
-from dodal.devices.i22.dcm import DoubleCrystalMonochromator
+from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.tetramm import TetrammDetector
@@ -39,11 +43,11 @@ set_utils_beamline(BL)
 # Communication with GDA is also WIP so for now we determine an arbitrary scan number
 # locally and write the commissioning directory. The scan number is not guaranteed to
 # be unique and the data is at risk - this configuration is for testing only.
-set_directory_provider(
-    StaticVisitDirectoryProvider(
+set_path_provider(
+    StaticVisitPathProvider(
         BL,
         Path("/dls/i18/data/2024/cm37264-2/bluesky"),
-        client=DirectoryServiceClient("http://i18-control:8088/api"),
+        client=LocalDirectoryServiceClient(),
     )
 )
 
@@ -101,7 +105,7 @@ def panda1(
         "-MO-PANDA-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        directory_provider=get_directory_provider(),
+        path_provider=get_path_provider(),
     )
 
 
@@ -161,7 +165,7 @@ def i0(
         wait_for_connection,
         fake_with_ophyd_sim,
         type="Cividec Diamond XBPM",
-        directory_provider=get_directory_provider(),
+        path_provider=get_path_provider(),
     )
 
 
@@ -177,7 +181,7 @@ def it(
         wait_for_connection,
         fake_with_ophyd_sim,
         type="Tetramm",
-        directory_provider=get_directory_provider(),
+        path_provider=get_path_provider(),
     )
 
 
