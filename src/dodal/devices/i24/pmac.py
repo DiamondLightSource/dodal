@@ -139,6 +139,12 @@ class ProgramRunner(SignalRW):
 
     @AsyncStatus.wrap
     async def set(self, value: int, wait=True, timeout=None):
+        """ Set the pmac string to the program number and then wait for the scan to \
+        finish running.
+        This is done by checking the scan status PV which will go to 1 once the motion \
+        program starts and back to 0 when it's done. The timeout passed to this set \
+        should then be the total time required by the scan to finish.
+        """
         prog_str = f"&2b{value}r"
         assert isinstance(timeout, SupportsFloat) or (
             timeout is None
