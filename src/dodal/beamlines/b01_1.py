@@ -1,9 +1,7 @@
 from pathlib import Path
 
 from ophyd_async.epics.adaravis import AravisDetector
-from ophyd_async.epics.areadetector import AravisDetector
 from ophyd_async.fastcs.panda import HDFPanda
-from ophyd_async.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
     device_instantiation,
