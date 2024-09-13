@@ -46,6 +46,9 @@ dodal.devices.robot.BartRobot
       ~BartRobot.LOAD_TOLERANCE_MM
       
       
+      ~BartRobot.NOT_BUSY_TIMEOUT
+      
+      
       ~BartRobot.NO_PIN_ERROR_CODE
       
       
