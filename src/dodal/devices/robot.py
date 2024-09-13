@@ -1,5 +1,5 @@
 import asyncio
-from asyncio import FIRST_COMPLETED, CancelledError, Task
+from asyncio import FIRST_COMPLETED, CancelledError, Task, wait_for
 from dataclasses import dataclass
 from enum import Enum
 
@@ -41,6 +41,9 @@ class PinMounted(str, Enum):
 class BartRobot(StandardReadable, Movable):
     """The sample changing robot."""
 
+    # How long to wait for the robot if it is busy soaking/drying
+    NOT_BUSY_TIMEOUT = 60
+    # How long to wait for the actual load to happen
     LOAD_TIMEOUT = 60
     NO_PIN_ERROR_CODE = 25
 
@@ -93,7 +96,7 @@ class BartRobot(StandardReadable, Movable):
             for task in finished:
                 await task
         except CancelledError:
-            # If the outer enclosing task cancels after LOAD_TIMEOUT, this causes CancelledError to be raised
+            # If the outer enclosing task cancels after a timeout, this causes CancelledError to be raised
             # in the current task, when it propagates to here we should cancel all pending tasks before bubbling up
             for task in tasks:
                 task.cancel()
@@ -105,7 +108,9 @@ class BartRobot(StandardReadable, Movable):
             LOGGER.info(
                 f"Waiting on robot to finish {await self.program_name.get_value()}"
             )
-            await wait_for_value(self.program_running, False, None)
+            await wait_for_value(
+                self.program_running, False, timeout=self.NOT_BUSY_TIMEOUT
+            )
         await asyncio.gather(
             set_and_wait_for_value(self.next_puck, sample_location.puck),
             set_and_wait_for_value(self.next_pin, sample_location.pin),
@@ -121,10 +126,12 @@ class BartRobot(StandardReadable, Movable):
     @AsyncStatus.wrap
     async def set(self, value: SampleLocation):
         try:
-            await asyncio.wait_for(
-                self._load_pin_and_puck(value), timeout=self.LOAD_TIMEOUT
+            await wait_for(
+                self._load_pin_and_puck(value),
+                timeout=self.LOAD_TIMEOUT + self.NOT_BUSY_TIMEOUT,
             )
-        except asyncio.TimeoutError as e:
+        except (asyncio.TimeoutError, TimeoutError) as e:
+            # Will only need to catch asyncio.TimeoutError after https://github.com/bluesky/ophyd-async/issues/572
             error_code = await self.error_code.get_value()
             error_string = await self.error_str.get_value()
             raise RobotLoadFailed(int(error_code), error_string) from e
