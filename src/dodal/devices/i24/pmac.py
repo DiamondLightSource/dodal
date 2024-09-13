@@ -1,3 +1,4 @@
+from asyncio import sleep
 from enum import Enum, IntEnum
 from typing import SupportsFloat
 
@@ -138,12 +139,49 @@ class ProgramRunner(SignalRW):
 
     @AsyncStatus.wrap
     async def set(self, value: int, wait=True, timeout=None):
+        """ Set the pmac string to the program number and then wait for the scan to \
+        finish running.
+        This is done by checking the scan status PV which will go to 1 once the motion \
+        program starts and back to 0 when it's done. The timeout passed to this set \
+        should then be the total time required by the scan to finish.
+        """
         prog_str = f"&2b{value}r"
         assert isinstance(timeout, SupportsFloat) or (
             timeout is None
-        ), f"ProgramRunner does not support calculating timeout itself, {timeout=}"
+        ), f"ProgramRunner does not support calculating timeout itself, {timeout}"
         await self.signal.set(prog_str, wait=wait)
+        # First wait for signal to go to 1, then wait for the scan to finish.
+        await wait_for_value(
+            self.status,
+            ScanState.RUNNING,
+            timeout=DEFAULT_TIMEOUT,
+        )
         await wait_for_value(self.status, ScanState.DONE, timeout)
+
+
+class ProgramAbort(Triggerable):
+    """Abort a data collection by setting the PMAC string and then wait for the \
+        status value to go back to 0.
+    """
+
+    def __init__(
+        self,
+        pmac_str_sig: SignalRW,
+        status_sig: SignalR,
+    ) -> None:
+        self.signal = pmac_str_sig
+        self.status = status_sig
+
+    @AsyncStatus.wrap
+    async def trigger(self):
+        await self.signal.set("A", wait=True)
+        await sleep(1.0)  # TODO Check with scientist what this sleep is really for.
+        await self.signal.set("P2401=0", wait=True)
+        await wait_for_value(
+            self.status,
+            ScanState.DONE,
+            timeout=DEFAULT_TIMEOUT,
+        )
 
 
 class PMAC(StandardReadable):
@@ -175,5 +213,6 @@ class PMAC(StandardReadable):
         self.run_program = ProgramRunner(
             self.pmac_string, self.scanstatus, backend=SoftSignalBackend(str)
         )
+        self.abort_program = ProgramAbort(self.pmac_string, self.scanstatus)
 
         super().__init__(name)
