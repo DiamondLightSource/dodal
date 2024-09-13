@@ -1,5 +1,5 @@
 from asyncio import create_task, sleep
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import ANY, AsyncMock, MagicMock, patch
 
 import pytest
 from ophyd_async.core import set_mock_value
@@ -10,6 +10,7 @@ from dodal.devices.robot import BartRobot, PinMounted, RobotLoadFailed, SampleLo
 async def _get_bart_robot() -> BartRobot:
     device = BartRobot("robot", "-MO-ROBOT-01:")
     device.LOAD_TIMEOUT = 0.01  # type: ignore
+    device.NOT_BUSY_TIMEOUT = 0.01  # type: ignore
     await device.connect(mock=True)
     return device
 
@@ -118,3 +119,11 @@ async def test_given_waiting_for_pin_to_mount_when_pin_mounted_then_no_error_rai
     set_mock_value(device.gonio_pin_sensor, PinMounted.PIN_MOUNTED)
     await sleep(0.01)
     await status
+
+
+@patch("dodal.devices.robot.wait_for")
+async def test_set_waits_for_both_timeouts(mock_wait_for: AsyncMock):
+    device = await _get_bart_robot()
+    device._load_pin_and_puck = MagicMock()
+    await device.set(SampleLocation(1, 2))
+    mock_wait_for.assert_awaited_once_with(ANY, timeout=0.02)
