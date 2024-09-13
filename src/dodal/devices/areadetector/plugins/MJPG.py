@@ -91,7 +91,8 @@ class SnapshotWithBeamCentre(MJPG):
     image and saves the image to disk."""
 
     CROSSHAIR_LENGTH_PX = 20
-    CROSSHAIR_COLOUR = "Blue"
+    CROSSHAIR_OUTLINE_COLOUR = "Black"
+    CROSSHAIR_FILL_COLOUR = "White"
 
     def post_processing(self, image: Image.Image):
         assert (
@@ -100,15 +101,27 @@ class SnapshotWithBeamCentre(MJPG):
         beam_x = self.oav_params.beam_centre_i
         beam_y = self.oav_params.beam_centre_j
 
+        SnapshotWithBeamCentre.draw_crosshair(image, beam_x, beam_y)
+
+        self._save_image(image)
+
+    @classmethod
+    def draw_crosshair(cls, image: Image, beam_x: int, beam_y: int):
         draw = ImageDraw.Draw(image)
-        HALF_LEN = self.CROSSHAIR_LENGTH_PX / 2
+        HALF_LEN = cls.CROSSHAIR_LENGTH_PX / 2
+        draw.rectangle(
+            [beam_x - 1, beam_y - HALF_LEN - 1, beam_x + 1, beam_y + HALF_LEN + 1],
+            fill=cls.CROSSHAIR_OUTLINE_COLOUR,
+        )
+        draw.rectangle(
+            [beam_x - HALF_LEN - 1, beam_y - 1, beam_x + HALF_LEN + 1, beam_y + 1],
+            fill=cls.CROSSHAIR_OUTLINE_COLOUR,
+        )
         draw.line(
             ((beam_x, beam_y - HALF_LEN), (beam_x, beam_y + HALF_LEN)),
-            fill=self.CROSSHAIR_COLOUR,
+            fill=cls.CROSSHAIR_FILL_COLOUR,
         )
         draw.line(
             ((beam_x - HALF_LEN, beam_y), (beam_x + HALF_LEN, beam_y)),
-            fill=self.CROSSHAIR_COLOUR,
+            fill=cls.CROSSHAIR_FILL_COLOUR,
         )
-
-        self._save_image(image)
