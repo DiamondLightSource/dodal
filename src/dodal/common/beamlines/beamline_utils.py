@@ -1,5 +1,7 @@
 import inspect
 from collections.abc import Callable
+from dataclasses import dataclass
+from functools import wraps
 from typing import Final, TypeVar, cast
 
 from bluesky.run_engine import call_in_bluesky_event_loop
@@ -8,8 +10,35 @@ from ophyd.sim import make_fake_device
 from ophyd_async.core import Device as OphydV2Device
 from ophyd_async.core import wait_for_connection as v2_device_wait_for_connection
 
+from dodal.aliases import AnyDevice
 from dodal.common.types import UpdatingPathProvider
-from dodal.utils import AnyDevice, BeamlinePrefix, skip_device
+
+T = TypeVar("T", bound=AnyDevice)
+
+
+def skip_device(precondition=lambda: True):
+    def decorator(func: Callable[..., T]) -> Callable[..., T]:
+        @wraps(func)
+        def wrapper(*args, **kwds) -> T:
+            return func(*args, **kwds)
+
+        if precondition():
+            wrapper.__skip__ = True  # type: ignore
+        return wrapper
+
+    return decorator
+
+
+@dataclass
+class BeamlinePrefix:
+    ixx: str
+    suffix: str | None = None
+
+    def __post_init__(self):
+        self.suffix = self.ixx[0].upper() if not self.suffix else self.suffix
+        self.beamline_prefix = f"BL{self.ixx[1:3]}{self.suffix}"
+        self.insertion_prefix = f"SR{self.ixx[1:3]}{self.suffix}"
+
 
 DEFAULT_CONNECTION_TIMEOUT: Final[float] = 5.0
 

@@ -35,16 +35,11 @@ from bluesky.protocols import (
     Triggerable,
     WritesExternalAssets,
 )
-from ophyd.device import Device as OphydV1Device
 from ophyd_async.core import Device as OphydV2Device
 
 import dodal.log
-
-try:
-    from typing import TypeAlias
-except ImportError:
-    from typing import TypeAlias
-
+from dodal.aliases import AnyDevice, AnyDeviceFactory, V1DeviceFactory, V2DeviceFactory
+from dodal.common.beamlines.device_factory import DeviceInitializationController
 
 #: Protocols defining interface to hardware
 BLUESKY_PROTOCOLS = [
@@ -65,16 +60,6 @@ BLUESKY_PROTOCOLS = [
 ]
 
 
-@runtime_checkable
-class MovableReadable(Movable, Readable, Protocol): ...
-
-
-AnyDevice: TypeAlias = OphydV1Device | OphydV2Device
-V1DeviceFactory: TypeAlias = Callable[..., OphydV1Device]
-V2DeviceFactory: TypeAlias = Callable[..., OphydV2Device]
-AnyDeviceFactory: TypeAlias = V1DeviceFactory | V2DeviceFactory
-
-
 def get_beamline_name(default: str) -> str:
     return environ.get("BEAMLINE") or default
 
@@ -83,31 +68,7 @@ def get_hostname() -> str:
     return socket.gethostname().split(".")[0]
 
 
-@dataclass
-class BeamlinePrefix:
-    ixx: str
-    suffix: str | None = None
 
-    def __post_init__(self):
-        self.suffix = self.ixx[0].upper() if not self.suffix else self.suffix
-        self.beamline_prefix = f"BL{self.ixx[1:3]}{self.suffix}"
-        self.insertion_prefix = f"SR{self.ixx[1:3]}{self.suffix}"
-
-
-T = TypeVar("T", bound=AnyDevice)
-
-
-def skip_device(precondition=lambda: True):
-    def decorator(func: Callable[..., T]) -> Callable[..., T]:
-        @wraps(func)
-        def wrapper(*args, **kwds) -> T:
-            return func(*args, **kwds)
-
-        if precondition():
-            wrapper.__skip__ = True  # type: ignore
-        return wrapper
-
-    return decorator
 
 
 def make_device(
@@ -250,17 +211,26 @@ def collect_factories(
     Returns:
         dict[str, AnyDeviceFactory]: Mapping of factory name -> factory.
     """
-
     factories: dict[str, AnyDeviceFactory] = {}
 
-    for var in module.__dict__.values():
-        if (
-            callable(var)
-            and is_any_device_factory(var)
-            and (include_skipped or not _is_device_skipped(var))
+    all_variables_in_beamline_file = module.__dict__.values()
+    for variable in all_variables_in_beamline_file:
+        if _is_valid_factory(include_skipped, variable) and hasattr(
+            variable, "__name__"
         ):
-            factories[var.__name__] = var
+            factories[variable.__name__] = variable
+        elif isinstance(variable, DeviceInitializationController):
+            factories[variable._factory.__name__] = variable._factory  # noqa: SLF001
+
     return factories
+
+
+def _is_valid_factory(include_skipped: bool, var: Any):
+    return (
+        callable(var)
+        and is_any_device_factory(var)
+        and (include_skipped or not _is_device_skipped(var))
+    )
 
 
 def _is_device_skipped(func: AnyDeviceFactory) -> bool:
