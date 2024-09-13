@@ -106,7 +106,7 @@ class SnapshotWithBeamCentre(MJPG):
         self._save_image(image)
 
     @classmethod
-    def draw_crosshair(cls, image: Image, beam_x: int, beam_y: int):
+    def draw_crosshair(cls, image: Image.Image, beam_x: int, beam_y: int):
         draw = ImageDraw.Draw(image)
         HALF_LEN = cls.CROSSHAIR_LENGTH_PX / 2
         draw.rectangle(
