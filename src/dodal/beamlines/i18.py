@@ -2,7 +2,6 @@ import os
 from pathlib import Path
 
 from ophyd_async.fastcs.panda import HDFPanda
-from ophyd_async.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
     device_instantiation,
