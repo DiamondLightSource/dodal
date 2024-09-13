@@ -20,6 +20,7 @@ dodal.devices.i24.pmac
    ~pmac.PMACStringEncReset
    ~pmac.PMACStringLaser
    ~pmac.PMACStringMove
+   ~pmac.ProgramAbort
    ~pmac.ProgramRunner
    ~pmac.ScanState
 
