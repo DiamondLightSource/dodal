@@ -1,6 +1,6 @@
 from bluesky.protocols import Movable
 from ophyd_async.core import StandardReadable
-from ophyd_async.epics.motion import Motor
+from ophyd_async.epics.motor import Motor
 
 
 class RasterStage(StandardReadable, Movable):
