@@ -2,7 +2,7 @@ from bluesky.protocols import Movable
 from ophyd_async.core import (
     StandardReadable,
 )
-from ophyd_async.epics import Motor
+from ophyd_async.epics.motor import Motor
 
 
 class Table(StandardReadable, Movable):
