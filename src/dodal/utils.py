@@ -68,9 +68,6 @@ def get_hostname() -> str:
     return socket.gethostname().split(".")[0]
 
 
-
-
-
 def make_device(
     module: str | ModuleType,
     device_name: str,
@@ -149,7 +146,7 @@ def invoke_factories(
     exceptions: dict[str, Exception] = {}
 
     # Compute tree of dependencies,
-    dependencies = {
+    dependencies: dict[str, set[str]] = {
         factory_name: set(extract_dependencies(factories, factory_name))
         for factory_name in factories.keys()
     }
