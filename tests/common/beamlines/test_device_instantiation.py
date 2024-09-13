@@ -2,7 +2,7 @@ from typing import Any
 
 import pytest
 
-from dodal.beamlines import all_beamline_modules
+from dodal.beamlines import get_all_beamline_modules
 from dodal.common.beamlines import beamline_utils
 from dodal.utils import BLUESKY_PROTOCOLS, make_all_devices
 
@@ -13,7 +13,7 @@ def follows_bluesky_protocols(obj: Any) -> bool:
 
 @pytest.mark.parametrize(
     "module_and_devices_for_beamline",
-    set(all_beamline_modules()),
+    set(get_all_beamline_modules()),
     indirect=True,
 )
 def test_device_creation(RE, module_and_devices_for_beamline):
@@ -33,7 +33,7 @@ def test_device_creation(RE, module_and_devices_for_beamline):
 
 @pytest.mark.parametrize(
     "module_and_devices_for_beamline",
-    set(all_beamline_modules()),
+    set(get_all_beamline_modules()),
     indirect=True,
 )
 def test_devices_are_identical(RE, module_and_devices_for_beamline):
@@ -46,5 +46,6 @@ def test_devices_are_identical(RE, module_and_devices_for_beamline):
         include_skipped=True,
         fake_with_ophyd_sim=True,
     )
+    print(devices_b)
     for device_name in devices_a.keys():
         assert devices_a[device_name] is devices_b[device_name]
