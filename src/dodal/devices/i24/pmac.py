@@ -1,8 +1,7 @@
 from asyncio import sleep
 from enum import Enum, IntEnum
-from typing import SupportsFloat
 
-from bluesky.protocols import Triggerable
+from bluesky.protocols import Flyable, Triggerable
 from ophyd_async.core import (
     DEFAULT_TIMEOUT,
     AsyncStatus,
@@ -118,8 +117,8 @@ class PMACStringEncReset(SignalRW):
         await self.signal.set(value.value, wait, timeout)
 
 
-class ProgramRunner(SignalRW):
-    """Trigger the collection by setting the program number on the PMAC string.
+class ProgramRunner(SignalRW, Flyable):
+    """Run the collection by setting the program number on the PMAC string.
 
     Once the program number has been set, wait for the collection to be complete.
     This will only be true when the status becomes 0.
@@ -138,25 +137,27 @@ class ProgramRunner(SignalRW):
         super().__init__(backend, timeout, name)
 
     @AsyncStatus.wrap
-    async def set(self, value: int, wait=True, timeout=None):
-        """ Set the pmac string to the program number and then wait for the scan to \
-        finish running.
-        This is done by checking the scan status PV which will go to 1 once the motion \
-        program starts and back to 0 when it's done. The timeout passed to this set \
-        should then be the total time required by the scan to finish.
+    async def kickoff(self, program_num: int):
+        """Kick off the collection by sending a program number to the pmac_string and \
+            wait for the scan status PV to go to 1.
         """
-        prog_str = f"&2b{value}r"
-        assert isinstance(timeout, SupportsFloat) or (
-            timeout is None
-        ), f"ProgramRunner does not support calculating timeout itself, {timeout}"
-        await self.signal.set(prog_str, wait=wait)
-        # First wait for signal to go to 1, then wait for the scan to finish.
+        prog_num_str = f"&2b{program_num}r"
+        await self.signal.set(prog_num_str, wait=True)
         await wait_for_value(
             self.status,
             ScanState.RUNNING,
             timeout=DEFAULT_TIMEOUT,
         )
-        await wait_for_value(self.status, ScanState.DONE, timeout)
+
+    @AsyncStatus.wrap
+    async def complete(self, complete_time: float):
+        """Stop collecting when the scan status PV goes to 0.
+
+        Args:
+            complete_time (float): total time required by the collection to \
+            finish correctly.
+        """
+        await wait_for_value(self.status, ScanState.DONE, timeout=complete_time)
 
 
 class ProgramAbort(Triggerable):
