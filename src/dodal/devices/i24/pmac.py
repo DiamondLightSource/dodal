@@ -11,6 +11,7 @@ from ophyd_async.core import (
     SignalRW,
     SoftSignalBackend,
     StandardReadable,
+    soft_signal_rw,
     wait_for_value,
 )
 from ophyd_async.epics.motor import Motor
@@ -23,6 +24,12 @@ ZERO_STR = "!x0y0z0"  # Command to blend any ongoing move into new position
 class ScanState(IntEnum):
     RUNNING = 1
     DONE = 0
+
+
+class ProgramNumber(str, Enum):
+    ELEVEN = "&2b11r"
+    TWELVE = "&2b12r"
+    FOURTEEN = "&2b14r"
 
 
 class LaserSettings(str, Enum):
@@ -128,20 +135,25 @@ class ProgramRunner(SignalRW, Flyable):
         self,
         pmac_str_sig: SignalRW,
         status_sig: SignalR,
+        prog_num_sig: SignalRW,
         backend: SignalBackend,
         timeout: float | None = DEFAULT_TIMEOUT,
         name: str = "",
     ) -> None:
         self.signal = pmac_str_sig
         self.status = status_sig
+        self.prog_num = prog_num_sig
+
+        self.SCAN_COMPLETE_TIME: float = 600.0  # 10min for now, guess
+
         super().__init__(backend, timeout, name)
 
     @AsyncStatus.wrap
-    async def kickoff(self, program_num: int):
+    async def kickoff(self):
         """Kick off the collection by sending a program number to the pmac_string and \
             wait for the scan status PV to go to 1.
         """
-        prog_num_str = f"&2b{program_num}r"
+        prog_num_str = await self.prog_num.get_value()
         await self.signal.set(prog_num_str, wait=True)
         await wait_for_value(
             self.status,
@@ -150,14 +162,16 @@ class ProgramRunner(SignalRW, Flyable):
         )
 
     @AsyncStatus.wrap
-    async def complete(self, complete_time: float):
+    async def complete(self):
         """Stop collecting when the scan status PV goes to 0.
 
         Args:
             complete_time (float): total time required by the collection to \
             finish correctly.
         """
-        await wait_for_value(self.status, ScanState.DONE, timeout=complete_time)
+        await wait_for_value(
+            self.status, ScanState.DONE, timeout=self.SCAN_COMPLETE_TIME
+        )
 
 
 class ProgramAbort(Triggerable):
@@ -211,8 +225,12 @@ class PMAC(StandardReadable):
         self.scanstatus = epics_signal_r(float, "BL24I-MO-STEP-14:signal:P2401")
         self.counter = epics_signal_r(float, "BL24I-MO-STEP-14:signal:P2402")
 
+        self.program_number = soft_signal_rw(str)
         self.run_program = ProgramRunner(
-            self.pmac_string, self.scanstatus, backend=SoftSignalBackend(str)
+            self.pmac_string,
+            self.scanstatus,
+            self.program_number,
+            backend=SoftSignalBackend(str),
         )
         self.abort_program = ProgramAbort(self.pmac_string, self.scanstatus)
 

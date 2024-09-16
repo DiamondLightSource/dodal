@@ -6,7 +6,13 @@ import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import callback_on_mock_put, get_mock_put, set_mock_value
 
-from dodal.devices.i24.pmac import HOME_STR, PMAC, EncReset, LaserSettings
+from dodal.devices.i24.pmac import (
+    HOME_STR,
+    PMAC,
+    EncReset,
+    LaserSettings,
+    ProgramNumber,
+)
 from dodal.devices.util.test_utils import patch_motor
 
 
@@ -78,11 +84,12 @@ async def test_run_program(fake_pmac: PMAC, RE):
     )
 
     # RE(bps.kickoff(fake_pmac.run_program, program_num=10))
-    prog_num = 10
-    await fake_pmac.run_program.kickoff(program_num=prog_num)
-    await fake_pmac.run_program.complete(complete_time=2.0)
+    set_mock_value(fake_pmac.program_number, ProgramNumber.ELEVEN)
+    # RE(bps.kickoff(fake_pmac.run_program, wait=True))
+    await fake_pmac.run_program.kickoff()
+    await fake_pmac.run_program.complete()
 
-    assert await fake_pmac.pmac_string.get_value() == f"&2b{prog_num}r"
+    assert await fake_pmac.pmac_string.get_value() == "&2b11r"
 
 
 @patch("dodal.devices.i24.pmac.sleep")
