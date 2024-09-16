@@ -87,8 +87,8 @@ class MJPG(Device, ABC):
 
 
 class SnapshotWithBeamCentre(MJPG):
-    """A child of MJPG which, when triggered, draws a crosshair at the beam centre in the
-    image and saves the image to disk."""
+    """A child of MJPG which, when triggered, draws an outlined crosshair at the beam
+    centre in the image and saves the image to disk."""
 
     CROSSHAIR_LENGTH_PX = 20
     CROSSHAIR_OUTLINE_COLOUR = "Black"
@@ -108,13 +108,24 @@ class SnapshotWithBeamCentre(MJPG):
     @classmethod
     def draw_crosshair(cls, image: Image.Image, beam_x: int, beam_y: int):
         draw = ImageDraw.Draw(image)
+        OUTLINE_WIDTH = 1
         HALF_LEN = cls.CROSSHAIR_LENGTH_PX / 2
         draw.rectangle(
-            [beam_x - 1, beam_y - HALF_LEN - 1, beam_x + 1, beam_y + HALF_LEN + 1],
+            [
+                beam_x - OUTLINE_WIDTH,
+                beam_y - HALF_LEN - OUTLINE_WIDTH,
+                beam_x + OUTLINE_WIDTH,
+                beam_y + HALF_LEN + OUTLINE_WIDTH,
+            ],
             fill=cls.CROSSHAIR_OUTLINE_COLOUR,
         )
         draw.rectangle(
-            [beam_x - HALF_LEN - 1, beam_y - 1, beam_x + HALF_LEN + 1, beam_y + 1],
+            [
+                beam_x - HALF_LEN - OUTLINE_WIDTH,
+                beam_y - OUTLINE_WIDTH,
+                beam_x + HALF_LEN + OUTLINE_WIDTH,
+                beam_y + OUTLINE_WIDTH,
+            ],
             fill=cls.CROSSHAIR_OUTLINE_COLOUR,
         )
         draw.line(
