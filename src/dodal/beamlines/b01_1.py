@@ -14,7 +14,7 @@ from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import get_beamline_name
 
-BL = get_beamline_name("c01")  # noqa: F821
+BL = get_beamline_name("c01", force_default=True)  # noqa: F821
 set_log_beamline(BL)
 set_utils_beamline(BL)
 

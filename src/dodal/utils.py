@@ -68,7 +68,9 @@ V2DeviceFactory: TypeAlias = Callable[..., OphydV2Device]
 AnyDeviceFactory: TypeAlias = V1DeviceFactory | V2DeviceFactory
 
 
-def get_beamline_name(default: str) -> str:
+def get_beamline_name(default: str, force_default: bool = False) -> str:
+    if force_default:
+        return default
     return environ.get("BEAMLINE") or default
 
 
@@ -149,6 +151,7 @@ def make_all_devices(
     """
     if isinstance(module, str) or module is None:
         module = import_module(module or __name__)
+    print(module.BL)
     factories = collect_factories(module, include_skipped)
     devices: tuple[dict[str, AnyDevice], dict[str, Exception]] = invoke_factories(
         factories, **kwargs
