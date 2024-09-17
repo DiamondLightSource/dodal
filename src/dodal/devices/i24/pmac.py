@@ -140,6 +140,7 @@ class ProgramRunner(SignalRW, Flyable):
         self.prog_num = prog_num_sig
 
         self.collection_time = collection_time_sig
+        self.KICKOFF_TIMEOUT = timeout
 
         super().__init__(backend, timeout, name)
 
@@ -152,13 +153,12 @@ class ProgramRunner(SignalRW, Flyable):
         """Kick off the collection by sending a program number to the pmac_string and \
             wait for the scan status PV to go to 1.
         """
-        # prog_num = await self.prog_num.get_value()
         prog_num_str = await self._get_prog_number_string()
         await self.signal.set(prog_num_str, wait=True)
         await wait_for_value(
             self.status,
             ScanState.RUNNING,
-            timeout=DEFAULT_TIMEOUT,
+            timeout=self.KICKOFF_TIMEOUT,
         )
 
     @AsyncStatus.wrap
