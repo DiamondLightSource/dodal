@@ -10,7 +10,6 @@ from ophyd_async.core import (
     StandardReadable,
     soft_signal_r_and_setter,
 )
-from ophyd_async.epics import Motor
 from ophyd_async.epics.motor import Motor
 from ophyd_async.epics.signal import epics_signal_r
 
