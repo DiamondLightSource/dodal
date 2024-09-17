@@ -228,7 +228,7 @@ class PMAC(StandardReadable):
         # A couple of soft signals for running a collection: program number to send to
         # the PMAC_STRING and expected collection time.
         self.program_number = soft_signal_rw(str)
-        self.collection_time = soft_signal_rw(float)
+        self.collection_time = soft_signal_rw(float, units="s")
 
         self.run_program = ProgramRunner(
             self.pmac_string,
