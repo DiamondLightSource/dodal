@@ -136,6 +136,7 @@ class ProgramRunner(SignalRW, Flyable):
         pmac_str_sig: SignalRW,
         status_sig: SignalR,
         prog_num_sig: SignalRW,
+        collection_time_sig: SignalRW,
         backend: SignalBackend,
         timeout: float | None = DEFAULT_TIMEOUT,
         name: str = "",
@@ -144,7 +145,7 @@ class ProgramRunner(SignalRW, Flyable):
         self.status = status_sig
         self.prog_num = prog_num_sig
 
-        self.SCAN_COMPLETE_TIME: float = 600.0  # 10min for now, guess
+        self.collection_time = collection_time_sig
 
         super().__init__(backend, timeout, name)
 
@@ -169,9 +170,8 @@ class ProgramRunner(SignalRW, Flyable):
             complete_time (float): total time required by the collection to \
             finish correctly.
         """
-        await wait_for_value(
-            self.status, ScanState.DONE, timeout=self.SCAN_COMPLETE_TIME
-        )
+        scan_complete_time = await self.collection_time.get_value()
+        await wait_for_value(self.status, ScanState.DONE, timeout=scan_complete_time)
 
 
 class ProgramAbort(Triggerable):
@@ -225,11 +225,16 @@ class PMAC(StandardReadable):
         self.scanstatus = epics_signal_r(float, "BL24I-MO-STEP-14:signal:P2401")
         self.counter = epics_signal_r(float, "BL24I-MO-STEP-14:signal:P2402")
 
+        # A couple of soft signals for running a collection: program number to send to
+        # the PMAC_STRING and expected collection time.
         self.program_number = soft_signal_rw(str)
+        self.collection_time = soft_signal_rw(float)
+
         self.run_program = ProgramRunner(
             self.pmac_string,
             self.scanstatus,
             self.program_number,
+            self.collection_time,
             backend=SoftSignalBackend(str),
         )
         self.abort_program = ProgramAbort(self.pmac_string, self.scanstatus)
