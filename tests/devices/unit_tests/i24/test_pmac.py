@@ -11,7 +11,6 @@ from dodal.devices.i24.pmac import (
     PMAC,
     EncReset,
     LaserSettings,
-    ProgramNumber,
 )
 from dodal.devices.util.test_utils import patch_motor
 
@@ -83,7 +82,7 @@ async def test_run_program(fake_pmac: PMAC, RE):
         lambda *args, **kwargs: asyncio.create_task(go_high_then_low()),  # type: ignore
     )
 
-    set_mock_value(fake_pmac.program_number, ProgramNumber.ELEVEN)
+    set_mock_value(fake_pmac.program_number, 11)
     set_mock_value(fake_pmac.collection_time, 2.0)
     await fake_pmac.run_program.kickoff()
     await fake_pmac.run_program.complete()

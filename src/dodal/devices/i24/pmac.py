@@ -26,12 +26,6 @@ class ScanState(IntEnum):
     DONE = 0
 
 
-class ProgramNumber(str, Enum):
-    ELEVEN = "&2b11r"
-    TWELVE = "&2b12r"
-    FOURTEEN = "&2b14r"
-
-
 class LaserSettings(str, Enum):
     """PMAC strings to switch laser on and off.
     Note. On the PMAC, M-variables usually have to do with position compare
@@ -149,12 +143,17 @@ class ProgramRunner(SignalRW, Flyable):
 
         super().__init__(backend, timeout, name)
 
+    async def _get_prog_number_string(self) -> str:
+        prog_num = await self.prog_num.get_value()
+        return f"&2b{prog_num}r"
+
     @AsyncStatus.wrap
     async def kickoff(self):
         """Kick off the collection by sending a program number to the pmac_string and \
             wait for the scan status PV to go to 1.
         """
-        prog_num_str = await self.prog_num.get_value()
+        # prog_num = await self.prog_num.get_value()
+        prog_num_str = await self._get_prog_number_string()
         await self.signal.set(prog_num_str, wait=True)
         await wait_for_value(
             self.status,
@@ -227,7 +226,7 @@ class PMAC(StandardReadable):
 
         # A couple of soft signals for running a collection: program number to send to
         # the PMAC_STRING and expected collection time.
-        self.program_number = soft_signal_rw(str)
+        self.program_number = soft_signal_rw(int)
         self.collection_time = soft_signal_rw(float, units="s")
 
         self.run_program = ProgramRunner(
