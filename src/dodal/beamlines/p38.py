@@ -315,7 +315,7 @@ def linkam(
     return device_instantiation(
         Linkam3,
         "linkam",
-        "-EA-LINKM-02:",
+        f"{BeamlinePrefix(BL).insertion_prefix}-EA-LINKM-02:",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
@@ -327,7 +327,7 @@ def high_pressure_xray_cell(
     return device_instantiation(
         PressureJumpCell,
         "high_pressure_xray_cell",
-        "-EA",
+        f"{BeamlinePrefix(BL).insertion_prefix}-EA",
         wait_for_connection,
         fake_with_ophyd_sim,
         cell_prefix="-HPXC-01:",

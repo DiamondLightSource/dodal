@@ -181,16 +181,34 @@ class Pump(StandardReadable):
 
 
 class PressureTransducer(StandardReadable):
+    """
+    Pressure transducer for a high pressure X-ray cell.
+    This is the chamber and there are three of them.
+    1 is the start, 3 is where the sample is.
+    NOTE: the distinction between the adc prefix and the cell prefix is kept here.
+
+    """
+
     def __init__(
-        self, prefix: str, number: int, name: str = "", adc_prefix: str = ""
+        self,
+        prefix: str,
+        cell_prefix: str,
+        number: int,
+        name: str = "",
+        full_different_prefix_adc: str = "",
     ) -> None:
+        final_prefix = f"{prefix}{cell_prefix}"
         with self.add_children_as_readables():
-            self.omron_pressure = epics_signal_r(float, f"{prefix}PP{number}:PRES")
-            self.omron_voltage = epics_signal_r(float, f"{prefix}PP{number}:RAW")
-            self.beckhoff_pressure = epics_signal_r(
-                float, f"{prefix}STATP{number}:MeanValue_RBV"
+            self.omron_pressure = epics_signal_r(
+                float, f"{final_prefix}PP{number}:PRES"
             )
-            self.beckhoff_voltage = epics_signal_r(float, adc_prefix + "CH1")
+            self.omron_voltage = epics_signal_r(float, f"{final_prefix}PP{number}:RAW")
+            self.beckhoff_pressure = epics_signal_r(
+                float, f"{final_prefix}STATP{number}:MeanValue_RBV"
+            )
+            self.slow_beckhoff_voltage_readout = epics_signal_r(
+                float, f"{full_different_prefix_adc}CH1"
+            )
 
         super().__init__(name)
 
@@ -219,40 +237,37 @@ class PressureJumpCellController(HasName):
 class PressureJumpCell(StandardReadable):
     """
     High pressure X-ray cell, used to apply pressure or pressure jumps to a sample.
+    prefix: str
+        The prefix of beamline - SPECIAL - unusual that the cell prefix is computed separately
     """
 
     def __init__(
         self,
-        beamline_prefix: str,
         prefix: str,
         cell_prefix: str = "-HPXC-01:",
         adc_prefix: str = "-ADC",
-        ctrl_prefix: str = "CTRL:",
         name: str = "",
     ):
-        self.all_valves_control = AllValvesControl(
-            f"{beamline_prefix}{prefix}{cell_prefix}", name
-        )
-        self.pump = Pump(f"{beamline_prefix}{prefix}{cell_prefix}", name)
+        self.all_valves_control = AllValvesControl(f"{prefix}{cell_prefix}", name)
+        self.pump = Pump(f"{prefix}{cell_prefix}", name)
 
         self.controller = PressureJumpCellController(
-            f"{beamline_prefix}{prefix}{cell_prefix}{ctrl_prefix}", name
+            f"{prefix}{cell_prefix}CTRL:", name
         )
 
         with self.add_children_as_readables():
             self.pressure_transducers: DeviceVector[PressureTransducer] = DeviceVector(
                 {
                     i: PressureTransducer(
-                        prefix=f"{beamline_prefix}{prefix}{cell_prefix}",
+                        prefix=prefix,
                         number=i,
-                        adc_prefix=f"{beamline_prefix}{adc_prefix}-0{i}:",
+                        cell_prefix=cell_prefix,
+                        full_different_prefix_adc=f"{prefix}{adc_prefix}-0{i}:",
                     )
                     for i in [1, 2, 3]
                 }
             )
 
-            self.cell_temperature = epics_signal_r(
-                float, f"{beamline_prefix}{prefix}{cell_prefix}TEMP"
-            )
+            self.cell_temperature = epics_signal_r(float, f"{prefix}{cell_prefix}TEMP")
 
         super().__init__(name)

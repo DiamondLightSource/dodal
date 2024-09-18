@@ -99,17 +99,17 @@ async def test_reading_pjumpcell_includes_read_fields_transducers(
     set_mock_value(cell.pressure_transducers[1].omron_pressure, 1001)
     set_mock_value(cell.pressure_transducers[1].omron_voltage, 2.51)
     set_mock_value(cell.pressure_transducers[1].beckhoff_pressure, 1001.1)
-    set_mock_value(cell.pressure_transducers[1].beckhoff_voltage, 2.51)
+    set_mock_value(cell.pressure_transducers[1].slow_beckhoff_voltage_readout, 2.51)
 
     set_mock_value(cell.pressure_transducers[2].omron_pressure, 1002)
     set_mock_value(cell.pressure_transducers[2].omron_voltage, 2.52)
     set_mock_value(cell.pressure_transducers[2].beckhoff_pressure, 1002.2)
-    set_mock_value(cell.pressure_transducers[2].beckhoff_voltage, 2.52)
+    set_mock_value(cell.pressure_transducers[2].slow_beckhoff_voltage_readout, 2.52)
 
     set_mock_value(cell.pressure_transducers[3].omron_pressure, 1003)
     set_mock_value(cell.pressure_transducers[3].omron_voltage, 2.53)
     set_mock_value(cell.pressure_transducers[3].beckhoff_pressure, 1003.3)
-    set_mock_value(cell.pressure_transducers[3].beckhoff_voltage, 2.53)
+    set_mock_value(cell.pressure_transducers[3].slow_beckhoff_voltage_readout, 2.53)
 
     await assert_reading(
         cell.pressure_transducers[1],
