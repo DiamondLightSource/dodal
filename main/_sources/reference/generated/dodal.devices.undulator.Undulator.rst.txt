@@ -21,6 +21,9 @@ dodal.devices.undulator.Undulator
       
       
       
+      ~Undulator.set
+      
+      
       
       
       

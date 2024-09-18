@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.undulator_dcm &#8212; dodal 1.31.2.dev7+gd94d5b1b3 documentation</title>
+    <title>dodal.devices.undulator_dcm &#8212; dodal 1.31.2.dev8+gcc5ccf130 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=41a6a91f"></script>
+    <script src="../../../_static/documentation_options.js?v=40f0fd43"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -473,20 +473,15 @@ document.write(`
   <h1>Source code for dodal.devices.undulator_dcm</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">asyncio</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">bluesky.protocols</span> <span class="kn">import</span> <span class="n">Movable</span>
-<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">argmin</span><span class="p">,</span> <span class="n">ndarray</span>
 <span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="n">AsyncStatus</span><span class="p">,</span> <span class="n">StandardReadable</span>
 
 <span class="kn">from</span> <span class="nn">dodal.common.beamlines.beamline_parameters</span> <span class="kn">import</span> <span class="n">get_beamline_parameters</span>
-<span class="kn">from</span> <span class="nn">dodal.log</span> <span class="kn">import</span> <span class="n">LOGGER</span>
 
 <span class="kn">from</span> <span class="nn">.dcm</span> <span class="kn">import</span> <span class="n">DCM</span>
 <span class="kn">from</span> <span class="nn">.undulator</span> <span class="kn">import</span> <span class="n">Undulator</span><span class="p">,</span> <span class="n">UndulatorGapAccess</span>
-<span class="kn">from</span> <span class="nn">.util.lookup_tables</span> <span class="kn">import</span> <span class="n">energy_distance_table</span>
 
 <span class="n">ENERGY_TIMEOUT_S</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">30.0</span>
-<span class="n">STATUS_TIMEOUT_S</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span>
 
 <span class="c1"># Enable to allow testing when the beamline is down, do not change in production!</span>
 <span class="n">TEST_MODE</span> <span class="o">=</span> <span class="kc">False</span>
@@ -494,14 +489,6 @@ document.write(`
 
 <span class="k">class</span> <span class="nc">AccessError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="k">pass</span>
-
-
-<span class="k">def</span> <span class="nf">_get_closest_gap_for_energy</span><span class="p">(</span>
-    <span class="n">dcm_energy_ev</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">energy_to_distance_table</span><span class="p">:</span> <span class="n">ndarray</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-    <span class="n">table</span> <span class="o">=</span> <span class="n">energy_to_distance_table</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
-    <span class="n">idx</span> <span class="o">=</span> <span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">dcm_energy_ev</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">table</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="UndulatorDCM">
@@ -523,7 +510,6 @@ document.write(`
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">undulator</span><span class="p">:</span> <span class="n">Undulator</span><span class="p">,</span>
         <span class="n">dcm</span><span class="p">:</span> <span class="n">DCM</span><span class="p">,</span>
-        <span class="n">id_gap_lookup_table_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">daq_configuration_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
@@ -536,11 +522,10 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">dcm</span> <span class="o">=</span> <span class="n">dcm</span>
 
         <span class="c1"># These attributes are just used by hyperion for lookup purposes</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">id_gap_lookup_table_path</span> <span class="o">=</span> <span class="n">id_gap_lookup_table_path</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dcm_pitch_converter_lookup_table_path</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pitch_energy_table_path</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">daq_configuration_path</span> <span class="o">+</span> <span class="s2">&quot;/lookup/BeamLineEnergy_DCM_Pitch_converter.txt&quot;</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dcm_roll_converter_lookup_table_path</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">roll_energy_table_path</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">daq_configuration_path</span> <span class="o">+</span> <span class="s2">&quot;/lookup/BeamLineEnergy_DCM_Roll_converter.txt&quot;</span>
         <span class="p">)</span>
         <span class="c1"># I03 configures the DCM Perp as a side effect of applying this fixed value to the DCM Offset after an energy change</span>
@@ -553,7 +538,7 @@ document.write(`
     <span class="k">async</span> <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_dcm_energy</span><span class="p">(</span><span class="n">value</span><span class="p">),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_set_undulator_gap_if_required</span><span class="p">(</span><span class="n">value</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">undulator</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">),</span>
         <span class="p">)</span>
 
     <span class="k">async</span> <span class="k">def</span> <span class="nf">_set_dcm_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_kev</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -564,45 +549,6 @@ document.write(`
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">dcm</span><span class="o">.</span><span class="n">energy_in_kev</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
             <span class="n">energy_kev</span><span class="p">,</span>
             <span class="n">timeout</span><span class="o">=</span><span class="n">ENERGY_TIMEOUT_S</span><span class="p">,</span>
-        <span class="p">)</span>
-
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_set_undulator_gap_if_required</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_kev</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting DCM energy to </span><span class="si">{</span><span class="n">energy_kev</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> kev&quot;</span><span class="p">)</span>
-        <span class="n">gap_to_match_dcm_energy</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gap_to_match_dcm_energy</span><span class="p">(</span><span class="n">energy_kev</span><span class="p">)</span>
-
-        <span class="c1"># Check if undulator gap is close enough to the value from the DCM</span>
-        <span class="n">current_gap</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">undulator</span><span class="o">.</span><span class="n">current_gap</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
-        <span class="n">tolerance</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">undulator</span><span class="o">.</span><span class="n">gap_discrepancy_tolerance_mm</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
-        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">gap_to_match_dcm_energy</span> <span class="o">-</span> <span class="n">current_gap</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">tolerance</span><span class="p">:</span>
-            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Undulator gap mismatch. </span><span class="si">{</span><span class="nb">abs</span><span class="p">(</span><span class="n">gap_to_match_dcm_energy</span><span class="o">-</span><span class="n">current_gap</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">mm is outside tolerance.</span><span class="se">\</span>
-<span class="s2">                Moving gap to nominal value, </span><span class="si">{</span><span class="n">gap_to_match_dcm_energy</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">mm&quot;</span>
-            <span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">TEST_MODE</span><span class="p">:</span>
-                <span class="c1"># Only move if the gap is sufficiently different to the value from the</span>
-                <span class="c1"># DCM lookup table AND we&#39;re not in TEST_MODE</span>
-                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">undulator</span><span class="o">.</span><span class="n">gap_motor</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
-                    <span class="n">gap_to_match_dcm_energy</span><span class="p">,</span>
-                    <span class="n">timeout</span><span class="o">=</span><span class="n">STATUS_TIMEOUT_S</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;In test mode, not moving ID gap&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                <span class="s2">&quot;Gap is already in the correct place for the new energy value &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">energy_kev</span><span class="si">}</span><span class="s2">, no need to ask it to move&quot;</span>
-            <span class="p">)</span>
-
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_gap_to_match_dcm_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_kev</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="c1"># Get 2d np.array converting energies to undulator gap distance, from lookup table</span>
-        <span class="n">energy_to_distance_table</span> <span class="o">=</span> <span class="k">await</span> <span class="n">energy_distance_table</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">id_gap_lookup_table_path</span>
-        <span class="p">)</span>
-
-        <span class="c1"># Use the lookup table to get the undulator gap associated with this dcm energy</span>
-        <span class="k">return</span> <span class="n">_get_closest_gap_for_energy</span><span class="p">(</span>
-            <span class="n">energy_kev</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">,</span>
-            <span class="n">energy_to_distance_table</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 </pre></div>

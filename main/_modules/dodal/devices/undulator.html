@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.undulator &#8212; dodal 1.31.2.dev7+gd94d5b1b3 documentation</title>
+    <title>dodal.devices.undulator &#8212; dodal 1.31.2.dev8+gcc5ccf130 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=41a6a91f"></script>
+    <script src="../../../_static/documentation_options.js?v=40f0fd43"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -473,13 +473,36 @@ document.write(`
   <h1>Source code for dodal.devices.undulator</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 
-<span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="n">ConfigSignal</span><span class="p">,</span> <span class="n">StandardReadable</span><span class="p">,</span> <span class="n">soft_signal_r_and_setter</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">bluesky.protocols</span> <span class="kn">import</span> <span class="n">Movable</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">argmin</span><span class="p">,</span> <span class="n">ndarray</span>
+<span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AsyncStatus</span><span class="p">,</span>
+    <span class="n">ConfigSignal</span><span class="p">,</span>
+    <span class="n">StandardReadable</span><span class="p">,</span>
+    <span class="n">soft_signal_r_and_setter</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">ophyd_async.epics.motor</span> <span class="kn">import</span> <span class="n">Motor</span>
 <span class="kn">from</span> <span class="nn">ophyd_async.epics.signal</span> <span class="kn">import</span> <span class="n">epics_signal_r</span>
+
+<span class="kn">from</span> <span class="nn">dodal.log</span> <span class="kn">import</span> <span class="n">LOGGER</span>
+
+<span class="kn">from</span> <span class="nn">.util.lookup_tables</span> <span class="kn">import</span> <span class="n">energy_distance_table</span>
+
+
+<span class="k">class</span> <span class="nc">AccessError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<span class="c1"># Enable to allow testing when the beamline is down, do not change in production!</span>
+<span class="n">TEST_MODE</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="c1"># will be made more generic in https://github.com/DiamondLightSource/dodal/issues/754</span>
+
 
 <span class="c1"># The acceptable difference, in mm, between the undulator gap and the DCM</span>
 <span class="c1"># energy, when the latter is converted to mm using lookup tables</span>
 <span class="n">UNDULATOR_DISCREPANCY_THRESHOLD_MM</span> <span class="o">=</span> <span class="mf">2e-3</span>
+<span class="n">STATUS_TIMEOUT_S</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span>
 
 
 <div class="viewcode-block" id="UndulatorGapAccess">
@@ -490,9 +513,17 @@ document.write(`
 
 
 
+<span class="k">def</span> <span class="nf">_get_closest_gap_for_energy</span><span class="p">(</span>
+    <span class="n">dcm_energy_ev</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">energy_to_distance_table</span><span class="p">:</span> <span class="n">ndarray</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="n">table</span> <span class="o">=</span> <span class="n">energy_to_distance_table</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">dcm_energy_ev</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">table</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span>
+
+
 <div class="viewcode-block" id="Undulator">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.undulator.Undulator.html#dodal.devices.undulator.Undulator">[docs]</a>
-<span class="k">class</span> <span class="nc">Undulator</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">Undulator</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An Undulator-type insertion device, used to control photon emission at a given</span>
 <span class="sd">    beam energy.</span>
@@ -501,6 +532,7 @@ document.write(`
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">id_gap_lookup_table_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
         <span class="n">poles</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">length</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -514,6 +546,7 @@ document.write(`
 <span class="sd">            name (str, optional): Name for device. Defaults to &quot;&quot;.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">id_gap_lookup_table_path</span> <span class="o">=</span> <span class="n">id_gap_lookup_table_path</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">gap_motor</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;BLGAPMTR&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">current_gap</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;CURRGAPD&quot;</span><span class="p">)</span>
@@ -540,7 +573,66 @@ document.write(`
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Undulator.set">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.undulator.Undulator.html#dodal.devices.undulator.Undulator.set">[docs]</a>
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the undulator gap to a given energy in keV</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value: energy in keV</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_undulator_gap</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_set_undulator_gap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_kev</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">access_level</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">gap_access</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">access_level</span> <span class="ow">is</span> <span class="n">UndulatorGapAccess</span><span class="o">.</span><span class="n">DISABLED</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">TEST_MODE</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">AccessError</span><span class="p">(</span><span class="s2">&quot;Undulator gap access is disabled. Contact Control Room&quot;</span><span class="p">)</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting undulator gap to </span><span class="si">{</span><span class="n">energy_kev</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> kev&quot;</span><span class="p">)</span>
+        <span class="n">target_gap</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_gap_to_match_energy</span><span class="p">(</span><span class="n">energy_kev</span><span class="p">)</span>
+
+        <span class="c1"># Check if undulator gap is close enough to the value from the DCM</span>
+        <span class="n">current_gap</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_gap</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="n">tolerance</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">gap_discrepancy_tolerance_mm</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="n">difference</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">target_gap</span> <span class="o">-</span> <span class="n">current_gap</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">difference</span> <span class="o">&gt;</span> <span class="n">tolerance</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Undulator gap mismatch. </span><span class="si">{</span><span class="n">difference</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">mm is outside tolerance.</span><span class="se">\</span>
+<span class="s2">                Moving gap to nominal value, </span><span class="si">{</span><span class="n">target_gap</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">mm&quot;</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">TEST_MODE</span><span class="p">:</span>
+                <span class="c1"># Only move if the gap is sufficiently different to the value from the</span>
+                <span class="c1"># DCM lookup table AND we&#39;re not in TEST_MODE</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">gap_motor</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+                    <span class="n">target_gap</span><span class="p">,</span>
+                    <span class="n">timeout</span><span class="o">=</span><span class="n">STATUS_TIMEOUT_S</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;In test mode, not moving ID gap&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="s2">&quot;Gap is already in the correct place for the new energy value &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">energy_kev</span><span class="si">}</span><span class="s2">, no need to ask it to move&quot;</span>
+            <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_get_gap_to_match_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_kev</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        get a 2d np.array from lookup table that</span>
+<span class="sd">        converts energies to undulator gap distance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">energy_to_distance_table</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="k">await</span> <span class="n">energy_distance_table</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id_gap_lookup_table_path</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Use the lookup table to get the undulator gap associated with this dcm energy</span>
+        <span class="k">return</span> <span class="n">_get_closest_gap_for_energy</span><span class="p">(</span>
+            <span class="n">energy_kev</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">,</span>
+            <span class="n">energy_to_distance_table</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
 </pre></div>
 

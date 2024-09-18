@@ -34,4 +34,10 @@ dodal.devices.undulator
 
    
    
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      AccessError
+   
    
