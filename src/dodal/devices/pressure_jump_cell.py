@@ -224,25 +224,26 @@ class PressureJumpCell(StandardReadable):
     def __init__(
         self,
         beamline_prefix: str,
+        prefix: str,
         cell_prefix: str = "-HPXC-01:",
         adc_prefix: str = "-ADC",
         ctrl_prefix: str = "CTRL:",
         name: str = "",
     ):
         self.all_valves_control = AllValvesControl(
-            f"{beamline_prefix}{cell_prefix}", name
+            f"{beamline_prefix}{prefix}{cell_prefix}", name
         )
-        self.pump = Pump(f"{beamline_prefix}{cell_prefix}", name)
+        self.pump = Pump(f"{beamline_prefix}{prefix}{cell_prefix}", name)
 
         self.controller = PressureJumpCellController(
-            f"{beamline_prefix}{cell_prefix}{ctrl_prefix}", name
+            f"{beamline_prefix}{prefix}{cell_prefix}{ctrl_prefix}", name
         )
 
         with self.add_children_as_readables():
             self.pressure_transducers: DeviceVector[PressureTransducer] = DeviceVector(
                 {
                     i: PressureTransducer(
-                        prefix=f"{beamline_prefix}{cell_prefix}",
+                        prefix=f"{beamline_prefix}{prefix}{cell_prefix}",
                         number=i,
                         adc_prefix=f"{beamline_prefix}{adc_prefix}-0{i}:",
                     )
@@ -251,7 +252,7 @@ class PressureJumpCell(StandardReadable):
             )
 
             self.cell_temperature = epics_signal_r(
-                float, f"{beamline_prefix}{cell_prefix}TEMP"
+                float, f"{beamline_prefix}{prefix}{cell_prefix}TEMP"
             )
 
         super().__init__(name)
