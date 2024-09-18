@@ -316,6 +316,7 @@ def undulator(
         wait_for_connection,
         fake_with_ophyd_sim,
         bl_prefix=False,
+        id_gap_lookup_table_path="/dls_sw/i03/software/daq_configuration/lookup/BeamLine_Undulator_toGap.txt",
     )
 
 
@@ -334,7 +335,6 @@ def undulator_dcm(
         undulator=undulator(wait_for_connection, fake_with_ophyd_sim),
         dcm=dcm(wait_for_connection, fake_with_ophyd_sim),
         daq_configuration_path=DAQ_CONFIGURATION_PATH,
-        id_gap_lookup_table_path="/dls_sw/i03/software/daq_configuration/lookup/BeamLine_Undulator_toGap.txt",
     )
 
 
