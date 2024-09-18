@@ -122,7 +122,7 @@ class ApertureScatterguard(StandardReadable, Movable):
         )
         with self.add_children_as_readables(HintedSignal):
             self.selected_aperture = create_hardware_backed_soft_signal(
-                ApertureValue, self.get_current_aperture_position
+                ApertureValue, self._get_current_aperture_position
             )
 
         super().__init__(name)
@@ -152,7 +152,7 @@ class ApertureScatterguard(StandardReadable, Movable):
             self.scatterguard.y.set(scatterguard_y),
         )
 
-    async def get_current_aperture_position(self) -> ApertureValue:
+    async def _get_current_aperture_position(self) -> ApertureValue:
         """
         Returns the current aperture position using readback values
         for SMALL, MEDIUM, LARGE. ROBOT_LOAD position defined when
@@ -173,7 +173,7 @@ class ApertureScatterguard(StandardReadable, Movable):
         raise InvalidApertureMove("Current aperture/scatterguard state unrecognised")
 
     async def _get_current_radius(self) -> float | None:
-        current_value = await self.get_current_aperture_position()
+        current_value = await self._get_current_aperture_position()
         return self._loaded_positions[current_value].radius
 
     async def _safe_move_within_datacollection_range(
