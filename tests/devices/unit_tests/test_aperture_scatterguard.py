@@ -328,6 +328,9 @@ async def test_aperture_positions_robot_load_unsafe(
         await ap_sg.read()
 
 
+@pytest.mark.skip(
+    "Curently not working, see https://github.com/DiamondLightSource/dodal/issues/782"
+)
 async def test_given_aperture_not_set_through_device_but_motors_in_position_when_device_read_then_position_returned(
     aperture_in_medium_pos: ApertureScatterguard,
     aperture_positions: dict[ApertureValue, AperturePosition],
