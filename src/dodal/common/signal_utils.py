@@ -2,7 +2,6 @@ from collections.abc import Callable, Coroutine
 from typing import Any, TypeVar
 
 from bluesky.protocols import Reading
-from event_model.documents.event_descriptor import DataKey
 from ophyd_async.core import SignalR, SoftSignalBackend
 from ophyd_async.core._soft_signal_backend import SignalMetadata
 
