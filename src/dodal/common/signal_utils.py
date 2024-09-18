@@ -23,10 +23,6 @@ class HarwareBackedSoftSignalBackend(SoftSignalBackend[T]):
         new_value = await self.get_from_hardware_func()
         await self.put(new_value)
 
-    async def get_datakey(self, source: str) -> DataKey:
-        await self._update_value()
-        return await super().get_datakey(source)
-
     async def get_reading(self) -> Reading:
         await self._update_value()
         return await super().get_reading()
@@ -40,8 +36,9 @@ def create_hardware_backed_soft_signal(
     datatype: type[T],
     get_from_hardware_func: Callable[[], Coroutine[Any, Any, T]],
     units: str | None = None,
+    precision: int | None = None,
 ):
-    metadata = SignalMetadata(units=units, precision=None)
+    metadata = SignalMetadata(units=units, precision=precision)
     return SignalR(
         backend=HarwareBackedSoftSignalBackend(
             get_from_hardware_func, datatype, metadata=metadata
