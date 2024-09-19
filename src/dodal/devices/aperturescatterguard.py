@@ -220,15 +220,15 @@ class ApertureScatterguard(StandardReadable, Movable):
                 self.aperture.y.set(aperture_y),
                 self.aperture.z.set(aperture_z),
             )
-            return
-        await asyncio.gather(
-            self.aperture.x.set(aperture_x),
-            self.aperture.y.set(aperture_y),
-            self.aperture.z.set(aperture_z),
-        )
+        else:
+            await asyncio.gather(
+                self.aperture.x.set(aperture_x),
+                self.aperture.y.set(aperture_y),
+                self.aperture.z.set(aperture_z),
+            )
 
-        await asyncio.gather(
-            self.scatterguard.x.set(scatterguard_x),
-            self.scatterguard.y.set(scatterguard_y),
-        )
+            await asyncio.gather(
+                self.scatterguard.x.set(scatterguard_x),
+                self.scatterguard.y.set(scatterguard_y),
+            )
         await self.selected_aperture.set(value)

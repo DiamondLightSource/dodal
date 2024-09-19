@@ -39,7 +39,12 @@ class ZocaloStartInfo:
 
 
 def _get_zocalo_headers() -> tuple[str, str]:
-    user = os.environ.get("ZOCALO_GO_USER", getpass.getuser())
+    user = os.environ.get("ZOCALO_GO_USER")
+
+    # cannot default as getuser() will throw when called from inside a container
+    if not user:
+        user = getpass.getuser()
+
     hostname = os.environ.get("ZOCALO_GO_HOSTNAME", socket.gethostname())
     return user, hostname
 

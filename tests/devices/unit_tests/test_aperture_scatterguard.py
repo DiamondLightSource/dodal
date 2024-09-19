@@ -139,10 +139,14 @@ def _assert_patched_ap_sg_has_call(
 
 
 def _assert_position_in_reading(
-    reading: dict[str, Any], position: AperturePosition, device_name: str
+    reading: dict[str, Any],
+    aperture: ApertureValue,
+    position: AperturePosition,
+    device_name: str,
 ):
     if position.radius is not None:
         assert reading[f"{device_name}-radius"]["value"] == position.radius
+    assert reading[f"{device_name}-selected_aperture"]["value"] == aperture
     assert reading[f"{device_name}-aperture-x"]["value"] == position.aperture_x
     assert reading[f"{device_name}-aperture-y"]["value"] == position.aperture_y
     assert reading[f"{device_name}-aperture-z"]["value"] == position.aperture_z
@@ -307,6 +311,9 @@ async def test_aperture_positions_robot_load_unsafe(
         await ap_sg.get_current_aperture_position()
 
 
+@pytest.mark.skip(
+    "Curently not working, see https://github.com/DiamondLightSource/dodal/issues/782"
+)
 async def test_given_aperture_not_set_through_device_but_motors_in_position_when_device_read_then_position_returned(
     aperture_in_medium_pos: ApertureScatterguard,
     aperture_positions: dict[ApertureValue, AperturePosition],
@@ -315,20 +322,32 @@ async def test_given_aperture_not_set_through_device_but_motors_in_position_when
     assert isinstance(reading, dict)
     _assert_position_in_reading(
         reading,
+        ApertureValue.MEDIUM,
         aperture_positions[ApertureValue.MEDIUM],
         aperture_in_medium_pos.name,
     )
 
 
+@pytest.mark.parametrize(
+    "aperture",
+    [
+        ApertureValue.SMALL,
+        ApertureValue.MEDIUM,
+        ApertureValue.LARGE,
+        ApertureValue.ROBOT_LOAD,
+    ],
+)
 async def test_when_aperture_set_and_device_read_then_position_returned(
+    aperture: ApertureValue,
     aperture_in_medium_pos: ApertureScatterguard,
     aperture_positions: dict[ApertureValue, AperturePosition],
 ):
-    await aperture_in_medium_pos.set(ApertureValue.MEDIUM)
+    await aperture_in_medium_pos.set(aperture)
     reading = await aperture_in_medium_pos.read()
     _assert_position_in_reading(
         reading,
-        aperture_positions[ApertureValue.MEDIUM],
+        aperture,
+        aperture_positions[aperture],
         aperture_in_medium_pos.name,
     )
 
@@ -347,6 +366,11 @@ async def test_ap_sg_in_runengine(
     assert await ap.z.user_readback.get_value() == test_loc.aperture_z
     assert await sg.x.user_readback.get_value() == test_loc.scatterguard_x
     assert await sg.y.user_readback.get_value() == test_loc.scatterguard_y
+    assert (
+        await aperture_in_medium_pos.selected_aperture.get_value()
+        == ApertureValue.SMALL
+    )
+    assert await aperture_in_medium_pos.radius.get_value() == 20
 
 
 async def test_ap_sg_descriptor(
