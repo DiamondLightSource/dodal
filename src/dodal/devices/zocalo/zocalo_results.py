@@ -217,7 +217,7 @@ class ZocaloResults(StandardReadable, Triggerable):
             raw_results = self._raw_results_received.get(timeout=self.timeout_s)
             source_of_first_results = source_from_results(raw_results)
 
-            # Wait for results from CPU and GPU, warn and continue if one timed out, error if both time out
+            # Wait for results from CPU and GPU, warn and continue if only GPU times out. Error if CPU times out
             if self.use_cpu_and_gpu:
                 if source_of_first_results == ZocaloSource.CPU:
                     LOGGER.warning("Received zocalo results from CPU before GPU")
@@ -240,18 +240,31 @@ class ZocaloResults(StandardReadable, Triggerable):
                     if differences_str:
                         LOGGER.warning(differences_str)
 
-                except Empty:
+                    # Always use CPU results
+                    raw_results = (
+                        raw_results_two_sources[0]
+                        if source_of_first_results == ZocaloSource.CPU
+                        else raw_results_two_sources[1]
+                    )
+
+                except Empty as err:
                     source_of_missing_results = (
                         ZocaloSource.CPU.value
                         if source_of_first_results == ZocaloSource.GPU.value
                         else ZocaloSource.GPU.value
                     )
-                    LOGGER.warning(
-                        f"Zocalo results from {source_of_missing_results} timed out. Using results from {source_of_first_results}"
-                    )
+                    if source_of_missing_results == ZocaloSource.GPU.value:
+                        LOGGER.warning(
+                            f"Zocalo results from {source_of_missing_results} timed out. Using results from {source_of_first_results}"
+                        )
+                    else:
+                        LOGGER.error(
+                            f"Zocalo results from {source_of_missing_results} timed out and GPU results not yet reliable"
+                        )
+                        raise err
 
             LOGGER.info(
-                f"Zocalo results from {source_of_first_results} processing: found {len(raw_results['results'])} crystals."
+                f"Zocalo results from {ZocaloSource.CPU.value} processing: found {len(raw_results['results'])} crystals."
             )
             # Sort from strongest to weakest in case of multiple crystals
             await self._put_results(
