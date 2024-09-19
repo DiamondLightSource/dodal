@@ -4,12 +4,14 @@ import pickle
 import uuid
 from collections.abc import Awaitable, Callable
 from datetime import timedelta
+from enum import Enum
 
 import numpy as np
 from aiohttp import ClientResponse, ClientSession
 from bluesky.protocols import Flyable, Stoppable
 from ophyd_async.core import (
     AsyncStatus,
+    DeviceVector,
     StandardReadable,
     soft_signal_r_and_setter,
     soft_signal_rw,
@@ -28,6 +30,11 @@ async def get_next_jpeg(response: ClientResponse) -> bytes:
         line = await response.content.readline()
         if line.startswith(JPEG_START_BYTE):
             return line + await response.content.readuntil(JPEG_STOP_BYTE)
+
+
+class Source(Enum):
+    FULL_SCREEN = 0
+    ROI = 1
 
 
 class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
@@ -59,7 +66,15 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
             redis_db: int           which redis database to connect to, defaults to 0
             name: str               the name of this device
         """
-        self.stream_url = epics_signal_r(str, f"{prefix}MJPG:MJPG_URL_RBV")
+        self._sources = DeviceVector(
+            {
+                Source.FULL_SCREEN.value: epics_signal_r(
+                    str, f"{prefix}MJPG:MJPG_URL_RBV"
+                ),
+                Source.ROI.value: epics_signal_r(str, f"{prefix}XTAL:MJPG_URL_RBV"),
+            }
+        )
+        self.selected_source = soft_signal_rw(Source)
 
         with self.add_children_as_readables():
             self.uuid, self.uuid_setter = soft_signal_r_and_setter(str)
@@ -95,7 +110,8 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
     async def _open_connection_and_do_function(
         self, function_to_do: Callable[[ClientResponse, str | None], Awaitable]
     ):
-        stream_url = await self.stream_url.get_value()
+        source = await self.selected_source.get_value()
+        stream_url = await self._sources[source.value].get_value()
         async with ClientSession() as session:
             async with session.get(stream_url) as response:
                 await function_to_do(response, stream_url)
