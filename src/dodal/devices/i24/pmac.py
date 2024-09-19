@@ -4,9 +4,9 @@ from typing import SupportsFloat
 
 from bluesky.protocols import Triggerable
 from ophyd_async.core import (
+    CALCULATE_TIMEOUT,
     DEFAULT_TIMEOUT,
     AsyncStatus,
-    CalculateTimeout,
     SignalBackend,
     SignalR,
     SignalRW,
@@ -90,7 +90,7 @@ class PMACStringLaser(SignalRW):
         self,
         value: LaserSettings,
         wait=True,
-        timeout=CalculateTimeout,
+        timeout=CALCULATE_TIMEOUT,
     ):
         await self.signal.set(value.value, wait, timeout)
 
@@ -113,7 +113,7 @@ class PMACStringEncReset(SignalRW):
         self,
         value: EncReset,
         wait=True,
-        timeout=CalculateTimeout,
+        timeout=CALCULATE_TIMEOUT,
     ):
         await self.signal.set(value.value, wait, timeout)
 

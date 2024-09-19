@@ -3,13 +3,13 @@ from enum import Enum
 
 from bluesky.protocols import Hints
 from ophyd_async.core import (
-    AsyncStatus,
     DatasetDescriber,
     DetectorControl,
     DetectorTrigger,
     Device,
     PathProvider,
     StandardDetector,
+    TriggerInfo,
     set_and_wait_for_value,
     soft_signal_r_and_setter,
 )
@@ -113,29 +113,24 @@ class TetrammController(DetectorControl):
         # 2 internal clock cycles. Best effort approximation
         return 2 / self.base_sample_rate
 
-    async def arm(
-        self,
-        num: int,
-        trigger: DetectorTrigger = DetectorTrigger.edge_trigger,
-        exposure: float | None = None,
-    ) -> AsyncStatus:
-        if exposure is None:
-            raise ValueError(
-                "Tetramm does not support arm without exposure time. "
-                "Is this a software scan? Tetramm only supports hardware scans."
-            )
-        self._validate_trigger(trigger)
+    async def prepare(self, trigger_info: TriggerInfo):
+        self._validate_trigger(trigger_info.trigger)
+        assert trigger_info.livetime is not None
 
         # trigger mode must be set first and on its own!
         await self._drv.trigger_mode.set(TetrammTrigger.ExtTrigger)
 
         await asyncio.gather(
-            self._drv.averaging_time.set(exposure), self.set_exposure(exposure)
+            self._drv.averaging_time.set(trigger_info.livetime),
+            self.set_exposure(trigger_info.livetime),
         )
 
-        status = await set_and_wait_for_value(self._drv.acquire, True)
+    async def arm(self):
+        self._arm_status = await set_and_wait_for_value(self._drv.acquire, True)
 
-        return status
+    async def wait_for_idle(self):
+        if self._arm_status:
+            await self._arm_status
 
     def _validate_trigger(self, trigger: DetectorTrigger) -> None:
         supported_trigger_types = {
