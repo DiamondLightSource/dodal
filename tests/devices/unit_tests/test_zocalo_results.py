@@ -306,18 +306,10 @@ async def test_source_of_zocalo_results_correctly_identified(
         ]
     )
 
-    zocalo_results._raw_results_received.get = MagicMock(
-        return_value={"recipe_parameters": {"gpu": True}, "results": []}
-    )
-    RE(bps.trigger(zocalo_results, wait=False))
-    mock_logger.info.assert_has_calls(
-        [call("Zocalo results from GPU processing: found 0 crystals.")]
-    )
-
 
 @patch("dodal.devices.zocalo.zocalo_results.LOGGER")
 @patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection", autospec=True)
-async def test_if_zocalo_results_timeout_from_one_source_then_warn(
+async def test_if_zocalo_results_timeout_from_gpu_then_warn(
     mock_connection, mock_logger, RE: RunEngine
 ):
     zocalo_results = ZocaloResults(
@@ -326,12 +318,35 @@ async def test_if_zocalo_results_timeout_from_one_source_then_warn(
     await zocalo_results.connect()
     await zocalo_results.stage()
     zocalo_results._raw_results_received.get = MagicMock(
-        side_effect=[{"recipe_parameters": {"test": 0}, "results": []}, Empty]
+        side_effect=[
+            {"recipe_parameters": {"test": 0}, "results": []},
+            Empty,
+        ]
     )
     RE(bps.trigger(zocalo_results, wait=False))
     mock_logger.warning.assert_called_with(
         f"Zocalo results from GPU timed out. Using results from {ZocaloSource.CPU.value}"
     )
+
+
+@patch("dodal.devices.zocalo.zocalo_results.LOGGER")
+@patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection", autospec=True)
+async def test_if_zocalo_results_from_gpu_but_not_cpu_then_error(
+    mock_connection, mock_logger, RE: RunEngine
+):
+    zocalo_results = ZocaloResults(
+        name="zocalo", zocalo_environment="dev_artemis", use_cpu_and_gpu=True
+    )
+    await zocalo_results.connect()
+    await zocalo_results.stage()
+    zocalo_results._raw_results_received.get = MagicMock(
+        side_effect=[
+            {"recipe_parameters": {"test": 0, "gpu": True}, "results": []},
+            Empty,
+        ]
+    )
+    with pytest.raises(NoResultsFromZocalo):
+        await zocalo_results.trigger()
 
 
 @patch("dodal.devices.zocalo.zocalo_results.LOGGER")
