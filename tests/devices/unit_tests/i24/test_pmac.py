@@ -1,7 +1,10 @@
+import asyncio
+from unittest.mock import ANY, call, patch
+
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import set_mock_value
+from ophyd_async.core import callback_on_mock_put, get_mock_put, set_mock_value
 
 from dodal.devices.i24.pmac import HOME_STR, PMAC, EncReset, LaserSettings
 from dodal.devices.util.test_utils import patch_motor
@@ -64,8 +67,30 @@ async def test_set_pmac_string_for_enc_reset(fake_pmac: PMAC, RE):
 
 
 async def test_run_proogram(fake_pmac: PMAC, RE):
-    set_mock_value(fake_pmac.scanstatus, 0)
+    async def go_high_then_low():
+        set_mock_value(fake_pmac.scanstatus, 1)
+        await asyncio.sleep(0.01)
+        set_mock_value(fake_pmac.scanstatus, 0)
+
     prog_num = 10
+    callback_on_mock_put(
+        fake_pmac.pmac_string,
+        lambda *args, **kwargs: asyncio.create_task(go_high_then_low()),  # type: ignore
+    )
     RE(bps.abs_set(fake_pmac.run_program, prog_num, timeout=1, wait=True))
 
     assert await fake_pmac.pmac_string.get_value() == f"&2b{prog_num}r"
+
+
+@patch("dodal.devices.i24.pmac.sleep")
+async def test_abort_program(mock_sleep, fake_pmac: PMAC, RE):
+    set_mock_value(fake_pmac.scanstatus, 0)
+    RE(bps.trigger(fake_pmac.abort_program, wait=True))
+
+    mock_pmac_string = get_mock_put(fake_pmac.pmac_string)
+    mock_pmac_string.assert_has_calls(
+        [
+            call("A", wait=True, timeout=ANY),
+            call("P2401=0", wait=True, timeout=ANY),
+        ]
+    )
