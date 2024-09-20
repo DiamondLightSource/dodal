@@ -1,10 +1,11 @@
+from ophyd_async.epics.adsimdetector import SimDetector
+
 from dodal.common.beamlines.beamline_utils import (
     device_instantiation,
-    get_directory_provider,
+    get_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.adsim import SimStage
-from dodal.devices.areadetector import AdSimDetector
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import get_beamline_name, get_hostname
 
@@ -27,12 +28,12 @@ def sim_motors(
 
 def adsim(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> AdSimDetector:
+) -> SimDetector:
     return device_instantiation(
-        AdSimDetector,
+        SimDetector,
         "adsim",
         "-AD-SIM-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        directory_provider=get_directory_provider(),
+        directory_provider=get_path_provider(),
     )
