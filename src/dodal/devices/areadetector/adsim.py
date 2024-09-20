@@ -1,11 +1,16 @@
 from bluesky.protocols import HasHints, Hints
 from ophyd_async.core import (
-    DirectoryProvider,
+    PathProvider,
     StandardDetector,
 )
-from ophyd_async.epics.areadetector.controllers import ADSimController
-from ophyd_async.epics.areadetector.drivers import ADBase, ADBaseShapeProvider
-from ophyd_async.epics.areadetector.writers import HDFWriter, NDFileHDF, NDPluginStats
+from ophyd_async.epics.adcore import (
+    ADBaseDatasetDescriber,
+    ADBaseIO,
+    ADHDFWriter,
+    NDFileHDFIO,
+    NDPluginStatsIO,
+)
+from ophyd_async.epics.adsimdetector import SimController
 
 
 class AdSimDetector(StandardDetector, HasHints):
@@ -17,23 +22,22 @@ class AdSimDetector(StandardDetector, HasHints):
         self,
         name: str,
         prefix: str,
-        directory_provider: DirectoryProvider,
+        directory_provider: PathProvider,
     ):
-        drv = ADBase(prefix + "CAM:")
-        hdf = NDFileHDF(prefix + "HDF5:")
+        drv = ADBaseIO(prefix + "CAM:")
+        hdf = NDFileHDFIO(prefix + "HDF5:")
 
         self.drv = drv
         self.hdf = hdf
-        self.stats = NDPluginStats(prefix + "STAT:")
+        self.stats = NDPluginStatsIO(prefix + "STAT:")
 
         super().__init__(
-            ADSimController(drv),
-            HDFWriter(
+            SimController(drv),
+            ADHDFWriter(
                 hdf,
                 directory_provider,
                 lambda: self.name,
-                ADBaseShapeProvider(drv),
-                sum="StatsTotal",
+                ADBaseDatasetDescriber(drv),
             ),
             config_sigs=[drv.acquire_time, drv.acquire],
             name=name,
@@ -41,5 +45,5 @@ class AdSimDetector(StandardDetector, HasHints):
 
     @property
     def hints(self) -> Hints:
-        assert isinstance(self.writer, HDFWriter)
+        assert isinstance(self.writer, ADHDFWriter)
         return self.writer.hints
