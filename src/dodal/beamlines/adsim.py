@@ -35,5 +35,5 @@ def adsim(
         "-AD-SIM-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        directory_provider=get_path_provider(),
+        path_provider=get_path_provider(),
     )
