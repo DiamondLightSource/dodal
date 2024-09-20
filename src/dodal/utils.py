@@ -214,8 +214,8 @@ def collect_factories(
             variable, "__name__"
         ):
             factories[variable.__name__] = variable
-        elif isinstance(variable, DeviceInitializationController):
-            factories[variable._factory.__name__] = variable._factory  # noqa: SLF001
+        # elif isinstance(variable, DeviceInitializationController):
+        #     factories[variable._factory.__name__] = variable._factory  # noqa: SLF001
 
     return factories
 
@@ -248,8 +248,29 @@ def is_v2_device_factory(func: Callable) -> TypeGuard[V2DeviceFactory]:
         return False
 
 
+def is_new_device_factory(func: Callable) -> TypeGuard[AnyDeviceFactory]:
+    try:
+        return_type = signature(func).return_annotation
+        print(f"func:{func}")
+        print(f"return type:{return_type}")
+
+        return isinstance(func, DeviceInitializationController)
+        return (
+            signature(func)
+            == Callable[[Callable[..., Any]], DeviceInitializationController[..., Any]]
+            and return_type == DeviceInitializationController
+        )
+
+    except ValueError:
+        return False
+
+
 def is_any_device_factory(func: Callable) -> TypeGuard[AnyDeviceFactory]:
-    return is_v1_device_factory(func) or is_v2_device_factory(func)
+    return (
+        is_v1_device_factory(func)
+        or is_v2_device_factory(func)
+        or is_new_device_factory(func)
+    )
 
 
 def is_v2_device_type(obj: type[Any]) -> bool:
