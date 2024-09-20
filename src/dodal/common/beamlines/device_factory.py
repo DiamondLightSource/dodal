@@ -74,14 +74,20 @@ class DeviceInitializationController(Generic[P, T]):
             return self.device
 
         # unpack the arguments, fill in the defaults
-        connect = self._config.eager_connect if connect is None else connect
+        connect = connect or self._config.eager_connect
         name = name or (
             self._factory.__name__ if self._config.use_factory_name else None
         )
-        mock = self._config.mock if mock is None else mock
+        mock = mock or self._config.mock
         timeout = timeout or self._config.timeout
 
+        fake_with_ophyd_sim: object | None = kwargs.pop("fake_with_ophyd_sim")
+        assert isinstance(
+            fake_with_ophyd_sim, bool | None
+        ), "fake_with_ophyd_sim must be a boolean"
+        mock = fake_with_ophyd_sim or mock
         # the instantiation of the device
+
         device = self._factory(*args, **kwargs)
         if name:
             device.set_name(name)
