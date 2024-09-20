@@ -23,7 +23,7 @@ class MoveTooLarge(Exception):
         super().__init__(*args)
 
 
-def _check_and_cache_values(
+def check_and_cache_values(
     devices_and_positions: dict[AnyDevice, float],
     smallest_move: float,
     maximum_move: float,
@@ -87,7 +87,7 @@ def move_and_reset_wrapper(
                                        on. If false it is left up to the caller to wait on
                                        them. Defaults to True.
     """
-    initial_positions = yield from _check_and_cache_values(
+    initial_positions = yield from check_and_cache_values(
         device_and_positions, smallest_move, maximum_move
     )
 
