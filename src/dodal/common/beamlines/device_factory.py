@@ -35,6 +35,7 @@ class DeviceInitializationController(Generic[P, T]):
         self._factory: Callable[P, T] = factory
         self._config: DeviceInitializationConfig = config
         self._cached_device: T | None = None
+        self.__name__ = factory.__name__
 
     @property
     def skip(self) -> bool:
@@ -43,8 +44,8 @@ class DeviceInitializationController(Generic[P, T]):
     def __repr__(self) -> str:
         config_details = f"""
         Device:
-            - factory: {self._factory.__name__}
-            - name: {self._factory.__name__}
+            - factory: {self._factory}
+            - name: {self.__name__}
             - device object: {self.device}
         Config settings:
           - eager_connect: {self._config.eager_connect}

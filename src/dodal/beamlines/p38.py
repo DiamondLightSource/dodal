@@ -109,15 +109,15 @@ def i0(
 #
 
 
-def slits_1(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
-) -> Slits:
-    return numbered_slits(
-        1,
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
+# def slits_1(
+#     wait_for_connection: bool = True,
+#     fake_with_ophyd_sim: bool = True,
+# ) -> Slits:
+#     return numbered_slits(
+#         1,
+#         wait_for_connection,
+#         fake_with_ophyd_sim,
+#     )
 
 
 def slits_2(
