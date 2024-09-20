@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from ophyd_async.epics.adsimdetector import SimDetector
 
 from dodal.common.beamlines.beamline_utils import (
@@ -5,12 +7,11 @@ from dodal.common.beamlines.beamline_utils import (
     get_path_provider,
     set_path_provider,
 )
-from pathlib import Path
-from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.adsim import SimStage
 from dodal.log import set_beamline as set_log_beamline
-from dodal.utils import get_beamline_name, get_hostname
+from dodal.utils import get_hostname
 
 BL = get_hostname()
 set_log_beamline(BL)
@@ -34,7 +35,7 @@ def sim_motors(
         BL + "-MO-SIM-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        bl_prefix=False
+        bl_prefix=False,
     )
 
 
@@ -50,5 +51,5 @@ def adsim(
         drv_suffix="CAM:",
         hdf_suffix="HDF5:",
         path_provider=get_path_provider(),
-        bl_prefix=False
+        bl_prefix=False,
     )
