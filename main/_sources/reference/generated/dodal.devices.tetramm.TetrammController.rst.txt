@@ -22,7 +22,13 @@ dodal.devices.tetramm.TetrammController
       ~TetrammController.get_deadtime
       
       
+      ~TetrammController.prepare
+      
+      
       ~TetrammController.set_exposure
+      
+      
+      ~TetrammController.wait_for_idle
       
    
    

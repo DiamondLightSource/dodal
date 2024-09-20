@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.tetramm.TetrammController &#8212; dodal 1.31.2.dev8+gcc5ccf130 documentation</title>
+    <title>dodal.devices.tetramm.TetrammController &#8212; dodal 1.31.2.dev9+g3f59ce090 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../_static/documentation_options.js?v=40f0fd43"></script>
+    <script src="../../_static/documentation_options.js?v=3eaba0bb"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -862,7 +862,7 @@ document.write(`
 <p class="rubric">Methods</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">arm</span></code>(num[, trigger, exposure])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">arm</span></code>()</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">disarm</span></code>()</p></td>
@@ -871,8 +871,14 @@ document.write(`
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_deadtime</span></code>(exposure)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.tetramm.TetrammController.set_exposure" title="dodal.devices.tetramm.TetrammController.set_exposure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_exposure</span></code></a>(exposure)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare</span></code>(trigger_info)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.tetramm.TetrammController.set_exposure" title="dodal.devices.tetramm.TetrammController.set_exposure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_exposure</span></code></a>(exposure)</p></td>
 <td><p>Tries to set the exposure time of a single frame.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">wait_for_idle</span></code>()</p></td>
+<td><p></p></td>
 </tr>
 </tbody>
 </table>
