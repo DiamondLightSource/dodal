@@ -31,7 +31,7 @@ dependencies = [
     "aiofiles",
     "aiohttp",
     "redis",
-    "scanspec",
+    "scanspec>=0.7.3",
 ]
 
 dynamic = ["version"]
