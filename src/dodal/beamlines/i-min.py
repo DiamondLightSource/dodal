@@ -2,9 +2,7 @@ from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import get_path_provider
 from dodal.common.beamlines.device_factory import device_factory
-from dodal.common.beamlines.device_helpers import numbered_slits
 from dodal.devices.i22.fswitch import FSwitch
-from dodal.devices.slits import Slits
 
 
 @device_factory()
