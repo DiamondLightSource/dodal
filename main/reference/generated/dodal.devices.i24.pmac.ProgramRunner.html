@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.i24.pmac.ProgramRunner &#8212; dodal 1.31.2.dev9+g3f59ce090 documentation</title>
+    <title>dodal.devices.i24.pmac.ProgramRunner &#8212; dodal 1.31.2.dev10+gee5da2b5f documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../_static/documentation_options.js?v=3eaba0bb"></script>
+    <script src="../../_static/documentation_options.js?v=387e81f7"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -837,7 +837,7 @@ document.write(`
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.i24.pmac.ProgramRunner">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.i24.pmac.</span></span><span class="sig-name descname"><span class="pre">ProgramRunner</span></span><a class="reference internal" href="../../_modules/dodal/devices/i24/pmac.html#ProgramRunner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.i24.pmac.ProgramRunner" title="Link to this definition">#</a></dt>
-<dd><p>Trigger the collection by setting the program number on the PMAC string.</p>
+<dd><p>Run the collection by setting the program number on the PMAC string.</p>
 <p>Once the program number has been set, wait for the collection to be complete.
 This will only be true when the status becomes 0.</p>
 <dl class="field-list simple">
@@ -845,6 +845,8 @@ This will only be true when the status becomes 0.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>pmac_str_sig</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">SignalRW</span></code></span>)</p></li>
 <li><p><strong>status_sig</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">SignalR</span></code></span>)</p></li>
+<li><p><strong>prog_num_sig</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">SignalRW</span></code></span>)</p></li>
+<li><p><strong>collection_time_sig</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">SignalRW</span></code></span>)</p></li>
 <li><p><strong>backend</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">SignalBackend</span></code></span>)</p></li>
 <li><p><strong>timeout</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">10.0</span></code>)</p></li>
 <li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">''</span></code>)</p></li>
@@ -854,8 +856,11 @@ This will only be true when the status becomes 0.</p>
 <p class="rubric">Methods</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.i24.pmac.ProgramRunner.set" title="dodal.devices.i24.pmac.ProgramRunner.set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code></a>(value[, wait, timeout])</p></td>
-<td><p>Set the pmac string to the program number and then wait for the scan to         finish running.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.i24.pmac.ProgramRunner.complete" title="dodal.devices.i24.pmac.ProgramRunner.complete"><code class="xref py py-obj docutils literal notranslate"><span class="pre">complete</span></code></a>()</p></td>
+<td><p>Stop collecting when the scan status PV goes to 0.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.i24.pmac.ProgramRunner.kickoff" title="dodal.devices.i24.pmac.ProgramRunner.kickoff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">kickoff</span></code></a>()</p></td>
+<td><p>Kick off the collection by sending a program number to the pmac_string and             wait for the scan status PV to go to 1.</p></td>
 </tr>
 </tbody>
 </table>
@@ -867,13 +872,18 @@ This will only be true when the status becomes 0.</p>
 </table>
 </div>
 <dl class="py method">
-<dt class="sig sig-object py" id="dodal.devices.i24.pmac.ProgramRunner.set">
-<span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">wait</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/i24/pmac.html#ProgramRunner.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.i24.pmac.ProgramRunner.set" title="Link to this definition">#</a></dt>
-<dd><p>Set the pmac string to the program number and then wait for the scan to         finish running.
-This is done by checking the scan status PV which will go to 1 once the motion         program starts and back to 0 when it’s done. The timeout passed to this set         should then be the total time required by the scan to finish.</p>
+<dt class="sig sig-object py" id="dodal.devices.i24.pmac.ProgramRunner.kickoff">
+<span class="sig-name descname"><span class="pre">kickoff</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/i24/pmac.html#ProgramRunner.kickoff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.i24.pmac.ProgramRunner.kickoff" title="Link to this definition">#</a></dt>
+<dd><p>Kick off the collection by sending a program number to the pmac_string and             wait for the scan status PV to go to 1.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dodal.devices.i24.pmac.ProgramRunner.complete">
+<span class="sig-name descname"><span class="pre">complete</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/i24/pmac.html#ProgramRunner.complete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.i24.pmac.ProgramRunner.complete" title="Link to this definition">#</a></dt>
+<dd><p>Stop collecting when the scan status PV goes to 0.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>value</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p>
+<dd class="field-odd"><p><strong>complete_time</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a>) – total time required by the collection to             finish correctly.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -929,7 +939,8 @@ This is done by checking the scan status PV which will go to 1 once the motion  
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.i24.pmac.ProgramRunner"><code class="docutils literal notranslate"><span class="pre">ProgramRunner</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.i24.pmac.ProgramRunner.set"><code class="docutils literal notranslate"><span class="pre">ProgramRunner.set()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.i24.pmac.ProgramRunner.kickoff"><code class="docutils literal notranslate"><span class="pre">ProgramRunner.kickoff()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.i24.pmac.ProgramRunner.complete"><code class="docutils literal notranslate"><span class="pre">ProgramRunner.complete()</span></code></a></li>
 </ul>
 </li>
 </ul>

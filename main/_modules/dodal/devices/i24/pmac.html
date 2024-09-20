@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.i24.pmac &#8212; dodal 1.31.2.dev9+g3f59ce090 documentation</title>
+    <title>dodal.devices.i24.pmac &#8212; dodal 1.31.2.dev10+gee5da2b5f documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../../_static/documentation_options.js?v=3eaba0bb"></script>
+    <script src="../../../../_static/documentation_options.js?v=387e81f7"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -473,9 +473,8 @@ document.write(`
   <h1>Source code for dodal.devices.i24.pmac</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">asyncio</span> <span class="kn">import</span> <span class="n">sleep</span>
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">IntEnum</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">SupportsFloat</span>
 
-<span class="kn">from</span> <span class="nn">bluesky.protocols</span> <span class="kn">import</span> <span class="n">Triggerable</span>
+<span class="kn">from</span> <span class="nn">bluesky.protocols</span> <span class="kn">import</span> <span class="n">Flyable</span><span class="p">,</span> <span class="n">Triggerable</span>
 <span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CALCULATE_TIMEOUT</span><span class="p">,</span>
     <span class="n">DEFAULT_TIMEOUT</span><span class="p">,</span>
@@ -485,6 +484,7 @@ document.write(`
     <span class="n">SignalRW</span><span class="p">,</span>
     <span class="n">SoftSignalBackend</span><span class="p">,</span>
     <span class="n">StandardReadable</span><span class="p">,</span>
+    <span class="n">soft_signal_rw</span><span class="p">,</span>
     <span class="n">wait_for_value</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">ophyd_async.epics.motor</span> <span class="kn">import</span> <span class="n">Motor</span>
@@ -611,8 +611,8 @@ document.write(`
 
 <div class="viewcode-block" id="ProgramRunner">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i24.pmac.ProgramRunner.html#dodal.devices.i24.pmac.ProgramRunner">[docs]</a>
-<span class="k">class</span> <span class="nc">ProgramRunner</span><span class="p">(</span><span class="n">SignalRW</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Trigger the collection by setting the program number on the PMAC string.</span>
+<span class="k">class</span> <span class="nc">ProgramRunner</span><span class="p">(</span><span class="n">SignalRW</span><span class="p">,</span> <span class="n">Flyable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run the collection by setting the program number on the PMAC string.</span>
 
 <span class="sd">    Once the program number has been set, wait for the collection to be complete.</span>
 <span class="sd">    This will only be true when the status becomes 0.</span>
@@ -622,36 +622,53 @@ document.write(`
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">pmac_str_sig</span><span class="p">:</span> <span class="n">SignalRW</span><span class="p">,</span>
         <span class="n">status_sig</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">,</span>
+        <span class="n">prog_num_sig</span><span class="p">:</span> <span class="n">SignalRW</span><span class="p">,</span>
+        <span class="n">collection_time_sig</span><span class="p">:</span> <span class="n">SignalRW</span><span class="p">,</span>
         <span class="n">backend</span><span class="p">:</span> <span class="n">SignalBackend</span><span class="p">,</span>
         <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">DEFAULT_TIMEOUT</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">signal</span> <span class="o">=</span> <span class="n">pmac_str_sig</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">status_sig</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prog_num</span> <span class="o">=</span> <span class="n">prog_num_sig</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">collection_time</span> <span class="o">=</span> <span class="n">collection_time_sig</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">KICKOFF_TIMEOUT</span> <span class="o">=</span> <span class="n">timeout</span>
+
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">backend</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ProgramRunner.set">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i24.pmac.ProgramRunner.html#dodal.devices.i24.pmac.ProgramRunner.set">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_get_prog_number_string</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">prog_num</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">prog_num</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&amp;2b</span><span class="si">{</span><span class="n">prog_num</span><span class="si">}</span><span class="s2">r&quot;</span>
+
+<div class="viewcode-block" id="ProgramRunner.kickoff">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i24.pmac.ProgramRunner.html#dodal.devices.i24.pmac.ProgramRunner.kickoff">[docs]</a>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Set the pmac string to the program number and then wait for the scan to \</span>
-<span class="sd">        finish running.</span>
-<span class="sd">        This is done by checking the scan status PV which will go to 1 once the motion \</span>
-<span class="sd">        program starts and back to 0 when it&#39;s done. The timeout passed to this set \</span>
-<span class="sd">        should then be the total time required by the scan to finish.</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">kickoff</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Kick off the collection by sending a program number to the pmac_string and \</span>
+<span class="sd">            wait for the scan status PV to go to 1.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">prog_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&amp;2b</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">r&quot;</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">SupportsFloat</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
-            <span class="n">timeout</span> <span class="ow">is</span> <span class="kc">None</span>
-        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;ProgramRunner does not support calculating timeout itself, </span><span class="si">{</span><span class="n">timeout</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">prog_str</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="n">wait</span><span class="p">)</span>
-        <span class="c1"># First wait for signal to go to 1, then wait for the scan to finish.</span>
+        <span class="n">prog_num_str</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_prog_number_string</span><span class="p">()</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">prog_num_str</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
             <span class="n">ScanState</span><span class="o">.</span><span class="n">RUNNING</span><span class="p">,</span>
-            <span class="n">timeout</span><span class="o">=</span><span class="n">DEFAULT_TIMEOUT</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="n">ScanState</span><span class="o">.</span><span class="n">DONE</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span></div>
+            <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">KICKOFF_TIMEOUT</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ProgramRunner.complete">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i24.pmac.ProgramRunner.html#dodal.devices.i24.pmac.ProgramRunner.complete">[docs]</a>
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">complete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop collecting when the scan status PV goes to 0.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            complete_time (float): total time required by the collection to \</span>
+<span class="sd">            finish correctly.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">scan_complete_time</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">collection_time</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="n">ScanState</span><span class="o">.</span><span class="n">DONE</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">scan_complete_time</span><span class="p">)</span></div>
 </div>
 
 
@@ -712,8 +729,17 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">scanstatus</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;BL24I-MO-STEP-14:signal:P2401&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;BL24I-MO-STEP-14:signal:P2402&quot;</span><span class="p">)</span>
 
+        <span class="c1"># A couple of soft signals for running a collection: program number to send to</span>
+        <span class="c1"># the PMAC_STRING and expected collection time.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">program_number</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collection_time</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="mf">600.0</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;s&quot;</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">run_program</span> <span class="o">=</span> <span class="n">ProgramRunner</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">pmac_string</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scanstatus</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">SoftSignalBackend</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pmac_string</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scanstatus</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">program_number</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">collection_time</span><span class="p">,</span>
+            <span class="n">backend</span><span class="o">=</span><span class="n">SoftSignalBackend</span><span class="p">(</span><span class="nb">str</span><span class="p">),</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">abort_program</span> <span class="o">=</span> <span class="n">ProgramAbort</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pmac_string</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scanstatus</span><span class="p">)</span>
 

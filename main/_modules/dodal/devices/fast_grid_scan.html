@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.fast_grid_scan &#8212; dodal 1.31.2.dev9+g3f59ce090 documentation</title>
+    <title>dodal.devices.fast_grid_scan &#8212; dodal 1.31.2.dev10+gee5da2b5f documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=3eaba0bb"></script>
+    <script src="../../../_static/documentation_options.js?v=387e81f7"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -476,6 +476,7 @@ document.write(`
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">bluesky.plan_stubs</span> <span class="kn">import</span> <span class="n">mv</span>
+<span class="kn">from</span> <span class="nn">bluesky.protocols</span> <span class="kn">import</span> <span class="n">Flyable</span>
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">ndarray</span>
 <span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
@@ -692,7 +693,7 @@ document.write(`
 
 <div class="viewcode-block" id="FastGridScanCommon">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.FastGridScanCommon.html#dodal.devices.fast_grid_scan.FastGridScanCommon">[docs]</a>
-<span class="k">class</span> <span class="nc">FastGridScanCommon</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">ParamType</span><span class="p">]):</span>
+<span class="k">class</span> <span class="nc">FastGridScanCommon</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Flyable</span><span class="p">,</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">ParamType</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Device for a general fast grid scan</span>
 
 <span class="sd">    When the motion program is started, the goniometer will move in a snake-like grid trajectory,</span>

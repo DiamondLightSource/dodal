@@ -15,12 +15,16 @@ dodal.devices.i24.pmac.ProgramRunner
       
       
       
+      ~ProgramRunner.complete
       
       
       
       
       
-      ~ProgramRunner.set
+      ~ProgramRunner.kickoff
+      
+      
+      
       
       
       
