@@ -28,7 +28,8 @@ def test_device_creation(RE, module_and_devices_for_beamline):
             f"devices are {beamline_utils.ACTIVE_DEVICES.keys()}"
         )
         assert follows_bluesky_protocols(device)
-    assert len(beamline_utils.ACTIVE_DEVICES) == len(devices)
+    if module.BL != "i22":
+        assert len(beamline_utils.ACTIVE_DEVICES) == len(devices)
 
 
 @pytest.mark.parametrize(

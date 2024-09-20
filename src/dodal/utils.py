@@ -250,17 +250,7 @@ def is_v2_device_factory(func: Callable) -> TypeGuard[V2DeviceFactory]:
 
 def is_new_device_factory(func: Callable) -> TypeGuard[AnyDeviceFactory]:
     try:
-        return_type = signature(func).return_annotation
-        print(f"func:{func}")
-        print(f"return type:{return_type}")
-
         return isinstance(func, DeviceInitializationController)
-        return (
-            signature(func)
-            == Callable[[Callable[..., Any]], DeviceInitializationController[..., Any]]
-            and return_type == DeviceInitializationController
-        )
-
     except ValueError:
         return False
 
