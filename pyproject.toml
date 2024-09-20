@@ -31,7 +31,6 @@ dependencies = [
     "aiofiles",
     "aiohttp",
     "redis",
-    "h5py"
 ]
 
 dynamic = ["version"]

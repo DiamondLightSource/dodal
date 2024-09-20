@@ -1,5 +1,5 @@
 from ophyd_async.core import StandardReadable
-from ophyd_async.sim.demo import SimMotor
+from ophyd_async.epics.motor import Motor
 
 
 class SimStage(StandardReadable):
@@ -7,9 +7,9 @@ class SimStage(StandardReadable):
 
     def __init__(self, prefix: str, name: str = "sim"):
         with self.add_children_as_readables():
-            self.x = SimMotor(prefix + "M1")
-            self.y = SimMotor(prefix + "M2")
-            self.z = SimMotor(prefix + "M3")
-            self.theta = SimMotor(prefix + "M4")
-            self.load = SimMotor(prefix + "M5")
+            self.x = Motor(prefix + "M1")
+            self.y = Motor(prefix + "M2")
+            self.z = Motor(prefix + "M3")
+            self.theta = Motor(prefix + "M4")
+            self.load = Motor(prefix + "M5")
         super().__init__(name=name)
