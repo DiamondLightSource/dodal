@@ -23,7 +23,10 @@ def spec_scan(
             in addition to any Movables in the Spec",
         ),
     ],
-    spec: Annotated[Spec[Movable], "ScanSpec modelling the path of the scan"],
+    spec: Annotated[
+        Spec[Movable],  # type: ignore
+        Field(description="ScanSpec modelling the path of the scan"),
+    ],
     metadata: Mapping[str, Any] | None = None,
 ) -> MsgGenerator:
     """Generic plan for reading `detectors` at every point of a ScanSpec `spec`."""
@@ -40,7 +43,9 @@ def spec_scan(
     yield from bp.scan_nd(detectors, _as_cycler(spec), md=_md)
 
 
-def _as_cycler(spec: Spec[Movable]) -> Cycler:
+def _as_cycler(
+    spec: Spec[Movable],  # type: ignore
+) -> Cycler:
     """
     Convert a scanspec to a cycler for compatibility with legacy Bluesky plans such as
     `bp.scan_nd`. Use the midpoints of the scanspec since cyclers are normally used
