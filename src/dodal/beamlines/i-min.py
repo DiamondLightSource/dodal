@@ -16,12 +16,6 @@ def fswitch() -> FSwitch:
         lens_material="Beryllium",
     )
 
-
-@device_factory()
-def slits_6() -> Slits:
-    return numbered_slits(6)
-
-
 @device_factory()
 def panda1() -> HDFPanda:
     return HDFPanda(
