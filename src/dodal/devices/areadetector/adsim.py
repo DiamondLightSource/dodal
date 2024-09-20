@@ -22,7 +22,7 @@ class AdSimDetector(StandardDetector, HasHints):
         self,
         name: str,
         prefix: str,
-        directory_provider: PathProvider,
+        path_provider: PathProvider,
     ):
         drv = ADBaseIO(prefix + "CAM:")
         hdf = NDFileHDFIO(prefix + "HDF5:")
@@ -35,7 +35,7 @@ class AdSimDetector(StandardDetector, HasHints):
             SimController(drv),
             ADHDFWriter(
                 hdf,
-                directory_provider,
+                path_provider,
                 lambda: self.name,
                 ADBaseDatasetDescriber(drv),
             ),
