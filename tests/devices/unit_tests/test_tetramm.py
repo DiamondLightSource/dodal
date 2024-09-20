@@ -351,6 +351,30 @@ async def test_error_if_armed_without_exposure(tetramm_controller: TetrammContro
         )
 
 
+async def test_pilatus_controller(
+    RE,
+    tetramm: TetrammDetector,
+):
+    controller = tetramm.controller
+    driver = tetramm.drv
+    await controller.prepare(
+        TriggerInfo(
+            number=1,
+            trigger=DetectorTrigger.constant_gate,
+            livetime=VALID_TEST_EXPOSURE_TIME,
+            deadtime=VALID_TEST_DEADTIME,
+        )
+    )
+    await controller.arm()
+    await controller.wait_for_idle()
+
+    assert await driver.acquire.get_value() is True
+
+    await controller.disarm()
+
+    assert await driver.acquire.get_value() is False
+
+
 async def assert_armed(driver: TetrammDriver) -> None:
     assert (await driver.trigger_mode.get_value()) is TetrammTrigger.ExtTrigger
     assert (await driver.averaging_time.get_value()) == VALID_TEST_EXPOSURE_TIME
