@@ -37,6 +37,14 @@ def create_hardware_backed_soft_signal(
     units: str | None = None,
     precision: int | None = None,
 ):
+    """Creates a soft signal that, when read will call the function passed into
+    `get_from_hardware_func` and return this.
+
+    This will allow you to make soft signals derived from arbitrary hardware signals.
+    However, calling subscribe on this signal does not give you a sensible value and
+    the signal is currently read only. See https://github.com/bluesky/ophyd-async/issues/525
+    for a more full solution.
+    """
     metadata = SignalMetadata(units=units, precision=precision)
     return SignalR(
         backend=HarwareBackedSoftSignalBackend(

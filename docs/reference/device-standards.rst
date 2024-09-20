@@ -169,6 +169,6 @@ based on this and so this has the issues listed above. Instead you should make s
             else:
                 await self.underlying_motor.set(0)
 
-
+This will be simplified by https://github.com/bluesky/ophyd-async/issues/525
 
 .. _flowchart: https://blueskyproject.io/ophyd-async/main/how-to/choose-interfaces-for-devices.html
