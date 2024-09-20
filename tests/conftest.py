@@ -67,11 +67,8 @@ def module_and_devices_for_beamline(request):
         mock_beamline_module_filepaths(beamline, bl_mod)
         devices, _ = make_all_devices(
             bl_mod,
-            # todo this part clashes with line 85 of device_factory
-            # there the kwargs are not expected, and fake_with_ophyd_sim is mock instead
-            # and the include_skipped is unknown behavior
-            # include_skipped=True,
-            # fake_with_ophyd_sim=True,
+            include_skipped=True,
+            fake_with_ophyd_sim=True,
         )
         yield (bl_mod, devices)
         beamline_utils.clear_devices()
