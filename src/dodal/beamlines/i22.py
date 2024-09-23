@@ -15,7 +15,7 @@ from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
 from dodal.devices.i22.fswitch import FSwitch
 from dodal.devices.i22.nxsas import NXSasMetadataHolder, NXSasOAV, NXSasPilatus
-from dodal.devices.i22.six_slits import SlitsCollection
+from dodal.devices.i22.slits_collection import SlitsCollection
 from dodal.devices.linkam3 import Linkam3
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.tetramm import TetrammDetector
