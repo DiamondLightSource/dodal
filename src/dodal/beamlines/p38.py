@@ -13,7 +13,7 @@ from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvi
 from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
 from dodal.devices.i22.fswitch import FSwitch
-from dodal.devices.i22.six_slits import SixSlits
+from dodal.devices.i22.six_slits import SlitsCollection
 from dodal.devices.linkam3 import Linkam3
 from dodal.devices.tetramm import TetrammDetector
 from dodal.devices.undulator import Undulator
@@ -109,10 +109,11 @@ def i0(
 def six_slits(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = True,
-) -> SixSlits:
+) -> SlitsCollection:
     return device_instantiation(
-        SixSlits,
+        SlitsCollection,
         "six_slits",
+        6,
         wait_for_connection,
         fake_with_ophyd_sim,
     )
