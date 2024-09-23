@@ -9,13 +9,12 @@ from dodal.common.beamlines.beamline_utils import (
     set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.beamlines.device_helpers import numbered_slits
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
 from dodal.devices.i22.fswitch import FSwitch
+from dodal.devices.i22.six_slits import SixSlits
 from dodal.devices.linkam3 import Linkam3
-from dodal.devices.slits import Slits
 from dodal.devices.tetramm import TetrammDetector
 from dodal.devices.undulator import Undulator
 from dodal.log import set_beamline as set_log_beamline
@@ -107,67 +106,13 @@ def i0(
 #
 
 
-def slits_1(
+def six_slits(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = True,
-) -> Slits:
-    return numbered_slits(
-        1,
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
-
-
-def slits_2(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
-) -> Slits:
-    return numbered_slits(
-        2,
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
-
-
-def slits_3(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
-) -> Slits:
-    return numbered_slits(
-        3,
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
-
-
-def slits_4(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
-) -> Slits:
-    return numbered_slits(
-        4,
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
-
-
-def slits_5(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
-) -> Slits:
-    return numbered_slits(
-        5,
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
-
-
-def slits_6(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
-) -> Slits:
-    return numbered_slits(
-        6,
+) -> SixSlits:
+    return device_instantiation(
+        SixSlits,
+        "six_slits",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
