@@ -1,8 +1,15 @@
+from dataclasses import dataclass
+
 from bluesky.protocols import Movable
-from ophyd_async.core import (
-    StandardReadable,
-)
+from ophyd_async.core import AsyncStatus, StandardReadable
 from ophyd_async.epics.signal import epics_signal_rw
+
+
+# todo might  make a class for common types of movement and use it as a value type
+@dataclass
+class XYPosition:
+    x: float
+    y: float
 
 
 class KBMirror(StandardReadable, Movable):
@@ -21,5 +28,7 @@ class KBMirror(StandardReadable, Movable):
             self.ellip = epics_signal_rw(float, prefix + "ELLIP")
         super().__init__(name=name)
 
-    async def set(self, value: float):
-        await self.x.set(value)
+    @AsyncStatus.wrap
+    async def set(self, value: XYPosition):
+        self.x.set(value.x)
+        self.y.set(value.y)
