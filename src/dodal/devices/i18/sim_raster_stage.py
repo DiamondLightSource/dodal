@@ -1,5 +1,6 @@
 from bluesky.protocols import Movable
 from ophyd_async.core import (
+    AsyncStatus,
     StandardReadable,
 )
 from ophyd_async.epics.motor import Motor
@@ -12,5 +13,6 @@ class RasterStage(StandardReadable, Movable):
             self.perp_in_mm = Motor(prefix + "M2")
         super().__init__(name)
 
+    @AsyncStatus.wrap
     async def set(self, value: float):
         await self.offset_in_mm.set(value)
