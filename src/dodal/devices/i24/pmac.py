@@ -1,8 +1,7 @@
 from asyncio import sleep
 from enum import Enum, IntEnum
-from typing import SupportsFloat
 
-from bluesky.protocols import Triggerable
+from bluesky.protocols import Flyable, Triggerable
 from ophyd_async.core import (
     CALCULATE_TIMEOUT,
     DEFAULT_TIMEOUT,
@@ -12,6 +11,7 @@ from ophyd_async.core import (
     SignalRW,
     SoftSignalBackend,
     StandardReadable,
+    soft_signal_rw,
     wait_for_value,
 )
 from ophyd_async.epics.motor import Motor
@@ -118,8 +118,8 @@ class PMACStringEncReset(SignalRW):
         await self.signal.set(value.value, wait, timeout)
 
 
-class ProgramRunner(SignalRW):
-    """Trigger the collection by setting the program number on the PMAC string.
+class ProgramRunner(SignalRW, Flyable):
+    """Run the collection by setting the program number on the PMAC string.
 
     Once the program number has been set, wait for the collection to be complete.
     This will only be true when the status becomes 0.
@@ -129,34 +129,48 @@ class ProgramRunner(SignalRW):
         self,
         pmac_str_sig: SignalRW,
         status_sig: SignalR,
+        prog_num_sig: SignalRW,
+        collection_time_sig: SignalRW,
         backend: SignalBackend,
         timeout: float | None = DEFAULT_TIMEOUT,
         name: str = "",
     ) -> None:
         self.signal = pmac_str_sig
         self.status = status_sig
+        self.prog_num = prog_num_sig
+
+        self.collection_time = collection_time_sig
+        self.KICKOFF_TIMEOUT = timeout
+
         super().__init__(backend, timeout, name)
 
+    async def _get_prog_number_string(self) -> str:
+        prog_num = await self.prog_num.get_value()
+        return f"&2b{prog_num}r"
+
     @AsyncStatus.wrap
-    async def set(self, value: int, wait=True, timeout=None):
-        """ Set the pmac string to the program number and then wait for the scan to \
-        finish running.
-        This is done by checking the scan status PV which will go to 1 once the motion \
-        program starts and back to 0 when it's done. The timeout passed to this set \
-        should then be the total time required by the scan to finish.
+    async def kickoff(self):
+        """Kick off the collection by sending a program number to the pmac_string and \
+            wait for the scan status PV to go to 1.
         """
-        prog_str = f"&2b{value}r"
-        assert isinstance(timeout, SupportsFloat) or (
-            timeout is None
-        ), f"ProgramRunner does not support calculating timeout itself, {timeout}"
-        await self.signal.set(prog_str, wait=wait)
-        # First wait for signal to go to 1, then wait for the scan to finish.
+        prog_num_str = await self._get_prog_number_string()
+        await self.signal.set(prog_num_str, wait=True)
         await wait_for_value(
             self.status,
             ScanState.RUNNING,
-            timeout=DEFAULT_TIMEOUT,
+            timeout=self.KICKOFF_TIMEOUT,
         )
-        await wait_for_value(self.status, ScanState.DONE, timeout)
+
+    @AsyncStatus.wrap
+    async def complete(self):
+        """Stop collecting when the scan status PV goes to 0.
+
+        Args:
+            complete_time (float): total time required by the collection to \
+            finish correctly.
+        """
+        scan_complete_time = await self.collection_time.get_value()
+        await wait_for_value(self.status, ScanState.DONE, timeout=scan_complete_time)
 
 
 class ProgramAbort(Triggerable):
@@ -210,8 +224,17 @@ class PMAC(StandardReadable):
         self.scanstatus = epics_signal_r(float, "BL24I-MO-STEP-14:signal:P2401")
         self.counter = epics_signal_r(float, "BL24I-MO-STEP-14:signal:P2402")
 
+        # A couple of soft signals for running a collection: program number to send to
+        # the PMAC_STRING and expected collection time.
+        self.program_number = soft_signal_rw(int)
+        self.collection_time = soft_signal_rw(float, initial_value=600.0, units="s")
+
         self.run_program = ProgramRunner(
-            self.pmac_string, self.scanstatus, backend=SoftSignalBackend(str)
+            self.pmac_string,
+            self.scanstatus,
+            self.program_number,
+            self.collection_time,
+            backend=SoftSignalBackend(str),
         )
         self.abort_program = ProgramAbort(self.pmac_string, self.scanstatus)
 
