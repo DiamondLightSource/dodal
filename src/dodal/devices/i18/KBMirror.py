@@ -20,3 +20,6 @@ class KBMirror(StandardReadable, Movable):
             self.curve = epics_signal_rw(float, prefix + "CURVE")
             self.ellip = epics_signal_rw(float, prefix + "ELLIP")
         super().__init__(name=name)
+
+    async def set(self, value: float):
+        await self.x.set(value)
