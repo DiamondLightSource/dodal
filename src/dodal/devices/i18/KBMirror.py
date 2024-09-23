@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 
-from bluesky.protocols import Movable
 from ophyd_async.core import AsyncStatus, StandardReadable
 from ophyd_async.epics.signal import epics_signal_rw
 
@@ -12,7 +11,7 @@ class XYPosition:
     y: float
 
 
-class KBMirror(StandardReadable, Movable):
+class KBMirror(StandardReadable):
     def __init__(
         self,
         prefix: str,
@@ -29,6 +28,6 @@ class KBMirror(StandardReadable, Movable):
         super().__init__(name=name)
 
     @AsyncStatus.wrap
-    async def set(self, value: XYPosition):
+    async def set_xy(self, value: XYPosition):
         self.x.set(value.x)
         self.y.set(value.y)
