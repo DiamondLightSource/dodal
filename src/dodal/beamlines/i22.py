@@ -6,12 +6,12 @@ from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
     BeamlinePrefix,
+    device_instantiation,
     get_path_provider,
     set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_factory import device_factory
-from dodal.common.beamlines.device_helpers import numbered_slits
 from dodal.common.visit import (
     RemoteDirectoryServiceClient,
     StaticVisitPathProvider,
@@ -160,32 +160,74 @@ def undulator() -> Undulator:
 # slits section, s1 is on the frontend, s6 is closest to the sample
 @device_factory()
 def slits_1() -> Slits:
-    return numbered_slits(1)
+    slit_number = 1
+    return device_instantiation(
+        Slits,
+        f"slits_{slit_number}",
+        f"-AL-SLITS-{slit_number:02}:",
+        wait_for_connection=False,
+        fake_with_ophyd_sim=False,
+    )
 
 
 @device_factory()
 def slits_2() -> Slits:
-    return numbered_slits(2)
+    slit_number = 2
+    return device_instantiation(
+        Slits,
+        f"slits_{slit_number}",
+        f"-AL-SLITS-{slit_number:02}:",
+        wait_for_connection=False,
+        fake_with_ophyd_sim=False,
+    )
 
 
 @device_factory()
 def slits_3() -> Slits:
-    return numbered_slits(3)
+    slit_number = 3
+    return device_instantiation(
+        Slits,
+        f"slits_{slit_number}",
+        f"-AL-SLITS-{slit_number:02}:",
+        wait_for_connection=False,
+        fake_with_ophyd_sim=False,
+    )
 
 
 @device_factory()
 def slits_4() -> Slits:
-    return numbered_slits(4)
+    slit_number = 4
+    return device_instantiation(
+        Slits,
+        f"slits_{slit_number}",
+        f"-AL-SLITS-{slit_number:02}:",
+        wait_for_connection=False,
+        fake_with_ophyd_sim=False,
+    )
 
 
 @device_factory()
 def slits_5() -> Slits:
-    return numbered_slits(5)
+    slit_number = 5
+    return device_instantiation(
+        Slits,
+        f"slits_{slit_number}",
+        f"-AL-SLITS-{slit_number:02}:",
+        wait_for_connection=False,
+        fake_with_ophyd_sim=False,
+    )
 
 
 @device_factory()
 def slits_6() -> Slits:
-    return numbered_slits(6)
+    slit_number = 6
+    return device_instantiation(
+        Slits,
+        f"slits_{slit_number}",
+        f"-AL-SLITS-{slit_number:02}:",
+        wait_for_connection=False,
+        fake_with_ophyd_sim=False,
+    )
 
 
 @device_factory()
