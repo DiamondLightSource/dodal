@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.zocalo.zocalo_results &#8212; dodal 1.31.2.dev10+gee5da2b5f documentation</title>
+    <title>dodal.devices.zocalo.zocalo_results &#8212; dodal 1.31.2.dev11+geece06440 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../../_static/documentation_options.js?v=387e81f7"></script>
+    <script src="../../../../_static/documentation_options.js?v=19873c64"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -483,6 +483,7 @@ document.write(`
 <span class="kn">import</span> <span class="nn">workflows.recipe</span>
 <span class="kn">import</span> <span class="nn">workflows.transport</span>
 <span class="kn">from</span> <span class="nn">bluesky.protocols</span> <span class="kn">import</span> <span class="n">Descriptor</span><span class="p">,</span> <span class="n">Triggerable</span>
+<span class="kn">from</span> <span class="nn">deepdiff</span> <span class="kn">import</span> <span class="n">DeepDiff</span>
 <span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">NDArray</span>
 <span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
@@ -510,6 +511,14 @@ document.write(`
     <span class="n">max_count</span> <span class="o">=</span> <span class="s2">&quot;max_count&quot;</span>
     <span class="n">total_count</span> <span class="o">=</span> <span class="s2">&quot;total_count&quot;</span>
     <span class="n">n_voxels</span> <span class="o">=</span> <span class="s2">&quot;n_voxels&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="ZocaloSource">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.zocalo.zocalo_results.ZocaloSource.html#dodal.devices.zocalo.ZocaloSource">[docs]</a>
+<span class="k">class</span> <span class="nc">ZocaloSource</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+    <span class="n">CPU</span> <span class="o">=</span> <span class="s2">&quot;CPU&quot;</span>
+    <span class="n">GPU</span> <span class="o">=</span> <span class="s2">&quot;GPU&quot;</span></div>
 
 
 
@@ -542,6 +551,32 @@ document.write(`
 
 
 
+<div class="viewcode-block" id="get_dict_differences">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.zocalo.zocalo_results.html#dodal.devices.zocalo.get_dict_differences">[docs]</a>
+<span class="k">def</span> <span class="nf">get_dict_differences</span><span class="p">(</span>
+    <span class="n">dict1</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">dict1_source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dict2</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">dict2_source</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a string containing dict1 and dict2 if there are differences between them, greater than a</span>
+<span class="sd">    1e-5 tolerance. If dictionaries are identical, return None&quot;&quot;&quot;</span>
+
+    <span class="n">diff</span> <span class="o">=</span> <span class="n">DeepDiff</span><span class="p">(</span><span class="n">dict1</span><span class="p">,</span> <span class="n">dict2</span><span class="p">,</span> <span class="n">math_epsilon</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">ignore_numeric_type_changes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">diff</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Zocalo results from </span><span class="si">{</span><span class="n">dict1_source</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">dict2_source</span><span class="si">}</span><span class="s2"> are not identical.</span><span class="se">\n</span><span class="s2"> Results from </span><span class="si">{</span><span class="n">dict1_source</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">dict1</span><span class="si">}</span><span class="se">\n</span><span class="s2"> Results from </span><span class="si">{</span><span class="n">dict2_source</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">dict2</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="source_from_results">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.zocalo.zocalo_results.html#dodal.devices.zocalo.source_from_results">[docs]</a>
+<span class="k">def</span> <span class="nf">source_from_results</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">ZocaloSource</span><span class="o">.</span><span class="n">GPU</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">if</span> <span class="n">results</span><span class="p">[</span><span class="s2">&quot;recipe_parameters&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gpu&quot;</span><span class="p">)</span>
+        <span class="k">else</span> <span class="n">ZocaloSource</span><span class="o">.</span><span class="n">CPU</span><span class="o">.</span><span class="n">value</span>
+    <span class="p">)</span></div>
+
+
+
 <div class="viewcode-block" id="ZocaloResults">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.zocalo.zocalo_results.ZocaloResults.html#dodal.devices.zocalo.ZocaloResults">[docs]</a>
 <span class="k">class</span> <span class="nc">ZocaloResults</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Triggerable</span><span class="p">):</span>
@@ -549,7 +584,25 @@ document.write(`
 <span class="sd">    be triggered from a plan-subscribed callback using the run_start() and run_end()</span>
 <span class="sd">    methods on dodal.devices.zocalo.ZocaloTrigger.</span>
 
-<span class="sd">    See https://github.com/DiamondLightSource/dodal/wiki/How-to-Interact-with-Zocalo&quot;&quot;&quot;</span>
+<span class="sd">    See https://diamondlightsource.github.io/dodal/main/how-to/zocalo.html</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): Name of the device</span>
+
+<span class="sd">        zocalo_environment (str): How zocalo is configured. Defaults to i03&#39;s development configuration</span>
+
+<span class="sd">        channel (str): Name for the results Queue</span>
+
+<span class="sd">        sort_key (str): How results are ranked. Defaults to sorting by highest counts</span>
+
+<span class="sd">        timeout_s (float): Maximum time to wait for the Queue to be filled by an object, starting</span>
+<span class="sd">        from when the ZocaloResults device is triggered</span>
+
+<span class="sd">        prefix (str): EPICS PV prefix for the device</span>
+
+<span class="sd">        use_cpu_and_gpu (bool): When True, ZocaloResults will wait for results from the CPU and the GPU, compare them, and provide a warning if the results differ. When False, ZocaloResults will only use results from the CPU</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -559,6 +612,7 @@ document.write(`
         <span class="n">sort_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DEFAULT_SORT_KEY</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
         <span class="n">timeout_s</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">DEFAULT_TIMEOUT</span><span class="p">,</span>
         <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">use_cpu_and_gpu</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">zocalo_environment</span> <span class="o">=</span> <span class="n">zocalo_environment</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sort_key</span> <span class="o">=</span> <span class="n">SortKeys</span><span class="p">[</span><span class="n">sort_key</span><span class="p">]</span>
@@ -567,6 +621,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_prefix</span> <span class="o">=</span> <span class="n">prefix</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_raw_results_received</span><span class="p">:</span> <span class="n">Queue</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="p">:</span> <span class="n">CommonTransport</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_cpu_and_gpu</span> <span class="o">=</span> <span class="n">use_cpu_and_gpu</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results_setter</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span>
             <span class="nb">list</span><span class="p">[</span><span class="n">XrcResult</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;results&quot;</span>
@@ -595,14 +650,14 @@ document.write(`
         <span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_put_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">XrcResult</span><span class="p">],</span> <span class="n">ispyb_ids</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_put_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">XrcResult</span><span class="p">],</span> <span class="n">recipe_parameters</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_results_setter</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">results</span><span class="p">))</span>
         <span class="n">centres_of_mass</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;centre_of_mass&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">])</span>
         <span class="n">bbox_sizes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">bbox_size</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_com_setter</span><span class="p">(</span><span class="n">centres_of_mass</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_bbox_setter</span><span class="p">(</span><span class="n">bbox_sizes</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_ispyb_dcid_setter</span><span class="p">(</span><span class="n">ispyb_ids</span><span class="p">[</span><span class="s2">&quot;dcid&quot;</span><span class="p">])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_ispyb_dcgid_setter</span><span class="p">(</span><span class="n">ispyb_ids</span><span class="p">[</span><span class="s2">&quot;dcgid&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ispyb_dcid_setter</span><span class="p">(</span><span class="n">recipe_parameters</span><span class="p">[</span><span class="s2">&quot;dcid&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ispyb_dcgid_setter</span><span class="p">(</span><span class="n">recipe_parameters</span><span class="p">[</span><span class="s2">&quot;dcgid&quot;</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">_clear_old_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Clearing queue&quot;</span><span class="p">)</span>
@@ -613,7 +668,7 @@ document.write(`
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span> <span class="nf">stage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Stages the Zocalo device by: subscribing to the queue, doing a background</span>
-<span class="sd">        sleep for a few seconds to wait for any stale messages to be recieved, then</span>
+<span class="sd">        sleep for a few seconds to wait for any stale messages to be received, then</span>
 <span class="sd">        clearing the queue. Plans using this device should wait on ZOCALO_STAGE_GROUP</span>
 <span class="sd">        before triggering processing for the experiment&quot;&quot;&quot;</span>
 
@@ -658,7 +713,57 @@ document.write(`
             <span class="p">)</span>
 
             <span class="n">raw_results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_results_received</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout_s</span><span class="p">)</span>
-            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Zocalo: found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">raw_results</span><span class="p">[</span><span class="s1">&#39;results&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> crystals.&quot;</span><span class="p">)</span>
+            <span class="n">source_of_first_results</span> <span class="o">=</span> <span class="n">source_from_results</span><span class="p">(</span><span class="n">raw_results</span><span class="p">)</span>
+
+            <span class="c1"># Wait for results from CPU and GPU, warn and continue if only GPU times out. Error if CPU times out</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cpu_and_gpu</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">source_of_first_results</span> <span class="o">==</span> <span class="n">ZocaloSource</span><span class="o">.</span><span class="n">CPU</span><span class="p">:</span>
+                    <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Received zocalo results from CPU before GPU&quot;</span><span class="p">)</span>
+                <span class="n">raw_results_two_sources</span> <span class="o">=</span> <span class="p">[</span><span class="n">raw_results</span><span class="p">]</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">raw_results_two_sources</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_raw_results_received</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout_s</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="n">source_of_second_results</span> <span class="o">=</span> <span class="n">source_from_results</span><span class="p">(</span>
+                        <span class="n">raw_results_two_sources</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="p">)</span>
+
+                    <span class="c1"># Compare results from both sources and warn if they aren&#39;t the same</span>
+                    <span class="n">differences_str</span> <span class="o">=</span> <span class="n">get_dict_differences</span><span class="p">(</span>
+                        <span class="n">raw_results_two_sources</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;results&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                        <span class="n">source_of_first_results</span><span class="p">,</span>
+                        <span class="n">raw_results_two_sources</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;results&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                        <span class="n">source_of_second_results</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">differences_str</span><span class="p">:</span>
+                        <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">differences_str</span><span class="p">)</span>
+
+                    <span class="c1"># Always use CPU results</span>
+                    <span class="n">raw_results</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">raw_results_two_sources</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="n">source_of_first_results</span> <span class="o">==</span> <span class="n">ZocaloSource</span><span class="o">.</span><span class="n">CPU</span>
+                        <span class="k">else</span> <span class="n">raw_results_two_sources</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="p">)</span>
+
+                <span class="k">except</span> <span class="n">Empty</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                    <span class="n">source_of_missing_results</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">ZocaloSource</span><span class="o">.</span><span class="n">CPU</span><span class="o">.</span><span class="n">value</span>
+                        <span class="k">if</span> <span class="n">source_of_first_results</span> <span class="o">==</span> <span class="n">ZocaloSource</span><span class="o">.</span><span class="n">GPU</span><span class="o">.</span><span class="n">value</span>
+                        <span class="k">else</span> <span class="n">ZocaloSource</span><span class="o">.</span><span class="n">GPU</span><span class="o">.</span><span class="n">value</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">source_of_missing_results</span> <span class="o">==</span> <span class="n">ZocaloSource</span><span class="o">.</span><span class="n">GPU</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                        <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Zocalo results from </span><span class="si">{</span><span class="n">source_of_missing_results</span><span class="si">}</span><span class="s2"> timed out. Using results from </span><span class="si">{</span><span class="n">source_of_first_results</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Zocalo results from </span><span class="si">{</span><span class="n">source_of_missing_results</span><span class="si">}</span><span class="s2"> timed out and GPU results not yet reliable&quot;</span>
+                        <span class="p">)</span>
+                        <span class="k">raise</span> <span class="n">err</span>
+
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Zocalo results from </span><span class="si">{</span><span class="n">ZocaloSource</span><span class="o">.</span><span class="n">CPU</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> processing: found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">raw_results</span><span class="p">[</span><span class="s1">&#39;results&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> crystals.&quot;</span>
+            <span class="p">)</span>
             <span class="c1"># Sort from strongest to weakest in case of multiple crystals</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_put_results</span><span class="p">(</span>
                 <span class="nb">sorted</span><span class="p">(</span>
@@ -666,7 +771,7 @@ document.write(`
                     <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sort_key</span><span class="o">.</span><span class="n">value</span><span class="p">],</span>
                     <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="p">),</span>
-                <span class="n">raw_results</span><span class="p">[</span><span class="s2">&quot;ispyb_ids&quot;</span><span class="p">],</span>
+                <span class="n">raw_results</span><span class="p">[</span><span class="s2">&quot;recipe_parameters&quot;</span><span class="p">],</span>
             <span class="p">)</span>
         <span class="k">except</span> <span class="n">Empty</span> <span class="k">as</span> <span class="n">timeout_exception</span><span class="p">:</span>
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Timed out waiting for zocalo results!&quot;</span><span class="p">)</span>
@@ -731,9 +836,17 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="o">.</span><span class="n">ack</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>  <span class="c1"># type: ignore # we create transport here</span>
 
             <span class="n">results</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;results&quot;</span><span class="p">,</span> <span class="p">[])</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_raw_results_received</span><span class="o">.</span><span class="n">put</span><span class="p">(</span>
-                <span class="p">{</span><span class="s2">&quot;results&quot;</span><span class="p">:</span> <span class="n">results</span><span class="p">,</span> <span class="s2">&quot;ispyb_ids&quot;</span><span class="p">:</span> <span class="n">recipe_parameters</span><span class="p">}</span>
-            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cpu_and_gpu</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_raw_results_received</span><span class="o">.</span><span class="n">put</span><span class="p">(</span>
+                    <span class="p">{</span><span class="s2">&quot;results&quot;</span><span class="p">:</span> <span class="n">results</span><span class="p">,</span> <span class="s2">&quot;recipe_parameters&quot;</span><span class="p">:</span> <span class="n">recipe_parameters</span><span class="p">}</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Only add to queue if results are from CPU</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">recipe_parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gpu&quot;</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_raw_results_received</span><span class="o">.</span><span class="n">put</span><span class="p">(</span>
+                        <span class="p">{</span><span class="s2">&quot;results&quot;</span><span class="p">:</span> <span class="n">results</span><span class="p">,</span> <span class="s2">&quot;recipe_parameters&quot;</span><span class="p">:</span> <span class="n">recipe_parameters</span><span class="p">}</span>
+                    <span class="p">)</span>
 
         <span class="n">subscription</span> <span class="o">=</span> <span class="n">workflows</span><span class="o">.</span><span class="n">recipe</span><span class="o">.</span><span class="n">wrap_subscribe</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="p">,</span>

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.zocalo.zocalo_results.ZocaloResults &#8212; dodal 1.31.2.dev10+gee5da2b5f documentation</title>
+    <title>dodal.devices.zocalo.zocalo_results.ZocaloResults &#8212; dodal 1.31.2.dev11+geece06440 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../_static/documentation_options.js?v=387e81f7"></script>
+    <script src="../../_static/documentation_options.js?v=19873c64"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="icon" href="../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="dodal.plans" href="dodal.plans.html" />
+    <link rel="next" title="dodal.devices.zocalo.zocalo_results.ZocaloSource" href="dodal.devices.zocalo.zocalo_results.ZocaloSource.html" />
     <link rel="prev" title="dodal.devices.zocalo.zocalo_results.XrcResult" href="dodal.devices.zocalo.zocalo_results.XrcResult.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -840,16 +840,18 @@ document.write(`
 <dd><p>An ophyd device which can wait for results from a Zocalo job. These jobs should
 be triggered from a plan-subscribed callback using the run_start() and run_end()
 methods on dodal.devices.zocalo.ZocaloTrigger.</p>
-<p>See <a class="github reference external" href="https://github.com/DiamondLightSource/dodal/wiki/How-to-Interact-with-Zocalo">DiamondLightSource/dodal</a></p>
+<p>See <a class="reference external" href="https://diamondlightsource.github.io/dodal/main/how-to/zocalo.html">https://diamondlightsource.github.io/dodal/main/how-to/zocalo.html</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">'zocalo'</span></code>)</p></li>
-<li><p><strong>zocalo_environment</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">'dev_artemis'</span></code>)</p></li>
-<li><p><strong>channel</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">'xrc.i03'</span></code>)</p></li>
-<li><p><strong>sort_key</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">'max_count'</span></code>)</p></li>
-<li><p><strong>timeout_s</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">180</span></code>)</p></li>
-<li><p><strong>prefix</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">''</span></code>)</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Name of the device</p></li>
+<li><p><strong>zocalo_environment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – How zocalo is configured. Defaults to i03’s development configuration</p></li>
+<li><p><strong>channel</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Name for the results Queue</p></li>
+<li><p><strong>sort_key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – How results are ranked. Defaults to sorting by highest counts</p></li>
+<li><p><strong>timeout_s</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a>) – Maximum time to wait for the Queue to be filled by an object, starting</p></li>
+<li><p><strong>triggered</strong> (<em>from when the ZocaloResults device is</em>)</p></li>
+<li><p><strong>prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – EPICS PV prefix for the device</p></li>
+<li><p><strong>use_cpu_and_gpu</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – When True, ZocaloResults will wait for results from the CPU and the GPU, compare them, and provide a warning if the results differ. When False, ZocaloResults will only use results from the CPU</p></li>
 </ul>
 </dd>
 </dl>
@@ -860,7 +862,7 @@ methods on dodal.devices.zocalo.ZocaloTrigger.</p>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.zocalo.zocalo_results.ZocaloResults.stage" title="dodal.devices.zocalo.zocalo_results.ZocaloResults.stage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stage</span></code></a>()</p></td>
-<td><p>Stages the Zocalo device by: subscribing to the queue, doing a background sleep for a few seconds to wait for any stale messages to be recieved, then clearing the queue.</p></td>
+<td><p>Stages the Zocalo device by: subscribing to the queue, doing a background sleep for a few seconds to wait for any stale messages to be received, then clearing the queue.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.zocalo.zocalo_results.ZocaloResults.trigger" title="dodal.devices.zocalo.zocalo_results.ZocaloResults.trigger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">trigger</span></code></a>()</p></td>
 <td><p>Returns an AsyncStatus waiting for results to be received from Zocalo.</p></td>
@@ -881,7 +883,7 @@ methods on dodal.devices.zocalo.ZocaloTrigger.</p>
 <dt class="sig sig-object py" id="dodal.devices.zocalo.zocalo_results.ZocaloResults.stage">
 <span class="sig-name descname"><span class="pre">stage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/zocalo/zocalo_results.html#ZocaloResults.stage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.zocalo.zocalo_results.ZocaloResults.stage" title="Link to this definition">#</a></dt>
 <dd><p>Stages the Zocalo device by: subscribing to the queue, doing a background
-sleep for a few seconds to wait for any stale messages to be recieved, then
+sleep for a few seconds to wait for any stale messages to be received, then
 clearing the queue. Plans using this device should wait on ZOCALO_STAGE_GROUP
 before triggering processing for the experiment</p>
 </dd></dl>
@@ -916,11 +918,11 @@ before triggering processing for the experiment</p>
       </div>
     </a>
     <a class="right-next"
-       href="dodal.plans.html"
+       href="dodal.devices.zocalo.zocalo_results.ZocaloSource.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">dodal.plans</p>
+        <p class="prev-next-title">dodal.devices.zocalo.zocalo_results.ZocaloSource</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

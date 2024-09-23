@@ -17,6 +17,7 @@ dodal.devices.zocalo.zocalo\_results
    ~zocalo_results.SortKeys
    ~zocalo_results.XrcResult
    ~zocalo_results.ZocaloResults
+   ~zocalo_results.ZocaloSource
 
 
 
@@ -36,7 +37,9 @@ dodal.devices.zocalo.zocalo\_results
    .. autosummary::
    
       bbox_size
+      get_dict_differences
       get_processing_result
+      source_from_results
    
    
 
