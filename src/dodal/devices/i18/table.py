@@ -1,5 +1,6 @@
 from bluesky.protocols import Movable
 from ophyd_async.core import (
+    AsyncStatus,
     StandardReadable,
 )
 from ophyd_async.epics.motor import Motor
@@ -13,5 +14,6 @@ class Table(StandardReadable, Movable):
             self.z = Motor(motion_prefix + "Z")
             self.theta = Motor(motion_prefix + "THETA")
 
-    async def set(self, value: float, wait: bool = False):
+    @AsyncStatus.wrap
+    async def set(self, value: float):
         await self.x.set(value)
