@@ -12,3 +12,6 @@ class Table(StandardReadable, Movable):
             self.y = Motor(motion_prefix + "Y")
             self.z = Motor(motion_prefix + "Z")
             self.theta = Motor(motion_prefix + "THETA")
+
+    async def set(self, value: float, wait: bool = False):
+        await self.x.set(value)
