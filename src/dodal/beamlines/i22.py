@@ -12,7 +12,6 @@ from dodal.common.beamlines.beamline_utils import (
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import numbered_slits
 from dodal.common.visit import (
-    DirectoryServiceClient,
     RemoteDirectoryServiceClient,
     StaticVisitPathProvider,
 )
@@ -137,7 +136,7 @@ def waxs(
                 sensor_thickness=(0.45, "mm"),
                 distance=(175.4199417092314, "mm"),
             ),
-            directory_provider=get_directory_provider(),
+            directory_provider=get_path_provider(),
         )
 
     return device_instantiation(
