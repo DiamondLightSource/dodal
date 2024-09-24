@@ -134,7 +134,7 @@ def dcm() -> DoubleCrystalMonochromator:
         usage="Bragg",
         type="silicon",
         reflection=(3, 1, 1),
-        # todo update
+        # todo update d_spacing values to match the reflection maths
         d_spacing=(3.13475, "nm"),
     )
 

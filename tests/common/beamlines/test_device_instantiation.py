@@ -42,13 +42,10 @@ def test_devices_are_identical(RE, module_and_devices_for_beamline):
     Ensures that for every beamline all device functions are singletons to prevent duplicate instantiation.
     """
     bl_mod, devices_a = module_and_devices_for_beamline
-    # if bl_mod.BL == "i22":
-    #     pytest.skip("i22 uses the new setup")
     devices_b, _ = make_all_devices(
         bl_mod,
         include_skipped=True,
         fake_with_ophyd_sim=True,
     )
-    print(devices_b)
     for device_name in devices_a.keys():
         assert devices_a[device_name] is devices_b[device_name]
