@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.focusing_mirror &#8212; dodal 1.31.2.dev11+geece06440 documentation</title>
+    <title>dodal.devices.focusing_mirror &#8212; dodal 1.31.2.dev12+g1975af43d documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=19873c64"></script>
+    <script src="../../../_static/documentation_options.js?v=db62156d"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -562,7 +562,7 @@ document.write(`
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">setpoint_v</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> already at </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2"> - skipping set&quot;</span><span class="p">)</span>
             <span class="k">return</span>
 
-        <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;setting </span><span class="si">{</span><span class="n">setpoint_v</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting </span><span class="si">{</span><span class="n">setpoint_v</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="c1"># Register an observer up front to ensure we don&#39;t miss events after we</span>
         <span class="c1"># perform the set</span>
@@ -571,16 +571,14 @@ document.write(`
         <span class="p">)</span>
         <span class="c1"># discard the current value (OK) so we can await a subsequent change</span>
         <span class="k">await</span> <span class="n">anext</span><span class="p">(</span><span class="n">demand_accepted_iterator</span><span class="p">)</span>
-        <span class="k">await</span> <span class="n">setpoint_v</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">set_status</span> <span class="o">=</span> <span class="n">setpoint_v</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="c1"># The set should always change to SLEW regardless of whether we are</span>
         <span class="c1"># already at the set point, then change back to OK/FAIL depending on</span>
         <span class="c1"># success</span>
         <span class="n">accepted_value</span> <span class="o">=</span> <span class="k">await</span> <span class="n">anext</span><span class="p">(</span><span class="n">demand_accepted_iterator</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">accepted_value</span> <span class="o">==</span> <span class="n">MirrorVoltageDemand</span><span class="o">.</span><span class="n">SLEW</span>
-        <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Demand not accepted for </span><span class="si">{</span><span class="n">setpoint_v</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, waiting for acceptance...&quot;</span>
-        <span class="p">)</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Waiting for </span><span class="si">{</span><span class="n">setpoint_v</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> to set&quot;</span><span class="p">)</span>
         <span class="k">while</span> <span class="n">MirrorVoltageDemand</span><span class="o">.</span><span class="n">SLEW</span> <span class="o">==</span> <span class="p">(</span>
             <span class="n">accepted_value</span> <span class="o">:=</span> <span class="k">await</span> <span class="n">anext</span><span class="p">(</span><span class="n">demand_accepted_iterator</span><span class="p">)</span>
         <span class="p">):</span>
@@ -589,7 +587,8 @@ document.write(`
         <span class="k">if</span> <span class="n">accepted_value</span> <span class="o">!=</span> <span class="n">MirrorVoltageDemand</span><span class="o">.</span><span class="n">OK</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Voltage slew failed for </span><span class="si">{</span><span class="n">setpoint_v</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, new state=</span><span class="si">{</span><span class="n">accepted_value</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span></div>
+            <span class="p">)</span>
+        <span class="k">await</span> <span class="n">set_status</span></div>
 </div>
 
 
