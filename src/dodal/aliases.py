@@ -1,9 +1,6 @@
 from collections.abc import Callable
+from typing import TypeAlias
 
-try:
-    from typing import TypeAlias
-except ImportError:
-    from typing import TypeAlias
 from ophyd.device import Device as OphydV1Device
 from ophyd_async.core import Device as OphydV2Device
 
