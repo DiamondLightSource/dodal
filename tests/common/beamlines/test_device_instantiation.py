@@ -1,8 +1,9 @@
 from typing import Any
+from unittest.mock import patch
 
 import pytest
 
-from dodal.beamlines import get_all_beamline_modules
+from dodal.beamlines import ModuleDiscoveryError, get_all_beamline_modules
 from dodal.common.beamlines import beamline_utils
 from dodal.utils import BLUESKY_PROTOCOLS, make_all_devices
 
@@ -49,3 +50,33 @@ def test_devices_are_identical(RE, module_and_devices_for_beamline):
     )
     for device_name in devices_a.keys():
         assert devices_a[device_name] is devices_b[device_name]
+
+
+def test_get_all_beamline_modules_raises_module_discovery_error_on_spec_failure():
+    """
+    Tests that get_all_beamline_modules raises ModuleDiscoveryError if module spec cannot be found.
+    """
+
+    # Simulate the failure of `importlib.util.find_spec` by returning None
+    with patch("importlib.util.find_spec", return_value=None):
+        with pytest.raises(
+            ModuleDiscoveryError, match="Unable to find module search locations"
+        ):
+            list(
+                get_all_beamline_modules()
+            )  # Convert the generator to a list to trigger execution
+
+
+def test_get_all_beamline_modules_raises_module_discovery_error_on_exception():
+    """
+    Tests that get_all_beamline_modules raises ModuleDiscoveryError if an exception is raised in find_spec.
+    """
+
+    # Simulate an exception being raised from `importlib.util.find_spec`
+    with patch("importlib.util.find_spec", side_effect=Exception("Mocked exception")):
+        with pytest.raises(
+            ModuleDiscoveryError, match="Error while finding module spec"
+        ):
+            list(
+                get_all_beamline_modules()
+            )  # Convert the generator to a list to trigger execution
