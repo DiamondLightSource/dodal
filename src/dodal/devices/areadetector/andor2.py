@@ -17,10 +17,6 @@ class Andor2(StandardDetector):
         Path provider for hdf writer
     name: str
         Name of the device
-    config_sigs: Sequence[SignalR]
-        optional config signal to be added
-    **scalar_sigs: str
-        Optional scalar signals
     """
 
     _controller: Andor2Controller
@@ -37,10 +33,10 @@ class Andor2(StandardDetector):
         super().__init__(
             Andor2Controller(self.drv),
             ADHDFWriter(
-                self.hdf,
-                path_provider,
-                lambda: self.name,
-                ADBaseDatasetDescriber(self.drv),
+                hdf=self.hdf,
+                path_provider=path_provider,
+                name_provider=lambda: self.name,
+                dataset_describer=ADBaseDatasetDescriber(self.drv),
             ),
             config_sigs=[self.drv.acquire_time],
             name=name,
