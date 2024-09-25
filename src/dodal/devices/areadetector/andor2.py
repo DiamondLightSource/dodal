@@ -7,7 +7,7 @@ from dodal.devices.areadetector.andor2_epics import Andor2Controller, Andor2Driv
 
 class Andor2(StandardDetector):
     """
-    Andor 2 area detector device
+    Andor 2 area detector device. Andor model:DU897_BV
 
     Parameters
     ----------

@@ -94,8 +94,10 @@ def andor2_point(
 ) -> SingleTriggerDetector:
     return device_instantiation(
         SingleTriggerDetector,
-        drv=andor2_det().drv,
-        read_uncached=([andor2_det().drv.stat_mean]),
+        drv=andor2_det(wait_for_connection, fake_with_ophyd_sim).drv,
+        read_uncached=(
+            [andor2_det(wait_for_connection, fake_with_ophyd_sim).drv.stat_mean]
+        ),
         prefix="",
         name="andor2_point",
         wait=wait_for_connection,
