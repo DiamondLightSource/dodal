@@ -29,6 +29,12 @@ dodal.devices.webcam
 
    
    
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      create_placeholder_image
+   
    
 
    
