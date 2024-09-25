@@ -1,0 +1,42 @@
+dodal.common.beamlines.beamline\_parameters
+===========================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.common.beamlines
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~beamline_parameters.GDABeamlineParameters
+
+
+
+
+.. automodule:: dodal.common.beamlines.beamline_parameters
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      get_beamline_parameters
+   
+   
+
+   
+   
+   

@@ -1,0 +1,84 @@
+dodal.devices.aperturescatterguard.ApertureValue
+================================================
+
+.. currentmodule:: dodal.devices.aperturescatterguard
+
+.. autoclass:: ApertureValue
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~ApertureValue.ROBOT_LOAD
+      
+      
+      ~ApertureValue.SMALL
+      
+      
+      ~ApertureValue.MEDIUM
+      
+      
+      ~ApertureValue.LARGE
+      
+   
+   

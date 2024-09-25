@@ -1,0 +1,31 @@
+dodal.devices.detector.detector\_motion.DetectorMotion
+======================================================
+
+.. currentmodule:: dodal.devices.detector.detector_motion
+
+.. autoclass:: DetectorMotion
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   

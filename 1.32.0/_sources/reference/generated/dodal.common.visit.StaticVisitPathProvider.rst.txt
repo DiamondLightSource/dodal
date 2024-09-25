@@ -1,0 +1,26 @@
+dodal.common.visit.StaticVisitPathProvider
+==========================================
+
+.. currentmodule:: dodal.common.visit
+
+.. autoclass:: StaticVisitPathProvider
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~StaticVisitPathProvider.data_session
+      
+      
+      ~StaticVisitPathProvider.update
+      
+   
+   
+
+   
+   
+   
