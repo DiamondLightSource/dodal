@@ -74,7 +74,6 @@ class DeviceInitializationController(Generic[P, T]):
             return self.device
 
         # unpack the arguments, fill in the defaults
-        connect = connect or self._config.eager_connect
         name = name or (
             self._factory.__name__ if self._config.use_factory_name else None
         )
