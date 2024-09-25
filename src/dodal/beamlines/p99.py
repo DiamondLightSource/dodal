@@ -1,4 +1,13 @@
-from dodal.common.beamlines.beamline_utils import device_instantiation, set_beamline
+from pathlib import Path
+
+from ophyd_async.core import AutoIncrementFilenameProvider, StaticPathProvider
+from ophyd_async.epics.adcore import SingleTriggerDetector
+
+from dodal.common.beamlines.beamline_utils import (
+    device_instantiation,
+    set_beamline,
+)
+from dodal.devices.areadetector import Andor2
 from dodal.devices.motors import XYZPositioner
 from dodal.devices.p99.sample_stage import FilterMotor, SampleAngleStage
 from dodal.log import set_beamline as set_log_beamline
@@ -58,4 +67,37 @@ def sample_lab_xyz_stage(
         name="sample_lab_xyz_stage",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
+    )
+
+
+andor_data_path = StaticPathProvider(
+    filename_provider=AutoIncrementFilenameProvider(base_filename="andor2"),
+    directory_path=Path("/dls/p99/data/2024/cm37284-2/processing/writenData"),
+)
+
+
+def andor2_det(
+    wait_for_connection: bool = True, fake_with_ophyd_mock: bool = False
+) -> Andor2:
+    return device_instantiation(
+        Andor2,
+        prefix="-EA-DET-03:",
+        name="andor2_det",
+        path_provider=andor_data_path,
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_mock,
+    )
+
+
+def andor2_point(
+    wait_for_connection: bool = True, fake_with_ophyd_mock: bool = False
+) -> SingleTriggerDetector:
+    return device_instantiation(
+        SingleTriggerDetector,
+        drv=andor2_det().drv,
+        read_uncached=([andor2_det().drv.stat_mean]),
+        prefix="",
+        name="andor2_point",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_mock,
     )
