@@ -50,7 +50,7 @@ def sample_xyz_stage(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> XYZPositioner:
     return device_instantiation(
-        FilterMotor,
+        XYZPositioner,
         prefix="-MO-STAGE-02:",
         name="sample_xyz_stage",
         wait=wait_for_connection,
@@ -62,7 +62,7 @@ def sample_lab_xyz_stage(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> XYZPositioner:
     return device_instantiation(
-        FilterMotor,
+        XYZPositioner,
         prefix="-MO-STAGE-02:LAB:",
         name="sample_lab_xyz_stage",
         wait=wait_for_connection,
@@ -77,7 +77,7 @@ andor_data_path = StaticPathProvider(
 
 
 def andor2_det(
-    wait_for_connection: bool = True, fake_with_ophyd_mock: bool = False
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> Andor2:
     return device_instantiation(
         Andor2,
@@ -85,12 +85,12 @@ def andor2_det(
         name="andor2_det",
         path_provider=andor_data_path,
         wait=wait_for_connection,
-        fake=fake_with_ophyd_mock,
+        fake=fake_with_ophyd_sim,
     )
 
 
 def andor2_point(
-    wait_for_connection: bool = True, fake_with_ophyd_mock: bool = False
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> SingleTriggerDetector:
     return device_instantiation(
         SingleTriggerDetector,
@@ -99,5 +99,5 @@ def andor2_point(
         prefix="",
         name="andor2_point",
         wait=wait_for_connection,
-        fake=fake_with_ophyd_mock,
+        fake=fake_with_ophyd_sim,
     )
