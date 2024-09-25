@@ -1,4 +1,4 @@
-from asyncio import wait_for
+from asyncio import TimeoutError, wait_for
 from dataclasses import dataclass
 
 import numpy as np

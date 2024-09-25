@@ -3,6 +3,7 @@ from typing import Generic, TypeVar
 
 import numpy as np
 from bluesky.plan_stubs import mv
+from bluesky.protocols import Flyable
 from numpy import ndarray
 from ophyd_async.core import (
     AsyncStatus,
@@ -193,7 +194,7 @@ class ExpectedImages(SignalR[int]):
         return first_grid + second_grid
 
 
-class FastGridScanCommon(StandardReadable, ABC, Generic[ParamType]):
+class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
     """Device for a general fast grid scan
 
     When the motion program is started, the goniometer will move in a snake-like grid trajectory,
