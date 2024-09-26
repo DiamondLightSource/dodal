@@ -1,7 +1,6 @@
 import asyncio
 import io
 import pickle
-import uuid
 from collections.abc import Awaitable, Callable
 from datetime import timedelta
 from enum import Enum
@@ -13,6 +12,7 @@ from ophyd_async.core import (
     AsyncStatus,
     DeviceVector,
     StandardReadable,
+    observe_value,
     soft_signal_r_and_setter,
     soft_signal_rw,
 )
@@ -35,6 +35,17 @@ async def get_next_jpeg(response: ClientResponse) -> bytes:
 class Source(Enum):
     FULL_SCREEN = 0
     ROI = 1
+
+
+class OAVSource(StandardReadable):
+    def __init__(
+        self,
+        prefix: str,
+        name: str,
+    ):
+        self.url = epics_signal_r(str, f"{prefix}MJPG_URL_RBV")
+        self.image_uuid = epics_signal_r(str, f"{prefix}UniqueId_RBV")
+        super().__init__(name=name)
 
 
 class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
@@ -68,16 +79,11 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
         """
         self._sources = DeviceVector(
             {
-                Source.FULL_SCREEN.value: epics_signal_r(
-                    str, f"{prefix}MJPG:MJPG_URL_RBV"
-                ),
-                Source.ROI.value: epics_signal_r(str, f"{prefix}XTAL:MJPG_URL_RBV"),
+                Source.FULL_SCREEN.value: OAVSource(f"{prefix}MJPG:", "fullscreen"),
+                Source.ROI.value: OAVSource(f"{prefix}XTAL:", "ROI"),
             }
         )
         self.selected_source = soft_signal_rw(Source)
-
-        with self.add_children_as_readables():
-            self.uuid, self.uuid_setter = soft_signal_r_and_setter(str)
 
         self.forwarding_task = None
         self.redis_client = StrictRedis(
@@ -88,42 +94,49 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
 
         self.sample_id = soft_signal_rw(int, initial_value=0)
 
-        # The uuid that images are being saved under, this should be monitored for
-        # callbacks to correlate the data
-        self.uuid, self.uuid_setter = soft_signal_r_and_setter(str)
+        with self.add_children_as_readables():
+            # The uuid that images are being saved under, this should be monitored for
+            # callbacks to correlate the data
+            self.uuid, self.uuid_setter = soft_signal_r_and_setter(str)
 
         super().__init__(name=name)
 
-    async def _get_frame_and_put_to_redis(self, response: ClientResponse):
+    async def _get_frame_and_put_to_redis(
+        self, redis_uuid: str, response: ClientResponse
+    ):
         """Converts the data that comes in as a jpeg byte stream into a numpy array of
         RGB values, pickles this array then writes it to redis.
         """
         jpeg_bytes = await get_next_jpeg(response)
-        self.uuid_setter(image_uuid := str(uuid.uuid4()))
+        self.uuid_setter(redis_uuid)
         img = Image.open(io.BytesIO(jpeg_bytes))
         image_data = pickle.dumps(np.asarray(img))
-        sample_id = str(await self.sample_id.get_value())
-        await self.redis_client.hset(sample_id, image_uuid, image_data)  # type: ignore
-        await self.redis_client.expire(sample_id, timedelta(days=self.DATA_EXPIRY_DAYS))
-        LOGGER.debug(f"Sent frame to redis key {sample_id} with uuid {image_uuid}")
+        sample_id = str(int(await self.sample_id.get_value()))
+        redis_key = f"murko:{sample_id}:raw"
+        await self.redis_client.hset(redis_key, redis_uuid, image_data)  # type: ignore
+        await self.redis_client.expire(redis_key, timedelta(days=self.DATA_EXPIRY_DAYS))
+        LOGGER.debug(f"Sent frame to redis key {redis_key} with uuid {redis_uuid}")
 
     async def _open_connection_and_do_function(
-        self, function_to_do: Callable[[ClientResponse, str | None], Awaitable]
+        self, function_to_do: Callable[[ClientResponse, OAVSource], Awaitable]
     ):
-        source = await self.selected_source.get_value()
-        stream_url = await self._sources[source.value].get_value()
+        source_name = await self.selected_source.get_value()
+        source = self._sources[source_name.value]
+        stream_url = await source.url.get_value()
         async with ClientSession() as session:
             async with session.get(stream_url) as response:
-                await function_to_do(response, stream_url)
+                await function_to_do(response, source)
 
-    async def _stream_to_redis(self, response, _):
-        while not self._stop_flag:
-            await self._get_frame_and_put_to_redis(response)
-            await asyncio.sleep(0.01)
+    async def _stream_to_redis(self, response: ClientResponse, source: OAVSource):
+        async for image_uuid in observe_value(source.image_uuid):
+            while not self._stop_flag:
+                redis_uuid = f"{source.name}-{image_uuid}"
+                await self._get_frame_and_put_to_redis(redis_uuid, response)
+                await asyncio.sleep(0.01)
 
-    async def _confirm_mjpg_stream(self, response, stream_url):
+    async def _confirm_mjpg_stream(self, response: ClientResponse, source: OAVSource):
         if response.content_type != "multipart/x-mixed-replace":
-            raise ValueError(f"{stream_url} is not an MJPG stream")
+            raise ValueError(f"{await source.url.get_value()} is not an MJPG stream")
 
     @AsyncStatus.wrap
     async def kickoff(self):
