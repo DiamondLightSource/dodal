@@ -21,7 +21,7 @@ set_beamline(BL)
 def sample_angle_stage(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> SampleAngleStage:
-    """Sample stage for p99"""
+    """sample angle stage (old currently on the side)"""
 
     return device_instantiation(
         SampleAngleStage,
@@ -35,8 +35,6 @@ def sample_angle_stage(
 def sample_stage_filer(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> FilterMotor:
-    """Sample stage for p99"""
-
     return device_instantiation(
         FilterMotor,
         prefix="-MO-STAGE-02:MP:SELECT",
@@ -92,6 +90,11 @@ def andor2_det(
 def andor2_point(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> SingleTriggerDetector:
+    """
+    This is the same physical detector as andor2_det but it will not save
+    any image as we only care about the detector mean count.
+    This behave very much like a oversize/overpirce photo diode when use in this mode.
+    """
     return device_instantiation(
         SingleTriggerDetector,
         drv=andor2_det(wait_for_connection, fake_with_ophyd_sim).drv,
