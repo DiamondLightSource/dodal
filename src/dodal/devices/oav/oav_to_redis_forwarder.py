@@ -55,6 +55,9 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
 
     DATA_EXPIRY_DAYS = 7
 
+    # This timeout is the maximum time that the forwarder can be streaming for
+    TIMEOUT = 30
+
     def __init__(
         self,
         prefix: str,
@@ -86,7 +89,7 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
             host=redis_host, password=redis_password, db=redis_db
         )
 
-        self._stop_flag = False
+        self._stop_flag = asyncio.Event()
 
         self.sample_id = soft_signal_rw(int, initial_value=0)
 
@@ -100,9 +103,6 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
     async def _get_frame_and_put_to_redis(
         self, redis_uuid: str, response: ClientResponse
     ):
-        """Converts the data that comes in as a jpeg byte stream into a numpy array of
-        RGB values, pickles this array then writes it to redis.
-        """
         jpeg_bytes = await get_next_jpeg(response)
         self.uuid_setter(redis_uuid)
         sample_id = await self.sample_id.get_value()
@@ -124,10 +124,13 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
                 await function_to_do(response, source)
 
     async def _stream_to_redis(self, response: ClientResponse, source: OAVSource):
-        async for image_uuid in observe_value(source.image_uuid):
-            if self._stop_flag:
-                break
-            redis_uuid = f"{source.name}-{image_uuid}"
+        done_status = AsyncStatus(
+            asyncio.wait_for(self._stop_flag.wait(), timeout=self.TIMEOUT)
+        )
+        async for image_uuid in observe_value(
+            source.image_uuid, done_status=done_status
+        ):
+            redis_uuid = f"{source.oav_name}-{image_uuid}"
             await self._get_frame_and_put_to_redis(redis_uuid, response)
 
     async def _confirm_mjpg_stream(self, response: ClientResponse, source: OAVSource):
@@ -136,7 +139,7 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
 
     @AsyncStatus.wrap
     async def kickoff(self):
-        self._stop_flag = False
+        self._stop_flag.clear()
         await self._open_connection_and_do_function(self._confirm_mjpg_stream)
         self.forwarding_task = asyncio.create_task(
             self._open_connection_and_do_function(self._stream_to_redis)
@@ -153,5 +156,5 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
             LOGGER.info(
                 f"Stopping forwarding for {await self.selected_source.get_value()}"
             )
-            self._stop_flag = True
+            self._stop_flag.set()
             await self.forwarding_task
