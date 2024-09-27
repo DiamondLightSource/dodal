@@ -1,3 +1,4 @@
+import asyncio
 from collections import defaultdict
 from unittest.mock import ANY
 
@@ -122,7 +123,7 @@ async def test_gap_time_out_error(mock_id_gap: UndulatorGap, RE: RunEngine):
         lambda *_, **__: set_mock_value(mock_id_gap.gate, UndulatorGateStatus.open),
     )
     set_mock_value(mock_id_gap.velocity, 1000)
-    with pytest.raises(TimeoutError):
+    with pytest.raises(asyncio.TimeoutError):
         await mock_id_gap.set("2")
 
 
@@ -169,7 +170,7 @@ async def test_phase_time_out_error(mock_phaseAxes: UndulatorPhaseAxes, RE: RunE
         lambda *_, **__: set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.open),
     )
     set_mock_value(mock_phaseAxes.top_inner.velocity, 1000)
-    with pytest.raises(TimeoutError):
+    with pytest.raises(asyncio.TimeoutError):
         await mock_phaseAxes.set(setValue)
 
 
@@ -292,7 +293,7 @@ async def test_jaw_phase_time_out_error(mock_jaw_phase: UndulatorJawPhase):
         lambda *_, **__: set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.open),
     )
     set_mock_value(mock_jaw_phase.jaw_Phase.velocity, 1000)
-    with pytest.raises(TimeoutError):
+    with pytest.raises(asyncio.TimeoutError):
         await mock_jaw_phase.set(2)
 
 
