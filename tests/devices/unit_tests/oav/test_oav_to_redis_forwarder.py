@@ -26,15 +26,26 @@ def oav_forwarder(RE):
     return oav_forwarder
 
 
+def get_mock_response(jpeg_bytes: bytes | None = None):
+    if not jpeg_bytes:
+        jpeg_bytes = b"\xff\xd8\x67\xce\xff\xd9"
+    mock_response = MagicMock()
+    mock_response.content.readline = AsyncMock(return_value=jpeg_bytes[:3])
+    mock_response.content.readuntil = AsyncMock(return_value=jpeg_bytes[3:])
+    return mock_response
+
+
 @pytest.fixture
 def oav_forwarder_with_valid_response(oav_forwarder: OAVToRedisForwarder):
     client_session_patch = patch(
         "dodal.devices.oav.oav_to_redis_forwarder.ClientSession.get", autospec=True
     )
     mock_get = client_session_patch.start()
-    mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
+    mock_get.return_value.__aenter__.return_value = (
+        mock_response := get_mock_response()
+    )
     mock_response.content_type = "multipart/x-mixed-replace"
-    oav_forwarder._get_frame_and_put_to_redis = AsyncMock()
+    # oav_forwarder._get_frame_and_put_to_redis = AsyncMock()
     yield oav_forwarder, mock_response, mock_get
     client_session_patch.stop()
 
@@ -56,6 +67,7 @@ async def test_when_oav_forwarder_kicked_off_then_connection_open_and_data_strea
     oav_forwarder_with_valid_response,
 ):
     oav_forwarder, mock_response, _ = oav_forwarder_with_valid_response
+    oav_forwarder._get_frame_and_put_to_redis = AsyncMock()
 
     await oav_forwarder.kickoff()
 
@@ -88,15 +100,6 @@ async def test_when_oav_forwarder_kicked_off_then_completed_forwarding_is_stoppe
     await oav_forwarder.kickoff()
     await oav_forwarder.complete()
     assert oav_forwarder.forwarding_task.done()
-
-
-def get_mock_response(jpeg_bytes: bytes | None = None):
-    if not jpeg_bytes:
-        jpeg_bytes = b"\xff\xd8\x67\xce\xff\xd9"
-    mock_response = MagicMock()
-    mock_response.content.readline = AsyncMock(return_value=jpeg_bytes[:3])
-    mock_response.content.readuntil = AsyncMock(return_value=jpeg_bytes[3:])
-    return mock_response
 
 
 async def test_given_byte_stream_when_get_next_jpeg_called_then_jpeg_bytes_returned():
@@ -150,9 +153,53 @@ async def test_when_different_sources_selected_then_different_urls_used(
     oav_forwarder_with_valid_response, source, expected_url
 ):
     oav_forwarder, _, mock_get = oav_forwarder_with_valid_response
-    oav_forwarder.selected_source.set(source)
+    set_mock_value(oav_forwarder.selected_source, source)
 
     await oav_forwarder.kickoff()
     await oav_forwarder.complete()
 
     mock_get.assert_called_with(ANY, expected_url)
+
+
+@pytest.mark.parametrize(
+    "source, expected_uuid_prefix",
+    [
+        (Source.FULL_SCREEN, "fullscreen"),
+        (Source.ROI, "roi"),
+    ],
+)
+async def test_when_different_sources_selected_then_different_uuids_used(
+    oav_forwarder_with_valid_response, source, expected_uuid_prefix
+):
+    oav_forwarder, _, _ = oav_forwarder_with_valid_response
+    set_mock_value(oav_forwarder.selected_source, source)
+
+    await oav_forwarder.kickoff()
+    await asyncio.sleep(0.01)
+    await oav_forwarder.complete()
+
+    redis_call = oav_forwarder.redis_client.hset.call_args[0]
+    assert redis_call[1] == f"{expected_uuid_prefix}-0"
+
+
+@pytest.mark.parametrize(
+    "source, expected_uuid_prefix",
+    [
+        (Source.FULL_SCREEN, "fullscreen"),
+        (Source.ROI, "roi"),
+    ],
+)
+async def test_oav_only_forwards_data_when_the_unique_id_updates(
+    oav_forwarder_with_valid_response, source, expected_uuid_prefix
+):
+    oav_forwarder, _, _ = oav_forwarder_with_valid_response
+    set_mock_value(oav_forwarder.selected_source, source)
+    await oav_forwarder.kickoff()
+    await asyncio.sleep(0.01)
+    oav_forwarder.redis_client.hset.assert_called_once()
+    set_mock_value(oav_forwarder._sources[source.value].image_uuid, 1)
+    await asyncio.sleep(0.01)
+    assert oav_forwarder.redis_client.hset.call_count == 2
+    second_call = oav_forwarder.redis_client.hset.call_args_list[1][0]
+    assert second_call[1] == f"{expected_uuid_prefix}-1"
+    await oav_forwarder.complete()
