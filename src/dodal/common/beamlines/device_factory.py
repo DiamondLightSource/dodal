@@ -80,16 +80,6 @@ class DeviceInitializationController(Generic[P, T]):
         mock = mock or self._config.mock
         timeout = timeout or self._config.timeout
 
-        try:
-            fake_with_ophyd_sim: object | None = kwargs.pop("fake_with_ophyd_sim")
-            assert isinstance(
-                fake_with_ophyd_sim, bool | None
-            ), "fake_with_ophyd_sim must be a boolean"
-            mock = fake_with_ophyd_sim or mock
-            # the instantiation of the device
-        except KeyError:
-            pass
-
         device = self._factory(*args, **kwargs)
         if name:
             device.set_name(name)
