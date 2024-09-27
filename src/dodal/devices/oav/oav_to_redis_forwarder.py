@@ -40,7 +40,6 @@ class OAVSource(StandardReadable):
         oav_name: str,
     ):
         self.url = epics_signal_r(str, f"{prefix}MJPG_URL_RBV")
-        self.image_uuid = epics_signal_r(int, f"{prefix}UniqueId_RBV")
         self.oav_name = oav_name
 
 
@@ -76,6 +75,8 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
             redis_db: int           which redis database to connect to, defaults to 0
             name: str               the name of this device
         """
+        self.counter = epics_signal_r(int, f"{prefix}CAM:ArrayCounter_RBV")
+
         self._sources = DeviceVector(
             {
                 Source.ROI.value: OAVSource(f"{prefix}MJPG:", "roi"),
@@ -127,9 +128,7 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
         done_status = AsyncStatus(
             asyncio.wait_for(self._stop_flag.wait(), timeout=self.TIMEOUT)
         )
-        async for image_uuid in observe_value(
-            source.image_uuid, done_status=done_status
-        ):
+        async for image_uuid in observe_value(self.counter, done_status=done_status):
             redis_uuid = f"{source.oav_name}-{image_uuid}"
             await self._get_frame_and_put_to_redis(redis_uuid, response)
 

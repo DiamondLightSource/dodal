@@ -197,7 +197,7 @@ async def test_oav_only_forwards_data_when_the_unique_id_updates(
     await oav_forwarder.kickoff()
     await asyncio.sleep(0.01)
     oav_forwarder.redis_client.hset.assert_called_once()
-    set_mock_value(oav_forwarder._sources[source.value].image_uuid, 1)
+    set_mock_value(oav_forwarder.counter, 1)
     await asyncio.sleep(0.01)
     assert oav_forwarder.redis_client.hset.call_count == 2
     second_call = oav_forwarder.redis_client.hset.call_args_list[1][0]
