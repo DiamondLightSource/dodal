@@ -1,11 +1,8 @@
 import asyncio
-import io
-import pickle
 from collections.abc import Awaitable, Callable
 from datetime import timedelta
 from enum import Enum
 
-import numpy as np
 from aiohttp import ClientResponse, ClientSession
 from bluesky.protocols import Flyable, Stoppable
 from ophyd_async.core import (
@@ -17,7 +14,6 @@ from ophyd_async.core import (
     soft_signal_rw,
 )
 from ophyd_async.epics.signal import epics_signal_r
-from PIL import Image
 from redis.asyncio import StrictRedis
 
 from dodal.log import LOGGER
@@ -41,11 +37,11 @@ class OAVSource(StandardReadable):
     def __init__(
         self,
         prefix: str,
-        name: str,
+        oav_name: str,
     ):
         self.url = epics_signal_r(str, f"{prefix}MJPG_URL_RBV")
-        self.image_uuid = epics_signal_r(str, f"{prefix}UniqueId_RBV")
-        super().__init__(name=name)
+        self.image_uuid = epics_signal_r(int, f"{prefix}UniqueId_RBV")
+        self.oav_name = oav_name
 
 
 class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
@@ -79,8 +75,8 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
         """
         self._sources = DeviceVector(
             {
-                Source.FULL_SCREEN.value: OAVSource(f"{prefix}MJPG:", "fullscreen"),
-                Source.ROI.value: OAVSource(f"{prefix}XTAL:", "ROI"),
+                Source.ROI.value: OAVSource(f"{prefix}MJPG:", "roi"),
+                Source.FULL_SCREEN.value: OAVSource(f"{prefix}XTAL:", "fullscreen"),
             }
         )
         self.selected_source = soft_signal_rw(Source)
@@ -109,18 +105,18 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
         """
         jpeg_bytes = await get_next_jpeg(response)
         self.uuid_setter(redis_uuid)
-        img = Image.open(io.BytesIO(jpeg_bytes))
-        image_data = pickle.dumps(np.asarray(img))
-        sample_id = str(int(await self.sample_id.get_value()))
+        sample_id = await self.sample_id.get_value()
         redis_key = f"murko:{sample_id}:raw"
-        await self.redis_client.hset(redis_key, redis_uuid, image_data)  # type: ignore
+        await self.redis_client.hset(redis_key, redis_uuid, jpeg_bytes)  # type: ignore
         await self.redis_client.expire(redis_key, timedelta(days=self.DATA_EXPIRY_DAYS))
-        LOGGER.debug(f"Sent frame to redis key {redis_key} with uuid {redis_uuid}")
 
     async def _open_connection_and_do_function(
         self, function_to_do: Callable[[ClientResponse, OAVSource], Awaitable]
     ):
         source_name = await self.selected_source.get_value()
+        LOGGER.info(
+            f"Forwarding data from sample {await self.sample_id.get_value()} and OAV {source_name}"
+        )
         source = self._sources[source_name.value]
         stream_url = await source.url.get_value()
         async with ClientSession() as session:
@@ -129,10 +125,10 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
 
     async def _stream_to_redis(self, response: ClientResponse, source: OAVSource):
         async for image_uuid in observe_value(source.image_uuid):
-            while not self._stop_flag:
-                redis_uuid = f"{source.name}-{image_uuid}"
-                await self._get_frame_and_put_to_redis(redis_uuid, response)
-                await asyncio.sleep(0.01)
+            if self._stop_flag:
+                break
+            redis_uuid = f"{source.name}-{image_uuid}"
+            await self._get_frame_and_put_to_redis(redis_uuid, response)
 
     async def _confirm_mjpg_stream(self, response: ClientResponse, source: OAVSource):
         if response.content_type != "multipart/x-mixed-replace":
@@ -154,5 +150,8 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
     @AsyncStatus.wrap
     async def stop(self, success=True):
         if self.forwarding_task:
+            LOGGER.info(
+                f"Stopping forwarding for {await self.selected_source.get_value()}"
+            )
             self._stop_flag = True
             await self.forwarding_task
