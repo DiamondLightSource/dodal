@@ -15,7 +15,7 @@ description = "Ophyd devices and other utils that could be used across DLS beaml
 dependencies = [
     "click",
     "ophyd",
-    "ophyd-async>=0.5.2",
+    "ophyd-async>=0.6,<0.7",
     "bluesky",
     "pyepics",
     "dataclasses-json",
@@ -31,6 +31,7 @@ dependencies = [
     "aiofiles",
     "aiohttp",
     "redis",
+    "deepdiff",
 ]
 
 dynamic = ["version"]
