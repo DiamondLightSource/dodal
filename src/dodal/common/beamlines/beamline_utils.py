@@ -17,6 +17,10 @@ T = TypeVar("T", bound=AnyDevice)
 
 
 def skip_device(precondition=lambda: True):
+    """
+    DEPRECATED: Use 'device_factory' decorator instead.
+    """
+
     def decorator(func: Callable[..., T]) -> Callable[..., T]:
         @wraps(func)
         def wrapper(*args, **kwds) -> T:
