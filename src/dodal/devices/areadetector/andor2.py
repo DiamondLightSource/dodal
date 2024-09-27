@@ -7,16 +7,8 @@ from dodal.devices.areadetector.andor2_epics import Andor2Controller, Andor2Driv
 
 class Andor2(StandardDetector):
     """
-    Andor 2 area detector device. Andor model:DU897_BV
-
-    Parameters
-    ----------
-    prefix: str
-        Epic Pv,
-    path_provider: PathProvider
-        Path provider for hdf writer
-    name: str
-        Name of the device
+    Andor 2 area detector device (CCD detector 56fps with full chip readout).
+    Andor model:DU897_BV.
     """
 
     _controller: Andor2Controller
@@ -28,6 +20,16 @@ class Andor2(StandardDetector):
         path_provider: PathProvider,
         name: str,
     ):
+        """
+        Parameters
+        ----------
+        prefix: str
+            Epic Pv,
+        path_provider: PathProvider
+            Path provider for hdf writer
+        name: str
+            Name of the device
+        """
         self.drv = Andor2DriverIO(prefix + "CAM:")
         self.hdf = NDFileHDFIO(prefix + "HDF5:")
         super().__init__(

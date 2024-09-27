@@ -15,16 +15,14 @@ from .andor2_io import (
     ImageMode,
 )
 
+MIN_DEAD_TIME = 0.1
+DEFAULT_MAX_NUM_IMAGE = 999_999
+
 
 class Andor2Controller(DetectorControl):
-    """
-    Andor 2 controller
-
-    """
-
     _supported_trigger_types = {
         DetectorTrigger.internal: Andor2TriggerMode.internal,
-        DetectorTrigger.constant_gate: Andor2TriggerMode.ext_trigger,
+        DetectorTrigger.edge_trigger: Andor2TriggerMode.ext_trigger,
     }
 
     def __init__(
@@ -39,8 +37,8 @@ class Andor2Controller(DetectorControl):
 
     def get_deadtime(self, exposure: float | None) -> float:
         if exposure is None:
-            return 0.1
-        return exposure + 0.1
+            return MIN_DEAD_TIME
+        return exposure + MIN_DEAD_TIME
 
     async def prepare(self, trigger_info: TriggerInfo):
         if trigger_info.livetime is not None:
@@ -50,7 +48,9 @@ class Andor2Controller(DetectorControl):
         await asyncio.gather(
             self._drv.trigger_mode.set(self._get_trigger_mode(trigger_info.trigger)),
             self._drv.num_images.set(
-                999_999 if trigger_info.number == 0 else trigger_info.number
+                DEFAULT_MAX_NUM_IMAGE
+                if trigger_info.number == 0
+                else trigger_info.number
             ),
             self._drv.image_mode.set(ImageMode.multiple),
         )

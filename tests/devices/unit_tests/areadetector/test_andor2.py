@@ -1,6 +1,6 @@
 from collections import defaultdict
 from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 import pytest
 from bluesky.plans import count
@@ -24,7 +24,11 @@ from dodal.devices.areadetector.andor2_epics import (
     Andor2TriggerMode,
     ImageMode,
 )
-from dodal.devices.areadetector.andor2_epics.andor2_controller import Andor2Controller
+from dodal.devices.areadetector.andor2_epics.andor2_controller import (
+    DEFAULT_MAX_NUM_IMAGE,
+    MIN_DEAD_TIME,
+    Andor2Controller,
+)
 
 
 @pytest.fixture
@@ -49,44 +53,82 @@ def static_path_provider(
 
 
 @pytest.fixture
-async def Andor() -> Andor2Controller:
+async def andor_controller() -> Andor2Controller:
     async with DeviceCollector(mock=True):
         drv = Andor2DriverIO("DRIVER:")
-        controller = Andor2Controller(drv)
+        andor_controller = Andor2Controller(drv)
 
-    return controller
+    return andor_controller
 
 
-async def test_Andor_controller(RE, Andor: Andor2Controller):
-    with patch("ophyd_async.core.wait_for_value", return_value=None):
-        await Andor.prepare(trigger_info=TriggerInfo(number=1, livetime=0.002))
-        await Andor.arm()
+async def test_andor_controller_prepare_and_arm_with_TriggerInfo(
+    RE, andor_controller: Andor2Controller
+):
+    await andor_controller.prepare(trigger_info=TriggerInfo(number=1, livetime=0.002))
+    await andor_controller.arm()
 
-    driver = Andor._drv
-
-    set_mock_value(driver.accumulate_period, 1)
+    driver = andor_controller._drv
     assert await driver.num_images.get_value() == 1
     assert await driver.image_mode.get_value() == ImageMode.multiple
     assert await driver.trigger_mode.get_value() == Andor2TriggerMode.internal
     assert await driver.acquire.get_value() is True
     assert await driver.acquire_time.get_value() == 0.002
-    assert Andor.get_deadtime(2) == 2 + 0.1
-    assert Andor.get_deadtime(None) == 0.1
 
-    with patch("ophyd_async.core.wait_for_value", return_value=None):
-        await Andor.disarm()
 
+async def test_andor_controller_prepare_and_arm_with_no_livetime(
+    RE, andor_controller: Andor2Controller
+):
+    # get driver and set the current acquire time.
+    default_count_time = 2141
+    driver = andor_controller._drv
+    set_mock_value(driver.acquire_time, default_count_time)
+    await andor_controller.prepare(trigger_info=TriggerInfo(number=5))
+    await andor_controller.arm()
+
+    assert await driver.num_images.get_value() == 5
+    assert await driver.image_mode.get_value() == ImageMode.multiple
+    assert await driver.trigger_mode.get_value() == Andor2TriggerMode.internal
+    assert await driver.acquire.get_value() is True
+    assert await driver.acquire_time.get_value() == default_count_time
+
+
+async def test_andor_controller_prepare_and_arm_with_trigger_number_of_zero(
+    RE, andor_controller: Andor2Controller
+):
+    # get driver and set the current acquire time.
+    default_count_time = 1231
+    driver = andor_controller._drv
+    set_mock_value(driver.acquire_time, default_count_time)
+    await andor_controller.prepare(trigger_info=TriggerInfo(number=0))
+    await andor_controller.arm()
+
+    assert await driver.num_images.get_value() == DEFAULT_MAX_NUM_IMAGE
+    assert await driver.image_mode.get_value() == ImageMode.multiple
+    assert await driver.trigger_mode.get_value() == Andor2TriggerMode.internal
+    assert await driver.acquire.get_value() is True
+    assert await driver.acquire_time.get_value() == default_count_time
+
+
+async def test_andor_controller_disarm(RE, andor_controller: Andor2Controller):
+    await andor_controller.disarm()
+    driver = andor_controller._drv
     assert await driver.acquire.get_value() is False
 
-    with patch("ophyd_async.core.wait_for_value", return_value=None):
-        await Andor.disarm()
+    await andor_controller.disarm()
+
+
+async def test_andor_incorrect_tigger_mode(RE, andor_controller: Andor2Controller):
     with pytest.raises(ValueError):
-        Andor._get_trigger_mode(DetectorTrigger.edge_trigger)
+        andor_controller._get_trigger_mode(DetectorTrigger.variable_gate)
 
-    assert await driver.acquire.get_value() is False
+    assert await andor_controller._drv.acquire.get_value() is False
 
 
-# area detector that is use for testing
+async def test_andor_controller_deadtime(RE, andor_controller: Andor2Controller):
+    assert andor_controller.get_deadtime(2) == 2 + MIN_DEAD_TIME
+    assert andor_controller.get_deadtime(None) == MIN_DEAD_TIME
+
+
 @pytest.fixture
 async def andor2(static_path_provider: StaticPathProvider) -> Andor2:
     async with DeviceCollector(mock=True):
@@ -119,7 +161,7 @@ async def andor2(static_path_provider: StaticPathProvider) -> Andor2:
     return andor2
 
 
-async def test_Andor2_RE(
+async def test_andor2_RE(
     RE: RunEngine,
     andor2: Andor2,
     static_path_provider: StaticPathProvider,
