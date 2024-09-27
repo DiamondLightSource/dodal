@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.aperturescatterguard &#8212; dodal 1.31.2.dev13+g936dfaa74 documentation</title>
+    <title>dodal.devices.aperturescatterguard &#8212; dodal 1.32.1.dev1+g228d9dcf2 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=40a88d8c"></script>
+    <script src="../../../_static/documentation_options.js?v=77b92e8f"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -481,11 +481,11 @@ document.write(`
     <span class="n">AsyncStatus</span><span class="p">,</span>
     <span class="n">HintedSignal</span><span class="p">,</span>
     <span class="n">StandardReadable</span><span class="p">,</span>
-    <span class="n">soft_signal_rw</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span>
 
 <span class="kn">from</span> <span class="nn">dodal.common.beamlines.beamline_parameters</span> <span class="kn">import</span> <span class="n">GDABeamlineParameters</span>
+<span class="kn">from</span> <span class="nn">dodal.common.signal_utils</span> <span class="kn">import</span> <span class="n">create_hardware_backed_soft_signal</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.aperture</span> <span class="kn">import</span> <span class="n">Aperture</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.scatterguard</span> <span class="kn">import</span> <span class="n">Scatterguard</span>
 
@@ -589,7 +589,9 @@ document.write(`
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span> <span class="o">=</span> <span class="n">Aperture</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-MO-MAPT-01:&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scatterguard</span> <span class="o">=</span> <span class="n">Scatterguard</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-MO-SCAT-01:&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;µm&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">create_hardware_backed_soft_signal</span><span class="p">(</span>
+            <span class="nb">float</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_current_radius</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;µm&quot;</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_positions</span> <span class="o">=</span> <span class="n">loaded_positions</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tolerances</span> <span class="o">=</span> <span class="n">tolerances</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_readables</span><span class="p">(</span>
@@ -603,7 +605,9 @@ document.write(`
             <span class="p">],</span>
         <span class="p">)</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">HintedSignal</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">selected_aperture</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="n">ApertureValue</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">selected_aperture</span> <span class="o">=</span> <span class="n">create_hardware_backed_soft_signal</span><span class="p">(</span>
+                <span class="n">ApertureValue</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_current_aperture_position</span>
+            <span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
@@ -620,9 +624,6 @@ document.write(`
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span> <span class="nf">_set_raw_unsafe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="n">AperturePosition</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Accept the risks and move in an unsafe way. Collisions possible.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">position</span><span class="o">.</span><span class="n">radius</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">position</span><span class="o">.</span><span class="n">radius</span><span class="p">)</span>
-
         <span class="n">aperture_x</span><span class="p">,</span> <span class="n">aperture_y</span><span class="p">,</span> <span class="n">aperture_z</span><span class="p">,</span> <span class="n">scatterguard_x</span><span class="p">,</span> <span class="n">scatterguard_y</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">position</span><span class="o">.</span><span class="n">values</span>
         <span class="p">)</span>
@@ -634,15 +635,8 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">scatterguard</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">scatterguard_x</span><span class="p">),</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">scatterguard</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">scatterguard_y</span><span class="p">),</span>
         <span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">value</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_current_aperture_position</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">selected_aperture</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-        <span class="k">except</span> <span class="n">InvalidApertureMove</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">selected_aperture</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
 
-<div class="viewcode-block" id="ApertureScatterguard.get_current_aperture_position">
-<a class="viewcode-back" href="../../../reference/generated/dodal.devices.aperturescatterguard.ApertureScatterguard.html#dodal.devices.aperturescatterguard.ApertureScatterguard.get_current_aperture_position">[docs]</a>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">get_current_aperture_position</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ApertureValue</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_get_current_aperture_position</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ApertureValue</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the current aperture position using readback values</span>
 <span class="sd">        for SMALL, MEDIUM, LARGE. ROBOT_LOAD position defined when</span>
@@ -660,8 +654,11 @@ document.write(`
         <span class="k">elif</span> <span class="n">current_ap_y</span> <span class="o">&lt;=</span> <span class="n">robot_load_ap_y</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tolerances</span><span class="o">.</span><span class="n">aperture_y</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">ApertureValue</span><span class="o">.</span><span class="n">ROBOT_LOAD</span>
 
-        <span class="k">raise</span> <span class="n">InvalidApertureMove</span><span class="p">(</span><span class="s2">&quot;Current aperture/scatterguard state unrecognised&quot;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="n">InvalidApertureMove</span><span class="p">(</span><span class="s2">&quot;Current aperture/scatterguard state unrecognised&quot;</span><span class="p">)</span>
 
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_get_current_radius</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">current_value</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_current_aperture_position</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_positions</span><span class="p">[</span><span class="n">current_value</span><span class="p">]</span><span class="o">.</span><span class="n">radius</span>
 
     <span class="k">async</span> <span class="k">def</span> <span class="nf">_safe_move_within_datacollection_range</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="n">AperturePosition</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">ApertureValue</span>
@@ -690,8 +687,6 @@ document.write(`
             <span class="p">)</span>
 
         <span class="n">current_ap_y</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">user_readback</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">position</span><span class="o">.</span><span class="n">radius</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">position</span><span class="o">.</span><span class="n">radius</span><span class="p">)</span>
 
         <span class="n">aperture_x</span><span class="p">,</span> <span class="n">aperture_y</span><span class="p">,</span> <span class="n">aperture_z</span><span class="p">,</span> <span class="n">scatterguard_x</span><span class="p">,</span> <span class="n">scatterguard_y</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">position</span><span class="o">.</span><span class="n">values</span>
@@ -717,8 +712,7 @@ document.write(`
             <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">scatterguard</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">scatterguard_x</span><span class="p">),</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">scatterguard</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">scatterguard_y</span><span class="p">),</span>
-            <span class="p">)</span>
-        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">selected_aperture</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+            <span class="p">)</span></div>
 
 </pre></div>
 

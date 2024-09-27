@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Device Standards &#8212; dodal 1.31.2.dev13+g936dfaa74 documentation</title>
+    <title>Device Standards &#8212; dodal 1.32.1.dev1+g228d9dcf2 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../_static/documentation_options.js?v=40a88d8c"></script>
+    <script src="../_static/documentation_options.js?v=77b92e8f"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -452,6 +452,10 @@ document.write(`
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/dodal.common.coordination.html">dodal.common.coordination</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/dodal.common.maths.html">dodal.common.maths</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="generated/dodal.common.signal_utils.html">dodal.common.signal_utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="generated/dodal.common.signal_utils.HarwareBackedSoftSignalBackend.html">dodal.common.signal_utils.HarwareBackedSoftSignalBackend</a></li>
+</ul>
+</details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="generated/dodal.common.types.html">dodal.common.types</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="generated/dodal.common.types.UpdatingPathProvider.html">dodal.common.types.UpdatingPathProvider</a></li>
 </ul>
@@ -845,6 +849,16 @@ complex device (e.g. multiple files) it should have a folder of its own e.g. <co
 </ol>
 <p>This is in an effort to avoid duplication across facilities/beamlines.</p>
 </section>
+<section id="device-best-practices">
+<h2>Device Best Practices<a class="headerlink" href="#device-best-practices" title="Link to this heading">#</a></h2>
+<p>Ophyd-async directory contains a <a class="reference external" href="https://blueskyproject.io/ophyd-async/main/how-to/choose-interfaces-for-devices.html">flowchart</a> for a simplified decision tree about what interfaces
+should a given device implement. In addition to this the following guidelines are strongly recommended:</p>
+<ol class="arabic simple">
+<li><p>Devices should contain only the PV suffixes that are generic for any instance of the device. See <a class="reference internal" href="#pv-suffixes">PV Suffixes</a></p></li>
+<li><p>Anything in a device that is expected to be set externally should be a signal. See <a class="reference internal" href="#use-of-signals">Use of signals</a></p></li>
+<li><p>Devices should not hold state, when they are read they should read the hardware. See <a class="reference internal" href="#holding-state">Holding State</a></p></li>
+</ol>
+</section>
 <section id="pv-suffixes">
 <h2>PV Suffixes<a class="headerlink" href="#pv-suffixes" title="Link to this heading">#</a></h2>
 <p>In general devices should contain only the PV suffixes that are generic for any instance of the device e.g.</p>
@@ -896,7 +910,7 @@ lost</p></li>
 <p>Instead you should make a soft signal:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-         <span class="bp">self</span><span class="o">.</span><span class="n">param</span> <span class="o">=</span> <span class="n">create_soft_signal</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">param</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
 
 <span class="n">my_device</span> <span class="o">=</span> <span class="n">MyDevice</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">my_plan</span><span class="p">():</span>
@@ -904,10 +918,65 @@ lost</p></li>
 </pre></div>
 </div>
 </section>
-<section id="ophyd-devices-best-practices">
-<h2>Ophyd Devices best practices<a class="headerlink" href="#ophyd-devices-best-practices" title="Link to this heading">#</a></h2>
-<p>Ophyd-async directory contains a <a class="reference external" href="https://blueskyproject.io/ophyd-async/main/how-to/choose-interfaces-for-devices.html">flowchart</a> for a simplified decision tree about what interfaces
-should a given device implement.</p>
+<section id="holding-state">
+<h2>Holding State<a class="headerlink" href="#holding-state" title="Link to this heading">#</a></h2>
+<p>Devices should avoid holding state as much as possible. Ophyd devices are mostly trying to reflect the state of hardware and so when the device is read that hardware should be read.</p>
+<p>If the device holds the state itself it is likely to not reflect the real hardware if:
+* The device has just been initialised
+* The hardware has changed independently e.g. via EPICS directly
+* The hardware has failed to do what the device expected</p>
+<p>For example, if I have a device that I would like to treat as moving in/out based on an underlying axis then it would be incorrect to implement it like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">InOut</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">IN</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">OUT</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="k">class</span> <span class="nc">MyDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">underlying_motor</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="s2">&quot;MOTOR&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">in_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_in_out_setter</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="n">InOut</span><span class="p">)</span>
+
+
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">InOut</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="n">InOut</span><span class="o">.</span><span class="n">IN</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">underlying_motor</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">underlying_motor</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_in_out_setter</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>While this may appear to work fine during normal operation the state of in_out is only ever updated if the ophyd device is set. It is incorrect to assume that underlying_motor only changes
+based on this and so this has the issues listed above. Instead you should make sure to update in_out whenever the device is read e.g.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">InOut</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">IN</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">OUT</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="k">class</span> <span class="nc">MyDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">underlying_motor</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="s2">&quot;MOTOR&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">in_out</span> <span class="o">=</span> <span class="n">create_hardware_backed_soft_signal</span><span class="p">(</span><span class="n">InOut</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_in_out_from_hardware</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_get_in_out_from_hardware</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">current_position</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">underlying_motor</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">isclose</span><span class="p">(</span><span class="n">current_position</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">InOut</span><span class="o">.</span><span class="n">IN</span>
+        <span class="k">elif</span> <span class="n">isclose</span><span class="p">(</span><span class="n">current_position</span><span class="p">,</span> <span class="mi">100</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">InOut</span><span class="o">.</span><span class="n">OUT</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">()</span>
+
+
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">InOut</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="n">InOut</span><span class="o">.</span><span class="n">IN</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">underlying_motor</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">underlying_motor</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will be simplified by <a class="github reference external" href="https://github.com/bluesky/ophyd-async/issues/525">bluesky/ophyd-async#525</a></p>
 </section>
 </section>
 
@@ -959,10 +1028,11 @@ should a given device implement.</p>
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ophyd-vs-ophyd-async">Ophyd vs Ophyd-async</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#where-to-put-devices">Where to put devices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#device-best-practices">Device Best Practices</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pv-suffixes">PV Suffixes</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#beamline-prefix">Beamline Prefix</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#use-of-signals">Use of signals</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ophyd-devices-best-practices">Ophyd Devices best practices</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#holding-state">Holding State</a></li>
 </ul>
   </nav></div>
 

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; dodal 1.31.2.dev13+g936dfaa74 documentation</title>
+    <title>Index &#8212; dodal 1.32.1.dev1+g228d9dcf2 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="_static/documentation_options.js?v=40a88d8c"></script>
+    <script src="_static/documentation_options.js?v=77b92e8f"></script>
     <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -447,6 +447,10 @@ document.write(`
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="reference/generated/dodal.common.coordination.html">dodal.common.coordination</a></li>
 <li class="toctree-l3"><a class="reference internal" href="reference/generated/dodal.common.maths.html">dodal.common.maths</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="reference/generated/dodal.common.signal_utils.html">dodal.common.signal_utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.common.signal_utils.HarwareBackedSoftSignalBackend.html">dodal.common.signal_utils.HarwareBackedSoftSignalBackend</a></li>
+</ul>
+</details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="reference/generated/dodal.common.types.html">dodal.common.types</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.common.types.UpdatingPathProvider.html">dodal.common.types.UpdatingPathProvider</a></li>
 </ul>
@@ -966,10 +970,10 @@ document.write(`
 </li>
       <li><a href="reference/generated/dodal.common.beamlines.beamline_utils.html#dodal.common.beamlines.beamline_utils.clear_devices">clear_devices() (in module dodal.common.beamlines.beamline_utils)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/dodal.devices.oav.pin_image_recognition.utils.html#dodal.devices.oav.pin_image_recognition.utils.close">close() (in module dodal.devices.oav.pin_image_recognition.utils)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/dodal.devices.oav.utils.ColorMode.html#dodal.devices.oav.utils.ColorMode">ColorMode (class in dodal.devices.oav.utils)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.i24.pmac.ProgramRunner.html#dodal.devices.i24.pmac.ProgramRunner.complete">complete() (dodal.devices.i24.pmac.ProgramRunner method)</a>
@@ -977,6 +981,8 @@ document.write(`
       <li><a href="reference/generated/dodal.devices.detector.det_dim_constants.html#dodal.devices.detector.det_dim_constants.constants_from_type">constants_from_type() (in module dodal.devices.detector.det_dim_constants)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.smargon.AxisLimit.html#dodal.devices.smargon.AxisLimit.contains">contains() (dodal.devices.smargon.AxisLimit method)</a>
+</li>
+      <li><a href="reference/generated/dodal.common.signal_utils.html#dodal.common.signal_utils.create_hardware_backed_soft_signal">create_hardware_backed_soft_signal() (in module dodal.common.signal_utils)</a>
 </li>
       <li><a href="reference/generated/dodal.common.visit.DirectoryServiceClient.html#dodal.common.visit.DirectoryServiceClient.create_new_collection">create_new_collection() (dodal.common.visit.DirectoryServiceClient method)</a>
 </li>
@@ -1208,6 +1214,13 @@ document.write(`
 </li>
       </ul></li>
       <li>
+    dodal.common.signal_utils
+
+      <ul>
+        <li><a href="reference/generated/dodal.common.signal_utils.html#module-dodal.common.signal_utils">module</a>
+</li>
+      </ul></li>
+      <li>
     dodal.common.types
 
       <ul>
@@ -1396,6 +1409,8 @@ document.write(`
         <li><a href="reference/generated/dodal.devices.flux.html#module-dodal.devices.flux">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     dodal.devices.focusing_mirror
 
@@ -1403,8 +1418,6 @@ document.write(`
         <li><a href="reference/generated/dodal.devices.focusing_mirror.html#module-dodal.devices.focusing_mirror">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     dodal.devices.hutch_shutter
 
@@ -1935,8 +1948,6 @@ document.write(`
 </li>
       <li><a href="reference/generated/dodal.common.beamlines.beamline_parameters.html#dodal.common.beamlines.beamline_parameters.get_beamline_parameters">get_beamline_parameters() (in module dodal.common.beamlines.beamline_parameters)</a>
 </li>
-      <li><a href="reference/generated/dodal.devices.aperturescatterguard.ApertureScatterguard.html#dodal.devices.aperturescatterguard.ApertureScatterguard.get_current_aperture_position">get_current_aperture_position() (dodal.devices.aperturescatterguard.ApertureScatterguard method)</a>
-</li>
       <li><a href="reference/generated/dodal.common.visit.DirectoryServiceClient.html#dodal.common.visit.DirectoryServiceClient.get_current_collection">get_current_collection() (dodal.common.visit.DirectoryServiceClient method)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.zocalo.zocalo_results.html#dodal.devices.zocalo.zocalo_results.get_dict_differences">get_dict_differences() (in module dodal.devices.zocalo.zocalo_results)</a>
@@ -1945,10 +1956,10 @@ document.write(`
 </li>
       <li><a href="reference/generated/dodal.devices.oav.utils.html#dodal.devices.oav.utils.get_move_required_so_that_beam_is_at_pixel">get_move_required_so_that_beam_is_at_pixel() (in module dodal.devices.oav.utils)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/dodal.devices.oav.oav_to_redis_forwarder.html#dodal.devices.oav.oav_to_redis_forwarder.get_next_jpeg">get_next_jpeg() (in module dodal.devices.oav.oav_to_redis_forwarder)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/dodal.common.beamlines.beamline_utils.html#dodal.common.beamlines.beamline_utils.get_path_provider">get_path_provider() (in module dodal.common.beamlines.beamline_utils)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.zocalo.html#dodal.devices.zocalo.get_processing_result">get_processing_result() (in module dodal.devices.zocalo)</a>
@@ -1981,6 +1992,8 @@ document.write(`
 <h2 id="H">H</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/dodal.common.signal_utils.HarwareBackedSoftSignalBackend.html#dodal.common.signal_utils.HarwareBackedSoftSignalBackend">HarwareBackedSoftSignalBackend (class in dodal.common.signal_utils)</a>
+</li>
       <li><a href="reference/generated/dodal.devices.areadetector.adutils.Hdf5Writer.html#dodal.devices.areadetector.adutils.Hdf5Writer">Hdf5Writer (class in dodal.devices.areadetector.adutils)</a>
 </li>
       <li><a href="reference/generated/dodal.beamlines.i22.html#dodal.beamlines.i22.hfm">hfm() (in module dodal.beamlines.i22)</a>
@@ -2158,6 +2171,8 @@ document.write(`
         <li><a href="reference/generated/dodal.common.coordination.html#module-dodal.common.coordination">dodal.common.coordination</a>
 </li>
         <li><a href="reference/generated/dodal.common.maths.html#module-dodal.common.maths">dodal.common.maths</a>
+</li>
+        <li><a href="reference/generated/dodal.common.signal_utils.html#module-dodal.common.signal_utils">dodal.common.signal_utils</a>
 </li>
         <li><a href="reference/generated/dodal.common.types.html#module-dodal.common.types">dodal.common.types</a>
 </li>

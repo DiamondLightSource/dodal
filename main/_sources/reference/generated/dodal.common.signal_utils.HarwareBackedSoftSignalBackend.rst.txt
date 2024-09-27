@@ -1,0 +1,40 @@
+dodal.common.signal\_utils.HarwareBackedSoftSignalBackend
+=========================================================
+
+.. currentmodule:: dodal.common.signal_utils
+
+.. autoclass:: HarwareBackedSoftSignalBackend
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      ~HarwareBackedSoftSignalBackend.get_reading
+      
+      
+      
+      ~HarwareBackedSoftSignalBackend.get_value
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+   
+   
