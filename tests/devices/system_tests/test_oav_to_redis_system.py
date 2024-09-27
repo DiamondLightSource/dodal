@@ -5,7 +5,10 @@ import pytest
 from aiohttp.client_exceptions import ClientConnectorError
 from ophyd_async.core import DeviceCollector, set_mock_value
 
-from dodal.devices.oav.oav_to_redis_forwarder import OAVToRedisForwarder, Source
+from dodal.devices.oav.oav_to_redis_forwarder import (
+    OAVToRedisForwarder,
+    Source,
+)
 
 
 def _oav_to_redis_forwarder(mock):
@@ -30,7 +33,7 @@ def mock_oav_to_redis_forwarder(_, RE):
 
 def _set_url(mock_oav_to_redis_forwarder: OAVToRedisForwarder, url: str):
     set_mock_value(
-        mock_oav_to_redis_forwarder._sources[Source.FULL_SCREEN.value],
+        mock_oav_to_redis_forwarder._sources[Source.FULL_SCREEN.value].url,
         url,
     )
     set_mock_value(mock_oav_to_redis_forwarder.selected_source, Source.FULL_SCREEN)
