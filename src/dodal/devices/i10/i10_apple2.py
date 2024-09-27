@@ -56,31 +56,6 @@ class I10Apple2(Apple2):
     A pair of look up tables are needed to provide the conversion
      between motor position and energy.
     Set is in energy(eV).
-
-    Parameters
-    ----------
-    id_gap:
-        An UndulatorGap device.
-    id_phase:
-        An UndulatorPhaseAxes device.
-    energy_gap_table_path:
-        The path to id gap look up table.
-    energy_phase_table_path:
-        The path to id phase look up table.
-    source:
-        The column name and the name of the source in look up table. e.g. ("source", "idu")
-    mode:
-        The column name of the mode in look up table.
-    min_energy:
-        The column name that contain the maximum energy in look up table.
-    max_energy:
-        The column name that contain the maximum energy in look up table.
-    poly_deg:
-        The column names for the parameters for the energy conversion polynomial, starting with the least significant.
-    prefix:
-        Not in use but needed for device_instantiation.
-    Name:
-        Name of the device
     """
 
     def __init__(
@@ -98,6 +73,33 @@ class I10Apple2(Apple2):
         poly_deg: list | None = None,
         name: str = "",
     ) -> None:
+        """
+        Parameters
+        ----------
+        id_gap:
+            An UndulatorGap device.
+        id_phase:
+            An UndulatorPhaseAxes device.
+        energy_gap_table_path:
+            The path to id gap look up table.
+        energy_phase_table_path:
+            The path to id phase look up table.
+        source:
+            The column name and the name of the source in look up table. e.g. ("source", "idu")
+        mode:
+            The column name of the mode in look up table.
+        min_energy:
+            The column name that contain the maximum energy in look up table.
+        max_energy:
+            The column name that contain the maximum energy in look up table.
+        poly_deg:
+            The column names for the parameters for the energy conversion polynomial, starting with the least significant.
+        prefix:
+            Not in use but needed for device_instantiation.
+        Name:
+            Name of the device
+        """
+
         # A dataclass contains the path to the look up table and the expected column names.
         self.lookup_table_config = LookupTableConfig(
             path=LookupPath(Gap=energy_gap_table_path, Phase=energy_phase_table_path),
@@ -174,20 +176,24 @@ class I10Apple2(Apple2):
 class I10Apple2PGM(StandardReadable, Movable):
     """
     Compound device to set both ID and PGM energy at the sample time,poly_deg
-    ----------
-    id:
-        An Apple2 device.
-    pgm:
-        A PGM/mono device.
-    prefix:
-        Not in use but needed for device_instantiation.
-    name:
-        New device name.
+
     """
 
     def __init__(
         self, id: I10Apple2, pgm: PGM, prefix: str = "", name: str = ""
     ) -> None:
+        """
+        Parameters
+        ----------
+        id:
+            An Apple2 device.
+        pgm:
+            A PGM/mono device.
+        prefix:
+            Not in use but needed for device_instantiation.
+        name:
+            New device name.
+        """
         super().__init__(name=name)
         with self.add_children_as_readables():
             self.id = id
@@ -207,18 +213,19 @@ class I10Apple2PGM(StandardReadable, Movable):
 class I10Apple2Pol(StandardReadable, Movable):
     """
     Compound device to set polorisation of ID.
-
-    Parameters
-    ----------
-    id:
-        An I10Apple2 device.
-    prefix:
-        Not in use but needed for device_instantiation.
-    name:
-        New device name.
     """
 
     def __init__(self, id: I10Apple2, prefix: str = "", name: str = "") -> None:
+        """
+        Parameters
+        ----------
+        id:
+            An I10Apple2 device.
+        prefix:
+            Not in use but needed for device_instantiation.
+        name:
+            New device name.
+        """
         super().__init__(name=name)
         with self.add_children_as_readables():
             self.id = id
@@ -240,19 +247,6 @@ class LinearArbitraryAngle(StandardReadable, Movable):
      The angle of 0 is equivalent to linear horizontal "lh" (sigma) and
       90 is linear vertical "lv" (pi).
     This device require a jaw_phase to angle conversion which is done via a polynomial.
-
-    Parameters
-    ----------
-    id: I10Apple2
-        An I10Apple2 device.
-    prefix: str
-        Not in use but needed for device_instantiation.
-    name: str
-        New device name.
-    jaw_phase_limit: float
-        The maximum allowed jaw_phase movement.
-    jaw_phase_poly_param: list
-        polynomial parameters highest power first.
     """
 
     def __init__(
@@ -264,6 +258,20 @@ class LinearArbitraryAngle(StandardReadable, Movable):
         jaw_phase_poly_param: list[float] = DEFAULT_JAW_PHASE_POLY_PARAMS,
         angle_threshold_deg=30.0,
     ) -> None:
+        """
+        Parameters
+        ----------
+        id: I10Apple2
+            An I10Apple2 device.
+        prefix: str
+            Not in use but needed for device_instantiation.
+        name: str
+            New device name.
+        jaw_phase_limit: float
+            The maximum allowed jaw_phase movement.
+        jaw_phase_poly_param: list
+            polynomial parameters highest power first.
+        """
         super().__init__(name=name)
         with self.add_children_as_readables():
             self.id = id

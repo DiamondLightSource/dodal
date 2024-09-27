@@ -363,17 +363,6 @@ class Apple2(StandardReadable, Movable):
      and energy.
     This conversion (update_lookuptable) and the way the id move (set) are two abstract
      methods that are beamline specific and need to be implemented.
-
-    Parameters
-    ----------
-    id_gap:
-        An UndulatorGap device.
-    id_phase:
-        An UndulatorPhaseAxes device.
-    prefix:
-        Not in use but needed for device_instantiation.
-    name:
-        Name of the device.
     """
 
     def __init__(
@@ -383,6 +372,18 @@ class Apple2(StandardReadable, Movable):
         prefix: str = "",
         name: str = "",
     ) -> None:
+        """
+        Parameters
+        ----------
+        id_gap:
+            An UndulatorGap device.
+        id_phase:
+            An UndulatorPhaseAxes device.
+        prefix:
+            Not in use but needed for device_instantiation.
+        name:
+            Name of the device.
+        """
         super().__init__(name)
 
         # Attributes are set after super call so they are not renamed to
