@@ -31,9 +31,6 @@ dodal.devices.oav.oav\_detector.ZoomController
       ~ZoomController.set
       
       
-      ~ZoomController.set_flatfield_on_zoom_level_one
-      
-      
       
       
       
