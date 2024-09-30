@@ -63,6 +63,7 @@ def synchrotron(
     )
 
 
+@skip_device()
 def undulator(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
@@ -231,6 +232,9 @@ def table(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -
     )
 
 
+# note this is a mock table, not sure how does it relate to the real Table,
+# maybe just a fake option in instantiation is needed
+@skip_device()
 def raster_stage(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> RasterStage:
