@@ -20,6 +20,7 @@ class Table(StandardReadable):
             self.y = Motor(prefix + "Y")
             self.z = Motor(prefix + "Z")
             self.theta = Motor(prefix + "THETA")
+        super().__init__(name=name)
 
     @AsyncStatus.wrap
     async def set_xy(self, value: XYPosition):
