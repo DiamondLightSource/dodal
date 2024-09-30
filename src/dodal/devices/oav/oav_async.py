@@ -10,7 +10,7 @@ from ophyd_async.core import (
 from ophyd_async.epics.adaravis import AravisController, AravisDetector
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
-# from dodal.common.signal_utils import create_hardware_backed_soft_signal
+from dodal.common.signal_utils import create_hardware_backed_soft_signal
 
 
 class ZoomController(StandardReadable):
@@ -71,3 +71,11 @@ class OAV(AravisDetector):
 
         self.zoom_controller = ZoomController(prefix, name)
         self.parameters = params
+
+        # Just an example, need to do the same for all of them
+        self.micronsPerXPixel = create_hardware_backed_soft_signal(
+            int, self._get_microns_per_pixel
+        )
+
+    async def _get_microns_per_pixel(self):
+        pass
