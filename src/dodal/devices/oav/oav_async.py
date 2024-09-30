@@ -20,6 +20,7 @@ class ZoomController(StandardReadable):
         self.level = epics_signal_rw(str, "MP:SELECT")
 
 
+# NOTE: Would a common base to be used by oav and NXsasOAV make sense/be useful???
 class OAV(AravisDetector):
     def __init__(
         self,
