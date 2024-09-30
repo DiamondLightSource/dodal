@@ -12,9 +12,8 @@ from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beam
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
-from dodal.utils import get_beamline_name
 
-BL = get_beamline_name("c01", force_default=True)  # noqa: F821
+BL = "c01"
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
