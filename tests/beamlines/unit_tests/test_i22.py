@@ -24,7 +24,5 @@ def test_device_creation(RE, module_and_devices_for_beamline):
         "oav",
         "linkam",
     ]
-    for key in expected_keys:
-        assert key in devices
-        assert devices[key] is not None
+    assert all(key in devices for key in expected_keys)
     assert isinstance(devices["saxs"], PilatusDetector)

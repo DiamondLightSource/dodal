@@ -214,8 +214,8 @@ def collect_factories(
             variable, "__name__"
         ):
             factories[variable.__name__] = variable
-        # elif isinstance(variable, DeviceInitializationController):
-        #     factories[variable._factory.__name__] = variable._factory  # noqa: SLF001
+        elif isinstance(variable, DeviceInitializationController):
+            factories[variable._factory.__name__] = variable._factory  # noqa: SLF001
 
     return factories
 
