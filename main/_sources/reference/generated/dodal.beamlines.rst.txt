@@ -9,6 +9,7 @@
    :toctree:
    :recursive:
 
+   dodal.beamlines.b01_1
    dodal.beamlines.i03
    dodal.beamlines.i04
    dodal.beamlines.i04_1
