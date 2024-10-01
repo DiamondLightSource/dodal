@@ -223,7 +223,7 @@ def collect_factories(
 def _is_valid_factory(include_skipped: bool, var: Any):
     return (
         callable(var)
-        and is_any_device_factory(var)
+        and (is_v1_device_factory(var) or is_v2_device_factory(var))
         and (include_skipped or not _is_device_skipped(var))
     )
 
