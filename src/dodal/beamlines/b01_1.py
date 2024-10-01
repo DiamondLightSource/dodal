@@ -25,6 +25,16 @@ set_path_provider(
     )
 )
 
+"""
+NOTE: Due to ArgoCD and the k8s cluster configuration those PVs are not available remotely.
+You need to be on the beamline-local network to access them.
+The simplest way to do this is to `ssh b01-1-ws001` and run `dodal connect b01_1` from there.
+remember about the underscore in the beamline name.
+
+See the IOC status here:
+https://argocd.diamond.ac.uk/applications?showFavorites=false&proj=&sync=&autoSync=&health=&namespace=&cluster=&labels=
+"""
+
 
 def panda(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
