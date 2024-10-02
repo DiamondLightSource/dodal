@@ -80,22 +80,3 @@ class CrystalMetadata:
         )
         d_spacing_nm = d_spacing_m * 1e9  # Convert meters to nanometers
         return round(d_spacing_nm, 5), "nm"
-
-
-# test with: python -m dodal.common.crystal_metadata
-if __name__ == "__main__":
-    # Example usage
-    try:
-        metadata_si311 = CrystalMetadata("Si311")
-        print(metadata_si311)
-
-        metadata_si111 = CrystalMetadata("Si111")
-        print(metadata_si111)
-
-        metadata_ge111 = CrystalMetadata("Ge111")
-        print(metadata_ge111)
-
-        # This will raise an error as 'Ga' (Gallium) is not supported
-        metadata_ga111 = CrystalMetadata("Ga111")
-    except ValueError as e:
-        print(e)
