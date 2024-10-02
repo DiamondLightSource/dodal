@@ -1,5 +1,3 @@
-import asyncio
-
 from ophyd_async.core import (
     AsyncStatus,
     DeviceVector,
@@ -11,6 +9,7 @@ from ophyd_async.epics.adaravis import AravisController, AravisDetector
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
 from dodal.common.signal_utils import create_hardware_backed_soft_signal
+from dodal.devices.oav.oav_utils import OAVConfig
 
 
 class ZoomController(StandardReadable):
@@ -43,17 +42,15 @@ class ZoomController(StandardReadable):
         )
 
     @property
-    async def allowed_zoom_levels(self):
-        return asyncio.gather(
-            *[level.get_value() for level in list(self.all_levels.values())]
-        )
+    async def allowed_zoom_levels(self) -> list[str]:
+        res = [await level.get_value() for level in list(self.all_levels.values())]
+        return res
 
     @AsyncStatus.wrap
     async def set(self, level_to_set: str):
         await self.level.set(level_to_set, wait=True)
 
 
-# NOTE: Would a common base to be used by oav and NXsasOAV make sense/be useful???
 class OAV(AravisDetector):
     def __init__(
         self,
@@ -61,7 +58,7 @@ class OAV(AravisDetector):
         path_provider: PathProvider,
         drv_suffix: str,
         hdf_suffix: str,
-        params,
+        config: OAVConfig,
         name: str = "",
         gpio_number: AravisController.GPIO_NUMBER = 1,
     ):
@@ -70,12 +67,19 @@ class OAV(AravisDetector):
         )
 
         self.zoom_controller = ZoomController(prefix, name)
-        self.parameters = params
-
-        # Just an example, need to do the same for all of them
-        self.micronsPerXPixel = create_hardware_backed_soft_signal(
-            int, self._get_microns_per_pixel
+        # I need the params files as input.
+        self.parameters = config.get_parameters(
+            self.zoom_controller.allowed_zoom_levels
         )
 
-    async def _get_microns_per_pixel(self):
+        # TODO Actually wondering if this wouldn't make more sense in the zoom
+        # Just an example, need to do the same for all of them
+        self.micronsPerXPixel = create_hardware_backed_soft_signal(
+            int,
+            lambda: self._get_microns_per_pixel(
+                await self.zoom_controller.level.get_value()
+            ),
+        )
+
+    async def _get_microns_per_pixel(self, zoom_level: str):
         pass
