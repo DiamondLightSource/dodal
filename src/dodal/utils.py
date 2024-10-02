@@ -4,6 +4,7 @@ import os
 import re
 import socket
 import string
+from collections import defaultdict
 from collections.abc import Callable, Iterable, Mapping
 from importlib import import_module
 from inspect import signature
@@ -105,7 +106,7 @@ def make_all_devices(
         **kwargs: Arguments passed on to every device.
 
     Returns:
-        Tuple[Dict[str, AnyDevice], Dict[str, Exception]]: This represents a tuple containing two dictionaries:
+        Tuple[dict[str, AnyDevice], dict[str, Exception]]: This represents a tuple containing two dictionaries:
 
     A dictionary where the keys are device names and the values are devices.
     A dictionary where the keys are device names and the values are exceptions.
@@ -120,51 +121,78 @@ def make_all_devices(
     return devices
 
 
-def invoke_factories(
-    factories: Mapping[str, AnyDeviceFactory],
-    **kwargs,
-) -> tuple[dict[str, AnyDevice], dict[str, Exception]]:
-    """Call device factory functions in the correct order to resolve dependencies.
-    Inspect function signatures to work out dependencies and execute functions in
-    correct order.
+def compute_dependencies(
+    factories: Mapping[str, Any], dependencies: dict[str, set[str]]
+) -> None:
+    """Compute dependencies for each factory function."""
+    for factory_name in factories.keys():
+        dependencies[factory_name] = set(extract_dependencies(factories, factory_name))
 
-    If one device takes another as an argument (by name, similar to pytest fixtures)
-    this will detect a dependency and create and cache the non-dependant device first.
+
+def get_available_leaves(
+    dependencies: dict[str, set[str]],
+    devices: dict[str, Any],
+    exceptions: dict[str, Exception],
+) -> list[str]:
+    """Get the names of factories that are ready to be invoked, meaning all their dependencies are resolved."""
+    return [
+        device
+        for device, device_dependencies in dependencies.items()
+        if device not in devices
+        and device not in exceptions
+        and device_dependencies.issubset(devices.keys())
+    ]
+
+
+def invoke_factory(
+    factory_name: str,
+    factories: Mapping[str, Any],
+    devices: dict[str, Any],
+    kwargs: dict[str, Any],
+) -> Any:
+    """Invoke a factory with its resolved dependencies."""
+    params = {
+        name: devices[name] for name in extract_dependencies(factories, factory_name)
+    }
+    return factories[factory_name](**params, **kwargs)
+
+
+def invoke_factories(
+    factories: Mapping[str, Any], **kwargs
+) -> tuple[dict[str, Any], dict[str, Exception]]:
+    """
+    Call device factory functions in the correct order to resolve dependencies.
 
     Args:
         factories: Mapping of function name -> function
 
     Returns:
-        Tuple[Dict[str, AnyDevice], Dict[str, Exception]]: Tuple of two dictionaries.
-        One mapping device name to device, one mapping device name to exception for
-        any failed devices
+        Tuple[dict[str, Any], dict[str, Exception]]: Devices and exceptions encountered.
     """
-
-    devices: dict[str, AnyDevice] = {}
+    devices: dict[str, Any] = {}
     exceptions: dict[str, Exception] = {}
+    dependencies: dict[str, set[str]] = defaultdict(set)
 
-    # Compute tree of dependencies,
-    dependencies: dict[str, set[str]] = {
-        factory_name: set(extract_dependencies(factories, factory_name))
-        for factory_name in factories.keys()
-    }
-    while (len(devices) + len(exceptions)) < len(factories):
-        leaves = [
-            device
-            for device, device_dependencies in dependencies.items()
-            if (device not in devices and device not in exceptions)
-            and len(device_dependencies - set(devices.keys())) == 0
-        ]
-        dependent_name = leaves.pop()
-        params = {name: devices[name] for name in dependencies[dependent_name]}
-        try:
-            devices[dependent_name] = factories[dependent_name](**params, **kwargs)
-        except Exception as e:
-            exceptions[dependent_name] = e
+    # Compute dependencies for all factories
+    compute_dependencies(factories, dependencies)
 
-    all_devices = {device.name: device for device in devices.values()}
+    # Process all factories until all are either resolved or failed
+    while len(devices) + len(exceptions) < len(factories):
+        available_leaves = get_available_leaves(dependencies, devices, exceptions)
+        if not available_leaves:
+            raise RuntimeError(
+                "Cyclic dependency detected or unsatisfiable dependencies"
+            )
 
-    return (all_devices, exceptions)
+        for factory_name in available_leaves:
+            try:
+                devices[factory_name] = invoke_factory(
+                    factory_name, factories, devices, kwargs
+                )
+            except Exception as e:
+                exceptions[factory_name] = e
+
+    return devices, exceptions
 
 
 def extract_dependencies(

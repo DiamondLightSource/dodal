@@ -126,7 +126,12 @@ class FocusingMirror(StandardReadable):
     """Focusing Mirror"""
 
     def __init__(
-        self, name, prefix, bragg_to_lat_lut_path=None, x_suffix="X", y_suffix="Y"
+        self,
+        prefix,
+        bragg_to_lat_lut_path=None,
+        x_suffix="X",
+        y_suffix="Y",
+        name: str = "",
     ):
         self.bragg_to_lat_lookup_table_path = bragg_to_lat_lut_path
         self.yaw_mrad = Motor(prefix + "YAW")
