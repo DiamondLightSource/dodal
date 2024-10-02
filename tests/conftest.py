@@ -59,7 +59,7 @@ def mock_beamline_module_filepaths(bl_name, bl_module):
 
 
 @pytest.fixture(scope="function")
-def module_and_devices_for_beamline(request):
+def module_and_devices_for_beamline_device_factory(request):
     beamline = request.param
     with patch.dict(os.environ, {"BEAMLINE": beamline}, clear=True):
         bl_mod = importlib.import_module("dodal.beamlines." + beamline)
