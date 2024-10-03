@@ -63,8 +63,6 @@ async def test_reading_pjumpcell_includes_read_fields_pump(
     cell: PressureJumpCell,
 ):
     set_mock_value(cell.pump.pump_position, 100)
-    # set_mock_value(cell.pump.pump_forward_limit, LimitSwitchState.OFF)
-    # set_mock_value(cell.pump.pump_backward_limit, LimitSwitchState.ON)
     set_mock_value(
         cell.pump.pump_motor_direction,
         PumpMotorDirectionState.FORWARD,

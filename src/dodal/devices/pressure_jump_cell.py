@@ -20,16 +20,6 @@ class PumpState(str, Enum):
     AUTO_POSITION = "Auto Position"
 
 
-class BusyState(str, Enum):
-    IDLE = "Idle"
-    BUSY = "Busy"
-
-
-class TimerState(str, Enum):
-    TIMEOUT = "TIMEOUT"
-    COUNTDOWN = "COUNTDOWN"
-
-
 class StopState(str, Enum):
     CONTINUE = "CONTINUE"
     STOP = "STOP"
@@ -47,14 +37,6 @@ class ValveControlRequest(str, Enum):
     OPEN = "Open"
     CLOSE = "Close"
     RESET = "Reset"
-
-
-class PumpMotorControlRequest(str, Enum):
-    ENABLE = "Enable"
-    DISABLE = "Disable"
-    RESET = "Reset"
-    FORWARD = "Forward"
-    REVERSE = "Reverse"
 
 
 class PumpMotorDirectionState(str, Enum):
@@ -78,11 +60,6 @@ class FastValveState(str, Enum):
     CLOSED = "Closed"
     CLOSED_ARMED = "Closed Armed"
     NONE = "Unused"
-
-
-class LimitSwitchState(str, Enum):
-    OFF = "Off"
-    ON = "On"
 
 
 @dataclass
