@@ -8,7 +8,6 @@ from ophyd_async.core import (
     ConfigSignal,
     DeviceVector,
     SignalR,
-    SignalRW,
     StandardReadable,
 )
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
@@ -37,6 +36,11 @@ class ValveControlRequest(str, Enum):
     OPEN = "Open"
     CLOSE = "Close"
     RESET = "Reset"
+
+
+class ValveOpenSeqRequest(int, Enum):
+    INACTIVE = 0
+    OPEN_SEQ = 1
 
 
 class PumpMotorDirectionState(str, Enum):
@@ -103,20 +107,12 @@ class AllValvesControl(StandardReadable, Movable):
                 )
             )
 
-        self.fast_valve_control: DeviceVector[SignalRW[FastValveControlRequest]] = (
-            DeviceVector(
-                {
-                    i: epics_signal_rw(FastValveControlRequest, f"{prefix}V{i}:CON")
-                    for i in self.fast_valves
-                }
-            )
+        self.fast_valve_control: DeviceVector[FastValveControl] = DeviceVector(
+            {i: FastValveControl(f"{prefix}V{i}") for i in self.fast_valves}
         )
 
-        self.valve_control: DeviceVector[SignalRW[ValveControlRequest]] = DeviceVector(
-            {
-                i: epics_signal_rw(ValveControlRequest, f"{prefix}V{i}:CON")
-                for i in self.slow_valves
-            }
+        self.valve_control: DeviceVector[ValveControl] = DeviceVector(
+            {i: ValveControl(f"{prefix}V{i}") for i in self.slow_valves}
         )
 
         super().__init__(name)
@@ -138,6 +134,24 @@ class AllValvesControl(StandardReadable, Movable):
                 if value is not None
             )
         )
+
+
+class ValveControl(StandardReadable):
+    def __init__(self, prefix: str, name: str = "") -> None:
+        with self.add_children_as_readables():
+            self.close = epics_signal_rw(ValveControlRequest, prefix + ":CON")
+            self.open = epics_signal_rw(ValveOpenSeqRequest, prefix + ":OPENSEQ")
+
+        super().__init__(name)
+
+
+class FastValveControl(StandardReadable):
+    def __init__(self, prefix: str, name: str = "") -> None:
+        with self.add_children_as_readables():
+            self.close = epics_signal_rw(FastValveControlRequest, prefix + ":CON")
+            self.open = epics_signal_rw(ValveOpenSeqRequest, prefix + ":OPENSEQ")
+
+        super().__init__(name)
 
 
 class Pump(StandardReadable):
