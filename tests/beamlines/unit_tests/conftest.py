@@ -5,7 +5,7 @@ from unittest.mock import patch
 import pytest
 
 from dodal.common.beamlines import beamline_utils
-from dodal.utils import make_all_devices
+from tests.beamlines.unit_tests.controller_utils import make_all_controlled_devices
 
 MOCK_DAQ_CONFIG_PATH = "tests/devices/unit_tests/test_daq_configuration"
 mock_paths = [
@@ -34,7 +34,7 @@ def module_and_devices_for_beamline_device_factory(request):
         beamline_module = importlib.import_module("dodal.beamlines." + beamline)
         importlib.reload(beamline_module)
         mock_beamline_module_filepaths(beamline, beamline_module)
-        devices, _ = make_all_devices(beamline_module)
+        devices, _ = make_all_controlled_devices(beamline_module)
         yield (beamline_module, devices)
         beamline_utils.clear_devices()
         del beamline_module
