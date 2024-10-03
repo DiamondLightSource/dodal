@@ -11,6 +11,8 @@ from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 from dodal.common.signal_utils import create_hardware_backed_soft_signal
 from dodal.devices.oav.oav_utils import OAVConfig
 
+DEFAULT_OAV_WINDOW = (1024, 768)
+
 
 class ZoomController(StandardReadable):
     """
@@ -67,19 +69,50 @@ class OAV(AravisDetector):
         )
 
         self.zoom_controller = ZoomController(prefix, name)
-        # I need the params files as input.
+        # TODO This will actually come from the MJPG but for now...
+        self.x_size = epics_signal_r(int, prefix + "CAM:ArraySizeX_RBV")
+        self.y_size = epics_signal_r(int, prefix + "CAM:ArraySizeY_RBV")
+
         self.parameters = config.get_parameters(
             self.zoom_controller.allowed_zoom_levels
         )
 
-        # TODO Actually wondering if this wouldn't make more sense in the zoom
-        # Just an example, need to do the same for all of them
+        # TODO Wondering if this wouldn't make more sense in the zoom
         self.micronsPerXPixel = create_hardware_backed_soft_signal(
-            int,
-            lambda: self._get_microns_per_pixel(
-                await self.zoom_controller.level.get_value()
-            ),
+            float,
+            lambda: self._get_microns_per_pixel("x"),
+        )
+        self.micronsPerYPixel = create_hardware_backed_soft_signal(
+            float,
+            lambda: self._get_microns_per_pixel("y"),
         )
 
-    async def _get_microns_per_pixel(self, zoom_level: str):
-        pass
+        self.beam_centre_i = create_hardware_backed_soft_signal(
+            int, lambda: self._get_beam_position("x")
+        )
+
+        self.beam_centre_j = create_hardware_backed_soft_signal(
+            int, lambda: self._get_beam_position("y")
+        )
+
+    async def _get_microns_per_pixel(self, coord: str) -> float:
+        _zoom = await self.zoom_controller.level.get_value()
+        if coord == "x":
+            value = self.parameters[_zoom].microns_per_pixel_x
+            x_size = await self.x_size.get_value()
+            return value * DEFAULT_OAV_WINDOW[0] / x_size
+        if coord == "y":
+            value = self.parameters[_zoom].microns_per_pixel_y
+            y_size = await self.x_size.get_value()
+            return value * DEFAULT_OAV_WINDOW[1] / y_size
+
+    async def _get_beam_position(self, coord: str) -> int:
+        _zoom = await self.zoom_controller.level.get_value()
+        if coord == "x":
+            value = self.parameters[_zoom].crosshair_x
+            x_size = await self.x_size.get_value()
+            return int(value * x_size / DEFAULT_OAV_WINDOW[0])
+        if coord == "y":
+            value = self.parameters[_zoom].crosshair_y
+            y_size = await self.y_size.get_value()
+            return int(value * y_size / DEFAULT_OAV_WINDOW[1])
