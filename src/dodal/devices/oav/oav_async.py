@@ -1,3 +1,5 @@
+import asyncio
+
 from ophyd_async.core import (
     AsyncStatus,
     DeviceVector,
@@ -45,7 +47,10 @@ class ZoomController(StandardReadable):
 
     @property
     async def allowed_zoom_levels(self) -> list[str]:
-        res = [await level.get_value() for level in list(self.all_levels.values())]
+        # I'm not sure this is returning what I think
+        res = await asyncio.gather(
+            *[level.get_value() for level in list(self.all_levels.values())]
+        )
         return res
 
     @AsyncStatus.wrap
@@ -73,9 +78,8 @@ class OAV(AravisDetector):
         self.x_size = epics_signal_r(int, prefix + "CAM:ArraySizeX_RBV")
         self.y_size = epics_signal_r(int, prefix + "CAM:ArraySizeY_RBV")
 
-        self.parameters = config.get_parameters(
-            self.zoom_controller.allowed_zoom_levels
-        )
+        _zoom_levels = self.zoom_controller.allowed_zoom_levels
+        self.parameters = config.get_parameters(_zoom_levels)
 
         # TODO Wondering if this wouldn't make more sense in the zoom
         self.micronsPerXPixel = create_hardware_backed_soft_signal(
