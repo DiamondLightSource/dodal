@@ -9,8 +9,8 @@ import bluesky.plan_stubs as bps
 import numpy as np
 import workflows.recipe
 import workflows.transport
-from bluesky import Msg
 from bluesky.protocols import Descriptor, Triggerable
+from bluesky.utils import Msg
 from deepdiff import DeepDiff
 from numpy.typing import NDArray
 from ophyd_async.core import (
@@ -52,7 +52,7 @@ ZOCALO_STAGE_GROUP = "clear zocalo queue"
 
 
 class XrcResult(TypedDict):
-    centre_of_mass: list[int]
+    centre_of_mass: list[float]
     max_voxel: list[int]
     max_count: int
     n_voxels: int
@@ -401,5 +401,5 @@ def get_full_processing_results(
     """A plan that will return the raw zocalo results, ranked in descending order according to the sort key.
     Returns empty list in the event no results found."""
     LOGGER.info("Retrieving raw zocalo processing results")
-    raw_results = yield from bps.rd(zocalo.results, default_value=[])
-    return [_corrected_xrc_result(r) for r in raw_results]
+    raw_results = yield from bps.rd(zocalo.results, default_value=[])  # type: ignore
+    return [_corrected_xrc_result(r) for r in raw_results]  # type: ignore
