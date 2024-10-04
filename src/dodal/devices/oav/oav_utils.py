@@ -1,11 +1,6 @@
 import xml.etree.ElementTree as et
 from dataclasses import dataclass
 
-from dodal.devices.oav.oav_errors import (
-    OAVError_BeamPositionNotFound,
-    OAVError_ZoomLevelNotFound,
-)
-
 
 @dataclass
 class ZoomParams:
@@ -45,50 +40,37 @@ class OAVConfig:
         root = tree.getroot()
         return root.findall(".//zoomLevel")
 
-    def _read_zoom_params(self, zoom: str) -> tuple[float, float]:
-        zoom = _get_correct_zoom_string(zoom)
-        um_per_x_pix = None
-        um_per_y_pix = None
+    def _read_zoom_params(self) -> dict:
+        um_per_pix = {}
         for node in self.zoom_params:
-            if _get_element_as_float(node, "level") == zoom:
-                um_per_x_pix = _get_element_as_float(node, "micronsPerXPixel")
-                um_per_y_pix = _get_element_as_float(node, "micronsPerYPixel")
-        if not um_per_y_pix or not um_per_x_pix:
-            raise OAVError_ZoomLevelNotFound(
-                f"""
-                Could not find the micronsPer[X,Y]Pixel parameters in
-                for zoom level {zoom}.
-                """
-            )
-        return um_per_x_pix, um_per_y_pix
+            _zoom = str(_get_element_as_float(node, "level"))
+            _um_pix_x = _get_element_as_float(node, "micronsPerXPixel")
+            _um_pix_y = _get_element_as_float(node, "micronsPerYPixel")
+            um_per_pix[_zoom] = {
+                "microns_per_pixel_x": _um_pix_x,
+                "microns_per_pixel_y": _um_pix_y,
+            }
+        return um_per_pix
 
-    def _read_display_config(self, zoom: str) -> tuple[int, int]:
-        zoom = _get_correct_zoom_string(zoom)
-        crosshair_x_line = None
-        crosshair_y_line = None
+    def _read_display_config(self) -> dict:
+        crosshairs = {}
         for i in range(len(self.display_config)):
-            if self.display_config[i].startswith("zoomLevel = " + zoom):
-                crosshair_x_line = self.display_config[i + 1]
-                crosshair_y_line = self.display_config[i + 2]
-                break
+            if self.display_config[i].startswith("zoomLevel"):
+                _zoom = self.display_config[i].split(" = ")[1].strip()
+                _x = int(self.display_config[i + 1].split(" = ")[1])
+                _y = int(self.display_config[i + 2].split(" = ")[1])
+                crosshairs[_zoom] = {"crosshair_x": _x, "crosshair_y": _y}
+        return crosshairs
 
-        if crosshair_x_line is None or crosshair_y_line is None:
-            raise OAVError_BeamPositionNotFound(
-                f"Could not extract beam position at zoom level {zoom}"
-            )
-        return int(crosshair_x_line.split(" = ")[1]), int(
-            crosshair_y_line.split(" = ")[1]
-        )
-
-    def get_parameters(self, allowed_zoom_levels: list[str]) -> dict[str, ZoomParams]:
+    def get_parameters(self) -> dict[str, ZoomParams]:
         config = {}
-        for zoom in allowed_zoom_levels:
-            _um_xy = self._read_zoom_params(zoom)
-            _bc_xy = self._read_display_config(zoom)
-            config[zoom] = ZoomParams(
-                microns_per_pixel_x=_um_xy[0],
-                microns_per_pixel_y=_um_xy[1],
-                crosshair_x=_bc_xy[0],
-                crosshair_y=_bc_xy[1],
+        _um_xy = self._read_zoom_params()
+        _bc_xy = self._read_display_config()
+        for zoom_key in list(_bc_xy.keys()):
+            config[zoom_key] = ZoomParams(
+                microns_per_pixel_x=_um_xy["microns_per_pixel_x"],
+                microns_per_pixel_y=_um_xy["microns_per_pixel_y"],
+                crosshair_x=_bc_xy["crosshair_x"],
+                crosshair_y=_bc_xy["crosshair_y"],
             )
         return config
