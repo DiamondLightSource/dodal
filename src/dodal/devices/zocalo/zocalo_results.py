@@ -9,6 +9,7 @@ import bluesky.plan_stubs as bps
 import numpy as np
 import workflows.recipe
 import workflows.transport
+from bluesky import Msg
 from bluesky.protocols import Descriptor, Triggerable
 from deepdiff import DeepDiff
 from numpy.typing import NDArray
@@ -384,3 +385,21 @@ def get_processing_result(
     bbox_size = None if len(bbox_sizes) == 0 else bbox_sizes[0]  # type: ignore
     LOGGER.debug(f"Top bbox size: {bbox_size}")
     return centre_of_mass, bbox_size
+
+
+def _corrected_xrc_result(uncorrected: XrcResult) -> XrcResult:
+    corrected = XrcResult(**uncorrected)
+    corrected["centre_of_mass"] = [
+        coord - 0.5 for coord in uncorrected["centre_of_mass"]
+    ]
+    return corrected
+
+
+def get_full_processing_results(
+    zocalo: ZocaloResults,
+) -> Generator[Msg, Any, Sequence[XrcResult]]:
+    """A plan that will return the raw zocalo results, ranked in descending order according to the sort key.
+    Returns empty list in the event no results found."""
+    LOGGER.info("Retrieving raw zocalo processing results")
+    raw_results = yield from bps.rd(zocalo.results, default_value=[])
+    return [_corrected_xrc_result(r) for r in raw_results]
