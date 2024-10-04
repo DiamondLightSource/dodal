@@ -19,6 +19,8 @@ from dodal.devices.oav.oav_utils import OAVConfig
 DEFAULT_OAV_WINDOW = (1024, 768)
 
 
+# Workaround to deal with the fact that beamlines may have slightly different string
+# descriptions of the zoom level"
 def _get_correct_zoom_string(zoom: str) -> str:
     if zoom.endswith("x"):
         zoom = zoom.strip("x")
