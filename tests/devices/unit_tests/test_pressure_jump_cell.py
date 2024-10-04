@@ -109,6 +109,7 @@ async def test_reading_pjumpcell_includes_config_fields_valves(
         },
     )
 
+
 async def test_pjumpcell_set_valve_sets_valve_fields(
     cell: PressureJumpCell,
 ):
@@ -119,7 +120,6 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
     set_mock_value(
         cell.all_valves_control.valve_control[1].open, ValveOpenSeqRequest.INACTIVE
     )
-
 
     set_mock_value(
         cell.all_valves_control.fast_valve_control[6].close, FastValveControlRequest.ARM
@@ -149,11 +149,12 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
-        })
+        },
+    )
 
     # Check fast valves have been set to the new value
     await assert_reading(
-        cell.all_valves_control.valve_control[6],
+        cell.all_valves_control.fast_valve_control[6],
         {
             "pjump-all_valves_control-fast_valve_control-6-close": {
                 "value": FastValveControlRequest.CLOSE,
@@ -165,7 +166,8 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
-        })
+        },
+    )
 
 
 async def test_reading_pjumpcell_includes_read_fields_pump(
@@ -236,7 +238,7 @@ async def test_reading_pjumpcell_includes_read_fields_transducers(
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
-            "pjump-pressure_transducers-1-beckhoff_voltage": {
+            "pjump-pressure_transducers-1-slow_beckhoff_voltage_readout": {
                 "value": 2.51,
                 "timestamp": ANY,
                 "alarm_severity": 0,
@@ -261,7 +263,7 @@ async def test_reading_pjumpcell_includes_read_fields_transducers(
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
-            "pjump-pressure_transducers-2-beckhoff_voltage": {
+            "pjump-pressure_transducers-2-slow_beckhoff_voltage_readout": {
                 "value": 2.52,
                 "timestamp": ANY,
                 "alarm_severity": 0,
@@ -286,7 +288,7 @@ async def test_reading_pjumpcell_includes_read_fields_transducers(
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
-            "pjump-pressure_transducers-3-beckhoff_voltage": {
+            "pjump-pressure_transducers-3-slow_beckhoff_voltage_readout": {
                 "value": 2.53,
                 "timestamp": ANY,
                 "alarm_severity": 0,

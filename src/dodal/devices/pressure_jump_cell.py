@@ -118,11 +118,19 @@ class AllValvesControl(StandardReadable, Movable):
         super().__init__(name)
 
     async def set_valve(
-        self, valve: int, value: ValveControlRequest | FastValveControlRequest | ValveOpenSeqRequest
+        self,
+        valve: int,
+        value: ValveControlRequest | FastValveControlRequest | ValveOpenSeqRequest,
     ):
-        if valve in self.slow_valves and isinstance(value, ValveControlRequest) or isinstance(value, ValveOpenSeqRequest):
+        if valve in self.slow_valves and (
+            isinstance(value, ValveControlRequest)
+            or isinstance(value, ValveOpenSeqRequest)
+        ):
             await self.valve_control[valve].set(value)
-        elif valve in self.fast_valves and isinstance(value, FastValveControlRequest) or isinstance(value, ValveOpenSeqRequest):
+        elif valve in self.fast_valves and (
+            isinstance(value, FastValveControlRequest)
+            or isinstance(value, ValveOpenSeqRequest)
+        ):
             await self.fast_valve_control[valve].set(value)
 
     @AsyncStatus.wrap
@@ -144,7 +152,7 @@ class ValveControl(StandardReadable):
 
         super().__init__(name)
 
-    def set(self, value: ValveControlRequest|ValveOpenSeqRequest ) -> AsyncStatus:
+    def set(self, value: ValveControlRequest | ValveOpenSeqRequest) -> AsyncStatus:
         setStatus = None
 
         if isinstance(value, ValveControlRequest):
@@ -163,7 +171,7 @@ class FastValveControl(StandardReadable):
 
         super().__init__(name)
 
-    def set(self, value: FastValveControlRequest|ValveOpenSeqRequest) -> AsyncStatus:
+    def set(self, value: FastValveControlRequest | ValveOpenSeqRequest) -> AsyncStatus:
         setStatus = None
 
         if isinstance(value, FastValveControlRequest):
