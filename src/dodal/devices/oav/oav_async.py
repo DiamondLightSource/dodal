@@ -92,7 +92,7 @@ class OAV(AravisDetector):
         _zoom = await self.zoom_controller.level.get_value()
         return _get_correct_zoom_string(_zoom)
 
-    async def _get_microns_per_pixel(self, coord: str) -> float:
+    async def _get_microns_per_pixel(self, coord: str) -> float:  # type: ignore
         _zoom = await self._read_current_zoom()
         match coord:
             case "x":
@@ -104,7 +104,7 @@ class OAV(AravisDetector):
                 y_size = await self.x_size.get_value()
                 return value * DEFAULT_OAV_WINDOW[1] / y_size
 
-    async def _get_beam_position(self, coord: str) -> int:
+    async def _get_beam_position(self, coord: str) -> int:  # type: ignore
         _zoom = await self._read_current_zoom()
         match coord:
             case "x":
