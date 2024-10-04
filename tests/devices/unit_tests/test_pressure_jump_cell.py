@@ -109,11 +109,54 @@ async def test_reading_pjumpcell_includes_config_fields_valves(
         },
     )
 
+async def test_pjumpcell_set_valve_sets_valve_fields(
+    cell: PressureJumpCell,
+):
+    # Set some initial values
+    set_mock_value(
+        cell.all_valves_control.valve_control[1].close, ValveControlRequest.CLOSE
+    )
+    set_mock_value(
+        cell.all_valves_control.valve_control[1].open, ValveOpenSeqRequest.INACTIVE
+    )
+
+
+    set_mock_value(
+        cell.all_valves_control.fast_valve_control[6].close, FastValveControlRequest.ARM
+    )
+
+    set_mock_value(
+        cell.all_valves_control.fast_valve_control[6].open, ValveOpenSeqRequest.INACTIVE
+    )
+
+    # Set new values
+    await cell.all_valves_control.set_valve(1, ValveControlRequest.OPEN)
+    await cell.all_valves_control.set_valve(1, ValveOpenSeqRequest.OPEN_SEQ)
+    await cell.all_valves_control.set_valve(6, FastValveControlRequest.CLOSE)
+    await cell.all_valves_control.set_valve(6, ValveOpenSeqRequest.OPEN_SEQ)
+
+    # Check slow valves have been set to the new value
     await assert_reading(
-        cell.all_valves_control.fast_valve_control[6],
+        cell.all_valves_control.valve_control[1],
+        {
+            "pjump-all_valves_control-valve_control-1-close": {
+                "value": ValveControlRequest.OPEN,
+                "timestamp": ANY,
+                "alarm_severity": 0,
+            },
+            "pjump-all_valves_control-valve_control-1-open": {
+                "value": ValveOpenSeqRequest.OPEN_SEQ,
+                "timestamp": ANY,
+                "alarm_severity": 0,
+            },
+        })
+
+    # Check fast valves have been set to the new value
+    await assert_reading(
+        cell.all_valves_control.valve_control[6],
         {
             "pjump-all_valves_control-fast_valve_control-6-close": {
-                "value": FastValveControlRequest.ARM,
+                "value": FastValveControlRequest.CLOSE,
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
@@ -122,8 +165,7 @@ async def test_reading_pjumpcell_includes_config_fields_valves(
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
-        },
-    )
+        })
 
 
 async def test_reading_pjumpcell_includes_read_fields_pump(
