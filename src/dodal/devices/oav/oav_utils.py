@@ -17,15 +17,11 @@ def _get_element_as_float(node: et.Element, element_name: str) -> float:
     return float(element.text)
 
 
-def _get_correct_zoom_string(zoom: str) -> str:
-    if zoom.endswith("x"):
-        zoom = zoom.strip("x")
-    return zoom
-
-
-# Probably needs something similar to OAVCOnfigParams but that just read the files,
-# fills a dictionary {"zoom_level_name": OAVParams} and returns it
 class OAVConfig:
+    """ Read the OAV config files and return a dictionary of {'zoom_level': ZoomParams}\
+    with information about microns per pixels and crosshairs.
+    """
+
     def __init__(self, zoom_params_file: str, display_config_file: str):
         self.zoom_params = self._get_zoom_params(zoom_params_file)
         self.display_config = self._get_display_config(display_config_file)

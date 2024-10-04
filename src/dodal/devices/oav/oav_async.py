@@ -1,5 +1,3 @@
-import asyncio
-
 from ophyd_async.core import (
     AsyncStatus,
     DeviceVector,
@@ -7,13 +5,24 @@ from ophyd_async.core import (
     SignalR,
     StandardReadable,
 )
+from ophyd_async.core._utils import DEFAULT_TIMEOUT
 from ophyd_async.epics.adaravis import AravisController, AravisDetector
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
 from dodal.common.signal_utils import create_hardware_backed_soft_signal
 from dodal.devices.oav.oav_utils import OAVConfig
 
+# GDA currently assumes this aspect ratio for the OAV window size.
+# For some beamline this doesn't affect anything as the actual OAV aspect ratio
+# matches. Others need to take it into account to rescale the values stored in
+# the configuration files.
 DEFAULT_OAV_WINDOW = (1024, 768)
+
+
+def _get_correct_zoom_string(zoom: str) -> str:
+    if zoom.endswith("x"):
+        zoom = zoom.strip("x")
+    return zoom
 
 
 class ZoomController(StandardReadable):
@@ -47,10 +56,7 @@ class ZoomController(StandardReadable):
 
     @property
     async def allowed_zoom_levels(self) -> list[str]:
-        # I'm not sure this is returning what I think
-        res = await asyncio.gather(
-            *[level.get_value() for level in list(self.all_levels.values())]
-        )
+        res = [await level.get_value() for level in list(self.all_levels.values())]
         return res
 
     @AsyncStatus.wrap
@@ -78,10 +84,42 @@ class OAV(AravisDetector):
         self.x_size = epics_signal_r(int, prefix + "CAM:ArraySizeX_RBV")
         self.y_size = epics_signal_r(int, prefix + "CAM:ArraySizeY_RBV")
 
-        _zoom_levels = self.zoom_controller.allowed_zoom_levels
-        self.parameters = config.get_parameters(_zoom_levels)
+        self.parameters = config.get_parameters()
 
-        # TODO Wondering if this wouldn't make more sense in the zoom
+    async def _read_current_zoom(self) -> str:
+        _zoom = await self.zoom_controller.level.get_value()
+        return _get_correct_zoom_string(_zoom)
+
+    async def _get_microns_per_pixel(self, coord: str) -> float:
+        _zoom = await self._read_current_zoom()
+        match coord:
+            case "x":
+                value = self.parameters[_zoom].microns_per_pixel_x
+                x_size = await self.x_size.get_value()
+                return value * DEFAULT_OAV_WINDOW[0] / x_size
+            case "y":
+                value = self.parameters[_zoom].microns_per_pixel_y
+                y_size = await self.x_size.get_value()
+                return value * DEFAULT_OAV_WINDOW[1] / y_size
+
+    async def _get_beam_position(self, coord: str) -> int:
+        _zoom = await self._read_current_zoom()
+        match coord:
+            case "x":
+                value = self.parameters[_zoom].crosshair_x
+                x_size = await self.x_size.get_value()
+                return int(value * x_size / DEFAULT_OAV_WINDOW[0])
+            case "y":
+                value = self.parameters[_zoom].crosshair_y
+                y_size = await self.y_size.get_value()
+                return int(value * y_size / DEFAULT_OAV_WINDOW[1])
+
+    async def connect(
+        self,
+        mock: bool = False,
+        timeout: float = DEFAULT_TIMEOUT,
+        force_reconnect: bool = False,
+    ):
         self.micronsPerXPixel = create_hardware_backed_soft_signal(
             float,
             lambda: self._get_microns_per_pixel("x"),
@@ -99,24 +137,4 @@ class OAV(AravisDetector):
             int, lambda: self._get_beam_position("y")
         )
 
-    async def _get_microns_per_pixel(self, coord: str) -> float:
-        _zoom = await self.zoom_controller.level.get_value()
-        if coord == "x":
-            value = self.parameters[_zoom].microns_per_pixel_x
-            x_size = await self.x_size.get_value()
-            return value * DEFAULT_OAV_WINDOW[0] / x_size
-        if coord == "y":
-            value = self.parameters[_zoom].microns_per_pixel_y
-            y_size = await self.x_size.get_value()
-            return value * DEFAULT_OAV_WINDOW[1] / y_size
-
-    async def _get_beam_position(self, coord: str) -> int:
-        _zoom = await self.zoom_controller.level.get_value()
-        if coord == "x":
-            value = self.parameters[_zoom].crosshair_x
-            x_size = await self.x_size.get_value()
-            return int(value * x_size / DEFAULT_OAV_WINDOW[0])
-        if coord == "y":
-            value = self.parameters[_zoom].crosshair_y
-            y_size = await self.y_size.get_value()
-            return int(value * y_size / DEFAULT_OAV_WINDOW[1])
+        return await super().connect(mock, timeout, force_reconnect)
