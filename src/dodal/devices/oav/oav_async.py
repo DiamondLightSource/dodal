@@ -95,27 +95,25 @@ class OAV(AravisDetector):
 
     async def _get_microns_per_pixel(self, coord: str) -> float:  # type: ignore
         _zoom = await self._read_current_zoom()
-        match coord:
-            case "x":
-                value = self.parameters[_zoom].microns_per_pixel_x
-                x_size = await self.x_size.get_value()
-                return value * DEFAULT_OAV_WINDOW[0] / x_size
-            case "y":
-                value = self.parameters[_zoom].microns_per_pixel_y
-                y_size = await self.x_size.get_value()
-                return value * DEFAULT_OAV_WINDOW[1] / y_size
+        if coord == "x":
+            value = self.parameters[_zoom].microns_per_pixel_x
+            x_size = await self.x_size.get_value()
+            return value * DEFAULT_OAV_WINDOW[0] / x_size
+        if coord == "y":
+            value = self.parameters[_zoom].microns_per_pixel_y
+            y_size = await self.x_size.get_value()
+            return value * DEFAULT_OAV_WINDOW[1] / y_size
 
     async def _get_beam_position(self, coord: str) -> int:  # type: ignore
         _zoom = await self._read_current_zoom()
-        match coord:
-            case "x":
-                value = self.parameters[_zoom].crosshair_x
-                x_size = await self.x_size.get_value()
-                return int(value * x_size / DEFAULT_OAV_WINDOW[0])
-            case "y":
-                value = self.parameters[_zoom].crosshair_y
-                y_size = await self.y_size.get_value()
-                return int(value * y_size / DEFAULT_OAV_WINDOW[1])
+        if coord == "x":
+            value = self.parameters[_zoom].crosshair_x
+            x_size = await self.x_size.get_value()
+            return int(value * x_size / DEFAULT_OAV_WINDOW[0])
+        if coord == "y":
+            value = self.parameters[_zoom].crosshair_y
+            y_size = await self.y_size.get_value()
+            return int(value * y_size / DEFAULT_OAV_WINDOW[1])
 
     async def connect(
         self,
