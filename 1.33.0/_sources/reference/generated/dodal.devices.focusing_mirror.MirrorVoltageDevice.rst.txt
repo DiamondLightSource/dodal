@@ -1,0 +1,34 @@
+dodal.devices.focusing\_mirror.MirrorVoltageDevice
+==================================================
+
+.. currentmodule:: dodal.devices.focusing_mirror
+
+.. autoclass:: MirrorVoltageDevice
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      ~MirrorVoltageDevice.set
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   

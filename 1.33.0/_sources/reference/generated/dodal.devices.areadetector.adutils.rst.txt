@@ -1,0 +1,38 @@
+dodal.devices.areadetector.adutils
+==================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.areadetector
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~adutils.Hdf5Writer
+   ~adutils.SingleTriggerV33
+   ~adutils.SynchronisedAdDriverBase
+
+
+
+
+.. automodule:: dodal.devices.areadetector.adutils
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

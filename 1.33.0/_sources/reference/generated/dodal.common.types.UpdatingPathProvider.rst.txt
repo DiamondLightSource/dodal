@@ -1,0 +1,26 @@
+dodal.common.types.UpdatingPathProvider
+=======================================
+
+.. currentmodule:: dodal.common.types
+
+.. autoclass:: UpdatingPathProvider
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~UpdatingPathProvider.data_session
+      
+      
+      ~UpdatingPathProvider.update
+      
+   
+   
+
+   
+   
+   

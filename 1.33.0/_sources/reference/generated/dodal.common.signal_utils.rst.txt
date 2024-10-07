@@ -1,0 +1,42 @@
+dodal.common.signal\_utils
+==========================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.common
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~signal_utils.HarwareBackedSoftSignalBackend
+
+
+
+
+.. automodule:: dodal.common.signal_utils
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      create_hardware_backed_soft_signal
+   
+   
+
+   
+   
+   
