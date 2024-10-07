@@ -27,8 +27,8 @@ from dodal.utils import get_beamline_name, skip_device
 set_path_provider(
     StaticVisitPathProvider(
         BL,
-        Path("/scratch/tests"),
-        # client=RemoteDirectoryServiceClient("http://i22-control:8088/api"),
+        Path("/dls/i24/data/2024/cm37275-4/bluesky"),
+        # client=RemoteDirectoryServiceClient("http://i24-control:8088/api"),
     )
 )
 
