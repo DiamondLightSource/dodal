@@ -64,9 +64,9 @@ class OAVConfig:
         _bc_xy = self._read_display_config()
         for zoom_key in list(_bc_xy.keys()):
             config[zoom_key] = ZoomParams(
-                microns_per_pixel_x=_um_xy["microns_per_pixel_x"],
-                microns_per_pixel_y=_um_xy["microns_per_pixel_y"],
-                crosshair_x=_bc_xy["crosshair_x"],
-                crosshair_y=_bc_xy["crosshair_y"],
+                microns_per_pixel_x=_um_xy[zoom_key]["microns_per_pixel_x"],
+                microns_per_pixel_y=_um_xy[zoom_key]["microns_per_pixel_y"],
+                crosshair_x=_bc_xy[zoom_key]["crosshair_x"],
+                crosshair_y=_bc_xy[zoom_key]["crosshair_y"],
             )
         return config
