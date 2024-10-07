@@ -5,7 +5,7 @@ from unittest.mock import patch
 import pytest
 
 from dodal.common.beamlines import beamline_utils
-from tests.beamlines.unit_tests.controller_utils import make_all_controlled_devices
+from dodal.common.beamlines.controller_utils import make_all_controlled_devices
 
 MOCK_DAQ_CONFIG_PATH = "tests/devices/unit_tests/test_daq_configuration"
 mock_paths = [
