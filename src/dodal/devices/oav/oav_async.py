@@ -81,7 +81,7 @@ class OAV(AravisDetector):
             prefix, path_provider, drv_suffix, hdf_suffix, name, gpio_number
         )
 
-        self.zoom_controller = ZoomController(prefix, name)
+        self.zoom_controller = ZoomController("-EA-OAV-01:FZOOM:", name)
         # TODO This will actually come from the MJPG but for now...
         self.x_size = epics_signal_r(int, prefix + "CAM:ArraySizeX_RBV")
         self.y_size = epics_signal_r(int, prefix + "CAM:ArraySizeY_RBV")
