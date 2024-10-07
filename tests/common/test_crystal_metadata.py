@@ -4,9 +4,6 @@ from dodal.common.crystal_metadata import CrystalMetadata
 
 
 def test_unsupported_material_value_error():
-    """
-    Test ValueError is raised when an unsupported material prefix is used.
-    """
     with pytest.raises(
         ValueError, match="Unsupported material: Ga. Only 'Si' and 'Ge' are supported."
     ):
@@ -14,9 +11,6 @@ def test_unsupported_material_value_error():
 
 
 def test_invalid_reflection_plane_format_value_error():
-    """
-    Test ValueError is raised when an invalid reflection plane format is used.
-    """
     with pytest.raises(
         ValueError,
         match="Invalid reflection plane format. Expected format is 'TypeXYZ'.",
@@ -25,9 +19,6 @@ def test_invalid_reflection_plane_format_value_error():
 
 
 def test_happy_path_silicon():
-    """
-    Test correct metadata is generated for Silicon (Si) with a valid reflection plane.
-    """
     crystal_metadata = CrystalMetadata(reflection_plane="Si311")
 
     # Check the values
@@ -40,9 +31,6 @@ def test_happy_path_silicon():
 
 
 def test_happy_path_germanium():
-    """
-    Test correct metadata is generated for Germanium (Ge) with a valid reflection plane.
-    """
     crystal_metadata = CrystalMetadata(reflection_plane="Ge111")
 
     # Check the values
