@@ -85,3 +85,20 @@ async def test_oav_returns_rescaled_beam_position_and_microns_per_pixel_correctl
     assert microns_y == pytest.approx(2.28, abs=1e-2)
     assert beam_x == 601
     assert beam_y == 450
+
+
+@pytest.mark.parametrize(
+    "h, v, expected_x, expected_y",
+    [
+        (54, 100, 517 - 54, 350 - 100),
+        (0, 0, 517, 350),
+        (500, 500, 517 - 500, 350 - 500),
+    ],
+)
+async def test_calculate_beam_distance(h, v, expected_x, expected_y, oav: OAV):
+    set_mock_value(oav.zoom_controller.level, "5.0x")  # type: ignore
+
+    assert await oav.calculate_beam_distance(
+        h,
+        v,
+    ) == (expected_x, expected_y)

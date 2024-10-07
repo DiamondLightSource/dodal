@@ -50,6 +50,11 @@ class ZoomController(StandardReadable):
             }
         )
 
+    @property
+    async def allowed_zoom_levels(self) -> list[str]:
+        res = [await level.get_value() for level in list(self.all_levels.values())]
+        return res
+
     @AsyncStatus.wrap
     async def set(self, level_to_set: str):
         await self.level.set(level_to_set, wait=True)
@@ -83,6 +88,7 @@ class OAV(AravisDetector):
         return _get_correct_zoom_string(_zoom)
 
     async def _get_microns_per_pixel(self, coord: str) -> float:  # type: ignore
+        """Extracts the microns per x pixel and y pixel for a given zoom level."""
         _zoom = await self._read_current_zoom()
         if coord == "x":
             value = self.parameters[_zoom].microns_per_pixel_x
@@ -94,6 +100,8 @@ class OAV(AravisDetector):
             return value * DEFAULT_OAV_WINDOW[1] / y_size
 
     async def _get_beam_position(self, coord: str) -> int:  # type: ignore
+        """Extracts the beam location in pixels `xCentre` `yCentre`, for a requested zoom \
+        level. """
         _zoom = await self._read_current_zoom()
         if coord == "x":
             value = self.parameters[_zoom].crosshair_x
@@ -103,6 +111,27 @@ class OAV(AravisDetector):
             value = self.parameters[_zoom].crosshair_y
             y_size = await self.y_size.get_value()
             return int(value * y_size / DEFAULT_OAV_WINDOW[1])
+
+    async def calculate_beam_distance(
+        self, horizontal_pixels: int, vertical_pixels: int
+    ) -> tuple[int, int]:
+        """
+        Calculates the distance between the beam centre and the given (horizontal, vertical).
+
+        Args:
+            horizontal_pixels (int): The x (camera coordinates) value in pixels.
+            vertical_pixels (int): The y (camera coordinates) value in pixels.
+        Returns:
+            The distance between the beam centre and the (horizontal, vertical) point in pixels as a tuple
+            (horizontal_distance, vertical_distance).
+        """
+        beam_x = await self.beam_centre_i.get_value()
+        beam_y = await self.beam_centre_j.get_value()
+
+        return (
+            beam_x - horizontal_pixels,
+            beam_y - vertical_pixels,
+        )
 
     async def connect(
         self,
