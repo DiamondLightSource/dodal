@@ -15,4 +15,3 @@ class Diode(StandardReadable):
             self.signal = epics_signal_r(float, prefix + "B:DIODE:I")
 
         super().__init__(name=name)
-
