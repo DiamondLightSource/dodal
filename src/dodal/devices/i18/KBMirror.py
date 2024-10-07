@@ -4,7 +4,6 @@ from ophyd_async.core import AsyncStatus, StandardReadable
 from ophyd_async.epics.signal import epics_signal_rw
 
 
-# todo might  make a class for common types of movement and use it as a value type
 @dataclass
 class XYPosition:
     x: float

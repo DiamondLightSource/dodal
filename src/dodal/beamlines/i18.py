@@ -29,9 +29,6 @@ from dodal.devices.xspress3.xspress3 import Xspress3
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
 
-# Make sure EPICS_CA_SERVER_PORT is set to correct value (6064 for DLS sim area detector and motors, 5064 on beamlines)
-os.environ["EPICS_CA_SERVER_PORT"] = "6064"
-
 BL = get_beamline_name("i18")
 set_log_beamline(BL)
 set_utils_beamline(BL)
@@ -109,20 +106,30 @@ def panda1(
     )
 
 
-# NOTE: the reason for skipping is that the odin detectors are not yet supported
-@skip_device()
-def xspress3(
+def old_xspress3(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> Xspress3:
-    """
-    16 channels Xspress3 detector
-    """
-
     return device_instantiation(
         Xspress3,
         prefix="-EA-XSP-02:",
         name="Xspress3",
         num_channels=16,
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+    )
+
+
+# NOTE: the reason for skipping is that the odin detectors are not yet supported
+# There is a controls project in the works, not ready anytime soon
+@skip_device()
+def xspress3_odin(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Xspress3:
+    return device_instantiation(
+        Xspress3,
+        prefix="-EA-XSP-03:",
+        name="Xspress3",
+        num_channels=4,
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )
