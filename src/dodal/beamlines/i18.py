@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 
 from ophyd_async.fastcs.panda import HDFPanda
