@@ -1,5 +1,13 @@
-from dodal.common.beamlines.beamline_utils import BL, device_instantiation
+from pathlib import Path
+
+from dodal.common.beamlines.beamline_utils import (
+    BL,
+    device_instantiation,
+    get_path_provider,
+    set_path_provider,
+)
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.visit import StaticVisitPathProvider
 from dodal.devices.detector import DetectorParams
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.hutch_shutter import HutchShutter
@@ -10,11 +18,22 @@ from dodal.devices.i24.dual_backlight import DualBacklight
 from dodal.devices.i24.i24_detector_motion import DetectorMotion
 from dodal.devices.i24.i24_vgonio import VGonio
 from dodal.devices.i24.pmac import PMAC
+from dodal.devices.oav.oav_async import OAV as OAV2
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.oav_parameters import OAVConfigParams
+from dodal.devices.oav.oav_utils import OAVConfig
 from dodal.devices.zebra import Zebra
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import get_beamline_name, skip_device
+
+set_path_provider(
+    StaticVisitPathProvider(
+        BL,
+        Path("/scratch/tests"),
+        # client=RemoteDirectoryServiceClient("http://i22-control:8088/api"),
+    )
+)
+
 
 ZOOM_PARAMS_FILE = (
     "/dls_sw/i24/software/gda_versions/gda_9_34/config/xml/jCameraManZoomLevels.xml"
@@ -148,6 +167,23 @@ def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
         wait_for_connection,
         fake_with_ophyd_sim,
         params=OAVConfigParams(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+    )
+
+
+@skip_device(lambda: BL == "s24")
+def new_oav(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> OAV2:
+    return device_instantiation(
+        OAV2,
+        "oav2",
+        "-DI-OAV-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        drv_suffix="CAM:",
+        hdf_suffix="HDF5:",
+        config=OAVConfig(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+        path_provider=get_path_provider(),
     )
 
 
