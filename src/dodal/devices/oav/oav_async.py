@@ -56,11 +56,6 @@ class ZoomController(StandardReadable):
             }
         )
 
-    @property
-    async def allowed_zoom_levels(self) -> list[str]:
-        res = [await level.get_value() for level in list(self.all_levels.values())]
-        return res
-
     @AsyncStatus.wrap
     async def set(self, level_to_set: str):
         await self.level.set(level_to_set, wait=True)
