@@ -40,3 +40,27 @@ def test_happy_path_germanium():
         (0.326633, "nm"), rel=1e-3
     )  # Allow for small tolerance
     assert crystal_metadata.usage == "Bragg"
+
+
+def test_invalid_reflection_plane_with_two_numbers():
+    with pytest.raises(
+        ValueError,
+        match="Invalid reflection plane format. Expected format is 'TypeXYZ'.",
+    ):
+        CrystalMetadata(reflection_plane="Si31")  # Only two numbers
+
+
+def test_invalid_reflection_plane_with_negative_number():
+    with pytest.raises(
+        ValueError,
+        match="Invalid reflection plane format. Expected format is 'TypeXYZ'.",
+    ):
+        CrystalMetadata(reflection_plane="Si-311")  # Negative number
+
+
+def test_invalid_reflection_plane_with_floats():
+    with pytest.raises(
+        ValueError,
+        match="Invalid reflection plane format. Expected format is 'TypeXYZ'.",
+    ):
+        CrystalMetadata(reflection_plane="Si3.1.1")  # Floats in reflection plane
