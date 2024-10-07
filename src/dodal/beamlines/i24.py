@@ -19,7 +19,7 @@ from dodal.devices.i24.i24_detector_motion import DetectorMotion
 from dodal.devices.i24.i24_vgonio import VGonio
 from dodal.devices.i24.pmac import PMAC
 from dodal.devices.oav.oav_async import OAV
-from dodal.devices.oav.oav_utils import OAVConfig
+from dodal.devices.oav.oav_parameters import OAVConfig
 from dodal.devices.zebra import Zebra
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import get_beamline_name, skip_device
