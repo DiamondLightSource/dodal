@@ -223,6 +223,7 @@ class ZoomParams:
     crosshair_y: int
 
 
+# Once all moved to async this should replace OAVConfigParams
 class OAVConfig:
     """ Read the OAV config files and return a dictionary of {'zoom_level': ZoomParams}\
     with information about microns per pixels and crosshairs.
