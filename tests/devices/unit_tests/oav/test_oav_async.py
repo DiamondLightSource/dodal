@@ -14,11 +14,10 @@ ZOOM_LEVELS_XML = "tests/devices/unit_tests/test_jCameraManZoomLevels.xml"
 async def oav() -> OAV:
     oav_config = OAVConfig(ZOOM_LEVELS_XML, DISPLAY_CONFIGURATION)
     path_provider = MagicMock()
-    async with DeviceCollector(mock=True):
+    async with DeviceCollector(mock=True, connect=True):
         oav = OAV("", path_provider, "", "", config=oav_config, name="fake_oav")
     set_mock_value(oav.x_size, 1024)
     set_mock_value(oav.y_size, 768)
-    await oav.connect(mock=True)
     return oav
 
 
@@ -46,8 +45,9 @@ async def test_get_micronsperpixel_from_oav(
     set_mock_value(oav.zoom_controller.level, zoom_level)
 
     microns_x = await oav.micronsPerXPixel.get_value()
-    microns_y = await oav.micronsPerXPixel.get_value()
     assert microns_x == pytest.approx(expected_microns_x, abs=1e-2)
+
+    microns_y = await oav.micronsPerYPixel.get_value()
     assert microns_y == pytest.approx(expected_microns_y, abs=1e-2)
     # assert await oav.micronsPerYPixel.get_value() == pytest.approx(
     #     expected_microns_y, abs=1e-2
@@ -82,7 +82,7 @@ async def test_oav_returns_rescaled_beam_position_and_microns_per_pixel_correctl
     set_mock_value(oav.zoom_controller.level, "1.0")
 
     microns_x = await oav.micronsPerXPixel.get_value()
-    microns_y = await oav.micronsPerXPixel.get_value()
+    microns_y = await oav.micronsPerYPixel.get_value()
     beam_x = await oav.beam_centre_i.get_value()
     beam_y = await oav.beam_centre_j.get_value()
 
