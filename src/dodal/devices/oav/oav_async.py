@@ -90,7 +90,7 @@ class OAV(AravisDetector):
             return value * DEFAULT_OAV_WINDOW[0] / x_size
         if coord == "y":
             value = self.parameters[_zoom].microns_per_pixel_y
-            y_size = await self.x_size.get_value()
+            y_size = await self.y_size.get_value()
             return value * DEFAULT_OAV_WINDOW[1] / y_size
 
     async def _get_beam_position(self, coord: str) -> int:  # type: ignore

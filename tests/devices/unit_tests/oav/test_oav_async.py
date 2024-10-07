@@ -44,14 +44,12 @@ async def test_get_micronsperpixel_from_oav(
 ):
     set_mock_value(oav.zoom_controller.level, zoom_level)
 
-    microns_x = await oav.micronsPerXPixel.get_value()
-    assert microns_x == pytest.approx(expected_microns_x, abs=1e-2)
-
-    microns_y = await oav.micronsPerYPixel.get_value()
-    assert microns_y == pytest.approx(expected_microns_y, abs=1e-2)
-    # assert await oav.micronsPerYPixel.get_value() == pytest.approx(
-    #     expected_microns_y, abs=1e-2
-    # )
+    assert await oav.micronsPerXPixel.get_value() == pytest.approx(
+        expected_microns_x, abs=1e-2
+    )
+    assert await oav.micronsPerYPixel.get_value() == pytest.approx(
+        expected_microns_y, abs=1e-2
+    )
 
 
 @pytest.mark.parametrize(
@@ -66,11 +64,8 @@ async def test_extract_beam_position_given_different_zoom_levels(
 ):
     set_mock_value(oav.zoom_controller.level, zoom_level)
 
-    beam_x = await oav.beam_centre_i.get_value()
-    beam_y = await oav.beam_centre_j.get_value()
-
-    assert beam_x == expected_xCentre
-    assert beam_y == expected_yCentre
+    assert await oav.beam_centre_i.get_value() == expected_xCentre
+    assert await oav.beam_centre_j.get_value() == expected_yCentre
 
 
 async def test_oav_returns_rescaled_beam_position_and_microns_per_pixel_correctly(
