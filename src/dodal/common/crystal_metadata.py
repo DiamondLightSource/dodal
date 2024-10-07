@@ -64,6 +64,10 @@ class CrystalMetadata:
                 "Invalid reflection plane format. Expected format is 'TypeXYZ'."
             )
         indices = plane[2:]
+        if len(indices) != 3:
+            raise ValueError(
+                "Invalid reflection plane format. Expected format is 'TypeXYZ'."
+            )
         h_index, k_index, l_index = int(indices[0]), int(indices[1]), int(indices[2])
         return h_index, k_index, l_index
 

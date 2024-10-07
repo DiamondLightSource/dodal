@@ -16,5 +16,3 @@ class Diode(StandardReadable):
 
         super().__init__(name=name)
 
-
-# todo should add 'read' override?
