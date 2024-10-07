@@ -57,7 +57,7 @@ def _collect_device_initializers(
     all_variables_in_beamline_file = module.__dict__.values()
     for variable in all_variables_in_beamline_file:
         if isinstance(variable, DeviceInitializationController):
-            initalizers[variable._factory.__name__] = variable
+            initalizers[variable._factory.__name__] = variable  # noqa: SLF001
 
     return initalizers
 
