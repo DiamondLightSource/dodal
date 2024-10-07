@@ -10,13 +10,7 @@ from ophyd_async.epics.adaravis import AravisController, AravisDetector
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
 from dodal.common.signal_utils import create_hardware_backed_soft_signal
-from dodal.devices.oav.oav_utils import OAVConfig
-
-# GDA currently assumes this aspect ratio for the OAV window size.
-# For some beamline this doesn't affect anything as the actual OAV aspect ratio
-# matches. Others need to take it into account to rescale the values stored in
-# the configuration files.
-DEFAULT_OAV_WINDOW = (1024, 768)
+from dodal.devices.oav.oav_parameters import DEFAULT_OAV_WINDOW, OAVConfig
 
 
 # Workaround to deal with the fact that beamlines may have slightly different string

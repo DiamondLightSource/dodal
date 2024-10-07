@@ -4,7 +4,7 @@ import pytest
 from ophyd_async.core import DeviceCollector, set_mock_value
 
 from dodal.devices.oav.oav_async import OAV, ZoomController
-from dodal.devices.oav.oav_utils import OAVConfig
+from dodal.devices.oav.oav_parameters import OAVConfig
 
 DISPLAY_CONFIGURATION = "tests/devices/unit_tests/test_display.configuration"
 ZOOM_LEVELS_XML = "tests/devices/unit_tests/test_jCameraManZoomLevels.xml"
