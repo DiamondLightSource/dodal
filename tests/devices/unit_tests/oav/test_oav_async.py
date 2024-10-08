@@ -15,7 +15,7 @@ async def oav() -> OAV:
     oav_config = OAVConfig(ZOOM_LEVELS_XML, DISPLAY_CONFIGURATION)
     path_provider = MagicMock()
     async with DeviceCollector(mock=True, connect=True):
-        oav = OAV("", path_provider, "", "", config=oav_config, name="fake_oav")
+        oav = OAV("", path_provider, config=oav_config, name="fake_oav")
     set_mock_value(oav.x_size, 1024)
     set_mock_value(oav.y_size, 768)
     return oav
