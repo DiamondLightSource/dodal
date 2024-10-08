@@ -1,3 +1,5 @@
+from enum import IntEnum
+
 from ophyd_async.core import (
     AsyncStatus,
     PathProvider,
@@ -8,6 +10,11 @@ from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
 from dodal.common.signal_utils import create_hardware_backed_soft_signal
 from dodal.devices.oav.oav_parameters import DEFAULT_OAV_WINDOW, OAVConfig
+
+
+class Coords(IntEnum):
+    X = 0
+    Y = 1
 
 
 # Workaround to deal with the fact that beamlines may have slightly different string
@@ -62,53 +69,45 @@ class OAV(AravisDetector):
         self.x_size = epics_signal_r(int, prefix + "CAM:ArraySizeX_RBV")
         self.y_size = epics_signal_r(int, prefix + "CAM:ArraySizeY_RBV")
 
+        self.sizes = [self.x_size, self.y_size]
+
         self.parameters = config.get_parameters()
 
         self.microns_per_pixel_x = create_hardware_backed_soft_signal(
             float,
-            lambda: self._get_microns_per_pixel("x"),
+            lambda: self._get_microns_per_pixel(Coords.X),
         )
         self.microns_per_pixel_y = create_hardware_backed_soft_signal(
             float,
-            lambda: self._get_microns_per_pixel("y"),
+            lambda: self._get_microns_per_pixel(Coords.Y),
         )
 
         self.beam_centre_i = create_hardware_backed_soft_signal(
-            int, lambda: self._get_beam_position("x")
+            int, lambda: self._get_beam_position(Coords.X)
         )
 
         self.beam_centre_j = create_hardware_backed_soft_signal(
-            int, lambda: self._get_beam_position("y")
+            int, lambda: self._get_beam_position(Coords.Y)
         )
 
     async def _read_current_zoom(self) -> str:
         _zoom = await self.zoom_controller.level.get_value()
         return _get_correct_zoom_string(_zoom)
 
-    async def _get_microns_per_pixel(self, coord: str) -> float:  # type: ignore
+    async def _get_microns_per_pixel(self, coord: int) -> float:
         """Extracts the microns per x pixel and y pixel for a given zoom level."""
         _zoom = await self._read_current_zoom()
-        if coord == "x":
-            value = self.parameters[_zoom].microns_per_pixel_x
-            x_size = await self.x_size.get_value()
-            return value * DEFAULT_OAV_WINDOW[0] / x_size
-        if coord == "y":
-            value = self.parameters[_zoom].microns_per_pixel_y
-            y_size = await self.y_size.get_value()
-            return value * DEFAULT_OAV_WINDOW[1] / y_size
+        value = self.parameters[_zoom].microns_per_pixel[coord]
+        size = await self.sizes[coord].get_value()
+        return value * DEFAULT_OAV_WINDOW[coord] / size
 
-    async def _get_beam_position(self, coord: str) -> int:  # type: ignore
-        """Extracts the beam location in pixels `xCentre` `yCentre`, for a requested zoom \
-        level. """
+    async def _get_beam_position(self, coord: int) -> int:
+        """Extracts the beam location in pixels `xCentre` `yCentre`, for a requested \
+        zoom level. """
         _zoom = await self._read_current_zoom()
-        if coord == "x":
-            value = self.parameters[_zoom].crosshair_x
-            x_size = await self.x_size.get_value()
-            return int(value * x_size / DEFAULT_OAV_WINDOW[0])
-        if coord == "y":
-            value = self.parameters[_zoom].crosshair_y
-            y_size = await self.y_size.get_value()
-            return int(value * y_size / DEFAULT_OAV_WINDOW[1])
+        value = self.parameters[_zoom].crosshair[coord]
+        size = await self.sizes[coord].get_value()
+        return int(value * size / DEFAULT_OAV_WINDOW[coord])
 
     async def calculate_beam_distance(
         self, horizontal_pixels: int, vertical_pixels: int

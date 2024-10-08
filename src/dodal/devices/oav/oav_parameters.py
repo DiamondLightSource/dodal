@@ -217,10 +217,8 @@ class OAVConfigParams:
 
 @dataclass
 class ZoomParams:
-    microns_per_pixel_x: float
-    microns_per_pixel_y: float
-    crosshair_x: int
-    crosshair_y: int
+    microns_per_pixel: tuple[float, float]
+    crosshair: tuple[int, int]
 
 
 # Once all moved to async this should replace OAVConfigParams
@@ -249,10 +247,7 @@ class OAVConfig:
             zoom = str(_get_element_as_float(node, "level"))
             um_pix_x = _get_element_as_float(node, "micronsPerXPixel")
             um_pix_y = _get_element_as_float(node, "micronsPerYPixel")
-            um_per_pix[zoom] = {
-                "microns_per_pixel_x": um_pix_x,
-                "microns_per_pixel_y": um_pix_y,
-            }
+            um_per_pix[zoom] = (um_pix_x, um_pix_y)
         return um_per_pix
 
     def _read_display_config(self) -> dict:
@@ -262,18 +257,16 @@ class OAVConfig:
                 zoom = self.display_config[i].split(" = ")[1].strip()
                 x = int(self.display_config[i + 1].split(" = ")[1])
                 y = int(self.display_config[i + 2].split(" = ")[1])
-                crosshairs[zoom] = {"crosshair_x": x, "crosshair_y": y}
+                crosshairs[zoom] = (x, y)
         return crosshairs
 
     def get_parameters(self) -> dict[str, ZoomParams]:
         config = {}
-        _um_xy = self._read_zoom_params()
-        _bc_xy = self._read_display_config()
-        for zoom_key in list(_bc_xy.keys()):
+        um_xy = self._read_zoom_params()
+        bc_xy = self._read_display_config()
+        for zoom_key in list(bc_xy.keys()):
             config[zoom_key] = ZoomParams(
-                microns_per_pixel_x=_um_xy[zoom_key]["microns_per_pixel_x"],
-                microns_per_pixel_y=_um_xy[zoom_key]["microns_per_pixel_y"],
-                crosshair_x=_bc_xy[zoom_key]["crosshair_x"],
-                crosshair_y=_bc_xy[zoom_key]["crosshair_y"],
+                microns_per_pixel=um_xy[zoom_key],
+                crosshair=bc_xy[zoom_key],
             )
         return config
