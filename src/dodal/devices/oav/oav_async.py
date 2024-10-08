@@ -65,9 +65,9 @@ class OAV(AravisDetector):
         self,
         prefix: str,
         path_provider: PathProvider,
-        drv_suffix: str,
-        hdf_suffix: str,
         config: OAVConfig,
+        drv_suffix: str = "CAM:",
+        hdf_suffix: str = "HDF5:",
         name: str = "",
         gpio_number: AravisController.GPIO_NUMBER = 1,
     ):
@@ -77,7 +77,8 @@ class OAV(AravisDetector):
 
         _bl_prefix = prefix.split("-")[0]
         self.zoom_controller = ZoomController(f"{_bl_prefix}-EA-OAV-01:FZOOM:", name)
-        # TODO This will actually come from the MJPG but for now...
+
+        # TODO See https://github.com/DiamondLightSource/dodal/issues/824
         self.x_size = epics_signal_r(int, prefix + "CAM:ArraySizeX_RBV")
         self.y_size = epics_signal_r(int, prefix + "CAM:ArraySizeY_RBV")
 

@@ -28,7 +28,6 @@ set_path_provider(
     StaticVisitPathProvider(
         BL,
         Path("/dls/i24/data/2024/cm37275-4/bluesky"),
-        # client=RemoteDirectoryServiceClient("http://i24-control:8088/api"),
     )
 )
 
@@ -161,8 +160,6 @@ def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
         "-DI-OAV-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        drv_suffix="CAM:",
-        hdf_suffix="HDF5:",
         config=OAVConfig(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
         path_provider=get_path_provider(),
     )
