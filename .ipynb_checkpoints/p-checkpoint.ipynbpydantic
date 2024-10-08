@@ -1,0 +1,235 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "ef076421-53cc-4a5a-abd2-3133af676e78",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "from pydantic import BaseModel\n",
+    "from dodal.devices.i10.id_apple2 import convert_csv_to_lookup\n",
+    "lut= convert_csv_to_lookup(file=\"/workspaces/dodal/tests/devices/i10/lookupTables/IDEnergy2GapCalibrations.csv\", source=(\"Source\",\"idu\"))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "4df22e82-6817-470d-80da-dc7e8c356bd7",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "{'lh': {'Energies': {'255.3': {'Low': 255.3,\n",
+       "    'High': 513.28,\n",
+       "    'Poly': poly1d([ 4.33435e-08, -7.52562e-05,  6.41791e-02,  3.88755e+00])},\n",
+       "   '513.28': {'Low': 513.28,\n",
+       "    'High': 771.545,\n",
+       "    'Poly': poly1d([ 1.04394e-08, -2.61385e-05,  3.93435e-02,  8.14960e+00])},\n",
+       "   '771.545': {'Low': 771.545,\n",
+       "    'High': 1027.52,\n",
+       "    'Poly': poly1d([ 9.55013e-09, -2.51296e-05,  3.93892e-02,  7.92050e+00])},\n",
+       "   '1027.52': {'Low': 1027.52,\n",
+       "    'High': 1282.59,\n",
+       "    'Poly': poly1d([ 1.04932e-08, -2.84144e-05,  4.30451e-02,  6.60845e+00])},\n",
+       "   '1282.59': {'Low': 1282.59,\n",
+       "    'High': 1700.0,\n",
+       "    'Poly': poly1d([ 8.26909e-08, -3.14196e-04,  4.21009e-01, -1.60378e+02])}},\n",
+       "  'Limit': {'Minimum': 255.3, 'Maximum': 1700.0}},\n",
+       " 'lv': {'Energies': {'521.99': {'Low': 521.99,\n",
+       "    'High': 734.983,\n",
+       "    'Poly': poly1d([ 1.67544e-09, -6.57463e-06,  2.02971e-02,  6.96008e+00])},\n",
+       "   '734.983': {'Low': 734.983,\n",
+       "    'High': 932.69,\n",
+       "    'Poly': poly1d([ 2.32314e-09, -5.82037e-06,  1.81492e-02,  7.87490e+00])},\n",
+       "   '932.69': {'Low': 932.69,\n",
+       "    'High': 1129.16,\n",
+       "    'Poly': poly1d([ 8.33737e-09, -2.22386e-05,  3.31944e-02,  3.24578e+00])},\n",
+       "   '1129.16': {'Low': 1129.16,\n",
+       "    'High': 1325.74,\n",
+       "    'Poly': poly1d([ 1.91056e-08, -6.01726e-05,  7.77255e-02, -1.41739e+01])},\n",
+       "   '1325.74': {'Low': 1325.74,\n",
+       "    'High': 1700.0,\n",
+       "    'Poly': poly1d([ 8.03864e-08, -3.12082e-04,  4.23051e-01, -1.72027e+02])}},\n",
+       "  'Limit': {'Minimum': 521.99, 'Maximum': 1700.0}},\n",
+       " 'pc': {'Energies': {'418.566': {'Low': 418.566,\n",
+       "    'High': 637.695,\n",
+       "    'Poly': poly1d([ 1.35966e-08, -2.99885e-05,  3.68795e-02,  5.13046e+00])},\n",
+       "   '637.695': {'Low': 637.695,\n",
+       "    'High': 855.483,\n",
+       "    'Poly': poly1d([ 6.54757e-09, -1.67934e-05,  2.85808e-02,  6.88328e+00])},\n",
+       "   '855.483': {'Low': 855.483,\n",
+       "    'High': 1071.32,\n",
+       "    'Poly': poly1d([ 7.21330e-09, -1.90157e-05,  3.09807e-02,  6.03968e+00])},\n",
+       "   '1071.32': {'Low': 1071.32,\n",
+       "    'High': 1287.03,\n",
+       "    'Poly': poly1d([ 1.57511e-08, -4.76693e-05,  6.30626e-02, -5.94187e+00])},\n",
+       "   '1287.03': {'Low': 1287.03,\n",
+       "    'High': 1700.0,\n",
+       "    'Poly': poly1d([ 5.53938e-08, -2.04650e-04,  2.70486e-01, -9.73851e+01])}},\n",
+       "  'Limit': {'Minimum': 418.566, 'Maximum': 1700.0}},\n",
+       " 'nc': {'Energies': {'426.626': {'Low': 426.626,\n",
+       "    'High': 646.014,\n",
+       "    'Poly': poly1d([ 1.28076e-08, -2.86867e-05,  3.61496e-02,  5.26037e+00])},\n",
+       "   '646.014': {'Low': 646.014,\n",
+       "    'High': 863.674,\n",
+       "    'Poly': poly1d([ 7.57955e-09, -1.92019e-05,  3.04420e-02,  6.39722e+00])},\n",
+       "   '863.674': {'Low': 863.674,\n",
+       "    'High': 1079.84,\n",
+       "    'Poly': poly1d([ 5.92247e-09, -1.52587e-05,  2.73263e-02,  7.21445e+00])},\n",
+       "   '1079.84': {'Low': 1079.84,\n",
+       "    'High': 1295.74,\n",
+       "    'Poly': poly1d([ 1.65398e-08, -5.06815e-05,  6.68457e-02, -7.52454e+00])},\n",
+       "   '1295.74': {'Low': 1295.74,\n",
+       "    'High': 1700.0,\n",
+       "    'Poly': poly1d([ 5.77565e-08, -2.15111e-04,  2.85830e-01, -1.04872e+02])}},\n",
+       "  'Limit': {'Minimum': 426.626, 'Maximum': 1700.0}},\n",
+       " 'lh3': {'Energies': {'769.119': {'Low': 769.119,\n",
+       "    'High': 1028.01,\n",
+       "    'Poly': poly1d([ 3.62736e-09, -1.44570e-05,  2.74816e-02,  1.83429e+00])},\n",
+       "   '1028.01': {'Low': 1028.01,\n",
+       "    'High': 1286.16,\n",
+       "    'Poly': poly1d([ 1.69557e-09, -8.56945e-06,  2.14904e-02,  3.87065e+00])},\n",
+       "   '1286.16': {'Low': 1286.16,\n",
+       "    'High': 1544.17,\n",
+       "    'Poly': poly1d([ 5.94806e-10, -4.20572e-06,  1.57398e-02,  6.38981e+00])},\n",
+       "   '1544.17': {'Low': 1544.17,\n",
+       "    'High': 1794.62,\n",
+       "    'Poly': poly1d([ 5.17381e-09, -2.58804e-05,  4.99948e-02, -1.16837e+01])},\n",
+       "   '1794.62': {'Low': 1794.62,\n",
+       "    'High': 2100.0,\n",
+       "    'Poly': poly1d([ 2.32221e-08, -1.35379e-04,  2.68796e-01, -1.56010e+02])}},\n",
+       "  'Limit': {'Minimum': 769.119, 'Maximum': 2100.0}},\n",
+       " 'la': {'Energies': {'654': {'Low': 654.0,\n",
+       "    'High': 1700.0,\n",
+       "    'Poly': poly1d([ 5.1239781e-20, -3.6007756e-16,  1.0820994e-12, -1.7983774e-09,\n",
+       "            1.7879222e-06, -1.0666011e-03,  3.6850100e-01, -4.3829175e+01])}},\n",
+       "  'Limit': {'Minimum': 654.0, 'Maximum': 1700.0}}}"
+      ]
+     },
+     "execution_count": 3,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "class lookuptable(BaseModel):\n",
+    "    Value: str\n",
+    "    Type: str"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 40,
+   "id": "4e56e0e6-80e0-4cb7-be99-788f60dac9e1",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "class lookuptable(BaseModel):\n",
+    "    model: str\n",
+    "\n",
+    "\n",
+    "class ConfStructure(BaseModel):\n",
+    "    version: int\n",
+    "    info: Info"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 41,
+   "id": "c6b856eb-4597-4d4c-928c-82e2a3c85032",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "my_conf_wrong = {\n",
+    "    'version': 1,\n",
+    "\n",
+    "    'info': {\n",
+    "        'conf_one': 2.5,\n",
+    "        'conf_two': 'foo',\n",
+    "        'conf_three': False,\n",
+    "        'optional_conf': 'bar'\n",
+    "    }\n",
+    "}\n",
+    "\n",
+    "my_conf_right = {\n",
+    "    'version': 10,\n",
+    "\n",
+    "    'info': {\n",
+    "        'conf_one': 14.5,\n",
+    "        'conf_two': 'something',\n",
+    "        'conf_three': False\n",
+    "    }\n",
+    "}\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 42,
+   "id": "6694cd4a-22e3-4f5b-a363-616c1758beeb",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "model = ConfStructure(**my_conf_right)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 39,
+   "id": "60cc1988-281b-4971-8d6f-08358bb4e879",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "res = ConfStructure(**my_conf_wrong)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "6d669082-693a-40bb-82a4-e918fcb5221c",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "'Low': 255.3,\n",
+    "    'High': 513.28,\n",
+    "    'Poly': poly1d([ 4.33435e-08, -7.52562e-05,  6.41791e-02,  3.88755e+00])},"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "b4ca9b09-7e63-4283-b434-99bddd74ae63",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "class energies(BaseModel):\n",
+    "    Low: float,\n",
+    "    High: float,\n",
+    "    Poly: np.poly1d\n",
+    "    "
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.11.9"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

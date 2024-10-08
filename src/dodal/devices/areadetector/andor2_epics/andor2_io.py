@@ -30,6 +30,10 @@ class ADBaseDataType(str, Enum):
     Float32 = "Float32"
     Float64 = "Float64"
     _ = ""
+    """
+    #This is needed due to all empty enum from epics will reduce to a single
+    "" and throw a typeerror as the blank "" is unmatched.
+    """
 
 
 class Andor2DriverIO(ADBaseIO):
