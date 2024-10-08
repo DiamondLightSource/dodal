@@ -1,13 +1,8 @@
-from pathlib import Path
-
 from dodal.common.beamlines.beamline_utils import (
     BL,
     device_instantiation,
-    get_path_provider,
-    set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.visit import StaticVisitPathProvider
 from dodal.devices.detector import DetectorParams
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.hutch_shutter import HutchShutter
@@ -23,14 +18,6 @@ from dodal.devices.oav.oav_parameters import OAVConfig
 from dodal.devices.zebra import Zebra
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import get_beamline_name, skip_device
-
-set_path_provider(
-    StaticVisitPathProvider(
-        BL,
-        Path("/dls/i24/data/2024/cm37275-4/bluesky"),
-    )
-)
-
 
 ZOOM_PARAMS_FILE = (
     "/dls_sw/i24/software/gda_versions/gda_9_34/config/xml/jCameraManZoomLevels.xml"
@@ -161,7 +148,6 @@ def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
         wait_for_connection,
         fake_with_ophyd_sim,
         config=OAVConfig(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
-        path_provider=get_path_provider(),
     )
 
 
