@@ -1,17 +1,19 @@
 import os
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 from bluesky.protocols import Readable
 from ophyd import EpicsMotor
 
 from dodal.beamlines import i03, i23
+from dodal.common.beamlines.device_factory import DeviceInitializationController
 from dodal.utils import (
     _find_next_run_number_from_files,
     collect_factories,
     get_beamline_based_on_environment_variable,
     get_hostname,
     get_run_number,
+    is_any_device_factory,
     make_all_devices,
     make_device,
 )
@@ -213,3 +215,63 @@ def test_get_run_number_uses_prefix(mock_list_dir: MagicMock):
     assert get_run_number("dir", "bar") == 7
     assert get_run_number("dir", "baz") == 29
     assert get_run_number("dir", "qux") == 1
+
+
+def test_is_any_device_factory_v1():
+    # Mock a function with return annotation corresponding to V1DeviceFactory
+    mock_func = Mock()
+    mock_func.return_annotation = "V1DeviceType"
+
+    # Mock is_v1_device_type to return True
+    with patch("dodal.utils.is_v1_device_type", return_value=True):
+        assert is_any_device_factory(mock_func) is True
+
+
+def test_is_any_device_factory_v2():
+    # Mock a function with return annotation corresponding to V2DeviceFactory
+    mock_func = Mock()
+    mock_func.return_annotation = "V2DeviceType"
+
+    # Mock is_v2_device_type to return True
+    with patch("dodal.utils.is_v2_device_type", return_value=True):
+        assert is_any_device_factory(mock_func) is True
+
+
+def test_is_any_device_factory_new():
+    # Mock a function instance of DeviceInitializationController
+    mock_func = Mock(spec=DeviceInitializationController)
+    assert is_any_device_factory(mock_func) is True
+
+
+def test_is_any_device_factory_invalid():
+    # Mock a function with an unsupported return annotation
+    mock_func = Mock()
+    mock_func.return_annotation = None
+
+    # Mock all is_v1, is_v2, and is_new checks to return False
+    with (
+        patch("dodal.utils.is_v1_device_factory", return_value=False),
+        patch("dodal.utils.is_v2_device_factory", return_value=False),
+        patch("dodal.utils.is_new_device_factory", return_value=False),
+    ):
+        assert is_any_device_factory(mock_func) is False
+
+
+def test_is_any_device_factory_signature_value_error():
+    # Mock a function that raises a ValueError when checking the signature
+    mock_func = Mock()
+
+    with patch("dodal.utils.signature", side_effect=ValueError):
+        assert is_any_device_factory(mock_func) is False
+
+
+def test_is_any_device_factory_type_error_new_factory():
+    # Mock a function that raises a ValueError when checked with isinstance
+    mock_func = Mock()
+
+    # Mock new factory check to raise ValueError
+    with patch(
+        "dodal.common.beamlines.device_factory.DeviceInitializationController",
+        side_effect=ValueError,
+    ):
+        assert is_any_device_factory(mock_func) is False
