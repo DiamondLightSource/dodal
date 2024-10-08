@@ -35,34 +35,26 @@ def test_makes_devices() -> None:
     import tests.fake_beamline as fake_beamline
 
     devices, exceptions = make_all_devices(fake_beamline)
-    assert {"device_a", "device_b", "device_c"} == devices.keys() and len(
-        exceptions
-    ) == 0
+    assert {"readable", "motor", "cryo"} == devices.keys() and len(exceptions) == 0
 
 
 def test_makes_devices_with_dependencies() -> None:
     import tests.fake_beamline_dependencies as fake_beamline
 
     devices, exceptions = make_all_devices(fake_beamline)
-    assert {"device_a", "device_b", "device_c"} == devices.keys() and len(
-        exceptions
-    ) == 0
+    assert {"readable", "motor", "cryo"} == devices.keys() and len(exceptions) == 0
 
 
 def test_makes_devices_with_disordered_dependencies() -> None:
     import tests.fake_beamline_disordered_dependencies as fake_beamline
 
     devices, exceptions = make_all_devices(fake_beamline)
-    assert {"device_a", "device_b", "device_c"} == devices.keys() and len(
-        exceptions
-    ) == 0
+    assert {"readable", "motor", "cryo"} == devices.keys() and len(exceptions) == 0
 
 
 def test_makes_devices_with_module_name() -> None:
     devices, exceptions = make_all_devices("tests.fake_beamline")
-    assert {"device_a", "device_b", "device_c"} == devices.keys() and len(
-        exceptions
-    ) == 0
+    assert {"readable", "motor", "cryo"} == devices.keys() and len(exceptions) == 0
 
 
 def test_get_hostname() -> None:
