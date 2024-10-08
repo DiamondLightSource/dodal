@@ -6,24 +6,24 @@ from ophyd_async.epics.motor import Motor
 from ophyd_async.epics.signal import epics_signal_rw
 
 
-class Filters(str, Enum):
+class _Filters(str, Enum):
     pass
 
 
-class I03Filters(Filters):
+class I03Filters(_Filters):
     EMPTY = "Empty"
     TWO_HUNDRED = "200um"
     ONE_HUNDRED = "100um"
 
 
-class I04Filters(Filters):
+class I04Filters(_Filters):
     EMPTY = "Empty"
     TWO_HUNDRED = "200um"
     FIFTY = "50um"
     OUT = "Out"
 
 
-T = TypeVar("T", bound=Filters)
+T = TypeVar("T", bound=_Filters)
 
 
 class DiamondFilter(StandardReadable, Generic[T]):
