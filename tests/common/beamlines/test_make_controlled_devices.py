@@ -15,3 +15,4 @@ def test_make_all_controlled_devices_import_module():
         mock_import.assert_called_once_with("test_module")
         assert isinstance(devices, dict)
         assert isinstance(exceptions, dict)
+
