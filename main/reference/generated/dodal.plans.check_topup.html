@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.plans.check_topup &#8212; dodal 1.32.1.dev4+gf2e63c2c5 documentation</title>
+    <title>dodal.plans.check_topup &#8212; dodal 1.33.1.dev1+g49fd0a54a documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../_static/documentation_options.js?v=08435940"></script>
+    <script src="../../_static/documentation_options.js?v=1076fe0a"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -872,14 +872,14 @@ document.write(`
 
 <dl class="py function">
 <dt class="sig sig-object py" id="dodal.plans.check_topup.check_topup_and_wait_if_necessary">
-<span class="sig-prename descclassname"><span class="pre">dodal.plans.check_topup.</span></span><span class="sig-name descname"><span class="pre">check_topup_and_wait_if_necessary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">synchrotron</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dodal.devices.synchrotron.Synchrotron.html#dodal.devices.synchrotron.Synchrotron" title="dodal.devices.synchrotron.Synchrotron"><span class="pre">Synchrotron</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_exposure_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ops_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/plans/check_topup.html#check_topup_and_wait_if_necessary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.plans.check_topup.check_topup_and_wait_if_necessary" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">dodal.plans.check_topup.</span></span><span class="sig-name descname"><span class="pre">check_topup_and_wait_if_necessary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">synchrotron</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dodal.devices.synchrotron.Synchrotron.html#dodal.devices.synchrotron.Synchrotron" title="dodal.devices.synchrotron.Synchrotron"><span class="pre">Synchrotron</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_exposure_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ops_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/plans/check_topup.html#check_topup_and_wait_if_necessary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.plans.check_topup.check_topup_and_wait_if_necessary" title="Link to this definition">#</a></dt>
 <dd><p>A small plan to check if topup gating is permitted and sleep until the topup        is over if it starts before the end of collection.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>synchrotron</strong> (<a class="reference internal" href="dodal.devices.synchrotron.Synchrotron.html#dodal.devices.synchrotron.Synchrotron" title="dodal.devices.synchrotron.Synchrotron"><em>Synchrotron</em></a>) – Synchrotron device.</p></li>
-<li><p><strong>total_exposure_time</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a>) – Expected total exposure time for             collection, in seconds.</p></li>
-<li><p><strong>ops_time</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a>) – Additional time to account for various operations,            eg. x-ray centering, in seconds. Defaults to 30.0.</p></li>
+<li><p><strong>total_exposure_time</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – Expected total exposure time for             collection, in seconds.</p></li>
+<li><p><strong>ops_time</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – Additional time to account for various operations,            eg. x-ray centering, in seconds. Defaults to 30.0.</p></li>
 </ul>
 </dd>
 </dl>

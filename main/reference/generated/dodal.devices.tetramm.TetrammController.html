@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.tetramm.TetrammController &#8212; dodal 1.32.1.dev4+gf2e63c2c5 documentation</title>
+    <title>dodal.devices.tetramm.TetrammController &#8212; dodal 1.33.1.dev1+g49fd0a54a documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../_static/documentation_options.js?v=08435940"></script>
+    <script src="../../_static/documentation_options.js?v=1076fe0a"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -849,7 +849,7 @@ document.write(`
 <dd><p>Fixed in hardware</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)">int</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -858,9 +858,9 @@ document.write(`
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>drv</strong> (<a class="reference internal" href="dodal.devices.tetramm.TetrammDriver.html#dodal.devices.tetramm.TetrammDriver" title="dodal.devices.tetramm.TetrammDriver"><em>TetrammDriver</em></a>) – A configured driver for the device</p></li>
-<li><p><strong>maximum_readings_per_frame</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – Maximum number of readings per frame: actual readings may be lower if higher frame rate is required</p></li>
-<li><p><strong>minimum_values_per_reading</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – Lower bound on the values that will be averaged to create a single reading</p></li>
-<li><p><strong>readings_per_frame</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – Actual number of readings per frame.</p></li>
+<li><p><strong>maximum_readings_per_frame</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – Maximum number of readings per frame: actual readings may be lower if higher frame rate is required</p></li>
+<li><p><strong>minimum_values_per_reading</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – Lower bound on the values that will be averaged to create a single reading</p></li>
+<li><p><strong>readings_per_frame</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – Actual number of readings per frame.</p></li>
 </ul>
 </dd>
 </dl>
@@ -905,7 +905,7 @@ document.write(`
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="dodal.devices.tetramm.TetrammController.set_exposure">
-<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_exposure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exposure</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/tetramm.html#TetrammController.set_exposure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.tetramm.TetrammController.set_exposure" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_exposure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exposure</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/tetramm.html#TetrammController.set_exposure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.tetramm.TetrammController.set_exposure" title="Link to this definition">#</a></dt>
 <dd><p>Tries to set the exposure time of a single frame.</p>
 <p>As during the  exposure time, the device must collect an integer number
 of readings, in the case where the exposure is not a multiple of the base
@@ -913,11 +913,11 @@ sample rate, it will be lowered to the prior multiple ot ensure triggers
 are not missed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>exposure</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a>) – The time for a single frame in seconds</p>
+<dd class="field-odd"><p><strong>exposure</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a>) – The time for a single frame in seconds</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.12)"><strong>ValueError</strong></a> – If exposure is too low to collect the required number</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><strong>ValueError</strong></a> – If exposure is too low to collect the required number</p></li>
 <li><p><strong>of readings per frame.</strong> – </p></li>
 </ul>
 </dd>
@@ -926,13 +926,13 @@ are not missed.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="dodal.devices.tetramm.TetrammController.max_frame_rate">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_frame_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></em><a class="headerlink" href="#dodal.devices.tetramm.TetrammController.max_frame_rate" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_frame_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></em><a class="headerlink" href="#dodal.devices.tetramm.TetrammController.max_frame_rate" title="Link to this definition">#</a></dt>
 <dd><p>Max frame rate in Hz for the current configuration</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="dodal.devices.tetramm.TetrammController.minimum_exposure">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">minimum_exposure</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></em><a class="headerlink" href="#dodal.devices.tetramm.TetrammController.minimum_exposure" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">minimum_exposure</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></em><a class="headerlink" href="#dodal.devices.tetramm.TetrammController.minimum_exposure" title="Link to this definition">#</a></dt>
 <dd><p>Smallest amount of time needed to take a frame</p>
 </dd></dl>
 
