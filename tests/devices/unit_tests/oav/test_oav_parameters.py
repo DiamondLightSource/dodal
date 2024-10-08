@@ -1,6 +1,11 @@
 import pytest
 
-from dodal.devices.oav.oav_parameters import OAVConfig, OAVConfigParams, OAVParameters
+from dodal.devices.oav.oav_parameters import (
+    OAVConfig,
+    OAVConfigParams,
+    OAVParameters,
+    ZoomParams,
+)
 
 OAV_CENTRING_JSON = "tests/devices/unit_tests/test_OAVCentring.json"
 DISPLAY_CONFIGURATION = "tests/devices/unit_tests/test_display.configuration"
@@ -13,6 +18,11 @@ def mock_parameters():
         "loopCentring",
         OAV_CENTRING_JSON,
     )
+
+
+@pytest.fixture
+def mock_config() -> dict[str, ZoomParams]:
+    return OAVConfig(ZOOM_LEVELS_XML, DISPLAY_CONFIGURATION).get_parameters()
 
 
 def test_given_key_in_context_but_not_default_when_load_parameters_then_value_found(
@@ -47,14 +57,37 @@ def test_given_context_and_microns_per_pixel_get_max_tip_distance_in_pixels(
     ) == pytest.approx(189.873, abs=1e-3)
 
 
+@pytest.mark.parametrize(
+    "zoom_level, expected_microns, expected_crosshair",
+    [
+        ("2.5", (2.31, 2.31), (493, 355)),
+        ("10.0", (0.438, 0.438), (613, 344)),
+    ],
+)
+def test_oav_config(
+    zoom_level, expected_microns, expected_crosshair, mock_config: dict
+):
+    assert isinstance(mock_config[zoom_level], ZoomParams)
+    crosshairs = (
+        mock_config[zoom_level].crosshair_x,
+        mock_config[zoom_level].crosshair_y,
+    )
+    microns = (
+        mock_config[zoom_level].microns_per_pixel_x,
+        mock_config[zoom_level].microns_per_pixel_y,
+    )
+
+    assert crosshairs == expected_crosshair
+    assert microns == expected_microns
+
+
 def test_given_oav_config_get_max_tip_distance_in_pixels(
-    mock_parameters: OAVParameters,
+    mock_parameters: OAVParameters, mock_config: dict
 ):
     zoom_level = mock_parameters.zoom
-    config_params = OAVConfig(ZOOM_LEVELS_XML, DISPLAY_CONFIGURATION).get_parameters()
 
     assert mock_parameters.max_tip_distance == 300
-    assert config_params[str(zoom_level)].microns_per_pixel_x
+    assert mock_config[str(zoom_level)].microns_per_pixel_x
     assert mock_parameters.get_max_tip_distance_in_pixels(
-        config_params[str(zoom_level)].microns_per_pixel_x
+        mock_config[str(zoom_level)].microns_per_pixel_x
     ) == pytest.approx(189.873, abs=1e-3)
