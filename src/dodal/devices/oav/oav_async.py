@@ -64,11 +64,11 @@ class OAV(AravisDetector):
 
         self.parameters = config.get_parameters()
 
-        self.micronsPerXPixel = create_hardware_backed_soft_signal(
+        self.microns_per_pixel_x = create_hardware_backed_soft_signal(
             float,
             lambda: self._get_microns_per_pixel("x"),
         )
-        self.micronsPerYPixel = create_hardware_backed_soft_signal(
+        self.microns_per_pixel_y = create_hardware_backed_soft_signal(
             float,
             lambda: self._get_microns_per_pixel("y"),
         )
