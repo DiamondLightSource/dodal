@@ -27,14 +27,9 @@ class ImageMode(str, Enum):
 class ADBaseDataType(str, Enum):
     UInt16 = "UInt16"
     UInt32 = "UInt32"
-    b1 = ""
-    b2 = ""
-    b3 = ""
-    b4 = ""
-    b5 = ""
-    b6 = ""
     Float32 = "Float32"
     Float64 = "Float64"
+    _ = ""
 
 
 class Andor2DriverIO(ADBaseIO):
