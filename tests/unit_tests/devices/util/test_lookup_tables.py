@@ -29,7 +29,7 @@ def test_linear_interpolation(s, expected_t):
 )
 def test_linear_interpolation_reverse_order(s, expected_t):
     lut_converter = linear_interpolation_lut(
-        "tests/test_data/test_beamline_dcm_roll_converter_reversed.txt"
+        "tests/unit_tests/devices/util/data/test_beamline_dcm_roll_converter_reversed.txt"
     )
     actual_t = lut_converter(s)
     assert actual_t == expected_t, f"actual {actual_t} != expected {expected_t}"
