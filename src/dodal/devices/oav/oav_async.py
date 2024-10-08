@@ -1,8 +1,6 @@
 from ophyd_async.core import (
     AsyncStatus,
-    DeviceVector,
     PathProvider,
-    SignalR,
     StandardReadable,
 )
 from ophyd_async.epics.adaravis import AravisController, AravisDetector
@@ -36,23 +34,6 @@ class ZoomController(StandardReadable):
 
         # Level is the string description of the zoom level e.g. "1.0x" or "1.0"
         self.level = epics_signal_rw(str, f"{prefix}MP:SELECT")
-
-        self.all_levels: DeviceVector[SignalR[str]] = DeviceVector(
-            {
-                "zrst": epics_signal_r(str, f"{prefix}MP:SELECT.ZRST"),
-                "onst": epics_signal_r(str, f"{prefix}MP:SELECT.ONST"),
-                "twst": epics_signal_r(str, f"{prefix}MP:SELECT.TWST"),
-                "thst": epics_signal_r(str, f"{prefix}MP:SELECT.THST"),
-                "frst": epics_signal_r(str, f"{prefix}MP:SELECT.FRST"),
-                "fvst": epics_signal_r(str, f"{prefix}MP:SELECT.FVST"),
-                "sxst": epics_signal_r(str, f"{prefix}MP:SELECT.SXST"),
-            }
-        )
-
-    @property
-    async def allowed_zoom_levels(self) -> list[str]:
-        res = [await level.get_value() for level in list(self.all_levels.values())]
-        return res
 
     @AsyncStatus.wrap
     async def set(self, level_to_set: str):
