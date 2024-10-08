@@ -19,6 +19,7 @@ from dodal.devices.cryostream import CryoStream
 from dodal.devices.dcm import DCM
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.detector_motion import DetectorMotion
+from dodal.devices.diamond_filter import DiamondFilter, I03Filters
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import PandAFastGridScan, ZebraFastGridScan
 from dodal.devices.flux import Flux
@@ -26,6 +27,7 @@ from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, VFMMirrorVo
 from dodal.devices.motors import XYZPositioner
 from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
+from dodal.devices.qbpm import QBPM
 from dodal.devices.robot import BartRobot
 from dodal.devices.s4_slit_gaps import S4SlitGaps
 from dodal.devices.smargon import Smargon
@@ -513,6 +515,35 @@ def cryo_stream(
         CryoStream,
         "cryo_stream",
         "",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+def diamond_filter(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> DiamondFilter[I03Filters]:
+    """Get the i03 diamond filter device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        DiamondFilter[I03Filters],
+        "diamond_filter",
+        "-MO-FLTR-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        data_type=I03Filters,
+    )
+
+
+def qbpms(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> QBPM:
+    """Get the i03 qbpm device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        QBPM,
+        "qbpm",
+        "-DI-QBPM-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
