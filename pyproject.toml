@@ -115,7 +115,7 @@ filterwarnings = [
     "ignore::DeprecationWarning:wheel",
 ]
 # Doctest python code in docs, python code in src docstrings, test functions in tests
-testpaths = "docs src tests"
+testpaths = "docs src tests system_tests"
 
 [tool.coverage.report]
 exclude_also = [
