@@ -54,17 +54,17 @@ def connect(beamline: str, all: bool, sim_backend: bool) -> None:
     RunEngine()
 
     print(f"Attempting connection to {beamline} (using {full_module_path})")
-    old_devices, old_exceptions = make_all_devices(
+    devices, exceptions = make_all_devices(
         full_module_path,
         include_skipped=all,
         fake_with_ophyd_sim=sim_backend,
     )
-    device_factory_devices, device_factory_exceptions = make_all_controlled_devices(
-        full_module_path
-    )
-
-    devices = {**old_devices, **device_factory_devices}
-    exceptions = {**old_exceptions, **device_factory_exceptions}
+    if beamline == "i22":
+        device_factory_devices, device_factory_exceptions = make_all_controlled_devices(
+            full_module_path
+        )
+        devices = {**devices, **device_factory_devices}
+        exceptions = {**exceptions, **device_factory_exceptions}
     sim_statement = " (sim mode)" if sim_backend else ""
 
     print(f"{len(devices)} devices connected{sim_statement}:")
