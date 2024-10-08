@@ -1,7 +1,6 @@
 import pytest
 
-from dodal.devices.oav.oav_detector import OAVConfigParams
-from dodal.devices.oav.oav_parameters import OAVParameters
+from dodal.devices.oav.oav_parameters import OAVConfig, OAVConfigParams, OAVParameters
 
 OAV_CENTRING_JSON = "tests/devices/unit_tests/test_OAVCentring.json"
 DISPLAY_CONFIGURATION = "tests/devices/unit_tests/test_display.configuration"
@@ -45,4 +44,17 @@ def test_given_context_and_microns_per_pixel_get_max_tip_distance_in_pixels(
     assert config_params.micronsPerXPixel
     assert mock_parameters.get_max_tip_distance_in_pixels(
         config_params.micronsPerXPixel
+    ) == pytest.approx(189.873, abs=1e-3)
+
+
+def test_given_oav_config_get_max_tip_distance_in_pixels(
+    mock_parameters: OAVParameters,
+):
+    zoom_level = mock_parameters.zoom
+    config_params = OAVConfig(ZOOM_LEVELS_XML, DISPLAY_CONFIGURATION).get_parameters()
+
+    assert mock_parameters.max_tip_distance == 300
+    assert config_params[str(zoom_level)].microns_per_pixel_x
+    assert mock_parameters.get_max_tip_distance_in_pixels(
+        config_params[str(zoom_level)].microns_per_pixel_x
     ) == pytest.approx(189.873, abs=1e-3)
