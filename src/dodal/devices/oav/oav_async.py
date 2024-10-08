@@ -5,7 +5,6 @@ from ophyd_async.core import (
     SignalR,
     StandardReadable,
 )
-from ophyd_async.core._utils import DEFAULT_TIMEOUT
 from ophyd_async.epics.adaravis import AravisController, AravisDetector
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
@@ -84,6 +83,23 @@ class OAV(AravisDetector):
 
         self.parameters = config.get_parameters()
 
+        self.micronsPerXPixel = create_hardware_backed_soft_signal(
+            float,
+            lambda: self._get_microns_per_pixel("x"),
+        )
+        self.micronsPerYPixel = create_hardware_backed_soft_signal(
+            float,
+            lambda: self._get_microns_per_pixel("y"),
+        )
+
+        self.beam_centre_i = create_hardware_backed_soft_signal(
+            int, lambda: self._get_beam_position("x")
+        )
+
+        self.beam_centre_j = create_hardware_backed_soft_signal(
+            int, lambda: self._get_beam_position("y")
+        )
+
     async def _read_current_zoom(self) -> str:
         _zoom = await self.zoom_controller.level.get_value()
         return _get_correct_zoom_string(_zoom)
@@ -133,28 +149,3 @@ class OAV(AravisDetector):
             beam_x - horizontal_pixels,
             beam_y - vertical_pixels,
         )
-
-    async def connect(
-        self,
-        mock: bool = False,
-        timeout: float = DEFAULT_TIMEOUT,
-        force_reconnect: bool = False,
-    ):
-        self.micronsPerXPixel = create_hardware_backed_soft_signal(
-            float,
-            lambda: self._get_microns_per_pixel("x"),
-        )
-        self.micronsPerYPixel = create_hardware_backed_soft_signal(
-            float,
-            lambda: self._get_microns_per_pixel("y"),
-        )
-
-        self.beam_centre_i = create_hardware_backed_soft_signal(
-            int, lambda: self._get_beam_position("x")
-        )
-
-        self.beam_centre_j = create_hardware_backed_soft_signal(
-            int, lambda: self._get_beam_position("y")
-        )
-
-        return await super().connect(mock, timeout, force_reconnect)
