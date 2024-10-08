@@ -11,7 +11,7 @@ from dodal.utils import AnyDevice
 
 # Test with an example beamline, device instantiation is already tested
 # in beamline unit tests
-EXAMPLE_BEAMLINE = "i22"
+EXAMPLE_BEAMLINE = "i24"
 
 
 @pytest.fixture
