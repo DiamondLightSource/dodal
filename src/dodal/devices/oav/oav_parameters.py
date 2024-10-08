@@ -246,12 +246,12 @@ class OAVConfig:
     def _read_zoom_params(self) -> dict:
         um_per_pix = {}
         for node in self.zoom_params:
-            _zoom = str(_get_element_as_float(node, "level"))
-            _um_pix_x = _get_element_as_float(node, "micronsPerXPixel")
-            _um_pix_y = _get_element_as_float(node, "micronsPerYPixel")
-            um_per_pix[_zoom] = {
-                "microns_per_pixel_x": _um_pix_x,
-                "microns_per_pixel_y": _um_pix_y,
+            zoom = str(_get_element_as_float(node, "level"))
+            um_pix_x = _get_element_as_float(node, "micronsPerXPixel")
+            um_pix_y = _get_element_as_float(node, "micronsPerYPixel")
+            um_per_pix[zoom] = {
+                "microns_per_pixel_x": um_pix_x,
+                "microns_per_pixel_y": um_pix_y,
             }
         return um_per_pix
 
@@ -259,10 +259,10 @@ class OAVConfig:
         crosshairs = {}
         for i in range(len(self.display_config)):
             if self.display_config[i].startswith("zoomLevel"):
-                _zoom = self.display_config[i].split(" = ")[1].strip()
-                _x = int(self.display_config[i + 1].split(" = ")[1])
-                _y = int(self.display_config[i + 2].split(" = ")[1])
-                crosshairs[_zoom] = {"crosshair_x": _x, "crosshair_y": _y}
+                zoom = self.display_config[i].split(" = ")[1].strip()
+                x = int(self.display_config[i + 1].split(" = ")[1])
+                y = int(self.display_config[i + 2].split(" = ")[1])
+                crosshairs[zoom] = {"crosshair_x": x, "crosshair_y": y}
         return crosshairs
 
     def get_parameters(self) -> dict[str, ZoomParams]:
