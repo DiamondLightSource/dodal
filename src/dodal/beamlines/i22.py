@@ -104,7 +104,7 @@ def i0() -> TetrammDetector:
 @device_factory()
 def it() -> TetrammDetector:
     return TetrammDetector(
-        name='it',
+        name="it",
         prefix="-EA-TTRM-02:",
         type="PIN Diode",
         path_provider=get_path_provider(),
