@@ -15,6 +15,7 @@ from typing import (
     Any,
     TypeGuard,
     TypeVar,
+    runtime_checkable,
 )
 
 from bluesky.protocols import (
@@ -61,6 +62,11 @@ BLUESKY_PROTOCOLS = [
     Configurable,
     Triggerable,
 ]
+
+
+@runtime_checkable
+class MovableReadable(Movable, Readable): ...
+
 
 AnyDevice: TypeAlias = OphydV1Device | OphydV2Device
 V1DeviceFactory: TypeAlias = Callable[..., OphydV1Device]
