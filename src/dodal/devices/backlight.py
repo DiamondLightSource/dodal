@@ -1,6 +1,7 @@
 from asyncio import sleep
 from enum import Enum
 
+from bluesky.protocols import Movable
 from ophyd_async.core import AsyncStatus, StandardReadable
 from ophyd_async.epics.signal import epics_signal_rw
 
@@ -15,7 +16,7 @@ class BacklightPosition(str, Enum):
     OUT = "Out"
 
 
-class Backlight(StandardReadable):
+class Backlight(StandardReadable, Movable):
     """Simple device to trigger the pneumatic in/out."""
 
     TIME_TO_MOVE_S = 1  # Tested using a stopwatch on the beamline 09/2024
@@ -29,7 +30,7 @@ class Backlight(StandardReadable):
         super().__init__(name)
 
     @AsyncStatus.wrap
-    async def set(self, position: BacklightPosition):
+    async def set(self, value: BacklightPosition):
         """This setter will turn the backlight on when we move it in to the beam and off
         when we move it out.
 
@@ -38,10 +39,10 @@ class Backlight(StandardReadable):
         to move completely in/out so we sleep here to simulate this.
         """
         old_position = await self.position.get_value()
-        await self.position.set(position)
-        if position == BacklightPosition.OUT:
+        await self.position.set(value)
+        if value == BacklightPosition.OUT:
             await self.power.set(BacklightPower.OFF)
         else:
             await self.power.set(BacklightPower.ON)
-        if old_position != position:
+        if old_position != value:
             await sleep(self.TIME_TO_MOVE_S)
