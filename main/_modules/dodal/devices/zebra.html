@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.zebra &#8212; dodal 1.33.1.dev2+g08268c3b6 documentation</title>
+    <title>dodal.devices.zebra &#8212; dodal 1.33.1.dev3+ge2b270595 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=b12c2cba"></script>
+    <script src="../../../_static/documentation_options.js?v=cc4eb3a1"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -486,6 +486,7 @@ document.write(`
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">ophyd_async.epics.signal</span> <span class="kn">import</span> <span class="n">epics_signal_r</span><span class="p">,</span> <span class="n">epics_signal_rw</span>
 
+<span class="c1"># These constants refer to I03&#39;s Zebra. See https://github.com/DiamondLightSource/dodal/issues/772</span>
 <span class="c1"># Sources</span>
 <span class="n">DISCONNECT</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">IN1_TTL</span> <span class="o">=</span> <span class="mi">1</span>
@@ -512,8 +513,10 @@ document.write(`
 
 <span class="c1"># The AND gate that controls the automatic shutter</span>
 <span class="n">AUTO_SHUTTER_GATE</span> <span class="o">=</span> <span class="mi">2</span>
-<span class="c1"># The input that triggers the automatic shutter</span>
-<span class="n">AUTO_SHUTTER_INPUT</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="c1"># The first two inputs of the auto shutter gate.</span>
+<span class="n">AUTO_SHUTTER_INPUT_1</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">AUTO_SHUTTER_INPUT_2</span> <span class="o">=</span> <span class="mi">2</span>
 
 
 <div class="viewcode-block" id="ArmSource">
