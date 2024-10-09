@@ -16,7 +16,7 @@ dependencies = [
     "click",
     "ophyd",
     "ophyd-async>=0.6,<0.7",
-    "bluesky",
+    "bluesky<1.13",           # https://github.com/DiamondLightSource/dodal/issues/828
     "pyepics",
     "dataclasses-json",
     "pillow",
