@@ -25,6 +25,44 @@ set_path_provider(
     )
 )
 
+"""
+Usage Example
+-------------
+
+Before running the code, make sure to perform the following steps:
+
+1. Run AdSimulator on the workstation using DLS Launcher.
+2. Export the following environment variables:
+    - EPICS_CA_SERVER_PORT=6064
+    - EPICS_CA_REPEATER_PORT=6065
+
+The code below demonstrates how to use the `adsim` and `sim_motors` functions from the `dodal.beamlines.adsim` module:
+
+```
+import asyncio
+
+from bluesky.plans import count
+from bluesky.run_engine import RunEngine
+
+from dodal.beamlines.adsim import adsim, sim_motors
+from dodal.common.beamlines.beamline_utils import get_path_provider
+
+
+async def run_experiment():
+    RE = RunEngine()
+    det = adsim()
+    sim_motors()
+    pp = get_path_provider()
+    await pp.update()
+    RE(count([det], num=10))
+
+
+if __name__ == "__main__":
+    asyncio.run(run_experiment())
+```
+
+"""
+
 
 def sim_motors(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
