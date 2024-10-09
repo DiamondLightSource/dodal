@@ -13,6 +13,7 @@ from os import environ
 from types import ModuleType
 from typing import (
     Any,
+    Protocol,
     TypeGuard,
     TypeVar,
     runtime_checkable,
@@ -65,7 +66,7 @@ BLUESKY_PROTOCOLS = [
 
 
 @runtime_checkable
-class MovableReadable(Movable, Readable): ...
+class MovableReadable(Movable, Readable, Protocol): ...
 
 
 AnyDevice: TypeAlias = OphydV1Device | OphydV2Device
