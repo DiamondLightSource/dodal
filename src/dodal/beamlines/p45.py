@@ -7,12 +7,13 @@ from dodal.common.beamlines.beamline_utils import (
     device_instantiation,
     get_path_provider,
     set_path_provider,
+    skip_device,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.visit import StaticVisitPathProvider
 from dodal.devices.p45 import Choppers, TomoStageWithStretchAndSkew
 from dodal.log import set_beamline as set_log_beamline
-from dodal.utils import get_beamline_name, skip_device
+from dodal.utils import get_beamline_name
 
 BL = get_beamline_name("p45")
 set_log_beamline(BL)
