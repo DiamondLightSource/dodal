@@ -69,9 +69,9 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
         self._sources = DeviceVector(
             {
                 Source.FULL_SCREEN.value: epics_signal_r(
-                    str, f"{prefix}MJPG:MJPG_URL_RBV"
+                    str, f"{prefix}XTAL:MJPG_URL_RBV"
                 ),
-                Source.ROI.value: epics_signal_r(str, f"{prefix}XTAL:MJPG_URL_RBV"),
+                Source.ROI.value: epics_signal_r(str, f"{prefix}MJPG:MJPG_URL_RBV"),
             }
         )
         self.selected_source = soft_signal_rw(Source)
