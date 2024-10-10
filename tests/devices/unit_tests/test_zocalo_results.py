@@ -16,6 +16,7 @@ from dodal.devices.zocalo.zocalo_results import (
     XrcResult,
     ZocaloResults,
     ZocaloSource,
+    get_full_processing_results,
     get_processing_result,
 )
 
@@ -178,6 +179,27 @@ async def test_extraction_plan(mocked_zocalo_device, RE) -> None:
         assert np.all(com == np.array([0.5, 1.5, 2.5]))
         assert np.all(bbox == np.array([2, 2, 1]))
         yield from bps.close_run()
+
+    RE(plan())
+
+
+async def test_get_full_processing_results(mocked_zocalo_device, RE) -> None:
+    zocalo_device: ZocaloResults = await mocked_zocalo_device(
+        TEST_RESULTS, run_setup=False
+    )
+
+    def plan():
+        yield from bps.trigger(zocalo_device)
+        full_results = yield from get_full_processing_results(zocalo_device)
+        assert len(full_results) == 3
+        centres_of_mass = [xrc_result["centre_of_mass"] for xrc_result in full_results]
+        bbox = [xrc_result["bounding_box"] for xrc_result in full_results]
+        assert centres_of_mass == [[0.5, 1.5, 2.5], [1.5, 2.5, 3.5], [3.5, 4.5, 5.5]]
+        assert bbox == [
+            [[1, 2, 3], [3, 4, 4]],
+            [[1, 2, 3], [3, 4, 4]],
+            [[1, 2, 3], [3, 4, 4]],
+        ]
 
     RE(plan())
 
