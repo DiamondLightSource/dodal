@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 I03_BEAM_HEIGHT_UM = 20
+I03_BEAM_WIDTH_UM = 80
 
 
 @dataclass
@@ -10,4 +11,7 @@ class BeamSize:
 
 
 def beam_size_from_aperture(aperture_size: float | None):
-    return BeamSize(aperture_size, I03_BEAM_HEIGHT_UM if aperture_size else None)
+    return BeamSize(
+        min(aperture_size, I03_BEAM_WIDTH_UM),
+        I03_BEAM_HEIGHT_UM if aperture_size else None,
+    )
