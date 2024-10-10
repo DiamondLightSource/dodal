@@ -45,7 +45,7 @@ class MirrorVoltageDemand(str, Enum):
     SLEW = "SLEW"
 
 
-class MirrorVoltageDevice(Device):
+class SingleMirrorVoltage(Device):
     """Abstract the bimorph mirror voltage PVs into a single device that can be set asynchronously and returns when
     the demanded voltage setpoint is accepted, without blocking the caller as this process can take significant time.
     """
@@ -105,21 +105,27 @@ class MirrorVoltageDevice(Device):
         await set_status
 
 
-class VFMMirrorVoltages(StandardReadable):
+class MirrorVoltages(StandardReadable):
     def __init__(
         self, name: str, prefix: str, *args, daq_configuration_path: str, **kwargs
     ):
         self.voltage_lookup_table_path = (
             daq_configuration_path + "/json/mirrorFocus.json"
         )
+
         with self.add_children_as_readables():
-            self.voltage_channels = DeviceVector(
-                {
-                    i - 14: MirrorVoltageDevice(prefix=f"{prefix}BM:V{i}")
-                    for i in range(14, 22)
-                }
-            )
+            self.horizontal_voltages = self._channels_in_range(prefix, 0, 13)
+            self.vertical_voltages = self._channels_in_range(prefix, 14, 22)
+
         super().__init__(*args, name=name, **kwargs)
+
+    def _channels_in_range(self, prefix, start_idx, end_idx):
+        return DeviceVector(
+            {
+                i - start_idx: SingleMirrorVoltage(prefix=f"{prefix}BM:V{i}")
+                for i in range(start_idx, end_idx)
+            }
+        )
 
 
 class FocusingMirror(StandardReadable):

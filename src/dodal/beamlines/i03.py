@@ -22,7 +22,7 @@ from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import PandAFastGridScan, ZebraFastGridScan
 from dodal.devices.flux import Flux
-from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, VFMMirrorVoltages
+from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, MirrorVoltages
 from dodal.devices.motors import XYZPositioner
 from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
@@ -121,11 +121,11 @@ def vfm(
 
 
 @skip_device(lambda: BL == "s03")
-def vfm_mirror_voltages(
+def mirror_voltages(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> VFMMirrorVoltages:
+) -> MirrorVoltages:
     return device_instantiation(
-        device_factory=VFMMirrorVoltages,
+        device_factory=MirrorVoltages,
         name="vfm_mirror_voltages",
         prefix="-MO-PSU-01:",
         wait=wait_for_connection,
