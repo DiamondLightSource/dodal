@@ -126,7 +126,7 @@ def mirror_voltages(
 ) -> MirrorVoltages:
     return device_instantiation(
         device_factory=MirrorVoltages,
-        name="vfm_mirror_voltages",
+        name="mirror_voltages",
         prefix="-MO-PSU-01:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
