@@ -13,6 +13,7 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
+# These constants refer to I03's Zebra. See https://github.com/DiamondLightSource/dodal/issues/772
 # Sources
 DISCONNECT = 0
 IN1_TTL = 1
@@ -39,8 +40,10 @@ TTL_PANDA = 4
 
 # The AND gate that controls the automatic shutter
 AUTO_SHUTTER_GATE = 2
-# The input that triggers the automatic shutter
-AUTO_SHUTTER_INPUT = 1
+
+# The first two inputs of the auto shutter gate.
+AUTO_SHUTTER_INPUT_1 = 1
+AUTO_SHUTTER_INPUT_2 = 2
 
 
 class ArmSource(str, Enum):

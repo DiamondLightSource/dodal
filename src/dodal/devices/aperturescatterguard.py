@@ -8,11 +8,11 @@ from ophyd_async.core import (
     AsyncStatus,
     HintedSignal,
     StandardReadable,
-    soft_signal_rw,
 )
 from pydantic import BaseModel, Field
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
+from dodal.common.signal_utils import create_hardware_backed_soft_signal
 from dodal.devices.aperture import Aperture
 from dodal.devices.scatterguard import Scatterguard
 
@@ -105,7 +105,9 @@ class ApertureScatterguard(StandardReadable, Movable):
     ) -> None:
         self.aperture = Aperture(prefix + "-MO-MAPT-01:")
         self.scatterguard = Scatterguard(prefix + "-MO-SCAT-01:")
-        self.radius = soft_signal_rw(float, units="µm")
+        self.radius = create_hardware_backed_soft_signal(
+            float, self._get_current_radius, units="µm"
+        )
         self._loaded_positions = loaded_positions
         self._tolerances = tolerances
         self.add_readables(
@@ -119,7 +121,9 @@ class ApertureScatterguard(StandardReadable, Movable):
             ],
         )
         with self.add_children_as_readables(HintedSignal):
-            self.selected_aperture = soft_signal_rw(ApertureValue)
+            self.selected_aperture = create_hardware_backed_soft_signal(
+                ApertureValue, self._get_current_aperture_position
+            )
 
         super().__init__(name)
 
@@ -136,9 +140,6 @@ class ApertureScatterguard(StandardReadable, Movable):
     @AsyncStatus.wrap
     async def _set_raw_unsafe(self, position: AperturePosition):
         """Accept the risks and move in an unsafe way. Collisions possible."""
-        if position.radius is not None:
-            await self.radius.set(position.radius)
-
         aperture_x, aperture_y, aperture_z, scatterguard_x, scatterguard_y = (
             position.values
         )
@@ -150,13 +151,8 @@ class ApertureScatterguard(StandardReadable, Movable):
             self.scatterguard.x.set(scatterguard_x),
             self.scatterguard.y.set(scatterguard_y),
         )
-        try:
-            value = await self.get_current_aperture_position()
-            self.selected_aperture.set(value)
-        except InvalidApertureMove:
-            self.selected_aperture.set(None)  # type: ignore
 
-    async def get_current_aperture_position(self) -> ApertureValue:
+    async def _get_current_aperture_position(self) -> ApertureValue:
         """
         Returns the current aperture position using readback values
         for SMALL, MEDIUM, LARGE. ROBOT_LOAD position defined when
@@ -175,6 +171,10 @@ class ApertureScatterguard(StandardReadable, Movable):
             return ApertureValue.ROBOT_LOAD
 
         raise InvalidApertureMove("Current aperture/scatterguard state unrecognised")
+
+    async def _get_current_radius(self) -> float | None:
+        current_value = await self._get_current_aperture_position()
+        return self._loaded_positions[current_value].radius
 
     async def _safe_move_within_datacollection_range(
         self, position: AperturePosition, value: ApertureValue
@@ -203,8 +203,6 @@ class ApertureScatterguard(StandardReadable, Movable):
             )
 
         current_ap_y = await self.aperture.y.user_readback.get_value()
-        if position.radius is not None:
-            await self.radius.set(position.radius)
 
         aperture_x, aperture_y, aperture_z, scatterguard_x, scatterguard_y = (
             position.values
@@ -231,4 +229,3 @@ class ApertureScatterguard(StandardReadable, Movable):
                 self.scatterguard.x.set(scatterguard_x),
                 self.scatterguard.y.set(scatterguard_y),
             )
-        await self.selected_aperture.set(value)

@@ -154,8 +154,8 @@ async def test_aperturescatterguard_moves_in_correct_order(
         yield from bps.open_run()
         yield from bps.monitor(ap_sg.aperture.y.motor_done_move, name="ap_y")
         yield from bps.monitor(ap_sg.scatterguard.y.motor_done_move, name="sg_y")
-        yield from bps.mv(ap_sg, pos1)
-        yield from bps.mv(ap_sg, pos2)
+        yield from bps.mv(ap_sg, pos1)  # type: ignore # See: https://github.com/DiamondLightSource/dodal/issues/827
+        yield from bps.mv(ap_sg, pos2)  # type: ignore # See: https://github.com/DiamondLightSource/dodal/issues/827
         yield from bps.close_run()
 
     RE(monitor_and_moves())

@@ -76,7 +76,7 @@ class MirrorVoltageDevice(Device):
             LOGGER.debug(f"{setpoint_v.name} already at {value} - skipping set")
             return
 
-        LOGGER.debug(f"setting {setpoint_v.name} to {value}")
+        LOGGER.debug(f"Setting {setpoint_v.name} to {value}")
 
         # Register an observer up front to ensure we don't miss events after we
         # perform the set
@@ -85,16 +85,14 @@ class MirrorVoltageDevice(Device):
         )
         # discard the current value (OK) so we can await a subsequent change
         await anext(demand_accepted_iterator)
-        await setpoint_v.set(value)
+        set_status = setpoint_v.set(value, wait=False)
 
         # The set should always change to SLEW regardless of whether we are
         # already at the set point, then change back to OK/FAIL depending on
         # success
         accepted_value = await anext(demand_accepted_iterator)
         assert accepted_value == MirrorVoltageDemand.SLEW
-        LOGGER.debug(
-            f"Demand not accepted for {setpoint_v.name}, waiting for acceptance..."
-        )
+        LOGGER.debug(f"Waiting for {setpoint_v.name} to set")
         while MirrorVoltageDemand.SLEW == (
             accepted_value := await anext(demand_accepted_iterator)
         ):
@@ -104,6 +102,7 @@ class MirrorVoltageDevice(Device):
             raise AssertionError(
                 f"Voltage slew failed for {setpoint_v.name}, new state={accepted_value}"
             )
+        await set_status
 
 
 class VFMMirrorVoltages(StandardReadable):

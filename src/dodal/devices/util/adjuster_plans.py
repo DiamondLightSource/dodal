@@ -21,6 +21,6 @@ def lookup_table_adjuster(
     def adjust(group=None) -> Generator[Msg, None, None]:
         setpoint = lookup_table(input)
         LOGGER.info(f"lookup_table_adjuster setting {output_device.name} to {setpoint}")
-        yield from bps.abs_set(output_device, setpoint, group=group)
+        yield from bps.abs_set(output_device, setpoint, group=group)  # type: ignore # See: https://github.com/DiamondLightSource/dodal/issues/827
 
     return adjust

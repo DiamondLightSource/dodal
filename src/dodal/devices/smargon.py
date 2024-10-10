@@ -40,8 +40,8 @@ class StubOffsets(Device):
         super().__init__(name)
 
     @AsyncStatus.wrap
-    async def set(self, pos: StubPosition):
-        if pos == StubPosition.CURRENT_AS_CENTER:
+    async def set(self, value: StubPosition):
+        if value == StubPosition.CURRENT_AS_CENTER:
             await self.center_at_current_position.set(1)
             smargon = cast(Smargon, self.parent)
             await wait_for_value(

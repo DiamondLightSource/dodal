@@ -1,6 +1,6 @@
 import uuid
 from collections.abc import Generator
-from typing import Any, TypeVar
+from typing import Any, TypeVar, cast
 
 from bluesky import plan_stubs as bps
 from bluesky.preprocessors import finalize_wrapper, pchain
@@ -9,13 +9,14 @@ from ophyd_async.core import Device
 from ophyd_async.epics.motor import Motor
 
 from dodal.common import MsgGenerator
+from dodal.utils import MovableReadable
 
-AnyDevice = TypeVar("AnyDevice", bound=Device)
+MovableReadableDevice = TypeVar("MovableReadableDevice", bound=MovableReadable)
 
 
 class MoveTooLarge(Exception):
     def __init__(
-        self, axis: Device, maximum_move: float, position: float, *args: object
+        self, axis: MovableReadable, maximum_move: float, position: float, *args: object
     ) -> None:
         self.axis = axis
         self.maximum_move = maximum_move
@@ -24,10 +25,10 @@ class MoveTooLarge(Exception):
 
 
 def _check_and_cache_values(
-    devices_and_positions: dict[AnyDevice, float],
+    devices_and_positions: dict[MovableReadableDevice, float],
     smallest_move: float,
     maximum_move: float,
-) -> Generator[Msg, Any, dict[AnyDevice, float]]:
+) -> Generator[Msg, Any, dict[MovableReadableDevice, float]]:
     """Caches the positions of all Motors on specified device if they are within
     smallest_move of home_position. Throws MoveTooLarge if they are outside maximum_move
     of the home_position
@@ -51,7 +52,9 @@ def home_and_reset_wrapper(
     wait_for_all: bool = True,
 ) -> MsgGenerator:
     home_positions = {
-        axis: 0.0 for _, axis in device.children() if isinstance(axis, Motor)
+        cast(MovableReadable, axis): 0.0
+        for _, axis in device.children()
+        if isinstance(axis, Motor)
     }
     return move_and_reset_wrapper(
         plan, home_positions, smallest_move, maximum_move, group, wait_for_all
@@ -60,7 +63,7 @@ def home_and_reset_wrapper(
 
 def move_and_reset_wrapper(
     plan: MsgGenerator,
-    device_and_positions: dict[AnyDevice, float],
+    device_and_positions: dict[MovableReadable, float],
     smallest_move: float,
     maximum_move: float,
     group: str | None = None,
