@@ -1,4 +1,7 @@
-from dodal.common.beamlines.beamline_utils import BL, device_instantiation
+from dodal.common.beamlines.beamline_utils import (
+    BL,
+    device_instantiation,
+)
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.detector import DetectorParams
 from dodal.devices.eiger import EigerDetector
@@ -10,8 +13,8 @@ from dodal.devices.i24.dual_backlight import DualBacklight
 from dodal.devices.i24.i24_detector_motion import DetectorMotion
 from dodal.devices.i24.i24_vgonio import VGonio
 from dodal.devices.i24.pmac import PMAC
-from dodal.devices.oav.oav_detector import OAV
-from dodal.devices.oav.oav_parameters import OAVConfigParams
+from dodal.devices.oav.oav_async import OAV
+from dodal.devices.oav.oav_parameters import OAVConfig
 from dodal.devices.zebra import Zebra
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import get_beamline_name, skip_device
@@ -138,16 +141,13 @@ def pmac(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) ->
 
 @skip_device(lambda: BL == "s24")
 def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> OAV:
-    """Get the i24 OAV device, instantiate it if it hasn't already been.
-    If this is called when already instantiated in i24, it will return the existing object.
-    """
     return device_instantiation(
         OAV,
         "oav",
-        "",
+        "-DI-OAV-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        params=OAVConfigParams(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+        config=OAVConfig(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
     )
 
 
