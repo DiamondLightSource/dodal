@@ -114,7 +114,7 @@ class MirrorVoltages(StandardReadable):
         )
 
         with self.add_children_as_readables():
-            self.horizontal_voltages = self._channels_in_range(prefix, 0, 13)
+            self.horizontal_voltages = self._channels_in_range(prefix, 0, 14)
             self.vertical_voltages = self._channels_in_range(prefix, 14, 22)
 
         super().__init__(*args, name=name, **kwargs)

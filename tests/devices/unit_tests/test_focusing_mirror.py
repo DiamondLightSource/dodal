@@ -245,7 +245,7 @@ def test_mirror_set_voltage_returns_immediately_if_voltage_already_demanded(
 def test_mirror_populates_voltage_channels(RE):
     with DeviceCollector(mock=True):
         mirror_voltages = MirrorVoltages("", "", daq_configuration_path="")
-    assert len(mirror_voltages.horizontal_voltages) == 13
+    assert len(mirror_voltages.horizontal_voltages) == 14
     assert len(mirror_voltages.vertical_voltages) == 8
     assert isinstance(mirror_voltages.horizontal_voltages[0], SingleMirrorVoltage)
 
