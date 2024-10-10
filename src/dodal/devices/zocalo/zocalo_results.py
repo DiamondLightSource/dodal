@@ -1,5 +1,4 @@
 import asyncio
-from collections import OrderedDict
 from collections.abc import Generator, Sequence
 from enum import Enum
 from queue import Empty, Queue
@@ -9,7 +8,7 @@ import bluesky.plan_stubs as bps
 import numpy as np
 import workflows.recipe
 import workflows.transport
-from bluesky.protocols import Descriptor, Triggerable
+from bluesky.protocols import Triggerable
 from bluesky.utils import Msg
 from deepdiff import DeepDiff
 from numpy.typing import NDArray
@@ -131,14 +130,23 @@ class ZocaloResults(StandardReadable, Triggerable):
         self.transport: CommonTransport | None = None
         self.use_cpu_and_gpu = use_cpu_and_gpu
 
-        self.results, self._results_setter = soft_signal_r_and_setter(
-            list[XrcResult], name="results"
-        )
         self.centres_of_mass, self._com_setter = soft_signal_r_and_setter(
             NDArray[np.uint64], name="centres_of_mass"
         )
         self.bbox_sizes, self._bbox_setter = soft_signal_r_and_setter(
             NDArray[np.uint64], "bbox_sizes", self.name
+        )
+        self.max_voxel, self._max_voxel_setter = soft_signal_r_and_setter(
+            NDArray[np.uint64], int, name="max_voxel"
+        )
+        self.max_count, self._max_count_setter = soft_signal_r_and_setter(
+            NDArray[np.uint64], name="max_count"
+        )
+        self.n_voxels, self._n_voxels_setter = soft_signal_r_and_setter(
+            NDArray[np.uint64], name="n_voxels"
+        )
+        self.total_count, self._total_count_setter = soft_signal_r_and_setter(
+            NDArray[np.uint64], name="total_count"
         )
         self.ispyb_dcid, self._ispyb_dcid_setter = soft_signal_r_and_setter(
             int, name="ispyb_dcid"
@@ -148,7 +156,10 @@ class ZocaloResults(StandardReadable, Triggerable):
         )
         self.add_readables(
             [
-                self.results,
+                self.max_voxel,
+                self.max_count,
+                self.n_voxels,
+                self.total_count,
                 self.centres_of_mass,
                 self.bbox_sizes,
                 self.ispyb_dcid,
@@ -159,11 +170,14 @@ class ZocaloResults(StandardReadable, Triggerable):
         super().__init__(name)
 
     async def _put_results(self, results: Sequence[XrcResult], recipe_parameters):
-        self._results_setter(list(results))
         centres_of_mass = np.array([r["centre_of_mass"] for r in results])
         bbox_sizes = np.array([bbox_size(r) for r in results])
         self._com_setter(centres_of_mass)
         self._bbox_setter(bbox_sizes)
+        self._max_voxel_setter([r["max_voxel"] for r in results])
+        self._max_count_setter([r["max_count"] for r in results])
+        self._n_voxels_setter([r["n_voxels"] for r in results])
+        self._total_count_setter([r["total_count"] for r in results])
         self._ispyb_dcid_setter(recipe_parameters["dcid"])
         self._ispyb_dcgid_setter(recipe_parameters["dcgid"])
 
@@ -287,48 +301,6 @@ class ZocaloResults(StandardReadable, Triggerable):
         finally:
             self._kickoff_run = False
 
-    async def describe(self) -> dict[str, Descriptor]:
-        zocalo_array_type: Descriptor = {
-            "source": f"zocalo_service:{self.zocalo_environment}",
-            "dtype": "array",
-            "shape": [-1, 3],
-        }
-        zocalo_int_type: Descriptor = {
-            "source": f"zocalo_service:{self.zocalo_environment}",
-            "dtype": "integer",
-            "shape": [0],
-        }
-        return OrderedDict(
-            [
-                (
-                    self._name + "-results",
-                    {
-                        "source": f"zocalo_service:{self.zocalo_environment}",
-                        "dtype": "array",
-                        "shape": [
-                            -1,
-                        ],  # TODO describe properly - see https://github.com/DiamondLightSource/dodal/issues/253
-                    },
-                ),
-                (
-                    self._name + "-centres_of_mass",
-                    zocalo_array_type,
-                ),
-                (
-                    self._name + "-bbox_sizes",
-                    zocalo_array_type,
-                ),
-                (
-                    self._name + "-ispyb_dcid",
-                    zocalo_int_type,
-                ),
-                (
-                    self._name + "-ispyb_dcgid",
-                    zocalo_int_type,
-                ),
-            ],
-        )
-
     def _subscribe_to_results(self):
         self.transport = _get_zocalo_connection(self.zocalo_environment)
 
@@ -365,28 +337,6 @@ class ZocaloResults(StandardReadable, Triggerable):
         )
 
 
-def get_processing_result(
-    zocalo: ZocaloResults,
-) -> Generator[Any, Any, tuple[np.ndarray, np.ndarray] | tuple[None, None]]:
-    """A minimal plan which will extract the top ranked xray centre and crystal bounding
-    box size from the zocalo results. Returns (None, None) if no crystals were found."""
-
-    LOGGER.info("Getting zocalo processing results.")
-    centres_of_mass = yield from bps.rd(zocalo.centres_of_mass, default_value=[])  # type: ignore
-    LOGGER.debug(f"Centres of mass: {centres_of_mass}")
-    centre_of_mass = (
-        None
-        if len(centres_of_mass) == 0  # type: ignore
-        else centres_of_mass[0] - np.array([0.5, 0.5, 0.5])  # type: ignore
-    )
-    LOGGER.debug(f"Adjusted top centring result: {centre_of_mass}")
-    bbox_sizes = yield from bps.rd(zocalo.bbox_sizes, default_value=[])  # type: ignore
-    LOGGER.debug(f"Bounding box sizes: {centres_of_mass}")
-    bbox_size = None if len(bbox_sizes) == 0 else bbox_sizes[0]  # type: ignore
-    LOGGER.debug(f"Top bbox size: {bbox_size}")
-    return centre_of_mass, bbox_size
-
-
 def _corrected_xrc_result(uncorrected: XrcResult) -> XrcResult:
     corrected = XrcResult(**uncorrected)
     corrected["centre_of_mass"] = [
@@ -401,5 +351,22 @@ def get_full_processing_results(
     """A plan that will return the raw zocalo results, ranked in descending order according to the sort key.
     Returns empty list in the event no results found."""
     LOGGER.info("Retrieving raw zocalo processing results")
-    raw_results = yield from bps.rd(zocalo.results, default_value=[])  # type: ignore
-    return [_corrected_xrc_result(r) for r in raw_results]  # type: ignore
+    com = yield from bps.rd(zocalo.centres_of_mass, default_value=[])  # type: ignore
+    max_voxel = yield from bps.rd(zocalo.max_voxel, default_value=[])  # type: ignore
+    max_count = yield from bps.rd(zocalo.max_count, default_value=[])  # type: ignore
+    n_voxels = yield from bps.rd(zocalo.n_voxels, default_value=[])  # type: ignore
+    total_count = yield from bps.rd(zocalo.total_count, default_value=[])  # type: ignore
+    bounding_box = yield from bps.rd(zocalo.bounding_box, default_value=[])  # type: ignore
+    return [
+        XrcResult(
+            centre_of_mass=com,
+            max_voxel=mv,
+            max_count=mc,
+            n_voxels=n,
+            total_count=tc,
+            bounding_box=bb,
+        )
+        for com, mv, mc, n, tc, bb in zip(
+            com, max_voxel, max_count, n_voxels, total_count, bounding_box, strict=True
+        )
+    ]
