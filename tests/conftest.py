@@ -94,7 +94,7 @@ def pytest_runtest_teardown():
 
 @pytest.fixture
 def vfm_mirror_voltages(RE: RunEngine):
-    voltages = i03.vfm_mirror_voltages(fake_with_ophyd_sim=True)
+    voltages = i03.mirror_voltages(fake_with_ophyd_sim=True)
     voltages.voltage_lookup_table_path = "tests/test_data/test_mirror_focus.json"
     yield voltages
     beamline_utils.clear_devices()
