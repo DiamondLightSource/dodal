@@ -5,7 +5,7 @@ import pytest
 from aiohttp.client_exceptions import ClientConnectorError
 from ophyd_async.core import DeviceCollector, set_mock_value
 
-from dodal.devices.oav.oav_to_redis_forwarder import OAVToRedisForwarder
+from dodal.devices.oav.oav_to_redis_forwarder import OAVToRedisForwarder, Source
 
 
 def _oav_to_redis_forwarder(mock):
@@ -28,14 +28,19 @@ def mock_oav_to_redis_forwarder(_, RE):
     return _oav_to_redis_forwarder(True)
 
 
+def _set_url(mock_oav_to_redis_forwarder: OAVToRedisForwarder, url: str):
+    set_mock_value(
+        mock_oav_to_redis_forwarder._sources[Source.FULL_SCREEN.value],
+        url,
+    )
+    set_mock_value(mock_oav_to_redis_forwarder.selected_source, Source.FULL_SCREEN)
+
+
 @pytest.mark.s03  # Doesn't actually depend on s03 but is a system test as it depends on external webpage. See https://github.com/DiamondLightSource/mx-bluesky/issues/183
 async def test_given_stream_url_is_not_a_real_webpage_when_kickoff_then_error(
     mock_oav_to_redis_forwarder: OAVToRedisForwarder,
 ):
-    set_mock_value(
-        mock_oav_to_redis_forwarder.stream_url,
-        "http://www.this_is_not_a_valid_webpage.com/",
-    )
+    _set_url(mock_oav_to_redis_forwarder, "http://www.this_is_not_a_valid_webpage.com/")
     with pytest.raises(ClientConnectorError):
         await mock_oav_to_redis_forwarder.kickoff()
 
@@ -45,7 +50,7 @@ async def test_given_stream_url_is_real_webpage_but_not_mjpg_when_kickoff_then_e
     mock_oav_to_redis_forwarder: OAVToRedisForwarder,
 ):
     URL = "https://www.google.com/"
-    set_mock_value(mock_oav_to_redis_forwarder.stream_url, URL)
+    _set_url(mock_oav_to_redis_forwarder, URL)
     with pytest.raises(ValueError) as e:
         await mock_oav_to_redis_forwarder.kickoff()
     assert URL in str(e.value)

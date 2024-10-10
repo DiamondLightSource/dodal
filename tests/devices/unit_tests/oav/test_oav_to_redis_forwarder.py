@@ -2,14 +2,18 @@ import asyncio
 import io
 import pickle
 from datetime import timedelta
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import ANY, AsyncMock, MagicMock, patch
 
 import numpy as np
 import pytest
 from ophyd_async.core import DeviceCollector, set_mock_value
 from PIL import Image
 
-from dodal.devices.oav.oav_to_redis_forwarder import OAVToRedisForwarder, get_next_jpeg
+from dodal.devices.oav.oav_to_redis_forwarder import (
+    OAVToRedisForwarder,
+    Source,
+    get_next_jpeg,
+)
 
 
 @pytest.fixture
@@ -17,7 +21,10 @@ from dodal.devices.oav.oav_to_redis_forwarder import OAVToRedisForwarder, get_ne
 def oav_forwarder(RE):
     with DeviceCollector(mock=True):
         oav_forwarder = OAVToRedisForwarder("prefix", "host", "password")
-    set_mock_value(oav_forwarder.stream_url, "test-stream-url")
+    set_mock_value(
+        oav_forwarder._sources[Source.FULL_SCREEN.value], "test-full-screen-stream-url"
+    )
+    set_mock_value(oav_forwarder._sources[Source.ROI.value], "test-roi-stream-url")
     return oav_forwarder
 
 
@@ -30,7 +37,7 @@ def oav_forwarder_with_valid_response(oav_forwarder):
     mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
     mock_response.content_type = "multipart/x-mixed-replace"
     oav_forwarder._get_frame_and_put_to_redis = AsyncMock()
-    yield oav_forwarder, mock_response
+    yield oav_forwarder, mock_response, mock_get
     client_session_patch.stop()
 
 
@@ -50,7 +57,7 @@ async def test_given_response_is_not_mjpeg_when_oav_forwarder_kicked_off_then_ex
 async def test_when_oav_forwarder_kicked_off_then_connection_open_and_data_streamed(
     oav_forwarder_with_valid_response,
 ):
-    oav_forwarder, mock_response = oav_forwarder_with_valid_response
+    oav_forwarder, mock_response, _ = oav_forwarder_with_valid_response
 
     await oav_forwarder.kickoff()
 
@@ -63,7 +70,7 @@ async def test_when_oav_forwarder_kicked_off_then_connection_open_and_data_strea
 async def test_when_oav_forwarder_kicked_off_then_stopped_forwarding_is_stopped(
     oav_forwarder_with_valid_response,
 ):
-    oav_forwarder, _ = oav_forwarder_with_valid_response
+    oav_forwarder, _, _ = oav_forwarder_with_valid_response
 
     await oav_forwarder.kickoff()
     await oav_forwarder.stop()
@@ -73,7 +80,7 @@ async def test_when_oav_forwarder_kicked_off_then_stopped_forwarding_is_stopped(
 async def test_when_oav_forwarder_kicked_off_then_completed_forwarding_is_stopped(
     oav_forwarder_with_valid_response,
 ):
-    oav_forwarder, _ = oav_forwarder_with_valid_response
+    oav_forwarder, _, _ = oav_forwarder_with_valid_response
 
     await oav_forwarder.kickoff()
     await oav_forwarder.complete()
@@ -138,3 +145,22 @@ async def test_when_get_frame_and_put_to_redis_called_then_data_put_in_redis_wit
     redis_expire_call = oav_forwarder.redis_client.expire.call_args[0]
     assert redis_expire_call[0] == str(SAMPLE_ID)
     assert redis_expire_call[1] == timedelta(days=oav_forwarder.DATA_EXPIRY_DAYS)
+
+
+@pytest.mark.parametrize(
+    "source, expected_url",
+    [
+        (Source.FULL_SCREEN, "test-full-screen-stream-url"),
+        (Source.ROI, "test-roi-stream-url"),
+    ],
+)
+async def test_when_different_sources_selected_then_different_urls_used(
+    oav_forwarder_with_valid_response, source, expected_url
+):
+    oav_forwarder, _, mock_get = oav_forwarder_with_valid_response
+    oav_forwarder.selected_source.set(source)
+
+    await oav_forwarder.kickoff()
+    await oav_forwarder.complete()
+
+    mock_get.assert_called_with(ANY, expected_url)
