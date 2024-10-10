@@ -16,7 +16,7 @@ from dodal.devices.zocalo.zocalo_results import (
     XrcResult,
     ZocaloResults,
     ZocaloSource,
-    get_processing_result,
+    get_full_processing_results,
 )
 
 TEST_RESULTS: list[XrcResult] = [
@@ -123,30 +123,10 @@ async def test_put_result_read_results(
     zocalo_device = await mocked_zocalo_device([], run_setup=True)
     await zocalo_device._put_results(TEST_RESULTS, test_recipe_parameters)
     reading = await zocalo_device.read()
-    results: list[XrcResult] = reading["zocalo-results"]["value"]
     centres: list[XrcResult] = reading["zocalo-centres_of_mass"]["value"]
     bboxes: list[XrcResult] = reading["zocalo-bbox_sizes"]["value"]
-    assert results == TEST_RESULTS
     assert np.all(centres == np.array([[1, 2, 3], [2, 3, 4], [4, 5, 6]]))
     assert np.all(bboxes[0] == [2, 2, 1])
-
-
-async def test_rd_top_results(
-    mocked_zocalo_device,
-    RE,
-):
-    zocalo_device = await mocked_zocalo_device([], run_setup=True)
-    await zocalo_device._put_results(TEST_RESULTS, test_recipe_parameters)
-
-    def test_plan():
-        bbox_size = yield from bps.rd(zocalo_device.bbox_sizes)
-        assert len(bbox_size[0]) == 3  # type: ignore
-        assert np.all(bbox_size[0] == np.array([2, 2, 1]))  # type: ignore
-        centres_of_mass = yield from bps.rd(zocalo_device.centres_of_mass)
-        assert len(centres_of_mass[0]) == 3  # type: ignore
-        assert np.all(centres_of_mass[0] == np.array([1, 2, 3]))  # type: ignore
-
-    RE(test_plan())
 
 
 async def test_trigger_and_wait_puts_results(
@@ -166,18 +146,25 @@ async def test_trigger_and_wait_puts_results(
     zocalo_device._put_results.assert_called()
 
 
-async def test_extraction_plan(mocked_zocalo_device, RE) -> None:
+async def test_get_full_processing_results(mocked_zocalo_device, RE) -> None:
     zocalo_device: ZocaloResults = await mocked_zocalo_device(
         TEST_RESULTS, run_setup=False
     )
 
     def plan():
-        yield from bps.open_run()
-        yield from bps.trigger_and_read([zocalo_device], name=ZOCALO_READING_PLAN_NAME)
-        com, bbox = yield from get_processing_result(zocalo_device)
-        assert np.all(com == np.array([0.5, 1.5, 2.5]))
-        assert np.all(bbox == np.array([2, 2, 1]))
-        yield from bps.close_run()
+        yield from bps.trigger(zocalo_device)
+        full_results = yield from get_full_processing_results(zocalo_device)
+        assert len(full_results) == 3
+        centres_of_mass = [xrc_result["centre_of_mass"] for xrc_result in full_results]
+        bbox = [xrc_result["bounding_box"] for xrc_result in full_results]
+        assert centres_of_mass == [[0.5, 1.5, 2.5], [1.5, 2.5, 3.5], [3.5, 4.5, 5.5]]
+        assert bbox == [
+            [[1, 2, 3], [3, 4, 4]],
+            [[1, 2, 3], [3, 4, 4]],
+            [[1, 2, 3], [3, 4, 4]],
+        ]
+        for prop in ["max_voxel", "max_count", "n_voxels", "total_count"]:
+            assert [r[prop] for r in full_results] == [r[prop] for r in TEST_RESULTS]  # type: ignore
 
     RE(plan())
 
