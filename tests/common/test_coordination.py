@@ -2,9 +2,9 @@ from inspect import Parameter, signature
 
 import pytest
 from bluesky.protocols import Movable
+from bluesky.utils import MsgGenerator
 
 from dodal.common.coordination import group_uuid, inject
-from dodal.common.types import MsgGenerator
 
 static_uuid = "51aef931-33b4-4b33-b7ad-a8287f541202"
 
