@@ -10,6 +10,7 @@ from dodal.common.beamlines.beamline_utils import (
     set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.device_helpers import HDF5_PREFIX
 from dodal.common.visit import RemoteDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
@@ -57,7 +58,7 @@ def saxs() -> PilatusDetector:
         prefix=f"{PREFIX.beamline_prefix}-EA-PILAT-01:",
         path_provider=get_path_provider(),
         drv_suffix="CAM:",
-        hdf_suffix="HDF5:",
+        hdf_suffix=HDF5_PREFIX,
         metadata_holder=metadata_holder,
     )
 
@@ -82,7 +83,7 @@ def waxs() -> PilatusDetector:
         prefix=f"{PREFIX.beamline_prefix}-EA-PILAT-03:",
         path_provider=get_path_provider(),
         drv_suffix="CAM:",
-        hdf_suffix="HDF5:",
+        hdf_suffix=HDF5_PREFIX,
         metadata_holder=metadata_holder,
     )
 
@@ -108,14 +109,14 @@ def it() -> TetrammDetector:
 @device_factory()
 def vfm() -> FocusingMirror:
     return FocusingMirror(
-        f"{PREFIX.beamline_prefix}-OP-KBM-01:VFM:",
+        prefix=f"{PREFIX.beamline_prefix}-OP-KBM-01:VFM:",
     )
 
 
 @device_factory()
 def hfm() -> FocusingMirror:
     return FocusingMirror(
-        f"{PREFIX.beamline_prefix}|-OP-KBM-01:HFM:",
+        prefix=f"{PREFIX.beamline_prefix}|-OP-KBM-01:HFM:",
     )
 
 
@@ -144,7 +145,7 @@ def dcm() -> DoubleCrystalMonochromator:
 @device_factory()
 def undulator() -> Undulator:
     return Undulator(
-        f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
+        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
         id_gap_lookup_table_path="/dls_sw/i22/software/daq_configuration/lookup/BeamLine_Undulator_toGap.txt",
         poles=80,
         length=2.0,
@@ -153,38 +154,38 @@ def undulator() -> Undulator:
 
 @device_factory()
 def slits_1() -> Slits:
-    return Slits(f"{PREFIX.beamline_prefix}-AL-SLITS-01:")
+    return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-01:")
 
 
 @device_factory()
 def slits_2() -> Slits:
-    return Slits(f"{PREFIX.beamline_prefix}-AL-SLITS-02:")
+    return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-02:")
 
 
 @device_factory()
 def slits_3() -> Slits:
-    return Slits(f"{PREFIX.beamline_prefix}-AL-SLITS-03:")
+    return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-03:")
 
 
 @device_factory()
 def slits_4() -> Slits:
-    return Slits(f"{PREFIX.beamline_prefix}-AL-SLITS-04:")
+    return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-04:")
 
 
 @device_factory()
 def slits_5() -> Slits:
-    return Slits(f"{PREFIX.beamline_prefix}-AL-SLITS-05:")
+    return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-05:")
 
 
 @device_factory()
 def slits_6() -> Slits:
-    return Slits(f"{PREFIX.beamline_prefix}-AL-SLITS-06:")
+    return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-06:")
 
 
 @device_factory()
 def fswitch() -> FSwitch:
     return FSwitch(
-        f"{PREFIX.beamline_prefix}-MO-FSWT-01:",
+        prefix=f"{PREFIX.beamline_prefix}-MO-FSWT-01:",
         lens_geometry="paraboloid",
         cylindrical=True,
         lens_material="Beryllium",
@@ -196,7 +197,7 @@ def fswitch() -> FSwitch:
 @device_factory()
 def panda1() -> HDFPanda:
     return HDFPanda(
-        f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
+        prefix=f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
         path_provider=get_path_provider(),
     )
 
@@ -204,7 +205,7 @@ def panda1() -> HDFPanda:
 @device_factory(skip=True)
 def panda2() -> HDFPanda:
     return HDFPanda(
-        f"{PREFIX.beamline_prefix}-EA-PANDA-02:",
+        prefix=f"{PREFIX.beamline_prefix}-EA-PANDA-02:",
         path_provider=get_path_provider(),
     )
 
@@ -212,7 +213,7 @@ def panda2() -> HDFPanda:
 @device_factory(skip=True)
 def panda3() -> HDFPanda:
     return HDFPanda(
-        f"{PREFIX.beamline_prefix}-EA-PANDA-03:",
+        prefix=f"{PREFIX.beamline_prefix}-EA-PANDA-03:",
         path_provider=get_path_provider(),
     )
 
@@ -220,7 +221,7 @@ def panda3() -> HDFPanda:
 @device_factory(skip=True)
 def panda4() -> HDFPanda:
     return HDFPanda(
-        f"{PREFIX.beamline_prefix}-EA-PANDA-04:",
+        prefix=f"{PREFIX.beamline_prefix}-EA-PANDA-04:",
         path_provider=get_path_provider(),
     )
 
@@ -234,9 +235,9 @@ def oav() -> AravisDetector:
         distance=(-1.0, "m"),
     )
     return NXSasOAV(
-        prefix="",
+        prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
         drv_suffix="DET:",
-        hdf_suffix="HDF5:",
+        hdf_suffix=HDF5_PREFIX,
         path_provider=get_path_provider(),
         metadata_holder=metadata_holder,
     )
@@ -244,4 +245,4 @@ def oav() -> AravisDetector:
 
 @device_factory()
 def linkam() -> Linkam3:
-    return Linkam3(f"{PREFIX.beamline_prefix}-EA-TEMPC-05")
+    return Linkam3(prefix=f"{PREFIX.beamline_prefix}-EA-TEMPC-05")
