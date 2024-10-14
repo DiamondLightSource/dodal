@@ -92,7 +92,6 @@ def i0() -> TetrammDetector:
     return TetrammDetector(
         prefix=f"{PREFIX.beamline_prefix}-EA-XBPM-02:",
         path_provider=get_path_provider(),
-        name="",
         type="Cividec Diamond XBPM",
     )
 
@@ -102,7 +101,6 @@ def it() -> TetrammDetector:
     return TetrammDetector(
         prefix=f"{PREFIX.beamline_prefix}-EA-TTRM-02:",
         path_provider=get_path_provider(),
-        name="",
         type="PIN Diode",
     )
 
@@ -110,16 +108,14 @@ def it() -> TetrammDetector:
 @device_factory()
 def vfm() -> FocusingMirror:
     return FocusingMirror(
-        "",
-        prefix=f"{PREFIX.beamline_prefix}-OP-KBM-01:VFM:",
+        f"{PREFIX.beamline_prefix}-OP-KBM-01:VFM:",
     )
 
 
 @device_factory()
 def hfm() -> FocusingMirror:
     return FocusingMirror(
-        "",
-        prefix=f"{PREFIX.beamline_prefix}|-OP-KBM-01:HFM:",
+        f"{PREFIX.beamline_prefix}|-OP-KBM-01:HFM:",
     )
 
 
@@ -248,4 +244,4 @@ def oav() -> AravisDetector:
 
 @device_factory()
 def linkam() -> Linkam3:
-    return Linkam3(f"{PREFIX.beamline_prefix}-EA-TEMPC-05", "")
+    return Linkam3(f"{PREFIX.beamline_prefix}-EA-TEMPC-05")
