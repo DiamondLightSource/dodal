@@ -30,7 +30,8 @@ class DiamondFilter(StandardReadable, Generic[T]):
     """
     A filter set that is used to reduce the heat load on the monochromator.
 
-    It has 4 slots that can contain filters of different thickness.
+    It has 4 slots that can contain filters of different thickness. Changing the thickness
+    signal will move the filter set to select this filter.
     """
 
     def __init__(
