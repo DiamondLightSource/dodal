@@ -14,11 +14,12 @@ from bluesky.preprocessors import (
 )
 from bluesky.protocols import HasName, Readable, Reading, Triggerable
 from bluesky.run_engine import RunEngine
+from bluesky.utils import MsgGenerator
 from event_model.documents.event_descriptor import DataKey
 from ophyd_async.core import AsyncStatus, DeviceCollector, PathProvider
 from pydantic import BaseModel
 
-from dodal.common.types import MsgGenerator, UpdatingPathProvider
+from dodal.common.types import UpdatingPathProvider
 from dodal.common.visit import (
     DataCollectionIdentifier,
     DirectoryServiceClient,

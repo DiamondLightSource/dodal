@@ -1,9 +1,9 @@
 from bluesky import plan_stubs as bps
 from bluesky import preprocessors as bpp
-from bluesky.utils import make_decorator
+from bluesky.utils import MsgGenerator, make_decorator
 
 from dodal.common.beamlines import beamline_utils
-from dodal.common.types import MsgGenerator, UpdatingPathProvider
+from dodal.common.types import UpdatingPathProvider
 
 DATA_SESSION = "data_session"
 DATA_GROUPS = "data_groups"
