@@ -9,10 +9,7 @@ from importlib import import_module
 from inspect import signature
 from os import environ
 from types import ModuleType
-from typing import (
-    Any,
-    TypeGuard,
-)
+from typing import Any, Protocol, TypeGuard, runtime_checkable
 
 from bluesky.protocols import (
     Checkable,
@@ -35,6 +32,11 @@ from ophyd_async.core import Device as OphydV2Device
 import dodal.log
 from dodal.aliases import AnyDevice, AnyDeviceFactory, V1DeviceFactory, V2DeviceFactory
 from dodal.common.beamlines.device_factory import DeviceInitializationController
+
+
+@runtime_checkable
+class MovableReadable(Movable, Readable, Protocol): ...
+
 
 #: Protocols defining interface to hardware
 BLUESKY_PROTOCOLS = [
