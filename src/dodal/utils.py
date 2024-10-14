@@ -33,11 +33,6 @@ import dodal.log
 from dodal.aliases import AnyDevice, AnyDeviceFactory, V1DeviceFactory, V2DeviceFactory
 from dodal.common.beamlines.device_factory import DeviceInitializationController
 
-
-@runtime_checkable
-class MovableReadable(Movable, Readable, Protocol): ...
-
-
 #: Protocols defining interface to hardware
 BLUESKY_PROTOCOLS = [
     Checkable,
@@ -55,6 +50,10 @@ BLUESKY_PROTOCOLS = [
     Configurable,
     Triggerable,
 ]
+
+
+@runtime_checkable
+class MovableReadable(Movable, Readable, Protocol): ...
 
 
 def get_beamline_name(default: str) -> str:
