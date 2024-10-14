@@ -164,7 +164,7 @@ class FocusingMirrorWithStripes(FocusingMirror):
         # apply the current set stripe setting
         self.apply_stripe = epics_signal_x(prefix + "CHANGE.PROC")
 
-        super().__init__(name, prefix, *args, **kwargs)
+        super().__init__(prefix, name, *args, **kwargs)
 
     def energy_to_stripe(self, energy_kev) -> MirrorStripe:
         # In future, this should be configurable per-mirror
