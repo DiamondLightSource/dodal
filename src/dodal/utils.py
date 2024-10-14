@@ -6,13 +6,14 @@ import socket
 import string
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass
-from functools import wraps
+from functools import update_wrapper, wraps
 from importlib import import_module
 from inspect import signature
 from os import environ
 from types import ModuleType
 from typing import (
     Any,
+    Generic,
     Protocol,
     TypeGuard,
     TypeVar,
@@ -35,6 +36,7 @@ from bluesky.protocols import (
     Triggerable,
     WritesExternalAssets,
 )
+from bluesky.run_engine import call_in_bluesky_event_loop
 from ophyd.device import Device as OphydV1Device
 from ophyd_async.core import Device as OphydV2Device
 
@@ -95,6 +97,8 @@ class BeamlinePrefix:
 
 
 T = TypeVar("T", bound=AnyDevice)
+D = TypeVar("D", bound=OphydV2Device)
+skip = bool | Callable[[], bool]
 
 
 def skip_device(precondition=lambda: True):
@@ -108,6 +112,68 @@ def skip_device(precondition=lambda: True):
         return wrapper
 
     return decorator
+
+
+class DeviceInitializationController(Generic[D]):
+    def __init__(
+        self,
+        factory: Callable[[], D],
+        eager_connect: bool,
+        use_factory_name: bool,
+        timeout: float,
+        mock: bool,
+        skip: skip,
+    ):
+        self._factory: Callable[[], D] = factory
+        self._cached_device: D | None = None
+        self._callbacks: list[Callable[[D], None]] = []
+        self._eager_connect = eager_connect
+        self._use_factory_name = use_factory_name
+        self._timeout = timeout
+        self._mock = mock
+        self._skip = skip
+        update_wrapper(self, factory)
+
+    @property
+    def skip(self) -> bool:
+        return self._skip() if callable(self._skip) else self._skip
+
+    @property
+    def device(self) -> D | None:
+        return self._cached_device
+
+    def add_callback(self, callback: Callable[[D], None]):
+        self._callbacks.append(callback)
+
+    def __call__(
+        self,
+        connect: bool | None = None,
+        name: str | None = None,
+        timeout: float | None = None,
+        mock: bool | None = None,
+    ) -> D:
+        if self.device is not None:
+            device = self.device
+        else:
+            device = self._factory()
+
+        if name:
+            device.set_name(name)
+        elif not device.name and self._use_factory_name:
+            device.set_name(self._factory.__name__)
+
+        if connect or connect is None and self._eager_connect:
+            call_in_bluesky_event_loop(
+                device.connect(
+                    timeout=timeout if timeout is not None else self._timeout,
+                    mock=mock if mock is not None else self._mock,
+                )
+            )
+
+        self._cached_device = device
+        for callback in self._callbacks:
+            callback(device)
+        return device
 
 
 def make_device(
@@ -202,7 +268,14 @@ def invoke_factories(
         dependent_name = leaves.pop()
         params = {name: devices[name] for name in dependencies[dependent_name]}
         try:
-            devices[dependent_name] = factories[dependent_name](**params, **kwargs)
+            factory = factories[dependent_name]
+            if isinstance(factory, DeviceInitializationController):
+                mock = kwargs.get("mock", False) or kwargs.get(
+                    "fake_with_ophyd_sim", False
+                )
+                devices[dependent_name] = factory(mock=mock)
+            else:
+                devices[dependent_name] = factory(**params, **kwargs)
         except Exception as e:
             exceptions[dependent_name] = e
 
@@ -264,6 +337,8 @@ def collect_factories(
 
 
 def _is_device_skipped(func: AnyDeviceFactory) -> bool:
+    if isinstance(func, DeviceInitializationController):
+        return func.skip
     return getattr(func, "__skip__", False)
 
 

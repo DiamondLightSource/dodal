@@ -1,7 +1,6 @@
 import inspect
 from collections.abc import Callable
-from functools import update_wrapper
-from typing import Annotated, Final, Generic, TypeVar, cast
+from typing import Annotated, Final, TypeVar, cast
 
 from bluesky.run_engine import call_in_bluesky_event_loop
 from ophyd import Device as OphydV1Device
@@ -11,7 +10,14 @@ from ophyd_async.core import Device as OphydV2Device
 from ophyd_async.core import wait_for_connection as v2_device_wait_for_connection
 
 from dodal.common.types import UpdatingPathProvider
-from dodal.utils import AnyDevice, BeamlinePrefix, skip_device
+from dodal.utils import (
+    AnyDevice,
+    BeamlinePrefix,
+    D,
+    DeviceInitializationController,
+    skip,
+    skip_device,
+)
 
 DEFAULT_CONNECTION_TIMEOUT: Final[float] = 5.0
 
@@ -127,69 +133,11 @@ def device_instantiation(
     return device_instance
 
 
-D = TypeVar("D", bound=OphydV2Device)
-_skip = bool | Callable[[], bool]
+def _cache_device(name: str) -> Callable[[OphydV2Device], None]:
+    def cache_device(device: OphydV2Device):
+        ACTIVE_DEVICES[name] = device
 
-
-class DeviceInitializationController(Generic[D]):
-    def __init__(
-        self,
-        factory: Callable[[], D],
-        eager_connect: bool,
-        use_factory_name: bool,
-        timeout: float,
-        mock: bool,
-        skip: _skip,
-    ):
-        self._factory: Callable[[], D] = factory
-        self._cached_device: D | None = None
-        self._eager_connect = eager_connect
-        self._use_factory_name = use_factory_name
-        self._timeout = timeout
-        self._mock = mock
-        self._skip = skip
-        update_wrapper(self, factory)
-
-    @property
-    def skip(self) -> bool:
-        return self._skip() if callable(self._skip) else self._skip
-
-    @property
-    def device(self) -> D | None:
-        return self._cached_device
-
-    def __call__(
-        self,
-        connect: bool | None = None,
-        name: str | None = None,
-        timeout: float | None = None,
-        mock: bool | None = None,
-    ) -> D:
-        if self.device is not None:
-            device = self.device
-        else:
-            device = self._factory()
-
-        if name:
-            device.set_name(name)
-        elif not device.name and self._use_factory_name:
-            device.set_name(self._factory.__name__)
-
-        if connect or connect is None and self._eager_connect:
-            call_in_bluesky_event_loop(
-                device.connect(
-                    timeout=timeout if timeout is not None else self._timeout,
-                    mock=mock if mock is not None else self._mock,
-                )
-            )
-
-        self._cache_device(device)
-        return device
-
-    def _cache_device(self, device: D):
-        if device.name:
-            ACTIVE_DEVICES[device.name] = device
-        self._cached_device = device
+    return cache_device
 
 
 def device_factory(
@@ -199,14 +147,16 @@ def device_factory(
     timeout: Annotated[float, "Timeout for connecting to the device"] = DEFAULT_TIMEOUT,
     mock: Annotated[bool, "Use Signals with mock backends for device"] = False,
     skip: Annotated[
-        _skip,
+        skip,
         "mark the factory to be (conditionally) skipped when beamline is imported by external program",
     ] = False,
 ) -> Callable[[Callable[[], D]], DeviceInitializationController[D]]:
     def decorator(factory: Callable[[], D]) -> DeviceInitializationController[D]:
-        return DeviceInitializationController(
+        controller = DeviceInitializationController(
             factory, eager_connect, use_factory_name, timeout, mock, skip
         )
+        controller.add_callback(_cache_device(factory.__name__))
+        return controller
 
     return decorator
 
