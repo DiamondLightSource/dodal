@@ -8,12 +8,3 @@ __all__ = [
     "PlanGenerator",
     "step_to_num",
 ]
-
-
-def __getattr__(name):
-    if name == "MsgGenerator":
-        raise DeprecationWarning("import from bluesky.utils instead")
-    if name == "inject":
-        raise DeprecationWarning("Use result of dodal device call instead")
-
-    return globals()[name]
