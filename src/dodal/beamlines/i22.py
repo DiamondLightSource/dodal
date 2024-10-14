@@ -160,38 +160,32 @@ def undulator() -> Undulator:
 # slits section, s1 is on the frontend, s6 is closest to the sample
 @device_factory()
 def slits_1() -> Slits:
-    slit_number = 1
-    return Slits(f"-AL-SLITS-{slit_number:02}:", f"slits_{slit_number}")
+    return Slits("-AL-SLITS-1:")
 
 
 @device_factory()
 def slits_2() -> Slits:
-    slit_number = 2
-    return Slits(f"-AL-SLITS-{slit_number:02}:", f"slits_{slit_number}")
+    return Slits("-AL-SLITS-2:")
 
 
 @device_factory()
 def slits_3() -> Slits:
-    slit_number = 3
-    return Slits(f"-AL-SLITS-{slit_number:02}:", f"slits_{slit_number}")
+    return Slits("-AL-SLITS-3:")
 
 
 @device_factory()
 def slits_4() -> Slits:
-    slit_number = 4
-    return Slits(f"-AL-SLITS-{slit_number:02}:", f"slits_{slit_number}")
+    return Slits("-AL-SLITS-4:")
 
 
 @device_factory()
 def slits_5() -> Slits:
-    slit_number = 5
-    return Slits(f"-AL-SLITS-{slit_number:02}:", f"slits_{slit_number}")
+    return Slits("-AL-SLITS-5:")
 
 
 @device_factory()
 def slits_6() -> Slits:
-    slit_number = 6
-    return Slits(f"-AL-SLITS-{slit_number:02}:", f"slits_{slit_number}")
+    return Slits("-AL-SLITS-6:")
 
 
 @device_factory()
