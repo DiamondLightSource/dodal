@@ -1,0 +1,44 @@
+dodal.devices.oav.oav\_async.ZoomController
+===========================================
+
+.. currentmodule:: dodal.devices.oav.oav_async
+
+.. autoclass:: ZoomController
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~ZoomController.set
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

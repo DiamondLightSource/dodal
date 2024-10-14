@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.beamlines.i24 &#8212; dodal 1.33.1.dev8+g4cc081193 documentation</title>
+    <title>dodal.beamlines.i24 &#8212; dodal 1.33.1.dev9+g73cbfc942 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../_static/documentation_options.js?v=43fb1821"></script>
+    <script src="../../_static/documentation_options.js?v=e4924116"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -618,6 +618,7 @@ document.write(`
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.oav.html">dodal.devices.oav</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.oav.grid_overlay.html">dodal.devices.oav.grid_overlay</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.oav.oav_async.html">dodal.devices.oav.oav_async</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.oav.oav_calculations.html">dodal.devices.oav.oav_calculations</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.oav.oav_detector.html">dodal.devices.oav.oav_detector</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.oav.oav_errors.html">dodal.devices.oav.oav_errors</a></li>
@@ -871,7 +872,7 @@ document.write(`
 <td><p>Get the i24 Eiger device, instantiate it if it hasn't already been.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#dodal.beamlines.i24.oav" title="dodal.beamlines.i24.oav"><code class="xref py py-obj docutils literal notranslate"><span class="pre">oav</span></code></a>([wait_for_connection, fake_with_ophyd_sim])</p></td>
-<td><p>Get the i24 OAV device, instantiate it if it hasn't already been.</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#dodal.beamlines.i24.pmac" title="dodal.beamlines.i24.pmac"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pmac</span></code></a>([wait_for_connection, fake_with_ophyd_sim])</p></td>
 <td><p>Get the i24 PMAC device, instantiate it if it hasn't already been.</p></td>
@@ -1018,10 +1019,8 @@ If this is called when already instantiated in i24, it will return the existing 
 
 <dl class="py function">
 <dt class="sig sig-object py" id="dodal.beamlines.i24.oav">
-<span class="sig-prename descclassname"><span class="pre">dodal.beamlines.i24.</span></span><span class="sig-name descname"><span class="pre">oav</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wait_for_connection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fake_with_ophyd_sim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="dodal.devices.oav.oav_detector.OAV.html#dodal.devices.oav.oav_detector.OAV" title="dodal.devices.oav.oav_detector.OAV"><span class="pre">OAV</span></a></span></span><a class="reference internal" href="../../_modules/dodal/beamlines/i24.html#oav"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.beamlines.i24.oav" title="Link to this definition">#</a></dt>
-<dd><p>Get the i24 OAV device, instantiate it if it hasn’t already been.
-If this is called when already instantiated in i24, it will return the existing object.</p>
-<dl class="field-list simple">
+<span class="sig-prename descclassname"><span class="pre">dodal.beamlines.i24.</span></span><span class="sig-name descname"><span class="pre">oav</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wait_for_connection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fake_with_ophyd_sim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="dodal.devices.oav.oav_async.OAV.html#dodal.devices.oav.oav_async.OAV" title="dodal.devices.oav.oav_async.OAV"><span class="pre">OAV</span></a></span></span><a class="reference internal" href="../../_modules/dodal/beamlines/i24.html#oav"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.beamlines.i24.oav" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>wait_for_connection</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
@@ -1029,7 +1028,7 @@ If this is called when already instantiated in i24, it will return the existing 
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.oav.oav_detector.OAV.html#dodal.devices.oav.oav_detector.OAV" title="dodal.devices.oav.oav_detector.OAV"><code class="xref py py-class docutils literal notranslate"><span class="pre">OAV</span></code></a></span></p>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.oav.oav_async.OAV.html#dodal.devices.oav.oav_async.OAV" title="dodal.devices.oav.oav_async.OAV"><code class="xref py py-class docutils literal notranslate"><span class="pre">OAV</span></code></a></span></p>
 </dd>
 </dl>
 </dd></dl>

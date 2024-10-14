@@ -1,0 +1,44 @@
+dodal.devices.oav.oav\_async.OAV
+================================
+
+.. currentmodule:: dodal.devices.oav.oav_async
+
+.. autoclass:: OAV
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      ~OAV.calculate_beam_distance
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

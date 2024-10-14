@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.oav.oav_parameters &#8212; dodal 1.33.1.dev8+g4cc081193 documentation</title>
+    <title>dodal.devices.oav.oav_parameters &#8212; dodal 1.33.1.dev9+g73cbfc942 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../_static/documentation_options.js?v=43fb1821"></script>
+    <script src="../../_static/documentation_options.js?v=e4924116"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -54,7 +54,7 @@
     <link rel="icon" href="../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="dodal.devices.oav.oav_parameters.OAVConfigParams" href="dodal.devices.oav.oav_parameters.OAVConfigParams.html" />
+    <link rel="next" title="dodal.devices.oav.oav_parameters.OAVConfig" href="dodal.devices.oav.oav_parameters.OAVConfig.html" />
     <link rel="prev" title="dodal.devices.oav.oav_errors" href="dodal.devices.oav.oav_errors.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -618,6 +618,7 @@ document.write(`
 </details></li>
 <li class="toctree-l3 current active has-children"><a class="reference internal" href="dodal.devices.oav.html">dodal.devices.oav</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.oav.grid_overlay.html">dodal.devices.oav.grid_overlay</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.oav.oav_async.html">dodal.devices.oav.oav_async</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.oav.oav_calculations.html">dodal.devices.oav.oav_calculations</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.oav.oav_detector.html">dodal.devices.oav.oav_detector</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.oav.oav_errors.html">dodal.devices.oav.oav_errors</a></li>
@@ -852,11 +853,17 @@ document.write(`
 <p class="rubric">Classes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.oav.oav_parameters.OAVConfigParams.html#dodal.devices.oav.oav_parameters.OAVConfigParams" title="dodal.devices.oav.oav_parameters.OAVConfigParams"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OAVConfigParams</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.oav.oav_parameters.OAVConfig.html#dodal.devices.oav.oav_parameters.OAVConfig" title="dodal.devices.oav.oav_parameters.OAVConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OAVConfig</span></code></a></p></td>
+<td><p>Read the OAV config files and return a dictionary of {'zoom_level': ZoomParams}    with information about microns per pixels and crosshairs.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.oav.oav_parameters.OAVConfigParams.html#dodal.devices.oav.oav_parameters.OAVConfigParams" title="dodal.devices.oav.oav_parameters.OAVConfigParams"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OAVConfigParams</span></code></a></p></td>
 <td><p>The OAV parameters which may update depending on settings such as the zoom level.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.oav.oav_parameters.OAVParameters.html#dodal.devices.oav.oav_parameters.OAVParameters" title="dodal.devices.oav.oav_parameters.OAVParameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OAVParameters</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="dodal.devices.oav.oav_parameters.OAVParameters.html#dodal.devices.oav.oav_parameters.OAVParameters" title="dodal.devices.oav.oav_parameters.OAVParameters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OAVParameters</span></code></a></p></td>
 <td><p>The parameters to set up the OAV depending on the context.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="dodal.devices.oav.oav_parameters.ZoomParams.html#dodal.devices.oav.oav_parameters.ZoomParams" title="dodal.devices.oav.oav_parameters.ZoomParams"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ZoomParams</span></code></a></p></td>
+<td><p>ZoomParams(microns_per_pixel: tuple[float, float], crosshair: tuple[int, int])</p></td>
 </tr>
 </tbody>
 </table>
@@ -883,11 +890,11 @@ document.write(`
       </div>
     </a>
     <a class="right-next"
-       href="dodal.devices.oav.oav_parameters.OAVConfigParams.html"
+       href="dodal.devices.oav.oav_parameters.OAVConfig.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">dodal.devices.oav.oav_parameters.OAVConfigParams</p>
+        <p class="prev-next-title">dodal.devices.oav.oav_parameters.OAVConfig</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

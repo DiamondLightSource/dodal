@@ -14,8 +14,10 @@ dodal.devices.oav.oav\_parameters
    :toctree:
    :recursive:
 
+   ~oav_parameters.OAVConfig
    ~oav_parameters.OAVConfigParams
    ~oav_parameters.OAVParameters
+   ~oav_parameters.ZoomParams
 
 
 

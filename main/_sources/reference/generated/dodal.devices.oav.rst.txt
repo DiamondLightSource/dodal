@@ -10,6 +10,7 @@ dodal.devices.oav
    :recursive:
 
    dodal.devices.oav.grid_overlay
+   dodal.devices.oav.oav_async
    dodal.devices.oav.oav_calculations
    dodal.devices.oav.oav_detector
    dodal.devices.oav.oav_errors
