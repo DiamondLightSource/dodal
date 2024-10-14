@@ -15,6 +15,7 @@ dodal.devices.oav.oav\_to\_redis\_forwarder
    :recursive:
 
    ~oav_to_redis_forwarder.OAVToRedisForwarder
+   ~oav_to_redis_forwarder.Source
 
 
 

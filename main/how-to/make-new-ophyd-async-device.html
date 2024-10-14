@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Decision Flowchart for Creating a New ophyd_async Device &#8212; dodal 1.33.1.dev6+g9cb9596da documentation</title>
+    <title>Decision Flowchart for Creating a New ophyd_async Device &#8212; dodal 1.33.1.dev7+g507f9ea1b documentation</title>
   
   
   
@@ -38,14 +38,20 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../_static/documentation_options.js?v=44ed241f"></script>
+    <script src="../_static/documentation_options.js?v=e6eb6cd8"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=30646c52"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
-    <script src="https://unpkg.com/mermaid@10.2.0/dist/mermaid.min.js"></script>
-    <script>mermaid.initialize({startOnLoad:true});</script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+    <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'how-to/make-new-ophyd-async-device';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.4';
@@ -513,8 +519,8 @@ That is done using <a class="reference external" href="https://blueskyproject.io
 <p>See if you can find a similar device that someone has already made. If one seems to exist but has different PV names, those can and should be changed. Advise consulting with controls. If the device is urgently needed, two copies can coexist but there must be an issue to reconcile.</p>
 <p>You might find the dodal CLI useful to verify the PV values.</p>
 <p>There’s some of this already but more general advice not to do this task alone. Consult before starting, seek feedback early (e.g. draft PR) and merge with other people’s devices where possible. The test suite should provide the confidence to do so without breaking anything.</p>
-<div class="mermaid">
-            flowchart TD
+<pre  class="mermaid">
+        flowchart TD
   highLevelStart([Start]) --&gt; createIssue[Create Issue for New Device]
   createIssue --&gt; scoutUsers[Scout current and potential users of the device, tag them in the issue]
   scoutUsers --&gt; checkExistingDevices[Check if a similar device exists]
@@ -530,7 +536,7 @@ That is done using <a class="reference external" href="https://blueskyproject.io
   coordinateMerges --&gt; markPRReady[Mark PR as ready]
   adviseConsultControls -- &quot;Urgent need for device&quot; --&gt; createIssueForReconciliation[Create an issue to reconcile two versions later]
   createIssueForReconciliation --&gt; testPVs
-        </div></section>
+    </pre></section>
 <section id="interface-selection-flowchart">
 <h2>Interface Selection Flowchart<a class="headerlink" href="#interface-selection-flowchart" title="Link to this heading">#</a></h2>
 <p>See the chart in <a class="reference external" href="https://blueskyproject.io/ophyd-async/main/how-to/choose-interfaces-for-devices.html">ophyd-async</a>.</p>
@@ -538,8 +544,8 @@ That is done using <a class="reference external" href="https://blueskyproject.io
 <section id="testing-flowchart">
 <h2>Testing Flowchart<a class="headerlink" href="#testing-flowchart" title="Link to this heading">#</a></h2>
 <p>This flowchart outlines the testing procedure for the new ophyd_async device, from creating fixtures to testing state transitions and hardware integration.</p>
-<div class="mermaid">
-            flowchart TD
+<pre  class="mermaid">
+        flowchart TD
   testStart([Start Testing]) --&gt; checkExistingFixtures[Check for existing fixtures]
   checkExistingFixtures --&gt; createFixtures[Create or update fixtures for various states of the device]
   createFixtures --&gt; createMockReactions[Create mock reactions to signals]
@@ -550,7 +556,7 @@ That is done using <a class="reference external" href="https://blueskyproject.io
   decision -- &quot;Yes&quot; --&gt; testingComplete[Testing Complete]
   decision -- &quot;No&quot; --&gt; modifyCode[Modify code and update tests]
   modifyCode --&gt; createFixtures
-        </div></section>
+    </pre></section>
 <section id="additional-notes">
 <h2>Additional Notes<a class="headerlink" href="#additional-notes" title="Link to this heading">#</a></h2>
 <ul class="simple">
