@@ -30,6 +30,7 @@ dodal.beamlines.i04
       beamstop
       dcm
       detector_motion
+      diamond_filter
       eiger
       flux
       gonio_positioner

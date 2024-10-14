@@ -19,6 +19,7 @@
    dodal.devices.cryostream
    dodal.devices.dcm
    dodal.devices.detector
+   dodal.devices.diamond_filter
    dodal.devices.eiger
    dodal.devices.eiger_odin
    dodal.devices.fast_grid_scan
@@ -36,6 +37,7 @@
    dodal.devices.oav
    dodal.devices.p45
    dodal.devices.p99
+   dodal.devices.qbpm
    dodal.devices.robot
    dodal.devices.s4_slit_gaps
    dodal.devices.scatterguard

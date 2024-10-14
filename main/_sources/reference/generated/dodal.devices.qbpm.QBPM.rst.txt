@@ -1,0 +1,41 @@
+dodal.devices.qbpm.QBPM
+=======================
+
+.. currentmodule:: dodal.devices.qbpm
+
+.. autoclass:: QBPM
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   
