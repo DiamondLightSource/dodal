@@ -35,7 +35,7 @@ def test_pmac_can_be_created(fake_pmac: PMAC):
 
 async def test_pmac_motor_move(fake_pmac: PMAC, RE):
     pos = (1.0, 0.5)
-    RE(bps.mv(fake_pmac.x, pos[0], fake_pmac.y, pos[1]))
+    RE(bps.mv(fake_pmac.x, pos[0], fake_pmac.y, pos[1]))  # type: ignore # See: https://github.com/DiamondLightSource/dodal/issues/827
 
     assert await fake_pmac.x.user_readback.get_value() == 1.0
     assert await fake_pmac.y.user_readback.get_value() == 0.5
