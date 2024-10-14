@@ -1,5 +1,6 @@
 import inspect
 from collections.abc import Callable
+from functools import update_wrapper
 from typing import Annotated, Final, Generic, TypeVar, cast
 
 from bluesky.run_engine import call_in_bluesky_event_loop
@@ -147,6 +148,7 @@ class DeviceInitializationController(Generic[D]):
         self._timeout = timeout
         self._mock = mock
         self._skip = skip
+        update_wrapper(self, factory)
 
     @property
     def skip(self) -> bool:
