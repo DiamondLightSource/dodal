@@ -17,7 +17,7 @@ from dodal.devices.motors import XYZPositioner
 from dodal.devices.smargon import Smargon
 from dodal.devices.zebra import Zebra
 from dodal.log import LOGGER
-from dodal.utils import make_all_devices
+from dodal.utils import DeviceInitializationController, make_all_devices
 
 from ...conftest import mock_beamline_module_filepaths
 
@@ -137,50 +137,49 @@ def test_wait_for_v2_device_connection_passes_through_timeout(kwargs, expected_t
     )
 
 
-def test_device_controller_names():
+def dummy_mirror() -> FocusingMirror:
     mirror = MagicMock(spec=FocusingMirror)
     connect = AsyncMock()
     mirror.connect = connect
 
+    def set_name(name: str):
+        mirror.name = name  # type: ignore
+
+    mirror.set_name.side_effect = set_name
+    mirror.set_name("")
+    return mirror
+
+
+def test_device_controller_names():
     @beamline_utils.device_factory(eager_connect=False)
     def device() -> FocusingMirror:
-        return mirror
+        return dummy_mirror()
 
     mirror = device(name="foo")
     assert mirror.name == "foo"
-    assert connect.call_count == 0
+    assert mirror.connect.call_count == 0  # type: ignore
 
 
 def test_device_controller_connect(RE):
-    mirror = MagicMock(spec=FocusingMirror)
-    connect = AsyncMock()
-    mirror.connect = connect
-
     @beamline_utils.device_factory(mock=True)
     def device() -> FocusingMirror:
-        return mirror
+        return dummy_mirror()
 
     mirror = device()
     assert mirror.name == "device"
-    assert connect.call_count == 1
+    assert mirror.connect.call_count == 1  # type: ignore
 
 
 def test_skip(RE):
-    mirror = MagicMock(spec=FocusingMirror)
-    connect = AsyncMock()
-    mirror.connect = connect
+    skip = True
 
-    _skip = True
+    def _skip() -> bool:
+        return skip
 
-    def skip() -> bool:
-        return _skip
+    controller = beamline_utils.device_factory(skip=_skip)(dummy_mirror)
 
-    device = MagicMock()
-    device.__name__ = "foo"
-    device.return_value = mirror
+    assert isinstance(controller, DeviceInitializationController)
+    assert controller.skip
 
-    device_factory = beamline_utils.device_factory(mock=True, skip=skip)(device)
-    assert device_factory.skip
-
-    _skip = False
-    assert not device_factory.skip
+    skip = False
+    assert not controller.skip
