@@ -309,6 +309,16 @@ def extract_dependencies(
             yield name
 
 
+def get_device_factories(
+    module: ModuleType,
+) -> dict[str, DeviceInitializationController]:
+    return {
+        name: controller
+        for name, controller in module.__dict__.items()
+        if isinstance(controller, DeviceInitializationController)
+    }
+
+
 def collect_factories(
     module: ModuleType, include_skipped: bool = False
 ) -> dict[str, AnyDeviceFactory]:
