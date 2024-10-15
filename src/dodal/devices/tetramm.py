@@ -4,7 +4,7 @@ from enum import Enum
 from bluesky.protocols import Hints
 from ophyd_async.core import (
     DatasetDescriber,
-    DetectorControl,
+    DetectorController,
     DetectorTrigger,
     Device,
     PathProvider,
@@ -80,7 +80,7 @@ class TetrammDriver(Device):
         super().__init__(name=name)
 
 
-class TetrammController(DetectorControl):
+class TetrammController(DetectorController):
     """Controller for a TetrAMM current monitor
 
     Attributes:
