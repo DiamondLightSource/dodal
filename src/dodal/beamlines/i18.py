@@ -17,7 +17,6 @@ from dodal.common.visit import (
 from dodal.devices.i18.diode import Diode
 from dodal.devices.i18.KBMirror import KBMirror
 from dodal.devices.i18.sim_detector import SimDetector
-from dodal.devices.i18.sim_raster_stage import RasterStage
 from dodal.devices.i18.table import Table
 from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
 from dodal.devices.slits import Slits
@@ -59,7 +58,7 @@ def synchrotron(
     )
 
 
-@skip_device()
+@skip_device("not ready yet")
 def undulator(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
@@ -118,9 +117,11 @@ def old_xspress3(
     )
 
 
-# NOTE: the reason for skipping is that the odin detectors are not yet supported
-# There is a controls project in the works, not ready anytime soon
-@skip_device()
+@skip_device("""
+             odin detectors are not yet supported.
+             There is a controls project in the works,
+             not ready anytime soon
+             """)
 def xspress3_odin(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> Xspress3:
@@ -228,7 +229,9 @@ def diode(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -
     )
 
 
-def table(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> Table:
+def main_table(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Table:
     return device_instantiation(
         Table,
         "table",
@@ -238,14 +241,31 @@ def table(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -
     )
 
 
-# note this is a mock table, not sure how does it relate to the real Table,
-# maybe just a fake option in instantiation is needed
-@skip_device()
+def thor_labs_table(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Table:
+    return device_instantiation(
+        Table,
+        "table",
+        "-MO-TABLE-02:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+# SIMULATED DEVICES
+
+
+@skip_device(
+    """
+    this is a mock table, not sure how does it relate to the real Table, maybe just a fake option in instantiation is needed
+    """
+)
 def raster_stage(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> RasterStage:
+) -> Table:
     return device_instantiation(
-        RasterStage,
+        Table,
         "raster_stage",
         "-MO-SIM-01:",
         wait_for_connection,
