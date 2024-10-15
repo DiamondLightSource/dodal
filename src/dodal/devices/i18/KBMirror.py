@@ -1,16 +1,15 @@
-from dataclasses import dataclass
-
+from bluesky.protocols import Movable
 from ophyd_async.core import AsyncStatus, StandardReadable
 from ophyd_async.epics.signal import epics_signal_rw
+from pydantic import BaseModel
 
 
-@dataclass
-class XYPosition:
+class XYPosition(BaseModel):
     x: float
     y: float
 
 
-class KBMirror(StandardReadable):
+class KBMirror(StandardReadable, Movable):
     def __init__(
         self,
         prefix: str,
@@ -28,5 +27,10 @@ class KBMirror(StandardReadable):
 
     @AsyncStatus.wrap
     async def set_xy(self, value: XYPosition):
+        self.x.set(value.x)
+        self.y.set(value.y)
+
+    @AsyncStatus.wrap
+    async def set(self, value: XYPosition):
         self.x.set(value.x)
         self.y.set(value.y)
