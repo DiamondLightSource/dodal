@@ -64,7 +64,9 @@ async def andor_controller() -> Andor2Controller:
 async def test_andor_controller_prepare_and_arm_with_TriggerInfo(
     RE, andor_controller: Andor2Controller
 ):
-    await andor_controller.prepare(trigger_info=TriggerInfo(number=1, livetime=0.002))
+    await andor_controller.prepare(
+        trigger_info=TriggerInfo(number_of_triggers=1, livetime=0.002)
+    )
     await andor_controller.arm()
 
     driver = andor_controller._drv
@@ -82,7 +84,7 @@ async def test_andor_controller_prepare_and_arm_with_no_livetime(
     default_count_time = 2141
     driver = andor_controller._drv
     set_mock_value(driver.acquire_time, default_count_time)
-    await andor_controller.prepare(trigger_info=TriggerInfo(number=5))
+    await andor_controller.prepare(trigger_info=TriggerInfo(number_of_triggers=5))
     await andor_controller.arm()
 
     assert await driver.num_images.get_value() == 5
@@ -99,7 +101,7 @@ async def test_andor_controller_prepare_and_arm_with_trigger_number_of_zero(
     default_count_time = 1231
     driver = andor_controller._drv
     set_mock_value(driver.acquire_time, default_count_time)
-    await andor_controller.prepare(trigger_info=TriggerInfo(number=0))
+    await andor_controller.prepare(trigger_info=TriggerInfo(number_of_triggers=0))
     await andor_controller.arm()
 
     assert await driver.num_images.get_value() == DEFAULT_MAX_NUM_IMAGE

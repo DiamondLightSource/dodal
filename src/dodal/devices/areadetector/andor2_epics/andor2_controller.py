@@ -1,6 +1,6 @@
 import asyncio
 
-from ophyd_async.core import DetectorControl, DetectorTrigger
+from ophyd_async.core import DetectorController, DetectorTrigger
 from ophyd_async.core._detector import TriggerInfo
 from ophyd_async.epics import adcore
 from ophyd_async.epics.adcore import (
@@ -19,7 +19,7 @@ MIN_DEAD_TIME = 0.1
 DEFAULT_MAX_NUM_IMAGE = 999_999
 
 
-class Andor2Controller(DetectorControl):
+class Andor2Controller(DetectorController):
     _supported_trigger_types = {
         DetectorTrigger.internal: Andor2TriggerMode.internal,
         DetectorTrigger.edge_trigger: Andor2TriggerMode.ext_trigger,
@@ -49,8 +49,8 @@ class Andor2Controller(DetectorControl):
             self._drv.trigger_mode.set(self._get_trigger_mode(trigger_info.trigger)),
             self._drv.num_images.set(
                 DEFAULT_MAX_NUM_IMAGE
-                if trigger_info.number == 0
-                else trigger_info.number
+                if trigger_info.total_number_of_triggers == 0
+                else trigger_info.total_number_of_triggers
             ),
             self._drv.image_mode.set(ImageMode.multiple),
         )
