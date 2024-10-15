@@ -111,7 +111,7 @@ def make_all_devices(
     """
     if isinstance(module, str) or module is None:
         module = import_module(module or __name__)
-        if module.CONTROLLED_COLLECTION:
+        if hasattr(module, "CONTROLLED_COLLECTION") and module.CONTROLLED_COLLECTION:
             return make_all_controlled_devices(module, include_skipped, **kwargs)
     factories = collect_factories(module, include_skipped)
     devices: tuple[dict[str, AnyDevice], dict[str, Exception]] = invoke_factories(
