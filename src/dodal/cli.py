@@ -5,7 +5,6 @@ from bluesky.run_engine import RunEngine
 from ophyd_async.core import NotConnected
 
 from dodal.beamlines import all_beamline_names, module_name_for_beamline
-from dodal.common.beamlines.controller_utils import make_all_controlled_devices
 from dodal.utils import make_all_devices
 
 from . import __version__
@@ -59,12 +58,6 @@ def connect(beamline: str, all: bool, sim_backend: bool) -> None:
         include_skipped=all,
         fake_with_ophyd_sim=sim_backend,
     )
-    if beamline == "i22":
-        device_factory_devices, device_factory_exceptions = make_all_controlled_devices(
-            full_module_path
-        )
-        devices = {**devices, **device_factory_devices}
-        exceptions = {**exceptions, **device_factory_exceptions}
     sim_statement = " (sim mode)" if sim_backend else ""
 
     print(f"{len(devices)} devices connected{sim_statement}:")

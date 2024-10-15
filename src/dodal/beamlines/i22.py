@@ -28,6 +28,7 @@ from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import get_beamline_name
 
 BL = get_beamline_name("i22")
+CONTROLLED_COLLETION = True
 set_log_beamline(BL)
 set_utils_beamline(BL)
 

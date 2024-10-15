@@ -31,6 +31,7 @@ from ophyd_async.core import Device as OphydV2Device
 
 import dodal.log
 from dodal.aliases import AnyDevice, AnyDeviceFactory, V1DeviceFactory, V2DeviceFactory
+from dodal.common.beamlines.controller_utils import make_all_controlled_devices
 from dodal.common.beamlines.device_factory import DeviceInitializationController
 
 #: Protocols defining interface to hardware
@@ -110,6 +111,8 @@ def make_all_devices(
     """
     if isinstance(module, str) or module is None:
         module = import_module(module or __name__)
+        if module.CONTROLLED_COLLECTION:
+            return make_all_controlled_devices(module, include_skipped, **kwargs)
     factories = collect_factories(module, include_skipped)
     devices: tuple[dict[str, AnyDevice], dict[str, Exception]] = invoke_factories(
         factories, **kwargs
