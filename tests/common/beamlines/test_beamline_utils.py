@@ -12,6 +12,7 @@ from ophyd_async.core import StandardReadable
 from dodal.beamlines import i03
 from dodal.common.beamlines import beamline_utils
 from dodal.devices.eiger import EigerDetector
+from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.motors import XYZPositioner
 from dodal.devices.smargon import Smargon
 from dodal.devices.zebra import Zebra
@@ -134,3 +135,52 @@ def test_wait_for_v2_device_connection_passes_through_timeout(kwargs, expected_t
         mock=ANY,
         timeout=expected_timeout,
     )
+
+
+def test_device_controller_names():
+    mirror = MagicMock(spec=FocusingMirror)
+    connect = AsyncMock()
+    mirror.connect = connect
+
+    @beamline_utils.device_factory(eager_connect=False)
+    def device() -> FocusingMirror:
+        return mirror
+
+    mirror = device(name="foo")
+    assert mirror.name == "foo"
+    assert connect.call_count == 0
+
+
+def test_device_controller_connect(RE):
+    mirror = MagicMock(spec=FocusingMirror)
+    connect = AsyncMock()
+    mirror.connect = connect
+
+    @beamline_utils.device_factory(mock=True)
+    def device() -> FocusingMirror:
+        return mirror
+
+    mirror = device()
+    assert mirror.name == "device"
+    assert connect.call_count == 1
+
+
+def test_skip(RE):
+    mirror = MagicMock(spec=FocusingMirror)
+    connect = AsyncMock()
+    mirror.connect = connect
+
+    _skip = True
+
+    def skip() -> bool:
+        return _skip
+
+    device = MagicMock()
+    device.__name__ = "foo"
+    device.return_value = mirror
+
+    device_factory = beamline_utils.device_factory(mock=True, skip=skip)(device)
+    assert device_factory.skip
+
+    _skip = False
+    assert not device_factory.skip
