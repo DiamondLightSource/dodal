@@ -158,10 +158,6 @@ def hfm(
     )
 
 
-crystal_metadata_1 = CrystalMetadata("Si111")
-crystal_metadata_2 = CrystalMetadata("Si311")
-
-
 def dcm(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
@@ -175,8 +171,18 @@ def dcm(
         bl_prefix=False,
         motion_prefix=f"{BeamlinePrefix(BL).beamline_prefix}-MO-DCM-01:",
         temperature_prefix=f"{BeamlinePrefix(BL).beamline_prefix}-DI-DCM-01:",
-        crystal_1_metadata=crystal_metadata_1,
-        crystal_2_metadata=crystal_metadata_2,
+        crystal_1_metadata=CrystalMetadata(
+            usage="Bragg",
+            type="silicon",
+            reflection=(1, 1, 1),
+            d_spacing=(3.13475, "nm"),
+        ),
+        crystal_2_metadata=CrystalMetadata(
+            usage="Bragg",
+            type="silicon",
+            reflection=(1, 1, 1),
+            d_spacing=(3.13475, "nm"),
+        ),
     )
 
 

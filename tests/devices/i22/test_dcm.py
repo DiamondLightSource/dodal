@@ -21,8 +21,18 @@ async def dcm() -> DoubleCrystalMonochromator:
         dcm = DoubleCrystalMonochromator(
             motion_prefix="FOO-MO",
             temperature_prefix="FOO-DI",
-            crystal_1_metadata=CrystalMetadata("Si111"),
-            crystal_2_metadata=CrystalMetadata("Si111"),
+            crystal_1_metadata=CrystalMetadata(
+                usage="Bragg",
+                type="silicon",
+                reflection=(1, 1, 1),
+                d_spacing=(3.13475, "mm"),
+            ),
+            crystal_2_metadata=CrystalMetadata(
+                usage="Bragg",
+                type="silicon",
+                reflection=(1, 1, 1),
+                d_spacing=(3.13475, "mm"),
+            ),
         )
 
     return dcm
@@ -48,8 +58,8 @@ async def test_crystal_metadata_not_propagated_when_not_supplied():
         dcm = DoubleCrystalMonochromator(
             motion_prefix="FOO-MO",
             temperature_prefix="FOO-DI",
-            crystal_1_metadata=CrystalMetadata("Si111"),
-            crystal_2_metadata=CrystalMetadata("Si111"),
+            crystal_1_metadata=None,
+            crystal_2_metadata=None,
         )
 
     configuration = await dcm.read_configuration()
@@ -236,7 +246,7 @@ async def test_configuration(dcm: DoubleCrystalMonochromator):
                 "alarm_severity": ANY,
             },
             "dcm-crystal_2_d_spacing": {
-                "value": ANY,
+                "value": 3.13475,
                 "timestamp": ANY,
                 "alarm_severity": ANY,
             },
@@ -261,7 +271,7 @@ async def test_configuration(dcm: DoubleCrystalMonochromator):
                 "alarm_severity": ANY,
             },
             "dcm-crystal_1_d_spacing": {
-                "value": ANY,
+                "value": 3.13475,
                 "timestamp": ANY,
                 "alarm_severity": ANY,
             },
