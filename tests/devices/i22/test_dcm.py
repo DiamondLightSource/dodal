@@ -12,6 +12,7 @@ from ophyd_async.core import (
     set_mock_value,
 )
 
+from dodal.common.crystal_metadata import MaterialsEnum
 from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
 
 
@@ -22,16 +23,12 @@ async def dcm() -> DoubleCrystalMonochromator:
             motion_prefix="FOO-MO",
             temperature_prefix="FOO-DI",
             crystal_1_metadata=CrystalMetadata(
-                usage="Bragg",
-                type="silicon",
-                reflection=(1, 1, 1),
-                d_spacing=(3.13475, "mm"),
+                material=MaterialsEnum.Si,
+                reflection_plane=(1, 1, 1),
             ),
             crystal_2_metadata=CrystalMetadata(
-                usage="Bragg",
-                type="silicon",
-                reflection=(1, 1, 1),
-                d_spacing=(3.13475, "mm"),
+                material=MaterialsEnum.Si,
+                reflection_plane=(1, 1, 1),
             ),
         )
 
@@ -51,29 +48,6 @@ def test_count_dcm(
         event=1,
         stop=1,
     )
-
-
-async def test_crystal_metadata_not_propagated_when_not_supplied():
-    async with DeviceCollector(mock=True):
-        dcm = DoubleCrystalMonochromator(
-            motion_prefix="FOO-MO",
-            temperature_prefix="FOO-DI",
-            crystal_1_metadata=None,
-            crystal_2_metadata=None,
-        )
-
-    configuration = await dcm.read_configuration()
-    expected_absent_keys = {
-        "crystal-1-usage",
-        "crystal-1-type",
-        "crystal-1-reflection",
-        "crystal-1-d_spacing",
-        "crystal-2-usage",
-        "crystal-2-type",
-        "crystal-2-reflection",
-        "crystal-2-d_spacing",
-    }
-    assert expected_absent_keys.isdisjoint(configuration)
 
 
 @pytest.mark.parametrize(

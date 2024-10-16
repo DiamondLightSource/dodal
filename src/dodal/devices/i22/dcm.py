@@ -1,7 +1,5 @@
 import time
 from collections.abc import Sequence
-from dataclasses import dataclass
-from typing import Literal
 
 from bluesky.protocols import Reading
 from event_model.documents.event_descriptor import DataKey
@@ -9,22 +7,11 @@ from ophyd_async.core import ConfigSignal, StandardReadable, soft_signal_r_and_s
 from ophyd_async.epics.motor import Motor
 from ophyd_async.epics.signal import epics_signal_r
 
+from dodal.common.crystal_metadata import CrystalMetadata
+
 # Conversion constant for energy and wavelength, taken from the X-Ray data booklet
 # Converts between energy in KeV and wavelength in angstrom
 _CONVERSION_CONSTANT = 12.3984
-
-
-@dataclass(frozen=True, unsafe_hash=True)
-class CrystalMetadata:
-    """
-    Metadata used in the NeXus format,
-    see https://manual.nexusformat.org/classes/base_classes/NXcrystal.html
-    """
-
-    usage: Literal["Bragg", "Laue"] | None = None
-    type: str | None = None
-    reflection: tuple[int, int, int] | None = None
-    d_spacing: tuple[float, str] | None = None
 
 
 class DoubleCrystalMonochromator(StandardReadable):
@@ -41,8 +28,8 @@ class DoubleCrystalMonochromator(StandardReadable):
         self,
         motion_prefix: str,
         temperature_prefix: str,
-        crystal_1_metadata: CrystalMetadata | None = None,
-        crystal_2_metadata: CrystalMetadata | None = None,
+        crystal_1_metadata: CrystalMetadata,
+        crystal_2_metadata: CrystalMetadata,
         prefix: str = "",
         name: str = "",
     ) -> None:
@@ -70,8 +57,6 @@ class DoubleCrystalMonochromator(StandardReadable):
 
         # Soft metadata
         # If supplied include crystal details in output of read_configuration
-        crystal_1_metadata = crystal_1_metadata or CrystalMetadata()
-        crystal_2_metadata = crystal_2_metadata or CrystalMetadata()
         with self.add_children_as_readables(ConfigSignal):
             if crystal_1_metadata.usage is not None:
                 self.crystal_1_usage, _ = soft_signal_r_and_setter(
