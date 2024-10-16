@@ -87,13 +87,12 @@ class MJPG(StandardReadable, Triggerable, ABC):
                     completed_status()
                     # st.set_finished()
             except requests.HTTPError as e:
-                print(e)
+                completed_status(exception=e)
                 # st.set_exception(e)
 
         threading.Thread(target=get_snapshot, daemon=True).start()
 
         # return st
-        pass
 
     @abstractmethod
     def post_processing(self, image: Image.Image):
