@@ -134,11 +134,22 @@ def xspress3_odin(
     )
 
 
-crystal_1_metadata = CrystalMetadata("Si111")
-crystal_2_metadata = CrystalMetadata("Si111")
-
-_unused_crystal_metadata_1 = CrystalMetadata("Si311")
-_unused_crystal_metadata_2 = CrystalMetadata("Si333")
+crystal_1_metadata = (
+    CrystalMetadata(
+        usage="Bragg",
+        type="silicon",
+        reflection=(1, 1, 1),
+        d_spacing=(3.13475, "nm"),
+    ),
+)
+crystal_2_metadata = (
+    CrystalMetadata(
+        usage="Bragg",
+        type="silicon",
+        reflection=(1, 1, 1),
+        d_spacing=(3.13475, "nm"),
+    ),
+)
 
 
 def dcm(

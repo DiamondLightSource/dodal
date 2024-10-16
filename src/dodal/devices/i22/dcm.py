@@ -15,8 +15,6 @@ from ophyd_async.core import (
 from ophyd_async.epics.core import epics_signal_r
 from ophyd_async.epics.motor import Motor
 
-from dodal.common.crystal_metadata import CrystalMetadata
-
 # Conversion constant for energy and wavelength, taken from the X-Ray data booklet
 # Converts between energy in KeV and wavelength in angstrom
 _CONVERSION_CONSTANT = 12.3984
