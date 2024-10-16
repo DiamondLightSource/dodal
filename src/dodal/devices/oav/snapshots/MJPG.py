@@ -1,3 +1,4 @@
+import asyncio
 import threading
 from abc import ABC, abstractmethod
 from io import BytesIO
@@ -12,7 +13,7 @@ from ophyd_async.core import (
     soft_signal_rw,
 )
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
-from PIL import Image  # , ImageDraw
+from PIL import Image
 
 from dodal.log import LOGGER
 
@@ -83,7 +84,7 @@ class MJPG(StandardReadable, Triggerable, ABC):
                 response = requests.get(url_str, stream=True)
                 response.raise_for_status()
                 with Image.open(BytesIO(response.content)) as image:
-                    self.post_processing(image)
+                    asyncio.run(self.post_processing(image))
                     completed_status()
                     # st.set_finished()
             except requests.HTTPError as e:
@@ -95,5 +96,5 @@ class MJPG(StandardReadable, Triggerable, ABC):
         # return st
 
     @abstractmethod
-    def post_processing(self, image: Image.Image):
+    async def post_processing(self, image: Image.Image):
         pass
