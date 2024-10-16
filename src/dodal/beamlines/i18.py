@@ -58,7 +58,8 @@ def synchrotron(
     )
 
 
-@skip_device("not ready yet")
+# not ready yet
+@skip_device()
 def undulator(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
@@ -117,11 +118,10 @@ def old_xspress3(
     )
 
 
-@skip_device("""
-             odin detectors are not yet supported.
-             There is a controls project in the works,
-             not ready anytime soon
-             """)
+# odin detectors are not yet supported.
+# There is a controls project in the works,
+# not ready anytime soon
+@skip_device()
 def xspress3_odin(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> Xspress3:
@@ -256,11 +256,8 @@ def thor_labs_table(
 # SIMULATED DEVICES
 
 
-@skip_device(
-    """
-    this is a mock table, not sure how does it relate to the real Table, maybe just a fake option in instantiation is needed
-    """
-)
+# this is a mock table, not sure how does it relate to the real Table, maybe just a fake option in instantiation is needed
+@skip_device()
 def raster_stage(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> Table:
