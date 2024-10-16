@@ -233,17 +233,12 @@ def dcm(
         fake_with_ophyd_sim,
         bl_prefix=False,
         temperature_prefix=f"{BeamlinePrefix(BL).beamline_prefix}-DI-DCM-01:",
-<<<<<<< HEAD
         crystal_1_metadata=make_crystal_metadata_from_material(
             MaterialsEnum.Si, (1, 1, 1)
         ),
         crystal_2_metadata=make_crystal_metadata_from_material(
             MaterialsEnum.Si, (1, 1, 1)
         ),
-=======
-        crystal_1_metadata=CrystalMetadata("Si111"),
-        crystal_2_metadata=CrystalMetadata("Si111"),
->>>>>>> 7c02f1411 (adapt the tests)
     )
 
 
