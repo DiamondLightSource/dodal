@@ -17,8 +17,8 @@ DAQ members led us to this proposal:
 - ophyd-async: make Device.connect(mock, timeout, force=False) idempotent
 - ophyd-async: make ensure_connected(\*devices) plan stub
 - dodal: make device_factory() decorator that may construct, name, cache and connect a device
-- dodal: make get_device_factories() that returns all device factories
-- blueapi: call get_device_factories(), instantiate and connect Devices appropriately, log those that fail
+- dodal: collect_factories() returns all device factories
+- blueapi: call collect_factories(), instantiate and connect Devices appropriately, log those that fail
 - blueapi: when plan is called, run ensure_connected on all plan args and defaults that are Devices
 
 We can then iterate on this if the parallel connect causes a broadcast storm. We could also in future add a monitor to a heartbeat PV per device in Device.connect so that it would reconnect next time it was called.

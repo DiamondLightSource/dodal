@@ -98,7 +98,7 @@ class BeamlinePrefix:
 
 T = TypeVar("T", bound=AnyDevice)
 D = TypeVar("D", bound=OphydV2Device)
-skip = bool | Callable[[], bool]
+skip_type = bool | Callable[[], bool]
 
 
 def skip_device(precondition=lambda: True):
@@ -122,7 +122,7 @@ class DeviceInitializationController(Generic[D]):
         use_factory_name: bool,
         timeout: float,
         mock: bool,
-        skip: skip,
+        skip: skip_type,
     ):
         self._factory: Callable[[], D] = factory
         self._cached_device: D | None = None
@@ -147,28 +147,57 @@ class DeviceInitializationController(Generic[D]):
 
     def __call__(
         self,
-        connect: bool | None = None,
+        connect_immediately: bool | None = None,
         name: str | None = None,
-        timeout: float | None = None,
+        connection_timeout: float | None = None,
         mock: bool | None = None,
     ) -> D:
+        """Returns an instance of the Device the wrapped factory produces: the same
+        instance will be returned if this method is called multiple times, and arguments
+        may be passed to override this Controller's configuration.
+
+        Args:
+            connect_immediately (bool | None, optional): whether to call connect on the
+              device before returning it- connect is idempotent for ophyd-async devices.
+              Not connecting to the device allows for the instance to be created prior
+              to the RunEngine event loop being configured or for connect to be called
+              lazily e.g. by the `ensure_connected` stub. Defaults to None, which defers
+              to the eager_connect parameter of this Controller.
+            name (str | None, optional): an override name to give the device, which is
+              also used to name its children. Defaults to None, which does not name the
+              device unless the device has no name and this Controller is configured to
+              use_factory_name, which propagates the name of the wrapped factory
+              function to the device instance.
+            connection_timeout (float | None, optional): an override timeout length in
+              seconds for the connect method, if it is called. Defaults to None, which
+              defers to the timeout configured for this Controller: the default uses
+              ophyd_async's DEFAULT_TIMEOUT.
+            mock (bool | None, optional): overrides whether to connect to Mock signal
+              backends, if connect is called. Defaults to None, which uses the mock
+              parameter of this Controller.
+
+        Returns:
+            D: a singleton instance of the Device class returned by the wrapped factory.
+        """
         if self.device is not None:
             device = self.device
         else:
             device = self._factory()
 
+        if connect_immediately or connect_immediately is None and self._eager_connect:
+            call_in_bluesky_event_loop(
+                device.connect(
+                    timeout=connection_timeout
+                    if connection_timeout is not None
+                    else self._timeout,
+                    mock=mock if mock is not None else self._mock,
+                )
+            )
+
         if name:
             device.set_name(name)
         elif not device.name and self._use_factory_name:
             device.set_name(self._factory.__name__)
-
-        if connect or connect is None and self._eager_connect:
-            call_in_bluesky_event_loop(
-                device.connect(
-                    timeout=timeout if timeout is not None else self._timeout,
-                    mock=mock if mock is not None else self._mock,
-                )
-            )
 
         self._cached_device = device
         for callback in self._callbacks:
@@ -270,10 +299,9 @@ def invoke_factories(
         try:
             factory = factories[dependent_name]
             if isinstance(factory, DeviceInitializationController):
-                mock = kwargs.get("mock", False) or kwargs.get(
-                    "fake_with_ophyd_sim", False
-                )
-                devices[dependent_name] = factory(mock=mock)
+                # replace with an arg
+                # https://github.com/DiamondLightSource/dodal/issues/844
+                devices[dependent_name] = factory(mock=kwargs.get("mock", False))
             else:
                 devices[dependent_name] = factory(**params, **kwargs)
         except Exception as e:
@@ -307,16 +335,6 @@ def extract_dependencies(
     for name, param in inspect.signature(factories[factory_name]).parameters.items():
         if param.default is inspect.Parameter.empty and name in factories:
             yield name
-
-
-def get_device_factories(
-    module: ModuleType,
-) -> dict[str, DeviceInitializationController]:
-    return {
-        name: controller
-        for name, controller in module.__dict__.items()
-        if isinstance(controller, DeviceInitializationController)
-    }
 
 
 def collect_factories(

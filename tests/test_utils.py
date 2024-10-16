@@ -131,6 +131,22 @@ def test_make_device_dependency_throws():
         make_device(fake_beamline, "device_z")
 
 
+def test_device_factory_skips():
+    import tests.fake_device_factory_beamline as fake_beamline
+
+    devices, exceptions = make_all_devices(fake_beamline)
+    assert len(devices) == 0
+    assert len(exceptions) == 0
+
+
+def test_device_factory_can_ignore_skip():
+    import tests.fake_device_factory_beamline as fake_beamline
+
+    devices, exceptions = make_all_devices(fake_beamline, include_skipped=True)
+    assert len(devices) == 2
+    assert len(exceptions) == 0
+
+
 def device_a() -> Readable:
     return MagicMock()
 
