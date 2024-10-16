@@ -32,7 +32,10 @@ class CrystalMetadata:
     d_spacing: tuple[float, str] | None = None
 
     def __init__(
-        self, material: MaterialsEnum, reflection_plane: tuple[int, int, int]
+        self,
+        material: MaterialsEnum,
+        reflection_plane: tuple[int, int, int],
+        usage: str = "Bragg",
     ) -> None:
         # Determine material from reflection plane prefix
         # Set attributes using object.__setattr__ since the class is frozen
@@ -45,7 +48,7 @@ class CrystalMetadata:
             material.value.lattice_parameter, reflection_plane
         )
         object.__setattr__(self, "d_spacing", d_spacing)
-        object.__setattr__(self, "usage", "Bragg")  # Assuming "Bragg" usage by default
+        object.__setattr__(self, "usage", usage)
 
     @staticmethod
     def calculate_d_spacing(

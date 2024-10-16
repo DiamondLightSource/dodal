@@ -12,6 +12,7 @@ from ophyd_async.core import (
     set_mock_value,
 )
 
+from dodal.common.crystal_metadata import MaterialsEnum
 from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
 
 
@@ -22,16 +23,12 @@ async def dcm() -> DoubleCrystalMonochromator:
             prefix="FOO-MO",
             temperature_prefix="FOO-DI",
             crystal_1_metadata=CrystalMetadata(
-                usage="Bragg",
-                type="silicon",
-                reflection=(1, 1, 1),
-                d_spacing=(3.13475, "mm"),
+                material=MaterialsEnum.Si,
+                reflection_plane=(1, 1, 1),
             ),
             crystal_2_metadata=CrystalMetadata(
-                usage="Bragg",
-                type="silicon",
-                reflection=(1, 1, 1),
-                d_spacing=(3.13475, "mm"),
+                material=MaterialsEnum.Si,
+                reflection_plane=(1, 1, 1),
             ),
         )
 
