@@ -8,6 +8,7 @@ from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
 from dodal.common.signal_utils import create_hardware_backed_soft_signal
 from dodal.devices.oav.oav_parameters import DEFAULT_OAV_WINDOW, OAVConfig
+from dodal.devices.oav.snapshots.snapshot import SnapshotWithBeamCentre
 
 
 class Coords(IntEnum):
@@ -47,6 +48,7 @@ class ZoomController(StandardReadable):
 
 class OAV(StandardReadable):
     def __init__(self, prefix: str, config: OAVConfig, name: str = ""):
+        self.snapshot = SnapshotWithBeamCentre(f"{prefix}-DI-OAV-01:MJPG:", name)
         _bl_prefix = prefix.split("-")[0]
         self.zoom_controller = ZoomController(f"{_bl_prefix}-EA-OAV-01:FZOOM:", name)
 
@@ -75,7 +77,15 @@ class OAV(StandardReadable):
             int, lambda: self._get_beam_position(Coords.Y)
         )
 
+        self._set_up_snapshot()
+
         super().__init__(name)
+
+    def _set_up_snapshot(self):
+        self.snapshot.microns_per_pixel_x = self.microns_per_pixel_x
+        self.snapshot.microns_per_pixel_y = self.microns_per_pixel_y
+        self.snapshot.beam_centre_i = self.beam_centre_i
+        self.snapshot.beam_centre_j = self.beam_centre_j
 
     async def _read_current_zoom(self) -> str:
         _zoom = await self.zoom_controller.level.get_value()
