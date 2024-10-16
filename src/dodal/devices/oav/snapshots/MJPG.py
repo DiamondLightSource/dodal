@@ -1,8 +1,16 @@
+import threading
 from abc import ABC, abstractmethod
+from io import BytesIO
 from pathlib import Path
 
+import requests
 from bluesky.protocols import Triggerable
-from ophyd_async.core import AsyncStatus, StandardReadable, soft_signal_rw
+from ophyd_async.core import (
+    AsyncStatus,
+    StandardReadable,
+    completed_status,
+    soft_signal_rw,
+)
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 from PIL import Image  # , ImageDraw
 
@@ -42,6 +50,10 @@ class MJPG(StandardReadable, Triggerable, ABC):
         super().__init__(name)
 
     async def _save_image(self, image: Image.Image):
+        """A helper function to save a given image to the path supplied by the \
+            directory and filename signals. The full resultant path is put on the \
+            last_saved_path signal
+        """
         filename_str = await self.filename.get_value()
         directory_str = await self.directory.get_value()
 
@@ -56,6 +68,31 @@ class MJPG(StandardReadable, Triggerable, ABC):
 
     @AsyncStatus.wrap
     async def trigger(self):
+        """This takes a snapshot image from the MJPG stream and send it to the
+        post_processing method, expected to be implemented by a child of this class.
+
+        It is the responsibility of the child class to save any resulting images.
+        """
+        # TODO Figure out status!!!
+        # status = AsyncStatus(self)
+        url_str = await self.url.get_value()
+
+        # For now, let's assume I set microns_per_pixels in the oav from those values
+        def get_snapshot():
+            try:
+                response = requests.get(url_str, stream=True)
+                response.raise_for_status()
+                with Image.open(BytesIO(response.content)) as image:
+                    self.post_processing(image)
+                    completed_status()
+                    # st.set_finished()
+            except requests.HTTPError as e:
+                print(e)
+                # st.set_exception(e)
+
+        threading.Thread(target=get_snapshot, daemon=True).start()
+
+        # return st
         pass
 
     @abstractmethod
