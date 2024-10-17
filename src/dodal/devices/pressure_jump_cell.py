@@ -12,6 +12,7 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
+OPENSEQ_PULSE_LENGTH = 0.2
 
 class PumpState(str, Enum):
     MANUAL = "Manual"
@@ -125,12 +126,16 @@ class AllValvesControl(StandardReadable, Movable):
         if valve in self.slow_valves and (isinstance(value, ValveControlRequest)):
             if value == ValveControlRequest.OPEN:
                 await self.valve_control[valve].set(ValveOpenSeqRequest.OPEN_SEQ)
+                await asyncio.sleep(OPENSEQ_PULSE_LENGTH)
+                await self.valve_control[valve].set(ValveOpenSeqRequest.INACTIVE)
             else:
                 await self.valve_control[valve].set(value)
 
         elif valve in self.fast_valves and (isinstance(value, FastValveControlRequest)):
             if value == FastValveControlRequest.OPEN:
                 await self.fast_valve_control[valve].set(ValveOpenSeqRequest.OPEN_SEQ)
+                await asyncio.sleep(OPENSEQ_PULSE_LENGTH)
+                await self.fast_valve_control[valve].set(ValveOpenSeqRequest.INACTIVE)
             else:
                 await self.fast_valve_control[valve].set(value)
 
