@@ -33,7 +33,10 @@ async def energy_distance_table(lookup_table_path: str) -> np.ndarray:
 
 
 def linear_interpolation_lut(filename: str) -> Callable[[float], float]:
-    """Returns a callable that converts values by linear interpolation of lookup table values"""
+    """Returns a callable that converts values by linear interpolation of lookup table
+    values.
+
+    If the value falls outside the lookup table then the closest value will be used."""
     LOGGER.info(f"Using lookup table {filename}")
     s_and_t_vals = zip(*loadtxt(filename, comments=["#", "Units"]), strict=False)
 
@@ -54,10 +57,6 @@ def linear_interpolation_lut(filename: str) -> Callable[[float], float]:
             )
 
     def s_to_t2(s: float) -> float:
-        if s < s_values[0] or s > s_values[len(s_values) - 1]:
-            raise ValueError(
-                f"Lookup table does not support extrapolation from file {filename}, s={s}"
-            )
         return float(interp(s, s_values, t_values))
 
     return s_to_t2
