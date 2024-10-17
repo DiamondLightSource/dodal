@@ -98,7 +98,7 @@ class BeamlinePrefix:
 
 T = TypeVar("T", bound=AnyDevice)
 D = TypeVar("D", bound=OphydV2Device)
-skip_type = bool | Callable[[], bool]
+SkipType = bool | Callable[[], bool]
 
 
 def skip_device(precondition=lambda: True):
@@ -122,7 +122,7 @@ class DeviceInitializationController(Generic[D]):
         use_factory_name: bool,
         timeout: float,
         mock: bool,
-        skip: skip_type,
+        skip: SkipType,
     ):
         self._factory: Callable[[], D] = factory
         self._cached_device: D | None = None
@@ -155,6 +155,9 @@ class DeviceInitializationController(Generic[D]):
         """Returns an instance of the Device the wrapped factory produces: the same
         instance will be returned if this method is called multiple times, and arguments
         may be passed to override this Controller's configuration.
+        Once the device is connected, the value of mock must be consistent, or connect
+        must be False.
+
 
         Args:
             connect_immediately (bool | None, optional): whether to call connect on the
@@ -174,7 +177,8 @@ class DeviceInitializationController(Generic[D]):
               ophyd_async's DEFAULT_TIMEOUT.
             mock (bool | None, optional): overrides whether to connect to Mock signal
               backends, if connect is called. Defaults to None, which uses the mock
-              parameter of this Controller.
+              parameter of this Controller. This value must be used consistently when
+              connect is called on the Device.
 
         Returns:
             D: a singleton instance of the Device class returned by the wrapped factory.

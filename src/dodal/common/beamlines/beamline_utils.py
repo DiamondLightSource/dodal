@@ -15,8 +15,8 @@ from dodal.utils import (
     BeamlinePrefix,
     D,
     DeviceInitializationController,
+    SkipType,
     skip_device,
-    skip_type,
 )
 
 DEFAULT_CONNECTION_TIMEOUT: Final[float] = 5.0
@@ -147,7 +147,7 @@ def device_factory(
     timeout: Annotated[float, "Timeout for connecting to the device"] = DEFAULT_TIMEOUT,
     mock: Annotated[bool, "Use Signals with mock backends for device"] = False,
     skip: Annotated[
-        skip_type,
+        SkipType,
         "mark the factory to be (conditionally) skipped when beamline is imported by external program",
     ] = False,
 ) -> Callable[[Callable[[], D]], DeviceInitializationController[D]]:
