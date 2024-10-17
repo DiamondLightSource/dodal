@@ -11,6 +11,7 @@ from dodal.devices.backlight import Backlight
 from dodal.devices.dcm import DCM
 from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.detector_motion import DetectorMotion
+from dodal.devices.diamond_filter import DiamondFilter, I04Filters
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import ZebraFastGridScan
 from dodal.devices.flux import Flux
@@ -418,4 +419,20 @@ def oav_to_redis_forwarder(
         redis_host=REDIS_HOST,
         redis_password=REDIS_PASSWORD,
         redis_db=7,
+    )
+
+
+def diamond_filter(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> DiamondFilter[I04Filters]:
+    """Get the i04 diamond filter device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        DiamondFilter[I04Filters],
+        "diamond_filter",
+        "-MO-FLTR-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        data_type=I04Filters,
     )

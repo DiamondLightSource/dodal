@@ -8,6 +8,7 @@ import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import (
     DeviceCollector,
+    callback_on_mock_put,
     get_mock_put,
     set_mock_value,
 )
@@ -115,6 +116,7 @@ async def aperture_in_medium_pos_w_call_log(
     await ap_sg._set_raw_unsafe(aperture_positions[ApertureValue.MEDIUM])
 
     set_mock_value(ap_sg.aperture.medium, 1)
+
     yield ap_sg, call_log
 
 
@@ -144,9 +146,6 @@ def _assert_position_in_reading(
     position: AperturePosition,
     device_name: str,
 ):
-    if position.radius is not None:
-        assert reading[f"{device_name}-radius"]["value"] == position.radius
-    assert reading[f"{device_name}-selected_aperture"]["value"] == aperture
     assert reading[f"{device_name}-aperture-x"]["value"] == position.aperture_x
     assert reading[f"{device_name}-aperture-y"]["value"] == position.aperture_y
     assert reading[f"{device_name}-aperture-z"]["value"] == position.aperture_z
@@ -244,19 +243,27 @@ def set_underlying_motors(ap_sg: ApertureScatterguard, position: AperturePositio
         motor.set(pos)
 
 
-async def test_aperture_positions_large(ap_sg: ApertureScatterguard):
-    set_mock_value(ap_sg.aperture.large, 1)
-    assert await ap_sg.get_current_aperture_position() == ApertureValue.LARGE
-
-
-async def test_aperture_positions_medium(ap_sg: ApertureScatterguard):
-    set_mock_value(ap_sg.aperture.medium, 1)
-    assert await ap_sg.get_current_aperture_position() == ApertureValue.MEDIUM
-
-
-async def test_aperture_positions_small(ap_sg: ApertureScatterguard):
-    set_mock_value(ap_sg.aperture.small, 1)
-    assert await ap_sg.get_current_aperture_position() == ApertureValue.SMALL
+@pytest.mark.parametrize(
+    "read_pv, aperture",
+    [
+        ("large", ApertureValue.LARGE),
+        ("medium", ApertureValue.MEDIUM),
+        ("small", ApertureValue.SMALL),
+    ],
+)
+async def test_aperture_positions(
+    ap_sg: ApertureScatterguard,
+    aperture_positions: dict[ApertureValue, AperturePosition],
+    read_pv: str,
+    aperture: ApertureValue,
+):
+    set_mock_value(getattr(ap_sg.aperture, read_pv), 1)
+    reading = await ap_sg.read()
+    assert isinstance(reading, dict)
+    assert (
+        reading[f"{ap_sg.name}-radius"]["value"] == aperture_positions[aperture].radius
+    )
+    assert reading[f"{ap_sg.name}-selected_aperture"]["value"] == aperture
 
 
 async def test_aperture_positions_robot_load(
@@ -268,7 +275,12 @@ async def test_aperture_positions_robot_load(
     set_mock_value(ap_sg.aperture.small, 0)
     robot_load = aperture_positions[ApertureValue.ROBOT_LOAD]
     await ap_sg.aperture.y.set(robot_load.aperture_y)
-    assert await ap_sg.get_current_aperture_position() == ApertureValue.ROBOT_LOAD
+    reading = await ap_sg.read()
+    assert isinstance(reading, dict)
+    assert reading[f"{ap_sg.name}-radius"]["value"] == 0.0
+    assert (
+        reading[f"{ap_sg.name}-selected_aperture"]["value"] == ApertureValue.ROBOT_LOAD
+    )
 
 
 async def test_aperture_positions_robot_load_within_tolerance(
@@ -282,7 +294,12 @@ async def test_aperture_positions_robot_load_within_tolerance(
     set_mock_value(ap_sg.aperture.medium, 0)
     set_mock_value(ap_sg.aperture.small, 0)
     await ap_sg.aperture.y.set(robot_load_ap_y + tolerance)
-    assert await ap_sg.get_current_aperture_position() == ApertureValue.ROBOT_LOAD
+    reading = await ap_sg.read()
+    assert isinstance(reading, dict)
+    assert reading[f"{ap_sg.name}-radius"]["value"] == 0.0
+    assert (
+        reading[f"{ap_sg.name}-selected_aperture"]["value"] == ApertureValue.ROBOT_LOAD
+    )
 
 
 async def test_aperture_positions_robot_load_outside_tolerance(
@@ -297,7 +314,7 @@ async def test_aperture_positions_robot_load_outside_tolerance(
     set_mock_value(ap_sg.aperture.small, 0)
     await ap_sg.aperture.y.set(robot_load_ap_y + tolerance)
     with pytest.raises(InvalidApertureMove):
-        await ap_sg.get_current_aperture_position()
+        await ap_sg.read()
 
 
 async def test_aperture_positions_robot_load_unsafe(
@@ -308,7 +325,7 @@ async def test_aperture_positions_robot_load_unsafe(
     set_mock_value(ap_sg.aperture.small, 0)
     await ap_sg.aperture.y.set(50.0)
     with pytest.raises(InvalidApertureMove):
-        await ap_sg.get_current_aperture_position()
+        await ap_sg.read()
 
 
 @pytest.mark.skip(
@@ -360,6 +377,14 @@ async def test_ap_sg_in_runengine(
     ap = aperture_in_medium_pos.aperture
     sg = aperture_in_medium_pos.scatterguard
     test_loc = aperture_positions[ApertureValue.SMALL]
+
+    def set_small_readback_pv(value, *args, **kwargs):
+        set_mock_value(ap.small, 1)
+        set_mock_value(ap.medium, 0)
+        set_mock_value(ap.y.user_readback, value)
+
+    callback_on_mock_put(ap.y.user_setpoint, set_small_readback_pv)
+
     RE(bps.abs_set(aperture_in_medium_pos, ApertureValue.SMALL, wait=True))
     assert await ap.x.user_readback.get_value() == test_loc.aperture_x
     assert await ap.y.user_readback.get_value() == test_loc.aperture_y

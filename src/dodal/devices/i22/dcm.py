@@ -43,7 +43,6 @@ class DoubleCrystalMonochromator(StandardReadable):
         temperature_prefix: str,
         crystal_1_metadata: CrystalMetadata | None = None,
         crystal_2_metadata: CrystalMetadata | None = None,
-        prefix: str = "",
         name: str = "",
     ) -> None:
         with self.add_children_as_readables():

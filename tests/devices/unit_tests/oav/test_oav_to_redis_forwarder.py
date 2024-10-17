@@ -45,7 +45,6 @@ def oav_forwarder_with_valid_response(oav_forwarder: OAVToRedisForwarder):
         mock_response := get_mock_response()
     )
     mock_response.content_type = "multipart/x-mixed-replace"
-    # oav_forwarder._get_frame_and_put_to_redis = AsyncMock()
     yield oav_forwarder, mock_response, mock_get
     client_session_patch.stop()
 

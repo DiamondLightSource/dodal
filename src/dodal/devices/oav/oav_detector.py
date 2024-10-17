@@ -12,7 +12,6 @@ from ophyd import (
     OverlayPlugin,
     ProcessPlugin,
     ROIPlugin,
-    Signal,
     StatusBase,
 )
 
@@ -35,8 +34,6 @@ class ZoomController(Device):
 
     # Level is the string description of the zoom level e.g. "1.0x"
     level = Component(EpicsSignal, "MP:SELECT", string=True)
-    # Used by OAV to work out if we're changing the setpoint
-    _level_sp = Component(Signal)
 
     zrst = Component(EpicsSignal, "MP:SELECT.ZRST")
     onst = Component(EpicsSignal, "MP:SELECT.ONST")
@@ -45,14 +42,6 @@ class ZoomController(Device):
     frst = Component(EpicsSignal, "MP:SELECT.FRST")
     fvst = Component(EpicsSignal, "MP:SELECT.FVST")
     sxst = Component(EpicsSignal, "MP:SELECT.SXST")
-
-    def set_flatfield_on_zoom_level_one(self, value):
-        self.parent: OAV
-        flat_applied = self.parent.proc.port_name.get()
-        no_flat_applied = self.parent.cam.port_name.get()
-        return self.parent.grid_snapshot.input_plugin.set(
-            flat_applied if value == "1.0x" else no_flat_applied
-        )
 
     @property
     def allowed_zoom_levels(self):
@@ -67,10 +56,7 @@ class ZoomController(Device):
         ]
 
     def set(self, level_to_set: str) -> StatusBase:
-        return_status = self._level_sp.set(level_to_set)
-        return_status &= self.level.set(level_to_set)
-        return_status &= self.set_flatfield_on_zoom_level_one(level_to_set)
-        return return_status
+        return self.level.set(level_to_set)
 
 
 class OAV(AreaDetector):
