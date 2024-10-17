@@ -122,7 +122,8 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
     )
 
     set_mock_value(
-        cell.all_valves_control.fast_valve_control[6].close, FastValveControlRequest.ARM
+        cell.all_valves_control.fast_valve_control[6].close,
+        FastValveControlRequest.RESET,
     )
 
     set_mock_value(
@@ -131,21 +132,27 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
 
     # Set new values
     await cell.all_valves_control.set_valve(1, ValveControlRequest.OPEN)
-    await cell.all_valves_control.set_valve(1, ValveOpenSeqRequest.OPEN_SEQ)
-    await cell.all_valves_control.set_valve(6, FastValveControlRequest.CLOSE)
-    await cell.all_valves_control.set_valve(6, ValveOpenSeqRequest.OPEN_SEQ)
+    await cell.all_valves_control.set_valve(1, ValveControlRequest.CLOSE)
+    await cell.all_valves_control.set_valve(6, FastValveControlRequest.ARM)
+    await cell.all_valves_control.set_valve(6, FastValveControlRequest.OPEN)
+
+    # cell.all_valves_control.valve_control[1].close.set(ValveControlRequest.OPEN)
+    # cell.all_valves_control.valve_control[1].open.set(ValveOpenSeqRequest.OPEN_SEQ)
+    # cell.all_valves_control.valve_control[6].close.set(ValveOpenSeqRequest.OPEN_SEQ)
+    # cell.all_valves_control.valve_control[6].open.set(ValveOpenSeqRequest.OPEN_SEQ)
+
 
     # Check slow valves have been set to the new value
     await assert_reading(
         cell.all_valves_control.valve_control[1],
         {
-            "pjump-all_valves_control-valve_control-1-close": {
-                "value": ValveControlRequest.OPEN,
+            "pjump-all_valves_control-valve_control-1-open": {
+                "value": ValveOpenSeqRequest.OPEN_SEQ,
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
-            "pjump-all_valves_control-valve_control-1-open": {
-                "value": ValveOpenSeqRequest.OPEN_SEQ,
+            "pjump-all_valves_control-valve_control-1-close": {
+                "value": ValveControlRequest.CLOSE,
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
@@ -157,7 +164,7 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
         cell.all_valves_control.fast_valve_control[6],
         {
             "pjump-all_valves_control-fast_valve_control-6-close": {
-                "value": FastValveControlRequest.CLOSE,
+                "value": FastValveControlRequest.ARM,
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
