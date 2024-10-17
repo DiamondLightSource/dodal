@@ -130,7 +130,12 @@ class FocusingMirror(StandardReadable):
     """Focusing Mirror"""
 
     def __init__(
-        self, name, prefix, bragg_to_lat_lut_path=None, x_suffix="X", y_suffix="Y"
+        self,
+        prefix: str,
+        name: str = "",
+        bragg_to_lat_lut_path: str | None = None,
+        x_suffix: str = "X",
+        y_suffix: str = "Y",
     ):
         self.bragg_to_lat_lookup_table_path = bragg_to_lat_lut_path
         self.yaw_mrad = Motor(prefix + "YAW")
@@ -161,12 +166,12 @@ class FocusingMirrorWithStripes(FocusingMirror):
     """A focusing mirror where the stripe material can be changed. This is usually done
     based on the energy of the beamline."""
 
-    def __init__(self, name, prefix, *args, **kwargs):
+    def __init__(self, prefix: str, name: str = "", *args, **kwargs):
         self.stripe = epics_signal_rw(MirrorStripe, prefix + "STRP:DVAL")
         # apply the current set stripe setting
         self.apply_stripe = epics_signal_x(prefix + "CHANGE.PROC")
 
-        super().__init__(name, prefix, *args, **kwargs)
+        super().__init__(prefix, name, *args, **kwargs)
 
     def energy_to_stripe(self, energy_kev) -> MirrorStripe:
         # In future, this should be configurable per-mirror
