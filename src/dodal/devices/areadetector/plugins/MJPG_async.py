@@ -32,13 +32,6 @@ class MJPG(StandardReadable, Triggerable, ABC):
         self.input_rbpv = epics_signal_r(str, prefix + "NDArrayPort_RBV")
         self.input_plugin = epics_signal_rw(str, prefix + "NDArrayPort")
 
-        # scaling factors for the snapshot at the time it was triggered
-        self.microns_per_pixel_x = soft_signal_rw(float)
-        self.microns_per_pixel_y = soft_signal_rw(float)
-
-        # May not need this one
-        # self.oav_params = None  (OAVConfig)
-
         self.KICKOFF_TIMEOUT = 30.0
 
         super().__init__(name)

@@ -1,9 +1,6 @@
 from enum import IntEnum
 
-from ophyd_async.core import (
-    AsyncStatus,
-    StandardReadable,
-)
+from ophyd_async.core import AsyncStatus, StandardReadable
 from ophyd_async.epics.signal import epics_signal_rw
 
 from dodal.common.signal_utils import create_hardware_backed_soft_signal
@@ -84,8 +81,6 @@ class OAV(StandardReadable):
 
     async def _set_up_snapshots(self):
         for snapshot in [self.snapshot, self.grid_snapshot]:
-            await snapshot.microns_per_pixel_x.set(self.microns_per_pixel_x, wait=True)
-            await snapshot.microns_per_pixel_y.set(self.microns_per_pixel_y, wait=True)
             await snapshot.beam_centre_i.set(self.beam_centre_i, wait=True)
             await snapshot.beam_centre_j.set(self.beam_centre_j, wait=True)
 
