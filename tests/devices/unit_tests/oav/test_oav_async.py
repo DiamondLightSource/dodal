@@ -13,8 +13,8 @@ async def oav() -> OAV:
     oav_config = OAVConfig(ZOOM_LEVELS_XML, DISPLAY_CONFIGURATION)
     async with DeviceCollector(mock=True, connect=True):
         oav = OAV("", config=oav_config, name="fake_oav")
-    set_mock_value(oav.x_size, 1024)
-    set_mock_value(oav.y_size, 768)
+    set_mock_value(oav.grid_snapshot.x_size, 1024)
+    set_mock_value(oav.grid_snapshot.y_size, 768)
     return oav
 
 
@@ -68,8 +68,8 @@ async def test_extract_beam_position_given_different_zoom_levels(
 async def test_oav_returns_rescaled_beam_position_and_microns_per_pixel_correctly(
     oav: OAV,
 ):
-    set_mock_value(oav.x_size, 1292)
-    set_mock_value(oav.y_size, 964)
+    set_mock_value(oav.grid_snapshot.x_size, 1292)
+    set_mock_value(oav.grid_snapshot.y_size, 964)
 
     set_mock_value(oav.zoom_controller.level, "1.0")
 
@@ -99,3 +99,7 @@ async def test_calculate_beam_distance(h, v, expected_x, expected_y, oav: OAV):
         h,
         v,
     ) == (expected_x, expected_y)
+
+
+async def test_when_oav_created_microns_and_beam_centre_set_in_snapshots(oav: OAV):
+    pass

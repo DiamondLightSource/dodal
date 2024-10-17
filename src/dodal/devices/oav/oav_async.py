@@ -4,7 +4,7 @@ from ophyd_async.core import (
     AsyncStatus,
     StandardReadable,
 )
-from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
+from ophyd_async.epics.signal import epics_signal_rw
 
 from dodal.common.signal_utils import create_hardware_backed_soft_signal
 from dodal.devices.oav.oav_parameters import DEFAULT_OAV_WINDOW, OAVConfig
@@ -54,9 +54,8 @@ class OAV(StandardReadable):
         _bl_prefix = prefix.split("-")[0]
         self.zoom_controller = ZoomController(f"{_bl_prefix}-EA-OAV-01:FZOOM:", name)
 
-        # TODO See https://github.com/DiamondLightSource/dodal/issues/824
-        self.x_size = epics_signal_r(int, prefix + "CAM:ArraySizeX_RBV")
-        self.y_size = epics_signal_r(int, prefix + "CAM:ArraySizeY_RBV")
+        self.x_size = await self.grid_snapshot.x_size.get_value()
+        self.y_size = await self.grid_snapshot.y_size.get_value()
 
         self.sizes = [self.x_size, self.y_size]
 
