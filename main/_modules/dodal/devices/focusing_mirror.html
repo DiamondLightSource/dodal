@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.focusing_mirror &#8212; dodal 1.33.1.dev10+g9e12af099 documentation</title>
+    <title>dodal.devices.focusing_mirror &#8212; dodal 1.33.1.dev11+g0ba531caa documentation</title>
   
   
   
@@ -37,7 +37,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../../../_static/documentation_options.js?v=f64ddd3f"></script>
+    <script src="../../../_static/documentation_options.js?v=c848a8eb"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -625,7 +625,12 @@ document.write(`
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Focusing Mirror&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">bragg_to_lat_lut_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">x_suffix</span><span class="o">=</span><span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="n">y_suffix</span><span class="o">=</span><span class="s2">&quot;Y&quot;</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">bragg_to_lat_lut_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">x_suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;X&quot;</span><span class="p">,</span>
+        <span class="n">y_suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Y&quot;</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bragg_to_lat_lookup_table_path</span> <span class="o">=</span> <span class="n">bragg_to_lat_lut_path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">yaw_mrad</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;YAW&quot;</span><span class="p">)</span>
@@ -656,12 +661,12 @@ document.write(`
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A focusing mirror where the stripe material can be changed. This is usually done</span>
 <span class="sd">    based on the energy of the beamline.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stripe</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">MirrorStripe</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;STRP:DVAL&quot;</span><span class="p">)</span>
         <span class="c1"># apply the current set stripe setting</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">apply_stripe</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;CHANGE.PROC&quot;</span><span class="p">)</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">energy_to_stripe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_kev</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MirrorStripe</span><span class="p">:</span>
         <span class="c1"># In future, this should be configurable per-mirror</span>
