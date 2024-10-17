@@ -49,10 +49,7 @@ class OAV(StandardReadable):
         _bl_prefix = prefix.split("-")[0]
         self.zoom_controller = ZoomController(f"{_bl_prefix}-EA-OAV-01:FZOOM:", name)
 
-        self.x_size = await self.grid_snapshot.x_size.get_value()
-        self.y_size = await self.grid_snapshot.y_size.get_value()
-
-        self.sizes = [self.x_size, self.y_size]
+        self.sizes = [self.grid_snapshot.x_size, self.grid_snapshot.y_size]
 
         self.parameters = config.get_parameters()
 

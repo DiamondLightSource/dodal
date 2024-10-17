@@ -1,4 +1,4 @@
-from ophyd_async.core import SignalRW
+from ophyd_async.core import SignalR
 from PIL import Image, ImageDraw
 
 from dodal.devices.areadetector.plugins.MJPG_async import MJPG
@@ -15,8 +15,8 @@ class SnapshotWithBeamCentre(MJPG):
     def __init__(
         self,
         prefix: str,
-        beam_x_signal: SignalRW,
-        beam_y_signal: SignalRW,
+        beam_x_signal: SignalR,
+        beam_y_signal: SignalR,
         name: str = "",
     ) -> None:
         self.beam_centre_i = beam_x_signal
