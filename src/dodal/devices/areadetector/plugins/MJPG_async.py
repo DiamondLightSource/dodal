@@ -1,17 +1,10 @@
-import asyncio
-import threading
 from abc import ABC, abstractmethod
 from io import BytesIO
 from pathlib import Path
 
-import requests
+from aiohttp import ClientSession
 from bluesky.protocols import Triggerable
-from ophyd_async.core import (
-    AsyncStatus,
-    StandardReadable,
-    completed_status,
-    soft_signal_rw,
-)
+from ophyd_async.core import AsyncStatus, StandardReadable, soft_signal_rw
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 from PIL import Image
 
@@ -74,26 +67,17 @@ class MJPG(StandardReadable, Triggerable, ABC):
 
         It is the responsibility of the child class to save any resulting images.
         """
-        # TODO Figure out status!!!
-        # status = AsyncStatus(self)
         url_str = await self.url.get_value()
 
-        # For now, let's assume I set microns_per_pixels in the oav from those values
-        def get_snapshot():
-            try:
-                response = requests.get(url_str, stream=True)
-                response.raise_for_status()
-                with Image.open(BytesIO(response.content)) as image:
-                    asyncio.run(self.post_processing(image))
-                    completed_status()
-                    # st.set_finished()
-            except requests.HTTPError as e:
-                completed_status(exception=e)
-                # st.set_exception(e)
-
-        threading.Thread(target=get_snapshot, daemon=True).start()
-
-        # return st
+        async with ClientSession() as session:
+            async with session.get(url_str) as response:
+                try:
+                    response.raise_for_status()
+                    data = await response.read()
+                    with Image.open(BytesIO(data)) as image:
+                        await self.post_processing(image)
+                except Exception as e:
+                    LOGGER.warning(f"Failed to create snapshot. \n {e}")
 
     @abstractmethod
     async def post_processing(self, image: Image.Image):
