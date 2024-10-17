@@ -17,7 +17,6 @@ from ophyd_async.core import (
     PathProvider,
 )
 
-from dodal.beamlines import i03
 from dodal.common.beamlines import beamline_utils
 from dodal.common.visit import (
     DirectoryServiceClient,
@@ -90,14 +89,6 @@ def pytest_runtest_setup(item):
 def pytest_runtest_teardown():
     if "dodal.beamlines.beamline_utils" in sys.modules:
         sys.modules["dodal.beamlines.beamline_utils"].clear_devices()
-
-
-@pytest.fixture
-def vfm_mirror_voltages(RE: RunEngine):
-    voltages = i03.vfm_mirror_voltages(fake_with_ophyd_sim=True)
-    voltages.voltage_lookup_table_path = "tests/test_data/test_mirror_focus.json"
-    yield voltages
-    beamline_utils.clear_devices()
 
 
 s03_epics_server_port = getenv("S03_EPICS_CA_SERVER_PORT")
