@@ -147,6 +147,17 @@ def test_device_factory_can_ignore_skip():
     assert len(exceptions) == 0
 
 
+def test_device_factory_can_rename(RE):
+    from tests.fake_device_factory_beamline import device_c
+
+    cryo = device_c(mock=True, connect_immediately=True)
+    assert cryo.name == "device_c"
+    assert cryo.fine.name == "device_c-fine"
+    device_c(name="cryo")
+    assert cryo.name == "cryo"
+    assert cryo.fine.name == "cryo-fine"
+
+
 def device_a() -> Readable:
     return MagicMock()
 

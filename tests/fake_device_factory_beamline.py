@@ -1,26 +1,24 @@
-from unittest.mock import MagicMock
-
-from bluesky.protocols import Readable
+from bluesky.protocols import Readable, Reading, SyncOrAsync
+from event_model.documents.event_descriptor import DataKey
 from ophyd_async.core import Device
 
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.devices.cryostream import CryoStream
 
 
-class ReadableDevice(Readable, Device): ...
+class ReadableDevice(Readable, Device):
+    def read(self) -> SyncOrAsync[dict[str, Reading]]:
+        return {}
+
+    def describe(self) -> SyncOrAsync[dict[str, DataKey]]:
+        return {}
 
 
 @device_factory(skip=True, eager_connect=False)
 def device_a() -> ReadableDevice:
-    return _mock_with_name("readable")
+    return ReadableDevice("readable")
 
 
 @device_factory(skip=lambda: True, eager_connect=False)
 def device_c() -> CryoStream:
-    return _mock_with_name("cryo")
-
-
-def _mock_with_name(name: str) -> MagicMock:
-    mock = MagicMock()
-    mock.name = name
-    return mock
+    return CryoStream("FOO:")
