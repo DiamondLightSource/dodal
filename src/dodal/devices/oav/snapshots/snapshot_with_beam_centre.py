@@ -1,7 +1,7 @@
-from ophyd_async.core import soft_signal_rw
+from ophyd_async.core import SignalRW
 from PIL import Image, ImageDraw
 
-from dodal.devices.oav.snapshots.MJPG import MJPG
+from dodal.devices.areadetector.plugins.MJPG_async import MJPG
 
 
 class SnapshotWithBeamCentre(MJPG):
@@ -12,9 +12,15 @@ class SnapshotWithBeamCentre(MJPG):
     CROSSHAIR_OUTLINE_COLOUR = "Black"
     CROSSHAIR_FILL_COLOUR = "White"
 
-    def __init__(self, prefix: str, name: str = "") -> None:
-        self.beam_centre_i = soft_signal_rw(int)
-        self.beam_centre_j = soft_signal_rw(int)
+    def __init__(
+        self,
+        prefix: str,
+        beam_x_signal: SignalRW,
+        beam_y_signal: SignalRW,
+        name: str = "",
+    ) -> None:
+        self.beam_centre_i = beam_x_signal
+        self.beam_centre_j = beam_y_signal
         super().__init__(prefix, name)
 
     async def post_processing(self, image: Image.Image):

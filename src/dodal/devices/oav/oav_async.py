@@ -46,8 +46,6 @@ class ZoomController(StandardReadable):
 
 class OAV(StandardReadable):
     def __init__(self, prefix: str, config: OAVConfig, name: str = ""):
-        self.snapshot = SnapshotWithBeamCentre(f"{prefix}-DI-OAV-01:MJPG:", name)
-        self.grid_snapshot = SnapshotWithGrid(f"{prefix}-DI-OAV-01:MJPG:", name)
         _bl_prefix = prefix.split("-")[0]
         self.zoom_controller = ZoomController(f"{_bl_prefix}-EA-OAV-01:FZOOM:", name)
 
@@ -75,14 +73,12 @@ class OAV(StandardReadable):
             int, lambda: self._get_beam_position(Coords.Y)
         )
 
-        await self._set_up_snapshots()
+        self.snapshot = SnapshotWithBeamCentre(
+            f"{prefix}-DI-OAV-01:MJPG:", self.beam_centre_i, self.beam_centre_j, name
+        )
+        self.grid_snapshot = SnapshotWithGrid(f"{prefix}-DI-OAV-01:MJPG:", name)
 
         super().__init__(name)
-
-    async def _set_up_snapshots(self):
-        for snapshot in [self.snapshot, self.grid_snapshot]:
-            await snapshot.beam_centre_i.set(self.beam_centre_i, wait=True)
-            await snapshot.beam_centre_j.set(self.beam_centre_j, wait=True)
 
     async def _read_current_zoom(self) -> str:
         _zoom = await self.zoom_controller.level.get_value()

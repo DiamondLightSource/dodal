@@ -3,11 +3,11 @@ from os.path import join as path_join
 from ophyd_async.core import soft_signal_rw
 from PIL.Image import Image
 
+from dodal.devices.areadetector.plugins.MJPG_async import MJPG
 from dodal.devices.oav.grid_overlay import (
     add_grid_border_overlay_to_image,
     add_grid_overlay_to_image,
 )
-from dodal.devices.oav.snapshots.MJPG import MJPG
 from dodal.log import LOGGER
 
 
