@@ -4,12 +4,12 @@ from ophyd_async.epics.adaravis import AravisDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
-    device_instantiation,
+    device_factory,
     get_path_provider,
     set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.beamlines.device_helpers import numbered_slits
+from dodal.common.beamlines.device_helpers import HDF5_PREFIX
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
@@ -19,9 +19,10 @@ from dodal.devices.slits import Slits
 from dodal.devices.tetramm import TetrammDetector
 from dodal.devices.undulator import Undulator
 from dodal.log import set_beamline as set_log_beamline
-from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
+from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("p38")
+PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
@@ -39,64 +40,80 @@ set_path_provider(
 )
 
 
-def d3(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> AravisDetector:
-    return device_instantiation(
-        AravisDetector,
-        "d3",
-        "-DI-DCAM-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+@device_factory()
+def d3() -> AravisDetector:
+    return AravisDetector(
+        prefix=f"{PREFIX.beamline_prefix}-DI-DCAM-01:",
         drv_suffix="DET:",
-        hdf_suffix="HDF5:",
+        hdf_suffix=HDF5_PREFIX,
         path_provider=get_path_provider(),
     )
 
 
-# Disconnected
-@skip_device()
-def d11(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> AravisDetector:
-    return device_instantiation(
-        AravisDetector,
-        "d11",
-        "-DI-DCAM-03:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+@device_factory(skip=True)  # Disconnected
+def d11() -> AravisDetector:
+    return AravisDetector(
+        prefix=f"{PREFIX.beamline_prefix}-DI-DCAM-03:",
         drv_suffix="DET:",
-        hdf_suffix="HDF5:",
+        hdf_suffix=HDF5_PREFIX,
         path_provider=get_path_provider(),
     )
 
 
-def d12(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> AravisDetector:
-    return device_instantiation(
-        AravisDetector,
-        "d12",
-        "-DI-DCAM-04:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+@device_factory()
+def d12() -> AravisDetector:
+    return AravisDetector(
+        prefix=f"{PREFIX.beamline_prefix}-DI-DCAM-04:",
         drv_suffix="DET:",
-        hdf_suffix="HDF5:",
+        hdf_suffix=HDF5_PREFIX,
         path_provider=get_path_provider(),
     )
 
 
-def i0(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-) -> TetrammDetector:
-    return device_instantiation(
-        TetrammDetector,
-        "i0",
-        "-EA-XBPM-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+@device_factory()
+def i0() -> TetrammDetector:
+    return TetrammDetector(
+        prefix=f"{PREFIX.beamline_prefix}-EA-XBPM-01:",
         path_provider=get_path_provider(),
+    )
+
+
+# Must find which PandA IOC(s) are compatible
+# Must document what PandAs are physically connected to
+# See: https://github.com/bluesky/ophyd-async/issues/284
+@device_factory(skip=True)
+def panda1() -> HDFPanda:
+    return HDFPanda(
+        prefix=f"{BeamlinePrefix(BL).beamline_prefix}-EA-PANDA-01:",
+        path_provider=get_path_provider(),
+    )
+
+
+@device_factory(skip=True)
+def panda2() -> HDFPanda:
+    return HDFPanda(
+        prefix=f"{BeamlinePrefix(BL).beamline_prefix}-EA-PANDA-02:",
+        path_provider=get_path_provider(),
+    )
+
+
+@device_factory(skip=True)
+def panda3() -> HDFPanda:
+    return HDFPanda(
+        prefix=f"{BeamlinePrefix(BL).beamline_prefix}-EA-PANDA-03:",
+        path_provider=get_path_provider(),
+    )
+
+
+#
+# The linkam device is moved between i22 and p38 as appropriate
+#
+
+
+@device_factory(skip=True)
+def linkam() -> Linkam3:
+    return Linkam3(
+        prefix=f"{BeamlinePrefix(BL).beamline_prefix}-EA-LINKM-02:",
     )
 
 
@@ -107,214 +124,83 @@ def i0(
 #
 
 
-def slits_1(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
-) -> Slits:
-    return numbered_slits(
-        1,
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
+@device_factory(mock=True)
+def slits_1() -> Slits:
+    return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-01:")
 
 
-def slits_2(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
-) -> Slits:
-    return numbered_slits(
-        2,
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
+@device_factory(mock=True)
+def slits_2() -> Slits:
+    return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-02:")
 
 
-def slits_3(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
-) -> Slits:
-    return numbered_slits(
-        3,
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
+@device_factory(mock=True)
+def slits_3() -> Slits:
+    return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-03:")
 
 
-def slits_4(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
-) -> Slits:
-    return numbered_slits(
-        4,
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
+@device_factory(mock=True)
+def slits_4() -> Slits:
+    return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-04:")
 
 
-def slits_5(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
-) -> Slits:
-    return numbered_slits(
-        5,
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
+@device_factory(mock=True)
+def slits_5() -> Slits:
+    return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-05:")
 
 
-def slits_6(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
-) -> Slits:
-    return numbered_slits(
-        6,
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
+@device_factory(mock=True)
+def slits_6() -> Slits:
+    return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-06:")
 
 
-def fswitch(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
-) -> FSwitch:
-    return device_instantiation(
-        FSwitch,
-        "fswitch",
-        "-MO-FSWT-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+@device_factory(mock=True)
+def fswitch() -> FSwitch:
+    return FSwitch(
+        prefix=f"{PREFIX.beamline_prefix}-MO-FSWT-01:",
         lens_geometry="paraboloid",
         cylindrical=True,
         lens_material="Beryllium",
     )
 
 
-def vfm(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
-) -> FocusingMirror:
-    return device_instantiation(
-        FocusingMirror,
-        "vfm",
-        "-OP-KBM-01:VFM:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+@device_factory(mock=True)
+def vfm() -> FocusingMirror:
+    return FocusingMirror(prefix=f"{PREFIX.beamline_prefix}-OP-KBM-01:VFM:")
+
+
+@device_factory(mock=True)
+def hfm() -> FocusingMirror:
+    return FocusingMirror(prefix=f"{PREFIX.beamline_prefix}-OP-KBM-01:HFM:")
+
+
+@device_factory(mock=True)
+def dcm() -> DoubleCrystalMonochromator:
+    crystal_1_metadata = CrystalMetadata(
+        usage="Bragg",
+        type="silicon",
+        reflection=(1, 1, 1),
+        d_spacing=(3.13475, "nm"),
     )
-
-
-def hfm(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
-) -> FocusingMirror:
-    return device_instantiation(
-        FocusingMirror,
-        "hfm",
-        "-OP-KBM-01:HFM:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+    crystal_2_metadata = CrystalMetadata(
+        usage="Bragg",
+        type="silicon",
+        reflection=(1, 1, 1),
+        d_spacing=(3.13475, "nm"),
     )
-
-
-def dcm(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
-) -> DoubleCrystalMonochromator:
-    return device_instantiation(
-        DoubleCrystalMonochromator,
-        "dcm",
-        "",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-        bl_prefix=False,
+    return DoubleCrystalMonochromator(
         motion_prefix=f"{BeamlinePrefix(BL).beamline_prefix}-MO-DCM-01:",
         temperature_prefix=f"{BeamlinePrefix(BL).beamline_prefix}-DI-DCM-01:",
-        crystal_1_metadata=CrystalMetadata(
-            usage="Bragg",
-            type="silicon",
-            reflection=(1, 1, 1),
-            d_spacing=(3.13475, "nm"),
-        ),
-        crystal_2_metadata=CrystalMetadata(
-            usage="Bragg",
-            type="silicon",
-            reflection=(1, 1, 1),
-            d_spacing=(3.13475, "nm"),
-        ),
+        crystal_1_metadata=crystal_1_metadata,
+        crystal_2_metadata=crystal_2_metadata,
     )
 
 
-def undulator(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
-) -> Undulator:
-    return device_instantiation(
-        Undulator,
-        "undulator",
-        f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-        bl_prefix=False,
+@device_factory(mock=True)
+def undulator() -> Undulator:
+    return Undulator(
+        prefix=f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
+        id_gap_lookup_table_path="/dev/null",
         poles=80,
         length=2.0,
-    )
-
-
-# Must find which PandA IOC(s) are compatible
-# Must document what PandAs are physically connected to
-# See: https://github.com/bluesky/ophyd-async/issues/284
-@skip_device()
-def panda1(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-) -> HDFPanda:
-    return device_instantiation(
-        HDFPanda,
-        "panda1",
-        "-EA-PANDA-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-        path_provider=get_path_provider(),
-    )
-
-
-@skip_device()
-def panda2(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-) -> HDFPanda:
-    return device_instantiation(
-        HDFPanda,
-        "panda2",
-        "-EA-PANDA-02:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-        path_provider=get_path_provider(),
-    )
-
-
-@skip_device()
-def panda3(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-) -> HDFPanda:
-    return device_instantiation(
-        HDFPanda,
-        "panda3",
-        "-EA-PANDA-03:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-        path_provider=get_path_provider(),
-    )
-
-
-@skip_device()
-def linkam(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Linkam3:
-    return device_instantiation(
-        Linkam3,
-        "linkam",
-        "-EA-LINKM-02:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
     )
