@@ -16,17 +16,21 @@ def test_group_uid(group: str):
     assert not gid.endswith(f"{group}-")
 
 
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
+def test_inject_returns_value():
+    assert inject("foo") == "foo"
+
+
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_type_checking_ignores_inject():
-    with pytest.raises(DeprecationWarning):
+    def example_function(x: Movable = inject("foo")) -> MsgGenerator:  # noqa: B008
+        yield from {}
 
-        def example_function(x: Movable = inject("foo")) -> MsgGenerator:  # noqa: B008
-            yield from {}
-
-        # These asserts are sanity checks
-        # the real test is whether this test passes type checking
-        x: Parameter = signature(example_function).parameters["x"]
-        assert x.annotation == Movable
-        assert x.default == "foo"
+    # These asserts are sanity checks
+    # the real test is whether this test passes type checking
+    x: Parameter = signature(example_function).parameters["x"]
+    assert x.annotation == Movable
+    assert x.default == "foo"
 
 
 def test_inject_is_deprecated():
