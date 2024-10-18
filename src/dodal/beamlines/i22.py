@@ -146,7 +146,6 @@ def dcm() -> DoubleCrystalMonochromator:
 def undulator() -> Undulator:
     return Undulator(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
-        id_gap_lookup_table_path="/dev/null",
         poles=80,
         length=2.0,
     )
