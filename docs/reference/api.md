@@ -9,6 +9,7 @@
     dodal.common
     dodal.devices
     dodal.plans
+    dodal.plan_stubs
 
 .. automodule:: dodal
 

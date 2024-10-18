@@ -39,7 +39,7 @@ def test_save_panda_failure_to_create_device_exits_with_failure_code(mock_exit):
         with pytest.raises(AssertionError):
             _save_panda("i03", "panda", "test/file.yml")
 
-    assert mock_exit.called_once_with(1)
+    mock_exit.assert_called_once_with(1)
 
 
 @patch("dodal.devices.util.save_panda._save_panda")
