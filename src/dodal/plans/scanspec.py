@@ -24,7 +24,7 @@ def spec_scan(
         ),
     ],
     spec: Annotated[
-        Spec[Movable],  # type: ignore
+        Spec[Movable],
         Field(description="ScanSpec modelling the path of the scan"),
     ],
     metadata: Mapping[str, Any] | None = None,

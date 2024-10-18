@@ -32,7 +32,7 @@ dependencies = [
     "aiohttp",
     "redis",
     "deepdiff",
-    "scanspec",
+    "scanspec>=0.7.3",
 ]
 
 dynamic = ["version"]

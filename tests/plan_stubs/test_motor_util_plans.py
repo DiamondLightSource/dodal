@@ -59,7 +59,7 @@ def my_device(RE):
     "device_type",
     [DeviceWithOnlyMotors, DeviceWithNoMotors, DeviceWithSomeMotors],
 )
-@patch("dodal.plans.motor_util_plans.move_and_reset_wrapper")
+@patch("dodal.plan_stubs.motor_utils.move_and_reset_wrapper")
 def test_given_types_of_device_when_home_and_reset_wrapper_called_then_motors_and_zeros_passed_to_move_and_reset_wrapper(
     patch_move_and_reset, device_type, RE
 ):
