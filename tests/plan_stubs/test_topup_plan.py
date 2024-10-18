@@ -7,7 +7,7 @@ from ophyd_async.core import set_mock_value
 
 from dodal.beamlines import i03
 from dodal.devices.synchrotron import Synchrotron, SynchrotronMode
-from dodal.plans.check_topup import (
+from dodal.plan_stubs import (
     check_topup_and_wait_if_necessary,
     wait_for_topup_complete,
 )
