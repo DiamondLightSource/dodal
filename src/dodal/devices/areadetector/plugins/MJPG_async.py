@@ -44,6 +44,7 @@ class MJPG(StandardReadable, Triggerable, ABC):
         """
         filename_str = await self.filename.get_value()
         directory_str = await self.directory.get_value()
+        print("HERE 6")
 
         path = Path(f"{directory_str}/{filename_str}.png").as_posix()
         if not Path(directory_str).is_dir():
@@ -51,9 +52,12 @@ class MJPG(StandardReadable, Triggerable, ABC):
             Path(directory_str).mkdir(parents=True)
 
         LOGGER.info(f"Saving image to {path}")
+        print("HERE 7")
+
+        buffer = BytesIO()
+        image.save(buffer, format="png")
         async with aiofiles.open(path, "wb") as fh:
-            # FIXME
-            await fh.write(image)
+            await fh.write(buffer.getbuffer())
         # image.save(path)
         await self.last_saved_path.set(path, wait=True)
 
@@ -70,8 +74,11 @@ class MJPG(StandardReadable, Triggerable, ABC):
             async with session.get(url_str) as response:
                 try:
                     response.raise_for_status()
+                    print("HERE 1")
                     data = await response.read()
+                    print("HERE1.5")
                     with Image.open(BytesIO(data)) as image:
+                        print("HERE 2")
                         await self.post_processing(image)
                 except Exception as e:
                     LOGGER.warning(f"Failed to create snapshot. \n {e}")

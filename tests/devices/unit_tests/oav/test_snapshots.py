@@ -31,14 +31,17 @@ async def test_given_snapshot_triggered_then_crosshair_drawn(
     mock_get, patch_image_draw, patch_image, snapshot
 ):
     mock_get.return_value.__aenter__.return_value = AsyncMock()
+    mock_get.return_value.read.return_value = MagicMock()
     patch_line = MagicMock()
     patch_image_draw.Draw.return_value.line = patch_line
+
+    # patch_image.open.return_value = MagicMock()
 
     await snapshot.directory.set("/tmp/")
     await snapshot.filename.set("test")
 
-    # FIXME This will fail because "function never awaited"
-    # Need to find it though.
+    # FIXME Now failing because data is not Bytes but asyncmock
+    # Not sure how to fix tbh
     # await snapshot.trigger()
 
     # assert len(patch_line.mock_calls) == 2
