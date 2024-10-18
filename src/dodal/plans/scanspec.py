@@ -40,7 +40,7 @@ def spec_scan(
         **(metadata or {}),
     }
 
-    yield from bp.scan_nd(detectors, _as_cycler(spec), md=_md)
+    yield from bp.scan_nd(tuple(detectors), _as_cycler(spec), md=_md)
 
 
 def _as_cycler(
