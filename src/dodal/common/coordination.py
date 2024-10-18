@@ -41,7 +41,7 @@ def inject(name: str) -> Any:  # type: ignore
 
     warnings.warn(
         dedent("""
-        Inject is deprecated, users are now expected to call the device factory 
+        Inject is deprecated, users are now expected to call the device factory
         functions in dodal directly, these will cache devices as singletons after
         they have been called once. For example:
 

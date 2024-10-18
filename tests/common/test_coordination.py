@@ -17,11 +17,23 @@ def test_group_uid(group: str):
 
 
 def test_type_checking_ignores_inject():
-    def example_function(x: Movable = inject("foo")) -> MsgGenerator:  # noqa: B008
-        yield from {}
+    with pytest.raises(DeprecationWarning):
 
-    # These asserts are sanity checks
-    # the real test is whether this test passes type checking
-    x: Parameter = signature(example_function).parameters["x"]
-    assert x.annotation == Movable
-    assert x.default == "foo"
+        def example_function(x: Movable = inject("foo")) -> MsgGenerator:  # noqa: B008
+            yield from {}
+
+        # These asserts are sanity checks
+        # the real test is whether this test passes type checking
+        x: Parameter = signature(example_function).parameters["x"]
+        assert x.annotation == Movable
+        assert x.default == "foo"
+
+
+def test_inject_is_deprecated():
+    with pytest.raises(
+        DeprecationWarning,
+        match="Inject is deprecated, users are now expected to call the device factory",
+    ):
+
+        def example_function(x: Movable = inject("foo")) -> MsgGenerator:  # noqa: B008
+            yield from {}
