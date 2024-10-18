@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from io import BytesIO
 from pathlib import Path
 
+import aiofiles
 from aiohttp import ClientSession
 from bluesky.protocols import Triggerable
 from ophyd_async.core import AsyncStatus, StandardReadable, soft_signal_rw
@@ -50,7 +51,10 @@ class MJPG(StandardReadable, Triggerable, ABC):
             Path(directory_str).mkdir(parents=True)
 
         LOGGER.info(f"Saving image to {path}")
-        image.save(path)
+        async with aiofiles.open(path, "wb") as fh:
+            # FIXME
+            await fh.write(image)
+        # image.save(path)
         await self.last_saved_path.set(path, wait=True)
 
     @AsyncStatus.wrap

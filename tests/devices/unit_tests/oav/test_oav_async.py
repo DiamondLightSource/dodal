@@ -99,7 +99,3 @@ async def test_calculate_beam_distance(h, v, expected_x, expected_y, oav: OAV):
         h,
         v,
     ) == (expected_x, expected_y)
-
-
-async def test_when_oav_created_microns_and_beam_centre_set_in_snapshots(oav: OAV):
-    pass
