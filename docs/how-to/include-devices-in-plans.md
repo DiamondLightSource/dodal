@@ -1,6 +1,6 @@
 # Include Devices in Plans
 
-There are three main ways to include dodal devices in plans
+There are two main ways to include dodal devices in plans
 
 ## 1. Pass as Argument
 
@@ -34,27 +34,4 @@ def my_plan(detector: Readable = i22.saxs(connect_immediately=False)) -> MsgGene
 RE(my_plan()))
 ```
 
-This is useful for plans that will usually, but not exclusively, use the same device.
-
-## 3. Instantiate Within the Plan
-
-```python
-import bluesky.plans as bp
-import ophyd_async.plan_stubs as ops
-
-from bluesky.protocols import Readable
-from bluesky.utils import MsgGenerator
-from dodal.beamlines import i22
-
-def my_plan() -> MsgGenerator:
-    detector = i22.saxs(connect_immediately=False)
-    # We need to connect via the stub instead of directly 
-    # so that the RunEngine performs the connection in the
-    # correct event loop
-    yield from ops.ensure_connected(detector)
-    yield from bp.count([detector])
-
-RE(my_plan()))
-```
-
-This is useful for plans that are designed to only ever work with a specific device.
+This is useful for plans that will usually, but not exclusively, use the same device or that are designed to only ever work with a specific device.
