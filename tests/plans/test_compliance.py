@@ -2,9 +2,10 @@ import inspect
 from types import ModuleType
 from typing import Any, get_type_hints
 
-from dls_bluesky_core.core import MsgGenerator, PlanGenerator
+from bluesky.utils import MsgGenerator
 
 from dodal import plan_stubs, plans
+from dodal.common.types import PlanGenerator
 
 
 def is_bluesky_plan_generator(func: Any) -> bool:
@@ -20,10 +21,10 @@ def get_all_available_generators(mod: ModuleType):
         for name in names:
             yield getattr(mod, name)
 
-    if "__export__" in mod.__dict__:
-        yield from get_named_subset(mod.get("__export__"))
-    elif "__all__" in mod.__dict__:
-        yield from get_named_subset(mod.get("__all__"))
+    if explicit_exports := mod.__dict__.get("__export__"):
+        yield from get_named_subset(explicit_exports)
+    elif implicit_exports := mod.__dict__.get("__all__"):
+        yield from get_named_subset(implicit_exports)
     else:
         for name, value in mod.__dict__.items():
             if not name.startswith("_"):
