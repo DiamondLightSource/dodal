@@ -37,3 +37,25 @@ def camera_coordinates_to_xyz(
 
     z = vertical * sine
     return np.array([x, y, z], dtype=np.float64)
+
+
+def calculate_beam_distance(
+    beam_centre: tuple[int, int],
+    horizontal_pixels: int,
+    vertical_pixels: int,
+) -> tuple[int, int]:
+    """
+    Calculates the distance between the beam centre and the given (horizontal, vertical).
+
+    Args:
+        horizontal_pixels (int): The x (camera coordinates) value in pixels.
+        vertical_pixels (int): The y (camera coordinates) value in pixels.
+    Returns:
+        The distance between the beam centre and the (horizontal, vertical) point in pixels as a tuple
+        (horizontal_distance, vertical_distance).
+    """
+    beam_x, beam_y = beam_centre
+    return (
+        beam_x - horizontal_pixels,
+        beam_y - vertical_pixels,
+    )

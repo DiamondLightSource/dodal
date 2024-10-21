@@ -1,5 +1,5 @@
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import ANY, AsyncMock, MagicMock, patch
 
 import pytest
 from ophyd_async.core import DeviceCollector, MockSignalBackend, SignalR, set_mock_value
@@ -21,8 +21,9 @@ async def snapshot() -> SnapshotWithBeamCentre:
     mock_beam_y = create_and_set_mock_signal_r(int, "mock_beam_y", 380)
     async with DeviceCollector(mock=True):
         snapshot = SnapshotWithBeamCentre("", mock_beam_x, mock_beam_y, "fake_snapshot")
-    await snapshot.directory.set("/tmp/")
-    await snapshot.filename.set("test")
+    set_mock_value(snapshot.directory, "/tmp/")
+    set_mock_value(snapshot.filename, "test")
+    set_mock_value(snapshot.url, "http://test.url")
     return snapshot
 
 
@@ -31,14 +32,15 @@ async def grid_snapshot() -> SnapshotWithGrid:
     async with DeviceCollector(mock=True):
         grid_snapshot = SnapshotWithGrid("", "fake_grid")
 
-    await grid_snapshot.top_left_x.set(100)
-    await grid_snapshot.top_left_y.set(100)
-    await grid_snapshot.box_width.set(50)
-    await grid_snapshot.num_boxes_y.set(15)
-    await grid_snapshot.num_boxes_y.set(10)
+    set_mock_value(grid_snapshot.top_left_x, 100)
+    set_mock_value(grid_snapshot.top_left_y, 100)
+    set_mock_value(grid_snapshot.box_width, 50)
+    set_mock_value(grid_snapshot.num_boxes_x, 15)
+    set_mock_value(grid_snapshot.num_boxes_y, 10)
 
-    await grid_snapshot.directory.set("/tmp/")
-    await grid_snapshot.filename.set("test")
+    set_mock_value(grid_snapshot.directory, "/tmp/")
+    set_mock_value(grid_snapshot.filename, "test")
+    set_mock_value(grid_snapshot.url, "http://test.url")
     return grid_snapshot
 
 
@@ -129,9 +131,17 @@ async def test_snapshot_with_grid_triggered_saves_image_and_draws_grid(
     grid_snapshot._save_grid_to_image = (mock_save_grid := AsyncMock())
 
     await grid_snapshot.trigger()
+
+    test_url = await grid_snapshot.url.get_value()
+    # Get called with an instance of the session and correct url
+    mock_get.assert_called_once_with(ANY, test_url)
     mock_save.assert_awaited_once()
-    patch_add_border.assert_called_once()
-    patch_add_grid.assert_called_once()
+    patch_add_border.assert_called_once_with(
+        mock_open.return_value.__enter__.return_value, 100, 100, 50, 15, 10
+    )
+    patch_add_grid.assert_called_once_with(
+        mock_open.return_value.__enter__.return_value, 100, 100, 50, 15, 10
+    )
     assert mock_save_grid.await_count == 2
     assert (
         await grid_snapshot.last_path_outer.get_value() == "/tmp/test_outer_overlay.png"

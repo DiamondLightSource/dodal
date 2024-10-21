@@ -5,7 +5,10 @@ import bluesky.plan_stubs as bps
 import numpy as np
 from bluesky.utils import Msg
 
-from dodal.devices.oav.oav_calculations import camera_coordinates_to_xyz
+from dodal.devices.oav.oav_calculations import (
+    calculate_beam_distance,
+    camera_coordinates_to_xyz,
+)
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.smargon import Smargon
@@ -78,22 +81,37 @@ def get_move_required_so_that_beam_is_at_pixel(
     )
     current_angle = yield from bps.rd(smargon.omega)
 
-    return calculate_x_y_z_of_pixel(current_motor_xyz, current_angle, pixel, oav)
+    beam_x = yield from bps.rd(oav.beam_centre_i)
+    beam_y = yield from bps.rd(oav.beam_centre_j)
+    microns_per_pixel_x = yield from bps.rd(oav.microns_per_pixel_x)
+    microns_per_pixel_y = yield from bps.rd(oav.microns_per_pixel_y)
+
+    return calculate_x_y_z_of_pixel(
+        current_motor_xyz,
+        current_angle,
+        pixel,
+        (beam_x, beam_y),
+        (microns_per_pixel_x, microns_per_pixel_y),
+    )
 
 
 def calculate_x_y_z_of_pixel(
-    current_x_y_z, current_omega, pixel: Pixel, oav: OAV
+    current_x_y_z,
+    current_omega,
+    pixel: Pixel,
+    beam_centre: tuple[int, int],
+    microns_per_pixel: tuple[float, float],
 ) -> np.ndarray:
-    beam_distance_px: Pixel = oav.calculate_beam_distance(*pixel)
+    print(beam_centre)
+    print(microns_per_pixel)
+    beam_distance_px: Pixel = calculate_beam_distance((beam_centre), *pixel)
 
-    assert oav.microns_per_pixel_x
-    assert oav.microns_per_pixel_y
     return current_x_y_z + camera_coordinates_to_xyz(
         beam_distance_px[0],
         beam_distance_px[1],
         current_omega,
-        oav.microns_per_pixel_x,
-        oav.microns_per_pixel_y,
+        microns_per_pixel[0],
+        microns_per_pixel[1],
     )
 
 

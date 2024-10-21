@@ -3,7 +3,7 @@ from io import BytesIO
 from pathlib import Path
 
 import aiofiles
-from aiohttp import ClientSession
+from aiohttp import ClientConnectionError, ClientSession
 from bluesky.protocols import Triggerable
 from ophyd_async.core import AsyncStatus, StandardReadable, soft_signal_rw
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
@@ -69,8 +69,12 @@ class MJPG(StandardReadable, Triggerable, ABC):
 
         async with ClientSession() as session:
             async with session.get(url_str) as response:
+                print(response.ok)
                 if not response.ok:
-                    LOGGER.warning(
+                    LOGGER.error(
+                        f"OAV responded with {response.status}: {response.reason}."
+                    )
+                    raise ClientConnectionError(
                         f"OAV responded with {response.status}: {response.reason}."
                     )
                 try:
