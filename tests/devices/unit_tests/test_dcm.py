@@ -20,6 +20,10 @@ async def dcm() -> DCM:
         "dcm-bragg_in_degrees",
         "dcm-energy_in_kev",
         "dcm-offset_in_mm",
+        "dcm-crystal_metadata_usage",
+        "dcm-crystal_metadata_type",
+        "dcm-crystal_metadata_reflection",
+        "dcm-crystal_metadata_d_spacing",
     ],
 )
 async def test_read_and_describe_includes(
