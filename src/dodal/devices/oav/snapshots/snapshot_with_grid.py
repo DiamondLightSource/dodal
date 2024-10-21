@@ -1,5 +1,7 @@
+from io import BytesIO
 from os.path import join as path_join
 
+import aiofiles
 from ophyd_async.core import soft_signal_rw
 from PIL.Image import Image
 
@@ -24,6 +26,12 @@ class SnapshotWithGrid(MJPG):
         self.last_path_outer = soft_signal_rw(str)
         self.last_path_full_overlay = soft_signal_rw(str)
 
+    async def _save_grid_to_image(self, image: Image, path: str):
+        buffer = BytesIO()
+        image.save(buffer, format="png")
+        async with aiofiles.open(path, "wb") as fh:
+            await fh.write(buffer.getbuffer())
+
     async def post_processing(self, image: Image):
         # Save an unmodified image with no suffix
         await self._save_image(image)
@@ -44,7 +52,7 @@ class SnapshotWithGrid(MJPG):
         path = path_join(directory_str, f"{filename_str}_outer_overlay.png")
         await self.last_path_outer.set(path, wait=True)
         LOGGER.info(f"Saving grid outer edge at {path}")
-        image.save(path)
+        await self._save_grid_to_image(image, path)
 
         add_grid_overlay_to_image(
             image, top_left_x, top_left_y, box_witdh, num_boxes_x, num_boxes_y
@@ -53,4 +61,4 @@ class SnapshotWithGrid(MJPG):
         path = path_join(directory_str, f"{filename_str}_grid_overlay.png")
         await self.last_path_full_overlay.set(path, wait=True)
         LOGGER.info(f"Saving full grid overlay at {path}")
-        image.save(path)
+        await self._save_grid_to_image(image, path)
