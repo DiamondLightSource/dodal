@@ -21,27 +21,36 @@ async def snapshot() -> SnapshotWithBeamCentre:
     return snapshot
 
 
-@patch("dodal.devices.oav.snapshots.snapshot_with_beam_centre.Image")
+@patch("dodal.devices.areadetector.plugins.MJPG_async.Path.mkdir")
+@patch("dodal.devices.areadetector.plugins.MJPG_async.Image")
 @patch("dodal.devices.oav.snapshots.snapshot_with_beam_centre.ImageDraw")
 @patch(
     "dodal.devices.areadetector.plugins.MJPG_async.ClientSession.get",
     autospec=True,
 )
-async def test_given_snapshot_triggered_then_crosshair_drawn(
-    mock_get, patch_image_draw, patch_image, snapshot
+# @patch("dodal.devices.areadetector.plugins.MJPG_async.aiofiles", autospec=True)
+async def test_given_snapshot_triggered_then_crosshair_drawn_and_file_saved(
+    # mock_aiofiles, 
+    mock_get, patch_image_draw, patch_image, mock_mkdir, snapshot
 ):
-    mock_get.return_value.__aenter__.return_value = AsyncMock()
-    mock_get.return_value.read.return_value = MagicMock()
+    mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
+    mock_response.ok = MagicMock(return_value=True)
+    mock_response.read.return_value = (test_data := b"TEST")
+
+    # mock_open = mock_aiofiles.open
+    # mock_open.return_value.__aenter__.return_value = (mock_file := AsyncMock())
+
     patch_line = MagicMock()
     patch_image_draw.Draw.return_value.line = patch_line
 
-    # patch_image.open.return_value = MagicMock()
+    mock_open = patch_image.open
+    mock_open.return_value.__aenter__.return_value = test_data
 
     await snapshot.directory.set("/tmp/")
     await snapshot.filename.set("test")
 
-    # FIXME Now failing because data is not Bytes but asyncmock
-    # Not sure how to fix tbh
-    # await snapshot.trigger()
+    await snapshot.trigger()
 
-    # assert len(patch_line.mock_calls) == 2
+    assert len(patch_line.mock_calls) == 2
+    # mock_open.assert_called_once_with("/tmp/file.png", "wb")
+    # mock_file.write.assert_called_once_with(test_data)
