@@ -42,10 +42,10 @@ async def grid_snapshot() -> SnapshotWithGrid:
     return grid_snapshot
 
 
-@patch("dodal.devices.areadetector.plugins.MJPG_async.Image")
+@patch("dodal.devices.areadetector.plugins.MJPG.Image")
 @patch("dodal.devices.oav.snapshots.snapshot_with_beam_centre.ImageDraw")
 @patch(
-    "dodal.devices.areadetector.plugins.MJPG_async.ClientSession.get",
+    "dodal.devices.areadetector.plugins.MJPG.ClientSession.get",
     autospec=True,
 )
 async def test_snapshot_with_beam_centre_triggered_then_crosshair_drawn_and(
@@ -69,13 +69,13 @@ async def test_snapshot_with_beam_centre_triggered_then_crosshair_drawn_and(
     mock_save.assert_awaited_once()
 
 
-@patch("dodal.devices.areadetector.plugins.MJPG_async.Path.mkdir")
-@patch("dodal.devices.areadetector.plugins.MJPG_async.Image")
+@patch("dodal.devices.areadetector.plugins.MJPG.Path.mkdir")
+@patch("dodal.devices.areadetector.plugins.MJPG.Image")
 @patch(
-    "dodal.devices.areadetector.plugins.MJPG_async.ClientSession.get",
+    "dodal.devices.areadetector.plugins.MJPG.ClientSession.get",
     autospec=True,
 )
-@patch("dodal.devices.areadetector.plugins.MJPG_async.aiofiles", autospec=True)
+@patch("dodal.devices.areadetector.plugins.MJPG.aiofiles", autospec=True)
 async def test_snapshot_with_beam_centre_correctly_triggered_and_saved(
     mock_aiofiles, mock_get, patch_image, mock_mkdir, snapshot
 ):
@@ -106,13 +106,13 @@ def test_snapshot_draws_expected_crosshair(tmp_path: Path):
     assert image_bytes == expected_bytes, "Actual and expected images differ"
 
 
-@patch("dodal.devices.areadetector.plugins.MJPG_async.Image")
+@patch("dodal.devices.areadetector.plugins.MJPG.Image")
 @patch(
     "dodal.devices.oav.snapshots.snapshot_with_grid.add_grid_border_overlay_to_image"
 )
 @patch("dodal.devices.oav.snapshots.snapshot_with_grid.add_grid_overlay_to_image")
 @patch(
-    "dodal.devices.areadetector.plugins.MJPG_async.ClientSession.get",
+    "dodal.devices.areadetector.plugins.MJPG.ClientSession.get",
     autospec=True,
 )
 async def test_snapshot_with_grid_triggered_saves_image_and_draws_grid(

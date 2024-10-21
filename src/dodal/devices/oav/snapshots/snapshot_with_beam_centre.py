@@ -1,7 +1,7 @@
 from ophyd_async.core import SignalR
 from PIL import Image, ImageDraw
 
-from dodal.devices.areadetector.plugins.MJPG_async import MJPG
+from dodal.devices.areadetector.plugins.MJPG import MJPG
 
 
 class SnapshotWithBeamCentre(MJPG):
