@@ -6,7 +6,7 @@ import numpy as np
 from bluesky.utils import Msg
 
 from dodal.devices.oav.oav_calculations import camera_coordinates_to_xyz
-from dodal.devices.oav.oav_detector import OAVConfigParams
+from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.smargon import Smargon
 
@@ -64,7 +64,7 @@ class EdgeOutputArrayImageType(IntEnum):
 
 
 def get_move_required_so_that_beam_is_at_pixel(
-    smargon: Smargon, pixel: Pixel, oav_params: OAVConfigParams
+    smargon: Smargon, pixel: Pixel, oav: OAV
 ) -> Generator[Msg, None, np.ndarray]:
     """Calculate the required move so that the given pixel is in the centre of the beam."""
 
@@ -78,22 +78,22 @@ def get_move_required_so_that_beam_is_at_pixel(
     )
     current_angle = yield from bps.rd(smargon.omega)
 
-    return calculate_x_y_z_of_pixel(current_motor_xyz, current_angle, pixel, oav_params)
+    return calculate_x_y_z_of_pixel(current_motor_xyz, current_angle, pixel, oav)
 
 
 def calculate_x_y_z_of_pixel(
-    current_x_y_z, current_omega, pixel: Pixel, oav_params: OAVConfigParams
+    current_x_y_z, current_omega, pixel: Pixel, oav: OAV
 ) -> np.ndarray:
-    beam_distance_px: Pixel = oav_params.calculate_beam_distance(*pixel)
+    beam_distance_px: Pixel = oav.calculate_beam_distance(*pixel)
 
-    assert oav_params.micronsPerXPixel
-    assert oav_params.micronsPerYPixel
+    assert oav.microns_per_pixel_x
+    assert oav.microns_per_pixel_y
     return current_x_y_z + camera_coordinates_to_xyz(
         beam_distance_px[0],
         beam_distance_px[1],
         current_omega,
-        oav_params.micronsPerXPixel,
-        oav_params.micronsPerYPixel,
+        oav.microns_per_pixel_x,
+        oav.microns_per_pixel_y,
     )
 
 
