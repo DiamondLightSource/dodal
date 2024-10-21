@@ -42,10 +42,8 @@ class MJPG(StandardReadable, Triggerable, ABC):
             directory and filename signals. The full resultant path is put on the \
             last_saved_path signal
         """
-        print("HERE 5.5")
         filename_str = await self.filename.get_value()
         directory_str = await self.directory.get_value()
-        print("HERE 6")
 
         path = Path(f"{directory_str}/{filename_str}.png").as_posix()
         if not Path(directory_str).is_dir():
@@ -53,13 +51,11 @@ class MJPG(StandardReadable, Triggerable, ABC):
             Path(directory_str).mkdir(parents=True)
 
         LOGGER.info(f"Saving image to {path}")
-        print("HERE 7")
 
         buffer = BytesIO()
         image.save(buffer, format="png")
         async with aiofiles.open(path, "wb") as fh:
             await fh.write(buffer.getbuffer())
-        # image.save(path)
         await self.last_saved_path.set(path, wait=True)
 
     @AsyncStatus.wrap
@@ -78,12 +74,9 @@ class MJPG(StandardReadable, Triggerable, ABC):
                         f"OAV responded with {response.status}: {response.reason}."
                     )
                 try:
-                    print("HERE 1")
                     data = await response.read()
-                    print("HERE1.5")
                     with Image.open(BytesIO(data)) as image:
-                       print("HERE 2")
-                       await self.post_processing(image)
+                        await self.post_processing(image)
                 except Exception as e:
                     LOGGER.warning(f"Failed to create snapshot. \n {e}")
 

@@ -28,17 +28,16 @@ async def snapshot() -> SnapshotWithBeamCentre:
     "dodal.devices.areadetector.plugins.MJPG_async.ClientSession.get",
     autospec=True,
 )
-# @patch("dodal.devices.areadetector.plugins.MJPG_async.aiofiles", autospec=True)
+@patch("dodal.devices.areadetector.plugins.MJPG_async.aiofiles", autospec=True)
 async def test_given_snapshot_triggered_then_crosshair_drawn_and_file_saved(
-    # mock_aiofiles, 
-    mock_get, patch_image_draw, patch_image, mock_mkdir, snapshot
+    mock_aiofiles, mock_get, patch_image_draw, patch_image, mock_mkdir, snapshot
 ):
     mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
     mock_response.ok = MagicMock(return_value=True)
     mock_response.read.return_value = (test_data := b"TEST")
 
-    # mock_open = mock_aiofiles.open
-    # mock_open.return_value.__aenter__.return_value = (mock_file := AsyncMock())
+    mock_aio_open = mock_aiofiles.open
+    mock_aio_open.return_value.__aenter__.return_value = (mock_file := AsyncMock())
 
     patch_line = MagicMock()
     patch_image_draw.Draw.return_value.line = patch_line
@@ -52,5 +51,6 @@ async def test_given_snapshot_triggered_then_crosshair_drawn_and_file_saved(
     await snapshot.trigger()
 
     assert len(patch_line.mock_calls) == 2
-    # mock_open.assert_called_once_with("/tmp/file.png", "wb")
-    # mock_file.write.assert_called_once_with(test_data)
+    assert await snapshot.last_saved_path.get_value() == "/tmp/test.png"
+    mock_aio_open.assert_called_once_with("/tmp/test.png", "wb")
+    mock_file.write.assert_called_once()

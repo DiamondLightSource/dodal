@@ -24,12 +24,9 @@ class SnapshotWithBeamCentre(MJPG):
         super().__init__(prefix, name)
 
     async def post_processing(self, image: Image.Image):
-        print("HERE 3")
         beam_x = await self.beam_centre_i.get_value()
         beam_y = await self.beam_centre_j.get_value()
-        print("HERE 4")
         SnapshotWithBeamCentre.draw_crosshair(image, beam_x, beam_y)
-        print("HERE 5")
 
         await self._save_image(image)
 
