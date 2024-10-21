@@ -31,11 +31,11 @@ async def grid_snapshot() -> SnapshotWithGrid:
     async with DeviceCollector(mock=True):
         grid_snapshot = SnapshotWithGrid("", "fake_grid")
 
-    await grid_snapshot.top_left_x.set(5)
-    await grid_snapshot.top_left_y.set(5)
-    await grid_snapshot.box_width.set(5)
-    await grid_snapshot.num_boxes_y.set(5)
-    await grid_snapshot.num_boxes_y.set(5)
+    await grid_snapshot.top_left_x.set(100)
+    await grid_snapshot.top_left_y.set(100)
+    await grid_snapshot.box_width.set(50)
+    await grid_snapshot.num_boxes_y.set(15)
+    await grid_snapshot.num_boxes_y.set(10)
 
     await grid_snapshot.directory.set("/tmp/")
     await grid_snapshot.filename.set("test")

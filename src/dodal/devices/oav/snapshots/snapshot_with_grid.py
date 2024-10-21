@@ -6,7 +6,7 @@ from ophyd_async.core import soft_signal_rw
 from PIL.Image import Image
 
 from dodal.devices.areadetector.plugins.MJPG_async import MJPG
-from dodal.devices.oav.grid_overlay import (
+from dodal.devices.oav.snapshots.grid_overlay import (
     add_grid_border_overlay_to_image,
     add_grid_overlay_to_image,
 )
