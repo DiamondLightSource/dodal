@@ -49,8 +49,6 @@ class OAV(StandardReadable):
         _bl_prefix = prefix.split("-")[0]
         self.zoom_controller = ZoomController(f"{_bl_prefix}-EA-OAV-01:FZOOM:", name)
 
-        self.sizes = [self.grid_snapshot.x_size, self.grid_snapshot.y_size]
-
         self.parameters = config.get_parameters()
 
         self.microns_per_pixel_x = create_hardware_backed_soft_signal(
@@ -74,6 +72,8 @@ class OAV(StandardReadable):
             f"{prefix}-DI-OAV-01:MJPG:", self.beam_centre_i, self.beam_centre_j, name
         )
         self.grid_snapshot = SnapshotWithGrid(f"{prefix}-DI-OAV-01:MJPG:", name)
+
+        self.sizes = [self.grid_snapshot.x_size, self.grid_snapshot.y_size]
 
         super().__init__(name)
 
