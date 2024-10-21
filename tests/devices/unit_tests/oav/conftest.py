@@ -15,4 +15,5 @@ async def oav() -> OAV:
         oav = OAV("", config=oav_config, name="fake_oav")
     set_mock_value(oav.grid_snapshot.x_size, 1024)
     set_mock_value(oav.grid_snapshot.y_size, 768)
+    set_mock_value(oav.zoom_controller.level, "1.0x")
     return oav
