@@ -35,13 +35,13 @@ def test_linear_interpolation_reverse_order(s, expected_t):
     assert actual_t == expected_t, f"actual {actual_t} != expected {expected_t}"
 
 
-@mark.parametrize("s", [(1.999,), (5.501,)])
-def test_linear_interpolation_rejects_extrapolation(s):
+@mark.parametrize("s, expected_t", [(1.0, 1.0), (7.0, 8.0)])
+def test_linear_interpolation_extrapolates_returning_the_last_value(s, expected_t):
     lut_converter = linear_interpolation_lut(
         "tests/test_data/test_beamline_dcm_roll_converter.txt"
     )
-    with pytest.raises(ValueError):
-        lut_converter(s)
+    actual_t = lut_converter(s)
+    assert actual_t == expected_t, f"actual {actual_t} != expected {expected_t}"
 
 
 def test_linear_interpolation_rejects_non_monotonic_increasing():
