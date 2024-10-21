@@ -220,7 +220,7 @@ async def test_configuration(dcm: DoubleCrystalMonochromator):
                 "alarm_severity": ANY,
             },
             "dcm-crystal_2_d_spacing": {
-                "value": 3.13475,
+                "value": 0.31356,
                 "timestamp": ANY,
                 "alarm_severity": ANY,
             },
@@ -245,7 +245,7 @@ async def test_configuration(dcm: DoubleCrystalMonochromator):
                 "alarm_severity": ANY,
             },
             "dcm-crystal_1_d_spacing": {
-                "value": 3.13475,
+                "value": 0.31356,
                 "timestamp": ANY,
                 "alarm_severity": ANY,
             },
