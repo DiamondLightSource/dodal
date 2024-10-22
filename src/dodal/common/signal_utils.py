@@ -1,16 +1,14 @@
 from collections.abc import Callable, Coroutine
-from typing import Any, TypeVar
+from typing import Any
 
 from bluesky.protocols import Reading
-from ophyd_async.core import SignalR, SoftSignalBackend
-
-T = TypeVar("T")
+from ophyd_async.core import SignalDatatypeT, SignalR, SoftSignalBackend
 
 
-class HardwareBackedSoftSignalBackend(SoftSignalBackend[T]):
+class HardwareBackedSoftSignalBackend(SoftSignalBackend[SignalDatatypeT]):
     def __init__(
         self,
-        get_from_hardware_func: Callable[[], Coroutine[Any, Any, T]],
+        get_from_hardware_func: Callable[[], Coroutine[Any, Any, SignalDatatypeT]],
         *args,
         **kwargs,
     ) -> None:
@@ -25,14 +23,14 @@ class HardwareBackedSoftSignalBackend(SoftSignalBackend[T]):
         await self._update_value()
         return await super().get_reading()
 
-    async def get_value(self) -> T:
+    async def get_value(self) -> SignalDatatypeT:
         await self._update_value()
         return await super().get_value()
 
 
 def create_hardware_backed_soft_signal(
-    datatype: type[T],
-    get_from_hardware_func: Callable[[], Coroutine[Any, Any, T]],
+    datatype: type[SignalDatatypeT],
+    get_from_hardware_func: Callable[[], Coroutine[Any, Any, SignalDatatypeT]],
     units: str | None = None,
     precision: int | None = None,
 ):

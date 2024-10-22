@@ -102,7 +102,10 @@ async def test_given_no_tip_when_wait_for_tip_to_be_found_called_then_exception_
     await mock_pin_tip_detect.validity_timeout.set(0.2)
     mock_pin_tip_detect._get_tip_and_edge_data = AsyncMock(
         return_value=SampleLocation(
-            *PinTipDetection.INVALID_POSITION, np.array([]), np.array([])
+            int(PinTipDetection.INVALID_POSITION[0]),
+            int(PinTipDetection.INVALID_POSITION[1]),
+            np.array([]),
+            np.array([])
         )
     )
     RE = RunEngine(call_returns_result=True)

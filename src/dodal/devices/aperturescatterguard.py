@@ -27,7 +27,7 @@ class AperturePosition(BaseModel):
     aperture_z: float
     scatterguard_x: float
     scatterguard_y: float
-    radius: float | None = Field(json_schema_extra={"units": "µm"}, default=None)
+    radius: float = Field(json_schema_extra={"units": "µm"}, default=0.0)
 
     @property
     def values(self) -> tuple[float, float, float, float, float]:
@@ -54,7 +54,7 @@ class AperturePosition(BaseModel):
     @staticmethod
     def from_gda_params(
         name: ApertureValue,
-        radius: float | None,
+        radius: float,
         params: GDABeamlineParameters,
     ) -> AperturePosition:
         return AperturePosition(
@@ -81,7 +81,7 @@ def load_positions_from_beamline_parameters(
 ) -> dict[ApertureValue, AperturePosition]:
     return {
         ApertureValue.ROBOT_LOAD: AperturePosition.from_gda_params(
-            ApertureValue.ROBOT_LOAD, None, params
+            ApertureValue.ROBOT_LOAD, 0, params
         ),
         ApertureValue.SMALL: AperturePosition.from_gda_params(
             ApertureValue.SMALL, 20, params
@@ -172,7 +172,7 @@ class ApertureScatterguard(StandardReadable, Movable):
 
         raise InvalidApertureMove("Current aperture/scatterguard state unrecognised")
 
-    async def _get_current_radius(self) -> float | None:
+    async def _get_current_radius(self) -> float:
         current_value = await self._get_current_aperture_position()
         return self._loaded_positions[current_value].radius
 
