@@ -150,7 +150,7 @@ async def test_when_different_sources_selected_then_different_urls_used(
     oav_forwarder_with_valid_response, source, expected_url
 ):
     oav_forwarder, _, mock_get = oav_forwarder_with_valid_response
-    set_mock_value(oav_forwarder.selected_source, source)
+    set_mock_value(oav_forwarder.selected_source, source.value)
 
     await oav_forwarder.kickoff()
     await oav_forwarder.complete()
@@ -169,7 +169,7 @@ async def test_when_different_sources_selected_then_different_uuids_used(
     oav_forwarder_with_valid_response, source, expected_uuid_prefix
 ):
     oav_forwarder, _, _ = oav_forwarder_with_valid_response
-    set_mock_value(oav_forwarder.selected_source, source)
+    set_mock_value(oav_forwarder.selected_source, source.value)
 
     await oav_forwarder.kickoff()
     await asyncio.sleep(0.01)
@@ -190,7 +190,7 @@ async def test_oav_only_forwards_data_when_the_unique_id_updates(
     oav_forwarder_with_valid_response, source, expected_uuid_prefix
 ):
     oav_forwarder, _, _ = oav_forwarder_with_valid_response
-    set_mock_value(oav_forwarder.selected_source, source)
+    set_mock_value(oav_forwarder.selected_source, source.value)
     await oav_forwarder.kickoff()
     await asyncio.sleep(0.01)
     oav_forwarder.redis_client.hset.assert_called_once()
