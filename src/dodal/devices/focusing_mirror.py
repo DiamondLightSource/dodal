@@ -1,5 +1,3 @@
-from enum import Enum
-
 from ophyd_async.core import (
     AsyncStatus,
     ConfigSignal,
@@ -7,6 +5,7 @@ from ophyd_async.core import (
     DeviceVector,
     HintedSignal,
     StandardReadable,
+    StrictEnum,
     observe_value,
     soft_signal_r_and_setter,
 )
@@ -25,20 +24,20 @@ VOLTAGE_POLLING_DELAY_S = 0.5
 DEFAULT_SETTLE_TIME_S = 60
 
 
-class MirrorType(str, Enum):
+class MirrorType(StrictEnum):
     """See https://manual.nexusformat.org/classes/base_classes/NXmirror.html"""
 
     SINGLE = "single"
     MULTI = "multi"
 
 
-class MirrorStripe(str, Enum):
+class MirrorStripe(StrictEnum):
     RHODIUM = "Rhodium"
     BARE = "Bare"
     PLATINUM = "Platinum"
 
 
-class MirrorVoltageDemand(str, Enum):
+class MirrorVoltageDemand(StrictEnum):
     N_A = "N/A"
     OK = "OK"
     FAIL = "FAIL"

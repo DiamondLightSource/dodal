@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import asyncio
-from enum import Enum
 
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
     HintedSignal,
     StandardReadable,
+    StrictEnum,
 )
 from pydantic import BaseModel, Field
 
@@ -67,7 +67,7 @@ class AperturePosition(BaseModel):
         )
 
 
-class ApertureValue(str, Enum):
+class ApertureValue(StrictEnum):
     """Maps from a short usable name to the value name in the GDA Beamline parameters"""
 
     ROBOT_LOAD = "ROBOT_LOAD"
