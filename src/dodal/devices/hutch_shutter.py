@@ -1,10 +1,9 @@
-from enum import Enum
-
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     DEFAULT_TIMEOUT,
     AsyncStatus,
     StandardReadable,
+    StrictEnum,
     wait_for_value,
 )
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_w
@@ -16,13 +15,13 @@ class ShutterNotSafeToOperateError(Exception):
     pass
 
 
-class ShutterDemand(str, Enum):
+class ShutterDemand(StrictEnum):
     OPEN = "Open"
     CLOSE = "Close"
     RESET = "Reset"
 
 
-class ShutterState(str, Enum):
+class ShutterState(StrictEnum):
     FAULT = "Fault"
     OPEN = "Open"
     OPENING = "Opening"

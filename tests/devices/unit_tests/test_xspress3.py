@@ -56,7 +56,7 @@ async def test_stage_in_RE_success_in_busy_state(
     RE(bps.stage(mock_xspress3mini, wait=True))
 
     get_mock_put(mock_xspress3mini.trigger_mode).assert_called_once_with(
-        TriggerMode.BURST, wait=ANY, timeout=ANY
+        TriggerMode.BURST, wait=ANY
     )
     await asyncio.sleep(0.2)
     assert 2 == get_mock_put(mock_xspress3mini.acquire).call_count

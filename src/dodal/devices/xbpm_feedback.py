@@ -1,11 +1,9 @@
-from enum import Enum
-
 from bluesky.protocols import Triggerable
-from ophyd_async.core import AsyncStatus, Device, observe_value
+from ophyd_async.core import AsyncStatus, Device, StrictEnum, observe_value
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
 
-class Pause(str, Enum):
+class Pause(StrictEnum):
     PAUSE = "Paused"  # 0
     RUN = "Ok to Run"  # 1
 

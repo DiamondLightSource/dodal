@@ -1,12 +1,12 @@
 import asyncio
 import time
-from enum import Enum
 
 from bluesky.protocols import Location
 from ophyd_async.core import (
     ConfigSignal,
     HintedSignal,
     StandardReadable,
+    StrictEnum,
     WatchableAsyncStatus,
     WatcherUpdate,
     observe_value,
@@ -14,7 +14,7 @@ from ophyd_async.core import (
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
 
-class PumpControl(str, Enum):
+class PumpControl(StrictEnum):
     Manual = "Manual"
     Auto = "Auto"
 

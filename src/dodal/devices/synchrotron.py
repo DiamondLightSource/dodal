@@ -1,6 +1,11 @@
 from enum import Enum
 
-from ophyd_async.core import ConfigSignal, StandardReadable, soft_signal_r_and_setter
+from ophyd_async.core import (
+    ConfigSignal,
+    StandardReadable,
+    StrictEnum,
+    soft_signal_r_and_setter,
+)
 from ophyd_async.epics.signal import epics_signal_r
 
 
@@ -19,7 +24,7 @@ class Suffix(str, Enum):
     END_COUNTDOWN = "ENDCOUNTDN"
 
 
-class SynchrotronMode(str, Enum):
+class SynchrotronMode(StrictEnum):
     SHUTDOWN = "Shutdown"
     INJECTION = "Injection"
     NOBEAM = "No Beam"

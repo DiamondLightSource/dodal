@@ -3,12 +3,11 @@ from typing import Any, TypeVar
 
 from bluesky.protocols import Reading
 from ophyd_async.core import SignalR, SoftSignalBackend
-from ophyd_async.core._soft_signal_backend import SignalMetadata
 
 T = TypeVar("T")
 
 
-class HarwareBackedSoftSignalBackend(SoftSignalBackend[T]):
+class HardwareBackedSoftSignalBackend(SoftSignalBackend[T]):
     def __init__(
         self,
         get_from_hardware_func: Callable[[], Coroutine[Any, Any, T]],
@@ -20,7 +19,7 @@ class HarwareBackedSoftSignalBackend(SoftSignalBackend[T]):
 
     async def _update_value(self):
         new_value = await self.get_from_hardware_func()
-        await self.put(new_value)
+        await self.put(new_value, True)
 
     async def get_reading(self) -> Reading:
         await self._update_value()
@@ -45,9 +44,8 @@ def create_hardware_backed_soft_signal(
     the signal is currently read only. See https://github.com/bluesky/ophyd-async/issues/525
     for a more full solution.
     """
-    metadata = SignalMetadata(units=units, precision=precision)
     return SignalR(
-        backend=HarwareBackedSoftSignalBackend(
-            get_from_hardware_func, datatype, metadata=metadata
+        backend=HardwareBackedSoftSignalBackend(
+            get_from_hardware_func, datatype, units=units, precision=precision
         )
     )

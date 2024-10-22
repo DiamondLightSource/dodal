@@ -1,21 +1,20 @@
-from enum import Enum
-
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     DEFAULT_TIMEOUT,
     AsyncStatus,
     StandardReadable,
+    StrictEnum,
     wait_for_value,
 )
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw, epics_signal_w
 
 
-class ZebraShutterState(str, Enum):
+class ZebraShutterState(StrictEnum):
     CLOSE = "Close"
     OPEN = "Open"
 
 
-class ZebraShutterControl(str, Enum):
+class ZebraShutterControl(StrictEnum):
     MANUAL = "Manual"
     AUTO = "Auto"
 
