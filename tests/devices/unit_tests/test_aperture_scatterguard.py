@@ -174,7 +174,7 @@ async def test_aperture_unsafe_move(
         aperture_z=5.6,
         scatterguard_x=7.8,
         scatterguard_y=9.0,
-        radius=None,
+        radius=0,
     )
     ap_sg = aperture_in_medium_pos
     await ap_sg._set_raw_unsafe(pos)
