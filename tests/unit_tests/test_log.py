@@ -241,9 +241,6 @@ async def test_ophyd_async_logger_integrated(caplog, dodal_logger_for_tests):
     assert "Connecting to soft://test_signal" in caplog.text
 
 
-@pytest.mark.skip(
-    reason="https://github.com/bluesky/ophyd-async/pull/594 names in signal factory methods are broken"
-)
 async def test_ophyd_async_logger_configured(dodal_logger_for_tests):
     integrate_bluesky_and_ophyd_logging(dodal_logger_for_tests)
     do_default_logging_setup(True)
@@ -260,10 +257,7 @@ async def test_ophyd_async_logger_configured(dodal_logger_for_tests):
 
     device = _Device()
     await device.connect()
-    assert (
-        f"[{test_device_name}-{test_signal_name}]"
-        in stream_handler.stream.write.call_args.args[0]
-    )
+    assert f"[{test_signal_name}]" in stream_handler.stream.write.call_args.args[0]
     device.log.debug("test message")
     assert f"[{test_device_name}]" in stream_handler.stream.write.call_args.args[0]
 
