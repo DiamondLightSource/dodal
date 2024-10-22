@@ -241,7 +241,7 @@ async def test_given_tip_found_when_wait_for_tip_to_be_found_called_then_tip_imm
     )
     RE = RunEngine(call_returns_result=True)
     result = RE(wait_for_tip_to_be_found(mock_pin_tip_detect))
-    assert result.plan_result == (100, 100)  # type: ignore
+    assert all(result.plan_result == (100, 100))
     mock_pin_tip_detect._get_tip_and_edge_data.assert_called_once()
 
 

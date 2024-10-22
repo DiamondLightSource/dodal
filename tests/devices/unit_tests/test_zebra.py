@@ -44,11 +44,11 @@ async def test_position_compare_sets_signals(RE: RunEngine):
     await fake_pc.gate_trigger.set(I03Axes.OMEGA)
     await fake_pc.num_gates.set(10)
 
-    assert await fake_pc.gate_source.get_value() == "External"
-    assert await fake_pc.gate_trigger.get_value() == "Enc4"
+    assert await fake_pc.gate_source.get_value() == TrigSource.EXTERNAL
+    assert await fake_pc.gate_trigger.get_value() == I03Axes.OMEGA
     assert await fake_pc.num_gates.get_value() == 10
 
-    fake_pc.arm_source.set(ArmSource.SOFT)
+    await fake_pc.arm_source.set(ArmSource.SOFT)
     status = fake_pc.arm.set(ArmDemand.ARM)
     await status
 

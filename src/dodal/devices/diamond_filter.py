@@ -1,12 +1,11 @@
-from enum import Enum
 from typing import Generic, TypeVar
 
-from ophyd_async.core import StandardReadable
+from ophyd_async.core import StandardReadable, StrictEnum
 from ophyd_async.epics.motor import Motor
 from ophyd_async.epics.signal import epics_signal_rw
 
 
-class _Filters(str, Enum):
+class _Filters(StrictEnum):
     pass
 
 

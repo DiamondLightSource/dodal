@@ -194,11 +194,11 @@ def test_when_home_and_reset_wrapper_called_with_null_plan_then_motors_homed_and
     )
 
     get_mock_put(my_device.x.user_setpoint).assert_has_calls(
-        [call(0, wait=ANY, timeout=ANY), call(initial_x, wait=ANY, timeout=ANY)]
+        [call(0, wait=ANY), call(initial_x, wait=ANY)]
     )
 
     get_mock_put(my_device.y.user_setpoint).assert_has_calls(
-        [call(0, wait=ANY, timeout=ANY), call(initial_y, wait=ANY, timeout=ANY)]
+        [call(0, wait=ANY), call(initial_y, wait=ANY)]
     )
 
 
@@ -293,11 +293,11 @@ def test_given_home_and_reset_inner_plan_fails_reset_still(RE, my_device):
         )
 
     get_mock_put(my_device.x.user_setpoint).assert_has_calls(
-        [call(0.0, wait=ANY, timeout=ANY), call(initial_x, wait=ANY, timeout=ANY)]
+        [call(0.0, wait=ANY), call(initial_x, wait=ANY)]
     )
 
     get_mock_put(my_device.y.user_setpoint).assert_has_calls(
-        [call(0.0, wait=ANY, timeout=ANY), call(initial_y, wait=ANY, timeout=ANY)]
+        [call(0.0, wait=ANY), call(initial_y, wait=ANY)]
     )
 
 
@@ -331,9 +331,9 @@ def test_given_move_to_home_fails_reset_still(RE, my_device, move_that_failed):
     assert isinstance(e.value.__cause__, MyException)
 
     get_mock_put(my_device.x.user_setpoint).assert_has_calls(
-        [call(0.0, wait=ANY, timeout=ANY), call(initial_x, wait=ANY, timeout=ANY)]
+        [call(0.0, wait=ANY), call(initial_x, wait=ANY)]
     )
 
     get_mock_put(my_device.y.user_setpoint).assert_has_calls(
-        [call(0.0, wait=ANY, timeout=ANY), call(initial_y, wait=ANY, timeout=ANY)]
+        [call(0.0, wait=ANY), call(initial_y, wait=ANY)]
     )

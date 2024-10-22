@@ -74,7 +74,7 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
                 Source.ROI.value: epics_signal_r(str, f"{prefix}MJPG:MJPG_URL_RBV"),
             }
         )
-        self.selected_source = soft_signal_rw(Source)
+        self.selected_source = soft_signal_rw(int)
 
         with self.add_children_as_readables():
             self.uuid, self.uuid_setter = soft_signal_r_and_setter(str)
@@ -111,7 +111,7 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
         self, function_to_do: Callable[[ClientResponse, str | None], Awaitable]
     ):
         source = await self.selected_source.get_value()
-        stream_url = await self._sources[source.value].get_value()
+        stream_url = await self._sources[source].get_value()
         async with ClientSession() as session:
             async with session.get(stream_url) as response:
                 await function_to_do(response, stream_url)

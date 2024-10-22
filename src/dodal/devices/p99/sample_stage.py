@@ -1,6 +1,4 @@
-from enum import Enum
-
-from ophyd_async.core import Device
+from ophyd_async.core import Device, SubsetEnum
 from ophyd_async.epics.signal import epics_signal_rw
 
 
@@ -18,7 +16,7 @@ class SampleAngleStage(Device):
         super().__init__(name=name)
 
 
-class p99StageSelections(str, Enum):
+class p99StageSelections(SubsetEnum):
     Empty = "Empty"
     Mn5um = "Mn 5um"
     Fe = "Fe (empty)"

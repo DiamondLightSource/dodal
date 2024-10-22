@@ -159,7 +159,7 @@ async def test_when_different_sources_selected_then_different_urls_used(
     oav_forwarder_with_valid_response, source, expected_url
 ):
     oav_forwarder, _, mock_get = oav_forwarder_with_valid_response
-    oav_forwarder.selected_source.set(source)
+    oav_forwarder.selected_source.set(source.value)
 
     await oav_forwarder.kickoff()
     await oav_forwarder.complete()
