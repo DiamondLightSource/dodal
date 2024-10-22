@@ -1,8 +1,7 @@
 from asyncio import Task, create_task, sleep
-from enum import Enum
 
 from bluesky.protocols import Stoppable
-from ophyd_async.core import AsyncStatus, Device, SignalRW, StandardReadable
+from ophyd_async.core import AsyncStatus, Device, SignalRW, StandardReadable, StrictEnum
 from ophyd_async.epics.signal import epics_signal_rw
 
 
@@ -10,7 +9,7 @@ class ThawingException(Exception):
     pass
 
 
-class ThawerStates(str, Enum):
+class ThawerStates(StrictEnum):
     OFF = "Off"
     ON = "On"
 

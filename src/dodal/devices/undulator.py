@@ -1,5 +1,4 @@
 import os
-from enum import Enum
 
 import numpy as np
 from bluesky.protocols import Movable
@@ -8,6 +7,7 @@ from ophyd_async.core import (
     AsyncStatus,
     ConfigSignal,
     StandardReadable,
+    StrictEnum,
     soft_signal_r_and_setter,
 )
 from ophyd_async.epics.motor import Motor
@@ -33,7 +33,7 @@ UNDULATOR_DISCREPANCY_THRESHOLD_MM = 2e-3
 STATUS_TIMEOUT_S: float = 10.0
 
 
-class UndulatorGapAccess(str, Enum):
+class UndulatorGapAccess(StrictEnum):
     ENABLED = "ENABLED"
     DISABLED = "DISABLED"
 

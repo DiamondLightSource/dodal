@@ -1,5 +1,3 @@
-from enum import Enum
-
 from bluesky.protocols import Stageable
 from numpy import float64
 from numpy.typing import NDArray
@@ -7,6 +5,7 @@ from ophyd_async.core import (
     AsyncStatus,
     Device,
     DeviceVector,
+    StrictEnum,
     wait_for_value,
 )
 from ophyd_async.epics.signal import (
@@ -23,7 +22,7 @@ from dodal.devices.xspress3.xspress3_channel import (
 from dodal.log import LOGGER
 
 
-class TriggerMode(str, Enum):
+class TriggerMode(StrictEnum):
     SOFTWARE = "Software"
     HARDWARE = "Hardware"
     BURST = "Burst"
@@ -35,17 +34,17 @@ class TriggerMode(str, Enum):
     LVDS_both = "LVDS Both"
 
 
-class UpdateRBV(str, Enum):
+class UpdateRBV(StrictEnum):
     DISABLED = "Disabled"
     ENABLED = "Enabled"
 
 
-class AcquireRBVState(str, Enum):
+class AcquireRBVState(StrictEnum):
     DONE = "Done"
     ACQUIRE = "Acquiring"
 
 
-class DetectorState(str, Enum):
+class DetectorState(StrictEnum):
     IDLE = "Idle"
     ACQUIRE = "Acquire"
     READOUT = "Readout"
