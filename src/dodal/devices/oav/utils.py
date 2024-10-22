@@ -106,4 +106,4 @@ def wait_for_tip_to_be_found(
         timeout = yield from bps.rd(ophyd_pin_tip_detection.validity_timeout)
         raise PinNotFoundException(f"No pin found after {timeout} seconds")
 
-    return found_tip  # type: ignore
+    return Pixel((int(found_tip[0]), int(found_tip[1])))  # type: ignore
