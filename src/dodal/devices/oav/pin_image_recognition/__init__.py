@@ -4,6 +4,7 @@ import time
 import numpy as np
 from numpy.typing import NDArray
 from ophyd_async.core import (
+    Array1D,
     AsyncStatus,
     HintedSignal,
     StandardReadable,
@@ -22,7 +23,8 @@ from dodal.devices.oav.pin_image_recognition.utils import (
 )
 from dodal.log import LOGGER
 
-Tip = tuple[int | None, int | None]
+# Tip position in x, y pixel coordinates
+Tip = Array1D[np.int32]
 
 
 class InvalidPinException(Exception):
@@ -45,7 +47,7 @@ class PinTipDetection(StandardReadable):
     no tip is found after this time it will not error but instead return {INVALID_POSITION}.
     """
 
-    INVALID_POSITION = (None, None)
+    INVALID_POSITION = np.array([np.iinfo(np.int32).min, np.iinfo(np.int32).min])
 
     def __init__(self, prefix: str, name: str = ""):
         self._prefix: str = prefix
@@ -90,10 +92,10 @@ class PinTipDetection(StandardReadable):
         super().__init__(name=name)
 
     def _set_triggered_values(self, results: SampleLocation):
-        tip = (results.tip_x, results.tip_y)
-        if tip == self.INVALID_POSITION:
+        if results.tip_x is None or results.tip_y is None:
             raise InvalidPinException
         else:
+            tip = np.array([results.tip_x, results.tip_y])
             self._tip_setter(tip)
         self._top_edge_setter(results.edge_top)
         self._bottom_edge_setter(results.edge_bottom)

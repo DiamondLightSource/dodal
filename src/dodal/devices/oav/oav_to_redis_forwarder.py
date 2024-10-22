@@ -84,7 +84,7 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
                 Source.FULL_SCREEN.value: OAVSource(f"{prefix}XTAL:", "fullscreen"),
             }
         )
-        self.selected_source = soft_signal_rw(Source)
+        self.selected_source = soft_signal_rw(int)
 
         self.forwarding_task = None
         self.redis_client = StrictRedis(
@@ -118,11 +118,11 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
     async def _open_connection_and_do_function(
         self, function_to_do: Callable[[ClientResponse, OAVSource], Awaitable]
     ):
-        source_name = await self.selected_source.get_value()
+        source_idx = await self.selected_source.get_value()
         LOGGER.info(
-            f"Forwarding data from sample {await self.sample_id.get_value()} and OAV {source_name}"
+            f"Forwarding data from sample {await self.sample_id.get_value()} and OAV {source_idx}"
         )
-        source = self._sources[source_name.value]
+        source = self._sources[source_idx]
         stream_url = await source.url.get_value()
         async with ClientSession() as session:
             async with session.get(stream_url) as response:
@@ -164,7 +164,7 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
     async def stop(self, success=True):
         if self.forwarding_task:
             LOGGER.info(
-                f"Stopping forwarding for {await self.selected_source.get_value()}"
+                f"Stopping forwarding for source id {await self.selected_source.get_value()}"
             )
             self._stop_flag.set()
             await self.forwarding_task

@@ -1,10 +1,8 @@
-from enum import Enum
-
-from ophyd_async.core import AsyncStatus, StandardReadable
+from ophyd_async.core import AsyncStatus, StandardReadable, StrictEnum
 from ophyd_async.epics.signal import epics_signal_rw
 
 
-class BacklightPositions(str, Enum):
+class BacklightPositions(StrictEnum):
     OUT = "Out"
     IN = "In"
     LOAD_CHECK = "LoadCheck"
@@ -12,7 +10,7 @@ class BacklightPositions(str, Enum):
     DIODE = "Diode"
 
 
-class LEDStatus(str, Enum):
+class LEDStatus(StrictEnum):
     OFF = "OFF"
     ON = "ON"
 
