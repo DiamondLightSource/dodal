@@ -79,6 +79,7 @@ def get_move_required_so_that_beam_is_at_pixel(
         ],
         dtype=np.float64,
     )
+    print(current_motor_xyz)
     current_angle = yield from bps.rd(smargon.omega)
 
     beam_x = yield from bps.rd(oav.beam_centre_i)
@@ -105,6 +106,7 @@ def calculate_x_y_z_of_pixel(
     print(beam_centre)
     print(microns_per_pixel)
     beam_distance_px: Pixel = calculate_beam_distance((beam_centre), *pixel)
+    print(beam_distance_px)
 
     return current_x_y_z + camera_coordinates_to_xyz(
         beam_distance_px[0],

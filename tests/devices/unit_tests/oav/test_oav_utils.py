@@ -4,8 +4,8 @@ import numpy as np
 import pytest
 from bluesky.run_engine import RunEngine
 from ophyd.sim import instantiate_fake_device
+from ophyd_async.core import set_mock_value
 
-# from ophyd_async.core import set_mock_value
 from dodal.devices.oav.oav_calculations import calculate_beam_distance
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
@@ -13,11 +13,10 @@ from dodal.devices.oav.pin_image_recognition.utils import SampleLocation
 from dodal.devices.oav.utils import (
     PinNotFoundException,
     bottom_right_from_top_left,
+    get_move_required_so_that_beam_is_at_pixel,
     wait_for_tip_to_be_found,
-    # get_move_required_so_that_beam_is_at_pixel,
 )
-
-# from dodal.devices.smargon import Smargon
+from dodal.devices.smargon import Smargon
 
 
 def test_bottom_right_from_top_left():
@@ -49,48 +48,34 @@ def test_calculate_beam_distance(h, v, expected_x, expected_y, oav: OAV):
     ) == (expected_x, expected_y)
 
 
-# TODO, can't set beam center and micron as I want, will need to calculate
-# the right values.
-# @pytest.mark.parametrize(
-#     "px_per_um, beam_centre, angle, pixel_to_move_to, expected_xyz",
-#     [
-#         # Simple case of beam being in the top left and each pixel being 1 mm
-#         ([1000, 1000], [0, 0], 0, [100, 190], [100, 190, 0]),
-#         ([1000, 1000], [0, 0], -90, [50, 250], [50, 0, 250]),
-#         ([1000, 1000], [0, 0], 90, [-60, 450], [-60, 0, -450]),
-#         # Beam offset
-#         ([1000, 1000], [100, 100], 0, [100, 100], [0, 0, 0]),
-#         ([1000, 1000], [100, 100], -90, [50, 250], [-50, 0, 150]),
-#         # Pixels_per_micron different
-#         ([10, 50], [0, 0], 0, [100, 190], [1, 9.5, 0]),
-#         ([60, 80], [0, 0], -90, [50, 250], [3, 0, 20]),
-#     ],
-# )
-# async def test_values_for_move_so_that_beam_is_at_pixel(
-#     smargon: Smargon,
-#     oav: OAV,
-#     px_per_um,
-#     beam_centre,
-#     angle,
-#     pixel_to_move_to,
-#     expected_xyz,
-# ):
-#     await oav.microns_per_pixel_x._backend.put(px_per_um[0])
-#     # set_mock_value(oav.microns_per_pixel_x, px_per_um[0])
-#     set_mock_value(oav.microns_per_pixel_y, px_per_um[1])
-#     set_mock_value(oav.beam_centre_i, beam_centre[0])
-#     set_mock_value(oav.beam_centre_j, beam_centre[1])
+@pytest.mark.parametrize(
+    "zoom_level, angle, pixel_to_move_to, expected_xyz",
+    [
+        # Different zoom levels -> different um_per_pix and beam_centre
+        ("5.0x", 0, (100, 190), (-0.659, -0.253, 0)),
+        ("1.0x", 0, (100, 190), (-1.082, -0.485, 0)),
+        # Different position to reach, same zoom level
+        ("1.0x", 0, (50, 250), (-1.226, -0.313, 0)),
+        # Change angle
+        ("5.0x", 45, (100, 190), (-0.659, -0.179, 0.179)),
+    ],
+)
+async def test_values_for_move_so_that_beam_is_at_pixel(
+    zoom_level: str,
+    angle: int,
+    pixel_to_move_to: tuple,
+    expected_xyz: tuple,
+    oav: OAV,
+    smargon: Smargon,
+):
+    set_mock_value(oav.zoom_controller.level, zoom_level)
+    set_mock_value(smargon.omega.user_readback, angle)
+    RE = RunEngine(call_returns_result=True)
+    pos = RE(
+        get_move_required_so_that_beam_is_at_pixel(smargon, pixel_to_move_to, oav)
+    ).plan_result  # type: ignore
 
-#     set_mock_value(smargon.omega.user_readback, angle)
-
-#     RE = RunEngine(call_returns_result=True)
-#     pos = RE(
-#         get_move_required_so_that_beam_is_at_pixel(
-#             smargon, pixel_to_move_to, oav
-#         )
-#     ).plan_result  # type: ignore
-
-#     assert pos == pytest.approx(expected_xyz)
+    assert pos == pytest.approx(expected_xyz, abs=1e-3)
 
 
 @pytest.mark.asyncio
