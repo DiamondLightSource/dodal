@@ -1,3 +1,6 @@
+from unittest.mock import AsyncMock, patch
+
+import aiohttp
 import pytest
 from ophyd_async.core import set_mock_value
 
@@ -70,4 +73,13 @@ async def test_oav_returns_rescaled_beam_position_and_microns_per_pixel_correctl
     assert beam_y == 450
 
 
-# TODO add test for bad response of snapshot
+@patch(
+    "dodal.devices.areadetector.plugins.MJPG.ClientSession.get",
+    autospec=True,
+)
+async def test_snapshot_trigger_handles_bad_request_status(mock_get, oav: OAV):
+    mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
+    mock_response.ok = False
+
+    with pytest.raises(aiohttp.ClientConnectionError):
+        await oav.grid_snapshot.trigger()

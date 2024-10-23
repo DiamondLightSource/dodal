@@ -69,7 +69,6 @@ class MJPG(StandardReadable, Triggerable, ABC):
 
         async with ClientSession() as session:
             async with session.get(url_str) as response:
-                print(response.ok)
                 if not response.ok:
                     LOGGER.error(
                         f"OAV responded with {response.status}: {response.reason}."

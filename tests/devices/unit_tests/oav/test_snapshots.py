@@ -1,5 +1,5 @@
 from pathlib import Path
-from unittest.mock import ANY, AsyncMock, MagicMock, patch
+from unittest.mock import ANY, AsyncMock, MagicMock, call, patch
 
 import pytest
 from ophyd_async.core import DeviceCollector, MockSignalBackend, SignalR, set_mock_value
@@ -117,7 +117,7 @@ def test_snapshot_draws_expected_crosshair(tmp_path: Path):
     "dodal.devices.areadetector.plugins.MJPG.ClientSession.get",
     autospec=True,
 )
-async def test_snapshot_with_grid_triggered_saves_image_and_draws_grid(
+async def test_snapshot_with_grid_triggered_saves_image_and_draws_correct_grid(
     mock_get, patch_add_grid, patch_add_border, patch_image, grid_snapshot
 ):
     mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
@@ -143,6 +143,11 @@ async def test_snapshot_with_grid_triggered_saves_image_and_draws_grid(
         mock_open.return_value.__enter__.return_value, 100, 100, 50, 15, 10
     )
     assert mock_save_grid.await_count == 2
+    expected_grid_save_calls = [
+        call(ANY, f"/tmp/test_{suffix}.png")
+        for suffix in ["outer_overlay", "grid_overlay"]
+    ]
+    assert mock_save_grid.mock_calls == expected_grid_save_calls
     assert (
         await grid_snapshot.last_path_outer.get_value() == "/tmp/test_outer_overlay.png"
     )
