@@ -66,7 +66,7 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
             redis_db: int           which redis database to connect to, defaults to 0
             name: str               the name of this device
         """
-        self._sources = DeviceVector(
+        self.sources = DeviceVector(
             {
                 Source.FULL_SCREEN.value: epics_signal_r(
                     str, f"{prefix}XTAL:MJPG_URL_RBV"
@@ -111,7 +111,7 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
         self, function_to_do: Callable[[ClientResponse, str | None], Awaitable]
     ):
         source = await self.selected_source.get_value()
-        stream_url = await self._sources[source].get_value()
+        stream_url = await self.sources[source].get_value()
         async with ClientSession() as session:
             async with session.get(stream_url) as response:
                 await function_to_do(response, stream_url)

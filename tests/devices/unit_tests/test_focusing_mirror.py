@@ -35,29 +35,29 @@ def mirror_voltage_with_set_to_value(
         nonlocal spins
         if spins > 0:
             set_mock_value(
-                mirror_voltage._demand_accepted,
+                mirror_voltage.demand_accepted,
                 MirrorVoltageDemand.SLEW,
             )
             spins -= 1
             asyncio.create_task(set_demand_accepted_after_delay())
         else:
             set_mock_value(
-                mirror_voltage._demand_accepted,
+                mirror_voltage.demand_accepted,
                 new_value,
             )
         LOGGER.debug("DEMAND ACCEPTED OK")
 
     def not_ok_then_other_value(*args, **kwargs):
         set_mock_value(
-            mirror_voltage._demand_accepted,
+            mirror_voltage.demand_accepted,
             MirrorVoltageDemand.SLEW,
         )
         asyncio.create_task(set_demand_accepted_after_delay())
         return DEFAULT
 
-    callback_on_mock_put(mirror_voltage._setpoint_v, not_ok_then_other_value)
+    callback_on_mock_put(mirror_voltage.setpoint_v, not_ok_then_other_value)
     set_mock_value(
-        mirror_voltage._demand_accepted,
+        mirror_voltage.demand_accepted,
         MirrorVoltageDemand.OK,
     )
     return mirror_voltage
@@ -79,7 +79,7 @@ def mirror_voltage_with_set(
 
 @pytest.fixture
 def mirror_voltage_not_ok(mirror_voltage: SingleMirrorVoltage) -> SingleMirrorVoltage:
-    set_mock_value(mirror_voltage._demand_accepted, MirrorVoltageDemand.FAIL)
+    set_mock_value(mirror_voltage.demand_accepted, MirrorVoltageDemand.FAIL)
     return mirror_voltage
 
 
@@ -103,14 +103,14 @@ def mirror_voltage_with_set_timing_out(
 ) -> SingleMirrorVoltage:
     def not_ok(*args, **kwargs):
         set_mock_value(
-            mirror_voltage._demand_accepted,
+            mirror_voltage.demand_accepted,
             MirrorVoltageDemand.SLEW,
         )
         return DEFAULT
 
-    get_mock_put(mirror_voltage._setpoint_v).side_effect = not_ok
+    get_mock_put(mirror_voltage.setpoint_v).side_effect = not_ok
     set_mock_value(
-        mirror_voltage._demand_accepted,
+        mirror_voltage.demand_accepted,
         MirrorVoltageDemand.OK,
     )
     return mirror_voltage
@@ -123,10 +123,10 @@ def test_mirror_set_voltage_sets_and_waits_happy_path(
     def completed():
         pass
 
-    mock_put = get_mock_put(mirror_voltage_with_set._setpoint_v)
+    mock_put = get_mock_put(mirror_voltage_with_set.setpoint_v)
     mock_put.return_value = completed()
     set_mock_value(
-        mirror_voltage_with_set._demand_accepted,
+        mirror_voltage_with_set.demand_accepted,
         MirrorVoltageDemand.OK,
     )
 
@@ -145,10 +145,10 @@ def test_mirror_set_voltage_sets_and_waits_happy_path_spin_while_waiting_for_sle
     def completed():
         pass
 
-    mock_put = get_mock_put(mirror_voltage_with_set_multiple_spins._setpoint_v)
+    mock_put = get_mock_put(mirror_voltage_with_set_multiple_spins.setpoint_v)
     mock_put.return_value = completed()
     set_mock_value(
-        mirror_voltage_with_set_multiple_spins._demand_accepted,
+        mirror_voltage_with_set_multiple_spins.demand_accepted,
         MirrorVoltageDemand.OK,
     )
 
@@ -184,7 +184,7 @@ def test_mirror_set_voltage_sets_and_waits_set_fail(
     def failed(*args, **kwargs):
         raise AssertionError("Test Failure")
 
-    mirror_voltage_with_set._setpoint_v.set = failed
+    mirror_voltage_with_set.setpoint_v.set = failed
 
     def plan():
         with pytest.raises(FailedStatus) as e:
@@ -232,14 +232,14 @@ def test_mirror_set_voltage_returns_immediately_if_voltage_already_demanded(
     RE: RunEngine,
     mirror_voltage_with_set: SingleMirrorVoltage,
 ):
-    set_mock_value(mirror_voltage_with_set._setpoint_v, 100)
+    set_mock_value(mirror_voltage_with_set.setpoint_v, 100)
 
     def plan():
         yield from bps.abs_set(mirror_voltage_with_set, 100, wait=True)
 
     RE(plan())
 
-    get_mock_put(mirror_voltage_with_set._setpoint_v).assert_not_called()
+    get_mock_put(mirror_voltage_with_set.setpoint_v).assert_not_called()
 
 
 def test_mirror_populates_voltage_channels(RE):
