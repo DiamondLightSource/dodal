@@ -9,18 +9,18 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
-from dodal.devices.adsim import SimStage
+from dodal.devices.adsim.simstage import SimStage
 from dodal.log import set_beamline as set_log_beamline
-from dodal.utils import get_hostname
+from dodal.utils import get_beamline_name
 
-BL = get_hostname()
+BL = get_beamline_name("bl01t")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
 set_path_provider(
     StaticVisitPathProvider(
         BL,
-        Path("/scratch/adsim/bluesky"),
+        Path("/dev/null"),
         client=LocalDirectoryServiceClient(),
     )
 )
@@ -83,11 +83,11 @@ def adsim(
     return device_instantiation(
         SimDetector,
         "adsim",
-        BL + "-AD-SIM-01:",
+        BL + "-DI-CAM-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        drv_suffix="CAM:",
-        hdf_suffix="HDF5:",
+        drv_suffix="DET:",
+        hdf_suffix="HDF:",
         path_provider=get_path_provider(),
         bl_prefix=False,
     )

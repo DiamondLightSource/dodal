@@ -9,7 +9,4 @@ class SimStage(StandardReadable):
         with self.add_children_as_readables():
             self.x = Motor(prefix + "M1")
             self.y = Motor(prefix + "M2")
-            self.z = Motor(prefix + "M3")
-            self.theta = Motor(prefix + "M4")
-            self.load = Motor(prefix + "M5")
         super().__init__(name=name)
