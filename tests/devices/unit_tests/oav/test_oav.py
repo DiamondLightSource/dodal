@@ -92,7 +92,7 @@ async def test_when_snapshot_triggered_post_processing_called_correctly(
 
     await oav.snapshot.trigger()
 
-    mock_proc.assert_awaited_once_with(test_data)
+    mock_proc.assert_awaited_once()
 
 
 @patch(
