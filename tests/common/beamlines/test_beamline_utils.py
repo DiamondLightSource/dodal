@@ -167,7 +167,12 @@ def test_device_controller_connect(RE):
 
     mirror = device()
     assert mirror.name == "device"
-    assert mirror.connect.call_count == 1  # type: ignore
+    assert isinstance(mirror.connect, AsyncMock)
+    assert mirror.connect.call_count == 0
+
+    mirror2 = device(connect_immediately=True)
+    assert mirror is mirror2
+    assert mirror.connect.call_count == 1
 
 
 def test_skip(RE):
