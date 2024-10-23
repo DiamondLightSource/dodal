@@ -78,7 +78,7 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
         """
         self.counter = epics_signal_r(int, f"{prefix}CAM:ArrayCounter_RBV")
 
-        self._sources = DeviceVector(
+        self.sources = DeviceVector(
             {
                 Source.ROI.value: OAVSource(f"{prefix}MJPG:", "roi"),
                 Source.FULL_SCREEN.value: OAVSource(f"{prefix}XTAL:", "fullscreen"),
@@ -122,7 +122,7 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
         LOGGER.info(
             f"Forwarding data from sample {await self.sample_id.get_value()} and OAV {source_idx}"
         )
-        source = self._sources[source_idx]
+        source = self.sources[source_idx]
         stream_url = await source.url.get_value()
         async with ClientSession() as session:
             async with session.get(stream_url) as response:

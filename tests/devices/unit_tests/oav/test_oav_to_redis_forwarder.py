@@ -18,10 +18,10 @@ def oav_forwarder(RE):
     with DeviceCollector(mock=True):
         oav_forwarder = OAVToRedisForwarder("prefix", "host", "password")
     set_mock_value(
-        oav_forwarder._sources[Source.FULL_SCREEN.value].url,
+        oav_forwarder.sources[Source.FULL_SCREEN.value].url,
         "test-full-screen-stream-url",
     )
-    set_mock_value(oav_forwarder._sources[Source.ROI.value].url, "test-roi-stream-url")
+    set_mock_value(oav_forwarder.sources[Source.ROI.value].url, "test-roi-stream-url")
     set_mock_value(oav_forwarder.selected_source, Source.FULL_SCREEN)
     return oav_forwarder
 
