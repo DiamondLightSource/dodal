@@ -54,7 +54,7 @@ async def test_snapshot_with_beam_centre_triggered_then_crosshair_drawn_and(
     mock_get, patch_image_draw, patch_image, snapshot
 ):
     mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
-    mock_response.ok = MagicMock(return_value=True)
+    mock_response.ok = True
     mock_response.read.return_value = (test_data := b"TEST")
 
     patch_line = MagicMock()
@@ -82,7 +82,7 @@ async def test_snapshot_with_beam_centre_correctly_triggered_and_saved(
     mock_aiofiles, mock_get, patch_image, mock_mkdir, snapshot
 ):
     mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
-    mock_response.ok = MagicMock(return_value=True)
+    mock_response.ok = True
     mock_response.read.return_value = (test_data := b"TEST")
 
     mock_aio_open = mock_aiofiles.open
@@ -91,10 +91,19 @@ async def test_snapshot_with_beam_centre_correctly_triggered_and_saved(
     mock_open = patch_image.open
     mock_open.return_value.__aenter__.return_value = test_data
 
+    # Set new directory and test that it's created
+    set_mock_value(snapshot.directory, "new_dir")
+
     await snapshot.trigger()
 
-    assert await snapshot.last_saved_path.get_value() == "/tmp/test.png"
-    mock_aio_open.assert_called_once_with("/tmp/test.png", "wb")
+    mock_mkdir.assert_called_once()
+
+    test_url = await snapshot.url.get_value()
+    # Get called with an instance of the session and correct url
+    mock_get.assert_called_once_with(ANY, test_url)
+
+    assert await snapshot.last_saved_path.get_value() == "new_dir/test.png"
+    mock_aio_open.assert_called_once_with("new_dir/test.png", "wb")
     mock_file.write.assert_called_once()
 
 
@@ -121,7 +130,7 @@ async def test_snapshot_with_grid_triggered_saves_image_and_draws_correct_grid(
     mock_get, patch_add_grid, patch_add_border, patch_image, grid_snapshot
 ):
     mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
-    mock_response.ok = MagicMock(return_value=True)
+    mock_response.ok = True
     mock_response.read.return_value = (test_data := b"TEST")
 
     mock_open = patch_image.open
@@ -132,9 +141,6 @@ async def test_snapshot_with_grid_triggered_saves_image_and_draws_correct_grid(
 
     await grid_snapshot.trigger()
 
-    test_url = await grid_snapshot.url.get_value()
-    # Get called with an instance of the session and correct url
-    mock_get.assert_called_once_with(ANY, test_url)
     mock_save.assert_awaited_once()
     patch_add_border.assert_called_once_with(
         mock_open.return_value.__enter__.return_value, 100, 100, 50, 15, 10
@@ -155,3 +161,17 @@ async def test_snapshot_with_grid_triggered_saves_image_and_draws_correct_grid(
         await grid_snapshot.last_path_full_overlay.get_value()
         == "/tmp/test_grid_overlay.png"
     )
+
+
+@patch("dodal.devices.oav.snapshots.snapshot_with_grid.Image")
+@patch("dodal.devices.oav.snapshots.snapshot_with_grid.aiofiles", autospec=True)
+async def test_save_grid_to_image(mock_aiofiles, patch_image, grid_snapshot):
+    mock_aio_open = mock_aiofiles.open
+    mock_aio_open.return_value.__aenter__.return_value = (mock_file := AsyncMock())
+
+    test_path = MagicMock(return_value="some_path/test_grid.png")
+    await grid_snapshot._save_grid_to_image(patch_image, test_path)
+
+    patch_image.save.assert_called_once()
+    mock_aio_open.assert_called_once_with(test_path, "wb")
+    mock_file.write.assert_called_once()
