@@ -77,6 +77,28 @@ async def test_oav_returns_rescaled_beam_position_and_microns_per_pixel_correctl
     "dodal.devices.areadetector.plugins.MJPG.ClientSession.get",
     autospec=True,
 )
+@patch("dodal.devices.areadetector.plugins.MJPG.Image")
+async def test_when_snapshot_triggered_post_processing_called_correctly(
+    patch_image, mock_get, oav: OAV
+):
+    mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
+    mock_response.ok = True
+    mock_response.read.return_value = (test_data := b"TEST")
+
+    mock_open = patch_image.open
+    mock_open.return_value.__aenter__.return_value = test_data
+
+    oav.snapshot.post_processing = (mock_proc := AsyncMock())
+
+    await oav.snapshot.trigger()
+
+    mock_proc.assert_awaited_once_with(test_data)
+
+
+@patch(
+    "dodal.devices.areadetector.plugins.MJPG.ClientSession.get",
+    autospec=True,
+)
 async def test_snapshot_trigger_handles_bad_request_status(mock_get, oav: OAV):
     mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
     mock_response.ok = False
