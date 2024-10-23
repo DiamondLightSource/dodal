@@ -197,7 +197,8 @@ def fswitch() -> FSwitch:
 @device_factory()
 def panda1() -> HDFPanda:
     return HDFPanda(
-        prefix=f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
+        prefix="",
+        uri=f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
         path_provider=get_path_provider(),
     )
 
@@ -205,7 +206,8 @@ def panda1() -> HDFPanda:
 @device_factory(skip=True)
 def panda2() -> HDFPanda:
     return HDFPanda(
-        prefix=f"{PREFIX.beamline_prefix}-EA-PANDA-02:",
+        prefix="",
+        uri=f"{PREFIX.beamline_prefix}-EA-PANDA-02:",
         path_provider=get_path_provider(),
     )
 
@@ -213,7 +215,8 @@ def panda2() -> HDFPanda:
 @device_factory(skip=True)
 def panda3() -> HDFPanda:
     return HDFPanda(
-        prefix=f"{PREFIX.beamline_prefix}-EA-PANDA-03:",
+        prefix="",
+        uri=f"{PREFIX.beamline_prefix}-EA-PANDA-03:",
         path_provider=get_path_provider(),
     )
 
@@ -221,7 +224,8 @@ def panda3() -> HDFPanda:
 @device_factory(skip=True)
 def panda4() -> HDFPanda:
     return HDFPanda(
-        prefix=f"{PREFIX.beamline_prefix}-EA-PANDA-04:",
+        prefix="",
+        uri=f"{PREFIX.beamline_prefix}-EA-PANDA-04:",
         path_provider=get_path_provider(),
     )
 

@@ -270,9 +270,10 @@ def panda1(
     return device_instantiation(
         HDFPanda,
         "panda1",
-        "-EA-PANDA-01:",
+        "",
         wait_for_connection,
         fake_with_ophyd_sim,
+        uri="-EA-PANDA-01:",
         path_provider=get_path_provider(),
     )
 
@@ -285,9 +286,10 @@ def panda2(
     return device_instantiation(
         HDFPanda,
         "panda2",
-        "-EA-PANDA-02:",
+        "",
         wait_for_connection,
         fake_with_ophyd_sim,
+        uri="-EA-PANDA-02:",
         path_provider=get_path_provider(),
     )
 
@@ -300,9 +302,10 @@ def panda3(
     return device_instantiation(
         HDFPanda,
         "panda3",
-        "-EA-PANDA-03:",
+        "",
         wait_for_connection,
         fake_with_ophyd_sim,
+        uri="-EA-PANDA-03:",
         path_provider=get_path_provider(),
     )
 

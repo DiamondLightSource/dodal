@@ -94,9 +94,10 @@ def panda1(
     return device_instantiation(
         HDFPanda,
         "panda1",
-        "-MO-PANDA-01:",
+        "",
         wait_for_connection,
         fake_with_ophyd_sim,
+        uri="-MO-PANDA-01:",
         path_provider=get_path_provider(),
     )
 
@@ -109,8 +110,9 @@ def panda2(
     return device_instantiation(
         HDFPanda,
         "panda2",
-        "-MO-PANDA-02:",
+        "",
         wait_for_connection,
         fake_with_ophyd_sim,
+        uri="-MO-PANDA-02:",
         path_provider=get_path_provider(),
     )
