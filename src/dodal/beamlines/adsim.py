@@ -45,19 +45,19 @@ How to use the devices in a plan:
 In an ipython terminal run:
 
 ```python
-    from bluesky.plans import count, grid_scan
-    from bluesky.run_engine import RunEngine
+from bluesky.plans import count, grid_scan
+from bluesky.run_engine import RunEngine
 
-    from dodal.beamlines.adsim import adsim, sim_motors
-    from dodal.common.beamlines.beamline_utils import get_path_provider
+from dodal.beamlines.adsim import adsim, sim_motors
+from dodal.common.beamlines.beamline_utils import get_path_provider
 
-    RE = RunEngine()
-    det = adsim(connect_immediately=True)
-    motors = sim_motors(connect_immediately=True)
-    pp = get_path_provider()
-    await pp.update()
-    RE(count([det], num=10))
-    RE(grid_scan([det], motors.x, 0, 10, 11, motors.y, 0, 10, 11))
+RE = RunEngine()
+det = adsim(connect_immediately=True)
+motors = sim_motors(connect_immediately=True)
+pp = get_path_provider()
+await pp.update()
+RE(count([det], num=10))
+RE(grid_scan([det], motors.x, 0, 10, 11, motors.y, 0, 10, 11))
 
 
 ```
