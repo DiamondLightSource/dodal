@@ -2,7 +2,6 @@ import pytest
 
 from dodal.devices.oav.oav_parameters import (
     OAVConfig,
-    OAVConfigParams,
     OAVParameters,
     ZoomParams,
 )
@@ -41,20 +40,6 @@ def test_given_key_in_context_and_default_when_load_parameters_then_value_found_
     mock_parameters: OAVParameters,
 ):
     assert mock_parameters.minimum_height == 10
-
-
-def test_given_context_and_microns_per_pixel_get_max_tip_distance_in_pixels(
-    mock_parameters: OAVParameters,
-):
-    zoom_level = mock_parameters.zoom
-    config_params = OAVConfigParams(ZOOM_LEVELS_XML, DISPLAY_CONFIGURATION)
-    config_params.update_on_zoom(str(zoom_level), 1024, 768)
-
-    assert mock_parameters.max_tip_distance == 300
-    assert config_params.micronsPerXPixel
-    assert mock_parameters.get_max_tip_distance_in_pixels(
-        config_params.micronsPerXPixel
-    ) == pytest.approx(189.873, abs=1e-3)
 
 
 @pytest.mark.parametrize(

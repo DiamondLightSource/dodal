@@ -97,24 +97,3 @@ class OAV(StandardReadable):
         value = self.parameters[_zoom].crosshair[coord]
         size = await self.sizes[coord].get_value()
         return int(value * size / DEFAULT_OAV_WINDOW[coord])
-
-    async def calculate_beam_distance(
-        self, horizontal_pixels: int, vertical_pixels: int
-    ) -> tuple[int, int]:
-        """
-        Calculates the distance between the beam centre and the given (horizontal, vertical).
-
-        Args:
-            horizontal_pixels (int): The x (camera coordinates) value in pixels.
-            vertical_pixels (int): The y (camera coordinates) value in pixels.
-        Returns:
-            The distance between the beam centre and the (horizontal, vertical) point in pixels as a tuple
-            (horizontal_distance, vertical_distance).
-        """
-        beam_x = await self.beam_centre_i.get_value()
-        beam_y = await self.beam_centre_j.get_value()
-
-        return (
-            beam_x - horizontal_pixels,
-            beam_y - vertical_pixels,
-        )
