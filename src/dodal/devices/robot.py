@@ -1,12 +1,12 @@
 import asyncio
 from asyncio import FIRST_COMPLETED, CancelledError, Task, wait_for
 from dataclasses import dataclass
-from enum import Enum
 
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
     StandardReadable,
+    StrictEnum,
     set_and_wait_for_value,
     wait_for_value,
 )
@@ -33,7 +33,7 @@ class SampleLocation:
     pin: int
 
 
-class PinMounted(str, Enum):
+class PinMounted(StrictEnum):
     NO_PIN_MOUNTED = "No Pin Mounted"
     PIN_MOUNTED = "Pin Mounted"
 

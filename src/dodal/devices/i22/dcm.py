@@ -1,11 +1,16 @@
 import time
-from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Literal
 
+import numpy as np
 from bluesky.protocols import Reading
 from event_model.documents.event_descriptor import DataKey
-from ophyd_async.core import ConfigSignal, StandardReadable, soft_signal_r_and_setter
+from ophyd_async.core import (
+    Array1D,
+    ConfigSignal,
+    StandardReadable,
+    soft_signal_r_and_setter,
+)
 from ophyd_async.epics.motor import Motor
 from ophyd_async.epics.signal import epics_signal_r
 
@@ -39,7 +44,7 @@ class DoubleCrystalMonochromator(StandardReadable):
 
     def __init__(
         self,
-        motion_prefix: str,
+        prefix: str,
         temperature_prefix: str,
         crystal_1_metadata: CrystalMetadata | None = None,
         crystal_2_metadata: CrystalMetadata | None = None,
@@ -47,13 +52,13 @@ class DoubleCrystalMonochromator(StandardReadable):
     ) -> None:
         with self.add_children_as_readables():
             # Positionable Parameters
-            self.bragg = Motor(motion_prefix + "BRAGG")
-            self.offset = Motor(motion_prefix + "OFFSET")
-            self.perp = Motor(motion_prefix + "PERP")
-            self.energy = Motor(motion_prefix + "ENERGY")
-            self.crystal_1_roll = Motor(motion_prefix + "XTAL1:ROLL")
-            self.crystal_2_roll = Motor(motion_prefix + "XTAL2:ROLL")
-            self.crystal_2_pitch = Motor(motion_prefix + "XTAL2:PITCH")
+            self.bragg = Motor(prefix + "BRAGG")
+            self.offset = Motor(prefix + "OFFSET")
+            self.perp = Motor(prefix + "PERP")
+            self.energy = Motor(prefix + "ENERGY")
+            self.crystal_1_roll = Motor(prefix + "XTAL1:ROLL")
+            self.crystal_2_roll = Motor(prefix + "XTAL2:ROLL")
+            self.crystal_2_pitch = Motor(prefix + "XTAL2:PITCH")
 
             # Temperatures
             self.backplate_temp = epics_signal_r(float, temperature_prefix + "PT100-7")
@@ -86,7 +91,8 @@ class DoubleCrystalMonochromator(StandardReadable):
                 self.crystal_1_type = None
             if crystal_1_metadata.reflection is not None:
                 self.crystal_1_reflection, _ = soft_signal_r_and_setter(
-                    Sequence[int], initial_value=list(crystal_1_metadata.reflection)
+                    Array1D[np.int32],
+                    initial_value=np.array(crystal_1_metadata.reflection),
                 )
             else:
                 self.crystal_1_reflection = None
@@ -112,7 +118,8 @@ class DoubleCrystalMonochromator(StandardReadable):
                 self.crystal_2_type = None
             if crystal_2_metadata.reflection is not None:
                 self.crystal_2_reflection, _ = soft_signal_r_and_setter(
-                    Sequence[int], initial_value=list(crystal_2_metadata.reflection)
+                    Array1D[np.int32],
+                    initial_value=np.array(crystal_2_metadata.reflection),
                 )
             else:
                 self.crystal_2_reflection = None

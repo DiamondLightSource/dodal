@@ -1,12 +1,10 @@
-from enum import Enum
-
-from ophyd_async.core import StandardReadable
+from ophyd_async.core import StandardReadable, StrictEnum
 from ophyd_async.epics.signal import epics_signal_r
 
 
-class FluorescenceDetectorControlState(Enum):
-    OUT = 0
-    IN = 1
+class FluorescenceDetectorControlState(StrictEnum):
+    OUT = "Out"
+    IN = "In"
 
 
 class FluorescenceDetector(StandardReadable):

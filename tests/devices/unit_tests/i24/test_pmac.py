@@ -1,5 +1,5 @@
 import asyncio
-from unittest.mock import ANY, call, patch
+from unittest.mock import call, patch
 
 import bluesky.plan_stubs as bps
 import pytest
@@ -98,7 +98,7 @@ async def test_abort_program(mock_sleep, fake_pmac: PMAC, RE):
     mock_pmac_string = get_mock_put(fake_pmac.pmac_string)
     mock_pmac_string.assert_has_calls(
         [
-            call("A", wait=True, timeout=ANY),
-            call("P2401=0", wait=True, timeout=ANY),
+            call("A", wait=True),
+            call("P2401=0", wait=True),
         ]
     )

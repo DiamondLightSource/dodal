@@ -1,5 +1,3 @@
-from enum import Enum
-
 from ophyd_async.core import (
     AsyncStatus,
     ConfigSignal,
@@ -7,6 +5,7 @@ from ophyd_async.core import (
     DeviceVector,
     HintedSignal,
     StandardReadable,
+    StrictEnum,
     observe_value,
     soft_signal_r_and_setter,
 )
@@ -25,20 +24,20 @@ VOLTAGE_POLLING_DELAY_S = 0.5
 DEFAULT_SETTLE_TIME_S = 60
 
 
-class MirrorType(str, Enum):
+class MirrorType(StrictEnum):
     """See https://manual.nexusformat.org/classes/base_classes/NXmirror.html"""
 
     SINGLE = "single"
     MULTI = "multi"
 
 
-class MirrorStripe(str, Enum):
+class MirrorStripe(StrictEnum):
     RHODIUM = "Rhodium"
     BARE = "Bare"
     PLATINUM = "Platinum"
 
 
-class MirrorVoltageDemand(str, Enum):
+class MirrorVoltageDemand(StrictEnum):
     N_A = "N/A"
     OK = "OK"
     FAIL = "FAIL"
@@ -51,9 +50,9 @@ class SingleMirrorVoltage(Device):
     """
 
     def __init__(self, name: str = "", prefix: str = ""):
-        self._actual_v = epics_signal_r(int, prefix + "R")
-        self._setpoint_v = epics_signal_rw(int, prefix + "D")
-        self._demand_accepted = epics_signal_r(MirrorVoltageDemand, prefix + "DSEV")
+        self.actual_v = epics_signal_r(int, prefix + "R")
+        self.setpoint_v = epics_signal_rw(int, prefix + "D")
+        self.demand_accepted = epics_signal_r(MirrorVoltageDemand, prefix + "DSEV")
         super().__init__(name=name)
 
     @AsyncStatus.wrap
@@ -64,8 +63,8 @@ class SingleMirrorVoltage(Device):
         4. When either demand is accepted or DEFAULT_SETTLE_TIME expires, signal the result on the Status
         """
 
-        setpoint_v = self._setpoint_v
-        demand_accepted = self._demand_accepted
+        setpoint_v = self.setpoint_v
+        demand_accepted = self.demand_accepted
 
         if await demand_accepted.get_value() != MirrorVoltageDemand.OK:
             raise AssertionError(

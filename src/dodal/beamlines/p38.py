@@ -222,11 +222,10 @@ def dcm(
     return device_instantiation(
         DoubleCrystalMonochromator,
         "dcm",
-        "",
+        f"{BeamlinePrefix(BL).beamline_prefix}-MO-DCM-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
         bl_prefix=False,
-        motion_prefix=f"{BeamlinePrefix(BL).beamline_prefix}-MO-DCM-01:",
         temperature_prefix=f"{BeamlinePrefix(BL).beamline_prefix}-DI-DCM-01:",
         crystal_1_metadata=CrystalMetadata(
             usage="Bragg",
@@ -253,6 +252,7 @@ def undulator(
         f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        id_gap_lookup_table_path="SPECIFY_ME",
         bl_prefix=False,
         poles=80,
         length=2.0,
@@ -270,9 +270,10 @@ def panda1(
     return device_instantiation(
         HDFPanda,
         "panda1",
-        "-EA-PANDA-01:",
+        "",
         wait_for_connection,
         fake_with_ophyd_sim,
+        uri="-EA-PANDA-01:",
         path_provider=get_path_provider(),
     )
 
@@ -285,9 +286,10 @@ def panda2(
     return device_instantiation(
         HDFPanda,
         "panda2",
-        "-EA-PANDA-02:",
+        "",
         wait_for_connection,
         fake_with_ophyd_sim,
+        uri="-EA-PANDA-02:",
         path_provider=get_path_provider(),
     )
 
@@ -300,9 +302,10 @@ def panda3(
     return device_instantiation(
         HDFPanda,
         "panda3",
-        "-EA-PANDA-03:",
+        "",
         wait_for_connection,
         fake_with_ophyd_sim,
+        uri="-EA-PANDA-03:",
         path_provider=get_path_provider(),
     )
 

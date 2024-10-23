@@ -19,7 +19,7 @@ from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
 async def dcm() -> DoubleCrystalMonochromator:
     async with DeviceCollector(mock=True):
         dcm = DoubleCrystalMonochromator(
-            motion_prefix="FOO-MO",
+            prefix="FOO-MO",
             temperature_prefix="FOO-DI",
             crystal_1_metadata=CrystalMetadata(
                 usage="Bragg",
@@ -56,7 +56,7 @@ def test_count_dcm(
 async def test_crystal_metadata_not_propagated_when_not_supplied():
     async with DeviceCollector(mock=True):
         dcm = DoubleCrystalMonochromator(
-            motion_prefix="FOO-MO",
+            prefix="FOO-MO",
             temperature_prefix="FOO-DI",
             crystal_1_metadata=None,
             crystal_2_metadata=None,
@@ -171,6 +171,10 @@ async def test_reading(dcm: DoubleCrystalMonochromator):
     )
 
 
+@pytest.mark.skip(
+    reason="https://github.com/bluesky/ophyd-async/pull/594 assert_configuration() on numpy arrays is "
+    "broken"
+)
 async def test_configuration(dcm: DoubleCrystalMonochromator):
     await assert_configuration(
         dcm,

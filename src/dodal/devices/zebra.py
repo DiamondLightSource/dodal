@@ -9,6 +9,7 @@ from ophyd_async.core import (
     DeviceVector,
     SignalRW,
     StandardReadable,
+    StrictEnum,
     observe_value,
 )
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
@@ -46,18 +47,18 @@ AUTO_SHUTTER_INPUT_1 = 1
 AUTO_SHUTTER_INPUT_2 = 2
 
 
-class ArmSource(str, Enum):
+class ArmSource(StrictEnum):
     SOFT = "Soft"
     EXTERNAL = "External"
 
 
-class TrigSource(str, Enum):
+class TrigSource(StrictEnum):
     POSITION = "Position"
     TIME = "Time"
     EXTERNAL = "External"
 
 
-class EncEnum(str, Enum):
+class EncEnum(StrictEnum):
     Enc1 = "Enc1"
     Enc2 = "Enc2"
     Enc3 = "Enc3"
@@ -79,7 +80,7 @@ class I24Axes:
     VGON_YH = EncEnum.Enc4
 
 
-class RotationDirection(str, Enum):
+class RotationDirection(StrictEnum):
     POSITIVE = "Positive"
     NEGATIVE = "Negative"
 
@@ -93,7 +94,7 @@ class ArmDemand(Enum):
     DISARM = 0
 
 
-class SoftInState(str, Enum):
+class SoftInState(StrictEnum):
     YES = "Yes"
     NO = "No"
 

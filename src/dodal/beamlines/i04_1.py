@@ -123,6 +123,7 @@ def undulator(
         f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        id_gap_lookup_table_path="SPECIFY_ME",
         bl_prefix=False,
     )
 
