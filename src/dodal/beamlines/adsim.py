@@ -3,7 +3,7 @@ from pathlib import Path
 from ophyd_async.epics.adsimdetector import SimDetector
 
 from dodal.common.beamlines.beamline_utils import (
-    device_instantiation,
+    device_factory,
     get_path_provider,
     set_path_provider,
 )
@@ -29,65 +29,52 @@ set_path_provider(
 Usage Example
 -------------
 
-Before running the code, make sure to perform the following steps:
+Start the simulated beamline by following the epics-containers tutorial at
+https://epics-containers.github.io/main/tutorials/launch_example.html
 
-1. Run AdSimulator on the workstation using DLS Launcher.
-2. Export the following environment variables:
-    - EPICS_CA_SERVER_PORT=6064
-    - EPICS_CA_REPEATER_PORT=6065
-
-The code below demonstrates how to use the `adsim` and `sim_motors` functions from the `dodal.beamlines.adsim` module:
-
+```bash
+    git clone https://github.com/epics-containers/example-services
+    cd example-services
+    # setup some environment variables
+    source ./environment.sh
+    docker compose up -d
 ```
-import asyncio
-
-from bluesky.plans import count
-from bluesky.run_engine import RunEngine
-
-from dodal.beamlines.adsim import adsim, sim_motors
-from dodal.common.beamlines.beamline_utils import get_path_provider
 
 
-async def run_experiment():
+How to use the devices in a plan:
+In an ipython terminal run:
+
+```python
+    from bluesky.plans import count, grid_scan
+    from bluesky.run_engine import RunEngine
+
+    from dodal.beamlines.adsim import adsim, sim_motors
+    from dodal.common.beamlines.beamline_utils import get_path_provider
+
     RE = RunEngine()
-    det = adsim()
-    sim_motors()
+    det = adsim(connect_immediately=True)
+    motors = sim_motors(connect_immediately=True)
     pp = get_path_provider()
     await pp.update()
     RE(count([det], num=10))
+    RE(grid_scan([det], motors.x, 0, 10, 11, motors.y, 0, 10, 11))
 
 
-if __name__ == "__main__":
-    asyncio.run(run_experiment())
 ```
 
 """
 
 
-def sim_motors(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> SimStage:
-    return device_instantiation(
-        SimStage,
-        "sim_motors",
-        BL + "-MO-SIM-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-        bl_prefix=False,
-    )
+@device_factory()
+def sim_motors() -> SimStage:
+    return SimStage(BL + "-MO-SIM-01:")
 
 
-def adsim(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> SimDetector:
-    return device_instantiation(
-        SimDetector,
-        "adsim",
+@device_factory()
+def adsim() -> SimDetector:
+    return SimDetector(
         BL + "-DI-CAM-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-        drv_suffix="DET:",
         hdf_suffix="HDF:",
+        drv_suffix="DET:",
         path_provider=get_path_provider(),
-        bl_prefix=False,
     )
