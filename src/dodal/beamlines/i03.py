@@ -23,7 +23,7 @@ from dodal.devices.diamond_filter import DiamondFilter, I03Filters
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import PandAFastGridScan, ZebraFastGridScan
 from dodal.devices.flux import Flux
-from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, VFMMirrorVoltages
+from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, MirrorVoltages
 from dodal.devices.motors import XYZPositioner
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.oav_parameters import OAVConfig
@@ -124,12 +124,12 @@ def vfm(
 
 
 @skip_device(lambda: BL == "s03")
-def vfm_mirror_voltages(
+def mirror_voltages(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> VFMMirrorVoltages:
+) -> MirrorVoltages:
     return device_instantiation(
-        device_factory=VFMMirrorVoltages,
-        name="vfm_mirror_voltages",
+        device_factory=MirrorVoltages,
+        name="mirror_voltages",
         prefix="-MO-PSU-01:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
