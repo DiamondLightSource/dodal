@@ -32,11 +32,11 @@ async def test_given_attenuator_sets_filters_to_expected_value_then_set_returns(
     def mock_apply_values(*args, **kwargs):
         for i in range(16):
             set_mock_value(
-                fake_attenuator._calculated_filter_states[i], CALCULATED_VALUE[i]
+                fake_attenuator.calculated_filter_states[i], CALCULATED_VALUE[i]
             )
-            set_mock_value(fake_attenuator._filters_in_position[i], CALCULATED_VALUE[i])
+            set_mock_value(fake_attenuator.filters_in_position[i], CALCULATED_VALUE[i])
 
-    callback_on_mock_put(fake_attenuator._change, mock_apply_values)
+    callback_on_mock_put(fake_attenuator.change, mock_apply_values)
 
     await asyncio.wait_for(fake_attenuator.set(0.65), timeout=0.1)
 
@@ -47,10 +47,10 @@ async def test_given_attenuator_fails_to_set_filters_then_set_timeout(
     def mock_apply_values(*args, **kwargs):
         for i in range(16):
             set_mock_value(
-                fake_attenuator._calculated_filter_states[i], CALCULATED_VALUE[i]
+                fake_attenuator.calculated_filter_states[i], CALCULATED_VALUE[i]
             )
 
-    callback_on_mock_put(fake_attenuator._change, mock_apply_values)
+    callback_on_mock_put(fake_attenuator.change, mock_apply_values)
 
     with pytest.raises(asyncio.exceptions.TimeoutError):
         await asyncio.wait_for(fake_attenuator.set(0.65), timeout=0.01)
