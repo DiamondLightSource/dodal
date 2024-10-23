@@ -47,7 +47,7 @@ def _test_expected_calls_to_image_draw_line(mock_image_draw: MagicMock, expected
         ),
     ],
 )
-@patch("dodal.devices.oav.grid_overlay.ImageDraw.Draw")
+@patch("dodal.devices.oav.snapshots.grid_overlay.ImageDraw.Draw")
 def test_add_grid_border_overlay_to_image_makes_correct_calls_to_imagedraw(
     mock_imagedraw: MagicMock,
     top_left_x,
@@ -97,7 +97,7 @@ def test_add_grid_border_overlay_to_image_makes_correct_calls_to_imagedraw(
         ),
     ],
 )
-@patch("dodal.devices.oav.grid_overlay.ImageDraw.Draw")
+@patch("dodal.devices.oav.snapshots.grid_overlay.ImageDraw.Draw")
 def test_add_grid_overlay_to_image_makes_correct_calls_to_imagedraw(
     mock_imagedraw: MagicMock,
     top_left_x,
