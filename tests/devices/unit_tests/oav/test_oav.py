@@ -4,7 +4,7 @@ import aiohttp
 import pytest
 from ophyd_async.core import set_mock_value
 
-from dodal.devices.oav.oav_detector import OAV, ZoomController
+from dodal.devices.oav.oav_detector import OAV, Cam, ZoomController
 
 
 async def test_zoom_controller():
@@ -14,6 +14,18 @@ async def test_zoom_controller():
     await status
     assert status.success
     assert await zoom_controller.level.get_value() == "3.0x"
+
+
+async def test_cam():
+    cam = Cam("", "fake cam")
+    await cam.connect(mock=True)
+    status = cam.acquire_period.set(0.01)
+    await status
+    assert status.success
+    assert await cam.acquire_period.get_value() == 0.01
+
+    cam.acquire_time.set(0.01)
+    assert await cam.acquire_time.get_value() == 0.01
 
 
 @pytest.mark.parametrize(

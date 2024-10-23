@@ -4,6 +4,7 @@ from ophyd_async.core import AsyncStatus, StandardReadable
 from ophyd_async.epics.signal import epics_signal_rw
 
 from dodal.common.signal_utils import create_hardware_backed_soft_signal
+from dodal.devices.areadetector.plugins.CAM import Cam
 from dodal.devices.oav.oav_parameters import DEFAULT_OAV_WINDOW, OAVConfig
 from dodal.devices.oav.snapshots.snapshot_with_beam_centre import SnapshotWithBeamCentre
 from dodal.devices.oav.snapshots.snapshot_with_grid import SnapshotWithGrid
@@ -48,6 +49,8 @@ class OAV(StandardReadable):
     def __init__(self, prefix: str, config: OAVConfig, name: str = ""):
         _bl_prefix = prefix.split("-")[0]
         self.zoom_controller = ZoomController(f"{_bl_prefix}-EA-OAV-01:FZOOM:", name)
+
+        self.cam = Cam(f"{prefix}CAM:", name=name)
 
         self.parameters = config.get_parameters()
 
