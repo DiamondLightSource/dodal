@@ -151,7 +151,7 @@ def dummy_mirror() -> FocusingMirror:
 
 
 def test_device_controller_names():
-    @beamline_utils.device_factory(eager_connect=False)
+    @beamline_utils.device_factory()
     def device() -> FocusingMirror:
         return dummy_mirror()
 
