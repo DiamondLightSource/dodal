@@ -24,7 +24,9 @@ async def test_cam():
     assert status.success
     assert await cam.acquire_period.get_value() == 0.01
 
-    cam.acquire_time.set(0.01)
+    status = cam.acquire_time.set(0.01)
+    await status
+    assert status.success
     assert await cam.acquire_time.get_value() == 0.01
 
 
