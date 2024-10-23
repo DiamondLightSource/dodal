@@ -93,8 +93,8 @@ async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndulatorJawPhase:
             prefix=prefix, move_pv="RPQ1", jaw_phase="JAW"
         )
     set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.close)
-    set_mock_value(mock_jaw_phase.jaw_Phase.velocity, 2)
-    set_mock_value(mock_jaw_phase.jaw_Phase.user_setpoint_readback, 0)
+    set_mock_value(mock_jaw_phase.jaw_phase.velocity, 2)
+    set_mock_value(mock_jaw_phase.jaw_phase.user_setpoint_readback, 0)
     set_mock_value(mock_jaw_phase.fault, 0)
     return mock_jaw_phase
 
@@ -418,7 +418,7 @@ async def test_linear_arbitrary_RE_scan(
     assert_emitted(docs, start=1, descriptor=1, event=num_point, stop=1)
 
     jaw_phase = get_mock_put(
-        mock_linear_arbitrary_angle.id.id_jaw_phase.jaw_Phase.user_setpoint
+        mock_linear_arbitrary_angle.id.id_jaw_phase.jaw_phase.user_setpoint
     )
 
     poly = poly1d(

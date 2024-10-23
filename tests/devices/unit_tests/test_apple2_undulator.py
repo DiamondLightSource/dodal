@@ -71,9 +71,9 @@ async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndulatorJawPhase:
             prefix=prefix, move_pv="RPQ1", jaw_phase="JAW"
         )
     set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.close)
-    set_mock_value(mock_jaw_phase.jaw_Phase.velocity, 2)
-    set_mock_value(mock_jaw_phase.jaw_Phase.user_setpoint_readback, 0)
-    set_mock_value(mock_jaw_phase.jaw_Phase.user_setpoint_demand_readback, 0)
+    set_mock_value(mock_jaw_phase.jaw_phase.velocity, 2)
+    set_mock_value(mock_jaw_phase.jaw_phase.user_setpoint_readback, 0)
+    set_mock_value(mock_jaw_phase.jaw_phase.user_setpoint_demand_readback, 0)
     set_mock_value(mock_jaw_phase.fault, 0)
     return mock_jaw_phase
 
@@ -289,10 +289,10 @@ async def test_phase_success_set(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngi
 
 async def test_jaw_phase_time_out_error(mock_jaw_phase: UndulatorJawPhase):
     callback_on_mock_put(
-        mock_jaw_phase.jaw_Phase.user_setpoint,
+        mock_jaw_phase.jaw_phase.user_setpoint,
         lambda *_, **__: set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.open),
     )
-    set_mock_value(mock_jaw_phase.jaw_Phase.velocity, 1000)
+    set_mock_value(mock_jaw_phase.jaw_phase.velocity, 1000)
     with pytest.raises(asyncio.TimeoutError):
         await mock_jaw_phase.set(2)
 
@@ -319,9 +319,9 @@ async def test_jaw_phase_cal_timout(
     target: float,
     expected_timeout: float,
 ):
-    set_mock_value(mock_jaw_phase.jaw_Phase.velocity, velocity)
-    set_mock_value(mock_jaw_phase.jaw_Phase.user_setpoint_readback, readback)
-    set_mock_value(mock_jaw_phase.jaw_Phase.user_setpoint_demand_readback, target)
+    set_mock_value(mock_jaw_phase.jaw_phase.velocity, velocity)
+    set_mock_value(mock_jaw_phase.jaw_phase.user_setpoint_readback, readback)
+    set_mock_value(mock_jaw_phase.jaw_phase.user_setpoint_demand_readback, target)
 
     assert await mock_jaw_phase.get_timeout() == pytest.approx(
         expected_timeout, rel=0.1
@@ -330,7 +330,7 @@ async def test_jaw_phase_cal_timout(
 
 async def test_jaw_phase_success_scan(mock_jaw_phase: UndulatorJawPhase, RE: RunEngine):
     callback_on_mock_put(
-        mock_jaw_phase.jaw_Phase.user_setpoint,
+        mock_jaw_phase.jaw_phase.user_setpoint,
         lambda *_, **__: set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.open),
     )
     output = range(0, 11, 1)
@@ -341,7 +341,7 @@ async def test_jaw_phase_success_scan(mock_jaw_phase: UndulatorJawPhase, RE: Run
     pos = new_pos()
 
     def set_complete_move():
-        set_mock_value(mock_jaw_phase.jaw_Phase.user_setpoint_readback, next(pos))
+        set_mock_value(mock_jaw_phase.jaw_phase.user_setpoint_readback, next(pos))
         set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.close)
 
     callback_on_mock_put(mock_jaw_phase.set_move, lambda *_, **__: set_complete_move())
@@ -354,6 +354,6 @@ async def test_jaw_phase_success_scan(mock_jaw_phase: UndulatorJawPhase, RE: Run
     assert_emitted(docs, start=1, descriptor=1, event=11, stop=1)
     for i in output:
         assert (
-            docs["event"][i]["data"]["mock_jaw_phase-jaw_Phase-user_setpoint_readback"]
+            docs["event"][i]["data"]["mock_jaw_phase-jaw_phase-user_setpoint_readback"]
             == i
         )

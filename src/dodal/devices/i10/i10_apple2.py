@@ -29,6 +29,7 @@ ROW_PHASE_MOTOR_TOLERANCE = 0.004
 MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
 MAXIMUM_GAP_MOTOR_POSITION = 100
 DEFAULT_JAW_PHASE_POLY_PARAMS = [1.0 / 7.5, -120.0 / 7.5]
+ALPHA_OFFSET = 180
 
 
 # data class to store the lookup table configuration that is use in convert_csv_to_lookup
@@ -130,12 +131,11 @@ class I10Apple2(Apple2):
             pol, phase = await self.determinePhaseFromHardware()
             if pol is None:
                 raise ValueError(f"Pol is not set for {self.name}")
-            else:
-                self.pol = pol
+            self.pol = pol
 
         self._polarisation_set(self.pol)
         gap, phase = self._get_id_gap_phase(value)
-        phase3 = -phase if self.pol == "la" else phase
+        phase3 = phase * (-1 if self.pol == "la" else (1))
         id_set_val = Apple2Val(
             top_outer=str(phase),
             top_inner="0.0",
@@ -291,7 +291,7 @@ class LinearArbitraryAngle(StandardReadable, Movable):
                 f"Angle control is not available in polarisation {pol} with {self.id.name}"
             )
         # Moving to real angle which is 210 to 30.
-        alpha_real = value if value > self.angle_threshold_deg else value + 180.0
+        alpha_real = value if value > self.angle_threshold_deg else value + ALPHA_OFFSET
         jaw_phase = self.jaw_phase_from_angle(alpha_real)
         if abs(jaw_phase) > self.jaw_phase_limit:
             raise RuntimeError(
@@ -358,8 +358,8 @@ def convert_csv_to_lookup(
     look_up_table = {}
     pol = []
 
-    def data2dict(row):
-        # logical for the conversion for each row of data.
+    def data2dict(row) -> None:
+        # logic for the conversion for each row of data.
         if row[mode] not in pol:
             pol.append(row[mode])
             look_up_table[row[mode]] = {}

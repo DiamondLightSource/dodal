@@ -42,6 +42,52 @@ class Apple2Val:
     btm_outer: str
 
 
+class EnergyMinMax(BaseModel):
+    Minimum: float
+    Maximum: float
+
+
+class EnergyCoverageEntry(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    Low: float
+    High: float
+    Poly: np.poly1d
+
+
+class EnergyCoverage(RootModel):
+    root: dict[str, EnergyCoverageEntry]
+
+
+class LookupTableEntries(BaseModel):
+    Energies: EnergyCoverage
+    Limit: EnergyMinMax
+
+
+class Lookuptable(RootModel):
+    """
+    BaseModel class for the lookup table.
+    Apple2 lookup table should be in this format.
+
+    {mode: {'Energies': {Any: {'Low': float,
+                            'High': float,
+                            'Poly':np.poly1d
+                            }
+                        }
+            'Limit': {'Minimum': float,
+                    'Maximum': float
+                    }
+        }
+    }
+    """
+
+    root: dict[str, LookupTableEntries]
+
+
+ROW_PHASE_MOTOR_TOLERANCE = 0.004
+MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
+MAXIMUM_GAP_MOTOR_POSITION = 100
+
+
 class UndulatorGap(StandardReadable, Movable):
     """A device with a collection of epics signals to set Apple 2 undulator gap motion.
     Only PV used by beamline are added the full list is here:
@@ -78,7 +124,7 @@ class UndulatorGap(StandardReadable, Movable):
         split_pv = prefix.split("-")
         self.fault = epics_signal_r(
             float,
-            split_pv[0] + "-" + split_pv[1] + "-STAT" + "-" + split_pv[3] + "ANYFAULT",
+            f"{split_pv[0]}-{split_pv[1]}-STAT-{split_pv[3]}ANYFAULT",
         )
         # This is calculated acceleration from speed
         self.acceleration_time = epics_signal_r(float, prefix + "IDGSETACC")
@@ -259,7 +305,7 @@ class UndulatorJawPhase(StandardReadable, Movable):
     ):
         # Gap demand set point and readback
         with self.add_children_as_readables():
-            self.jaw_Phase = UndulatorPhaseMotor(prefix=prefix, infix=jaw_phase)
+            self.jaw_phase = UndulatorPhaseMotor(prefix=prefix, infix=jaw_phase)
         # Nothing move until this is set to 1 and it will return to 0 when done
         self.set_move = epics_signal_rw(int, f"{prefix}BL{move_pv}" + "MOVE")
         self.gate = epics_signal_r(UndulatorGateStatus, prefix + "BLGATE")
@@ -275,7 +321,7 @@ class UndulatorJawPhase(StandardReadable, Movable):
         await self.check_id_status()
 
         await asyncio.gather(
-            self.jaw_Phase.user_setpoint.set(value=str(value)),
+            self.jaw_phase.user_setpoint.set(value=str(value)),
         )
         timeout = await self._cal_timeout()
         await self.set_move.set(value=1, timeout=timeout)
@@ -286,9 +332,9 @@ class UndulatorJawPhase(StandardReadable, Movable):
         Get motor speed, current position and target position to calculate required timeout.
         """
         velo, target_pos, cur_pos = await asyncio.gather(
-            self.jaw_Phase.velocity.get_value(),
-            self.jaw_Phase.user_setpoint_demand_readback.get_value(),
-            self.jaw_Phase.user_setpoint_readback.get_value(),
+            self.jaw_phase.velocity.get_value(),
+            self.jaw_phase.user_setpoint_demand_readback.get_value(),
+            self.jaw_phase.user_setpoint_readback.get_value(),
         )
 
         move_distances = target_pos - cur_pos
@@ -304,52 +350,6 @@ class UndulatorJawPhase(StandardReadable, Movable):
 
     async def get_timeout(self) -> float:
         return await self._cal_timeout()
-
-
-class EnergyMinMax(BaseModel):
-    Minimum: float
-    Maximum: float
-
-
-class EnergyCoverageEntry(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-    Low: float
-    High: float
-    Poly: np.poly1d
-
-
-class EnergyCoverage(RootModel):
-    root: dict[str, EnergyCoverageEntry]
-
-
-class LookupTableEntries(BaseModel):
-    Energies: EnergyCoverage
-    Limit: EnergyMinMax
-
-
-class Lookuptable(RootModel):
-    """
-    BaseModel class for the lookup table.
-    Apple2 lookup table should be in this format.
-
-    {mode: {'Energies': {Any: {'Low': float,
-                            'High': float,
-                            'Poly':np.poly1d
-                            }
-                        }
-            'Limit': {'Minimum': float,
-                    'Maximum': float
-                    }
-        }
-    }
-    """
-
-    root: dict[str, LookupTableEntries]
-
-
-ROW_PHASE_MOTOR_TOLERANCE = 0.004
-MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
-MAXIMUM_GAP_MOTOR_POSITION = 100
 
 
 class Apple2(StandardReadable, Movable):

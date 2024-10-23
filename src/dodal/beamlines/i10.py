@@ -22,6 +22,7 @@ BL = get_beamline_name("i10")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
+LOOK_UPTABLE_DIR = "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/"
 """
 I10 has two insertion devices one up(idu) and one down stream(idd).
 It is worth noting that the down stream device is slightly longer,
@@ -141,10 +142,10 @@ def idu_gap_phase(
         id_phase=idu_phase_axes(wait_for_connection, fake_with_ophyd_sim),
         id_jaw_phase=idu_jaw(wait_for_connection, fake_with_ophyd_sim),
         energy_gap_table_path=Path(
-            "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2GapCalibrations.csv",
+            LOOK_UPTABLE_DIR + "IDEnergy2GapCalibrations.csv",
         ),
         energy_phase_table_path=Path(
-            "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2PhaseCalibrations.csv",
+            LOOK_UPTABLE_DIR + "IDEnergy2PhaseCalibrations.csv",
         ),
         source=("Source", "idu"),
         name="idu_gap_phase",
@@ -163,10 +164,10 @@ def idd_gap_phase(
         id_phase=idd_phase_axes(wait_for_connection, fake_with_ophyd_sim),
         id_jaw_phase=idd_jaw(wait_for_connection, fake_with_ophyd_sim),
         energy_gap_table_path=Path(
-            "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2GapCalibrations.csv",
+            LOOK_UPTABLE_DIR + "IDEnergy2GapCalibrations.csv",
         ),
         energy_phase_table_path=Path(
-            "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/IDEnergy2PhaseCalibrations.csv",
+            LOOK_UPTABLE_DIR + "IDEnergy2PhaseCalibrations.csv",
         ),
         source=("Source", "idd"),
         name="idd_gap_phase",
