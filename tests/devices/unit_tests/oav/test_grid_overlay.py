@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, call, patch
 
 import pytest
 
-from dodal.devices.oav.grid_overlay import (
+from dodal.devices.oav.snapshots.grid_overlay import (
     add_grid_border_overlay_to_image,
     add_grid_overlay_to_image,
 )
