@@ -7,9 +7,10 @@ from dodal.beamline_specific_utils.i03 import (
 
 RADII_AND_SIZES = [
     (None, (None, None)),
-    (123, (123, I03_BEAM_HEIGHT_UM)),
+    (123, (80, I03_BEAM_HEIGHT_UM)),
     (23.45, (23.45, I03_BEAM_HEIGHT_UM)),
-    (888, (888, I03_BEAM_HEIGHT_UM)),
+    (50, (50, I03_BEAM_HEIGHT_UM)),
+    (888, (80, I03_BEAM_HEIGHT_UM)),
 ]
 
 

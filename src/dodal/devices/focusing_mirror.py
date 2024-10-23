@@ -45,7 +45,7 @@ class MirrorVoltageDemand(str, Enum):
     SLEW = "SLEW"
 
 
-class MirrorVoltageDevice(Device):
+class SingleMirrorVoltage(Device):
     """Abstract the bimorph mirror voltage PVs into a single device that can be set asynchronously and returns when
     the demanded voltage setpoint is accepted, without blocking the caller as this process can take significant time.
     """
@@ -105,28 +105,39 @@ class MirrorVoltageDevice(Device):
         await set_status
 
 
-class VFMMirrorVoltages(StandardReadable):
+class MirrorVoltages(StandardReadable):
     def __init__(
         self, name: str, prefix: str, *args, daq_configuration_path: str, **kwargs
     ):
         self.voltage_lookup_table_path = (
             daq_configuration_path + "/json/mirrorFocus.json"
         )
+
         with self.add_children_as_readables():
-            self.voltage_channels = DeviceVector(
-                {
-                    i - 14: MirrorVoltageDevice(prefix=f"{prefix}BM:V{i}")
-                    for i in range(14, 22)
-                }
-            )
+            self.horizontal_voltages = self._channels_in_range(prefix, 0, 14)
+            self.vertical_voltages = self._channels_in_range(prefix, 14, 22)
+
         super().__init__(*args, name=name, **kwargs)
+
+    def _channels_in_range(self, prefix, start_idx, end_idx):
+        return DeviceVector(
+            {
+                i - start_idx: SingleMirrorVoltage(prefix=f"{prefix}BM:V{i}")
+                for i in range(start_idx, end_idx)
+            }
+        )
 
 
 class FocusingMirror(StandardReadable):
     """Focusing Mirror"""
 
     def __init__(
-        self, name, prefix, bragg_to_lat_lut_path=None, x_suffix="X", y_suffix="Y"
+        self,
+        prefix: str,
+        name: str = "",
+        bragg_to_lat_lut_path: str | None = None,
+        x_suffix: str = "X",
+        y_suffix: str = "Y",
     ):
         self.bragg_to_lat_lookup_table_path = bragg_to_lat_lut_path
         self.yaw_mrad = Motor(prefix + "YAW")
@@ -154,12 +165,12 @@ class FocusingMirrorWithStripes(FocusingMirror):
     """A focusing mirror where the stripe material can be changed. This is usually done
     based on the energy of the beamline."""
 
-    def __init__(self, name, prefix, *args, **kwargs):
+    def __init__(self, prefix: str, name: str = "", *args, **kwargs):
         self.stripe = epics_signal_rw(MirrorStripe, prefix + "STRP:DVAL")
         # apply the current set stripe setting
         self.apply_stripe = epics_signal_x(prefix + "CHANGE.PROC")
 
-        super().__init__(name, prefix, *args, **kwargs)
+        super().__init__(prefix, name, *args, **kwargs)
 
     def energy_to_stripe(self, energy_kev) -> MirrorStripe:
         # In future, this should be configurable per-mirror

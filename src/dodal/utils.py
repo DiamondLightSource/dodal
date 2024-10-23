@@ -6,15 +6,18 @@ import socket
 import string
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass
-from functools import wraps
+from functools import update_wrapper, wraps
 from importlib import import_module
 from inspect import signature
 from os import environ
 from types import ModuleType
 from typing import (
     Any,
+    Generic,
+    Protocol,
     TypeGuard,
     TypeVar,
+    runtime_checkable,
 )
 
 from bluesky.protocols import (
@@ -33,6 +36,7 @@ from bluesky.protocols import (
     Triggerable,
     WritesExternalAssets,
 )
+from bluesky.run_engine import call_in_bluesky_event_loop
 from ophyd.device import Device as OphydV1Device
 from ophyd_async.core import Device as OphydV2Device
 
@@ -62,6 +66,11 @@ BLUESKY_PROTOCOLS = [
     Triggerable,
 ]
 
+
+@runtime_checkable
+class MovableReadable(Movable, Readable, Protocol): ...
+
+
 AnyDevice: TypeAlias = OphydV1Device | OphydV2Device
 V1DeviceFactory: TypeAlias = Callable[..., OphydV1Device]
 V2DeviceFactory: TypeAlias = Callable[..., OphydV2Device]
@@ -88,6 +97,8 @@ class BeamlinePrefix:
 
 
 T = TypeVar("T", bound=AnyDevice)
+D = TypeVar("D", bound=OphydV2Device)
+SkipType = bool | Callable[[], bool]
 
 
 def skip_device(precondition=lambda: True):
@@ -101,6 +112,101 @@ def skip_device(precondition=lambda: True):
         return wrapper
 
     return decorator
+
+
+class DeviceInitializationController(Generic[D]):
+    def __init__(
+        self,
+        factory: Callable[[], D],
+        eager_connect: bool,
+        use_factory_name: bool,
+        timeout: float,
+        mock: bool,
+        skip: SkipType,
+    ):
+        self._factory: Callable[[], D] = factory
+        self._cached_device: D | None = None
+        self._callbacks: list[Callable[[D], None]] = []
+        self._eager_connect = eager_connect
+        self._use_factory_name = use_factory_name
+        self._timeout = timeout
+        self._mock = mock
+        self._skip = skip
+        update_wrapper(self, factory)
+
+    @property
+    def skip(self) -> bool:
+        return self._skip() if callable(self._skip) else self._skip
+
+    @property
+    def device(self) -> D | None:
+        return self._cached_device
+
+    def add_callback(self, callback: Callable[[D], None]):
+        self._callbacks.append(callback)
+
+    def __call__(
+        self,
+        connect_immediately: bool | None = None,
+        name: str | None = None,
+        connection_timeout: float | None = None,
+        mock: bool | None = None,
+    ) -> D:
+        """Returns an instance of the Device the wrapped factory produces: the same
+        instance will be returned if this method is called multiple times, and arguments
+        may be passed to override this Controller's configuration.
+        Once the device is connected, the value of mock must be consistent, or connect
+        must be False.
+
+
+        Args:
+            connect_immediately (bool | None, optional): whether to call connect on the
+              device before returning it- connect is idempotent for ophyd-async devices.
+              Not connecting to the device allows for the instance to be created prior
+              to the RunEngine event loop being configured or for connect to be called
+              lazily e.g. by the `ensure_connected` stub. Defaults to None, which defers
+              to the eager_connect parameter of this Controller.
+            name (str | None, optional): an override name to give the device, which is
+              also used to name its children. Defaults to None, which does not name the
+              device unless the device has no name and this Controller is configured to
+              use_factory_name, which propagates the name of the wrapped factory
+              function to the device instance.
+            connection_timeout (float | None, optional): an override timeout length in
+              seconds for the connect method, if it is called. Defaults to None, which
+              defers to the timeout configured for this Controller: the default uses
+              ophyd_async's DEFAULT_TIMEOUT.
+            mock (bool | None, optional): overrides whether to connect to Mock signal
+              backends, if connect is called. Defaults to None, which uses the mock
+              parameter of this Controller. This value must be used consistently when
+              connect is called on the Device.
+
+        Returns:
+            D: a singleton instance of the Device class returned by the wrapped factory.
+        """
+        if self.device is not None:
+            device = self.device
+        else:
+            device = self._factory()
+
+        if connect_immediately or connect_immediately is None and self._eager_connect:
+            call_in_bluesky_event_loop(
+                device.connect(
+                    timeout=connection_timeout
+                    if connection_timeout is not None
+                    else self._timeout,
+                    mock=mock if mock is not None else self._mock,
+                )
+            )
+
+        if name:
+            device.set_name(name)
+        elif not device.name and self._use_factory_name:
+            device.set_name(self._factory.__name__)
+
+        self._cached_device = device
+        for callback in self._callbacks:
+            callback(device)
+        return device
 
 
 def make_device(
@@ -195,7 +301,16 @@ def invoke_factories(
         dependent_name = leaves.pop()
         params = {name: devices[name] for name in dependencies[dependent_name]}
         try:
-            devices[dependent_name] = factories[dependent_name](**params, **kwargs)
+            factory = factories[dependent_name]
+            if isinstance(factory, DeviceInitializationController):
+                # replace with an arg
+                # https://github.com/DiamondLightSource/dodal/issues/844
+                devices[dependent_name] = factory(
+                    mock=kwargs.get("mock", False)
+                    or kwargs.get("fake_with_ophyd_sim", False)
+                )
+            else:
+                devices[dependent_name] = factory(**params, **kwargs)
         except Exception as e:
             exceptions[dependent_name] = e
 
@@ -257,6 +372,8 @@ def collect_factories(
 
 
 def _is_device_skipped(func: AnyDeviceFactory) -> bool:
+    if isinstance(func, DeviceInitializationController):
+        return func.skip
     return getattr(func, "__skip__", False)
 
 
