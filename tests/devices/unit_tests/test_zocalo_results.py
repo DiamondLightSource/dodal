@@ -489,4 +489,4 @@ async def test_given_gpu_enabled_when_no_results_found_then_returns_no_results(
         ]
     )
     await zocalo_results.trigger()
-    assert len(await zocalo_results.centres_of_mass.get_value()) == 0
+    assert len(await zocalo_results.centre_of_mass.get_value()) == 0
