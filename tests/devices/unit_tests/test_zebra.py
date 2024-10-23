@@ -40,9 +40,9 @@ async def test_position_compare_sets_signals(RE: RunEngine):
     fake_pc.arm.arm_set.set = AsyncMock(side_effect=mock_arm)
     fake_pc.arm.disarm_set.set = AsyncMock(side_effect=mock_arm)
 
-    fake_pc.gate_source.set(TrigSource.EXTERNAL)
-    fake_pc.gate_trigger.set(I03Axes.OMEGA)
-    fake_pc.num_gates.set(10)
+    await fake_pc.gate_source.set(TrigSource.EXTERNAL)
+    await fake_pc.gate_trigger.set(I03Axes.OMEGA)
+    await fake_pc.num_gates.set(10)
 
     assert await fake_pc.gate_source.get_value() == "External"
     assert await fake_pc.gate_trigger.get_value() == "Enc4"
