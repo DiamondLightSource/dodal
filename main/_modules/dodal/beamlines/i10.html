@@ -1,0 +1,802 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dodal.beamlines.i10 &#8212; dodal 1.33.1.dev18+ge673dbfa9 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+
+    <script src="../../../_static/documentation_options.js?v=4a4db483"></script>
+    <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=30646c52"></script>
+    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+    <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/dodal/beamlines/i10';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://DiamondLightSource.github.io/dodal/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'main';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
+    <link rel="icon" href="../../../_static/dls-logo.svg"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="main" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/dls-logo.svg" class="logo__image only-light" alt=""/>
+    <img src="../../../_static/dls-logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">dodal</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/DiamondLightSource/dodal" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/dodal" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/DiamondLightSource/dodal" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/dodal" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../beamlines.html" class="nav-link">dodal.beamlines</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">dodal.beamlines.i10</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for dodal.beamlines.i10</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span> <span class="nn">dodal.common.beamlines.beamline_utils</span> <span class="kn">import</span> <span class="n">device_instantiation</span>
+<span class="kn">from</span> <span class="nn">dodal.common.beamlines.beamline_utils</span> <span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_utils_beamline</span>
+<span class="kn">from</span> <span class="nn">dodal.devices.apple2_undulator</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">UndulatorGap</span><span class="p">,</span>
+    <span class="n">UndulatorJawPhase</span><span class="p">,</span>
+    <span class="n">UndulatorPhaseAxes</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">dodal.devices.i10.i10_apple2</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">I10Apple2</span><span class="p">,</span>
+    <span class="n">I10Apple2PGM</span><span class="p">,</span>
+    <span class="n">I10Apple2Pol</span><span class="p">,</span>
+    <span class="n">LinearArbitraryAngle</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">dodal.devices.i10.i10_setting_data</span> <span class="kn">import</span> <span class="n">I10Grating</span>
+<span class="kn">from</span> <span class="nn">dodal.devices.pgm</span> <span class="kn">import</span> <span class="n">PGM</span>
+<span class="kn">from</span> <span class="nn">dodal.log</span> <span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_log_beamline</span>
+<span class="kn">from</span> <span class="nn">dodal.utils</span> <span class="kn">import</span> <span class="n">BeamlinePrefix</span><span class="p">,</span> <span class="n">get_beamline_name</span>
+
+<span class="n">BL</span> <span class="o">=</span> <span class="n">get_beamline_name</span><span class="p">(</span><span class="s2">&quot;i10&quot;</span><span class="p">)</span>
+<span class="n">set_log_beamline</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>
+<span class="n">set_utils_beamline</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>
+
+<span class="n">LOOK_UPTABLE_DIR</span> <span class="o">=</span> <span class="s2">&quot;/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/&quot;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">I10 has two insertion devices one up(idu) and one down stream(idd).</span>
+<span class="sd">It is worth noting that the down stream device is slightly longer,</span>
+<span class="sd"> so it can reach Mn edge for linear arbitrary.</span>
+<span class="sd"> idd == id1</span>
+<span class="sd"> and</span>
+<span class="sd"> idu == id2.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="idd_gap">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i10.html#dodal.beamlines.i10.idd_gap">[docs]</a>
+<span class="k">def</span> <span class="nf">idd_gap</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UndulatorGap</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">device_factory</span><span class="o">=</span><span class="n">UndulatorGap</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;idd_gap&quot;</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BeamlinePrefix</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span><span class="o">.</span><span class="n">insertion_prefix</span><span class="si">}</span><span class="s2">-MO-SERVC-01:&quot;</span><span class="p">,</span>
+        <span class="n">wait</span><span class="o">=</span><span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake</span><span class="o">=</span><span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+        <span class="n">bl_prefix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="idd_phase_axes">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i10.html#dodal.beamlines.i10.idd_phase_axes">[docs]</a>
+<span class="k">def</span> <span class="nf">idd_phase_axes</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UndulatorPhaseAxes</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">device_factory</span><span class="o">=</span><span class="n">UndulatorPhaseAxes</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;idd_phase_axes&quot;</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BeamlinePrefix</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span><span class="o">.</span><span class="n">insertion_prefix</span><span class="si">}</span><span class="s2">-MO-SERVC-01:&quot;</span><span class="p">,</span>
+        <span class="n">top_outer</span><span class="o">=</span><span class="s2">&quot;RPQ1&quot;</span><span class="p">,</span>
+        <span class="n">top_inner</span><span class="o">=</span><span class="s2">&quot;RPQ2&quot;</span><span class="p">,</span>
+        <span class="n">btm_inner</span><span class="o">=</span><span class="s2">&quot;RPQ3&quot;</span><span class="p">,</span>
+        <span class="n">btm_outer</span><span class="o">=</span><span class="s2">&quot;RPQ4&quot;</span><span class="p">,</span>
+        <span class="n">wait</span><span class="o">=</span><span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake</span><span class="o">=</span><span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+        <span class="n">bl_prefix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="idd_jaw">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i10.html#dodal.beamlines.i10.idd_jaw">[docs]</a>
+<span class="k">def</span> <span class="nf">idd_jaw</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UndulatorJawPhase</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">device_factory</span><span class="o">=</span><span class="n">UndulatorJawPhase</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;idd_jaw&quot;</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BeamlinePrefix</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span><span class="o">.</span><span class="n">insertion_prefix</span><span class="si">}</span><span class="s2">-MO-SERVC-01:&quot;</span><span class="p">,</span>
+        <span class="n">move_pv</span><span class="o">=</span><span class="s2">&quot;RPQ1&quot;</span><span class="p">,</span>
+        <span class="n">wait</span><span class="o">=</span><span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake</span><span class="o">=</span><span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+        <span class="n">bl_prefix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="idu_gap">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i10.html#dodal.beamlines.i10.idu_gap">[docs]</a>
+<span class="k">def</span> <span class="nf">idu_gap</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UndulatorGap</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">device_factory</span><span class="o">=</span><span class="n">UndulatorGap</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;idu_gap&quot;</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BeamlinePrefix</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span><span class="o">.</span><span class="n">insertion_prefix</span><span class="si">}</span><span class="s2">-MO-SERVC-21:&quot;</span><span class="p">,</span>
+        <span class="n">wait</span><span class="o">=</span><span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake</span><span class="o">=</span><span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+        <span class="n">bl_prefix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="idu_phase_axes">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i10.html#dodal.beamlines.i10.idu_phase_axes">[docs]</a>
+<span class="k">def</span> <span class="nf">idu_phase_axes</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UndulatorPhaseAxes</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">device_factory</span><span class="o">=</span><span class="n">UndulatorPhaseAxes</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;idu_phase_axes&quot;</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BeamlinePrefix</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span><span class="o">.</span><span class="n">insertion_prefix</span><span class="si">}</span><span class="s2">-MO-SERVC-21:&quot;</span><span class="p">,</span>
+        <span class="n">top_outer</span><span class="o">=</span><span class="s2">&quot;RPQ1&quot;</span><span class="p">,</span>
+        <span class="n">top_inner</span><span class="o">=</span><span class="s2">&quot;RPQ2&quot;</span><span class="p">,</span>
+        <span class="n">btm_inner</span><span class="o">=</span><span class="s2">&quot;RPQ3&quot;</span><span class="p">,</span>
+        <span class="n">btm_outer</span><span class="o">=</span><span class="s2">&quot;RPQ4&quot;</span><span class="p">,</span>
+        <span class="n">wait</span><span class="o">=</span><span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake</span><span class="o">=</span><span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+        <span class="n">bl_prefix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="idu_jaw">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i10.html#dodal.beamlines.i10.idu_jaw">[docs]</a>
+<span class="k">def</span> <span class="nf">idu_jaw</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UndulatorJawPhase</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">device_factory</span><span class="o">=</span><span class="n">UndulatorJawPhase</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;idu_jaw&quot;</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BeamlinePrefix</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span><span class="o">.</span><span class="n">insertion_prefix</span><span class="si">}</span><span class="s2">-MO-SERVC-21:&quot;</span><span class="p">,</span>
+        <span class="n">move_pv</span><span class="o">=</span><span class="s2">&quot;RPQ1&quot;</span><span class="p">,</span>
+        <span class="n">wait</span><span class="o">=</span><span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake</span><span class="o">=</span><span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+        <span class="n">bl_prefix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="pgm">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i10.html#dodal.beamlines.i10.pgm">[docs]</a>
+<span class="k">def</span> <span class="nf">pgm</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PGM</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">device_factory</span><span class="o">=</span><span class="n">PGM</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;pgm&quot;</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;-OP-PGM-01:&quot;</span><span class="p">,</span>
+        <span class="n">grating</span><span class="o">=</span><span class="n">I10Grating</span><span class="p">,</span>
+        <span class="n">gratingPv</span><span class="o">=</span><span class="s2">&quot;NLINES2&quot;</span><span class="p">,</span>
+        <span class="n">wait</span><span class="o">=</span><span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake</span><span class="o">=</span><span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="idu_gap_phase">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i10.html#dodal.beamlines.i10.idu_gap_phase">[docs]</a>
+<span class="k">def</span> <span class="nf">idu_gap_phase</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">I10Apple2</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">device_factory</span><span class="o">=</span><span class="n">I10Apple2</span><span class="p">,</span>
+        <span class="n">id_gap</span><span class="o">=</span><span class="n">idu_gap</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">),</span>
+        <span class="n">id_phase</span><span class="o">=</span><span class="n">idu_phase_axes</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">),</span>
+        <span class="n">id_jaw_phase</span><span class="o">=</span><span class="n">idu_jaw</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">),</span>
+        <span class="n">energy_gap_table_path</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span>
+            <span class="n">LOOK_UPTABLE_DIR</span> <span class="o">+</span> <span class="s2">&quot;IDEnergy2GapCalibrations.csv&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">energy_phase_table_path</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span>
+            <span class="n">LOOK_UPTABLE_DIR</span> <span class="o">+</span> <span class="s2">&quot;IDEnergy2PhaseCalibrations.csv&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">source</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Source&quot;</span><span class="p">,</span> <span class="s2">&quot;idu&quot;</span><span class="p">),</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;idu_gap_phase&quot;</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">wait</span><span class="o">=</span><span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake</span><span class="o">=</span><span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="idd_gap_phase">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i10.html#dodal.beamlines.i10.idd_gap_phase">[docs]</a>
+<span class="k">def</span> <span class="nf">idd_gap_phase</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">I10Apple2</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">device_factory</span><span class="o">=</span><span class="n">I10Apple2</span><span class="p">,</span>
+        <span class="n">id_gap</span><span class="o">=</span><span class="n">idd_gap</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">),</span>
+        <span class="n">id_phase</span><span class="o">=</span><span class="n">idd_phase_axes</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">),</span>
+        <span class="n">id_jaw_phase</span><span class="o">=</span><span class="n">idd_jaw</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">),</span>
+        <span class="n">energy_gap_table_path</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span>
+            <span class="n">LOOK_UPTABLE_DIR</span> <span class="o">+</span> <span class="s2">&quot;IDEnergy2GapCalibrations.csv&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">energy_phase_table_path</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span>
+            <span class="n">LOOK_UPTABLE_DIR</span> <span class="o">+</span> <span class="s2">&quot;IDEnergy2PhaseCalibrations.csv&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">source</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Source&quot;</span><span class="p">,</span> <span class="s2">&quot;idd&quot;</span><span class="p">),</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;idd_gap_phase&quot;</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">wait</span><span class="o">=</span><span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake</span><span class="o">=</span><span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="idu_pol">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i10.html#dodal.beamlines.i10.idu_pol">[docs]</a>
+<span class="k">def</span> <span class="nf">idu_pol</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">I10Apple2Pol</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">device_factory</span><span class="o">=</span><span class="n">I10Apple2Pol</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="nb">id</span><span class="o">=</span><span class="n">idu_gap_phase</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">),</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;idu_pol&quot;</span><span class="p">,</span>
+        <span class="n">wait</span><span class="o">=</span><span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake</span><span class="o">=</span><span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="idd_pol">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i10.html#dodal.beamlines.i10.idd_pol">[docs]</a>
+<span class="k">def</span> <span class="nf">idd_pol</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">I10Apple2Pol</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">device_factory</span><span class="o">=</span><span class="n">I10Apple2Pol</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="nb">id</span><span class="o">=</span><span class="n">idd_gap_phase</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">),</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;idd_pol&quot;</span><span class="p">,</span>
+        <span class="n">wait</span><span class="o">=</span><span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake</span><span class="o">=</span><span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="idu">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i10.html#dodal.beamlines.i10.idu">[docs]</a>
+<span class="k">def</span> <span class="nf">idu</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">I10Apple2PGM</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">device_factory</span><span class="o">=</span><span class="n">I10Apple2PGM</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="nb">id</span><span class="o">=</span><span class="n">idu_gap_phase</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">),</span>
+        <span class="n">pgm</span><span class="o">=</span><span class="n">pgm</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">),</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;idu&quot;</span><span class="p">,</span>
+        <span class="n">wait</span><span class="o">=</span><span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake</span><span class="o">=</span><span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="idd">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i10.html#dodal.beamlines.i10.idd">[docs]</a>
+<span class="k">def</span> <span class="nf">idd</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">I10Apple2PGM</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">device_factory</span><span class="o">=</span><span class="n">I10Apple2PGM</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="nb">id</span><span class="o">=</span><span class="n">idd_gap_phase</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">),</span>
+        <span class="n">pgm</span><span class="o">=</span><span class="n">pgm</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">),</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;idd&quot;</span><span class="p">,</span>
+        <span class="n">wait</span><span class="o">=</span><span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake</span><span class="o">=</span><span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="idu_la_angle">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i10.html#dodal.beamlines.i10.idu_la_angle">[docs]</a>
+<span class="k">def</span> <span class="nf">idu_la_angle</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearArbitraryAngle</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">device_factory</span><span class="o">=</span><span class="n">LinearArbitraryAngle</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="nb">id</span><span class="o">=</span><span class="n">idu</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">),</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;idu_la_angle&quot;</span><span class="p">,</span>
+        <span class="n">wait</span><span class="o">=</span><span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake</span><span class="o">=</span><span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="idd_la_angle">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i10.html#dodal.beamlines.i10.idd_la_angle">[docs]</a>
+<span class="k">def</span> <span class="nf">idd_la_angle</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearArbitraryAngle</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">device_factory</span><span class="o">=</span><span class="n">LinearArbitraryAngle</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="nb">id</span><span class="o">=</span><span class="n">idu</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">),</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;idd_la_angle&quot;</span><span class="p">,</span>
+        <span class="n">wait</span><span class="o">=</span><span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake</span><span class="o">=</span><span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

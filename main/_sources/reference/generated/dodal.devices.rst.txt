@@ -13,6 +13,7 @@
    dodal.devices.adsim
    dodal.devices.aperture
    dodal.devices.aperturescatterguard
+   dodal.devices.apple2_undulator
    dodal.devices.areadetector
    dodal.devices.attenuator
    dodal.devices.backlight
@@ -37,6 +38,7 @@
    dodal.devices.oav
    dodal.devices.p45
    dodal.devices.p99
+   dodal.devices.pgm
    dodal.devices.qbpm
    dodal.devices.robot
    dodal.devices.s4_slit_gaps
