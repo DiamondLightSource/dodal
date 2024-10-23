@@ -222,11 +222,10 @@ def dcm(
     return device_instantiation(
         DoubleCrystalMonochromator,
         "dcm",
-        "",
+        f"{BeamlinePrefix(BL).beamline_prefix}-MO-DCM-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
         bl_prefix=False,
-        motion_prefix=f"{BeamlinePrefix(BL).beamline_prefix}-MO-DCM-01:",
         temperature_prefix=f"{BeamlinePrefix(BL).beamline_prefix}-DI-DCM-01:",
         crystal_1_metadata=CrystalMetadata(
             usage="Bragg",
@@ -253,6 +252,7 @@ def undulator(
         f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        id_gap_lookup_table_path="SPECIFY_ME",
         bl_prefix=False,
         poles=80,
         length=2.0,
