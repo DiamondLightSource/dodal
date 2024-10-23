@@ -135,7 +135,7 @@ def dcm() -> DoubleCrystalMonochromator:
         d_spacing=(3.13475, "nm"),
     )
     return DoubleCrystalMonochromator(
-        motion_prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:",
+        prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:",
         temperature_prefix=f"{PREFIX.beamline_prefix}-DI-DCM-01:",
         crystal_1_metadata=crystal_1_metadata,
         crystal_2_metadata=crystal_2_metadata,
@@ -197,7 +197,6 @@ def fswitch() -> FSwitch:
 @device_factory()
 def panda1() -> HDFPanda:
     return HDFPanda(
-        prefix="",
         uri=f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
         path_provider=get_path_provider(),
     )
@@ -206,7 +205,6 @@ def panda1() -> HDFPanda:
 @device_factory(skip=True)
 def panda2() -> HDFPanda:
     return HDFPanda(
-        prefix="",
         uri=f"{PREFIX.beamline_prefix}-EA-PANDA-02:",
         path_provider=get_path_provider(),
     )
@@ -215,7 +213,6 @@ def panda2() -> HDFPanda:
 @device_factory(skip=True)
 def panda3() -> HDFPanda:
     return HDFPanda(
-        prefix="",
         uri=f"{PREFIX.beamline_prefix}-EA-PANDA-03:",
         path_provider=get_path_provider(),
     )
@@ -224,7 +221,6 @@ def panda3() -> HDFPanda:
 @device_factory(skip=True)
 def panda4() -> HDFPanda:
     return HDFPanda(
-        prefix="",
         uri=f"{PREFIX.beamline_prefix}-EA-PANDA-04:",
         path_provider=get_path_provider(),
     )
