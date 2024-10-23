@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.common.beamlines.beamline_utils &#8212; dodal 1.33.1.dev16+g523cef830 documentation</title>
+    <title>dodal.common.beamlines.beamline_utils &#8212; dodal 1.33.1.dev17+g52848b318 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
-    <script src="../../../../_static/documentation_options.js?v=f316c291"></script>
+    <script src="../../../../_static/documentation_options.js?v=e9b0998d"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -611,7 +611,6 @@ window.addEventListener("load", () => mermaid.run());
 <a class="viewcode-back" href="../../../../reference/generated/dodal.common.beamlines.beamline_utils.html#dodal.common.beamlines.beamline_utils.device_factory">[docs]</a>
 <span class="k">def</span> <span class="nf">device_factory</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
-    <span class="n">eager_connect</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="s2">&quot;Connect or raise Exception at startup&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">use_factory_name</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="s2">&quot;Use factory name as name of device&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">timeout</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;Timeout for connecting to the device&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT_TIMEOUT</span><span class="p">,</span>
     <span class="n">mock</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="s2">&quot;Use Signals with mock backends for device&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -622,7 +621,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Callable</span><span class="p">[[],</span> <span class="n">D</span><span class="p">]],</span> <span class="n">DeviceInitializationController</span><span class="p">[</span><span class="n">D</span><span class="p">]]:</span>
     <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">factory</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">D</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">DeviceInitializationController</span><span class="p">[</span><span class="n">D</span><span class="p">]:</span>
         <span class="n">controller</span> <span class="o">=</span> <span class="n">DeviceInitializationController</span><span class="p">(</span>
-            <span class="n">factory</span><span class="p">,</span> <span class="n">eager_connect</span><span class="p">,</span> <span class="n">use_factory_name</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">mock</span><span class="p">,</span> <span class="n">skip</span>
+            <span class="n">factory</span><span class="p">,</span> <span class="n">use_factory_name</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">mock</span><span class="p">,</span> <span class="n">skip</span>
         <span class="p">)</span>
         <span class="n">controller</span><span class="o">.</span><span class="n">add_callback</span><span class="p">(</span><span class="n">_cache_device</span><span class="p">(</span><span class="n">factory</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">controller</span>

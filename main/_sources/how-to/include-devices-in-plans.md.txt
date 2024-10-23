@@ -28,7 +28,7 @@ from bluesky.protocols import Readable
 from bluesky.utils import MsgGenerator
 from dodal.beamlines import i22
 
-def my_plan(detector: Readable = i22.saxs(connect_immediately=False)) -> MsgGenerator:
+def my_plan(detector: Readable = i22.saxs()) -> MsgGenerator:
     yield from bp.count([detector])
 
 RE(my_plan()))
