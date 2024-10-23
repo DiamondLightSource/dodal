@@ -69,9 +69,9 @@ class OAV(StandardReadable):
         )
 
         self.snapshot = SnapshotWithBeamCentre(
-            f"{prefix}-DI-OAV-01:MJPG:", self.beam_centre_i, self.beam_centre_j, name
+            f"{prefix}:MJPG:", self.beam_centre_i, self.beam_centre_j, name
         )
-        self.grid_snapshot = SnapshotWithGrid(f"{prefix}-DI-OAV-01:MJPG:", name)
+        self.grid_snapshot = SnapshotWithGrid(f"{prefix}:MJPG:", name)
 
         self._snapshot_trigger_subscription_id = None
 
