@@ -142,7 +142,6 @@ def _cache_device(name: str) -> Callable[[OphydV2Device], None]:
 
 def device_factory(
     *,
-    eager_connect: Annotated[bool, "Connect or raise Exception at startup"] = True,
     use_factory_name: Annotated[bool, "Use factory name as name of device"] = True,
     timeout: Annotated[float, "Timeout for connecting to the device"] = DEFAULT_TIMEOUT,
     mock: Annotated[bool, "Use Signals with mock backends for device"] = False,
@@ -153,7 +152,7 @@ def device_factory(
 ) -> Callable[[Callable[[], D]], DeviceInitializationController[D]]:
     def decorator(factory: Callable[[], D]) -> DeviceInitializationController[D]:
         controller = DeviceInitializationController(
-            factory, eager_connect, use_factory_name, timeout, mock, skip
+            factory, use_factory_name, timeout, mock, skip
         )
         controller.add_callback(_cache_device(factory.__name__))
         return controller
