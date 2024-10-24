@@ -5,6 +5,7 @@ from ophyd_async.epics.signal import epics_signal_rw
 
 from dodal.common.signal_utils import create_hardware_backed_soft_signal
 from dodal.devices.areadetector.plugins.CAM import Cam
+from dodal.devices.oav.oav_errors import OAVError_ZoomLevelNotFound
 from dodal.devices.oav.oav_parameters import DEFAULT_OAV_WINDOW, OAVConfig
 from dodal.devices.oav.snapshots.snapshot_with_beam_centre import SnapshotWithBeamCentre
 from dodal.devices.oav.snapshots.snapshot_with_grid import SnapshotWithGrid
@@ -40,8 +41,18 @@ class ZoomController(StandardReadable):
         # Level is the string description of the zoom level e.g. "1.0x" or "1.0"
         self.level = epics_signal_rw(str, f"{prefix}MP:SELECT")
 
+    async def _get_allowed_zoom_levels(self) -> list:
+        zoom_levels = await self.level.describe()
+        print(zoom_levels)
+        return zoom_levels["level"]["choices"]  # type: ignore
+
     @AsyncStatus.wrap
     async def set(self, level_to_set: str):
+        allowed_zoom_levels = await self._get_allowed_zoom_levels()
+        if level_to_set not in allowed_zoom_levels:
+            raise OAVError_ZoomLevelNotFound(
+                f"{level_to_set} not found, expected one of {allowed_zoom_levels}"
+            )
         await self.level.set(level_to_set, wait=True)
 
 
