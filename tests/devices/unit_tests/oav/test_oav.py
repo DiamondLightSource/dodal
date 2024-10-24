@@ -19,6 +19,9 @@ async def test_zoom_controller():
 async def test_cam():
     cam = Cam("", "fake cam")
     await cam.connect(mock=True)
+    set_mock_value(cam.array_size_x, 1024)
+    set_mock_value(cam.array_size_y, 768)
+
     status = cam.acquire_period.set(0.01)
     await status
     assert status.success
@@ -28,6 +31,8 @@ async def test_cam():
     await status
     assert status.success
     assert await cam.acquire_time.get_value() == 0.01
+
+    assert await cam.array_size_x.get_value() == 1024
 
 
 @pytest.mark.parametrize(

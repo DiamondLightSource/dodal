@@ -1,7 +1,7 @@
 from enum import IntEnum
 
 from ophyd_async.core import StandardReadable
-from ophyd_async.epics.signal import epics_signal_rw
+from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
 
 class ColorMode(IntEnum):
@@ -25,4 +25,7 @@ class Cam(StandardReadable):
         self.acquire_period = epics_signal_rw(float, "AcquirePeriod")
         self.acquire_time = epics_signal_rw(float, "AcquireTime")
         self.gain = epics_signal_rw(float, "Gain")
+
+        self.array_size_x = epics_signal_r(int, "ArraySizeX_RBV")
+        self.array_size_y = epics_signal_r(int, "ArraySizeY_RBV")
         super().__init__(name)
