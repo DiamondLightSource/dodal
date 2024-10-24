@@ -63,8 +63,8 @@ class BartRobot(StandardReadable, Movable):
         self.current_puck = epics_signal_r(float, prefix + "CURRENT_PUCK_RBV")
         self.current_pin = epics_signal_r(float, prefix + "CURRENT_PIN_RBV")
 
-        self.next_sample_id = epics_signal_rw_rbv(float, prefix + "NEXT_ID")
-        self.sample_id = epics_signal_r(float, prefix + "CURRENT_ID_RBV")
+        self.next_sample_id = epics_signal_rw_rbv(int, prefix + "NEXT_ID")
+        self.sample_id = epics_signal_r(int, prefix + "CURRENT_ID_RBV")
 
         self.load = epics_signal_x(prefix + "LOAD.PROC")
         self.program_running = epics_signal_r(bool, prefix + "PROGRAM_RUNNING")
