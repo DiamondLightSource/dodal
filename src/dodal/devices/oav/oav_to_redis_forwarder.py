@@ -125,6 +125,13 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
                 await function_to_do(response, source)
 
     async def _stream_to_redis(self, response: ClientResponse, source: OAVSource):
+        """Uses the update of the frame counter as a trigger to pull an image off the OAV
+        and into redis.
+
+        The frame counter is continually increasing on the timescales we store data and
+        so can be used as a uuid. If the OAV is updating too quickly we may drop frames
+        but in this case a best effort on getting as many frames as possible is sufficient.
+        """
         done_status = AsyncStatus(
             asyncio.wait_for(self._stop_flag.wait(), timeout=self.TIMEOUT)
         )
