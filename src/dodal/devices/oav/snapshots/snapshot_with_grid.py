@@ -19,7 +19,7 @@ class SnapshotWithGrid(MJPG):
 
         self.top_left_x = soft_signal_rw(int)
         self.top_left_y = soft_signal_rw(int)
-        self.box_width = soft_signal_rw(float)
+        self.box_width = soft_signal_rw(int)
         self.num_boxes_x = soft_signal_rw(int)
         self.num_boxes_y = soft_signal_rw(int)
 

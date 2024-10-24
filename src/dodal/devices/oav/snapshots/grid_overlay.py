@@ -13,8 +13,8 @@ def _add_parallel_lines_to_image(
     image: Image.Image,
     start_x: int,
     start_y: int,
-    line_length: float,
-    spacing: float,
+    line_length: int,
+    spacing: int,
     num_lines: int,
     orientation=Orientation.horizontal,
 ):
@@ -70,7 +70,7 @@ def add_grid_border_overlay_to_image(
     image: Image.Image,
     top_left_x: int,
     top_left_y: int,
-    box_width: float,
+    box_width: int,
     num_boxes_x: int,
     num_boxes_y: int,
 ):
@@ -96,7 +96,7 @@ def add_grid_overlay_to_image(
     image: Image.Image,
     top_left_x: int,
     top_left_y: int,
-    box_width: float,
+    box_width: int,
     num_boxes_x: int,
     num_boxes_y: int,
 ):
