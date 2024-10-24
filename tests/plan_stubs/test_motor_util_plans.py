@@ -14,9 +14,9 @@ from ophyd_async.core import (
 from ophyd_async.epics.motor import Motor
 
 from dodal.devices.util.test_utils import patch_motor
-from dodal.plans.motor_util_plans import (
+from dodal.plan_stubs.motor_utils import (
     MoveTooLarge,
-    _check_and_cache_values,
+    check_and_cache_values,
     home_and_reset_wrapper,
 )
 
@@ -59,7 +59,7 @@ def my_device(RE):
     "device_type",
     [DeviceWithOnlyMotors, DeviceWithNoMotors, DeviceWithSomeMotors],
 )
-@patch("dodal.plans.motor_util_plans.move_and_reset_wrapper")
+@patch("dodal.plan_stubs.motor_utils.move_and_reset_wrapper")
 def test_given_types_of_device_when_home_and_reset_wrapper_called_then_motors_and_zeros_passed_to_move_and_reset_wrapper(
     patch_move_and_reset, device_type, RE
 ):
@@ -80,7 +80,7 @@ def test_given_a_device_when_check_and_cache_values_then_motor_values_returned(
         set_mock_value(motor.user_readback, i * 100)
 
     motors_and_positions: dict[Motor, float] = RE(
-        _check_and_cache_values(
+        check_and_cache_values(
             {motor_obj: 0.0 for motor_obj in my_device.motors}, 0, 1000
         )
     ).plan_result  # type: ignore
@@ -109,7 +109,7 @@ def test_given_a_device_with_a_too_large_move_when_check_and_cache_values_then_e
     motors_and_positions = {motor_obj: new_position for motor_obj in my_device.motors}
 
     with pytest.raises(MoveTooLarge) as e:
-        RE(_check_and_cache_values(motors_and_positions, 0, max))
+        RE(check_and_cache_values(motors_and_positions, 0, max))
         assert e.value.axis == my_device.y
         assert e.value.maximum_move == max
 
@@ -136,7 +136,7 @@ def test_given_a_device_where_one_move_too_small_when_check_and_cache_values_the
     }
 
     motors_and_positions: dict[Motor, float] = RE(
-        _check_and_cache_values(motors_and_new_positions, min, 1000)
+        check_and_cache_values(motors_and_new_positions, min, 1000)
     ).plan_result  # type: ignore
     cached_positions = motors_and_positions.values()
 
@@ -156,7 +156,7 @@ def test_given_a_device_where_all_moves_too_small_when_check_and_cache_values_th
     motors_and_new_positions = {motor_obj: 0.0 for motor_obj in my_device.motors}
 
     motors_and_positions: dict[Motor, float] = RE(
-        _check_and_cache_values(motors_and_new_positions, 40, 1000)
+        check_and_cache_values(motors_and_new_positions, 40, 1000)
     ).plan_result  # type: ignore
     cached_positions = motors_and_positions.values()
 

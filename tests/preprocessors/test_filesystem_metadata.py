@@ -26,7 +26,7 @@ from dodal.common.visit import (
     LocalDirectoryServiceClient,
     StaticVisitPathProvider,
 )
-from dodal.plans.data_session_metadata import (
+from dodal.plan_stubs.data_session import (
     DATA_SESSION,
     attach_data_session_metadata_wrapper,
 )
