@@ -69,3 +69,10 @@ def test_given_oav_config_get_max_tip_distance_in_pixels(
     assert mock_parameters.get_max_tip_distance_in_pixels(
         microns_per_pixel_x
     ) == pytest.approx(189.873, abs=1e-3)
+
+
+def test_given_new_context_parameters_are_updated(mock_parameters: OAVParameters):
+    mock_parameters.update_context("xrayCentring")
+
+    assert mock_parameters.active_params.get("zoom") == 7.5
+    assert mock_parameters.active_params.get("brightness") == 80
