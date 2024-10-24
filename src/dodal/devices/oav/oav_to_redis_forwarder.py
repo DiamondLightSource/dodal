@@ -105,6 +105,9 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
     async def _get_frame_and_put_to_redis(
         self, redis_uuid: str, response: ClientResponse
     ):
+        """Stores the raw bytes of the jpeg image in redis. Murko ultimately wants a
+        pickled numpy array of pixel values but raw byes are more space efficient. There
+        may be better ways of doing this, see https://github.com/DiamondLightSource/mx-bluesky/issues/592"""
         jpeg_bytes = await get_next_jpeg(response)
         self.uuid_setter(redis_uuid)
         sample_id = await self.sample_id.get_value()
