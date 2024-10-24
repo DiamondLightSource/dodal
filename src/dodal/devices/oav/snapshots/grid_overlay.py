@@ -13,8 +13,8 @@ def _add_parallel_lines_to_image(
     image: Image.Image,
     start_x: int,
     start_y: int,
-    line_length: int,
-    spacing: int,
+    line_length: float,
+    spacing: float,
     num_lines: int,
     orientation=Orientation.horizontal,
 ):
@@ -31,8 +31,8 @@ def _add_parallel_lines_to_image(
         image (PIL.Image): The image to be drawn upon.
         start_x (int): The x coordinate (in pixels) of the start of the initial line.
         start_y (int): The y coordinate (in pixels) of the start of the initial line.
-        line_length (int): The length of each of the parallel lines in pixels.
-        spacing (int): The spacing, in pixels, between each parallel line. Strictly, \
+        line_length (float): The length of each of the parallel lines in pixels.
+        spacing (float): The spacing, in pixels, between each parallel line. Strictly, \
             there are spacing-1 pixels between each line
         num_lines (int): The total number of parallel lines to draw.
         orientation (Orientation): The orientation (horizontal or vertical) of the \
@@ -70,7 +70,7 @@ def add_grid_border_overlay_to_image(
     image: Image.Image,
     top_left_x: int,
     top_left_y: int,
-    box_width: int,
+    box_width: float,
     num_boxes_x: int,
     num_boxes_y: int,
 ):
@@ -96,7 +96,7 @@ def add_grid_overlay_to_image(
     image: Image.Image,
     top_left_x: int,
     top_left_y: int,
-    box_width: int,
+    box_width: float,
     num_boxes_x: int,
     num_boxes_y: int,
 ):
