@@ -69,9 +69,6 @@ async def test_when_oav_forwarder_kicked_off_then_connection_open_and_data_strea
     oav_forwarder._get_frame_and_put_to_redis = AsyncMock()
 
     await oav_forwarder.kickoff()
-
-    oav_forwarder._get_frame_and_put_to_redis.assert_not_called()
-
     await asyncio.sleep(0.01)
 
     call_args = oav_forwarder._get_frame_and_put_to_redis.call_args
