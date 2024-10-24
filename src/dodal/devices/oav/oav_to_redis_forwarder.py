@@ -2,6 +2,7 @@ import asyncio
 from collections.abc import Awaitable, Callable
 from datetime import timedelta
 from enum import Enum
+from uuid import uuid4
 
 from aiohttp import ClientResponse, ClientSession
 from bluesky.protocols import Flyable, Stoppable
@@ -135,8 +136,8 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
         done_status = AsyncStatus(
             asyncio.wait_for(self._stop_flag.wait(), timeout=self.TIMEOUT)
         )
-        async for image_uuid in observe_value(self.counter, done_status=done_status):
-            redis_uuid = f"{source.oav_name}-{image_uuid}"
+        async for frame_count in observe_value(self.counter, done_status=done_status):
+            redis_uuid = f"{source.oav_name}-{frame_count}-{uuid4()}"
             await self._get_frame_and_put_to_redis(redis_uuid, response)
 
     async def _confirm_mjpg_stream(self, response: ClientResponse, source: OAVSource):

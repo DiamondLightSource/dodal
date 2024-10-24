@@ -74,9 +74,10 @@ async def test_when_oav_forwarder_kicked_off_then_connection_open_and_data_strea
 
     await asyncio.sleep(0.01)
 
-    oav_forwarder._get_frame_and_put_to_redis.assert_called_with(
-        "fullscreen-0", mock_response
-    )
+    call_args = oav_forwarder._get_frame_and_put_to_redis.call_args
+
+    assert call_args[0][0].startswith("fullscreen-0")
+    assert call_args[0][1] == mock_response
 
     await oav_forwarder.complete()
 
@@ -178,7 +179,7 @@ async def test_when_different_sources_selected_then_different_uuids_used(
     await oav_forwarder.complete()
 
     redis_call = oav_forwarder.redis_client.hset.call_args[0]
-    assert redis_call[1] == f"{expected_uuid_prefix}-0"
+    assert redis_call[1].startswith(f"{expected_uuid_prefix}-0")
 
 
 @pytest.mark.parametrize(
@@ -200,5 +201,5 @@ async def test_oav_only_forwards_data_when_the_unique_id_updates(
     await asyncio.sleep(0.01)
     assert oav_forwarder.redis_client.hset.call_count == 2
     second_call = oav_forwarder.redis_client.hset.call_args_list[1][0]
-    assert second_call[1] == f"{expected_uuid_prefix}-1"
+    assert second_call[1].startswith(f"{expected_uuid_prefix}-1")
     await oav_forwarder.complete()
