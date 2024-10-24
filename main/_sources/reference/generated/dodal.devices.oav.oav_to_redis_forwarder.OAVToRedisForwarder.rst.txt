@@ -46,6 +46,9 @@ dodal.devices.oav.oav\_to\_redis\_forwarder.OAVToRedisForwarder
       ~OAVToRedisForwarder.DATA_EXPIRY_DAYS
       
       
+      ~OAVToRedisForwarder.TIMEOUT
+      
+      
       
       
       

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.robot &#8212; dodal 1.33.1.dev18+ge673dbfa9 documentation</title>
+    <title>dodal.devices.robot &#8212; dodal 1.33.1.dev19+gc89282aba documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
-    <script src="../../../_static/documentation_options.js?v=4a4db483"></script>
+    <script src="../../../_static/documentation_options.js?v=dadfa4ad"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -517,8 +517,8 @@ window.addEventListener("load", () => mermaid.run());
         <span class="bp">self</span><span class="o">.</span><span class="n">current_puck</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;CURRENT_PUCK_RBV&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">current_pin</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;CURRENT_PIN_RBV&quot;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">next_sample_id</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;NEXT_ID&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sample_id</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;CURRENT_ID_RBV&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">next_sample_id</span> <span class="o">=</span> <span class="n">epics_signal_rw_rbv</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;NEXT_ID&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_id</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;CURRENT_ID_RBV&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">load</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;LOAD.PROC&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">program_running</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PROGRAM_RUNNING&quot;</span><span class="p">)</span>
