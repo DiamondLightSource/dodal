@@ -25,9 +25,17 @@ from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("i22")
+IS_LAB = BL == "p38"
+LINKAM_IS_IN_LAB = False
 PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
+
+
+VISIT_PATH: Path = Path(
+    f"/dls/${'p38' if IS_LAB else 'i22'}/data/2024/cm37271-2/bluesky"
+)
+API_URL: str = f"http://{'p38' if IS_LAB else 'i22'}-control:8088/api"
 
 # Currently we must hard-code the visit, determining the visit at runtime requires
 # infrastructure that is still WIP.
@@ -37,14 +45,14 @@ set_utils_beamline(BL)
 set_path_provider(
     StaticVisitPathProvider(
         BL,
-        Path("/dls/i22/data/2024/cm37271-2/bluesky"),
-        client=RemoteDirectoryServiceClient("http://i22-control:8088/api"),
+        VISIT_PATH,
+        client=RemoteDirectoryServiceClient(API_URL),
     )
 )
 
 
 @device_factory()
-def saxs() -> PilatusDetector:
+def saxs() -> NXSasPilatus | NXSasOAV:
     metadata_holder = NXSasMetadataHolder(
         x_pixel_size=(1.72e-1, "mm"),
         y_pixel_size=(1.72e-1, "mm"),
@@ -54,6 +62,15 @@ def saxs() -> PilatusDetector:
         sensor_thickness=(0.45, "mm"),
         distance=(4711.833684146172, "mm"),
     )
+
+    if IS_LAB:
+        return NXSasOAV(
+            prefix=f"{PREFIX.beamline_prefix}-DI-DCAM-03:",
+            path_provider=get_path_provider(),
+            drv_suffix="DET:",
+            hdf_suffix=HDF5_PREFIX,
+            metadata_holder=metadata_holder,
+        )
     return NXSasPilatus(
         prefix=f"{PREFIX.beamline_prefix}-EA-PILAT-01:",
         path_provider=get_path_provider(),
@@ -63,13 +80,13 @@ def saxs() -> PilatusDetector:
     )
 
 
-@device_factory()
+@device_factory(mock=IS_LAB)
 def synchrotron() -> Synchrotron:
     return Synchrotron()
 
 
 @device_factory()
-def waxs() -> PilatusDetector:
+def waxs() -> PilatusDetector | AravisDetector:
     metadata_holder = NXSasMetadataHolder(
         x_pixel_size=(1.72e-1, "mm"),
         y_pixel_size=(1.72e-1, "mm"),
@@ -79,6 +96,13 @@ def waxs() -> PilatusDetector:
         sensor_thickness=(0.45, "mm"),
         distance=(175.4199417092314, "mm"),
     )
+    if IS_LAB:
+        return AravisDetector(
+            prefix=f"{PREFIX.beamline_prefix}-DI-DCAM-04:",
+            drv_suffix="DET:",
+            hdf_suffix=HDF5_PREFIX,
+            path_provider=get_path_provider(),
+        )
     return NXSasPilatus(
         prefix=f"{PREFIX.beamline_prefix}-EA-PILAT-03:",
         path_provider=get_path_provider(),
@@ -91,13 +115,20 @@ def waxs() -> PilatusDetector:
 @device_factory()
 def i0() -> TetrammDetector:
     return TetrammDetector(
-        prefix=f"{PREFIX.beamline_prefix}-EA-XBPM-02:",
+        prefix=f"{PREFIX.beamline_prefix}-EA-XBPM-0{1 if IS_LAB else 2}:",
         path_provider=get_path_provider(),
         type="Cividec Diamond XBPM",
     )
 
 
-@device_factory()
+#
+# The following devices are fake by default since P38 has no optics,
+# but having mock devices here means they will be reflected in downstream data
+# processing, where they may be required.
+#
+
+
+@device_factory(mock=IS_LAB)
 def it() -> TetrammDetector:
     return TetrammDetector(
         prefix=f"{PREFIX.beamline_prefix}-EA-TTRM-02:",
@@ -106,21 +137,21 @@ def it() -> TetrammDetector:
     )
 
 
-@device_factory()
+@device_factory(mock=IS_LAB)
 def vfm() -> FocusingMirror:
     return FocusingMirror(
         prefix=f"{PREFIX.beamline_prefix}-OP-KBM-01:VFM:",
     )
 
 
-@device_factory()
+@device_factory(mock=IS_LAB)
 def hfm() -> FocusingMirror:
     return FocusingMirror(
         prefix=f"{PREFIX.beamline_prefix}|-OP-KBM-01:HFM:",
     )
 
 
-@device_factory()
+@device_factory(mock=IS_LAB)
 def dcm() -> DoubleCrystalMonochromator:
     crystal_1_metadata = CrystalMetadata(
         usage="Bragg",
@@ -142,7 +173,7 @@ def dcm() -> DoubleCrystalMonochromator:
     )
 
 
-@device_factory()
+@device_factory(mock=IS_LAB)
 def undulator() -> Undulator:
     return Undulator(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
@@ -152,37 +183,37 @@ def undulator() -> Undulator:
     )
 
 
-@device_factory()
+@device_factory(mock=IS_LAB)
 def slits_1() -> Slits:
     return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-01:")
 
 
-@device_factory()
+@device_factory(mock=IS_LAB)
 def slits_2() -> Slits:
     return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-02:")
 
 
-@device_factory()
+@device_factory(mock=IS_LAB)
 def slits_3() -> Slits:
     return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-03:")
 
 
-@device_factory()
+@device_factory(mock=IS_LAB)
 def slits_4() -> Slits:
     return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-04:")
 
 
-@device_factory()
+@device_factory(mock=IS_LAB)
 def slits_5() -> Slits:
     return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-05:")
 
 
-@device_factory()
+@device_factory(mock=IS_LAB)
 def slits_6() -> Slits:
     return Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-06:")
 
 
-@device_factory()
+@device_factory(mock=IS_LAB)
 def fswitch() -> FSwitch:
     return FSwitch(
         prefix=f"{PREFIX.beamline_prefix}-MO-FSWT-01:",
@@ -194,7 +225,7 @@ def fswitch() -> FSwitch:
 
 # Must document what PandAs are physically connected to
 # See: https://github.com/bluesky/ophyd-async/issues/284
-@device_factory()
+@device_factory(skip=IS_LAB)
 def panda1() -> HDFPanda:
     return HDFPanda(
         prefix=f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
@@ -210,7 +241,7 @@ def panda2() -> HDFPanda:
     )
 
 
-@device_factory(skip=True)
+@device_factory(skip=IS_LAB)
 def panda3() -> HDFPanda:
     return HDFPanda(
         prefix=f"{PREFIX.beamline_prefix}-EA-PANDA-03:",
@@ -218,7 +249,7 @@ def panda3() -> HDFPanda:
     )
 
 
-@device_factory(skip=True)
+@device_factory(skip=IS_LAB)
 def panda4() -> HDFPanda:
     return HDFPanda(
         prefix=f"{PREFIX.beamline_prefix}-EA-PANDA-04:",
@@ -227,7 +258,14 @@ def panda4() -> HDFPanda:
 
 
 @device_factory()
-def oav() -> AravisDetector:
+def oav() -> AravisDetector | NXSasOAV:
+    if IS_LAB:
+        return AravisDetector(
+            prefix=f"{PREFIX.beamline_prefix}-DI-DCAM-01:",
+            drv_suffix="DET:",
+            hdf_suffix=HDF5_PREFIX,
+            path_provider=get_path_provider(),
+        )
     metadata_holder = NXSasMetadataHolder(
         x_pixel_size=(3.45e-3, "mm"),  # Double check this figure
         y_pixel_size=(3.45e-3, "mm"),
@@ -243,6 +281,8 @@ def oav() -> AravisDetector:
     )
 
 
-@device_factory()
+@device_factory(skip=IS_LAB != LINKAM_IS_IN_LAB)
 def linkam() -> Linkam3:
+    if IS_LAB:
+        return Linkam3(prefix=f"{PREFIX.beamline_prefix}-EA-LINKM-02")
     return Linkam3(prefix=f"{PREFIX.beamline_prefix}-EA-TEMPC-05")
