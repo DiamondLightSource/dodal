@@ -15,6 +15,11 @@ jobs:
     with:
       tox: pre-commit,type-checking
 
+  license_check:
+    needs: check
+    if: needs.check.outputs.branch-pr == ''
+    uses: ./.github/workflows/_license.yml
+
   test:
     needs: check
     if: needs.check.outputs.branch-pr == ''
