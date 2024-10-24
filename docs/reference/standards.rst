@@ -29,7 +29,7 @@ Supported Python Versions
 As a standard for the python versions to support, we should be matching the deprecation policy at 
 https://numpy.org/neps/nep-0029-deprecation_policy.html.
 
-Currently supported versions are: 3.10, 3.11.
+Currently supported versions are: 3.10, 3.11, 3.12. (As of the last edit of this document.)
 
 .. _documentation_standards:
 

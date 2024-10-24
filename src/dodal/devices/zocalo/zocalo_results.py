@@ -229,16 +229,19 @@ class ZocaloResults(StandardReadable, Triggerable):
                     source_of_second_results = source_from_results(
                         raw_results_two_sources[1]
                     )
+                    first_results = raw_results_two_sources[0]["results"]
+                    second_results = raw_results_two_sources[1]["results"]
 
-                    # Compare results from both sources and warn if they aren't the same
-                    differences_str = get_dict_differences(
-                        raw_results_two_sources[0]["results"][0],
-                        source_of_first_results,
-                        raw_results_two_sources[1]["results"][0],
-                        source_of_second_results,
-                    )
-                    if differences_str:
-                        LOGGER.warning(differences_str)
+                    if first_results and second_results:
+                        # Compare results from both sources and warn if they aren't the same
+                        differences_str = get_dict_differences(
+                            first_results[0],
+                            source_of_first_results,
+                            second_results[0],
+                            source_of_second_results,
+                        )
+                        if differences_str:
+                            LOGGER.warning(differences_str)
 
                     # Always use CPU results
                     raw_results = (

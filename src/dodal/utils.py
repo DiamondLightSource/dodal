@@ -118,7 +118,6 @@ class DeviceInitializationController(Generic[D]):
     def __init__(
         self,
         factory: Callable[[], D],
-        eager_connect: bool,
         use_factory_name: bool,
         timeout: float,
         mock: bool,
@@ -127,7 +126,6 @@ class DeviceInitializationController(Generic[D]):
         self._factory: Callable[[], D] = factory
         self._cached_device: D | None = None
         self._callbacks: list[Callable[[D], None]] = []
-        self._eager_connect = eager_connect
         self._use_factory_name = use_factory_name
         self._timeout = timeout
         self._mock = mock
@@ -147,7 +145,7 @@ class DeviceInitializationController(Generic[D]):
 
     def __call__(
         self,
-        connect_immediately: bool | None = None,
+        connect_immediately: bool = False,
         name: str | None = None,
         connection_timeout: float | None = None,
         mock: bool | None = None,
@@ -160,12 +158,11 @@ class DeviceInitializationController(Generic[D]):
 
 
         Args:
-            connect_immediately (bool | None, optional): whether to call connect on the
+            connect_immediately (bool, default False): whether to call connect on the
               device before returning it- connect is idempotent for ophyd-async devices.
               Not connecting to the device allows for the instance to be created prior
               to the RunEngine event loop being configured or for connect to be called
-              lazily e.g. by the `ensure_connected` stub. Defaults to None, which defers
-              to the eager_connect parameter of this Controller.
+              lazily e.g. by the `ensure_connected` stub.
             name (str | None, optional): an override name to give the device, which is
               also used to name its children. Defaults to None, which does not name the
               device unless the device has no name and this Controller is configured to
@@ -188,7 +185,7 @@ class DeviceInitializationController(Generic[D]):
         else:
             device = self._factory()
 
-        if connect_immediately or connect_immediately is None and self._eager_connect:
+        if connect_immediately:
             call_in_bluesky_event_loop(
                 device.connect(
                     timeout=connection_timeout
@@ -305,7 +302,10 @@ def invoke_factories(
             if isinstance(factory, DeviceInitializationController):
                 # replace with an arg
                 # https://github.com/DiamondLightSource/dodal/issues/844
-                devices[dependent_name] = factory(mock=kwargs.get("mock", False))
+                devices[dependent_name] = factory(
+                    mock=kwargs.get("mock", False)
+                    or kwargs.get("fake_with_ophyd_sim", False)
+                )
             else:
                 devices[dependent_name] = factory(**params, **kwargs)
         except Exception as e:

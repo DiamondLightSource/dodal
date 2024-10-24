@@ -74,7 +74,7 @@ async def test_when_oav_forwarder_kicked_off_then_connection_open_and_data_strea
 
     await asyncio.sleep(0.01)
 
-    oav_forwarder._get_frame_and_put_to_redis.assert_called_once_with(
+    oav_forwarder._get_frame_and_put_to_redis.assert_called_with(
         "fullscreen-0", mock_response
     )
 

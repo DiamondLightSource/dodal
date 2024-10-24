@@ -479,3 +479,18 @@ async def test_gpu_results_ignored_and_cpu_results_used_if_toggle_disabled(
             )
 
     RE(zocalo_plan())
+
+
+async def test_given_gpu_enabled_when_no_results_found_then_returns_no_results(
+    zocalo_results: ZocaloResults,
+):
+    zocalo_results.use_cpu_and_gpu = True
+    await zocalo_results.stage()
+    zocalo_results._raw_results_received.get = MagicMock(
+        side_effect=[
+            {"recipe_parameters": {"dcgid": 0, "dcid": 0, "gpu": True}, "results": []},
+            {"recipe_parameters": {"dcgid": 0, "dcid": 0}, "results": []},
+        ]
+    )
+    await zocalo_results.trigger()
+    assert len(await zocalo_results.centres_of_mass.get_value()) == 0
