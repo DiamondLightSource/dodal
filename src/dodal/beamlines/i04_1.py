@@ -3,7 +3,8 @@ from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beam
 from dodal.devices.backlight import Backlight
 from dodal.devices.detector import DetectorParams
 from dodal.devices.eiger import EigerDetector
-from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
+from dodal.devices.oav.oav_detector import OAV
+from dodal.devices.oav.oav_parameters import OAVConfig
 from dodal.devices.s4_slit_gaps import S4SlitGaps
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.undulator import Undulator
@@ -75,7 +76,7 @@ def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
         "",
         wait_for_connection,
         fake_with_ophyd_sim,
-        params=OAVConfigParams(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+        config=OAVConfig(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
     )
 
 

@@ -1,138 +1,88 @@
-import os
-import threading
 from abc import ABC, abstractmethod
 from io import BytesIO
 from pathlib import Path
 
-import requests
-from ophyd import Component, Device, DeviceStatus, EpicsSignal, EpicsSignalRO, Signal
-from PIL import Image, ImageDraw
+import aiofiles
+from aiohttp import ClientConnectionError, ClientSession
+from bluesky.protocols import Triggerable
+from ophyd_async.core import AsyncStatus, StandardReadable, soft_signal_rw
+from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
+from PIL import Image
 
-from dodal.devices.oav.oav_parameters import OAVConfigParams
 from dodal.log import LOGGER
 
 
-class MJPG(Device, ABC):
+class MJPG(StandardReadable, Triggerable, ABC):
     """The MJPG areadetector plugin creates an MJPG video stream of the camera's output.
 
     This devices uses that stream to grab images. When it is triggered it will send the
     latest image from the stream to the `post_processing` method for child classes to handle.
     """
 
-    filename = Component(Signal)
-    directory = Component(Signal)
-    last_saved_path = Component(Signal)
-    url = Component(EpicsSignal, "JPG_URL_RBV", string=True)
-    x_size = Component(EpicsSignalRO, "ArraySize1_RBV")
-    y_size = Component(EpicsSignalRO, "ArraySize2_RBV")
-    input_rbpv = Component(EpicsSignalRO, "NDArrayPort_RBV")
-    input_plugin = Component(EpicsSignal, "NDArrayPort")
+    def __init__(self, prefix: str, name: str = "") -> None:
+        self.filename = soft_signal_rw(str)
+        self.directory = soft_signal_rw(str)
+        self.last_saved_path = soft_signal_rw(str)
 
-    # scaling factors for the snapshot at the time it was triggered
-    microns_per_pixel_x = Component(Signal)
-    microns_per_pixel_y = Component(Signal)
+        self.url = epics_signal_rw(str, prefix + "JPG_URL_RBV")
 
-    oav_params: OAVConfigParams | None = None
+        self.x_size = epics_signal_r(int, prefix + "ArraySize1_RBV")
+        self.y_size = epics_signal_r(int, prefix + "ArraySize2_RBV")
 
-    KICKOFF_TIMEOUT: float = 30.0
+        # TODO check type of these two
+        self.input_rbpv = epics_signal_r(str, prefix + "NDArrayPort_RBV")
+        self.input_plugin = epics_signal_rw(str, prefix + "NDArrayPort")
 
-    def _save_image(self, image: Image.Image):
-        """A helper function to save a given image to the path supplied by the directory
-        and filename signals. The full resultant path is put on the last_saved_path signal
+        self.KICKOFF_TIMEOUT = 30.0
+
+        super().__init__(name)
+
+    async def _save_image(self, image: Image.Image):
+        """A helper function to save a given image to the path supplied by the \
+            directory and filename signals. The full resultant path is put on the \
+            last_saved_path signal
         """
-        filename_str = self.filename.get()
-        directory_str: str = self.directory.get()  # type: ignore
+        filename_str = await self.filename.get_value()
+        directory_str = await self.directory.get_value()
 
         path = Path(f"{directory_str}/{filename_str}.png").as_posix()
-        if not os.path.isdir(Path(directory_str)):
+        if not Path(directory_str).is_dir():
             LOGGER.info(f"Snapshot folder {directory_str} does not exist, creating...")
-            os.mkdir(directory_str)
+            Path(directory_str).mkdir(parents=True)
 
         LOGGER.info(f"Saving image to {path}")
-        image.save(path)
-        self.last_saved_path.put(path)
 
-    def trigger(self):
+        buffer = BytesIO()
+        image.save(buffer, format="png")
+        async with aiofiles.open(path, "wb") as fh:
+            await fh.write(buffer.getbuffer())
+        await self.last_saved_path.set(path, wait=True)
+
+    @AsyncStatus.wrap
+    async def trigger(self):
         """This takes a snapshot image from the MJPG stream and send it to the
         post_processing method, expected to be implemented by a child of this class.
 
         It is the responsibility of the child class to save any resulting images.
         """
-        st = DeviceStatus(device=self, timeout=self.KICKOFF_TIMEOUT)
-        url_str = self.url.get()
+        url_str = await self.url.get_value()
 
-        assert isinstance(
-            self.oav_params, OAVConfigParams
-        ), "MJPG does not have valid OAV parameters"
-        self.microns_per_pixel_x.set(self.oav_params.micronsPerXPixel)
-        self.microns_per_pixel_y.set(self.oav_params.micronsPerYPixel)
-
-        def get_snapshot():
-            try:
-                response = requests.get(url_str, stream=True)
-                response.raise_for_status()
-                with Image.open(BytesIO(response.content)) as image:
-                    self.post_processing(image)
-                    st.set_finished()
-            except requests.HTTPError as e:
-                st.set_exception(e)
-
-        threading.Thread(target=get_snapshot, daemon=True).start()
-
-        return st
+        async with ClientSession() as session:
+            async with session.get(url_str) as response:
+                if not response.ok:
+                    LOGGER.error(
+                        f"OAV responded with {response.status}: {response.reason}."
+                    )
+                    raise ClientConnectionError(
+                        f"OAV responded with {response.status}: {response.reason}."
+                    )
+                try:
+                    data = await response.read()
+                    with Image.open(BytesIO(data)) as image:
+                        await self.post_processing(image)
+                except Exception as e:
+                    LOGGER.warning(f"Failed to create snapshot. \n {e}")
 
     @abstractmethod
-    def post_processing(self, image: Image.Image):
+    async def post_processing(self, image: Image.Image):
         pass
-
-
-class SnapshotWithBeamCentre(MJPG):
-    """A child of MJPG which, when triggered, draws an outlined crosshair at the beam
-    centre in the image and saves the image to disk."""
-
-    CROSSHAIR_LENGTH_PX = 20
-    CROSSHAIR_OUTLINE_COLOUR = "Black"
-    CROSSHAIR_FILL_COLOUR = "White"
-
-    def post_processing(self, image: Image.Image):
-        assert (
-            self.oav_params is not None
-        ), "Snapshot device does not have valid OAV parameters"
-        beam_x = self.oav_params.beam_centre_i
-        beam_y = self.oav_params.beam_centre_j
-
-        SnapshotWithBeamCentre.draw_crosshair(image, beam_x, beam_y)
-
-        self._save_image(image)
-
-    @classmethod
-    def draw_crosshair(cls, image: Image.Image, beam_x: int, beam_y: int):
-        draw = ImageDraw.Draw(image)
-        OUTLINE_WIDTH = 1
-        HALF_LEN = cls.CROSSHAIR_LENGTH_PX / 2
-        draw.rectangle(
-            [
-                beam_x - OUTLINE_WIDTH,
-                beam_y - HALF_LEN - OUTLINE_WIDTH,
-                beam_x + OUTLINE_WIDTH,
-                beam_y + HALF_LEN + OUTLINE_WIDTH,
-            ],
-            fill=cls.CROSSHAIR_OUTLINE_COLOUR,
-        )
-        draw.rectangle(
-            [
-                beam_x - HALF_LEN - OUTLINE_WIDTH,
-                beam_y - OUTLINE_WIDTH,
-                beam_x + HALF_LEN + OUTLINE_WIDTH,
-                beam_y + OUTLINE_WIDTH,
-            ],
-            fill=cls.CROSSHAIR_OUTLINE_COLOUR,
-        )
-        draw.line(
-            ((beam_x, beam_y - HALF_LEN), (beam_x, beam_y + HALF_LEN)),
-            fill=cls.CROSSHAIR_FILL_COLOUR,
-        )
-        draw.line(
-            ((beam_x - HALF_LEN, beam_y), (beam_x + HALF_LEN, beam_y)),
-            fill=cls.CROSSHAIR_FILL_COLOUR,
-        )
