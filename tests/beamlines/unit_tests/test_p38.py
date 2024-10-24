@@ -11,7 +11,7 @@ from dodal.beamlines import i22
 
 def test_devices_diff_when_in_lab():
     beamline_utils.clear_devices()
-    saxs = i22.saxs(wait_for_connection=False, fake_with_ophyd_sim=True)
+    saxs = i22.saxs()
     assert saxs.__class__ == NXSasOAV, f"Expected NXSasOav, got {saxs.__class__}"
 
 
@@ -28,5 +28,4 @@ def test_device_creation(RE, module_and_devices_for_beamline):
     saxs: NXSasOAV = devices["saxs"]  # type: ignore
 
     print(saxs)
-    assert saxs.prefix == "BL24I-MO-VGON-01:"
-    assert saxs.kappa.prefix == "BL24I-MO-VGON-01:KAPPA"
+    assert saxs.drv.trigger_mode.name == "BL22I-DI-DICAM-03:DET:TriggerMode"
