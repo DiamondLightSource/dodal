@@ -345,7 +345,11 @@ def zebra(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -
 
 
 @skip_device(lambda: BL == "s04")
-def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> OAV:
+def oav(
+    wait_for_connection: bool = True,
+    fake_with_ophyd_sim: bool = False,
+    params: OAVConfig | None = None,
+) -> OAV:
     """Get the i04 OAV device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
@@ -355,7 +359,7 @@ def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
         "",
         wait_for_connection,
         fake_with_ophyd_sim,
-        config=OAVConfig(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+        config=params or OAVConfig(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
     )
 
 
