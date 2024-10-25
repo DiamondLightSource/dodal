@@ -50,11 +50,12 @@ class DCM(StandardReadable):
                 str, initial_value=crystal_metadata.type
             )
             self.crystal_metadata_reflection, _ = soft_signal_r_and_setter(
-                Sequence[int], initial_value=list(crystal_metadata.reflection)
+                Sequence[int],
+                initial_value=list(crystal_metadata.reflection),  # type: ignore
             )
             self.crystal_metadata_d_spacing, _ = soft_signal_r_and_setter(
                 float,
-                initial_value=crystal_metadata.d_spacing[0],
-                units=crystal_metadata.d_spacing[1],
+                initial_value=crystal_metadata.d_spacing[0],  # type: ignore
+                units=crystal_metadata.d_spacing[1],  # type: ignore
             )
         super().__init__(name)
