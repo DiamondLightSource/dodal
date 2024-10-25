@@ -13,6 +13,7 @@ from dodal.devices.i10.i10_apple2 import (
     I10Apple2Pol,
     LinearArbitraryAngle,
 )
+from dodal.devices.i10.i10_current_amp import RasorFemto
 from dodal.devices.i10.i10_setting_data import I10Grating
 from dodal.devices.pgm import PGM
 from dodal.log import set_beamline as set_log_beamline
@@ -254,4 +255,20 @@ def idd_la_angle(
         name="idd_la_angle",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
+    )
+
+
+"Raosr devices"
+
+
+def rasor_femto(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> RasorFemto:
+    return device_instantiation(
+        device_factory=RasorFemto,
+        name="rasor_femto",
+        prefix="ME01D-EA-IAMP",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+        bl_prefix=False,
     )
