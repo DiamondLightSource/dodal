@@ -92,7 +92,7 @@ def test_cli_connect_when_devices_error(
         _mock_connect(
             EXAMPLE_BEAMLINE,
             runner=runner,
-            devices=SOME_SUCCESSFUL_DEVICES,
+            devices=devices,
         )
 
 
