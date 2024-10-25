@@ -49,7 +49,7 @@ def inject(name: str) -> Any:  # type: ignore
         from bluesky.utils import MsgGenerator
         from dodal.beamlines import i22
 
-        def my_plan(detector: Readable = i22.saxs()) -> MsgGenerator:
+        def my_plan(detector: Readable = i22.saxs(connect_immediately=False)) -> MsgGenerator:
             ...
 
         Where previously the default would have been inject("saxs")

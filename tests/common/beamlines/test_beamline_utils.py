@@ -151,7 +151,7 @@ def dummy_mirror() -> FocusingMirror:
 
 
 def test_device_controller_names():
-    @beamline_utils.device_factory()
+    @beamline_utils.device_factory(eager_connect=False)
     def device() -> FocusingMirror:
         return dummy_mirror()
 
@@ -167,12 +167,7 @@ def test_device_controller_connect(RE):
 
     mirror = device()
     assert mirror.name == "device"
-    assert isinstance(mirror.connect, AsyncMock)
-    assert mirror.connect.call_count == 0
-
-    mirror2 = device(connect_immediately=True)
-    assert mirror is mirror2
-    assert mirror.connect.call_count == 1
+    assert mirror.connect.call_count == 1  # type: ignore
 
 
 def test_skip(RE):

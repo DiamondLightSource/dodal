@@ -14,11 +14,11 @@ class ReadableDevice(Readable, Device):
         return {}
 
 
-@device_factory(skip=True)
+@device_factory(skip=True, eager_connect=False)
 def device_a() -> ReadableDevice:
     return ReadableDevice("readable")
 
 
-@device_factory(skip=lambda: True)
+@device_factory(skip=lambda: True, eager_connect=False)
 def device_c() -> CryoStream:
     return CryoStream("FOO:")
