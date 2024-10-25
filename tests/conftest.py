@@ -31,9 +31,11 @@ mock_paths = [
     ("DAQ_CONFIGURATION_PATH", MOCK_DAQ_CONFIG_PATH),
     ("ZOOM_PARAMS_FILE", "tests/devices/unit_tests/test_jCameraManZoomLevels.xml"),
     ("DISPLAY_CONFIG", "tests/devices/unit_tests/test_display.configuration"),
+    ("LOOK_UPTABLE_DIR", "tests/devices/i10/lookupTables/"),
 ]
 mock_attributes_table = {
     "i03": mock_paths,
+    "i10": mock_paths,
     "s03": mock_paths,
     "i04": mock_paths,
     "s04": mock_paths,
