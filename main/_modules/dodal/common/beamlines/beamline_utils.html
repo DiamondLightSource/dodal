@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.common.beamlines.beamline_utils &#8212; dodal 1.33.1.dev19+gc89282aba documentation</title>
+    <title>dodal.common.beamlines.beamline_utils &#8212; dodal 1.33.1.dev20+gfe6ab477e documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
-    <script src="../../../../_static/documentation_options.js?v=dadfa4ad"></script>
+    <script src="../../../../_static/documentation_options.js?v=1da2fc7c"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -446,24 +446,16 @@ window.addEventListener("load", () => mermaid.run());
   <h1>Source code for dodal.common.beamlines.beamline_utils</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Callable</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Annotated</span><span class="p">,</span> <span class="n">Final</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Final</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">cast</span>
 
 <span class="kn">from</span> <span class="nn">bluesky.run_engine</span> <span class="kn">import</span> <span class="n">call_in_bluesky_event_loop</span>
 <span class="kn">from</span> <span class="nn">ophyd</span> <span class="kn">import</span> <span class="n">Device</span> <span class="k">as</span> <span class="n">OphydV1Device</span>
 <span class="kn">from</span> <span class="nn">ophyd.sim</span> <span class="kn">import</span> <span class="n">make_fake_device</span>
-<span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="n">DEFAULT_TIMEOUT</span>
 <span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="n">Device</span> <span class="k">as</span> <span class="n">OphydV2Device</span>
 <span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="n">wait_for_connection</span> <span class="k">as</span> <span class="n">v2_device_wait_for_connection</span>
 
 <span class="kn">from</span> <span class="nn">dodal.common.types</span> <span class="kn">import</span> <span class="n">UpdatingPathProvider</span>
-<span class="kn">from</span> <span class="nn">dodal.utils</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AnyDevice</span><span class="p">,</span>
-    <span class="n">BeamlinePrefix</span><span class="p">,</span>
-    <span class="n">D</span><span class="p">,</span>
-    <span class="n">DeviceInitializationController</span><span class="p">,</span>
-    <span class="n">SkipType</span><span class="p">,</span>
-    <span class="n">skip_device</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">dodal.utils</span> <span class="kn">import</span> <span class="n">AnyDevice</span><span class="p">,</span> <span class="n">BeamlinePrefix</span><span class="p">,</span> <span class="n">skip_device</span>
 
 <span class="n">DEFAULT_CONNECTION_TIMEOUT</span><span class="p">:</span> <span class="n">Final</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">5.0</span>
 
@@ -597,36 +589,6 @@ window.addEventListener("load", () => mermaid.run());
     <span class="k">if</span> <span class="n">post_create</span><span class="p">:</span>
         <span class="n">post_create</span><span class="p">(</span><span class="n">device_instance</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">device_instance</span></div>
-
-
-
-<span class="k">def</span> <span class="nf">_cache_device</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">OphydV2Device</span><span class="p">],</span> <span class="kc">None</span><span class="p">]:</span>
-    <span class="k">def</span> <span class="nf">cache_device</span><span class="p">(</span><span class="n">device</span><span class="p">:</span> <span class="n">OphydV2Device</span><span class="p">):</span>
-        <span class="n">ACTIVE_DEVICES</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">device</span>
-
-    <span class="k">return</span> <span class="n">cache_device</span>
-
-
-<div class="viewcode-block" id="device_factory">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.common.beamlines.beamline_utils.html#dodal.common.beamlines.beamline_utils.device_factory">[docs]</a>
-<span class="k">def</span> <span class="nf">device_factory</span><span class="p">(</span>
-    <span class="o">*</span><span class="p">,</span>
-    <span class="n">use_factory_name</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="s2">&quot;Use factory name as name of device&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="n">timeout</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;Timeout for connecting to the device&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">DEFAULT_TIMEOUT</span><span class="p">,</span>
-    <span class="n">mock</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="s2">&quot;Use Signals with mock backends for device&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">skip</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span>
-        <span class="n">SkipType</span><span class="p">,</span>
-        <span class="s2">&quot;mark the factory to be (conditionally) skipped when beamline is imported by external program&quot;</span><span class="p">,</span>
-    <span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Callable</span><span class="p">[[],</span> <span class="n">D</span><span class="p">]],</span> <span class="n">DeviceInitializationController</span><span class="p">[</span><span class="n">D</span><span class="p">]]:</span>
-    <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">factory</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">D</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">DeviceInitializationController</span><span class="p">[</span><span class="n">D</span><span class="p">]:</span>
-        <span class="n">controller</span> <span class="o">=</span> <span class="n">DeviceInitializationController</span><span class="p">(</span>
-            <span class="n">factory</span><span class="p">,</span> <span class="n">use_factory_name</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">mock</span><span class="p">,</span> <span class="n">skip</span>
-        <span class="p">)</span>
-        <span class="n">controller</span><span class="o">.</span><span class="n">add_callback</span><span class="p">(</span><span class="n">_cache_device</span><span class="p">(</span><span class="n">factory</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">controller</span>
-
-    <span class="k">return</span> <span class="n">decorator</span></div>
 
 
 

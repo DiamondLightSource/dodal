@@ -27,7 +27,6 @@ dodal.common.beamlines.beamline\_utils
       active_device_is_same_type
       clear_device
       clear_devices
-      device_factory
       device_instantiation
       get_path_provider
       list_active_devices

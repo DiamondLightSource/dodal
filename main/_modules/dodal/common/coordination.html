@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.common.coordination &#8212; dodal 1.33.1.dev19+gc89282aba documentation</title>
+    <title>dodal.common.coordination &#8212; dodal 1.33.1.dev20+gfe6ab477e documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
-    <script src="../../../_static/documentation_options.js?v=dadfa4ad"></script>
+    <script src="../../../_static/documentation_options.js?v=1da2fc7c"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -445,8 +445,6 @@ window.addEventListener("load", () => mermaid.run());
                   
   <h1>Source code for dodal.common.coordination</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">uuid</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">textwrap</span> <span class="kn">import</span> <span class="n">dedent</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
 
 <span class="kn">from</span> <span class="nn">dodal.common.types</span> <span class="kn">import</span> <span class="n">Group</span>
@@ -490,24 +488,6 @@ window.addEventListener("load", () => mermaid.run());
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-        <span class="n">dedent</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">        Inject is deprecated, users are now expected to call the device factory</span>
-<span class="s2">        functions in dodal directly, these will cache devices as singletons after</span>
-<span class="s2">        they have been called once. For example:</span>
-
-<span class="s2">        from bluesky.protocols import Readable</span>
-<span class="s2">        from bluesky.utils import MsgGenerator</span>
-<span class="s2">        from dodal.beamlines import i22</span>
-
-<span class="s2">        def my_plan(detector: Readable = i22.saxs()) -&gt; MsgGenerator:</span>
-<span class="s2">            ...</span>
-
-<span class="s2">        Where previously the default would have been inject(&quot;saxs&quot;)</span>
-<span class="s2">        &quot;&quot;&quot;</span><span class="p">),</span>
-        <span class="ne">DeprecationWarning</span><span class="p">,</span>
-        <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-    <span class="p">)</span>
     <span class="k">return</span> <span class="n">name</span></div>
 
 </pre></div>
