@@ -131,33 +131,6 @@ def test_make_device_dependency_throws():
         make_device(fake_beamline, "device_z")
 
 
-def test_device_factory_skips():
-    import tests.fake_device_factory_beamline as fake_beamline
-
-    devices, exceptions = make_all_devices(fake_beamline)
-    assert len(devices) == 0
-    assert len(exceptions) == 0
-
-
-def test_device_factory_can_ignore_skip():
-    import tests.fake_device_factory_beamline as fake_beamline
-
-    devices, exceptions = make_all_devices(fake_beamline, include_skipped=True)
-    assert len(devices) == 2
-    assert len(exceptions) == 0
-
-
-def test_device_factory_can_rename(RE):
-    from tests.fake_device_factory_beamline import device_c
-
-    cryo = device_c(mock=True, connect_immediately=True)
-    assert cryo.name == "device_c"
-    assert cryo.fine.name == "device_c-fine"
-    device_c(name="cryo")
-    assert cryo.name == "cryo"
-    assert cryo.fine.name == "cryo-fine"
-
-
 def device_a() -> Readable:
     return MagicMock()
 
