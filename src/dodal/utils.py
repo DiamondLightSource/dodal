@@ -305,10 +305,7 @@ def invoke_factories(
             if isinstance(factory, DeviceInitializationController):
                 # replace with an arg
                 # https://github.com/DiamondLightSource/dodal/issues/844
-                devices[dependent_name] = factory(
-                    mock=kwargs.get("mock", False)
-                    or kwargs.get("fake_with_ophyd_sim", False)
-                )
+                devices[dependent_name] = factory(mock=kwargs.get("mock", False))
             else:
                 devices[dependent_name] = factory(**params, **kwargs)
         except Exception as e:
