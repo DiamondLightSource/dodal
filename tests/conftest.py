@@ -31,9 +31,11 @@ mock_paths = [
     ("DAQ_CONFIGURATION_PATH", MOCK_DAQ_CONFIG_PATH),
     ("ZOOM_PARAMS_FILE", "tests/devices/unit_tests/test_jCameraManZoomLevels.xml"),
     ("DISPLAY_CONFIG", "tests/devices/unit_tests/test_display.configuration"),
+    ("LOOK_UPTABLE_DIR", "tests/devices/i10/lookupTables/"),
 ]
 mock_attributes_table = {
     "i03": mock_paths,
+    "i10": mock_paths,
     "s03": mock_paths,
     "i04": mock_paths,
     "s04": mock_paths,
@@ -88,12 +90,12 @@ def module_and_devices_for_beamline(request):
         bl_mod = importlib.import_module("dodal.beamlines." + beamline)
         importlib.reload(bl_mod)
         mock_beamline_module_filepaths(beamline, bl_mod)
-        devices, _ = make_all_devices(
+        devices, exceptions = make_all_devices(
             bl_mod,
             include_skipped=True,
             fake_with_ophyd_sim=True,
         )
-        yield (bl_mod, devices)
+        yield (bl_mod, devices, exceptions)
         beamline_utils.clear_devices()
         del bl_mod
 
