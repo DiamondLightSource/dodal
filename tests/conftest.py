@@ -17,7 +17,7 @@ from ophyd_async.core import (
     PathProvider,
 )
 
-from dodal.common.beamlines import beamline_utils
+from dodal.common.beamlines import beamline_parameters, beamline_utils
 from dodal.common.visit import (
     DirectoryServiceClient,
     LocalDirectoryServiceClient,
@@ -37,7 +37,28 @@ mock_attributes_table = {
     "s03": mock_paths,
     "i04": mock_paths,
     "s04": mock_paths,
+    "i24": mock_paths,
 }
+
+BANNED_PATHS = [Path("/dls"), Path("/dls_sw")]
+
+
+@pytest.fixture(autouse=True)
+def patch_open_to_prevent_dls_reads_in_tests():
+    unpatched_open = open
+
+    def patched_open(*args, **kwargs):
+        requested_path = Path(args[0])
+        if requested_path.is_absolute():
+            for p in BANNED_PATHS:
+                assert not requested_path.is_relative_to(
+                    p
+                ), f"Attempt to open {requested_path} from inside a unit test"
+        return unpatched_open(*args, **kwargs)
+
+    with patch("builtins.open", side_effect=patched_open):
+        yield []
+
 
 # Prevent pytest from catching exceptions when debugging in vscode so that break on
 # exception works correctly (see: https://github.com/pytest-dev/pytest/issues/7409)
@@ -55,6 +76,9 @@ if os.getenv("PYTEST_RAISE", "0") == "1":
 def mock_beamline_module_filepaths(bl_name, bl_module):
     if mock_attributes := mock_attributes_table.get(bl_name):
         [bl_module.__setattr__(attr[0], attr[1]) for attr in mock_attributes]
+        beamline_parameters.BEAMLINE_PARAMETER_PATHS[bl_name] = (
+            "tests/test_data/i04_beamlineParameters"
+        )
 
 
 @pytest.fixture(scope="function")
