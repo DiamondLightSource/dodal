@@ -14,6 +14,13 @@ from dodal.log import LOGGER
 IMG_FORMAT = "png"
 
 
+async def asyncio_save_image(image: Image.Image, path: str):
+    buffer = BytesIO()
+    image.save(buffer, format=IMG_FORMAT)
+    async with aiofiles.open(path, "wb") as fh:
+        await fh.write(buffer.getbuffer())
+
+
 class MJPG(StandardReadable, Triggerable, ABC):
     """The MJPG areadetector plugin creates an MJPG video stream of the camera's output.
 
@@ -50,10 +57,8 @@ class MJPG(StandardReadable, Triggerable, ABC):
 
         LOGGER.info(f"Saving image to {path}")
 
-        buffer = BytesIO()
-        image.save(buffer, format=IMG_FORMAT)
-        async with aiofiles.open(path, "wb") as fh:
-            await fh.write(buffer.getbuffer())
+        await asyncio_save_image(image, path)
+
         await self.last_saved_path.set(path, wait=True)
 
     @AsyncStatus.wrap

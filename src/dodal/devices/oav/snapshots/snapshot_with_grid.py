@@ -1,11 +1,9 @@
-from io import BytesIO
 from os.path import join as path_join
 
-import aiofiles
 from ophyd_async.core import soft_signal_rw
 from PIL.Image import Image
 
-from dodal.devices.areadetector.plugins.MJPG import MJPG
+from dodal.devices.areadetector.plugins.MJPG import MJPG, asyncio_save_image
 from dodal.devices.oav.snapshots.grid_overlay import (
     add_grid_border_overlay_to_image,
     add_grid_overlay_to_image,
@@ -25,12 +23,6 @@ class SnapshotWithGrid(MJPG):
         self.last_path_full_overlay = soft_signal_rw(str)
 
         super().__init__(prefix, name)
-
-    async def _save_grid_to_image(self, image: Image, path: str):
-        buffer = BytesIO()
-        image.save(buffer, format="png")
-        async with aiofiles.open(path, "wb") as fh:
-            await fh.write(buffer.getbuffer())
 
     async def post_processing(self, image: Image):
         # Save an unmodified image with no suffix
@@ -52,7 +44,7 @@ class SnapshotWithGrid(MJPG):
         path = path_join(directory_str, f"{filename_str}_outer_overlay.png")
         await self.last_path_outer.set(path, wait=True)
         LOGGER.info(f"Saving grid outer edge at {path}")
-        await self._save_grid_to_image(image, path)
+        await asyncio_save_image(image, path)
 
         add_grid_overlay_to_image(
             image, top_left_x, top_left_y, box_witdh, num_boxes_x, num_boxes_y
@@ -61,4 +53,4 @@ class SnapshotWithGrid(MJPG):
         path = path_join(directory_str, f"{filename_str}_grid_overlay.png")
         await self.last_path_full_overlay.set(path, wait=True)
         LOGGER.info(f"Saving full grid overlay at {path}")
-        await self._save_grid_to_image(image, path)
+        await asyncio_save_image(image, path)

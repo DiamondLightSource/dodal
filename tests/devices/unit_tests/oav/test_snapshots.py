@@ -9,7 +9,10 @@ from dodal.devices.oav.snapshots.snapshot_with_beam_centre import (
     SnapshotWithBeamCentre,
     draw_crosshair,
 )
-from dodal.devices.oav.snapshots.snapshot_with_grid import SnapshotWithGrid
+from dodal.devices.oav.snapshots.snapshot_with_grid import (
+    SnapshotWithGrid,
+    asyncio_save_image,
+)
 
 
 def create_and_set_mock_signal_r(dtype, name, value):
@@ -125,12 +128,18 @@ def test_snapshot_draws_expected_crosshair(tmp_path: Path):
     "dodal.devices.oav.snapshots.snapshot_with_grid.add_grid_border_overlay_to_image"
 )
 @patch("dodal.devices.oav.snapshots.snapshot_with_grid.add_grid_overlay_to_image")
+@patch("dodal.devices.oav.snapshots.snapshot_with_grid.asyncio_save_image")
 @patch(
     "dodal.devices.areadetector.plugins.MJPG.ClientSession.get",
     autospec=True,
 )
 async def test_snapshot_with_grid_triggered_saves_image_and_draws_correct_grid(
-    mock_get, patch_add_grid, patch_add_border, patch_image, grid_snapshot
+    mock_get,
+    mock_save_grid,
+    patch_add_grid,
+    patch_add_border,
+    patch_image,
+    grid_snapshot,
 ):
     mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
     mock_response.ok = True
@@ -140,7 +149,6 @@ async def test_snapshot_with_grid_triggered_saves_image_and_draws_correct_grid(
     mock_open.return_value.__aenter__.return_value = test_data
 
     grid_snapshot._save_image = (mock_save := AsyncMock())
-    grid_snapshot._save_grid_to_image = (mock_save_grid := AsyncMock())
 
     await grid_snapshot.trigger()
 
@@ -166,14 +174,14 @@ async def test_snapshot_with_grid_triggered_saves_image_and_draws_correct_grid(
     )
 
 
-@patch("dodal.devices.oav.snapshots.snapshot_with_grid.Image")
-@patch("dodal.devices.oav.snapshots.snapshot_with_grid.aiofiles", autospec=True)
-async def test_save_grid_to_image(mock_aiofiles, patch_image, grid_snapshot):
+@patch("dodal.devices.areadetector.plugins.MJPG.Image")
+@patch("dodal.devices.areadetector.plugins.MJPG.aiofiles", autospec=True)
+async def test_asyncio_save_image(mock_aiofiles, patch_image):
     mock_aio_open = mock_aiofiles.open
     mock_aio_open.return_value.__aenter__.return_value = (mock_file := AsyncMock())
 
     test_path = MagicMock(return_value="some_path/test_grid.png")
-    await grid_snapshot._save_grid_to_image(patch_image, test_path)
+    await asyncio_save_image(patch_image, test_path)
 
     patch_image.save.assert_called_once()
     mock_aio_open.assert_called_once_with(test_path, "wb")
