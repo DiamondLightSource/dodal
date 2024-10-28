@@ -8,8 +8,8 @@ from dodal.devices.oav.oav_detector import (
     OAV,
     Cam,
     ZoomController,
+    ZoomLevelNotFoundError,
 )
-from dodal.devices.oav.oav_errors import OAVError_ZoomLevelNotFound
 
 
 async def test_zoom_controller():
@@ -26,7 +26,7 @@ async def test_zoom_controller_set_raises_error_for_wrong_level():
     zoom_controller = ZoomController("", "fake zoom controller")
     await zoom_controller.connect(mock=True)
     zoom_controller._get_allowed_zoom_levels = AsyncMock(return_value=["1.0x", "3.0x"])
-    with pytest.raises(OAVError_ZoomLevelNotFound):
+    with pytest.raises(ZoomLevelNotFoundError):
         await zoom_controller.set("5.0x")
 
 
