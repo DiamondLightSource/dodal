@@ -11,6 +11,8 @@ from PIL import Image
 
 from dodal.log import LOGGER
 
+IMG_FORMAT = "png"
+
 
 class MJPG(StandardReadable, Triggerable, ABC):
     """The MJPG areadetector plugin creates an MJPG video stream of the camera's output.
@@ -41,7 +43,7 @@ class MJPG(StandardReadable, Triggerable, ABC):
         filename_str = await self.filename.get_value()
         directory_str = await self.directory.get_value()
 
-        path = Path(f"{directory_str}/{filename_str}.png").as_posix()
+        path = Path(f"{directory_str}/{filename_str}.{IMG_FORMAT}").as_posix()
         if not Path(directory_str).is_dir():
             LOGGER.info(f"Snapshot folder {directory_str} does not exist, creating...")
             Path(directory_str).mkdir(parents=True)
@@ -49,7 +51,7 @@ class MJPG(StandardReadable, Triggerable, ABC):
         LOGGER.info(f"Saving image to {path}")
 
         buffer = BytesIO()
-        image.save(buffer, format="png")
+        image.save(buffer, format=IMG_FORMAT)
         async with aiofiles.open(path, "wb") as fh:
             await fh.write(buffer.getbuffer())
         await self.last_saved_path.set(path, wait=True)
