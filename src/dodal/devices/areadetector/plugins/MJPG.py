@@ -59,7 +59,8 @@ class MJPG(StandardReadable, Triggerable, ABC):
         """This takes a snapshot image from the MJPG stream and send it to the
         post_processing method, expected to be implemented by a child of this class.
 
-        It is the responsibility of the child class to save any resulting images.
+        It is the responsibility of the child class to save any resulting images by \
+        calling _save_image.
         """
         url_str = await self.url.get_value()
 
@@ -72,12 +73,9 @@ class MJPG(StandardReadable, Triggerable, ABC):
                     raise ClientConnectionError(
                         f"OAV responded with {response.status}: {response.reason}."
                     )
-                try:
-                    data = await response.read()
-                    with Image.open(BytesIO(data)) as image:
-                        await self.post_processing(image)
-                except Exception as e:
-                    LOGGER.warning(f"Failed to create snapshot. \n {e}")
+                data = await response.read()
+                with Image.open(BytesIO(data)) as image:
+                    await self.post_processing(image)
 
     @abstractmethod
     async def post_processing(self, image: Image.Image):

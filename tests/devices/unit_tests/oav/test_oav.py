@@ -138,22 +138,3 @@ async def test_snapshot_trigger_handles_bad_request_status(mock_get, oav: OAV):
 
     with pytest.raises(aiohttp.ClientConnectionError):
         await oav.grid_snapshot.trigger()
-
-
-@patch(
-    "dodal.devices.areadetector.plugins.MJPG.ClientSession.get",
-    autospec=True,
-)
-@patch("dodal.devices.areadetector.plugins.MJPG.Image")
-async def test_snapshot_trigger_fails_in_post_processing_withouth_raising_error(
-    patch_image, mock_get, oav: OAV
-):
-    mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
-    mock_response.ok = True
-    mock_response.read.return_value = "invalid read"
-
-    mock_open = patch_image.open
-
-    await oav.snapshot.trigger()
-
-    mock_open.assert_not_called()
