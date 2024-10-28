@@ -15,8 +15,6 @@ from dodal.log import LOGGER
 
 class SnapshotWithGrid(MJPG):
     def __init__(self, prefix: str, name: str = "") -> None:
-        super().__init__(prefix, name)
-
         self.top_left_x = soft_signal_rw(int)
         self.top_left_y = soft_signal_rw(int)
         self.box_width = soft_signal_rw(int)
@@ -25,6 +23,8 @@ class SnapshotWithGrid(MJPG):
 
         self.last_path_outer = soft_signal_rw(str)
         self.last_path_full_overlay = soft_signal_rw(str)
+
+        super().__init__(prefix, name)
 
     async def _save_grid_to_image(self, image: Image, path: str):
         buffer = BytesIO()
