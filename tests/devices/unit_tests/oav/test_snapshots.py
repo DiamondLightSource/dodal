@@ -5,7 +5,10 @@ import pytest
 from ophyd_async.core import DeviceCollector, MockSignalBackend, SignalR, set_mock_value
 from PIL import Image
 
-from dodal.devices.oav.snapshots.snapshot_with_beam_centre import SnapshotWithBeamCentre
+from dodal.devices.oav.snapshots.snapshot_with_beam_centre import (
+    SnapshotWithBeamCentre,
+    draw_crosshair,
+)
 from dodal.devices.oav.snapshots.snapshot_with_grid import SnapshotWithGrid
 
 
@@ -109,7 +112,7 @@ async def test_snapshot_with_beam_centre_correctly_triggered_and_saved(
 
 def test_snapshot_draws_expected_crosshair(tmp_path: Path):
     image = Image.open("tests/test_data/test_images/oav_snapshot_test.png")
-    SnapshotWithBeamCentre.draw_crosshair(image, 510, 380)
+    draw_crosshair(image, 510, 380)
     image.save(tmp_path / "output_image.png")
     expected_image = Image.open("tests/test_data/test_images/oav_snapshot_expected.png")
     image_bytes = image.tobytes()
