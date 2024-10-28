@@ -72,8 +72,6 @@ class OAV(StandardReadable):
 
         self.grid_snapshot = SnapshotWithGrid(f"{prefix}MJPG:", name)
 
-        self._snapshot_trigger_subscription_id = None
-
         self.sizes = [self.grid_snapshot.x_size, self.grid_snapshot.y_size]
 
         super().__init__(name)
