@@ -87,7 +87,7 @@ def calculate_x_y_z_of_pixel(
     beam_centre: tuple[int, int],
     microns_per_pixel: tuple[float, float],
 ) -> np.ndarray:
-    beam_distance_px: Pixel = calculate_beam_distance((beam_centre), *pixel)
+    beam_distance_px: Pixel = calculate_beam_distance(beam_centre, *pixel)
 
     return current_x_y_z + camera_coordinates_to_xyz(
         beam_distance_px[0],
