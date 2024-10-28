@@ -1,6 +1,6 @@
 from enum import IntEnum
 
-from ophyd_async.core import AsyncStatus, StandardReadable
+from ophyd_async.core import DEFAULT_TIMEOUT, AsyncStatus, StandardReadable
 from ophyd_async.epics.signal import epics_signal_rw
 
 from dodal.common.signal_utils import create_hardware_backed_soft_signal
@@ -58,33 +58,14 @@ class ZoomController(StandardReadable):
 
 class OAV(StandardReadable):
     def __init__(self, prefix: str, config: OAVConfig, name: str = ""):
+        self.oav_config = config
+        self._prefix = prefix
+        self._name = name
         _bl_prefix = prefix.split("-")[0]
         self.zoom_controller = ZoomController(f"{_bl_prefix}-EA-OAV-01:FZOOM:", name)
 
         self.cam = Cam(f"{prefix}CAM:", name=name)
 
-        self.parameters = config.get_parameters()
-
-        self.microns_per_pixel_x = create_hardware_backed_soft_signal(
-            float,
-            lambda: self._get_microns_per_pixel(Coords.X),
-        )
-        self.microns_per_pixel_y = create_hardware_backed_soft_signal(
-            float,
-            lambda: self._get_microns_per_pixel(Coords.Y),
-        )
-
-        self.beam_centre_i = create_hardware_backed_soft_signal(
-            int, lambda: self._get_beam_position(Coords.X)
-        )
-
-        self.beam_centre_j = create_hardware_backed_soft_signal(
-            int, lambda: self._get_beam_position(Coords.Y)
-        )
-
-        self.snapshot = SnapshotWithBeamCentre(
-            f"{prefix}MJPG:", self.beam_centre_i, self.beam_centre_j, name
-        )
         self.grid_snapshot = SnapshotWithGrid(f"{prefix}MJPG:", name)
 
         self._snapshot_trigger_subscription_id = None
@@ -111,3 +92,34 @@ class OAV(StandardReadable):
         value = self.parameters[_zoom].crosshair[coord]
         size = await self.sizes[coord].get_value()
         return int(value * size / DEFAULT_OAV_WINDOW[coord])
+
+    async def connect(
+        self,
+        mock: bool = False,
+        timeout: float = DEFAULT_TIMEOUT,
+        force_reconnect: bool = False,
+    ):
+        self.parameters = self.oav_config.get_parameters()
+
+        self.microns_per_pixel_x = create_hardware_backed_soft_signal(
+            float,
+            lambda: self._get_microns_per_pixel(Coords.X),
+        )
+        self.microns_per_pixel_y = create_hardware_backed_soft_signal(
+            float,
+            lambda: self._get_microns_per_pixel(Coords.Y),
+        )
+
+        self.beam_centre_i = create_hardware_backed_soft_signal(
+            int, lambda: self._get_beam_position(Coords.X)
+        )
+
+        self.beam_centre_j = create_hardware_backed_soft_signal(
+            int, lambda: self._get_beam_position(Coords.Y)
+        )
+
+        self.snapshot = SnapshotWithBeamCentre(
+            f"{self._prefix}MJPG:", self.beam_centre_i, self.beam_centre_j, self._name
+        )
+
+        return await super().connect(mock, timeout, force_reconnect)
