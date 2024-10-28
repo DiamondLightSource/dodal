@@ -21,7 +21,8 @@ def test_device_creation(RE, module_and_devices_for_beamline):
     Ensures that for every beamline all device factories are using valid args
     and creating types that conform to Bluesky protocols.
     """
-    module, devices = module_and_devices_for_beamline
+    module, devices, exceptions = module_and_devices_for_beamline
+    assert not exceptions
     for device_name, device in devices.items():
         assert device_name in beamline_utils.ACTIVE_DEVICES, (
             f"No device named {device_name} was created for {module}, "
@@ -40,7 +41,7 @@ def test_devices_are_identical(RE, module_and_devices_for_beamline):
     """
     Ensures that for every beamline all device functions prevent duplicate instantiation.
     """
-    bl_mod, devices_a = module_and_devices_for_beamline
+    bl_mod, devices_a, _ = module_and_devices_for_beamline
     devices_b, _ = make_all_devices(
         bl_mod,
         include_skipped=True,

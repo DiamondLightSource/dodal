@@ -11,7 +11,7 @@ Each beamline should have its own file in the ``doodal.beamlines`` folder, in wh
 beamline are instantiated. The file should be named after the colloquial name for the beamline. For example:
 
 * ``i03.py``
-* ``i04_1.py``
+* ``i20_1.py``
 * ``vmxi.py``
 
 Beamline modules (in ``dodal.beamlines``) are code-as-configuration. They define the set of devices and common device
