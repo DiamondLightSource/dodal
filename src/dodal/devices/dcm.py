@@ -1,6 +1,10 @@
-from ophyd_async.core import StandardReadable
+from collections.abc import Sequence
+
+from ophyd_async.core import StandardReadable, soft_signal_r_and_setter
 from ophyd_async.epics.motor import Motor
 from ophyd_async.epics.signal import epics_signal_r
+
+from dodal.common.crystal_metadata import CrystalMetadata, MaterialsEnum
 
 
 class DCM(StandardReadable):
@@ -17,6 +21,9 @@ class DCM(StandardReadable):
         self,
         prefix: str,
         name: str = "",
+        crystal_metadata: CrystalMetadata = CrystalMetadata(  # noqa: B008
+            MaterialsEnum.Si, (1, 1, 1)
+        ),
     ) -> None:
         with self.add_children_as_readables():
             self.bragg_in_degrees = Motor(prefix + "BRAGG")
@@ -36,4 +43,19 @@ class DCM(StandardReadable):
             self.perp_temp = epics_signal_r(float, prefix + "TEMP6")
             self.perp_sub_assembly_temp = epics_signal_r(float, prefix + "TEMP7")
 
+            self.crystal_metadata_usage, _ = soft_signal_r_and_setter(
+                str, initial_value=crystal_metadata.usage
+            )
+            self.crystal_metadata_type, _ = soft_signal_r_and_setter(
+                str, initial_value=crystal_metadata.type
+            )
+            self.crystal_metadata_reflection, _ = soft_signal_r_and_setter(
+                Sequence[int],
+                initial_value=list(crystal_metadata.reflection),  # type: ignore
+            )
+            self.crystal_metadata_d_spacing, _ = soft_signal_r_and_setter(
+                float,
+                initial_value=crystal_metadata.d_spacing[0],  # type: ignore
+                units=crystal_metadata.d_spacing[1],  # type: ignore
+            )
         super().__init__(name)
