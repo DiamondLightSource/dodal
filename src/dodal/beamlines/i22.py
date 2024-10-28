@@ -26,16 +26,13 @@ from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("i22")
 IS_LAB = BL == "p38"
-LINKAM_IS_IN_LAB = False
 PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
+VISIT_PATH: Path = Path(f"/dls/${BL}/data/2024/cm37271-2/bluesky")
 
-VISIT_PATH: Path = Path(
-    f"/dls/${'p38' if IS_LAB else 'i22'}/data/2024/cm37271-2/bluesky"
-)
-API_URL: str = f"http://{'p38' if IS_LAB else 'i22'}-control:8088/api"
+API_URL: str = f"http://{BL}-control:8088/api"
 
 # Currently we must hard-code the visit, determining the visit at runtime requires
 # infrastructure that is still WIP.
@@ -281,7 +278,7 @@ def oav() -> AravisDetector | NXSasOAV:
     )
 
 
-@device_factory(skip=IS_LAB != LINKAM_IS_IN_LAB)
+@device_factory()
 def linkam() -> Linkam3:
     if IS_LAB:
         return Linkam3(prefix=f"{PREFIX.beamline_prefix}-EA-LINKM-02")
