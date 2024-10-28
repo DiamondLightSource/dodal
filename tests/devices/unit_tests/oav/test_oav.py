@@ -15,7 +15,9 @@ from dodal.devices.oav.oav_detector import (
 async def test_zoom_controller():
     zoom_controller = ZoomController("", "fake zoom controller")
     await zoom_controller.connect(mock=True)
-    zoom_controller._get_allowed_zoom_levels = AsyncMock(return_value=["1.0x", "3.0x"])
+    zoom_controller.level.describe = AsyncMock(
+        return_value={"level": {"choices": ["1.0x", "3.0x"]}}
+    )
     status = zoom_controller.set("3.0x")
     await status
     assert status.success
