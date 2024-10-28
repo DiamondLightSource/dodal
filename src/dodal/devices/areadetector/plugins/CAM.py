@@ -1,10 +1,10 @@
-from enum import StrEnum
+from enum import Enum
 
 from ophyd_async.core import StandardReadable
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
 
-class ColorMode(StrEnum):
+class ColorMode(str, Enum):
     """
     Enum to store the various color modes of the camera. We use RGB1.
     """
