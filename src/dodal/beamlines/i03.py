@@ -236,7 +236,7 @@ def oav(
     return device_instantiation(
         OAV,
         "oav",
-        "",
+        "-DI-OAV-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
         config=params or OAVConfig(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
