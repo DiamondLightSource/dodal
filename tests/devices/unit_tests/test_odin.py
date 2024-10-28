@@ -156,3 +156,13 @@ def test_given_error_on_node_1_when_clear_odin_errors_called_then_resets_all_err
     nodes.clear_odin_errors()
     for node in nodes.nodes:
         node.clear_errors.set.assert_called_once_with(1)
+
+
+@patch("dodal.devices.eiger_odin.await_value")
+def test_given_await_value_returns_done_status_then_init_state_returns_done(
+    patch_await, fake_odin: EigerOdin
+):
+    patch_await.side_effect = lambda *_: fake_status(False)
+    full_status = fake_odin.nodes.get_init_state(None)
+    full_status.wait()
+    assert full_status.done
