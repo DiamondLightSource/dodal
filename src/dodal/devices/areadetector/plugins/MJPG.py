@@ -29,10 +29,6 @@ class MJPG(StandardReadable, Triggerable, ABC):
         self.x_size = epics_signal_r(int, prefix + "ArraySize1_RBV")
         self.y_size = epics_signal_r(int, prefix + "ArraySize2_RBV")
 
-        # TODO check type of these two
-        self.input_rbpv = epics_signal_r(str, prefix + "NDArrayPort_RBV")
-        self.input_plugin = epics_signal_rw(str, prefix + "NDArrayPort")
-
         self.KICKOFF_TIMEOUT = 30.0
 
         super().__init__(name)
