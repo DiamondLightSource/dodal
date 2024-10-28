@@ -2,9 +2,34 @@ on:
   workflow_call:
 
 jobs:
-  artifacts:
+  license_check:
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Get explicit and transitive dependencies
+        run: |
+          pip install
+          pip freeze > requirements-all.txt
+      - name: Check python
+        id: license_check_report
+        uses: pilosus/action-pip-license-checker@v2
+        with:
+          requirements: "requirements-all.txt"
+          fail: "Copyleft"
+          exclude: "(?i)^(pylint|aio[-_]*).*"
+      - name: Print report
+        if: ${{ always() }}
+        run: echo "${{ steps.license_check_report.outputs.report }}"
 
+  get_report:
+    runs-on: ubuntu-latest
     steps:
       - name: Dependencies license compliance checker
         id: license_check_report
