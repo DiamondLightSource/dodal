@@ -19,9 +19,8 @@ ZOOM_LEVELS_XML = "tests/devices/unit_tests/test_jCameraManZoomLevels.xml"
 @pytest.fixture
 async def oav() -> OAV:
     oav_config = OAVConfig(ZOOM_LEVELS_XML, DISPLAY_CONFIGURATION)
-    async with DeviceCollector():
+    async with DeviceCollector(connect=True):
         oav = OAV("", config=oav_config, name="oav")
-    await oav.connect()
     return oav
 
 
