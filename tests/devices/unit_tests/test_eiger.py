@@ -210,7 +210,7 @@ def test_when_set_odin_pvs_called_then_full_filename_written_and_set_mx_settings
 def test_stage_raises_exception_if_odin_initialisation_status_not_ok(fake_eiger):
     fake_eiger.odin.nodes.clear_odin_errors = Mock(return_value=None)
     expected_error_message = "Test error"
-    fake_eiger.odin.check_odin_initialised = Mock(
+    fake_eiger.odin.wait_for_odin_initialised = Mock(
         return_value=(False, expected_error_message)
     )
     with pytest.raises(
@@ -228,7 +228,7 @@ def test_stage_enables_roi_mode_correctly(
     mock_await, fake_eiger, roi_mode, expected_num_change_roi_calls, expected_exception
 ):
     fake_eiger.odin.nodes.clear_odin_errors = Mock(return_value=None)
-    fake_eiger.odin.check_odin_initialised = Mock(return_value=(True, ""))
+    fake_eiger.odin.wait_for_odin_initialised = Mock(return_value=(True, ""))
 
     fake_eiger.detector_params.use_roi_mode = roi_mode
     mock_await.return_value = failed_status(UnknownStatusFailure("Test Exception"))
@@ -346,8 +346,9 @@ def test_bad_odin_state_results_in_unstage_returning_bad_status(
 def test_given_failing_odin_when_stage_then_exception_raised(fake_eiger):
     error_contents = "Got an error"
     fake_eiger.odin.nodes.clear_odin_errors = MagicMock()
-    fake_eiger.odin.check_odin_initialised = MagicMock()
-    fake_eiger.odin.check_odin_initialised.return_value = (False, error_contents)
+    fake_eiger.odin.wait_for_odin_initialised = MagicMock(
+        return_value=(False, error_contents)
+    )
     with pytest.raises(Exception) as e:
         fake_eiger.async_stage().wait()
     assert error_contents in e.value.__str__()
@@ -355,13 +356,17 @@ def test_given_failing_odin_when_stage_then_exception_raised(fake_eiger):
 
 def set_up_eiger_to_stage_happily(fake_eiger: EigerDetector):
     fake_eiger.odin.nodes.clear_odin_errors = MagicMock()
-    fake_eiger.odin.check_odin_initialised = MagicMock(return_value=(True, ""))
+    fake_eiger.odin.wait_for_odin_initialised = MagicMock(return_value=(True, ""))
     fake_eiger.odin.file_writer.file_path.put(True)
 
 
+@patch("dodal.devices.eiger_odin.await_value")
 @patch("dodal.devices.eiger.await_value")
-def test_stage_runs_successfully(mock_await, fake_eiger: EigerDetector):
-    mock_await.return_value = finished_status()
+def test_stage_runs_successfully(
+    mock_eiger_await, mock_eiger_odin_await, fake_eiger: EigerDetector
+):
+    mock_eiger_await.return_value = finished_status()
+    mock_eiger_odin_await.return_value = finished_status()
     set_up_eiger_to_stage_happily(fake_eiger)
     fake_eiger.stage()
     fake_eiger.arming_status.wait(1)  # This should complete long before 1s
@@ -606,9 +611,10 @@ def test_given_detector_arming_when_unstage_then_wait_for_arming_to_finish(
 def test_given_detector_arming_status_failed_when_unstage_then_detector_still_disarmed(
     fake_eiger: EigerDetector,
 ):
+    fake_eiger.odin.check_odin_state = MagicMock(return_value=True)
     fake_eiger.cam.acquire.sim_put(1)  # type: ignore
 
-    fake_eiger.arming_status = get_bad_status()
+    fake_eiger.wait_on_arming_if_started = MagicMock(side_effect=RuntimeError())
     with pytest.raises(RuntimeError):
         fake_eiger.unstage()
 
