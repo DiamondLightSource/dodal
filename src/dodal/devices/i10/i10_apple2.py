@@ -2,7 +2,7 @@ import asyncio
 import csv
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, SupportsFloat
 
 import numpy as np
 from bluesky.protocols import Movable
@@ -121,11 +121,12 @@ class I10Apple2(Apple2):
             self.id_jaw_phase = id_jaw_phase
 
     @AsyncStatus.wrap
-    async def set(self, value: float) -> None:
+    async def set(self, value: SupportsFloat) -> None:
         """
         Check polarisation state and use it together with the energy(value)
         to calculate the required gap and phases before setting it.
         """
+        value = float(value)
         if self.pol is None:
             LOGGER.warning("Polarisation not set attempting to read from hardware")
             pol, phase = await self.determinePhaseFromHardware()
@@ -284,7 +285,8 @@ class LinearArbitraryAngle(StandardReadable, Movable):
             )
 
     @AsyncStatus.wrap
-    async def set(self, value: float) -> None:
+    async def set(self, value: SupportsFloat) -> None:
+        value = float(value)
         pol = self.id.pol
         if pol != "la":
             raise RuntimeError(
