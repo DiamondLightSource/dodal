@@ -433,7 +433,7 @@ async def test_linear_arbitrary_RE_scan(
             else temp_angle + 180.0
         )  # convert angle to jawphase.
         assert jaw_phase.call_args_list[cnt] == mock.call(
-            str(poly(alpha_real)), wait=True, timeout=mock.ANY
+            str(poly(alpha_real)), wait=True
         )
 
 
