@@ -1,8 +1,7 @@
-from enum import Enum
-
 from ophyd_async.core import (
     ConfigSignal,
     StandardReadable,
+    StrictEnum,
 )
 from ophyd_async.epics.motor import Motor
 from ophyd_async.epics.signal import epics_signal_rw
@@ -16,7 +15,7 @@ class PGM(StandardReadable):
     def __init__(
         self,
         prefix: str,
-        grating: type[Enum],
+        grating: type[StrictEnum],
         gratingPv: str,
         name: str = "",
     ) -> None:
