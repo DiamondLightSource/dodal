@@ -10,6 +10,7 @@ from ophyd.status import DeviceStatus, Status
 from ophyd_async.core import DeviceCollector, get_mock_put, set_mock_value
 
 from dodal.devices.fast_grid_scan import (
+    FastGridScanCommon,
     PandAFastGridScan,
     PandAGridScanParams,
     ZebraFastGridScan,
@@ -314,12 +315,11 @@ def test_can_run_fast_grid_scan_in_run_engine(
     RE: RunEngine,
 ):
     @bpp.run_decorator()
-    def kickoff_and_complete(device):
+    def kickoff_and_complete(device: FastGridScanCommon):
         yield from bps.kickoff(device, group="kickoff")
         set_mock_value(device.status, 1)
         yield from bps.wait("kickoff")
         yield from bps.complete(device, group="complete")
-        set_mock_value(device.position_counter, device.expected_images)
         set_mock_value(device.status, 0)
         yield from bps.wait("complete")
 
