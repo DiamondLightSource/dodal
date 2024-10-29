@@ -6,6 +6,7 @@ from ophyd_async.core import (
     DEFAULT_TIMEOUT,
     AsyncStatus,
     Device,
+    Reference,
     SignalR,
     SignalRW,
     StandardReadable,
@@ -62,12 +63,12 @@ class PMACStringMove(Triggerable):
         pmac_str_sig: SignalRW,
         string_to_send: str,
     ) -> None:
-        self.signal = pmac_str_sig
+        self.signal_ref = Reference(pmac_str_sig)
         self.cmd_string = string_to_send
 
     @AsyncStatus.wrap
     async def trigger(self):
-        await self.signal.set(self.cmd_string, wait=True)
+        await self.signal_ref().set(self.cmd_string, wait=True)
 
 
 class PMACStringLaser(Device, Movable):
@@ -78,7 +79,7 @@ class PMACStringLaser(Device, Movable):
         pmac_str_sig: SignalRW,
         name: str = "",
     ) -> None:
-        self._signal = pmac_str_sig
+        self._signal_ref = Reference(pmac_str_sig)
         super().__init__(name)
 
     @AsyncStatus.wrap
@@ -86,7 +87,7 @@ class PMACStringLaser(Device, Movable):
         self,
         value: LaserSettings,
     ):
-        await self._signal.set(value.value)
+        await self._signal_ref().set(value.value)
 
 
 class PMACStringEncReset(Device, Movable):
@@ -97,7 +98,7 @@ class PMACStringEncReset(Device, Movable):
         pmac_str_sig: SignalRW,
         name: str = "",
     ) -> None:
-        self._signal = pmac_str_sig
+        self._signal_ref = Reference(pmac_str_sig)
         super().__init__(name)
 
     @AsyncStatus.wrap
@@ -105,7 +106,7 @@ class PMACStringEncReset(Device, Movable):
         self,
         value: EncReset,
     ):
-        await self._signal.set(value.value)
+        await self._signal_ref().set(value.value)
 
 
 class ProgramRunner(Device, Flyable):
@@ -123,16 +124,16 @@ class ProgramRunner(Device, Flyable):
         collection_time_sig: SignalRW,
         name: str = "",
     ) -> None:
-        self._signal = pmac_str_sig
-        self._status = status_sig
-        self._prog_num = prog_num_sig
+        self._signal_ref = Reference(pmac_str_sig)
+        self._status_ref = Reference(status_sig)
+        self._prog_num_ref = Reference(prog_num_sig)
 
-        self._collection_time = collection_time_sig
+        self._collection_time_ref = Reference(collection_time_sig)
 
         super().__init__(name)
 
     async def _get_prog_number_string(self) -> str:
-        prog_num = await self._prog_num.get_value()
+        prog_num = await self._prog_num_ref().get_value()
         return f"&2b{prog_num}r"
 
     @AsyncStatus.wrap
@@ -141,9 +142,9 @@ class ProgramRunner(Device, Flyable):
             wait for the scan status PV to go to 1.
         """
         prog_num_str = await self._get_prog_number_string()
-        await self._signal.set(prog_num_str, wait=True)
+        await self._signal_ref().set(prog_num_str, wait=True)
         await wait_for_value(
-            self._status,
+            self._status_ref(),
             ScanState.RUNNING,
             timeout=DEFAULT_TIMEOUT,
         )
@@ -156,8 +157,10 @@ class ProgramRunner(Device, Flyable):
             complete_time (float): total time required by the collection to \
             finish correctly.
         """
-        scan_complete_time = await self._collection_time.get_value()
-        await wait_for_value(self._status, ScanState.DONE, timeout=scan_complete_time)
+        scan_complete_time = await self._collection_time_ref().get_value()
+        await wait_for_value(
+            self._status_ref(), ScanState.DONE, timeout=scan_complete_time
+        )
 
 
 class ProgramAbort(Triggerable):
@@ -170,16 +173,16 @@ class ProgramAbort(Triggerable):
         pmac_str_sig: SignalRW,
         status_sig: SignalR,
     ) -> None:
-        self.signal = pmac_str_sig
-        self.status = status_sig
+        self._signal_ref = Reference(pmac_str_sig)
+        self._status_ref = Reference(status_sig)
 
     @AsyncStatus.wrap
     async def trigger(self):
-        await self.signal.set("A", wait=True)
+        await self._signal_ref().set("A", wait=True)
         await sleep(1.0)  # TODO Check with scientist what this sleep is really for.
-        await self.signal.set("P2401=0", wait=True)
+        await self._signal_ref().set("P2401=0", wait=True)
         await wait_for_value(
-            self.status,
+            self._status_ref(),
             ScanState.DONE,
             timeout=DEFAULT_TIMEOUT,
         )
