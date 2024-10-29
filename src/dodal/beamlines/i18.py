@@ -134,21 +134,18 @@ def xspress3_odin(
     )
 
 
-crystal_1_metadata = (
-    CrystalMetadata(
-        usage="Bragg",
-        type="silicon",
-        reflection=(1, 1, 1),
-        d_spacing=(3.13475, "nm"),
-    ),
+crystal_1_metadata = CrystalMetadata(
+    usage="Bragg",
+    type="silicon",
+    reflection=(1, 1, 1),
+    d_spacing=(3.13475, "nm"),
 )
-crystal_2_metadata = (
-    CrystalMetadata(
-        usage="Bragg",
-        type="silicon",
-        reflection=(1, 1, 1),
-        d_spacing=(3.13475, "nm"),
-    ),
+
+crystal_2_metadata = CrystalMetadata(
+    usage="Bragg",
+    type="silicon",
+    reflection=(1, 1, 1),
+    d_spacing=(3.13475, "nm"),
 )
 
 
@@ -159,11 +156,10 @@ def dcm(
     return device_instantiation(
         DoubleCrystalMonochromator,
         "dcm",
-        "",
+        f"{BeamlinePrefix(BL).beamline_prefix}-MO-DCM-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
         bl_prefix=False,
-        motion_prefix=f"{BeamlinePrefix(BL).beamline_prefix}-MO-DCM-01:",
         temperature_prefix=f"{BeamlinePrefix(BL).beamline_prefix}-DI-DCM-01:",
         crystal_1_metadata=crystal_1_metadata,
         crystal_2_metadata=crystal_2_metadata,
