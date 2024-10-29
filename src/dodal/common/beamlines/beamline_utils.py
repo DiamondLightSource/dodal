@@ -90,34 +90,22 @@ def device_instantiation(
         fake: bool                  whether to fake with ophyd.sim
         post_create: Callable       (optional) a function to be run on the device after
                                     creation
-        bl_prefix: bool             if true, add the beamline prefix when instantiating, if
-                                    false the complete PV prefix or uri must be supplied.
-    Keyword Args:
-        uri:                        If specified, takes precedence over the prefix and is
-                                    specified as the uri parameter to the factory method
+        bl_prefix: bool             if true, add the beamline prefix when instantiating
     Returns:
         The instance of the device.
     """
-    uri = kwargs.get("uri")
-    uri_or_prefix = uri or prefix
-    kwargs_with_prefix_or_uri = dict(kwargs)
-    full_prefix = (
-        f"{(BeamlinePrefix(BL).beamline_prefix)}{uri_or_prefix}"
-        if bl_prefix
-        else uri_or_prefix
-    )
-    if uri:
-        kwargs_with_prefix_or_uri |= {"uri": full_prefix}
-    else:
-        kwargs_with_prefix_or_uri |= {"prefix": full_prefix}
-
     already_existing_device: AnyDevice | None = ACTIVE_DEVICES.get(name)
     if fake:
         device_factory = cast(Callable[..., T], make_fake_device(device_factory))
     if already_existing_device is None:
         device_instance = device_factory(
             name=name,
-            **kwargs_with_prefix_or_uri,
+            prefix=(
+                f"{(BeamlinePrefix(BL).beamline_prefix)}{prefix}"
+                if bl_prefix
+                else prefix
+            ),
+            **kwargs,
         )
         ACTIVE_DEVICES[name] = device_instance
         if wait:
