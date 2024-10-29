@@ -377,10 +377,9 @@ def panda(
     return device_instantiation(
         HDFPanda,
         "panda",
-        "",
+        "-EA-PANDA-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        uri="-EA-PANDA-01:",
         path_provider=get_path_provider(),
     )
 
