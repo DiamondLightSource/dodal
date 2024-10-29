@@ -42,6 +42,7 @@ class OAVSource(StandardReadable):
     ):
         self.url = epics_signal_r(str, f"{prefix}MJPG_URL_RBV")
         self.oav_name = oav_name
+        super().__init__()
 
 
 class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
