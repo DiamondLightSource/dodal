@@ -42,8 +42,7 @@ def panda(
     return device_instantiation(
         device_factory=HDFPanda,
         name="panda",
-        prefix="",
-        uri="-EA-PANDA-01:",
+        prefix="-EA-PANDA-01:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
         path_provider=get_path_provider(),
