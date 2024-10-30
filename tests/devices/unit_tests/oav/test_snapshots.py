@@ -50,26 +50,33 @@ async def grid_snapshot() -> SnapshotWithGrid:
     return grid_snapshot
 
 
-@patch("dodal.devices.areadetector.plugins.MJPG.Image")
-@patch("dodal.devices.oav.snapshots.snapshot_with_beam_centre.ImageDraw")
-@patch(
-    "dodal.devices.areadetector.plugins.MJPG.ClientSession.get",
-    autospec=True,
-)
-async def test_snapshot_with_beam_centre_triggered_then_crosshair_drawn_and(
-    mock_get, patch_image_draw, patch_image, snapshot
-):
-    mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
-    mock_response.ok = True
-    mock_response.read.return_value = (test_data := b"TEST")
+@pytest.fixture
+def mock_session_with_valid_response():
+    with patch(
+        "dodal.devices.areadetector.plugins.MJPG.ClientSession.get", autospec=True
+    ) as mock_get:
+        mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
+        mock_response.ok = True
+        mock_response.read.return_value = b"TEST"
+        yield mock_get
 
+
+@pytest.fixture
+def mock_image_open():
+    with patch("dodal.devices.areadetector.plugins.MJPG.Image") as patch_image:
+        mock_open = patch_image.open
+        mock_open.return_value.__aenter__.return_value = b"TEST"
+        yield mock_open
+
+
+@patch("dodal.devices.oav.snapshots.snapshot_with_beam_centre.ImageDraw")
+async def test_snapshot_with_beam_centre_triggered_then_crosshair_drawn_and_saved(
+    patch_image_draw, mock_image_open, mock_session_with_valid_response, snapshot
+):
     patch_line = MagicMock()
     patch_image_draw.Draw.return_value.line = patch_line
 
     snapshot._save_image = (mock_save := AsyncMock())
-
-    mock_open = patch_image.open
-    mock_open.return_value.__aenter__.return_value = test_data
 
     await snapshot.trigger()
 
@@ -77,25 +84,17 @@ async def test_snapshot_with_beam_centre_triggered_then_crosshair_drawn_and(
     mock_save.assert_awaited_once()
 
 
-@patch("dodal.devices.areadetector.plugins.MJPG.Path.mkdir")
-@patch("dodal.devices.areadetector.plugins.MJPG.Image")
-@patch(
-    "dodal.devices.areadetector.plugins.MJPG.ClientSession.get",
-    autospec=True,
-)
 @patch("dodal.devices.areadetector.plugins.MJPG.aiofiles", autospec=True)
+@patch("dodal.devices.areadetector.plugins.MJPG.Path.mkdir")
 async def test_snapshot_with_beam_centre_correctly_triggered_and_saved(
-    mock_aiofiles, mock_get, patch_image, mock_mkdir, snapshot
+    mock_mkdir,
+    mock_aiofiles,
+    mock_image_open,
+    mock_session_with_valid_response,
+    snapshot,
 ):
-    mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
-    mock_response.ok = True
-    mock_response.read.return_value = (test_data := b"TEST")
-
     mock_aio_open = mock_aiofiles.open
     mock_aio_open.return_value.__aenter__.return_value = (mock_file := AsyncMock())
-
-    mock_open = patch_image.open
-    mock_open.return_value.__aenter__.return_value = test_data
 
     # Set new directory and test that it's created
     set_mock_value(snapshot.directory, "new_dir")
@@ -106,7 +105,7 @@ async def test_snapshot_with_beam_centre_correctly_triggered_and_saved(
 
     test_url = await snapshot.url.get_value()
     # Get called with an instance of the session and correct url
-    mock_get.assert_called_once_with(ANY, test_url)
+    mock_session_with_valid_response.assert_called_once_with(ANY, test_url)
 
     assert await snapshot.last_saved_path.get_value() == "new_dir/test.png"
     mock_aio_open.assert_called_once_with("new_dir/test.png", "wb")
@@ -123,41 +122,29 @@ def test_snapshot_draws_expected_crosshair(tmp_path: Path):
     assert image_bytes == expected_bytes, "Actual and expected images differ"
 
 
-@patch("dodal.devices.areadetector.plugins.MJPG.Image")
 @patch(
     "dodal.devices.oav.snapshots.snapshot_with_grid.add_grid_border_overlay_to_image"
 )
 @patch("dodal.devices.oav.snapshots.snapshot_with_grid.add_grid_overlay_to_image")
 @patch("dodal.devices.oav.snapshots.snapshot_with_grid.asyncio_save_image")
-@patch(
-    "dodal.devices.areadetector.plugins.MJPG.ClientSession.get",
-    autospec=True,
-)
 async def test_snapshot_with_grid_triggered_saves_image_and_draws_correct_grid(
-    mock_get,
     mock_save_grid,
     patch_add_grid,
     patch_add_border,
-    patch_image,
+    mock_image_open,
+    mock_session_with_valid_response,
     grid_snapshot,
 ):
-    mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
-    mock_response.ok = True
-    mock_response.read.return_value = (test_data := b"TEST")
-
-    mock_open = patch_image.open
-    mock_open.return_value.__aenter__.return_value = test_data
-
     grid_snapshot._save_image = (mock_save := AsyncMock())
 
     await grid_snapshot.trigger()
 
     mock_save.assert_awaited_once()
     patch_add_border.assert_called_once_with(
-        mock_open.return_value.__enter__.return_value, 100, 100, 50, 15, 10
+        mock_image_open.return_value.__enter__.return_value, 100, 100, 50, 15, 10
     )
     patch_add_grid.assert_called_once_with(
-        mock_open.return_value.__enter__.return_value, 100, 100, 50, 15, 10
+        mock_image_open.return_value.__enter__.return_value, 100, 100, 50, 15, 10
     )
     assert mock_save_grid.await_count == 2
     expected_grid_save_calls = [
