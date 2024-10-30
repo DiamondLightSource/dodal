@@ -107,17 +107,17 @@ class FemtoAdcDetector(StandardReadable):
         lower_limit: float = 0.8,
         name: str = "",
     ) -> None:
-        with self.add_children_as_readables(HintedSignal):
+        with self.add_children_as_readables():
             self.current_amp = current_amp
             self.current, self._current_set = soft_signal_r_and_setter(
                 float, initial_value=None, units="Amp"
             )
+            self.analogue_readout = epics_signal_r(float, prefix + "I")
 
         with self.add_children_as_readables(ConfigSignal):
             self.auto_mode = soft_signal_rw(bool, initial_value=True)
             self.upper_limit = upper_limit
             self.lower_limit = lower_limit
-        self.analogue_readout = epics_signal_r(float, prefix + "I")
         super().__init__(name)
 
     async def read(self) -> dict[str, Reading]:
