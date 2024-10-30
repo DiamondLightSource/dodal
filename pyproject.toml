@@ -16,7 +16,7 @@ dependencies = [
     "click",
     "ophyd",
     # TODO reinstate me
-    "ophyd-async @ git+https://github.com/bluesky/ophyd-async.git@2fead5d165a1883ca8b8c177fa1ed43e32fa5283",
+    "ophyd-async @ git+https://github.com/bluesky/ophyd-async.git@6cc74cc4fa57b2c11e4a942591d78d875b47bc37",
     # "ophyd-async>=0.7.0a1,<0.8",
     "bluesky",
     "pyepics",
