@@ -85,9 +85,7 @@ async def test_snapshot_with_beam_centre_triggered_then_crosshair_drawn_and_save
 
 
 @patch("dodal.devices.areadetector.plugins.MJPG.aiofiles", autospec=True)
-@patch("dodal.devices.areadetector.plugins.MJPG.Path.mkdir")
 async def test_snapshot_with_beam_centre_correctly_triggered_and_saved(
-    mock_mkdir,
     mock_aiofiles,
     mock_image_open,
     mock_session_with_valid_response,
@@ -96,20 +94,35 @@ async def test_snapshot_with_beam_centre_correctly_triggered_and_saved(
     mock_aio_open = mock_aiofiles.open
     mock_aio_open.return_value.__aenter__.return_value = (mock_file := AsyncMock())
 
+    await snapshot.trigger()
+
+    test_url = await snapshot.url.get_value()
+    # Get called with an instance of the session and correct url
+    mock_session_with_valid_response.assert_called_once_with(ANY, test_url)
+
+    assert await snapshot.last_saved_path.get_value() == "/tmp/test.png"
+    mock_aio_open.assert_called_once_with("/tmp/test.png", "wb")
+    mock_file.write.assert_called_once()
+
+
+@patch("dodal.devices.areadetector.plugins.MJPG.Path.mkdir")
+@patch("dodal.devices.areadetector.plugins.MJPG.aiofiles", autospec=True)
+async def test_given_directory_not_existing_when_snapshot_triggered_then_directory_created(
+    mock_aiofiles,
+    mock_mkdir,
+    mock_image_open,
+    mock_session_with_valid_response,
+    snapshot,
+):
+    mock_aio_open = mock_aiofiles.open
+    mock_aio_open.return_value.__aenter__.return_value = AsyncMock()
+
     # Set new directory and test that it's created
     set_mock_value(snapshot.directory, "new_dir")
 
     await snapshot.trigger()
 
     mock_mkdir.assert_called_once()
-
-    test_url = await snapshot.url.get_value()
-    # Get called with an instance of the session and correct url
-    mock_session_with_valid_response.assert_called_once_with(ANY, test_url)
-
-    assert await snapshot.last_saved_path.get_value() == "new_dir/test.png"
-    mock_aio_open.assert_called_once_with("new_dir/test.png", "wb")
-    mock_file.write.assert_called_once()
 
 
 def test_snapshot_draws_expected_crosshair(tmp_path: Path):
