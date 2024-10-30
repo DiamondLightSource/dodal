@@ -73,25 +73,28 @@ class FemtoDDPCA(StandardReadable, Movable):
 
     @AsyncStatus.wrap
     async def set(self, value) -> None:
+        if value not in self.gain_table.__members__:
+            raise ValueError(f"Gain value {value} is not within {self.name} range.")
         LOGGER.info(f"{self.name} gain change to {value}")
         await self.gain.set(value=self.gain_table[value], timeout=self.timeout)
         # wait for current amplifier to settle
         await asyncio.sleep(self.raise_timetable[value].value)
 
     async def increase_gain(self) -> bool:
-        current_gain = int((await self.gain.get_value()).name.split("_")[1])
+        print(await self.gain.get_value())
+        current_gain = int((await self.gain.get_value()).name.split("_")[-1])
         current_gain += 1
         if current_gain > len(self.gain_table):
             return False
-        self.set(value=self.gain_table[f"sen_{current_gain}"])
+        await self.set(f"sen_{current_gain}")
         return True
 
     async def decrease_gain(self) -> bool:
-        current_gain = int((await self.gain.get_value()).name.split("_")[1])
+        current_gain = int((await self.gain.get_value()).name.split("_")[-1])
         current_gain -= 1
         if current_gain < 1:
             return False
-        self.set(value=self.gain_table[f"sen_{current_gain}"])
+        await self.set(f"sen_{current_gain}")
         return True
 
 
