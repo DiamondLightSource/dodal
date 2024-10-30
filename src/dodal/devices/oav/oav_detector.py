@@ -70,7 +70,31 @@ class OAV(StandardReadable):
 
         self.cam = Cam(f"{prefix}CAM:", name=name)
 
-        self.grid_snapshot = SnapshotWithGrid(f"{prefix}MJPG:", name)
+        with self.add_children_as_readables():
+            self.grid_snapshot = SnapshotWithGrid(f"{prefix}MJPG:", name)
+            self.microns_per_pixel_x = create_hardware_backed_soft_signal(
+                float,
+                lambda: self._get_microns_per_pixel(Coords.X),
+            )
+            self.microns_per_pixel_y = create_hardware_backed_soft_signal(
+                float,
+                lambda: self._get_microns_per_pixel(Coords.Y),
+            )
+
+            self.beam_centre_i = create_hardware_backed_soft_signal(
+                int, lambda: self._get_beam_position(Coords.X)
+            )
+
+            self.beam_centre_j = create_hardware_backed_soft_signal(
+                int, lambda: self._get_beam_position(Coords.Y)
+            )
+
+            self.snapshot = SnapshotWithBeamCentre(
+                f"{self._prefix}MJPG:",
+                self.beam_centre_i,
+                self.beam_centre_j,
+                self._name,
+            )
 
         self.sizes = [self.grid_snapshot.x_size, self.grid_snapshot.y_size]
 
@@ -102,26 +126,5 @@ class OAV(StandardReadable):
         force_reconnect: bool = False,
     ):
         self.parameters = self.oav_config.get_parameters()
-
-        self.microns_per_pixel_x = create_hardware_backed_soft_signal(
-            float,
-            lambda: self._get_microns_per_pixel(Coords.X),
-        )
-        self.microns_per_pixel_y = create_hardware_backed_soft_signal(
-            float,
-            lambda: self._get_microns_per_pixel(Coords.Y),
-        )
-
-        self.beam_centre_i = create_hardware_backed_soft_signal(
-            int, lambda: self._get_beam_position(Coords.X)
-        )
-
-        self.beam_centre_j = create_hardware_backed_soft_signal(
-            int, lambda: self._get_beam_position(Coords.Y)
-        )
-
-        self.snapshot = SnapshotWithBeamCentre(
-            f"{self._prefix}MJPG:", self.beam_centre_i, self.beam_centre_j, self._name
-        )
 
         return await super().connect(mock, timeout, force_reconnect)
