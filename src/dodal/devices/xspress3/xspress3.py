@@ -1,7 +1,7 @@
 from bluesky.protocols import Stageable
 from numpy import float64
-from numpy.typing import NDArray
 from ophyd_async.core import (
+    Array1D,
     AsyncStatus,
     Device,
     DeviceVector,
@@ -100,7 +100,7 @@ class Xspress3(Device, Stageable):
         """signal for the corrected MCA spectrum (1d array)"""
         self.dt_corrected_latest_mca = DeviceVector(
             {
-                i: epics_signal_r(NDArray[float64], f"{prefix}ARR{i}:ArrayData")
+                i: epics_signal_r(Array1D[float64], f"{prefix}ARR{i}:ArrayData")
                 for i in range(1, num_channels + 1)
             }
         )
