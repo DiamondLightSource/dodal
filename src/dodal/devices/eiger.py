@@ -131,7 +131,9 @@ class EigerDetector(Device):
             LOGGER.info("Disarming detector")
         finally:
             self.disarm_detector()
-            status_ok = self.odin.check_odin_state(self.GENERAL_STATUS_TIMEOUT)
+            status_ok = self.odin.check_and_wait_for_odin_state(
+                self.GENERAL_STATUS_TIMEOUT
+            )
             self.disable_roi_mode()
         return status_ok
 

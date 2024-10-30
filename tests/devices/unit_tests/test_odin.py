@@ -34,7 +34,7 @@ def fake_odin():
         (True, True, True, False),
     ],
 )
-def test_check_odin_state(
+def test_check_and_wait_for_odin_state(
     fake_odin: EigerOdin,
     is_initialised: bool,
     frames_dropped: bool,
@@ -46,10 +46,10 @@ def test_check_odin_state(
     fake_odin.nodes.check_frames_timed_out = Mock(return_value=[frames_timed_out, ""])
 
     if is_initialised:
-        assert fake_odin.check_odin_state(None) == expected_state
+        assert fake_odin.check_and_wait_for_odin_state(None) == expected_state
     else:
         with pytest.raises(RuntimeError):
-            fake_odin.check_odin_state(None)
+            fake_odin.check_and_wait_for_odin_state(None)
 
 
 @pytest.mark.parametrize(
@@ -166,3 +166,40 @@ def test_given_await_value_returns_done_status_then_init_state_returns_done(
     full_status = fake_odin.nodes.get_init_state(None)
     full_status.wait()
     assert full_status.done
+
+
+def test_given_frames_time_out_then_check_frames_timed_out_returns_error(
+    fake_odin: EigerOdin,
+):
+    fake_odin.nodes.nodes[1].frames_timed_out.sim_put(1)
+    error, message = fake_odin.nodes.check_frames_timed_out()
+    assert error
+    assert "timed out" in message
+    assert "1" in message
+
+
+def test_given_no_frames_time_out_then_check_frames_timed_out_returns_no_error(
+    fake_odin: EigerOdin,
+):
+    error, message = fake_odin.nodes.check_frames_timed_out()
+    assert not error
+    assert not message
+
+
+def test_given_frames_dropped_then_check_frames_timed_out_returns_error(
+    fake_odin: EigerOdin,
+):
+    fake_odin.nodes.nodes[2].frames_dropped.sim_put(1)
+    error, message = fake_odin.nodes.check_frames_dropped()
+    assert error
+    assert "dropped" in message
+    assert "2" in message
+
+
+def test_given_no_frames_dropped_then_check_frames_timed_out_returns_no_error(
+    fake_odin: EigerOdin,
+):
+    error, message = fake_odin.nodes.check_frames_timed_out()
+    assert not error
+    assert not message
+    pass

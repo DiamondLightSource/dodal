@@ -63,26 +63,28 @@ class OdinNodesStatus(Device):
     def nodes(self) -> list[OdinNode]:
         return [self.node_0, self.node_1, self.node_2, self.node_3]
 
-    def check_node_frames_from_attr(
+    def _check_node_frames_from_attr(
         self, node_get_func, error_message_verb: str
     ) -> tuple[bool, str]:
         nodes_frames_values = [0] * len(self.nodes)
         frames_details = []
         for node_number, node_pv in enumerate(self.nodes):
-            nodes_frames_values[node_number] = node_get_func(node_pv)
-            error_message = f"Filewriter {node_number} {error_message_verb} \
-                    {nodes_frames_values[node_number]} frames"
-            frames_details.append(error_message)
+            node_state = node_get_func(node_pv)
+            nodes_frames_values[node_number] = node_state
+            if node_state != 0:
+                error_message = f"Filewriter {node_number} {error_message_verb} \
+                        {nodes_frames_values[node_number]} frames"
+                frames_details.append(error_message)
         bad_frames = any(v != 0 for v in nodes_frames_values)
         return bad_frames, "\n".join(frames_details)
 
     def check_frames_timed_out(self) -> tuple[bool, str]:
-        return self.check_node_frames_from_attr(
+        return self._check_node_frames_from_attr(
             lambda node: node.frames_timed_out.get(), "timed out"
         )
 
     def check_frames_dropped(self) -> tuple[bool, str]:
-        return self.check_node_frames_from_attr(
+        return self._check_node_frames_from_attr(
             lambda node: node.frames_dropped.get(), "dropped"
         )
 
@@ -125,7 +127,7 @@ class EigerOdin(Device):
             writing_finished &= await_value(node_pv.writing, 0)
         return writing_finished
 
-    def check_odin_state(self, timeout) -> bool:
+    def check_and_wait_for_odin_state(self, timeout) -> bool:
         is_initialised, error_message = self.wait_for_odin_initialised(timeout)
         frames_dropped, frames_dropped_details = self.nodes.check_frames_dropped()
         frames_timed_out, frames_timed_out_details = self.nodes.check_frames_timed_out()

@@ -331,11 +331,11 @@ def test_unsuccessful_false_roi_mode_change_results_in_callback_error(
         run_functions_without_blocking(unwrapped_funcs).wait()
 
 
-@patch("dodal.devices.eiger.EigerOdin.check_odin_state")
+@patch("dodal.devices.eiger.EigerOdin.check_and_wait_for_odin_state")
 def test_bad_odin_state_results_in_unstage_returning_bad_status(
-    mock_check_odin_state, fake_eiger: EigerDetector
+    mock_check_and_wait_for_odin_state, fake_eiger: EigerDetector
 ):
-    mock_check_odin_state.return_value = False
+    mock_check_and_wait_for_odin_state.return_value = False
     happy_status = Status()
     happy_status.set_finished()
     fake_eiger.filewriters_finished = happy_status
@@ -533,7 +533,7 @@ def test_given_in_free_run_mode_when_unstaged_then_waiting_on_file_writer_to_fin
 
     fake_eiger.odin.file_writer.capture.sim_put(1)  # type: ignore
     fake_eiger.odin.file_writer.num_captured.sim_put(2000)  # type: ignore
-    fake_eiger.odin.check_odin_state = MagicMock(return_value=True)
+    fake_eiger.odin.check_and_wait_for_odin_state = MagicMock(return_value=True)
 
     fake_eiger.detector_params.trigger_mode = TriggerMode.FREE_RUN
     fake_eiger.unstage()
@@ -549,7 +549,7 @@ def test_given_in_free_run_mode_and_not_all_frames_collected_in_time_when_unstag
 
     fake_eiger.odin.file_writer.capture.sim_put(1)  # type: ignore
     fake_eiger.odin.file_writer.num_captured.sim_put(1000)  # type: ignore
-    fake_eiger.odin.check_odin_state = MagicMock(return_value=True)
+    fake_eiger.odin.check_and_wait_for_odin_state = MagicMock(return_value=True)
 
     fake_eiger.detector_params.trigger_mode = TriggerMode.FREE_RUN
     fake_eiger.ALL_FRAMES_TIMEOUT = 0.1
@@ -600,7 +600,7 @@ def test_given_detector_arming_when_unstage_then_wait_for_arming_to_finish(
 
     fake_eiger.odin.file_writer.capture.sim_put(1)  # type: ignore
     fake_eiger.odin.file_writer.num_captured.sim_put(2000)  # type: ignore
-    fake_eiger.odin.check_odin_state = MagicMock(return_value=True)
+    fake_eiger.odin.check_and_wait_for_odin_state = MagicMock(return_value=True)
 
     fake_eiger.arming_status = Status()
     fake_eiger.arming_status.wait = MagicMock()
@@ -611,7 +611,7 @@ def test_given_detector_arming_when_unstage_then_wait_for_arming_to_finish(
 def test_given_detector_arming_status_failed_when_unstage_then_detector_still_disarmed(
     fake_eiger: EigerDetector,
 ):
-    fake_eiger.odin.check_odin_state = MagicMock(return_value=True)
+    fake_eiger.odin.check_and_wait_for_odin_state = MagicMock(return_value=True)
     fake_eiger.cam.acquire.sim_put(1)  # type: ignore
 
     fake_eiger.wait_on_arming_if_started = MagicMock(side_effect=RuntimeError())
