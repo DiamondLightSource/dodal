@@ -50,9 +50,9 @@ class SingleMirrorVoltage(Device):
     """
 
     def __init__(self, name: str = "", prefix: str = ""):
-        self.actual_v = epics_signal_r(int, prefix + "R")
-        self.setpoint_v = epics_signal_rw(int, prefix + "D")
-        self.demand_accepted = epics_signal_r(MirrorVoltageDemand, prefix + "DSEV")
+        self._actual_v = epics_signal_r(int, prefix + "R")
+        self._setpoint_v = epics_signal_rw(int, prefix + "D")
+        self._demand_accepted = epics_signal_r(MirrorVoltageDemand, prefix + "DSEV")
         super().__init__(name=name)
 
     @AsyncStatus.wrap
@@ -63,8 +63,8 @@ class SingleMirrorVoltage(Device):
         4. When either demand is accepted or DEFAULT_SETTLE_TIME expires, signal the result on the Status
         """
 
-        setpoint_v = self.setpoint_v
-        demand_accepted = self.demand_accepted
+        setpoint_v = self._setpoint_v
+        demand_accepted = self._demand_accepted
 
         if await demand_accepted.get_value() != MirrorVoltageDemand.OK:
             raise AssertionError(
