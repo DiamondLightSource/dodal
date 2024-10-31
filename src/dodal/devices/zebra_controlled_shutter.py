@@ -29,7 +29,7 @@ class ZebraShutter(StandardReadable, Movable):
     gates then feed into an OR gate, which then feeds to the shutter."""
 
     def __init__(self, prefix: str, name: str):
-        self.manual_position_setpoint = epics_signal_w(
+        self._manual_position_setpoint = epics_signal_w(
             ZebraShutterState, prefix + "CTRL2"
         )
         self.control_mode = epics_signal_rw(ZebraShutterControl, prefix + "CTRL1")
@@ -44,7 +44,7 @@ class ZebraShutter(StandardReadable, Movable):
             raise UserWarning(
                 f"Tried to set shutter to {value.value} but the shutter is in auto mode."
             )
-        await self.manual_position_setpoint.set(value)
+        await self._manual_position_setpoint.set(value)
         return await wait_for_value(
             signal=self.position_readback,
             match=value,
