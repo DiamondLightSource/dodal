@@ -197,9 +197,8 @@ class I10Apple2PGM(StandardReadable, Movable):
             New device name.
         """
         super().__init__(name=name)
-        with self.add_children_as_readables():
-            self.id_ref = Reference(id)
-            self.pgm_ref = Reference(pgm)
+        self.id_ref = Reference(id)
+        self.pgm_ref = Reference(pgm)
         with self.add_children_as_readables(HintedSignal):
             self.energy_offset = soft_signal_rw(float, initial_value=0)
 
@@ -275,8 +274,7 @@ class LinearArbitraryAngle(StandardReadable, Movable):
             polynomial parameters highest power first.
         """
         super().__init__(name=name)
-        with self.add_children_as_readables():
-            self.id_ref = Reference(id)
+        self.id_ref = Reference(id)
         self.jaw_phase_from_angle = np.poly1d(jaw_phase_poly_param)
         self.angle_threshold_deg = angle_threshold_deg
         self.jaw_phase_limit = jaw_phase_limit
