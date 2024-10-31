@@ -1,9 +1,10 @@
 import os
-from unittest.mock import patch
+from collections.abc import Sequence
+from unittest.mock import MagicMock, patch
 
 import pytest
 from click.testing import CliRunner, Result
-from ophyd_async.core import Device, NotConnected
+from ophyd_async.core import Device
 
 from dodal import __version__
 from dodal.cli import main
@@ -88,12 +89,42 @@ def test_cli_connect_when_devices_error(
     runner: CliRunner,
     devices: tuple[dict[str, AnyDevice], dict[str, Exception]],
 ):
-    with pytest.raises(NotConnected):
-        _mock_connect(
-            EXAMPLE_BEAMLINE,
-            runner=runner,
-            devices=SOME_SUCCESSFUL_DEVICES,
-        )
+    result = _mock_connect(
+        EXAMPLE_BEAMLINE,
+        runner=runner,
+        devices=SOME_SUCCESSFUL_DEVICES,
+    )
+    assert result.exit_code != 0
+
+
+@pytest.mark.parametrize(
+    "args, expected_beamlines",
+    [[["ALL"], ["i03"]], [["--include-training", "ALL"], ["i03", "training_rig"]]],
+)
+@patch(
+    "dodal.cli.all_beamline_names", new=MagicMock(return_value=["i03", "training_rig"])
+)
+@patch.dict(os.environ, clear=True)
+def test_cli_all_include_training(
+    runner: CliRunner, args: Sequence[str], expected_beamlines: Sequence[str]
+):
+    result = _mock_connect(*args, runner=runner, devices=ALL_SUCCESSFUL_DEVICES)
+    for bl in expected_beamlines:
+        assert f"Attempting connection to {bl}" in result.stdout
+
+
+@pytest.mark.parametrize(
+    "args, expected_beamlines",
+    [[["ALL"], ["i03"]], [["--include-sim", "ALL"], ["i03", "s03"]]],
+)
+@patch("dodal.cli.all_beamline_names", new=MagicMock(return_value=["i03", "s03"]))
+@patch.dict(os.environ, clear=True)
+def test_cli_all_include_sim(
+    runner: CliRunner, args: Sequence[str], expected_beamlines: Sequence[str]
+):
+    result = _mock_connect(*args, runner=runner, devices=ALL_SUCCESSFUL_DEVICES)
+    for bl in expected_beamlines:
+        assert f"Attempting connection to {bl}" in result.stdout
 
 
 def _mock_connect(
