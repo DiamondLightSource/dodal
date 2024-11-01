@@ -1,3 +1,4 @@
+from .amp_detector import AutoGainDectector
 from .current_amplifier import CurrentAmp
 from .femto import (
     Femto3xxGainTable,
@@ -14,4 +15,5 @@ __all__ = [
     "FemtoAdcDetector",
     "CurrentAmp",
     "Femto3xxGainToCurrentTable",
+    "AutoGainDectector",
 ]
