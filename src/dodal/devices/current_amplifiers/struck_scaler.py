@@ -1,6 +1,6 @@
 from enum import Enum
 
-from bluesky.protocols import Triggerable
+from bluesky.protocols import Preparable, Triggerable
 from ophyd_async.core import (
     AsyncStatus,
     HintedSignal,
@@ -20,7 +20,7 @@ class CountState(str, Enum):
     count = "Count"  # type: ignore
 
 
-class StruckScaler(StandardReadable, Triggerable):
+class StruckScaler(StandardReadable, Triggerable, Preparable):
     def __init__(self, prefix: str, suffix: str, name: str = ""):
         with self.add_children_as_readables(HintedSignal):
             self.readout = epics_signal_r(float, prefix + suffix)
@@ -47,6 +47,14 @@ class StruckScaler(StandardReadable, Triggerable):
             read_signal=self.trigger_start,
             read_value=CountState.done,
         )
+
+    @AsyncStatus.wrap
+    async def prepare(self, value) -> None:
+        await self.count_time.set(value)
+
+    async def get_count(self) -> float:
+        await self.trigger()
+        return await self.readout.get_value()
 
 
 """

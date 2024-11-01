@@ -1,5 +1,11 @@
 from .current_amplifier import CurrentAmp
-from .femto import Femto3xxGainTable, Femto3xxRaiseTime, FemtoAdcDetector, FemtoDDPCA
+from .femto import (
+    Femto3xxGainTable,
+    Femto3xxGainToCurrentTable,
+    Femto3xxRaiseTime,
+    FemtoAdcDetector,
+    FemtoDDPCA,
+)
 
 __all__ = [
     "FemtoDDPCA",
@@ -7,4 +13,5 @@ __all__ = [
     "Femto3xxRaiseTime",
     "FemtoAdcDetector",
     "CurrentAmp",
+    "Femto3xxGainToCurrentTable",
 ]

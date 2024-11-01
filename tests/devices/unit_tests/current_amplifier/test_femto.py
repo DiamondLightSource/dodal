@@ -1,19 +1,27 @@
 from collections import defaultdict
 from unittest import mock
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, Mock
 
 import pytest
 from bluesky.plan_stubs import abs_set
 from bluesky.plans import count
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import DeviceCollector, get_mock_put, set_mock_value
+from ophyd_async.core import (
+    DeviceCollector,
+    callback_on_mock_put,
+    get_mock_put,
+    set_mock_value,
+)
 
 from dodal.devices.current_amplifiers import (
     Femto3xxGainTable,
+    Femto3xxGainToCurrentTable,
     Femto3xxRaiseTime,
     FemtoAdcDetector,
     FemtoDDPCA,
 )
+from dodal.devices.current_amplifiers.amp_detector import AutoGainDectector
+from dodal.devices.current_amplifiers.struck_scaler import CountState, StruckScaler
 
 
 @pytest.fixture
@@ -25,6 +33,7 @@ async def mock_femto(
             prefix=prefix,
             suffix=suffix,
             gain_table=Femto3xxGainTable,
+            gain_to_current_table=Femto3xxGainToCurrentTable,
             raise_timetable=Femto3xxRaiseTime,
             name="mock_femto",
         )
@@ -45,6 +54,38 @@ async def mock_femto_adc_detector(
         )
     assert mock_femto_adc_detector.name == "mock_femto_adc_detector"
     return mock_femto_adc_detector
+
+
+@pytest.fixture
+async def mock_StruckScaler(
+    prefix: str = "BLXX-EA-DET-007:", suffix: str = ".s17"
+) -> StruckScaler:
+    async with DeviceCollector(mock=True):
+        mock_StruckScaler = StruckScaler(
+            prefix=prefix,
+            suffix=suffix,
+            name="mock_StruckScaler",
+        )
+    assert mock_StruckScaler.name == "mock_StruckScaler"
+    return mock_StruckScaler
+
+
+@pytest.fixture
+async def mock_femto_struck_scaler_detector(
+    mock_StruckScaler: StruckScaler,
+    mock_femto: FemtoDDPCA,
+    prefix: str = "BLXX-EA-DET-007:",
+) -> AutoGainDectector:
+    async with DeviceCollector(mock=True):
+        mock_femto_struck_scaler_detector = AutoGainDectector(
+            current_amp=mock_femto,
+            counter=mock_StruckScaler,
+            upper_limit=9.5,
+            lower_limit=0.5,
+            name="mock_femto_struck_scaler_detector",
+        )
+    assert mock_femto_struck_scaler_detector.name == "mock_femto_struck_scaler_detector"
+    return mock_femto_struck_scaler_detector
 
 
 @pytest.mark.parametrize(
@@ -172,3 +213,85 @@ async def test_femto_adc_detector_read(
     assert docs["event"][0]["data"]["mock_femto_adc_detector-current"] == pytest.approx(
         expected_current
     )
+
+
+@pytest.mark.parametrize(
+    "gain,raw_voltage, expected_current",
+    [
+        ("sen_1", 0.51, 0.51e-4),
+        ("sen_3", -10, -10e-6),
+        ("sen_6", 5.2, 5.2e-9),
+        ("sen_9", 2.2, 2.2e-12),
+        ("sen_10", 8.7, 8.7e-13),
+        ("sen_5", 0.0, 0.0),
+    ],
+)
+async def test_femto_struck_scaler_read(
+    mock_femto: FemtoDDPCA,
+    mock_femto_struck_scaler_detector: AutoGainDectector,
+    RE: RunEngine,
+    gain,
+    raw_voltage,
+    expected_current,
+):
+    set_mock_value(mock_femto.gain, Femto3xxGainTable[gain])
+    set_mock_value(mock_femto_struck_scaler_detector.counter.readout, raw_voltage)
+    set_mock_value(mock_femto_struck_scaler_detector.auto_mode, False)
+    docs = defaultdict(list)
+
+    def capture_emitted(name, doc):
+        docs[name].append(doc)
+
+    RE(count([mock_femto_struck_scaler_detector]), capture_emitted)
+    assert docs["event"][0]["data"][
+        "mock_femto_struck_scaler_detector-current"
+    ] == pytest.approx(expected_current)
+
+
+@pytest.mark.parametrize(
+    "gain,raw_voltage, expected_current",
+    [
+        ("sen_10", [1e4, 1e3, 1e2, 1e1, 1], 1e-9),
+        ("sen_1", [4e-3, 4e-2, 4e-1, 4], 4e-7),
+        ("sen_6", [520, 52, 5.2], 5.2e-7),
+        ("sen_9", [2.2, 2.2], 2.2e-12),
+        ("sen_10", [0.17, 0.17], 0.17e-13),
+        ("sen_5", [0.0, 0.0], 0.0),
+    ],
+)
+async def test_femto_struck_scaler_read_with_autoGain(
+    mock_femto: FemtoDDPCA,
+    mock_femto_struck_scaler_detector: AutoGainDectector,
+    RE: RunEngine,
+    gain,
+    raw_voltage,
+    expected_current,
+):
+    set_mock_value(mock_femto.gain, Femto3xxGainTable[gain])
+    # set_mock_value(mock_femto_struck_scaler_detector.counter.readout, raw_voltage[0])
+    set_mock_value(mock_femto_struck_scaler_detector.counter.count_time, 1)
+    set_mock_value(mock_femto_struck_scaler_detector.auto_mode, True)
+    rbv_mocks = Mock()
+    rbv_mocks.get.side_effect = raw_voltage
+
+    def do():
+        set_mock_value(
+            mock_femto_struck_scaler_detector.counter.trigger_start, CountState.done
+        )
+        set_mock_value(
+            mock_femto_struck_scaler_detector.counter.readout, rbv_mocks.get()
+        )
+
+    callback_on_mock_put(
+        mock_femto_struck_scaler_detector.counter.trigger_start, lambda *_, **__: do()
+    )
+
+    docs = defaultdict(list)
+
+    def capture_emitted(name, doc):
+        docs[name].append(doc)
+
+    RE(count([mock_femto_struck_scaler_detector]), capture_emitted)
+    assert docs["event"][0]["data"][
+        "mock_femto_struck_scaler_detector-current"
+    ] == pytest.approx(expected_current, rel=1e-14)

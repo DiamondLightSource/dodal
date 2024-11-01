@@ -2,6 +2,7 @@ from ophyd_async.core import Device
 
 from dodal.devices.current_amplifiers import (
     Femto3xxGainTable,
+    Femto3xxGainToCurrentTable,
     Femto3xxRaiseTime,
     FemtoDDPCA,
 )
@@ -13,18 +14,21 @@ class RasorFemto(Device):
             prefix + "-01:",
             suffix=suffix,
             gain_table=Femto3xxGainTable,
+            gain_to_current_table=Femto3xxGainToCurrentTable,
             raise_timetable=Femto3xxRaiseTime,
         )
         self.ca2 = FemtoDDPCA(
             prefix + "-02:",
             suffix=suffix,
             gain_table=Femto3xxGainTable,
+            gain_to_current_table=Femto3xxGainToCurrentTable,
             raise_timetable=Femto3xxRaiseTime,
         )
         self.ca3 = FemtoDDPCA(
             prefix + "-03:",
             suffix=suffix,
             gain_table=Femto3xxGainTable,
+            gain_to_current_table=Femto3xxGainToCurrentTable,
             raise_timetable=Femto3xxRaiseTime,
         )
 

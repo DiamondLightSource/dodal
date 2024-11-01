@@ -28,6 +28,7 @@ class CurrentAmp(StandardReadable, Movable):
         prefix: str,
         suffix: str,
         gain_table: type[Enum],
+        gain_to_current_table: type[Enum],
         raise_timetable: type[Enum],
         timeout: float = 1,
         name: str = "",
@@ -39,6 +40,7 @@ class CurrentAmp(StandardReadable, Movable):
             self.gain_table = gain_table
             self.timeout = timeout
             self.raise_timetable = raise_timetable
+        self.gain_to_current_table = gain_to_current_table
         super().__init__(name)
 
     @AsyncStatus.wrap

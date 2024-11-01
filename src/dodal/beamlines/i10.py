@@ -275,12 +275,12 @@ def rasor_femto(
     )
 
 
-def scaler_card_1(
+def rasor_scaler_card_1(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> StruckScaler:
     return device_instantiation(
         device_factory=StruckScaler,
-        name="scaler_card_1",
+        name="rasor_scaler_card_1",
         prefix="ME01D-EA-SCLR-01:SCALER1",
         suffix=".17",
         wait=wait_for_connection,
