@@ -1,17 +1,16 @@
 import asyncio
 from enum import Enum
 
-from bluesky.protocols import Movable, Reading
+from bluesky.protocols import Reading
 from ophyd_async.core import (
-    AsyncStatus,
     ConfigSignal,
-    HintedSignal,
     StandardReadable,
     soft_signal_r_and_setter,
     soft_signal_rw,
 )
-from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
+from ophyd_async.epics.signal import epics_signal_r
 
+from dodal.devices.current_amplifiers.current_amplifier import CurrentAmp
 from dodal.log import LOGGER
 
 
@@ -45,9 +44,9 @@ class Femto3xxRaiseTime(float, Enum):
     sen_10 = 350e-3
 
 
-class FemtoDDPCA(StandardReadable, Movable):
+class FemtoDDPCA(CurrentAmp):
     """
-    Femto current amplifier device, this class shouldcover all DDPCA Femto current
+    Femto current amplifier device, this class should cover all DDPCA Femto current
      amplifiers, As the main different between all the DDPCA Femto is their gain table
      and respond time table.
     This class will allow the change of gain via set or the two incremental,
@@ -57,52 +56,27 @@ class FemtoDDPCA(StandardReadable, Movable):
     def __init__(
         self,
         prefix: str,
+        suffix: str,
         gain_table: type[Enum],
         raise_timetable: type[Enum],
         timeout: float = 1,
         name: str = "",
     ) -> None:
-        with self.add_children_as_readables(HintedSignal):
-            self.gain = epics_signal_rw(gain_table, prefix + "GAIN")
-
-        with self.add_children_as_readables(ConfigSignal):
-            self.gain_table = gain_table
-            self.timeout = timeout
-            self.raise_timetable = raise_timetable
-        super().__init__(name)
-
-    @AsyncStatus.wrap
-    async def set(self, value) -> None:
-        if value not in self.gain_table.__members__:
-            raise ValueError(f"Gain value {value} is not within {self.name} range.")
-        LOGGER.info(f"{self.name} gain change to {value}")
-        await self.gain.set(value=self.gain_table[value], timeout=self.timeout)
-        # wait for current amplifier to settle
-        await asyncio.sleep(self.raise_timetable[value].value)
-
-    async def increase_gain(self) -> bool:
-        print(await self.gain.get_value())
-        current_gain = int((await self.gain.get_value()).name.split("_")[-1])
-        current_gain += 1
-        if current_gain > len(self.gain_table):
-            return False
-        await self.set(f"sen_{current_gain}")
-        return True
-
-    async def decrease_gain(self) -> bool:
-        current_gain = int((await self.gain.get_value()).name.split("_")[-1])
-        current_gain -= 1
-        if current_gain < 1:
-            return False
-        await self.set(f"sen_{current_gain}")
-        return True
+        super().__init__(
+            prefix=prefix,
+            suffix=suffix,
+            gain_table=gain_table,
+            raise_timetable=raise_timetable,
+            timeout=timeout,
+            name=name,
+        )
 
 
 class FemtoAdcDetector(StandardReadable):
     def __init__(
         self,
         prefix: str,
-        current_amp: FemtoDDPCA,
+        current_amp: CurrentAmp,
         upper_limit: float = 8.8,
         lower_limit: float = 0.8,
         name: str = "",

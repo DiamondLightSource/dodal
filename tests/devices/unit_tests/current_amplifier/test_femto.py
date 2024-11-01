@@ -17,10 +17,13 @@ from dodal.devices.current_amplifiers import (
 
 
 @pytest.fixture
-async def mock_femto(prefix: str = "BLXX-EA-DET-007:") -> FemtoDDPCA:
+async def mock_femto(
+    prefix: str = "BLXX-EA-DET-007:", suffix: str = "Gain"
+) -> FemtoDDPCA:
     async with DeviceCollector(mock=True):
         mock_femto = FemtoDDPCA(
             prefix=prefix,
+            suffix=suffix,
             gain_table=Femto3xxGainTable,
             raise_timetable=Femto3xxRaiseTime,
             name="mock_femto",
@@ -149,7 +152,6 @@ async def test_femto_decrease_gain(
         ("sen_5", 0.0, 0.0),
     ],
 )
-# @mock.patch("asyncio.sleep")
 async def test_femto_adc_detector_read(
     mock_femto: FemtoDDPCA,
     mock_femto_adc_detector: FemtoAdcDetector,
