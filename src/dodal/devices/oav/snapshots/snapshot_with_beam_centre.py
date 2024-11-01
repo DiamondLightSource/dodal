@@ -51,8 +51,9 @@ class SnapshotWithBeamCentre(MJPG):
         beam_y_signal: SignalR,
         name: str = "",
     ) -> None:
-        self.beam_centre_i = beam_x_signal
-        self.beam_centre_j = beam_y_signal
+        with self.add_children_as_readables():
+            self.beam_centre_i = beam_x_signal
+            self.beam_centre_j = beam_y_signal
         super().__init__(prefix, name)
 
     async def post_processing(self, image: Image.Image):

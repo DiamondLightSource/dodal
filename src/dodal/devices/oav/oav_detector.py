@@ -80,15 +80,12 @@ class OAV(StandardReadable):
                 float,
                 lambda: self._get_microns_per_pixel(Coords.Y),
             )
-
             self.beam_centre_i = create_hardware_backed_soft_signal(
                 int, lambda: self._get_beam_position(Coords.X)
             )
-
             self.beam_centre_j = create_hardware_backed_soft_signal(
                 int, lambda: self._get_beam_position(Coords.Y)
             )
-
             self.snapshot = SnapshotWithBeamCentre(
                 f"{self._prefix}MJPG:",
                 self.beam_centre_i,
