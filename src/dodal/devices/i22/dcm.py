@@ -7,12 +7,12 @@ from bluesky.protocols import Reading
 from event_model.documents.event_descriptor import DataKey
 from ophyd_async.core import (
     Array1D,
-    ConfigSignal,
     StandardReadable,
+    StandardReadableFormat,
     soft_signal_r_and_setter,
 )
+from ophyd_async.epics.core import epics_signal_r
 from ophyd_async.epics.motor import Motor
-from ophyd_async.epics.signal import epics_signal_r
 
 # Conversion constant for energy and wavelength, taken from the X-Ray data booklet
 # Converts between energy in KeV and wavelength in angstrom
@@ -76,7 +76,7 @@ class DoubleCrystalMonochromator(StandardReadable):
         # If supplied include crystal details in output of read_configuration
         crystal_1_metadata = crystal_1_metadata or CrystalMetadata()
         crystal_2_metadata = crystal_2_metadata or CrystalMetadata()
-        with self.add_children_as_readables(ConfigSignal):
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             if crystal_1_metadata.usage is not None:
                 self.crystal_1_usage, _ = soft_signal_r_and_setter(
                     str, initial_value=crystal_1_metadata.usage

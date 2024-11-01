@@ -113,6 +113,9 @@ filterwarnings = [
     "ignore:.*pkg_resources.*:DeprecationWarning",
     # Ignore deprecation warning from setuptools_dso (remove when https://github.com/epics-base/setuptools_dso/issues/36 is released)
     "ignore::DeprecationWarning:wheel",
+    # Ignore deprecation warning from ophyd_async motor.py
+    "ignore:.*StandardReadableFormat\\.CONFIG_SIGNAL.*:DeprecationWarning",
+    "ignore:.*StandardReadableFormat\\.HINTED_SIGNAL.*:DeprecationWarning",
 ]
 # Doctest python code in docs, python code in src docstrings, test functions in tests
 testpaths = "docs src tests system_tests"

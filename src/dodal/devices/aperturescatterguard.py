@@ -5,8 +5,8 @@ import asyncio
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
-    HintedSignal,
     StandardReadable,
+    StandardReadableFormat,
     StrictEnum,
 )
 from pydantic import BaseModel, Field
@@ -132,7 +132,7 @@ class ApertureScatterguard(StandardReadable, Movable):
                 self.radius,
             ],
         )
-        with self.add_children_as_readables(HintedSignal):
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.selected_aperture = create_hardware_backed_soft_signal(
                 ApertureValue, self._get_current_aperture_position
             )

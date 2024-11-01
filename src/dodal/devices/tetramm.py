@@ -14,7 +14,7 @@ from ophyd_async.core import (
     soft_signal_r_and_setter,
 )
 from ophyd_async.epics.adcore import ADHDFWriter, NDFileHDFIO, stop_busy_record
-from ophyd_async.epics.signal import (
+from ophyd_async.epics.core import (
     epics_signal_r,
     epics_signal_rw,
     epics_signal_rw_rbv,

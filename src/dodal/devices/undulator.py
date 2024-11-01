@@ -5,13 +5,13 @@ from bluesky.protocols import Movable
 from numpy import argmin, ndarray
 from ophyd_async.core import (
     AsyncStatus,
-    ConfigSignal,
     StandardReadable,
+    StandardReadableFormat,
     StrictEnum,
     soft_signal_r_and_setter,
 )
+from ophyd_async.epics.core import epics_signal_r
 from ophyd_async.epics.motor import Motor
-from ophyd_async.epics.signal import epics_signal_r
 
 from dodal.log import LOGGER
 
@@ -75,7 +75,7 @@ class Undulator(StandardReadable, Movable):
             self.current_gap = epics_signal_r(float, prefix + "CURRGAPD")
             self.gap_access = epics_signal_r(UndulatorGapAccess, prefix + "IDBLENA")
 
-        with self.add_children_as_readables(ConfigSignal):
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.gap_discrepancy_tolerance_mm, _ = soft_signal_r_and_setter(
                 float,
                 initial_value=UNDULATOR_DISCREPANCY_THRESHOLD_MM,
