@@ -60,7 +60,11 @@ class AutoGainDectector(StandardReadable):
         count_time = await self.counter.count_time.get_value()
         while cnt < len(self.current_amp.gain_table):
             await self.counter.trigger()
-            reading = await self.counter.readout.get_value(cached=False)
+            """
+            negative value is possible on some current amplifier it is the order of
+              magnitude that is important
+            """
+            reading = abs(await self.counter.readout.get_value(cached=False))
             if reading > self.upper_limit / count_time:
                 if not await self.current_amp.decrease_gain():
                     return False
