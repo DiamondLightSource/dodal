@@ -16,12 +16,6 @@ def test_group_uid(group: str):
     assert not gid.endswith(f"{group}-")
 
 
-@pytest.mark.filterwarnings("ignore::DeprecationWarning")
-def test_inject_returns_value():
-    assert inject("foo") == "foo"
-
-
-@pytest.mark.filterwarnings("ignore::DeprecationWarning")
 def test_type_checking_ignores_inject():
     def example_function(x: Movable = inject("foo")) -> MsgGenerator:  # noqa: B008
         yield from {}
@@ -31,13 +25,3 @@ def test_type_checking_ignores_inject():
     x: Parameter = signature(example_function).parameters["x"]
     assert x.annotation == Movable
     assert x.default == "foo"
-
-
-def test_inject_is_deprecated():
-    with pytest.raises(
-        DeprecationWarning,
-        match="Inject is deprecated, users are now expected to call the device factory",
-    ):
-
-        def example_function(x: Movable = inject("foo")) -> MsgGenerator:  # noqa: B008
-            yield from {}

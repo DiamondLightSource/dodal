@@ -1,3 +1,4 @@
+import os
 from enum import Enum
 
 import numpy as np
@@ -54,7 +55,7 @@ class Undulator(StandardReadable, Movable):
     def __init__(
         self,
         prefix: str,
-        id_gap_lookup_table_path: str,
+        id_gap_lookup_table_path: str = os.devnull,
         name: str = "",
         poles: int | None = None,
         length: float | None = None,
