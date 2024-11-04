@@ -18,7 +18,8 @@ from dodal.devices.flux import Flux
 from dodal.devices.i04.transfocator import Transfocator
 from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZPositioner
-from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
+from dodal.devices.oav.oav_detector import OAV
+from dodal.devices.oav.oav_parameters import OAVConfig
 from dodal.devices.oav.oav_to_redis_forwarder import OAVToRedisForwarder
 from dodal.devices.robot import BartRobot
 from dodal.devices.s4_slit_gaps import S4SlitGaps
@@ -344,17 +345,21 @@ def zebra(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -
 
 
 @skip_device(lambda: BL == "s04")
-def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> OAV:
+def oav(
+    wait_for_connection: bool = True,
+    fake_with_ophyd_sim: bool = False,
+    params: OAVConfig | None = None,
+) -> OAV:
     """Get the i04 OAV device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
     return device_instantiation(
         OAV,
         "oav",
-        "",
+        "-DI-OAV-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        params=OAVConfigParams(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+        config=params or OAVConfig(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
     )
 
 

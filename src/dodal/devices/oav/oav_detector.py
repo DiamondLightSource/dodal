@@ -1,26 +1,35 @@
-# type: ignore # OAV will soon be ophyd-async, see https://github.com/DiamondLightSource/dodal/issues/716
-from functools import partial
+from enum import IntEnum
 
-from ophyd import ADComponent as ADC
-from ophyd import (
-    AreaDetector,
-    CamBase,
-    Component,
-    Device,
-    EpicsSignal,
-    HDF5Plugin,
-    OverlayPlugin,
-    ProcessPlugin,
-    ROIPlugin,
-    StatusBase,
-)
+from ophyd_async.core import DEFAULT_TIMEOUT, AsyncStatus, StandardReadable
+from ophyd_async.epics.signal import epics_signal_rw
 
-from dodal.devices.areadetector.plugins.MJPG import SnapshotWithBeamCentre
-from dodal.devices.oav.grid_overlay import SnapshotWithGrid
-from dodal.devices.oav.oav_parameters import OAVConfigParams
+from dodal.common.signal_utils import create_hardware_backed_soft_signal
+from dodal.devices.areadetector.plugins.CAM import Cam
+from dodal.devices.oav.oav_parameters import DEFAULT_OAV_WINDOW, OAVConfig
+from dodal.devices.oav.snapshots.snapshot_with_beam_centre import SnapshotWithBeamCentre
+from dodal.devices.oav.snapshots.snapshot_with_grid import SnapshotWithGrid
+from dodal.log import LOGGER
 
 
-class ZoomController(Device):
+class ZoomLevelNotFoundError(Exception):
+    def __init__(self, errmsg):
+        LOGGER.error(errmsg)
+
+
+class Coords(IntEnum):
+    X = 0
+    Y = 1
+
+
+# Workaround to deal with the fact that beamlines may have slightly different string
+# descriptions of the zoom level"
+def _get_correct_zoom_string(zoom: str) -> str:
+    if zoom.endswith("x"):
+        zoom = zoom.strip("x")
+    return zoom
+
+
+class ZoomController(StandardReadable):
     """
     Device to control the zoom level. This should be set like
         o = OAV(name="oav")
@@ -30,63 +39,89 @@ class ZoomController(Device):
     you should wait on any zoom changs to finish before changing the OAV wiring.
     """
 
-    percentage = Component(EpicsSignal, "ZOOMPOSCMD")
+    def __init__(self, prefix: str, name: str = "") -> None:
+        super().__init__(name=name)
+        self.percentage = epics_signal_rw(float, f"{prefix}ZOOMPOSCMD")
 
-    # Level is the string description of the zoom level e.g. "1.0x"
-    level = Component(EpicsSignal, "MP:SELECT", string=True)
+        # Level is the string description of the zoom level e.g. "1.0x" or "1.0"
+        self.level = epics_signal_rw(str, f"{prefix}MP:SELECT")
 
-    zrst = Component(EpicsSignal, "MP:SELECT.ZRST")
-    onst = Component(EpicsSignal, "MP:SELECT.ONST")
-    twst = Component(EpicsSignal, "MP:SELECT.TWST")
-    thst = Component(EpicsSignal, "MP:SELECT.THST")
-    frst = Component(EpicsSignal, "MP:SELECT.FRST")
-    fvst = Component(EpicsSignal, "MP:SELECT.FVST")
-    sxst = Component(EpicsSignal, "MP:SELECT.SXST")
+    async def _get_allowed_zoom_levels(self) -> list:
+        zoom_levels = await self.level.describe()
+        return zoom_levels["level"]["choices"]  # type: ignore
 
-    @property
-    def allowed_zoom_levels(self):
-        return [
-            self.zrst.get(),
-            self.onst.get(),
-            self.twst.get(),
-            self.thst.get(),
-            self.frst.get(),
-            self.fvst.get(),
-            self.sxst.get(),
-        ]
-
-    def set(self, level_to_set: str) -> StatusBase:
-        return self.level.set(level_to_set)
+    @AsyncStatus.wrap
+    async def set(self, level_to_set: str):
+        allowed_zoom_levels = await self._get_allowed_zoom_levels()
+        if level_to_set not in allowed_zoom_levels:
+            raise ZoomLevelNotFoundError(
+                f"{level_to_set} not found, expected one of {allowed_zoom_levels}"
+            )
+        await self.level.set(level_to_set, wait=True)
 
 
-class OAV(AreaDetector):
-    cam = ADC(CamBase, "-DI-OAV-01:CAM:")
-    roi = ADC(ROIPlugin, "-DI-OAV-01:ROI:")
-    proc = ADC(ProcessPlugin, "-DI-OAV-01:PROC:")
-    over = ADC(OverlayPlugin, "-DI-OAV-01:OVER:")
-    tiff = ADC(OverlayPlugin, "-DI-OAV-01:TIFF:")
-    hdf5 = ADC(HDF5Plugin, "-DI-OAV-01:HDF5:")
-    grid_snapshot = Component(SnapshotWithGrid, "-DI-OAV-01:MJPG:")
-    snapshot = Component(SnapshotWithBeamCentre, "-DI-OAV-01:MJPG:")
-    zoom_controller = Component(ZoomController, "-EA-OAV-01:FZOOM:")
+class OAV(StandardReadable):
+    def __init__(self, prefix: str, config: OAVConfig, name: str = ""):
+        self.oav_config = config
+        self._prefix = prefix
+        self._name = name
+        _bl_prefix = prefix.split("-")[0]
+        self.zoom_controller = ZoomController(f"{_bl_prefix}-EA-OAV-01:FZOOM:", name)
 
-    def __init__(self, *args, params: OAVConfigParams, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.parameters = params
-        self.grid_snapshot.oav_params = params
-        self.snapshot.oav_params = params
-        self.subscription_id = None
-        self._snapshot_trigger_subscription_id = None
+        self.cam = Cam(f"{prefix}CAM:", name=name)
 
-    def wait_for_connection(self, all_signals=False, timeout=2):
-        connected = super().wait_for_connection(all_signals, timeout)
-        x = self.grid_snapshot.x_size.get()
-        y = self.grid_snapshot.y_size.get()
+        with self.add_children_as_readables():
+            self.grid_snapshot = SnapshotWithGrid(f"{prefix}MJPG:", name)
+            self.microns_per_pixel_x = create_hardware_backed_soft_signal(
+                float,
+                lambda: self._get_microns_per_pixel(Coords.X),
+            )
+            self.microns_per_pixel_y = create_hardware_backed_soft_signal(
+                float,
+                lambda: self._get_microns_per_pixel(Coords.Y),
+            )
+            self.beam_centre_i = create_hardware_backed_soft_signal(
+                int, lambda: self._get_beam_position(Coords.X)
+            )
+            self.beam_centre_j = create_hardware_backed_soft_signal(
+                int, lambda: self._get_beam_position(Coords.Y)
+            )
+            self.snapshot = SnapshotWithBeamCentre(
+                f"{self._prefix}MJPG:",
+                self.beam_centre_i,
+                self.beam_centre_j,
+                self._name,
+            )
 
-        cb = partial(self.parameters.update_on_zoom, xsize=x, ysize=y)
+        self.sizes = [self.grid_snapshot.x_size, self.grid_snapshot.y_size]
 
-        if self.subscription_id is not None:
-            self.zoom_controller.level.unsubscribe(self.subscription_id)
-        self.subscription_id = self.zoom_controller.level.subscribe(cb)
+        super().__init__(name)
 
-        return connected
+    async def _read_current_zoom(self) -> str:
+        _zoom = await self.zoom_controller.level.get_value()
+        return _get_correct_zoom_string(_zoom)
+
+    async def _get_microns_per_pixel(self, coord: int) -> float:
+        """Extracts the microns per x pixel and y pixel for a given zoom level."""
+        _zoom = await self._read_current_zoom()
+        value = self.parameters[_zoom].microns_per_pixel[coord]
+        size = await self.sizes[coord].get_value()
+        return value * DEFAULT_OAV_WINDOW[coord] / size
+
+    async def _get_beam_position(self, coord: int) -> int:
+        """Extracts the beam location in pixels `xCentre` `yCentre`, for a requested \
+        zoom level. """
+        _zoom = await self._read_current_zoom()
+        value = self.parameters[_zoom].crosshair[coord]
+        size = await self.sizes[coord].get_value()
+        return int(value * size / DEFAULT_OAV_WINDOW[coord])
+
+    async def connect(
+        self,
+        mock: bool = False,
+        timeout: float = DEFAULT_TIMEOUT,
+        force_reconnect: bool = False,
+    ):
+        self.parameters = self.oav_config.get_parameters()
+
+        return await super().connect(mock, timeout, force_reconnect)

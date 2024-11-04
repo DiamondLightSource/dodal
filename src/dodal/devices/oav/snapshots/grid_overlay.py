@@ -1,13 +1,7 @@
-# type: ignore # OAV will soon be ophyd-async, see https://github.com/DiamondLightSource/dodal/issues/716
 from enum import Enum
 from functools import partial
-from os.path import join as path_join
 
-from ophyd import Component, Signal
 from PIL import Image, ImageDraw
-
-from dodal.devices.areadetector.plugins.MJPG import MJPG
-from dodal.log import LOGGER
 
 
 class Orientation(Enum):
@@ -122,40 +116,3 @@ def add_grid_overlay_to_image(
         spacing=box_width,
         num_lines=num_boxes_y - 1,
     )
-
-
-class SnapshotWithGrid(MJPG):
-    top_left_x = Component(Signal)
-    top_left_y = Component(Signal)
-    box_width = Component(Signal)
-    num_boxes_x = Component(Signal)
-    num_boxes_y = Component(Signal)
-
-    last_path_outer = Component(Signal)
-    last_path_full_overlay = Component(Signal)
-
-    def post_processing(self, image: Image.Image):
-        # Save an unmodified image with no suffix
-        self._save_image(image)
-
-        top_left_x = self.top_left_x.get()
-        top_left_y = self.top_left_y.get()
-        box_width = self.box_width.get()
-        num_boxes_x = self.num_boxes_x.get()
-        num_boxes_y = self.num_boxes_y.get()
-        assert isinstance(filename_str := self.filename.get(), str)
-        assert isinstance(directory_str := self.directory.get(), str)
-        add_grid_border_overlay_to_image(
-            image, top_left_x, top_left_y, box_width, num_boxes_x, num_boxes_y
-        )
-        path = path_join(directory_str, f"{filename_str}_outer_overlay.png")
-        self.last_path_outer.put(path)
-        LOGGER.info(f"Saving grid outer edge at {path}")
-        image.save(path)
-        add_grid_overlay_to_image(
-            image, top_left_x, top_left_y, box_width, num_boxes_x, num_boxes_y
-        )
-        path = path_join(directory_str, f"{filename_str}_grid_overlay.png")
-        self.last_path_full_overlay.put(path)
-        LOGGER.info(f"Saving full grid overlay at {path}")
-        image.save(path)

@@ -1,41 +1,53 @@
-import pytest
-from ophyd.sim import instantiate_fake_device
+from unittest.mock import AsyncMock, patch
 
-from dodal.devices.oav.oav_detector import OAV, OAVConfigParams
-from dodal.devices.oav.oav_errors import (
-    OAVError_BeamPositionNotFound,
-    OAVError_ZoomLevelNotFound,
+import pytest
+from ophyd_async.core import set_mock_value
+
+from dodal.devices.oav.oav_detector import (
+    OAV,
+    Cam,
+    ZoomController,
+    ZoomLevelNotFoundError,
 )
 
-DISPLAY_CONFIGURATION = "tests/devices/unit_tests/test_display.configuration"
-ZOOM_LEVELS_XML = "tests/devices/unit_tests/test_jCameraManZoomLevels.xml"
+
+async def test_zoom_controller():
+    zoom_controller = ZoomController("", "fake zoom controller")
+    await zoom_controller.connect(mock=True)
+    zoom_controller.level.describe = AsyncMock(
+        return_value={"level": {"choices": ["1.0x", "3.0x"]}}
+    )
+    status = zoom_controller.set("3.0x")
+    await status
+    assert status.success
+    assert await zoom_controller.level.get_value() == "3.0x"
 
 
-@pytest.fixture
-def oav() -> OAV:
-    oav_params = OAVConfigParams(ZOOM_LEVELS_XML, DISPLAY_CONFIGURATION)
-    oav: OAV = instantiate_fake_device(OAV, params=oav_params)
-    oav.proc.port_name.sim_put("proc")  # type: ignore
-    oav.cam.port_name.sim_put("CAM")  # type: ignore
-
-    oav.grid_snapshot.x_size.sim_put("1024")  # type: ignore
-    oav.grid_snapshot.y_size.sim_put("768")  # type: ignore
-
-    oav.zoom_controller.zrst.set("1.0x")
-    oav.zoom_controller.onst.set("2.0x")
-    oav.zoom_controller.twst.set("3.0x")
-    oav.zoom_controller.thst.set("5.0x")
-    oav.zoom_controller.frst.set("7.0x")
-    oav.zoom_controller.fvst.set("9.0x")
-
-    oav.wait_for_connection()
-
-    return oav
+async def test_zoom_controller_set_raises_error_for_wrong_level():
+    zoom_controller = ZoomController("", "fake zoom controller")
+    await zoom_controller.connect(mock=True)
+    zoom_controller._get_allowed_zoom_levels = AsyncMock(return_value=["1.0x", "3.0x"])
+    with pytest.raises(ZoomLevelNotFoundError):
+        await zoom_controller.set("5.0x")
 
 
-def test_load_microns_per_pixel_entry_not_found(oav: OAV):
-    with pytest.raises(OAVError_ZoomLevelNotFound):
-        oav.parameters.load_microns_per_pixel(0.000001, 0, 0)
+async def test_cam():
+    cam = Cam("", "fake cam")
+    await cam.connect(mock=True)
+    set_mock_value(cam.array_size_x, 1024)
+    set_mock_value(cam.array_size_y, 768)
+
+    status = cam.acquire_period.set(0.01)
+    await status
+    assert status.success
+    assert await cam.acquire_period.get_value() == 0.01
+
+    status = cam.acquire_time.set(0.01)
+    await status
+    assert status.success
+    assert await cam.acquire_time.get_value() == 0.01
+
+    assert await cam.array_size_x.get_value() == 1024
 
 
 @pytest.mark.parametrize(
@@ -47,87 +59,71 @@ def test_load_microns_per_pixel_entry_not_found(oav: OAV):
         ("15.0", 0.302, 0.302),
     ],
 )
-def test_get_micronsperpixel_from_oav(
+async def test_get_micronsperpixel_from_oav(
     zoom_level, expected_microns_x, expected_microns_y, oav: OAV
 ):
-    oav.zoom_controller.level.sim_put(zoom_level)  # type: ignore
+    set_mock_value(oav.zoom_controller.level, zoom_level)
 
-    assert oav.parameters.micronsPerXPixel == pytest.approx(
+    assert await oav.microns_per_pixel_x.get_value() == pytest.approx(
         expected_microns_x, abs=1e-2
     )
-    assert oav.parameters.micronsPerYPixel == pytest.approx(
+    assert await oav.microns_per_pixel_y.get_value() == pytest.approx(
         expected_microns_y, abs=1e-2
     )
-
-
-def test_beam_position_not_found_for_wrong_entry(oav: OAV):
-    with pytest.raises(OAVError_BeamPositionNotFound):
-        oav.parameters.get_beam_position_from_zoom(2.0, 0, 0)
-
-
-def test_get_beam_position(oav: OAV):
-    expected_beam_position = (493, 355)
-    beam_position = oav.parameters.get_beam_position_from_zoom(2.5, 1024, 768)
-
-    assert beam_position[0] == expected_beam_position[0]
-    assert beam_position[1] == expected_beam_position[1]
 
 
 @pytest.mark.parametrize(
     "zoom_level,expected_xCentre,expected_yCentre",
     [("1.0", 477, 359), ("5.0", 517, 350), ("10.0x", 613, 344)],
 )
-def test_extract_beam_position_given_different_zoom_levels(
+async def test_extract_beam_position_given_different_zoom_levels(
     zoom_level,
     expected_xCentre,
     expected_yCentre,
     oav: OAV,
 ):
-    oav.zoom_controller.level.sim_put(zoom_level)  # type: ignore
+    set_mock_value(oav.zoom_controller.level, zoom_level)
 
-    assert oav.parameters.beam_centre_i == expected_xCentre
-    assert oav.parameters.beam_centre_j == expected_yCentre
-
-
-def test_extract_rescaled_micronsperpixel(oav: OAV):
-    oav.grid_snapshot.x_size.sim_put("1292")  # type: ignore
-    oav.grid_snapshot.y_size.sim_put("964")  # type: ignore
-    oav.wait_for_connection()
-
-    oav.zoom_controller.level.sim_put("1.0")  # type: ignore
-
-    assert oav.parameters.micronsPerXPixel == pytest.approx(2.27, abs=1e-2)
-    assert oav.parameters.micronsPerYPixel == pytest.approx(2.28, abs=1e-2)
+    assert await oav.beam_centre_i.get_value() == expected_xCentre
+    assert await oav.beam_centre_j.get_value() == expected_yCentre
 
 
-def test_extract_rescaled_beam_position(oav: OAV):
-    oav.grid_snapshot.x_size.sim_put("1292")  # type: ignore
-    oav.grid_snapshot.y_size.sim_put("964")  # type: ignore
-    oav.wait_for_connection()
+async def test_oav_returns_rescaled_beam_position_and_microns_per_pixel_correctly(
+    oav: OAV,
+):
+    set_mock_value(oav.grid_snapshot.x_size, 1292)
+    set_mock_value(oav.grid_snapshot.y_size, 964)
 
-    oav.zoom_controller.level.sim_put("1.0")  # type: ignore
+    set_mock_value(oav.zoom_controller.level, "1.0")
 
-    assert oav.parameters.beam_centre_i == 601
-    assert oav.parameters.beam_centre_j == 450
+    microns_x = await oav.microns_per_pixel_x.get_value()
+    microns_y = await oav.microns_per_pixel_y.get_value()
+    beam_x = await oav.beam_centre_i.get_value()
+    beam_y = await oav.beam_centre_j.get_value()
+
+    assert microns_x == pytest.approx(2.27, abs=1e-2)
+    assert microns_y == pytest.approx(2.28, abs=1e-2)
+    assert beam_x == 601
+    assert beam_y == 450
 
 
-@pytest.mark.parametrize(
-    "h, v, expected_x, expected_y",
-    [
-        (54, 100, 517 - 54, 350 - 100),
-        (0, 0, 517, 350),
-        (500, 500, 517 - 500, 350 - 500),
-    ],
+@patch(
+    "dodal.devices.areadetector.plugins.MJPG.ClientSession.get",
+    autospec=True,
 )
-def test_calculate_beam_distance(h, v, expected_x, expected_y, oav: OAV):
-    oav.zoom_controller.level.sim_put("5.0x")  # type: ignore
+@patch("dodal.devices.areadetector.plugins.MJPG.Image")
+async def test_when_snapshot_triggered_post_processing_called_correctly(
+    patch_image, mock_get, oav: OAV
+):
+    mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
+    mock_response.ok = True
+    mock_response.read.return_value = (test_data := b"TEST")
 
-    assert oav.parameters.calculate_beam_distance(
-        h,
-        v,
-    ) == (expected_x, expected_y)
+    mock_open = patch_image.open
+    mock_open.return_value.__aenter__.return_value = test_data
 
+    oav.snapshot.post_processing = (mock_proc := AsyncMock())
 
-def test_when_oav_created_then_snapshot_parameters_set(oav: OAV):
-    assert oav.snapshot.oav_params is not None
-    assert oav.grid_snapshot.oav_params is not None
+    await oav.snapshot.trigger()
+
+    mock_proc.assert_awaited_once()
