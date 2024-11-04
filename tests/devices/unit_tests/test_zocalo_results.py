@@ -9,6 +9,7 @@ from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
 from ophyd_async.core import AsyncStatus
 
+from dodal.devices.zocalo.zocalo_constants import ZOCALO_ENV
 from dodal.devices.zocalo.zocalo_results import (
     ZOCALO_READING_PLAN_NAME,
     NoResultsFromZocalo,
@@ -88,7 +89,7 @@ async def zocalo_results():
         patch("dodal.devices.zocalo.zocalo_results._get_zocalo_connection"),
         patch("dodal.devices.zocalo.zocalo_results.CLEAR_QUEUE_WAIT_S", 0),
     ):
-        yield ZocaloResults(name="zocalo", zocalo_environment="dev_artemis")
+        yield ZocaloResults(name="zocalo", zocalo_environment=ZOCALO_ENV)
 
 
 @pytest.fixture
@@ -191,7 +192,7 @@ async def test_subscribe_only_on_called_stage(
     mock_connection: MagicMock, mock_wrap_subscribe: MagicMock, RE: RunEngine
 ):
     zocalo_results = ZocaloResults(
-        name="zocalo", zocalo_environment="dev_artemis", timeout_s=0
+        name="zocalo", zocalo_environment=ZOCALO_ENV, timeout_s=0
     )
     mock_wrap_subscribe.assert_not_called()
     await zocalo_results.stage()
@@ -216,7 +217,7 @@ async def test_zocalo_results_trigger_log_message(
 ):
     zocalo_results = ZocaloResults(
         name="zocalo",
-        zocalo_environment="dev_artemis",
+        zocalo_environment=ZOCALO_ENV,
         timeout_s=0,
         use_cpu_and_gpu=True,
     )
@@ -266,7 +267,7 @@ async def test_when_exception_caused_by_zocalo_message_then_exception_propagated
     mock_connection, RE: RunEngine
 ):
     zocalo_results = ZocaloResults(
-        name="zocalo", zocalo_environment="dev_artemis", timeout_s=0.1
+        name="zocalo", zocalo_environment=ZOCALO_ENV, timeout_s=0.1
     )
     await zocalo_results.connect()
     with pytest.raises(FailedStatus) as e:
@@ -435,7 +436,7 @@ async def test_gpu_results_ignored_and_cpu_results_used_if_toggle_disabled(
 ):
     zocalo_results = ZocaloResults(
         name="zocalo",
-        zocalo_environment="dev_artemis",
+        zocalo_environment=ZOCALO_ENV,
         timeout_s=0,
         use_cpu_and_gpu=False,
     )

@@ -16,6 +16,7 @@ from dodal.devices.zocalo import (
     ZocaloStartInfo,
     ZocaloTrigger,
 )
+from dodal.devices.zocalo.zocalo_constants import ZOCALO_ENV
 
 TEST_RESULT_LARGE: XrcResult = {
     "centre_of_mass": [1, 2, 3],
@@ -39,7 +40,7 @@ async def test_read_results_from_fake_zocalo(
     zocalo_device: ZocaloResults, RE: RunEngine
 ):
     zocalo_device._subscribe_to_results()
-    zc = ZocaloTrigger("dev_artemis")
+    zc = ZocaloTrigger(ZOCALO_ENV)
     zc.run_start(ZocaloStartInfo(0, None, 0, 100, 0))
     zc.run_end(0)
     zocalo_device.timeout_s = 5
@@ -60,7 +61,7 @@ async def test_stage_unstage_controls_read_results_from_fake_zocalo(
     zocalo_device: ZocaloResults, RE: RunEngine
 ):
     dodal.devices.zocalo.zocalo_results.CLEAR_QUEUE_WAIT_S = 0.05
-    zc = ZocaloTrigger("dev_artemis")
+    zc = ZocaloTrigger(ZOCALO_ENV)
     zocalo_device.timeout_s = 5
 
     def plan():

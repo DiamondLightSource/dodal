@@ -79,6 +79,10 @@ def get_beamline_name(default: str) -> str:
     return environ.get("BEAMLINE") or default
 
 
+def is_test_mode() -> bool:
+    return environ.get("DODAL_TEST_MODE") is True
+
+
 def get_hostname() -> str:
     return socket.gethostname().split(".")[0]
 

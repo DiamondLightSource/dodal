@@ -43,6 +43,7 @@ mock_attributes_table = {
 }
 
 BANNED_PATHS = [Path("/dls"), Path("/dls_sw")]
+environ["DODAL_TEST_MODE"] = "true"
 
 
 @pytest.fixture(autouse=True)
