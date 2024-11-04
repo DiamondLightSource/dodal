@@ -80,7 +80,7 @@ def get_beamline_name(default: str) -> str:
 
 
 def is_test_mode() -> bool:
-    return environ.get("DODAL_TEST_MODE") is True
+    return environ.get("DODAL_TEST_MODE") == "true"
 
 
 def get_hostname() -> str:
