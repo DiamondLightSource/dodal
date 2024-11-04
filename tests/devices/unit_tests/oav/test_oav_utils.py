@@ -105,7 +105,7 @@ async def test_given_no_tip_when_wait_for_tip_to_be_found_called_then_exception_
             int(PinTipDetection.INVALID_POSITION[0]),
             int(PinTipDetection.INVALID_POSITION[1]),
             np.array([]),
-            np.array([])
+            np.array([]),
         )
     )
     RE = RunEngine(call_returns_result=True)
