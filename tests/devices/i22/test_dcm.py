@@ -12,24 +12,23 @@ from ophyd_async.core import (
     set_mock_value,
 )
 
-from dodal.common.crystal_metadata import MaterialsEnum
-from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
+from dodal.common.crystal_metadata import (
+    MaterialsEnum,
+    make_crystal_metadata_from_material,
+)
+from dodal.devices.i22.dcm import DoubleCrystalMonochromator
 
 
 @pytest.fixture
 async def dcm() -> DoubleCrystalMonochromator:
+    metadata_1 = make_crystal_metadata_from_material(MaterialsEnum.Si, (1, 1, 1))
+    metadata_2 = make_crystal_metadata_from_material(MaterialsEnum.Si, (1, 1, 1))
     async with DeviceCollector(mock=True):
         dcm = DoubleCrystalMonochromator(
             prefix="FOO-MO",
             temperature_prefix="FOO-DI",
-            crystal_1_metadata=CrystalMetadata(
-                material=MaterialsEnum.Si,
-                reflection_plane=(1, 1, 1),
-            ),
-            crystal_2_metadata=CrystalMetadata(
-                material=MaterialsEnum.Si,
-                reflection_plane=(1, 1, 1),
-            ),
+            crystal_1_metadata=metadata_1,
+            crystal_2_metadata=metadata_2,
         )
 
     return dcm

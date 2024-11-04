@@ -1,12 +1,13 @@
 import pytest
 
-from dodal.common.crystal_metadata import CrystalMetadata, MaterialsEnum
+from dodal.common.crystal_metadata import (
+    MaterialsEnum,
+    make_crystal_metadata_from_material,
+)
 
 
 def test_happy_path_silicon():
-    crystal_metadata = CrystalMetadata(
-        material=MaterialsEnum.Si, reflection_plane=(3, 1, 1)
-    )
+    crystal_metadata = make_crystal_metadata_from_material(MaterialsEnum.Si, (3, 1, 1))
 
     # Check the values
     assert crystal_metadata.type == "silicon"
@@ -18,10 +19,7 @@ def test_happy_path_silicon():
 
 
 def test_happy_path_germanium():
-    crystal_metadata = CrystalMetadata(
-        material=MaterialsEnum.Ge, reflection_plane=(1, 1, 1)
-    )
-
+    crystal_metadata = make_crystal_metadata_from_material(MaterialsEnum.Ge, (1, 1, 1))
     # Check the values
     assert crystal_metadata.type == "germanium"
     assert crystal_metadata.reflection == (1, 1, 1)
@@ -36,4 +34,4 @@ def test_invalid_reflection_plane_with_negative_number():
         AssertionError,
         match="Reflection plane indices must be positive integers",
     ):
-        CrystalMetadata(material=MaterialsEnum.Si, reflection_plane=(-1, 2, 3))
+        make_crystal_metadata_from_material(MaterialsEnum.Si, (-1, 2, 3))

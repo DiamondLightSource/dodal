@@ -4,7 +4,11 @@ from ophyd_async.core import StandardReadable, soft_signal_r_and_setter
 from ophyd_async.epics.motor import Motor
 from ophyd_async.epics.signal import epics_signal_r
 
-from dodal.common.crystal_metadata import CrystalMetadata, MaterialsEnum
+from dodal.common.crystal_metadata import (
+    CrystalMetadata,
+    MaterialsEnum,
+    make_crystal_metadata_from_material,
+)
 
 
 class DCM(StandardReadable):
@@ -21,10 +25,11 @@ class DCM(StandardReadable):
         self,
         prefix: str,
         name: str = "",
-        crystal_metadata: CrystalMetadata = CrystalMetadata(  # noqa: B008
-            MaterialsEnum.Si, (1, 1, 1)
-        ),
+        crystal_metadata: CrystalMetadata | None = None,
     ) -> None:
+        cm = crystal_metadata or make_crystal_metadata_from_material(
+            MaterialsEnum.Si, (1, 1, 1)
+        )
         with self.add_children_as_readables():
             self.bragg_in_degrees = Motor(prefix + "BRAGG")
             self.roll_in_mrad = Motor(prefix + "ROLL")
@@ -44,10 +49,10 @@ class DCM(StandardReadable):
             self.perp_sub_assembly_temp = epics_signal_r(float, prefix + "TEMP7")
 
             self.crystal_metadata_usage, _ = soft_signal_r_and_setter(
-                str, initial_value=crystal_metadata.usage
+                str, initial_value=cm.usage
             )
             self.crystal_metadata_type, _ = soft_signal_r_and_setter(
-                str, initial_value=crystal_metadata.type
+                str, initial_value=cm.type
             )
             self.crystal_metadata_reflection, _ = soft_signal_r_and_setter(
                 Sequence[int],
