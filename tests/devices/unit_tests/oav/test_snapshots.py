@@ -2,7 +2,11 @@ from pathlib import Path
 from unittest.mock import ANY, AsyncMock, MagicMock, call, patch
 
 import pytest
-from ophyd_async.core import DeviceCollector, MockSignalBackend, SignalR, set_mock_value
+from ophyd_async.core import (
+    DeviceCollector,
+    set_mock_value,
+    soft_signal_r_and_setter,
+)
 from PIL import Image
 
 from dodal.devices.oav.snapshots.snapshot_with_beam_centre import (
@@ -15,16 +19,16 @@ from dodal.devices.oav.snapshots.snapshot_with_grid import (
 )
 
 
-def create_and_set_mock_signal_r(dtype, name, value):
-    sig = SignalR(MockSignalBackend(dtype), name=name)
-    set_mock_value(sig, value)
-    return sig
+async def create_and_set_mock_signal_r(dtype, name, value):
+    get, _ = soft_signal_r_and_setter(dtype, value, name=name)
+    await get.connect(mock=True)
+    return get
 
 
 @pytest.fixture
 async def snapshot() -> SnapshotWithBeamCentre:
-    mock_beam_x = create_and_set_mock_signal_r(int, "moxk_beam_x", 510)
-    mock_beam_y = create_and_set_mock_signal_r(int, "mock_beam_y", 380)
+    mock_beam_x = await create_and_set_mock_signal_r(int, "mock_beam_x", 510)
+    mock_beam_y = await create_and_set_mock_signal_r(int, "mock_beam_y", 380)
     async with DeviceCollector(mock=True):
         snapshot = SnapshotWithBeamCentre("", mock_beam_x, mock_beam_y, "fake_snapshot")
     set_mock_value(snapshot.directory, "/tmp/")
