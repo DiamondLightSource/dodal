@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.utils &#8212; dodal 1.33.1.dev24+gb0e233c11 documentation</title>
+    <title>dodal.devices.oav.utils &#8212; dodal 1.33.1.dev25+gcc5c25947 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
-    <script src="../../../../_static/documentation_options.js?v=704a358c"></script>
+    <script src="../../../../_static/documentation_options.js?v=e7b65fa9"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -451,8 +451,11 @@ window.addEventListener("load", () => mermaid.run());
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">bluesky.utils</span> <span class="kn">import</span> <span class="n">Msg</span>
 
-<span class="kn">from</span> <span class="nn">dodal.devices.oav.oav_calculations</span> <span class="kn">import</span> <span class="n">camera_coordinates_to_xyz</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.oav.oav_detector</span> <span class="kn">import</span> <span class="n">OAVConfigParams</span>
+<span class="kn">from</span> <span class="nn">dodal.devices.oav.oav_calculations</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">calculate_beam_distance</span><span class="p">,</span>
+    <span class="n">camera_coordinates_to_xyz</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">dodal.devices.oav.oav_detector</span> <span class="kn">import</span> <span class="n">OAV</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.oav.pin_image_recognition</span> <span class="kn">import</span> <span class="n">PinTipDetection</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.smargon</span> <span class="kn">import</span> <span class="n">Smargon</span>
 
@@ -485,24 +488,6 @@ window.addEventListener("load", () => mermaid.run());
 
 
 
-<div class="viewcode-block" id="ColorMode">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.utils.ColorMode.html#dodal.devices.oav.utils.ColorMode">[docs]</a>
-<span class="k">class</span> <span class="nc">ColorMode</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Enum to store the various color modes of the camera. We use RGB1.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">MONO</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">BAYER</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="n">RGB1</span> <span class="o">=</span> <span class="mi">2</span>
-    <span class="n">RGB2</span> <span class="o">=</span> <span class="mi">3</span>
-    <span class="n">RGB3</span> <span class="o">=</span> <span class="mi">4</span>
-    <span class="n">YUV444</span> <span class="o">=</span> <span class="mi">5</span>
-    <span class="n">YUV422</span> <span class="o">=</span> <span class="mi">6</span>
-    <span class="n">YUV421</span> <span class="o">=</span> <span class="mi">7</span></div>
-
-
-
 <div class="viewcode-block" id="EdgeOutputArrayImageType">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.utils.EdgeOutputArrayImageType.html#dodal.devices.oav.utils.EdgeOutputArrayImageType">[docs]</a>
 <span class="k">class</span> <span class="nc">EdgeOutputArrayImageType</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
@@ -521,7 +506,7 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="get_move_required_so_that_beam_is_at_pixel">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.utils.html#dodal.devices.oav.utils.get_move_required_so_that_beam_is_at_pixel">[docs]</a>
 <span class="k">def</span> <span class="nf">get_move_required_so_that_beam_is_at_pixel</span><span class="p">(</span>
-    <span class="n">smargon</span><span class="p">:</span> <span class="n">Smargon</span><span class="p">,</span> <span class="n">pixel</span><span class="p">:</span> <span class="n">Pixel</span><span class="p">,</span> <span class="n">oav_params</span><span class="p">:</span> <span class="n">OAVConfigParams</span>
+    <span class="n">smargon</span><span class="p">:</span> <span class="n">Smargon</span><span class="p">,</span> <span class="n">pixel</span><span class="p">:</span> <span class="n">Pixel</span><span class="p">,</span> <span class="n">oav</span><span class="p">:</span> <span class="n">OAV</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Msg</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the required move so that the given pixel is in the centre of the beam.&quot;&quot;&quot;</span>
 
@@ -535,25 +520,38 @@ window.addEventListener("load", () => mermaid.run());
     <span class="p">)</span>
     <span class="n">current_angle</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">smargon</span><span class="o">.</span><span class="n">omega</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">calculate_x_y_z_of_pixel</span><span class="p">(</span><span class="n">current_motor_xyz</span><span class="p">,</span> <span class="n">current_angle</span><span class="p">,</span> <span class="n">pixel</span><span class="p">,</span> <span class="n">oav_params</span><span class="p">)</span></div>
+    <span class="n">beam_x</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">oav</span><span class="o">.</span><span class="n">beam_centre_i</span><span class="p">)</span>
+    <span class="n">beam_y</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">oav</span><span class="o">.</span><span class="n">beam_centre_j</span><span class="p">)</span>
+    <span class="n">microns_per_pixel_x</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">oav</span><span class="o">.</span><span class="n">microns_per_pixel_x</span><span class="p">)</span>
+    <span class="n">microns_per_pixel_y</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">oav</span><span class="o">.</span><span class="n">microns_per_pixel_y</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">calculate_x_y_z_of_pixel</span><span class="p">(</span>
+        <span class="n">current_motor_xyz</span><span class="p">,</span>
+        <span class="n">current_angle</span><span class="p">,</span>
+        <span class="n">pixel</span><span class="p">,</span>
+        <span class="p">(</span><span class="n">beam_x</span><span class="p">,</span> <span class="n">beam_y</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">microns_per_pixel_x</span><span class="p">,</span> <span class="n">microns_per_pixel_y</span><span class="p">),</span>
+    <span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="calculate_x_y_z_of_pixel">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.utils.html#dodal.devices.oav.utils.calculate_x_y_z_of_pixel">[docs]</a>
 <span class="k">def</span> <span class="nf">calculate_x_y_z_of_pixel</span><span class="p">(</span>
-    <span class="n">current_x_y_z</span><span class="p">,</span> <span class="n">current_omega</span><span class="p">,</span> <span class="n">pixel</span><span class="p">:</span> <span class="n">Pixel</span><span class="p">,</span> <span class="n">oav_params</span><span class="p">:</span> <span class="n">OAVConfigParams</span>
+    <span class="n">current_x_y_z</span><span class="p">,</span>
+    <span class="n">current_omega</span><span class="p">,</span>
+    <span class="n">pixel</span><span class="p">:</span> <span class="n">Pixel</span><span class="p">,</span>
+    <span class="n">beam_centre</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+    <span class="n">microns_per_pixel</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-    <span class="n">beam_distance_px</span><span class="p">:</span> <span class="n">Pixel</span> <span class="o">=</span> <span class="n">oav_params</span><span class="o">.</span><span class="n">calculate_beam_distance</span><span class="p">(</span><span class="o">*</span><span class="n">pixel</span><span class="p">)</span>
+    <span class="n">beam_distance_px</span><span class="p">:</span> <span class="n">Pixel</span> <span class="o">=</span> <span class="n">calculate_beam_distance</span><span class="p">(</span><span class="n">beam_centre</span><span class="p">,</span> <span class="o">*</span><span class="n">pixel</span><span class="p">)</span>
 
-    <span class="k">assert</span> <span class="n">oav_params</span><span class="o">.</span><span class="n">micronsPerXPixel</span>
-    <span class="k">assert</span> <span class="n">oav_params</span><span class="o">.</span><span class="n">micronsPerYPixel</span>
     <span class="k">return</span> <span class="n">current_x_y_z</span> <span class="o">+</span> <span class="n">camera_coordinates_to_xyz</span><span class="p">(</span>
         <span class="n">beam_distance_px</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
         <span class="n">beam_distance_px</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
         <span class="n">current_omega</span><span class="p">,</span>
-        <span class="n">oav_params</span><span class="o">.</span><span class="n">micronsPerXPixel</span><span class="p">,</span>
-        <span class="n">oav_params</span><span class="o">.</span><span class="n">micronsPerYPixel</span><span class="p">,</span>
+        <span class="n">microns_per_pixel</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">microns_per_pixel</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
     <span class="p">)</span></div>
 
 

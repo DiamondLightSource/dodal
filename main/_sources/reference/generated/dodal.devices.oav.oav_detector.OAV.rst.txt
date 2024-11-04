@@ -16,38 +16,11 @@ dodal.devices.oav.oav\_detector.OAV
       
       
       
+      ~OAV.connect
       
       
       
       
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      ~OAV.wait_for_connection
       
       
       
@@ -65,53 +38,6 @@ dodal.devices.oav.oav\_detector.OAV
       
       
       
-      
-      ~OAV.cam
-      
-      
-      ~OAV.component_names
-      
-      
-      
-      
-      
-      
-      
-      ~OAV.grid_snapshot
-      
-      
-      ~OAV.hdf5
-      
-      
-      
-      
-      
-      
-      ~OAV.over
-      
-      
-      
-      ~OAV.proc
-      
-      
-      
-      
-      ~OAV.roi
-      
-      
-      
-      
-      ~OAV.snapshot
-      
-      
-      ~OAV.subscriptions
-      
-      
-      ~OAV.tiff
-      
-      
-      
-      ~OAV.zoom_controller
       
    
    

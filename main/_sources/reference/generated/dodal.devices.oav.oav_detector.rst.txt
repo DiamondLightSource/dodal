@@ -14,6 +14,7 @@ dodal.devices.oav.oav\_detector
    :toctree:
    :recursive:
 
+   ~oav_detector.Coords
    ~oav_detector.OAV
    ~oav_detector.ZoomController
 
@@ -33,5 +34,11 @@ dodal.devices.oav.oav\_detector
    
 
    
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      ZoomLevelNotFoundError
    
    

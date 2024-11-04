@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.oav_parameters &#8212; dodal 1.33.1.dev24+gb0e233c11 documentation</title>
+    <title>dodal.devices.oav.oav_parameters &#8212; dodal 1.33.1.dev25+gcc5c25947 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
-    <script src="../../../../_static/documentation_options.js?v=704a358c"></script>
+    <script src="../../../../_static/documentation_options.js?v=e7b65fa9"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -451,12 +451,6 @@ window.addEventListener("load", () => mermaid.run());
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
 <span class="kn">from</span> <span class="nn">xml.etree.ElementTree</span> <span class="kn">import</span> <span class="n">Element</span>
 
-<span class="kn">from</span> <span class="nn">dodal.devices.oav.oav_errors</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">OAVError_BeamPositionNotFound</span><span class="p">,</span>
-    <span class="n">OAVError_ZoomLevelNotFound</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span> <span class="nn">dodal.log</span> <span class="kn">import</span> <span class="n">LOGGER</span>
-
 <span class="c1"># GDA currently assumes this aspect ratio for the OAV window size.</span>
 <span class="c1"># For some beamline this doesn&#39;t affect anything as the actual OAV aspect ratio</span>
 <span class="c1"># matches. Others need to take it into account to rescale the values stored in</span>
@@ -565,123 +559,6 @@ window.addEventListener("load", () => mermaid.run());
 
 
 
-<div class="viewcode-block" id="OAVConfigParams">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_parameters.OAVConfigParams.html#dodal.devices.oav.oav_parameters.OAVConfigParams">[docs]</a>
-<span class="k">class</span> <span class="nc">OAVConfigParams</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    The OAV parameters which may update depending on settings such as the zoom level.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">zoom_params_file</span><span class="p">,</span>
-        <span class="n">display_config</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">zoom_params_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">zoom_params_file</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">display_config</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">display_config</span>
-
-    <span class="k">def</span> <span class="nf">update_on_zoom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">xsize</span><span class="p">,</span> <span class="n">ysize</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">xsize</span><span class="p">,</span> <span class="n">ysize</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">xsize</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">ysize</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">):</span>
-            <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
-        <span class="n">zoom</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">load_microns_per_pixel</span><span class="p">(</span><span class="n">zoom</span><span class="p">,</span> <span class="n">xsize</span><span class="p">,</span> <span class="n">ysize</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">beam_centre_i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">beam_centre_j</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_beam_position_from_zoom</span><span class="p">(</span>
-            <span class="n">zoom</span><span class="p">,</span> <span class="n">xsize</span><span class="p">,</span> <span class="n">ysize</span>
-        <span class="p">)</span>
-
-<div class="viewcode-block" id="OAVConfigParams.load_microns_per_pixel">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_parameters.OAVConfigParams.html#dodal.devices.oav.oav_parameters.OAVConfigParams.load_microns_per_pixel">[docs]</a>
-    <span class="k">def</span> <span class="nf">load_microns_per_pixel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zoom</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">xsize</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ysize</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Loads the microns per x pixel and y pixel for a given zoom level. These are</span>
-<span class="sd">        currently generated by GDA, though hyperion could generate them in future.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">tree</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">zoom_params_file</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">micronsPerXPixel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">micronsPerYPixel</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">root</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
-        <span class="n">levels</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;.//zoomLevel&quot;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">levels</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">_get_element_as_float</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;level&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="n">zoom</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">micronsPerXPixel</span> <span class="o">=</span> <span class="p">(</span>
-                    <span class="n">_get_element_as_float</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;micronsPerXPixel&quot;</span><span class="p">)</span>
-                    <span class="o">*</span> <span class="n">DEFAULT_OAV_WINDOW</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                    <span class="o">/</span> <span class="n">xsize</span>
-                <span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">micronsPerYPixel</span> <span class="o">=</span> <span class="p">(</span>
-                    <span class="n">_get_element_as_float</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;micronsPerYPixel&quot;</span><span class="p">)</span>
-                    <span class="o">*</span> <span class="n">DEFAULT_OAV_WINDOW</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-                    <span class="o">/</span> <span class="n">ysize</span>
-                <span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">micronsPerXPixel</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">micronsPerYPixel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">OAVError_ZoomLevelNotFound</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">                Could not find the micronsPer[X,Y]Pixel parameters in</span>
-<span class="s2">                </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">zoom_params_file</span><span class="si">}</span><span class="s2"> for zoom level </span><span class="si">{</span><span class="n">zoom</span><span class="si">}</span><span class="s2">.</span>
-<span class="s2">                &quot;&quot;&quot;</span>
-            <span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="OAVConfigParams.get_beam_position_from_zoom">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_parameters.OAVConfigParams.html#dodal.devices.oav.oav_parameters.OAVConfigParams.get_beam_position_from_zoom">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_beam_position_from_zoom</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">zoom</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">xsize</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ysize</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Extracts the beam location in pixels `xCentre` `yCentre`, for a requested zoom \</span>
-<span class="sd">        level. The beam location is manually inputted by the beamline operator on GDA \</span>
-<span class="sd">        by clicking where on screen a scintillator lights up, and stored in the \</span>
-<span class="sd">        display.configuration file.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">crosshair_x_line</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">crosshair_y_line</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">display_config</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">file_lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">file_lines</span><span class="p">)):</span>
-                <span class="k">if</span> <span class="n">file_lines</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;zoomLevel = &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">zoom</span><span class="p">)):</span>
-                    <span class="n">crosshair_x_line</span> <span class="o">=</span> <span class="n">file_lines</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
-                    <span class="n">crosshair_y_line</span> <span class="o">=</span> <span class="n">file_lines</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span>
-                    <span class="k">break</span>
-
-        <span class="k">if</span> <span class="n">crosshair_x_line</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">crosshair_y_line</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">OAVError_BeamPositionNotFound</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Could not extract beam position at zoom level </span><span class="si">{</span><span class="n">zoom</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
-
-        <span class="n">beam_centre_i</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="nb">int</span><span class="p">(</span><span class="n">crosshair_x_line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; = &quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">xsize</span> <span class="o">/</span> <span class="n">DEFAULT_OAV_WINDOW</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="p">)</span>
-        <span class="n">beam_centre_j</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="nb">int</span><span class="p">(</span><span class="n">crosshair_y_line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; = &quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">ysize</span> <span class="o">/</span> <span class="n">DEFAULT_OAV_WINDOW</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="p">)</span>
-        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Beam centre: </span><span class="si">{</span><span class="n">beam_centre_i</span><span class="p">,</span><span class="w"> </span><span class="n">beam_centre_j</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">beam_centre_i</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">beam_centre_j</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="OAVConfigParams.calculate_beam_distance">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_parameters.OAVConfigParams.html#dodal.devices.oav.oav_parameters.OAVConfigParams.calculate_beam_distance">[docs]</a>
-    <span class="k">def</span> <span class="nf">calculate_beam_distance</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">horizontal_pixels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">vertical_pixels</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Calculates the distance between the beam centre and the given (horizontal, vertical).</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            horizontal_pixels (int): The x (camera coordinates) value in pixels.</span>
-<span class="sd">            vertical_pixels (int): The y (camera coordinates) value in pixels.</span>
-<span class="sd">        Returns:</span>
-<span class="sd">            The distance between the beam centre and the (horizontal, vertical) point in pixels as a tuple</span>
-<span class="sd">            (horizontal_distance, vertical_distance).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">beam_centre_i</span> <span class="o">-</span> <span class="n">horizontal_pixels</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">beam_centre_j</span> <span class="o">-</span> <span class="n">vertical_pixels</span><span class="p">,</span>
-        <span class="p">)</span></div>
-</div>
-
-
-
 <div class="viewcode-block" id="ZoomParams">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_parameters.ZoomParams.html#dodal.devices.oav.oav_parameters.ZoomParams">[docs]</a>
 <span class="nd">@dataclass</span>
@@ -691,7 +568,6 @@ window.addEventListener("load", () => mermaid.run());
 
 
 
-<span class="c1"># Once all moved to async this should replace OAVConfigParams</span>
 <div class="viewcode-block" id="OAVConfig">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_parameters.OAVConfig.html#dodal.devices.oav.oav_parameters.OAVConfig">[docs]</a>
 <span class="k">class</span> <span class="nc">OAVConfig</span><span class="p">:</span>

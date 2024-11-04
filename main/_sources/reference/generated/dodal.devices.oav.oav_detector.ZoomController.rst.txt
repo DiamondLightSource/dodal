@@ -21,23 +21,7 @@ dodal.devices.oav.oav\_detector.ZoomController
       
       
       
-      
-      
-      
-      
-      
-      
-      
       ~ZoomController.set
-      
-      
-      
-      
-      
-      
-      
-      
-      
       
       
       
@@ -54,55 +38,7 @@ dodal.devices.oav.oav\_detector.ZoomController
    
       
       
-      ~ZoomController.allowed_zoom_levels
       
-      
-      
-      ~ZoomController.component_names
-      
-      
-      
-      
-      
-      
-      ~ZoomController.frst
-      
-      
-      ~ZoomController.fvst
-      
-      
-      
-      
-      
-      ~ZoomController.level
-      
-      
-      
-      ~ZoomController.onst
-      
-      
-      
-      ~ZoomController.percentage
-      
-      
-      
-      
-      
-      
-      ~ZoomController.subscriptions
-      
-      
-      ~ZoomController.sxst
-      
-      
-      ~ZoomController.thst
-      
-      
-      
-      ~ZoomController.twst
-      
-      
-      ~ZoomController.zrst
       
    
    

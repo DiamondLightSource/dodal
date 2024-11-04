@@ -14,7 +14,6 @@ dodal.devices.oav.utils
    :toctree:
    :recursive:
 
-   ~utils.ColorMode
    ~utils.EdgeOutputArrayImageType
 
 

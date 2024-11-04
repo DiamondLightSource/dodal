@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.oav.oav_calculations &#8212; dodal 1.33.1.dev24+gb0e233c11 documentation</title>
+    <title>dodal.devices.oav.oav_calculations &#8212; dodal 1.33.1.dev25+gcc5c25947 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
-    <script src="../../_static/documentation_options.js?v=704a358c"></script>
+    <script src="../../_static/documentation_options.js?v=e7b65fa9"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -58,7 +58,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="dodal.devices.oav.oav_detector" href="dodal.devices.oav.oav_detector.html" />
-    <link rel="prev" title="dodal.devices.oav.oav_async.ZoomController" href="dodal.devices.oav.oav_async.ZoomController.html" />
+    <link rel="prev" title="dodal.devices.oav" href="dodal.devices.oav.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="main" />
@@ -602,11 +602,8 @@
 </ul>
 </details></li>
 <li class="toctree-l3 current active has-children"><a class="reference internal" href="dodal.devices.oav.html">dodal.devices.oav</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.oav.grid_overlay.html">dodal.devices.oav.grid_overlay</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.oav.oav_async.html">dodal.devices.oav.oav_async</a></li>
 <li class="toctree-l4 current active"><a class="current reference internal" href="#">dodal.devices.oav.oav_calculations</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.oav.oav_detector.html">dodal.devices.oav.oav_detector</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.oav.oav_errors.html">dodal.devices.oav.oav_errors</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.oav.oav_parameters.html">dodal.devices.oav.oav_parameters</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.oav.oav_to_redis_forwarder.html">dodal.devices.oav.oav_to_redis_forwarder</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.oav.pin_image_recognition.html">dodal.devices.oav.pin_image_recognition</a></li>
@@ -841,7 +838,10 @@
 <p class="rubric">Functions</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.oav.oav_calculations.camera_coordinates_to_xyz" title="dodal.devices.oav.oav_calculations.camera_coordinates_to_xyz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">camera_coordinates_to_xyz</span></code></a>(horizontal, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.oav.oav_calculations.calculate_beam_distance" title="dodal.devices.oav.oav_calculations.calculate_beam_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calculate_beam_distance</span></code></a>(beam_centre, ...)</p></td>
+<td><p>Calculates the distance between the beam centre and the given (horizontal, vertical).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.oav.oav_calculations.camera_coordinates_to_xyz" title="dodal.devices.oav.oav_calculations.camera_coordinates_to_xyz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">camera_coordinates_to_xyz</span></code></a>(horizontal, ...)</p></td>
 <td><p>Converts from (horizontal,vertical) pixel measurements from the OAV camera into to (x, y, z) motor coordinates in millmeters.</p></td>
 </tr>
 </tbody>
@@ -868,6 +868,28 @@ For an overview of the coordinate system for I03 see <a class="github reference 
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="dodal.devices.oav.oav_calculations.calculate_beam_distance">
+<span class="sig-prename descclassname"><span class="pre">dodal.devices.oav.oav_calculations.</span></span><span class="sig-name descname"><span class="pre">calculate_beam_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beam_centre</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">horizontal_pixels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertical_pixels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/dodal/devices/oav/oav_calculations.html#calculate_beam_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.oav.oav_calculations.calculate_beam_distance" title="Link to this definition">#</a></dt>
+<dd><p>Calculates the distance between the beam centre and the given (horizontal, vertical).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>horizontal_pixels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – The x (camera coordinates) value in pixels.</p></li>
+<li><p><strong>vertical_pixels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – The y (camera coordinates) value in pixels.</p></li>
+<li><p><strong>beam_centre</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]</span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The distance between the beam centre and the (horizontal, vertical) point in pixels as a tuple
+(horizontal_distance, vertical_distance).</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
 
@@ -881,12 +903,12 @@ For an overview of the coordinate system for I03 see <a class="github reference 
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="dodal.devices.oav.oav_async.ZoomController.html"
+       href="dodal.devices.oav.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">dodal.devices.oav.oav_async.ZoomController</p>
+        <p class="prev-next-title">dodal.devices.oav</p>
       </div>
     </a>
     <a class="right-next"
@@ -918,6 +940,7 @@ For an overview of the coordinate system for I03 see <a class="github reference 
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.oav.oav_calculations.camera_coordinates_to_xyz"><code class="docutils literal notranslate"><span class="pre">camera_coordinates_to_xyz()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.oav.oav_calculations.calculate_beam_distance"><code class="docutils literal notranslate"><span class="pre">calculate_beam_distance()</span></code></a></li>
 </ul>
   </nav></div>
 

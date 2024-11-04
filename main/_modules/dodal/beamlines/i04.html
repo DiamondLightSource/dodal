@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.i04 &#8212; dodal 1.33.1.dev24+gb0e233c11 documentation</title>
+    <title>dodal.beamlines.i04 &#8212; dodal 1.33.1.dev25+gcc5c25947 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
 
-    <script src="../../../_static/documentation_options.js?v=704a358c"></script>
+    <script src="../../../_static/documentation_options.js?v=e7b65fa9"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -467,7 +467,8 @@ window.addEventListener("load", () => mermaid.run());
 <span class="kn">from</span> <span class="nn">dodal.devices.i04.transfocator</span> <span class="kn">import</span> <span class="n">Transfocator</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.ipin</span> <span class="kn">import</span> <span class="n">IPin</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.motors</span> <span class="kn">import</span> <span class="n">XYZPositioner</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.oav.oav_detector</span> <span class="kn">import</span> <span class="n">OAV</span><span class="p">,</span> <span class="n">OAVConfigParams</span>
+<span class="kn">from</span> <span class="nn">dodal.devices.oav.oav_detector</span> <span class="kn">import</span> <span class="n">OAV</span>
+<span class="kn">from</span> <span class="nn">dodal.devices.oav.oav_parameters</span> <span class="kn">import</span> <span class="n">OAVConfig</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.oav.oav_to_redis_forwarder</span> <span class="kn">import</span> <span class="n">OAVToRedisForwarder</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.robot</span> <span class="kn">import</span> <span class="n">BartRobot</span>
 <span class="kn">from</span> <span class="nn">dodal.devices.s4_slit_gaps</span> <span class="kn">import</span> <span class="n">S4SlitGaps</span>
@@ -852,17 +853,21 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="oav">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.oav">[docs]</a>
 <span class="nd">@skip_device</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">BL</span> <span class="o">==</span> <span class="s2">&quot;s04&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">oav</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OAV</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">oav</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">params</span><span class="p">:</span> <span class="n">OAVConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OAV</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i04 OAV device, instantiate it if it hasn&#39;t already been.</span>
 <span class="sd">    If this is called when already instantiated in i04, it will return the existing object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
         <span class="n">OAV</span><span class="p">,</span>
         <span class="s2">&quot;oav&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-DI-OAV-01:&quot;</span><span class="p">,</span>
         <span class="n">wait_for_connection</span><span class="p">,</span>
         <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
-        <span class="n">params</span><span class="o">=</span><span class="n">OAVConfigParams</span><span class="p">(</span><span class="n">ZOOM_PARAMS_FILE</span><span class="p">,</span> <span class="n">DISPLAY_CONFIG</span><span class="p">),</span>
+        <span class="n">config</span><span class="o">=</span><span class="n">params</span> <span class="ow">or</span> <span class="n">OAVConfig</span><span class="p">(</span><span class="n">ZOOM_PARAMS_FILE</span><span class="p">,</span> <span class="n">DISPLAY_CONFIG</span><span class="p">),</span>
     <span class="p">)</span></div>
 
 
