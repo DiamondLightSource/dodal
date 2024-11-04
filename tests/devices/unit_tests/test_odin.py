@@ -62,7 +62,7 @@ def test_check_and_wait_for_odin_state(
     ],
 )
 @patch("dodal.devices.eiger_odin.await_value")
-def test_check_odin_initialised(
+def test_wait_for_odin_initialised(
     patch_await,
     fake_odin: EigerOdin,
     fan_connected: bool,

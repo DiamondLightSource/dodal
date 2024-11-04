@@ -85,8 +85,8 @@ def get_bad_status(exception=StatusException):
 @pytest.fixture
 def mock_set_odin_filewriter(fake_eiger: EigerDetector):
     fake_eiger.odin.nodes.clear_odin_errors = MagicMock()
-    fake_eiger.odin.check_odin_initialised = MagicMock()
-    fake_eiger.odin.check_odin_initialised.return_value = (True, "")
+    fake_eiger.odin.wait_for_odin_initialised = MagicMock()
+    fake_eiger.odin.wait_for_odin_initialised.return_value = (True, "")
     fake_eiger.odin.file_writer.file_path.put(True)
 
     def do_set(val: str):
@@ -517,8 +517,8 @@ def test_given_in_free_run_mode_when_staged_then_triggers_and_filewriter_set_cor
     fake_eiger: EigerDetector,
 ):
     fake_eiger.odin.nodes.clear_odin_errors = MagicMock()
-    fake_eiger.odin.check_odin_initialised = MagicMock()
-    fake_eiger.odin.check_odin_initialised.return_value = (True, "")
+    fake_eiger.odin.wait_for_odin_initialised = MagicMock()
+    fake_eiger.odin.wait_for_odin_initialised.return_value = (True, "")
     fake_eiger.odin.file_writer.file_path.put(True)
     fake_eiger.detector_params.trigger_mode = TriggerMode.FREE_RUN
     fake_eiger.set_num_triggers_and_captures()
