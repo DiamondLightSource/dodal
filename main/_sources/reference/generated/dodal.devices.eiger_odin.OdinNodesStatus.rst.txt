@@ -20,9 +20,6 @@ dodal.devices.eiger\_odin.OdinNodesStatus
       ~OdinNodesStatus.check_frames_timed_out
       
       
-      ~OdinNodesStatus.check_node_frames_from_attr
-      
-      
       
       ~OdinNodesStatus.clear_odin_errors
       
@@ -32,9 +29,6 @@ dodal.devices.eiger\_odin.OdinNodesStatus
       
       
       
-      
-      
-      ~OdinNodesStatus.get_error_state
       
       
       ~OdinNodesStatus.get_init_state
@@ -53,6 +47,9 @@ dodal.devices.eiger\_odin.OdinNodesStatus
       
       
       
+      
+      
+      ~OdinNodesStatus.wait_for_no_errors
       
       
       

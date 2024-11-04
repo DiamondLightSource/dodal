@@ -14,10 +14,7 @@ dodal.devices.eiger\_odin.EigerOdin
    
       
       
-      ~EigerOdin.check_odin_initialised
-      
-      
-      ~EigerOdin.check_odin_state
+      ~EigerOdin.check_and_wait_for_odin_state
       
       
       
@@ -46,6 +43,9 @@ dodal.devices.eiger\_odin.EigerOdin
       
       
       
+      
+      
+      ~EigerOdin.wait_for_odin_initialised
       
       
       
