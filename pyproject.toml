@@ -15,7 +15,7 @@ description = "Ophyd devices and other utils that could be used across DLS beaml
 dependencies = [
     "click",
     "ophyd",
-    "ophyd-async>=0.8.0a1",
+    "ophyd-async @ git+https://github.com/bluesky/ophyd-async.git@adr-device",
     "bluesky",
     "pyepics",
     "dataclasses-json",
@@ -113,9 +113,6 @@ filterwarnings = [
     "ignore:.*pkg_resources.*:DeprecationWarning",
     # Ignore deprecation warning from setuptools_dso (remove when https://github.com/epics-base/setuptools_dso/issues/36 is released)
     "ignore::DeprecationWarning:wheel",
-    # Ignore deprecation warning from ophyd_async motor.py
-    "ignore:.*StandardReadableFormat\\.CONFIG_SIGNAL.*:DeprecationWarning",
-    "ignore:.*StandardReadableFormat\\.HINTED_SIGNAL.*:DeprecationWarning",
 ]
 # Doctest python code in docs, python code in src docstrings, test functions in tests
 testpaths = "docs src tests system_tests"
