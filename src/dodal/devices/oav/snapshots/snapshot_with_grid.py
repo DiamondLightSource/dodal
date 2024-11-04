@@ -3,7 +3,7 @@ from os.path import join as path_join
 from ophyd_async.core import soft_signal_rw
 from PIL.Image import Image
 
-from dodal.devices.areadetector.plugins.MJPG import MJPG, asyncio_save_image
+from dodal.devices.areadetector.plugins.MJPG import IMG_FORMAT, MJPG, asyncio_save_image
 from dodal.devices.oav.snapshots.grid_overlay import (
     add_grid_border_overlay_to_image,
     add_grid_overlay_to_image,
@@ -42,7 +42,7 @@ class SnapshotWithGrid(MJPG):
             image, top_left_x, top_left_y, box_witdh, num_boxes_x, num_boxes_y
         )
 
-        path = path_join(directory_str, f"{filename_str}_outer_overlay.png")
+        path = path_join(directory_str, f"{filename_str}_outer_overlay.{IMG_FORMAT}")
         await self.last_path_outer.set(path, wait=True)
         LOGGER.info(f"Saving grid outer edge at {path}")
         await asyncio_save_image(image, path)
@@ -51,7 +51,7 @@ class SnapshotWithGrid(MJPG):
             image, top_left_x, top_left_y, box_witdh, num_boxes_x, num_boxes_y
         )
 
-        path = path_join(directory_str, f"{filename_str}_grid_overlay.png")
+        path = path_join(directory_str, f"{filename_str}_grid_overlay.{IMG_FORMAT}")
         await self.last_path_full_overlay.set(path, wait=True)
         LOGGER.info(f"Saving full grid overlay at {path}")
         await asyncio_save_image(image, path)
