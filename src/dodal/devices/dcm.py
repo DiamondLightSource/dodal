@@ -53,6 +53,5 @@ class DCM(StandardReadable):
                 Sequence[int],
                 initial_value=list(crystal_metadata.reflection),  # type: ignore
             )
-            # todo note this fails at i18 for now, waiting for an EPICS fix
-            self.crystal_metadata_d_spacing = epics_signal_r(float, "DSPACING")
+            self.crystal_metadata_d_spacing = epics_signal_r(float, "DSPACING:RBV")
         super().__init__(name)
