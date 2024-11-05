@@ -4,16 +4,28 @@ from .femto import (
     Femto3xxGainTable,
     Femto3xxGainToCurrentTable,
     Femto3xxRaiseTime,
-    FemtoAdcDetector,
     FemtoDDPCA,
+)
+from .SR570 import (
+    SR570,
+    SR570FineGainTable,
+    SR570FullGainTable,
+    SR570GainTable,
+    SR570GainToCurrentTable,
+    SR570RaiseTimeTable,
 )
 
 __all__ = [
     "FemtoDDPCA",
     "Femto3xxGainTable",
     "Femto3xxRaiseTime",
-    "FemtoAdcDetector",
     "CurrentAmp",
     "Femto3xxGainToCurrentTable",
     "AutoGainDectector",
+    "SR570",
+    "SR570GainTable",
+    "SR570FineGainTable",
+    "SR570FullGainTable",
+    "SR570GainToCurrentTable",
+    "SR570RaiseTimeTable",
 ]

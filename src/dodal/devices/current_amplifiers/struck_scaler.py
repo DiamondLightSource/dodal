@@ -55,16 +55,3 @@ class StruckScaler(StandardReadable, Triggerable, Preparable):
     async def get_count(self) -> float:
         await self.trigger()
         return await self.readout.get_value()
-
-
-"""
-    to do a scan,
-    stage the scaler card
-        put count mode to oneShot
-    prepare
-        set the count time
-    trigger counting
-        wait until counting is complete
-    read count
-
-"""

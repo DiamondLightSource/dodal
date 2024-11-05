@@ -17,7 +17,6 @@ from dodal.devices.current_amplifiers import (
     Femto3xxGainTable,
     Femto3xxGainToCurrentTable,
     Femto3xxRaiseTime,
-    FemtoAdcDetector,
     FemtoDDPCA,
 )
 from dodal.devices.current_amplifiers.amp_detector import AutoGainDectector
@@ -39,21 +38,6 @@ async def mock_femto(
         )
     assert mock_femto.name == "mock_femto"
     return mock_femto
-
-
-@pytest.fixture
-async def mock_femto_adc_detector(
-    mock_femto: FemtoDDPCA,
-    prefix: str = "BLXX-EA-DET-007:",
-) -> FemtoAdcDetector:
-    async with DeviceCollector(mock=True):
-        mock_femto_adc_detector = FemtoAdcDetector(
-            prefix=prefix,
-            current_amp=mock_femto,
-            name="mock_femto_adc_detector",
-        )
-    assert mock_femto_adc_detector.name == "mock_femto_adc_detector"
-    return mock_femto_adc_detector
 
 
 @pytest.fixture
@@ -179,39 +163,6 @@ async def test_femto_decrease_gain(
     assert (await mock_femto.gain.get_value()) == Femto3xxGainTable[final_gain]
     assert sleep.call_count == int(starting_gain.split("_")[-1]) - int(
         final_gain.split("_")[-1]
-    )
-
-
-@pytest.mark.parametrize(
-    "gain,raw_voltage, expected_current",
-    [
-        ("sen_1", 0.51, 0.51e-4),
-        ("sen_3", -10, -10e-6),
-        ("sen_6", 5.2, 5.2e-9),
-        ("sen_9", 2.2, 2.2e-12),
-        ("sen_10", 8.7, 8.7e-13),
-        ("sen_5", 0.0, 0.0),
-    ],
-)
-async def test_femto_adc_detector_read(
-    mock_femto: FemtoDDPCA,
-    mock_femto_adc_detector: FemtoAdcDetector,
-    RE: RunEngine,
-    gain,
-    raw_voltage,
-    expected_current,
-):
-    set_mock_value(mock_femto.gain, Femto3xxGainTable[gain])
-    set_mock_value(mock_femto_adc_detector.analogue_readout, raw_voltage)
-    set_mock_value(mock_femto_adc_detector.auto_mode, False)
-    docs = defaultdict(list)
-
-    def capture_emitted(name, doc):
-        docs[name].append(doc)
-
-    RE(count([mock_femto_adc_detector]), capture_emitted)
-    assert docs["event"][0]["data"]["mock_femto_adc_detector-current"] == pytest.approx(
-        expected_current
     )
 
 

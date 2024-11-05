@@ -1,17 +1,6 @@
-import asyncio
 from enum import Enum
 
-from bluesky.protocols import Reading
-from ophyd_async.core import (
-    ConfigSignal,
-    StandardReadable,
-    soft_signal_r_and_setter,
-    soft_signal_rw,
-)
-from ophyd_async.epics.signal import epics_signal_r
-
 from dodal.devices.current_amplifiers.current_amplifier import CurrentAmp
-from dodal.log import LOGGER
 
 
 class Femto3xxGainTable(str, Enum):
@@ -87,57 +76,3 @@ class FemtoDDPCA(CurrentAmp):
             timeout=timeout,
             name=name,
         )
-
-
-class FemtoAdcDetector(StandardReadable):
-    def __init__(
-        self,
-        prefix: str,
-        current_amp: CurrentAmp,
-        upper_limit: float = 8.8,
-        lower_limit: float = 0.8,
-        name: str = "",
-    ) -> None:
-        with self.add_children_as_readables():
-            self.current_amp = current_amp
-            self.current, self._current_set = soft_signal_r_and_setter(
-                float, initial_value=None, units="Amp"
-            )
-            self.analogue_readout = epics_signal_r(float, prefix + "I")
-
-        with self.add_children_as_readables(ConfigSignal):
-            self.auto_mode = soft_signal_rw(bool, initial_value=True)
-            self.upper_limit = upper_limit
-            self.lower_limit = lower_limit
-        super().__init__(name)
-
-    async def read(self) -> dict[str, Reading]:
-        if await self.auto_mode.get_value() is True:
-            LOGGER.info(f"{self.name}-Attempting auto-gain")
-            if await self.auto_gain():
-                LOGGER.info(
-                    f"{self.name} new gain = f{self.current_amp.gain.get_value()}."
-                )
-            else:
-                LOGGER.warning("{self.name} new gain is at maximum/minimum value.")
-        gain_value = 10 ** float(
-            (await self.current_amp.gain.get_value()).value.split("^")[1]
-        )
-        self._current_set(await self.analogue_readout.get_value() / gain_value)
-        return await super().read()
-
-    async def auto_gain(self) -> bool:
-        cnt = 0
-        while cnt < len(self.current_amp.gain_table):
-            reading = await self.analogue_readout.get_value(cached=False)
-            if reading > self.upper_limit:
-                if not await self.current_amp.decrease_gain():
-                    return False
-            elif reading < self.lower_limit:
-                if not await self.current_amp.increase_gain():
-                    return False
-            else:
-                return True
-            await asyncio.sleep(0.5)
-            cnt += 1
-        return True
