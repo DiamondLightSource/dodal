@@ -57,6 +57,7 @@ tmp/
 # Sphinx documentation
 docs/_build/
 docs/reference/generated/
+docs/_api
 
 # PyBuilder
 target/
