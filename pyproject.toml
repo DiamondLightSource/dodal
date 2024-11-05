@@ -91,6 +91,7 @@ dodal = ["*.txt"]
 version_file = "src/dodal/_version.py"
 
 [tool.pyright]
+typeCheckingMode = "standard"
 reportMissingImports = false # Ignore missing stubs in imported modules
 
 [tool.pytest.ini_options]
