@@ -1,4 +1,4 @@
-from ophyd_async.core import SignalR
+from ophyd_async.core import Reference, SignalR
 from PIL import Image, ImageDraw
 
 from dodal.devices.areadetector.plugins.MJPG import MJPG
@@ -52,13 +52,13 @@ class SnapshotWithBeamCentre(MJPG):
         name: str = "",
     ) -> None:
         with self.add_children_as_readables():
-            self.beam_centre_i = beam_x_signal
-            self.beam_centre_j = beam_y_signal
+            self._beam_centre_i_ref = Reference(beam_x_signal)
+            self._beam_centre_j_ref = Reference(beam_y_signal)
         super().__init__(prefix, name)
 
     async def post_processing(self, image: Image.Image):
-        beam_x = await self.beam_centre_i.get_value()
-        beam_y = await self.beam_centre_j.get_value()
+        beam_x = await self._beam_centre_i_ref().get_value()
+        beam_y = await self._beam_centre_j_ref().get_value()
         draw_crosshair(image, beam_x, beam_y)
 
         await self._save_image(image)

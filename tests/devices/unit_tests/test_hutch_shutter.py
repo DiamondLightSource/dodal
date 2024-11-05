@@ -4,7 +4,6 @@ import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import (
-    DEFAULT_TIMEOUT,
     callback_on_mock_put,
     get_mock_put,
     set_mock_value,
@@ -73,6 +72,6 @@ async def test_shutter_operations(
 
     call_list = []
     for i in expected_calls:
-        call_list.append(call(i, wait=True, timeout=DEFAULT_TIMEOUT))
+        call_list.append(call(i, wait=True))
     mock_shutter_control = get_mock_put(fake_shutter.control)
     mock_shutter_control.assert_has_calls(call_list)

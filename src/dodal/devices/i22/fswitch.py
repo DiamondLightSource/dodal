@@ -1,6 +1,5 @@
 import asyncio
 import time
-from enum import Enum
 
 from bluesky.protocols import Reading
 from event_model import DataKey
@@ -8,12 +7,13 @@ from ophyd_async.core import (
     ConfigSignal,
     DeviceVector,
     StandardReadable,
+    StrictEnum,
     soft_signal_r_and_setter,
 )
 from ophyd_async.epics.signal import epics_signal_r
 
 
-class FilterState(str, Enum):
+class FilterState(StrictEnum):
     """
     Note that the in/out here refers to the internal rocker
     position so a PV value of IN implies a filter OUT of beam

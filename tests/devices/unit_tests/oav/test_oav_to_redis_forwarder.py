@@ -14,15 +14,15 @@ from dodal.devices.oav.oav_to_redis_forwarder import (
 
 @pytest.fixture
 @patch("dodal.devices.oav.oav_to_redis_forwarder.StrictRedis", new=AsyncMock)
-def oav_forwarder(RE):
+async def oav_forwarder(RE):
     with DeviceCollector(mock=True):
         oav_forwarder = OAVToRedisForwarder("prefix", "host", "password")
     set_mock_value(
-        oav_forwarder._sources[Source.FULL_SCREEN.value].url,
+        oav_forwarder.sources[Source.FULL_SCREEN.value].url,
         "test-full-screen-stream-url",
     )
-    set_mock_value(oav_forwarder._sources[Source.ROI.value].url, "test-roi-stream-url")
-    set_mock_value(oav_forwarder.selected_source, Source.FULL_SCREEN)
+    set_mock_value(oav_forwarder.sources[Source.ROI.value].url, "test-roi-stream-url")
+    set_mock_value(oav_forwarder.selected_source, Source.FULL_SCREEN.value)
     return oav_forwarder
 
 
@@ -150,7 +150,7 @@ async def test_when_different_sources_selected_then_different_urls_used(
     oav_forwarder_with_valid_response, source, expected_url
 ):
     oav_forwarder, _, mock_get = oav_forwarder_with_valid_response
-    set_mock_value(oav_forwarder.selected_source, source)
+    set_mock_value(oav_forwarder.selected_source, source.value)
 
     await oav_forwarder.kickoff()
     await oav_forwarder.complete()
@@ -169,7 +169,7 @@ async def test_when_different_sources_selected_then_different_uuids_used(
     oav_forwarder_with_valid_response, source, expected_uuid_prefix
 ):
     oav_forwarder, _, _ = oav_forwarder_with_valid_response
-    set_mock_value(oav_forwarder.selected_source, source)
+    set_mock_value(oav_forwarder.selected_source, source.value)
 
     await oav_forwarder.kickoff()
     await asyncio.sleep(0.01)
@@ -190,7 +190,7 @@ async def test_oav_only_forwards_data_when_the_unique_id_updates(
     oav_forwarder_with_valid_response, source, expected_uuid_prefix
 ):
     oav_forwarder, _, _ = oav_forwarder_with_valid_response
-    set_mock_value(oav_forwarder.selected_source, source)
+    set_mock_value(oav_forwarder.selected_source, source.value)
     await oav_forwarder.kickoff()
     await asyncio.sleep(0.01)
     oav_forwarder.redis_client.hset.assert_called_once()

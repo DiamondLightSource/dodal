@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 from contextlib import ExitStack
 from typing import Any
-from unittest.mock import ANY, MagicMock, call
+from unittest.mock import MagicMock, call
 
 import bluesky.plan_stubs as bps
 import pytest
@@ -135,9 +135,7 @@ def _assert_patched_ap_sg_has_call(
         position.values,
         strict=False,
     ):
-        get_mock_put(motor.user_setpoint).assert_called_with(
-            pos, wait=True, timeout=ANY
-        )
+        get_mock_put(motor.user_setpoint).assert_called_with(pos, wait=True)
 
 
 def _assert_position_in_reading(
@@ -154,7 +152,7 @@ def _assert_position_in_reading(
 
 
 def _call_list(calls: Sequence[float]):
-    return [call.setpoint(v, wait=True, timeout=ANY) for v in calls]
+    return [call.setpoint(v, wait=True) for v in calls]
 
 
 async def test_aperture_scatterguard_select_bottom_moves_sg_down_then_assembly_up(
@@ -176,7 +174,7 @@ async def test_aperture_unsafe_move(
         aperture_z=5.6,
         scatterguard_x=7.8,
         scatterguard_y=9.0,
-        radius=None,
+        radius=0,
     )
     ap_sg = aperture_in_medium_pos
     await ap_sg._set_raw_unsafe(pos)
