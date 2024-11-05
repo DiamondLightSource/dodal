@@ -1,4 +1,3 @@
-
 import numpy as np
 from numpy.typing import NDArray
 from ophyd_async.core import StandardReadable, soft_signal_r_and_setter
