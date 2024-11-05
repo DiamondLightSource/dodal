@@ -1,9 +1,11 @@
 from enum import Enum
 
+from ophyd_async.core import StrictEnum
+
 from dodal.devices.current_amplifiers.current_amplifier import CurrentAmp
 
 
-class Femto3xxGainTable(str, Enum):
+class Femto3xxGainTable(StrictEnum):
     """These are the sensitivity setting for Femto 3xx current amplifier"""
 
     sen_1 = "10^4"
@@ -61,7 +63,7 @@ class FemtoDDPCA(CurrentAmp):
         self,
         prefix: str,
         suffix: str,
-        gain_table: type[Enum],
+        gain_table: type[StrictEnum],
         gain_to_current_table: type[Enum],
         raise_timetable: type[Enum],
         timeout: float = 1,

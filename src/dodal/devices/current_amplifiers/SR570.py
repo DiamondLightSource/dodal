@@ -1,14 +1,18 @@
 import asyncio
-from enum import Enum
 
-from ophyd_async.core import AsyncStatus, ConfigSignal, soft_signal_r_and_setter
+from ophyd_async.core import (
+    AsyncStatus,
+    ConfigSignal,
+    StrictEnum,
+    soft_signal_r_and_setter,
+)
 from ophyd_async.epics.signal import epics_signal_rw
 
 from dodal.devices.current_amplifiers.current_amplifier import CurrentAmp
 from dodal.log import LOGGER
 
 
-class SR570GainTable(str, Enum):
+class SR570GainTable(StrictEnum):
     """These are the sensitivity setting for Femto 3xx current amplifier"""
 
     sen_1 = "mA/V"
@@ -17,7 +21,7 @@ class SR570GainTable(str, Enum):
     sen_4 = "pA/V"
 
 
-class SR570RaiseTimeTable(float, Enum):
+class SR570RaiseTimeTable(StrictEnum):
     """These are the gain dependent raise time(s) for Femto 3xx current amplifier"""
 
     sen_1 = 1e-4
@@ -26,7 +30,7 @@ class SR570RaiseTimeTable(float, Enum):
     sen_4 = 0.2
 
 
-class SR570FineGainTable(str, Enum):
+class SR570FineGainTable(StrictEnum):
     """These are the sensitivity setting for Femto 3xx current amplifier"""
 
     sen_1 = "1"
@@ -40,7 +44,7 @@ class SR570FineGainTable(str, Enum):
     sen_9 = "500"
 
 
-class SR570FullGainTable(Enum):
+class SR570FullGainTable(StrictEnum):
     sen_1 = [SR570GainTable.sen_1, SR570FineGainTable.sen_1]
     sen_2 = [SR570GainTable.sen_2, SR570FineGainTable.sen_9]
     sen_3 = [SR570GainTable.sen_2, SR570FineGainTable.sen_8]
@@ -71,7 +75,7 @@ class SR570FullGainTable(Enum):
     sen_28 = [SR570GainTable.sen_4, SR570FineGainTable.sen_1]
 
 
-class SR570GainToCurrentTable(float, Enum):
+class SR570GainToCurrentTable(StrictEnum):
     sen_1 = 1e3
     sen_2 = 2e3
     sen_3 = 5e3
@@ -111,11 +115,11 @@ class SR570(CurrentAmp):
         self,
         prefix: str,
         suffix: str,
-        gain_table: type[Enum],
-        fine_gain_table: type[Enum],
-        full_gain_table: type[Enum],
-        gain_to_current_table: type[Enum],
-        raise_timetable: type[Enum],
+        gain_table: type[StrictEnum],
+        fine_gain_table: type[StrictEnum],
+        full_gain_table: type[StrictEnum],
+        gain_to_current_table: type[StrictEnum],
+        raise_timetable: type[StrictEnum],
         timeout: float = 1,
         name: str = "",
     ) -> None:
@@ -148,6 +152,7 @@ class SR570(CurrentAmp):
             self.coarse_gain.set(value=gain, timeout=self.timeout),
             self.fine_gain.set(value=fine_gain, timeout=self.timeout),
         )
-        self._set_gain(self.gain_table[value])
-        # wait for current amplifier to settle
+        self._set_gain(
+            StrictEnum(self.gain_table[value])
+        )  # wait for current amplifier to settle
         await asyncio.sleep(self.raise_timetable[gain.name].value)

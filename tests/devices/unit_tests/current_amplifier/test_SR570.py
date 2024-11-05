@@ -8,6 +8,7 @@ from bluesky.plans import count
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import (
     DeviceCollector,
+    StrictEnum,
     callback_on_mock_put,
     get_mock_put,
     set_mock_value,
@@ -226,7 +227,7 @@ async def test_SR570_struck_scaler_read_with_autoGain(
     raw_voltage,
     expected_current,
 ):
-    set_mock_value(mock_sr570.gain, SR570FullGainTable[gain])
+    set_mock_value(mock_sr570.gain, StrictEnum(SR570FullGainTable[gain]))
     set_mock_value(mock_sr570_struck_scaler_detector.counter.count_time, 1)
     set_mock_value(mock_sr570_struck_scaler_detector.auto_mode, True)
     rbv_mocks = Mock()

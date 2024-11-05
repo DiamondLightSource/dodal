@@ -1,21 +1,20 @@
-from enum import Enum
-
 from bluesky.protocols import Preparable, Triggerable
 from ophyd_async.core import (
     AsyncStatus,
     HintedSignal,
     StandardReadable,
+    StrictEnum,
     set_and_wait_for_other_value,
 )
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
 
-class CountMode(str, Enum):
+class CountMode(StrictEnum):
     auto = "AutoCount"
     one_shot = "OneShot"
 
 
-class CountState(str, Enum):
+class CountState(StrictEnum):
     done = "Done"
     count = "Count"  # type: ignore
 

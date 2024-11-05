@@ -7,6 +7,7 @@ from ophyd_async.core import (
     ConfigSignal,
     HintedSignal,
     StandardReadable,
+    StrictEnum,
 )
 from ophyd_async.epics.signal import epics_signal_rw
 
@@ -27,7 +28,7 @@ class CurrentAmp(StandardReadable, Movable):
         self,
         prefix: str,
         suffix: str,
-        gain_table: type[Enum],
+        gain_table: type[StrictEnum],
         gain_to_current_table: type[Enum],
         raise_timetable: type[Enum],
         timeout: float = 1,
