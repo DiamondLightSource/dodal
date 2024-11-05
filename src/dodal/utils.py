@@ -128,7 +128,6 @@ class DeviceInitializationController(Generic[D]):
         skip: SkipType,
     ):
         self._factory: Callable[[], D] = factory
-        self._cached_device: D | None = None
         self._callbacks: list[Callable[[D], None]] = []
         self._use_factory_name = use_factory_name
         self._timeout = timeout
@@ -140,11 +139,14 @@ class DeviceInitializationController(Generic[D]):
     def skip(self) -> bool:
         return self._skip() if callable(self._skip) else self._skip
 
-    @property
-    def device(self) -> D | None:
-        return self._cached_device
-
     def add_callback(self, callback: Callable[[D], None]):
+        """
+        Add callback for handling the device after creation
+
+        Args:
+            callback: Function which is passed a new device after it is initialized
+        """
+
         self._callbacks.append(callback)
 
     def __call__(
@@ -184,10 +186,7 @@ class DeviceInitializationController(Generic[D]):
         Returns:
             D: a singleton instance of the Device class returned by the wrapped factory.
         """
-        if self.device is not None:
-            device = self.device
-        else:
-            device = self._factory()
+        device = self._factory()
 
         if connect_immediately:
             call_in_bluesky_event_loop(
@@ -204,7 +203,6 @@ class DeviceInitializationController(Generic[D]):
         elif not device.name and self._use_factory_name:
             device.set_name(self._factory.__name__)
 
-        self._cached_device = device
         for callback in self._callbacks:
             callback(device)
         return device
