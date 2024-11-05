@@ -102,7 +102,7 @@ def add_grid_overlay_to_image(
 ):
     _add_vertical_parallel_lines_to_image(
         image,
-        start_x=top_left_x + box_width,
+        start_x=int(top_left_x + box_width),
         start_y=top_left_y,
         line_length=int(num_boxes_y * box_width),
         spacing=box_width,
@@ -111,7 +111,7 @@ def add_grid_overlay_to_image(
     _add_horizontal_parallel_lines_to_image(
         image,
         start_x=top_left_x,
-        start_y=top_left_y + box_width,
+        start_y=int(top_left_y + box_width),
         line_length=int(num_boxes_x * box_width),
         spacing=box_width,
         num_lines=num_boxes_y - 1,
