@@ -171,6 +171,10 @@ async def test_reading(dcm: DoubleCrystalMonochromator):
     )
 
 
+@pytest.mark.skip(
+    reason="https://github.com/bluesky/ophyd-async/issues/618 assert_configuration() on numpy arrays is "
+    "broken"
+)
 async def test_configuration(dcm: DoubleCrystalMonochromator):
     await assert_configuration(
         dcm,

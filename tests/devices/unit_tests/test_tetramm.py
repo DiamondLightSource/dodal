@@ -348,7 +348,7 @@ async def test_stage_sets_up_accurate_describe_output(
     assert await tetramm.describe() == {
         TEST_TETRAMM_NAME: {
             "source": "mock+ca://MY-TETRAMM:HDF5:FullFileName_RBV",
-            "shape": (11, 400),
+            "shape": [11, 400],
             "dtype_numpy": "<f8",
             "dtype": "array",
             "external": "STREAM:",

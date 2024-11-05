@@ -1,11 +1,9 @@
-from enum import Enum
-
-from ophyd_async.core import StandardReadable
+from ophyd_async.core import StandardReadable, StrictEnum
 from ophyd_async.epics.motor import Motor
 from ophyd_async.epics.signal import epics_signal_rw
 
 
-class BeamstopPositions(str, Enum):
+class BeamstopPositions(StrictEnum):
     CHECK_BEAM = "CheckBeam"
     DATA_COLLECTION = "Data Collection"
     DATA_COLLECTION_FAR = "Data Collection Far"

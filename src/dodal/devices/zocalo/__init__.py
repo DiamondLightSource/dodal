@@ -4,14 +4,14 @@ from dodal.devices.zocalo.zocalo_results import (
     NoZocaloSubscription,
     XrcResult,
     ZocaloResults,
-    get_processing_result,
+    get_full_processing_results,
 )
 
 __all__ = [
     "ZocaloResults",
     "XrcResult",
     "ZocaloTrigger",
-    "get_processing_result",
+    "get_full_processing_results",
     "ZOCALO_READING_PLAN_NAME",
     "NoResultsFromZocalo",
     "NoZocaloSubscription",

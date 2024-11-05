@@ -90,8 +90,7 @@ def device_instantiation(
         fake: bool                  whether to fake with ophyd.sim
         post_create: Callable       (optional) a function to be run on the device after
                                     creation
-        bl_prefix: bool             if true, add the beamline prefix when instantiating, if
-                                    false the complete PV prefix must be supplied.
+        bl_prefix: bool             if true, add the beamline prefix when instantiating
     Returns:
         The instance of the device.
     """

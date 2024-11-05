@@ -2,13 +2,14 @@ import asyncio
 import csv
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, SupportsFloat
 
 import numpy as np
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
     HintedSignal,
+    Reference,
     StandardReadable,
     soft_signal_r_and_setter,
     soft_signal_rw,
@@ -121,11 +122,12 @@ class I10Apple2(Apple2):
             self.id_jaw_phase = id_jaw_phase
 
     @AsyncStatus.wrap
-    async def set(self, value: float) -> None:
+    async def set(self, value: SupportsFloat) -> None:
         """
         Check polarisation state and use it together with the energy(value)
         to calculate the required gap and phases before setting it.
         """
+        value = float(value)
         if self.pol is None:
             LOGGER.warning("Polarisation not set attempting to read from hardware")
             pol, phase = await self.determinePhaseFromHardware()
@@ -195,9 +197,8 @@ class I10Apple2PGM(StandardReadable, Movable):
             New device name.
         """
         super().__init__(name=name)
-        with self.add_children_as_readables():
-            self.id = id
-            self.pgm = pgm
+        self.id_ref = Reference(id)
+        self.pgm_ref = Reference(pgm)
         with self.add_children_as_readables(HintedSignal):
             self.energy_offset = soft_signal_rw(float, initial_value=0)
 
@@ -205,8 +206,8 @@ class I10Apple2PGM(StandardReadable, Movable):
     async def set(self, value: float) -> None:
         LOGGER.info(f"Moving f{self.name} energy to {value}.")
         await asyncio.gather(
-            self.id.set(value=value + await self.energy_offset.get_value()),
-            self.pgm.energy.set(value),
+            self.id_ref().set(value=value + await self.energy_offset.get_value()),
+            self.pgm_ref().energy.set(value),
         )
 
 
@@ -273,8 +274,7 @@ class LinearArbitraryAngle(StandardReadable, Movable):
             polynomial parameters highest power first.
         """
         super().__init__(name=name)
-        with self.add_children_as_readables():
-            self.id = id
+        self.id_ref = Reference(id)
         self.jaw_phase_from_angle = np.poly1d(jaw_phase_poly_param)
         self.angle_threshold_deg = angle_threshold_deg
         self.jaw_phase_limit = jaw_phase_limit
@@ -284,11 +284,12 @@ class LinearArbitraryAngle(StandardReadable, Movable):
             )
 
     @AsyncStatus.wrap
-    async def set(self, value: float) -> None:
-        pol = self.id.pol
+    async def set(self, value: SupportsFloat) -> None:
+        value = float(value)
+        pol = self.id_ref().pol
         if pol != "la":
             raise RuntimeError(
-                f"Angle control is not available in polarisation {pol} with {self.id.name}"
+                f"Angle control is not available in polarisation {pol} with {self.id_ref().name}"
             )
         # Moving to real angle which is 210 to 30.
         alpha_real = value if value > self.angle_threshold_deg else value + ALPHA_OFFSET
@@ -298,7 +299,7 @@ class LinearArbitraryAngle(StandardReadable, Movable):
                 f"jaw_phase position for angle ({value}) is outside permitted range"
                 f" [-{self.jaw_phase_limit}, {self.jaw_phase_limit}]"
             )
-        await self.id.id_jaw_phase.set(jaw_phase)
+        await self.id_ref().id_jaw_phase.set(jaw_phase)
         self._angle_set(value)
 
 

@@ -135,7 +135,7 @@ def test_mirror_set_voltage_sets_and_waits_happy_path(
 
     RE(plan())
 
-    mock_put.assert_called_with(100, wait=ANY, timeout=ANY)
+    mock_put.assert_called_with(100, wait=ANY)
 
 
 def test_mirror_set_voltage_sets_and_waits_happy_path_spin_while_waiting_for_slew(
@@ -161,7 +161,7 @@ def test_mirror_set_voltage_sets_and_waits_happy_path_spin_while_waiting_for_sle
 
     RE(plan())
 
-    mock_put.assert_called_with(100, wait=ANY, timeout=ANY)
+    mock_put.assert_called_with(100, wait=ANY)
 
 
 def test_mirror_set_voltage_set_rejected_when_not_ok(

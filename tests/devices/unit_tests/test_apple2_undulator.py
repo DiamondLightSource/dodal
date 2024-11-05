@@ -247,20 +247,18 @@ async def test_phase_success_set(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngi
 
     callback_on_mock_put(mock_phaseAxes.set_move, lambda *_, **__: set_complete_move())
     RE(bps.abs_set(mock_phaseAxes, set_value, wait=True))
-    get_mock_put(mock_phaseAxes.set_move).assert_called_once_with(
-        1, wait=True, timeout=ANY
-    )
+    get_mock_put(mock_phaseAxes.set_move).assert_called_once_with(1, wait=True)
     get_mock_put(mock_phaseAxes.top_inner.user_setpoint).assert_called_once_with(
-        set_value.top_inner, wait=True, timeout=ANY
+        set_value.top_inner, wait=True
     )
     get_mock_put(mock_phaseAxes.top_outer.user_setpoint).assert_called_once_with(
-        set_value.top_outer, wait=True, timeout=ANY
+        set_value.top_outer, wait=True
     )
     get_mock_put(mock_phaseAxes.btm_inner.user_setpoint).assert_called_once_with(
-        set_value.btm_inner, wait=True, timeout=ANY
+        set_value.btm_inner, wait=True
     )
     get_mock_put(mock_phaseAxes.btm_outer.user_setpoint).assert_called_once_with(
-        set_value.btm_outer, wait=True, timeout=ANY
+        set_value.btm_outer, wait=True
     )
 
     assert await mock_phaseAxes.read() == {

@@ -1,9 +1,11 @@
 # Changes here will be overwritten by Copier
-_commit: 2.2.0
+_commit: 2.5.0
 _src_path: gh:DiamondLightSource/python-copier-template
 author_email: dominic.oram@diamond.ac.uk
 author_name: Dominic Oram
+component_lifecycle: production
 component_owner: group:data-acquisition
+component_type: library
 description: Ophyd devices and other utils that could be used across DLS beamlines
 distribution_name: dls-dodal
 docker: false

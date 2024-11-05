@@ -1,5 +1,4 @@
 import asyncio
-from enum import Enum
 
 from bluesky.protocols import Hints
 from ophyd_async.core import (
@@ -9,6 +8,7 @@ from ophyd_async.core import (
     Device,
     PathProvider,
     StandardDetector,
+    StrictEnum,
     TriggerInfo,
     set_and_wait_for_value,
     soft_signal_r_and_setter,
@@ -21,30 +21,30 @@ from ophyd_async.epics.signal import (
 )
 
 
-class TetrammRange(str, Enum):
+class TetrammRange(StrictEnum):
     uA = "+- 120 uA"
     nA = "+- 120 nA"
 
 
-class TetrammTrigger(str, Enum):
+class TetrammTrigger(StrictEnum):
     FreeRun = "Free run"
     ExtTrigger = "Ext. trig."
     ExtBulb = "Ext. bulb"
     ExtGate = "Ext. gate"
 
 
-class TetrammChannels(str, Enum):
+class TetrammChannels(StrictEnum):
     One = "1"
     Two = "2"
     Four = "4"
 
 
-class TetrammResolution(str, Enum):
+class TetrammResolution(StrictEnum):
     SixteenBits = "16 bits"
     TwentyFourBits = "24 bits"
 
 
-class TetrammGeometry(str, Enum):
+class TetrammGeometry(StrictEnum):
     Diamond = "Diamond"
     Square = "Square"
 

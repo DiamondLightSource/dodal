@@ -5,8 +5,11 @@ import bluesky.plan_stubs as bps
 import numpy as np
 from bluesky.utils import Msg
 
-from dodal.devices.oav.oav_calculations import camera_coordinates_to_xyz
-from dodal.devices.oav.oav_detector import OAVConfigParams
+from dodal.devices.oav.oav_calculations import (
+    calculate_beam_distance,
+    camera_coordinates_to_xyz,
+)
+from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.pin_image_recognition import PinTipDetection
 from dodal.devices.smargon import Smargon
 
@@ -36,21 +39,6 @@ def bottom_right_from_top_left(
     )
 
 
-class ColorMode(IntEnum):
-    """
-    Enum to store the various color modes of the camera. We use RGB1.
-    """
-
-    MONO = 0
-    BAYER = 1
-    RGB1 = 2
-    RGB2 = 3
-    RGB3 = 4
-    YUV444 = 5
-    YUV422 = 6
-    YUV421 = 7
-
-
 class EdgeOutputArrayImageType(IntEnum):
     """
     Enum to store the types of image to tweak the output array. We use Original.
@@ -64,7 +52,7 @@ class EdgeOutputArrayImageType(IntEnum):
 
 
 def get_move_required_so_that_beam_is_at_pixel(
-    smargon: Smargon, pixel: Pixel, oav_params: OAVConfigParams
+    smargon: Smargon, pixel: Pixel, oav: OAV
 ) -> Generator[Msg, None, np.ndarray]:
     """Calculate the required move so that the given pixel is in the centre of the beam."""
 
@@ -78,22 +66,35 @@ def get_move_required_so_that_beam_is_at_pixel(
     )
     current_angle = yield from bps.rd(smargon.omega)
 
-    return calculate_x_y_z_of_pixel(current_motor_xyz, current_angle, pixel, oav_params)
+    beam_x = yield from bps.rd(oav.beam_centre_i)
+    beam_y = yield from bps.rd(oav.beam_centre_j)
+    microns_per_pixel_x = yield from bps.rd(oav.microns_per_pixel_x)
+    microns_per_pixel_y = yield from bps.rd(oav.microns_per_pixel_y)
+
+    return calculate_x_y_z_of_pixel(
+        current_motor_xyz,
+        current_angle,
+        pixel,
+        (beam_x, beam_y),
+        (microns_per_pixel_x, microns_per_pixel_y),
+    )
 
 
 def calculate_x_y_z_of_pixel(
-    current_x_y_z, current_omega, pixel: Pixel, oav_params: OAVConfigParams
+    current_x_y_z,
+    current_omega,
+    pixel: Pixel,
+    beam_centre: tuple[int, int],
+    microns_per_pixel: tuple[float, float],
 ) -> np.ndarray:
-    beam_distance_px: Pixel = oav_params.calculate_beam_distance(*pixel)
+    beam_distance_px: Pixel = calculate_beam_distance(beam_centre, *pixel)
 
-    assert oav_params.micronsPerXPixel
-    assert oav_params.micronsPerYPixel
     return current_x_y_z + camera_coordinates_to_xyz(
         beam_distance_px[0],
         beam_distance_px[1],
         current_omega,
-        oav_params.micronsPerXPixel,
-        oav_params.micronsPerYPixel,
+        microns_per_pixel[0],
+        microns_per_pixel[1],
     )
 
 
@@ -102,8 +103,8 @@ def wait_for_tip_to_be_found(
 ) -> Generator[Msg, None, Pixel]:
     yield from bps.trigger(ophyd_pin_tip_detection, wait=True)
     found_tip = yield from bps.rd(ophyd_pin_tip_detection.triggered_tip)
-    if found_tip == ophyd_pin_tip_detection.INVALID_POSITION:
+    if all(found_tip == ophyd_pin_tip_detection.INVALID_POSITION):
         timeout = yield from bps.rd(ophyd_pin_tip_detection.validity_timeout)
         raise PinNotFoundException(f"No pin found after {timeout} seconds")
 
-    return found_tip  # type: ignore
+    return Pixel((int(found_tip[0]), int(found_tip[1])))

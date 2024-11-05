@@ -15,7 +15,7 @@ description = "Ophyd devices and other utils that could be used across DLS beaml
 dependencies = [
     "click",
     "ophyd",
-    "ophyd-async>=0.7.0a1,<0.8",
+    "ophyd-async==0.8.0a2",
     "bluesky",
     "pyepics",
     "dataclasses-json",
@@ -91,6 +91,7 @@ dodal = ["*.txt"]
 version_file = "src/dodal/_version.py"
 
 [tool.pyright]
+typeCheckingMode = "standard"
 reportMissingImports = false # Ignore missing stubs in imported modules
 
 [tool.pytest.ini_options]

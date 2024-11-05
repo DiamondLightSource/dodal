@@ -1,8 +1,14 @@
 from asyncio import Task, create_task, sleep
-from enum import Enum
 
 from bluesky.protocols import Stoppable
-from ophyd_async.core import AsyncStatus, Device, SignalRW, StandardReadable
+from ophyd_async.core import (
+    AsyncStatus,
+    Device,
+    Reference,
+    SignalRW,
+    StandardReadable,
+    StrictEnum,
+)
 from ophyd_async.epics.signal import epics_signal_rw
 
 
@@ -10,27 +16,27 @@ class ThawingException(Exception):
     pass
 
 
-class ThawerStates(str, Enum):
+class ThawerStates(StrictEnum):
     OFF = "Off"
     ON = "On"
 
 
 class ThawingTimer(Device, Stoppable):
     def __init__(self, control_signal: SignalRW[ThawerStates]) -> None:
-        self._control_signal = control_signal
+        self._control_signal_ref = Reference(control_signal)
         self._thawing_task: Task | None = None
         super().__init__("thaw_for_time_s")
 
     @AsyncStatus.wrap
     async def set(self, time_to_thaw_for: float):
-        await self._control_signal.set(ThawerStates.ON)
+        await self._control_signal_ref().set(ThawerStates.ON)
         if self._thawing_task and not self._thawing_task.done():
             raise ThawingException("Thawing task already in progress")
         self._thawing_task = create_task(sleep(time_to_thaw_for))
         try:
             await self._thawing_task
         finally:
-            await self._control_signal.set(ThawerStates.OFF)
+            await self._control_signal_ref().set(ThawerStates.OFF)
 
     @AsyncStatus.wrap
     async def stop(self, *args, **kwargs):
