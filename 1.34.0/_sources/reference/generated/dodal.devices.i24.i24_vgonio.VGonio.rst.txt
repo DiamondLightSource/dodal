@@ -1,0 +1,102 @@
+dodal.devices.i24.i24\_vgonio.VGonio
+====================================
+
+.. currentmodule:: dodal.devices.i24.i24_vgonio
+
+.. autoclass:: VGonio
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      ~VGonio.component_names
+      
+      
+      
+      
+      
+      
+      
+      ~VGonio.kappa
+      
+      
+      
+      
+      
+      ~VGonio.omega
+      
+      
+      
+      ~VGonio.phi
+      
+      
+      
+      
+      
+      
+      ~VGonio.subscriptions
+      
+      
+      
+      ~VGonio.x
+      
+      
+      ~VGonio.xs
+      
+      
+      ~VGonio.yh
+      
+      
+      ~VGonio.ys
+      
+      
+      ~VGonio.z
+      
+      
+      ~VGonio.zs
+      
+   
+   

@@ -1,0 +1,96 @@
+dodal.devices.areadetector.adsim.AdSimDetector
+==============================================
+
+.. currentmodule:: dodal.devices.areadetector.adsim
+
+.. autoclass:: AdSimDetector
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~AdSimDetector.stage
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      ~AdSimDetector.cam
+      
+      
+      ~AdSimDetector.component_names
+      
+      
+      
+      
+      
+      
+      
+      ~AdSimDetector.hdf
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~AdSimDetector.subscriptions
+      
+      
+   
+   

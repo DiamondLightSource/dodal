@@ -1,0 +1,78 @@
+dodal.devices.cryostream.InOut
+==============================
+
+.. currentmodule:: dodal.devices.cryostream
+
+.. autoclass:: InOut
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~InOut.IN
+      
+      
+      ~InOut.OUT
+      
+   
+   

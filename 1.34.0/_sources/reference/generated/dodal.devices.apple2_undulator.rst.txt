@@ -1,0 +1,54 @@
+dodal.devices.apple2\_undulator
+===============================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~apple2_undulator.Apple2
+   ~apple2_undulator.Apple2PhasesVal
+   ~apple2_undulator.Apple2Val
+   ~apple2_undulator.EnergyCoverage
+   ~apple2_undulator.EnergyCoverageEntry
+   ~apple2_undulator.EnergyMinMax
+   ~apple2_undulator.LookupTableEntries
+   ~apple2_undulator.Lookuptable
+   ~apple2_undulator.UndulatorGap
+   ~apple2_undulator.UndulatorGateStatus
+   ~apple2_undulator.UndulatorJawPhase
+   ~apple2_undulator.UndulatorPhaseAxes
+   ~apple2_undulator.UndulatorPhaseMotor
+
+
+
+
+.. automodule:: dodal.devices.apple2_undulator
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      motor_position_equal
+   
+   
+
+   
+   
+   

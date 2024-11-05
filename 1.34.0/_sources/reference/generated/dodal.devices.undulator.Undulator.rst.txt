@@ -1,0 +1,44 @@
+dodal.devices.undulator.Undulator
+=================================
+
+.. currentmodule:: dodal.devices.undulator
+
+.. autoclass:: Undulator
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~Undulator.set
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

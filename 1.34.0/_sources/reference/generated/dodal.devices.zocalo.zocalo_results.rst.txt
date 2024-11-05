@@ -1,0 +1,55 @@
+dodal.devices.zocalo.zocalo\_results
+====================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.zocalo
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~zocalo_results.SortKeys
+   ~zocalo_results.XrcResult
+   ~zocalo_results.ZocaloResults
+   ~zocalo_results.ZocaloSource
+
+
+
+
+.. automodule:: dodal.devices.zocalo.zocalo_results
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      bbox_size
+      get_dict_differences
+      get_processing_result
+      source_from_results
+   
+   
+
+   
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      NoResultsFromZocalo
+      NoZocaloSubscription
+   
+   

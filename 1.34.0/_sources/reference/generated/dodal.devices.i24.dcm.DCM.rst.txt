@@ -1,0 +1,41 @@
+dodal.devices.i24.dcm.DCM
+=========================
+
+.. currentmodule:: dodal.devices.i24.dcm
+
+.. autoclass:: DCM
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

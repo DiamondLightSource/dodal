@@ -1,0 +1,44 @@
+dodal.devices.zebra.PositionCompare
+===================================
+
+.. currentmodule:: dodal.devices.zebra
+
+.. autoclass:: PositionCompare
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~PositionCompare.is_armed
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

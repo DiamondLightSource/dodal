@@ -1,0 +1,34 @@
+dodal.common.coordination
+=========================
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.common.coordination
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      group_uuid
+      inject
+   
+   
+
+   
+   
+   

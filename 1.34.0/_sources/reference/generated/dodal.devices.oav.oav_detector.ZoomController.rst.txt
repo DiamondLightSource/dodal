@@ -1,0 +1,44 @@
+dodal.devices.oav.oav\_detector.ZoomController
+==============================================
+
+.. currentmodule:: dodal.devices.oav.oav_detector
+
+.. autoclass:: ZoomController
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~ZoomController.set
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

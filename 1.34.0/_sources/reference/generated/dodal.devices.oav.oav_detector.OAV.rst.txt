@@ -1,0 +1,43 @@
+dodal.devices.oav.oav\_detector.OAV
+===================================
+
+.. currentmodule:: dodal.devices.oav.oav_detector
+
+.. autoclass:: OAV
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      ~OAV.connect
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

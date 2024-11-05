@@ -1,0 +1,50 @@
+dodal.devices.apple2\_undulator.UndulatorGap
+============================================
+
+.. currentmodule:: dodal.devices.apple2_undulator
+
+.. autoclass:: UndulatorGap
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      ~UndulatorGap.check_id_status
+      
+      
+      
+      
+      
+      
+      ~UndulatorGap.get_timeout
+      
+      
+      
+      
+      ~UndulatorGap.set
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

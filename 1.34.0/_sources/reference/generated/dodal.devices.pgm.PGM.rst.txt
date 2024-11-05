@@ -1,0 +1,41 @@
+dodal.devices.pgm.PGM
+=====================
+
+.. currentmodule:: dodal.devices.pgm
+
+.. autoclass:: PGM
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

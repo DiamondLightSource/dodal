@@ -1,0 +1,36 @@
+dodal.devices.logging\_ophyd\_device
+====================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~logging_ophyd_device.InfoLoggingDevice
+
+
+
+
+.. automodule:: dodal.devices.logging_ophyd_device
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

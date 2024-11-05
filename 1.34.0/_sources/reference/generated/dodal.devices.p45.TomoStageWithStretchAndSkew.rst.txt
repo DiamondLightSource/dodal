@@ -1,0 +1,84 @@
+dodal.devices.p45.TomoStageWithStretchAndSkew
+=============================================
+
+.. currentmodule:: dodal.devices.p45
+
+.. autoclass:: TomoStageWithStretchAndSkew
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      ~TomoStageWithStretchAndSkew.component_names
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~TomoStageWithStretchAndSkew.subscriptions
+      
+      
+      ~TomoStageWithStretchAndSkew.theta
+      
+      
+      
+      ~TomoStageWithStretchAndSkew.x
+      
+      
+      ~TomoStageWithStretchAndSkew.y
+      
+   
+   

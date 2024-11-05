@@ -1,0 +1,81 @@
+dodal.devices.zebra.RotationDirection
+=====================================
+
+.. currentmodule:: dodal.devices.zebra
+
+.. autoclass:: RotationDirection
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~RotationDirection.multiplier
+      
+      
+      ~RotationDirection.POSITIVE
+      
+      
+      ~RotationDirection.NEGATIVE
+      
+   
+   

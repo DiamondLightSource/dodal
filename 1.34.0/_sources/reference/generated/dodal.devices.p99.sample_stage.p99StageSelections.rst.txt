@@ -1,0 +1,120 @@
+dodal.devices.p99.sample\_stage.p99StageSelections
+==================================================
+
+.. currentmodule:: dodal.devices.p99.sample_stage
+
+.. autoclass:: p99StageSelections
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~p99StageSelections.Empty
+      
+      
+      ~p99StageSelections.Mn5um
+      
+      
+      ~p99StageSelections.Fe
+      
+      
+      ~p99StageSelections.Co5um
+      
+      
+      ~p99StageSelections.Ni5um
+      
+      
+      ~p99StageSelections.Cu5um
+      
+      
+      ~p99StageSelections.Zn5um
+      
+      
+      ~p99StageSelections.Zr
+      
+      
+      ~p99StageSelections.Mo
+      
+      
+      ~p99StageSelections.Rh
+      
+      
+      ~p99StageSelections.Pd
+      
+      
+      ~p99StageSelections.Ag
+      
+      
+      ~p99StageSelections.Cd25um
+      
+      
+      ~p99StageSelections.W
+      
+      
+      ~p99StageSelections.Pt
+      
+      
+      ~p99StageSelections.User
+      
+   
+   

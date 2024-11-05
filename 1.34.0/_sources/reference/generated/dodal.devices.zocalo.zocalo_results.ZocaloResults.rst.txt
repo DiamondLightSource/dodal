@@ -1,0 +1,50 @@
+dodal.devices.zocalo.zocalo\_results.ZocaloResults
+==================================================
+
+.. currentmodule:: dodal.devices.zocalo.zocalo_results
+
+.. autoclass:: ZocaloResults
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~ZocaloResults.describe
+      
+      
+      
+      
+      
+      
+      
+      ~ZocaloResults.stage
+      
+      
+      ~ZocaloResults.trigger
+      
+      
+      ~ZocaloResults.unstage
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   
