@@ -1,7 +1,6 @@
 import abc
 import asyncio
 from dataclasses import dataclass
-from enum import Enum
 from typing import Any
 
 import numpy as np
@@ -11,6 +10,7 @@ from ophyd_async.core import (
     ConfigSignal,
     HintedSignal,
     StandardReadable,
+    StrictEnum,
     soft_signal_r_and_setter,
     wait_for_value,
 )
@@ -20,7 +20,7 @@ from pydantic import BaseModel, ConfigDict, RootModel
 from dodal.log import LOGGER
 
 
-class UndulatorGateStatus(str, Enum):
+class UndulatorGateStatus(StrictEnum):
     open = "Open"
     close = "Closed"
 

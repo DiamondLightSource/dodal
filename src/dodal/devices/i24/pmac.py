@@ -1,15 +1,14 @@
 from asyncio import sleep
 from enum import Enum, IntEnum
 
-from bluesky.protocols import Flyable, Triggerable
+from bluesky.protocols import Flyable, Movable, Triggerable
 from ophyd_async.core import (
-    CALCULATE_TIMEOUT,
     DEFAULT_TIMEOUT,
     AsyncStatus,
-    SignalBackend,
+    Device,
+    Reference,
     SignalR,
     SignalRW,
-    SoftSignalBackend,
     StandardReadable,
     soft_signal_rw,
     wait_for_value,
@@ -64,61 +63,53 @@ class PMACStringMove(Triggerable):
         pmac_str_sig: SignalRW,
         string_to_send: str,
     ) -> None:
-        self.signal = pmac_str_sig
+        self.signal_ref = Reference(pmac_str_sig)
         self.cmd_string = string_to_send
 
     @AsyncStatus.wrap
     async def trigger(self):
-        await self.signal.set(self.cmd_string, wait=True)
+        await self.signal_ref().set(self.cmd_string, wait=True)
 
 
-class PMACStringLaser(SignalRW):
+class PMACStringLaser(Device, Movable):
     """Set the pmac_string to control the laser."""
 
     def __init__(
         self,
         pmac_str_sig: SignalRW,
-        backend: SignalBackend,
-        timeout: float | None = DEFAULT_TIMEOUT,
         name: str = "",
     ) -> None:
-        self.signal = pmac_str_sig
-        super().__init__(backend, timeout, name)
+        self._signal_ref = Reference(pmac_str_sig)
+        super().__init__(name)
 
     @AsyncStatus.wrap
     async def set(
         self,
         value: LaserSettings,
-        wait=True,
-        timeout=CALCULATE_TIMEOUT,
     ):
-        await self.signal.set(value.value, wait, timeout)
+        await self._signal_ref().set(value.value)
 
 
-class PMACStringEncReset(SignalRW):
+class PMACStringEncReset(Device, Movable):
     """Set a pmac_string to control the encoder channels in the controller."""
 
     def __init__(
         self,
         pmac_str_sig: SignalRW,
-        backend: SignalBackend,
-        timeout: float | None = DEFAULT_TIMEOUT,
         name: str = "",
     ) -> None:
-        self.signal = pmac_str_sig
-        super().__init__(backend, timeout, name)
+        self._signal_ref = Reference(pmac_str_sig)
+        super().__init__(name)
 
     @AsyncStatus.wrap
     async def set(
         self,
         value: EncReset,
-        wait=True,
-        timeout=CALCULATE_TIMEOUT,
     ):
-        await self.signal.set(value.value, wait, timeout)
+        await self._signal_ref().set(value.value)
 
 
-class ProgramRunner(SignalRW, Flyable):
+class ProgramRunner(Device, Flyable):
     """Run the collection by setting the program number on the PMAC string.
 
     Once the program number has been set, wait for the collection to be complete.
@@ -131,21 +122,18 @@ class ProgramRunner(SignalRW, Flyable):
         status_sig: SignalR,
         prog_num_sig: SignalRW,
         collection_time_sig: SignalRW,
-        backend: SignalBackend,
-        timeout: float | None = DEFAULT_TIMEOUT,
         name: str = "",
     ) -> None:
-        self.signal = pmac_str_sig
-        self.status = status_sig
-        self.prog_num = prog_num_sig
+        self._signal_ref = Reference(pmac_str_sig)
+        self._status_ref = Reference(status_sig)
+        self._prog_num_ref = Reference(prog_num_sig)
 
-        self.collection_time = collection_time_sig
-        self.KICKOFF_TIMEOUT = timeout
+        self._collection_time_ref = Reference(collection_time_sig)
 
-        super().__init__(backend, timeout, name)
+        super().__init__(name)
 
     async def _get_prog_number_string(self) -> str:
-        prog_num = await self.prog_num.get_value()
+        prog_num = await self._prog_num_ref().get_value()
         return f"&2b{prog_num}r"
 
     @AsyncStatus.wrap
@@ -154,11 +142,11 @@ class ProgramRunner(SignalRW, Flyable):
             wait for the scan status PV to go to 1.
         """
         prog_num_str = await self._get_prog_number_string()
-        await self.signal.set(prog_num_str, wait=True)
+        await self._signal_ref().set(prog_num_str, wait=True)
         await wait_for_value(
-            self.status,
+            self._status_ref(),
             ScanState.RUNNING,
-            timeout=self.KICKOFF_TIMEOUT,
+            timeout=DEFAULT_TIMEOUT,
         )
 
     @AsyncStatus.wrap
@@ -169,8 +157,10 @@ class ProgramRunner(SignalRW, Flyable):
             complete_time (float): total time required by the collection to \
             finish correctly.
         """
-        scan_complete_time = await self.collection_time.get_value()
-        await wait_for_value(self.status, ScanState.DONE, timeout=scan_complete_time)
+        scan_complete_time = await self._collection_time_ref().get_value()
+        await wait_for_value(
+            self._status_ref(), ScanState.DONE, timeout=scan_complete_time
+        )
 
 
 class ProgramAbort(Triggerable):
@@ -183,16 +173,16 @@ class ProgramAbort(Triggerable):
         pmac_str_sig: SignalRW,
         status_sig: SignalR,
     ) -> None:
-        self.signal = pmac_str_sig
-        self.status = status_sig
+        self._signal_ref = Reference(pmac_str_sig)
+        self._status_ref = Reference(status_sig)
 
     @AsyncStatus.wrap
     async def trigger(self):
-        await self.signal.set("A", wait=True)
+        await self._signal_ref().set("A", wait=True)
         await sleep(1.0)  # TODO Check with scientist what this sleep is really for.
-        await self.signal.set("P2401=0", wait=True)
+        await self._signal_ref().set("P2401=0", wait=True)
         await wait_for_value(
-            self.status,
+            self._status_ref(),
             ScanState.DONE,
             timeout=DEFAULT_TIMEOUT,
         )
@@ -209,10 +199,10 @@ class PMAC(StandardReadable):
         )
         self.to_xyz_zero = PMACStringMove(self.pmac_string, ZERO_STR)
 
-        self.laser = PMACStringLaser(self.pmac_string, backend=SoftSignalBackend(str))
+        self.laser = PMACStringLaser(self.pmac_string)
 
         self.enc_reset = PMACStringEncReset(
-            self.pmac_string, backend=SoftSignalBackend(str)
+            self.pmac_string,
         )
 
         self.x = Motor(prefix + "X")
@@ -234,7 +224,6 @@ class PMAC(StandardReadable):
             self.scanstatus,
             self.program_number,
             self.collection_time,
-            backend=SoftSignalBackend(str),
         )
         self.abort_program = ProgramAbort(self.pmac_string, self.scanstatus)
 

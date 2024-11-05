@@ -108,7 +108,7 @@ async def test_given_valid_data_reading_then_used_to_find_location():
 
         process_call = mock_process_array.call_args[0][0]
         assert np.array_equal(process_call, image_array)
-        assert location[TRIGGERED_TIP_READING]["value"] == (100, 200)
+        assert np.all(location[TRIGGERED_TIP_READING]["value"] == (100, 200))
         assert np.all(
             location[TRIGGERED_TOP_EDGE_READING]["value"] == np.array([1, 2, 3])
         )
@@ -129,7 +129,7 @@ async def test_given_find_tip_fails_when_triggered_then_tip_invalid():
     ):
         await device.trigger()
         reading = await device.read()
-        assert reading[TRIGGERED_TIP_READING]["value"] == device.INVALID_POSITION
+        assert all(reading[TRIGGERED_TIP_READING]["value"] == device.INVALID_POSITION)
         assert len(reading[TRIGGERED_TOP_EDGE_READING]["value"]) == 0
         assert len(reading[TRIGGERED_BOTTOM_EDGE_READING]["value"]) == 0
 
@@ -155,7 +155,7 @@ async def test_given_find_tip_fails_twice_when_triggered_then_tip_invalid_and_tr
     ):
         await device.trigger()
         reading = await device.read()
-        assert reading[TRIGGERED_TIP_READING]["value"] == device.INVALID_POSITION
+        assert all(reading[TRIGGERED_TIP_READING]["value"] == device.INVALID_POSITION)
         assert mock_process_array.call_count > 1
 
 

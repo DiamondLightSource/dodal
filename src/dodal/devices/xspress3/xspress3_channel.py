@@ -1,10 +1,8 @@
-from enum import Enum
-
-from ophyd_async.core import Device
+from ophyd_async.core import Device, StrictEnum
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
 
-class AcquireState(str, Enum):
+class AcquireState(StrictEnum):
     DONE = "Done"
     ACQUIRE = "Acquire"
 

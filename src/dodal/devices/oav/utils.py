@@ -103,8 +103,8 @@ def wait_for_tip_to_be_found(
 ) -> Generator[Msg, None, Pixel]:
     yield from bps.trigger(ophyd_pin_tip_detection, wait=True)
     found_tip = yield from bps.rd(ophyd_pin_tip_detection.triggered_tip)
-    if found_tip == ophyd_pin_tip_detection.INVALID_POSITION:
+    if all(found_tip == ophyd_pin_tip_detection.INVALID_POSITION):
         timeout = yield from bps.rd(ophyd_pin_tip_detection.validity_timeout)
         raise PinNotFoundException(f"No pin found after {timeout} seconds")
 
-    return found_tip  # type: ignore
+    return Pixel((int(found_tip[0]), int(found_tip[1])))
