@@ -56,7 +56,7 @@ class DCM(StandardReadable):
             )
             self.crystal_metadata_reflection, _ = soft_signal_r_and_setter(
                 Sequence[int],
-                initial_value=list(crystal_metadata.reflection),  # type: ignore
+                initial_value=list(cm.reflection),  # type: ignore
             )
             self.crystal_metadata_d_spacing = epics_signal_r(float, "DSPACING:RBV")
         super().__init__(name)
