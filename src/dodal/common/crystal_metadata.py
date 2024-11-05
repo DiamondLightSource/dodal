@@ -26,10 +26,10 @@ class CrystalMetadata:
     see https://manual.nexusformat.org/classes/base_classes/NXcrystal.html
     """
 
-    usage: Literal["Bragg", "Laue"] | None = None
-    type: str | None = None
-    reflection: tuple[int, int, int] | None = None
-    d_spacing: tuple[float, str] | None = None
+    usage: Literal["Bragg", "Laue"]
+    type: str
+    reflection: tuple[int, int, int]
+    d_spacing: tuple[float, str]
 
     @staticmethod
     def calculate_default_d_spacing(

@@ -66,56 +66,40 @@ class DoubleCrystalMonochromator(StandardReadable):
                 self.crystal_1_usage, _ = soft_signal_r_and_setter(
                     str, initial_value=crystal_1_metadata.usage
                 )
-            else:
-                self.crystal_1_usage = None
             if crystal_1_metadata.type is not None:
                 self.crystal_1_type, _ = soft_signal_r_and_setter(
                     str, initial_value=crystal_1_metadata.type
                 )
-            else:
-                self.crystal_1_type = None
             if crystal_1_metadata.reflection is not None:
                 self.crystal_1_reflection, _ = soft_signal_r_and_setter(
                     Array1D[np.int32],
                     initial_value=np.array(crystal_1_metadata.reflection),
                 )
-            else:
-                self.crystal_1_reflection = None
             if crystal_1_metadata.d_spacing is not None:
                 self.crystal_1_d_spacing, _ = soft_signal_r_and_setter(
                     float,
                     initial_value=crystal_1_metadata.d_spacing[0],
                     units=crystal_1_metadata.d_spacing[1],
                 )
-            else:
-                self.crystal_1_d_spacing = None
             if crystal_2_metadata.usage is not None:
                 self.crystal_2_usage, _ = soft_signal_r_and_setter(
                     str, initial_value=crystal_2_metadata.usage
                 )
-            else:
-                self.crystal_2_usage = None
             if crystal_2_metadata.type is not None:
                 self.crystal_2_type, _ = soft_signal_r_and_setter(
                     str, initial_value=crystal_2_metadata.type
                 )
-            else:
-                self.crystal_2_type = None
             if crystal_2_metadata.reflection is not None:
                 self.crystal_2_reflection, _ = soft_signal_r_and_setter(
                     Array1D[np.int32],
                     initial_value=np.array(crystal_2_metadata.reflection),
                 )
-            else:
-                self.crystal_2_reflection = None
             if crystal_2_metadata.d_spacing is not None:
                 self.crystal_2_d_spacing, _ = soft_signal_r_and_setter(
                     float,
                     initial_value=crystal_2_metadata.d_spacing[0],
                     units=crystal_2_metadata.d_spacing[1],
                 )
-            else:
-                self.crystal_2_d_spacing = None
 
         super().__init__(name)
 
