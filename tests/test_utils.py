@@ -158,9 +158,11 @@ def test_device_factory_can_rename(RE):
     cryo = device_c(mock=True, connect_immediately=True)
     assert cryo.name == "device_c"
     assert cryo.fine.name == "device_c-fine"
-    device_c(name="cryo")
-    assert cryo.name == "cryo"
-    assert cryo.fine.name == "cryo-fine"
+
+    cryo_2 = device_c(name="cryo")
+    assert cryo is not cryo_2
+    assert cryo_2.name == "cryo"
+    assert cryo_2.fine.name == "cryo-fine"
 
 
 def device_a() -> Readable:

@@ -47,5 +47,13 @@ def test_devices_are_identical(RE, module_and_devices_for_beamline):
         include_skipped=True,
         fake_with_ophyd_sim=True,
     )
-    for device_name in devices_a.keys():
-        assert devices_a[device_name] is devices_b[device_name]
+    non_identical_names = [
+        device_name
+        for device_name, device in devices_a.items()
+        if device is not devices_b[device_name]
+    ]
+    total_number_of_devices = len(devices_a)
+    non_identical_number_of_devies = len(devices_a)
+    assert (
+        len(non_identical_names) == 0
+    ), f"{non_identical_number_of_devies}/{total_number_of_devices} devices were not identical: {non_identical_names}"
