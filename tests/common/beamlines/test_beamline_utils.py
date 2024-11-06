@@ -1,4 +1,5 @@
 import asyncio
+import functools
 from unittest.mock import ANY, AsyncMock, MagicMock, patch
 
 import pytest
@@ -174,6 +175,17 @@ def test_device_controller_eager_connect(RE):
 
     mirror = device(connect_immediately=True)
     assert mirror.connect.call_count == 1  # type: ignore
+
+
+def test_multiple_layers_of_lru_caching_does_not_affect_device():
+    @beamline_utils.device_factory(mock=True)
+    @functools.lru_cache
+    def device() -> FocusingMirror:
+        return dummy_mirror()
+
+    mirror_1 = device()
+    mirror_2 = device()
+    assert mirror_1 is mirror_2
 
 
 def test_skip(RE):
