@@ -10,11 +10,7 @@ from dodal.common.beamlines.beamline_utils import (
     set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.beamlines.device_helpers import HDF5_PREFIX, numbered_slits
-from dodal.common.crystal_metadata import (
-    MaterialsEnum,
-    make_crystal_metadata_from_material,
-)
+from dodal.common.beamlines.device_helpers import HDF5_PREFIX
 from dodal.common.visit import RemoteDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
