@@ -19,7 +19,7 @@ def test_vertical_gonio_device_can_be_created(vgonio: VerticalGoniometer):
 
 async def test_vgonio_motor_move(vgonio: VerticalGoniometer, RE):
     pos = (1.0, 1.5)
-    RE(bps.mv(vgonio.x, pos[0], vgonio.yh, pos[1]))
+    RE(bps.mv(vgonio.x, pos[0], vgonio.yh, pos[1]))  # type:ignore
 
     assert await vgonio.x.user_readback.get_value() == 1.0
     assert await vgonio.yh.user_readback.get_value() == 1.5
