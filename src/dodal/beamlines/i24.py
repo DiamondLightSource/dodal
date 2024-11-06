@@ -1,15 +1,14 @@
-from dodal.common.beamlines.beamline_utils import (
-    BL,
-    device_instantiation,
-)
+from dodal.common.beamlines.beamline_utils import BL, device_instantiation
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.detector import DetectorParams
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.hutch_shutter import HutchShutter
 from dodal.devices.i24.aperture import Aperture
+from dodal.devices.i24.beam_center import DetectorBeamCenter
 from dodal.devices.i24.beamstop import Beamstop
 from dodal.devices.i24.dcm import DCM
 from dodal.devices.i24.dual_backlight import DualBacklight
+from dodal.devices.i24.focus_mode import MirrorFocusMode
 from dodal.devices.i24.i24_detector_motion import DetectorMotion
 from dodal.devices.i24.i24_vgonio import VGonio
 from dodal.devices.i24.pmac import PMAC
@@ -191,6 +190,47 @@ def shutter(
         HutchShutter,
         "shutter",
         "-PS-SHTR-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+def focus_mirrors(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> MirrorFocusMode:
+    """Get the i24 focus mirror devise to find the beam size."""
+    return device_instantiation(
+        MirrorFocusMode,
+        "focus_mirrors",
+        "-OP-MFM-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+@skip_device(lambda: BL == "s24")
+def eiger_beam_center(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> DetectorBeamCenter:
+    """A device for setting/reading the beamcenter from the eiger on i24."""
+    return device_instantiation(
+        DetectorBeamCenter,
+        "eiger_bc",
+        "-EA-EIGER-01:CAM:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+@skip_device(lambda: BL == "s24")
+def pilatus_beam_center(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> DetectorBeamCenter:
+    """A device for setting/reading the beamcenter from the pilatus on i24."""
+    return device_instantiation(
+        DetectorBeamCenter,
+        "pilatus_bc",
+        "-EA-PILAT-01:cam1:",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
