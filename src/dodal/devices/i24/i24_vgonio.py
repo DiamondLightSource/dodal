@@ -1,17 +1,16 @@
-from ophyd import Component as Cpt
-from ophyd import EpicsMotor
-from ophyd.epics_motor import MotorBundle
+from ophyd_async.core import StandardReadable
+from ophyd_async.epics.motor import Motor
 
 
-class VGonio(MotorBundle):
-    x = Cpt(EpicsMotor, "PINX")
-    z = Cpt(EpicsMotor, "PINZ")
-    yh = Cpt(EpicsMotor, "PINYH")
-    omega = Cpt(EpicsMotor, "OMEGA")
-    kappa = Cpt(EpicsMotor, "KAPPA")
-    phi = Cpt(EpicsMotor, "PHI")
+class VerticalGoniometer(StandardReadable):
+    def __init__(self, prefix: str, name: str = "") -> None:
+        self.x = Motor(prefix + "PINX")
+        self.z = Motor(prefix + "PINZ")
+        self.yh = Motor(prefix + "PINYH")
+        self.omega = Motor(prefix + "OMEGA")
 
-    # Real motors
-    xs = Cpt(EpicsMotor, "PINXS")
-    ys = Cpt(EpicsMotor, "PINXS")
-    zs = Cpt(EpicsMotor, "PINZS")
+        self.real_x = Motor(prefix + "PINXS")
+        self.real_z = Motor(prefix + "PINZS")
+        self.fast_y = Motor(prefix + "PINYS")
+
+        super().__init__(name)

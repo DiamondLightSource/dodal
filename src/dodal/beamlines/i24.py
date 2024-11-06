@@ -11,7 +11,7 @@ from dodal.devices.i24.beamstop import Beamstop
 from dodal.devices.i24.dcm import DCM
 from dodal.devices.i24.dual_backlight import DualBacklight
 from dodal.devices.i24.i24_detector_motion import DetectorMotion
-from dodal.devices.i24.i24_vgonio import VGonio
+from dodal.devices.i24.i24_vgonio import VerticalGoniometer
 from dodal.devices.i24.pmac import PMAC
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.oav_parameters import OAVConfig
@@ -154,12 +154,12 @@ def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
 @skip_device(lambda: BL == "s24")
 def vgonio(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> VGonio:
-    """Get the i24 vgonio device, instantiate it if it hasn't already been.
+) -> VerticalGoniometer:
+    """Get the i24 vertical goniometer device, instantiate it if it hasn't already been.
     If this is called when already instantiated, it will return the existing object.
     """
     return device_instantiation(
-        VGonio,
+        VerticalGoniometer,
         "vgonio",
         "-MO-VGON-01:",
         wait_for_connection,
