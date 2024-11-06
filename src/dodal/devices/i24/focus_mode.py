@@ -9,8 +9,7 @@ class HFocusMode(StrictEnum):
     focus20d = "HMFMfocus20d"
     focus30d = "HMFMfocus30d"
     focus50d = "HMFMfocus50d"
-    focus1050d = "HMFMfocus1050d"
-    focus5010d = "HMFMfocus5010d"
+    focus1050d = "HMFMfocus1030d"
     focus3010d = "HMFMfocus3010d"
 
 
@@ -19,8 +18,7 @@ class VFocusMode(StrictEnum):
     focus20d = "VMFMfocus20d"
     focus30d = "VMFMfocus30d"
     focus50d = "VMFMfocus50d"
-    focus1050d = "VMFMfocus1050d"
-    focus5010d = "VMFMfocus5010d"
+    focus1030d = "VMFMfocus1030d"
     focus3010d = "VMFMfocus3010d"
 
 
@@ -29,8 +27,7 @@ BEAM_SIZES = {
     "focus20d": [20, 20],
     "focus30d": [30, 30],
     "focus50d": [50, 50],
-    "focus1050d": [10, 50],
-    "focus5010d": [50, 10],
+    "focus1030d": [10, 30],
     "focus3010d": [30, 10],
 }
 
