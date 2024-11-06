@@ -10,7 +10,8 @@ from dodal.devices.i24.dcm import DCM
 from dodal.devices.i24.dual_backlight import DualBacklight
 from dodal.devices.i24.focus_mode import MirrorFocusMode
 from dodal.devices.i24.i24_detector_motion import DetectorMotion
-from dodal.devices.i24.i24_vgonio import VGonio
+
+# from dodal.devices.i24.i24_vgonio import VGonio
 from dodal.devices.i24.pmac import PMAC
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.oav_parameters import OAVConfig
@@ -150,20 +151,21 @@ def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
     )
 
 
-@skip_device(lambda: BL == "s24")
-def vgonio(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> VGonio:
-    """Get the i24 vgonio device, instantiate it if it hasn't already been.
-    If this is called when already instantiated, it will return the existing object.
-    """
-    return device_instantiation(
-        VGonio,
-        "vgonio",
-        "-MO-VGON-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
+# See https://github.com/DiamondLightSource/dodal/issues/890
+# @skip_device(lambda: BL == "s24")
+# def vgonio(
+#     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+# ) -> VGonio:
+#     """Get the i24 vgonio device, instantiate it if it hasn't already been.
+#     If this is called when already instantiated, it will return the existing object.
+#     """
+#     return device_instantiation(
+#         VGonio,
+#         "vgonio",
+#         "-MO-VGON-01:",
+#         wait_for_connection,
+#         fake_with_ophyd_sim,
+#     )
 
 
 def zebra(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> Zebra:
