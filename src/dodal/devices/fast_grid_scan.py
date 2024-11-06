@@ -74,21 +74,6 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
     # Whether to set the stub offsets after centering
     set_stub_offsets: bool = False
 
-    def get_param_positions(self) -> dict:
-        return {
-            "x_steps": self.x_steps,
-            "y_steps": self.y_steps,
-            "z_steps": self.z_steps,
-            "x_step_size": self.x_step_size,
-            "y_step_size": self.y_step_size,
-            "z_step_size": self.z_step_size,
-            "x_start": self.x_start,
-            "y1_start": self.y1_start,
-            "y2_start": self.y2_start,
-            "z1_start": self.z1_start,
-            "z2_start": self.z2_start,
-        }
-
     @property
     def x_axis(self) -> GridAxis:
         return GridAxis(self.x_start, self.x_step_size, self.x_steps)
@@ -140,11 +125,6 @@ class ZebraGridScanParams(GridScanParamsCommon):
 
     dwell_time_ms: float = 10
 
-    def get_param_positions(self):
-        param_positions = super().get_param_positions()
-        param_positions["dwell_time_ms"] = self.dwell_time_ms
-        return param_positions
-
     @field_validator("dwell_time_ms")
     @classmethod
     def non_integer_dwell_time(cls, dwell_time_ms: float) -> float:
@@ -165,11 +145,6 @@ class PandAGridScanParams(GridScanParamsCommon):
     """
 
     run_up_distance_mm: float = 0.17
-
-    def get_param_positions(self):
-        param_positions = super().get_param_positions()
-        param_positions["run_up_distance_mm"] = self.run_up_distance_mm
-        return param_positions
 
 
 class MotionProgram(Device):
