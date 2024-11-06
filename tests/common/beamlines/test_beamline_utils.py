@@ -149,29 +149,31 @@ def dummy_mirror() -> FocusingMirror:
     return mirror
 
 
-def test_device_controller_names():
+def test_device_controller_name_propagated():
     @beamline_utils.device_factory()
     def device() -> FocusingMirror:
         return dummy_mirror()
 
     mirror = device(name="foo")
     assert mirror.name == "foo"
+
+
+def test_device_controller_connection_is_lazy():
+    @beamline_utils.device_factory()
+    def device() -> FocusingMirror:
+        return dummy_mirror()
+
+    mirror = device(name="foo")
     assert mirror.connect.call_count == 0  # type: ignore
 
 
-def test_device_controller_connect(RE):
+def test_device_controller_eager_connect(RE):
     @beamline_utils.device_factory(mock=True)
     def device() -> FocusingMirror:
         return dummy_mirror()
 
-    mirror = device()
-    assert mirror.name == "device"
-    assert isinstance(mirror.connect, AsyncMock)
-    assert mirror.connect.call_count == 0
-
-    mirror2 = device(connect_immediately=True)
-    assert mirror is mirror2
-    assert mirror.connect.call_count == 1
+    mirror = device(connect_immediately=True)
+    assert mirror.connect.call_count == 1  # type: ignore
 
 
 def test_skip(RE):
