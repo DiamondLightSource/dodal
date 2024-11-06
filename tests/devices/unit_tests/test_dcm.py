@@ -16,7 +16,6 @@ async def dcm() -> DCM:
 async def test_metadata_reflection(dcm: DCM):
     signal = dcm.crystal_metadata_reflection
     v = await signal.read()
-    print(v)
     assert v is not None, "Value is not clear"
 
 
