@@ -1,3 +1,4 @@
+import functools
 import importlib
 import inspect
 import os
@@ -127,7 +128,7 @@ class DeviceInitializationController(Generic[D]):
         mock: bool,
         skip: SkipType,
     ):
-        self._factory: Callable[[], D] = factory
+        self._factory: Callable[[], D] = functools.lru_cache(factory)
         self._callbacks: list[Callable[[D], None]] = []
         self._use_factory_name = use_factory_name
         self._timeout = timeout

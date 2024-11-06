@@ -160,7 +160,7 @@ def test_device_factory_can_rename(RE):
     assert cryo.fine.name == "device_c-fine"
 
     cryo_2 = device_c(name="cryo")
-    assert cryo is not cryo_2
+    assert cryo is cryo_2
     assert cryo_2.name == "cryo"
     assert cryo_2.fine.name == "cryo-fine"
 
