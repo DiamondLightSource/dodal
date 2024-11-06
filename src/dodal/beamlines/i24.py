@@ -11,8 +11,8 @@ from dodal.devices.i24.beamstop import Beamstop
 from dodal.devices.i24.dcm import DCM
 from dodal.devices.i24.dual_backlight import DualBacklight
 from dodal.devices.i24.i24_detector_motion import DetectorMotion
-from dodal.devices.i24.i24_vgonio import VerticalGoniometer
 from dodal.devices.i24.pmac import PMAC
+from dodal.devices.i24.vgonio import VerticalGoniometer
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.oav_parameters import OAVConfig
 from dodal.devices.zebra import Zebra
