@@ -31,12 +31,12 @@ from dodal.parameters.experiment_parameter_base import AbstractExperimentWithBea
 @dataclass
 class GridAxis:
     start: float
-    step_size: float
+    step_size_mm: float
     full_steps: int
 
     def steps_to_motor_position(self, steps):
         """Gives the motor position based on steps, where steps are 0 indexed"""
-        return self.start + self.step_size * steps
+        return self.start + self.step_size_mm * steps
 
     @property
     def end(self):
@@ -62,9 +62,9 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
     x_steps: int = 1
     y_steps: int = 1
     z_steps: int = 0
-    x_step_size: float = 0.1
-    y_step_size: float = 0.1
-    z_step_size: float = 0.1
+    x_step_size_mm: float = 0.1
+    y_step_size_mm: float = 0.1
+    z_step_size_mm: float = 0.1
     x_start: float = 0.1
     y1_start: float = 0.1
     y2_start: float = 0.1
@@ -76,15 +76,15 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
 
     @property
     def x_axis(self) -> GridAxis:
-        return GridAxis(self.x_start, self.x_step_size, self.x_steps)
+        return GridAxis(self.x_start, self.x_step_size_mm, self.x_steps)
 
     @property
     def y_axis(self) -> GridAxis:
-        return GridAxis(self.y1_start, self.y_step_size, self.y_steps)
+        return GridAxis(self.y1_start, self.y_step_size_mm, self.y_steps)
 
     @property
     def z_axis(self) -> GridAxis:
-        return GridAxis(self.z2_start, self.z_step_size, self.z_steps)
+        return GridAxis(self.z2_start, self.z_step_size_mm, self.z_steps)
 
     def get_num_images(self):
         return self.x_steps * (self.y_steps + self.z_steps)
@@ -216,9 +216,9 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
             "x_steps": self.x_steps,
             "y_steps": self.y_steps,
             "z_steps": self.z_steps,
-            "x_step_size": self.x_step_size,
-            "y_step_size": self.y_step_size,
-            "z_step_size": self.z_step_size,
+            "x_step_size_mm": self.x_step_size,
+            "y_step_size_mm": self.y_step_size,
+            "z_step_size_mm": self.z_step_size,
             "x_start": self.x_start,
             "y1_start": self.y1_start,
             "y2_start": self.y2_start,
