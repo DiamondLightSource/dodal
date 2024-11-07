@@ -8,7 +8,7 @@ from dodal.devices.i24.beam_center import DetectorBeamCenter
 from dodal.devices.i24.beamstop import Beamstop
 from dodal.devices.i24.dcm import DCM
 from dodal.devices.i24.dual_backlight import DualBacklight
-from dodal.devices.i24.focus_mode import MirrorFocusMode
+from dodal.devices.i24.focus_mirrors import FocusMirrorsMode
 from dodal.devices.i24.i24_detector_motion import DetectorMotion
 from dodal.devices.i24.pmac import PMAC
 from dodal.devices.i24.vgonio import VerticalGoniometer
@@ -197,10 +197,10 @@ def shutter(
 
 def focus_mirrors(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> MirrorFocusMode:
+) -> FocusMirrorsMode:
     """Get the i24 focus mirror devise to find the beam size."""
     return device_instantiation(
-        MirrorFocusMode,
+        FocusMirrorsMode,
         "focus_mirrors",
         "-OP-MFM-01:",
         wait_for_connection,

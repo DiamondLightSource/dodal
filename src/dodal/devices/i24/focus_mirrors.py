@@ -32,7 +32,7 @@ BEAM_SIZES = {
 }
 
 
-class MirrorFocusMode(StandardReadable):
+class FocusMirrorsMode(StandardReadable):
     """A small device to read the focus mode and work out the beam size."""
 
     def __init__(self, prefix: str, name: str = "") -> None:
