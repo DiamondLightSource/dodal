@@ -13,6 +13,12 @@ async def dcm() -> DCM:
     return dcm
 
 
+async def test_metadata_reflection(dcm: DCM):
+    signal = dcm.crystal_metadata_reflection
+    v = await signal.read()
+    assert v is not None, "Value is not clear"
+
+
 @pytest.mark.parametrize(
     "key",
     [
@@ -20,6 +26,10 @@ async def dcm() -> DCM:
         "dcm-bragg_in_degrees",
         "dcm-energy_in_kev",
         "dcm-offset_in_mm",
+        "dcm-crystal_metadata_usage",
+        "dcm-crystal_metadata_type",
+        "dcm-crystal_metadata_reflection",
+        "dcm-crystal_metadata_d_spacing",
     ],
 )
 async def test_read_and_describe_includes(
