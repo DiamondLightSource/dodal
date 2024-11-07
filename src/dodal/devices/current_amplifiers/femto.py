@@ -85,9 +85,7 @@ class FemtoDDPCA(CurrentAmp):
             self.timeout = timeout
             self.raise_timetable = raise_timetable
         self.gain_to_current_table = gain_to_current_table
-        super().__init__(
-            name=name,
-        )
+        super().__init__(name=name, gain_convertion_table=gain_to_current_table)
 
     @AsyncStatus.wrap
     async def set(self, value) -> None:
@@ -113,3 +111,6 @@ class FemtoDDPCA(CurrentAmp):
             return False
         await self.set(f"sen_{current_gain}")
         return True
+
+    async def get_gain(self) -> str:
+        return (await self.gain.get_value()).name

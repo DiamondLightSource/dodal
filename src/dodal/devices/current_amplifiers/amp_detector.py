@@ -47,7 +47,7 @@ class AutoGainDectector(StandardReadable):
             LOGGER.info(f"{self.name}-Attempting auto-gain")
             if await self.auto_gain():
                 LOGGER.info(
-                    f"{self.name} new gain = f{await self.current_amp.gain.get_value()}."
+                    f"{self.name} new gain = f{await self.current_amp.get_gain()}."
                 )
             else:
                 LOGGER.warning("{self.name} new gain is at maximum/minimum value.")
@@ -58,7 +58,7 @@ class AutoGainDectector(StandardReadable):
     async def auto_gain(self) -> bool:
         cnt = 0
         count_time = await self.counter.count_time.get_value()
-        while cnt < len(self.current_amp.gain_table):
+        while cnt < len(self.current_amp.gain_convertion_table):
             await self.counter.trigger()
             """
             negative value is possible on some current amplifier it is the order of
@@ -77,8 +77,8 @@ class AutoGainDectector(StandardReadable):
         return True
 
     async def get_corrected_current(self) -> float:
-        current_gain = (await self.current_amp.gain.get_value()).name
-        correction_factor = self.current_amp.gain_to_current_table[current_gain].value
+        current_gain = await self.current_amp.get_gain()
+        correction_factor = self.current_amp.gain_convertion_table[current_gain]
         await self.counter.trigger()
         corrected_current = (
             await self.counter.readout.get_value(cached=False)

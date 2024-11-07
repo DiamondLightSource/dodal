@@ -16,10 +16,13 @@ class CurrentAmp(ABC, StandardReadable, Movable):
 
     """
 
-    def __init__(self, name: str = "") -> None:
+    def __init__(self, gain_convertion_table, name: str = "") -> None:
+        self.gain_convertion_table = gain_convertion_table
         super().__init__(name)
 
     @abstractmethod
     async def increase_gain(self) -> bool: ...
     @abstractmethod
     async def decrease_gain(self) -> bool: ...
+    @abstractmethod
+    async def get_gain(self) -> str: ...
