@@ -31,16 +31,16 @@ class Femto3xxGainTable(StrictEnum):
 class Femto3xxGainToCurrentTable(float, Enum):
     """These are the sensitivity setting for Femto 3xx current amplifier"""
 
-    sen_1 = 10**4
-    sen_2 = 10**5
-    sen_3 = 10**6
-    sen_4 = 10**7
-    sen_5 = 10**8
-    sen_6 = 10**9
-    sen_7 = 10**10
-    sen_8 = 10**11
-    sen_9 = 10**12
-    sen_10 = 10**13
+    sen_1 = 1e4
+    sen_2 = 1e5
+    sen_3 = 1e6
+    sen_4 = 1e7
+    sen_5 = 1e8
+    sen_6 = 1e9
+    sen_7 = 1e10
+    sen_8 = 1e11
+    sen_9 = 1e12
+    sen_10 = 1e13
 
 
 class Femto3xxRaiseTime(float, Enum):
@@ -61,7 +61,7 @@ class Femto3xxRaiseTime(float, Enum):
 class FemtoDDPCA(CurrentAmp):
     """
     Femto current amplifier device, this class should cover all DDPCA Femto current
-     amplifiers, As the main different between all the DDPCA Femto is their gain table
+     amplifiers, As the main different between all the DDPCACondition Femto is their gain table
      and respond time table.
     This class will allow the change of gain via set or the two incremental,
      increase_gain and decrease gain function.
@@ -89,27 +89,32 @@ class FemtoDDPCA(CurrentAmp):
 
     @AsyncStatus.wrap
     async def set(self, value) -> None:
-        if value not in self.gain_table.__members__:
+        if value not in [item.value for item in self.gain_convertion_table]:
             raise ValueError(f"Gain value {value} is not within {self.name} range.")
-        LOGGER.info(f"{self.name} gain change to {value}")
-        await self.gain.set(value=self.gain_table[value], timeout=self.timeout)
+        sen_setting = self.gain_convertion_table(value).name
+        LOGGER.info(f"{self.name} gain change to {sen_setting}:{value}")
+
+        await self.gain.set(
+            value=self.gain_table[sen_setting].value,
+            timeout=self.timeout,
+        )
         # wait for current amplifier to settle
-        await asyncio.sleep(self.raise_timetable[value].value)
+        await asyncio.sleep(self.raise_timetable[sen_setting].value)
 
     async def increase_gain(self) -> bool:
-        current_gain = int((await self.gain.get_value()).name.split("_")[-1])
+        current_gain = int((await self.get_gain()).split("_")[-1])
         current_gain += 1
         if current_gain > len(self.gain_table):
             return False
-        await self.set(f"sen_{current_gain}")
+        await self.set(self.gain_convertion_table[f"sen_{current_gain}"])
         return True
 
     async def decrease_gain(self) -> bool:
-        current_gain = int((await self.gain.get_value()).name.split("_")[-1])
+        current_gain = int((await self.get_gain()).split("_")[-1])
         current_gain -= 1
         if current_gain < 1:
             return False
-        await self.set(f"sen_{current_gain}")
+        await self.set(self.gain_convertion_table[f"sen_{current_gain}"])
         return True
 
     async def get_gain(self) -> str:

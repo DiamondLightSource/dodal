@@ -75,11 +75,11 @@ async def mock_femto_struck_scaler_detector(
 @pytest.mark.parametrize(
     "gain, wait_time, gain_value",
     [
-        (["sen_1", 0.8e-3, "10^4"]),
-        (["sen_3", 0.8e-3, "10^6"]),
-        (["sen_5", 2.3e-3, "10^8"]),
-        (["sen_7", 17e-3, "10^10"]),
-        (["sen_10", 350e-3, "10^13"]),
+        ([1e4, 0.8e-3, "10^4"]),
+        ([1e6, 0.8e-3, "10^6"]),
+        ([1e8, 2.3e-3, "10^8"]),
+        ([1e10, 17e-3, "10^10"]),
+        ([1e13, 350e-3, "10^13"]),
     ],
 )
 @mock.patch("asyncio.sleep")
