@@ -7,6 +7,7 @@ from dataclasses import dataclass
 import zocalo.configuration
 from workflows.transport import lookup
 
+from dodal.devices.zocalo.zocalo_constants import ZOCALO_ENV
 from dodal.log import LOGGER
 
 
@@ -56,7 +57,7 @@ class ZocaloTrigger:
 
     see https://github.com/DiamondLightSource/dodal/wiki/How-to-Interact-with-Zocalo"""
 
-    def __init__(self, environment: str = "artemis"):
+    def __init__(self, environment: str = ZOCALO_ENV):
         self.zocalo_environment: str = environment
 
     def _send_to_zocalo(self, parameters: dict):

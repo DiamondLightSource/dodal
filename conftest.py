@@ -44,6 +44,7 @@ mock_attributes_table = {
 }
 
 BANNED_PATHS = [Path("/dls"), Path("/dls_sw")]
+environ["DODAL_TEST_MODE"] = "true"
 
 
 @pytest.fixture(autouse=True)
@@ -156,19 +157,6 @@ async def static_path_provider(
 
 
 @pytest.fixture
-async def RE():
-    RE = RunEngine()
-    # make sure the event loop is thoroughly up and running before we try to create
-    # any ophyd_async devices which might need it
-    timeout = time.monotonic() + 1
-    while not RE.loop.is_running():
-        await asyncio.sleep(0)
-        if time.monotonic() > timeout:
-            raise TimeoutError("This really shouldn't happen but just in case...")
-    yield RE
-
-
-@pytest.fixture
 def run_engine_documents(RE: RunEngine) -> Mapping[str, list[dict]]:
     docs: dict[str, list[dict]] = {}
 
@@ -185,3 +173,16 @@ def failed_status(failure: Exception) -> Status:
     status = Status()
     status.set_exception(failure)
     return status
+
+
+@pytest.fixture
+async def RE():
+    RE = RunEngine()
+    # make sure the event loop is thoroughly up and running before we try to create
+    # any ophyd_async devices which might need it
+    timeout = time.monotonic() + 1
+    while not RE.loop.is_running():
+        await asyncio.sleep(0)
+        if time.monotonic() > timeout:
+            raise TimeoutError("This really shouldn't happen but just in case...")
+    yield RE
