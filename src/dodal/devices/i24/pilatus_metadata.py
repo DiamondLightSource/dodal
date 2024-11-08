@@ -35,6 +35,7 @@ class PilatusMetadata(StandardReadable):
         )
         # Now, find the -09 part of this
         numberpart = re.search(r"(-0+9)", expected_filename)
+        assert numberpart is not None
         template_fill = "#" * len(numberpart.group(0))
         return (
             expected_filename[: numberpart.start()]
