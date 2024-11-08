@@ -1,10 +1,10 @@
 import asyncio
-import os
 
 import bluesky.plan_stubs as bps
 import psutil
 import pytest
 from bluesky.preprocessors import stage_decorator
+from bluesky.protocols import Reading
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
 
@@ -16,6 +16,7 @@ from dodal.devices.zocalo import (
     ZocaloStartInfo,
     ZocaloTrigger,
 )
+from dodal.devices.zocalo.zocalo_constants import ZOCALO_ENV
 
 TEST_RESULT_LARGE: XrcResult = {
     "centre_of_mass": [1, 2, 3],
@@ -26,6 +27,8 @@ TEST_RESULT_LARGE: XrcResult = {
     "bounding_box": [[2, 2, 2], [8, 8, 7]],
 }
 
+DCID_WHICH_EXISTS_IN_DEV_ISPYB = 1000
+
 
 @pytest.fixture
 async def zocalo_device():
@@ -34,15 +37,35 @@ async def zocalo_device():
     return zd
 
 
+def convert_zocalo_device_reading_to_xrc_result(
+    zocalo_reading: dict[str, Reading],
+) -> XrcResult:
+    com = zocalo_reading["zocalo-centre_of_mass"]["value"][0]
+    max_voxel = zocalo_reading["zocalo-max_voxel"]["value"][0]
+    max_count = zocalo_reading["zocalo-max_count"]["value"][0]
+    n_voxels = zocalo_reading["zocalo-n_voxels"]["value"][0]
+    total_count = zocalo_reading["zocalo-total_count"]["value"][0]
+    bounding_box = zocalo_reading["zocalo-bounding_box"]["value"][0]
+
+    return XrcResult(
+        centre_of_mass=com.tolist(),
+        max_voxel=max_voxel.tolist(),
+        max_count=int(max_count),
+        n_voxels=int(n_voxels),
+        total_count=int(total_count),
+        bounding_box=bounding_box.tolist(),
+    )
+
+
 @pytest.mark.s03
 async def test_read_results_from_fake_zocalo(
     zocalo_device: ZocaloResults, RE: RunEngine
 ):
     zocalo_device._subscribe_to_results()
-    zc = ZocaloTrigger("dev_artemis")
-    zc.run_start(ZocaloStartInfo(0, None, 0, 100, 0))
-    zc.run_end(0)
-    zocalo_device.timeout_s = 5
+    zc = ZocaloTrigger(ZOCALO_ENV)
+    zc.run_start(ZocaloStartInfo(DCID_WHICH_EXISTS_IN_DEV_ISPYB, None, 0, 100, 0))
+    zc.run_end(DCID_WHICH_EXISTS_IN_DEV_ISPYB)
+    zocalo_device.timeout_s = 15
 
     def plan():
         yield from bps.open_run()
@@ -52,7 +75,7 @@ async def test_read_results_from_fake_zocalo(
     RE(plan())
 
     results = await zocalo_device.read()
-    assert results["zocalo-results"]["value"][0] == TEST_RESULT_LARGE
+    assert convert_zocalo_device_reading_to_xrc_result(results) == TEST_RESULT_LARGE
 
 
 @pytest.mark.s03
@@ -60,13 +83,13 @@ async def test_stage_unstage_controls_read_results_from_fake_zocalo(
     zocalo_device: ZocaloResults, RE: RunEngine
 ):
     dodal.devices.zocalo.zocalo_results.CLEAR_QUEUE_WAIT_S = 0.05
-    zc = ZocaloTrigger("dev_artemis")
-    zocalo_device.timeout_s = 5
+    zc = ZocaloTrigger(ZOCALO_ENV)
+    zocalo_device.timeout_s = 15
 
     def plan():
         yield from bps.open_run()
-        zc.run_start(ZocaloStartInfo(0, None, 0, 100, 0))
-        zc.run_end(0)
+        zc.run_start(ZocaloStartInfo(DCID_WHICH_EXISTS_IN_DEV_ISPYB, None, 0, 100, 0))
+        zc.run_end(DCID_WHICH_EXISTS_IN_DEV_ISPYB)
         yield from bps.sleep(0.15)
         yield from bps.trigger_and_read([zocalo_device])
         yield from bps.close_run()
@@ -89,7 +112,7 @@ async def test_stage_unstage_controls_read_results_from_fake_zocalo(
     await asyncio.sleep(1)
 
     results = await zocalo_device.read()
-    assert results["zocalo-results"]["value"][0] == TEST_RESULT_LARGE
+    assert convert_zocalo_device_reading_to_xrc_result(results) == TEST_RESULT_LARGE
     await zocalo_device.unstage()
 
     # Generating some more results leaves them at RMQ
@@ -104,9 +127,7 @@ async def test_stage_unstage_controls_read_results_from_fake_zocalo(
 async def test_stale_connections_closed_after_unstage(
     zocalo_device: ZocaloResults, RE: RunEngine
 ):
-    this_process = psutil.Process(os.getpid())
-
-    connections_before = len(this_process.connections())
+    connections_before = len(psutil.net_connections())
 
     def stage_unstage():
         yield from bps.stage(zocalo_device)
@@ -114,6 +135,6 @@ async def test_stale_connections_closed_after_unstage(
 
     RE(stage_unstage())
 
-    connections_after = len(this_process.connections())
+    connections_after = len(psutil.net_connections())
 
     assert connections_before == connections_after

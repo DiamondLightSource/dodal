@@ -1,8 +1,9 @@
-# Configuration file for the Sphinx documentation builder.
-#
-# This file only contains a selection of the most common options. For a full
-# list see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
+"""Configuration file for the Sphinx documentation builder.
+
+This file only contains a selection of the most common options. For a full
+list see the documentation:
+https://www.sphinx-doc.org/en/master/usage/configuration.html
+"""
 
 import sys
 from inspect import isclass
@@ -33,6 +34,7 @@ else:
 extensions = [
     # Use this for generating API docs
     "sphinx.ext.autodoc",
+    # and making summary tables at the top of API docs
     "sphinx.ext.autosummary",
     # This can parse google style docstrings
     "sphinx.ext.napoleon",
@@ -90,6 +92,12 @@ autodoc_preserve_defaults = True
 
 autosummary_generate = True
 autosummary_imported_members = False
+
+# Document only what is in __all__
+autosummary_ignore_module_all = False
+
+# Add any paths that contain templates here, relative to this directory.
+templates_path = ["_templates"]
 
 # Output graphviz directive produced images in a scalable format
 graphviz_output_format = "svg"

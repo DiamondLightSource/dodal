@@ -40,6 +40,6 @@ def test_can_stage_and_unstage_eiger(eiger: EigerDetector):
     eiger.stage()
     assert eiger.cam.acquire.get() == 1
     # S03 filewriters stay in error
-    eiger.odin.check_odin_initialised = lambda: (True, "")
+    eiger.odin.wait_for_odin_initialised = lambda: (True, "")
     eiger.unstage()
     assert eiger.cam.acquire.get() == 0

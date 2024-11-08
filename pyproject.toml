@@ -24,10 +24,10 @@ dependencies = [
     "requests",
     "graypy",
     "pydantic>=2.0",
-    "opencv-python-headless",    # For pin-tip detection.
-    "aioca",                     # Required for CA support with ophyd-async.
-    "p4p",                       # Required for PVA support with ophyd-async.
-    "numpy<2.0",                 # Unpin when https://github.com/bluesky/ophyd-async/issues/387 resolved
+    "opencv-python-headless",                                                  # For pin-tip detection.
+    "aioca",                                                                   # Required for CA support with ophyd-async.
+    "p4p",                                                                     # Required for PVA support with ophyd-async.
+    "numpy<2.0",                                                               # Unpin when https://github.com/bluesky/ophyd-async/issues/387 resolved
     "aiofiles",
     "aiohttp",
     "redis",
@@ -91,7 +91,8 @@ dodal = ["*.txt"]
 version_file = "src/dodal/_version.py"
 
 [tool.pyright]
-reportMissingImports = false # Ignore missing stubs in imported modules
+typeCheckingMode = "standard"
+reportMissingImports = false  # Ignore missing stubs in imported modules
 
 [tool.pytest.ini_options]
 # Run pytest with all our checkers, and don't spam us with massive tracebacks on error

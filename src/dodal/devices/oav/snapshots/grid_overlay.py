@@ -1,13 +1,7 @@
-# type: ignore # OAV will soon be ophyd-async, see https://github.com/DiamondLightSource/dodal/issues/716
 from enum import Enum
 from functools import partial
-from os.path import join as path_join
 
-from ophyd import Component, Signal
 from PIL import Image, ImageDraw
-
-from dodal.devices.areadetector.plugins.MJPG import MJPG
-from dodal.log import LOGGER
 
 
 class Orientation(Enum):
@@ -20,7 +14,7 @@ def _add_parallel_lines_to_image(
     start_x: int,
     start_y: int,
     line_length: int,
-    spacing: int,
+    spacing: float,
     num_lines: int,
     orientation=Orientation.horizontal,
 ):
@@ -38,7 +32,7 @@ def _add_parallel_lines_to_image(
         start_x (int): The x coordinate (in pixels) of the start of the initial line.
         start_y (int): The y coordinate (in pixels) of the start of the initial line.
         line_length (int): The length of each of the parallel lines in pixels.
-        spacing (int): The spacing, in pixels, between each parallel line. Strictly, \
+        spacing (float): The spacing, in pixels, between each parallel line. Strictly, \
             there are spacing-1 pixels between each line
         num_lines (int): The total number of parallel lines to draw.
         orientation (Orientation): The orientation (horizontal or vertical) of the \
@@ -46,13 +40,13 @@ def _add_parallel_lines_to_image(
     lines = [
         (
             (
-                (start_x, start_y + i * spacing),
-                (start_x + line_length, start_y + i * spacing),
+                (start_x, start_y + int(i * spacing)),
+                (start_x + line_length, start_y + int(i * spacing)),
             )
             if orientation == Orientation.horizontal
             else (
-                (start_x + i * spacing, start_y),
-                (start_x + i * spacing, start_y + line_length),
+                (start_x + int(i * spacing), start_y),
+                (start_x + int(i * spacing), start_y + line_length),
             )
         )
         for i in range(num_lines)
@@ -76,7 +70,7 @@ def add_grid_border_overlay_to_image(
     image: Image.Image,
     top_left_x: int,
     top_left_y: int,
-    box_width: int,
+    box_width: float,
     num_boxes_x: int,
     num_boxes_y: int,
 ):
@@ -84,16 +78,16 @@ def add_grid_border_overlay_to_image(
         image,
         start_x=top_left_x,
         start_y=top_left_y,
-        line_length=num_boxes_y * box_width,
-        spacing=num_boxes_x * box_width,
+        line_length=int(num_boxes_y * box_width),
+        spacing=int(num_boxes_x * box_width),
         num_lines=2,
     )
     _add_horizontal_parallel_lines_to_image(
         image,
         start_x=top_left_x,
         start_y=top_left_y,
-        line_length=num_boxes_x * box_width,
-        spacing=num_boxes_y * box_width,
+        line_length=int(num_boxes_x * box_width),
+        spacing=int(num_boxes_y * box_width),
         num_lines=2,
     )
 
@@ -102,60 +96,23 @@ def add_grid_overlay_to_image(
     image: Image.Image,
     top_left_x: int,
     top_left_y: int,
-    box_width: int,
+    box_width: float,
     num_boxes_x: int,
     num_boxes_y: int,
 ):
     _add_vertical_parallel_lines_to_image(
         image,
-        start_x=top_left_x + box_width,
+        start_x=int(top_left_x + box_width),
         start_y=top_left_y,
-        line_length=num_boxes_y * box_width,
+        line_length=int(num_boxes_y * box_width),
         spacing=box_width,
         num_lines=num_boxes_x - 1,
     )
     _add_horizontal_parallel_lines_to_image(
         image,
         start_x=top_left_x,
-        start_y=top_left_y + box_width,
-        line_length=num_boxes_x * box_width,
+        start_y=int(top_left_y + box_width),
+        line_length=int(num_boxes_x * box_width),
         spacing=box_width,
         num_lines=num_boxes_y - 1,
     )
-
-
-class SnapshotWithGrid(MJPG):
-    top_left_x = Component(Signal)
-    top_left_y = Component(Signal)
-    box_width = Component(Signal)
-    num_boxes_x = Component(Signal)
-    num_boxes_y = Component(Signal)
-
-    last_path_outer = Component(Signal)
-    last_path_full_overlay = Component(Signal)
-
-    def post_processing(self, image: Image.Image):
-        # Save an unmodified image with no suffix
-        self._save_image(image)
-
-        top_left_x = self.top_left_x.get()
-        top_left_y = self.top_left_y.get()
-        box_width = self.box_width.get()
-        num_boxes_x = self.num_boxes_x.get()
-        num_boxes_y = self.num_boxes_y.get()
-        assert isinstance(filename_str := self.filename.get(), str)
-        assert isinstance(directory_str := self.directory.get(), str)
-        add_grid_border_overlay_to_image(
-            image, top_left_x, top_left_y, box_width, num_boxes_x, num_boxes_y
-        )
-        path = path_join(directory_str, f"{filename_str}_outer_overlay.png")
-        self.last_path_outer.put(path)
-        LOGGER.info(f"Saving grid outer edge at {path}")
-        image.save(path)
-        add_grid_overlay_to_image(
-            image, top_left_x, top_left_y, box_width, num_boxes_x, num_boxes_y
-        )
-        path = path_join(directory_str, f"{filename_str}_grid_overlay.png")
-        self.last_path_full_overlay.put(path)
-        LOGGER.info(f"Saving full grid overlay at {path}")
-        image.save(path)

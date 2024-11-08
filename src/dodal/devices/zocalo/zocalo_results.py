@@ -21,6 +21,7 @@ from ophyd_async.core import (
 )
 from workflows.transport.common_transport import CommonTransport
 
+from dodal.devices.zocalo.zocalo_constants import ZOCALO_ENV
 from dodal.devices.zocalo.zocalo_interaction import _get_zocalo_connection
 from dodal.log import LOGGER
 
@@ -115,7 +116,7 @@ class ZocaloResults(StandardReadable, Triggerable):
     def __init__(
         self,
         name: str = "zocalo",
-        zocalo_environment: str = "dev_artemis",
+        zocalo_environment: str = ZOCALO_ENV,
         channel: str = "xrc.i03",
         sort_key: str = DEFAULT_SORT_KEY.value,
         timeout_s: float = DEFAULT_TIMEOUT,

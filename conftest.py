@@ -7,6 +7,7 @@ import time
 from collections.abc import Mapping
 from os import environ, getenv
 from pathlib import Path
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -43,6 +44,7 @@ mock_attributes_table = {
 }
 
 BANNED_PATHS = [Path("/dls"), Path("/dls_sw")]
+environ["DODAL_TEST_MODE"] = "true"
 
 
 @pytest.fixture(autouse=True)
@@ -67,11 +69,16 @@ def patch_open_to_prevent_dls_reads_in_tests():
 if os.getenv("PYTEST_RAISE", "0") == "1":
 
     @pytest.hookimpl(tryfirst=True)
-    def pytest_exception_interact(call):
-        raise call.excinfo.value
+    def pytest_exception_interact(call: pytest.CallInfo[Any]):
+        if call.excinfo is not None:
+            raise call.excinfo.value
+        else:
+            raise RuntimeError(
+                f"{call} has no exception data, an unknown error has occurred"
+            )
 
     @pytest.hookimpl(tryfirst=True)
-    def pytest_internalerror(excinfo):
+    def pytest_internalerror(excinfo: pytest.ExceptionInfo[Any]):
         raise excinfo.value
 
 
@@ -150,19 +157,6 @@ async def static_path_provider(
 
 
 @pytest.fixture
-async def RE():
-    RE = RunEngine()
-    # make sure the event loop is thoroughly up and running before we try to create
-    # any ophyd_async devices which might need it
-    timeout = time.monotonic() + 1
-    while not RE.loop.is_running():
-        await asyncio.sleep(0)
-        if time.monotonic() > timeout:
-            raise TimeoutError("This really shouldn't happen but just in case...")
-    yield RE
-
-
-@pytest.fixture
 def run_engine_documents(RE: RunEngine) -> Mapping[str, list[dict]]:
     docs: dict[str, list[dict]] = {}
 
@@ -179,3 +173,16 @@ def failed_status(failure: Exception) -> Status:
     status = Status()
     status.set_exception(failure)
     return status
+
+
+@pytest.fixture
+async def RE():
+    RE = RunEngine()
+    # make sure the event loop is thoroughly up and running before we try to create
+    # any ophyd_async devices which might need it
+    timeout = time.monotonic() + 1
+    while not RE.loop.is_running():
+        await asyncio.sleep(0)
+        if time.monotonic() > timeout:
+            raise TimeoutError("This really shouldn't happen but just in case...")
+    yield RE

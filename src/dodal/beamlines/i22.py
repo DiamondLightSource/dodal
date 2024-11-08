@@ -11,9 +11,13 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import numbered_slits
+from dodal.common.crystal_metadata import (
+    MaterialsEnum,
+    make_crystal_metadata_from_material,
+)
 from dodal.common.visit import RemoteDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.focusing_mirror import FocusingMirror
-from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
+from dodal.devices.i22.dcm import DoubleCrystalMonochromator
 from dodal.devices.i22.fswitch import FSwitch
 from dodal.devices.i22.nxsas import NXSasMetadataHolder, NXSasOAV, NXSasPilatus
 from dodal.devices.linkam3 import Linkam3
@@ -170,17 +174,12 @@ def dcm(
         fake_with_ophyd_sim,
         bl_prefix=False,
         temperature_prefix=f"{BeamlinePrefix(BL).beamline_prefix}-DI-DCM-01:",
-        crystal_1_metadata=CrystalMetadata(
-            usage="Bragg",
-            type="silicon",
-            reflection=(1, 1, 1),
-            d_spacing=(3.13475, "nm"),
+        crystal_1_metadata=make_crystal_metadata_from_material(
+            MaterialsEnum.Si, (1, 1, 1)
         ),
-        crystal_2_metadata=CrystalMetadata(
-            usage="Bragg",
-            type="silicon",
-            reflection=(1, 1, 1),
-            d_spacing=(3.13475, "nm"),
+        crystal_2_metadata=make_crystal_metadata_from_material(
+            MaterialsEnum.Si,
+            (1, 1, 1),
         ),
     )
 
