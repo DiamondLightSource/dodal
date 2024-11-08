@@ -10,6 +10,7 @@ from dodal.devices.i24.dcm import DCM
 from dodal.devices.i24.dual_backlight import DualBacklight
 from dodal.devices.i24.focus_mirrors import FocusMirrorsMode
 from dodal.devices.i24.i24_detector_motion import DetectorMotion
+from dodal.devices.i24.pilatus_metadata import PilatusMetadata
 from dodal.devices.i24.pmac import PMAC
 from dodal.devices.i24.vgonio import VerticalGoniometer
 from dodal.devices.oav.oav_detector import OAV
@@ -231,6 +232,20 @@ def pilatus_beam_center(
         DetectorBeamCenter,
         "pilatus_bc",
         "-EA-PILAT-01:cam1:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+@skip_device(lambda: BL == "s24")
+def pilatus_metadata(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> PilatusMetadata:
+    """A small pilatus driver device for figuring out the filename template."""
+    return device_instantiation(
+        PilatusMetadata,
+        "pilatus_meta",
+        "-EA-PILAT-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
