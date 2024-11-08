@@ -4,6 +4,7 @@ from pathlib import Path
 from unittest.mock import ANY, MagicMock, Mock, call, create_autospec, patch
 
 import pytest
+from conftest import failed_status
 from ophyd.sim import NullStatus, make_fake_device
 from ophyd.status import Status
 from ophyd.utils import UnknownStatusFailure
@@ -14,8 +15,6 @@ from dodal.devices.eiger import EigerDetector
 from dodal.devices.status import await_value
 from dodal.devices.util.epics_util import run_functions_without_blocking
 from dodal.log import LOGGER
-
-from ...conftest import failed_status
 
 TEST_DETECTOR_SIZE_CONSTANTS = EIGER2_X_16M_SIZE
 
