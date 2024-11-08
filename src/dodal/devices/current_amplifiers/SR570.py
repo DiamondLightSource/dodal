@@ -1,4 +1,5 @@
 import asyncio
+from enum import Enum
 
 from ophyd_async.core import (
     AsyncStatus,
@@ -21,7 +22,7 @@ class SR570GainTable(StrictEnum):
     sen_4 = "pA/V"
 
 
-class SR570RaiseTimeTable(StrictEnum):
+class SR570RaiseTimeTable(float, Enum):
     """These are the gain dependent raise time(s) for Femto 3xx current amplifier"""
 
     sen_1 = 1e-4
@@ -44,7 +45,7 @@ class SR570FineGainTable(StrictEnum):
     sen_9 = "500"
 
 
-class SR570FullGainTable(StrictEnum):
+class SR570FullGainTable(Enum):
     sen_1 = [SR570GainTable.sen_1, SR570FineGainTable.sen_1]
     sen_2 = [SR570GainTable.sen_2, SR570FineGainTable.sen_9]
     sen_3 = [SR570GainTable.sen_2, SR570FineGainTable.sen_8]
@@ -75,7 +76,7 @@ class SR570FullGainTable(StrictEnum):
     sen_28 = [SR570GainTable.sen_4, SR570FineGainTable.sen_1]
 
 
-class SR570GainToCurrentTable(StrictEnum):
+class SR570GainToCurrentTable(float, Enum):
     sen_1 = 1e3
     sen_2 = 2e3
     sen_3 = 5e3
@@ -98,11 +99,11 @@ class SR570GainToCurrentTable(StrictEnum):
     sen_20 = 2e9
     sen_21 = 5e9
     sen_22 = 1e10
-    sen_23 = 2e9
-    sen_24 = 5e9
+    sen_23 = 2e10
+    sen_24 = 5e10
     sen_25 = 1e11
-    sen_26 = 2e9
-    sen_27 = 5e9
+    sen_26 = 2e11
+    sen_27 = 5e11
     sen_28 = 1e12
 
 
@@ -115,44 +116,58 @@ class SR570(CurrentAmp):
         self,
         prefix: str,
         suffix: str,
-        gain_table: type[StrictEnum],
+        gain_table: type[Enum],
         fine_gain_table: type[StrictEnum],
-        full_gain_table: type[StrictEnum],
-        gain_to_current_table: type[StrictEnum],
-        raise_timetable: type[StrictEnum],
+        coarse_gain_table: type[StrictEnum],
+        combined_table: type[Enum],
+        raise_timetable: type[Enum],
         timeout: float = 1,
         name: str = "",
     ) -> None:
-        super().__init__(
-            prefix=prefix,
-            suffix=suffix + "2",
-            gain_table=full_gain_table,
-            gain_to_current_table=gain_to_current_table,
-            raise_timetable=raise_timetable,
-            timeout=timeout,
-            name=name,
-        )
-        with self.add_children_as_readables():
-            self.gain, self._set_gain = soft_signal_r_and_setter(
-                full_gain_table
-            )  # overriding gain as there are 2 gain setting rather than just 1.
+        super().__init__(name=name, gain_convertion_table=gain_table)
+
+        self.fine_gain_table = fine_gain_table
+        self.coarse_gain_table = coarse_gain_table
+        self.timeout = timeout
+        self.raise_time_table = raise_timetable
+        self.combined_table = SR570FullGainTable
+        self.gain, self._set_gain = soft_signal_r_and_setter(
+            str
+        )  # overriding gain as there are 2 gain setting rather than just 1.
 
         with self.add_children_as_readables(ConfigSignal):
             self.fine_gain = epics_signal_rw(fine_gain_table, prefix + suffix + "1")
-            self.coarse_gain = epics_signal_rw(gain_table, prefix + suffix + "2")
+            self.coarse_gain = epics_signal_rw(coarse_gain_table, prefix + suffix + "2")
 
     @AsyncStatus.wrap
     async def set(self, value) -> None:
-        if value not in self.gain_table.__members__:
+        if value not in self.gain_convertion_table.__members__:
             raise ValueError(f"Gain value {value} is not within {self.name} range.")
         LOGGER.info(f"{self.name} gain change to {value}")
-        gain, fine_gain = self.gain_table[value].value
-        print(gain, fine_gain)
-        await asyncio.gather(
-            self.coarse_gain.set(value=gain, timeout=self.timeout),
-            self.fine_gain.set(value=fine_gain, timeout=self.timeout),
-        )
-        self._set_gain(
-            StrictEnum(self.gain_table[value])
-        )  # wait for current amplifier to settle
-        await asyncio.sleep(self.raise_timetable[gain.name].value)
+
+        coarse_gain, fine_gain = self.combined_table[value].value
+        print(coarse_gain, fine_gain)
+        await self.fine_gain.set(value=fine_gain, timeout=self.timeout)
+        await self.coarse_gain.set(value=coarse_gain, timeout=self.timeout)
+        self._set_gain(value)  # wait for current amplifier to settle
+        await asyncio.sleep(self.raise_time_table[value].value)
+
+    async def increase_gain(self) -> bool:
+        # current_gain = int((await self.gain.get_value()).name.split("_")[-1])
+        # current_gain += 1
+        # if current_gain > len(self.gain_table):
+        #     return False
+        # await self.set(f"sen_{current_gain}")
+        return True
+
+    async def decrease_gain(self) -> bool:
+        return True
+        # current_gain = int((await self.gain.get_value()).name.split("_")[-1])
+        # current_gain -= 1
+        # if current_gain < 1:
+        #     return False
+        # await self.set(f"sen_{current_gain}")
+        # return True
+
+    async def get_gain(self) -> str:
+        return await self.gain.get_value()

@@ -32,10 +32,10 @@ async def mock_sr570(prefix: str = "BLXX-EA-DET-007:", suffix: str = "Gain") -> 
         mock_sr570 = SR570(
             prefix=prefix,
             suffix=suffix,
-            gain_table=SR570GainTable,
+            gain_table=SR570GainToCurrentTable,
             fine_gain_table=SR570FineGainTable,
-            full_gain_table=SR570FullGainTable,
-            gain_to_current_table=SR570GainToCurrentTable,
+            coarse_gain_table=SR570GainTable,
+            combined_table=SR570FullGainTable,
             raise_timetable=SR570RaiseTimeTable,
             name="mock_sr570",
         )
@@ -78,7 +78,7 @@ async def mock_sr570_struck_scaler_detector(
 @pytest.mark.parametrize(
     "gain, wait_time, gain_value",
     [
-        (["sen_1", 1e-4, SR570FullGainTable.sen_1]),
+        (["sen_1", 1e-4, "sen_1"]),
         (["sen_10", 1e-4, SR570FullGainTable.sen_10]),
         (["sen_11", 0.15, SR570FullGainTable.sen_11]),
         (["sen_14", 0.15, SR570FullGainTable.sen_14]),
@@ -134,7 +134,7 @@ async def test_SR570_increase_gain(
     gain_change_count: int,
     final_gain: str,
 ):
-    set_mock_value(mock_sr570.gain, SR570FullGainTable[starting_gain])
+    set_mock_value(mock_sr570.gain, SR570GainToCurrentTable[starting_gain].name)
     for _ in range(gain_change_count):
         await mock_sr570.increase_gain()
     assert (await mock_sr570.gain.get_value()) == SR570FullGainTable[final_gain]
@@ -189,7 +189,7 @@ async def test_SR570_struck_scaler_read(
     raw_voltage,
     expected_current,
 ):
-    set_mock_value(mock_sr570.gain, SR570FullGainTable[gain])
+    mock_sr570.gain = SR570FullGainTable[gain].name
     set_mock_value(mock_sr570_struck_scaler_detector.counter.readout, raw_voltage)
     set_mock_value(mock_sr570_struck_scaler_detector.auto_mode, False)
     docs = defaultdict(list)

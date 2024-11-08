@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from enum import Enum
 
 from bluesky.protocols import Movable
 from ophyd_async.core import (
@@ -16,7 +17,7 @@ class CurrentAmp(ABC, StandardReadable, Movable):
 
     """
 
-    def __init__(self, gain_convertion_table, name: str = "") -> None:
+    def __init__(self, gain_convertion_table: type[Enum], name: str = "") -> None:
         self.gain_convertion_table = gain_convertion_table
         super().__init__(name)
 
