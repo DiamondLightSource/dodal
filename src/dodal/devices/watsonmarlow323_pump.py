@@ -1,20 +1,18 @@
-from enum import Enum
-
-from ophyd_async.core import StandardReadable
+from ophyd_async.core import ConfigSignal, StandardReadable, StrictEnum
 from ophyd_async.epics.signal import epics_signal_rw
 
 
-class WatsonMarlow323PumpEnable(str, Enum):
+class WatsonMarlow323PumpEnable(StrictEnum):
     DISABLED = "Disabled"
     ENABLED = "Enabled"
 
 
-class WatsonMarlow323PumpDirection(str, Enum):
+class WatsonMarlow323PumpDirection(StrictEnum):
     CLOCKWISE = "CW"
     COUNTER_CLOCKWISE = "CCW"
 
 
-class WatsonMarlow323PumpState(str, Enum):
+class WatsonMarlow323PumpState(StrictEnum):
     STOPPED = "STOP"
     STARTED = "START"
 
@@ -23,30 +21,25 @@ class WatsonMarlow323Pump(StandardReadable):
     """Watson Marlow 323 Peristaltic Pump device"""
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        self.enabled = epics_signal_rw(
-            WatsonMarlow323PumpEnable,
-            prefix + "DISABLE",
-        )
+        with self.add_children_as_readables():
+            self.direction = epics_signal_rw(
+                WatsonMarlow323PumpDirection,
+                read_pv=prefix + "INFO:DIR",
+                write_pv=prefix + "SET:DIR",
+            )
+            self.state = epics_signal_rw(
+                WatsonMarlow323PumpState,
+                read_pv=prefix + "INFO:RUN",
+                write_pv=prefix + "SET:RUN",
+            )
+            self.speed = epics_signal_rw(
+                float, read_pv=prefix + "INFO:SPD", write_pv=prefix + "SET:SPD"
+            )
 
-        self.direction = epics_signal_rw(
-            WatsonMarlow323PumpDirection,
-            read_pv=prefix + "INFO:DIR",
-            write_pv=prefix + "SET:DIR",
-        )
-        self.state = epics_signal_rw(
-            WatsonMarlow323PumpState,
-            read_pv=prefix + "INFO:RUN",
-            write_pv=prefix + "SET:RUN",
-        )
-        self.speed = epics_signal_rw(
-            float, read_pv=prefix + "INFO:SPD", write_pv=prefix + "SET:SPD"
-        )
-
-        self.set_readable_signals(
-            read=[self.state, self.speed, self.direction],
-            config=[
-                self.enabled,
-            ],
-        )
+        with self.add_children_as_readables(ConfigSignal):
+            self.enabled = epics_signal_rw(
+                WatsonMarlow323PumpEnable,
+                prefix + "DISABLE",
+            )
 
         super().__init__(name=name)
