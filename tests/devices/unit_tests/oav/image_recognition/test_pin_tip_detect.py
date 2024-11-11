@@ -2,6 +2,7 @@ import asyncio
 from unittest.mock import MagicMock, patch
 
 import numpy as np
+import pytest
 from ophyd_async.core import set_mock_value
 
 from dodal.devices.oav.pin_image_recognition import MxSampleDetect, PinTipDetection
@@ -196,3 +197,23 @@ async def test_given_tip_invalid_then_loop_keeps_retrying_until_valid(
     ):
         await device.trigger()
         mock_logger.assert_called_once()
+
+
+@pytest.mark.execution_timeout(5)
+async def test_exception_before_await_during_trigger_causes_timeout():
+    pin_tip = await _get_pin_tip_detection_device()
+    array = np.array([1, 1, 1, 1, 1, 1, 1])
+    array_index_to_increment = [0]
+
+    async def array_update_then_exception(_):
+        array_index_to_increment[0] += 1
+        array = np.array([1, 2, 1, array_index_to_increment[0], 1, 1, 1])
+        set_mock_value(pin_tip.array_data, array)
+        raise Exception
+
+    pin_tip._get_tip_and_edge_data = MagicMock(side_effect=array_update_then_exception)
+
+    set_mock_value(pin_tip.array_data, array)
+    set_mock_value(pin_tip.validity_timeout, 0.1)
+
+    await pin_tip.trigger()
