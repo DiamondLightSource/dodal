@@ -68,6 +68,7 @@ dev = [
     "types-mock",
     "types-PyYAML",
     "types-aiofiles",
+    "pytest-timeouts"
 ]
 
 [project.scripts]
