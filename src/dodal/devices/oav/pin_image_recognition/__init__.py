@@ -153,6 +153,7 @@ class PinTipDetection(StandardReadable):
             """
             async for value in observe_value(self.array_data):
                 try:
+                    await asyncio.sleep(0)
                     location = await self._get_tip_and_edge_data(value)
                     self._set_triggered_values(location)
                 except Exception as e:
