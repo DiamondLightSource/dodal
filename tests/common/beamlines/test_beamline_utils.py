@@ -150,41 +150,47 @@ def dummy_mirror() -> FocusingMirror:
     return mirror
 
 
-def test_device_controller_name_propagated():
-    @beamline_utils.device_factory()
-    def device() -> FocusingMirror:
-        return dummy_mirror()
+@beamline_utils.device_factory(mock=True)
+def dummy_mirror_as_device_factory() -> FocusingMirror:
+    return dummy_mirror()
 
-    mirror = device(name="foo")
+
+@beamline_utils.device_factory(mock=True)
+@functools.lru_cache
+def cached_dummy_mirror_as_device_factory() -> FocusingMirror:
+    return dummy_mirror()
+
+
+def test_device_controller_name_propagated():
+    mirror = dummy_mirror_as_device_factory(name="foo")
     assert mirror.name == "foo"
 
 
 def test_device_controller_connection_is_lazy():
-    @beamline_utils.device_factory()
-    def device() -> FocusingMirror:
-        return dummy_mirror()
-
-    mirror = device(name="foo")
+    mirror = dummy_mirror_as_device_factory(name="foo")
     assert mirror.connect.call_count == 0  # type: ignore
 
 
 def test_device_controller_eager_connect(RE):
-    @beamline_utils.device_factory(mock=True)
-    def device() -> FocusingMirror:
-        return dummy_mirror()
-
-    mirror = device(connect_immediately=True)
+    mirror = dummy_mirror_as_device_factory(connect_immediately=True)
     assert mirror.connect.call_count == 1  # type: ignore
 
 
-def test_multiple_layers_of_lru_caching_does_not_affect_device():
-    @beamline_utils.device_factory(mock=True)
-    @functools.lru_cache
-    def device() -> FocusingMirror:
-        return dummy_mirror()
-
-    mirror_1 = device()
-    mirror_2 = device()
+@pytest.mark.parametrize(
+    "factory",
+    [
+        dummy_mirror_as_device_factory,
+        # The second test case confirms that if, for some reason, we use a device
+        # factory decorated with @lru_cache, dodal is not affected and will still cache
+        # the same device instance internally. We actually also use lru_cache
+        # internally so this test case is just a sanity check to prove it is
+        # idempotent.
+        cached_dummy_mirror_as_device_factory,
+    ],
+)
+def test_device_cached(factory: DeviceInitializationController):
+    mirror_1 = factory()
+    mirror_2 = factory()
     assert mirror_1 is mirror_2
 
 
