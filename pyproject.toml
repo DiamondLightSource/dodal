@@ -15,7 +15,7 @@ description = "Ophyd devices and other utils that could be used across DLS beaml
 dependencies = [
     "click",
     "ophyd",
-    "ophyd-async==0.8.0a2",
+    "ophyd-async==0.8.0a3",
     "bluesky",
     "pyepics",
     "dataclasses-json",
@@ -27,7 +27,7 @@ dependencies = [
     "opencv-python-headless",    # For pin-tip detection.
     "aioca",                     # Required for CA support with ophyd-async.
     "p4p",                       # Required for PVA support with ophyd-async.
-    "numpy<2.0",                 # Unpin when https://github.com/bluesky/ophyd-async/issues/387 resolved
+    "numpy<3.0",                 # Unpin when https://github.com/bluesky/ophyd-async/issues/387 resolved
     "aiofiles",
     "aiohttp",
     "redis",
@@ -57,7 +57,7 @@ dev = [
     "pytest-cov",
     "pytest-random-order",
     "ruff",
-    "sphinx<7.4.6",              #  pinned due to https://github.com/sphinx-doc/sphinx/issues/12660
+    "sphinx<8.1.4",              #  pinned due to https://github.com/sphinx-doc/sphinx/issues/12660
     "sphinx-autobuild",
     "sphinx-copybutton",
     "sphinxcontrib-mermaid",
