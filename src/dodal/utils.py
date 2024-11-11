@@ -129,7 +129,6 @@ class DeviceInitializationController(Generic[D]):
         skip: SkipType,
     ):
         self._factory: Callable[[], D] = functools.lru_cache(factory)
-        self._callbacks: list[Callable[[D], None]] = []
         self._use_factory_name = use_factory_name
         self._timeout = timeout
         self._mock = mock
@@ -139,16 +138,6 @@ class DeviceInitializationController(Generic[D]):
     @property
     def skip(self) -> bool:
         return self._skip() if callable(self._skip) else self._skip
-
-    def add_callback(self, callback: Callable[[D], None]):
-        """
-        Add callback for handling the device after creation
-
-        Args:
-            callback: Function which is passed a new device after it is initialized
-        """
-
-        self._callbacks.append(callback)
 
     def __call__(
         self,
@@ -204,8 +193,6 @@ class DeviceInitializationController(Generic[D]):
         elif not device.name and self._use_factory_name:
             device.set_name(self._factory.__name__)
 
-        for callback in self._callbacks:
-            callback(device)
         return device
 
 

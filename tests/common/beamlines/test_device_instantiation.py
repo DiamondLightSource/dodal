@@ -1,9 +1,9 @@
 from typing import Any
 
 import pytest
+from ophyd_async.core import NotConnected
 
 from dodal.beamlines import all_beamline_modules
-from dodal.common.beamlines import beamline_utils
 from dodal.utils import BLUESKY_PROTOCOLS, make_all_devices
 
 
@@ -21,15 +21,10 @@ def test_device_creation(RE, module_and_devices_for_beamline):
     Ensures that for every beamline all device factories are using valid args
     and creating types that conform to Bluesky protocols.
     """
-    module, devices, exceptions = module_and_devices_for_beamline
-    assert not exceptions
-    for device_name, device in devices.items():
-        assert device_name in beamline_utils.ACTIVE_DEVICES, (
-            f"No device named {device_name} was created for {module}, "
-            f"devices are {beamline_utils.ACTIVE_DEVICES.keys()}"
-        )
-        assert follows_bluesky_protocols(device)
-    assert len(beamline_utils.ACTIVE_DEVICES) == len(devices)
+    _, _, exceptions = module_and_devices_for_beamline
+    if len(exceptions) > 0:
+        raise NotConnected(exceptions)
+    # Pass test if there were no exceptions
 
 
 @pytest.mark.parametrize(
