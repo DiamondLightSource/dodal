@@ -26,11 +26,6 @@ class KBMirror(StandardReadable, Movable):
         super().__init__(name=name)
 
     @AsyncStatus.wrap
-    async def set_xy(self, value: XYPosition):
-        self.x.set(value.x)
-        self.y.set(value.y)
-
-    @AsyncStatus.wrap
     async def set(self, value: XYPosition):
         self.x.set(value.x)
         self.y.set(value.y)
