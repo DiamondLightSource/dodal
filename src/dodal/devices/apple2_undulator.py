@@ -7,14 +7,13 @@ import numpy as np
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
-    ConfigSignal,
-    HintedSignal,
     StandardReadable,
+    StandardReadableFormat,
     StrictEnum,
     soft_signal_r_and_setter,
     wait_for_value,
 )
-from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw, epics_signal_w
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
 from pydantic import BaseModel, ConfigDict, RootModel
 
 from dodal.log import LOGGER
@@ -128,12 +127,12 @@ class UndulatorGap(StandardReadable, Movable):
         )
         # This is calculated acceleration from speed
         self.acceleration_time = epics_signal_r(float, prefix + "IDGSETACC")
-        with self.add_children_as_readables(ConfigSignal):
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Unit
             self.motor_egu = epics_signal_r(str, prefix + "BLGAPMTR.EGU")
             # Gap velocity
             self.velocity = epics_signal_rw(float, prefix + "BLGSETVEL")
-        with self.add_children_as_readables(HintedSignal):
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             # Gap readback value
             self.user_readback = epics_signal_r(float, prefix + "CURRGAPD")
         super().__init__(name)
@@ -187,10 +186,10 @@ class UndulatorPhaseMotor(StandardReadable):
         self.user_setpoint_demand_readback = epics_signal_r(float, fullPV + "DMD")
 
         fullPV = fullPV + "MTR"
-        with self.add_children_as_readables(HintedSignal):
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.user_setpoint_readback = epics_signal_r(float, fullPV + ".RBV")
 
-        with self.add_children_as_readables(ConfigSignal):
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.motor_egu = epics_signal_r(str, fullPV + ".EGU")
             self.velocity = epics_signal_rw(float, fullPV + ".VELO")
 
@@ -391,7 +390,7 @@ class Apple2(StandardReadable, Movable):
         with self.add_children_as_readables():
             self.gap = id_gap
             self.phase = id_phase
-        with self.add_children_as_readables(HintedSignal):
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             # Store the polarisation for readback.
             self.polarisation, self._polarisation_set = soft_signal_r_and_setter(
                 str, initial_value=None

@@ -1,10 +1,10 @@
 from ophyd_async.core import (
-    ConfigSignal,
     StandardReadable,
+    StandardReadableFormat,
     StrictEnum,
 )
+from ophyd_async.epics.core import epics_signal_rw
 from ophyd_async.epics.motor import Motor
-from ophyd_async.epics.signal import epics_signal_rw
 
 
 class PGM(StandardReadable):
@@ -33,7 +33,7 @@ class PGM(StandardReadable):
         """
         with self.add_children_as_readables():
             self.energy = Motor(prefix + "ENERGY")
-        with self.add_children_as_readables(ConfigSignal):
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.grating = epics_signal_rw(grating, prefix + gratingPv)
             self.cff = epics_signal_rw(float, prefix + "CFF")
 

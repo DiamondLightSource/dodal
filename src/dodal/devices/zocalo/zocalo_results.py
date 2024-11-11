@@ -15,8 +15,8 @@ from deepdiff import DeepDiff
 from numpy.typing import NDArray
 from ophyd_async.core import (
     AsyncStatus,
-    HintedSignal,
     StandardReadable,
+    StandardReadableFormat,
     soft_signal_r_and_setter,
 )
 from workflows.transport.common_transport import CommonTransport
@@ -167,7 +167,7 @@ class ZocaloResults(StandardReadable, Triggerable):
                 self.ispyb_dcid,
                 self.ispyb_dcgid,
             ],
-            wrapper=HintedSignal,
+            format=StandardReadableFormat.HINTED_SIGNAL,
         )
         super().__init__(name)
 
