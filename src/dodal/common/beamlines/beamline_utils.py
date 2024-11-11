@@ -47,17 +47,6 @@ def list_active_devices() -> list[str]:
     return list(ACTIVE_DEVICES.keys())
 
 
-def cache_device(
-    device: AnyDevice,
-    name: str | None = None,
-    overwrite: bool = False,
-) -> None:
-    global ACTIVE_DEVICES
-    name = name or device.name
-    if overwrite or name not in ACTIVE_DEVICES:
-        ACTIVE_DEVICES[name] = device
-
-
 def active_device_is_same_type(
     active_device: AnyDevice, device: Callable[..., AnyDevice]
 ) -> bool:
@@ -126,7 +115,7 @@ def device_instantiation(
             ),
             **kwargs,
         )
-        cache_device(device_instance, name, overwrite=True)
+        ACTIVE_DEVICES[name] = device_instance
         if wait:
             wait_for_connection(device_instance, mock=fake)
 
@@ -154,11 +143,13 @@ def device_factory(
     ] = False,
 ) -> Callable[[Callable[[], D]], DeviceInitializationController[D]]:
     def decorator(factory: Callable[[], D]) -> DeviceInitializationController[D]:
-        controller = DeviceInitializationController(
-            factory, use_factory_name, timeout, mock, skip
+        return DeviceInitializationController(
+            factory,
+            use_factory_name,
+            timeout,
+            mock,
+            skip,
         )
-        controller.add_callback(lambda device: cache_device(device, factory.__name__))
-        return controller
 
     return decorator
 
