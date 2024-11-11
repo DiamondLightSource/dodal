@@ -115,8 +115,8 @@ class ApertureScatterguard(StandardReadable, Movable):
         prefix: str = "",
         name: str = "",
     ) -> None:
-        self.aperture = Aperture(prefix + "-MO-MAPT-01:")
-        self.scatterguard = Scatterguard(prefix + "-MO-SCAT-01:")
+        self._aperture = Aperture(prefix + "-MO-MAPT-01:")
+        self._scatterguard = Scatterguard(prefix + "-MO-SCAT-01:")
         self.radius = create_hardware_backed_soft_signal(
             float, self._get_current_radius, units="µm"
         )
@@ -124,11 +124,11 @@ class ApertureScatterguard(StandardReadable, Movable):
         self._tolerances = tolerances
         self.add_readables(
             [
-                self.aperture.x.user_readback,
-                self.aperture.y.user_readback,
-                self.aperture.z.user_readback,
-                self.scatterguard.x.user_readback,
-                self.scatterguard.y.user_readback,
+                self._aperture.x.user_readback,
+                self._aperture.y.user_readback,
+                self._aperture.z.user_readback,
+                self._scatterguard.x.user_readback,
+                self._scatterguard.y.user_readback,
                 self.radius,
             ],
         )
@@ -138,11 +138,6 @@ class ApertureScatterguard(StandardReadable, Movable):
             )
 
         super().__init__(name)
-
-    def get_position_from_gda_aperture_name(
-        self, gda_aperture_name: str
-    ) -> ApertureValue:
-        return ApertureValue(gda_aperture_name)
 
     @AsyncStatus.wrap
     async def set(self, value: ApertureValue):
@@ -157,11 +152,11 @@ class ApertureScatterguard(StandardReadable, Movable):
         )
 
         await asyncio.gather(
-            self.aperture.x.set(aperture_x),
-            self.aperture.y.set(aperture_y),
-            self.aperture.z.set(aperture_z),
-            self.scatterguard.x.set(scatterguard_x),
-            self.scatterguard.y.set(scatterguard_y),
+            self._aperture.x.set(aperture_x),
+            self._aperture.y.set(aperture_y),
+            self._aperture.z.set(aperture_z),
+            self._scatterguard.x.set(scatterguard_x),
+            self._scatterguard.y.set(scatterguard_y),
         )
 
     async def _get_current_aperture_position(self) -> ApertureValue:
@@ -171,13 +166,13 @@ class ApertureScatterguard(StandardReadable, Movable):
         mini aperture y <= ROBOT_LOAD.location.aperture_y + tolerance.
         If no position is found then raises InvalidApertureMove.
         """
-        current_ap_y = await self.aperture.y.user_readback.get_value(cached=False)
+        current_ap_y = await self._aperture.y.user_readback.get_value(cached=False)
         robot_load_ap_y = self._loaded_positions[ApertureValue.ROBOT_LOAD].aperture_y
-        if await self.aperture.large.get_value(cached=False) == 1:
+        if await self._aperture.large.get_value(cached=False) == 1:
             return ApertureValue.LARGE
-        elif await self.aperture.medium.get_value(cached=False) == 1:
+        elif await self._aperture.medium.get_value(cached=False) == 1:
             return ApertureValue.MEDIUM
-        elif await self.aperture.small.get_value(cached=False) == 1:
+        elif await self._aperture.small.get_value(cached=False) == 1:
             return ApertureValue.SMALL
         elif current_ap_y <= robot_load_ap_y + self._tolerances.aperture_y:
             return ApertureValue.ROBOT_LOAD
@@ -198,14 +193,14 @@ class ApertureScatterguard(StandardReadable, Movable):
         """
         assert self._loaded_positions is not None
 
-        ap_z_in_position = await self.aperture.z.motor_done_move.get_value()
+        ap_z_in_position = await self._aperture.z.motor_done_move.get_value()
         if not ap_z_in_position:
             raise InvalidApertureMove(
                 "ApertureScatterguard z is still moving. Wait for it to finish "
                 "before triggering another move."
             )
 
-        current_ap_z = await self.aperture.z.user_readback.get_value()
+        current_ap_z = await self._aperture.z.user_readback.get_value()
         diff_on_z = abs(current_ap_z - position.aperture_z)
         if diff_on_z > self._tolerances.aperture_z:
             raise InvalidApertureMove(
@@ -214,7 +209,7 @@ class ApertureScatterguard(StandardReadable, Movable):
                 f"Current aperture z ({current_ap_z}), outside of tolerance ({self._tolerances.aperture_z}) from target ({position.aperture_z})."
             )
 
-        current_ap_y = await self.aperture.y.user_readback.get_value()
+        current_ap_y = await self._aperture.y.user_readback.get_value()
 
         aperture_x, aperture_y, aperture_z, scatterguard_x, scatterguard_y = (
             position.values
@@ -222,22 +217,22 @@ class ApertureScatterguard(StandardReadable, Movable):
 
         if position.aperture_y > current_ap_y:
             await asyncio.gather(
-                self.scatterguard.x.set(scatterguard_x),
-                self.scatterguard.y.set(scatterguard_y),
+                self._scatterguard.x.set(scatterguard_x),
+                self._scatterguard.y.set(scatterguard_y),
             )
             await asyncio.gather(
-                self.aperture.x.set(aperture_x),
-                self.aperture.y.set(aperture_y),
-                self.aperture.z.set(aperture_z),
+                self._aperture.x.set(aperture_x),
+                self._aperture.y.set(aperture_y),
+                self._aperture.z.set(aperture_z),
             )
         else:
             await asyncio.gather(
-                self.aperture.x.set(aperture_x),
-                self.aperture.y.set(aperture_y),
-                self.aperture.z.set(aperture_z),
+                self._aperture.x.set(aperture_x),
+                self._aperture.y.set(aperture_y),
+                self._aperture.z.set(aperture_z),
             )
 
             await asyncio.gather(
-                self.scatterguard.x.set(scatterguard_x),
-                self.scatterguard.y.set(scatterguard_y),
+                self._scatterguard.x.set(scatterguard_x),
+                self._scatterguard.y.set(scatterguard_y),
             )
