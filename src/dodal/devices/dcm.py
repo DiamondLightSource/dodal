@@ -1,6 +1,5 @@
 import numpy as np
-from numpy.typing import NDArray
-from ophyd_async.core import StandardReadable, soft_signal_r_and_setter
+from ophyd_async.core import Array1D, StandardReadable, soft_signal_r_and_setter
 from ophyd_async.epics.core import epics_signal_r
 from ophyd_async.epics.motor import Motor
 
@@ -56,7 +55,7 @@ class DCM(StandardReadable):
             )
             reflection_array = np.array(cm.reflection)
             self.crystal_metadata_reflection, _ = soft_signal_r_and_setter(
-                NDArray[np.uint64],
+                Array1D[np.uint64],
                 initial_value=reflection_array,
             )
             self.crystal_metadata_d_spacing = epics_signal_r(float, "DSPACING:RBV")
