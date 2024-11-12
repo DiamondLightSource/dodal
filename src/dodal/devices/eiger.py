@@ -105,7 +105,7 @@ class EigerDetector(Device):
     def async_stage(self):
         self.odin.nodes.clear_odin_errors()
         status_ok, error_message = self.odin.wait_for_odin_initialised(
-            self.GENERAL_STATUS_TIMEOUT
+            self.timeouts.general_status_timeout
         )
         if not status_ok:
             raise Exception(f"Odin not initialised: {error_message}")
@@ -157,7 +157,7 @@ class EigerDetector(Device):
         finally:
             self.disarm_detector()
             status_ok = self.odin.check_and_wait_for_odin_state(
-                self.GENERAL_STATUS_TIMEOUT
+                self.timeouts.general_status_timeout
             )
             self.disable_roi_mode()
         return status_ok

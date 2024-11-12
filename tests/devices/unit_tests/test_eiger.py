@@ -286,7 +286,7 @@ def test_change_roi_mode_sets_cam_roi_mode_correctly(
     fake_eiger.cam.roi_mode.set = mock_cam_roi_mode_set
     fake_eiger.change_roi_mode(roi_mode)
     mock_cam_roi_mode_set.assert_called_once_with(
-        expected_cam_roi_mode_call, timeout=fake_eiger.GENERAL_STATUS_TIMEOUT
+        expected_cam_roi_mode_call, timeout=fake_eiger.timeouts.general_status_timeout
     )
 
 
