@@ -59,8 +59,8 @@ def test_wait_for_topup_complete(
     fake_sleep.assert_called_with(0.1)
 
 
-@patch("dodal.plan_stubs.check_topup.bps.null")
 @patch("dodal.plan_stubs.check_topup.bps.sleep")
+@patch("dodal.plan_stubs.check_topup.bps.null")
 def test_no_waiting_if_decay_mode(
     fake_null: MagicMock, fake_sleep: MagicMock, synchrotron: Synchrotron, RE: RunEngine
 ):
