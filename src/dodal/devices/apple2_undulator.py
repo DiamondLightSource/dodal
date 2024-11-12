@@ -7,6 +7,7 @@ import numpy as np
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
+    Reference,
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
@@ -387,9 +388,9 @@ class Apple2(StandardReadable, Movable):
 
         # Attributes are set after super call so they are not renamed to
         # <name>-undulator, etc.
-        with self.add_children_as_readables():
-            self.gap = id_gap
-            self.phase = id_phase
+        self.gap = Reference(id_gap)
+        self.phase = Reference(id_phase)
+
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             # Store the polarisation for readback.
             self.polarisation, self._polarisation_set = soft_signal_r_and_setter(
@@ -436,16 +437,16 @@ class Apple2(StandardReadable, Movable):
         """
 
         # Only need to check gap as the phase motors share both fault and gate with gap.
-        await self.gap.check_id_status()
+        await self.gap().check_id_status()
         await asyncio.gather(
-            self.phase.top_outer.user_setpoint.set(value=value.top_outer),
-            self.phase.top_inner.user_setpoint.set(value=value.top_inner),
-            self.phase.btm_inner.user_setpoint.set(value=value.btm_inner),
-            self.phase.btm_outer.user_setpoint.set(value=value.btm_outer),
-            self.gap.user_setpoint.set(value=value.gap),
+            self.phase().top_outer.user_setpoint.set(value=value.top_outer),
+            self.phase().top_inner.user_setpoint.set(value=value.top_inner),
+            self.phase().btm_inner.user_setpoint.set(value=value.btm_inner),
+            self.phase().btm_outer.user_setpoint.set(value=value.btm_outer),
+            self.gap().user_setpoint.set(value=value.gap),
         )
         timeout = np.max(
-            await asyncio.gather(self.gap.get_timeout(), self.phase.get_timeout())
+            await asyncio.gather(self.gap().get_timeout(), self.phase().get_timeout())
         )
         LOGGER.info(
             f"Moving f{self.name} energy and polorisation to {energy}, {self.pol}"
@@ -453,10 +454,12 @@ class Apple2(StandardReadable, Movable):
         )
 
         await asyncio.gather(
-            self.gap.set_move.set(value=1, timeout=timeout),
-            self.phase.set_move.set(value=1, timeout=timeout),
+            self.gap().set_move.set(value=1, timeout=timeout),
+            self.phase().set_move.set(value=1, timeout=timeout),
         )
-        await wait_for_value(self.gap.gate, UndulatorGateStatus.close, timeout=timeout)
+        await wait_for_value(
+            self.gap().gate, UndulatorGateStatus.close, timeout=timeout
+        )
         self._energy_set(energy)  # Update energy for after move for readback.
 
     def _get_id_gap_phase(self, energy: float) -> tuple[float, float]:
@@ -521,12 +524,11 @@ class Apple2(StandardReadable, Movable):
         (May be for future one can use the inverse poly to work out the energy and try to match it with the current energy
         to workout the polarisation but during my test the inverse poly is too unstable for general use.)
         """
-        cur_loc = await self.read()
-        top_outer = cur_loc[self.phase.top_outer.user_setpoint_readback.name]["value"]
-        top_inner = cur_loc[self.phase.top_inner.user_setpoint_readback.name]["value"]
-        btm_inner = cur_loc[self.phase.btm_inner.user_setpoint_readback.name]["value"]
-        btm_outer = cur_loc[self.phase.btm_outer.user_setpoint_readback.name]["value"]
-        gap = cur_loc[self.gap.user_readback.name]["value"]
+        top_outer = await self.phase().top_outer.user_setpoint_readback.get_value()
+        top_inner = await self.phase().top_inner.user_setpoint_readback.get_value()
+        btm_inner = await self.phase().btm_inner.user_setpoint_readback.get_value()
+        btm_outer = await self.phase().btm_outer.user_setpoint_readback.get_value()
+        gap = await self.gap().user_readback.get_value()
         if gap > MAXIMUM_GAP_MOTOR_POSITION:
             raise RuntimeError(
                 f"{self.name} is not in use, close gap or set polarisation to use this ID"

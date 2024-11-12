@@ -119,7 +119,7 @@ class I10Apple2(Apple2):
             name=name,
         )
         with self.add_children_as_readables():
-            self.id_jaw_phase = id_jaw_phase
+            self.id_jaw_phase = Reference(id_jaw_phase)
 
     @AsyncStatus.wrap
     async def set(self, value: SupportsFloat) -> None:
@@ -148,8 +148,8 @@ class I10Apple2(Apple2):
         LOGGER.info(f"Setting polarisation to {self.pol}, with {id_set_val}")
         await self._set(value=id_set_val, energy=value)
         if self.pol != "la":
-            await self.id_jaw_phase.set(0)
-            await self.id_jaw_phase.set_move.set(1)
+            await self.id_jaw_phase().set(0)
+            await self.id_jaw_phase().set_move.set(1)
 
     def update_lookuptable(self):
         """
@@ -299,7 +299,7 @@ class LinearArbitraryAngle(StandardReadable, Movable):
                 f"jaw_phase position for angle ({value}) is outside permitted range"
                 f" [-{self.jaw_phase_limit}, {self.jaw_phase_limit}]"
             )
-        await self.id_ref().id_jaw_phase.set(jaw_phase)
+        await self.id_ref().id_jaw_phase().set(jaw_phase)
         self._angle_set(value)
 
 
