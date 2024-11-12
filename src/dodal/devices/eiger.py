@@ -65,10 +65,8 @@ class EigerDetector(Device):
     def __init__(self, beamline: str = "i03", *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.beamline = beamline
-        if beamline in AVAILABLE_TIMEOUTS:
-            self.timeouts = AVAILABLE_TIMEOUTS[beamline]
-        else:
-            raise ValueError(f"Unknown beamline_name: {beamline}")
+        # using i03 timeouts as default
+        self.timeouts = AVAILABLE_TIMEOUTS.get(beamline, AVAILABLE_TIMEOUTS["i03"])
 
     @classmethod
     def with_params(

@@ -11,7 +11,7 @@ from ophyd.utils import UnknownStatusFailure
 
 from dodal.devices.detector import DetectorParams, TriggerMode
 from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
-from dodal.devices.eiger import EigerDetector
+from dodal.devices.eiger import AVAILABLE_TIMEOUTS, EigerDetector
 from dodal.devices.status import await_value
 from dodal.devices.util.epics_util import run_functions_without_blocking
 from dodal.log import LOGGER
@@ -731,3 +731,12 @@ def test_when_eiger_is_stopped_then_dev_shm_disabled(fake_eiger: EigerDetector):
     fake_eiger.stop()
 
     assert fake_eiger.odin.fan.dev_shm_enable.get() == 0
+
+
+def test_for_other_beamlines_i03_used_as_default(params: DetectorParams):
+    FakeEigerDetector: EigerDetector = make_fake_device(EigerDetector)
+    fake_eiger: EigerDetector = FakeEigerDetector.with_params(
+        params=params, beamline="ixx"
+    )
+    assert fake_eiger.beamline == "ixx"
+    assert fake_eiger.timeouts == AVAILABLE_TIMEOUTS["i03"]
