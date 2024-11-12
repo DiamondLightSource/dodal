@@ -2,7 +2,7 @@
     eiger or pilatus detector on i24"""
 
 from ophyd_async.core import StandardReadable
-from ophyd_async.epics.signal import epics_signal_rw
+from ophyd_async.epics.core import epics_signal_rw
 
 
 class DetectorBeamCenter(StandardReadable):

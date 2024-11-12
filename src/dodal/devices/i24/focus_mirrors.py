@@ -1,5 +1,5 @@
 from ophyd_async.core import StandardReadable, StrictEnum
-from ophyd_async.epics.signal import epics_signal_rw
+from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.common.signal_utils import create_hardware_backed_soft_signal
 
