@@ -1,7 +1,7 @@
 from enum import IntEnum
 
-from ophyd_async.core import DEFAULT_TIMEOUT, AsyncStatus, StandardReadable
-from ophyd_async.epics.signal import epics_signal_rw
+from ophyd_async.core import DEFAULT_TIMEOUT, AsyncStatus, LazyMock, StandardReadable
+from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.common.signal_utils import create_hardware_backed_soft_signal
 from dodal.devices.areadetector.plugins.CAM import Cam
@@ -118,7 +118,7 @@ class OAV(StandardReadable):
 
     async def connect(
         self,
-        mock: bool = False,
+        mock: bool | LazyMock = False,
         timeout: float = DEFAULT_TIMEOUT,
         force_reconnect: bool = False,
     ):

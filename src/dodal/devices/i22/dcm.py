@@ -5,12 +5,12 @@ from bluesky.protocols import Reading
 from event_model.documents.event_descriptor import DataKey
 from ophyd_async.core import (
     Array1D,
-    ConfigSignal,
     StandardReadable,
+    StandardReadableFormat,
     soft_signal_r_and_setter,
 )
+from ophyd_async.epics.core import epics_signal_r
 from ophyd_async.epics.motor import Motor
-from ophyd_async.epics.signal import epics_signal_r
 
 from dodal.common.crystal_metadata import CrystalMetadata
 
@@ -61,7 +61,7 @@ class DoubleCrystalMonochromator(StandardReadable):
 
         # Soft metadata
         # If supplied include crystal details in output of read_configuration
-        with self.add_children_as_readables(ConfigSignal):
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.crystal_1_usage, _ = soft_signal_r_and_setter(
                 str, initial_value=crystal_1_metadata.usage
             )

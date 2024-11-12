@@ -6,13 +6,13 @@ from numpy.typing import NDArray
 from ophyd_async.core import (
     Array1D,
     AsyncStatus,
-    HintedSignal,
     StandardReadable,
+    StandardReadableFormat,
     observe_value,
     soft_signal_r_and_setter,
     soft_signal_rw,
 )
-from ophyd_async.epics.signal import epics_signal_r
+from ophyd_async.epics.core import epics_signal_r
 
 from dodal.devices.oav.pin_image_recognition.utils import (
     ARRAY_PROCESSING_FUNCTIONS_MAP,
@@ -86,7 +86,7 @@ class PinTipDetection(StandardReadable):
                 self.triggered_top_edge,
                 self.triggered_bottom_edge,
             ],
-            wrapper=HintedSignal,
+            format=StandardReadableFormat.HINTED_SIGNAL,
         )
 
         super().__init__(name=name)

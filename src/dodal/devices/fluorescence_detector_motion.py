@@ -1,5 +1,5 @@
 from ophyd_async.core import StandardReadable, StrictEnum
-from ophyd_async.epics.signal import epics_signal_r
+from ophyd_async.epics.core import epics_signal_r
 
 
 class FluorescenceDetectorControlState(StrictEnum):

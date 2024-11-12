@@ -6,7 +6,7 @@ import aiofiles
 from aiohttp import ClientSession
 from bluesky.protocols import Triggerable
 from ophyd_async.core import AsyncStatus, StandardReadable, soft_signal_rw
-from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 from PIL import Image
 
 from dodal.log import LOGGER
