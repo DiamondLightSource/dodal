@@ -7,7 +7,7 @@ from ophyd_async.core import set_mock_value
 
 from dodal.beamlines import i03
 from dodal.devices.synchrotron import Synchrotron, SynchrotronMode
-from dodal.plans.check_topup import (
+from dodal.plan_stubs.check_topup import (
     check_topup_and_wait_if_necessary,
     wait_for_topup_complete,
 )
@@ -18,8 +18,8 @@ def synchrotron(RE) -> Synchrotron:
     return i03.synchrotron(fake_with_ophyd_sim=True)
 
 
-@patch("dodal.plans.check_topup.wait_for_topup_complete")
-@patch("dodal.plans.check_topup.bps.sleep")
+@patch("dodal.plan_stubs.check_topup.wait_for_topup_complete")
+@patch("dodal.plan_stubs.check_topup.bps.sleep")
 def test_when_topup_before_end_of_collection_wait(
     fake_sleep: MagicMock, fake_wait: MagicMock, synchrotron: Synchrotron, RE: RunEngine
 ):
@@ -37,8 +37,8 @@ def test_when_topup_before_end_of_collection_wait(
     fake_sleep.assert_called_once_with(61.0)
 
 
-@patch("dodal.plans.check_topup.bps.rd")
-@patch("dodal.plans.check_topup.bps.sleep")
+@patch("dodal.plan_stubs.check_topup.bps.rd")
+@patch("dodal.plan_stubs.check_topup.bps.sleep")
 def test_wait_for_topup_complete(
     fake_sleep: MagicMock, fake_rd: MagicMock, synchrotron: Synchrotron, RE: RunEngine
 ):
@@ -59,8 +59,8 @@ def test_wait_for_topup_complete(
     fake_sleep.assert_called_with(0.1)
 
 
-@patch("dodal.plans.check_topup.bps.sleep")
-@patch("dodal.plans.check_topup.bps.null")
+@patch("dodal.plan_stubs.check_topup.bps.null")
+@patch("dodal.plan_stubs.check_topup.bps.sleep")
 def test_no_waiting_if_decay_mode(
     fake_null: MagicMock, fake_sleep: MagicMock, synchrotron: Synchrotron, RE: RunEngine
 ):
@@ -77,7 +77,7 @@ def test_no_waiting_if_decay_mode(
     assert fake_sleep.call_count == 0
 
 
-@patch("dodal.plans.check_topup.bps.null")
+@patch("dodal.plan_stubs.check_topup.bps.null")
 def test_no_waiting_when_mode_does_not_allow_gating(
     fake_null: MagicMock, synchrotron: Synchrotron, RE: RunEngine
 ):
@@ -120,7 +120,7 @@ def test_no_waiting_when_mode_does_not_allow_gating(
         (29, 39, 35, 1, 0, "topup_long_delay.txt"),
     ],
 )
-@patch("dodal.plans.check_topup.bps.sleep")
+@patch("dodal.plan_stubs.check_topup.bps.sleep")
 def test_topup_not_allowed_when_exceeds_threshold_percentage_of_topup_time(
     mock_sleep,
     RE: RunEngine,
