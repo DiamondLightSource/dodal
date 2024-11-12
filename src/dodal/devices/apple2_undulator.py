@@ -390,6 +390,7 @@ class Apple2(StandardReadable, Movable):
         # <name>-undulator, etc.
         self.gap = Reference(id_gap)
         self.phase = Reference(id_phase)
+
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             # Store the polarisation for readback.
             self.polarisation, self._polarisation_set = soft_signal_r_and_setter(
