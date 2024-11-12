@@ -12,3 +12,10 @@ class Aperture(StandardReadable):
         self.medium = epics_signal_r(float, prefix + "Y:MEDIUM_CALC")
         self.large = epics_signal_r(float, prefix + "Y:LARGE_CALC")
         super().__init__(name)
+
+    async def in_position(self):
+        return (
+            await self.small.get_value()
+            or await self.medium.get_value()
+            or await self.large.get_value()
+        )

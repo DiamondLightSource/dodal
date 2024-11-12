@@ -1,14 +1,19 @@
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Callable, Coroutine
+from enum import Enum
+from typing import Any
 
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
     HintedSignal,
+    Reference,
     StandardReadable,
     StrictEnum,
 )
+from ophyd_async.epics.motor import Motor
 from pydantic import BaseModel, Field
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
@@ -107,6 +112,72 @@ def load_positions_from_beamline_parameters(
     }
 
 
+class InOut(Enum):
+    IN = "IN"
+    OUT = "OUT"
+
+
+class ApertureSelector(StandardReadable, Movable):
+    def __init__(
+        self,
+        aperture: Aperture,
+        scatterguard: Scatterguard,
+        get_aperture_in_out: Callable[[], Coroutine[Any, Any, InOut]],
+        loaded_positions: dict[ApertureValue, AperturePosition],
+        safe_move: Callable[[AperturePosition], []],
+    ):
+        self.last_selected_aperture = ApertureValue.LARGE
+        self.aperture = Reference(aperture)
+        self.scatterguard = Reference(scatterguard)
+        self.loaded_positions = loaded_positions
+        self.get_aperture_in_out = get_aperture_in_out
+        self.safe_move = safe_move
+        super().__init__()
+
+    @AsyncStatus.wrap
+    async def set(self, value: ApertureValue):
+        self.last_selected_aperture = value
+        if await self.get_aperture_in_out() == InOut.OUT:
+            aperture_x, _, aperture_z, scatterguard_x, scatterguard_y = (
+                self.loaded_positions[value.value].values
+            )
+
+            await asyncio.gather(
+                self.aperture().x.set(aperture_x),
+                self.aperture().z.set(aperture_z),
+                self.scatterguard().x.set(scatterguard_x),
+                self.scatterguard().y.set(scatterguard_y),
+            )
+        else:
+            await self.safe_move(self.loaded_positions[value.value])
+
+
+class InOutDevice(StandardReadable, Movable):
+    def __init__(
+        self,
+        aperture_y: Motor,
+        selected_aperture: ApertureSelector,
+        loaded_positions: dict[ApertureValue, AperturePosition],
+    ):
+        self.aperture_y = Reference(aperture_y)
+        self.selected_aperture = Reference(selected_aperture)
+        self.positions = loaded_positions
+        super().__init__()
+
+    @AsyncStatus.wrap
+    async def set(self, value: InOut):
+        match value:
+            case InOut.IN:
+                selected_aperture = self.selected_aperture().last_selected_aperture
+                await self.aperture_y().set(
+                    self.positions[selected_aperture.value].aperture_y
+                )
+            case InOut.OUT:
+                await self.aperture_y().set(
+                    self.positions[ApertureValue.ROBOT_LOAD].aperture_y
+                )
+
+
 class ApertureScatterguard(StandardReadable, Movable):
     def __init__(
         self,
@@ -132,17 +203,33 @@ class ApertureScatterguard(StandardReadable, Movable):
                 self.radius,
             ],
         )
+
         with self.add_children_as_readables(HintedSignal):
             self.selected_aperture = create_hardware_backed_soft_signal(
                 ApertureValue, self._get_current_aperture_position
             )
 
+        # Setting this will select the aperture but not move it into beam if not needed
+        self.aperture = ApertureSelector(
+            self._aperture,
+            self._scatterguard,
+            self._apertures_in_out,
+            self._loaded_positions,
+            self._safe_move_within_datacollection_range,
+        )
+
+        # Setting this will just move the assembly out of the beam
+        self.in_out = InOutDevice(
+            self._aperture.y, self.aperture, self._loaded_positions
+        )
+
         super().__init__(name)
 
     @AsyncStatus.wrap
     async def set(self, value: ApertureValue):
+        """This set will move the aperture into the beam or move to robot load"""
         position = self._loaded_positions[value]
-        await self._safe_move_within_datacollection_range(position, value)
+        await self._safe_move_within_datacollection_range(position)
 
     @AsyncStatus.wrap
     async def _set_raw_unsafe(self, position: AperturePosition):
@@ -159,6 +246,14 @@ class ApertureScatterguard(StandardReadable, Movable):
             self._scatterguard.y.set(scatterguard_y),
         )
 
+    async def _apertures_in_out(self) -> InOut:
+        current_ap_y = await self._aperture.y.user_readback.get_value()
+        robot_load_ap_y = self._loaded_positions[ApertureValue.ROBOT_LOAD].aperture_y
+        if current_ap_y <= robot_load_ap_y + self._tolerances.aperture_y:
+            return InOut.OUT
+        else:
+            return InOut.IN
+
     async def _get_current_aperture_position(self) -> ApertureValue:
         """
         Returns the current aperture position using readback values
@@ -166,15 +261,13 @@ class ApertureScatterguard(StandardReadable, Movable):
         mini aperture y <= ROBOT_LOAD.location.aperture_y + tolerance.
         If no position is found then raises InvalidApertureMove.
         """
-        current_ap_y = await self._aperture.y.user_readback.get_value(cached=False)
-        robot_load_ap_y = self._loaded_positions[ApertureValue.ROBOT_LOAD].aperture_y
         if await self._aperture.large.get_value(cached=False) == 1:
             return ApertureValue.LARGE
         elif await self._aperture.medium.get_value(cached=False) == 1:
             return ApertureValue.MEDIUM
         elif await self._aperture.small.get_value(cached=False) == 1:
             return ApertureValue.SMALL
-        elif current_ap_y <= robot_load_ap_y + self._tolerances.aperture_y:
+        elif await self._apertures_in_out() == InOut.OUT:
             return ApertureValue.ROBOT_LOAD
 
         raise InvalidApertureMove("Current aperture/scatterguard state unrecognised")
@@ -183,9 +276,7 @@ class ApertureScatterguard(StandardReadable, Movable):
         current_value = await self._get_current_aperture_position()
         return self._loaded_positions[current_value].radius
 
-    async def _safe_move_within_datacollection_range(
-        self, position: AperturePosition, value: ApertureValue
-    ):
+    async def _safe_move_within_datacollection_range(self, position: AperturePosition):
         """
         Move the aperture and scatterguard combo safely to a new position.
         See https://github.com/DiamondLightSource/hyperion/wiki/Aperture-Scatterguard-Collisions
