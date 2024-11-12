@@ -8,9 +8,9 @@ from typing import Any
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
-    HintedSignal,
     Reference,
     StandardReadable,
+    StandardReadableFormat,
     StrictEnum,
 )
 from ophyd_async.epics.motor import Motor
@@ -204,7 +204,7 @@ class ApertureScatterguard(StandardReadable, Movable):
             ],
         )
 
-        with self.add_children_as_readables(HintedSignal):
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.selected_aperture = create_hardware_backed_soft_signal(
                 ApertureValue, self._get_current_aperture_position
             )

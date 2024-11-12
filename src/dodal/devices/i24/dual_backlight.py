@@ -1,5 +1,5 @@
 from ophyd_async.core import AsyncStatus, StandardReadable, StrictEnum
-from ophyd_async.epics.signal import epics_signal_rw
+from ophyd_async.epics.core import epics_signal_rw
 
 
 class BacklightPositions(StrictEnum):

@@ -4,13 +4,13 @@ import time
 from bluesky.protocols import Reading
 from event_model import DataKey
 from ophyd_async.core import (
-    ConfigSignal,
     DeviceVector,
     StandardReadable,
+    StandardReadableFormat,
     StrictEnum,
     soft_signal_r_and_setter,
 )
-from ophyd_async.epics.signal import epics_signal_r
+from ophyd_async.epics.core import epics_signal_r
 
 
 class FilterState(StrictEnum):
@@ -54,7 +54,7 @@ class FSwitch(StandardReadable):
                 for i in range(FSwitch.NUM_FILTERS)
             }
         )
-        with self.add_children_as_readables(ConfigSignal):
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             if lens_geometry is not None:
                 self.lens_geometry, _ = soft_signal_r_and_setter(
                     str, initial_value=lens_geometry
