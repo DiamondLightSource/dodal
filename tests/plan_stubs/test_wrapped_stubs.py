@@ -125,7 +125,6 @@ def test_sleep():
 
 def test_wait():
     # Waits for all groups
-    # move_on and wait are antonyms: what does move_on do?
     assert list(wait()) == [Msg("wait", group=None, timeout=None, move_on=False)]
 
 

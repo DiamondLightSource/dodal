@@ -44,9 +44,7 @@ def spec_scan(
     yield from bp.scan_nd(tuple(detectors), _as_cycler(spec), md=_md)
 
 
-def _as_cycler(
-    spec: Spec[Movable],  # type: ignore
-) -> Cycler:
+def _as_cycler(spec: Spec[Movable]) -> Cycler:
     """
     Convert a scanspec to a cycler for compatibility with legacy Bluesky plans such as
     `bp.scan_nd`. Use the midpoints of the scanspec since cyclers are normally used

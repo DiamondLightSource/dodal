@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from typing import Annotated, Any
 
 import bluesky.plans as bp
@@ -20,9 +21,9 @@ def count(
     ],
     num: Annotated[int, Field(description="Number of frames to collect", ge=1)] = 1,
     delay: Annotated[
-        NonNegativeFloat | list[NonNegativeFloat],
+        NonNegativeFloat | Sequence[NonNegativeFloat],
         Field(
-            description="Delay between readings: if list, len(delay) == num - 1 and \
+            description="Delay between readings: if tuple, len(delay) == num - 1 and \
             the delays are between each point, if value or None is the delay for every \
             gap",
             json_schema_extra={"units": "s"},
@@ -33,10 +34,10 @@ def count(
     """Reads from a number of devices.
     Wraps bluesky.plans.count(det, num, delay, md=metadata) exposing only serializable
     parameters and metadata."""
-    if isinstance(delay, list):
+    if isinstance(delay, Sequence):
         assert (
-            delays := len(delay)
-        ) == num - 1, f"Number of delays given must be {num - 1}: was given {delays}"
+            len(delay) == num - 1
+        ), f"Number of delays given must be {num - 1}: was given {len(delay)}"
     metadata = metadata or {}
     metadata["shape"] = (num,)
     yield from bp.count(tuple(detectors), num, delay=delay, md=metadata)

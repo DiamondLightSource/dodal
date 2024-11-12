@@ -13,6 +13,7 @@ Wrappers for Bluesky built-in plan stubs with type hinting
 Group = Annotated[str, "String identifier used by 'wait' or stubs that await"]
 
 
+# After bluesky 1.14, bounds for stubs that move can be narrowed
 # https://github.com/bluesky/bluesky/issues/1821
 def set_absolute(
     movable: Movable, value: Any, group: Group | None = None, wait: bool = False
@@ -37,7 +38,6 @@ def set_absolute(
     return (yield from bps.abs_set(movable, value, group=group, wait=wait))
 
 
-# https://github.com/bluesky/bluesky/issues/1821
 def set_relative(
     movable: Movable, value: Any, group: Group | None = None, wait: bool = False
 ) -> MsgGenerator:
@@ -62,7 +62,6 @@ def set_relative(
     return (yield from bps.rel_set(movable, value, group=group, wait=wait))
 
 
-# https://github.com/bluesky/bluesky/issues/1821
 def move(moves: Mapping[Movable, Any], group: Group | None = None) -> MsgGenerator:
     """
     Move a device, wrapper for `bp.mv`.
@@ -80,12 +79,11 @@ def move(moves: Mapping[Movable, Any], group: Group | None = None) -> MsgGenerat
     """
 
     return (
-        # https://github.com/bluesky/bluesky/issues/1809
+        # type ignore until https://github.com/bluesky/bluesky/issues/1809
         yield from bps.mv(*itertools.chain.from_iterable(moves.items()), group=group)  # type: ignore
     )
 
 
-# https://github.com/bluesky/bluesky/issues/1821
 def move_relative(
     moves: Mapping[Movable, Any], group: Group | None = None
 ) -> MsgGenerator:
@@ -132,7 +130,8 @@ def wait(
     timeout: float | None = None,
 ) -> MsgGenerator:
     """
-    Wait for a group status to complete, wrapper for `bp.wait`
+    Wait for a group status to complete, wrapper for `bp.wait`.
+    Does not expose move_on, as when used as a stub will not fail on Timeout.
 
     Args:
         group (Group | None, optional): The name of the group to wait for, defaults
