@@ -51,7 +51,7 @@ def connect(beamline: str, all: bool, sim_backend: bool) -> None:
 
     # We need to make a RunEngine to allow ophyd-async devices to connect.
     # See https://blueskyproject.io/ophyd-async/main/explanations/event-loop-choice.html
-    RE = RunEngine()
+    RE = RunEngine(call_returns_result=True)
 
     print(f"Attempting connection to {beamline} (using {full_module_path})")
     devices, exceptions = make_all_devices(
@@ -63,7 +63,7 @@ def connect(beamline: str, all: bool, sim_backend: bool) -> None:
     ophyd_async_devices = [
         device for device in devices.values() if isinstance(device, Device)
     ]
-    RE(ensure_connected(*ophyd_async_devices))
+    RE(ensure_connected(*ophyd_async_devices, mock=sim_backend))
 
     print(f"{len(devices)} devices connected{sim_statement}:")
     connected_devices = "\n".join(
