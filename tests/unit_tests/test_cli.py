@@ -3,7 +3,12 @@ from unittest.mock import patch
 
 import pytest
 from click.testing import CliRunner, Result
-from ophyd_async.core import DEFAULT_TIMEOUT, Device, LazyMock, NotConnected
+from ophyd_async.core import (
+    DEFAULT_TIMEOUT,
+    Device,
+    LazyMock,
+    NotConnected,
+)
 
 from dodal import __version__
 from dodal.cli import main
