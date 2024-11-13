@@ -1,7 +1,5 @@
 from collections.abc import Sequence
-from pathlib import Path
 from typing import cast
-from unittest.mock import patch
 
 import pytest
 from bluesky.protocols import Readable
@@ -15,34 +13,16 @@ from event_model.documents import (
     StreamResource,
 )
 from ophyd_async.core import (
-    DeviceCollector,
-    PathProvider,
     StandardDetector,
 )
-from ophyd_async.sim.demo import PatternDetector
 from pydantic import ValidationError
 
 from dodal.plans.wrapped import count
 
 
 @pytest.fixture
-def det(RE: RunEngine, tmp_path: Path) -> StandardDetector:
-    with DeviceCollector(mock=True):
-        det = PatternDetector(tmp_path / "foo.h5")
-    return det
-
-
-@pytest.fixture
-def path_provider(static_path_provider: PathProvider):
-    # Prevents issue with leftover state from beamline tests
-    with patch("dodal.plan_stubs.data_session.get_path_provider") as mock:
-        mock.return_value = static_path_provider
-        yield
-
-
-@pytest.fixture
 def documents_from_num(
-    request: pytest.FixtureRequest, det: StandardDetector, path_provider, RE: RunEngine
+    request: pytest.FixtureRequest, det: StandardDetector, RE: RunEngine
 ) -> dict[str, list[DocumentType]]:
     docs: dict[str, list[DocumentType]] = {}
     RE(
@@ -52,7 +32,7 @@ def documents_from_num(
     return docs
 
 
-def test_count_delay_validation(det: StandardDetector, path_provider, RE):
+def test_count_delay_validation(det: StandardDetector, RE):
     args: dict[float | Sequence[float], str] = {  # type: ignore
         # List wrong length
         (1,): "Number of delays given must be 2: was given 1",
@@ -74,7 +54,7 @@ def test_count_delay_validation(det: StandardDetector, path_provider, RE):
         print(delay)
 
 
-def test_count_detectors_validation(path_provider, RE):
+def test_count_detectors_validation(RE):
     args: dict[str, set[Readable]] = {
         # No device to read
         "Set should have at least 1 item after validation, not 0": set(),
@@ -86,7 +66,7 @@ def test_count_detectors_validation(path_provider, RE):
             RE(count(dets))
 
 
-def test_count_num_validation(det: StandardDetector, path_provider, RE):
+def test_count_num_validation(det: StandardDetector, RE):
     args: dict[int, str] = {
         -1: "Input should be greater than or equal to 1",
         0: "Input should be greater than or equal to 1",

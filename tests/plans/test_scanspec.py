@@ -1,8 +1,6 @@
 from collections.abc import Sequence
 from functools import reduce
-from pathlib import Path
 from typing import cast
-from unittest.mock import patch
 
 import pytest
 from bluesky.run_engine import RunEngine
@@ -14,51 +12,17 @@ from event_model.documents import (
     RunStop,
     StreamResource,
 )
-from ophyd_async.core import (
-    DeviceCollector,
-    PathProvider,
-    StandardDetector,
-)
-from ophyd_async.sim.demo import PatternDetector, SimMotor
+from ophyd_async.core import StandardDetector
+from ophyd_async.sim.demo import SimMotor
 from scanspec.specs import Line
 
 from dodal.plans import spec_scan
 
 
 @pytest.fixture
-def det(RE: RunEngine, tmp_path: Path) -> StandardDetector:
-    with DeviceCollector(mock=True):
-        det = PatternDetector(tmp_path / "foo.h5")
-    return det
-
-
-@pytest.fixture
-def x_axis(RE: RunEngine) -> SimMotor:
-    with DeviceCollector(mock=True):
-        x_axis = SimMotor()
-    return x_axis
-
-
-@pytest.fixture
-def y_axis(RE: RunEngine) -> SimMotor:
-    with DeviceCollector(mock=True):
-        y_axis = SimMotor()
-    return y_axis
-
-
-@pytest.fixture
-def path_provider(static_path_provider: PathProvider):
-    # Prevents issue with leftover state from beamline tests
-    with patch("dodal.plan_stubs.data_session.get_path_provider") as mock:
-        mock.return_value = static_path_provider
-        yield
-
-
-@pytest.fixture
 def documents_from_expected_shape(
     request: pytest.FixtureRequest,
     det: StandardDetector,
-    path_provider,
     RE: RunEngine,
     x_axis: SimMotor,
     y_axis: SimMotor,
