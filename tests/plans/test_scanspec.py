@@ -29,6 +29,7 @@ def documents_from_expected_shape(
 ) -> dict[str, list[DocumentType]]:
     shape: Sequence[int] = request.param
     motors = [x_axis, y_axis]
+    # Does not support static, https://github.com/bluesky/scanspec/issues/154
     # spec = Static.duration(1)
     spec = Line(motors[0], 0, 5, shape[0])
     for i in range(1, len(shape)):
@@ -43,6 +44,7 @@ def documents_from_expected_shape(
 
 
 spec_and_shape = (
+    # Does not support static, https://github.com/bluesky/scanspec/issues/154
     # [(), (1,)],  # static
     [(1,), (1,)],
     [(3,), (3,)],

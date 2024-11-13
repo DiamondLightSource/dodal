@@ -31,6 +31,9 @@ def spec_scan(
     """Generic plan for reading `detectors` at every point of a ScanSpec `Spec`.
     A `Spec` is an N-dimensional path.
     """
+    # TODO: https://github.com/bluesky/scanspec/issues/154
+    # support Static.duration: Spec[Literal["DURATION"]]
+
     _md = {
         "plan_args": {
             "detectors": {det.name for det in detectors},

@@ -103,7 +103,7 @@ def move_relative(
     """
 
     return (
-        # https://github.com/bluesky/bluesky/issues/1809
+        # type ignore until https://github.com/bluesky/bluesky/issues/1809
         yield from bps.mvr(*itertools.chain.from_iterable(moves.items()), group=group)  # type: ignore
     )
 
