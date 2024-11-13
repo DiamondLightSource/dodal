@@ -40,60 +40,37 @@ class UnconnectableDevice(Device):
 
 
 def device_results(
-    happy_devices: int,
+    happy_devices: int = 0,
     instantiation_failures: int = 0,
     connection_failures: int = 0,
 ) -> tuple[dict[str, AnyDevice], dict[str, Exception]]:
-    happy = {f"happy_device_{i}": Device() for i in range(happy_devices)}
-    conn = {
-        f"unconnectable_device_{i}": UnconnectableDevice()
-        for i in range(connection_failures)
-    }
-    failed_devices: dict[str, Exception] = {
-        f"failed_device_{i}": TimeoutError() for i in range(instantiation_failures)
-    }
+    return {
+        **{
+            f"happy_device_{i}": Device(name=f"happy_device_{i}")
+            for i in range(happy_devices)
+        },
+        **{
+            f"unconnectable_device_{i}": UnconnectableDevice(
+                name=f"unconnectable_device_{i}"
+            )
+            for i in range(connection_failures)
+        },
+    }, {f"failed_device_{i}": TimeoutError() for i in range(instantiation_failures)}
 
-    return {**happy, **conn}, failed_devices
 
-
-ALL_CONNECTED_DEVICES: tuple[dict[str, AnyDevice], dict[str, Exception]] = (
-    {f"device_{i}": Device(name=f"device_{i}") for i in range(6)},
-    {},
+ALL_CONNECTED_DEVICES = device_results(happy_devices=6)
+SOME_FAILED_INSTANTIATION = device_results(happy_devices=3, instantiation_failures=3)
+SOME_FAILED_CONNECTION = device_results(happy_devices=3, connection_failures=3)
+ALL_FAILED_INSTANTIATION = device_results(instantiation_failures=6)
+ALL_FAILED_CONNECTION = device_results(connection_failures=6)
+SOME_FAILED_INSTANTIATION_OR_CONNECTION = device_results(
+    instantiation_failures=3,
+    connection_failures=3,
 )
-
-SOME_FAILED_INSTANTIATION: tuple[dict[str, AnyDevice], dict[str, Exception]] = (
-    {f"device_{i}": Device(name=f"device_{i}") for i in range(3)},
-    {f"device_{i}": TimeoutError() for i in range(3, 6)},
-)
-
-
-SOME_FAILED_CONNECTION: tuple[dict[str, AnyDevice], dict[str, Exception]] = (
-    {
-        **{f"device_{i}": Device(name=f"device_{i}") for i in range(3)},
-        **{f"device_{i}": UnconnectableDevice(name=f"device_{i}") for i in range(3, 6)},
-    },
-    {},
-)
-
-ALL_FAILED_INSTANTIATION: tuple[dict[str, AnyDevice], dict[str, Exception]] = (
-    {},
-    {f"device_{i}": TimeoutError() for i in range(6)},
-)
-
-ALL_FAILED_CONNECTION: tuple[dict[str, AnyDevice], dict[str, Exception]] = (
-    {f"device_{i}": UnconnectableDevice(name=f"device_{i}") for i in range(6)},
-    {},
-)
-
-
-SOME_FAILED_INSTANTIATION_OR_CONNECTION: tuple[
-    dict[str, AnyDevice], dict[str, Exception]
-] = (
-    {
-        **{f"device_{i}": Device(name=f"device_{i}") for i in range(1)},
-        **{f"device_{i}": UnconnectableDevice(name=f"device_{i}") for i in range(2, 3)},
-    },
-    {f"device_{i}": TimeoutError() for i in range(3, 6)},
+SOME_CONNECTED_AND_VARIOUS_FAILURES = device_results(
+    happy_devices=2,
+    instantiation_failures=2,
+    connection_failures=2,
 )
 
 
@@ -143,6 +120,7 @@ def test_cli_connect_in_sim_mode(runner: CliRunner):
         SOME_FAILED_CONNECTION,
         SOME_FAILED_INSTANTIATION,
         SOME_FAILED_INSTANTIATION_OR_CONNECTION,
+        SOME_CONNECTED_AND_VARIOUS_FAILURES,
     ],
 )
 def test_cli_connect_when_devices_error(
