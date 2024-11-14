@@ -10,7 +10,7 @@ from ophyd_async.core import (
     SignalR,
     StandardReadable,
 )
-from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 OPENSEQ_PULSE_LENGTH = 0.2
 
