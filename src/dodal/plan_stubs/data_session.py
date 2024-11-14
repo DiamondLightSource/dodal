@@ -2,7 +2,7 @@ from bluesky import plan_stubs as bps
 from bluesky import preprocessors as bpp
 from bluesky.utils import MsgGenerator, make_decorator
 
-from dodal.common.beamlines import beamline_utils
+from dodal.common.beamlines.beamline_utils import get_path_provider
 from dodal.common.types import UpdatingPathProvider
 
 DATA_SESSION = "data_session"
@@ -31,7 +31,7 @@ def attach_data_session_metadata_wrapper(
         Iterator[Msg]: Plan messages
     """
     if provider is None:
-        provider = beamline_utils.get_path_provider()
+        provider = get_path_provider()
     yield from bps.wait_for([provider.update])
     ress = yield from bps.wait_for([provider.data_session])
     data_session = ress[0].result()

@@ -32,6 +32,7 @@ dependencies = [
     "aiohttp",
     "redis",
     "deepdiff",
+    "scanspec>=0.7.3",
 ]
 
 dynamic = ["version"]
@@ -47,6 +48,7 @@ dev = [
     # Commented out due to dependency version conflict with pydantic 1.x
     # "copier",
     "myst-parser",
+    "ophyd_async[sim]",
     "pipdeptree",
     "pre-commit",
     "psutil",
