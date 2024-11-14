@@ -8,6 +8,20 @@ from pydantic import Field, NonNegativeFloat, validate_call
 from dodal.common import MsgGenerator
 from dodal.plan_stubs.data_session import attach_data_session_metadata_decorator
 
+"""This module wraps plan(s) from bluesky.plans until required handling for them is
+moved into bluesky or better handled in downstream services.
+
+Required decorators are installed on plan import
+https://github.com/DiamondLightSource/blueapi/issues/474
+
+Non-serialisable fields are ignored when they are optional
+https://github.com/DiamondLightSource/blueapi/issues/711
+
+We may also need other adjustments for UI purposes, e.g.
+Forcing uniqueness or orderedness of Readables
+Limits and metadata (e.g. units)
+"""
+
 
 @attach_data_session_metadata_decorator()
 @validate_call(config={"arbitrary_types_allowed": True})
