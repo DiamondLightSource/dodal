@@ -14,6 +14,7 @@ from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
 
 OPENSEQ_PULSE_LENGTH = 0.2
 
+
 class PumpState(str, Enum):
     MANUAL = "Manual"
     AUTO_PRESSURE = "Auto Pressure"

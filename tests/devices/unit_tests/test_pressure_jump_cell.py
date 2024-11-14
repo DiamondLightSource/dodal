@@ -1,5 +1,6 @@
-from unittest.mock import ANY
 import asyncio
+from unittest.mock import ANY
+
 import pytest
 from ophyd_async.core import DeviceCollector, assert_reading, set_mock_value
 
@@ -131,14 +132,13 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
     )
 
     # Set new values
-    
+
     await cell.all_valves_control.set_valve(1, ValveControlRequest.CLOSE)
     await cell.all_valves_control.set_valve(6, FastValveControlRequest.ARM)
 
     await asyncio.gather(
         cell.all_valves_control.set_valve(1, ValveControlRequest.OPEN),
         cell.all_valves_control.set_valve(6, FastValveControlRequest.OPEN),
-
         # Check valves requested to open are set to OPEN_SEQ on initially calling
         # set_valve()
         assert_reading(
@@ -153,7 +153,7 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
                     "value": ANY,
                     "timestamp": ANY,
                     "alarm_severity": 0,
-            },
+                },
             },
         ),
         assert_reading(
@@ -168,10 +168,9 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
                     "value": ANY,
                     "timestamp": ANY,
                     "alarm_severity": 0,
+                },
             },
-            },
-        )
-
+        ),
     )
 
     # Check slow valves have been set to the new value and valves requested to open are
