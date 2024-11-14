@@ -1,32 +1,32 @@
 import asyncio
 from dataclasses import dataclass
-from enum import Enum
 
 from bluesky.protocols import HasName, Movable
 from ophyd_async.core import (
     AsyncStatus,
-    ConfigSignal,
     DeviceVector,
     SignalR,
     StandardReadable,
+    StandardReadableFormat,
+    StrictEnum,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 OPENSEQ_PULSE_LENGTH = 0.2
 
 
-class PumpState(str, Enum):
+class PumpState(StrictEnum):
     MANUAL = "Manual"
     AUTO_PRESSURE = "Auto Pressure"
     AUTO_POSITION = "Auto Position"
 
 
-class StopState(str, Enum):
+class StopState(StrictEnum):
     CONTINUE = "CONTINUE"
     STOP = "STOP"
 
 
-class FastValveControlRequest(str, Enum):
+class FastValveControlRequest(StrictEnum):
     OPEN = "Open"
     CLOSE = "Close"
     RESET = "Reset"
@@ -34,24 +34,24 @@ class FastValveControlRequest(str, Enum):
     DISARM = "Disarm"
 
 
-class ValveControlRequest(str, Enum):
+class ValveControlRequest(StrictEnum):
     OPEN = "Open"
     CLOSE = "Close"
     RESET = "Reset"
 
 
-class ValveOpenSeqRequest(int, Enum):
+class ValveOpenSeqRequest(StrictEnum):
     INACTIVE = 0
     OPEN_SEQ = 1
 
 
-class PumpMotorDirectionState(str, Enum):
+class PumpMotorDirectionState(StrictEnum):
     EMPTY = ""
     FORWARD = "Forward"
     REVERSE = "Reverse"
 
 
-class ValveState(str, Enum):
+class ValveState(StrictEnum):
     FAULT = "Fault"
     OPEN = "Open"
     OPENING = "Opening"
@@ -59,7 +59,7 @@ class ValveState(str, Enum):
     CLOSING = "Closing"
 
 
-class FastValveState(str, Enum):
+class FastValveState(StrictEnum):
     FAULT = "Fault"
     OPEN = "Open"
     OPEN_ARMED = "Open Armed"
@@ -200,7 +200,7 @@ class Pump(StandardReadable):
                 float, write_pv=prefix + "MSPEED", read_pv=prefix + "MSPEED_RBV"
             )
 
-        with self.add_children_as_readables(ConfigSignal):
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.pump_mode = epics_signal_rw(PumpState, prefix + "SP:AUTO")
 
         super().__init__(name)
