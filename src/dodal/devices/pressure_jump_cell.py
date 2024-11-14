@@ -159,14 +159,14 @@ class ValveControl(StandardReadable):
         super().__init__(name)
 
     def set(self, value: ValveControlRequest | ValveOpenSeqRequest) -> AsyncStatus:
-        setStatus = None
+        set_status = None
 
         if isinstance(value, ValveControlRequest):
-            setStatus = self.close.set(value)
+            set_status = self.close.set(value)
         elif isinstance(value, ValveOpenSeqRequest):
-            setStatus = self.open.set(value)
+            set_status = self.open.set(value)
 
-        return setStatus
+        return set_status
 
 
 class FastValveControl(StandardReadable):
@@ -178,14 +178,14 @@ class FastValveControl(StandardReadable):
         super().__init__(name)
 
     def set(self, value: FastValveControlRequest | ValveOpenSeqRequest) -> AsyncStatus:
-        setStatus = None
+        set_status = None
 
         if isinstance(value, FastValveControlRequest):
-            setStatus = self.close.set(value)
+            set_status = self.close.set(value)
         elif isinstance(value, ValveOpenSeqRequest):
-            setStatus = self.open.set(value)
+            set_status = self.open.set(value)
 
-        return setStatus
+        return set_status
 
 
 class Pump(StandardReadable):
