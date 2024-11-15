@@ -173,9 +173,10 @@ class FocusingMirrorWithStripes(FocusingMirror):
 
         super().__init__(prefix, name, *args, **kwargs)
 
-    def energy_to_stripe(self, energy_kev) -> MirrorStripe:
+    def energy_to_stripe(self, energy_kev) -> tuple[MirrorStripe, float, float]:
+        """Return the stripe, yaw angle and lateral position"""
         # In future, this should be configurable per-mirror
         if energy_kev < 7:
-            return MirrorStripe.BARE
+            return MirrorStripe.BARE, 6.2, 0.0
         else:
-            return MirrorStripe.RHODIUM
+            return MirrorStripe.RHODIUM, 0.0, 10.0

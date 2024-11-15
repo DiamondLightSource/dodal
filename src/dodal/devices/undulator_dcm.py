@@ -4,6 +4,7 @@ from bluesky.protocols import Movable
 from ophyd_async.core import AsyncStatus, StandardReadable
 
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
+from dodal.log import LOGGER
 
 from .dcm import DCM
 from .undulator import Undulator
@@ -59,3 +60,6 @@ class UndulatorDCM(StandardReadable, Movable):
             self.dcm.energy_in_kev.set(value, timeout=ENERGY_TIMEOUT_S),
             self.undulator.set(value),
         )
+        # DCM Perp pitch
+        LOGGER.info(f"Adjusting DCM offset to {self.dcm_fixed_offset_mm} mm")
+        await self.dcm.offset_in_mm.set(self.dcm_fixed_offset_mm)
