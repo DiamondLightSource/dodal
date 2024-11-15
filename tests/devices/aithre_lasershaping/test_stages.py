@@ -1,6 +1,6 @@
 from ophyd_async.core import get_mock
 
-from dodal.devices.laser_shaping.goniometer import Goniometer
+from dodal.devices.aithre_lasershaping.goniometer import Goniometer
 
 
 async def test_stage_x_y():
