@@ -10,7 +10,7 @@ Dodal is a sprawling library that supports a large number of instruments. As it 
 
 ## Decision
 
-Have a team of approved reviewers in the DiamondLightSource Github organisation. Every PR into dodal **must** be reviewed by a member of this team before merging (enforced by repo settings and [CODEOWNERS feature](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners)). Have a set of documented criteria for becoming part of the team, with the expectation that any team that regularly works on dodal and become members over time. The hope is that a consistent set of standards can be maintained by the approver community.
+Have a team of approved reviewers in the DiamondLightSource Github organisation. Every PR into dodal **must** be reviewed by a member of this team before merging (enforced by repo settings and [CODEOWNERS feature](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners)). Have a set of [documented criteria](../reviews.md) for becoming part of the team, with the expectation that any team that regularly works on dodal and become members over time. The hope is that a consistent set of standards can be maintained by the approver community.
 
 ## Consequences
 
