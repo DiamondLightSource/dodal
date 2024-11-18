@@ -96,16 +96,6 @@ def test_cli_sets_beamline_environment_variable(runner: CliRunner):
 
 
 @patch.dict(os.environ, clear=True)
-def test_cli_connect(runner: CliRunner):
-    result = _mock_connect(
-        EXAMPLE_BEAMLINE,
-        runner=runner,
-        devices=ALL_CONNECTED_DEVICES,
-    )
-    assert "6 devices connected" in result.stdout
-
-
-@patch.dict(os.environ, clear=True)
 def test_cli_connect_in_sim_mode(runner: CliRunner):
     result = _mock_connect(
         "-s",
@@ -114,6 +104,31 @@ def test_cli_connect_in_sim_mode(runner: CliRunner):
         devices=ALL_CONNECTED_DEVICES,
     )
     assert "6 devices connected (sim mode)" in result.stdout
+
+
+@patch.dict(os.environ, clear=True)
+@pytest.mark.parametrize(
+    "devices,expected_connections",
+    [
+        (ALL_CONNECTED_DEVICES, 6),
+        (SOME_FAILED_CONNECTION, 3),
+        (SOME_FAILED_INSTANTIATION, 3),
+        (SOME_CONNECTED_AND_VARIOUS_FAILURES, 2),
+        (SOME_FAILED_INSTANTIATION_OR_CONNECTION, 0),
+    ],
+)
+def test_cli_connect_reports_correct_number_of_connected_devices(
+    runner: CliRunner,
+    devices: tuple[dict[str, AnyDevice], dict[str, Exception]],
+    expected_connections: int,
+):
+    result = _mock_connect(
+        EXAMPLE_BEAMLINE,
+        runner=runner,
+        devices=devices,
+        catch_exceptions=True,
+    )
+    assert f"{expected_connections} devices connected" in result.stdout
 
 
 @patch.dict(os.environ, clear=True)
@@ -144,6 +159,7 @@ def _mock_connect(
     *args,
     runner: CliRunner,
     devices: tuple[dict[str, AnyDevice], dict[str, Exception]] = ({}, {}),
+    catch_exceptions: bool = False,
 ) -> Result:
     with patch(
         "dodal.cli.make_all_devices",
@@ -152,6 +168,6 @@ def _mock_connect(
         result = runner.invoke(
             main,
             ["connect"] + list(args),
-            catch_exceptions=False,
+            catch_exceptions=catch_exceptions,
         )
     return result

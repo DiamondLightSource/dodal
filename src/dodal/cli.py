@@ -55,40 +55,63 @@ def connect(beamline: str, all: bool, sim_backend: bool) -> None:
     RE = RunEngine(call_returns_result=True)
 
     print(f"Attempting connection to {beamline} (using {full_module_path})")
+
     # Force all devices to be lazy (don't connect to PVs on instantiation) and do
     # connection as an extra step, because the alternatives is handling the fact
     # that only some devices may be lazy.
-    devices, exceptions = make_all_devices(
+    devices, instance_exceptions = make_all_devices(
         full_module_path,
         include_skipped=all,
         fake_with_ophyd_sim=sim_backend,
         wait_for_connection=False,
     )
-    _connect_devices(RE, devices, sim_backend)
+    devices, connect_exceptions = _connect_devices(RE, devices, sim_backend)
 
+    # Inform user of successful connections
+    _report_successful_devices(devices, sim_backend)
+
+    # If exceptions have occurred, this will print details of the relevant PVs
+    exceptions = {**instance_exceptions, **connect_exceptions}
+    if len(exceptions) > 0:
+        raise NotConnected(exceptions)
+
+
+def _report_successful_devices(
+    devices: Mapping[str, AnyDevice],
+    sim_backend: bool,
+) -> None:
     sim_statement = " (sim mode)" if sim_backend else ""
-
-    print(f"{len(devices)} devices connected{sim_statement}:")
     connected_devices = "\n".join(
         sorted([f"\t{device_name}" for device_name in devices.keys()])
     )
-    print(connected_devices)
 
-    # If exceptions have occurred, this will print details of the relevant PVs
-    if len(exceptions) > 0:
-        raise NotConnected(exceptions)
+    print(f"{len(devices)} devices connected{sim_statement}:")
+    print(connected_devices)
 
 
 def _connect_devices(
     RE: RunEngine,
     devices: Mapping[str, AnyDevice],
     sim_backend: bool,
-) -> None:
+) -> tuple[Mapping[str, AnyDevice], Mapping[str, Exception]]:
     ophyd_devices, ophyd_async_devices = filter_ophyd_devices(devices)
+    exceptions = {}
 
     # Connect ophyd devices
-    for device in ophyd_devices.values():
-        device.wait_for_connection()
+    for name, device in ophyd_devices.items():
+        try:
+            device.wait_for_connection()
+        except Exception as ex:
+            exceptions[name] = ex
 
     # Connect ophyd-async devices
-    RE(ensure_connected(*ophyd_async_devices.values(), mock=sim_backend))
+    try:
+        RE(ensure_connected(*ophyd_async_devices.values(), mock=sim_backend))
+    except NotConnected as ex:
+        exceptions = {**exceptions, **ex.sub_errors}
+
+    # Only return the subset of devices that haven't raised an exception
+    successful_devices = {
+        name: device for name, device in devices.items() if name not in exceptions
+    }
+    return successful_devices, exceptions
