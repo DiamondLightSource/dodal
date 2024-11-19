@@ -1,12 +1,40 @@
 # Approved Reviewers
 
-Dodal PRs *must* be reviewed by a member of [the approved review team](https://github.com/orgs/DiamondLightSource/teams/bluesky-reviewers) before they are merged. 
+Code reviews are an important tool for ensuring both quality and collective responsibility for the codebase. Dodal PRs *must* be reviewed by a member of [the approved review team](https://github.com/orgs/DiamondLightSource/teams/bluesky-reviewers) before they are merged. 
 
-## Review Standards
+## Review Standards and Practices
 
-TBD
+When reviewing you should ensure the code meets the [repository standards](../reference/standards.rst) and [device standards](../reference/device-standards.rst). Approved reviewers will adhere to the following, if they do not, junior reviewers and reviewees should feel empowered to hold them to them.
 
-Then something about juniors should also feel free to point to the guidance on PRs from codeowners and hold them to it
+### Questions and Comments
+
+Questions and requests for clarification are encouraged. If you have comments for the reviewer you could add them with the following prefixes to be helpful:
+
+- Nit - This is arguably just taste, you don't mind if the developer doesn't follow this
+- Should - This will improve code quality but unlikely to affect functionality. If the developer doesn't want to do this they should write an explanation.
+- Must - This will negatively affect functionality if not implemented.
+
+### The Happy Path
+
+If the review passes then the reviewer should approve the change and either the reviewer or PR author should merge it. 
+
+### Requesting Changes
+
+If the review fails the reviewer should request any changes (this issue is said to require rework)
+A developer should ideally pick up any rework PRs before starting new work
+When a developer is happy that a rework is complete they should press the re-request review button on the PR
+
+### Making Changes
+
+Reviewers should feel free to make small changes to a PR as part of a review e.g. typos, poorly named variables, fixing a test. However, if code has been changed in this way they need then need to run it past another developer (ideally the original developer). This means that no code is merged into main without being looked at by at least 2 people, ensuring collective responsibility for the codebase.
+Dismissing a previous reviewer
+
+### Dismissing Stale Reviews
+
+There may be times where one person requests changes on a PR, these changes are addressed and another person then approves it. In this case the PR still cannot be merged until the original review is dismissed. We're happy for people to dismiss stale reviews with the understanding that:
+
+- The new reviewer should check that the must and should comments have been addressed
+- If it's a big change it may still be worth the original reviewer looking again, if so they should make this clear to the original reviewer and the person that wrote the code
 
 ## Joining the Review Team
 
