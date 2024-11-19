@@ -306,6 +306,6 @@ def test_filter_ophyd_devices_raises_for_extra_types():
             {
                 "oa": OphydV1Device(prefix="", name="oa"),
                 "aa": OphydV2Device(name="aa"),
-                "ab": 3,
+                "ab": 3,  # type: ignore
             }
         )

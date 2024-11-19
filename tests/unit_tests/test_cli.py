@@ -84,7 +84,7 @@ def device_results(
             for i in range(ophyd_connection_failures)
         },
     }
-    exceptions = {
+    exceptions: dict[str, Exception] = {
         **{
             f"ophyd_async_failed_device_{i}": TimeoutError()
             for i in range(ophyd_async_instantiation_failures)
@@ -287,20 +287,6 @@ def test_cli_connect_when_devices_error(
             runner=runner,
             devices=devices,
         )
-
-
-# def test_cli_connect_reports_correct_number_of_connected_devices(
-#     runner: CliRunner,
-#     devices: tuple[dict[str, AnyDevice], dict[str, Exception]],
-#     expected_connections: int,
-# ):
-#     result = _mock_connect(
-#         EXAMPLE_BEAMLINE,
-#         runner=runner,
-#         devices=devices,
-#         catch_exceptions=True,
-#     )
-#     assert f"{expected_connections} devices connected" in result.stdout
 
 
 def _mock_connect(
