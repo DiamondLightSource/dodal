@@ -301,6 +301,37 @@ def is_v1_device_type(obj: type[Any]) -> bool:
     return is_class and follows_protocols and not is_v2_device_type(obj)
 
 
+def filter_ophyd_devices(
+    devices: Mapping[str, AnyDevice],
+) -> tuple[Mapping[str, OphydV1Device], Mapping[str, OphydV2Device]]:
+    """
+    Split a dictionary of ophyd and ophyd-async devices
+    (i.e. the output of make_all_devices) into 2 separate dictionaries of the
+    different types. Useful when special handling is needed for each type of device.
+
+    Args:
+        devices: Dictionary of device name to ophyd or ophyd-async device.
+
+    Raises:
+        ValueError: If anything in the dictionary doesn't come from either library.
+
+    Returns:
+        Tuple of two dictionaries, one mapping names to ophyd devices and one mapping
+        names to ophyd-async devices.
+    """
+
+    ophyd_devices = {}
+    ophyd_async_devices = {}
+    for name, device in devices.items():
+        if isinstance(device, OphydV1Device):
+            ophyd_devices[name] = device
+        elif isinstance(device, OphydV2Device):
+            ophyd_async_devices[name] = device
+        else:
+            raise ValueError(f"{name}: {device} is not an ophyd or ophyd-async device")
+    return ophyd_devices, ophyd_async_devices
+
+
 def get_beamline_based_on_environment_variable() -> ModuleType:
     """
     Gets the dodal module for the current beamline, as specified by the
