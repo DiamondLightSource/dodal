@@ -219,11 +219,11 @@ def zebra_grid_scan_params():
         x_step_size_mm=0.3,
         y_step_size_mm=0.2,
         z_step_size_mm=0.1,
-        x_start=0,
-        y1_start=1,
-        y2_start=2,
-        z1_start=3,
-        z2_start=4,
+        x_start_mm=0,
+        y1_start_mm=1,
+        y2_start_mm=2,
+        z1_start_mm=3,
+        z2_start_mm=4,
     )
 
 
@@ -237,11 +237,11 @@ def panda_grid_scan_params():
         x_step_size_mm=0.3,
         y_step_size_mm=0.2,
         z_step_size_mm=0.1,
-        x_start=0,
-        y1_start=1,
-        y2_start=2,
-        z1_start=3,
-        z2_start=4,
+        x_start_mm=0,
+        y1_start_mm=1,
+        y2_start_mm=2,
+        z1_start_mm=3,
+        z2_start_mm=4,
     )
 
 

@@ -65,26 +65,26 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
     x_step_size_mm: float = 0.1
     y_step_size_mm: float = 0.1
     z_step_size_mm: float = 0.1
-    x_start: float = 0.1
-    y1_start: float = 0.1
-    y2_start: float = 0.1
-    z1_start: float = 0.1
-    z2_start: float = 0.1
+    x_start_mm: float = 0.1
+    y1_start_mm: float = 0.1
+    y2_start_mm: float = 0.1
+    z1_start_mm: float = 0.1
+    z2_start_mm: float = 0.1
 
     # Whether to set the stub offsets after centering
     set_stub_offsets: bool = False
 
     @property
     def x_axis(self) -> GridAxis:
-        return GridAxis(self.x_start, self.x_step_size_mm, self.x_steps)
+        return GridAxis(self.x_start_mm, self.x_step_size_mm, self.x_steps)
 
     @property
     def y_axis(self) -> GridAxis:
-        return GridAxis(self.y1_start, self.y_step_size_mm, self.y_steps)
+        return GridAxis(self.y1_start_mm, self.y_step_size_mm, self.y_steps)
 
     @property
     def z_axis(self) -> GridAxis:
-        return GridAxis(self.z2_start, self.z_step_size_mm, self.z_steps)
+        return GridAxis(self.z2_start_mm, self.z_step_size_mm, self.z_steps)
 
     def get_num_images(self):
         return self.x_steps * (self.y_steps + self.z_steps)
@@ -219,11 +219,11 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
             "x_step_size_mm": self.x_step_size,
             "y_step_size_mm": self.y_step_size,
             "z_step_size_mm": self.z_step_size,
-            "x_start": self.x_start,
-            "y1_start": self.y1_start,
-            "y2_start": self.y2_start,
-            "z1_start": self.z1_start,
-            "z2_start": self.z2_start,
+            "x_start_mm": self.x_start,
+            "y1_start_mm": self.y1_start,
+            "y2_start_mm": self.y2_start,
+            "z1_start_mm": self.z1_start,
+            "z2_start_mm": self.z2_start,
         }
         super().__init__(name)
 
