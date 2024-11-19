@@ -6,7 +6,7 @@ from ophyd_async.core import (
     StrictEnum,
     wait_for_value,
 )
-from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw, epics_signal_w
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
 
 
 class ZebraShutterState(StrictEnum):
@@ -25,7 +25,7 @@ class ZebraShutter(StandardReadable, Movable):
     Internally in the zebra there are two AND gates, one for manual control and one for
     automatic control. A soft input (aliased to control_mode) will switch between
     which of these AND gates to use. For the manual gate the shutter is then controlled
-    by a different soft input (aliased to _manual_position_setpoint). Both these AND
+    by a different soft input (aliased to manual_position_setpoint). Both these AND
     gates then feed into an OR gate, which then feeds to the shutter."""
 
     def __init__(self, prefix: str, name: str):

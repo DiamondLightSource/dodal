@@ -12,7 +12,7 @@ from ophyd_async.core import (
     StrictEnum,
     observe_value,
 )
-from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 # These constants refer to I03's Zebra. See https://github.com/DiamondLightSource/dodal/issues/772
 # Sources

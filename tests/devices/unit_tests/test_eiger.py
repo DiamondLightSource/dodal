@@ -4,18 +4,17 @@ from pathlib import Path
 from unittest.mock import ANY, MagicMock, Mock, call, create_autospec, patch
 
 import pytest
+from conftest import failed_status
 from ophyd.sim import NullStatus, make_fake_device
 from ophyd.status import Status
 from ophyd.utils import UnknownStatusFailure
 
 from dodal.devices.detector import DetectorParams, TriggerMode
 from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
-from dodal.devices.eiger import EigerDetector
+from dodal.devices.eiger import AVAILABLE_TIMEOUTS, EigerDetector
 from dodal.devices.status import await_value
 from dodal.devices.util.epics_util import run_functions_without_blocking
 from dodal.log import LOGGER
-
-from ...conftest import failed_status
 
 TEST_DETECTOR_SIZE_CONSTANTS = EIGER2_X_16M_SIZE
 
@@ -287,7 +286,7 @@ def test_change_roi_mode_sets_cam_roi_mode_correctly(
     fake_eiger.cam.roi_mode.set = mock_cam_roi_mode_set
     fake_eiger.change_roi_mode(roi_mode)
     mock_cam_roi_mode_set.assert_called_once_with(
-        expected_cam_roi_mode_call, timeout=fake_eiger.GENERAL_STATUS_TIMEOUT
+        expected_cam_roi_mode_call, timeout=fake_eiger.timeouts.general_status_timeout
     )
 
 
@@ -552,7 +551,7 @@ def test_given_in_free_run_mode_and_not_all_frames_collected_in_time_when_unstag
     fake_eiger.odin.check_and_wait_for_odin_state = MagicMock(return_value=True)
 
     fake_eiger.detector_params.trigger_mode = TriggerMode.FREE_RUN
-    fake_eiger.ALL_FRAMES_TIMEOUT = 0.1
+    fake_eiger.timeouts.all_frames_timeout = 0.1
     with pytest.raises(TimeoutError):
         fake_eiger.unstage()
 
@@ -732,3 +731,12 @@ def test_when_eiger_is_stopped_then_dev_shm_disabled(fake_eiger: EigerDetector):
     fake_eiger.stop()
 
     assert fake_eiger.odin.fan.dev_shm_enable.get() == 0
+
+
+def test_for_other_beamlines_i03_used_as_default(params: DetectorParams):
+    FakeEigerDetector: EigerDetector = make_fake_device(EigerDetector)
+    fake_eiger: EigerDetector = FakeEigerDetector.with_params(
+        params=params, beamline="ixx"
+    )
+    assert fake_eiger.beamline == "ixx"
+    assert fake_eiger.timeouts == AVAILABLE_TIMEOUTS["i03"]

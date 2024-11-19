@@ -10,14 +10,20 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import numbered_slits
+from dodal.common.crystal_metadata import (
+    MaterialsEnum,
+    make_crystal_metadata_from_material,
+)
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.focusing_mirror import FocusingMirror
-from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
+from dodal.devices.i22.dcm import DoubleCrystalMonochromator
 from dodal.devices.i22.fswitch import FSwitch
 from dodal.devices.linkam3 import Linkam3
+from dodal.devices.pressure_jump_cell import PressureJumpCell
 from dodal.devices.slits import Slits
 from dodal.devices.tetramm import TetrammDetector
 from dodal.devices.undulator import Undulator
+from dodal.devices.watsonmarlow323_pump import WatsonMarlow323Pump
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
 
@@ -227,17 +233,11 @@ def dcm(
         fake_with_ophyd_sim,
         bl_prefix=False,
         temperature_prefix=f"{BeamlinePrefix(BL).beamline_prefix}-DI-DCM-01:",
-        crystal_1_metadata=CrystalMetadata(
-            usage="Bragg",
-            type="silicon",
-            reflection=(1, 1, 1),
-            d_spacing=(3.13475, "nm"),
+        crystal_1_metadata=make_crystal_metadata_from_material(
+            MaterialsEnum.Si, (1, 1, 1)
         ),
-        crystal_2_metadata=CrystalMetadata(
-            usage="Bragg",
-            type="silicon",
-            reflection=(1, 1, 1),
-            d_spacing=(3.13475, "nm"),
+        crystal_2_metadata=make_crystal_metadata_from_material(
+            MaterialsEnum.Si, (1, 1, 1)
         ),
     )
 
@@ -313,7 +313,34 @@ def linkam(
     return device_instantiation(
         Linkam3,
         "linkam",
-        "-EA-LINKM-02:",
+        f"{BeamlinePrefix(BL).insertion_prefix}-EA-LINKM-02:",
         wait_for_connection,
         fake_with_ophyd_sim,
+    )
+
+
+def ppump(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = True
+) -> WatsonMarlow323Pump:
+    """Peristaltic Pump"""
+    return device_instantiation(
+        WatsonMarlow323Pump,
+        "ppump",
+        "-EA-PUMP-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+def high_pressure_xray_cell(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> PressureJumpCell:
+    return device_instantiation(
+        PressureJumpCell,
+        "high_pressure_xray_cell",
+        f"{BeamlinePrefix(BL).insertion_prefix}-EA",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        cell_prefix="-HPXC-01:",
+        adc_prefix="-ADC",
     )

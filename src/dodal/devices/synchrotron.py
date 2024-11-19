@@ -1,12 +1,12 @@
 from enum import Enum
 
 from ophyd_async.core import (
-    ConfigSignal,
     StandardReadable,
+    StandardReadableFormat,
     StrictEnum,
     soft_signal_r_and_setter,
 )
-from ophyd_async.epics.signal import epics_signal_r
+from ophyd_async.epics.core import epics_signal_r
 
 
 class Prefix(str, Enum):
@@ -49,7 +49,7 @@ class Synchrotron(StandardReadable):
             self.current = epics_signal_r(float, signal_prefix + Suffix.SIGNAL)
             self.energy = epics_signal_r(float, status_prefix + Suffix.BEAM_ENERGY)
 
-        with self.add_children_as_readables(ConfigSignal):
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.probe, _ = soft_signal_r_and_setter(str, initial_value="x-ray")
             self.type, _ = soft_signal_r_and_setter(
                 str, initial_value="Synchrotron X-ray Source"

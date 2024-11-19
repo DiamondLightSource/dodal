@@ -8,9 +8,9 @@ import numpy as np
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
-    HintedSignal,
     Reference,
     StandardReadable,
+    StandardReadableFormat,
     soft_signal_r_and_setter,
     soft_signal_rw,
 )
@@ -119,7 +119,7 @@ class I10Apple2(Apple2):
             name=name,
         )
         with self.add_children_as_readables():
-            self.id_jaw_phase = id_jaw_phase
+            self.id_jaw_phase = Reference(id_jaw_phase)
 
     @AsyncStatus.wrap
     async def set(self, value: SupportsFloat) -> None:
@@ -148,8 +148,8 @@ class I10Apple2(Apple2):
         LOGGER.info(f"Setting polarisation to {self.pol}, with {id_set_val}")
         await self._set(value=id_set_val, energy=value)
         if self.pol != "la":
-            await self.id_jaw_phase.set(0)
-            await self.id_jaw_phase.set_move.set(1)
+            await self.id_jaw_phase().set(0)
+            await self.id_jaw_phase().set_move.set(1)
 
     def update_lookuptable(self):
         """
@@ -199,7 +199,7 @@ class I10Apple2PGM(StandardReadable, Movable):
         super().__init__(name=name)
         self.id_ref = Reference(id)
         self.pgm_ref = Reference(pgm)
-        with self.add_children_as_readables(HintedSignal):
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.energy_offset = soft_signal_rw(float, initial_value=0)
 
     @AsyncStatus.wrap
@@ -278,7 +278,7 @@ class LinearArbitraryAngle(StandardReadable, Movable):
         self.jaw_phase_from_angle = np.poly1d(jaw_phase_poly_param)
         self.angle_threshold_deg = angle_threshold_deg
         self.jaw_phase_limit = jaw_phase_limit
-        with self.add_children_as_readables(HintedSignal):
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.angle, self._angle_set = soft_signal_r_and_setter(
                 float, initial_value=None
             )
@@ -299,7 +299,7 @@ class LinearArbitraryAngle(StandardReadable, Movable):
                 f"jaw_phase position for angle ({value}) is outside permitted range"
                 f" [-{self.jaw_phase_limit}, {self.jaw_phase_limit}]"
             )
-        await self.id_ref().id_jaw_phase.set(jaw_phase)
+        await self.id_ref().id_jaw_phase().set(jaw_phase)
         self._angle_set(value)
 
 

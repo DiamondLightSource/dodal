@@ -1,6 +1,13 @@
-from ophyd_async.core import StandardReadable
+import numpy as np
+from ophyd_async.core import Array1D, StandardReadable, soft_signal_r_and_setter
+from ophyd_async.epics.core import epics_signal_r
 from ophyd_async.epics.motor import Motor
-from ophyd_async.epics.signal import epics_signal_r
+
+from dodal.common.crystal_metadata import (
+    CrystalMetadata,
+    MaterialsEnum,
+    make_crystal_metadata_from_material,
+)
 
 
 class DCM(StandardReadable):
@@ -17,7 +24,11 @@ class DCM(StandardReadable):
         self,
         prefix: str,
         name: str = "",
+        crystal_metadata: CrystalMetadata | None = None,
     ) -> None:
+        cm = crystal_metadata or make_crystal_metadata_from_material(
+            MaterialsEnum.Si, (1, 1, 1)
+        )
         with self.add_children_as_readables():
             self.bragg_in_degrees = Motor(prefix + "BRAGG")
             self.roll_in_mrad = Motor(prefix + "ROLL")
@@ -36,4 +47,16 @@ class DCM(StandardReadable):
             self.perp_temp = epics_signal_r(float, prefix + "TEMP6")
             self.perp_sub_assembly_temp = epics_signal_r(float, prefix + "TEMP7")
 
+            self.crystal_metadata_usage, _ = soft_signal_r_and_setter(
+                str, initial_value=cm.usage
+            )
+            self.crystal_metadata_type, _ = soft_signal_r_and_setter(
+                str, initial_value=cm.type
+            )
+            reflection_array = np.array(cm.reflection)
+            self.crystal_metadata_reflection, _ = soft_signal_r_and_setter(
+                Array1D[np.uint64],
+                initial_value=reflection_array,
+            )
+            self.crystal_metadata_d_spacing = epics_signal_r(float, "DSPACING:RBV")
         super().__init__(name)

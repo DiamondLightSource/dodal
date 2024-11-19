@@ -11,7 +11,7 @@ from dodal.devices.zocalo import (
 )
 from dodal.devices.zocalo.zocalo_interaction import ZocaloStartInfo
 
-SIM_ZOCALO_ENV = "dev_artemis"
+SIM_ZOCALO_ENV = "dev_bluesky"
 
 EXPECTED_DCID = 100
 EXPECTED_FILENAME = "test/file"

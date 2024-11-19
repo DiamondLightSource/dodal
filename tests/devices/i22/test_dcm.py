@@ -12,27 +12,23 @@ from ophyd_async.core import (
     set_mock_value,
 )
 
-from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
+from dodal.common.crystal_metadata import (
+    MaterialsEnum,
+    make_crystal_metadata_from_material,
+)
+from dodal.devices.i22.dcm import DoubleCrystalMonochromator
 
 
 @pytest.fixture
 async def dcm() -> DoubleCrystalMonochromator:
+    metadata_1 = make_crystal_metadata_from_material(MaterialsEnum.Si, (1, 1, 1))
+    metadata_2 = make_crystal_metadata_from_material(MaterialsEnum.Si, (1, 1, 1))
     async with DeviceCollector(mock=True):
         dcm = DoubleCrystalMonochromator(
             prefix="FOO-MO",
             temperature_prefix="FOO-DI",
-            crystal_1_metadata=CrystalMetadata(
-                usage="Bragg",
-                type="silicon",
-                reflection=(1, 1, 1),
-                d_spacing=(3.13475, "mm"),
-            ),
-            crystal_2_metadata=CrystalMetadata(
-                usage="Bragg",
-                type="silicon",
-                reflection=(1, 1, 1),
-                d_spacing=(3.13475, "mm"),
-            ),
+            crystal_1_metadata=metadata_1,
+            crystal_2_metadata=metadata_2,
         )
 
     return dcm
@@ -51,29 +47,6 @@ def test_count_dcm(
         event=1,
         stop=1,
     )
-
-
-async def test_crystal_metadata_not_propagated_when_not_supplied():
-    async with DeviceCollector(mock=True):
-        dcm = DoubleCrystalMonochromator(
-            prefix="FOO-MO",
-            temperature_prefix="FOO-DI",
-            crystal_1_metadata=None,
-            crystal_2_metadata=None,
-        )
-
-    configuration = await dcm.read_configuration()
-    expected_absent_keys = {
-        "crystal-1-usage",
-        "crystal-1-type",
-        "crystal-1-reflection",
-        "crystal-1-d_spacing",
-        "crystal-2-usage",
-        "crystal-2-type",
-        "crystal-2-reflection",
-        "crystal-2-d_spacing",
-    }
-    assert expected_absent_keys.isdisjoint(configuration)
 
 
 @pytest.mark.parametrize(
@@ -250,7 +223,7 @@ async def test_configuration(dcm: DoubleCrystalMonochromator):
                 "alarm_severity": ANY,
             },
             "dcm-crystal_2_d_spacing": {
-                "value": 3.13475,
+                "value": 0.31356,
                 "timestamp": ANY,
                 "alarm_severity": ANY,
             },
@@ -275,7 +248,7 @@ async def test_configuration(dcm: DoubleCrystalMonochromator):
                 "alarm_severity": ANY,
             },
             "dcm-crystal_1_d_spacing": {
-                "value": 3.13475,
+                "value": 0.31356,
                 "timestamp": ANY,
                 "alarm_severity": ANY,
             },
