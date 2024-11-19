@@ -551,7 +551,7 @@ def test_given_in_free_run_mode_and_not_all_frames_collected_in_time_when_unstag
     fake_eiger.odin.check_and_wait_for_odin_state = MagicMock(return_value=True)
 
     fake_eiger.detector_params.trigger_mode = TriggerMode.FREE_RUN
-    fake_eiger.ALL_FRAMES_TIMEOUT = 0.1
+    fake_eiger.timeouts.all_frames_timeout = 0.1
     with pytest.raises(TimeoutError):
         fake_eiger.unstage()
 
