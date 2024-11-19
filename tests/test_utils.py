@@ -220,6 +220,13 @@ def test_get_run_number_uses_prefix(mock_list_dir: MagicMock):
     assert get_run_number("dir", "qux") == 1
 
 
+OPHYD_DEVICE_A = OphydV1Device(prefix="FOO", name="OPHYD_DEVICE_A")
+OPHYD_DEVICE_B = OphydV1Device(prefix="BAR", name="OPHYD_DEVICE_B")
+
+OPHYD_ASYNC_DEVICE_A = OphydV2Device(name="OPHYD_ASYNC_DEVICE_A")
+OPHYD_ASYNC_DEVICE_B = OphydV2Device(name="OPHYD_ASYNC_DEVICE_B")
+
+
 def _filtering_test_cases() -> (
     Iterable[
         tuple[
@@ -229,58 +236,52 @@ def _filtering_test_cases() -> (
         ]
     ]
 ):
-    ophyd_device_a = OphydV1Device(prefix="FOO", name="ophyd_device_a")
-    ophyd_device_b = OphydV1Device(prefix="BAR", name="ophyd_device_b")
-
-    ophyd_async_device_a = OphydV2Device(name="ophyd_async_device_a")
-    ophyd_async_device_b = OphydV2Device(name="ophyd_async_device_b")
-
     yield {}, {}, {}
     yield (
-        {"ophyd_device_a": ophyd_device_a},
-        {"ophyd_device_a": ophyd_device_a},
+        {"oa": OPHYD_DEVICE_A},
+        {"oa": OPHYD_DEVICE_A},
         {},
     )
     yield (
-        {"ophyd_async_device_a": ophyd_async_device_a},
+        {"aa": OPHYD_ASYNC_DEVICE_A},
         {},
-        {"ophyd_async_device_a": ophyd_async_device_a},
+        {"aa": OPHYD_ASYNC_DEVICE_A},
     )
     yield (
-        {"ophyd_device_a": ophyd_device_a, "ophyd_device_b": ophyd_device_b},
-        {"ophyd_device_a": ophyd_device_a, "ophyd_device_b": ophyd_device_b},
+        {"oa": OPHYD_DEVICE_A, "ob": OPHYD_DEVICE_B},
+        {"oa": OPHYD_DEVICE_A, "ob": OPHYD_DEVICE_B},
         {},
     )
     yield (
         {
-            "ophyd_async_device_a": ophyd_async_device_a,
-            "ophyd_async_device_b": ophyd_async_device_b,
+            "aa": OPHYD_ASYNC_DEVICE_A,
+            "ab": OPHYD_ASYNC_DEVICE_B,
         },
         {},
         {
-            "ophyd_async_device_a": ophyd_async_device_a,
-            "ophyd_async_device_b": ophyd_async_device_b,
+            "aa": OPHYD_ASYNC_DEVICE_A,
+            "ab": OPHYD_ASYNC_DEVICE_B,
         },
     )
     yield (
         {
-            "ophyd_device_a": ophyd_device_a,
-            "ophyd_async_device_a": ophyd_async_device_a,
+            "oa": OPHYD_DEVICE_A,
+            "aa": OPHYD_ASYNC_DEVICE_A,
         },
-        {"ophyd_device_a": ophyd_device_a},
-        {"ophyd_async_device_a": ophyd_async_device_a},
+        {"oa": OPHYD_DEVICE_A},
+        {"aa": OPHYD_ASYNC_DEVICE_A},
     )
     yield (
         {
-            "ophyd_device_a": ophyd_device_a,
-            "ophyd_async_device_a": ophyd_async_device_a,
-            "ophyd_device_b": ophyd_device_b,
-            "ophyd_async_device_b": ophyd_async_device_b,
+            "oa": OPHYD_DEVICE_A,
+            "aa": OPHYD_ASYNC_DEVICE_A,
+            "ob": OPHYD_DEVICE_B,
+            "ab": OPHYD_ASYNC_DEVICE_B,
         },
-        {"ophyd_device_a": ophyd_device_a, "ophyd_device_b": ophyd_device_b},
+        {"oa": OPHYD_DEVICE_A, "ob": OPHYD_DEVICE_B},
         {
-            "ophyd_async_device_a": ophyd_async_device_a,
-            "ophyd_async_device_b": ophyd_async_device_b,
+            "aa": OPHYD_ASYNC_DEVICE_A,
+            "ab": OPHYD_ASYNC_DEVICE_B,
         },
     )
 
@@ -297,3 +298,14 @@ def test_filter_ophyd_devices_filters_ophyd_devices(
     ophyd_devices, ophyd_async_devices = filter_ophyd_devices(all_devices)
     assert ophyd_devices == expected_ophyd_devices
     assert ophyd_async_devices == expected_ophyd_async_devices
+
+
+def test_filter_ophyd_devices_raises_for_extra_types():
+    with pytest.raises(ValueError):
+        ophyd_devices, ophyd_async_devices = filter_ophyd_devices(
+            {
+                "oa": OphydV1Device(prefix="", name="oa"),
+                "aa": OphydV2Device(name="aa"),
+                "ab": 3,
+            }
+        )
