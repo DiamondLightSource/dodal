@@ -21,10 +21,17 @@ def test_device_creation(RE, module_and_devices_for_beamline):
     Ensures that for every beamline all device factories are using valid args
     and creating types that conform to Bluesky protocols.
     """
-    _, _, exceptions = module_and_devices_for_beamline
+    _, devices, exceptions = module_and_devices_for_beamline
     if len(exceptions) > 0:
         raise NotConnected(exceptions)
-    # Pass test if there were no exceptions
+    devices_not_following_bluesky_protocols = [
+        name
+        for name, device in devices.items()
+        if not follows_bluesky_protocols(device)
+    ]
+    assert (
+        len(devices_not_following_bluesky_protocols) == 0
+    ), f"{devices_not_following_bluesky_protocols} do not follow blueesky protocols"
 
 
 @pytest.mark.parametrize(
