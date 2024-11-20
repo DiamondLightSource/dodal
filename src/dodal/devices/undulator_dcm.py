@@ -6,16 +6,10 @@ from ophyd_async.core import AsyncStatus, StandardReadable
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 
 from .dcm import DCM
-from .undulator import Undulator, UndulatorGapAccess
+from .undulator import Undulator
 
 ENERGY_TIMEOUT_S: float = 30.0
 
-# Enable to allow testing when the beamline is down, do not change in production!
-TEST_MODE = False
-
-
-class AccessError(Exception):
-    pass
 
 
 class UndulatorDCM(StandardReadable, Movable):
@@ -61,17 +55,8 @@ class UndulatorDCM(StandardReadable, Movable):
 
     @AsyncStatus.wrap
     async def set(self, value: float):
+        await self.undulator.raise_if_not_enabled()
         await asyncio.gather(
-            self._set_dcm_energy(value),
+            self.dcm.energy_in_kev.set(value,timeout=ENERGY_TIMEOUT_S),
             self.undulator.set(value),
-        )
-
-    async def _set_dcm_energy(self, energy_kev: float) -> None:
-        access_level = await self.undulator.gap_access.get_value()
-        if access_level is UndulatorGapAccess.DISABLED and not TEST_MODE:
-            raise AccessError("Undulator gap access is disabled. Contact Control Room")
-
-        await self.dcm.energy_in_kev.set(
-            energy_kev,
-            timeout=ENERGY_TIMEOUT_S,
         )
