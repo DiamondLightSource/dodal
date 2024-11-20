@@ -1,4 +1,5 @@
 import os
+from collections.abc import Iterable, Mapping
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -7,8 +8,12 @@ from ophyd import EpicsMotor
 
 from dodal.beamlines import i03, i23
 from dodal.utils import (
+    AnyDevice,
+    OphydV1Device,
+    OphydV2Device,
     _find_next_run_number_from_files,
     collect_factories,
+    filter_ophyd_devices,
     get_beamline_based_on_environment_variable,
     get_hostname,
     get_run_number,
@@ -213,3 +218,94 @@ def test_get_run_number_uses_prefix(mock_list_dir: MagicMock):
     assert get_run_number("dir", "bar") == 7
     assert get_run_number("dir", "baz") == 29
     assert get_run_number("dir", "qux") == 1
+
+
+OPHYD_DEVICE_A = OphydV1Device(prefix="FOO", name="OPHYD_DEVICE_A")
+OPHYD_DEVICE_B = OphydV1Device(prefix="BAR", name="OPHYD_DEVICE_B")
+
+OPHYD_ASYNC_DEVICE_A = OphydV2Device(name="OPHYD_ASYNC_DEVICE_A")
+OPHYD_ASYNC_DEVICE_B = OphydV2Device(name="OPHYD_ASYNC_DEVICE_B")
+
+
+def _filtering_test_cases() -> (
+    Iterable[
+        tuple[
+            Mapping[str, AnyDevice],
+            Mapping[str, OphydV1Device],
+            Mapping[str, OphydV2Device],
+        ]
+    ]
+):
+    yield {}, {}, {}
+    yield (
+        {"oa": OPHYD_DEVICE_A},
+        {"oa": OPHYD_DEVICE_A},
+        {},
+    )
+    yield (
+        {"aa": OPHYD_ASYNC_DEVICE_A},
+        {},
+        {"aa": OPHYD_ASYNC_DEVICE_A},
+    )
+    yield (
+        {"oa": OPHYD_DEVICE_A, "ob": OPHYD_DEVICE_B},
+        {"oa": OPHYD_DEVICE_A, "ob": OPHYD_DEVICE_B},
+        {},
+    )
+    yield (
+        {
+            "aa": OPHYD_ASYNC_DEVICE_A,
+            "ab": OPHYD_ASYNC_DEVICE_B,
+        },
+        {},
+        {
+            "aa": OPHYD_ASYNC_DEVICE_A,
+            "ab": OPHYD_ASYNC_DEVICE_B,
+        },
+    )
+    yield (
+        {
+            "oa": OPHYD_DEVICE_A,
+            "aa": OPHYD_ASYNC_DEVICE_A,
+        },
+        {"oa": OPHYD_DEVICE_A},
+        {"aa": OPHYD_ASYNC_DEVICE_A},
+    )
+    yield (
+        {
+            "oa": OPHYD_DEVICE_A,
+            "aa": OPHYD_ASYNC_DEVICE_A,
+            "ob": OPHYD_DEVICE_B,
+            "ab": OPHYD_ASYNC_DEVICE_B,
+        },
+        {"oa": OPHYD_DEVICE_A, "ob": OPHYD_DEVICE_B},
+        {
+            "aa": OPHYD_ASYNC_DEVICE_A,
+            "ab": OPHYD_ASYNC_DEVICE_B,
+        },
+    )
+
+
+@pytest.mark.parametrize(
+    "all_devices,expected_ophyd_devices,expected_ophyd_async_devices",
+    list(_filtering_test_cases()),
+)
+def test_filter_ophyd_devices_filters_ophyd_devices(
+    all_devices: Mapping[str, AnyDevice],
+    expected_ophyd_devices: Mapping[str, OphydV1Device],
+    expected_ophyd_async_devices: Mapping[str, OphydV2Device],
+):
+    ophyd_devices, ophyd_async_devices = filter_ophyd_devices(all_devices)
+    assert ophyd_devices == expected_ophyd_devices
+    assert ophyd_async_devices == expected_ophyd_async_devices
+
+
+def test_filter_ophyd_devices_raises_for_extra_types():
+    with pytest.raises(ValueError):
+        ophyd_devices, ophyd_async_devices = filter_ophyd_devices(
+            {
+                "oa": OphydV1Device(prefix="", name="oa"),
+                "aa": OphydV2Device(name="aa"),
+                "ab": 3,  # type: ignore
+            }
+        )
