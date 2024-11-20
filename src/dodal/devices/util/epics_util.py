@@ -7,7 +7,7 @@ from ophyd import Device as OphydDevice
 from ophyd.status import Status, StatusBase
 from ophyd_async.core import AsyncStatus, wait_for_value
 from ophyd_async.core import Device as OphydAsyncDevice
-from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.log import LOGGER
 

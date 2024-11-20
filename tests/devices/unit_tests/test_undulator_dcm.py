@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pytest
+from conftest import MOCK_DAQ_CONFIG_PATH
 from ophyd_async.core import (
     AsyncStatus,
     DeviceCollector,
@@ -18,8 +19,6 @@ from dodal.devices.undulator_dcm import (
     UndulatorDCM,
 )
 from dodal.log import LOGGER
-
-from ...conftest import MOCK_DAQ_CONFIG_PATH
 
 ID_GAP_LOOKUP_TABLE_PATH: str = (
     "./tests/devices/unit_tests/test_beamline_undulator_to_gap_lookup_table.txt"

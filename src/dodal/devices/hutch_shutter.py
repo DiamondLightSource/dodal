@@ -6,7 +6,7 @@ from ophyd_async.core import (
     StrictEnum,
     wait_for_value,
 )
-from ophyd_async.epics.signal import epics_signal_r, epics_signal_w
+from ophyd_async.epics.core import epics_signal_r, epics_signal_w
 
 HUTCH_SAFE_FOR_OPERATIONS = 0  # Hutch is locked and can't be entered
 

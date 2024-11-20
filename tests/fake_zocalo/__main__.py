@@ -12,7 +12,7 @@ from ispyb.sqlalchemy import DataCollection
 from pika.adapters.blocking_connection import BlockingChannel
 from pika.spec import BasicProperties
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 
 TEST_RESULT_LARGE = [
     {
@@ -56,22 +56,29 @@ def load_configuration_file(filename):
     return conf
 
 
-def get_dcgid_and_prefix(dcid: int, Session) -> tuple[int, str]:
+def get_dcgid_and_prefix(dcid: int, session_maker: sessionmaker) -> tuple[int, str]:
     try:
-        with Session() as session:
+        with session_maker() as session:
+            assert isinstance(session, Session)
             query = (
-                session.query(DataCollection)
+                session.query(
+                    DataCollection.dataCollectionId, DataCollection.imagePrefix
+                )
                 .filter(DataCollection.dataCollectionId == dcid)
                 .first()
             )
-            dcgid: int = query.dataCollectionGroupId
-            prefix: str = query.imagePrefix
+            assert (
+                query is not None
+            ), f"Failed to find dcid {dcid} which matches any in dev ispyb"
+            dcgid, prefix = query
+
     except Exception as e:
         print("Exception occured when reading from ISPyB database:\n")
         print(e)
         print("This is probably because you are using mock dcid/dcgid values...")
-        dcgid = 4
+        dcgid = 1000
         prefix = ""
+        print(f"Using dcgid = {dcgid} and leaving the prefix empty as defaults")
     return dcgid, prefix
 
 
@@ -97,7 +104,7 @@ def make_result(payload):
 def main() -> None:
     url = ispyb.sqlalchemy.url(DEV_ISPYB_CONFIG)
     engine = create_engine(url, connect_args={"use_pure": True})
-    Session = sessionmaker(engine)
+    session_maker = sessionmaker(engine)
 
     config = load_configuration_file(
         os.path.expanduser("~/.zocalo/rabbitmq-credentials.yml")
@@ -113,6 +120,23 @@ def main() -> None:
         [*TEST_RESULT_LARGE, *TEST_RESULT_SMALL]
     )
 
+    conn = pika.BlockingConnection(params)
+    channel = conn.channel()
+
+    # Create the results exchange if it doesn't already exist
+    channel.exchange_declare(exchange="results", exchange_type="topic")
+
+    # Create the xrc.i03 queue if it doesn't already exist
+    # Arguments match queue created by 'module load rabbitmq/dev'
+    channel.queue_declare(
+        queue="xrc.i03",
+        durable=True,
+        arguments={"x-single-active-consumer": False, "x-queue-type": "quorum"},
+    )
+
+    # Route messages from the 'results' exchange to the 'xrc.i03' channel
+    channel.queue_bind(exchange="results", queue="xrc.i03", routing_key="xrc.i03")
+
     def on_request(ch: BlockingChannel, method, props, body):
         print(
             f"Received message: \n properties: \n\n {method} \n\n {props} \n\n{body}\n"
@@ -127,8 +151,7 @@ def main() -> None:
 
             dcid = message.get("parameters").get("ispyb_dcid")
             print(f"Getting info for dcid {dcid} from ispyb:")
-            dcgid, prefix = get_dcgid_and_prefix(dcid, Session)
-            print(f"Dcgid {dcgid} and prefix {prefix}")
+            dcgid, prefix = get_dcgid_and_prefix(dcid, session_maker)
 
             time.sleep(1)
             print('Sending "results"...')
@@ -150,8 +173,6 @@ def main() -> None:
             print("Finished.\n")
         ch.basic_ack(method.delivery_tag, False)
 
-    conn = pika.BlockingConnection(params)
-    channel = conn.channel()
     channel.basic_consume(queue="processing_recipe", on_message_callback=on_request)
     print("Listening for zocalo requests")
     try:

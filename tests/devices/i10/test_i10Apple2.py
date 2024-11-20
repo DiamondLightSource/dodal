@@ -164,10 +164,10 @@ async def test_I10Apple2_determine_pol(
     btm_inner_phase: float,
     btm_outer_phase: float,
 ):
-    set_mock_value(mock_id.phase.top_inner.user_setpoint_readback, top_inner_phase)
-    set_mock_value(mock_id.phase.top_outer.user_setpoint_readback, top_outer_phase)
-    set_mock_value(mock_id.phase.btm_inner.user_setpoint_readback, btm_inner_phase)
-    set_mock_value(mock_id.phase.btm_outer.user_setpoint_readback, btm_outer_phase)
+    set_mock_value(mock_id.phase().top_inner.user_setpoint_readback, top_inner_phase)
+    set_mock_value(mock_id.phase().top_outer.user_setpoint_readback, top_outer_phase)
+    set_mock_value(mock_id.phase().btm_inner.user_setpoint_readback, btm_inner_phase)
+    set_mock_value(mock_id.phase().btm_outer.user_setpoint_readback, btm_outer_phase)
 
     if pol is None:
         with pytest.raises(ValueError):
@@ -234,7 +234,7 @@ async def test_fail_I10Apple2_set_lookup_gap_pol(mock_id: I10Apple2):
 
 
 async def test_fail_I10Apple2_set_undefined_pol(mock_id: I10Apple2):
-    set_mock_value(mock_id.gap.user_readback, 101)
+    set_mock_value(mock_id.gap().user_readback, 101)
     with pytest.raises(RuntimeError) as e:
         await mock_id.set(600)
     assert (
@@ -244,15 +244,15 @@ async def test_fail_I10Apple2_set_undefined_pol(mock_id: I10Apple2):
 
 
 async def test_fail_I10Apple2_set_id_not_ready(mock_id: I10Apple2):
-    set_mock_value(mock_id.gap.fault, 1)
+    set_mock_value(mock_id.gap().fault, 1)
     with pytest.raises(RuntimeError) as e:
         await mock_id.set(600)
-    assert str(e.value) == mock_id.gap.name + " is in fault state"
-    set_mock_value(mock_id.gap.fault, 0)
-    set_mock_value(mock_id.gap.gate, UndulatorGateStatus.open)
+    assert str(e.value) == mock_id.gap().name + " is in fault state"
+    set_mock_value(mock_id.gap().fault, 0)
+    set_mock_value(mock_id.gap().gate, UndulatorGateStatus.open)
     with pytest.raises(RuntimeError) as e:
         await mock_id.set(600)
-    assert str(e.value) == mock_id.gap.name + " is already in motion."
+    assert str(e.value) == mock_id.gap().name + " is already in motion."
 
 
 async def test_I10Apple2_RE_scan(mock_id: I10Apple2, RE: RunEngine):
@@ -341,23 +341,23 @@ async def test_I10Apple2_pol_set(
     else:
         await mock_id_pol.set(pol)
         assert mock_id_pol.id.pol == pol
-        top_inner = get_mock_put(mock_id_pol.id.phase.top_inner.user_setpoint)
+        top_inner = get_mock_put(mock_id_pol.id.phase().top_inner.user_setpoint)
         top_inner.assert_called_once()
         assert float(top_inner.call_args[0][0]) == pytest.approx(expect_top_inner, 0.01)
 
-        top_outer = get_mock_put(mock_id_pol.id.phase.top_outer.user_setpoint)
+        top_outer = get_mock_put(mock_id_pol.id.phase().top_outer.user_setpoint)
         top_outer.assert_called_once()
         assert float(top_outer.call_args[0][0]) == pytest.approx(expect_top_outer, 0.01)
 
-        btm_inner = get_mock_put(mock_id_pol.id.phase.btm_inner.user_setpoint)
+        btm_inner = get_mock_put(mock_id_pol.id.phase().btm_inner.user_setpoint)
         btm_inner.assert_called_once()
         assert float(btm_inner.call_args[0][0]) == pytest.approx(expect_btm_inner, 0.01)
 
-        btm_outer = get_mock_put(mock_id_pol.id.phase.btm_outer.user_setpoint)
+        btm_outer = get_mock_put(mock_id_pol.id.phase().btm_outer.user_setpoint)
         btm_outer.assert_called_once()
         assert float(btm_outer.call_args[0][0]) == pytest.approx(expect_btm_outer, 0.01)
 
-        gap = get_mock_put(mock_id_pol.id.gap.user_setpoint)
+        gap = get_mock_put(mock_id_pol.id.gap().user_setpoint)
         gap.assert_called_once()
         assert float(gap.call_args[0][0]) == pytest.approx(expect_gap, 0.05)
 
@@ -428,7 +428,7 @@ async def test_linear_arbitrary_RE_scan(
     assert_emitted(docs, start=1, descriptor=1, event=num_point, stop=1)
 
     jaw_phase = get_mock_put(
-        mock_linear_arbitrary_angle.id_ref().id_jaw_phase.jaw_phase.user_setpoint
+        mock_linear_arbitrary_angle.id_ref().id_jaw_phase().jaw_phase.user_setpoint
     )
 
     poly = poly1d(
