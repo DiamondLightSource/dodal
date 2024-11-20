@@ -41,10 +41,10 @@ class FocusMirrorsMode(StandardReadable):
 
         with self.add_children_as_readables():
             self.beam_size_x = create_hardware_backed_soft_signal(
-                int, self._get_beam_size_x
+                int, self._get_beam_size_x, units="um"
             )
             self.beam_size_y = create_hardware_backed_soft_signal(
-                int, self._get_beam_size_y
+                int, self._get_beam_size_y, units="um"
             )
 
         super().__init__(name)
