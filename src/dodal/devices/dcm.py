@@ -58,5 +58,5 @@ class DCM(StandardReadable):
                 Array1D[np.uint64],
                 initial_value=reflection_array,
             )
-            self.crystal_metadata_d_spacing = epics_signal_r(float, "DSPACING:RBV")
+            self.crystal_metadata_d_spacing = epics_signal_r(float, prefix + "DSPACING:RBV")
         super().__init__(name)
