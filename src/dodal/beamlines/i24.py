@@ -70,7 +70,6 @@ def backlight(
     )
 
 
-@skip_device(lambda: BL == "s24")
 def detector_motion(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> DetectorMotion:
@@ -151,7 +150,6 @@ def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
     )
 
 
-@skip_device(lambda: BL == "s24")
 def vgonio(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> VerticalGoniometer:
@@ -180,7 +178,6 @@ def zebra(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -
     )
 
 
-@skip_device(lambda: BL == "s24")
 def shutter(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> HutchShutter:
@@ -209,7 +206,6 @@ def focus_mirrors(
     )
 
 
-@skip_device(lambda: BL == "s24")
 def eiger_beam_center(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> DetectorBeamCenter:
@@ -223,7 +219,6 @@ def eiger_beam_center(
     )
 
 
-@skip_device(lambda: BL == "s24")
 def pilatus_beam_center(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> DetectorBeamCenter:
@@ -237,7 +232,6 @@ def pilatus_beam_center(
     )
 
 
-@skip_device(lambda: BL == "s24")
 def pilatus_metadata(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> PilatusMetadata:
