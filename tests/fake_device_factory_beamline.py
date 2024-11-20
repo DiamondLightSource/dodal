@@ -1,3 +1,5 @@
+from unittest.mock import AsyncMock, MagicMock
+
 from bluesky.protocols import Readable, Reading, SyncOrAsync
 from event_model.documents.event_descriptor import DataKey
 from ophyd_async.core import Device
@@ -22,3 +24,11 @@ def device_a() -> ReadableDevice:
 @device_factory(skip=lambda: True)
 def device_c() -> CryoStream:
     return CryoStream("FOO:")
+
+
+@device_factory(skip=True)
+def mock_device() -> ReadableDevice:
+    device = MagicMock()
+    device.name = "mock_device"
+    device.connect = AsyncMock()
+    return device  # type: ignore

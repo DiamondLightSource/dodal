@@ -128,7 +128,7 @@ class DeviceInitializationController(Generic[D]):
         mock: bool,
         skip: SkipType,
     ):
-        self._factory: Callable[[], D] = functools.lru_cache(factory)
+        self._factory: Callable[[], D] = functools.cache(factory)
         self._use_factory_name = use_factory_name
         self._timeout = timeout
         self._mock = mock
@@ -138,6 +138,14 @@ class DeviceInitializationController(Generic[D]):
     @property
     def skip(self) -> bool:
         return self._skip() if callable(self._skip) else self._skip
+
+    def cache_clear(self) -> None:
+        """Clears the controller's internal cached instance of the device, if present.
+        Noop if not."""
+
+        # Functools adds the cache_clear function via setattr so the type checker
+        # does not pick it up.
+        self._factory.cache_clear()  # type: ignore
 
     def __call__(
         self,
@@ -290,11 +298,28 @@ def invoke_factories(
         try:
             factory = factories[dependent_name]
             if isinstance(factory, DeviceInitializationController):
-                # replace with an arg
+                # For now we translate the old-style parameters that
+                # device_instantiation expects. Once device_instantiation is gone and
+                # replaced with DeviceInitializationController we can formalise the
+                # API of make_all_devices and make these parameters explicit.
                 # https://github.com/DiamondLightSource/dodal/issues/844
+                mock = kwargs.get(
+                    "mock",
+                    kwargs.get(
+                        "fake_with_ophyd_sim",
+                        False,
+                    ),
+                )
+                connect_immediately = kwargs.get(
+                    "connect_immediately",
+                    kwargs.get(
+                        "wait_for_connection",
+                        False,
+                    ),
+                )
                 devices[dependent_name] = factory(
-                    mock=kwargs.get("mock", False)
-                    or kwargs.get("fake_with_ophyd_sim", False)
+                    mock=mock,
+                    connect_immediately=connect_immediately,
                 )
             else:
                 devices[dependent_name] = factory(**params, **kwargs)

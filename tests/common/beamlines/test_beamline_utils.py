@@ -194,6 +194,14 @@ def test_device_cached(factory: DeviceInitializationController):
     assert mirror_1 is mirror_2
 
 
+def test_device_cache_can_be_cleared():
+    mirror_1 = dummy_mirror_as_device_factory()
+    dummy_mirror_as_device_factory.cache_clear()
+
+    mirror_2 = dummy_mirror_as_device_factory()
+    assert mirror_1 is not mirror_2
+
+
 def test_skip(RE):
     skip = True
 
