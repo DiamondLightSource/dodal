@@ -155,11 +155,13 @@ async def test_energy_set_only_complete_when_all_statuses_are_finished(
     release_undulator.set()
     await asyncio.wait_for(status, timeout=0.02)
 
-async def test_when_undulator_gap_is_disabled_setting_energy_errors_and_dcm_energy_is_not_set(fake_undulator_dcm: UndulatorDCM):
+
+async def test_when_undulator_gap_is_disabled_setting_energy_errors_and_dcm_energy_is_not_set(
+    fake_undulator_dcm: UndulatorDCM,
+):
     set_mock_value(fake_undulator_dcm.undulator.gap_access, UndulatorGapAccess.DISABLED)
 
     with pytest.raises(AccessError):
         await fake_undulator_dcm.set(5)
 
     get_mock_put(fake_undulator_dcm.dcm.energy_in_kev.user_setpoint).assert_not_called()
-

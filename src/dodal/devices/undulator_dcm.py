@@ -11,7 +11,6 @@ from .undulator import Undulator
 ENERGY_TIMEOUT_S: float = 30.0
 
 
-
 class UndulatorDCM(StandardReadable, Movable):
     """
     Composite device to handle changing beamline energies, wraps the Undulator and the
@@ -57,6 +56,6 @@ class UndulatorDCM(StandardReadable, Movable):
     async def set(self, value: float):
         await self.undulator.raise_if_not_enabled()
         await asyncio.gather(
-            self.dcm.energy_in_kev.set(value,timeout=ENERGY_TIMEOUT_S),
+            self.dcm.energy_in_kev.set(value, timeout=ENERGY_TIMEOUT_S),
             self.undulator.set(value),
         )
