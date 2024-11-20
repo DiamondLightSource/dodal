@@ -48,7 +48,7 @@ class ZoomController(StandardReadable):
 
     async def _get_allowed_zoom_levels(self) -> list:
         zoom_levels = await self.level.describe()
-        return zoom_levels["level"]["choices"]  # type: ignore
+        return zoom_levels[self.level.name]["choices"]  # type: ignore
 
     @AsyncStatus.wrap
     async def set(self, level_to_set: str):
