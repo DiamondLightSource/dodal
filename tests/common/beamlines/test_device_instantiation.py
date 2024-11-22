@@ -31,7 +31,7 @@ def test_device_creation(RE, module_and_devices_for_beamline):
     ]
     assert (
         len(devices_not_following_bluesky_protocols) == 0
-    ), f"{devices_not_following_bluesky_protocols} do not follow blueesky protocols"
+    ), f"{devices_not_following_bluesky_protocols} do not follow bluesky protocols"
 
 
 @pytest.mark.parametrize(
