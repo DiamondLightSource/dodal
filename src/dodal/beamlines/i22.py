@@ -121,7 +121,7 @@ def vfm() -> FocusingMirror:
 @device_factory()
 def hfm() -> FocusingMirror:
     return FocusingMirror(
-        prefix=f"{PREFIX.beamline_prefix}|-OP-KBM-01:HFM:",
+        prefix=f"{PREFIX.beamline_prefix}-OP-KBM-01:HFM:",
     )
 
 
@@ -240,9 +240,9 @@ def oav() -> AravisDetector:
     )
 
 
-@device_factory()
+@device_factory(skip=True)
 def linkam() -> Linkam3:
-    return Linkam3(prefix=f"{PREFIX.beamline_prefix}-EA-TEMPC-05")
+    return Linkam3(prefix=f"{PREFIX.beamline_prefix}-EA-TEMPC-05:")
 
 
 @device_factory()
