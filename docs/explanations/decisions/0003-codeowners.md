@@ -6,7 +6,7 @@ Accepted
 
 ## Context
 
-Dodal is a sprawling library that supports a large number of instruments. As it expands, the code quality is naturally likely to decrease due to bloat, duplication, lack of single product ownership and multitudes of stakeholders and use cases understood differently by different people. Members of individual teams are likely to review each other's code based on their own criteria and team pressures, without accounting for the overall quality of the library. We have seen these problems with GDA and wish to avoid a repeat.
+As dodal expands and covers an increasing number of beamlines it is important to maintain quality. So far we have seen good results from following bluesky's own standards: Encouraging high test coverage, readable code (including type annotations, where appropriate) and collective ownership, including via thorough reviews which appropriately balance velocity with technical debt management. We would like to make sure this developer culture is preserved as we expand.
 
 ## Decision
 
@@ -15,3 +15,5 @@ Have a team of approved reviewers in the DiamondLightSource Github organisation.
 ## Consequences
 
 PRs will not be mergable until an approved owner has reviewed them, approved individuals/teams will have to review/support onboarding of new individuals/teams for some time before they are approved for review. 
+
+Once a critical mass of Diamond staff are used to this way of working, this ADR may be obsolete and should be replaced with a more open review system.
