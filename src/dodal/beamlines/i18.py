@@ -104,13 +104,13 @@ def panda1(
     )
 
 
-def old_xspress3(
+def xspress3(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> Xspress3:
     return device_instantiation(
         Xspress3,
         prefix="-EA-XSP-02:",
-        name="Xspress3",
+        name="xspress3",
         num_channels=16,
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
@@ -127,32 +127,31 @@ def xspress3_odin(
     return device_instantiation(
         Xspress3,
         prefix="-EA-XSP-03:",
-        name="Xspress3",
+        name="xspress3_odin",
         num_channels=4,
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )
 
 
-crystal_1_metadata = CrystalMetadata(
-    usage="Bragg",
-    type="silicon",
-    reflection=(1, 1, 1),
-    d_spacing=(3.13475, "nm"),
-)
-
-crystal_2_metadata = CrystalMetadata(
-    usage="Bragg",
-    type="silicon",
-    reflection=(1, 1, 1),
-    d_spacing=(3.13475, "nm"),
-)
-
-
 def dcm(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
 ) -> DoubleCrystalMonochromator:
+    crystal_1_metadata = CrystalMetadata(
+        usage="Bragg",
+        type="silicon",
+        reflection=(1, 1, 1),
+        d_spacing=(3.13475, "nm"),
+    )
+
+    crystal_2_metadata = CrystalMetadata(
+        usage="Bragg",
+        type="silicon",
+        reflection=(1, 1, 1),
+        d_spacing=(3.13475, "nm"),
+    )
+
     return device_instantiation(
         DoubleCrystalMonochromator,
         "dcm",
@@ -225,10 +224,11 @@ def hfm(
     )
 
 
-def diode(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> Diode:
+def d7diode(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Diode:
     return device_instantiation(
         Diode,
-        "diodad7bdiode",
         "-DI-PHDGN-07:",
         wait_for_connection,
         fake_with_ophyd_sim,
