@@ -33,7 +33,7 @@ class Linkam3(StandardReadable):
     tolerance: float = 0.5
     settle_time: int = 0
 
-    def __init__(self, prefix: str, name: str):
+    def __init__(self, prefix: str, name: str = ""):
         self.temp = epics_signal_r(float, prefix + "TEMP:")
         self.dsc = epics_signal_r(float, prefix + "DSC:")
         self.start_heat = epics_signal_rw(bool, prefix + "STARTHEAT:")
