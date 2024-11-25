@@ -9,6 +9,7 @@ from ophyd_async.core import AsyncStatus, DeviceCollector, get_mock_put, set_moc
 from dodal.devices.dcm import DCM
 from dodal.devices.undulator import AccessError, Undulator, UndulatorGapAccess
 from dodal.devices.undulator_dcm import UndulatorDCM
+from dodal.devices.util.test_utils import patch_motor
 from dodal.log import LOGGER
 
 ID_GAP_LOOKUP_TABLE_PATH: str = (
@@ -43,6 +44,7 @@ async def fake_undulator_dcm() -> UndulatorDCM:
             daq_configuration_path=MOCK_DAQ_CONFIG_PATH,
             name="undulator_dcm",
         )
+    patch_motor(dcm.offset_in_mm)
     return undulator_dcm
 
 

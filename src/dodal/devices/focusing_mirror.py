@@ -1,3 +1,5 @@
+from typing import TypedDict
+
 from ophyd_async.core import (
     AsyncStatus,
     Device,
@@ -34,6 +36,12 @@ class MirrorStripe(StrictEnum):
     RHODIUM = "Rhodium"
     BARE = "Bare"
     PLATINUM = "Platinum"
+
+
+class MirrorStripeConfiguration(TypedDict):
+    stripe: MirrorStripe
+    yaw_mrad: float
+    lat_mm: float
 
 
 class MirrorVoltageDemand(StrictEnum):
@@ -173,10 +181,10 @@ class FocusingMirrorWithStripes(FocusingMirror):
 
         super().__init__(prefix, name, *args, **kwargs)
 
-    def energy_to_stripe(self, energy_kev) -> tuple[MirrorStripe, float, float]:
-        """Return the stripe, yaw angle and lateral position"""
+    def energy_to_stripe(self, energy_kev) -> MirrorStripeConfiguration:
+        """Return the stripe, yaw angle and lateral position for the specified energy"""
         # In future, this should be configurable per-mirror
         if energy_kev < 7:
-            return MirrorStripe.BARE, 6.2, 0.0
+            return {"stripe": MirrorStripe.BARE, "yaw_mrad": 6.2, "lat_mm": 0.0}
         else:
-            return MirrorStripe.RHODIUM, 0.0, 10.0
+            return {"stripe": MirrorStripe.RHODIUM, "yaw_mrad": 0.0, "lat_mm": 10.0}
