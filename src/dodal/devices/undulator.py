@@ -108,10 +108,13 @@ class Undulator(StandardReadable, Movable):
         """
         await self._set_undulator_gap(value)
 
-    async def _set_undulator_gap(self, energy_kev: float) -> None:
+    async def raise_if_not_enabled(self):
         access_level = await self.gap_access.get_value()
         if access_level is UndulatorGapAccess.DISABLED and not TEST_MODE:
             raise AccessError("Undulator gap access is disabled. Contact Control Room")
+
+    async def _set_undulator_gap(self, energy_kev: float) -> None:
+        await self.raise_if_not_enabled()
         LOGGER.info(f"Setting undulator gap to {energy_kev:.2f} kev")
         target_gap = await self._get_gap_to_match_energy(energy_kev)
 
