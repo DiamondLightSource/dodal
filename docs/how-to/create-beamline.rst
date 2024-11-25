@@ -27,12 +27,12 @@ The following example creates a fictitious beamline ``w41``, with a simulated tw
 
     from dodal.common.beamlines.beamline_utils import device_instantiation
     from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-    from dodal.devices.areadetector.adaravis import AdAravisDetector
     from dodal.devices.synchrotron import Synchrotron
     from dodal.log import set_beamline as set_log_beamline
     from dodal.utils import get_beamline_name, skip_device
 
     BL = get_beamline_name("s41")  # Default used when not on a live beamline
+    PREFIX = BeamlinePrefix(BL)
     set_log_beamline(BL)  # Configure logging and util functions
     set_utils_beamline(BL)
 
@@ -43,13 +43,27 @@ The following example creates a fictitious beamline ``w41``, with a simulated tw
     to one or more Bluesky Protocols.
     """
 
+    """
+    A valid factory function which:
+    - may be instantiated automatically, selectively on live beamline
+        - a maximum of once
+    - automatically names the device
+    - must be explicitly connected (may be automated by tools)
+        - when connected may connect to a simulated backend
+        - may be connected concurrently (when automated by tools)
+    """"
+    @device_factory(skip=BL == "s41")
+    def synchrotron() -> Synchrotron:
+        return Synchrotron()
+
 
     """
-    A valid factory function which is:
-    - instantiated only on the live beamline
-    - a maximum of once
-    - can optionally be faked with ophyd simulated axes
-    - can optionally be connected concurrently by not waiting for connect to complete
+    A valid factory function which:
+    - may be instantiated automatically, selectively on live beamline
+        - a maximum of once
+    - must attempt to connect when first called
+        - can optionally be faked with ophyd simulated axes
+        - can optionally be connected concurrently by not waiting for connect to complete
     - if constructor took a prefix, could optionally exclude the BLIXX prefix
     """"
     @skip_device(lambda: BL == "s41")  # Conditionally do not instantiate this device
@@ -68,12 +82,17 @@ The following example creates a fictitious beamline ``w41``, with a simulated tw
             bl_prefix=False,
         )
 
-    def d11(name: str = "D11") -> AdAravisDetector:
-        """
-        Also a valid Device factory function, but as multiple calls would instantiate
-        multiple copies of a device, discouraged.
-        """
-        return AdAravisDetector(name=name, prefix=f"{BL}-DI-DCAM-01:")
+    """
+    A valid factory function which:
+    - may be instantiated automatically
+        - cannot distinguish between simulated beamline and live
+        - each call instantiates a new copy
+    - must be explicitly connected (may be automated by tools)
+        - when connected may connect to a simulated backend
+        - may be connected concurrently (when automated by tools)
+    """
+    def synchrotron() -> Synchrotron:
+        return Synchrotron()
 
 ``w41`` should also be added to the list of ``ALL_BEAMLINES`` in ``tests/beamlines/test_device_instantiation``.
 This test checks that the function returns a type that conforms to Bluesky protocols, 
