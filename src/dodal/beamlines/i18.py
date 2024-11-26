@@ -228,6 +228,7 @@ def d7diode(
 ) -> Diode:
     return device_instantiation(
         Diode,
+        "d7diode",
         "-DI-PHDGN-07:",
         wait_for_connection,
         fake_with_ophyd_sim,
