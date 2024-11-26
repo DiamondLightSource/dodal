@@ -10,8 +10,8 @@ if it set to true
 
 from bluesky.protocols import Reading
 from ophyd_async.core import (
-    ConfigSignal,
     StandardReadable,
+    StandardReadableFormat,
     soft_signal_r_and_setter,
     soft_signal_rw,
 )
@@ -36,7 +36,7 @@ class AutoGainDectector(StandardReadable):
             self.current, self._current_set = soft_signal_r_and_setter(
                 float, initial_value=None, units="Amp"
             )
-        with self.add_children_as_readables(ConfigSignal):
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.auto_mode = soft_signal_rw(bool, initial_value=True)
             self.upper_limit = upper_limit
             self.lower_limit = lower_limit
@@ -78,7 +78,7 @@ class AutoGainDectector(StandardReadable):
 
     async def get_corrected_current(self) -> float:
         current_gain = await self.current_amp.get_gain()
-        correction_factor = self.current_amp.gain_convertion_table[current_gain]
+        correction_factor = self.current_amp.gain_convertion_table[current_gain].value
         await self.counter.trigger()
         corrected_current = (
             await self.counter.readout.get_value(cached=False)

@@ -1,12 +1,12 @@
 from bluesky.protocols import Preparable, Triggerable
 from ophyd_async.core import (
     AsyncStatus,
-    HintedSignal,
     StandardReadable,
+    StandardReadableFormat,
     StrictEnum,
     set_and_wait_for_other_value,
 )
-from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 
 class CountMode(StrictEnum):
@@ -21,7 +21,7 @@ class CountState(StrictEnum):
 
 class StruckScaler(StandardReadable, Triggerable, Preparable):
     def __init__(self, prefix: str, suffix: str, name: str = ""):
-        with self.add_children_as_readables(HintedSignal):
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.readout = epics_signal_r(float, prefix + suffix)
 
         self.count_mode = epics_signal_rw(CountMode, prefix + ":AutoCount")
@@ -43,8 +43,8 @@ class StruckScaler(StandardReadable, Triggerable, Preparable):
         await set_and_wait_for_other_value(
             set_signal=self.trigger_start,
             set_value=CountState.count,
-            read_signal=self.trigger_start,
-            read_value=CountState.done,
+            match_signal=self.trigger_start,
+            match_value=CountState.done,
         )
 
     @AsyncStatus.wrap

@@ -3,11 +3,11 @@ from enum import Enum
 
 from ophyd_async.core import (
     AsyncStatus,
-    ConfigSignal,
+    StandardReadableFormat,
     StrictEnum,
     soft_signal_r_and_setter,
 )
-from ophyd_async.epics.signal import epics_signal_rw
+from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.devices.current_amplifiers.current_amplifier import CurrentAmp
 from dodal.log import LOGGER
@@ -135,7 +135,7 @@ class SR570(CurrentAmp):
             str
         )  # overriding gain as there are 2 gain setting rather than just 1.
 
-        with self.add_children_as_readables(ConfigSignal):
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.fine_gain = epics_signal_rw(fine_gain_table, prefix + suffix + "1")
             self.coarse_gain = epics_signal_rw(coarse_gain_table, prefix + suffix + "2")
 

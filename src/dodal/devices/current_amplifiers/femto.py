@@ -3,11 +3,10 @@ from enum import Enum
 
 from ophyd_async.core import (
     AsyncStatus,
-    ConfigSignal,
-    HintedSignal,
+    StandardReadableFormat,
     StrictEnum,
 )
-from ophyd_async.epics.signal import epics_signal_rw
+from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.devices.current_amplifiers import CurrentAmp
 from dodal.log import LOGGER
@@ -77,10 +76,10 @@ class FemtoDDPCA(CurrentAmp):
         timeout: float = 1,
         name: str = "",
     ) -> None:
-        with self.add_children_as_readables(HintedSignal):
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.gain = epics_signal_rw(gain_table, prefix + suffix)
 
-        with self.add_children_as_readables(ConfigSignal):
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.gain_table = gain_table
             self.timeout = timeout
             self.raise_timetable = raise_timetable

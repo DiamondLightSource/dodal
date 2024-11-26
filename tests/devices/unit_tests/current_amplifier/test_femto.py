@@ -202,13 +202,13 @@ async def test_femto_struck_scaler_read(
 @pytest.mark.parametrize(
     "gain,raw_voltage, expected_current",
     [
-        ("sen_10", [1e4, 1e3, 1e2, 1e1, 1], 1e-9),
-        ("sen_1", [4e-3, 4e-2, 4e-1, 4], 4e-7),
-        ("sen_6", [520, 52, 5.2], 5.2e-7),
+        ("sen_10", [1e4, 1e3, 1e2, 1e1, 1, 1], 1e-9),
+        ("sen_1", [4e-3, 4e-2, 4e-1, 4, 4], 4e-7),
+        ("sen_6", [520, 52, 5.2, 5.2], 5.2e-7),
         ("sen_9", [2.2, 2.2], 2.2e-12),
         ("sen_10", [0.17, 0.17], 0.17e-13),
-        ("sen_5", [0.0, 0.0], 0.0),
-        ("sen_5", [-200.0, -20.0, -2.0], -2e-6),
+        ("sen_5", [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 0.0),
+        ("sen_5", [-200.0, -20.0, -2.0, -2.0], -2e-6),
     ],
 )
 async def test_femto_struck_scaler_read_with_autoGain(
