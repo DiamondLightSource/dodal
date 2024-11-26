@@ -16,6 +16,7 @@ from dodal.common.visit import (
 from dodal.devices.i18.diode import Diode
 from dodal.devices.i18.KBMirror import KBMirror
 from dodal.devices.i18.table import Table
+from dodal.devices.i18.thor_labs_stage import ThorLabsStage
 from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
@@ -103,19 +104,6 @@ def panda1(
     )
 
 
-def xspress3(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Xspress3:
-    return device_instantiation(
-        Xspress3,
-        prefix="-EA-XSP-02:",
-        name="xspress3",
-        num_channels=16,
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
-    )
-
-
 # odin detectors are not yet supported.
 # There is a controls project in the works,
 # not ready anytime soon
@@ -125,7 +113,7 @@ def xspress3_odin(
 ) -> Xspress3:
     return device_instantiation(
         Xspress3,
-        prefix="-EA-XSP-03:",
+        prefix="-EA-XSP-02:",
         name="xspress3_odin",
         num_channels=4,
         wait=wait_for_connection,
@@ -271,6 +259,18 @@ def raster_stage(
         Table,
         "raster_stage",
         "-MO-SIM-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+    )
+
+
+def thor_labs_table(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> ThorLabsStage:
+    return device_instantiation(
+        ThorLabsStage,
+        "table",
+        "-MO-TABLE-02:",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
