@@ -10,7 +10,7 @@ from ophyd_async.core import (
     set_and_wait_for_value,
     wait_for_value,
 )
-from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw_rbv, epics_signal_x
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw_rbv, epics_signal_x
 
 from dodal.log import LOGGER
 
@@ -42,7 +42,7 @@ class BartRobot(StandardReadable, Movable):
     """The sample changing robot."""
 
     # How long to wait for the robot if it is busy soaking/drying
-    NOT_BUSY_TIMEOUT = 60
+    NOT_BUSY_TIMEOUT = 5 * 60
     # How long to wait for the actual load to happen
     LOAD_TIMEOUT = 60
     NO_PIN_ERROR_CODE = 25

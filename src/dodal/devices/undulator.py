@@ -5,13 +5,13 @@ from bluesky.protocols import Movable
 from numpy import argmin, ndarray
 from ophyd_async.core import (
     AsyncStatus,
-    ConfigSignal,
     StandardReadable,
+    StandardReadableFormat,
     StrictEnum,
     soft_signal_r_and_setter,
 )
+from ophyd_async.epics.core import epics_signal_r
 from ophyd_async.epics.motor import Motor
-from ophyd_async.epics.signal import epics_signal_r
 
 from dodal.log import LOGGER
 
@@ -75,7 +75,7 @@ class Undulator(StandardReadable, Movable):
             self.current_gap = epics_signal_r(float, prefix + "CURRGAPD")
             self.gap_access = epics_signal_r(UndulatorGapAccess, prefix + "IDBLENA")
 
-        with self.add_children_as_readables(ConfigSignal):
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.gap_discrepancy_tolerance_mm, _ = soft_signal_r_and_setter(
                 float,
                 initial_value=UNDULATOR_DISCREPANCY_THRESHOLD_MM,
@@ -108,10 +108,13 @@ class Undulator(StandardReadable, Movable):
         """
         await self._set_undulator_gap(value)
 
-    async def _set_undulator_gap(self, energy_kev: float) -> None:
+    async def raise_if_not_enabled(self):
         access_level = await self.gap_access.get_value()
         if access_level is UndulatorGapAccess.DISABLED and not TEST_MODE:
             raise AccessError("Undulator gap access is disabled. Contact Control Room")
+
+    async def _set_undulator_gap(self, energy_kev: float) -> None:
+        await self.raise_if_not_enabled()
         LOGGER.info(f"Setting undulator gap to {energy_kev:.2f} kev")
         target_gap = await self._get_gap_to_match_energy(energy_kev)
 

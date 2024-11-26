@@ -5,7 +5,12 @@ from pathlib import Path
 import aiofiles
 from aiohttp import ClientSession
 from bluesky.protocols import Triggerable
-from ophyd_async.core import AsyncStatus, HintedSignal, StandardReadable, soft_signal_rw
+from ophyd_async.core import (
+    AsyncStatus,
+    StandardReadable,
+    StandardReadableFormat,
+    soft_signal_rw,
+)
 from PIL import Image
 
 from dodal.log import LOGGER
@@ -27,7 +32,9 @@ class Webcam(StandardReadable, Triggerable):
         self.directory = soft_signal_rw(str, name="directory")
         self.last_saved_path = soft_signal_rw(str, name="last_saved_path")
 
-        self.add_readables([self.last_saved_path], wrapper=HintedSignal)
+        self.add_readables(
+            [self.last_saved_path], format=StandardReadableFormat.HINTED_SIGNAL
+        )
         super().__init__(name=name)
 
     async def _write_image(self, file_path: str, image: ByteString):

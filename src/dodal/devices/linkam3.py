@@ -3,15 +3,14 @@ import time
 
 from bluesky.protocols import Location
 from ophyd_async.core import (
-    ConfigSignal,
-    HintedSignal,
     StandardReadable,
+    StandardReadableFormat,
     StrictEnum,
     WatchableAsyncStatus,
     WatcherUpdate,
     observe_value,
 )
-from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 
 class PumpControl(StrictEnum):
@@ -34,7 +33,7 @@ class Linkam3(StandardReadable):
     tolerance: float = 0.5
     settle_time: int = 0
 
-    def __init__(self, prefix: str, name: str):
+    def __init__(self, prefix: str, name: str = ""):
         self.temp = epics_signal_r(float, prefix + "TEMP:")
         self.dsc = epics_signal_r(float, prefix + "DSC:")
         self.start_heat = epics_signal_rw(bool, prefix + "STARTHEAT:")
@@ -62,9 +61,10 @@ class Linkam3(StandardReadable):
         # status is a bitfield stored in a double?
         self.status = epics_signal_r(float, prefix + "STATUS:")
 
-        self.add_readables((self.temp,), wrapper=HintedSignal)
+        self.add_readables((self.temp,), format=StandardReadableFormat.HINTED_SIGNAL)
         self.add_readables(
-            (self.ramp_rate, self.speed, self.set_point), wrapper=ConfigSignal
+            (self.ramp_rate, self.speed, self.set_point),
+            format=StandardReadableFormat.CONFIG_SIGNAL,
         )
 
         super().__init__(name=name)

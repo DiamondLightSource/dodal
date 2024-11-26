@@ -7,8 +7,8 @@ from typing import cast
 from bluesky import plan_stubs as bps
 from bluesky.utils import Msg
 from ophyd_async.core import AsyncStatus, Device, StandardReadable, wait_for_value
+from ophyd_async.epics.core import epics_signal_r
 from ophyd_async.epics.motor import Motor
-from ophyd_async.epics.signal import epics_signal_r
 
 from dodal.devices.util.epics_util import SetWhenEnabled
 
