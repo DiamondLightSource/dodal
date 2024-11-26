@@ -237,10 +237,10 @@ def main_table(
 
 def thor_labs_table(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Table:
+) -> ThorLabsStage:
     return device_instantiation(
-        Table,
-        "table",
+        ThorLabsStage,
+        "thor_labs_stage",
         "-MO-TABLE-02:",
         wait_for_connection,
         fake_with_ophyd_sim,
@@ -259,18 +259,6 @@ def raster_stage(
         Table,
         "raster_stage",
         "-MO-SIM-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
-
-
-def thor_labs_table(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> ThorLabsStage:
-    return device_instantiation(
-        ThorLabsStage,
-        "table",
-        "-MO-TABLE-02:",
         wait_for_connection,
         fake_with_ophyd_sim,
     )
