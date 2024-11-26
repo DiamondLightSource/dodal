@@ -21,11 +21,11 @@ from dodal.utils import BeamlinePrefix, get_beamline_name
 # simple motors, a GigE camera and a PandA.
 # Since there are multiple rigs whose PVs are identical aside from the prefix,
 # this module can be used for any rig. It should fill in the prefix automatically
-# if the ${BEAMLINE} environment variable is correctly set. It currently defaults
-# to p47.
+# if the ${BEAMLINE} environment variable is correctly set, else defaulting
+# to p46, which is known to be in good working order.
 #
 
-BL = get_beamline_name("p47")
+BL = get_beamline_name("p46")
 PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
