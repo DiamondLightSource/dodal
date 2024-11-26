@@ -15,7 +15,6 @@ from dodal.common.visit import (
 )
 from dodal.devices.i18.diode import Diode
 from dodal.devices.i18.KBMirror import KBMirror
-from dodal.devices.i18.sim_detector import SimDetector
 from dodal.devices.i18.table import Table
 from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
 from dodal.devices.slits import Slits
@@ -270,16 +269,6 @@ def raster_stage(
     return device_instantiation(
         Table,
         "raster_stage",
-        "-MO-SIM-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
-
-
-def sim_detector(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False):
-    return device_instantiation(
-        SimDetector,
-        "sim_detector",
         "-MO-SIM-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
