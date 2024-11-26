@@ -116,21 +116,21 @@ class SR570(CurrentAmp):
         self,
         prefix: str,
         suffix: str,
-        gain_table: type[Enum],
         fine_gain_table: type[StrictEnum],
         coarse_gain_table: type[StrictEnum],
         combined_table: type[Enum],
+        gain_to_current_table: type[Enum],
         raise_timetable: type[Enum],
         timeout: float = 1,
         name: str = "",
     ) -> None:
-        super().__init__(name=name, gain_convertion_table=gain_table)
+        super().__init__(name=name, gain_convertion_table=gain_to_current_table)
 
         self.fine_gain_table = fine_gain_table
         self.coarse_gain_table = coarse_gain_table
         self.timeout = timeout
         self.raise_time_table = raise_timetable
-        self.combined_table = SR570FullGainTable
+        self.combined_table = combined_table
         self.gain, self._set_gain = soft_signal_r_and_setter(
             str
         )  # overriding gain as there are 2 gain setting rather than just 1.
@@ -141,33 +141,33 @@ class SR570(CurrentAmp):
 
     @AsyncStatus.wrap
     async def set(self, value) -> None:
-        if value not in self.gain_convertion_table.__members__:
+        if value not in [item.value for item in self.gain_convertion_table]:
             raise ValueError(f"Gain value {value} is not within {self.name} range.")
+        sen_setting = self.gain_convertion_table(value).name
         LOGGER.info(f"{self.name} gain change to {value}")
 
-        coarse_gain, fine_gain = self.combined_table[value].value
-        print(coarse_gain, fine_gain)
+        coarse_gain, fine_gain = self.combined_table[sen_setting].value
+        print(coarse_gain.name, fine_gain, sen_setting)
         await self.fine_gain.set(value=fine_gain, timeout=self.timeout)
         await self.coarse_gain.set(value=coarse_gain, timeout=self.timeout)
-        self._set_gain(value)  # wait for current amplifier to settle
-        await asyncio.sleep(self.raise_time_table[value].value)
+        self._set_gain(sen_setting)  # wait for current amplifier to settle
+        await asyncio.sleep(self.raise_time_table[coarse_gain.name].value)
 
     async def increase_gain(self) -> bool:
-        # current_gain = int((await self.gain.get_value()).name.split("_")[-1])
-        # current_gain += 1
-        # if current_gain > len(self.gain_table):
-        #     return False
-        # await self.set(f"sen_{current_gain}")
+        current_gain = int((await self.get_gain()).split("_")[-1])
+        current_gain += 1
+        if current_gain > len(self.combined_table):
+            return False
+        await self.set(self.gain_convertion_table[f"sen_{current_gain}"])
         return True
 
     async def decrease_gain(self) -> bool:
+        current_gain = int((await self.get_gain()).split("_")[-1])
+        current_gain -= 1
+        if current_gain < 1:
+            return False
+        await self.set(self.gain_convertion_table[f"sen_{current_gain}"])
         return True
-        # current_gain = int((await self.gain.get_value()).name.split("_")[-1])
-        # current_gain -= 1
-        # if current_gain < 1:
-        #     return False
-        # await self.set(f"sen_{current_gain}")
-        # return True
 
     async def get_gain(self) -> str:
         return await self.gain.get_value()
