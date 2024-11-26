@@ -14,7 +14,7 @@ from dodal.devices.i10.i10_apple2 import (
     I10Apple2Pol,
     LinearArbitraryAngle,
 )
-from dodal.devices.i10.i10_current_amp import RasorFemto, RasorSR370
+from dodal.devices.i10.i10_current_amp import RasorFemto, RasorSR570
 from dodal.devices.i10.i10_setting_data import I10Grating
 from dodal.devices.pgm import PGM
 from dodal.log import set_beamline as set_log_beamline
@@ -291,9 +291,9 @@ def rasor_scaler_card_1(
 
 def rasor_sr570(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> RasorSR370:
+) -> RasorSR570:
     return device_instantiation(
-        device_factory=RasorSR370,
+        device_factory=RasorSR570,
         name="rasor_sr570",
         prefix="ME01D-EA-IAMP",
         wait=wait_for_connection,
