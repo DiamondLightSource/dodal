@@ -4,20 +4,11 @@ from unittest.mock import MagicMock, patch
 import numpy as np
 import pytest
 from conftest import MOCK_DAQ_CONFIG_PATH
-from ophyd_async.core import (
-    AsyncStatus,
-    DeviceCollector,
-    set_mock_value,
-)
+from ophyd_async.core import AsyncStatus, DeviceCollector, get_mock_put, set_mock_value
 
 from dodal.devices.dcm import DCM
-from dodal.devices.undulator import (
-    Undulator,
-    UndulatorGapAccess,
-)
-from dodal.devices.undulator_dcm import (
-    UndulatorDCM,
-)
+from dodal.devices.undulator import AccessError, Undulator, UndulatorGapAccess
+from dodal.devices.undulator_dcm import UndulatorDCM
 from dodal.log import LOGGER
 
 ID_GAP_LOOKUP_TABLE_PATH: str = (
@@ -95,7 +86,6 @@ async def test_if_gap_is_wrong_then_logger_info_is_called_and_gap_is_set_correct
 
 @patch("dodal.devices.util.lookup_tables.loadtxt")
 @patch("dodal.devices.undulator.LOGGER")
-@patch("dodal.devices.undulator_dcm.TEST_MODE", True)
 @patch("dodal.devices.undulator.TEST_MODE", True)
 async def test_when_gap_access_is_not_checked_if_test_mode_enabled(
     mock_logger: MagicMock, mock_load: MagicMock, fake_undulator_dcm: UndulatorDCM
@@ -164,3 +154,14 @@ async def test_energy_set_only_complete_when_all_statuses_are_finished(
     assert not status.done
     release_undulator.set()
     await asyncio.wait_for(status, timeout=0.02)
+
+
+async def test_when_undulator_gap_is_disabled_setting_energy_errors_and_dcm_energy_is_not_set(
+    fake_undulator_dcm: UndulatorDCM,
+):
+    set_mock_value(fake_undulator_dcm.undulator.gap_access, UndulatorGapAccess.DISABLED)
+
+    with pytest.raises(AccessError):
+        await fake_undulator_dcm.set(5)
+
+    get_mock_put(fake_undulator_dcm.dcm.energy_in_kev.user_setpoint).assert_not_called()
