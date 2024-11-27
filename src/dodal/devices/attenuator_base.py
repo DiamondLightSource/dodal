@@ -3,7 +3,11 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal
 
 
 class AttenuatorBase(StandardReadable):
-    """An attenuator base class with a minimum set of common PVs to phase1 beamlines."""
+    """An attenuator base class with a minimum set of common PVs to phase1 beamlines.
+
+    The desired transmission value is fractional (i.e 0-1) instead of a percentage, \
+    and when read from the device the actual_transmission will also return a fraction.
+    """
 
     def __init__(self, prefix: str, name: str = "") -> None:
         self._desired_transmission = epics_signal_rw(float, prefix + "T2A:SETVAL1")
