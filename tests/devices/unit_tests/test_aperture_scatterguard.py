@@ -2,7 +2,7 @@ import asyncio
 from collections.abc import Sequence
 from contextlib import ExitStack
 from typing import Any
-from unittest.mock import AsyncMock, MagicMock, call
+from unittest.mock import ANY, MagicMock, call, patch
 
 import bluesky.plan_stubs as bps
 import pytest
@@ -19,8 +19,8 @@ from dodal.devices.aperturescatterguard import (
     AperturePosition,
     ApertureScatterguard,
     ApertureValue,
-    InOut,
     InvalidApertureMove,
+    _safe_move_whilst_in_beam,
     load_positions_from_beamline_parameters,
 )
 from dodal.devices.util.test_utils import patch_motor
@@ -232,7 +232,7 @@ async def test_aperture_scatterguard_throws_error_if_outside_tolerance(
             scatterguard_x=0,
             scatterguard_y=0,
         )
-        await ap_sg._safe_move_within_datacollection_range(pos)
+        await _safe_move_whilst_in_beam(ap_sg._aperture, ap_sg._scatterguard, pos, 0.1)
 
 
 async def test_aperture_scatterguard_returns_status_if_within_tolerance(
@@ -245,7 +245,7 @@ async def test_aperture_scatterguard_returns_status_if_within_tolerance(
     pos = AperturePosition(
         aperture_x=0, aperture_y=0, aperture_z=1, scatterguard_x=0, scatterguard_y=0
     )
-    await ap_sg._safe_move_within_datacollection_range(pos)
+    await _safe_move_whilst_in_beam(ap_sg._aperture, ap_sg._scatterguard, pos, 0.1)
 
 
 def set_underlying_motors(ap_sg: ApertureScatterguard, position: AperturePosition):
@@ -439,7 +439,7 @@ async def test_given_aperture_out_when_new_aperture_selected_then_aperture_not_m
     ap.y.set(y_set_point)
     set_mock_value(ap.y.user_readback, y_set_point)
 
-    await ap_sg.aperture.set(ApertureValue.SMALL)
+    await ap_sg.aperture_outside_beam.set(ApertureValue.SMALL)
     assert await ap.y.user_setpoint.get_value() == y_set_point
 
     await assert_all_positions_other_than_y(
@@ -447,18 +447,16 @@ async def test_given_aperture_out_when_new_aperture_selected_then_aperture_not_m
     )
 
 
+@patch("dodal.devices.aperturescatterguard._safe_move_whilst_in_beam")
 async def test_given_aperture_in_when_new_aperture_set_then_aperture_moved_safely(
+    mock_safe_move,
     aperture_in_medium_pos: ApertureScatterguard,
     aperture_positions: dict[ApertureValue, AperturePosition],
 ):
-    assert (
-        aperture_in_medium_pos._safe_move_within_datacollection_range
-        == aperture_in_medium_pos.aperture.safe_move
+    await aperture_in_medium_pos.aperture_outside_beam.set(ApertureValue.SMALL)
+    mock_safe_move.assert_called_once_with(
+        ANY, ANY, aperture_positions[ApertureValue.SMALL], ANY
     )
-    aperture_in_medium_pos.aperture.safe_move = (safe_move := AsyncMock())
-
-    await aperture_in_medium_pos.aperture.set(ApertureValue.SMALL)
-    safe_move.assert_called_once_with(aperture_positions[ApertureValue.SMALL])
 
 
 @pytest.mark.parametrize(
@@ -476,7 +474,7 @@ async def test_given_in_and_aperture_selected_when_move_out_then_only_aperture_y
 
     assert await y_setpoint.get_value() == aperture_position.aperture_y
 
-    await ap_sg.in_out.set(InOut.OUT)
+    await ap_sg.move_out.trigger()
     await assert_all_positions_other_than_y(ap_sg, aperture_position)
 
     assert (
@@ -496,9 +494,10 @@ async def test_given_out_and_aperture_selected_when_move_in_then_correct_y_selec
 ):
     y_setpoint = ap_sg._aperture.y.user_setpoint
     aperture_position = aperture_positions[selected_aperture]
-    await ap_sg.aperture.set(selected_aperture)
-    await ap_sg._aperture.y.set(aperture_positions[ApertureValue.ROBOT_LOAD].aperture_y)
+    await ap_sg.move_out.trigger()
 
-    await ap_sg.in_out.set(InOut.IN)
+    await ap_sg.aperture_outside_beam.set(selected_aperture)
+
+    await ap_sg.set(selected_aperture)
     await assert_all_positions_other_than_y(ap_sg, aperture_position)
     assert await y_setpoint.get_value() == aperture_position.aperture_y

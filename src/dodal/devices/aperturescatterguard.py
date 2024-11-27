@@ -2,10 +2,9 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import Callable, Coroutine
-from enum import Enum
 from typing import Any
 
-from bluesky.protocols import Movable
+from bluesky.protocols import Movable, Triggerable
 from ophyd_async.core import (
     AsyncStatus,
     Reference,
@@ -170,11 +169,6 @@ async def _safe_move_whilst_in_beam(
         )
 
 
-class InOut(Enum):
-    IN = "IN"
-    OUT = "OUT"
-
-
 class ApertureSelector(StandardReadable, Movable):
     """Allows for moving all axes other than Y into the correct position, this means
     that we can set up the aperture while it is out of the beam then move it in later."""
@@ -183,15 +177,14 @@ class ApertureSelector(StandardReadable, Movable):
         self,
         aperture: Aperture,
         scatterguard: Scatterguard,
-        get_aperture_in_out: Callable[[], Coroutine[Any, Any, InOut]],
+        out_of_beam: Callable[[], Coroutine[Any, Any, bool]],
         loaded_positions: dict[ApertureValue, AperturePosition],
         aperture_z_tolerance: float,
     ):
-        self.last_selected_aperture = ApertureValue.LARGE
         self.aperture = Reference(aperture)
         self.scatterguard = Reference(scatterguard)
         self.loaded_positions = loaded_positions
-        self.get_aperture_in_out = get_aperture_in_out
+        self.get_is_out_of_beam = out_of_beam
         self.aperture_z_tolerance = aperture_z_tolerance
         super().__init__()
 
@@ -203,8 +196,7 @@ class ApertureSelector(StandardReadable, Movable):
         Moving the assembly whilst out of the beam has no collision risk so we can just
         move all the motors together.
         """
-        self.last_selected_aperture = value
-        if await self.get_aperture_in_out() == InOut.OUT:
+        if await self.get_is_out_of_beam():
             aperture_x, _, aperture_z, scatterguard_x, scatterguard_y = (
                 self.loaded_positions[value].values
             )
@@ -224,34 +216,22 @@ class ApertureSelector(StandardReadable, Movable):
             )
 
 
-class InOutDevice(StandardReadable):
-    """Allows for moving just the Y stage of the assembly in and out of the beam."""
+class OutTrigger(StandardReadable, Triggerable):
+    """Allows for moving just the Y stage of the assembly out of the beam."""
 
     def __init__(
         self,
         aperture_y: Motor,
-        selected_aperture: ApertureSelector,
-        loaded_positions: dict[ApertureValue, AperturePosition],
+        out_y: float,
     ):
         self.aperture_y = Reference(aperture_y)
-        self.selected_aperture = Reference(selected_aperture)
-        self.positions = loaded_positions
+        self.out_y = out_y
         super().__init__()
 
     @AsyncStatus.wrap
-    async def set(self, value: InOut):
-        """Moves the assembly in and out of the beam assuming that the last value set
-        to the aperture is the one we want to move in to."""
-        match value:
-            case InOut.IN:
-                selected_aperture = self.selected_aperture().last_selected_aperture
-                await self.aperture_y().set(
-                    self.positions[selected_aperture].aperture_y
-                )
-            case InOut.OUT:
-                await self.aperture_y().set(
-                    self.positions[ApertureValue.ROBOT_LOAD].aperture_y
-                )
+    async def trigger(self):
+        """Moves the assembly out of the beam."""
+        await self.aperture_y().set(self.out_y)
 
 
 class ApertureScatterguard(StandardReadable, Movable):
@@ -260,7 +240,7 @@ class ApertureScatterguard(StandardReadable, Movable):
 
     The simple interface is using:
 
-        >>> aperture_scatterguard.set(ApertureValue.LARGE)
+        await aperture_scatterguard.set(ApertureValue.LARGE)
 
     This will move the assembly so that the large aperture is in the beam, regardless
     of where the assembly currently is.
@@ -268,16 +248,18 @@ class ApertureScatterguard(StandardReadable, Movable):
     However, the aperture Y axis is faster than the others. In some cases we may want to
     move the assembly out of the beam with this axis without moving others:
 
-        >>> aperture_scatterguard.in_out.set(InOut.OUT)
+        await aperture_scatterguard.move_out.trigger()
 
     We may then want to keep the assembly out of the beam whilst asynchronously preparing
     the other axes for the aperture that's to follow:
 
-        >>> aperture_scatterguard.aperture_outside_beam.set(ApertureValue.LARGE)
+        await aperture_scatterguard.aperture_outside_beam.set(ApertureValue.LARGE)
 
-    Then, at a later time, move quickly into the beam:
+    Then, at a later time, move back into the beam:
 
-        >>> aperture_scatterguard.in_out.set(InOut.IN)
+        await aperture_scatterguard.set(ApertureValue.LARGE)
+
+    This move will now be faster as only the y is left to move.
     """
 
     def __init__(
@@ -310,18 +292,18 @@ class ApertureScatterguard(StandardReadable, Movable):
                 ApertureValue, self._get_current_aperture_position
             )
 
-        # Setting this will select the aperture but not move it into beam if not needed
+        # Setting this will select the aperture but not move it into beam
         self.aperture_outside_beam = ApertureSelector(
             self._aperture,
             self._scatterguard,
-            self._apertures_in_out,
+            self._is_out_of_beam,
             self._loaded_positions,
             self._tolerances.aperture_z,
         )
 
         # Setting this will just move the assembly out of the beam
-        self.in_out = InOutDevice(
-            self._aperture.y, self.aperture_outside_beam, self._loaded_positions
+        self.move_out = OutTrigger(
+            self._aperture.y, loaded_positions[ApertureValue.ROBOT_LOAD].aperture_y
         )
 
         super().__init__(name)
@@ -349,13 +331,10 @@ class ApertureScatterguard(StandardReadable, Movable):
             self._scatterguard.y.set(scatterguard_y),
         )
 
-    async def _apertures_in_out(self) -> InOut:
+    async def _is_out_of_beam(self) -> bool:
         current_ap_y = await self._aperture.y.user_readback.get_value()
         robot_load_ap_y = self._loaded_positions[ApertureValue.ROBOT_LOAD].aperture_y
-        if current_ap_y <= robot_load_ap_y + self._tolerances.aperture_y:
-            return InOut.OUT
-        else:
-            return InOut.IN
+        return current_ap_y <= robot_load_ap_y + self._tolerances.aperture_y
 
     async def _get_current_aperture_position(self) -> ApertureValue:
         """
@@ -370,7 +349,7 @@ class ApertureScatterguard(StandardReadable, Movable):
             return ApertureValue.MEDIUM
         elif await self._aperture.small.get_value(cached=False) == 1:
             return ApertureValue.SMALL
-        elif await self._apertures_in_out() == InOut.OUT:
+        elif await self._is_out_of_beam():
             return ApertureValue.ROBOT_LOAD
 
         raise InvalidApertureMove("Current aperture/scatterguard state unrecognised")
