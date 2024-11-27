@@ -33,9 +33,10 @@ set_utils_beamline(BL)
 def attenuator(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> AttenuatorBase:
-    """Get a basic (without filter wheels) attenuator device for i24, instantiate it
-    if it hasn't already been. If this is called when already instantiated in i24,
-    it will return the existing object."""
+    """Get a basic (temporarily without filter wheels) attenuator device for i24,
+    instantiate it if it hasn't already been. If this is called when already \
+    instantiated in i24, it will return the existing object."""
+    # For filter wheels see https://github.com/DiamondLightSource/dodal/issues/927
     return device_instantiation(
         AttenuatorBase,
         "attenuator",
