@@ -3,7 +3,7 @@ from unittest import mock
 from unittest.mock import AsyncMock, Mock
 
 import pytest
-from bluesky.plan_stubs import abs_set
+from bluesky.plan_stubs import abs_set, prepare
 from bluesky.plans import count
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import (
@@ -237,7 +237,6 @@ async def test_SR570_struck_scaler_read_with_autoGain(
     expected_current,
 ):
     set_mock_value(mock_sr570.gain, SR570FullGainTable[gain].name)
-    set_mock_value(mock_sr570_struck_scaler_detector.counter.count_time, 1)
     set_mock_value(mock_sr570_struck_scaler_detector.auto_mode, True)
     rbv_mocks = Mock()
     rbv_mocks.get.side_effect = raw_count
@@ -260,6 +259,7 @@ async def test_SR570_struck_scaler_read_with_autoGain(
     def capture_emitted(name, doc):
         docs[name].append(doc)
 
+    RE(prepare(mock_sr570_struck_scaler_detector, 1))
     RE(count([mock_sr570_struck_scaler_detector]), capture_emitted)
     assert docs["event"][0]["data"][
         "mock_sr570_struck_scaler_detector-current"

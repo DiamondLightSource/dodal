@@ -8,8 +8,9 @@ if it set to true
 
 """
 
-from bluesky.protocols import Reading
+from bluesky.protocols import Preparable, Reading
 from ophyd_async.core import (
+    AsyncStatus,
     StandardReadable,
     StandardReadableFormat,
     soft_signal_r_and_setter,
@@ -21,7 +22,7 @@ from dodal.devices.current_amplifiers.struck_scaler import StruckScaler
 from dodal.log import LOGGER
 
 
-class AutoGainDectector(StandardReadable):
+class AutoGainDectector(StandardReadable, Preparable):
     def __init__(
         self,
         current_amp: CurrentAmp,
@@ -64,7 +65,7 @@ class AutoGainDectector(StandardReadable):
               magnitude that is important
             """
             reading = abs(await self.counter.get_voltage_per_sec())
-            print(reading)
+            print(reading, cnt)
             if reading > self.upper_limit:
                 if not await self.current_amp.decrease_gain():
                     return False
@@ -72,7 +73,7 @@ class AutoGainDectector(StandardReadable):
                 if not await self.current_amp.increase_gain():
                     return False
             else:
-                return True
+                break
             cnt += 1
         return True
 
@@ -83,3 +84,15 @@ class AutoGainDectector(StandardReadable):
             await self.counter.get_voltage_per_sec()
         ) / correction_factor
         return corrected_current
+
+    @AsyncStatus.wrap
+    async def stage(self) -> None:
+        await self.counter.stage()
+
+    @AsyncStatus.wrap
+    async def unstage(self) -> None:
+        await self.counter.unstage()
+
+    @AsyncStatus.wrap
+    async def prepare(self, value) -> None:
+        await self.counter.prepare(value=value)

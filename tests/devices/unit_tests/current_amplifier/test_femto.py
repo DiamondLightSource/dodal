@@ -210,6 +210,7 @@ async def test_femto_struck_scaler_read(
         ("sen_10", [0.17e5, 0.17e5], 0.17e-13),
         ("sen_5", [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 0.0),
         ("sen_5", [-200.0e5, -20.0e5, -2.0e5, -2.0e5], -2e-6),
+        ("sen_1", [10.0e-6] * (30), 1.0e-23),
     ],
 )
 async def test_femto_struck_scaler_read_with_autoGain(
