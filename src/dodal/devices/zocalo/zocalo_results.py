@@ -12,8 +12,8 @@ import workflows.transport
 from bluesky.protocols import Triggerable
 from bluesky.utils import Msg
 from deepdiff import DeepDiff
-from numpy.typing import NDArray
 from ophyd_async.core import (
+    Array1D,
     AsyncStatus,
     StandardReadable,
     StandardReadableFormat,
@@ -133,22 +133,22 @@ class ZocaloResults(StandardReadable, Triggerable):
         self.use_cpu_and_gpu = use_cpu_and_gpu
 
         self.centre_of_mass, self._com_setter = soft_signal_r_and_setter(
-            NDArray[np.uint64], name="centre_of_mass"
+            Array1D[np.uint64], name="centre_of_mass"
         )
         self.bounding_box, self._bounding_box_setter = soft_signal_r_and_setter(
-            NDArray[np.uint64], name="bounding_box"
+            Array1D[np.uint64], name="bounding_box"
         )
         self.max_voxel, self._max_voxel_setter = soft_signal_r_and_setter(
-            NDArray[np.uint64], name="max_voxel"
+            Array1D[np.uint64], name="max_voxel"
         )
         self.max_count, self._max_count_setter = soft_signal_r_and_setter(
-            NDArray[np.uint64], name="max_count"
+            Array1D[np.uint64], name="max_count"
         )
         self.n_voxels, self._n_voxels_setter = soft_signal_r_and_setter(
-            NDArray[np.uint64], name="n_voxels"
+            Array1D[np.uint64], name="n_voxels"
         )
         self.total_count, self._total_count_setter = soft_signal_r_and_setter(
-            NDArray[np.uint64], name="total_count"
+            Array1D[np.uint64], name="total_count"
         )
         self.ispyb_dcid, self._ispyb_dcid_setter = soft_signal_r_and_setter(
             int, name="ispyb_dcid"

@@ -1,14 +1,21 @@
 import os
-from unittest.mock import MagicMock, patch
+from collections.abc import Iterable, Mapping
+from typing import cast
+from unittest.mock import ANY, MagicMock, Mock, patch
 
 import pytest
 from bluesky.protocols import Readable
+from bluesky.run_engine import RunEngine
 from ophyd import EpicsMotor
 
 from dodal.beamlines import i03, i23
 from dodal.utils import (
+    AnyDevice,
+    OphydV1Device,
+    OphydV2Device,
     _find_next_run_number_from_files,
     collect_factories,
+    filter_ophyd_devices,
     get_beamline_based_on_environment_variable,
     get_hostname,
     get_run_number,
@@ -131,6 +138,85 @@ def test_make_device_dependency_throws():
         make_device(fake_beamline, "device_z")
 
 
+def test_device_factory_skips():
+    import tests.fake_device_factory_beamline as fake_beamline
+
+    devices, exceptions = make_all_devices(fake_beamline)
+    assert len(devices) == 0
+    assert len(exceptions) == 0
+
+
+def test_device_factory_can_ignore_skip():
+    import tests.fake_device_factory_beamline as fake_beamline
+
+    devices, exceptions = make_all_devices(fake_beamline, include_skipped=True)
+    assert len(devices) == 3
+    assert len(exceptions) == 0
+
+
+def test_fake_with_ophyd_sim_passed_to_device_factory(RE: RunEngine):
+    import tests.fake_device_factory_beamline as fake_beamline
+
+    fake_beamline.mock_device.cache_clear()
+
+    devices, exceptions = make_all_devices(
+        fake_beamline,
+        include_skipped=True,
+        fake_with_ophyd_sim=True,
+        connect_immediately=True,
+    )
+    if "mock_device" in exceptions:
+        raise exceptions["mock_device"]
+    mock_device = cast(Mock, devices["mock_device"])
+    mock_device.connect.assert_called_once_with(timeout=ANY, mock=True)
+
+
+def test_mock_passed_to_device_factory(RE: RunEngine):
+    import tests.fake_device_factory_beamline as fake_beamline
+
+    fake_beamline.mock_device.cache_clear()
+
+    devices, exceptions = make_all_devices(
+        fake_beamline,
+        include_skipped=True,
+        mock=True,
+        connect_immediately=True,
+    )
+    if "mock_device" in exceptions:
+        raise exceptions["mock_device"]
+    mock_device = cast(Mock, devices["mock_device"])
+    mock_device.connect.assert_called_once_with(timeout=ANY, mock=True)
+
+
+def test_connect_immediately_passed_to_device_factory(RE: RunEngine):
+    import tests.fake_device_factory_beamline as fake_beamline
+
+    fake_beamline.mock_device.cache_clear()
+
+    devices, exceptions = make_all_devices(
+        fake_beamline,
+        include_skipped=True,
+        connect_immediately=False,
+    )
+    if "mock_device" in exceptions:
+        raise exceptions["mock_device"]
+    mock_device = cast(Mock, devices["mock_device"])
+    mock_device.connect.assert_not_called()
+
+
+def test_device_factory_can_rename(RE):
+    from tests.fake_device_factory_beamline import device_c
+
+    cryo = device_c(mock=True, connect_immediately=True)
+    assert cryo.name == "device_c"
+    assert cryo.fine.name == "device_c-fine"
+
+    cryo_2 = device_c(name="cryo")
+    assert cryo is cryo_2
+    assert cryo_2.name == "cryo"
+    assert cryo_2.fine.name == "cryo-fine"
+
+
 def device_a() -> Readable:
     return MagicMock()
 
@@ -213,3 +299,94 @@ def test_get_run_number_uses_prefix(mock_list_dir: MagicMock):
     assert get_run_number("dir", "bar") == 7
     assert get_run_number("dir", "baz") == 29
     assert get_run_number("dir", "qux") == 1
+
+
+OPHYD_DEVICE_A = OphydV1Device(prefix="FOO", name="OPHYD_DEVICE_A")
+OPHYD_DEVICE_B = OphydV1Device(prefix="BAR", name="OPHYD_DEVICE_B")
+
+OPHYD_ASYNC_DEVICE_A = OphydV2Device(name="OPHYD_ASYNC_DEVICE_A")
+OPHYD_ASYNC_DEVICE_B = OphydV2Device(name="OPHYD_ASYNC_DEVICE_B")
+
+
+def _filtering_test_cases() -> (
+    Iterable[
+        tuple[
+            Mapping[str, AnyDevice],
+            Mapping[str, OphydV1Device],
+            Mapping[str, OphydV2Device],
+        ]
+    ]
+):
+    yield {}, {}, {}
+    yield (
+        {"oa": OPHYD_DEVICE_A},
+        {"oa": OPHYD_DEVICE_A},
+        {},
+    )
+    yield (
+        {"aa": OPHYD_ASYNC_DEVICE_A},
+        {},
+        {"aa": OPHYD_ASYNC_DEVICE_A},
+    )
+    yield (
+        {"oa": OPHYD_DEVICE_A, "ob": OPHYD_DEVICE_B},
+        {"oa": OPHYD_DEVICE_A, "ob": OPHYD_DEVICE_B},
+        {},
+    )
+    yield (
+        {
+            "aa": OPHYD_ASYNC_DEVICE_A,
+            "ab": OPHYD_ASYNC_DEVICE_B,
+        },
+        {},
+        {
+            "aa": OPHYD_ASYNC_DEVICE_A,
+            "ab": OPHYD_ASYNC_DEVICE_B,
+        },
+    )
+    yield (
+        {
+            "oa": OPHYD_DEVICE_A,
+            "aa": OPHYD_ASYNC_DEVICE_A,
+        },
+        {"oa": OPHYD_DEVICE_A},
+        {"aa": OPHYD_ASYNC_DEVICE_A},
+    )
+    yield (
+        {
+            "oa": OPHYD_DEVICE_A,
+            "aa": OPHYD_ASYNC_DEVICE_A,
+            "ob": OPHYD_DEVICE_B,
+            "ab": OPHYD_ASYNC_DEVICE_B,
+        },
+        {"oa": OPHYD_DEVICE_A, "ob": OPHYD_DEVICE_B},
+        {
+            "aa": OPHYD_ASYNC_DEVICE_A,
+            "ab": OPHYD_ASYNC_DEVICE_B,
+        },
+    )
+
+
+@pytest.mark.parametrize(
+    "all_devices,expected_ophyd_devices,expected_ophyd_async_devices",
+    list(_filtering_test_cases()),
+)
+def test_filter_ophyd_devices_filters_ophyd_devices(
+    all_devices: Mapping[str, AnyDevice],
+    expected_ophyd_devices: Mapping[str, OphydV1Device],
+    expected_ophyd_async_devices: Mapping[str, OphydV2Device],
+):
+    ophyd_devices, ophyd_async_devices = filter_ophyd_devices(all_devices)
+    assert ophyd_devices == expected_ophyd_devices
+    assert ophyd_async_devices == expected_ophyd_async_devices
+
+
+def test_filter_ophyd_devices_raises_for_extra_types():
+    with pytest.raises(ValueError):
+        ophyd_devices, ophyd_async_devices = filter_ophyd_devices(
+            {
+                "oa": OphydV1Device(prefix="", name="oa"),
+                "aa": OphydV2Device(name="aa"),
+                "ab": 3,  # type: ignore
+            }
+        )

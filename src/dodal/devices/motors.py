@@ -1,8 +1,8 @@
-from ophyd_async.core import Device
+from ophyd_async.core import StandardReadable
 from ophyd_async.epics.motor import Motor
 
 
-class XYZPositioner(Device):
+class XYZPositioner(StandardReadable):
     """
 
     Standard ophyd_async xyz motor stage, by combining 3 Motors,
@@ -15,7 +15,7 @@ class XYZPositioner(Device):
     name:
         name for the stage.
     infix:
-        EPICS PV, default is the ["X", "Y", "Z"].
+        EPICS PV, default is the ("X", "Y", "Z").
     Notes
     -----
     Example usage::
@@ -23,14 +23,18 @@ class XYZPositioner(Device):
             xyz_stage = XYZPositioner("BLXX-MO-STAGE-XX:")
     Or::
         with DeviceCollector():
-            xyz_stage = XYZPositioner("BLXX-MO-STAGE-XX:", suffix = ["A", "B", "C"])
+            xyz_stage = XYZPositioner("BLXX-MO-STAGE-XX:", infix = ("A", "B", "C"))
 
     """
 
-    def __init__(self, prefix: str, name: str, infix: list[str] | None = None):
-        if infix is None:
-            infix = ["X", "Y", "Z"]
-        self.x = Motor(prefix + infix[0])
-        self.y = Motor(prefix + infix[1])
-        self.z = Motor(prefix + infix[2])
+    def __init__(
+        self,
+        prefix: str,
+        name: str = "",
+        infix: tuple[str, str, str] = ("X", "Y", "Z"),
+    ):
+        with self.add_children_as_readables():
+            self.x = Motor(prefix + infix[0])
+            self.y = Motor(prefix + infix[1])
+            self.z = Motor(prefix + infix[2])
         super().__init__(name=name)

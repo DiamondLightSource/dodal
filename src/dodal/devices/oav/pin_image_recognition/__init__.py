@@ -2,7 +2,6 @@ import asyncio
 import time
 
 import numpy as np
-from numpy.typing import NDArray
 from ophyd_async.core import (
     Array1D,
     AsyncStatus,
@@ -57,12 +56,12 @@ class PinTipDetection(StandardReadable):
             Tip, name="triggered_tip"
         )
         self.triggered_top_edge, self._top_edge_setter = soft_signal_r_and_setter(
-            NDArray[np.uint32], name="triggered_top_edge"
+            Array1D[np.uint32], name="triggered_top_edge"
         )
         self.triggered_bottom_edge, self._bottom_edge_setter = soft_signal_r_and_setter(
-            NDArray[np.uint32], name="triggered_bottom_edge"
+            Array1D[np.uint32], name="triggered_bottom_edge"
         )
-        self.array_data = epics_signal_r(NDArray[np.uint8], f"pva://{prefix}PVA:ARRAY")
+        self.array_data = epics_signal_r(Array1D[np.uint8], f"pva://{prefix}PVA:ARRAY")
 
         # Soft parameters for pin-tip detection.
         self.preprocess_operation = soft_signal_rw(int, 10, name="preprocess")
@@ -101,7 +100,7 @@ class PinTipDetection(StandardReadable):
         self._bottom_edge_setter(results.edge_bottom)
 
     async def _get_tip_and_edge_data(
-        self, array_data: NDArray[np.uint8]
+        self, array_data: Array1D[np.uint8]
     ) -> SampleLocation:
         """
         Gets the location of the pin tip and the top and bottom edges.
