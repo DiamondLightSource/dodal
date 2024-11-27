@@ -124,7 +124,7 @@ class ApertureSelector(StandardReadable, Movable):
         scatterguard: Scatterguard,
         get_aperture_in_out: Callable[[], Coroutine[Any, Any, InOut]],
         loaded_positions: dict[ApertureValue, AperturePosition],
-        safe_move: Callable[[AperturePosition], []],
+        safe_move: Callable[[AperturePosition], Coroutine[Any, Any, None]],
     ):
         self.last_selected_aperture = ApertureValue.LARGE
         self.aperture = Reference(aperture)
@@ -139,7 +139,7 @@ class ApertureSelector(StandardReadable, Movable):
         self.last_selected_aperture = value
         if await self.get_aperture_in_out() == InOut.OUT:
             aperture_x, _, aperture_z, scatterguard_x, scatterguard_y = (
-                self.loaded_positions[value.value].values
+                self.loaded_positions[value].values
             )
 
             await asyncio.gather(
@@ -149,7 +149,7 @@ class ApertureSelector(StandardReadable, Movable):
                 self.scatterguard().y.set(scatterguard_y),
             )
         else:
-            await self.safe_move(self.loaded_positions[value.value])
+            await self.safe_move(self.loaded_positions[value])
 
 
 class InOutDevice(StandardReadable, Movable):
@@ -170,7 +170,7 @@ class InOutDevice(StandardReadable, Movable):
             case InOut.IN:
                 selected_aperture = self.selected_aperture().last_selected_aperture
                 await self.aperture_y().set(
-                    self.positions[selected_aperture.value].aperture_y
+                    self.positions[selected_aperture].aperture_y
                 )
             case InOut.OUT:
                 await self.aperture_y().set(
