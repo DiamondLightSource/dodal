@@ -6,15 +6,28 @@ from ophyd_async.core import (
     AsyncStatus,
     DeviceVector,
     SignalR,
+    StandardReadable,
     wait_for_value,
 )
-from ophyd_async.epics.core import epics_signal_r, epics_signal_x
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_x
 
-from dodal.devices.attenuator_base import AttenuatorBase
 from dodal.log import LOGGER
 
 
-class Attenuator(AttenuatorBase, Movable):
+class ReadOnlyAttenuator(StandardReadable):
+    """A read-only attenuator class with a minimum set of PVs for reading.
+
+    The actual_transmission will return a fractional transmission between 0-1.
+    """
+
+    def __init__(self, prefix: str, name: str = "") -> None:
+        with self.add_children_as_readables():
+            self.actual_transmission = epics_signal_r(float, prefix + "MATCH")
+
+        super().__init__(name)
+
+
+class Attenuator(ReadOnlyAttenuator, Movable):
     """The attenuator will insert filters into the beam to reduce its transmission.
 
     This device should be set with:
@@ -38,6 +51,8 @@ class Attenuator(AttenuatorBase, Movable):
             }
         )
 
+        self._desired_transmission = epics_signal_rw(float, prefix + "T2A:SETVAL1")
+        self._use_current_energy = epics_signal_x(prefix + "E2WL:USECURRENTENERGY.PROC")
         self._change = epics_signal_x(prefix + "FANOUT")
 
         super().__init__(prefix, name)
