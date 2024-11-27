@@ -1,6 +1,9 @@
 from ophyd_async.core import StandardReadable
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_x
 
+# This will need a set
+# See https://github.com/DiamondLightSource/dodal/issues/928
+
 
 class AttenuatorBase(StandardReadable):
     """An attenuator base class with a minimum set of common PVs to phase1 beamlines.
