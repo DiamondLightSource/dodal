@@ -1,6 +1,6 @@
 from dodal.common.beamlines.beamline_utils import BL, device_instantiation
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.attenuator_base import AttenuatorBase
+from dodal.devices.attenuator import ReadOnlyAttenuator
 from dodal.devices.detector import DetectorParams
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.hutch_shutter import HutchShutter
@@ -32,13 +32,12 @@ set_utils_beamline(BL)
 
 def attenuator(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> AttenuatorBase:
-    """Get a basic (temporarily without filter wheels) attenuator device for i24,
-    instantiate it if it hasn't already been. If this is called when already \
-    instantiated in i24, it will return the existing object."""
-    # For filter wheels see https://github.com/DiamondLightSource/dodal/issues/927
+) -> ReadOnlyAttenuator:
+    """Get a read-only attenuator device for i24, instantiate it if it hasn't already
+    been. If this is called when already instantiated in i24, it will return the
+    existing object."""
     return device_instantiation(
-        AttenuatorBase,
+        ReadOnlyAttenuator,
         "attenuator",
         "-OP-ATTN-01:",
         wait_for_connection,
