@@ -209,8 +209,8 @@ class ApertureSelector(StandardReadable, Movable):
             )
         else:
             await _safe_move_whilst_in_beam(
-                self.aperture,
-                self.scatterguard,
+                self.aperture(),
+                self.scatterguard(),
                 self.loaded_positions[value],
                 self.aperture_z_tolerance,
             )
