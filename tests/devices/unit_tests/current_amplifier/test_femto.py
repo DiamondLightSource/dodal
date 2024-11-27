@@ -19,7 +19,9 @@ from dodal.devices.current_amplifiers import (
     Femto3xxRaiseTime,
     FemtoDDPCA,
 )
-from dodal.devices.current_amplifiers.amp_detector import AutoGainDectector
+from dodal.devices.current_amplifiers.current_amplifier_detector import (
+    AutoGainDectector,
+)
 from dodal.devices.current_amplifiers.struck_scaler import CountState, StruckScaler
 
 
@@ -179,7 +181,7 @@ async def test_femto_decrease_gain(
 )
 async def test_femto_struck_scaler_read(
     mock_femto: FemtoDDPCA,
-    mock_femto_struck_scaler_detector: AutoGainDectector,
+    mock_femto_struck_scaler_detector,
     RE: RunEngine,
     gain,
     raw_voltage,
@@ -215,7 +217,7 @@ async def test_femto_struck_scaler_read(
 )
 async def test_femto_struck_scaler_read_with_autoGain(
     mock_femto: FemtoDDPCA,
-    mock_femto_struck_scaler_detector: AutoGainDectector,
+    mock_femto_struck_scaler_detector,
     RE: RunEngine,
     gain,
     raw_voltage,

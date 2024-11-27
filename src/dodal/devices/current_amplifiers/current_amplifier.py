@@ -2,9 +2,7 @@ from abc import ABC, abstractmethod
 from enum import Enum
 
 from bluesky.protocols import Movable
-from ophyd_async.core import (
-    StandardReadable,
-)
+from ophyd_async.core import AsyncStatus, StandardReadable
 
 
 class CurrentAmp(ABC, StandardReadable, Movable):
@@ -27,3 +25,19 @@ class CurrentAmp(ABC, StandardReadable, Movable):
     async def decrease_gain(self) -> bool: ...
     @abstractmethod
     async def get_gain(self) -> str: ...
+
+
+class CurrentAmpCounter(ABC, StandardReadable):
+    def __init__(self, count_per_volt: float, name: str = ""):
+        self.count_per_volt = count_per_volt
+        super().__init__(name)
+
+    @abstractmethod
+    async def get_count(self) -> float: ...
+    @abstractmethod
+    async def get_count_per_sec(self) -> float: ...
+    @abstractmethod
+    async def get_voltage_per_sec(self) -> float: ...
+    @abstractmethod
+    @AsyncStatus.wrap
+    async def prepare(self, value) -> None: ...

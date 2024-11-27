@@ -1,13 +1,3 @@
-"""
-take an amp and detector with count
-a flag for auto gain
-if it set to true
-    does auto gain before reading the detector count
-    auto read will change the current amp setting so that the detector count is within
-    a given range.
-
-"""
-
 from bluesky.protocols import Preparable, Reading
 from ophyd_async.core import (
     AsyncStatus,
@@ -17,8 +7,10 @@ from ophyd_async.core import (
     soft_signal_rw,
 )
 
-from dodal.devices.current_amplifiers.current_amplifier import CurrentAmp
-from dodal.devices.current_amplifiers.struck_scaler import StruckScaler
+from dodal.devices.current_amplifiers.current_amplifier import (
+    CurrentAmp,
+    CurrentAmpCounter,
+)
 from dodal.log import LOGGER
 
 
@@ -26,7 +18,7 @@ class AutoGainDectector(StandardReadable, Preparable):
     def __init__(
         self,
         current_amp: CurrentAmp,
-        counter: StruckScaler,
+        counter: CurrentAmpCounter,
         upper_limit: float,
         lower_limit: float,
         name: str = "",

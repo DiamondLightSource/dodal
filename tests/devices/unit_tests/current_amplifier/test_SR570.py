@@ -21,7 +21,9 @@ from dodal.devices.current_amplifiers import (
     SR570GainToCurrentTable,
     SR570RaiseTimeTable,
 )
-from dodal.devices.current_amplifiers.amp_detector import AutoGainDectector
+from dodal.devices.current_amplifiers.current_amplifier_detector import (
+    AutoGainDectector,
+)
 from dodal.devices.current_amplifiers.struck_scaler import CountState, StruckScaler
 
 
@@ -187,7 +189,7 @@ async def test_SR570_decrease_gain(
 )
 async def test_SR570_struck_scaler_read(
     mock_sr570: SR570,
-    mock_sr570_struck_scaler_detector: AutoGainDectector,
+    mock_sr570_struck_scaler_detector,
     RE: RunEngine,
     gain,
     raw_count,
@@ -230,7 +232,7 @@ async def test_SR570_struck_scaler_read(
 )
 async def test_SR570_struck_scaler_read_with_autoGain(
     mock_sr570: SR570,
-    mock_sr570_struck_scaler_detector: AutoGainDectector,
+    mock_sr570_struck_scaler_detector,
     RE: RunEngine,
     gain,
     raw_count,

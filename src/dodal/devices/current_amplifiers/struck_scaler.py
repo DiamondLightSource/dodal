@@ -1,12 +1,14 @@
-from bluesky.protocols import Preparable, Triggerable
 from ophyd_async.core import (
     AsyncStatus,
-    StandardReadable,
     StandardReadableFormat,
     StrictEnum,
     set_and_wait_for_other_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
+
+from dodal.devices.current_amplifiers.current_amplifier_detector import (
+    CurrentAmpCounter,
+)
 
 
 class CountMode(StrictEnum):
@@ -22,7 +24,7 @@ class CountState(StrictEnum):
 COUNT_PER_VOLTAGE = 100000
 
 
-class StruckScaler(StandardReadable, Triggerable, Preparable):
+class StruckScaler(CurrentAmpCounter):
     def __init__(
         self, prefix: str, suffix: str, count_per_volt=COUNT_PER_VOLTAGE, name: str = ""
     ):
@@ -32,8 +34,7 @@ class StruckScaler(StandardReadable, Triggerable, Preparable):
         self.count_mode = epics_signal_rw(CountMode, prefix + ":AutoCount")
         self.count_time = epics_signal_rw(float, prefix + ".TP")
         self.trigger_start = epics_signal_rw(CountState, prefix + ".CNT")
-        self.count_per_volt = count_per_volt
-        super().__init__(name)
+        super().__init__(count_per_volt=count_per_volt, name=name)
 
     @AsyncStatus.wrap
     async def stage(self) -> None:
