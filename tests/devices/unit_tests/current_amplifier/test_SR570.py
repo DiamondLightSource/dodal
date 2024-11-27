@@ -175,13 +175,13 @@ async def test_SR570_decrease_gain(
 
 
 @pytest.mark.parametrize(
-    "gain,raw_voltage, expected_current",
+    "gain,raw_count, expected_current",
     [
-        ("sen_1", 0.51, 0.51e-3),
-        ("sen_3", -10, -2e-3),
-        ("sen_11", 5.2, 2.6e-6),
-        ("sen_17", 2.2, 1.1e-8),
-        ("sen_23", 8.7, 4.35e-10),
+        ("sen_1", 0.51e5, 0.51e-3),
+        ("sen_3", -10e5, -2e-3),
+        ("sen_11", 5.2e5, 2.6e-6),
+        ("sen_17", 2.2e5, 1.1e-8),
+        ("sen_23", 8.7e5, 4.35e-10),
         ("sen_5", 0.0, 0.0),
     ],
 )
@@ -190,11 +190,12 @@ async def test_SR570_struck_scaler_read(
     mock_sr570_struck_scaler_detector: AutoGainDectector,
     RE: RunEngine,
     gain,
-    raw_voltage,
+    raw_count,
     expected_current,
 ):
     set_mock_value(mock_sr570.gain, SR570FullGainTable[gain].name)
-    set_mock_value(mock_sr570_struck_scaler_detector.counter.readout, raw_voltage)
+    set_mock_value(mock_sr570_struck_scaler_detector.counter.readout, raw_count)
+    set_mock_value(mock_sr570_struck_scaler_detector.counter.count_time, 1)
     set_mock_value(mock_sr570_struck_scaler_detector.auto_mode, False)
     docs = defaultdict(list)
 
@@ -208,19 +209,23 @@ async def test_SR570_struck_scaler_read(
 
 
 @pytest.mark.parametrize(
-    "gain,raw_voltage, expected_current",
+    "gain,raw_count, expected_current",
     [
         (
             "sen_10",
-            [1e-3, 2e-3, 5e-3, 1e-2, 2e-2, 5e-2, 1e-1, 2e-1, 5e-1, 5e-1],
+            [1e2, 2e2, 5e2, 1e3, 2e3, 5e3, 1e4, 2e4, 5e4, 5e4],
             1e-9,
         ),
-        ("sen_1", [1, 1], 1e-3),
-        ("sen_10", [520, 260, 104, 52, 26, 10.4, 5.2, 2.6, 2.6], 5.2e-4),
-        ("sen_19", [22.2, 11.1, 4.4, 4.4], 2.2e-8),
+        ("sen_1", [1e5, 1e5], 1e-3),
+        (
+            "sen_10",
+            [520e5, 260e5, 104e5, 52e5, 26e5, 10.4e5, 5.2e5, 2.6e5, 2.6e5],
+            5.2e-4,
+        ),
+        ("sen_19", [22.2e5, 11.1e5, 4.4e5, 4.4e5], 2.2e-8),
         ("sen_5", [0.0] * (30 - 5), 0.0),
-        ("sen_5", [-200.0, -100.0, -50.0, -20, -10, -10], -0.01),
-        ("sen_25", [0.002, 0.004, 0.01, 0.02, 0.02], 2e-14),
+        ("sen_5", [-200.0e5, -100.0e5, -50.0e5, -20e5, -10e5, -10e5], -0.01),
+        ("sen_25", [0.002e5, 0.004e5, 0.01e5, 0.02e5, 0.02e5], 2e-14),
     ],
 )
 async def test_SR570_struck_scaler_read_with_autoGain(
@@ -228,14 +233,14 @@ async def test_SR570_struck_scaler_read_with_autoGain(
     mock_sr570_struck_scaler_detector: AutoGainDectector,
     RE: RunEngine,
     gain,
-    raw_voltage,
+    raw_count,
     expected_current,
 ):
     set_mock_value(mock_sr570.gain, SR570FullGainTable[gain].name)
     set_mock_value(mock_sr570_struck_scaler_detector.counter.count_time, 1)
     set_mock_value(mock_sr570_struck_scaler_detector.auto_mode, True)
     rbv_mocks = Mock()
-    rbv_mocks.get.side_effect = raw_voltage
+    rbv_mocks.get.side_effect = raw_count
 
     def set_mock_counter():
         set_mock_value(

@@ -169,11 +169,11 @@ async def test_femto_decrease_gain(
 @pytest.mark.parametrize(
     "gain,raw_voltage, expected_current",
     [
-        ("sen_1", 0.51, 0.51e-4),
-        ("sen_3", -10, -10e-6),
-        ("sen_6", 5.2, 5.2e-9),
-        ("sen_9", 2.2, 2.2e-12),
-        ("sen_10", 8.7, 8.7e-13),
+        ("sen_1", 0.51e5, 0.51e-4),
+        ("sen_3", -10e5, -10e-6),
+        ("sen_6", 5.2e5, 5.2e-9),
+        ("sen_9", 2.2e5, 2.2e-12),
+        ("sen_10", 8.7e5, 8.7e-13),
         ("sen_5", 0.0, 0.0),
     ],
 )
@@ -186,6 +186,7 @@ async def test_femto_struck_scaler_read(
     expected_current,
 ):
     set_mock_value(mock_femto.gain, Femto3xxGainTable[gain])
+    set_mock_value(mock_femto_struck_scaler_detector.counter.count_time, 1)
     set_mock_value(mock_femto_struck_scaler_detector.counter.readout, raw_voltage)
     set_mock_value(mock_femto_struck_scaler_detector.auto_mode, False)
     docs = defaultdict(list)
@@ -202,13 +203,13 @@ async def test_femto_struck_scaler_read(
 @pytest.mark.parametrize(
     "gain,raw_voltage, expected_current",
     [
-        ("sen_10", [1e4, 1e3, 1e2, 1e1, 1, 1], 1e-9),
-        ("sen_1", [4e-3, 4e-2, 4e-1, 4, 4], 4e-7),
-        ("sen_6", [520, 52, 5.2, 5.2], 5.2e-7),
-        ("sen_9", [2.2, 2.2], 2.2e-12),
-        ("sen_10", [0.17, 0.17], 0.17e-13),
+        ("sen_10", [1e9, 1e8, 1e7, 1e6, 1e5, 1e5], 1e-9),
+        ("sen_1", [4e2, 4e3, 4e4, 4e5, 4e5], 4e-7),
+        ("sen_6", [520e5, 52e5, 5.2e5, 5.2e5], 5.2e-7),
+        ("sen_9", [2.2e5, 2.2e5], 2.2e-12),
+        ("sen_10", [0.17e5, 0.17e5], 0.17e-13),
         ("sen_5", [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 0.0),
-        ("sen_5", [-200.0, -20.0, -2.0, -2.0], -2e-6),
+        ("sen_5", [-200.0e5, -20.0e5, -2.0e5, -2.0e5], -2e-6),
     ],
 )
 async def test_femto_struck_scaler_read_with_autoGain(

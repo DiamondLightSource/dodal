@@ -57,18 +57,18 @@ class AutoGainDectector(StandardReadable):
 
     async def auto_gain(self) -> bool:
         cnt = 0
-        count_time = await self.counter.count_time.get_value()
         while cnt < len(self.current_amp.gain_convertion_table):
-            await self.counter.trigger()
+            # await self.counter.trigger()
             """
             negative value is possible on some current amplifier it is the order of
               magnitude that is important
             """
-            reading = abs(await self.counter.readout.get_value(cached=False))
-            if reading > self.upper_limit / count_time:
+            reading = abs(await self.counter.get_voltage_per_sec())
+            print(reading)
+            if reading > self.upper_limit:
                 if not await self.current_amp.decrease_gain():
                     return False
-            elif reading < self.lower_limit / count_time:
+            elif reading < self.lower_limit:
                 if not await self.current_amp.increase_gain():
                     return False
             else:
@@ -79,8 +79,7 @@ class AutoGainDectector(StandardReadable):
     async def get_corrected_current(self) -> float:
         current_gain = await self.current_amp.get_gain()
         correction_factor = self.current_amp.gain_convertion_table[current_gain].value
-        await self.counter.trigger()
         corrected_current = (
-            await self.counter.readout.get_value(cached=False)
+            await self.counter.get_voltage_per_sec()
         ) / correction_factor
         return corrected_current
