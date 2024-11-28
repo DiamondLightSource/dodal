@@ -9,6 +9,8 @@ class BimorphMirrorChannel(StandardReadable):
         with self.add_children_as_readables(Format.HINTED_SIGNAL):
             self.vout_rbv = epics_signal_r(float, f"{prefix}:VOUT_RBV")
 
+        super().__init__(name=name)
+
 
 class BimorphMirror(StandardReadable):
     def __init__(self, prefix: str, name="", number_of_channels: int = 0):
@@ -21,3 +23,4 @@ class BimorphMirror(StandardReadable):
                     for i in range(1, number_of_channels + 1)
                 }
             )
+        super().__init__(name=name)
