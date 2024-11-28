@@ -7,7 +7,9 @@ from ophyd_async.epics.core import PvSuffix, epics_signal_r
 
 
 class BimorphMirrorChannel(StandardReadable):
-    vout_rbv: A[SignalR[float], PvSuffix("VOUT_RBV"), Format.HINTED_SIGNAL]
+    def __init__(self, prefix: str, name=""):
+        with self.add_children_as_readables(Format.HINTED_SIGNAL):
+            self.vout_rbv = epics_signal_r(float, f"{prefix}:VOUT_RBV")
 
 
 class BimorphMirror(StandardReadable, Movable):
