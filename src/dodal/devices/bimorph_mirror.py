@@ -1,20 +1,21 @@
+import asyncio
+
 from bluesky.protocols import Movable
-from ophyd_async.core import DeviceVector, StandardReadable
+from ophyd_async.core import AsyncStatus, DeviceVector, StandardReadable, wait_for_value
 from ophyd_async.core import StandardReadableFormat as Format
-from ophyd_async.epics.core import epics_signal_r
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw_rbv, epics_signal_x
 
 
 class BimorphMirrorChannel(StandardReadable):
     def __init__(self, prefix: str, name=""):
         with self.add_children_as_readables(Format.HINTED_SIGNAL):
-            self.vtrgt_rbv = epics_signal_r(float, f"{prefix}:VTRGT_RBV")
-            self.vout_rbv = epics_signal_r(float, f"{prefix}:VOUT_RBV")
+            self.vtrgt = epics_signal_rw_rbv(float, f"{prefix}:VTRGT")
+            self.vout = epics_signal_rw_rbv(float, f"{prefix}:VOUT")
             self.status = epics_signal_r(float, f"{prefix}:STATUS")
 
         super().__init__(name=name)
 
-
-class BimorphMirror(StandardReadable):
+class BimorphMirror(StandardReadable, Movable):
     def __init__(self, prefix: str, name="", number_of_channels: int = 0):
         self.number_of_channels = number_of_channels
 
@@ -25,4 +26,20 @@ class BimorphMirror(StandardReadable):
                     for i in range(1, number_of_channels + 1)
                 }
             )
+        self.alltrgt_proc = epics_signal_x(f"{prefix}:ALLTRGT.PROC")
+
         super().__init__(name=name)
+
+    @AsyncStatus.wrap
+    async def set(self, value: dict[int, float]):
+        await asyncio.gather(
+            *[self.channels.get(i).vtrgt.set(target) for i, target in value.items()]
+        )
+        await self.alltrgt_proc.trigger()
+
+        await asyncio.gather(
+            *[
+                wait_for_value(self.channels.get(i).vtrgt, target, None)
+                for i, target in value.items()
+            ]
+        )
