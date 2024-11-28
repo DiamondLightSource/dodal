@@ -38,7 +38,7 @@ There may be times where one person requests changes on a PR, these changes are 
 
 ## Joining the Review Team
 
-At least two members of the review team from two different DLS teams *must* approve adding a new member, neither of them can be on the new member's DLS team. They should ideally both be senior engineers but this will not always be possible. 
+At least two members of the review team from two different DLS teams *must* approve adding a new member, neither of them can be on the new member's DLS team. At least one of the approvers should ideally be a senior engineer but this will not always be possible. 
 
 In the event of a rejection the review team should provide concise and actionable feedback and set a date for re-consideration.
 
