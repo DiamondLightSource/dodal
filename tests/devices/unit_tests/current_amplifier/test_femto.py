@@ -20,7 +20,7 @@ from dodal.devices.current_amplifiers import (
     FemtoDDPCA,
 )
 from dodal.devices.current_amplifiers.current_amplifier_detector import (
-    AutoGainDectector,
+    CurrentAmpDet,
 )
 from dodal.devices.current_amplifiers.struck_scaler import CountState, StruckScaler
 
@@ -61,9 +61,9 @@ async def mock_femto_struck_scaler_detector(
     mock_StruckScaler: StruckScaler,
     mock_femto: FemtoDDPCA,
     prefix: str = "BLXX-EA-DET-007:",
-) -> AutoGainDectector:
+) -> CurrentAmpDet:
     async with DeviceCollector(mock=True):
-        mock_femto_struck_scaler_detector = AutoGainDectector(
+        mock_femto_struck_scaler_detector = CurrentAmpDet(
             current_amp=mock_femto,
             counter=mock_StruckScaler,
             upper_limit=9.5,

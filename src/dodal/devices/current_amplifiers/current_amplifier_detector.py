@@ -14,7 +14,22 @@ from dodal.devices.current_amplifiers.current_amplifier import (
 from dodal.log import LOGGER
 
 
-class AutoGainDectector(StandardReadable, Preparable):
+class CurrentAmpDet(StandardReadable, Preparable):
+    """
+    CurrentAmpDet composed of a CurrentAmp and a CurrentAmpCounter. It provides
+      the option for automatically change the CurrentAmp gain to within the optimal
+      range. It also convert the currentAmp/counter output back into the detector
+      current output in Amp.
+    Attributes:
+        current_amp (currentAmp): Current amplifier type device.
+        counter (CurrentAmpCounter): Counter that capture the current amplifier output.
+        current (SignalRW([float]): Soft signal to store the corrected current.
+        auto_mode (signalR([bool])): Soft signal to store the flag for auto gain.
+        upper_limit (float): The upper limit of the current amplifier output in volt.
+        lower_limit (float): The lower limit of the current amplifier output in volt.
+        name (str): Name of the device.
+    """
+
     def __init__(
         self,
         current_amp: CurrentAmp,
@@ -36,28 +51,29 @@ class AutoGainDectector(StandardReadable, Preparable):
         super().__init__(name)
 
     async def read(self) -> dict[str, Reading]:
+        """
+        Read is modified so that if auto_mode is true it will optimism gain before
+         taking the final reading
+        """
         if await self.auto_mode.get_value() is True:
             LOGGER.info(f"{self.name}-Attempting auto-gain")
             if await self.auto_gain():
                 LOGGER.info(
-                    f"{self.name} new gain = f{await self.current_amp.get_gain()}."
+                    f"{self.name} new gain = {await self.current_amp.get_gain()}."
                 )
             else:
-                LOGGER.warning("{self.name} new gain is at maximum/minimum value.")
+                LOGGER.warning(f"{self.name} new gain is at maximum/minimum value.")
         current = await self.get_corrected_current()
         self._current_set(current)
         return await super().read()
 
     async def auto_gain(self) -> bool:
         cnt = 0
-        while cnt < len(self.current_amp.gain_convertion_table):
-            # await self.counter.trigger()
+        while cnt < len(self.current_amp.gain_conversion_table):
             """
-            negative value is possible on some current amplifier it is the order of
-              magnitude that is important
+            negative value is possible on some current amplifier, hence the abs.
             """
             reading = abs(await self.counter.get_voltage_per_sec())
-            print(reading, cnt)
             if reading > self.upper_limit:
                 if not await self.current_amp.decrease_gain():
                     return False
@@ -71,7 +87,7 @@ class AutoGainDectector(StandardReadable, Preparable):
 
     async def get_corrected_current(self) -> float:
         current_gain = await self.current_amp.get_gain()
-        correction_factor = self.current_amp.gain_convertion_table[current_gain].value
+        correction_factor = self.current_amp.gain_conversion_table[current_gain].value
         corrected_current = (
             await self.counter.get_voltage_per_sec()
         ) / correction_factor

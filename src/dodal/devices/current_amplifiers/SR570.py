@@ -5,7 +5,6 @@ from ophyd_async.core import (
     AsyncStatus,
     StandardReadableFormat,
     StrictEnum,
-    soft_signal_r_and_setter,
 )
 from ophyd_async.epics.core import epics_signal_rw
 
@@ -14,7 +13,7 @@ from dodal.log import LOGGER
 
 
 class SR570GainTable(StrictEnum):
-    """These are the sensitivity setting for Femto 3xx current amplifier"""
+    """Sensitivity setting for SR570 current amplifier"""
 
     sen_1 = "mA/V"
     sen_2 = "uA/V"
@@ -22,17 +21,8 @@ class SR570GainTable(StrictEnum):
     sen_4 = "pA/V"
 
 
-class SR570RaiseTimeTable(float, Enum):
-    """These are the gain dependent raise time(s) for Femto 3xx current amplifier"""
-
-    sen_1 = 1e-4
-    sen_2 = 1e-2
-    sen_3 = 0.15
-    sen_4 = 0.2
-
-
 class SR570FineGainTable(StrictEnum):
-    """These are the sensitivity setting for Femto 3xx current amplifier"""
+    """Fine sensitivity setting for SR570 current amplifier"""
 
     sen_1 = "1"
     sen_2 = "2"
@@ -45,7 +35,19 @@ class SR570FineGainTable(StrictEnum):
     sen_9 = "500"
 
 
+class SR570RaiseTimeTable(float, Enum):
+    """These are the gain dependent raise time(s) for SR570 current amplifier"""
+
+    sen_1 = 1e-4
+    sen_2 = 1e-2
+    sen_3 = 0.15
+    sen_4 = 0.2
+
+
 class SR570FullGainTable(Enum):
+    """Combined gain table as each gain step is a combination of both gain and
+    fine gain setting"""
+
     sen_1 = [SR570GainTable.sen_1, SR570FineGainTable.sen_1]
     sen_2 = [SR570GainTable.sen_2, SR570FineGainTable.sen_9]
     sen_3 = [SR570GainTable.sen_2, SR570FineGainTable.sen_8]
@@ -77,6 +79,8 @@ class SR570FullGainTable(Enum):
 
 
 class SR570GainToCurrentTable(float, Enum):
+    """Conversion table for gain(sen) to current"""
+
     sen_1 = 1e3
     sen_2 = 2e3
     sen_3 = 5e3
@@ -109,7 +113,21 @@ class SR570GainToCurrentTable(float, Enum):
 
 class SR570(CurrentAmp):
     """
-    SR570 current amplifier device.
+    SR570 current amplifier device. This is similar to Femto with the only different is,
+      SR570 has two gain setting, fine and coarse therefore it requires two extra
+       gain tables.
+    Attributes:
+        fine_gain (SignalRW): This is the epic signal that control SR570 fine gain.
+        coarse_gain (SignalRW): This is the epic signal that control SR570 coarse gain.
+        fine_gain_table (strictEnum): The table that fine_gain use to set gain.
+        coarse_gain_table (strictEnum): The table that coarse_gain use to set gain.
+        timeout (float): Maximum waiting time in second for setting gain.
+        raise_timetable (Enum): Table contain the amount of time to wait after
+            setting gain.
+        combined_table (Enum): Table that combine fine and coarse table into one.
+        gain (SignalRW([str]): Soft signal to store the member name of the current gain
+            setting in gain_conversion_table.
+
     """
 
     def __init__(
@@ -124,33 +142,28 @@ class SR570(CurrentAmp):
         timeout: float = 1,
         name: str = "",
     ) -> None:
-        super().__init__(name=name, gain_convertion_table=gain_to_current_table)
+        super().__init__(name=name, gain_conversion_table=gain_to_current_table)
+
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
+            self.fine_gain = epics_signal_rw(fine_gain_table, prefix + suffix + "1")
+            self.coarse_gain = epics_signal_rw(coarse_gain_table, prefix + suffix + "2")
 
         self.fine_gain_table = fine_gain_table
         self.coarse_gain_table = coarse_gain_table
         self.timeout = timeout
         self.raise_time_table = raise_timetable
         self.combined_table = combined_table
-        self.gain, self._set_gain = soft_signal_r_and_setter(
-            str
-        )  # overriding gain as there are 2 gain setting rather than just 1.
-
-        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
-            self.fine_gain = epics_signal_rw(fine_gain_table, prefix + suffix + "1")
-            self.coarse_gain = epics_signal_rw(coarse_gain_table, prefix + suffix + "2")
 
     @AsyncStatus.wrap
     async def set(self, value) -> None:
-        if value not in [item.value for item in self.gain_convertion_table]:
+        if value not in [item.value for item in self.gain_conversion_table]:
             raise ValueError(f"Gain value {value} is not within {self.name} range.")
-        sen_setting = self.gain_convertion_table(value).name
+        sen_setting = self.gain_conversion_table(value).name
         LOGGER.info(f"{self.name} gain change to {value}")
 
         coarse_gain, fine_gain = self.combined_table[sen_setting].value
-        print(coarse_gain.name, fine_gain, sen_setting)
         await self.fine_gain.set(value=fine_gain, timeout=self.timeout)
         await self.coarse_gain.set(value=coarse_gain, timeout=self.timeout)
-        self._set_gain(sen_setting)  # wait for current amplifier to settle
         await asyncio.sleep(self.raise_time_table[coarse_gain.name].value)
 
     async def increase_gain(self) -> bool:
@@ -158,7 +171,7 @@ class SR570(CurrentAmp):
         current_gain += 1
         if current_gain > len(self.combined_table):
             return False
-        await self.set(self.gain_convertion_table[f"sen_{current_gain}"])
+        await self.set(self.gain_conversion_table[f"sen_{current_gain}"])
         return True
 
     async def decrease_gain(self) -> bool:
@@ -166,8 +179,11 @@ class SR570(CurrentAmp):
         current_gain -= 1
         if current_gain < 1:
             return False
-        await self.set(self.gain_convertion_table[f"sen_{current_gain}"])
+        await self.set(self.gain_conversion_table[f"sen_{current_gain}"])
         return True
 
     async def get_gain(self) -> str:
-        return await self.gain.get_value()
+        result = await asyncio.gather(
+            self.coarse_gain.get_value(), self.fine_gain.get_value()
+        )
+        return self.combined_table(result).name

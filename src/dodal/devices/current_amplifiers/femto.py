@@ -60,10 +60,14 @@ class Femto3xxRaiseTime(float, Enum):
 class FemtoDDPCA(CurrentAmp):
     """
     Femto current amplifier device, this class should cover all DDPCA Femto current
-     amplifiers, As the main different between all the DDPCACondition Femto is their gain table
-     and respond time table.
-    This class will allow the change of gain via set or the two incremental,
-     increase_gain and decrease gain function.
+      amplifiers, As the main different between all the DDPCA Femto is their gain table
+        and respond time table.
+    Attributes:
+        gain (SignalRW): This is the epic signal that control current amplifier gain.
+        gain_table (strictEnum): The table that gain use to set gain.
+        timeout (float): Maximum waiting time in second for setting gain.
+        raise_timetable (Enum): Table contain the amount of time to wait after
+         setting gain.
     """
 
     def __init__(
@@ -83,20 +87,20 @@ class FemtoDDPCA(CurrentAmp):
             self.gain_table = gain_table
             self.timeout = timeout
             self.raise_timetable = raise_timetable
-        super().__init__(name=name, gain_convertion_table=gain_to_current_table)
+        super().__init__(name=name, gain_conversion_table=gain_to_current_table)
 
     @AsyncStatus.wrap
     async def set(self, value) -> None:
-        if value not in [item.value for item in self.gain_convertion_table]:
+        if value not in [item.value for item in self.gain_conversion_table]:
             raise ValueError(f"Gain value {value} is not within {self.name} range.")
-        sen_setting = self.gain_convertion_table(value).name
+        sen_setting = self.gain_conversion_table(value).name
         LOGGER.info(f"{self.name} gain change to {sen_setting}:{value}")
 
         await self.gain.set(
             value=self.gain_table[sen_setting].value,
             timeout=self.timeout,
         )
-        # wait for current amplifier to settle
+        # wait for current amplifier to bandpass filter to settle.
         await asyncio.sleep(self.raise_timetable[sen_setting].value)
 
     async def increase_gain(self) -> bool:
@@ -104,7 +108,7 @@ class FemtoDDPCA(CurrentAmp):
         current_gain += 1
         if current_gain > len(self.gain_table):
             return False
-        await self.set(self.gain_convertion_table[f"sen_{current_gain}"])
+        await self.set(self.gain_conversion_table[f"sen_{current_gain}"])
         return True
 
     async def decrease_gain(self) -> bool:
@@ -112,7 +116,7 @@ class FemtoDDPCA(CurrentAmp):
         current_gain -= 1
         if current_gain < 1:
             return False
-        await self.set(self.gain_convertion_table[f"sen_{current_gain}"])
+        await self.set(self.gain_conversion_table[f"sen_{current_gain}"])
         return True
 
     async def get_gain(self) -> str:

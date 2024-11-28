@@ -1,5 +1,5 @@
 from .current_amplifier import CurrentAmp
-from .current_amplifier_detector import AutoGainDectector
+from .current_amplifier_detector import CurrentAmpDet
 from .femto import (
     Femto3xxGainTable,
     Femto3xxGainToCurrentTable,
@@ -21,7 +21,7 @@ __all__ = [
     "Femto3xxRaiseTime",
     "CurrentAmp",
     "Femto3xxGainToCurrentTable",
-    "AutoGainDectector",
+    "CurrentAmpDet",
     "SR570",
     "SR570GainTable",
     "SR570FineGainTable",
