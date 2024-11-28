@@ -300,3 +300,43 @@ def rasor_Femto_pa_scaler_det() -> CurrentAmpDet:
         upper_limit=9.5,
         lower_limit=0.4,
     )
+
+
+@device_factory()
+def rasor_sr570_flou_scaler_det() -> CurrentAmpDet:
+    return CurrentAmpDet(
+        current_amp=rasor_sr570().ca2,
+        counter=rasor_det_scalers().fluo,
+        upper_limit=4.7,
+        lower_limit=0.4,
+    )
+
+
+@device_factory()
+def rasor_Femto_flou_scaler_det() -> CurrentAmpDet:
+    return CurrentAmpDet(
+        current_amp=rasor_femto().ca2,
+        counter=rasor_det_scalers().fluo,
+        upper_limit=9.5,
+        lower_limit=0.4,
+    )
+
+
+@device_factory()
+def rasor_sr570_drain_scaler_det() -> CurrentAmpDet:
+    return CurrentAmpDet(
+        current_amp=rasor_sr570().ca3,
+        counter=rasor_det_scalers().drain,
+        upper_limit=4.7,
+        lower_limit=0.4,
+    )
+
+
+@device_factory()
+def rasor_Femto_drain_scaler_det() -> CurrentAmpDet:
+    return CurrentAmpDet(
+        current_amp=rasor_femto().ca3,
+        counter=rasor_det_scalers().drain,
+        upper_limit=9.5,
+        lower_limit=0.4,
+    )
