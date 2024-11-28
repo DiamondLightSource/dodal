@@ -263,6 +263,7 @@ def idd_la_angle(
 "Raosr devices"
 
 
+@device_factory()
 def rasor_femto() -> RasorFemto:
     return RasorFemto(
         prefix="ME01D-EA-IAMP",
