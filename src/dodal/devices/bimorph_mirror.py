@@ -14,7 +14,7 @@ class BimorphMirror(StandardReadable):
     def __init__(self, prefix: str, name="", number_of_channels: int = 0):
         self.number_of_channels = number_of_channels
 
-        with self.add_children_as_readables(Format.HINTED_SIGNAL):
+        with self.add_children_as_readables():
             self.channels = DeviceVector(
                 {
                     i: BimorphMirrorChannel(f"{prefix}:C{i}", f"channel{i}")
