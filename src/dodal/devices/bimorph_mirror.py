@@ -1,5 +1,3 @@
-from typing import Annotated as A
-
 from bluesky.protocols import Movable
 from ophyd_async.core import DeviceVector, StandardReadable
 from ophyd_async.core import StandardReadableFormat as Format
@@ -12,7 +10,7 @@ class BimorphMirrorChannel(StandardReadable):
             self.vout_rbv = epics_signal_r(float, f"{prefix}:VOUT_RBV")
 
 
-class BimorphMirror(StandardReadable, Movable):
+class BimorphMirror(StandardReadable):
     def __init__(self, prefix: str, name="", number_of_channels: int = 0):
         self.number_of_channels = number_of_channels
 
