@@ -11,7 +11,7 @@ class BimorphMirrorChannel(StandardReadable):
         with self.add_children_as_readables(Format.HINTED_SIGNAL):
             self.vtrgt = epics_signal_rw_rbv(float, f"{prefix}:VTRGT")
             self.vout = epics_signal_rw_rbv(float, f"{prefix}:VOUT")
-            self.status = epics_signal_r(float, f"{prefix}:STATUS")
+            self.status = epics_signal_r(str, f"{prefix}:STATUS")
 
         super().__init__(name=name)
 
