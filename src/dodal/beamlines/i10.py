@@ -1,13 +1,13 @@
 from pathlib import Path
 
-from dodal.common.beamlines.beamline_utils import device_instantiation
+from dodal.common.beamlines.beamline_utils import device_factory, device_instantiation
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.apple2_undulator import (
     UndulatorGap,
     UndulatorJawPhase,
     UndulatorPhaseAxes,
 )
-from dodal.devices.current_amplifiers.struck_scaler import StruckScaler
+from dodal.devices.current_amplifiers import CurrentAmpDet
 from dodal.devices.i10.i10_apple2 import (
     I10Apple2,
     I10Apple2PGM,
@@ -15,6 +15,7 @@ from dodal.devices.i10.i10_apple2 import (
     LinearArbitraryAngle,
 )
 from dodal.devices.i10.i10_current_amp import RasorFemto, RasorSR570
+from dodal.devices.i10.i10_scaler_cards import rasor_scaler_card_1
 from dodal.devices.i10.i10_setting_data import I10Grating
 from dodal.devices.pgm import PGM
 from dodal.log import set_beamline as set_log_beamline
@@ -262,41 +263,39 @@ def idd_la_angle(
 "Raosr devices"
 
 
-def rasor_femto(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> RasorFemto:
-    return device_instantiation(
-        device_factory=RasorFemto,
-        name="rasor_femto",
+def rasor_femto() -> RasorFemto:
+    return RasorFemto(
         prefix="ME01D-EA-IAMP",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
-        bl_prefix=False,
     )
 
 
-def rasor_scaler_card_1(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> StruckScaler:
-    return device_instantiation(
-        device_factory=StruckScaler,
-        name="rasor_scaler_card_1",
-        prefix="ME01D-EA-SCLR-01:SCALER1",
-        suffix=".17",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
-        bl_prefix=False,
+@device_factory()
+def rasor_det_scalers() -> rasor_scaler_card_1:
+    return rasor_scaler_card_1(prefix="ME01D-EA-SCLR-01:SCALER1")
+
+
+@device_factory()
+def rasor_sr570() -> RasorSR570:
+    return RasorSR570(
+        prefix="ME01D-EA-IAMP",
     )
 
 
-def rasor_sr570(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> RasorSR570:
-    return device_instantiation(
-        device_factory=RasorSR570,
-        name="rasor_sr570",
-        prefix="ME01D-EA-IAMP",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
-        bl_prefix=False,
+@device_factory()
+def rasor_sr570_pa_scaler_det() -> CurrentAmpDet:
+    return CurrentAmpDet(
+        current_amp=rasor_sr570().ca1,
+        counter=rasor_det_scalers().det,
+        upper_limit=4.7,
+        lower_limit=0.4,
+    )
+
+
+@device_factory()
+def rasor_Femto_pa_scaler_det() -> CurrentAmpDet:
+    return CurrentAmpDet(
+        current_amp=rasor_femto().ca1,
+        counter=rasor_det_scalers().det,
+        upper_limit=9.5,
+        lower_limit=0.4,
     )

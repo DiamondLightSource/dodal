@@ -188,8 +188,8 @@ async def test_femto_struck_scaler_read(
     expected_current,
 ):
     set_mock_value(mock_femto.gain, Femto3xxGainTable[gain])
-    set_mock_value(mock_femto_struck_scaler_detector.counter.count_time, 1)
-    set_mock_value(mock_femto_struck_scaler_detector.counter.readout, raw_voltage)
+    set_mock_value(mock_femto_struck_scaler_detector.counter().count_time, 1)
+    set_mock_value(mock_femto_struck_scaler_detector.counter().readout, raw_voltage)
     set_mock_value(mock_femto_struck_scaler_detector.auto_mode, False)
     docs = defaultdict(list)
 
@@ -224,21 +224,21 @@ async def test_femto_struck_scaler_read_with_autoGain(
     expected_current,
 ):
     set_mock_value(mock_femto.gain, Femto3xxGainTable[gain])
-    set_mock_value(mock_femto_struck_scaler_detector.counter.count_time, 1)
+    set_mock_value(mock_femto_struck_scaler_detector.counter().count_time, 1)
     set_mock_value(mock_femto_struck_scaler_detector.auto_mode, True)
     rbv_mocks = Mock()
     rbv_mocks.get.side_effect = raw_voltage
 
     def set_mock_counter():
         set_mock_value(
-            mock_femto_struck_scaler_detector.counter.trigger_start, CountState.done
+            mock_femto_struck_scaler_detector.counter().trigger_start, CountState.done
         )
         set_mock_value(
-            mock_femto_struck_scaler_detector.counter.readout, rbv_mocks.get()
+            mock_femto_struck_scaler_detector.counter().readout, rbv_mocks.get()
         )
 
     callback_on_mock_put(
-        mock_femto_struck_scaler_detector.counter.trigger_start,
+        mock_femto_struck_scaler_detector.counter().trigger_start,
         lambda *_, **__: set_mock_counter(),
     )
 

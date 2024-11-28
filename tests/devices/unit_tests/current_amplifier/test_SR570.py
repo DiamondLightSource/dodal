@@ -199,8 +199,8 @@ async def test_SR570_struck_scaler_read(
     temp = SR570FullGainTable[gain].value
     set_mock_value(mock_sr570.coarse_gain, temp[0])
     set_mock_value(mock_sr570.fine_gain, temp[1])
-    set_mock_value(mock_sr570_struck_scaler_detector.counter.readout, raw_count)
-    set_mock_value(mock_sr570_struck_scaler_detector.counter.count_time, 1)
+    set_mock_value(mock_sr570_struck_scaler_detector.counter().readout, raw_count)
+    set_mock_value(mock_sr570_struck_scaler_detector.counter().count_time, 1)
     set_mock_value(mock_sr570_struck_scaler_detector.auto_mode, False)
     docs = defaultdict(list)
 
@@ -248,14 +248,14 @@ async def test_SR570_struck_scaler_read_with_autoGain(
 
     def set_mock_counter():
         set_mock_value(
-            mock_sr570_struck_scaler_detector.counter.trigger_start, CountState.done
+            mock_sr570_struck_scaler_detector.counter().trigger_start, CountState.done
         )
         set_mock_value(
-            mock_sr570_struck_scaler_detector.counter.readout, rbv_mocks.get()
+            mock_sr570_struck_scaler_detector.counter().readout, rbv_mocks.get()
         )
 
     callback_on_mock_put(
-        mock_sr570_struck_scaler_detector.counter.trigger_start,
+        mock_sr570_struck_scaler_detector.counter().trigger_start,
         lambda *_, **__: set_mock_counter(),
     )
 

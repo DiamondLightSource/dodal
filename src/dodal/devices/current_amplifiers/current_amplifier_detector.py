@@ -1,6 +1,7 @@
 from bluesky.protocols import Preparable, Reading
 from ophyd_async.core import (
     AsyncStatus,
+    Reference,
     StandardReadable,
     StandardReadableFormat,
     soft_signal_r_and_setter,
@@ -38,8 +39,8 @@ class CurrentAmpDet(StandardReadable, Preparable):
         lower_limit: float,
         name: str = "",
     ) -> None:
-        self.current_amp = current_amp
-        self.counter = counter
+        self.current_amp = Reference(current_amp)
+        self.counter = Reference(counter)
         with self.add_children_as_readables():
             self.current, self._current_set = soft_signal_r_and_setter(
                 float, initial_value=None, units="Amp"
@@ -59,7 +60,7 @@ class CurrentAmpDet(StandardReadable, Preparable):
             LOGGER.info(f"{self.name}-Attempting auto-gain")
             if await self.auto_gain():
                 LOGGER.info(
-                    f"{self.name} new gain = {await self.current_amp.get_gain()}."
+                    f"{self.name} new gain = {await self.current_amp().get_gain()}."
                 )
             else:
                 LOGGER.warning(f"{self.name} new gain is at maximum/minimum value.")
@@ -69,16 +70,16 @@ class CurrentAmpDet(StandardReadable, Preparable):
 
     async def auto_gain(self) -> bool:
         cnt = 0
-        while cnt < len(self.current_amp.gain_conversion_table):
+        while cnt < len(self.current_amp().gain_conversion_table):
             """
             negative value is possible on some current amplifier, hence the abs.
             """
-            reading = abs(await self.counter.get_voltage_per_sec())
+            reading = abs(await self.counter().get_voltage_per_sec())
             if reading > self.upper_limit:
-                if not await self.current_amp.decrease_gain():
+                if not await self.current_amp().decrease_gain():
                     return False
             elif reading < self.lower_limit:
-                if not await self.current_amp.increase_gain():
+                if not await self.current_amp().increase_gain():
                     return False
             else:
                 break
@@ -86,21 +87,21 @@ class CurrentAmpDet(StandardReadable, Preparable):
         return True
 
     async def get_corrected_current(self) -> float:
-        current_gain = await self.current_amp.get_gain()
-        correction_factor = self.current_amp.gain_conversion_table[current_gain].value
+        current_gain = await self.current_amp().get_gain()
+        correction_factor = self.current_amp().gain_conversion_table[current_gain].value
         corrected_current = (
-            await self.counter.get_voltage_per_sec()
+            await self.counter().get_voltage_per_sec()
         ) / correction_factor
         return corrected_current
 
     @AsyncStatus.wrap
     async def stage(self) -> None:
-        await self.counter.stage()
+        await self.counter().stage()
 
     @AsyncStatus.wrap
     async def unstage(self) -> None:
-        await self.counter.unstage()
+        await self.counter().unstage()
 
     @AsyncStatus.wrap
     async def prepare(self, value) -> None:
-        await self.counter.prepare(value=value)
+        await self.counter().prepare(value=value)

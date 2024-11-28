@@ -45,8 +45,8 @@ class RasorSR570(Device):
         self.ca1 = SR570(
             prefix + "-04:",
             suffix=suffix,
-            fine_gain_table=SR570GainTable,
-            coarse_gain_table=SR570FineGainTable,
+            fine_gain_table=SR570FineGainTable,
+            coarse_gain_table=SR570GainTable,
             combined_table=SR570FullGainTable,
             gain_to_current_table=SR570GainToCurrentTable,
             raise_timetable=SR570RaiseTimeTable,
@@ -54,8 +54,8 @@ class RasorSR570(Device):
         self.ca2 = SR570(
             prefix + "-05:",
             suffix=suffix,
-            fine_gain_table=SR570GainTable,
-            coarse_gain_table=SR570FineGainTable,
+            fine_gain_table=SR570FineGainTable,
+            coarse_gain_table=SR570GainTable,
             combined_table=SR570FullGainTable,
             gain_to_current_table=SR570GainToCurrentTable,
             raise_timetable=SR570RaiseTimeTable,
@@ -63,8 +63,8 @@ class RasorSR570(Device):
         self.ca3 = SR570(
             prefix + "-06:",
             suffix=suffix,
-            fine_gain_table=SR570GainTable,
-            coarse_gain_table=SR570FineGainTable,
+            fine_gain_table=SR570FineGainTable,
+            coarse_gain_table=SR570GainTable,
             combined_table=SR570FullGainTable,
             gain_to_current_table=SR570GainToCurrentTable,
             raise_timetable=SR570RaiseTimeTable,
