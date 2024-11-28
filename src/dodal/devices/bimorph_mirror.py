@@ -1,9 +1,9 @@
 from typing import Annotated as A
 
 from bluesky.protocols import Movable
-from ophyd_async.core import DeviceVector, SignalR, StandardReadable
+from ophyd_async.core import DeviceVector, StandardReadable
 from ophyd_async.core import StandardReadableFormat as Format
-from ophyd_async.epics.core import PvSuffix, epics_signal_r
+from ophyd_async.epics.core import epics_signal_r
 
 
 class BimorphMirrorChannel(StandardReadable):
