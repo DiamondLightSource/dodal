@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Architectural Decision Records &#8212; dodal 1.36.1.dev13+g5e9522108 documentation</title>
+    <title>Approved Reviewers &#8212; dodal 1.36.1.dev13+g5e9522108 documentation</title>
   
   
   
@@ -47,7 +47,7 @@
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=30646c52"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/decisions';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/reviews';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://DiamondLightSource.github.io/dodal/switcher.json';
@@ -57,8 +57,8 @@
     <link rel="icon" href="../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="1. Record architecture decisions" href="decisions/0001-record-architecture-decisions.html" />
-    <link rel="prev" title="Explanations" href="../explanations.html" />
+    <link rel="next" title="Reference" href="../reference.html" />
+    <link rel="prev" title="3. Add device factory decorator with lazy connect support" href="decisions/0003-make-devices-factory.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="main" />
@@ -396,14 +396,14 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">Architectural Decision Records</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="decisions.html">Architectural Decision Records</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="decisions/0001-record-architecture-decisions.html">1. Record architecture decisions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions/0002-switched-to-python-copier-template.html">2. Adopt python-copier-template for project structure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions/0003-codeowners.html">3. Use CODEOWNERS Github feature to restrict approved reviewers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="decisions/0003-make-devices-factory.html">3. Add device factory decorator with lazy connect support</a></li>
 </ul>
 </details></li>
-<li class="toctree-l1"><a class="reference internal" href="reviews.html">Approved Reviewers</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Approved Reviewers</a></li>
 </ul>
 </div>
 </nav></div>
@@ -442,7 +442,7 @@
     
     <li class="breadcrumb-item"><a href="../explanations.html" class="nav-link">Explanations</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Architectural Decision Records</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Approved Reviewers</span></li>
   </ul>
 </nav>
 </div>
@@ -459,18 +459,63 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="architectural-decision-records">
-<h1>Architectural Decision Records<a class="headerlink" href="#architectural-decision-records" title="Link to this heading">#</a></h1>
-<p>Architectural decisions are made throughout a project’s lifetime. As a way of keeping track of these decisions, we record these decisions in Architecture Decision Records (ADRs) listed below.</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0001-record-architecture-decisions.html">1. Record architecture decisions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0002-switched-to-python-copier-template.html">2. Adopt python-copier-template for project structure</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0003-codeowners.html">3. Use CODEOWNERS Github feature to restrict approved reviewers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="decisions/0003-make-devices-factory.html">3. Add device factory decorator with lazy connect support</a></li>
+  <section id="approved-reviewers">
+<h1>Approved Reviewers<a class="headerlink" href="#approved-reviewers" title="Link to this heading">#</a></h1>
+<p>Code reviews are an important tool for ensuring both quality and collective responsibility for the codebase. Dodal PRs <em>must</em> be reviewed by a member of <a class="reference external" href="https://github.com/orgs/DiamondLightSource/teams/bluesky-reviewers">the approved review team</a> before they are merged.</p>
+<section id="review-standards-and-practices">
+<h2>Review Standards and Practices<a class="headerlink" href="#review-standards-and-practices" title="Link to this heading">#</a></h2>
+<p>When reviewing you should ensure the code meets the <a class="reference internal" href="../reference/standards.html"><span class="std std-doc">repository standards</span></a> and <a class="reference internal" href="../reference/device-standards.html"><span class="std std-doc">device standards</span></a>. Approved reviewers will adhere to the following, if they do not, junior reviewers and reviewees should feel empowered to hold them to account.</p>
+<section id="questions-and-comments">
+<h3>Questions and Comments<a class="headerlink" href="#questions-and-comments" title="Link to this heading">#</a></h3>
+<p>Questions and requests for clarification are encouraged. If you have comments for the reviewer you could add them with the following prefixes to be helpful:</p>
+<ul class="simple">
+<li><p><strong>Must</strong>: This will negatively effect functionality if not implemented. The PR will not be merged until the comment is addressed to both the reviewer and developer’s satisfaction.</p></li>
+<li><p><strong>Should</strong>: This will improve quality/performance/etc. is but unlikely to affect functionality. If the developer doesn’t want to do this they should write an explanation.</p></li>
+<li><p><strong>Could</strong>: Similar to <strong>Should</strong> but without the requirement for explicit justification. The developer can dismiss on the grounds that velocity is the priority at the moment.</p></li>
+<li><p><strong>Nit</strong>: Preference only, the developer can dismiss without any justification.</p></li>
 </ul>
-</div>
-<p>For more information on ADRs see this <a class="reference external" href="http://thinkrelevance.com/blog/2011/11/15/documenting-architecture-decisions">blog by Michael Nygard</a>.</p>
+</section>
+<section id="the-happy-path">
+<h3>The Happy Path<a class="headerlink" href="#the-happy-path" title="Link to this heading">#</a></h3>
+<p>If the review passes then the reviewer should approve the change and either the reviewer or PR author should merge it.</p>
+</section>
+<section id="requesting-changes">
+<h3>Requesting Changes<a class="headerlink" href="#requesting-changes" title="Link to this heading">#</a></h3>
+<p>If the review fails the reviewer should request any changes (this issue is said to require rework)
+A developer should ideally pick up any rework PRs before starting new work
+When a developer is happy that a rework is complete they should press the re-request review button on the PR</p>
+</section>
+<section id="making-changes">
+<h3>Making Changes<a class="headerlink" href="#making-changes" title="Link to this heading">#</a></h3>
+<p>Reviewers should feel free to make small changes to a PR as part of a review e.g. typos, poorly named variables, fixing a test. However, if code has been changed in this way they need then need to run it past another developer (ideally the original developer). This means that no code is merged into main without being looked at by at least 2 people, ensuring collective responsibility for the codebase.</p>
+</section>
+<section id="dismissing-stale-reviews">
+<h3>Dismissing Stale Reviews<a class="headerlink" href="#dismissing-stale-reviews" title="Link to this heading">#</a></h3>
+<p>There may be times where one person requests changes on a PR, these changes are addressed and another person then approves it. In this case the PR still cannot be merged until the original review is dismissed. We’re happy for people to dismiss stale reviews with the understanding that:</p>
+<ul class="simple">
+<li><p>The new reviewer should check that the must and should comments have been addressed</p></li>
+<li><p>If it’s a big change it may still be worth the original reviewer looking again, if so they should make this clear to the original reviewer and the person that wrote the code</p></li>
+</ul>
+</section>
+</section>
+<section id="joining-the-review-team">
+<h2>Joining the Review Team<a class="headerlink" href="#joining-the-review-team" title="Link to this heading">#</a></h2>
+<p>At least two members of the review team from two different DLS teams <em>must</em> approve adding a new member, neither of them can be on the new member’s DLS team. At least one of the approvers should ideally be a senior engineer but this will not always be possible.</p>
+<p>In the event of a rejection the review team should provide concise and actionable feedback and set a date for re-consideration.</p>
+<section id="criteria-for-new-members">
+<h3>Criteria for New Members<a class="headerlink" href="#criteria-for-new-members" title="Link to this heading">#</a></h3>
+<p>New members should be regular contributors to dodal and should have been “shadow-reviewing” approved reviewers for a period of weeks or months before becoming approved. In both their contributions and reviews they should be consistently demonstrating the following <em>without prompting</em>:</p>
+<ul class="simple">
+<li><p>A good understanding of Python, including advanced langauge features such as <a class="reference external" href="https://wiki.python.org/moin/Generators">generators</a>, <a class="reference external" href="https://docs.python.org/3/library/asyncio-task.html">coroutines</a>, <a class="reference external" href="https://www.geeksforgeeks.org/comprehensions-in-python/">comprehensions</a> and <a class="reference external" href="https://peps.python.org/pep-0636/">pattern matching</a>.</p></li>
+<li><p>A pythonic coding style, demonstrated by using appropriate class/variable names, aherence to <a class="reference external" href="https://peps.python.org/pep-0008">PEP 8</a>.</p></li>
+<li><p>Adherence to the review standards above as well as the <a class="reference internal" href="../reference/standards.html"><span class="std std-doc">repository standards</span></a> and <a class="reference internal" href="../reference/device-standards.html"><span class="std std-doc">device standards</span></a>.</p></li>
+<li><p>Independent (i.e. not just to satisfy a reviewer) motivation to make sure all code in dodal is well-tested. Use of unit and system tests as appropriate. Clear effort made to keep test coverage high (&gt;90%).</p></li>
+<li><p>Advanced understanding of bluesky and ophyd-async including concepts and best practices, such as how to appropriately split logic between devices/plans/callbacks.</p></li>
+<li><p>Humility in the use of reviewing as a tool in a way that balances the need to preserve quality with the need for progress. Appropriate use of the Must/Should/Could/Nit system documented above is helpful in showing this, as it gives the reviewer the opportunity to weight their comments in terms of project impact. They should also demonstrate similar humiliary as a reviewee.</p></li>
+</ul>
+<p>Additionally, they should be regularly raising issues in the repository and demonstrating the ability to write well formed issues, with well defined acceptance criteria, that are understandable without large amounts of context.</p>
+</section>
+</section>
 </section>
 
 
@@ -484,20 +529,20 @@
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../explanations.html"
+       href="decisions/0003-make-devices-factory.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Explanations</p>
+        <p class="prev-next-title">3. Add device factory decorator with lazy connect support</p>
       </div>
     </a>
     <a class="right-next"
-       href="decisions/0001-record-architecture-decisions.html"
+       href="../reference.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">1. Record architecture decisions</p>
+        <p class="prev-next-title">Reference</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -513,10 +558,33 @@
 
 
   <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#review-standards-and-practices">Review Standards and Practices</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#questions-and-comments">Questions and Comments</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-happy-path">The Happy Path</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#requesting-changes">Requesting Changes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#making-changes">Making Changes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dismissing-stale-reviews">Dismissing Stale Reviews</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#joining-the-review-team">Joining the Review Team</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#criteria-for-new-members">Criteria for New Members</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
 
   
   <div class="tocsection editthispage">
-    <a href="https://github.com/DiamondLightSource/dodal/edit/main/docs/explanations/decisions.md">
+    <a href="https://github.com/DiamondLightSource/dodal/edit/main/docs/explanations/reviews.md">
       <i class="fa-solid fa-pencil"></i>
       
       
@@ -531,7 +599,7 @@
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../_sources/explanations/decisions.md.txt">
+    <a href="../_sources/explanations/reviews.md.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>
