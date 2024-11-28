@@ -27,6 +27,7 @@ class BimorphMirror(StandardReadable, Movable):
                 }
             )
         self.alltrgt_proc = epics_signal_x(f"{prefix}:ALLTRGT.PROC")
+        self.status = epics_signal_r(str, f"{prefix}:STATUS")
 
         super().__init__(name=name)
 
@@ -35,11 +36,19 @@ class BimorphMirror(StandardReadable, Movable):
         await asyncio.gather(
             *[self.channels.get(i).vtrgt.set(target) for i, target in value.items()]
         )
-        await self.alltrgt_proc.trigger()
 
         await asyncio.gather(
             *[
                 wait_for_value(self.channels.get(i).vtrgt, target, None)
+                for i, target in value.items()
+            ]
+        )
+
+        await self.alltrgt_proc.trigger()
+
+        await asyncio.gather(
+            *[
+                wait_for_value(self.channels.get(i).vout, target, None)
                 for i, target in value.items()
             ]
         )
