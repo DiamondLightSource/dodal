@@ -40,15 +40,15 @@ class ZoomController(StandardReadable):
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        super().__init__(name=name)
         self.percentage = epics_signal_rw(float, f"{prefix}ZOOMPOSCMD")
 
         # Level is the string description of the zoom level e.g. "1.0x" or "1.0"
         self.level = epics_signal_rw(str, f"{prefix}MP:SELECT")
+        super().__init__(name=name)
 
     async def _get_allowed_zoom_levels(self) -> list:
         zoom_levels = await self.level.describe()
-        return zoom_levels["level"]["choices"]  # type: ignore
+        return zoom_levels[self.level.name]["choices"]  # type: ignore
 
     @AsyncStatus.wrap
     async def set(self, level_to_set: str):
