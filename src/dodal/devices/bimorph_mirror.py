@@ -1,10 +1,25 @@
-from typing import Annotated as A
 import asyncio
+from typing import Annotated as A
 
 from bluesky.protocols import Movable
-from ophyd_async.core import AsyncStatus, DeviceVector, SignalR, SignalRW, SignalW, StandardReadable, StrictEnum, wait_for_value
+from ophyd_async.core import (
+    AsyncStatus,
+    DeviceVector,
+    SignalR,
+    SignalRW,
+    SignalW,
+    StandardReadable,
+    StrictEnum,
+    wait_for_value,
+)
 from ophyd_async.core import StandardReadableFormat as Format
-from ophyd_async.epics.core import EpicsDevice, epics_signal_r, epics_signal_x, epics_signal_w, PvSuffix
+from ophyd_async.epics.core import (
+    EpicsDevice,
+    PvSuffix,
+    epics_signal_r,
+    epics_signal_w,
+    epics_signal_x,
+)
 
 
 class BimorphMirrorOnOff(StrictEnum):

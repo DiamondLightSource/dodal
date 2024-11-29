@@ -1,10 +1,11 @@
 import asyncio
-import pytest
 
+import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import DeviceCollector
 
 from dodal.devices.bimorph_mirror import BimorphMirror
+
 
 @pytest.fixture
 def mirror(RE: RunEngine) -> BimorphMirror:
