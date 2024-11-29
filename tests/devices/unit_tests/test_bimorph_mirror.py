@@ -11,7 +11,7 @@ from dodal.devices.bimorph_mirror import BimorphMirror
 def mirror(RE: RunEngine) -> BimorphMirror:
     with DeviceCollector(mock=True):
         bm = BimorphMirror(prefix="BL02J-EA-IOC-97:G0:", number_of_channels=8)
-    
+
     return bm
 
 

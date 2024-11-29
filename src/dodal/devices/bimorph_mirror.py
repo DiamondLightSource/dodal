@@ -32,7 +32,7 @@ class BimorphMirrorMode(StrictEnum):
     HI="HI"
     NORMAL="NORMAL"
     FAST="FAST"
-    
+
 
 class BimorphMirrorStatus(StrictEnum):
     IDLE = "Idle"
@@ -42,9 +42,9 @@ class BimorphMirrorStatus(StrictEnum):
 
 class BimorphMirrorChannel(StandardReadable, EpicsDevice):
     """Collection of PVs comprising a single bimorph channel.
-    
+
     Attributes:
-        vtrgt: Float RW_RBV for target voltage, which can be set using parent mirror's all target proc 
+        vtrgt: Float RW_RBV for target voltage, which can be set using parent mirror's all target proc
         vout: Float RW_RBV for current voltage on bimorph
         status: BimorphMirrorOnOff readable for ON/OFF status of channel
         shift: Float writeable shifting channel voltage
@@ -58,7 +58,7 @@ class BimorphMirrorChannel(StandardReadable, EpicsDevice):
 
 class BimorphMirror(StandardReadable, Movable):
     """Class to represent CAENels Bimorph Mirrors.
-    
+
     Attributes:
         number_of_channels: Non-ophyd int holding number_of_channels passed into __init__
         channels: DeviceVector of BimorphMirrorChannel, indexed from 1, for each channel
@@ -68,6 +68,7 @@ class BimorphMirror(StandardReadable, Movable):
         err: Alarm status
 
     """
+
     def __init__(self, prefix: str, name="", number_of_channels: int = 0):
         self.number_of_channels = number_of_channels
 
@@ -88,7 +89,7 @@ class BimorphMirror(StandardReadable, Movable):
     @AsyncStatus.wrap
     async def set(self, value: dict[int, float]):
         """Sets bimorph voltages in parrallel via target voltage and all proc.
-        
+
         Args:
             value: Dict of channel numbers to target voltages"""
         for i in value.keys():
