@@ -59,7 +59,7 @@ class BimorphMirror(StandardReadable, Movable):
         with self.add_children_as_readables():
             self.channel_list = DeviceVector(
                 {
-                    i: BimorphMirrorChannel(f"{prefix}:C{i}", f"channel{i}")
+                    i: BimorphMirrorChannel(f"{prefix}:C{i}")
                     for i in range(1, number_of_channels + 1)
                 }
             )
