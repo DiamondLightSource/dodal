@@ -30,6 +30,8 @@ class BimorphMirror(StandardReadable, Movable):
             )
         self.alltrgt_proc = epics_signal_x(f"{prefix}:ALLTRGT.PROC")
         self.status = epics_signal_r(str, f"{prefix}:STATUS")
+        self.all_shift = epics_signal_w(float, f"{prefix}:ALLSHIFT")
+        self.all_volt = epics_signal_w(float, f"{prefix}:ALLVOLT")
 
         super().__init__(name=name)
 
