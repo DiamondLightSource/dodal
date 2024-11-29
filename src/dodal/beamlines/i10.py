@@ -14,9 +14,16 @@ from dodal.devices.i10.i10_apple2 import (
     I10Apple2Pol,
     LinearArbitraryAngle,
 )
-from dodal.devices.i10.i10_current_amp import RasorFemto, RasorSR570
-from dodal.devices.i10.i10_scaler_cards import rasor_scaler_card_1
 from dodal.devices.i10.i10_setting_data import I10Grating
+from dodal.devices.i10.rasor.rasor_current_amp import RasorFemto, RasorSR570
+from dodal.devices.i10.rasor.rasor_motors import (
+    DetSlits,
+    Diffractometer,
+    PaStage,
+    PinHole,
+)
+from dodal.devices.i10.rasor.rasor_scaler_cards import rasor_scaler_card_1
+from dodal.devices.motors import XYZPositioner
 from dodal.devices.pgm import PGM
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -261,6 +268,31 @@ def idd_la_angle(
 
 
 "Raosr devices"
+
+
+@device_factory()
+def pin_hole() -> PinHole:
+    return PinHole(prefix="ME01D-EA-PINH-01:")
+
+
+@device_factory()
+def det_slits() -> DetSlits:
+    return DetSlits(prefix="ME01D-MO-APTR-0")
+
+
+@device_factory()
+def diffractometer() -> Diffractometer:
+    return Diffractometer(prefix="ME01D-MO-DIFF-01:")
+
+
+@device_factory()
+def pa_stage() -> PaStage:
+    return PaStage(prefix="ME01D-MO-POLAN-01:")
+
+
+@device_factory()
+def simple_stage() -> XYZPositioner:
+    return XYZPositioner(prefix="ME01D-MO-CRYO-01:")
 
 
 @device_factory()
