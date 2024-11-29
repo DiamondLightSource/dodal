@@ -56,10 +56,10 @@ class PinTipDetection(StandardReadable):
             Tip, name="triggered_tip"
         )
         self.triggered_top_edge, self._top_edge_setter = soft_signal_r_and_setter(
-            Array1D[np.uint32], name="triggered_top_edge"
+            Array1D[np.int32], name="triggered_top_edge"
         )
         self.triggered_bottom_edge, self._bottom_edge_setter = soft_signal_r_and_setter(
-            Array1D[np.uint32], name="triggered_bottom_edge"
+            Array1D[np.int32], name="triggered_bottom_edge"
         )
         self.array_data = epics_signal_r(Array1D[np.uint8], f"pva://{prefix}PVA:ARRAY")
 
