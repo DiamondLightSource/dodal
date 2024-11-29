@@ -27,11 +27,20 @@ set_path_provider(
 )
 
 """
+Beamline module for use with the simulated AreaDetector and motors.
+These devices are simulated at the EPICS level, enabling testing of
+dodal and ophyd-async against what appear to be "real" signals.
+
 Usage Example
 -------------
 
 Start the simulated beamline by following the epics-containers tutorial at
 https://epics-containers.github.io/main/tutorials/launch_example.html
+And ensure that the signals are visible:
+
+```sh
+export EPICS_CA_ADDR_LIST=127.0.0.1
+```
 
 How to use the devices in a plan:
 In an ipython terminal run:
@@ -39,12 +48,12 @@ In an ipython terminal run:
 ```python
 from bluesky.run_engine import RunEngine
 
-from dodal.beamlines.adsim import adsim, sim_motors
-from dodal.common.beamlines.beamline_utils import get_path_provider
+from dodal.beamlines.t01 import adsim, sim_stage
 from dodal.plans import count
 
 RE = RunEngine()
 det = adsim(connect_immediately=True)
+sim_stage = sim_stage(connect_immediately=True)
 RE(count([det], num=10))
 ```
 

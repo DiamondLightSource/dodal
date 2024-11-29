@@ -101,6 +101,7 @@ reportMissingImports = false  # Ignore missing stubs in imported modules
 asyncio_mode = "auto"
 markers = [
     "s03: marks tests as requiring the s03 simulator running (deselect with '-m \"not s03\"')",
+    "t01: marks tests as requiring the t01 AreaDetector simulator running (deselect with '-m \"not t01\"')",
     "skip_in_pycharm: marks test as not working in pycharm testrunner",
 ]
 addopts = """
@@ -150,7 +151,7 @@ allowlist_externals =
     sphinx-build
     sphinx-autobuild
 commands =
-    tests: pytest -m 'not s03' --cov=dodal --cov-report term --cov-report xml:cov.xml {posargs}
+    tests: pytest -m 'not s03' -m 'not t01' --cov=dodal --cov-report term --cov-report xml:cov.xml {posargs}
     type-checking: pyright src tests {posargs}
     pre-commit: pre-commit run --all-files --show-diff-on-failure {posargs}
     docs: sphinx-{posargs:build -E} -T docs build/html
