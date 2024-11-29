@@ -79,7 +79,7 @@ async def test_aperturescatterguard_move_in_plan(
     assert ap_sg._loaded_positions is not None
     large = ap_sg._loaded_positions[ApertureValue.LARGE]
 
-    await ap_sg.aperture.z.set(large.aperture_z)
+    await ap_sg._aperture.z.set(large.aperture_z)
 
     RE(move_to_large)
     RE(move_to_medium)
@@ -91,7 +91,7 @@ async def test_aperturescatterguard_move_in_plan(
 async def test_move_fails_when_not_in_good_starting_pos(
     ap_sg: ApertureScatterguard, move_to_large, RE
 ):
-    await ap_sg.aperture.z.set(0)
+    await ap_sg._aperture.z.set(0)
 
     with pytest.raises(InvalidApertureMove):
         RE(move_to_large)
@@ -148,12 +148,12 @@ async def test_aperturescatterguard_moves_in_correct_order(
     RE = RunEngine({})
     RE.subscribe(cb)
 
-    await ap_sg.aperture.z.set(pos1.aperture_z)
+    await ap_sg._aperture.z.set(pos1.aperture_z)
 
     def monitor_and_moves():
         yield from bps.open_run()
-        yield from bps.monitor(ap_sg.aperture.y.motor_done_move, name="ap_y")
-        yield from bps.monitor(ap_sg.scatterguard.y.motor_done_move, name="sg_y")
+        yield from bps.monitor(ap_sg._aperture.y.motor_done_move, name="ap_y")
+        yield from bps.monitor(ap_sg._scatterguard.y.motor_done_move, name="sg_y")
         yield from bps.mv(ap_sg, pos1)  # type: ignore # See: https://github.com/DiamondLightSource/dodal/issues/827
         yield from bps.mv(ap_sg, pos2)  # type: ignore # See: https://github.com/DiamondLightSource/dodal/issues/827
         yield from bps.close_run()
