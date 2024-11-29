@@ -42,7 +42,7 @@ class BartRobot(StandardReadable, Movable):
     """The sample changing robot."""
 
     # How long to wait for the robot if it is busy soaking/drying
-    NOT_BUSY_TIMEOUT = 60
+    NOT_BUSY_TIMEOUT = 5*60
     # How long to wait for the actual load to happen
     LOAD_TIMEOUT = 60
     NO_PIN_ERROR_CODE = 25

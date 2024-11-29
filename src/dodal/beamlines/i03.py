@@ -41,7 +41,7 @@ from dodal.devices.zebra_controlled_shutter import ZebraShutter
 from dodal.devices.zocalo import ZocaloResults
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
-
+from dodal.devices.beamstop import Beamstop
 ZOOM_PARAMS_FILE = (
     "/dls_sw/i03/software/gda/configurations/i03-config/xml/jCameraManZoomLevels.xml"
 )
@@ -515,4 +515,28 @@ def cryo_stream(
         "",
         wait_for_connection,
         fake_with_ophyd_sim,
+    )
+
+
+def beamstop(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Beamstop:
+    """Get the i03 beamstop device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    params = get_beamline_parameters()
+
+    beamstop_x = params[f"in_beam_x_STANDARD"]
+    beamstop_y = params[f"in_beam_y_STANDARD"]
+    beamstop_z = params[f"in_beam_z_STANDARD"]
+
+    positions = [beamstop_x, beamstop_y, beamstop_z]
+
+    return device_instantiation(
+        Beamstop,
+        "beamstop",
+        "-MO-BS-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        collection_position=positions,
     )
