@@ -31,6 +31,7 @@ class BimorphMirror(StandardReadable, Movable):
                     for i in range(1, number_of_channels + 1)
                 }
             )
+        self.on_off = epics_signal_w(StrictEnum, f"{prefix}:ONOFF")
         self.alltrgt_proc = epics_signal_x(f"{prefix}:ALLTRGT.PROC")
         self.status = epics_signal_r(str, f"{prefix}:STATUS")
         self.all_shift = epics_signal_w(float, f"{prefix}:ALLSHIFT")
