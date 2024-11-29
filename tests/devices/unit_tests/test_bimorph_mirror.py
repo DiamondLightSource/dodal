@@ -1,5 +1,3 @@
-import asyncio
-
 import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import DeviceCollector, get_mock_put, set_mock_value
