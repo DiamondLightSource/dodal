@@ -49,7 +49,6 @@ class BimorphMirror(StandardReadable, Movable):
         on_off: Writeable BimorphOnOff
         alltrgt_proc: Procable signal that writes values in each channel's VTRGT to VOUT
         status: Readable BimorphMirrorStatus Busy/Idle status
-        channels: Readable str number of channels
         err: Alarm status
 
     """
@@ -66,7 +65,6 @@ class BimorphMirror(StandardReadable, Movable):
         self.on_off = epics_signal_w(BimorphMirrorOnOff, f"{prefix}ONOFF")
         self.alltrgt_proc = epics_signal_x(f"{prefix}ALLTRGT.PROC")
         self.status = epics_signal_r(BimorphMirrorStatus, f"{prefix}STATUS")
-        self.channels = epics_signal_r(str, f"{prefix}CHANNELS")
         self.err = epics_signal_r(str, f"{prefix}ERR")
 
         super().__init__(name=name)
