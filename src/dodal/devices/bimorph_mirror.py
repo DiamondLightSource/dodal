@@ -23,14 +23,14 @@ class BimorphMirrorChannel(StandardReadable):
     Attributes:
         vtrgt: Float RW_RBV for target voltage, which can be set using parent mirror's all target proc 
         vout: Float RW_RBV for current voltage on bimorph
-        status: String readable for ON/OFF status of channel
+        status: BimorphMirrorOnOff readable for ON/OFF status of channel
         shift: Float writeable shifting channel voltage
     """
     def __init__(self, prefix: str, name=""):
         with self.add_children_as_readables(Format.HINTED_SIGNAL):
             self.vtrgt = epics_signal_rw_rbv(float, f"{prefix}:VTRGT")
             self.vout = epics_signal_rw_rbv(float, f"{prefix}:VOUT")
-            self.status = epics_signal_r(str, f"{prefix}:STATUS")
+            self.status = epics_signal_r(BimorphMirrorOnOff, f"{prefix}:STATUS")
         
         self.shift = epics_signal_w(float, f"{prefix}:SHIFT")
 
