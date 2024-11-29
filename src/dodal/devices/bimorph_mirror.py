@@ -47,7 +47,6 @@ class BimorphMirror(StandardReadable, Movable):
         alltrgt_proc: Procable signal that writes values in each channel's VTRGT to VOUT
         status: Readable str Busy/Idle status
         channels: Number of channels
-        temps: Readable str board temperature
         err: Alarm status
 
     """
@@ -65,7 +64,6 @@ class BimorphMirror(StandardReadable, Movable):
         self.alltrgt_proc = epics_signal_x(f"{prefix}:ALLTRGT.PROC")
         self.status = epics_signal_r(str, f"{prefix}:STATUS")
         self.channels = epics_signal_r(float, f"{prefix}:CHANNELS")
-        self.temps = epics_signal_r(str, f"{prefix}:TEMPS")
         self.err = epics_signal_r(str, f"{prefix}:ERR")
 
         super().__init__(name=name)
