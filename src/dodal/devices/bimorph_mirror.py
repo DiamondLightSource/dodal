@@ -79,14 +79,7 @@ class BimorphMirror(StandardReadable, Movable):
             assert self.channels.get(i) is not None
 
         await asyncio.gather(
-            *[self.channels[i].vtrgt.set(target) for i, target in value.items()]
-        )
-
-        await asyncio.gather(
-            *[
-                wait_for_value(self.channels[i].vtrgt, target, None)
-                for i, target in value.items()
-            ]
+            *[self.channels[i].vtrgt.set(target, wait=True) for i, target in value.items()]
         )
 
         await self.alltrgt_proc.trigger()
