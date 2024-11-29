@@ -33,6 +33,9 @@ class BimorphMirror(StandardReadable, Movable):
 
     @AsyncStatus.wrap
     async def set(self, value: dict[int, float]):
+        for i in value.keys():
+            assert self.channels.get(i) is not None
+
         await asyncio.gather(
             *[self.channels.get(i).vtrgt.set(target) for i, target in value.items()]
         )
