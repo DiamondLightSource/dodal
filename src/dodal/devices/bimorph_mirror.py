@@ -1,10 +1,13 @@
 import asyncio
 
 from bluesky.protocols import Movable
-from ophyd_async.core import AsyncStatus, DeviceVector, StandardReadable, wait_for_value
+from ophyd_async.core import AsyncStatus, DeviceVector, StandardReadable, StrictEnum, wait_for_value
 from ophyd_async.core import StandardReadableFormat as Format
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw_rbv, epics_signal_x, epics_signal_w
 
+class BimorphMirrorOnOff(StrictEnum):
+    ON="ON"
+    OFF="OFF"
 
 class BimorphMirrorChannel(StandardReadable):
     def __init__(self, prefix: str, name=""):
@@ -35,7 +38,6 @@ class BimorphMirror(StandardReadable, Movable):
         self.channels = epics_signal_r(float, f"{prefix}:CHANNELS")
         self.status = epics_signal_r(str, f"{prefix}:STATUS")
         self.temps = epics_signal_r(str, f"{prefix}:TEMPS")
-
         self.reset_err_proc = epics_signal_x(f"{prefix}:RESETERR.PROC")
         self.err = epics_signal_r(str, f"{prefix}:ERR")
 
