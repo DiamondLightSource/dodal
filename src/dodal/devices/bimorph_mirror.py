@@ -46,6 +46,7 @@ class BimorphMirror(StandardReadable, Movable):
         on_off: Writeable BimorphOnOff
         alltrgt_proc: Procable signal that writes values in each channel's VTRGT to VOUT
         status: Readable str Busy/Idle status
+        channels: Number of channels
         temps: Readable str board temperature
         err: Alarm status
 
