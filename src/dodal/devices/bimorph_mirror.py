@@ -1,9 +1,10 @@
+from typing import Annotated as A
 import asyncio
 
 from bluesky.protocols import Movable
-from ophyd_async.core import AsyncStatus, DeviceVector, StandardReadable, StrictEnum, wait_for_value
+from ophyd_async.core import AsyncStatus, DeviceVector, SignalR, SignalRW, SignalW, StandardReadable, StrictEnum, wait_for_value
 from ophyd_async.core import StandardReadableFormat as Format
-from ophyd_async.epics.core import epics_signal_r, epics_signal_rw_rbv, epics_signal_x, epics_signal_w
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw_rbv, epics_signal_x, epics_signal_w, PvSuffix
 
 
 class BimorphMirrorOnOff(StrictEnum):
@@ -32,15 +33,11 @@ class BimorphMirrorChannel(StandardReadable):
         status: BimorphMirrorOnOff readable for ON/OFF status of channel
         shift: Float writeable shifting channel voltage
     """
-    def __init__(self, prefix: str, name=""):
-        with self.add_children_as_readables(Format.HINTED_SIGNAL):
-            self.vtrgt = epics_signal_rw_rbv(float, f"{prefix}:VTRGT")
-            self.vout = epics_signal_rw_rbv(float, f"{prefix}:VOUT")
-            self.status = epics_signal_r(BimorphMirrorOnOff, f"{prefix}:STATUS")
-        
-        self.shift = epics_signal_w(float, f"{prefix}:SHIFT")
 
-        super().__init__(name=name)
+    vtrgt: A[SignalRW[float], PvSuffix(":VTRGT", "VTRGT"), Format.HINTED_SIGNAL]
+    vout: A[SignalRW[float], PvSuffix(":VOUT", "VOUT"), Format.HINTED_SIGNAL]
+    status: A[SignalR[BimorphMirrorOnOff], PvSuffix(":STATUS"), Format.HINTED_SIGNAL]
+    shift: A[SignalW[float], PvSuffix(":STATUS")]
 
 
 class BimorphMirror(StandardReadable, Movable):
