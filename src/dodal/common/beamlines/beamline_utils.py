@@ -1,15 +1,23 @@
 import inspect
 from collections.abc import Callable
-from typing import Final, TypeVar, cast
+from typing import Annotated, Final, TypeVar, cast
 
 from bluesky.run_engine import call_in_bluesky_event_loop
 from ophyd import Device as OphydV1Device
 from ophyd.sim import make_fake_device
+from ophyd_async.core import DEFAULT_TIMEOUT
 from ophyd_async.core import Device as OphydV2Device
 from ophyd_async.core import wait_for_connection as v2_device_wait_for_connection
 
 from dodal.common.types import UpdatingPathProvider
-from dodal.utils import AnyDevice, BeamlinePrefix, skip_device
+from dodal.utils import (
+    AnyDevice,
+    BeamlinePrefix,
+    D,
+    DeviceInitializationController,
+    SkipType,
+    skip_device,
+)
 
 DEFAULT_CONNECTION_TIMEOUT: Final[float] = 5.0
 
@@ -122,6 +130,28 @@ def device_instantiation(
     if post_create:
         post_create(device_instance)
     return device_instance
+
+
+def device_factory(
+    *,
+    use_factory_name: Annotated[bool, "Use factory name as name of device"] = True,
+    timeout: Annotated[float, "Timeout for connecting to the device"] = DEFAULT_TIMEOUT,
+    mock: Annotated[bool, "Use Signals with mock backends for device"] = False,
+    skip: Annotated[
+        SkipType,
+        "mark the factory to be (conditionally) skipped when beamline is imported by external program",
+    ] = False,
+) -> Callable[[Callable[[], D]], DeviceInitializationController[D]]:
+    def decorator(factory: Callable[[], D]) -> DeviceInitializationController[D]:
+        return DeviceInitializationController(
+            factory,
+            use_factory_name,
+            timeout,
+            mock,
+            skip,
+        )
+
+    return decorator
 
 
 def set_path_provider(provider: UpdatingPathProvider):
