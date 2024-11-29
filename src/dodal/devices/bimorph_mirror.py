@@ -95,12 +95,15 @@ class BimorphMirror(StandardReadable, Movable):
         for i in value.keys():
             assert self.channels.get(i) is not None
 
+        # Write target voltages:
         await asyncio.gather(
             *[self.channels[i].vtrgt.set(target, wait=True) for i, target in value.items()]
         )
 
+        # Trigger set target voltages:
         await self.alltrgt_proc.trigger()
 
+        # Wait for values to propogate to voltage out rbv:
         await asyncio.gather(
             *[
                 wait_for_value(self.channels[i].vout, target, timeout=DEFAULT_TIMEOUT)
