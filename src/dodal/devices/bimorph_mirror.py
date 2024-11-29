@@ -45,10 +45,8 @@ class BimorphMirror(StandardReadable, Movable):
         channel_list: DeviceVector of BimorphMirrorChannel, indexed from 1, for each channel
         on_off: Writeable BimorphOnOff
         alltrgt_proc: Procable signal that writes values in each channel's VTRGT to VOUT
-        op_mode: RW_RBV BimorphMirrorMode mirror operation mode
         status: Readable str Busy/Idle status
         temps: Readable str board temperature
-        reset_err_proc: Procable to reset alarm status
         err: Alarm status
 
     """
@@ -64,14 +62,10 @@ class BimorphMirror(StandardReadable, Movable):
             )
         self.on_off = epics_signal_w(BimorphMirrorOnOff, f"{prefix}:ONOFF")
         self.alltrgt_proc = epics_signal_x(f"{prefix}:ALLTRGT.PROC")
-        self.op_mode = epics_signal_rw_rbv(BimorphMirrorMode, f"{prefix}:OPMODE")
         self.status = epics_signal_r(str, f"{prefix}:STATUS")
-        self.all_shift = epics_signal_w(float, f"{prefix}:ALLSHIFT")
-        self.all_volt = epics_signal_w(float, f"{prefix}:ALLVOLT")
         self.channels = epics_signal_r(float, f"{prefix}:CHANNELS")
         self.status = epics_signal_r(str, f"{prefix}:STATUS")
         self.temps = epics_signal_r(str, f"{prefix}:TEMPS")
-        self.reset_err_proc = epics_signal_x(f"{prefix}:RESETERR.PROC")
         self.err = epics_signal_r(str, f"{prefix}:ERR")
 
         super().__init__(name=name)
