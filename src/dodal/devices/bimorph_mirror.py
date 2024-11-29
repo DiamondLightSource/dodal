@@ -65,7 +65,6 @@ class BimorphMirror(StandardReadable, Movable):
         self.alltrgt_proc = epics_signal_x(f"{prefix}:ALLTRGT.PROC")
         self.status = epics_signal_r(str, f"{prefix}:STATUS")
         self.channels = epics_signal_r(float, f"{prefix}:CHANNELS")
-        self.status = epics_signal_r(str, f"{prefix}:STATUS")
         self.temps = epics_signal_r(str, f"{prefix}:TEMPS")
         self.err = epics_signal_r(str, f"{prefix}:ERR")
 
