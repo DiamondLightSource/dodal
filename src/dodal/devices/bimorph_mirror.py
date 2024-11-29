@@ -12,6 +12,7 @@ class BimorphMirrorChannel(StandardReadable):
             self.vtrgt = epics_signal_rw_rbv(float, f"{prefix}:VTRGT")
             self.vout = epics_signal_rw_rbv(float, f"{prefix}:VOUT")
             self.status = epics_signal_r(str, f"{prefix}:STATUS")
+        
 
         super().__init__(name=name)
 
@@ -37,12 +38,12 @@ class BimorphMirror(StandardReadable, Movable):
             assert self.channels.get(i) is not None
 
         await asyncio.gather(
-            *[self.channels.get(i).vtrgt.set(target) for i, target in value.items()]
+            *[self.channels[i].vtrgt.set(target) for i, target in value.items()]
         )
 
         await asyncio.gather(
             *[
-                wait_for_value(self.channels.get(i).vtrgt, target, None)
+                wait_for_value(self.channels[i].vtrgt, target, None)
                 for i, target in value.items()
             ]
         )
@@ -51,7 +52,7 @@ class BimorphMirror(StandardReadable, Movable):
 
         await asyncio.gather(
             *[
-                wait_for_value(self.channels.get(i).vout, target, None)
+                wait_for_value(self.channels[i].vout, target, None)
                 for i, target in value.items()
             ]
         )
