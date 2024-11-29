@@ -5,9 +5,17 @@ from ophyd_async.core import AsyncStatus, DeviceVector, StandardReadable, Strict
 from ophyd_async.core import StandardReadableFormat as Format
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw_rbv, epics_signal_x, epics_signal_w
 
+
 class BimorphMirrorOnOff(StrictEnum):
     ON="ON"
     OFF="OFF"
+
+
+class BimorphMirrorMode(StrictEnum):
+    HI="HI"
+    NORMAL="NORMAL"
+    FAST="FAST"
+    
 
 class BimorphMirrorChannel(StandardReadable):
     def __init__(self, prefix: str, name=""):
