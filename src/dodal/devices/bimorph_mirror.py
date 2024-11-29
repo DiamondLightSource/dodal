@@ -34,10 +34,10 @@ class BimorphMirrorChannel(StandardReadable):
         shift: Float writeable shifting channel voltage
     """
 
-    vtrgt: A[SignalRW[float], PvSuffix(":VTRGT", "VTRGT"), Format.HINTED_SIGNAL]
-    vout: A[SignalRW[float], PvSuffix(":VOUT", "VOUT"), Format.HINTED_SIGNAL]
-    status: A[SignalR[BimorphMirrorOnOff], PvSuffix(":STATUS"), Format.HINTED_SIGNAL]
-    shift: A[SignalW[float], PvSuffix(":STATUS")]
+    vtrgt: A[SignalRW[float], PvSuffix("VTRGT", "VTRGT"), Format.HINTED_SIGNAL]
+    vout: A[SignalRW[float], PvSuffix("VOUT", "VOUT"), Format.HINTED_SIGNAL]
+    status: A[SignalR[BimorphMirrorOnOff], PvSuffix("STATUS"), Format.HINTED_SIGNAL]
+    shift: A[SignalW[float], PvSuffix("STATUS")]
 
 
 class BimorphMirror(StandardReadable, Movable):
@@ -59,15 +59,15 @@ class BimorphMirror(StandardReadable, Movable):
         with self.add_children_as_readables():
             self.channel_list = DeviceVector(
                 {
-                    i: BimorphMirrorChannel(f"{prefix}:C{i}")
+                    i: BimorphMirrorChannel(f"{prefix}C{i}:")
                     for i in range(1, number_of_channels + 1)
                 }
             )
-        self.on_off = epics_signal_w(BimorphMirrorOnOff, f"{prefix}:ONOFF")
-        self.alltrgt_proc = epics_signal_x(f"{prefix}:ALLTRGT.PROC")
-        self.status = epics_signal_r(BimorphMirrorStatus, f"{prefix}:STATUS")
-        self.channels = epics_signal_r(str, f"{prefix}:CHANNELS")
-        self.err = epics_signal_r(str, f"{prefix}:ERR")
+        self.on_off = epics_signal_w(BimorphMirrorOnOff, f"{prefix}ONOFF")
+        self.alltrgt_proc = epics_signal_x(f"{prefix}ALLTRGT.PROC")
+        self.status = epics_signal_r(BimorphMirrorStatus, f"{prefix}STATUS")
+        self.channels = epics_signal_r(str, f"{prefix}CHANNELS")
+        self.err = epics_signal_r(str, f"{prefix}ERR")
 
         super().__init__(name=name)
 

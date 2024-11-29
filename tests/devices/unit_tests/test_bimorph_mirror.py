@@ -10,7 +10,7 @@ RE = RunEngine()
 
 async def async_main():
     with DeviceCollector(mock=True):
-        bm = BimorphMirror(prefix="BL02J-EA-IOC-97:G0", number_of_channels=8)
+        bm = BimorphMirror(prefix="BL02J-EA-IOC-97:G0:", number_of_channels=8)
     out = await bm.read()
     print(out)
 
