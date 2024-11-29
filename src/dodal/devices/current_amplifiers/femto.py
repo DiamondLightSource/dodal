@@ -92,7 +92,11 @@ class FemtoDDPCA(CurrentAmp):
     @AsyncStatus.wrap
     async def set(self, value) -> None:
         if value not in [item.value for item in self.gain_conversion_table]:
-            raise ValueError(f"Gain value {value} is not within {self.name} range.")
+            raise ValueError(
+                f"Gain value {value} is not within {self.name} range."
+                + "\n Available gain:"
+                + f" {[f'{c.value:.0e}' for c in self.gain_conversion_table]}"
+            )
         sen_setting = self.gain_conversion_table(value).name
         LOGGER.info(f"{self.name} gain change to {sen_setting}:{value}")
 

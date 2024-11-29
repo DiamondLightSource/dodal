@@ -114,7 +114,12 @@ async def test_femto_set_fail_out_of_range(
 ):
     with pytest.raises(ValueError) as e:
         await mock_femto.set(gain)
-    assert str(e.value) == f"Gain value {gain} is not within {mock_femto.name} range."
+    assert (
+        str(e.value)
+        == f"Gain value {gain} is not within {mock_femto.name} range."
+        + "\n Available gain:"
+        + f" {[f'{c.value:.0e}' for c in mock_femto.gain_conversion_table]}"
+    )
     get_mock_put(mock_femto.gain).assert_not_called()
     sleep.assert_not_called()
 

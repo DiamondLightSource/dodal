@@ -114,7 +114,13 @@ async def test_sr570_set(
 async def test_sr570_set_fail_out_of_range(sleep: AsyncMock, mock_sr570: SR570, gain):
     with pytest.raises(ValueError) as e:
         await mock_sr570.set(gain)
-    assert str(e.value) == f"Gain value {gain} is not within {mock_sr570.name} range."
+
+    assert (
+        str(e.value)
+        == f"Gain value {gain} is not within {mock_sr570.name} range."
+        + "\n Available gain:"
+        + f" {[f'{c.value:.0e}' for c in mock_sr570.gain_conversion_table]}"
+    )
     sleep.assert_not_called()
 
 
