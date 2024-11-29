@@ -1,12 +1,12 @@
 from .current_amplifier import CurrentAmp
-from .current_amplifier_detector import CurrentAmpDet
+from .current_amplifier_detector import CurrentAmpCounter, CurrentAmpDet
 from .femto import (
     Femto3xxGainTable,
     Femto3xxGainToCurrentTable,
     Femto3xxRaiseTime,
     FemtoDDPCA,
 )
-from .SR570 import (
+from .sr570 import (
     SR570,
     SR570FineGainTable,
     SR570FullGainTable,
@@ -14,6 +14,7 @@ from .SR570 import (
     SR570GainToCurrentTable,
     SR570RaiseTimeTable,
 )
+from .struck_scaler_counter import StruckScaler
 
 __all__ = [
     "FemtoDDPCA",
@@ -21,6 +22,7 @@ __all__ = [
     "Femto3xxRaiseTime",
     "CurrentAmp",
     "Femto3xxGainToCurrentTable",
+    "CurrentAmpCounter",
     "CurrentAmpDet",
     "SR570",
     "SR570GainTable",
@@ -28,4 +30,5 @@ __all__ = [
     "SR570FullGainTable",
     "SR570GainToCurrentTable",
     "SR570RaiseTimeTable",
+    "StruckScaler",
 ]

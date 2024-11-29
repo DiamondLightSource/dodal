@@ -6,7 +6,7 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-from dodal.devices.current_amplifiers.current_amplifier_detector import (
+from dodal.devices.current_amplifiers import (
     CurrentAmpCounter,
 )
 
@@ -25,6 +25,16 @@ COUNT_PER_VOLTAGE = 100000
 
 
 class StruckScaler(CurrentAmpCounter):
+    """
+    StruckScaler is a counting card that is use to count the output signal from a wide
+      range of detectors. This class contains the basic control to run the struckscaler
+      card in conjunction with a current amplifier.
+    Attributes:
+        readout(SignalR): Output of the scaler card output.
+        count_mode (SignalR[CountMode]): Counting card setting.
+        count_time (SignalRW([float]): Count time.
+    """
+
     def __init__(
         self, prefix: str, suffix: str, count_per_volt=COUNT_PER_VOLTAGE, name: str = ""
     ):

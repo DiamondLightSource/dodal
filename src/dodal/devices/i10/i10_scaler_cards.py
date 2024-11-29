@@ -1,6 +1,6 @@
 from ophyd_async.core import Device
 
-from dodal.devices.current_amplifiers.struck_scaler import StruckScaler
+from dodal.devices.current_amplifiers import StruckScaler
 
 
 class rasor_scaler_card_1(Device):

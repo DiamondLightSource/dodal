@@ -23,7 +23,10 @@ from dodal.devices.current_amplifiers import (
 from dodal.devices.current_amplifiers.current_amplifier_detector import (
     CurrentAmpDet,
 )
-from dodal.devices.current_amplifiers.struck_scaler import CountState, StruckScaler
+from dodal.devices.current_amplifiers.struck_scaler_counter import (
+    CountState,
+    StruckScaler,
+)
 
 
 @pytest.fixture
