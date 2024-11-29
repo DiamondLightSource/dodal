@@ -61,7 +61,7 @@ class PinTipDetection(StandardReadable):
         self.triggered_bottom_edge, self._bottom_edge_setter = soft_signal_r_and_setter(
             Array1D[np.int32], name="triggered_bottom_edge"
         )
-        self.array_data = epics_signal_r(Array1D[np.uint8], f"pva://{prefix}PVA:ARRAY")
+        self.array_data = epics_signal_r(np.ndarray, f"pva://{prefix}PVA:ARRAY")
 
         # Soft parameters for pin-tip detection.
         self.preprocess_operation = soft_signal_rw(int, 10, name="preprocess")
