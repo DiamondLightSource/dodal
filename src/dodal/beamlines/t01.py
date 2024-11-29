@@ -8,13 +8,12 @@ from dodal.common.beamlines.beamline_utils import (
     set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.beamlines.device_helpers import HDF5_PREFIX
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.adsim import SimStage
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
-BL = get_beamline_name("bl01t")
+BL = get_beamline_name("t01")
 PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
@@ -22,7 +21,7 @@ set_utils_beamline(BL)
 set_path_provider(
     StaticVisitPathProvider(
         BL,
-        Path("/dev/null"),
+        Path("/tmp"),
         client=LocalDirectoryServiceClient(),
     )
 )
@@ -54,7 +53,7 @@ RE(count([det], num=10))
 
 @device_factory()
 def sim_stage() -> SimStage:
-    return SimStage(f"{PREFIX.beamline_prefix}-MO-SIM-01:")
+    return SimStage(f"{PREFIX.beamline_prefix}-MO-SIMC-01:")
 
 
 @device_factory()
@@ -63,5 +62,5 @@ def adsim() -> SimDetector:
         f"{PREFIX.beamline_prefix}-DI-CAM-01:",
         path_provider=get_path_provider(),
         drv_suffix="DET:",
-        hdf_suffix=HDF5_PREFIX,
+        hdf_suffix="HDF:",
     )
