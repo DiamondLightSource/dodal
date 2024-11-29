@@ -3,7 +3,7 @@ import asyncio
 from bluesky.protocols import Movable
 from ophyd_async.core import AsyncStatus, DeviceVector, StandardReadable, wait_for_value
 from ophyd_async.core import StandardReadableFormat as Format
-from ophyd_async.epics.core import epics_signal_r, epics_signal_rw_rbv, epics_signal_x
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw_rbv, epics_signal_x, epics_signal_w
 
 
 class BimorphMirrorChannel(StandardReadable):
@@ -13,6 +13,7 @@ class BimorphMirrorChannel(StandardReadable):
             self.vout = epics_signal_rw_rbv(float, f"{prefix}:VOUT")
             self.status = epics_signal_r(str, f"{prefix}:STATUS")
         
+        self.shift = epics_signal_w(float, f"{prefix}:SHIFT")
 
         super().__init__(name=name)
 
