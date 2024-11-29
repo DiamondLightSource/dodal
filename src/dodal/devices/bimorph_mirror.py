@@ -34,8 +34,8 @@ class BimorphMirrorChannel(StandardReadable):
         shift: Float writeable shifting channel voltage
     """
 
-    vtrgt: A[SignalRW[float], PvSuffix("VTRGT", "VTRGT"), Format.HINTED_SIGNAL]
-    vout: A[SignalRW[float], PvSuffix("VOUT", "VOUT"), Format.HINTED_SIGNAL]
+    vtrgt: A[SignalRW[float], PvSuffix.rbv("VTRGT"), Format.HINTED_SIGNAL]
+    vout: A[SignalRW[float], PvSuffix.rbv("VOUT"), Format.HINTED_SIGNAL]
     status: A[SignalR[BimorphMirrorOnOff], PvSuffix("STATUS"), Format.HINTED_SIGNAL]
     shift: A[SignalW[float], PvSuffix("STATUS")]
 
