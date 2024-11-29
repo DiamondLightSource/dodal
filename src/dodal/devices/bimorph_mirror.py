@@ -17,6 +17,12 @@ class BimorphMirrorMode(StrictEnum):
     FAST="FAST"
     
 
+class BimorphMirrorStatus(StrictEnum):
+    IDLE = "Idle"
+    BUSY = "Busy"
+    ERROR = "Error"
+
+
 class BimorphMirrorChannel(StandardReadable):
     """Collection of PVs comprising a single bimorph channel.
     
@@ -45,7 +51,7 @@ class BimorphMirror(StandardReadable, Movable):
         channel_list: DeviceVector of BimorphMirrorChannel, indexed from 1, for each channel
         on_off: Writeable BimorphOnOff
         alltrgt_proc: Procable signal that writes values in each channel's VTRGT to VOUT
-        status: Readable str Busy/Idle status
+        status: Readable BimorphMirrorStatus Busy/Idle status
         channels: Number of channels
         err: Alarm status
 
@@ -62,7 +68,7 @@ class BimorphMirror(StandardReadable, Movable):
             )
         self.on_off = epics_signal_w(BimorphMirrorOnOff, f"{prefix}:ONOFF")
         self.alltrgt_proc = epics_signal_x(f"{prefix}:ALLTRGT.PROC")
-        self.status = epics_signal_r(str, f"{prefix}:STATUS")
+        self.status = epics_signal_r(BimorphMirrorStatus, f"{prefix}:STATUS")
         self.channels = epics_signal_r(float, f"{prefix}:CHANNELS")
         self.err = epics_signal_r(str, f"{prefix}:ERR")
 
