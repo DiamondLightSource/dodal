@@ -22,7 +22,7 @@ class BimorphMirror(StandardReadable, Movable):
         self.number_of_channels = number_of_channels
 
         with self.add_children_as_readables():
-            self.channels = DeviceVector(
+            self.channel_list = DeviceVector(
                 {
                     i: BimorphMirrorChannel(f"{prefix}:C{i}", f"channel{i}")
                     for i in range(1, number_of_channels + 1)
@@ -41,15 +41,15 @@ class BimorphMirror(StandardReadable, Movable):
     @AsyncStatus.wrap
     async def set(self, value: dict[int, float]):
         for i in value.keys():
-            assert self.channels.get(i) is not None
+            assert self.channel_list.get(i) is not None
 
         await asyncio.gather(
-            *[self.channels[i].vtrgt.set(target) for i, target in value.items()]
+            *[self.channel_list[i].vtrgt.set(target) for i, target in value.items()]
         )
 
         await asyncio.gather(
             *[
-                wait_for_value(self.channels[i].vtrgt, target, None)
+                wait_for_value(self.channel_list[i].vtrgt, target, None)
                 for i, target in value.items()
             ]
         )
@@ -58,7 +58,7 @@ class BimorphMirror(StandardReadable, Movable):
 
         await asyncio.gather(
             *[
-                wait_for_value(self.channels[i].vout, target, None)
+                wait_for_value(self.channel_list[i].vout, target, None)
                 for i, target in value.items()
             ]
         )
