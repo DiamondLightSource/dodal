@@ -3,6 +3,7 @@ from typing import Annotated as A
 
 from bluesky.protocols import Movable
 from ophyd_async.core import (
+    DEFAULT_TIMEOUT,
     AsyncStatus,
     DeviceVector,
     SignalR,
@@ -101,7 +102,7 @@ class BimorphMirror(StandardReadable, Movable):
 
         await asyncio.gather(
             *[
-                wait_for_value(self.channels[i].vout, target, None)
+                wait_for_value(self.channels[i].vout, target, timeout=DEFAULT_TIMEOUT)
                 for i, target in value.items()
             ]
         )
