@@ -36,6 +36,9 @@ class BimorphMirror(StandardReadable, Movable):
         self.status = epics_signal_r(str, f"{prefix}:STATUS")
         self.temps = epics_signal_r(str, f"{prefix}:TEMPS")
 
+        self.reset_err_proc = epics_signal_x(f"{prefix}:RESETERR.PROC")
+        self.err = epics_signal_r(str, f"{prefix}:ERR")
+
         super().__init__(name=name)
 
     @AsyncStatus.wrap
