@@ -17,6 +17,7 @@ def mirror(RE: RunEngine) -> BimorphMirror:
 def set_vout_mock_values(request, mirror: BimorphMirror):
     for key, val in request.param.items():
         set_mock_value(mirror.channels[key].vout, val)
+
     return request.param
 
 
