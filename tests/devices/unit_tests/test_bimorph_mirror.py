@@ -13,12 +13,18 @@ def mirror(RE: RunEngine) -> BimorphMirror:
     return bm
 
 
-@pytest.mark.parametrize("value", [({2: 50.0, 8: 24.0})])
-async def test_set_channels_waits_for_readback(
-    value: dict[int, float], mirror: BimorphMirror
-):
-    for key, val in value.items():
+@pytest.fixture
+def set_vout_mock_values(request, mirror: BimorphMirror):
+    for key, val in request.param.items():
         set_mock_value(mirror.channels[key].vout, val)
+    return request.param
+
+
+@pytest.mark.parametrize("set_vout_mock_values", [({2: 50.0, 8: 24.0})], indirect=True)
+async def test_set_channels_waits_for_readback(
+    set_vout_mock_values: dict[int, float], mirror: BimorphMirror
+):
+    value = set_vout_mock_values
 
     await mirror.set(value)
 
