@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from dodal.common.beamlines.beamline_utils import device_instantiation
+from dodal.common.beamlines.beamline_utils import device_factory, device_instantiation
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.apple2_undulator import (
     UndulatorGap,
@@ -14,6 +14,8 @@ from dodal.devices.i10.i10_apple2 import (
     LinearArbitraryAngle,
 )
 from dodal.devices.i10.i10_setting_data import I10Grating
+from dodal.devices.i10.mirrors import Mirror_with_piezo
+from dodal.devices.i10.slits import I10ExitSlit, I10PrimarySlit, I10Slit
 from dodal.devices.pgm import PGM
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -255,3 +257,48 @@ def idd_la_angle(
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )
+
+
+@device_factory()
+def m1() -> Mirror_with_piezo:
+    return Mirror_with_piezo(prefix="BL10I-OP-COL-01:")
+
+
+@device_factory()
+def m3m5() -> Mirror_with_piezo:
+    return Mirror_with_piezo(prefix="BL10I-OP-SWTCH-01:")
+
+
+@device_factory()
+def m4() -> Mirror_with_piezo:
+    return Mirror_with_piezo(prefix="BL10I-OP-FOCS-01:")
+
+
+@device_factory()
+def s1() -> I10PrimarySlit:
+    return I10PrimarySlit(prefix="BL10I-AL-SLITS-01:")
+
+
+@device_factory()
+def s2() -> I10Slit:
+    return I10Slit(prefix="BL10I-AL-SLITS-02:")
+
+
+@device_factory()
+def s3() -> I10Slit:
+    return I10Slit(prefix="BL10I-AL-SLITS-03:")
+
+
+@device_factory()
+def s4() -> I10ExitSlit:
+    return I10ExitSlit(prefix="BL10I-AL-SLITS-04:")
+
+
+@device_factory()
+def s5() -> I10Slit:
+    return I10Slit(prefix="BL10I-AL-SLITS-05:")
+
+
+@device_factory()
+def s6() -> I10Slit:
+    return I10Slit(prefix="BL10I-AL-SLITS-06:")
