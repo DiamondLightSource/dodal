@@ -7,7 +7,7 @@ from ophyd_async.core import AsyncStatus, StandardReadable
 
 class CurrentAmp(ABC, StandardReadable, Movable):
     """
-    Bass class for current amplifier, it contain the minimal functionality
+    Base class for current amplifier, it contain the minimal functionality
      a current amplifier needed:
 
     Attributes:
@@ -21,7 +21,7 @@ class CurrentAmp(ABC, StandardReadable, Movable):
 
     @abstractmethod
     async def increase_gain(self) -> bool:
-        """Method to increase the gain.
+        """Method to increase gain.
 
         Returns:
             bool: True if success.
@@ -29,7 +29,7 @@ class CurrentAmp(ABC, StandardReadable, Movable):
 
     @abstractmethod
     async def decrease_gain(self) -> bool:
-        """Method to increase the gain.
+        """Method to decrease gain.
 
         Returns:
             bool: True if success.
@@ -59,7 +59,7 @@ class CurrentAmpCounter(ABC, StandardReadable):
 
     @abstractmethod
     async def get_count(self) -> float:
-        """ "Get current count
+        """ "Get count
 
         Returns:
             float: Current count
@@ -75,7 +75,7 @@ class CurrentAmpCounter(ABC, StandardReadable):
 
     @abstractmethod
     async def get_voltage_per_sec(self) -> float:
-        """Get count per second
+        """Get count per second in voltage
 
         Returns:
             float: Current count in volt per second

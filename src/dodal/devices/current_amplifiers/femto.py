@@ -28,7 +28,7 @@ class Femto3xxGainTable(StrictEnum):
 
 
 class Femto3xxGainToCurrentTable(float, Enum):
-    """These are the sensitivity setting for Femto 3xx current amplifier"""
+    """These are the voltage to current setting for Femto 3xx current amplifier"""
 
     sen_1 = 1e4
     sen_2 = 1e5
@@ -61,13 +61,13 @@ class FemtoDDPCA(CurrentAmp):
     """
     Femto current amplifier device, this class should cover all DDPCA Femto current
       amplifiers, As the main different between all the DDPCA Femto is their gain table
-        and respond time table.
+        and response time table.
     Attributes:
         gain (SignalRW): This is the epic signal that control current amplifier gain.
-        gain_table (strictEnum): The table that gain use to set gain.
+        gain_table (strictEnum): The table epic use to set gain.
         timeout (float): Maximum waiting time in second for setting gain.
-        raise_timetable (Enum): Table contain the amount of time to wait after
-         setting gain.
+        raise_timetable (Enum): Table contain the minimum amount of time to wait after
+         changing gain.
     """
 
     def __init__(
@@ -104,7 +104,7 @@ class FemtoDDPCA(CurrentAmp):
             value=self.gain_table[sen_setting].value,
             timeout=self.timeout,
         )
-        # wait for current amplifier to bandpass filter to settle.
+        # wait for current amplifier's bandpass filter to settle.
         await asyncio.sleep(self.raise_timetable[sen_setting].value)
 
     async def increase_gain(self) -> bool:

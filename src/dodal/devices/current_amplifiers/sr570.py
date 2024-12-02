@@ -13,7 +13,7 @@ from dodal.log import LOGGER
 
 
 class SR570GainTable(StrictEnum):
-    """Sensitivity setting for SR570 current amplifier"""
+    """Coarse/unit sensitivity setting for SR570 current amplifier"""
 
     sen_1 = "mA/V"
     sen_2 = "uA/V"
@@ -45,7 +45,7 @@ class SR570RaiseTimeTable(float, Enum):
 
 
 class SR570FullGainTable(Enum):
-    """Combined gain table as each gain step is a combination of both gain and
+    """Combined gain table, as each gain step is a combination of both coarse gain and
     fine gain setting"""
 
     sen_1 = [SR570GainTable.sen_1, SR570FineGainTable.sen_1]
@@ -113,9 +113,9 @@ class SR570GainToCurrentTable(float, Enum):
 
 class SR570(CurrentAmp):
     """
-    SR570 current amplifier device. This is similar to Femto with the only different is,
-      SR570 has two gain setting, fine and coarse therefore it requires two extra
-       gain tables.
+    SR570 current amplifier device. This is similar to Femto with the only different
+     is SR570 has two gain setting fine and coarse, therefore it requires extra
+     gain tables.
     Attributes:
         fine_gain (SignalRW): This is the epic signal that control SR570 fine gain.
         coarse_gain (SignalRW): This is the epic signal that control SR570 coarse gain.

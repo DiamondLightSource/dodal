@@ -56,7 +56,7 @@ class PaStage(StandardReadable):
         with self.add_children_as_readables():
             self.ttp = Motor(prefix + "TWOTHETA")
             self.thp = Motor(prefix + "THETA")
-            self.y = Motor(prefix + "Y")
-            self.z = Motor(prefix + "Z")
+            self.py = Motor(prefix + "Y")
+            self.pz = Motor(prefix + "Z")
             self.eta = Motor(prefix + "ETA")
         super().__init__(name=name)

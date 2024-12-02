@@ -87,6 +87,9 @@ class CurrentAmpDet(StandardReadable, Preparable):
         return True
 
     async def get_corrected_current(self) -> float:
+        """
+        Convert the output(count and gain) back into the read detector output in Amp.
+        """
         current_gain = await self.current_amp().get_gain()
         correction_factor = self.current_amp().gain_conversion_table[current_gain].value
         corrected_current = (
