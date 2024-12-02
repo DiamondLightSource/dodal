@@ -9,6 +9,7 @@ from ophyd_async.core import AsyncStatus, DeviceCollector, get_mock_put, set_moc
 from dodal.devices.dcm import DCM
 from dodal.devices.undulator import AccessError, Undulator, UndulatorGapAccess
 from dodal.devices.undulator_dcm import UndulatorDCM
+from dodal.devices.util.test_utils import patch_motor
 from dodal.log import LOGGER
 
 ID_GAP_LOOKUP_TABLE_PATH: str = (
@@ -43,6 +44,7 @@ async def fake_undulator_dcm() -> UndulatorDCM:
             daq_configuration_path=MOCK_DAQ_CONFIG_PATH,
             name="undulator_dcm",
         )
+    patch_motor(dcm.offset_in_mm)
     return undulator_dcm
 
 
@@ -81,6 +83,7 @@ async def test_if_gap_is_wrong_then_logger_info_is_called_and_gap_is_set_correct
     assert (
         await fake_undulator_dcm.undulator.gap_motor.user_setpoint.get_value()
     ) == 6.045
+    assert (await fake_undulator_dcm.dcm.offset_in_mm.user_setpoint.get_value()) == 25.6
     mock_logger.info.assert_called()
 
 
@@ -132,6 +135,34 @@ async def test_if_gap_is_already_correct_then_dont_move_gap(
     mock_logger.debug.assert_called_once()
 
 
+async def test_dcm_offset_only_set_when_energy_set_completes(
+    fake_undulator_dcm: UndulatorDCM,
+):
+    set_mock_value(fake_undulator_dcm.undulator.current_gap, 5.0)
+
+    release_dcm = asyncio.Event()
+    release_undulator = asyncio.Event()
+
+    fake_undulator_dcm.dcm.energy_in_kev.set = MagicMock(
+        return_value=AsyncStatus(release_dcm.wait())
+    )
+    fake_undulator_dcm.undulator.gap_motor.set = MagicMock(
+        return_value=AsyncStatus(release_undulator.wait())
+    )
+
+    offset_put = get_mock_put(fake_undulator_dcm.dcm.offset_in_mm.user_setpoint)
+    status = fake_undulator_dcm.set(5.0)
+
+    await asyncio.wait([status.task], timeout=0.1)  # type: ignore
+    offset_put.assert_not_called()
+    release_dcm.set()
+    await asyncio.wait([status.task], timeout=0.1)  # type: ignore
+    offset_put.assert_not_called()
+    release_undulator.set()
+    await asyncio.wait_for(status, timeout=1)
+    offset_put.assert_called_with(25.6, wait=True)
+
+
 async def test_energy_set_only_complete_when_all_statuses_are_finished(
     fake_undulator_dcm: UndulatorDCM,
 ):
@@ -149,8 +180,10 @@ async def test_energy_set_only_complete_when_all_statuses_are_finished(
 
     status = fake_undulator_dcm.set(5.0)
 
+    await asyncio.wait([status.task], timeout=0.1)  # type: ignore
     assert not status.done
     release_dcm.set()
+    await asyncio.wait([status.task], timeout=0.1)  # type: ignore
     assert not status.done
     release_undulator.set()
     await asyncio.wait_for(status, timeout=0.02)
