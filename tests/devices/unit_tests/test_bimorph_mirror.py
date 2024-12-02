@@ -32,13 +32,13 @@ async def test_set_channels_waits_for_readback(
         assert (await mirror.channels[key].vtrgt.get_value()) == val
 
 
-async def test_set_channels_triggers_alltrgt_proc(mirror: BimorphMirror):
-    value = {2: 50.0, 8: 24.0}
+@pytest.mark.parametrize("set_vout_mock_values", [({2: 50.0, 8: 24.0})], indirect=True)
+async def test_set_channels_triggers_alltrgt_proc(
+    set_vout_mock_values: dict[int, float], mirror: BimorphMirror
+):
+    value = set_vout_mock_values
 
     mock_alltrgt_proc = get_mock_put(mirror.alltrgt_proc)
-
-    set_mock_value(mirror.channels[2].vout, 50.0)
-    set_mock_value(mirror.channels[8].vout, 24.0)
 
     mock_alltrgt_proc.assert_not_called()
 
