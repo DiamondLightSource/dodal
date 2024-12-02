@@ -14,18 +14,20 @@ def mirror(RE: RunEngine) -> BimorphMirror:
 
 
 @pytest.fixture
-def set_vout_mock_values(request, mirror: BimorphMirror):
+def set_vout_mock_and_return_value(request, mirror: BimorphMirror):
     for key, val in request.param.items():
         set_mock_value(mirror.channels[key].vout, val)
 
     return request.param
 
 
-@pytest.mark.parametrize("set_vout_mock_values", [({2: 50.0, 8: 24.0})], indirect=True)
+@pytest.mark.parametrize(
+    "set_vout_mock_and_return_value", [({2: 50.0, 8: 24.0})], indirect=True
+)
 async def test_set_channels_waits_for_readback(
-    set_vout_mock_values: dict[int, float], mirror: BimorphMirror
+    set_vout_mock_and_return_value: dict[int, float], mirror: BimorphMirror
 ):
-    value = set_vout_mock_values
+    value = set_vout_mock_and_return_value
 
     await mirror.set(value)
 
@@ -33,11 +35,13 @@ async def test_set_channels_waits_for_readback(
         assert (await mirror.channels[key].vtrgt.get_value()) == val
 
 
-@pytest.mark.parametrize("set_vout_mock_values", [({2: 50.0, 8: 24.0})], indirect=True)
+@pytest.mark.parametrize(
+    "set_vout_mock_and_return_value", [({2: 50.0, 8: 24.0})], indirect=True
+)
 async def test_set_channels_triggers_alltrgt_proc(
-    set_vout_mock_values: dict[int, float], mirror: BimorphMirror
+    set_vout_mock_and_return_value: dict[int, float], mirror: BimorphMirror
 ):
-    value = set_vout_mock_values
+    value = set_vout_mock_and_return_value
 
     mock_alltrgt_proc = get_mock_put(mirror.alltrgt_proc)
 
