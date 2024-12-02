@@ -27,7 +27,7 @@ def det(RE) -> StandardDetector:
 
 @pytest.fixture
 def sim_stage(RE) -> SimStage:
-    return adsim.sim_stage(connect_immediately=True)
+    return adsim.stage(connect_immediately=True)
 
 
 @pytest.fixture
@@ -54,7 +54,7 @@ def test_plan_produces_expected_start_document(
     start = cast(RunStart, docs[0])
     assert start.get("shape") == shape
     assert start.get("plan_name") == "count"
-    assert start.get("detectors") == ["adsim"]
+    assert start.get("detectors") == ["det"]
     assert start.get("num_points") == shape[0]
     assert start.get("num_intervals") == shape[0] - 1
     assert cast(str, start.get("data_session")).startswith("adsim")

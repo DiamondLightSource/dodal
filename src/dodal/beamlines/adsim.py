@@ -48,12 +48,12 @@ In an ipython terminal run:
 ```python
 from bluesky.run_engine import RunEngine
 
-from dodal.beamlines.adsim import det, sim_stage
+from dodal.beamlines.adsim import det, stage
 from dodal.plans import count
 
 RE = RunEngine()
 d = det(connect_immediately=True)
-s = sim_stage(connect_immediately=True)
+s = stage(connect_immediately=True)
 RE(count([d], num=10))
 ```
 
@@ -61,7 +61,7 @@ RE(count([d], num=10))
 
 
 @device_factory()
-def sim_stage() -> SimStage:
+def stage() -> SimStage:
     return SimStage(f"{PREFIX.beamline_prefix}-MO-SIMC-01:")
 
 
