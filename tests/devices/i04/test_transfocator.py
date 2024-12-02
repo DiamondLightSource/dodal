@@ -1,34 +1,36 @@
 from unittest.mock import MagicMock, patch
-
+import asyncio
 import pytest
 from ophyd.sim import make_fake_device
 from ophyd.status import SubscriptionStatus
 
+from ophyd_async.core import (
+    DeviceCollector,
+    set_mock_value,
+    AsyncStatus,
+)
+
 from dodal.devices.i04.transfocator import Transfocator
 
-
 @pytest.fixture
-def fake_transfocator():
-    FakeTransfocator = make_fake_device(Transfocator)
-    transfocator: Transfocator = FakeTransfocator(name="test_transfocator")
-    yield transfocator
-
+async def fake_transfocator() -> Transfocator:
+    async with DeviceCollector(mock=True):
+        transfocator = Transfocator(prefix="", name="transfocator")
+    return transfocator
 
 def given_predicted_lenses_is_half_of_beamsize(transfocator: Transfocator):
     def lens_number_is_half_beamsize(value, *args, **kwargs):
-        transfocator.predicted_vertical_num_lenses.sim_put(int(value / 2))  # type: ignore
+        set_mock_value(transfocator.predicted_vertical_num_lenses, int(value / 2))
 
     transfocator.beamsize_set_microns.subscribe(lens_number_is_half_beamsize)
 
 
-def test_given_beamsize_already_set_then_when_transfocator_set_then_returns_immediately(
+async def test_given_beamsize_already_set_then_when_transfocator_set_then_returns_immediately(
     fake_transfocator: Transfocator,
 ):
-    fake_transfocator.beamsize_set_microns.sim_put(100)  # type: ignore
-    set_status = fake_transfocator.set(100)
-    set_status.wait(0.01)
-    assert set_status.done and set_status.success
-
+    async with asyncio.timeout(0.01):
+        set_mock_value(fake_transfocator.beamsize_set_microns, 100.0)
+        await fake_transfocator.set(100.0)
 
 @patch("dodal.devices.i04.transfocator.sleep")
 def test_when_beamsize_set_then_set_correctly_on_device_and_waited_on(
