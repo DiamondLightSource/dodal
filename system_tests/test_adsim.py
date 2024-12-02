@@ -15,19 +15,19 @@ from ophyd_async.core import (
     StandardDetector,
 )
 
-from dodal.beamlines import t01
+from dodal.beamlines import adsim
 from dodal.devices.adsim import SimStage
 from dodal.plans import count
 
 
 @pytest.fixture
 def det(RE) -> StandardDetector:
-    return t01.adsim(connect_immediately=True)
+    return adsim.det(connect_immediately=True)
 
 
 @pytest.fixture
 def sim_stage(RE) -> SimStage:
-    return t01.sim_stage(connect_immediately=True)
+    return adsim.sim_stage(connect_immediately=True)
 
 
 @pytest.fixture
@@ -42,7 +42,7 @@ def documents_from_num(
     return docs
 
 
-@pytest.mark.t01
+@pytest.mark.adsim
 @pytest.mark.parametrize(
     "documents_from_num, shape", ([1, (1,)], [3, (3,)]), indirect=["documents_from_num"]
 )
@@ -57,14 +57,14 @@ def test_plan_produces_expected_start_document(
     assert start.get("detectors") == ["adsim"]
     assert start.get("num_points") == shape[0]
     assert start.get("num_intervals") == shape[0] - 1
-    assert cast(str, start.get("data_session")).startswith("t01")
+    assert cast(str, start.get("data_session")).startswith("adsim")
 
     assert (hints := start.get("hints")) and (
         hints.get("dimensions") == [(("time",), "primary")]
     )
 
 
-@pytest.mark.t01
+@pytest.mark.adsim
 @pytest.mark.parametrize(
     "documents_from_num, length", ([1, 1], [3, 3]), indirect=["documents_from_num"]
 )
@@ -78,7 +78,7 @@ def test_plan_produces_expected_stop_document(
     assert stop.get("exit_status") == "success"
 
 
-@pytest.mark.t01
+@pytest.mark.adsim
 @pytest.mark.parametrize("documents_from_num", [1], indirect=True)
 def test_plan_produces_expected_descriptor(
     documents_from_num: dict[str, list[DocumentType]], det: StandardDetector
@@ -91,7 +91,7 @@ def test_plan_produces_expected_descriptor(
     assert descriptor.get("name") == "primary"
 
 
-@pytest.mark.t01
+@pytest.mark.adsim
 @pytest.mark.parametrize(
     "documents_from_num, length", ([1, 1], [3, 3]), indirect=["documents_from_num"]
 )
@@ -108,7 +108,7 @@ def test_plan_produces_expected_events(
         assert event.get("seq_num") == i + 1
 
 
-@pytest.mark.t01
+@pytest.mark.adsim
 @pytest.mark.parametrize("documents_from_num", [1, 3], indirect=True)
 def test_plan_produces_expected_resources(
     documents_from_num: dict[str, list[DocumentType]],
@@ -129,7 +129,7 @@ def test_plan_produces_expected_resources(
         }
 
 
-@pytest.mark.t01
+@pytest.mark.adsim
 @pytest.mark.parametrize(
     "documents_from_num, length", ([1, 1], [3, 3]), indirect=["documents_from_num"]
 )

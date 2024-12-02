@@ -11,10 +11,10 @@ from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beam
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.adsim import SimStage
 from dodal.log import set_beamline as set_log_beamline
-from dodal.utils import BeamlinePrefix, get_beamline_name
+from dodal.utils import BeamlinePrefix
 
-BL = get_beamline_name("t01")
-PREFIX = BeamlinePrefix(BL)
+BL = "adsim"
+PREFIX = BeamlinePrefix("t01")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
@@ -48,13 +48,13 @@ In an ipython terminal run:
 ```python
 from bluesky.run_engine import RunEngine
 
-from dodal.beamlines.t01 import adsim, sim_stage
+from dodal.beamlines.adsim import det, sim_stage
 from dodal.plans import count
 
 RE = RunEngine()
-det = adsim(connect_immediately=True)
-sim_stage = sim_stage(connect_immediately=True)
-RE(count([det], num=10))
+d = det(connect_immediately=True)
+s = sim_stage(connect_immediately=True)
+RE(count([d], num=10))
 ```
 
 """
@@ -66,7 +66,7 @@ def sim_stage() -> SimStage:
 
 
 @device_factory()
-def adsim() -> SimDetector:
+def det() -> SimDetector:
     return SimDetector(
         f"{PREFIX.beamline_prefix}-DI-CAM-01:",
         path_provider=get_path_provider(),
