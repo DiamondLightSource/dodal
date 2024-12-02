@@ -50,3 +50,10 @@ async def test_set_channels_triggers_alltrgt_proc(
     await mirror.set(value)
 
     mock_alltrgt_proc.assert_called_once()
+
+
+@pytest.mark.parametrize("value", [({2: 50.0, 8: 24.0})])
+async def test_set_channels_waits_for_vout_readback(
+    value: dict[int, float], mirror: BimorphMirror
+):
+    raise NotImplementedError
