@@ -1,14 +1,9 @@
 import math
 import asyncio
-from time import sleep, time
-
-from ophyd import Component as Cpt
-from ophyd import Device, EpicsSignal, EpicsSignalRO, Kind
-from ophyd.status import DeviceStatus
+from time import time
 
 from ophyd_async.core import (
     StandardReadable,
-    StandardReadableFormat,
     observe_value,
     AsyncStatus,
 )
