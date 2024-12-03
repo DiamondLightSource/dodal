@@ -23,6 +23,8 @@ from dodal.utils import BeamlinePrefix, get_beamline_name
 BL = get_beamline_name("i10")
 set_log_beamline(BL)
 set_utils_beamline(BL)
+PREFIX = BeamlinePrefix(BL)
+
 I10_SLITS_SUFFIX = (
     "XSIZE",
     "YSIZE",
@@ -63,7 +65,7 @@ def idd_gap(
     return device_instantiation(
         device_factory=UndulatorGap,
         name="idd_gap",
-        prefix=f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
+        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
         bl_prefix=False,
@@ -76,7 +78,7 @@ def idd_phase_axes(
     return device_instantiation(
         device_factory=UndulatorPhaseAxes,
         name="idd_phase_axes",
-        prefix=f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
+        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
         top_outer="RPQ1",
         top_inner="RPQ2",
         btm_inner="RPQ3",
@@ -93,7 +95,7 @@ def idd_jaw(
     return device_instantiation(
         device_factory=UndulatorJawPhase,
         name="idd_jaw",
-        prefix=f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
+        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
         move_pv="RPQ1",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
@@ -107,7 +109,7 @@ def idu_gap(
     return device_instantiation(
         device_factory=UndulatorGap,
         name="idu_gap",
-        prefix=f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-21:",
+        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
         bl_prefix=False,
@@ -120,7 +122,7 @@ def idu_phase_axes(
     return device_instantiation(
         device_factory=UndulatorPhaseAxes,
         name="idu_phase_axes",
-        prefix=f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-21:",
+        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:",
         top_outer="RPQ1",
         top_inner="RPQ2",
         btm_inner="RPQ3",
@@ -137,7 +139,7 @@ def idu_jaw(
     return device_instantiation(
         device_factory=UndulatorJawPhase,
         name="idu_jaw",
-        prefix=f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-21:",
+        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:",
         move_pv="RPQ1",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
@@ -283,23 +285,23 @@ def idd_la_angle(
 
 @device_factory()
 def mirror_1() -> PiezoMirror:
-    return PiezoMirror(prefix=f"{BeamlinePrefix(BL).beamline_prefix}-OP-COL-01:")
+    return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-COL-01:")
 
 
 @device_factory()
 def mirror_3_5() -> PiezoMirror:
-    return PiezoMirror(prefix=f"{BeamlinePrefix(BL).beamline_prefix}-OP-SWTCH-01:")
+    return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:")
 
 
 @device_factory()
 def mirror_4() -> PiezoMirror:
-    return PiezoMirror(prefix=f"{BeamlinePrefix(BL).beamline_prefix}-OP-FOCS-01:")
+    return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-FOCS-01:")
 
 
 @device_factory()
 def slit_1() -> FullSlits:
     return FullSlits(
-        prefix=f"{BeamlinePrefix(BL).beamline_prefix}-AL-SLITS-01:",
+        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-01:",
         suffix=I10_PRIMARY_SUFFIX,
     )
 
@@ -307,7 +309,7 @@ def slit_1() -> FullSlits:
 @device_factory()
 def slit_2() -> FullSlits:
     return FullSlits(
-        prefix=f"{BeamlinePrefix(BL).beamline_prefix}-AL-SLITS-02:",
+        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-02:",
         suffix=I10_SLITS_SUFFIX,
     )
 
@@ -315,7 +317,7 @@ def slit_2() -> FullSlits:
 @device_factory()
 def slit_3() -> FullSlits:
     return FullSlits(
-        prefix=f"{BeamlinePrefix(BL).beamline_prefix}-AL-SLITS-03:",
+        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-03:",
         suffix=I10_SLITS_SUFFIX,
     )
 
@@ -323,7 +325,7 @@ def slit_3() -> FullSlits:
 @device_factory()
 def slit_4() -> MinimalSlits:
     return MinimalSlits(
-        prefix=f"{BeamlinePrefix(BL).beamline_prefix}-AL-SLITS-04:",
+        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-04:",
         suffix=("XSIZE", "YSIZE"),
     )
 
@@ -331,7 +333,7 @@ def slit_4() -> MinimalSlits:
 @device_factory()
 def slit_5() -> FullSlits:
     return FullSlits(
-        prefix=f"{BeamlinePrefix(BL).beamline_prefix}-AL-SLITS-05:",
+        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-05:",
         suffix=I10_SLITS_SUFFIX,
     )
 
@@ -339,6 +341,6 @@ def slit_5() -> FullSlits:
 @device_factory()
 def slit_6() -> FullSlits:
     return FullSlits(
-        prefix=f"{BeamlinePrefix(BL).beamline_prefix}-AL-SLITS-06:",
+        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-06:",
         suffix=I10_SLITS_SUFFIX,
     )
