@@ -3,7 +3,7 @@ from ophyd_async.epics.motor import Motor
 from dodal.devices.slits import Slits
 
 
-class I10Slit(Slits):
+class I10Slits(Slits):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
             self.x_ring_blade = Motor(prefix + "XRING")
@@ -20,7 +20,7 @@ class I10Slit(Slits):
         )
 
 
-class I10PrimarySlit(Slits):
+class I10PrimarySlits(Slits):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
             self.x_aptr_1 = Motor(prefix + "APTR1:X")

@@ -15,7 +15,7 @@ from dodal.devices.i10.i10_apple2 import (
 )
 from dodal.devices.i10.i10_setting_data import I10Grating
 from dodal.devices.i10.mirrors import PiezoMirror
-from dodal.devices.i10.slits import I10PrimarySlit, I10Slit
+from dodal.devices.i10.slits import I10PrimarySlits, I10Slits
 from dodal.devices.pgm import PGM
 from dodal.devices.slits import MinimalSlits
 from dodal.log import set_beamline as set_log_beamline
@@ -273,22 +273,22 @@ def switching_mirror() -> PiezoMirror:
 
 
 @device_factory()
-def slit_1() -> I10PrimarySlit:
-    return I10PrimarySlit(
+def slit_1() -> I10PrimarySlits:
+    return I10PrimarySlits(
         prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-01:",
     )
 
 
 @device_factory()
-def slit_2() -> I10Slit:
-    return I10Slit(
+def slit_2() -> I10Slits:
+    return I10Slits(
         prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-02:",
     )
 
 
 @device_factory()
-def slit_3() -> I10Slit:
-    return I10Slit(
+def slit_3() -> I10Slits:
+    return I10Slits(
         prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-03:",
     )
 
@@ -302,7 +302,7 @@ def forcsing_mirror() -> PiezoMirror:
 
 
 @device_factory()
-def exit_slits_4() -> MinimalSlits:
+def exit_slit_4() -> MinimalSlits:
     return MinimalSlits(
         prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-04:",
         x_gap="XSIZE",
@@ -311,14 +311,14 @@ def exit_slits_4() -> MinimalSlits:
 
 
 @device_factory()
-def slit_5() -> I10Slit:
-    return I10Slit(
+def slit_5() -> I10Slits:
+    return I10Slits(
         prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-05:",
     )
 
 
 @device_factory()
-def slit_6() -> I10Slit:
-    return I10Slit(
+def slit_6() -> I10Slits:
+    return I10Slits(
         prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-06:",
     )
