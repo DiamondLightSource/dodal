@@ -15,8 +15,9 @@ from dodal.devices.i10.i10_apple2 import (
 )
 from dodal.devices.i10.i10_setting_data import I10Grating
 from dodal.devices.i10.mirrors import PiezoMirror
+from dodal.devices.i10.slits import I10PrimarySlit, I10Slit
 from dodal.devices.pgm import PGM
-from dodal.devices.slits import FullSlits, MinimalSlits
+from dodal.devices.slits import MinimalSlits
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -24,28 +25,6 @@ BL = get_beamline_name("i10")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 PREFIX = BeamlinePrefix(BL)
-
-I10_SLITS_SUFFIX = (
-    "XSIZE",
-    "YSIZE",
-    "XCENTRE",
-    "YCENTRE",
-    "XRING",
-    "XHALL",
-    "YPLUS",
-    "YMINUS",
-)
-
-I10_PRIMARY_SUFFIX = (
-    "XSIZE",
-    "YSIZE",
-    "XCENTRE",
-    "YCENTRE",
-    "APTR1:X",
-    "APTR2:X",
-    "APTR1:Y",
-    "APTR2:Y",
-)
 
 
 LOOK_UPTABLE_DIR = "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/"
@@ -284,63 +263,62 @@ def idd_la_angle(
 
 
 @device_factory()
-def mirror_1() -> PiezoMirror:
+def first_mirror() -> PiezoMirror:
     return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-COL-01:")
 
 
 @device_factory()
-def mirror_3_5() -> PiezoMirror:
+def switching_mirror() -> PiezoMirror:
     return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:")
 
 
 @device_factory()
-def mirror_4() -> PiezoMirror:
+def slit_1() -> I10PrimarySlit:
+    return I10PrimarySlit(
+        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-01:",
+    )
+
+
+@device_factory()
+def slit_2() -> I10Slit:
+    return I10Slit(
+        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-02:",
+    )
+
+
+@device_factory()
+def slit_3() -> I10Slit:
+    return I10Slit(
+        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-03:",
+    )
+
+
+"Rasor devices"
+
+
+@device_factory()
+def forcsing_mirror() -> PiezoMirror:
     return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-FOCS-01:")
 
 
 @device_factory()
-def slit_1() -> FullSlits:
-    return FullSlits(
-        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-01:",
-        suffix=I10_PRIMARY_SUFFIX,
-    )
-
-
-@device_factory()
-def slit_2() -> FullSlits:
-    return FullSlits(
-        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-02:",
-        suffix=I10_SLITS_SUFFIX,
-    )
-
-
-@device_factory()
-def slit_3() -> FullSlits:
-    return FullSlits(
-        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-03:",
-        suffix=I10_SLITS_SUFFIX,
-    )
-
-
-@device_factory()
-def slit_4() -> MinimalSlits:
+def exit_slits_4() -> MinimalSlits:
     return MinimalSlits(
         prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-04:",
-        suffix=("XSIZE", "YSIZE"),
+        x_gap="XSIZE",
+        y_gap="YSIZE",
     )
 
 
 @device_factory()
-def slit_5() -> FullSlits:
-    return FullSlits(
+def slit_5() -> I10Slit:
+    return I10Slit(
         prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-05:",
-        suffix=I10_SLITS_SUFFIX,
     )
 
 
 @device_factory()
-def slit_6() -> FullSlits:
-    return FullSlits(
+def slit_6() -> I10Slit:
+    return I10Slit(
         prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-06:",
-        suffix=I10_SLITS_SUFFIX,
     )

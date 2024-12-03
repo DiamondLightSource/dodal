@@ -30,36 +30,10 @@ class Slits(MinimalSlits):
         x_gap: str = "X:SIZE",
         y_gap: str = "Y:SIZE",
         x_centre: str = "X:CENTRE",
-        y_centre: str = "Y:CENTRE"
+        y_centre: str = "Y:CENTRE",
         name: str = "",
     ) -> None:
         with self.add_children_as_readables():
             self.x_centre = Motor(prefix + x_centre)
             self.y_centre = Motor(prefix + y_centre)
         super().__init__(prefix=prefix, x_gap=x_gap, y_gap=y_gap, name=name)
-
-
-class FullSlits(Slits):
-    """XY slits with each blade/aperture movable independently"""
-
-    def __init__(
-        self,
-        prefix: str,
-        suffix: tuple[str, str, str, str, str, str, str, str] = (
-            "X:SIZE",
-            "Y:SIZE",
-            "X:CENTRE",
-            "Y:CENTRE",
-            "X:RING",
-            "X:HALL",
-            "Y:PLUS",
-            "Y:MINUS",
-        ),
-        name: str = "",
-    ) -> None:
-        with self.add_children_as_readables():
-            self.x_ring = Motor(prefix + suffix[4])
-            self.x_hall = Motor(prefix + suffix[5])
-            self.y_top = Motor(prefix + suffix[6])
-            self.y_bot = Motor(prefix + suffix[7])
-        super().__init__(prefix=prefix, suffix=suffix[0:4], name=name)
