@@ -1,4 +1,5 @@
 from collections import defaultdict
+from enum import Enum
 from unittest import mock
 from unittest.mock import AsyncMock, Mock
 
@@ -176,6 +177,21 @@ async def test_femto_decrease_gain(
     )
 
 
+class MockFemto3xxRaiseTime(float, Enum):
+    """Mock zero raise time(s) for Femto 3xx current amplifier"""
+
+    sen_1 = 0.0
+    sen_2 = 0.0
+    sen_3 = 0.0
+    sen_4 = 0.0
+    sen_5 = 0.0
+    sen_6 = 0.0
+    sen_7 = 0.0
+    sen_8 = 0.0
+    sen_9 = 0.0
+    sen_10 = 0.0
+
+
 @pytest.mark.parametrize(
     "gain,raw_voltage, expected_current",
     [
@@ -200,6 +216,9 @@ async def test_femto_struck_scaler_read(
     set_mock_value(mock_femto_struck_scaler_detector.counter().readout, raw_voltage)
     set_mock_value(mock_femto_struck_scaler_detector.auto_mode, False)
     docs = defaultdict(list)
+    mock_femto_struck_scaler_detector.current_amp().raise_timetable = (
+        MockFemto3xxRaiseTime
+    )
 
     def capture_emitted(name, doc):
         docs[name].append(doc)
@@ -236,6 +255,9 @@ async def test_femto_struck_scaler_read_with_autoGain(
     set_mock_value(mock_femto_struck_scaler_detector.auto_mode, True)
     rbv_mocks = Mock()
     rbv_mocks.get.side_effect = raw_voltage
+    mock_femto_struck_scaler_detector.current_amp().raise_timetable = (
+        MockFemto3xxRaiseTime
+    )
 
     def set_mock_counter():
         set_mock_value(

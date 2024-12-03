@@ -3,7 +3,7 @@ from ophyd_async.core import Device
 from dodal.devices.current_amplifiers import StruckScaler
 
 
-class rasor_scaler_card_1(Device):
+class RasorScalerCard1(Device):
     def __init__(self, prefix, name: str = "") -> None:
         self.mon = StruckScaler(prefix=prefix, suffix=".16")
         self.det = StruckScaler(prefix=prefix, suffix=".17")

@@ -22,7 +22,7 @@ from dodal.devices.i10.rasor.rasor_motors import (
     PaStage,
     PinHole,
 )
-from dodal.devices.i10.rasor.rasor_scaler_cards import rasor_scaler_card_1
+from dodal.devices.i10.rasor.rasor_scaler_cards import RasorScalerCard1
 from dodal.devices.motors import XYZPositioner
 from dodal.devices.pgm import PGM
 from dodal.log import set_beamline as set_log_beamline
@@ -267,7 +267,7 @@ def idd_la_angle(
     )
 
 
-"Raosr devices"
+"Rasor devices"
 
 
 @device_factory()
@@ -303,8 +303,8 @@ def rasor_femto() -> RasorFemto:
 
 
 @device_factory()
-def rasor_det_scalers() -> rasor_scaler_card_1:
-    return rasor_scaler_card_1(prefix="ME01D-EA-SCLR-01:SCALER1")
+def rasor_det_scalers() -> RasorScalerCard1:
+    return RasorScalerCard1(prefix="ME01D-EA-SCLR-01:SCALER1")
 
 
 @device_factory()
@@ -325,7 +325,7 @@ def rasor_sr570_pa_scaler_det() -> CurrentAmpDet:
 
 
 @device_factory()
-def rasor_Femto_pa_scaler_det() -> CurrentAmpDet:
+def rasor_femto_pa_scaler_det() -> CurrentAmpDet:
     return CurrentAmpDet(
         current_amp=rasor_femto().ca1,
         counter=rasor_det_scalers().det,
@@ -345,7 +345,7 @@ def rasor_sr570_flou_scaler_det() -> CurrentAmpDet:
 
 
 @device_factory()
-def rasor_Femto_flou_scaler_det() -> CurrentAmpDet:
+def rasor_femto_flou_scaler_det() -> CurrentAmpDet:
     return CurrentAmpDet(
         current_amp=rasor_femto().ca2,
         counter=rasor_det_scalers().fluo,
@@ -365,7 +365,7 @@ def rasor_sr570_drain_scaler_det() -> CurrentAmpDet:
 
 
 @device_factory()
-def rasor_Femto_drain_scaler_det() -> CurrentAmpDet:
+def rasor_femto_drain_scaler_det() -> CurrentAmpDet:
     return CurrentAmpDet(
         current_amp=rasor_femto().ca3,
         counter=rasor_det_scalers().drain,

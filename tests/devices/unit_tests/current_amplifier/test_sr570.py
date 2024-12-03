@@ -1,4 +1,5 @@
 from collections import defaultdict
+from enum import Enum
 from unittest import mock
 from unittest.mock import AsyncMock, Mock
 
@@ -186,6 +187,15 @@ async def test_SR570_decrease_gain(
     )
 
 
+class MockSR570RaiseTimeTable(float, Enum):
+    """Mock raise time(s) for SR570 current amplifier to speed up test"""
+
+    sen_1 = 0
+    sen_2 = 0
+    sen_3 = 0
+    sen_4 = 0
+
+
 @pytest.mark.parametrize(
     "gain,raw_count, expected_current",
     [
@@ -198,7 +208,6 @@ async def test_SR570_decrease_gain(
     ],
 )
 async def test_SR570_struck_scaler_read(
-    mock_sr570: SR570,
     mock_sr570_struck_scaler_detector,
     RE: RunEngine,
     gain,
@@ -206,11 +215,14 @@ async def test_SR570_struck_scaler_read(
     expected_current,
 ):
     temp = SR570FullGainTable[gain].value
-    set_mock_value(mock_sr570.coarse_gain, temp[0])
-    set_mock_value(mock_sr570.fine_gain, temp[1])
+    set_mock_value(mock_sr570_struck_scaler_detector.current_amp().coarse_gain, temp[0])
+    set_mock_value(mock_sr570_struck_scaler_detector.current_amp().fine_gain, temp[1])
     set_mock_value(mock_sr570_struck_scaler_detector.counter().readout, raw_count)
     set_mock_value(mock_sr570_struck_scaler_detector.counter().count_time, 1)
     set_mock_value(mock_sr570_struck_scaler_detector.auto_mode, False)
+    mock_sr570_struck_scaler_detector.current_amp().raise_timetable = (
+        MockSR570RaiseTimeTable
+    )
     docs = defaultdict(list)
 
     def capture_emitted(name, doc):
@@ -243,14 +255,18 @@ async def test_SR570_struck_scaler_read(
     ],
 )
 async def test_SR570_struck_scaler_read_with_autoGain(
-    mock_sr570: SR570,
     mock_sr570_struck_scaler_detector,
     RE: RunEngine,
     gain,
     raw_count,
     expected_current,
 ):
-    await mock_sr570.set(SR570GainToCurrentTable[gain])
+    mock_sr570_struck_scaler_detector.current_amp().raise_timetable = (
+        MockSR570RaiseTimeTable
+    )
+    await mock_sr570_struck_scaler_detector.current_amp().set(
+        SR570GainToCurrentTable[gain]
+    )
     set_mock_value(mock_sr570_struck_scaler_detector.auto_mode, True)
     rbv_mocks = Mock()
     rbv_mocks.get.side_effect = raw_count

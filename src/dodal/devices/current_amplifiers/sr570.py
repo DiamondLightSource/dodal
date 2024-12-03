@@ -151,7 +151,7 @@ class SR570(CurrentAmp):
         self.fine_gain_table = fine_gain_table
         self.coarse_gain_table = coarse_gain_table
         self.timeout = timeout
-        self.raise_time_table = raise_timetable
+        self.raise_timetable = raise_timetable
         self.combined_table = combined_table
 
     @AsyncStatus.wrap
@@ -168,7 +168,7 @@ class SR570(CurrentAmp):
         coarse_gain, fine_gain = self.combined_table[sen_setting].value
         await self.fine_gain.set(value=fine_gain, timeout=self.timeout)
         await self.coarse_gain.set(value=coarse_gain, timeout=self.timeout)
-        await asyncio.sleep(self.raise_time_table[coarse_gain.name].value)
+        await asyncio.sleep(self.raise_timetable[coarse_gain.name].value)
 
     async def increase_gain(self) -> bool:
         current_gain = int((await self.get_gain()).split("_")[-1])

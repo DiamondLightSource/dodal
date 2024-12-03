@@ -7,8 +7,8 @@ from ophyd_async.core import AsyncStatus, StandardReadable
 
 class CurrentAmp(ABC, StandardReadable, Movable):
     """
-    Base class for current amplifier, it contain the minimal functionality
-     a current amplifier needed:
+    Base class for current amplifier, it contains the minimal functionality
+     a current amplifier needs:
 
     Attributes:
         gain_conversion_table (Enum): The conversion table between current
