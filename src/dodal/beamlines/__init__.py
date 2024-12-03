@@ -16,6 +16,7 @@ _BEAMLINE_NAME_OVERRIDES = {
     "p47": "training_rig",
     "p48": "training_rig",
     "p49": "training_rig",
+    "t01": "adsim",
 }
 
 
