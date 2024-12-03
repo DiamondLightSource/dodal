@@ -10,7 +10,7 @@ from ophyd_async.core import (
     set_and_wait_for_value,
     wait_for_value,
 )
-from ophyd_async.epics.core import epics_signal_r, epics_signal_rw_rbv, epics_signal_x
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw_rbv, epics_signal_x, epics_signal_rw, epics_signal_w
 
 from dodal.log import LOGGER
 
@@ -79,12 +79,12 @@ class BartRobot(StandardReadable, Movable):
         self.close = epics_signal_x(prefix + "COLC.PROC")
 
         self.cryomode_rbv = epics_signal_r(float, prefix + "CRYO_MODE_RBV")
-        self.cryomode = epics_signal_rw_rbv(float, prefix + "CRYO_MODE_CTRL")
+        self.cryomode = epics_signal_rw(float, prefix + "CRYO_MODE_CTRL")
         self.gripper_temp = epics_signal_r(float, prefix + "GRIPPER_TEMP")
-        self.dewar_lid_heater_setpoint = epics_signal_rw_rbv(
-            float, prefix + "DW_1_SET_POINT"
+        self.dewar_lid_temperature = epics_signal_rw(
+            float, prefix + "DW_1_SET_POINT", read_pv="DW_1_TEMP"
         )
-        self.dewar_lid_temp = epics_signal_r(float, prefix + "DW_1_TEMP")
+        #self.dewar_lid_temp = epics_signal_r(float, prefix + "DW_1_TEMP")
         self.dewar_lid_heater = epics_signal_rw_rbv(str, prefix + "DW_1_CTRL")
 
         self.cryojet_retract = epics_signal_rw_rbv(float, prefix + "OP_24_FORCE_OPTION")
