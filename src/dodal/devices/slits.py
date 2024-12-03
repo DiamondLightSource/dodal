@@ -8,12 +8,13 @@ class MinimalSlits(StandardReadable):
     def __init__(
         self,
         prefix: str,
-        suffix: tuple[str, str] = ("X:SIZE", "Y:SIZE"),
+        x_gap: str = "X:SIZE",
+        y_gap: str = "Y:SIZE",
         name: str = "",
     ) -> None:
         with self.add_children_as_readables():
-            self.x_gap = Motor(prefix + suffix[0])
-            self.y_gap = Motor(prefix + suffix[1])
+            self.x_gap = Motor(prefix + x_gap)
+            self.y_gap = Motor(prefix + y_gap)
         super().__init__(name=name)
 
 
@@ -26,18 +27,16 @@ class Slits(MinimalSlits):
     def __init__(
         self,
         prefix: str,
-        suffix: tuple[str, str, str, str] = (
-            "X:SIZE",
-            "Y:SIZE",
-            "X:CENTRE",
-            "Y:CENTRE",
-        ),
+        x_gap: str = "X:SIZE",
+        y_gap: str = "Y:SIZE",
+        x_centre: str = "X:CENTRE",
+        y_centre: str = "Y:CENTRE"
         name: str = "",
     ) -> None:
         with self.add_children_as_readables():
-            self.x_centre = Motor(prefix + suffix[2])
-            self.y_centre = Motor(prefix + suffix[3])
-        super().__init__(prefix=prefix, suffix=suffix[0:2], name=name)
+            self.x_centre = Motor(prefix + x_centre)
+            self.y_centre = Motor(prefix + y_centre)
+        super().__init__(prefix=prefix, x_gap=x_gap, y_gap=y_gap, name=name)
 
 
 class FullSlits(Slits):
