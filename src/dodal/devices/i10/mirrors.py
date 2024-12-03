@@ -3,7 +3,7 @@ from ophyd_async.epics.core import epics_signal_rw
 from ophyd_async.epics.motor import Motor
 
 
-class Mirror_with_piezo(StandardReadable):
+class PiezoMirror(StandardReadable):
     def __init__(
         self,
         prefix: str,
