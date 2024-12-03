@@ -33,7 +33,7 @@ set_utils_beamline(BL)
 set_path_provider(
     StaticVisitPathProvider(
         BL,
-        Path("/exports/mybeamline/data"),
+        Path("/data"),
         client=LocalDirectoryServiceClient(),
     )
 )

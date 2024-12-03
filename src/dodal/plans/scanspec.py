@@ -2,9 +2,25 @@ import operator
 from functools import reduce
 from typing import Annotated, Any
 
+import bluesky.plan_stubs as bps
 import bluesky.plans as bp
+import bluesky.preprocessors as bpp
 from bluesky.protocols import Movable, Readable
+from bluesky.utils import MsgGenerator
 from cycler import Cycler, cycler
+from ophyd_async.core import (
+    StandardDetector,
+    StandardFlyer,
+)
+from ophyd_async.epics.motor import Motor
+from ophyd_async.fastcs.panda import (
+    HDFPanda,
+    StaticSeqTableTriggerLogic,
+)
+from ophyd_async.plan_stubs import fly_and_collect
+from ophyd_async.plan_stubs._fly import (
+    prepare_static_seq_table_flyer_and_detectors_with_same_trigger,
+)
 from pydantic import Field, validate_call
 from scanspec.specs import Spec
 
@@ -64,3 +80,39 @@ def _as_cycler(spec: Spec[Movable]) -> Cycler:
     # Need to "add" the cyclers for all the axes together. The code below is
     # effectively: cycler(motor1, [...]) + cycler(motor2, [...]) + ...
     return reduce(operator.add, (cycler(*args) for args in midpoints.items()))
+
+
+@attach_data_session_metadata_decorator()
+def plan(panda: HDFPanda, diff: StandardDetector) -> MsgGenerator:
+    trigger_logic = StaticSeqTableTriggerLogic(panda.seq[1])
+
+    flyer = StandardFlyer(
+        trigger_logic,
+        name="flyer",
+    )
+
+    @bpp.stage_decorator(devices=[diff, panda, flyer])
+    @bpp.run_decorator()
+    def inner():
+        yield from prepare_static_seq_table_flyer_and_detectors_with_same_trigger(
+            flyer, [diff], number_of_frames=15, exposure=0.1, shutter_time=0.05
+        )
+        yield from fly_and_collect(
+            stream_name="primary",
+            flyer=flyer,
+            detectors=[diff],
+        )
+
+    yield from inner()
+
+
+@attach_data_session_metadata_decorator()
+def plan_step_scan(detectors: set[StandardDetector], motor: Motor) -> MsgGenerator:
+    @bpp.stage_decorator(devices=[*detectors, motor])
+    @bpp.run_decorator()
+    def inner():
+        for i in range(10):
+            yield from bps.mv(motor, i)
+            yield from bps.trigger_and_read((*detectors, motor))
+
+    yield from inner()
