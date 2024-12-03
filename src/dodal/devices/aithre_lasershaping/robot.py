@@ -10,7 +10,7 @@ from ophyd_async.core import (
     set_and_wait_for_value,
     wait_for_value,
 )
-from ophyd_async.epics.core import epics_signal_r, epics_signal_rw_rbv, epics_signal_x
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw_rbv, epics_signal_x, epics_signal_rw, epics_signal_w
 
 from dodal.log import LOGGER
 
@@ -42,7 +42,7 @@ class BartRobot(StandardReadable, Movable):
     """The sample changing robot."""
 
     # How long to wait for the robot if it is busy soaking/drying
-    NOT_BUSY_TIMEOUT = 5 * 60
+    NOT_BUSY_TIMEOUT = 60
     # How long to wait for the actual load to happen
     LOAD_TIMEOUT = 60
     NO_PIN_ERROR_CODE = 25
@@ -55,7 +55,7 @@ class BartRobot(StandardReadable, Movable):
         name: str,
         prefix: str,
     ) -> None:
-        self.barcode = epics_signal_r(str, prefix + "BARCODE")
+        # self.barcode = epics_signal_r(str, prefix + "BARCODE")
         self.gonio_pin_sensor = epics_signal_r(PinMounted, prefix + "PIN_MOUNTED")
 
         self.next_pin = epics_signal_rw_rbv(float, prefix + "NEXT_PIN")
@@ -63,16 +63,41 @@ class BartRobot(StandardReadable, Movable):
         self.current_puck = epics_signal_r(float, prefix + "CURRENT_PUCK_RBV")
         self.current_pin = epics_signal_r(float, prefix + "CURRENT_PIN_RBV")
 
-        self.next_sample_id = epics_signal_rw_rbv(int, prefix + "NEXT_ID")
-        self.sample_id = epics_signal_r(int, prefix + "CURRENT_ID_RBV")
+        # self.next_sample_id = epics_signal_rw_rbv(int, prefix + "NEXT_ID")
+        # self.sample_id = epics_signal_r(int, prefix + "CURRENT_ID_RBV")
 
+        # buttons
         self.load = epics_signal_x(prefix + "LOAD.PROC")
+        self.stop = epics_signal_x(prefix + "ABORT.PROC")
         self.reset = epics_signal_x(prefix + "RESET.PROC")
+        self.init = epics_signal_x(prefix + "INIT.PROC")
+        self.soak = epics_signal_x(prefix + "SOAK.PROC")
+        self.home = epics_signal_x(prefix + "GOHM.PROC")
+        self.unload = epics_signal_x(prefix + "UNLD.PROC")
+        self.dry = epics_signal_x(prefix + "DRY.PROC")
+        self.open = epics_signal_x(prefix + "COLO.PROC")
+        self.close = epics_signal_x(prefix + "COLC.PROC")
+
+        self.cryomode_rbv = epics_signal_r(float, prefix + "CRYO_MODE_RBV")
+        self.cryomode = epics_signal_rw(float, prefix + "CRYO_MODE_CTRL")
+        self.gripper_temp = epics_signal_r(float, prefix + "GRIPPER_TEMP")
+        self.dewar_lid_temperature = epics_signal_rw(
+            float, prefix + "DW_1_SET_POINT", read_pv="DW_1_TEMP"
+        )
+        #self.dewar_lid_temp = epics_signal_r(float, prefix + "DW_1_TEMP")
+        self.dewar_lid_heater = epics_signal_rw_rbv(str, prefix + "DW_1_CTRL")
+
+        self.cryojet_retract = epics_signal_rw_rbv(float, prefix + "OP_24_FORCE_OPTION")
+        self.beamline_safe = epics_signal_rw_rbv(
+            float, prefix + "IP_16_FORCE_OPTION"
+        )  # 0 for on, 1 for no, 2 for off
+
         self.program_running = epics_signal_r(bool, prefix + "PROGRAM_RUNNING")
         self.program_name = epics_signal_r(str, prefix + "PROGRAM_NAME")
         self.error_str = epics_signal_r(str, prefix + "PRG_ERR_MSG")
         # Change error_code to int type when https://github.com/bluesky/ophyd-async/issues/280 released
         self.error_code = epics_signal_r(float, prefix + "PRG_ERR_CODE")
+
         super().__init__(name=name)
 
     async def pin_mounted_or_no_pin_found(self):

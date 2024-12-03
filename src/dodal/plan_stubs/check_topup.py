@@ -64,15 +64,19 @@ def _delay_to_avoid_topup(
         )
         gate = total_exposure_time_s < limit_s
         if gate:
-            LOGGER.info(f"""
+            LOGGER.info(
+                f"""
                 Exposure time of {total_exposure_time_s}s below the threshold of {limit_s}s.
                 Collection delayed until topup done.
-                """)
+                """
+            )
         else:
-            LOGGER.info(f"""
+            LOGGER.info(
+                f"""
                 Exposure time of {total_exposure_time_s}s meets the threshold of {limit_s}s.
                 Collection proceeding through topup.
-                """)
+                """
+            )
         return gate
     LOGGER.info(
         """

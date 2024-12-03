@@ -402,9 +402,11 @@ async def test_warning_if_results_are_different(
         ]
     )
     RE(bps.trigger(zocalo_results, wait=False))
-    mock_logger.warning.assert_called_with(
-        output
-    ) if output else mock_logger.warning.assert_not_called()
+    (
+        mock_logger.warning.assert_called_with(output)
+        if output
+        else mock_logger.warning.assert_not_called()
+    )
 
 
 async def test_if_zocalo_results_timeout_before_any_results_then_error(

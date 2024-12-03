@@ -1,0 +1,23 @@
+{
+	"exposure": 0.075,
+	"acqPeriod": 0.05,
+	"gain": 10.0,
+	"minheight": 10,
+	"oav": "OAV",
+	"min_callback_time": 0.15,
+	"close_ksize": 11,
+	"direction": 0,
+	"zoom": 1.0,
+	"preprocess": 8,
+	"preProcessKSize": 21,
+	"CannyEdgeUpperThreshold": 20.0,
+	"CannyEdgeLowerThreshold": 5.0,
+	"brightness": 20,
+	"filename": "/dls_sw/prod/R3.14.12.7/support/adPython/2-1-11/adPythonApp/scripts/adPythonMxSampleDetect.py",
+	"pinTipCentring": {
+		"max_tip_distance": 300
+	},
+	"xrayCentring": {
+		"max_tip_distance": 300
+	}
+}
