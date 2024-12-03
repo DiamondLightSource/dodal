@@ -99,9 +99,7 @@ class PinTipDetection(StandardReadable):
         self._top_edge_setter(results.edge_top)
         self._bottom_edge_setter(results.edge_bottom)
 
-    async def _get_tip_and_edge_data(
-        self, array_data: Array1D[np.uint8]
-    ) -> SampleLocation:
+    async def _get_tip_and_edge_data(self, array_data: np.ndarray) -> SampleLocation:
         """
         Gets the location of the pin tip and the top and bottom edges.
         """
