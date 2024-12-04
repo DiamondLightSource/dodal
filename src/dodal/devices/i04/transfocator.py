@@ -1,11 +1,11 @@
-import math
 import asyncio
+import math
 from time import time
 
 from ophyd_async.core import (
+    AsyncStatus,
     StandardReadable,
     observe_value,
-    AsyncStatus,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
@@ -25,7 +25,9 @@ class Transfocator(StandardReadable):
     def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
             self.beamsize_set_microns = epics_signal_rw(float, prefix + "VERT_REQ")
-            self.predicted_vertical_num_lenses = epics_signal_rw(float, prefix + "LENS_PRED")
+            self.predicted_vertical_num_lenses = epics_signal_rw(
+                float, prefix + "LENS_PRED"
+            )
             self.number_filters_sp = epics_signal_rw(int, prefix + "NUM_FILTERS")
 
             self.start = epics_signal_rw(int, prefix + "START.PROC")
@@ -40,8 +42,11 @@ class Transfocator(StandardReadable):
 
     async def _observe_beamsize_microns(self):
         have_we_done_it = False
+
         async def set_based_on_predicition(value: float):
-            if not math.isclose(self.latest_pred_vertical_num_lenses, value, abs_tol=1e-8):
+            if not math.isclose(
+                self.latest_pred_vertical_num_lenses, value, abs_tol=1e-8
+            ):
                 # We can only put an integer number of lenses in the beam but the
                 # calculation in the IOC returns the theoretical float number of lenses
                 nonlocal have_we_done_it
@@ -53,6 +58,7 @@ class Transfocator(StandardReadable):
                 await self.polling_wait_on_start_rbv(0)
                 self.latest_pred_vertical_num_lenses = value
                 have_we_done_it = True
+
         # The value hasn't changed so assume the device is already set up correctly
         async for value in observe_value(self.predicted_vertical_num_lenses):
             await set_based_on_predicition(value)
@@ -70,7 +76,7 @@ class Transfocator(StandardReadable):
             await asyncio.sleep(self._POLLING_WAIT)
 
         # last try
-        if self.start_rbv.get_value() != for_value:
+        if await self.start_rbv.get_value() != for_value:
             raise TimeoutError()
 
     @AsyncStatus.wrap
@@ -82,9 +88,14 @@ class Transfocator(StandardReadable):
         4. Start the device moving
         5. Wait for the start_rbv goes high and low again
         """
-        self.latest_pred_vertical_num_lenses = await self.predicted_vertical_num_lenses.get_value()
+        self.latest_pred_vertical_num_lenses = (
+            await self.predicted_vertical_num_lenses.get_value()
+        )
 
         LOGGER.info(f"Transfocator setting {beamsize_microns} beamsize")
 
         if await self.beamsize_set_microns.get_value() != beamsize_microns:
-            await asyncio.gather(self.beamsize_set_microns.set(beamsize_microns), self._observe_beamsize_microns())
+            await asyncio.gather(
+                self.beamsize_set_microns.set(beamsize_microns),
+                self._observe_beamsize_microns(),
+            )

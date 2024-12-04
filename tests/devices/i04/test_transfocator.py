@@ -1,7 +1,7 @@
-from unittest.mock import AsyncMock, patch
 import asyncio
-import pytest
+from unittest.mock import AsyncMock, patch
 
+import pytest
 from ophyd_async.core import (
     DeviceCollector,
     set_mock_value,
@@ -10,11 +10,13 @@ from ophyd_async.core import (
 
 from dodal.devices.i04.transfocator import Transfocator
 
+
 @pytest.fixture
 async def fake_transfocator() -> Transfocator:
     async with DeviceCollector(mock=True):
         transfocator = Transfocator(prefix="", name="transfocator")
     return transfocator
+
 
 def given_predicted_lenses_is_half_of_beamsize(transfocator: Transfocator):
     def lens_number_is_half_beamsize(value, *args, **kwargs):
@@ -23,16 +25,23 @@ def given_predicted_lenses_is_half_of_beamsize(transfocator: Transfocator):
     transfocator.beamsize_set_microns.subscribe_value(lens_number_is_half_beamsize)
 
 
+async def set_beamsize_to_same_value_as_mock_signal(
+    transfocator: Transfocator, value: float
+):
+    transfocator.set(value)
+    set_mock_value(transfocator.beamsize_set_microns, value)
+
+
 async def test_given_beamsize_already_set_then_when_transfocator_set_then_returns_immediately(
     fake_transfocator: Transfocator,
 ):
-    async with asyncio.timeout(0.01):
-        set_mock_value(fake_transfocator.beamsize_set_microns, 100.0)
-        await fake_transfocator.set(100.0)
+    await asyncio.wait_for(
+        set_beamsize_to_same_value_as_mock_signal(fake_transfocator, 100.0),
+        timeout=0.01,
+    )
 
-@patch("dodal.devices.i04.transfocator.asyncio.sleep")
+
 async def test_when_beamsize_set_then_set_correctly_on_device_and_waited_on(
-    mock_sleep,
     fake_transfocator: Transfocator,
 ):
     given_predicted_lenses_is_half_of_beamsize(fake_transfocator)
@@ -46,7 +55,21 @@ async def test_when_beamsize_set_then_set_correctly_on_device_and_waited_on(
         wait_for_value(fake_transfocator.predicted_vertical_num_lenses, 157, 0.1),
         wait_for_value(fake_transfocator.number_filters_sp, 157, 0.1),
         wait_for_value(fake_transfocator.start, 1, 0.1),
-        )
+    )
 
     await set_status
     assert set_status.done and set_status.success
+
+
+async def test_if_timeout_exceeded_and_start_rbv_not_equal_to_set_value_then_timeout_exception(
+    fake_transfocator: Transfocator,
+) -> None:
+    with patch.object(fake_transfocator, "TIMEOUT", 0):
+        given_predicted_lenses_is_half_of_beamsize(fake_transfocator)
+        fake_transfocator.start_rbv.get_value = AsyncMock(side_effect=[0, 1])
+        try:
+            await fake_transfocator.set(315)
+        except TimeoutError:
+            return
+
+    raise StopAsyncIteration()
