@@ -7,13 +7,11 @@ from ophyd_async.core import DeviceCollector, get_mock_put, set_mock_value
 from dodal.devices.bimorph_mirror import BimorphMirror
 
 BIMORPH_NAME = "bimorph"
-BIMORPH_NUMBER_OF_CHANNELS = 8
-
 
 @pytest.fixture
-def mirror(
-    RE: RunEngine, number_of_channels=BIMORPH_NUMBER_OF_CHANNELS
-) -> BimorphMirror:
+def mirror(request, RE: RunEngine) -> BimorphMirror:
+    number_of_channels = request.param
+
     with DeviceCollector(mock=True):
         bm = BimorphMirror(
             name=BIMORPH_NAME,
@@ -25,67 +23,54 @@ def mirror(
 
 
 @pytest.fixture
-def valid_bimorph_values(number_of_channels: int) -> dict[int, float]:
-    return {i: random.random() * 200 for i in range(1, number_of_channels + 1)}
+def valid_bimorph_values(mirror: BimorphMirror) -> dict[int, float]:
+    return {i: random.random() * 200 for i in range(1, mirror.number_of_channels + 1)}
 
 
 @pytest.fixture
-def set_vout_mock_and_return_value(request, mirror: BimorphMirror):
-    for key, val in request.param.items():
+def set_vout_mock(valid_bimorph_values: dict[int, float], mirror: BimorphMirror):
+    for key, val in valid_bimorph_values.items():
         set_mock_value(mirror.channels[key].vout, val)
 
-    return request.param
 
-
-@pytest.mark.parametrize(
-    "set_vout_mock_and_return_value", [({2: 50.0, 8: 24.0})], indirect=True
-)
+@pytest.mark.parametrize("mirror", [8], indirect=True)
 async def test_set_channels_waits_for_readback(
-    set_vout_mock_and_return_value: dict[int, float], mirror: BimorphMirror
+    mirror: BimorphMirror, valid_bimorph_values: dict[int, float], set_vout_mock
 ):
-    value = set_vout_mock_and_return_value
+    await mirror.set(valid_bimorph_values)
 
-    await mirror.set(value)
-
-    for key, val in value.items():
+    for key, val in valid_bimorph_values.items():
         assert (await mirror.channels[key].vtrgt.get_value()) == val
 
 
-@pytest.mark.parametrize(
-    "set_vout_mock_and_return_value", [({2: 50.0, 8: 24.0})], indirect=True
-)
+@pytest.mark.parametrize("mirror", [8], indirect=True)
 async def test_set_channels_triggers_alltrgt_proc(
-    set_vout_mock_and_return_value: dict[int, float], mirror: BimorphMirror
+    mirror: BimorphMirror, valid_bimorph_values: dict[int, float], set_vout_mock
 ):
-    value = set_vout_mock_and_return_value
-
     mock_alltrgt_proc = get_mock_put(mirror.alltrgt_proc)
 
     mock_alltrgt_proc.assert_not_called()
 
-    await mirror.set(value)
+    await mirror.set(valid_bimorph_values)
 
     mock_alltrgt_proc.assert_called_once()
 
 
-@pytest.mark.parametrize("value", [({2: 50.0, 8: 24.0})])
+@pytest.mark.parametrize("mirror", [8], indirect=True)
 async def test_set_channels_waits_for_vout_readback(
     value: dict[int, float], mirror: BimorphMirror
 ):
     raise NotImplementedError
 
 
-@pytest.mark.parametrize(
-    "set_vout_mock_and_return_value",
-    [({i: 0.0 for i in range(1, BIMORPH_NUMBER_OF_CHANNELS)})],
-    indirect=True,
-)
+@pytest.mark.parametrize("mirror", [8], indirect=True)
 async def test_read(
-    set_vout_mock_and_return_value: dict[int, float], mirror: BimorphMirror
+    mirror: BimorphMirror, valid_bimorph_values: dict[int, float], set_vout_mock
 ):
-    value = set_vout_mock_and_return_value
-
     read = await mirror.read()
 
     for i in range(1, mirror.number_of_channels):
-        assert read[f"{BIMORPH_NAME}-channels-{i}-vout"]["value"] == value[i]
+        assert (
+            read[f"{BIMORPH_NAME}-channels-{i}-vout"]["value"]
+            == valid_bimorph_values[i]
+        )
