@@ -5,13 +5,18 @@ from ophyd_async.core import DeviceCollector, get_mock_put, set_mock_value
 from dodal.devices.bimorph_mirror import BimorphMirror
 
 BIMORPH_NAME = "bimorph"
+BIMORPH_NUMBER_OF_CHANNELS = 8
 
 
 @pytest.fixture
-def mirror(RE: RunEngine) -> BimorphMirror:
+def mirror(
+    RE: RunEngine, number_of_channels=BIMORPH_NUMBER_OF_CHANNELS
+) -> BimorphMirror:
     with DeviceCollector(mock=True):
         bm = BimorphMirror(
-            name=BIMORPH_NAME, prefix="BL02J-EA-IOC-97:G0:", number_of_channels=8
+            name=BIMORPH_NAME,
+            prefix="BL02J-EA-IOC-97:G0:",
+            number_of_channels=number_of_channels,
         )
 
     return bm
@@ -64,7 +69,9 @@ async def test_set_channels_waits_for_vout_readback(
 
 
 @pytest.mark.parametrize(
-    "set_vout_mock_and_return_value", [({i: 0.0 for i in range(1, 9)})], indirect=True
+    "set_vout_mock_and_return_value",
+    [({i: 0.0 for i in range(1, BIMORPH_NUMBER_OF_CHANNELS)})],
+    indirect=True,
 )
 async def test_read(
     set_vout_mock_and_return_value: dict[int, float], mirror: BimorphMirror
@@ -73,5 +80,5 @@ async def test_read(
 
     read = await mirror.read()
 
-    for i in range(1, 9):
+    for i in range(1, mirror.number_of_channels):
         assert read[f"{BIMORPH_NAME}-channels-{i}-vout"]["value"] == value[i]
