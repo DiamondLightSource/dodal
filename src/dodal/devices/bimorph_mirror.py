@@ -50,9 +50,9 @@ class BimorphMirrorChannel(StandardReadable, EpicsDevice):
         shift: Float writeable shifting channel voltage
     """
 
-    vtrgt: A[SignalRW[float], PvSuffix.rbv("VTRGT"), Format.HINTED_SIGNAL]
+    vtrgt: A[SignalRW[float], PvSuffix.rbv("VTRGT"), Format.CONFIG_SIGNAL]
     vout: A[SignalRW[float], PvSuffix.rbv("VOUT"), Format.HINTED_SIGNAL]
-    status: A[SignalR[BimorphMirrorOnOff], PvSuffix("STATUS"), Format.HINTED_SIGNAL]
+    status: A[SignalR[BimorphMirrorOnOff], PvSuffix("STATUS"), Format.CONFIG_SIGNAL]
     shift: A[SignalW[float], PvSuffix("STATUS")]
 
 
