@@ -166,24 +166,30 @@ class SR570(CurrentAmp):
         LOGGER.info(f"{self.name} gain change to {value}")
 
         coarse_gain, fine_gain = self.combined_table[sen_setting].value
-        await self.fine_gain.set(value=fine_gain, timeout=self.timeout)
-        await self.coarse_gain.set(value=coarse_gain, timeout=self.timeout)
+        await asyncio.gather(
+            self.fine_gain.set(value=fine_gain, timeout=self.timeout),
+            self.coarse_gain.set(value=coarse_gain, timeout=self.timeout),
+        )
         await asyncio.sleep(self.raise_timetable[coarse_gain.name].value)
 
     @AsyncStatus.wrap
-    async def increase_gain(self, value=1) -> bool:
+    async def increase_gain(self, value=3) -> bool:
         current_gain = int((await self.get_gain()).name.split("_")[-1])
         current_gain += value
         if current_gain > len(self.combined_table):
+            await self.set(
+                self.gain_conversion_table[f"sen_{len(self.combined_table)}"]
+            )
             return False
         await self.set(self.gain_conversion_table[f"sen_{current_gain}"])
         return True
 
     @AsyncStatus.wrap
-    async def decrease_gain(self, value=1) -> bool:
+    async def decrease_gain(self, value=3) -> bool:
         current_gain = int((await self.get_gain()).name.split("_")[-1])
         current_gain -= value
         if current_gain < 1:
+            await self.set(self.gain_conversion_table["sen_1"])
             return False
         await self.set(self.gain_conversion_table[f"sen_{current_gain}"])
         return True

@@ -128,10 +128,10 @@ async def test_sr570_set_fail_out_of_range(sleep: AsyncMock, mock_sr570: SR570, 
 @pytest.mark.parametrize(
     "starting_gain, gain_change_count, final_gain",
     [
-        ([1e3, 1, 2e3]),
-        ([5e3, 5, 2e5]),
-        ([2e4, 3, 2e5]),
-        ([1e5, 20, 5e11]),
+        ([1e3, 1, 1e4]),
+        ([5e3, 5, 5e8]),
+        ([2e4, 3, 2e7]),
+        ([1e5, 6, 1e11]),
         ([2e11, 5, 1e12]),
     ],
 )
@@ -147,21 +147,16 @@ async def test_SR570_increase_gain(
     for _ in range(gain_change_count):
         await mock_sr570.increase_gain()
     assert (await mock_sr570.get_gain()) == SR570GainToCurrentTable(final_gain)
-    assert (
-        sleep.call_count
-        == int(SR570GainToCurrentTable(final_gain).name.split("_")[-1])
-        - int(SR570GainToCurrentTable(starting_gain).name.split("_")[-1])
-        + 1
-    )
+    assert sleep.call_count == gain_change_count + 1
 
 
 @pytest.mark.parametrize(
     "starting_gain, gain_change_count, final_gain",
     [
-        ([1e3, 5, 1e3]),
-        ([5e4, 2, 1e4]),
-        ([2e5, 3, 2e4]),
-        ([1e12, 13, 5e7]),
+        ([1e8, 5, 1e3]),
+        ([5e9, 3, 5e6]),
+        ([2e11, 3, 2e8]),
+        ([1e12, 8, 1e4]),
         ([1e5, 20, 1e3]),
     ],
 )
@@ -178,12 +173,7 @@ async def test_SR570_decrease_gain(
         await mock_sr570.decrease_gain()
     assert (await mock_sr570.get_gain()) == SR570GainToCurrentTable(final_gain)
     assert (
-        sleep.call_count
-        == abs(
-            int(SR570GainToCurrentTable(final_gain).name.split("_")[-1])
-            - int(SR570GainToCurrentTable(starting_gain).name.split("_")[-1])
-        )
-        + 1  # for starting gain
+        sleep.call_count == gain_change_count + 1  # for starting gain
     )
 
 
@@ -239,18 +229,18 @@ async def test_SR570_struck_scaler_read(
     [
         (
             "sen_10",
-            [1e2, 2e2, 5e2, 1e3, 2e3, 5e3, 1e4, 2e4, 5e4, 5e4],
+            [1e2, 1e3, 1e4, 1e5, 1e5],
             1e-9,
         ),
         ("sen_1", [1e5, 1e5], 1e-3),
         (
             "sen_10",
-            [520e5, 260e5, 104e5, 52e5, 26e5, 10.4e5, 5.2e5, 2.6e5, 2.6e5],
+            [520e5, 52e5, 5.2e5, 5.2e4, 5.2e4],
             5.2e-4,
         ),
-        ("sen_19", [22.2e5, 11.1e5, 4.4e5, 4.4e5], 2.2e-8),
+        ("sen_19", [22.2e5, 2.22e5, 2.22e5], 2.22e-8),
         ("sen_5", [0.0] * (30 - 5), 0.0),
-        ("sen_5", [-200.0e5, -100.0e5, -50.0e5, -20e5, -10e5, -10e5], -0.01),
+        ("sen_5", [-200.0e5, -20.0e5, -10.0e5, -10.0e5], -0.01),
         ("sen_25", [0.002e5, 0.004e5, 0.01e5, 0.02e5, 0.02e5], 2e-14),
     ],
 )
