@@ -1,4 +1,5 @@
 import random
+from unittest.mock import ANY, call, patch
 
 import pytest
 from bluesky.run_engine import RunEngine
@@ -60,9 +61,18 @@ async def test_set_channels_triggers_alltrgt_proc(
 
 @pytest.mark.parametrize("mirror", VALID_BIMORPH_CHANNELS, indirect=True)
 async def test_set_channels_waits_for_vout_readback(
-    value: dict[int, float], mirror: BimorphMirror
+    mirror: BimorphMirror, valid_bimorph_values: dict[int, float], set_vout_mock
 ):
-    raise NotImplementedError
+    with patch("dodal.devices.bimorph_mirror.wait_for_value") as mock_wait_for_value:
+        mock_wait_for_value.assert_not_called()
+
+        await mirror.set(valid_bimorph_values)
+
+        for i, val in valid_bimorph_values.items():
+            assert (
+                call(mirror.channels[i].vout, val, timeout=ANY)
+                in mock_wait_for_value.call_args_list
+            )
 
 
 @pytest.mark.parametrize("mirror", VALID_BIMORPH_CHANNELS, indirect=True)
