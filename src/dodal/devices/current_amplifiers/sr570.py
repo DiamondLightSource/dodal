@@ -170,24 +170,27 @@ class SR570(CurrentAmp):
         await self.coarse_gain.set(value=coarse_gain, timeout=self.timeout)
         await asyncio.sleep(self.raise_timetable[coarse_gain.name].value)
 
-    async def increase_gain(self) -> bool:
-        current_gain = int((await self.get_gain()).split("_")[-1])
-        current_gain += 1
+    @AsyncStatus.wrap
+    async def increase_gain(self, value=1) -> bool:
+        current_gain = int((await self.get_gain()).name.split("_")[-1])
+        current_gain += value
         if current_gain > len(self.combined_table):
             return False
         await self.set(self.gain_conversion_table[f"sen_{current_gain}"])
         return True
 
-    async def decrease_gain(self) -> bool:
-        current_gain = int((await self.get_gain()).split("_")[-1])
-        current_gain -= 1
+    @AsyncStatus.wrap
+    async def decrease_gain(self, value=1) -> bool:
+        current_gain = int((await self.get_gain()).name.split("_")[-1])
+        current_gain -= value
         if current_gain < 1:
             return False
         await self.set(self.gain_conversion_table[f"sen_{current_gain}"])
         return True
 
-    async def get_gain(self) -> str:
+    @AsyncStatus.wrap
+    async def get_gain(self) -> Enum:
         result = await asyncio.gather(
             self.coarse_gain.get_value(), self.fine_gain.get_value()
         )
-        return self.combined_table(result).name
+        return self.gain_conversion_table[self.combined_table(result).name]

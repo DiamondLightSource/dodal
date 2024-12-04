@@ -95,7 +95,7 @@ async def test_sr570_set(
     sleep: AsyncMock, mock_sr570: SR570, RE: RunEngine, gain, wait_time, gain_value
 ):
     RE(abs_set(mock_sr570, gain, wait=True))
-    assert await mock_sr570.get_gain() == gain_value
+    assert (await mock_sr570.get_gain()).name == gain_value
     # extra sleeps either side of set are bluesky's sleep which are set to 0.
     for actual, expected in zip(
         sleep.call_args[0], [0, 0, wait_time, 0, 0], strict=False
@@ -146,7 +146,7 @@ async def test_SR570_increase_gain(
     await mock_sr570.set(starting_gain)
     for _ in range(gain_change_count):
         await mock_sr570.increase_gain()
-    assert (await mock_sr570.get_gain()) == SR570GainToCurrentTable(final_gain).name
+    assert (await mock_sr570.get_gain()) == SR570GainToCurrentTable(final_gain)
     assert (
         sleep.call_count
         == int(SR570GainToCurrentTable(final_gain).name.split("_")[-1])
@@ -176,7 +176,7 @@ async def test_SR570_decrease_gain(
     await mock_sr570.set(starting_gain)
     for _ in range(gain_change_count):
         await mock_sr570.decrease_gain()
-    assert (await mock_sr570.get_gain()) == SR570GainToCurrentTable(final_gain).name
+    assert (await mock_sr570.get_gain()) == SR570GainToCurrentTable(final_gain)
     assert (
         sleep.call_count
         == abs(

@@ -107,21 +107,24 @@ class FemtoDDPCA(CurrentAmp):
         # wait for current amplifier's bandpass filter to settle.
         await asyncio.sleep(self.raise_timetable[sen_setting].value)
 
-    async def increase_gain(self) -> bool:
-        current_gain = int((await self.get_gain()).split("_")[-1])
-        current_gain += 1
+    @AsyncStatus.wrap
+    async def increase_gain(self, value=1) -> bool:
+        current_gain = int((await self.get_gain()).name.split("_")[-1])
+        current_gain += value
         if current_gain > len(self.gain_table):
             return False
         await self.set(self.gain_conversion_table[f"sen_{current_gain}"])
         return True
 
-    async def decrease_gain(self) -> bool:
-        current_gain = int((await self.get_gain()).split("_")[-1])
-        current_gain -= 1
+    @AsyncStatus.wrap
+    async def decrease_gain(self, value=1) -> bool:
+        current_gain = int((await self.get_gain()).name.split("_")[-1])
+        current_gain -= value
         if current_gain < 1:
             return False
         await self.set(self.gain_conversion_table[f"sen_{current_gain}"])
         return True
 
-    async def get_gain(self) -> str:
-        return (await self.gain.get_value()).name
+    @AsyncStatus.wrap
+    async def get_gain(self) -> Enum:
+        return self.gain_conversion_table[(await self.gain.get_value()).name]

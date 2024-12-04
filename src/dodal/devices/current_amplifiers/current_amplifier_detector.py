@@ -94,7 +94,7 @@ class CurrentAmpDet(StandardReadable, Preparable):
             self.current_amp().get_gain(),
             self.counter().get_voltage_per_sec(),
         )
-        correction_factor = self.current_amp().gain_conversion_table[current_gain].value
+        correction_factor = current_gain.value
         corrected_current = voltage_per_sec / correction_factor
         return corrected_current
 

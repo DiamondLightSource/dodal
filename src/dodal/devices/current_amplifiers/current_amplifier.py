@@ -1,7 +1,10 @@
 from abc import ABC, abstractmethod
 from enum import Enum
 
-from bluesky.protocols import Movable
+from bluesky.protocols import (
+    Movable,
+    Preparable,
+)
 from ophyd_async.core import AsyncStatus, StandardReadable
 
 
@@ -20,31 +23,34 @@ class CurrentAmp(ABC, StandardReadable, Movable):
         super().__init__(name)
 
     @abstractmethod
-    async def increase_gain(self) -> bool:
-        """Method to increase gain.
+    @AsyncStatus.wrap
+    async def increase_gain(self, value: int = 1) -> bool:
+        """Increase gain, increment by 1 by default.
 
         Returns:
             bool: True if success.
         """
 
+    @AsyncStatus.wrap
     @abstractmethod
-    async def decrease_gain(self) -> bool:
-        """Method to decrease gain.
+    async def decrease_gain(self, value: int = 1) -> bool:
+        """Decrease gain, decrement by 1 by default.
 
         Returns:
             bool: True if success.
         """
 
+    @AsyncStatus.wrap
     @abstractmethod
-    async def get_gain(self) -> str:
+    async def get_gain(self) -> type[Enum]:
         """Get the current gain setting
 
         Returns:
-            str: The member name of the current gain setting in gain_conversion_table.
+            Enum: The member name of the current gain setting in gain_conversion_table.
         """
 
 
-class CurrentAmpCounter(ABC, StandardReadable):
+class CurrentAmpCounter(ABC, StandardReadable, Preparable):
     """
     Base class for current amplifier counter, it contain the minimal implementations
       required for a counter/detector to function with CurrentAmpDet:
@@ -83,5 +89,5 @@ class CurrentAmpCounter(ABC, StandardReadable):
 
     @abstractmethod
     @AsyncStatus.wrap
-    async def prepare(self, value) -> None:
+    async def prepare(self, value: float) -> None:
         """Prepare method for setting up the counter"""
