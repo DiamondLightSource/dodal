@@ -1,3 +1,5 @@
+import random
+
 import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import DeviceCollector, get_mock_put, set_mock_value
@@ -20,6 +22,11 @@ def mirror(
         )
 
     return bm
+
+
+@pytest.fixture
+def valid_bimorph_values(number_of_channels: int) -> dict[int, float]:
+    return {i: random.random() * 200 for i in range(1, number_of_channels + 1)}
 
 
 @pytest.fixture
