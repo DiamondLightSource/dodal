@@ -91,7 +91,10 @@ class BimorphMirror(StandardReadable, Movable):
         """Sets bimorph voltages in parrallel via target voltage and all proc.
 
         Args:
-            value: Dict of channel numbers to target voltages"""
+            value: Dict of channel numbers to target voltages
+
+        Raises:
+            AssertionError: If specified channel number does not exist on mirror"""
         for i in value.keys():
             assert self.channels.get(i) is not None
 
