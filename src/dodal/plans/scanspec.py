@@ -125,7 +125,7 @@ def plan_step_scan(detectors: StandardDetector, motor: Motor) -> MsgGenerator:
 
 
 @attach_data_session_metadata_decorator
-def log_scan_plan(detectors: StandardDetector, motor: Motor):
+def log_scan_plan(detectors: StandardDetector, motor: Motor) -> MsgGenerator:
     @bpp.stage_decorator(devices=[detectors, motor])
     @bpp.run_decorator()
     def inner():
