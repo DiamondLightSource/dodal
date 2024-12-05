@@ -297,7 +297,7 @@ def slit_3() -> I10Slits:
 
 
 @device_factory()
-def forcsing_mirror() -> PiezoMirror:
+def focusing_mirror() -> PiezoMirror:
     return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-FOCS-01:")
 
 
