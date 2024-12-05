@@ -24,12 +24,12 @@ from ophyd_async.plan_stubs._fly import (
 from pydantic import Field, validate_call
 from scanspec.specs import Spec
 
-from bluesky.utils import MsgGenerator
 from dodal.plan_stubs.data_session import attach_data_session_metadata_decorator
 
 
 def connect_devices(devices: set[Readable]) -> MsgGenerator:
     yield from ensure_connected(*devices)
+
 
 @attach_data_session_metadata_decorator()
 @validate_call(config={"arbitrary_types_allowed": True})
@@ -110,13 +110,27 @@ def plan(panda: HDFPanda, diff: StandardDetector) -> MsgGenerator:
     yield from inner()
 
 
+@attach_data_session_metadata_decorator()
 def plan_step_scan(detectors: StandardDetector, motor: Motor) -> MsgGenerator:
-    yield from ensure_connected(detectors,motor)
+    yield from ensure_connected(detectors, motor)
+
     @bpp.stage_decorator(devices=[detectors, motor])
     @bpp.run_decorator()
     def inner():
         for i in range(10):
             yield from bps.mv(motor, i)
-            yield from bps.trigger_and_read((*detectors, motor))
+            yield from bps.trigger_and_read((detectors, motor))
+
+    yield from inner()
+
+
+@attach_data_session_metadata_decorator
+def log_scan_plan(detectors: StandardDetector, motor: Motor):
+    @bpp.stage_decorator(devices=[detectors, motor])
+    @bpp.run_decorator()
+    def inner():
+        yield from bp.log_scan(
+            detectors=[detectors], motor=motor, start=1, stop=20, num=5
+        )
 
     yield from inner()
