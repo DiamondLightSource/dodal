@@ -17,16 +17,19 @@ from ophyd_async.fastcs.panda import (
     HDFPanda,
     StaticSeqTableTriggerLogic,
 )
-from ophyd_async.plan_stubs import fly_and_collect
+from ophyd_async.plan_stubs import ensure_connected, fly_and_collect
 from ophyd_async.plan_stubs._fly import (
     prepare_static_seq_table_flyer_and_detectors_with_same_trigger,
 )
 from pydantic import Field, validate_call
 from scanspec.specs import Spec
 
-from dodal.common import MsgGenerator
+from bluesky.utils import MsgGenerator
 from dodal.plan_stubs.data_session import attach_data_session_metadata_decorator
 
+
+def connect_devices(devices: set[Readable]) -> MsgGenerator:
+    yield from ensure_connected(*devices)
 
 @attach_data_session_metadata_decorator()
 @validate_call(config={"arbitrary_types_allowed": True})
@@ -90,6 +93,7 @@ def plan(panda: HDFPanda, diff: StandardDetector) -> MsgGenerator:
         trigger_logic,
         name="flyer",
     )
+    yield from ensure_connected(diff, panda, flyer)
 
     @bpp.stage_decorator(devices=[diff, panda, flyer])
     @bpp.run_decorator()
@@ -106,9 +110,9 @@ def plan(panda: HDFPanda, diff: StandardDetector) -> MsgGenerator:
     yield from inner()
 
 
-@attach_data_session_metadata_decorator()
-def plan_step_scan(detectors: set[StandardDetector], motor: Motor) -> MsgGenerator:
-    @bpp.stage_decorator(devices=[*detectors, motor])
+def plan_step_scan(detectors: StandardDetector, motor: Motor) -> MsgGenerator:
+    yield from ensure_connected(detectors,motor)
+    @bpp.stage_decorator(devices=[detectors, motor])
     @bpp.run_decorator()
     def inner():
         for i in range(10):
