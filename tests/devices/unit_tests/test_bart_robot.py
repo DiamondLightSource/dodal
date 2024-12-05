@@ -87,18 +87,22 @@ async def test_given_program_not_running_and_pin_unmounts_then_mounts_when_load_
     device.LOAD_TIMEOUT = 0.03  # type: ignore
     set_mock_value(device.program_running, False)
     set_mock_value(device.gonio_pin_sensor, PinMounted.PIN_MOUNTED)
-
     device.load = AsyncMock(side_effect=device.load)
     status = device.set(SampleLocation(15, 10))
     await sleep(0.01)
+
+    assert await device.gonio_pin_sensor.get_value() == PinMounted.PIN_MOUNTED
     device.load.trigger.assert_called_once()  # type:ignore
+
     set_mock_value(device.gonio_pin_sensor, PinMounted.NO_PIN_MOUNTED)
     await sleep(0.005)
+
     set_mock_value(device.gonio_pin_sensor, PinMounted.PIN_MOUNTED)
     await status
     assert status.success
     assert (await device.next_puck.get_value()) == 15
     assert (await device.next_pin.get_value()) == 10
+    assert await device.gonio_pin_sensor.get_value() == PinMounted.PIN_MOUNTED
     device.load.trigger.assert_called_once()  # type:ignore
 
 
