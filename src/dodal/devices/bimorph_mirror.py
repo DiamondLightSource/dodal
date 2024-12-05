@@ -24,14 +24,14 @@ from ophyd_async.epics.core import (
 
 
 class BimorphMirrorOnOff(StrictEnum):
-    ON="ON"
-    OFF="OFF"
+    ON = "ON"
+    OFF = "OFF"
 
 
 class BimorphMirrorMode(StrictEnum):
-    HI="HI"
-    NORMAL="NORMAL"
-    FAST="FAST"
+    HI = "HI"
+    NORMAL = "NORMAL"
+    FAST = "FAST"
 
 
 class BimorphMirrorStatus(StrictEnum):
@@ -97,7 +97,10 @@ class BimorphMirror(StandardReadable, Movable):
 
         # Write target voltages:
         await asyncio.gather(
-            *[self.channels[i].vtrgt.set(target, wait=True) for i, target in value.items()]
+            *[
+                self.channels[i].vtrgt.set(target, wait=True)
+                for i, target in value.items()
+            ]
         )
 
         # Trigger set target voltages:

@@ -8,6 +8,7 @@ from dodal.devices.bimorph_mirror import BimorphMirror
 
 BIMORPH_NAME = "bimorph"
 
+
 @pytest.fixture
 def mirror(request, RE: RunEngine) -> BimorphMirror:
     number_of_channels = request.param
