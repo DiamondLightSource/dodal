@@ -293,7 +293,7 @@ def slit_3() -> I10Slits:
     )
 
 
-"Rasor devices"
+"""Rasor devices"""
 
 
 @device_factory()
@@ -302,7 +302,7 @@ def forcsing_mirror() -> PiezoMirror:
 
 
 @device_factory()
-def exit_slit_4() -> MinimalSlits:
+def slit_4() -> MinimalSlits:
     return MinimalSlits(
         prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-04:",
         x_gap="XSIZE",
