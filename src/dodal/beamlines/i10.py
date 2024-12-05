@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from dodal.common.beamlines.beamline_utils import device_instantiation
+from dodal.common.beamlines.beamline_utils import device_factory, device_instantiation
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.apple2_undulator import (
     UndulatorGap,
@@ -14,13 +14,18 @@ from dodal.devices.i10.i10_apple2 import (
     LinearArbitraryAngle,
 )
 from dodal.devices.i10.i10_setting_data import I10Grating
+from dodal.devices.i10.mirrors import PiezoMirror
+from dodal.devices.i10.slits import I10PrimarySlits, I10Slits
 from dodal.devices.pgm import PGM
+from dodal.devices.slits import MinimalSlits
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("i10")
 set_log_beamline(BL)
 set_utils_beamline(BL)
+PREFIX = BeamlinePrefix(BL)
+
 
 LOOK_UPTABLE_DIR = "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/"
 """
@@ -39,7 +44,7 @@ def idd_gap(
     return device_instantiation(
         device_factory=UndulatorGap,
         name="idd_gap",
-        prefix=f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
+        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
         bl_prefix=False,
@@ -52,7 +57,7 @@ def idd_phase_axes(
     return device_instantiation(
         device_factory=UndulatorPhaseAxes,
         name="idd_phase_axes",
-        prefix=f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
+        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
         top_outer="RPQ1",
         top_inner="RPQ2",
         btm_inner="RPQ3",
@@ -69,7 +74,7 @@ def idd_jaw(
     return device_instantiation(
         device_factory=UndulatorJawPhase,
         name="idd_jaw",
-        prefix=f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
+        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
         move_pv="RPQ1",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
@@ -83,7 +88,7 @@ def idu_gap(
     return device_instantiation(
         device_factory=UndulatorGap,
         name="idu_gap",
-        prefix=f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-21:",
+        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
         bl_prefix=False,
@@ -96,7 +101,7 @@ def idu_phase_axes(
     return device_instantiation(
         device_factory=UndulatorPhaseAxes,
         name="idu_phase_axes",
-        prefix=f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-21:",
+        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:",
         top_outer="RPQ1",
         top_inner="RPQ2",
         btm_inner="RPQ3",
@@ -113,7 +118,7 @@ def idu_jaw(
     return device_instantiation(
         device_factory=UndulatorJawPhase,
         name="idu_jaw",
-        prefix=f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-21:",
+        prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:",
         move_pv="RPQ1",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
@@ -254,4 +259,66 @@ def idd_la_angle(
         name="idd_la_angle",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
+    )
+
+
+@device_factory()
+def first_mirror() -> PiezoMirror:
+    return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-COL-01:")
+
+
+@device_factory()
+def switching_mirror() -> PiezoMirror:
+    return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:")
+
+
+@device_factory()
+def slit_1() -> I10PrimarySlits:
+    return I10PrimarySlits(
+        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-01:",
+    )
+
+
+@device_factory()
+def slit_2() -> I10Slits:
+    return I10Slits(
+        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-02:",
+    )
+
+
+@device_factory()
+def slit_3() -> I10Slits:
+    return I10Slits(
+        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-03:",
+    )
+
+
+"""Rasor devices"""
+
+
+@device_factory()
+def focusing_mirror() -> PiezoMirror:
+    return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-FOCS-01:")
+
+
+@device_factory()
+def slit_4() -> MinimalSlits:
+    return MinimalSlits(
+        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-04:",
+        x_gap="XSIZE",
+        y_gap="YSIZE",
+    )
+
+
+@device_factory()
+def slit_5() -> I10Slits:
+    return I10Slits(
+        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-05:",
+    )
+
+
+@device_factory()
+def slit_6() -> I10Slits:
+    return I10Slits(
+        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-06:",
     )
