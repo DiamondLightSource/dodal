@@ -398,7 +398,7 @@ def rasor_femto_pa_scaler_det() -> CurrentAmpDet:
 
 
 @device_factory()
-def rasor_sr570_flou_scaler_det() -> CurrentAmpDet:
+def rasor_sr570_fluo_scaler_det() -> CurrentAmpDet:
     return CurrentAmpDet(
         current_amp=rasor_sr570().ca2,
         counter=rasor_det_scalers().fluo,
@@ -406,7 +406,7 @@ def rasor_sr570_flou_scaler_det() -> CurrentAmpDet:
 
 
 @device_factory()
-def rasor_femto_flou_scaler_det() -> CurrentAmpDet:
+def rasor_femto_fluo_scaler_det() -> CurrentAmpDet:
     return CurrentAmpDet(
         current_amp=rasor_femto().ca2,
         counter=rasor_det_scalers().fluo,
