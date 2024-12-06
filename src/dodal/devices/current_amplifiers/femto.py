@@ -65,9 +65,12 @@ class FemtoDDPCA(CurrentAmp):
     Attributes:
         gain (SignalRW): This is the epic signal that control current amplifier gain.
         gain_table (strictEnum): The table epic use to set gain.
+        upperlimit (float): upperlimit of the current amplifier
+        lowerlimit (float): lowerlimit of the current amplifier
         timeout (float): Maximum waiting time in second for setting gain.
         raise_timetable (Enum): Table contain the minimum amount of time to wait after
          changing gain.
+
     """
 
     def __init__(

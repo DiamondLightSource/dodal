@@ -127,6 +127,8 @@ class SR570(CurrentAmp):
         combined_table (Enum): Table that combine fine and coarse table into one.
         gain (SignalRW([str]): Soft signal to store the member name of the current gain
             setting in gain_conversion_table.
+        upperlimit (float): upperlimit of the current amplifier
+        lowerlimit (float): lowerlimit of the current amplifier
 
     """
 
