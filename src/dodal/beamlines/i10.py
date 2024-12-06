@@ -319,8 +319,6 @@ def rasor_sr570_pa_scaler_det() -> CurrentAmpDet:
     return CurrentAmpDet(
         current_amp=rasor_sr570().ca1,
         counter=rasor_det_scalers().det,
-        upper_limit=4.7,
-        lower_limit=0.4,
     )
 
 
@@ -329,8 +327,6 @@ def rasor_femto_pa_scaler_det() -> CurrentAmpDet:
     return CurrentAmpDet(
         current_amp=rasor_femto().ca1,
         counter=rasor_det_scalers().det,
-        upper_limit=9.5,
-        lower_limit=0.4,
     )
 
 
@@ -339,8 +335,6 @@ def rasor_sr570_flou_scaler_det() -> CurrentAmpDet:
     return CurrentAmpDet(
         current_amp=rasor_sr570().ca2,
         counter=rasor_det_scalers().fluo,
-        upper_limit=4.7,
-        lower_limit=0.4,
     )
 
 
@@ -349,8 +343,6 @@ def rasor_femto_flou_scaler_det() -> CurrentAmpDet:
     return CurrentAmpDet(
         current_amp=rasor_femto().ca2,
         counter=rasor_det_scalers().fluo,
-        upper_limit=9.5,
-        lower_limit=0.4,
     )
 
 
@@ -359,8 +351,6 @@ def rasor_sr570_drain_scaler_det() -> CurrentAmpDet:
     return CurrentAmpDet(
         current_amp=rasor_sr570().ca3,
         counter=rasor_det_scalers().drain,
-        upper_limit=4.7,
-        lower_limit=0.4,
     )
 
 
@@ -369,6 +359,4 @@ def rasor_femto_drain_scaler_det() -> CurrentAmpDet:
     return CurrentAmpDet(
         current_amp=rasor_femto().ca3,
         counter=rasor_det_scalers().drain,
-        upper_limit=9.5,
-        lower_limit=0.4,
     )

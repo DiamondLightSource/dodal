@@ -41,6 +41,8 @@ async def mock_sr570(prefix: str = "BLXX-EA-DET-007:", suffix: str = "Gain") -> 
             combined_table=SR570FullGainTable,
             gain_to_current_table=SR570GainToCurrentTable,
             raise_timetable=SR570RaiseTimeTable,
+            upperlimit=4.7,
+            lowerlimit=0.4,
             name="mock_sr570",
         )
     assert mock_sr570.name == "mock_sr570"
@@ -71,8 +73,6 @@ async def mock_sr570_struck_scaler_detector(
         mock_sr570_struck_scaler_detector = CurrentAmpDet(
             current_amp=mock_sr570,
             counter=mock_StruckScaler,
-            upper_limit=4.7,
-            lower_limit=0.4,
             name="mock_sr570_struck_scaler_detector",
         )
     assert mock_sr570_struck_scaler_detector.name == "mock_sr570_struck_scaler_detector"

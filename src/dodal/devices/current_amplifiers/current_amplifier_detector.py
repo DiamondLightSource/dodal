@@ -28,8 +28,6 @@ class CurrentAmpDet(StandardReadable, Preparable):
         counter (CurrentAmpCounter): Counter that capture the current amplifier output.
         current (SignalRW([float]): Soft signal to store the corrected current.
         auto_mode (signalR([bool])): Soft signal to store the flag for auto gain.
-        upper_limit (float): The upper limit of the current amplifier output in volt.
-        lower_limit (float): The lower limit of the current amplifier output in volt.
         name (str): Name of the device.
     """
 
@@ -37,8 +35,6 @@ class CurrentAmpDet(StandardReadable, Preparable):
         self,
         current_amp: CurrentAmp,
         counter: CurrentAmpCounter,
-        upper_limit: float,
-        lower_limit: float,
         name: str = "",
     ) -> None:
         self.current_amp = Reference(current_amp)
@@ -49,8 +45,6 @@ class CurrentAmpDet(StandardReadable, Preparable):
             )
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.auto_mode = soft_signal_rw(bool, initial_value=True)
-            self.upper_limit = upper_limit
-            self.lower_limit = lower_limit
         super().__init__(name)
 
     async def read(self) -> dict[str, Reading]:
@@ -76,10 +70,10 @@ class CurrentAmpDet(StandardReadable, Preparable):
             negative value is possible on some current amplifier, hence the abs.
             """
             reading = abs(await self.counter().get_voltage_per_sec())
-            if reading > self.upper_limit:
+            if reading > await self.current_amp().get_upperlimit():
                 if not await self.current_amp().decrease_gain():
                     return False
-            elif reading < self.lower_limit:
+            elif reading < await self.current_amp().get_lowerlimit():
                 if not await self.current_amp().increase_gain():
                     return False
             else:

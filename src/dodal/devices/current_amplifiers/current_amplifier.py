@@ -49,6 +49,16 @@ class CurrentAmp(ABC, StandardReadable, Movable):
             Enum: The member name of the current gain setting in gain_conversion_table.
         """
 
+    @AsyncStatus.wrap
+    @abstractmethod
+    async def get_upperlimit(self) -> float:
+        """Get the upper limit of the current amplifier"""
+
+    @AsyncStatus.wrap
+    @abstractmethod
+    async def get_lowerlimit(self) -> float:
+        """Get the upper limit of the current amplifier"""
+
 
 class CurrentAmpCounter(ABC, StandardReadable, Preparable):
     """

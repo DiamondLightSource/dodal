@@ -70,8 +70,6 @@ async def mock_femto_struck_scaler_detector(
         mock_femto_struck_scaler_detector = CurrentAmpDet(
             current_amp=mock_femto,
             counter=mock_StruckScaler,
-            upper_limit=9.5,
-            lower_limit=0.5,
             name="mock_femto_struck_scaler_detector",
         )
     assert mock_femto_struck_scaler_detector.name == "mock_femto_struck_scaler_detector"

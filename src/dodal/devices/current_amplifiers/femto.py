@@ -77,6 +77,8 @@ class FemtoDDPCA(CurrentAmp):
         gain_table: type[StrictEnum],
         gain_to_current_table: type[Enum],
         raise_timetable: type[Enum],
+        upperlimit: float = 8.8,
+        lowerlimit: float = 0.68,
         timeout: float = 1,
         name: str = "",
     ) -> None:
@@ -87,6 +89,8 @@ class FemtoDDPCA(CurrentAmp):
             self.gain_table = gain_table
             self.timeout = timeout
             self.raise_timetable = raise_timetable
+        self.upperlimit = upperlimit
+        self.lowerlimit = lowerlimit
         super().__init__(name=name, gain_conversion_table=gain_to_current_table)
 
     @AsyncStatus.wrap
@@ -128,3 +132,11 @@ class FemtoDDPCA(CurrentAmp):
     @AsyncStatus.wrap
     async def get_gain(self) -> Enum:
         return self.gain_conversion_table[(await self.gain.get_value()).name]
+
+    @AsyncStatus.wrap
+    async def get_upperlimit(self) -> float:
+        return self.upperlimit
+
+    @AsyncStatus.wrap
+    async def get_lowerlimit(self) -> float:
+        return self.lowerlimit

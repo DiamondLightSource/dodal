@@ -139,6 +139,8 @@ class SR570(CurrentAmp):
         combined_table: type[Enum],
         gain_to_current_table: type[Enum],
         raise_timetable: type[Enum],
+        upperlimit: float = 4.8,
+        lowerlimit: float = 0.4,
         timeout: float = 1,
         name: str = "",
     ) -> None:
@@ -153,6 +155,8 @@ class SR570(CurrentAmp):
         self.timeout = timeout
         self.raise_timetable = raise_timetable
         self.combined_table = combined_table
+        self.upperlimit = upperlimit
+        self.lowerlimit = lowerlimit
 
     @AsyncStatus.wrap
     async def set(self, value) -> None:
@@ -200,3 +204,11 @@ class SR570(CurrentAmp):
             self.coarse_gain.get_value(), self.fine_gain.get_value()
         )
         return self.gain_conversion_table[self.combined_table(result).name]
+
+    @AsyncStatus.wrap
+    async def get_upperlimit(self) -> float:
+        return self.upperlimit
+
+    @AsyncStatus.wrap
+    async def get_lowerlimit(self) -> float:
+        return self.lowerlimit
