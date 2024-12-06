@@ -115,19 +115,19 @@ class FemtoDDPCA(CurrentAmp):
         await asyncio.sleep(self.raise_timetable[sen_setting].value)
 
     @AsyncStatus.wrap
-    async def increase_gain(self, value=1) -> None:
+    async def increase_gain(self, value: int = 1) -> None:
         current_gain = int((await self.get_gain()).name.split("_")[-1])
         current_gain += value
         if current_gain > len(self.gain_table):
-            raise ValueError("Gain it max value")
+            raise ValueError("Gain at max value")
         await self.set(self.gain_conversion_table[f"sen_{current_gain}"])
 
     @AsyncStatus.wrap
-    async def decrease_gain(self, value=1) -> None:
+    async def decrease_gain(self, value: int = 1) -> None:
         current_gain = int((await self.get_gain()).name.split("_")[-1])
         current_gain -= value
         if current_gain < 1:
-            raise ValueError("Gain it max value")
+            raise ValueError("Gain at min value")
         await self.set(self.gain_conversion_table[f"sen_{current_gain}"])
 
     @AsyncStatus.wrap
