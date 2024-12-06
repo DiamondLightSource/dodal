@@ -24,7 +24,7 @@ class CurrentAmp(ABC, StandardReadable, Movable):
 
     @abstractmethod
     @AsyncStatus.wrap
-    async def increase_gain(self, value: int = 1) -> bool:
+    async def increase_gain(self, value: int = 1) -> None:
         """Increase gain, increment by 1 by default.
 
         Returns:
@@ -33,7 +33,7 @@ class CurrentAmp(ABC, StandardReadable, Movable):
 
     @AsyncStatus.wrap
     @abstractmethod
-    async def decrease_gain(self, value: int = 1) -> bool:
+    async def decrease_gain(self, value: int = 1) -> None:
         """Decrease gain, decrement by 1 by default.
 
         Returns:

@@ -54,31 +54,42 @@ class CurrentAmpDet(StandardReadable, Preparable):
         """
         if await self.auto_mode.get_value():
             LOGGER.info(f"{self.name}-Attempting auto-gain")
-            if await self.auto_gain():
+            status = self.auto_gain()
+            await status
+            if not status.success:
+                if status.exception() is not None:
+                    LOGGER.warning(f"{self.name} new gain is at maximum/minimum value.")
+            else:
                 LOGGER.info(
                     f"{self.name} new gain = {await self.current_amp().get_gain()}."
                 )
-            else:
-                LOGGER.warning(f"{self.name} new gain is at maximum/minimum value.")
         current = await self.get_corrected_current()
         self._set_current(current)
         return await super().read()
 
-    async def auto_gain(self) -> bool:
+    @AsyncStatus.wrap
+    async def auto_gain(self) -> None:
         for _ in range(0, len(self.current_amp().gain_conversion_table)):
             """
             negative value is possible on some current amplifier, hence the abs.
             """
             reading = abs(await self.counter().get_voltage_per_sec())
             if reading > await self.current_amp().get_upperlimit():
-                if not await self.current_amp().decrease_gain():
-                    return False
+                status = self.current_amp().decrease_gain()
+                await status
+                if not status.success:
+                    if status.exception() is not None:
+                        LOGGER.warning(f"{self.name} new gain is at minimum value.")
+                    break
             elif reading < await self.current_amp().get_lowerlimit():
-                if not await self.current_amp().increase_gain():
-                    return False
+                status = self.current_amp().increase_gain()
+                await status
+                if not status.success:
+                    if status.exception() is not None:
+                        LOGGER.warning(f"{self.name} new gain is at maximum value.")
+                    break
             else:
                 break
-        return True
 
     async def get_corrected_current(self) -> float:
         """
