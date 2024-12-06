@@ -55,41 +55,40 @@ class CurrentAmpDet(StandardReadable, Preparable):
         if await self.auto_mode.get_value():
             LOGGER.info(f"{self.name}-Attempting auto-gain")
             status = self.auto_gain()
-            await status
-            if not status.success:
-                if status.exception() is not None:
-                    LOGGER.warning(f"{self.name} new gain is at maximum/minimum value.")
-            else:
+            try:
+                await status
                 LOGGER.info(
                     f"{self.name} new gain = {await self.current_amp().get_gain()}."
                 )
+            except ValueError as ex:
+                LOGGER.warning(f"{self.name} gain went outside limits")
+                # Further details are provided to the user in the logged exception
+                LOGGER.exception(ex)
         current = await self.get_corrected_current()
         self._set_current(current)
         return await super().read()
 
     @AsyncStatus.wrap
     async def auto_gain(self) -> None:
-        for _ in range(0, len(self.current_amp().gain_conversion_table)):
-            """
-            negative value is possible on some current amplifier, hence the abs.
-            """
-            reading = abs(await self.counter().get_voltage_per_sec())
-            if reading > await self.current_amp().get_upperlimit():
-                status = self.current_amp().decrease_gain()
-                await status
-                if not status.success:
-                    if status.exception() is not None:
-                        LOGGER.warning(f"{self.name} new gain is at minimum value.")
-                    break
-            elif reading < await self.current_amp().get_lowerlimit():
-                status = self.current_amp().increase_gain()
-                await status
-                if not status.success:
-                    if status.exception() is not None:
-                        LOGGER.warning(f"{self.name} new gain is at maximum value.")
-                    break
-            else:
-                break
+        # First try lowering the gain if we are over the limit, if we are not
+        # this loop will never run
+        while (reading := abs(await self.counter().get_voltage_per_sec())) > (
+            limit := await self.current_amp().get_upperlimit()
+        ):
+            LOGGER.debug(
+                f"{self.name} (auto gain): {reading} > {limit}, decreasing gain"
+            )
+            await self.current_amp().decrease_gain()
+
+        # Then try raising the gain if we are under the limit, if we are not
+        # this loop will never run
+        while (reading := abs(await self.counter().get_voltage_per_sec())) < (
+            limit := await self.current_amp().get_lowerlimit()
+        ):
+            LOGGER.debug(
+                f"{self.name} (auto gain): {reading} < {limit}, increasing gain"
+            )
+            await self.current_amp().increase_gain()
 
     async def get_corrected_current(self) -> float:
         """
