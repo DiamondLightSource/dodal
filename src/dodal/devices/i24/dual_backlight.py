@@ -8,6 +8,7 @@ class BacklightPositions(StrictEnum):
     LOAD_CHECK = "LoadCheck"
     OAV2 = "OAV2"
     DIODE = "Diode"
+    WHITE_IN = "White In"
 
 
 class LEDStatus(StrictEnum):
