@@ -57,7 +57,7 @@ class CurrentAmp(ABC, StandardReadable, Movable):
     @AsyncStatus.wrap
     @abstractmethod
     async def get_lowerlimit(self) -> float:
-        """Get the upper limit of the current amplifier"""
+        """Get the lower limit of the current amplifier"""
 
 
 class CurrentAmpCounter(ABC, StandardReadable, Preparable):
