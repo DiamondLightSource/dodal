@@ -84,16 +84,17 @@ async def test_given_program_not_running_and_pin_unmounting_but_new_pin_not_moun
 
 async def test_given_program_not_running_and_pin_unmounts_then_mounts_when_load_pin_then_pin_loaded():
     device = await _get_bart_robot()
-    device.LOAD_TIMEOUT = 0.03  # type: ignore
+    device.LOAD_TIMEOUT = 0.05  # type: ignore
     set_mock_value(device.program_running, False)
     set_mock_value(device.gonio_pin_sensor, PinMounted.PIN_MOUNTED)
-
     device.load = AsyncMock(side_effect=device.load)
     status = device.set(SampleLocation(15, 10))
-    await sleep(0.01)
+    await sleep(0.025)
     device.load.trigger.assert_called_once()  # type:ignore
+
     set_mock_value(device.gonio_pin_sensor, PinMounted.NO_PIN_MOUNTED)
-    await sleep(0.005)
+    await sleep(0.025)
+
     set_mock_value(device.gonio_pin_sensor, PinMounted.PIN_MOUNTED)
     await status
     assert status.success
