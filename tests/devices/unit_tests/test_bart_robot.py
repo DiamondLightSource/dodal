@@ -81,6 +81,7 @@ async def test_given_program_not_running_and_pin_unmounting_but_new_pin_not_moun
     last_log = patch_logger.mock_calls[1].args[0]
     assert "Waiting on new pin loaded" in last_log
 
+
 async def test_given_program_not_running_and_pin_unmounts_then_mounts_when_load_pin_then_pin_loaded():
     device = await _get_bart_robot()
     device.LOAD_TIMEOUT = 0.05  # type: ignore
