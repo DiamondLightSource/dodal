@@ -129,7 +129,6 @@ async def test_femto_set_fail_out_of_range(
         (["sen_1", 1, "sen_2"]),
         (["sen_3", 5, "sen_8"]),
         (["sen_5", 3, "sen_8"]),
-        (["sen_7", 20, "sen_10"]),
     ],
 )
 @mock.patch("asyncio.sleep")
@@ -149,13 +148,27 @@ async def test_femto_increase_gain(
     )
 
 
+@mock.patch("asyncio.sleep")
+async def test_femto_increase_gain_fail_at_max_gain(
+    sleep: AsyncMock,
+    mock_femto: FemtoDDPCA,
+):
+    starting_gain, final_gain = ["sen_10", "sen_10"]
+    set_mock_value(mock_femto.gain, Femto3xxGainTable[starting_gain])
+    with pytest.raises(ValueError):
+        await mock_femto.increase_gain()
+    assert (await mock_femto.gain.get_value()) == Femto3xxGainTable[final_gain]
+    assert sleep.call_count == int(final_gain.split("_")[-1]) - int(
+        starting_gain.split("_")[-1]
+    )
+
+
 @pytest.mark.parametrize(
     "starting_gain, gain_change_count, final_gain",
     [
-        (["sen_1", 5, "sen_1"]),
         (["sen_6", 2, "sen_4"]),
         (["sen_8", 3, "sen_5"]),
-        (["sen_7", 20, "sen_1"]),
+        (["sen_10", 9, "sen_1"]),
     ],
 )
 @mock.patch("asyncio.sleep")
@@ -170,9 +183,24 @@ async def test_femto_decrease_gain(
     for _ in range(gain_change_count):
         await mock_femto.decrease_gain()
     assert (await mock_femto.gain.get_value()) == Femto3xxGainTable[final_gain]
-    # assert sleep.call_count == int(starting_gain.split("_")[-1]) - int(
-    #     final_gain.split("_")[-1]
-    # )
+    assert sleep.call_count == int(starting_gain.split("_")[-1]) - int(
+        final_gain.split("_")[-1]
+    )
+
+
+@mock.patch("asyncio.sleep")
+async def test_femto_decrease_gain_fail_at_min_gain(
+    sleep: AsyncMock,
+    mock_femto: FemtoDDPCA,
+):
+    starting_gain, final_gain = ["sen_1", "sen_1"]
+    set_mock_value(mock_femto.gain, Femto3xxGainTable[starting_gain])
+    with pytest.raises(ValueError):
+        await mock_femto.decrease_gain()
+    assert (await mock_femto.gain.get_value()) == Femto3xxGainTable[final_gain]
+    assert sleep.call_count == int(final_gain.split("_")[-1]) - int(
+        starting_gain.split("_")[-1]
+    )
 
 
 class MockFemto3xxRaiseTime(float, Enum):
@@ -230,8 +258,8 @@ async def test_femto_struck_scaler_read(
 @pytest.mark.parametrize(
     "gain,raw_voltage, expected_current",
     [
-        ("sen_10", [1e9, 1e8, 1e7, 1e6, 1e5, 1e5], 1e-9),
-        ("sen_1", [4e2, 4e3, 4e4, 4e5, 4e5], 4e-7),
+        ("sen_10", [1e9, 1e8, 1e7, 1e6] + [1e5] * 2, 1e-9),
+        ("sen_1", [4e2, 4e3, 4e4] + [4e5] * 2, 4e-7),
         ("sen_6", [520e5, 52e5, 5.2e5, 5.2e5], 5.2e-7),
         ("sen_9", [2.2e5, 2.2e5], 2.2e-12),
         ("sen_10", [0.17e5, 0.17e5], 0.17e-13),

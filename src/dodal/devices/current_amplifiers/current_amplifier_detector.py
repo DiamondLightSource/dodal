@@ -72,23 +72,22 @@ class CurrentAmpDet(StandardReadable, Preparable):
     async def auto_gain(self) -> None:
         # First try lowering the gain if we are over the limit, if we are not
         # this loop will never run
-        while (reading := abs(await self.counter().get_voltage_per_sec())) > (
-            limit := await self.current_amp().get_upperlimit()
-        ):
+        reading = abs(await self.counter().get_voltage_per_sec())
+        while (reading) > (limit := await self.current_amp().get_upperlimit()):
             LOGGER.debug(
                 f"{self.name} (auto gain): {reading} > {limit}, decreasing gain"
             )
             await self.current_amp().decrease_gain()
+            reading = abs(await self.counter().get_voltage_per_sec())
 
         # Then try raising the gain if we are under the limit, if we are not
         # this loop will never run
-        while (reading := abs(await self.counter().get_voltage_per_sec())) < (
-            limit := await self.current_amp().get_lowerlimit()
-        ):
+        while (reading) < (limit := await self.current_amp().get_lowerlimit()):
             LOGGER.debug(
                 f"{self.name} (auto gain): {reading} < {limit}, increasing gain"
             )
             await self.current_amp().increase_gain()
+            reading = abs(await self.counter().get_voltage_per_sec())
 
     async def get_corrected_current(self) -> float:
         """

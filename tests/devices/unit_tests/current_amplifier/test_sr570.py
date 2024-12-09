@@ -132,7 +132,6 @@ async def test_sr570_set_fail_out_of_range(sleep: AsyncMock, mock_sr570: SR570, 
         ([5e3, 5, 5e8]),
         ([2e4, 3, 2e7]),
         ([1e5, 6, 1e11]),
-        ([2e11, 5, 1e12]),
     ],
 )
 @mock.patch("asyncio.sleep")
@@ -150,6 +149,19 @@ async def test_SR570_increase_gain(
     assert sleep.call_count == gain_change_count + 1
 
 
+@mock.patch("asyncio.sleep")
+async def test_SR570_increase_gain_top_out_fail(
+    sleep: AsyncMock,
+    mock_sr570: SR570,
+):
+    starting_gain, final_gain = ["sen_28", "sen_28"]
+    await mock_sr570.set(SR570GainToCurrentTable[starting_gain])
+    with pytest.raises(ValueError):
+        await mock_sr570.increase_gain()
+    assert (await mock_sr570.get_gain()) == SR570GainToCurrentTable[final_gain]
+    assert sleep.call_count == 2
+
+
 @pytest.mark.parametrize(
     "starting_gain, gain_change_count, final_gain",
     [
@@ -157,7 +169,6 @@ async def test_SR570_increase_gain(
         ([5e9, 3, 5e6]),
         ([2e11, 3, 2e8]),
         ([1e12, 8, 1e4]),
-        ([1e5, 20, 1e3]),
     ],
 )
 @mock.patch("asyncio.sleep")
@@ -175,6 +186,19 @@ async def test_SR570_decrease_gain(
     assert (
         sleep.call_count == gain_change_count + 1  # for starting gain
     )
+
+
+@mock.patch("asyncio.sleep")
+async def test_SR570_decrease_gain_bottom_out_fail(
+    sleep: AsyncMock,
+    mock_sr570: SR570,
+):
+    starting_gain, final_gain = ["sen_1", "sen_1"]
+    await mock_sr570.set(SR570GainToCurrentTable[starting_gain])
+    with pytest.raises(ValueError):
+        await mock_sr570.decrease_gain()
+    assert (await mock_sr570.get_gain()) == SR570GainToCurrentTable[final_gain]
+    assert sleep.call_count == 2
 
 
 class MockSR570RaiseTimeTable(float, Enum):
