@@ -1,4 +1,3 @@
-import random
 from unittest.mock import ANY, call, patch
 
 import pytest
@@ -25,7 +24,7 @@ def mirror(request, RE: RunEngine) -> BimorphMirror:
 
 @pytest.fixture
 def valid_bimorph_values(mirror: BimorphMirror) -> dict[int, float]:
-    return {i: random.random() * 200 for i in range(1, mirror.number_of_channels + 1)}
+    return {i: float(i) for i in range(1, mirror.number_of_channels + 1)}
 
 
 @pytest.fixture
