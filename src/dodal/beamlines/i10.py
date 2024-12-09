@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from ophyd_async.epics.motor import Motor
+
 from dodal.common.beamlines.beamline_utils import device_factory, device_instantiation
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.apple2_undulator import (
@@ -322,3 +324,8 @@ def slit_6() -> I10Slits:
     return I10Slits(
         prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-06:",
     )
+
+
+@device_factory()
+def d7() -> Motor:
+    return Motor(prefix="BL10I-DI-PHDGN-07:Y")
