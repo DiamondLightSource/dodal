@@ -3,7 +3,8 @@ from datetime import timedelta
 from unittest.mock import ANY, AsyncMock, MagicMock, patch
 
 import pytest
-from ophyd_async.core import DeviceCollector, set_mock_value
+from ophyd_async.core import DeviceCollector
+from ophyd_async.testing import set_mock_value
 
 from dodal.devices.oav.oav_to_redis_forwarder import (
     OAVToRedisForwarder,

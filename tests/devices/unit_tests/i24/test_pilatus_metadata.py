@@ -1,6 +1,6 @@
 import bluesky.plan_stubs as bps
 import pytest
-from ophyd_async.core import set_mock_value
+from ophyd_async.testing import set_mock_value
 
 from dodal.devices.i24.pilatus_metadata import PilatusMetadata
 

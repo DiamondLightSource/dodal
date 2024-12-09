@@ -2,7 +2,7 @@ import asyncio
 from unittest.mock import MagicMock, patch
 
 import numpy as np
-from ophyd_async.core import set_mock_value
+from ophyd_async.testing import set_mock_value
 
 from dodal.devices.oav.pin_image_recognition import (
     MxSampleDetect,

@@ -4,7 +4,7 @@ from unittest.mock import call, patch
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import callback_on_mock_put, get_mock_put, set_mock_value
+from ophyd_async.testing import callback_on_mock_put, get_mock_put, set_mock_value
 
 from dodal.devices.i24.pmac import (
     HOME_STR,

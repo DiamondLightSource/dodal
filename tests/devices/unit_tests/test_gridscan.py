@@ -7,7 +7,8 @@ from bluesky import plan_stubs as bps
 from bluesky import preprocessors as bpp
 from bluesky.run_engine import RunEngine
 from ophyd.status import DeviceStatus, Status
-from ophyd_async.core import DeviceCollector, get_mock_put, set_mock_value
+from ophyd_async.core import DeviceCollector
+from ophyd_async.testing import get_mock_put, set_mock_value
 
 from dodal.devices.fast_grid_scan import (
     FastGridScanCommon,

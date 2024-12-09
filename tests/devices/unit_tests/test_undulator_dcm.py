@@ -3,9 +3,10 @@ from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pytest
-from conftest import MOCK_DAQ_CONFIG_PATH
-from ophyd_async.core import AsyncStatus, DeviceCollector, get_mock_put, set_mock_value
+from ophyd_async.core import AsyncStatus, DeviceCollector
+from ophyd_async.testing import get_mock_put, set_mock_value
 
+from conftest import MOCK_DAQ_CONFIG_PATH
 from dodal.devices.dcm import DCM
 from dodal.devices.undulator import AccessError, Undulator, UndulatorGapAccess
 from dodal.devices.undulator_dcm import UndulatorDCM
