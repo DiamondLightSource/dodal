@@ -89,3 +89,9 @@ async def test_read(
 async def test_set_invalid_channel_throws_error(mirror: BimorphMirror):
     with pytest.raises(AssertionError):
         await mirror.set({mirror.number_of_channels + 1: 0.0})
+
+
+@pytest.mark.parametrize("number_of_channels", [-1])
+async def test_init_mirror_with_invalid_channels_throws_error(number_of_channels):
+    with pytest.raises(ValueError):
+        BimorphMirror(prefix="FAKE-PREFIX", number_of_channels=number_of_channels)
