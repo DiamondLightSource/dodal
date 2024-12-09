@@ -70,6 +70,9 @@ class BimorphMirror(StandardReadable, Movable):
     """
 
     def __init__(self, prefix: str, number_of_channels: int, name=""):
+        if number_of_channels < 0:
+            raise ValueError(f"Number of channels is below zero: {number_of_channels}")
+
         self.number_of_channels = number_of_channels
 
         with self.add_children_as_readables():
