@@ -15,7 +15,7 @@ def mirror(request, RE: RunEngine) -> BimorphMirror:
 
     with DeviceCollector(mock=True):
         bm = BimorphMirror(
-            prefix="BL02J-EA-IOC-97:G0:",
+            prefix="FAKE-PREFIX:",
             number_of_channels=number_of_channels,
         )
 
@@ -94,4 +94,4 @@ async def test_set_invalid_channel_throws_error(mirror: BimorphMirror):
 @pytest.mark.parametrize("number_of_channels", [-1])
 async def test_init_mirror_with_invalid_channels_throws_error(number_of_channels):
     with pytest.raises(ValueError):
-        BimorphMirror(prefix="FAKE-PREFIX", number_of_channels=number_of_channels)
+        BimorphMirror(prefix="FAKE-PREFIX:", number_of_channels=number_of_channels)
