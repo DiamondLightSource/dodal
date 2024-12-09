@@ -8,7 +8,7 @@
             "name": "Debug Unit Test",
             "type": "debugpy",
             "request": "launch",
-            "justMyCode": true,
+            "justMyCode": false,
             "program": "${file}",
             "purpose": [
                 "debug-test"
