@@ -65,11 +65,18 @@ class BimorphMirror(StandardReadable, Movable):
         on_off: Writeable BimorphOnOff
         alltrgt_proc: Procable signal that writes values in each channel's VTRGT to VOUT
         status: Readable BimorphMirrorStatus Busy/Idle status
-        err: Alarm status
-
-    """
+        err: Alarm status"""
 
     def __init__(self, prefix: str, number_of_channels: int, name=""):
+        """
+        Args:
+            prefix: str PV prefix
+            number_of_channels: int number of channels on bimorph mirror (can be zero)
+            name: str name of device
+
+        Raises:
+            ValueError: number_of_channels is less than zero"""
+
         if number_of_channels < 0:
             raise ValueError(f"Number of channels is below zero: {number_of_channels}")
 
