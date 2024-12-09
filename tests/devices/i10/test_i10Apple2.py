@@ -9,8 +9,8 @@ import pytest
 from bluesky.plans import scan
 from bluesky.run_engine import RunEngine
 from numpy import poly1d
-from ophyd_async.core import (
-    DeviceCollector,
+from ophyd_async.core import DeviceCollector
+from ophyd_async.testing import (
     assert_emitted,
     callback_on_mock_put,
     get_mock_put,
@@ -43,7 +43,7 @@ async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
     async with DeviceCollector(mock=True):
         mock_id_gap = UndulatorGap(prefix, "mock_id_gap")
     assert mock_id_gap.name == "mock_id_gap"
-    set_mock_value(mock_id_gap.gate, UndulatorGateStatus.close)
+    set_mock_value(mock_id_gap.gate, UndulatorGateStatus.CLOSE)
     set_mock_value(mock_id_gap.velocity, 1)
     set_mock_value(mock_id_gap.user_readback, 20)
     set_mock_value(mock_id_gap.user_setpoint, "20")
@@ -62,7 +62,7 @@ async def mock_phaseAxes(prefix: str = "BLXX-EA-DET-007:") -> UndulatorPhaseAxes
             btm_inner="RPQ4",
         )
     assert mock_phaseAxes.name == "mock_phaseAxes"
-    set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.close)
+    set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.CLOSE)
     set_mock_value(mock_phaseAxes.top_outer.velocity, 2)
     set_mock_value(mock_phaseAxes.top_inner.velocity, 2)
     set_mock_value(mock_phaseAxes.btm_outer.velocity, 2)
@@ -92,7 +92,7 @@ async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndulatorJawPhase:
         mock_jaw_phase = UndulatorJawPhase(
             prefix=prefix, move_pv="RPQ1", jaw_phase="JAW"
         )
-    set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.close)
+    set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.CLOSE)
     set_mock_value(mock_jaw_phase.jaw_phase.velocity, 2)
     set_mock_value(mock_jaw_phase.jaw_phase.user_setpoint_readback, 0)
     set_mock_value(mock_jaw_phase.fault, 0)
@@ -249,7 +249,7 @@ async def test_fail_I10Apple2_set_id_not_ready(mock_id: I10Apple2):
         await mock_id.set(600)
     assert str(e.value) == mock_id.gap().name + " is in fault state"
     set_mock_value(mock_id.gap().fault, 0)
-    set_mock_value(mock_id.gap().gate, UndulatorGateStatus.open)
+    set_mock_value(mock_id.gap().gate, UndulatorGateStatus.OPEN)
     with pytest.raises(RuntimeError) as e:
         await mock_id.set(600)
     assert str(e.value) == mock_id.gap().name + " is already in motion."
