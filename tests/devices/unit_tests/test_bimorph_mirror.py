@@ -87,7 +87,7 @@ async def test_read(
 
 @pytest.mark.parametrize("mirror", VALID_BIMORPH_CHANNELS, indirect=True)
 async def test_set_invalid_channel_throws_error(mirror: BimorphMirror):
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         await mirror.set({mirror.number_of_channels + 1: 0.0})
 
 
