@@ -426,3 +426,10 @@ def test_get_position_from_gda_aperture_name(
         ap_sg.get_position_from_gda_aperture_name(
             "VERY TINY APERTURE"  # type: ignore
         )
+
+
+def test_aperture_enum_name_formatting():
+    assert f"{ApertureValue.SMALL}" == "Small"
+    assert f"{ApertureValue.MEDIUM}" == "Medium"
+    assert f"{ApertureValue.LARGE}" == "Large"
+    assert f"{ApertureValue.ROBOT_LOAD}" == "Robot_load"
