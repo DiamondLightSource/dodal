@@ -104,9 +104,11 @@ class BimorphMirror(StandardReadable, Movable):
             value: Dict of channel numbers to target voltages
 
         Raises:
-            AssertionError: If specified channel number does not exist on mirror"""
+            ValueError: On set to non-existent channel"""
+
         for i in value.keys():
-            assert self.channels.get(i) is not None
+            if self.channels.get(i) is None:
+                raise ValueError(f"Set to non-existent channel: {i}")
 
         # Write target voltages:
         await asyncio.gather(
