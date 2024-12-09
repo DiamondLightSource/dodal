@@ -1,11 +1,11 @@
 import asyncio
 import math
-from time import time
 
 from ophyd_async.core import (
     AsyncStatus,
     StandardReadable,
     observe_value,
+    wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
@@ -41,43 +41,31 @@ class Transfocator(StandardReadable):
         super().__init__(name=name)
 
     async def _observe_beamsize_microns(self):
-        have_we_done_it = False
+        is_set_filters_done = False
 
-        async def set_based_on_predicition(value: float):
+        async def set_based_on_prediction(value: float):
             if not math.isclose(
                 self.latest_pred_vertical_num_lenses, value, abs_tol=1e-8
             ):
                 # We can only put an integer number of lenses in the beam but the
                 # calculation in the IOC returns the theoretical float number of lenses
-                nonlocal have_we_done_it
+                nonlocal is_set_filters_done
                 value = round(value)
                 LOGGER.info(f"Transfocator setting {value} filters")
                 await self.number_filters_sp.set(value)
                 await self.start.set(1)
-                await self.polling_wait_on_start_rbv(1)
-                await self.polling_wait_on_start_rbv(0)
+                # await self.polling_wait_on_start_rbv(1)
+                # await self.polling_wait_on_start_rbv(0)
+                await wait_for_value(self.start_rbv, 1, self.TIMEOUT)
+                await wait_for_value(self.start_rbv, 0, self.TIMEOUT)
                 self.latest_pred_vertical_num_lenses = value
-                have_we_done_it = True
+                is_set_filters_done = True
 
         # The value hasn't changed so assume the device is already set up correctly
         async for value in observe_value(self.predicted_vertical_num_lenses):
-            await set_based_on_predicition(value)
-            if have_we_done_it:
+            await set_based_on_prediction(value)
+            if is_set_filters_done:
                 break
-
-    async def polling_wait_on_start_rbv(self, for_value):
-        # For some reason couldn't get monitors working on START_RBV
-        # (See https://github.com/DiamondLightSource/dodal/issues/152)
-        start_time = time()
-        while time() < start_time + self.TIMEOUT:
-            RBV_value = await self.start_rbv.get_value()
-            if RBV_value == for_value:
-                return
-            await asyncio.sleep(self._POLLING_WAIT)
-
-        # last try
-        if await self.start_rbv.get_value() != for_value:
-            raise TimeoutError()
 
     @AsyncStatus.wrap
     async def set(self, beamsize_microns: float) -> None:
@@ -95,6 +83,9 @@ class Transfocator(StandardReadable):
         LOGGER.info(f"Transfocator setting {beamsize_microns} beamsize")
 
         if await self.beamsize_set_microns.get_value() != beamsize_microns:
+            """Setting beam_set_microns results in a change to predicted_vertical_num_lenses.
+            In the following logic, we observe this change, and set it in number_filters_sp.
+            """
             await asyncio.gather(
                 self.beamsize_set_microns.set(beamsize_microns),
                 self._observe_beamsize_microns(),
