@@ -186,7 +186,7 @@ class SR570(CurrentAmp):
             await self.set(
                 self.gain_conversion_table[f"sen_{len(self.combined_table)}"]
             )
-            raise ValueError("Gain it max value")
+            raise ValueError("Gain at max value")
         await self.set(self.gain_conversion_table[f"sen_{current_gain}"])
 
     @AsyncStatus.wrap
@@ -195,7 +195,7 @@ class SR570(CurrentAmp):
         current_gain -= value
         if current_gain < 1:
             await self.set(self.gain_conversion_table["sen_1"])
-            raise ValueError("Gain it max value")
+            raise ValueError("Gain at min value")
         await self.set(self.gain_conversion_table[f"sen_{current_gain}"])
 
     @AsyncStatus.wrap
