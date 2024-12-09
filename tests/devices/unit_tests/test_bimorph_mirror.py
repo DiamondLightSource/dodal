@@ -42,8 +42,10 @@ async def test_set_channels_waits_for_readback(
 ):
     await mirror.set(valid_bimorph_values)
 
-    for key, val in valid_bimorph_values.items():
-        assert (await mirror.channels[key].vtrgt.get_value()) == val
+    assert {
+        key: await mirror.channels[key].vtrgt.get_value()
+        for key in valid_bimorph_values
+    } == valid_bimorph_values
 
 
 @pytest.mark.parametrize("mirror", VALID_BIMORPH_CHANNELS, indirect=True)
@@ -68,11 +70,10 @@ async def test_set_channels_waits_for_vout_readback(
 
         await mirror.set(valid_bimorph_values)
 
-        for i, val in valid_bimorph_values.items():
-            assert (
-                call(mirror.channels[i].vout, val, timeout=ANY)
-                in mock_wait_for_value.call_args_list
-            )
+        assert [
+            call(mirror.channels[i].vout, val, timeout=ANY)
+            for i, val in valid_bimorph_values.items()
+        ] == mock_wait_for_value.call_args_list
 
 
 @pytest.mark.parametrize("mirror", VALID_BIMORPH_CHANNELS, indirect=True)
@@ -81,11 +82,10 @@ async def test_read(
 ):
     read = await mirror.read()
 
-    for i in range(1, mirror.number_of_channels):
-        assert (
-            read[f"{BIMORPH_NAME}-channels-{i}-vout"]["value"]
-            == valid_bimorph_values[i]
-        )
+    assert [
+        read[f"{BIMORPH_NAME}-channels-{i}-vout"]["value"]
+        for i in range(1, mirror.number_of_channels + 1)
+    ] == list(valid_bimorph_values.values())
 
 
 @pytest.mark.parametrize("mirror", VALID_BIMORPH_CHANNELS, indirect=True)
