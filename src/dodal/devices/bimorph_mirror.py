@@ -69,7 +69,7 @@ class BimorphMirror(StandardReadable, Movable):
 
     """
 
-    def __init__(self, prefix: str, name="", number_of_channels: int = 0):
+    def __init__(self, prefix: str, number_of_channels: int, name=""):
         self.number_of_channels = number_of_channels
 
         with self.add_children_as_readables():
