@@ -7,7 +7,6 @@ from ophyd_async.core import DeviceCollector, get_mock_put, set_mock_value
 
 from dodal.devices.bimorph_mirror import BimorphMirror
 
-BIMORPH_NAME = "bimorph"
 VALID_BIMORPH_CHANNELS = [8, 12, 16, 24]
 
 
@@ -17,7 +16,6 @@ def mirror(request, RE: RunEngine) -> BimorphMirror:
 
     with DeviceCollector(mock=True):
         bm = BimorphMirror(
-            name=BIMORPH_NAME,
             prefix="BL02J-EA-IOC-97:G0:",
             number_of_channels=number_of_channels,
         )
@@ -83,7 +81,7 @@ async def test_read(
     read = await mirror.read()
 
     assert [
-        read[f"{BIMORPH_NAME}-channels-{i}-vout"]["value"]
+        read[f"{mirror.name}-channels-{i}-vout"]["value"]
         for i in range(1, mirror.number_of_channels + 1)
     ] == list(valid_bimorph_values.values())
 
