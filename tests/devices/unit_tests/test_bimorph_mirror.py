@@ -28,14 +28,20 @@ def valid_bimorph_values(mirror: BimorphMirror) -> dict[int, float]:
 
 
 @pytest.fixture
-def set_vout_mock(valid_bimorph_values: dict[int, float], mirror: BimorphMirror):
-    for key, val in valid_bimorph_values.items():
-        set_mock_value(mirror.channels[key].vout, val)
+def mock_vtrgt_vout_propogation(mirror: BimorphMirror):
+    for channel in mirror.channels.values():
+
+        def effect(value: float, wait=False, signal=channel.vout):
+            signal.set(value, wait=wait)
+
+        get_mock_put(channel.vtrgt).side_effect = effect
 
 
 @pytest.mark.parametrize("mirror", VALID_BIMORPH_CHANNELS, indirect=True)
 async def test_set_channels_waits_for_readback(
-    mirror: BimorphMirror, valid_bimorph_values: dict[int, float], set_vout_mock
+    mirror: BimorphMirror,
+    valid_bimorph_values: dict[int, float],
+    mock_vtrgt_vout_propogation,
 ):
     await mirror.set(valid_bimorph_values)
 
@@ -47,7 +53,9 @@ async def test_set_channels_waits_for_readback(
 
 @pytest.mark.parametrize("mirror", VALID_BIMORPH_CHANNELS, indirect=True)
 async def test_set_channels_triggers_alltrgt_proc(
-    mirror: BimorphMirror, valid_bimorph_values: dict[int, float], set_vout_mock
+    mirror: BimorphMirror,
+    valid_bimorph_values: dict[int, float],
+    mock_vtrgt_vout_propogation,
 ):
     mock_alltrgt_proc = get_mock_put(mirror.alltrgt_proc)
 
@@ -60,7 +68,9 @@ async def test_set_channels_triggers_alltrgt_proc(
 
 @pytest.mark.parametrize("mirror", VALID_BIMORPH_CHANNELS, indirect=True)
 async def test_set_channels_waits_for_vout_readback(
-    mirror: BimorphMirror, valid_bimorph_values: dict[int, float], set_vout_mock
+    mirror: BimorphMirror,
+    valid_bimorph_values: dict[int, float],
+    mock_vtrgt_vout_propogation,
 ):
     with patch("dodal.devices.bimorph_mirror.wait_for_value") as mock_wait_for_value:
         mock_wait_for_value.assert_not_called()
@@ -75,8 +85,12 @@ async def test_set_channels_waits_for_vout_readback(
 
 @pytest.mark.parametrize("mirror", VALID_BIMORPH_CHANNELS, indirect=True)
 async def test_read(
-    mirror: BimorphMirror, valid_bimorph_values: dict[int, float], set_vout_mock
+    mirror: BimorphMirror,
+    valid_bimorph_values: dict[int, float],
+    mock_vtrgt_vout_propogation,
 ):
+    await mirror.set(valid_bimorph_values)
+
     read = await mirror.read()
 
     assert [
