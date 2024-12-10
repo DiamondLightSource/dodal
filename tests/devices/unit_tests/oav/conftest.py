@@ -1,7 +1,8 @@
 from unittest.mock import AsyncMock
 
 import pytest
-from ophyd_async.core import DeviceCollector, set_mock_value
+from ophyd_async.core import DeviceCollector
+from ophyd_async.testing import set_mock_value
 
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.oav_parameters import OAVConfig
