@@ -2,8 +2,8 @@ from unittest.mock import ANY
 
 import numpy as np
 import pytest
-from ophyd_async.core import (
-    DeviceCollector,
+from ophyd_async.core import DeviceCollector
+from ophyd_async.testing import (
     assert_configuration,
     assert_reading,
     set_mock_value,

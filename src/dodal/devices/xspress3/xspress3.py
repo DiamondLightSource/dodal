@@ -26,12 +26,12 @@ class TriggerMode(StrictEnum):
     SOFTWARE = "Software"
     HARDWARE = "Hardware"
     BURST = "Burst"
-    TTL_Veto_Only = "TTL Veto Only"
+    TTL_VETO_ONLY = "TTL Veto Only"
     IDC = "IDC"
     SOTWARE_START_STOP = "Software Start/Stop"
     TTL_BOTH = "TTL Both"
     LVDS_VETO_ONLY = "LVDS Veto Only"
-    LVDS_both = "LVDS Both"
+    LVDS_BOTH = "LVDS Both"
 
 
 class UpdateRBV(StrictEnum):
@@ -49,7 +49,7 @@ class DetectorState(StrictEnum):
     ACQUIRE = "Acquire"
     READOUT = "Readout"
     CORRECT = "Correct"
-    Saving = "Saving"
+    SAVING = "Saving"
     ABORTING = "Aborting"
     ERROR = "Error"
     WAITING = "Waiting"

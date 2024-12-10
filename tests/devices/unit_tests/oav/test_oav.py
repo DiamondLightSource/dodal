@@ -1,7 +1,7 @@
 from unittest.mock import AsyncMock, patch
 
 import pytest
-from ophyd_async.core import set_mock_value
+from ophyd_async.testing import set_mock_value
 
 from dodal.devices.oav.oav_detector import (
     OAV,
@@ -12,10 +12,10 @@ from dodal.devices.oav.oav_detector import (
 
 
 async def test_zoom_controller():
-    zoom_controller = ZoomController("", "fake zoom controller")
+    zoom_controller = ZoomController("", "zoom_controller")
     await zoom_controller.connect(mock=True)
     zoom_controller.level.describe = AsyncMock(
-        return_value={"level": {"choices": ["1.0x", "3.0x"]}}
+        return_value={"zoom_controller-level": {"choices": ["1.0x", "3.0x"]}}
     )
     status = zoom_controller.set("3.0x")
     await status
