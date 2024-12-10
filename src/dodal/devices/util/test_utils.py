@@ -1,8 +1,8 @@
-from ophyd_async.core import (
+from ophyd_async.epics.motor import Motor
+from ophyd_async.testing import (
     callback_on_mock_put,
     set_mock_value,
 )
-from ophyd_async.epics.motor import Motor
 
 
 def patch_motor(motor: Motor, initial_position=0):
