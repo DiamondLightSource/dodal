@@ -2,7 +2,7 @@ from unittest.mock import ANY, call, patch
 
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import DeviceCollector, get_mock_put, set_mock_value
+from ophyd_async.core import DeviceCollector, get_mock_put
 
 from dodal.devices.bimorph_mirror import BimorphMirror
 
