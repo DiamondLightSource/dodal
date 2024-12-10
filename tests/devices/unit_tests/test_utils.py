@@ -5,7 +5,8 @@ import pytest
 from ophyd.sim import NullStatus
 from ophyd.status import Status
 from ophyd.utils.errors import StatusTimeoutError, WaitTimeoutError
-from ophyd_async.core import AsyncStatus, get_mock_put, set_mock_value
+from ophyd_async.core import AsyncStatus
+from ophyd_async.testing import get_mock_put, set_mock_value
 
 from dodal.devices.util.epics_util import SetWhenEnabled, run_functions_without_blocking
 from dodal.log import LOGGER, GELFTCPHandler, logging, set_up_all_logging_handlers

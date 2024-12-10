@@ -4,9 +4,9 @@ from unittest.mock import ANY, AsyncMock, MagicMock, call, patch
 import pytest
 from ophyd_async.core import (
     DeviceCollector,
-    set_mock_value,
     soft_signal_r_and_setter,
 )
+from ophyd_async.testing import set_mock_value
 from PIL import Image
 
 from dodal.devices.oav.snapshots.snapshot_with_beam_centre import (

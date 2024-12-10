@@ -2,7 +2,8 @@ import asyncio
 from unittest.mock import ANY
 
 import pytest
-from ophyd_async.core import DeviceCollector, assert_reading, set_mock_value
+from ophyd_async.core import DeviceCollector
+from ophyd_async.testing import assert_reading, set_mock_value
 
 from dodal.devices.pressure_jump_cell import (
     FastValveControlRequest,

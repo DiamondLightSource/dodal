@@ -1,10 +1,8 @@
 from unittest.mock import ANY
 
 import pytest
-from ophyd_async.core import (
-    DeviceCollector,
-    assert_reading,
-)
+from ophyd_async.core import DeviceCollector
+from ophyd_async.testing import assert_reading
 
 from dodal.devices.qbpm import QBPM
 

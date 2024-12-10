@@ -59,25 +59,25 @@ class TrigSource(StrictEnum):
 
 
 class EncEnum(StrictEnum):
-    Enc1 = "Enc1"
-    Enc2 = "Enc2"
-    Enc3 = "Enc3"
-    Enc4 = "Enc4"
-    Enc1_4Av = "Enc1-4Av"
+    ENC1 = "Enc1"
+    ENC2 = "Enc2"
+    ENC3 = "Enc3"
+    ENC4 = "Enc4"
+    ENC1_4AV = "Enc1-4Av"
 
 
 class I03Axes:
-    SMARGON_X1 = EncEnum.Enc1
-    SMARGON_Y = EncEnum.Enc2
-    SMARGON_Z = EncEnum.Enc3
-    OMEGA = EncEnum.Enc4
+    SMARGON_X1 = EncEnum.ENC1
+    SMARGON_Y = EncEnum.ENC2
+    SMARGON_Z = EncEnum.ENC3
+    OMEGA = EncEnum.ENC4
 
 
 class I24Axes:
-    VGON_Z = EncEnum.Enc1
-    OMEGA = EncEnum.Enc2
-    VGON_X = EncEnum.Enc3
-    VGON_YH = EncEnum.Enc4
+    VGON_Z = EncEnum.ENC1
+    OMEGA = EncEnum.ENC2
+    VGON_X = EncEnum.ENC3
+    VGON_YH = EncEnum.ENC4
 
 
 class RotationDirection(StrictEnum):
