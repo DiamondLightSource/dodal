@@ -3,7 +3,8 @@ from unittest.mock import ANY, AsyncMock, patch
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import DeviceCollector, assert_reading, set_mock_value
+from ophyd_async.core import DeviceCollector
+from ophyd_async.testing import assert_reading, set_mock_value
 
 from dodal.devices.backlight import Backlight, BacklightPosition, BacklightPower
 
