@@ -3,7 +3,7 @@ from unittest.mock import call
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import (
+from ophyd_async.testing import (
     callback_on_mock_put,
     get_mock_put,
     set_mock_value,

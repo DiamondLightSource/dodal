@@ -1,7 +1,8 @@
 from unittest.mock import ANY
 
 import pytest
-from ophyd_async.core import DeviceCollector, assert_reading, set_mock_value
+from ophyd_async.core import DeviceCollector
+from ophyd_async.testing import assert_reading, set_mock_value
 
 from dodal.devices.watsonmarlow323_pump import (
     WatsonMarlow323Pump,

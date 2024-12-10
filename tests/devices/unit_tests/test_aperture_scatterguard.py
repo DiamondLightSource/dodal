@@ -6,8 +6,8 @@ from unittest.mock import MagicMock, call
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import (
-    DeviceCollector,
+from ophyd_async.core import DeviceCollector
+from ophyd_async.testing import (
     callback_on_mock_put,
     get_mock_put,
     set_mock_value,

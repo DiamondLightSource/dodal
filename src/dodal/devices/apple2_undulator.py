@@ -21,8 +21,8 @@ from dodal.log import LOGGER
 
 
 class UndulatorGateStatus(StrictEnum):
-    open = "Open"
-    close = "Closed"
+    OPEN = "Open"
+    CLOSE = "Closed"
 
 
 @dataclass
@@ -146,7 +146,7 @@ class UndulatorGap(StandardReadable, Movable):
         timeout = await self._cal_timeout()
         LOGGER.info(f"Moving {self.name} to {value} with timeout = {timeout}")
         await self.set_move.set(value=1, timeout=timeout)
-        await wait_for_value(self.gate, UndulatorGateStatus.close, timeout=timeout)
+        await wait_for_value(self.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
 
     async def _cal_timeout(self) -> float:
         vel = await self.velocity.get_value()
@@ -157,7 +157,7 @@ class UndulatorGap(StandardReadable, Movable):
     async def check_id_status(self) -> None:
         if await self.fault.get_value() != 0:
             raise RuntimeError(f"{self.name} is in fault state")
-        if await self.gate.get_value() == UndulatorGateStatus.open:
+        if await self.gate.get_value() == UndulatorGateStatus.OPEN:
             raise RuntimeError(f"{self.name} is already in motion.")
 
     async def get_timeout(self) -> float:
@@ -251,7 +251,7 @@ class UndulatorPhaseAxes(StandardReadable, Movable):
         )
         timeout = await self._cal_timeout()
         await self.set_move.set(value=1, timeout=timeout)
-        await wait_for_value(self.gate, UndulatorGateStatus.close, timeout=timeout)
+        await wait_for_value(self.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
 
     async def _cal_timeout(self) -> float:
         """
@@ -283,7 +283,7 @@ class UndulatorPhaseAxes(StandardReadable, Movable):
     async def check_id_status(self) -> None:
         if await self.fault.get_value() != 0:
             raise RuntimeError(f"{self.name} is in fault state")
-        if await self.gate.get_value() == UndulatorGateStatus.open:
+        if await self.gate.get_value() == UndulatorGateStatus.OPEN:
             raise RuntimeError(f"{self.name} is already in motion.")
 
     async def get_timeout(self) -> float:
@@ -325,7 +325,7 @@ class UndulatorJawPhase(StandardReadable, Movable):
         )
         timeout = await self._cal_timeout()
         await self.set_move.set(value=1, timeout=timeout)
-        await wait_for_value(self.gate, UndulatorGateStatus.close, timeout=timeout)
+        await wait_for_value(self.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
 
     async def _cal_timeout(self) -> float:
         """
@@ -345,7 +345,7 @@ class UndulatorJawPhase(StandardReadable, Movable):
     async def check_id_status(self) -> None:
         if await self.fault.get_value() != 0:
             raise RuntimeError(f"{self.name} is in fault state")
-        if await self.gate.get_value() == UndulatorGateStatus.open:
+        if await self.gate.get_value() == UndulatorGateStatus.OPEN:
             raise RuntimeError(f"{self.name} is already in motion.")
 
     async def get_timeout(self) -> float:
@@ -458,7 +458,7 @@ class Apple2(StandardReadable, Movable):
             self.phase().set_move.set(value=1, timeout=timeout),
         )
         await wait_for_value(
-            self.gap().gate, UndulatorGateStatus.close, timeout=timeout
+            self.gap().gate, UndulatorGateStatus.CLOSE, timeout=timeout
         )
         self._energy_set(energy)  # Update energy for after move for readback.
 

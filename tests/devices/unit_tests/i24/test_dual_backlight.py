@@ -1,7 +1,7 @@
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import set_mock_value
+from ophyd_async.testing import set_mock_value
 
 from dodal.devices.i24.dual_backlight import (
     BacklightPositions,

@@ -4,7 +4,6 @@ from unittest.mock import ANY, AsyncMock, MagicMock, patch
 
 import pytest
 from bluesky.run_engine import RunEngine as RE
-from conftest import mock_beamline_module_filepaths
 from ophyd import Device
 from ophyd.device import Device as OphydV1Device
 from ophyd.sim import FakeEpicsSignal
@@ -20,6 +19,8 @@ from dodal.devices.smargon import Smargon
 from dodal.devices.zebra import Zebra
 from dodal.log import LOGGER
 from dodal.utils import DeviceInitializationController, make_all_devices
+
+from ...conftest import mock_beamline_module_filepaths
 
 
 @pytest.fixture(autouse=True)

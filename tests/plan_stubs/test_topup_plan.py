@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import set_mock_value
+from ophyd_async.testing import set_mock_value
 
 from dodal.beamlines import i03
 from dodal.devices.synchrotron import Synchrotron, SynchrotronMode

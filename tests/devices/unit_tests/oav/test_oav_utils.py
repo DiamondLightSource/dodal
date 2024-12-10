@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from bluesky.run_engine import RunEngine
 from ophyd.sim import instantiate_fake_device
-from ophyd_async.core import set_mock_value
+from ophyd_async.testing import set_mock_value
 
 from dodal.devices.oav.oav_calculations import calculate_beam_distance
 from dodal.devices.oav.oav_detector import OAV
