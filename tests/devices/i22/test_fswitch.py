@@ -4,7 +4,8 @@ import pytest
 from bluesky.plans import count
 from bluesky.run_engine import RunEngine
 from event_model import DataKey
-from ophyd_async.core import DeviceCollector, set_mock_value
+from ophyd_async.core import DeviceCollector
+from ophyd_async.testing import set_mock_value
 
 from dodal.devices.i22.fswitch import FilterState, FSwitch
 

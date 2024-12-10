@@ -14,8 +14,8 @@ from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 
 class PumpControl(StrictEnum):
-    Manual = "Manual"
-    Auto = "Auto"
+    MANUAL = "Manual"
+    AUTO = "Auto"
 
 
 class Linkam3(StandardReadable):

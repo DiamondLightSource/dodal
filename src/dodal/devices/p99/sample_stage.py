@@ -12,22 +12,22 @@ class SampleAngleStage(StandardReadable):
 
 
 class p99StageSelections(SubsetEnum):
-    Empty = "Empty"
-    Mn5um = "Mn 5um"
-    Fe = "Fe (empty)"
-    Co5um = "Co 5um"
-    Ni5um = "Ni 5um"
-    Cu5um = "Cu 5um"
-    Zn5um = "Zn 5um"
-    Zr = "Zr (empty)"
-    Mo = "Mo (empty)"
-    Rh = "Rh (empty)"
-    Pd = "Pd (empty)"
-    Ag = "Ag (empty)"
-    Cd25um = "Cd 25um"
+    EMPTY = "Empty"
+    MN5UM = "Mn 5um"
+    FE = "Fe (empty)"
+    CO5UM = "Co 5um"
+    NI5UM = "Ni 5um"
+    CU5UM = "Cu 5um"
+    ZN5UM = "Zn 5um"
+    ZR = "Zr (empty)"
+    MO = "Mo (empty)"
+    RH = "Rh (empty)"
+    PD = "Pd (empty)"
+    AG = "Ag (empty)"
+    CD25UM = "Cd 25um"
     W = "W (empty)"
-    Pt = "Pt (empty)"
-    User = "User"
+    PT = "Pt (empty)"
+    USER = "User"
 
 
 class FilterMotor(StandardReadable):

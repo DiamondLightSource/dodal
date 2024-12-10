@@ -2,7 +2,7 @@ from asyncio import create_task, sleep
 from unittest.mock import ANY, AsyncMock, MagicMock, patch
 
 import pytest
-from ophyd_async.core import set_mock_value
+from ophyd_async.testing import set_mock_value
 
 from dodal.devices.robot import BartRobot, PinMounted, RobotLoadFailed, SampleLocation
 

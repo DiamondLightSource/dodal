@@ -3,7 +3,8 @@ from typing import Any
 from unittest.mock import ANY
 
 import pytest
-from ophyd_async.core import DeviceCollector, StandardReadable, set_mock_value
+from ophyd_async.core import DeviceCollector, StandardReadable
+from ophyd_async.testing import set_mock_value
 
 from dodal.devices.slits import Slits
 
