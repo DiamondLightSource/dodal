@@ -32,16 +32,16 @@ async def set_beamsize_to_same_value_as_mock_signal(
     await transfocator.set(value)
 
 
-@patch("dodal.devices.i04.transfocator.round")
+@patch("dodal.devices.i04.transfocator.Transfocator._observe_beamsize_microns")
 async def test_given_beamsize_already_set_then_when_transfocator_set_then_returns_immediately(
-    mock_round,
+    mock_observe_beamsize_microns,
     fake_transfocator: Transfocator,
 ):
     await asyncio.wait_for(
         set_beamsize_to_same_value_as_mock_signal(fake_transfocator, 100.0),
         timeout=0.01,
     )
-    assert mock_round.call_count == 0
+    mock_observe_beamsize_microns.assert_not_awaited()
 
 
 @patch("dodal.devices.i04.transfocator.wait_for_value")
