@@ -69,6 +69,6 @@ async def test_if_timeout_exceeded_and_start_rbv_not_equal_to_set_value_then_tim
 ) -> None:
     with patch.object(fake_transfocator, "TIMEOUT", 0):
         given_predicted_lenses_is_half_of_beamsize(fake_transfocator)
-        fake_transfocator.start_rbv.get_value = AsyncMock(side_effect=[0, 1])
+        fake_transfocator.start.get_value = AsyncMock(side_effect=[0, 1])
         with pytest.raises(TimeoutError):
             await fake_transfocator.set(315)

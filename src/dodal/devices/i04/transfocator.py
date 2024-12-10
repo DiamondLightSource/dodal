@@ -30,8 +30,9 @@ class Transfocator(StandardReadable):
             )
             self.number_filters_sp = epics_signal_rw(int, prefix + "NUM_FILTERS")
 
-            self.start = epics_signal_rw(int, prefix + "START.PROC")
-            self.start_rbv = epics_signal_r(int, prefix + "START_RBV")
+            self.start = epics_signal_rw(
+                int, prefix + "START_RBV", prefix + "START.PROC"
+            )
 
             self.vertical_lens_rbv = epics_signal_r(float, prefix + "VER")
 
@@ -54,10 +55,8 @@ class Transfocator(StandardReadable):
                 LOGGER.info(f"Transfocator setting {value} filters")
                 await self.number_filters_sp.set(value)
                 await self.start.set(1)
-                # await self.polling_wait_on_start_rbv(1)
-                # await self.polling_wait_on_start_rbv(0)
-                await wait_for_value(self.start_rbv, 1, self.TIMEOUT)
-                await wait_for_value(self.start_rbv, 0, self.TIMEOUT)
+                await wait_for_value(self.start, 1, self.TIMEOUT)
+                await wait_for_value(self.start, 0, self.TIMEOUT)
                 self.latest_pred_vertical_num_lenses = value
                 is_set_filters_done = True
 
