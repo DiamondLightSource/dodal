@@ -5,21 +5,21 @@ from dodal.common.signal_utils import create_hardware_backed_soft_signal
 
 
 class HFocusMode(StrictEnum):
-    focus10 = "HMFMfocus10"
-    focus20d = "HMFMfocus20d"
-    focus30d = "HMFMfocus30d"
-    focus50d = "HMFMfocus50d"
-    focus1050d = "HMFMfocus1030d"
-    focus3010d = "HMFMfocus3010d"
+    FOCUS_10 = "HMFMfocus10"
+    FOCUS_20D = "HMFMfocus20d"
+    FOCUS_30D = "HMFMfocus30d"
+    FOCUS_50D = "HMFMfocus50d"
+    FOCUS_1050D = "HMFMfocus1030d"
+    FOCUS_3010D = "HMFMfocus3010d"
 
 
 class VFocusMode(StrictEnum):
-    focus10 = "VMFMfocus10"
-    focus20d = "VMFMfocus20d"
-    focus30d = "VMFMfocus30d"
-    focus50d = "VMFMfocus50d"
-    focus1030d = "VMFMfocus1030d"
-    focus3010d = "VMFMfocus3010d"
+    FOCUS_10 = "VMFMfocus10"
+    FOCUS_20D = "VMFMfocus20d"
+    FOCUS_30D = "VMFMfocus30d"
+    FOCUS_50D = "VMFMfocus50d"
+    FOCUS_1030D = "VMFMfocus1030d"
+    FOCUS_3010D = "VMFMfocus3010d"
 
 
 BEAM_SIZES = {
