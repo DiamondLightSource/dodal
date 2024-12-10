@@ -4,9 +4,9 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from ophyd_async.core import (
     DeviceCollector,
-    set_mock_value,
     wait_for_value,
 )
+from ophyd_async.testing import set_mock_value
 
 from dodal.devices.i04.transfocator import Transfocator
 
