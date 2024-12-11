@@ -1,4 +1,5 @@
 import asyncio
+from collections.abc import Mapping
 from typing import Annotated as A
 
 from bluesky.protocols import Movable
