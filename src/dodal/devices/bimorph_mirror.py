@@ -61,8 +61,8 @@ class BimorphMirror(StandardReadable, Movable):
 
     Attributes:
         channels: DeviceVector of BimorphMirrorChannel, indexed from 1, for each channel
-        on_off: Writeable BimorphOnOff
-        alltrgt_proc: Procable signal that writes values in each channel's VTRGT to VOUT
+        enabled: Writeable BimorphOnOff
+        commit_target_voltages: Procable signal that writes values in each channel's VTRGT to VOUT
         status: Readable BimorphMirrorStatus Busy/Idle status
         err: Alarm status"""
 
@@ -116,7 +116,7 @@ class BimorphMirror(StandardReadable, Movable):
         )
 
         # Trigger set target voltages:
-        await self.alltrgt_proc.trigger()
+        await self.commit_target_voltages.trigger()
 
         # Wait for values to propogate to voltage out rbv:
         await asyncio.gather(

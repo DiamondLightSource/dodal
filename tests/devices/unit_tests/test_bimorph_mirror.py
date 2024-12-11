@@ -58,7 +58,7 @@ async def test_set_channels_triggers_alltrgt_proc(
     valid_bimorph_values: dict[int, float],
     mock_vtrgt_vout_propogation,
 ):
-    mock_alltrgt_proc = get_mock_put(mirror.alltrgt_proc)
+    mock_alltrgt_proc = get_mock_put(mirror.commit_target_voltages)
 
     mock_alltrgt_proc.assert_not_called()
 
