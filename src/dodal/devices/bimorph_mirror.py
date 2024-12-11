@@ -44,8 +44,8 @@ class BimorphMirrorChannel(StandardReadable, EpicsDevice):
     """Collection of PVs comprising a single bimorph channel.
 
     Attributes:
-        vtrgt: Float RW_RBV for target voltage, which can be set using parent mirror's all target proc
-        vout: Float RW_RBV for current voltage on bimorph
+        target_voltage: Float RW_RBV for target voltage, which can be set using parent mirror's all target proc
+        output_voltage: Float RW_RBV for current voltage on bimorph
         status: BimorphMirrorOnOff readable for ON/OFF status of channel
         shift: Float writeable shifting channel voltage
     """
@@ -110,7 +110,7 @@ class BimorphMirror(StandardReadable, Movable):
         # Write target voltages:
         await asyncio.gather(
             *[
-                self.channels[i].vtrgt.set(target, wait=True)
+                self.channels[i].target_voltage.set(target, wait=True)
                 for i, target in value.items()
             ]
         )
@@ -121,7 +121,9 @@ class BimorphMirror(StandardReadable, Movable):
         # Wait for values to propogate to voltage out rbv:
         await asyncio.gather(
             *[
-                wait_for_value(self.channels[i].vout, target, timeout=DEFAULT_TIMEOUT)
+                wait_for_value(
+                    self.channels[i].output_voltage, target, timeout=DEFAULT_TIMEOUT
+                )
                 for i, target in value.items()
             ]
         )

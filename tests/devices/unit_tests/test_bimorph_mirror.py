@@ -32,10 +32,10 @@ def valid_bimorph_values(mirror: BimorphMirror) -> dict[int, float]:
 def mock_vtrgt_vout_propogation(mirror: BimorphMirror):
     for channel in mirror.channels.values():
 
-        def effect(value: float, wait=False, signal=channel.vout):
+        def effect(value: float, wait=False, signal=channel.output_voltage):
             signal.set(value, wait=wait)
 
-        get_mock_put(channel.vtrgt).side_effect = effect
+        get_mock_put(channel.target_voltage).side_effect = effect
 
 
 @pytest.mark.parametrize("mirror", VALID_BIMORPH_CHANNELS, indirect=True)
@@ -47,7 +47,7 @@ async def test_set_channels_waits_for_readback(
     await mirror.set(valid_bimorph_values)
 
     assert {
-        key: await mirror.channels[key].vtrgt.get_value()
+        key: await mirror.channels[key].target_voltage.get_value()
         for key in valid_bimorph_values
     } == valid_bimorph_values
 
@@ -79,7 +79,7 @@ async def test_set_channels_waits_for_vout_readback(
         await mirror.set(valid_bimorph_values)
 
         assert [
-            call(mirror.channels[i].vout, val, timeout=ANY)
+            call(mirror.channels[i].output_voltage, val, timeout=ANY)
             for i, val in valid_bimorph_values.items()
         ] == mock_wait_for_value.call_args_list
 
@@ -95,7 +95,7 @@ async def test_read(
     read = await mirror.read()
 
     assert [
-        read[f"{mirror.name}-channels-{i}-vout"]["value"]
+        read[f"{mirror.name}-channels-{i}-output_voltage"]["value"]
         for i in range(1, len(mirror.channels) + 1)
     ] == list(valid_bimorph_values.values())
 
