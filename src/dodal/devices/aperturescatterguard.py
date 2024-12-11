@@ -87,6 +87,9 @@ class ApertureValue(StrictEnum):
     MEDIUM = "MEDIUM_APERTURE"
     LARGE = "LARGE_APERTURE"
 
+    def __str__(self):
+        return self.name.capitalize()
+
 
 def load_positions_from_beamline_parameters(
     params: GDABeamlineParameters,
