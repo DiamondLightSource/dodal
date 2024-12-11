@@ -89,8 +89,8 @@ class BimorphMirror(StandardReadable, Movable):
                     for i in range(1, number_of_channels + 1)
                 }
             )
-        self.on_off = epics_signal_w(BimorphMirrorOnOff, f"{prefix}ONOFF")
-        self.alltrgt_proc = epics_signal_x(f"{prefix}ALLTRGT.PROC")
+        self.enabled = epics_signal_w(BimorphMirrorOnOff, f"{prefix}ONOFF")
+        self.commit_target_voltages = epics_signal_x(f"{prefix}ALLTRGT.PROC")
         self.status = epics_signal_r(BimorphMirrorStatus, f"{prefix}STATUS")
         self.err = epics_signal_r(str, f"{prefix}ERR")
 
