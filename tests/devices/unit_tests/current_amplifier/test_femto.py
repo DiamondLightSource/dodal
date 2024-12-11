@@ -7,8 +7,8 @@ import pytest
 from bluesky.plan_stubs import abs_set
 from bluesky.plans import count
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import (
-    DeviceCollector,
+from ophyd_async.core import DeviceCollector
+from ophyd_async.testing import (
     callback_on_mock_put,
     get_mock_put,
     set_mock_value,
@@ -102,8 +102,8 @@ async def test_femto_set(
 @pytest.mark.parametrize(
     "gain,",
     [
-        ("sen_0"),
-        ("sen_24"),
+        ("SEN_0"),
+        ("SEN_24"),
         ("ssdfsden_212341"),
     ],
 )
@@ -126,9 +126,9 @@ async def test_femto_set_fail_out_of_range(
 @pytest.mark.parametrize(
     "starting_gain, gain_change_count, final_gain",
     [
-        (["sen_1", 1, "sen_2"]),
-        (["sen_3", 5, "sen_8"]),
-        (["sen_5", 3, "sen_8"]),
+        (["SEN_1", 1, "SEN_2"]),
+        (["SEN_3", 5, "SEN_8"]),
+        (["SEN_5", 3, "SEN_8"]),
     ],
 )
 @mock.patch("asyncio.sleep")
@@ -153,7 +153,7 @@ async def test_femto_increase_gain_fail_at_max_gain(
     sleep: AsyncMock,
     mock_femto: FemtoDDPCA,
 ):
-    starting_gain, final_gain = ["sen_10", "sen_10"]
+    starting_gain, final_gain = ["SEN_10", "SEN_10"]
     set_mock_value(mock_femto.gain, Femto3xxGainTable[starting_gain])
     with pytest.raises(ValueError):
         await mock_femto.increase_gain()
@@ -166,9 +166,9 @@ async def test_femto_increase_gain_fail_at_max_gain(
 @pytest.mark.parametrize(
     "starting_gain, gain_change_count, final_gain",
     [
-        (["sen_6", 2, "sen_4"]),
-        (["sen_8", 3, "sen_5"]),
-        (["sen_10", 9, "sen_1"]),
+        (["SEN_6", 2, "SEN_4"]),
+        (["SEN_8", 3, "SEN_5"]),
+        (["SEN_10", 9, "SEN_1"]),
     ],
 )
 @mock.patch("asyncio.sleep")
@@ -193,7 +193,7 @@ async def test_femto_decrease_gain_fail_at_min_gain(
     sleep: AsyncMock,
     mock_femto: FemtoDDPCA,
 ):
-    starting_gain, final_gain = ["sen_1", "sen_1"]
+    starting_gain, final_gain = ["SEN_1", "SEN_1"]
     set_mock_value(mock_femto.gain, Femto3xxGainTable[starting_gain])
     with pytest.raises(ValueError):
         await mock_femto.decrease_gain()
@@ -206,27 +206,27 @@ async def test_femto_decrease_gain_fail_at_min_gain(
 class MockFemto3xxRaiseTime(float, Enum):
     """Mock zero raise time(s) for Femto 3xx current amplifier"""
 
-    sen_1 = 0.0
-    sen_2 = 0.0
-    sen_3 = 0.0
-    sen_4 = 0.0
-    sen_5 = 0.0
-    sen_6 = 0.0
-    sen_7 = 0.0
-    sen_8 = 0.0
-    sen_9 = 0.0
-    sen_10 = 0.0
+    SEN_1 = 0.0
+    SEN_2 = 0.0
+    SEN_3 = 0.0
+    SEN_4 = 0.0
+    SEN_5 = 0.0
+    SEN_6 = 0.0
+    SEN_7 = 0.0
+    SEN_8 = 0.0
+    SEN_9 = 0.0
+    SEN_10 = 0.0
 
 
 @pytest.mark.parametrize(
     "gain,raw_voltage, expected_current",
     [
-        ("sen_1", 0.51e5, 0.51e-4),
-        ("sen_3", -10e5, -10e-6),
-        ("sen_6", 5.2e5, 5.2e-9),
-        ("sen_9", 2.2e5, 2.2e-12),
-        ("sen_10", 8.7e5, 8.7e-13),
-        ("sen_5", 0.0, 0.0),
+        ("SEN_1", 0.51e5, 0.51e-4),
+        ("SEN_3", -10e5, -10e-6),
+        ("SEN_6", 5.2e5, 5.2e-9),
+        ("SEN_9", 2.2e5, 2.2e-12),
+        ("SEN_10", 8.7e5, 8.7e-13),
+        ("SEN_5", 0.0, 0.0),
     ],
 )
 async def test_femto_struck_scaler_read(
@@ -258,14 +258,14 @@ async def test_femto_struck_scaler_read(
 @pytest.mark.parametrize(
     "gain,raw_voltage, expected_current",
     [
-        ("sen_10", [1e9, 1e8, 1e7, 1e6] + [1e5] * 2, 1e-9),
-        ("sen_1", [4e2, 4e3, 4e4] + [4e5] * 2, 4e-7),
-        ("sen_6", [520e5, 52e5, 5.2e5, 5.2e5], 5.2e-7),
-        ("sen_9", [2.2e5, 2.2e5], 2.2e-12),
-        ("sen_10", [0.17e5, 0.17e5], 0.17e-13),
-        ("sen_5", [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 0.0),
-        ("sen_5", [-200.0e5, -20.0e5, -2.0e5, -2.0e5], -2e-6),
-        ("sen_1", [10.0e-6] * (30), 1.0e-23),
+        ("SEN_10", [1e9, 1e8, 1e7, 1e6] + [1e5] * 2, 1e-9),
+        ("SEN_1", [4e2, 4e3, 4e4] + [4e5] * 2, 4e-7),
+        ("SEN_6", [520e5, 52e5, 5.2e5, 5.2e5], 5.2e-7),
+        ("SEN_9", [2.2e5, 2.2e5], 2.2e-12),
+        ("SEN_10", [0.17e5, 0.17e5], 0.17e-13),
+        ("SEN_5", [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 0.0),
+        ("SEN_5", [-200.0e5, -20.0e5, -2.0e5, -2.0e5], -2e-6),
+        ("SEN_1", [10.0e-6] * (30), 1.0e-23),
     ],
 )
 async def test_femto_struck_scaler_read_with_autoGain(
@@ -287,7 +287,7 @@ async def test_femto_struck_scaler_read_with_autoGain(
 
     def set_mock_counter():
         set_mock_value(
-            mock_femto_struck_scaler_detector.counter().trigger_start, CountState.done
+            mock_femto_struck_scaler_detector.counter().trigger_start, CountState.DONE
         )
         set_mock_value(
             mock_femto_struck_scaler_detector.counter().readout, rbv_mocks.get()

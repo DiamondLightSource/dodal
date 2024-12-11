@@ -12,13 +12,13 @@ from dodal.devices.current_amplifiers import (
 
 
 class CountMode(StrictEnum):
-    auto = "AutoCount"
-    one_shot = "OneShot"
+    AUTO = "AutoCount"
+    ONE_SHOT = "OneShot"
 
 
 class CountState(StrictEnum):
-    done = "Done"
-    count = "Count"  # type: ignore
+    DONE = "Done"
+    COUNT = "Count"  # type: ignore
 
 
 COUNT_PER_VOLTAGE = 100000
@@ -49,19 +49,19 @@ class StruckScaler(CurrentAmpCounter):
 
     @AsyncStatus.wrap
     async def stage(self) -> None:
-        await self.count_mode.set(CountMode.one_shot)
+        await self.count_mode.set(CountMode.ONE_SHOT)
 
     @AsyncStatus.wrap
     async def unstage(self) -> None:
-        await self.count_mode.set(CountMode.auto)
+        await self.count_mode.set(CountMode.AUTO)
 
     @AsyncStatus.wrap
     async def trigger(self) -> None:
         await set_and_wait_for_other_value(
             set_signal=self.trigger_start,
-            set_value=CountState.count,
+            set_value=CountState.COUNT,
             match_signal=self.trigger_start,
-            match_value=CountState.done,
+            match_value=CountState.COUNT,
         )
 
     @AsyncStatus.wrap

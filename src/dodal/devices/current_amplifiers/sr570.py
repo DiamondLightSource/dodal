@@ -15,100 +15,100 @@ from dodal.log import LOGGER
 class SR570GainTable(StrictEnum):
     """Coarse/unit sensitivity setting for SR570 current amplifier"""
 
-    sen_1 = "mA/V"
-    sen_2 = "uA/V"
-    sen_3 = "nA/V"
-    sen_4 = "pA/V"
+    SEN_1 = "mA/V"
+    SEN_2 = "uA/V"
+    SEN_3 = "nA/V"
+    SEN_4 = "pA/V"
 
 
 class SR570FineGainTable(StrictEnum):
     """Fine sensitivity setting for SR570 current amplifier"""
 
-    sen_1 = "1"
-    sen_2 = "2"
-    sen_3 = "5"
-    sen_4 = "10"
-    sen_5 = "20"
-    sen_6 = "50"
-    sen_7 = "100"
-    sen_8 = "200"
-    sen_9 = "500"
+    SEN_1 = "1"
+    SEN_2 = "2"
+    SEN_3 = "5"
+    SEN_4 = "10"
+    SEN_5 = "20"
+    SEN_6 = "50"
+    SEN_7 = "100"
+    SEN_8 = "200"
+    SEN_9 = "500"
 
 
 class SR570RaiseTimeTable(float, Enum):
     """These are the gain dependent raise time(s) for SR570 current amplifier"""
 
-    sen_1 = 1e-4
-    sen_2 = 1e-2
-    sen_3 = 0.15
-    sen_4 = 0.2
+    SEN_1 = 1e-4
+    SEN_2 = 1e-2
+    SEN_3 = 0.15
+    SEN_4 = 0.2
 
 
 class SR570FullGainTable(Enum):
     """Combined gain table, as each gain step is a combination of both coarse gain and
     fine gain setting"""
 
-    sen_1 = [SR570GainTable.sen_1, SR570FineGainTable.sen_1]
-    sen_2 = [SR570GainTable.sen_2, SR570FineGainTable.sen_9]
-    sen_3 = [SR570GainTable.sen_2, SR570FineGainTable.sen_8]
-    sen_4 = [SR570GainTable.sen_2, SR570FineGainTable.sen_7]
-    sen_5 = [SR570GainTable.sen_2, SR570FineGainTable.sen_6]
-    sen_6 = [SR570GainTable.sen_2, SR570FineGainTable.sen_5]
-    sen_7 = [SR570GainTable.sen_2, SR570FineGainTable.sen_4]
-    sen_8 = [SR570GainTable.sen_2, SR570FineGainTable.sen_3]
-    sen_9 = [SR570GainTable.sen_2, SR570FineGainTable.sen_2]
-    sen_10 = [SR570GainTable.sen_2, SR570FineGainTable.sen_1]
-    sen_11 = [SR570GainTable.sen_3, SR570FineGainTable.sen_9]
-    sen_12 = [SR570GainTable.sen_3, SR570FineGainTable.sen_8]
-    sen_13 = [SR570GainTable.sen_3, SR570FineGainTable.sen_7]
-    sen_14 = [SR570GainTable.sen_3, SR570FineGainTable.sen_6]
-    sen_15 = [SR570GainTable.sen_3, SR570FineGainTable.sen_5]
-    sen_16 = [SR570GainTable.sen_3, SR570FineGainTable.sen_4]
-    sen_17 = [SR570GainTable.sen_3, SR570FineGainTable.sen_3]
-    sen_18 = [SR570GainTable.sen_3, SR570FineGainTable.sen_2]
-    sen_19 = [SR570GainTable.sen_3, SR570FineGainTable.sen_1]
-    sen_20 = [SR570GainTable.sen_4, SR570FineGainTable.sen_9]
-    sen_21 = [SR570GainTable.sen_4, SR570FineGainTable.sen_8]
-    sen_22 = [SR570GainTable.sen_4, SR570FineGainTable.sen_7]
-    sen_23 = [SR570GainTable.sen_4, SR570FineGainTable.sen_6]
-    sen_24 = [SR570GainTable.sen_4, SR570FineGainTable.sen_5]
-    sen_25 = [SR570GainTable.sen_4, SR570FineGainTable.sen_4]
-    sen_26 = [SR570GainTable.sen_4, SR570FineGainTable.sen_3]
-    sen_27 = [SR570GainTable.sen_4, SR570FineGainTable.sen_2]
-    sen_28 = [SR570GainTable.sen_4, SR570FineGainTable.sen_1]
+    SEN_1 = [SR570GainTable.SEN_1, SR570FineGainTable.SEN_1]
+    SEN_2 = [SR570GainTable.SEN_2, SR570FineGainTable.SEN_9]
+    SEN_3 = [SR570GainTable.SEN_2, SR570FineGainTable.SEN_8]
+    SEN_4 = [SR570GainTable.SEN_2, SR570FineGainTable.SEN_7]
+    SEN_5 = [SR570GainTable.SEN_2, SR570FineGainTable.SEN_6]
+    SEN_6 = [SR570GainTable.SEN_2, SR570FineGainTable.SEN_5]
+    SEN_7 = [SR570GainTable.SEN_2, SR570FineGainTable.SEN_4]
+    SEN_8 = [SR570GainTable.SEN_2, SR570FineGainTable.SEN_3]
+    SEN_9 = [SR570GainTable.SEN_2, SR570FineGainTable.SEN_2]
+    SEN_10 = [SR570GainTable.SEN_2, SR570FineGainTable.SEN_1]
+    SEN_11 = [SR570GainTable.SEN_3, SR570FineGainTable.SEN_9]
+    SEN_12 = [SR570GainTable.SEN_3, SR570FineGainTable.SEN_8]
+    SEN_13 = [SR570GainTable.SEN_3, SR570FineGainTable.SEN_7]
+    SEN_14 = [SR570GainTable.SEN_3, SR570FineGainTable.SEN_6]
+    SEN_15 = [SR570GainTable.SEN_3, SR570FineGainTable.SEN_5]
+    SEN_16 = [SR570GainTable.SEN_3, SR570FineGainTable.SEN_4]
+    SEN_17 = [SR570GainTable.SEN_3, SR570FineGainTable.SEN_3]
+    SEN_18 = [SR570GainTable.SEN_3, SR570FineGainTable.SEN_2]
+    SEN_19 = [SR570GainTable.SEN_3, SR570FineGainTable.SEN_1]
+    SEN_20 = [SR570GainTable.SEN_4, SR570FineGainTable.SEN_9]
+    SEN_21 = [SR570GainTable.SEN_4, SR570FineGainTable.SEN_8]
+    SEN_22 = [SR570GainTable.SEN_4, SR570FineGainTable.SEN_7]
+    SEN_23 = [SR570GainTable.SEN_4, SR570FineGainTable.SEN_6]
+    SEN_24 = [SR570GainTable.SEN_4, SR570FineGainTable.SEN_5]
+    SEN_25 = [SR570GainTable.SEN_4, SR570FineGainTable.SEN_4]
+    SEN_26 = [SR570GainTable.SEN_4, SR570FineGainTable.SEN_3]
+    SEN_27 = [SR570GainTable.SEN_4, SR570FineGainTable.SEN_2]
+    SEN_28 = [SR570GainTable.SEN_4, SR570FineGainTable.SEN_1]
 
 
 class SR570GainToCurrentTable(float, Enum):
     """Conversion table for gain(sen) to current"""
 
-    sen_1 = 1e3
-    sen_2 = 2e3
-    sen_3 = 5e3
-    sen_4 = 1e4
-    sen_5 = 2e4
-    sen_6 = 5e4
-    sen_7 = 1e5
-    sen_8 = 2e5
-    sen_9 = 5e5
-    sen_10 = 1e6
-    sen_11 = 2e6
-    sen_12 = 5e6
-    sen_13 = 1e7
-    sen_14 = 2e7
-    sen_15 = 5e7
-    sen_16 = 1e8
-    sen_17 = 2e8
-    sen_18 = 5e8
-    sen_19 = 1e9
-    sen_20 = 2e9
-    sen_21 = 5e9
-    sen_22 = 1e10
-    sen_23 = 2e10
-    sen_24 = 5e10
-    sen_25 = 1e11
-    sen_26 = 2e11
-    sen_27 = 5e11
-    sen_28 = 1e12
+    SEN_1 = 1e3
+    SEN_2 = 2e3
+    SEN_3 = 5e3
+    SEN_4 = 1e4
+    SEN_5 = 2e4
+    SEN_6 = 5e4
+    SEN_7 = 1e5
+    SEN_8 = 2e5
+    SEN_9 = 5e5
+    SEN_10 = 1e6
+    SEN_11 = 2e6
+    SEN_12 = 5e6
+    SEN_13 = 1e7
+    SEN_14 = 2e7
+    SEN_15 = 5e7
+    SEN_16 = 1e8
+    SEN_17 = 2e8
+    SEN_18 = 5e8
+    SEN_19 = 1e9
+    SEN_20 = 2e9
+    SEN_21 = 5e9
+    SEN_22 = 1e10
+    SEN_23 = 2e10
+    SEN_24 = 5e10
+    SEN_25 = 1e11
+    SEN_26 = 2e11
+    SEN_27 = 5e11
+    SEN_28 = 1e12
 
 
 class SR570(CurrentAmp):
@@ -168,10 +168,10 @@ class SR570(CurrentAmp):
                 + "\n Available gain:"
                 + f" {[f'{c.value:.0e}' for c in self.gain_conversion_table]}"
             )
-        sen_setting = self.gain_conversion_table(value).name
+        SEN_setting = self.gain_conversion_table(value).name
         LOGGER.info(f"{self.name} gain change to {value}")
 
-        coarse_gain, fine_gain = self.combined_table[sen_setting].value
+        coarse_gain, fine_gain = self.combined_table[SEN_setting].value
         await asyncio.gather(
             self.fine_gain.set(value=fine_gain, timeout=self.timeout),
             self.coarse_gain.set(value=coarse_gain, timeout=self.timeout),
@@ -184,19 +184,19 @@ class SR570(CurrentAmp):
         current_gain += value
         if current_gain > len(self.combined_table):
             await self.set(
-                self.gain_conversion_table[f"sen_{len(self.combined_table)}"]
+                self.gain_conversion_table[f"SEN_{len(self.combined_table)}"]
             )
             raise ValueError("Gain at max value")
-        await self.set(self.gain_conversion_table[f"sen_{current_gain}"])
+        await self.set(self.gain_conversion_table[f"SEN_{current_gain}"])
 
     @AsyncStatus.wrap
     async def decrease_gain(self, value=3) -> None:
         current_gain = int((await self.get_gain()).name.split("_")[-1])
         current_gain -= value
         if current_gain < 1:
-            await self.set(self.gain_conversion_table["sen_1"])
+            await self.set(self.gain_conversion_table["SEN_1"])
             raise ValueError("Gain at min value")
-        await self.set(self.gain_conversion_table[f"sen_{current_gain}"])
+        await self.set(self.gain_conversion_table[f"SEN_{current_gain}"])
 
     @AsyncStatus.wrap
     async def get_gain(self) -> Enum:

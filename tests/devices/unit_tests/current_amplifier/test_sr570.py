@@ -9,9 +9,8 @@ from bluesky.plans import count
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import (
     DeviceCollector,
-    callback_on_mock_put,
-    set_mock_value,
 )
+from ophyd_async.testing import callback_on_mock_put, set_mock_value
 
 from dodal.devices.current_amplifiers import (
     SR570,
@@ -82,12 +81,12 @@ async def mock_sr570_struck_scaler_detector(
 @pytest.mark.parametrize(
     "gain, wait_time, gain_value",
     [
-        ([1e3, 1e-4, "sen_1"]),
-        ([1e6, 1e-4, SR570FullGainTable.sen_10.name]),
-        ([2e6, 0.15, SR570FullGainTable.sen_11.name]),
-        ([2e7, 0.15, SR570FullGainTable.sen_14.name]),
-        ([2e9, 0.2, SR570FullGainTable.sen_20.name]),
-        ([1e12, 0.2, SR570FullGainTable.sen_28.name]),
+        ([1e3, 1e-4, "SEN_1"]),
+        ([1e6, 1e-4, SR570FullGainTable.SEN_10.name]),
+        ([2e6, 0.15, SR570FullGainTable.SEN_11.name]),
+        ([2e7, 0.15, SR570FullGainTable.SEN_14.name]),
+        ([2e9, 0.2, SR570FullGainTable.SEN_20.name]),
+        ([1e12, 0.2, SR570FullGainTable.SEN_28.name]),
     ],
 )
 @mock.patch("asyncio.sleep")
@@ -154,7 +153,7 @@ async def test_SR570_increase_gain_top_out_fail(
     sleep: AsyncMock,
     mock_sr570: SR570,
 ):
-    starting_gain, final_gain = ["sen_28", "sen_28"]
+    starting_gain, final_gain = ["SEN_28", "SEN_28"]
     await mock_sr570.set(SR570GainToCurrentTable[starting_gain])
     with pytest.raises(ValueError):
         await mock_sr570.increase_gain()
@@ -193,7 +192,7 @@ async def test_SR570_decrease_gain_bottom_out_fail(
     sleep: AsyncMock,
     mock_sr570: SR570,
 ):
-    starting_gain, final_gain = ["sen_1", "sen_1"]
+    starting_gain, final_gain = ["SEN_1", "SEN_1"]
     await mock_sr570.set(SR570GainToCurrentTable[starting_gain])
     with pytest.raises(ValueError):
         await mock_sr570.decrease_gain()
@@ -204,21 +203,21 @@ async def test_SR570_decrease_gain_bottom_out_fail(
 class MockSR570RaiseTimeTable(float, Enum):
     """Mock raise time(s) for SR570 current amplifier to speed up test"""
 
-    sen_1 = 0
-    sen_2 = 0
-    sen_3 = 0
-    sen_4 = 0
+    SEN_1 = 0
+    SEN_2 = 0
+    SEN_3 = 0
+    SEN_4 = 0
 
 
 @pytest.mark.parametrize(
     "gain,raw_count, expected_current",
     [
-        ("sen_1", 0.51e5, 0.51e-3),
-        ("sen_3", -10e5, -2e-3),
-        ("sen_11", 5.2e5, 2.6e-6),
-        ("sen_17", 2.2e5, 1.1e-8),
-        ("sen_23", 8.7e5, 4.35e-10),
-        ("sen_5", 0.0, 0.0),
+        ("SEN_1", 0.51e5, 0.51e-3),
+        ("SEN_3", -10e5, -2e-3),
+        ("SEN_11", 5.2e5, 2.6e-6),
+        ("SEN_17", 2.2e5, 1.1e-8),
+        ("SEN_23", 8.7e5, 4.35e-10),
+        ("SEN_5", 0.0, 0.0),
     ],
 )
 async def test_SR570_struck_scaler_read(
@@ -252,20 +251,20 @@ async def test_SR570_struck_scaler_read(
     "gain,raw_count, expected_current",
     [
         (
-            "sen_10",
+            "SEN_10",
             [1e2, 1e3, 1e4, 1e5, 1e5],
             1e-9,
         ),
-        ("sen_1", [1e5, 1e5], 1e-3),
+        ("SEN_1", [1e5, 1e5], 1e-3),
         (
-            "sen_10",
+            "SEN_10",
             [520e5, 52e5, 5.2e5, 5.2e4, 5.2e4],
             5.2e-4,
         ),
-        ("sen_19", [22.2e5, 2.22e5, 2.22e5], 2.22e-8),
-        ("sen_5", [0.0] * (30 - 5), 0.0),
-        ("sen_5", [-200.0e5, -20.0e5, -10.0e5, -10.0e5], -0.01),
-        ("sen_25", [0.002e5, 0.004e5, 0.01e5, 0.02e5, 0.02e5], 2e-14),
+        ("SEN_19", [22.2e5, 2.22e5, 2.22e5], 2.22e-8),
+        ("SEN_5", [0.0] * (30 - 5), 0.0),
+        ("SEN_5", [-200.0e5, -20.0e5, -10.0e5, -10.0e5], -0.01),
+        ("SEN_25", [0.002e5, 0.004e5, 0.01e5, 0.02e5, 0.02e5], 2e-14),
     ],
 )
 async def test_SR570_struck_scaler_read_with_autoGain(
@@ -287,7 +286,7 @@ async def test_SR570_struck_scaler_read_with_autoGain(
 
     def set_mock_counter():
         set_mock_value(
-            mock_sr570_struck_scaler_detector.counter().trigger_start, CountState.done
+            mock_sr570_struck_scaler_detector.counter().trigger_start, CountState.DONE
         )
         set_mock_value(
             mock_sr570_struck_scaler_detector.counter().readout, rbv_mocks.get()
