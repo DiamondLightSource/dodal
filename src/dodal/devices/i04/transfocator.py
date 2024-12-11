@@ -29,15 +29,11 @@ class Transfocator(StandardReadable):
                 float, prefix + "LENS_PRED"
             )
             self.number_filters_sp = epics_signal_rw(int, prefix + "NUM_FILTERS")
-
-            self.start = epics_signal_rw(
-                int, prefix + "START_RBV", prefix + "START.PROC"
-            )
-
+            self.start = epics_signal_rw(int, prefix + "START.PROC")
+            self.start_rbv = epics_signal_r(int, prefix + "START_RBV")
             self.vertical_lens_rbv = epics_signal_r(float, prefix + "VER")
 
         self.TIMEOUT = 120
-        self._POLLING_WAIT = 0.01
 
         super().__init__(name=name)
 
@@ -55,8 +51,8 @@ class Transfocator(StandardReadable):
                 LOGGER.info(f"Transfocator setting {value} filters")
                 await self.number_filters_sp.set(value)
                 await self.start.set(1)
-                await wait_for_value(self.start, 1, self.TIMEOUT)
-                await wait_for_value(self.start, 0, self.TIMEOUT)
+                await wait_for_value(self.start_rbv, 1, self.TIMEOUT)
+                await wait_for_value(self.start_rbv, 0, self.TIMEOUT)
                 self.latest_pred_vertical_num_lenses = value
                 is_set_filters_done = True
 
@@ -82,9 +78,7 @@ class Transfocator(StandardReadable):
         LOGGER.info(f"Transfocator setting {beamsize_microns} beamsize")
 
         if await self.beamsize_set_microns.get_value() != beamsize_microns:
-            """Setting beam_set_microns results in a change to predicted_vertical_num_lenses.
-            In the following logic, we observe this change, and set it in number_filters_sp.
-            """
+            # Logic in the IOC calculates predicted_vertical_num_lenses when beam_set_microns changes
             await asyncio.gather(
                 self.beamsize_set_microns.set(beamsize_microns),
                 self._observe_beamsize_microns(),
