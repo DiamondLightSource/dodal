@@ -55,7 +55,8 @@ class ZocaloTrigger:
     intended to be used in bluesky callback classes. To get results from zocalo back
     into a plan, use the ZocaloResults ophyd device.
 
-    see https://diamondlightsource.github.io/dodal/main/how-to/zocalo.html"""
+    see https://diamondlightsource.github.io/dodal/main/how-to/zocalo.html for
+    more information about zocalo."""
 
     def __init__(self, environment: str = ZOCALO_ENV):
         self.zocalo_environment: str = environment
