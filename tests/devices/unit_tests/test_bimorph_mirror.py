@@ -25,7 +25,7 @@ def mirror(request, RE: RunEngine) -> BimorphMirror:
 
 @pytest.fixture
 def valid_bimorph_values(mirror: BimorphMirror) -> dict[int, float]:
-    return {i: float(i) for i in range(1, mirror.number_of_channels + 1)}
+    return {i: float(i) for i in range(1, len(mirror.channels) + 1)}
 
 
 @pytest.fixture
@@ -96,14 +96,14 @@ async def test_read(
 
     assert [
         read[f"{mirror.name}-channels-{i}-vout"]["value"]
-        for i in range(1, mirror.number_of_channels + 1)
+        for i in range(1, len(mirror.channels) + 1)
     ] == list(valid_bimorph_values.values())
 
 
 @pytest.mark.parametrize("mirror", VALID_BIMORPH_CHANNELS, indirect=True)
 async def test_set_invalid_channel_throws_error(mirror: BimorphMirror):
     with pytest.raises(ValueError):
-        await mirror.set({mirror.number_of_channels + 1: 0.0})
+        await mirror.set({len(mirror.channels) + 1: 0.0})
 
 
 @pytest.mark.parametrize("number_of_channels", [-1])

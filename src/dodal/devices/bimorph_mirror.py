@@ -60,7 +60,6 @@ class BimorphMirror(StandardReadable, Movable):
     """Class to represent CAENels Bimorph Mirrors.
 
     Attributes:
-        number_of_channels: Non-ophyd int holding number_of_channels passed into __init__
         channels: DeviceVector of BimorphMirrorChannel, indexed from 1, for each channel
         on_off: Writeable BimorphOnOff
         alltrgt_proc: Procable signal that writes values in each channel's VTRGT to VOUT
@@ -79,8 +78,6 @@ class BimorphMirror(StandardReadable, Movable):
 
         if number_of_channels < 0:
             raise ValueError(f"Number of channels is below zero: {number_of_channels}")
-
-        self.number_of_channels = number_of_channels
 
         with self.add_children_as_readables():
             self.channels = DeviceVector(
