@@ -104,9 +104,9 @@ class BimorphMirror(StandardReadable, Movable):
         Raises:
             ValueError: On set to non-existent channel"""
 
-        for i in value.keys():
-            if self.channels.get(i) is None:
-                raise ValueError(f"Set to non-existent channel: {i}")
+        diff = set(self.channels.keys()) - set(values.keys())
+        if len(diff) > 0:
+            raise ValueError(f"Attempting to put to non-existent channels: {diff}")
 
         # Write target voltages:
         await asyncio.gather(
