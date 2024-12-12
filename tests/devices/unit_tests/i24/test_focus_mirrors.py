@@ -17,9 +17,9 @@ async def test_setting_mirror_focus_returns_correct_beam_size(
 ):
     def set_mirrors():
         yield from bps.abs_set(
-            fake_mirrors.horizontal, HFocusMode.focus3010d, wait=True
+            fake_mirrors.horizontal, HFocusMode.FOCUS_3010D, wait=True
         )
-        yield from bps.abs_set(fake_mirrors.vertical, VFocusMode.focus3010d, wait=True)
+        yield from bps.abs_set(fake_mirrors.vertical, VFocusMode.FOCUS_3010D, wait=True)
 
     RE(set_mirrors())
 
