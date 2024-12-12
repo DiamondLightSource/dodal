@@ -1,0 +1,109 @@
+@startuml
+title Gridscan Parameter Relationships
+
+class DiffractionExperiment
+class DiffractionExperimentWithSample
+class GridCommon {
+    grid_width_um
+    exposure_time_s
+}
+class GridScanWithEdgeDetect {
+    box_size_um
+}
+class HyperionGridCommon {
+    enable_dev_shm
+}
+class HyperionThreeDGridScan {
+    x_step_size_um
+    y_step_size_um
+    z_step_size_um
+    y2_start_um
+    z2_start_um
+    --
+    grid_1_spec
+    grid_2_spec
+    scan_indices
+    scan_spec
+    scan_points
+    scan_points_first_grid
+    scan_points_second_grid
+    num_images
+    FGS_Params
+    panda_FGS_Params
+}
+class MxBlueSkyParameters
+class SpecifiedGrid
+class XyzStarts {
+    x_start_um
+    y_start_um
+    z_start_um
+}
+class OptionalXYZStarts {
+    x_start_um
+    y_start_um
+    z_start_um
+}
+class RotationScanPerSweep
+
+MxBlueSkyParameters <|-- DiffractionExperiment
+DiffractionExperiment <|-- DiffractionExperimentWithSample
+DiffractionExperimentWithSample <|-- GridCommon
+GridCommon <|-- GridScanWithEdgeDetect
+GridCommon <|-- HyperionGridCommon
+HyperionGridCommon <|-- HyperionThreeDGridScan
+SpecifiedGrid <|-- HyperionThreeDGridScan
+XyzStarts <|-- SpecifiedGrid
+OptionalXYZStarts <|-- RotationScanPerSweep
+class GridParamUpdate {
+    x_start_um
+    y_start_um
+    y2_start_um
+    z_start_um
+    z2_start_um
+    x_steps
+    y_steps
+    z_steps
+    x_step_size_um
+    y_step_size_um
+    z_step_size_um
+}
+
+class GridDetectionCallback {
+    get_grid_parameters() -> GridParamUpdate
+}
+    
+GridDetectionCallback --> GridParamUpdate : generates from event. Adds 0.5 to get box-centres
+GridParamUpdate --> HyperionThreeDGridScan : combines with GridScanWithEdgeDetect
+
+class experiment_plans {
+    grid_detect_then_xray_centre()
+    flyscan_xray_centre_no_move()
+    create_parameters_for_flyscan_xray_centre(GridScanWithEdgeDetect, GridParamUpdate) -> HyperionThreeDGridScan
+}
+
+class AbstractExperimentBase
+class AbstractExperimentWithBeamParams
+class GridScanParamsCommon {
+    x_steps
+    y_steps
+    z_steps
+    x_step_size_mm
+    y_step_size_mm
+    z_step_size_mm
+    x_start_mm
+    y1_start_mm
+    y2_start_mm
+    z1_start_mm
+    z2_start_mm
+}
+class PandAGridScanParams
+class ZebraGridScanParams
+
+AbstractExperimentBase <|-- AbstractExperimentWithBeamParams
+AbstractExperimentWithBeamParams <|-- GridScanParamsCommon
+GridScanParamsCommon <|-- PandAGridScanParams
+GridScanParamsCommon <|-- ZebraGridScanParams
+
+HyperionThreeDGridScan --> ZebraGridScanParams : generates
+HyperionThreeDGridScan --> PandAGridScanParams : generates
+@enduml
