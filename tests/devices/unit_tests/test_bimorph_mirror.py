@@ -100,6 +100,13 @@ async def test_set_channels_allows_tolerance(
 
 
 @pytest.mark.parametrize("mirror", VALID_BIMORPH_CHANNELS, indirect=True)
+async def test_set_one_channel(mirror: BimorphMirror, mock_vtrgt_vout_propogation):
+    values = {1: 1}
+
+    await mirror.set(values)
+
+
+@pytest.mark.parametrize("mirror", VALID_BIMORPH_CHANNELS, indirect=True)
 async def test_read(
     mirror: BimorphMirror,
     valid_bimorph_values: dict[int, float],
