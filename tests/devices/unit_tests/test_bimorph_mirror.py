@@ -5,7 +5,7 @@ from bluesky.run_engine import RunEngine
 from ophyd_async.core import DeviceCollector
 from ophyd_async.testing import get_mock_put
 
-from dodal.devices.bimorph_mirror import BimorphMirror, tolerance_func_builder
+from dodal.devices.bimorph_mirror import BimorphMirror
 
 VALID_BIMORPH_CHANNELS = [8, 12, 16, 24]
 
