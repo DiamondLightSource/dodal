@@ -105,6 +105,13 @@ async def test_set_one_channel(mirror: BimorphMirror, mock_vtrgt_vout_propogatio
 
     await mirror.set(values)
 
+    read = await mirror.read()
+
+    assert [
+        read[f"{mirror.name}-channels-{key}-output_voltage"]["value"]
+        for key in values
+    ] == list(values)
+
 
 @pytest.mark.parametrize("mirror", VALID_BIMORPH_CHANNELS, indirect=True)
 async def test_read(
