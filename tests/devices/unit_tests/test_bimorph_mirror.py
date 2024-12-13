@@ -108,8 +108,11 @@ async def test_set_one_channel(mirror: BimorphMirror, mock_vtrgt_vout_propogatio
     read = await mirror.read()
 
     assert [
-        read[f"{mirror.name}-channels-{key}-output_voltage"]["value"]
-        for key in values
+        await mirror.channels[key].target_voltage.get_value() for key in values
+    ] == list(values)
+
+    assert [
+        read[f"{mirror.name}-channels-{key}-output_voltage"]["value"] for key in values
     ] == list(values)
 
 
