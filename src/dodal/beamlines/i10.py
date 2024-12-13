@@ -8,6 +8,7 @@ from dodal.devices.apple2_undulator import (
     UndulatorPhaseAxes,
 )
 from dodal.devices.current_amplifiers import CurrentAmpDet
+from dodal.devices.i10.diagnostics import Diagnostic
 from dodal.devices.i10.i10_apple2 import (
     I10Apple2,
     I10Apple2PGM,
@@ -334,7 +335,14 @@ def slit_6() -> I10Slits:
     )
 
 
-"Rasor devices"
+"""Diagnostics"""
+
+
+@device_factory()
+def diagnostics() -> Diagnostic:
+    return Diagnostic(
+        prefix=f"{PREFIX.beamline_prefix}-DI-",
+    )
 
 
 @device_factory()
