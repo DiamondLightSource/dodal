@@ -23,7 +23,7 @@ class D5DropDown(StrictEnum):
     CELL_OUT = "Cell Out"
 
 
-class D6DropDown(StrictEnum):
+class D5ADropDown(StrictEnum):
     OUT_OF_THE_BEAM = "Out of the beam"
     DIODE = "Diode"
     BLADE = "Blade"
@@ -33,7 +33,13 @@ class D6DropDown(StrictEnum):
     GRID = "Grid"
 
 
-class D78ropDown(StrictEnum):
+class D6DropDown(StrictEnum):
+    DIODE_OUT = "Diode Out"
+    DIODE_IN = "Diode In"
+    AU_MESH = "Au Mesh"
+
+
+class D7DropDown(StrictEnum):
     OUT = "Out"
     SHUTTER = "Shutter"
 
@@ -150,7 +156,7 @@ class I10CentroidDetector(StandardReadable):
         await self.cam.acquire.set(True)
 
 
-class SceenCam(Device):
+class ScreenCam(Device):
     def __init__(
         self,
         prefix: str,
@@ -158,7 +164,7 @@ class SceenCam(Device):
         stage_read_enum: type[StrictEnum] = InOutReadBackTable,
         stage_read_suffix="STA",
         stage_write_suffix="CON",
-        cam_inffix="DCAM:",
+        cam_infix="DCAM:",
         name: str = "",
     ) -> None:
         self.screen_stage = I10PneumaticStage(
@@ -169,12 +175,12 @@ class SceenCam(Device):
             stage_write_suffix=stage_write_suffix,
         )
         self.single_trigger_centroid = I10CentroidDetector(
-            prefix=prefix + cam_inffix,
+            prefix=prefix + cam_infix,
         )
         super().__init__(name=name)
 
 
-class FullDiagonostic(SceenCam):
+class FullDiagonostic(ScreenCam):
     def __init__(
         self,
         prefix: str,
@@ -185,7 +191,7 @@ class FullDiagonostic(SceenCam):
         stage_read_enum: type[StrictEnum] = InOutReadBackTable,
         stage_read_suffix="STA",
         stage_write_suffix="CON",
-        cam_inffix="DCAM:",
+        cam_infix="DCAM:",
         name: str = "",
     ) -> None:
         self.positioner = DropDownStage(
@@ -200,37 +206,41 @@ class FullDiagonostic(SceenCam):
             stage_read_enum,
             stage_read_suffix,
             stage_write_suffix,
-            cam_inffix,
+            cam_infix,
             name,
         )
 
 
 class Diagnostic(Device):
     def __init__(self, prefix, name: str = "") -> None:
-        self.d1 = SceenCam(prefix=prefix + "PHDGN-01:")
-        self.d2 = SceenCam(prefix=prefix + "PHDGN-02:")
+        self.d1 = ScreenCam(prefix=prefix + "PHDGN-01:")
+        self.d2 = ScreenCam(prefix=prefix + "PHDGN-02:")
         self.d3 = FullDiagonostic(
             prefix=prefix + "PHDGN-03:",
             positioner_enum=D3DropDown,
             positioner_suffix="DET:X",
         )
-        self.d4 = SceenCam(prefix=prefix + "PHDGN-04:")
+        self.d4 = ScreenCam(prefix=prefix + "PHDGN-04:")
         self.d5 = DropDownStage(
             prefix=prefix + "IONC-01:",
             positioner_enum=D5DropDown,
             positioner_suffix="Y",
         )
+
+        self.d5A = DropDownStage(
+            prefix=prefix + "PHDGN-06:",
+            positioner_enum=D5ADropDown,
+            positioner_suffix="DET:X",
+        )
+
         self.d6 = FullDiagonostic(
-            prefix=prefix + "PHDGN-0",
+            prefix=prefix + "PHDGN-05:",
             positioner_enum=D6DropDown,
-            positioner_suffix="6:DET:X",
-            stage_read_suffix="5:STA",
-            stage_write_suffix="5:CON",
-            cam_inffix="5:DCAM:",
+            positioner_suffix="DET:X",
         )
         self.d7 = DropDownStage(
             prefix=prefix + "PHDGN-07:",
-            positioner_enum=D78ropDown,
+            positioner_enum=D7DropDown,
             positioner_suffix="Y",
         )
         super().__init__(name)
