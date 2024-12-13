@@ -104,7 +104,7 @@ class BimorphMirror(StandardReadable, Movable):
         Raises:
             ValueError: On set to non-existent channel"""
 
-        diff = set(self.channels.keys()) - set(values.keys())
+        diff = set(self.channels.keys()) - set(value.keys())
         if len(diff) > 0:
             raise ValueError(f"Attempting to put to non-existent channels: {diff}")
 
