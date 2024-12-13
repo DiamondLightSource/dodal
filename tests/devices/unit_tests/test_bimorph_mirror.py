@@ -5,7 +5,7 @@ from bluesky.run_engine import RunEngine
 from ophyd_async.core import DeviceCollector
 from ophyd_async.testing import get_mock_put
 
-from dodal.devices.bimorph_mirror import BimorphMirror
+from dodal.devices.bimorph_mirror import BimorphMirror, tolerance_func_builder
 
 VALID_BIMORPH_CHANNELS = [8, 12, 16, 24]
 
@@ -79,9 +79,24 @@ async def test_set_channels_waits_for_vout_readback(
         await mirror.set(valid_bimorph_values)
 
         assert [
-            call(mirror.channels[i].output_voltage, val, timeout=ANY)
+            call(mirror.channels[i].output_voltage, ANY, timeout=ANY)
             for i, val in valid_bimorph_values.items()
         ] == mock_wait_for_value.call_args_list
+
+
+@pytest.mark.parametrize("mirror", VALID_BIMORPH_CHANNELS, indirect=True)
+async def test_set_channels_allows_tolerance(
+    mirror: BimorphMirror,
+    valid_bimorph_values: dict[int, float],
+):
+    for channel in mirror.channels.values():
+
+        def out_by_a_little(value: float, wait=False, signal=channel.output_voltage):
+            signal.set(value + 0.00001, wait=wait)
+
+        get_mock_put(channel.target_voltage).side_effect = out_by_a_little
+
+    await mirror.set(valid_bimorph_values)
 
 
 @pytest.mark.parametrize("mirror", VALID_BIMORPH_CHANNELS, indirect=True)

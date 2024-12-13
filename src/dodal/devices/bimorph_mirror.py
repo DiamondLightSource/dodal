@@ -95,7 +95,7 @@ class BimorphMirror(StandardReadable, Movable):
         super().__init__(name=name)
 
     @AsyncStatus.wrap
-    async def set(self, value: Mapping[int, float]) -> None:
+    async def set(self, value: Mapping[int, float], tolerance: float = 0.0001) -> None:
         """Sets bimorph voltages in parrallel via target voltage and all proc.
 
         Args:
@@ -123,8 +123,17 @@ class BimorphMirror(StandardReadable, Movable):
         await asyncio.gather(
             *[
                 wait_for_value(
-                    self.channels[i].output_voltage, target, timeout=DEFAULT_TIMEOUT
+                    self.channels[i].output_voltage,
+                    tolerance_func_builder(tolerance, target),
+                    timeout=DEFAULT_TIMEOUT,
                 )
                 for i, target in value.items()
             ]
         )
+
+
+def tolerance_func_builder(tolerance: float, target_value: float):
+    def is_within_value(x):
+        return abs(x - target_value) <= tolerance
+
+    return is_within_value
