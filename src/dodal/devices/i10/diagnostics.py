@@ -1,5 +1,6 @@
 import asyncio
 
+from bluesky.protocols import Triggerable
 from ophyd_async.core import AsyncStatus, Device, StandardReadable, StrictEnum
 from ophyd_async.core import StandardReadableFormat as Format
 from ophyd_async.core._device import DeviceConnector
@@ -100,6 +101,8 @@ class I10PneumaticStage(StandardReadable):
         stage_write_suffix="CON",
         name: str = "",
     ) -> None:
+        """Pneumatic stage where a fluorescent screen can be insert into the x-ray beam,
+        often use together with a web cam to locate the x-ray beam."""
         with self.add_children_as_readables(Format.HINTED_SIGNAL):
             self.stage_drop_down_set = epics_signal_rw(
                 stage_write_enum,
@@ -120,8 +123,10 @@ class I10AravisDriverIO(AravisDriverIO):
         stat_infix: str = "STAT:",
         name: str = "",
     ) -> None:
-        # self.data_type = epics_signal_r(I10WebIODataType, prefix + "DataType_RBV")
         super().__init__(prefix + cam_infix, name)
+        """This is the standard web cam with added Centroid to AravisDriverIO so that
+        the centre of mass position can be obtained from epics"""
+        # data type correction for i10 model.
         self.data_type = epics_signal_r(
             I10WebIODataType, prefix + cam_infix + "DataType_RBV"
         )
@@ -136,34 +141,35 @@ class I10AravisDriverIO(AravisDriverIO):
         )
 
 
-class I10CentroidDetector(StandardReadable):
+class I10CentroidDetector(StandardReadable, Triggerable):
     def __init__(
         self,
         prefix: str,
         name="",
     ) -> None:
-        self.cam = I10AravisDriverIO(prefix=prefix)
-
+        """Detector to read out the centroid position,
+        this is base off the SingleTriggerDetector in ophyd_async"""
+        self.drv = I10AravisDriverIO(prefix=prefix)
         self.add_readables(
-            [self.cam.array_counter, self.cam.centroid_x, self.cam.centroid_y],
+            [self.drv.array_counter, self.drv.centroid_x, self.drv.centroid_y],
             Format.HINTED_UNCACHED_SIGNAL,
         )
 
-        self.add_readables([self.cam.acquire_time], Format.CONFIG_SIGNAL)
+        self.add_readables([self.drv.acquire_time], Format.CONFIG_SIGNAL)
 
         super().__init__(name=name)
 
     @AsyncStatus.wrap
     async def stage(self) -> None:
         await asyncio.gather(
-            self.cam.image_mode.set(ImageMode.SINGLE),
-            self.cam.wait_for_plugins.set(True),
+            self.drv.image_mode.set(ImageMode.SINGLE),
+            self.drv.wait_for_plugins.set(True),
         )
         await super().stage()
 
     @AsyncStatus.wrap
     async def trigger(self) -> None:
-        await self.cam.acquire.set(True)
+        await self.drv.acquire.set(True)
 
 
 class ScreenCam(Device):
