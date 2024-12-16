@@ -25,10 +25,9 @@ from dodal.devices.i10.rasor.rasor_motors import (
     PinHole,
 )
 from dodal.devices.i10.rasor.rasor_scaler_cards import RasorScalerCard1
-from dodal.devices.i10.slits import I10PrimarySlits, I10Slits
+from dodal.devices.i10.slits import I10Slits, I10SlitsDrainCurrent
 from dodal.devices.motors import XYZPositioner
 from dodal.devices.pgm import PGM
-from dodal.devices.slits import MinimalSlits
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -283,56 +282,22 @@ def switching_mirror() -> PiezoMirror:
     return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:")
 
 
-@device_factory()
-def slit_1() -> I10PrimarySlits:
-    return I10PrimarySlits(
-        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-01:",
-    )
-
-
-@device_factory()
-def slit_2() -> I10Slits:
-    return I10Slits(
-        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-02:",
-    )
-
-
-@device_factory()
-def slit_3() -> I10Slits:
-    return I10Slits(
-        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-03:",
-    )
-
-
 """Rasor devices"""
+
+
+@device_factory()
+def slits() -> I10Slits:
+    return I10Slits(prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-")
+
+
+@device_factory()
+def slits_current() -> I10SlitsDrainCurrent:
+    return I10SlitsDrainCurrent(prefix=f"{PREFIX.beamline_prefix}-")
 
 
 @device_factory()
 def focusing_mirror() -> PiezoMirror:
     return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-FOCS-01:")
-
-
-@device_factory()
-def slit_4() -> MinimalSlits:
-    return MinimalSlits(
-        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-04:",
-        x_gap="XSIZE",
-        y_gap="YSIZE",
-    )
-
-
-@device_factory()
-def slit_5() -> I10Slits:
-    return I10Slits(
-        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-05:",
-    )
-
-
-@device_factory()
-def slit_6() -> I10Slits:
-    return I10Slits(
-        prefix=f"{PREFIX.beamline_prefix}-AL-SLITS-06:",
-    )
 
 
 """Diagnostics"""

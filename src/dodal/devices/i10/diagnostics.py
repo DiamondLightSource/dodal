@@ -180,7 +180,7 @@ class ScreenCam(Device):
         super().__init__(name=name)
 
 
-class FullDiagonostic(ScreenCam):
+class FullDiagonostic(Device):
     def __init__(
         self,
         prefix: str,
@@ -200,7 +200,7 @@ class FullDiagonostic(ScreenCam):
             positioner_suffix=positioner_suffix,
             dropdown_pv_suffix=dropdown_pv_suffix,
         )
-        super().__init__(
+        self.screen = ScreenCam(
             prefix,
             stage_write_enum,
             stage_read_enum,
@@ -209,6 +209,7 @@ class FullDiagonostic(ScreenCam):
             cam_infix,
             name,
         )
+        super().__init__(name)
 
 
 class Diagnostic(Device):

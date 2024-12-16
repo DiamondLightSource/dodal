@@ -1,15 +1,19 @@
+from ophyd_async.core import Device
+from ophyd_async.core._device import DeviceConnector
+from ophyd_async.epics.core import epics_signal_r
 from ophyd_async.epics.motor import Motor
 
-from dodal.devices.slits import Slits
+from dodal.devices.slits import MinimalSlits, Slits
 
 
-class I10Slits(Slits):
+class I10SlitsBlades(Slits):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
-            self.x_ring_blade = Motor(prefix + "XRING")
-            self.x_hall_blade = Motor(prefix + "XHALL")
-            self.y_top_blade = Motor(prefix + "YPLUS")
-            self.y_bot_blade = Motor(prefix + "YMINUS")
+            self.ring_blade = Motor(prefix + "XRING")
+            self.hall_blade = Motor(prefix + "XHALL")
+            self.top_blade = Motor(prefix + "YPLUS")
+            self.bot_blade = Motor(prefix + "YMINUS")
+
         super().__init__(
             prefix=prefix,
             x_gap="XSIZE",
@@ -18,6 +22,33 @@ class I10Slits(Slits):
             y_centre="YCENTRE",
             name=name,
         )
+
+
+class BladeDrainCurrents(Device):
+    def __init__(
+        self,
+        prefix: str,
+        suffix_ring_blade: str = "SIG1",
+        suffix_hall_blade="SIG2",
+        suffix_top_blade="SIG3",
+        suffix_bot_blade="SIG4",
+        name: str = "",
+        connector: DeviceConnector | None = None,
+    ) -> None:
+        self.ring_blade_current = epics_signal_r(
+            float, read_pv=prefix + suffix_ring_blade
+        )
+        self.hall_blade_current = epics_signal_r(
+            float, read_pv=prefix + suffix_hall_blade
+        )
+        self.top_blade_current = epics_signal_r(
+            float, read_pv=prefix + suffix_top_blade
+        )
+        self.bot_blade_current = epics_signal_r(
+            float, read_pv=prefix + suffix_bot_blade
+        )
+
+        super().__init__(name, connector)
 
 
 class I10PrimarySlits(Slits):
@@ -35,3 +66,46 @@ class I10PrimarySlits(Slits):
             y_centre="YCENTRE",
             name=name,
         )
+
+
+class I10Slits(Device):
+    def __init__(self, prefix: str, name: str = "") -> None:
+        self.s1 = I10PrimarySlits(
+            prefix=prefix + "01:",
+        )
+        self.s2 = I10SlitsBlades(
+            prefix=prefix + "02:",
+        )
+        self.s3 = I10SlitsBlades(
+            prefix=prefix + "03:",
+        )
+        self.s4 = MinimalSlits(
+            prefix=prefix + "04:",
+            x_gap="XSIZE",
+            y_gap="YSIZE",
+        )
+        self.s5 = I10SlitsBlades(
+            prefix=prefix + "05:",
+        )
+        self.s6 = I10SlitsBlades(
+            prefix=prefix + "06:",
+        )
+        super().__init__(name=name)
+
+
+class I10SlitsDrainCurrent(Device):
+    def __init__(
+        self, prefix: str, name: str = "", connector: DeviceConnector | None = None
+    ) -> None:
+        self.s2 = BladeDrainCurrents(
+            prefix=prefix + "AL-SLITS-02:",
+            suffix_ring_blade="XRING:I",
+            suffix_hall_blade="XHALL:I",
+            suffix_top_blade="YPLUS:I",
+            suffix_bot_blade="YMINUS:I",
+        )
+        self.s3 = BladeDrainCurrents(prefix=prefix + "DI-IAMP-01:")
+        self.s4 = BladeDrainCurrents(prefix=prefix + "DI-IAMP-02:")
+        self.s5 = BladeDrainCurrents(prefix=prefix + "DI-IAMP-03:")
+        self.s6 = BladeDrainCurrents(prefix=prefix + "DI-IAMP-04:")
+        super().__init__(name, connector)
