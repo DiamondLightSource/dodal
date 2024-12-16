@@ -33,8 +33,8 @@ class UndulatorDCM(StandardReadable, Movable):
         prefix: str = "",
         name: str = "",
     ):
-        self.undulator = Reference(undulator)
-        self.dcm = Reference(dcm)
+        self.undulator_ref = Reference(undulator)
+        self.dcm_ref = Reference(dcm)
 
         super().__init__(name)
 
@@ -53,11 +53,11 @@ class UndulatorDCM(StandardReadable, Movable):
 
     @AsyncStatus.wrap
     async def set(self, value: float):
-        await self.undulator().raise_if_not_enabled()
+        await self.undulator_ref().raise_if_not_enabled()
         await asyncio.gather(
-            self.dcm().energy_in_kev.set(value, timeout=ENERGY_TIMEOUT_S),
-            self.undulator().set(value),
+            self.dcm_ref().energy_in_kev.set(value, timeout=ENERGY_TIMEOUT_S),
+            self.undulator_ref().set(value),
         )
         # DCM Perp pitch
         LOGGER.info(f"Adjusting DCM offset to {self.dcm_fixed_offset_mm} mm")
-        await self.dcm().offset_in_mm.set(self.dcm_fixed_offset_mm)
+        await self.dcm_ref().offset_in_mm.set(self.dcm_fixed_offset_mm)
