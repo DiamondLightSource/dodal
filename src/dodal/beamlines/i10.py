@@ -8,7 +8,7 @@ from dodal.devices.apple2_undulator import (
     UndulatorPhaseAxes,
 )
 from dodal.devices.current_amplifiers import CurrentAmpDet
-from dodal.devices.i10.diagnostics import Diagnostic
+from dodal.devices.i10.diagnostics import I10Diagnostic, I10Diagnotic5ADet
 from dodal.devices.i10.i10_apple2 import (
     I10Apple2,
     I10Apple2PGM,
@@ -272,6 +272,9 @@ def idd_la_angle(
     )
 
 
+"""Mirrors"""
+
+
 @device_factory()
 def first_mirror() -> PiezoMirror:
     return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-COL-01:")
@@ -282,7 +285,12 @@ def switching_mirror() -> PiezoMirror:
     return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-SWTCH-01:")
 
 
-"""Rasor devices"""
+@device_factory()
+def focusing_mirror() -> PiezoMirror:
+    return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-FOCS-01:")
+
+
+"""Optic slits"""
 
 
 @device_factory()
@@ -295,19 +303,22 @@ def slits_current() -> I10SlitsDrainCurrent:
     return I10SlitsDrainCurrent(prefix=f"{PREFIX.beamline_prefix}-")
 
 
-@device_factory()
-def focusing_mirror() -> PiezoMirror:
-    return PiezoMirror(prefix=f"{PREFIX.beamline_prefix}-OP-FOCS-01:")
-
-
 """Diagnostics"""
 
 
 @device_factory()
-def diagnostics() -> Diagnostic:
-    return Diagnostic(
+def diagnostics() -> I10Diagnostic:
+    return I10Diagnostic(
         prefix=f"{PREFIX.beamline_prefix}-DI-",
     )
+
+
+@device_factory()
+def d5a_det() -> I10Diagnotic5ADet:
+    return I10Diagnotic5ADet(prefix=f"{PREFIX.beamline_prefix}-DI-")
+
+
+"""Rasor devices"""
 
 
 @device_factory()

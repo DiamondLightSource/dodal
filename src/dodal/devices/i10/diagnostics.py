@@ -2,6 +2,7 @@ import asyncio
 
 from ophyd_async.core import AsyncStatus, Device, StandardReadable, StrictEnum
 from ophyd_async.core import StandardReadableFormat as Format
+from ophyd_async.core._device import DeviceConnector
 from ophyd_async.epics.adaravis import AravisDriverIO
 from ophyd_async.epics.adcore import (
     ImageMode,
@@ -11,6 +12,15 @@ from ophyd_async.epics.core import (
     epics_signal_rw,
 )
 from ophyd_async.epics.motor import Motor
+
+from dodal.devices.current_amplifiers import (
+    CurrentAmpDet,
+    Femto3xxGainTable,
+    Femto3xxGainToCurrentTable,
+    Femto3xxRaiseTime,
+    FemtoDDPCA,
+    StruckScaler,
+)
 
 
 class D3DropDown(StrictEnum):
@@ -180,7 +190,7 @@ class ScreenCam(Device):
         super().__init__(name=name)
 
 
-class FullDiagonostic(Device):
+class FullDiagnostic(Device):
     def __init__(
         self,
         prefix: str,
@@ -212,11 +222,11 @@ class FullDiagonostic(Device):
         super().__init__(name)
 
 
-class Diagnostic(Device):
+class I10Diagnostic(Device):
     def __init__(self, prefix, name: str = "") -> None:
         self.d1 = ScreenCam(prefix=prefix + "PHDGN-01:")
         self.d2 = ScreenCam(prefix=prefix + "PHDGN-02:")
-        self.d3 = FullDiagonostic(
+        self.d3 = FullDiagnostic(
             prefix=prefix + "PHDGN-03:",
             positioner_enum=D3DropDown,
             positioner_suffix="DET:X",
@@ -234,7 +244,7 @@ class Diagnostic(Device):
             positioner_suffix="DET:X",
         )
 
-        self.d6 = FullDiagonostic(
+        self.d6 = FullDiagnostic(
             prefix=prefix + "PHDGN-05:",
             positioner_enum=D6DropDown,
             positioner_suffix="DET:X",
@@ -245,3 +255,45 @@ class Diagnostic(Device):
             positioner_suffix="Y",
         )
         super().__init__(name)
+
+
+class DiagnoticDetector(Device):
+    def __init__(
+        self,
+        femto_prefix: str,
+        femto_suffix: str,
+        scaler_prefix: str,
+        scaler_suffix: str,
+        name: str = "",
+        connector: DeviceConnector | None = None,
+    ) -> None:
+        self.det = CurrentAmpDet(
+            current_amp=FemtoDDPCA(
+                prefix=femto_prefix,
+                suffix=femto_suffix,
+                gain_table=Femto3xxGainTable,
+                gain_to_current_table=Femto3xxGainToCurrentTable,
+                raise_timetable=Femto3xxRaiseTime,
+            ),
+            counter=StruckScaler(prefix=scaler_prefix, suffix=scaler_suffix),
+        )
+        super().__init__(name, connector)
+
+
+class I10Diagnotic5ADet(Device):
+    def __init__(
+        self, prefix: str, name: str = "", connector: DeviceConnector | None = None
+    ) -> None:
+        self.drain_current = DiagnoticDetector(
+            femto_prefix=prefix + "IAMP-06:",
+            femto_suffix="GAIN",
+            scaler_prefix=prefix + "SCLR-02:SCALER2",
+            scaler_suffix=".S17",
+        )
+        self.diode = DiagnoticDetector(
+            femto_prefix=prefix + "IAMP-05:",
+            femto_suffix="GAIN",
+            scaler_prefix=prefix + "SCLR-02:SCALER2",
+            scaler_suffix=".S18",
+        )
+        super().__init__(name, connector)
