@@ -36,8 +36,6 @@ class UndulatorDCM(StandardReadable, Movable):
         self.undulator_ref = Reference(undulator)
         self.dcm_ref = Reference(dcm)
 
-        super().__init__(name)
-
         # These attributes are just used by hyperion for lookup purposes
         self.pitch_energy_table_path = (
             daq_configuration_path + "/lookup/BeamLineEnergy_DCM_Pitch_converter.txt"
@@ -50,6 +48,8 @@ class UndulatorDCM(StandardReadable, Movable):
         self.dcm_fixed_offset_mm = get_beamline_parameters(
             daq_configuration_path + "/domain/beamlineParameters"
         )["DCM_Perp_Offset_FIXED"]
+
+        super().__init__(name)
 
     @AsyncStatus.wrap
     async def set(self, value: float):
