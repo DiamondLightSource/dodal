@@ -27,7 +27,7 @@ dependencies = [
     "opencv-python-headless", # For pin-tip detection.
     "aioca",                  # Required for CA support with ophyd-async.
     "p4p",                    # Required for PVA support with ophyd-async.
-    "numpy<2.0",              # Unpin when https://github.com/bluesky/ophyd-async/issues/387 resolved
+    "numpy",              # Unpin when https://github.com/bluesky/ophyd-async/issues/387 resolved
     "aiofiles",
     "aiohttp",
     "redis",
