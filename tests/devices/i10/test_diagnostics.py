@@ -26,7 +26,7 @@ async def mock_centroid_detector(
     return mock_centroid_detector
 
 
-async def test_single_stat_ad(
+async def test_I10CentroidDetector_with_blueSky(
     mock_centroid_detector: I10CentroidDetector,
     RE: RunEngine,
 ):
