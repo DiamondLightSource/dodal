@@ -51,7 +51,9 @@ class Transfocator(StandardReadable):
                 LOGGER.info(f"Transfocator setting {value} filters")
                 await self.number_filters_sp.set(value)
                 await self.start.set(1)
+                LOGGER.info("Waiting for start_rbv to change to 1")
                 await wait_for_value(self.start_rbv, 1, self.TIMEOUT)
+                LOGGER.info("Waiting for start_rbv to change to 0")
                 await wait_for_value(self.start_rbv, 0, self.TIMEOUT)
                 self.latest_pred_vertical_num_lenses = value
                 is_set_filters_done = True
@@ -63,7 +65,7 @@ class Transfocator(StandardReadable):
                 break
 
     @AsyncStatus.wrap
-    async def set(self, beamsize_microns: float) -> None:
+    async def set(self, value: float):
         """To set the beamsize on the transfocator we must:
         1. Set the beamsize in the calculator part of the transfocator
         2. Get the predicted number of lenses needed from this calculator
@@ -75,11 +77,11 @@ class Transfocator(StandardReadable):
             await self.predicted_vertical_num_lenses.get_value()
         )
 
-        LOGGER.info(f"Transfocator setting {beamsize_microns} beamsize")
+        LOGGER.info(f"Transfocator setting {value} beamsize")
 
-        if await self.beamsize_set_microns.get_value() != beamsize_microns:
+        if await self.beamsize_set_microns.get_value() != value:
             # Logic in the IOC calculates predicted_vertical_num_lenses when beam_set_microns changes
             await asyncio.gather(
-                self.beamsize_set_microns.set(beamsize_microns),
+                self.beamsize_set_microns.set(value),
                 self._observe_beamsize_microns(),
             )
