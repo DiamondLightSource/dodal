@@ -82,7 +82,7 @@ class DropDownStage(StandardReadable):
         prefix: str,
         positioner_enum: type[StrictEnum],
         positioner_suffix: str = "",
-        dropdown_pv_suffix=":MP:SELECT",
+        dropdown_pv_suffix: str = ":MP:SELECT",
         name: str = "",
     ) -> None:
         self.stage_motion = Motor(prefix=prefix + positioner_suffix)
@@ -103,8 +103,8 @@ class I10PneumaticStage(StandardReadable):
         prefix: str,
         stage_write_enum: type[StrictEnum],
         stage_read_enum: type[StrictEnum],
-        stage_read_suffix="STA",
-        stage_write_suffix="CON",
+        stage_read_suffix: str = "STA",
+        stage_write_suffix: str = "CON",
         name: str = "",
     ) -> None:
         with self.add_children_as_readables(Format.HINTED_SIGNAL):
@@ -156,7 +156,7 @@ class I10CentroidDetector(StandardReadable, Triggerable):
     def __init__(
         self,
         prefix: str,
-        name="",
+        name: str = "",
     ) -> None:
         self.drv = I10AravisDriverIO(prefix=prefix)
         self.add_readables(
@@ -189,8 +189,8 @@ class ScreenCam(Device):
         prefix: str,
         stage_write_enum: type[StrictEnum] = InOutTable,
         stage_read_enum: type[StrictEnum] = InOutReadBackTable,
-        stage_read_suffix="STA",
-        stage_write_suffix="CON",
+        stage_read_suffix: str = "STA",
+        stage_write_suffix: str = "CON",
         cam_infix="DCAM:",
         name: str = "",
     ) -> None:
@@ -215,12 +215,12 @@ class FullDiagnostic(Device):
         prefix: str,
         positioner_enum: type[StrictEnum],
         positioner_suffix: str = "",
-        dropdown_pv_suffix=":MP:SELECT",
+        dropdown_pv_suffix: str = ":MP:SELECT",
         stage_write_enum: type[StrictEnum] = InOutTable,
         stage_read_enum: type[StrictEnum] = InOutReadBackTable,
-        stage_read_suffix="STA",
-        stage_write_suffix="CON",
-        cam_infix="DCAM:",
+        stage_read_suffix: str = "STA",
+        stage_write_suffix: str = "CON",
+        cam_infix: str = "DCAM:",
         name: str = "",
     ) -> None:
         self.positioner = DropDownStage(

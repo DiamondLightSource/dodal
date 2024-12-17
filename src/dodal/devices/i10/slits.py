@@ -33,9 +33,9 @@ class BladeDrainCurrents(Device):
         self,
         prefix: str,
         suffix_ring_blade: str = "SIG1",
-        suffix_hall_blade="SIG2",
-        suffix_top_blade="SIG3",
-        suffix_bot_blade="SIG4",
+        suffix_hall_blade: str = "SIG2",
+        suffix_top_blade: str = "SIG3",
+        suffix_bot_blade: str = "SIG4",
         name: str = "",
         connector: DeviceConnector | None = None,
     ) -> None:
