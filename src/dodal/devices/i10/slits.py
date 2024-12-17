@@ -7,6 +7,8 @@ from dodal.devices.slits import MinimalSlits, Slits
 
 
 class I10SlitsBlades(Slits):
+    """Slits with extra control for each blade."""
+
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
             self.ring_blade = Motor(prefix + "XRING")
@@ -25,6 +27,8 @@ class I10SlitsBlades(Slits):
 
 
 class BladeDrainCurrents(Device):
+    """ "The drain current measurements on each blade."""
+
     def __init__(
         self,
         prefix: str,
@@ -52,6 +56,8 @@ class BladeDrainCurrents(Device):
 
 
 class I10PrimarySlits(Slits):
+    """First slits of the beamline with very high power load."""
+
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
             self.x_aptr_1 = Motor(prefix + "APTR1:X")
@@ -69,6 +75,8 @@ class I10PrimarySlits(Slits):
 
 
 class I10Slits(Device):
+    """Collection of all the i10 slits before end station."""
+
     def __init__(self, prefix: str, name: str = "") -> None:
         self.s1 = I10PrimarySlits(
             prefix=prefix + "01:",
@@ -94,6 +102,8 @@ class I10Slits(Device):
 
 
 class I10SlitsDrainCurrent(Device):
+    """Collection of all the drain current from i10 slits."""
+
     def __init__(
         self, prefix: str, name: str = "", connector: DeviceConnector | None = None
     ) -> None:

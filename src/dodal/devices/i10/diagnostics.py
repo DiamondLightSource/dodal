@@ -69,12 +69,14 @@ class InOutReadBackTable(StrictEnum):
     OUT_OF_BEAM = "Out of Beam"
 
 
-class I10WebIODataType(StrictEnum):
+class I10WebCamIODataType(StrictEnum):
     UINT8 = "UInt8"
     INT16 = "UInt16"
 
 
 class DropDownStage(StandardReadable):
+    """1D stage with a enum table to select positions."""
+
     def __init__(
         self,
         prefix: str,
@@ -92,6 +94,10 @@ class DropDownStage(StandardReadable):
 
 
 class I10PneumaticStage(StandardReadable):
+    """Pneumatic stage only has two real positions in or out.
+    Use for fluorescent screen which can be insert into the x-ray beam,
+    Most often use in conjunction with a webcam to locate the x-ray beam."""
+
     def __init__(
         self,
         prefix: str,
@@ -101,8 +107,6 @@ class I10PneumaticStage(StandardReadable):
         stage_write_suffix="CON",
         name: str = "",
     ) -> None:
-        """Pneumatic stage where a fluorescent screen can be insert into the x-ray beam,
-        often use together with a web cam to locate the x-ray beam."""
         with self.add_children_as_readables(Format.HINTED_SIGNAL):
             self.stage_drop_down_set = epics_signal_rw(
                 stage_write_enum,
@@ -116,6 +120,10 @@ class I10PneumaticStage(StandardReadable):
 
 
 class I10AravisDriverIO(AravisDriverIO):
+    """This is the standard webcam that can be found in ophyd_async
+    with four extra centroid signal. There is also a change in data_type due to it being
+    a older/different model"""
+
     def __init__(
         self,
         prefix: str,
@@ -124,11 +132,10 @@ class I10AravisDriverIO(AravisDriverIO):
         name: str = "",
     ) -> None:
         super().__init__(prefix + cam_infix, name)
-        """This is the standard web cam with added Centroid to AravisDriverIO so that
-        the centre of mass position can be obtained from epics"""
+
         # data type correction for i10 model.
         self.data_type = epics_signal_r(
-            I10WebIODataType, prefix + cam_infix + "DataType_RBV"
+            I10WebCamIODataType, prefix + cam_infix + "DataType_RBV"
         )
         # centroid x-y position
         self.centroid_x = epics_signal_r(float, prefix + stat_infix + "CentroidX_RBV")
@@ -142,13 +149,15 @@ class I10AravisDriverIO(AravisDriverIO):
 
 
 class I10CentroidDetector(StandardReadable, Triggerable):
+    """Detector to read out the centroid position,
+    this is base off the SingleTriggerDetector in ophyd_async with added
+    readable default"""
+
     def __init__(
         self,
         prefix: str,
         name="",
     ) -> None:
-        """Detector to read out the centroid position,
-        this is base off the SingleTriggerDetector in ophyd_async"""
         self.drv = I10AravisDriverIO(prefix=prefix)
         self.add_readables(
             [self.drv.array_counter, self.drv.centroid_x, self.drv.centroid_y],
@@ -173,6 +182,8 @@ class I10CentroidDetector(StandardReadable, Triggerable):
 
 
 class ScreenCam(Device):
+    """Compound device of pneumatic stage(fluorescent screen) and webcam"""
+
     def __init__(
         self,
         prefix: str,
@@ -197,6 +208,8 @@ class ScreenCam(Device):
 
 
 class FullDiagnostic(Device):
+    """Compound device of a diagnostic with screen, webcam and dropdown stage."""
+
     def __init__(
         self,
         prefix: str,
@@ -229,6 +242,8 @@ class FullDiagnostic(Device):
 
 
 class I10Diagnostic(Device):
+    """Collection of all the diagnostic stage on i10."""
+
     def __init__(self, prefix, name: str = "") -> None:
         self.d1 = ScreenCam(prefix=prefix + "PHDGN-01:")
         self.d2 = ScreenCam(prefix=prefix + "PHDGN-02:")
@@ -263,43 +278,30 @@ class I10Diagnostic(Device):
         super().__init__(name)
 
 
-class DiagnoticDetector(Device):
+class I10Diagnotic5ADet(Device):
+    """Diagnotic 5a detection with drain current and photo diode"""
+
     def __init__(
-        self,
-        femto_prefix: str,
-        femto_suffix: str,
-        scaler_prefix: str,
-        scaler_suffix: str,
-        name: str = "",
-        connector: DeviceConnector | None = None,
+        self, prefix: str, name: str = "", connector: DeviceConnector | None = None
     ) -> None:
-        self.det = CurrentAmpDet(
+        self.drain_current = CurrentAmpDet(
             current_amp=FemtoDDPCA(
-                prefix=femto_prefix,
-                suffix=femto_suffix,
+                prefix=prefix + "IAMP-06:",
+                suffix="GAIN",
                 gain_table=Femto3xxGainTable,
                 gain_to_current_table=Femto3xxGainToCurrentTable,
                 raise_timetable=Femto3xxRaiseTime,
             ),
-            counter=StruckScaler(prefix=scaler_prefix, suffix=scaler_suffix),
+            counter=StruckScaler(prefix=prefix + "SCLR-02:SCALER2", suffix=".S17"),
         )
-        super().__init__(name, connector)
-
-
-class I10Diagnotic5ADet(Device):
-    def __init__(
-        self, prefix: str, name: str = "", connector: DeviceConnector | None = None
-    ) -> None:
-        self.drain_current = DiagnoticDetector(
-            femto_prefix=prefix + "IAMP-06:",
-            femto_suffix="GAIN",
-            scaler_prefix=prefix + "SCLR-02:SCALER2",
-            scaler_suffix=".S17",
-        )
-        self.diode = DiagnoticDetector(
-            femto_prefix=prefix + "IAMP-05:",
-            femto_suffix="GAIN",
-            scaler_prefix=prefix + "SCLR-02:SCALER2",
-            scaler_suffix=".S18",
+        self.diode = CurrentAmpDet(
+            FemtoDDPCA(
+                prefix=prefix + "IAMP-05:",
+                suffix="GAIN",
+                gain_table=Femto3xxGainTable,
+                gain_to_current_table=Femto3xxGainToCurrentTable,
+                raise_timetable=Femto3xxRaiseTime,
+            ),
+            counter=StruckScaler(prefix=prefix + "SCLR-02:SCALER2", suffix=".S18"),
         )
         super().__init__(name, connector)
