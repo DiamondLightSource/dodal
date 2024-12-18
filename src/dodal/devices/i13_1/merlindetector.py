@@ -19,7 +19,6 @@ class MerlinDetector(StandardDetector):
     ):
         self.drv = MerlinDriverIO(prefix + drv_suffix)
         self.hdf = adcore.NDFileHDFIO(prefix + hdf_suffix)
-        # self.hdf = MerlinNDFileHDFIO(prefix + hdf_suffix)
 
         super().__init__(
             MerlinController(self.drv),
