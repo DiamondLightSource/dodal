@@ -1,4 +1,5 @@
 import asyncio
+import logging
 
 from ophyd_async.core import (
     DEFAULT_TIMEOUT,
@@ -19,10 +20,10 @@ class MerlinController(DetectorController):
     ) -> None:
         self.driver = driver
         self.good_states = good_states
-        self.frame_timeout: float
+        self.frame_timeout: float = 0
         self._arm_status: AsyncStatus | None = None
         for drv_child in self.driver.children():
-            print(drv_child)
+            logging.debug(drv_child)
 
     def get_deadtime(self, exposure: float | None) -> float:
         return 0.002
