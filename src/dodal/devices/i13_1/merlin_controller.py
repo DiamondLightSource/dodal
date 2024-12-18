@@ -34,7 +34,6 @@ class MerlinController(DetectorController):
         await asyncio.gather(
             self.driver.num_images.set(trigger_info.total_number_of_triggers),
             self.driver.image_mode.set(MerlinImageMode.MULTIPLE),
-            # self.driver.data_type.set(adcore.ADBaseDataType.INT16),
         )
 
     async def arm(self):
