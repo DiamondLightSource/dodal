@@ -63,9 +63,9 @@ class XrcResult(TypedDict):
          centre_of_mass: The position of the centre of mass of the crystal, adjusted so that
          grid box centres lie on integer grid coordinates, such that a 1x1x1 crystal detected in
          a single grid box at 0, 0, 0, has c.o.m. of 0, 0, 0, not 0.5, 0.5, 0.5
-         max_voxel: Position of the maximum voxel, in integer coordinates
+         max_voxel: Position of the voxel with the maximum count, in integer coordinates
          max_count: max count achieved in a single voxel for the crystal
-         n_voxels: Number of voxels in the diffracting centre
+         n_voxels: Number of voxels (aka grid boxes) in the diffracting centre
          total_count: Total of above-threshold spot counts in the labelled voxels
          bounding_box: The rectangular prism that bounds the crystal, expressed
             as the volume of whole boxes as a half-open range i.e such that

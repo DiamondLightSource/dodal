@@ -161,7 +161,7 @@ async def test_get_full_processing_results(mocked_zocalo_device, RE) -> None:
     def plan():
         yield from bps.trigger(zocalo_device)
         full_results = yield from get_full_processing_results(zocalo_device)
-        assert len(full_results) == 5
+        assert len(full_results) == len(TEST_RESULTS)
         centres_of_mass = [xrc_result["centre_of_mass"] for xrc_result in full_results]
         bbox = [xrc_result["bounding_box"] for xrc_result in full_results]
         assert np.all(
