@@ -11,7 +11,7 @@ import workflows.recipe
 import workflows.transport
 from bluesky.protocols import Triggerable
 from bluesky.utils import Msg
-from deepdiff import DeepDiff
+from deepdiff.diff import DeepDiff
 from ophyd_async.core import (
     Array1D,
     AsyncStatus,
