@@ -9,6 +9,7 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.visit import StaticVisitPathProvider
+from dodal.devices.i13_1.merlindetector import MerlinDetector
 from dodal.devices.motors import XYZPositioner
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import get_beamline_name
@@ -19,7 +20,7 @@ set_utils_beamline(BL)
 set_path_provider(
     StaticVisitPathProvider(
         BL,
-        Path("/data/2024/cm37257-4/"),  # latest commissioning visit
+        Path("/data/2024/cm37257-5/"),  # latest commissioning visit
     )
 )
 
@@ -57,6 +58,22 @@ def side_camera(
         AravisDetector,
         prefix="BL13J-OP-FLOAT-03:",
         name="side_camera",
+        bl_prefix=False,
+        drv_suffix="CAM:",
+        hdf_suffix="HDF5:",
+        path_provider=get_path_provider(),
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+    )
+
+
+def merlindetector(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> MerlinDetector:
+    return device_instantiation(
+        MerlinDetector,
+        prefix="BL13J-EA-DET-04:",
+        name="merlin",
         bl_prefix=False,
         drv_suffix="CAM:",
         hdf_suffix="HDF5:",
