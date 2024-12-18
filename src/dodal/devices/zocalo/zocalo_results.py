@@ -53,6 +53,26 @@ ZOCALO_STAGE_GROUP = "clear zocalo queue"
 
 
 class XrcResult(TypedDict):
+    """
+    Information about a diffracting centre.
+
+    NOTE: the coordinate systems of centre_of_mass and max_voxel/bounding_box are not
+        the same; centre_of_mass coordinates are continuous whereas max_voxel and bounding_box
+        coordinates are discrete.
+    Attributes:
+         centre_of_mass: The position of the centre of mass of the crystal, adjusted so that
+         grid box centres lie on integer grid coordinates, such that a 1x1x1 crystal detected in
+         a single grid box at 0, 0, 0, has c.o.m. of 0, 0, 0, not 0.5, 0.5, 0.5
+         max_voxel: Position of the voxel with the maximum count, in integer coordinates
+         max_count: max count achieved in a single voxel for the crystal
+         n_voxels: Number of voxels (aka grid boxes) in the diffracting centre
+         total_count: Total of above-threshold spot counts in the labelled voxels
+         bounding_box: The rectangular prism that bounds the crystal, expressed
+            as the volume of whole boxes as a half-open range i.e such that
+            p1 = (x1, y1, z1) <= p < p2 = (x2, y2, z2) and
+            p2 - p1 gives the dimensions in whole voxels.
+    """
+
     centre_of_mass: list[float]
     max_voxel: list[int]
     max_count: int
@@ -133,7 +153,7 @@ class ZocaloResults(StandardReadable, Triggerable):
         self.use_cpu_and_gpu = use_cpu_and_gpu
 
         self.centre_of_mass, self._com_setter = soft_signal_r_and_setter(
-            Array1D[np.uint64], name="centre_of_mass"
+            Array1D[np.float64], name="centre_of_mass"
         )
         self.bounding_box, self._bounding_box_setter = soft_signal_r_and_setter(
             Array1D[np.uint64], name="bounding_box"
