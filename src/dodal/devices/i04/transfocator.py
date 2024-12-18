@@ -85,3 +85,8 @@ class Transfocator(StandardReadable):
                 self.beamsize_set_microns.set(value),
                 self._observe_beamsize_microns(),
             )
+        number_filters_rbv = await self.number_filters_sp.get_value()
+        vertical_lens_size_rbv = await self.vertical_lens_rbv.get_value()
+        LOGGER.info(
+            f"Transfocator set complete. \nNumber of filters is: {number_filters_rbv} \nVertical beam size is: {vertical_lens_size_rbv}"
+        )
