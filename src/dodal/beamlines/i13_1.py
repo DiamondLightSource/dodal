@@ -9,7 +9,7 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.visit import StaticVisitPathProvider
-from dodal.devices.i13_1.merlindetector import MerlinDetector
+from dodal.devices.i13_1.merlin import Merlin
 from dodal.devices.motors import XYZPositioner
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import get_beamline_name
@@ -67,11 +67,11 @@ def side_camera(
     )
 
 
-def merlindetector(
+def merlin(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> MerlinDetector:
+) -> Merlin:
     return device_instantiation(
-        MerlinDetector,
+        Merlin,
         prefix="BL13J-EA-DET-04:",
         name="merlin",
         bl_prefix=False,
