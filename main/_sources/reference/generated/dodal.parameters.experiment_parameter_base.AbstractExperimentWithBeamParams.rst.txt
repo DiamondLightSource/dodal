@@ -1,0 +1,61 @@
+dodal.parameters.experiment\_parameter\_base.AbstractExperimentWithBeamParams
+=============================================================================
+
+.. currentmodule:: dodal.parameters.experiment_parameter_base
+
+.. autoclass:: AbstractExperimentWithBeamParams
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~AbstractExperimentWithBeamParams.get_num_images
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~AbstractExperimentWithBeamParams.model_config
+      
+      
+      
+      
+      
+      ~AbstractExperimentWithBeamParams.transmission_fraction
+      
+   
+   

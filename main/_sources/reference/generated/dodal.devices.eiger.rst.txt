@@ -15,6 +15,7 @@ dodal.devices.eiger
    :recursive:
 
    ~eiger.EigerDetector
+   ~eiger.EigerTimeouts
    ~eiger.InternalEigerTriggerMode
 
 

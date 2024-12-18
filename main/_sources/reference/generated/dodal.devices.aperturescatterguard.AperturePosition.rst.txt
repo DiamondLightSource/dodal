@@ -51,14 +51,10 @@ dodal.devices.aperturescatterguard.AperturePosition
    .. autosummary::
    
       
-      ~AperturePosition.model_computed_fields
-      
       
       ~AperturePosition.model_config
       
       
-      
-      ~AperturePosition.model_fields
       
       
       

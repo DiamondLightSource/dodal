@@ -20,15 +20,6 @@ dodal.beamlines.p99
 
    
    
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      sample_angle_stage
-      sample_lab_xyz_stage
-      sample_stage_filer
-      sample_xyz_stage
-   
    
 
    

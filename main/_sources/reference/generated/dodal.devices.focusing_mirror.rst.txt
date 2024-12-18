@@ -17,6 +17,7 @@ dodal.devices.focusing\_mirror
    ~focusing_mirror.FocusingMirror
    ~focusing_mirror.FocusingMirrorWithStripes
    ~focusing_mirror.MirrorStripe
+   ~focusing_mirror.MirrorStripeConfiguration
    ~focusing_mirror.MirrorType
    ~focusing_mirror.MirrorVoltageDemand
    ~focusing_mirror.MirrorVoltages

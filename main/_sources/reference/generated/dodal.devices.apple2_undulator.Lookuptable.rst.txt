@@ -45,14 +45,10 @@ dodal.devices.apple2\_undulator.Lookuptable
    .. autosummary::
    
       
-      ~Lookuptable.model_computed_fields
-      
       
       ~Lookuptable.model_config
       
       
-      
-      ~Lookuptable.model_fields
       
       
       

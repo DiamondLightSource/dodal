@@ -18,9 +18,6 @@ dodal.devices.fast\_grid\_scan.ZebraGridScanParams
       
       
       
-      ~ZebraGridScanParams.get_param_positions
-      
-      
       
       
       
@@ -54,14 +51,10 @@ dodal.devices.fast\_grid\_scan.ZebraGridScanParams
    
       
       
-      ~ZebraGridScanParams.model_computed_fields
-      
       
       ~ZebraGridScanParams.model_config
       
       
-      
-      ~ZebraGridScanParams.model_fields
       
       
       
@@ -80,28 +73,28 @@ dodal.devices.fast\_grid\_scan.ZebraGridScanParams
       ~ZebraGridScanParams.z_steps
       
       
-      ~ZebraGridScanParams.x_step_size
+      ~ZebraGridScanParams.x_step_size_mm
       
       
-      ~ZebraGridScanParams.y_step_size
+      ~ZebraGridScanParams.y_step_size_mm
       
       
-      ~ZebraGridScanParams.z_step_size
+      ~ZebraGridScanParams.z_step_size_mm
       
       
-      ~ZebraGridScanParams.x_start
+      ~ZebraGridScanParams.x_start_mm
       
       
-      ~ZebraGridScanParams.y1_start
+      ~ZebraGridScanParams.y1_start_mm
       
       
-      ~ZebraGridScanParams.y2_start
+      ~ZebraGridScanParams.y2_start_mm
       
       
-      ~ZebraGridScanParams.z1_start
+      ~ZebraGridScanParams.z1_start_mm
       
       
-      ~ZebraGridScanParams.z2_start
+      ~ZebraGridScanParams.z2_start_mm
       
       
       ~ZebraGridScanParams.set_stub_offsets

@@ -23,7 +23,6 @@ dodal.devices.focusing\_mirror.MirrorVoltages
       
       
       
-      
    
    
 

@@ -14,10 +14,10 @@
    dodal.devices.aperture
    dodal.devices.aperturescatterguard
    dodal.devices.apple2_undulator
-   dodal.devices.areadetector
    dodal.devices.attenuator
    dodal.devices.backlight
    dodal.devices.cryostream
+   dodal.devices.current_amplifiers
    dodal.devices.dcm
    dodal.devices.detector
    dodal.devices.diamond_filter
@@ -39,6 +39,7 @@
    dodal.devices.p45
    dodal.devices.p99
    dodal.devices.pgm
+   dodal.devices.pressure_jump_cell
    dodal.devices.qbpm
    dodal.devices.robot
    dodal.devices.s4_slit_gaps
@@ -55,6 +56,7 @@
    dodal.devices.undulator
    dodal.devices.undulator_dcm
    dodal.devices.util
+   dodal.devices.watsonmarlow323_pump
    dodal.devices.webcam
    dodal.devices.xbpm_feedback
    dodal.devices.zebra

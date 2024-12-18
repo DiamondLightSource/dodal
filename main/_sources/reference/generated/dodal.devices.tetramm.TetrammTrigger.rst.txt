@@ -69,16 +69,16 @@ dodal.devices.tetramm.TetrammTrigger
    .. autosummary::
    
       
-      ~TetrammTrigger.FreeRun
+      ~TetrammTrigger.FREE_RUN
       
       
-      ~TetrammTrigger.ExtTrigger
+      ~TetrammTrigger.EXT_TRIGGER
       
       
-      ~TetrammTrigger.ExtBulb
+      ~TetrammTrigger.EXT_BULB
       
       
-      ~TetrammTrigger.ExtGate
+      ~TetrammTrigger.EXT_GATE
       
    
    

@@ -14,21 +14,11 @@ dodal.devices.i24.pmac.ProgramRunner
    
       
       
-      
       ~ProgramRunner.complete
       
       
       
-      
-      
       ~ProgramRunner.kickoff
-      
-      
-      
-      
-      
-      
-      
       
       
    
@@ -40,7 +30,6 @@ dodal.devices.i24.pmac.ProgramRunner
 
    .. autosummary::
    
-      
       
       
       

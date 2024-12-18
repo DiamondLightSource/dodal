@@ -69,10 +69,10 @@ dodal.devices.linkam3.PumpControl
    .. autosummary::
    
       
-      ~PumpControl.Manual
+      ~PumpControl.MANUAL
       
       
-      ~PumpControl.Auto
+      ~PumpControl.AUTO
       
    
    

@@ -69,10 +69,10 @@ dodal.devices.tetramm.TetrammResolution
    .. autosummary::
    
       
-      ~TetrammResolution.SixteenBits
+      ~TetrammResolution.SIXTEEN_BITS
       
       
-      ~TetrammResolution.TwentyFourBits
+      ~TetrammResolution.TWENTY_FOUR_BITS
       
    
    

@@ -23,7 +23,6 @@ dodal.devices.training\_rig.sample\_stage.TrainingRigSampleStage
       
       
       
-      
    
    
 

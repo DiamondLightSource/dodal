@@ -8,6 +8,8 @@
     dodal.beamlines
     dodal.common
     dodal.devices
+    dodal.parameters
+    dodal.plan_stubs
     dodal.plans
 
 .. automodule:: dodal

@@ -45,14 +45,10 @@ dodal.devices.apple2\_undulator.EnergyMinMax
    .. autosummary::
    
       
-      ~EnergyMinMax.model_computed_fields
-      
       
       ~EnergyMinMax.model_config
       
       
-      
-      ~EnergyMinMax.model_fields
       
       
       

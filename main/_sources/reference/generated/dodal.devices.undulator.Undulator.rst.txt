@@ -19,10 +19,12 @@ dodal.devices.undulator.Undulator
       
       
       
+      ~Undulator.raise_if_not_enabled
+      
+      
       
       
       ~Undulator.set
-      
       
       
       

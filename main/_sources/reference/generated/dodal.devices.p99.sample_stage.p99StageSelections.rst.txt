@@ -69,52 +69,52 @@ dodal.devices.p99.sample\_stage.p99StageSelections
    .. autosummary::
    
       
-      ~p99StageSelections.Empty
+      ~p99StageSelections.EMPTY
       
       
-      ~p99StageSelections.Mn5um
+      ~p99StageSelections.MN5UM
       
       
-      ~p99StageSelections.Fe
+      ~p99StageSelections.FE
       
       
-      ~p99StageSelections.Co5um
+      ~p99StageSelections.CO5UM
       
       
-      ~p99StageSelections.Ni5um
+      ~p99StageSelections.NI5UM
       
       
-      ~p99StageSelections.Cu5um
+      ~p99StageSelections.CU5UM
       
       
-      ~p99StageSelections.Zn5um
+      ~p99StageSelections.ZN5UM
       
       
-      ~p99StageSelections.Zr
+      ~p99StageSelections.ZR
       
       
-      ~p99StageSelections.Mo
+      ~p99StageSelections.MO
       
       
-      ~p99StageSelections.Rh
+      ~p99StageSelections.RH
       
       
-      ~p99StageSelections.Pd
+      ~p99StageSelections.PD
       
       
-      ~p99StageSelections.Ag
+      ~p99StageSelections.AG
       
       
-      ~p99StageSelections.Cd25um
+      ~p99StageSelections.CD25UM
       
       
       ~p99StageSelections.W
       
       
-      ~p99StageSelections.Pt
+      ~p99StageSelections.PT
       
       
-      ~p99StageSelections.User
+      ~p99StageSelections.USER
       
    
    

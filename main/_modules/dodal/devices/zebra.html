@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.zebra &#8212; dodal 1.33.1.dev25+gcc5c25947 documentation</title>
+    <title>dodal.devices.zebra &#8212; dodal 1.36.4.dev7+gfa7828451 documentation</title>
   
   
   
@@ -15,8 +15,8 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
-  <!-- 
-    this give us a css class that will be invisible only if js is disabled 
+  <!--
+    this give us a css class that will be invisible only if js is disabled
   -->
   <noscript>
     <style>
@@ -26,8 +26,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
@@ -35,12 +35,12 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=e7b65fa9"></script>
+    <script src="../../../_static/documentation_options.js?v=ff305ed9"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -56,10 +56,11 @@ window.addEventListener("load", () => mermaid.run());
 </script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/dodal/devices/zebra';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.16.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://DiamondLightSource.github.io/dodal/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'main';
-        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
         </script>
     <link rel="icon" href="../../../_static/dls-logo.svg"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -395,9 +396,14 @@ window.addEventListener("load", () => mermaid.run());
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -455,9 +461,10 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">DeviceVector</span><span class="p">,</span>
     <span class="n">SignalRW</span><span class="p">,</span>
     <span class="n">StandardReadable</span><span class="p">,</span>
+    <span class="n">StrictEnum</span><span class="p">,</span>
     <span class="n">observe_value</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ophyd_async.epics.signal</span> <span class="kn">import</span> <span class="n">epics_signal_r</span><span class="p">,</span> <span class="n">epics_signal_rw</span>
+<span class="kn">from</span> <span class="nn">ophyd_async.epics.core</span> <span class="kn">import</span> <span class="n">epics_signal_r</span><span class="p">,</span> <span class="n">epics_signal_rw</span>
 
 <span class="c1"># These constants refer to I03&#39;s Zebra. See https://github.com/DiamondLightSource/dodal/issues/772</span>
 <span class="c1"># Sources</span>
@@ -494,7 +501,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="ArmSource">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.ArmSource.html#dodal.devices.zebra.ArmSource">[docs]</a>
-<span class="k">class</span> <span class="nc">ArmSource</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">ArmSource</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
     <span class="n">SOFT</span> <span class="o">=</span> <span class="s2">&quot;Soft&quot;</span>
     <span class="n">EXTERNAL</span> <span class="o">=</span> <span class="s2">&quot;External&quot;</span></div>
 
@@ -502,7 +509,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="TrigSource">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.TrigSource.html#dodal.devices.zebra.TrigSource">[docs]</a>
-<span class="k">class</span> <span class="nc">TrigSource</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">TrigSource</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
     <span class="n">POSITION</span> <span class="o">=</span> <span class="s2">&quot;Position&quot;</span>
     <span class="n">TIME</span> <span class="o">=</span> <span class="s2">&quot;Time&quot;</span>
     <span class="n">EXTERNAL</span> <span class="o">=</span> <span class="s2">&quot;External&quot;</span></div>
@@ -511,38 +518,38 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="EncEnum">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.EncEnum.html#dodal.devices.zebra.EncEnum">[docs]</a>
-<span class="k">class</span> <span class="nc">EncEnum</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
-    <span class="n">Enc1</span> <span class="o">=</span> <span class="s2">&quot;Enc1&quot;</span>
-    <span class="n">Enc2</span> <span class="o">=</span> <span class="s2">&quot;Enc2&quot;</span>
-    <span class="n">Enc3</span> <span class="o">=</span> <span class="s2">&quot;Enc3&quot;</span>
-    <span class="n">Enc4</span> <span class="o">=</span> <span class="s2">&quot;Enc4&quot;</span>
-    <span class="n">Enc1_4Av</span> <span class="o">=</span> <span class="s2">&quot;Enc1-4Av&quot;</span></div>
+<span class="k">class</span> <span class="nc">EncEnum</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
+    <span class="n">ENC1</span> <span class="o">=</span> <span class="s2">&quot;Enc1&quot;</span>
+    <span class="n">ENC2</span> <span class="o">=</span> <span class="s2">&quot;Enc2&quot;</span>
+    <span class="n">ENC3</span> <span class="o">=</span> <span class="s2">&quot;Enc3&quot;</span>
+    <span class="n">ENC4</span> <span class="o">=</span> <span class="s2">&quot;Enc4&quot;</span>
+    <span class="n">ENC1_4AV</span> <span class="o">=</span> <span class="s2">&quot;Enc1-4Av&quot;</span></div>
 
 
 
 <div class="viewcode-block" id="I03Axes">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.I03Axes.html#dodal.devices.zebra.I03Axes">[docs]</a>
 <span class="k">class</span> <span class="nc">I03Axes</span><span class="p">:</span>
-    <span class="n">SMARGON_X1</span> <span class="o">=</span> <span class="n">EncEnum</span><span class="o">.</span><span class="n">Enc1</span>
-    <span class="n">SMARGON_Y</span> <span class="o">=</span> <span class="n">EncEnum</span><span class="o">.</span><span class="n">Enc2</span>
-    <span class="n">SMARGON_Z</span> <span class="o">=</span> <span class="n">EncEnum</span><span class="o">.</span><span class="n">Enc3</span>
-    <span class="n">OMEGA</span> <span class="o">=</span> <span class="n">EncEnum</span><span class="o">.</span><span class="n">Enc4</span></div>
+    <span class="n">SMARGON_X1</span> <span class="o">=</span> <span class="n">EncEnum</span><span class="o">.</span><span class="n">ENC1</span>
+    <span class="n">SMARGON_Y</span> <span class="o">=</span> <span class="n">EncEnum</span><span class="o">.</span><span class="n">ENC2</span>
+    <span class="n">SMARGON_Z</span> <span class="o">=</span> <span class="n">EncEnum</span><span class="o">.</span><span class="n">ENC3</span>
+    <span class="n">OMEGA</span> <span class="o">=</span> <span class="n">EncEnum</span><span class="o">.</span><span class="n">ENC4</span></div>
 
 
 
 <div class="viewcode-block" id="I24Axes">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.I24Axes.html#dodal.devices.zebra.I24Axes">[docs]</a>
 <span class="k">class</span> <span class="nc">I24Axes</span><span class="p">:</span>
-    <span class="n">VGON_Z</span> <span class="o">=</span> <span class="n">EncEnum</span><span class="o">.</span><span class="n">Enc1</span>
-    <span class="n">OMEGA</span> <span class="o">=</span> <span class="n">EncEnum</span><span class="o">.</span><span class="n">Enc2</span>
-    <span class="n">VGON_X</span> <span class="o">=</span> <span class="n">EncEnum</span><span class="o">.</span><span class="n">Enc3</span>
-    <span class="n">VGON_YH</span> <span class="o">=</span> <span class="n">EncEnum</span><span class="o">.</span><span class="n">Enc4</span></div>
+    <span class="n">VGON_Z</span> <span class="o">=</span> <span class="n">EncEnum</span><span class="o">.</span><span class="n">ENC1</span>
+    <span class="n">OMEGA</span> <span class="o">=</span> <span class="n">EncEnum</span><span class="o">.</span><span class="n">ENC2</span>
+    <span class="n">VGON_X</span> <span class="o">=</span> <span class="n">EncEnum</span><span class="o">.</span><span class="n">ENC3</span>
+    <span class="n">VGON_YH</span> <span class="o">=</span> <span class="n">EncEnum</span><span class="o">.</span><span class="n">ENC4</span></div>
 
 
 
 <div class="viewcode-block" id="RotationDirection">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.RotationDirection.html#dodal.devices.zebra.RotationDirection">[docs]</a>
-<span class="k">class</span> <span class="nc">RotationDirection</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">RotationDirection</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
     <span class="n">POSITIVE</span> <span class="o">=</span> <span class="s2">&quot;Positive&quot;</span>
     <span class="n">NEGATIVE</span> <span class="o">=</span> <span class="s2">&quot;Negative&quot;</span>
 
@@ -562,7 +569,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="SoftInState">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.zebra.SoftInState.html#dodal.devices.zebra.SoftInState">[docs]</a>
-<span class="k">class</span> <span class="nc">SoftInState</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">SoftInState</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
     <span class="n">YES</span> <span class="o">=</span> <span class="s2">&quot;Yes&quot;</span>
     <span class="n">NO</span> <span class="o">=</span> <span class="s2">&quot;No&quot;</span></div>
 
@@ -841,8 +848,8 @@ window.addEventListener("load", () => mermaid.run());
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -853,7 +860,8 @@ window.addEventListener("load", () => mermaid.run());
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
 </p></div>
       
     </div>

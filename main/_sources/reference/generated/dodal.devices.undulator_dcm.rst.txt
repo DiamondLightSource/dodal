@@ -33,10 +33,4 @@ dodal.devices.undulator\_dcm
 
    
    
-   .. rubric:: Exceptions
-
-   .. autosummary::
-   
-      AccessError
-   
    

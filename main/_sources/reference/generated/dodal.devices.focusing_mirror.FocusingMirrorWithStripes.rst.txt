@@ -26,7 +26,6 @@ dodal.devices.focusing\_mirror.FocusingMirrorWithStripes
       
       
       
-      
    
    
 

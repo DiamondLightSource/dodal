@@ -3,20 +3,6 @@
 
 
 
-.. rubric:: Modules
-
-.. autosummary::
-   :toctree:
-   :recursive:
-
-   dodal.common.beamlines
-   dodal.common.coordination
-   dodal.common.maths
-   dodal.common.signal_utils
-   dodal.common.types
-   dodal.common.udc_directory_provider
-   dodal.common.visit
-
 
 
 
@@ -33,6 +19,15 @@
    
 
    
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      group_uuid
+      inject
+      in_micros
+      step_to_num
    
    
 

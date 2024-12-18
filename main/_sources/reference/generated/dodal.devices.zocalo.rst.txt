@@ -3,18 +3,21 @@ dodal.devices.zocalo
 
 
 
-.. rubric:: Modules
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
 
 .. autosummary::
    :toctree:
    :recursive:
 
-   dodal.devices.zocalo.zocalo_interaction
-   dodal.devices.zocalo.zocalo_results
-
-
-
-
+   ~zocalo.ZocaloResults
+   ~zocalo.XrcResult
+   ~zocalo.ZocaloTrigger
+   ~zocalo.ZocaloStartInfo
 
 
 
@@ -29,8 +32,21 @@ dodal.devices.zocalo
 
    
    
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      get_full_processing_results
+   
    
 
    
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      NoResultsFromZocalo
+      NoZocaloSubscription
    
    

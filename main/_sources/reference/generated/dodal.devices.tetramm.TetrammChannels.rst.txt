@@ -69,13 +69,13 @@ dodal.devices.tetramm.TetrammChannels
    .. autosummary::
    
       
-      ~TetrammChannels.One
+      ~TetrammChannels.ONE
       
       
-      ~TetrammChannels.Two
+      ~TetrammChannels.TWO
       
       
-      ~TetrammChannels.Four
+      ~TetrammChannels.FOUR
       
    
    

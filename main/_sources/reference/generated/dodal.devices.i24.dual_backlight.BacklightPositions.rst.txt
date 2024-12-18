@@ -83,5 +83,8 @@ dodal.devices.i24.dual\_backlight.BacklightPositions
       
       ~BacklightPositions.DIODE
       
+      
+      ~BacklightPositions.WHITE_IN
+      
    
    

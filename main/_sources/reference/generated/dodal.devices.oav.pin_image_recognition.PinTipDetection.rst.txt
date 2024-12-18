@@ -23,7 +23,6 @@ dodal.devices.oav.pin\_image\_recognition.PinTipDetection
       
       
       
-      
       ~PinTipDetection.trigger
       
       

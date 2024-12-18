@@ -34,7 +34,7 @@ dodal.devices.fast\_grid\_scan.GridAxis
       ~GridAxis.start
       
       
-      ~GridAxis.step_size
+      ~GridAxis.step_size_mm
       
       
       ~GridAxis.full_steps

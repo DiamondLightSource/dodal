@@ -1,0 +1,40 @@
+dodal.devices.attenuator.ReadOnlyAttenuator
+===========================================
+
+.. currentmodule:: dodal.devices.attenuator
+
+.. autoclass:: ReadOnlyAttenuator
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

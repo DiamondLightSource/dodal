@@ -69,10 +69,10 @@ dodal.devices.tetramm.TetrammGeometry
    .. autosummary::
    
       
-      ~TetrammGeometry.Diamond
+      ~TetrammGeometry.DIAMOND
       
       
-      ~TetrammGeometry.Square
+      ~TetrammGeometry.SQUARE
       
    
    

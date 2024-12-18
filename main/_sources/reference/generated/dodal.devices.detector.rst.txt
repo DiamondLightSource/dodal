@@ -3,21 +3,20 @@ dodal.devices.detector
 
 
 
-.. rubric:: Modules
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
 
 .. autosummary::
    :toctree:
    :recursive:
 
-   dodal.devices.detector.det_dim_constants
-   dodal.devices.detector.det_dist_to_beam_converter
-   dodal.devices.detector.det_resolution
-   dodal.devices.detector.detector
-   dodal.devices.detector.detector_motion
-
-
-
-
+   ~detector.DetectorParams
+   ~detector.TriggerMode
+   ~detector.DetectorDistanceToBeamXYConverter
 
 
 

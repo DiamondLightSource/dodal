@@ -69,10 +69,10 @@ dodal.devices.apple2\_undulator.UndulatorGateStatus
    .. autosummary::
    
       
-      ~UndulatorGateStatus.open
+      ~UndulatorGateStatus.OPEN
       
       
-      ~UndulatorGateStatus.close
+      ~UndulatorGateStatus.CLOSE
       
    
    

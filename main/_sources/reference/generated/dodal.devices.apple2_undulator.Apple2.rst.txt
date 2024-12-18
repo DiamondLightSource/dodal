@@ -28,7 +28,6 @@ dodal.devices.apple2\_undulator.Apple2
       
       
       
-      
       ~Apple2.update_lookuptable
       
    

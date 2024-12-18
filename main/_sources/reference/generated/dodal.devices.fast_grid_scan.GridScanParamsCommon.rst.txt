@@ -20,9 +20,6 @@ dodal.devices.fast\_grid\_scan.GridScanParamsCommon
       ~GridScanParamsCommon.get_num_images
       
       
-      ~GridScanParamsCommon.get_param_positions
-      
-      
       ~GridScanParamsCommon.grid_position_to_motor_position
       
       
@@ -57,14 +54,10 @@ dodal.devices.fast\_grid\_scan.GridScanParamsCommon
       ~GridScanParamsCommon.is_3d_grid_scan
       
       
-      ~GridScanParamsCommon.model_computed_fields
-      
       
       ~GridScanParamsCommon.model_config
       
       
-      
-      ~GridScanParamsCommon.model_fields
       
       
       
@@ -86,28 +79,28 @@ dodal.devices.fast\_grid\_scan.GridScanParamsCommon
       ~GridScanParamsCommon.z_steps
       
       
-      ~GridScanParamsCommon.x_step_size
+      ~GridScanParamsCommon.x_step_size_mm
       
       
-      ~GridScanParamsCommon.y_step_size
+      ~GridScanParamsCommon.y_step_size_mm
       
       
-      ~GridScanParamsCommon.z_step_size
+      ~GridScanParamsCommon.z_step_size_mm
       
       
-      ~GridScanParamsCommon.x_start
+      ~GridScanParamsCommon.x_start_mm
       
       
-      ~GridScanParamsCommon.y1_start
+      ~GridScanParamsCommon.y1_start_mm
       
       
-      ~GridScanParamsCommon.y2_start
+      ~GridScanParamsCommon.y2_start_mm
       
       
-      ~GridScanParamsCommon.z1_start
+      ~GridScanParamsCommon.z1_start_mm
       
       
-      ~GridScanParamsCommon.z2_start
+      ~GridScanParamsCommon.z2_start_mm
       
       
       ~GridScanParamsCommon.set_stub_offsets

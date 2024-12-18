@@ -69,10 +69,10 @@ dodal.devices.tetramm.TetrammRange
    .. autosummary::
    
       
-      ~TetrammRange.uA
+      ~TetrammRange.UA
       
       
-      ~TetrammRange.nA
+      ~TetrammRange.NA
       
    
    

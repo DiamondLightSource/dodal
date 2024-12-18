@@ -14,6 +14,7 @@ dodal.devices.slits
    :toctree:
    :recursive:
 
+   ~slits.MinimalSlits
    ~slits.Slits
 
 

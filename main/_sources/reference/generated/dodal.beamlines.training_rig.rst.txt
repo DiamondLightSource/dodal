@@ -20,13 +20,6 @@ dodal.beamlines.training\_rig
 
    
    
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      det
-      sample_stage
-   
    
 
    

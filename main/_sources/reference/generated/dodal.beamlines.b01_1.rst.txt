@@ -20,14 +20,6 @@ dodal.beamlines.b01\_1
 
    
    
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      manta
-      panda
-      synchrotron
-   
    
 
    

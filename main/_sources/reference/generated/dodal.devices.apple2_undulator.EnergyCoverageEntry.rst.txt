@@ -45,14 +45,10 @@ dodal.devices.apple2\_undulator.EnergyCoverageEntry
    .. autosummary::
    
       
-      ~EnergyCoverageEntry.model_computed_fields
-      
       
       ~EnergyCoverageEntry.model_config
       
       
-      
-      ~EnergyCoverageEntry.model_fields
       
       
       

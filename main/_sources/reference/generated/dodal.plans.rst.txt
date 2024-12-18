@@ -3,16 +3,6 @@
 
 
 
-.. rubric:: Modules
-
-.. autosummary::
-   :toctree:
-   :recursive:
-
-   dodal.plans.check_topup
-   dodal.plans.data_session_metadata
-   dodal.plans.motor_util_plans
-
 
 
 
@@ -29,6 +19,13 @@
    
 
    
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      count
+      spec_scan
    
    
 

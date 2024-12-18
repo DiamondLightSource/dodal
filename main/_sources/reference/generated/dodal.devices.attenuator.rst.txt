@@ -15,6 +15,7 @@ dodal.devices.attenuator
    :recursive:
 
    ~attenuator.Attenuator
+   ~attenuator.ReadOnlyAttenuator
 
 
 

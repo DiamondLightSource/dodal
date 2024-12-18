@@ -15,16 +15,7 @@ dodal.devices.i24.pmac.PMACStringEncReset
       
       
       
-      
-      
-      
-      
-      
       ~PMACStringEncReset.set
-      
-      
-      
-      
       
       
    
@@ -36,7 +27,6 @@ dodal.devices.i24.pmac.PMACStringEncReset
 
    .. autosummary::
    
-      
       
       
       

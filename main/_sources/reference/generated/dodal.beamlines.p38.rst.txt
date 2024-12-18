@@ -30,11 +30,13 @@ dodal.beamlines.p38
       dcm
       fswitch
       hfm
+      high_pressure_xray_cell
       i0
       linkam
       panda1
       panda2
       panda3
+      ppump
       slits_1
       slits_2
       slits_3

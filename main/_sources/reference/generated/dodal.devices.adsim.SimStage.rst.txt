@@ -23,23 +23,6 @@ dodal.devices.adsim.SimStage
       
       
       
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
    
    
 
@@ -52,39 +35,6 @@ dodal.devices.adsim.SimStage
       
       
       
-      ~SimStage.component_names
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      ~SimStage.load
-      
-      
-      
-      
-      
-      
-      
-      
-      ~SimStage.subscriptions
-      
-      
-      ~SimStage.theta
-      
-      
-      
-      ~SimStage.x
-      
-      
-      ~SimStage.y
-      
-      
-      ~SimStage.z
       
    
    

@@ -23,7 +23,6 @@ dodal.devices.thawer.Thawer
       
       
       
-      
       ~Thawer.stop
       
       

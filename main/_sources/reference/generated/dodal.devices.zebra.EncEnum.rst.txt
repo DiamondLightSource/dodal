@@ -69,19 +69,19 @@ dodal.devices.zebra.EncEnum
    .. autosummary::
    
       
-      ~EncEnum.Enc1
+      ~EncEnum.ENC1
       
       
-      ~EncEnum.Enc2
+      ~EncEnum.ENC2
       
       
-      ~EncEnum.Enc3
+      ~EncEnum.ENC3
       
       
-      ~EncEnum.Enc4
+      ~EncEnum.ENC4
       
       
-      ~EncEnum.Enc1_4Av
+      ~EncEnum.ENC1_4AV
       
    
    
