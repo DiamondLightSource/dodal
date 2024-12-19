@@ -91,7 +91,7 @@ class BinaryFilterAttenuator(ReadOnlyAttenuator, Movable):
 class EnumFilterAttenuator(ReadOnlyAttenuator):
     """The attenuator will insert filters into the beam to reduce its transmission.
 
-    This device is currently working, but feature incomplete. See (issue todo)
+    This device is currently working, but feature incomplete. See https://github.com/DiamondLightSource/dodal/issues/972
 
     In this attenuator, the state of a filter corresponds to the selected material,
     e.g Ag50, in contrast to either being 'IN' or 'OUT'; see BinaryFilterAttenuator.
