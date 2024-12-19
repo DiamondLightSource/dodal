@@ -8,7 +8,7 @@ from dodal.common.beamlines.beamline_utils import (
     set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.visit import StaticVisitPathProvider
+from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.i13_1.merlin import Merlin
 from dodal.devices.motors import XYZPositioner
 from dodal.log import set_beamline as set_log_beamline
@@ -20,7 +20,8 @@ set_utils_beamline(BL)
 set_path_provider(
     StaticVisitPathProvider(
         BL,
-        Path("/data/2024/cm37257-5/"),  # latest commissioning visit
+        Path("/dls/i13-1/data/2024/cm37257-5/tmp/"),  # latest commissioning visit
+        client=LocalDirectoryServiceClient(),
     )
 )
 
