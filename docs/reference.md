@@ -6,7 +6,7 @@ Technical reference material including APIs and release notes.
 :maxdepth: 1
 :glob:
 
-API <_api/dodal>
+reference/*
 genindex
 Release Notes <https://github.com/DiamondLightSource/dodal/releases>
 ```

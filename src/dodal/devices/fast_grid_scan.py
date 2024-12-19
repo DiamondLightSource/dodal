@@ -97,9 +97,14 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
         """Converts a grid position, given as steps in the x, y, z grid,
         to a real motor position.
 
-        :param grid_position: The x, y, z position in grid steps
-        :return: The motor position this corresponds to.
-        :raises: IndexError if the desired position is outside the grid."""
+        Args:
+            grid_position: The x, y, z position in grid steps. The origin is at the
+                centre of the first grid box
+        Returns:
+            The motor position this corresponds to.
+        Raises:
+            IndexError if the desired position is outside the grid.
+        """
         for position, axis in zip(
             grid_position, [self.x_axis, self.y_axis, self.z_axis], strict=False
         ):
