@@ -16,6 +16,7 @@
    dodal.devices.apple2_undulator
    dodal.devices.attenuator
    dodal.devices.backlight
+   dodal.devices.bimorph_mirror
    dodal.devices.cryostream
    dodal.devices.current_amplifiers
    dodal.devices.dcm
