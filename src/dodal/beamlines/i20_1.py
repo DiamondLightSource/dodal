@@ -5,8 +5,8 @@ from dodal.devices.xspress3.xspress3 import Xspress3
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
-BL = get_beamline_name("i20_1")
-PREFIX = BeamlinePrefix(BL)
+BL = get_beamline_name("i20-1")
+PREFIX = BeamlinePrefix(BL, suffix="J")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
