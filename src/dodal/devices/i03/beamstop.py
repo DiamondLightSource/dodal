@@ -43,7 +43,7 @@ class Beamstop(StandardReadable):
     def __init__(
         self,
         prefix: str,
-        beamlineParameters: GDABeamlineParameters,
+        beamline_parameters: GDABeamlineParameters,
         name: str = "",
     ):
         with self.add_children_as_readables():
@@ -55,11 +55,11 @@ class Beamstop(StandardReadable):
             )
 
         self._in_beam_xyz = [
-            float(beamlineParameters[f"in_beam_{axis}_STANDARD"])
+            float(beamline_parameters[f"in_beam_{axis}_STANDARD"])
             for axis in ("x", "y", "z")
         ]
         self._xyz_tolerance = [
-            float(beamlineParameters[f"bs_{axis}_tolerance"])
+            float(beamline_parameters[f"bs_{axis}_tolerance"])
             for axis in ("x", "y", "z")
         ]
 

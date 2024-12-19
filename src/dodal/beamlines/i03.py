@@ -24,6 +24,7 @@ from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import PandAFastGridScan, ZebraFastGridScan
 from dodal.devices.flux import Flux
 from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, MirrorVoltages
+from dodal.devices.i03.beamstop import Beamstop
 from dodal.devices.motors import XYZPositioner
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.oav_parameters import OAVConfig
@@ -90,6 +91,22 @@ def attenuator(
         "-EA-ATTN-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+    )
+
+
+def beamstop(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Beamstop:
+    """Get the i03 beamstop device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        Beamstop,
+        "beamstop",
+        "-MO-BS-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        beamline_parameters=get_beamline_parameters(),
     )
 
 
