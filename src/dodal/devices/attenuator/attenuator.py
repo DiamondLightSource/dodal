@@ -11,6 +11,8 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_x
 
+from dodal.devices.attenuator.filter import FilterMotor
+from dodal.devices.attenuator.filter_selections import FilterSelection
 from dodal.log import LOGGER
 
 
@@ -27,8 +29,9 @@ class ReadOnlyAttenuator(StandardReadable):
         super().__init__(name)
 
 
-class Attenuator(ReadOnlyAttenuator, Movable):
+class BinaryFilterAttenuator(ReadOnlyAttenuator, Movable):
     """The attenuator will insert filters into the beam to reduce its transmission.
+    In this attenuator, each filter can be in one of two states: IN or OUT
 
     This device should be set with:
         yield from bps.set(attenuator, desired_transmission)
@@ -83,3 +86,29 @@ class Attenuator(ReadOnlyAttenuator, Movable):
                 for i in range(16)
             ]
         )
+
+
+class EnumFilterAttenuator(ReadOnlyAttenuator):
+    """The attenuator will insert filters into the beam to reduce its transmission.
+
+    This device is currently working, but feature incomplete. See (issue todo)
+
+    In this attenuator, the state of a filter corresponds to the selected material,
+    e.g Ag50, in contrast to either being 'IN' or 'OUT'; see BinaryFilterAttenuator.
+    """
+
+    def __init__(
+        self,
+        num_filters: int,
+        filter_selection: list[type[FilterSelection]],
+        prefix: str,
+        name: str = "",
+    ):
+        with self.add_children_as_readables():
+            self.filters: DeviceVector[FilterMotor] = DeviceVector(
+                {
+                    i: FilterMotor(filter_selection[i], f"{prefix}MP{i+1}:", name)
+                    for i in range(num_filters)
+                }
+            )
+        super().__init__(name=name, prefix=prefix)
