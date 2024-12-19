@@ -3,7 +3,8 @@ import asyncio
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import DeviceCollector, callback_on_mock_put, set_mock_value
+from ophyd_async.core import DeviceCollector
+from ophyd_async.testing import callback_on_mock_put, set_mock_value
 
 from dodal.devices.attenuator import Attenuator
 

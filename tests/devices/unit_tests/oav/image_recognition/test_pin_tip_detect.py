@@ -2,10 +2,13 @@ import asyncio
 from unittest.mock import MagicMock, patch
 
 import numpy as np
-from ophyd_async.core import set_mock_value
+from ophyd_async.testing import set_mock_value
 
-from dodal.devices.oav.pin_image_recognition import MxSampleDetect, PinTipDetection
-from dodal.devices.oav.pin_image_recognition.utils import SampleLocation
+from dodal.devices.oav.pin_image_recognition import (
+    MxSampleDetect,
+    PinTipDetection,
+)
+from dodal.devices.oav.pin_image_recognition.utils import NONE_VALUE, SampleLocation
 
 EVENT_LOOP = asyncio.new_event_loop()
 
@@ -93,7 +96,10 @@ async def test_given_valid_data_reading_then_used_to_find_location():
     device = await _get_pin_tip_detection_device()
     image_array = np.array([1, 2, 3])
     test_sample_location = SampleLocation(
-        100, 200, np.array([1, 2, 3]), np.array([4, 5, 6])
+        100,
+        200,
+        top_edge := np.array([NONE_VALUE, 1, 2, 3]),
+        bottom_edge := np.array([NONE_VALUE, 4, 5, 6]),
     )
     set_mock_value(device.array_data, image_array)
 
@@ -109,12 +115,8 @@ async def test_given_valid_data_reading_then_used_to_find_location():
         process_call = mock_process_array.call_args[0][0]
         assert np.array_equal(process_call, image_array)
         assert np.all(location[TRIGGERED_TIP_READING]["value"] == (100, 200))
-        assert np.all(
-            location[TRIGGERED_TOP_EDGE_READING]["value"] == np.array([1, 2, 3])
-        )
-        assert np.all(
-            location[TRIGGERED_BOTTOM_EDGE_READING]["value"] == np.array([4, 5, 6])
-        )
+        assert np.all(location[TRIGGERED_TOP_EDGE_READING]["value"] == top_edge)
+        assert np.all(location[TRIGGERED_BOTTOM_EDGE_READING]["value"] == bottom_edge)
         assert location[TRIGGERED_TIP_READING]["timestamp"] > 0
 
 

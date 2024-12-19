@@ -46,10 +46,8 @@ def test_grid_overlay(RE: RunEngine):
     RE(take_snapshot_with_grid(oav, snapshot_filename, snapshot_directory))
 
 
-@pytest.mark.skip(reason="No OAV in S03")
 @pytest.mark.s03
 async def test_get_zoom_levels():
-    my_zoom_controller = ZoomController("BL03S-EA-OAV-01:FZOOM:", name="test_zoom")
+    my_zoom_controller = ZoomController("BL03I-EA-OAV-01:FZOOM:", name="test_zoom")
     await my_zoom_controller.connect()
-    description = await my_zoom_controller.level.describe()
-    assert description["zoom_controller-level"]["choices"][0] == "1.0x"  # type: ignore
+    assert "1.0x" in await my_zoom_controller._get_allowed_zoom_levels()

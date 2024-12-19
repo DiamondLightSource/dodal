@@ -2,7 +2,8 @@ import asyncio
 from unittest.mock import ANY, AsyncMock, call, patch
 
 import pytest
-from ophyd_async.core import DeviceCollector, get_mock_put
+from ophyd_async.core import DeviceCollector
+from ophyd_async.testing import get_mock_put
 
 from dodal.devices.thawer import Thawer, ThawerStates, ThawingException, ThawingTimer
 
