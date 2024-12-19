@@ -1,6 +1,6 @@
 from dodal.common.beamlines.beamline_utils import BL, device_instantiation
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.attenuator import ReadOnlyAttenuator
+from dodal.devices.attenuator.attenuator import ReadOnlyAttenuator
 from dodal.devices.detector import DetectorParams
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.hutch_shutter import HutchShutter
