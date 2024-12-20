@@ -10,7 +10,7 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics import adcore
 
-from .merlin_io import MerlinDriverIO, MerlinImageMode
+from dodal.devices.13_1.merlin.merlin_io import MerlinDriverIO, MerlinImageMode
 
 
 class MerlinController(DetectorController):
