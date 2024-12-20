@@ -1,8 +1,8 @@
 from ophyd_async.core import PathProvider, StandardDetector
 from ophyd_async.epics import adcore
 
-from dodal.devices.13_1.merlin.merlin_controller import MerlinController
-from dodal.devices.13_1.merlin.merlin_io import MerlinDriverIO
+from dodal.devices.13_1.merlin_controller import MerlinController
+from dodal.devices.13_1.merlin_io import MerlinDriverIO
 
 
 class Merlin(StandardDetector):
