@@ -95,7 +95,7 @@ class DropDownStage(StandardReadable):
 
 class I10PneumaticStage(StandardReadable):
     """Pneumatic stage only has two real positions in or out.
-    Use for fluorescent screen which can be insert into the x-ray beam,
+    Use for fluorescent screen which can be insert into the x-ray beam.
     Most often use in conjunction with a webcam to locate the x-ray beam."""
 
     def __init__(
@@ -122,7 +122,7 @@ class I10PneumaticStage(StandardReadable):
 class I10AravisDriverIO(AravisDriverIO):
     """This is the standard webcam that can be found in ophyd_async
     with four extra centroid signal. There is also a change in data_type due to it being
-    a older/different model"""
+    an older/different model"""
 
     def __init__(
         self,
