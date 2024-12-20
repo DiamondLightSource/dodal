@@ -14,7 +14,7 @@ from dodal.devices.attenuator.filter_selections import (
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
-BL = get_beamline_name("i22")
+BL = get_beamline_name("i02-1")
 PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
@@ -22,6 +22,10 @@ set_utils_beamline(BL)
 
 @device_factory()
 def attenuator() -> EnumFilterAttenuator:
+    """Get the i02-1 attenuator device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i02-1, it will return the existing object.
+    """
+
     return EnumFilterAttenuator(
         num_filters=4,
         filter_selection=[
