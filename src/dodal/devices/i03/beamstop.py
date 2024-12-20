@@ -19,12 +19,12 @@ class BeamstopPositions(StrictEnum):
     beamstop is in beam or not.
 
     Attributes:
-        IN_BEAM: The beamstop is in beam
+        DATA_COLLECTION: The beamstop is in beam ready for data collection
         UNKNOWN: The beamstop is in some other position, check the device motor
             positions to determine it.
     """
 
-    IN_BEAM = "In Beam"
+    DATA_COLLECTION = "Data Collection"
     UNKNOWN = "Unknown"
 
 
@@ -77,6 +77,6 @@ class Beamstop(StandardReadable):
                 current_pos, self._in_beam_xyz, self._xyz_tolerance, strict=False
             )
         ):
-            return BeamstopPositions.IN_BEAM
+            return BeamstopPositions.DATA_COLLECTION
         else:
             return BeamstopPositions.UNKNOWN
