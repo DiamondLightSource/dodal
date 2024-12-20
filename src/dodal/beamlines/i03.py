@@ -13,7 +13,7 @@ from dodal.devices.aperturescatterguard import (
     ApertureScatterguard,
     load_positions_from_beamline_parameters,
 )
-from dodal.devices.attenuator import Attenuator
+from dodal.devices.attenuator.attenuator import BinaryFilterAttenuator
 from dodal.devices.backlight import Backlight
 from dodal.devices.cryostream import CryoStream
 from dodal.devices.dcm import DCM
@@ -80,12 +80,12 @@ def aperture_scatterguard(
 
 def attenuator(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Attenuator:
+) -> BinaryFilterAttenuator:
     """Get the i03 attenuator device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return device_instantiation(
-        Attenuator,
+        BinaryFilterAttenuator,
         "attenuator",
         "-EA-ATTN-01:",
         wait_for_connection,
