@@ -2,6 +2,7 @@ from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.common.beamlines.beamline_utils import (
+    device_factory,
     device_instantiation,
     get_path_provider,
     set_path_provider,
@@ -69,68 +70,51 @@ I03_ZEBRA_MAPPING = ZebraMapping(
     AND_GATE_FOR_AUTO_SHUTTER=2,
 )
 
+PREFIX = BeamlinePrefix(BL)
 
-def aperture_scatterguard(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-) -> ApertureScatterguard:
+
+@device_factory()
+def aperture_scatterguard() -> ApertureScatterguard:
     """Get the i03 aperture and scatterguard device, instantiate it if it hasn't already
     been. If this is called when already instantiated in i03, it will return the existing
     object.
     """
     params = get_beamline_parameters()
-    return device_instantiation(
-        device_factory=ApertureScatterguard,
-        name="aperture_scatterguard",
-        prefix="",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
+    return ApertureScatterguard(
+        prefix=PREFIX.beamline_prefix,
         loaded_positions=load_positions_from_beamline_parameters(params),
         tolerances=AperturePosition.tolerances_from_gda_params(params),
     )
 
 
-def attenuator(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> BinaryFilterAttenuator:
+@device_factory()
+def attenuator() -> BinaryFilterAttenuator:
     """Get the i03 attenuator device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        BinaryFilterAttenuator,
-        "attenuator",
-        "-EA-ATTN-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
+    return BinaryFilterAttenuator(f"{PREFIX.beamline_prefix}-EA-ATTN-01:")
 
 
-def beamstop(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Beamstop:
+@device_factory()
+def beamstop() -> Beamstop:
     """Get the i03 beamstop device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        Beamstop,
-        "beamstop",
-        "-MO-BS-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+    return Beamstop(
+        prefix=f"{PREFIX.beamline_prefix}-MO-BS-01:",
+        name="beamstop",
         beamline_parameters=get_beamline_parameters(),
     )
 
 
-def dcm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> DCM:
+@device_factory()
+def dcm() -> DCM:
     """Get the i03 DCM device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        DCM,
+    return DCM(
+        f"{PREFIX.beamline_prefix}-MO-DCM-01:",
         "dcm",
-        "-MO-DCM-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
     )
 
 
@@ -373,7 +357,7 @@ def undulator_dcm(
             fake_with_ophyd_sim,
             daq_configuration_path=daq_configuration_path,
         ),
-        dcm=dcm(wait_for_connection, fake_with_ophyd_sim),
+        dcm=dcm(),
         # evaluate here not as parameter default to enable post-import mocking
         daq_configuration_path=daq_configuration_path or DAQ_CONFIGURATION_PATH,
     )

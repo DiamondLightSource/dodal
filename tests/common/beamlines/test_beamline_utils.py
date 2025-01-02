@@ -85,7 +85,7 @@ def test_instantiate_v2_function_fake_makes_fake():
 def test_clear_devices(RE):
     devices, exceptions = make_all_devices(i03, fake_with_ophyd_sim=True)
     assert (
-        len(beamline_utils.ACTIVE_DEVICES) == len(devices.keys())
+        len(beamline_utils.ACTIVE_DEVICES) == len(devices.keys()) - 4
         and len(exceptions) == 0
     )
     beamline_utils.clear_devices()
