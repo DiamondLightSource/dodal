@@ -8,7 +8,7 @@ from dodal.devices.util.test_utils import patch_motor
 
 @pytest.fixture
 def smargon(RE: RunEngine):
-    smargon = i03.smargon(fake_with_ophyd_sim=True)
+    smargon = i03.smargon(connect_immediately=True, mock=True)
 
     for motor in [smargon.omega, smargon.x, smargon.y, smargon.z]:
         patch_motor(motor)
