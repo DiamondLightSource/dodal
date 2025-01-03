@@ -119,16 +119,16 @@ def skip_device(precondition=lambda: True):
     return decorator
 
 
-class DeviceInitializationController(Generic[D]):
+class DeviceInitializationController(Generic[T]):
     def __init__(
         self,
-        factory: Callable[[], D],
+        factory: Callable[[], T],
         use_factory_name: bool,
         timeout: float,
         mock: bool,
         skip: SkipType,
     ):
-        self._factory: Callable[..., D] = functools.cache(factory)
+        self._factory: Callable[..., T] = functools.cache(factory)
         self._use_factory_name = use_factory_name
         self._timeout = timeout
         self._mock = mock
@@ -154,7 +154,7 @@ class DeviceInitializationController(Generic[D]):
         connection_timeout: float | None = None,
         mock: bool | None = None,
         **kwargs,
-    ) -> D:
+    ) -> T:
         """Returns an instance of the Device the wrapped factory produces: the same
         instance will be returned if this method is called multiple times, and arguments
         may be passed to override this Controller's configuration.
@@ -190,7 +190,13 @@ class DeviceInitializationController(Generic[D]):
             RuntimeError:   If the device factory was invoked again with different
              keyword arguments, without previously invoking cache_clear()
         """
-        device = self._factory(**kwargs)
+        is_v2_device = is_v2_device_factory(self._factory)
+        is_mock = mock if mock is not None else self._mock
+        if is_v2_device:
+            device: T = self._factory(**kwargs)
+        else:
+            device: T = self._factory(mock=is_mock, **kwargs)
+
         if self._factory.cache_info().currsize > 1:  # type: ignore
             raise RuntimeError(
                 f"Device factory method called multiple times with different parameters: "
@@ -198,14 +204,16 @@ class DeviceInitializationController(Generic[D]):
             )
 
         if connect_immediately:
-            call_in_bluesky_event_loop(
-                device.connect(
-                    timeout=connection_timeout
-                    if connection_timeout is not None
-                    else self._timeout,
-                    mock=mock if mock is not None else self._mock,
-                )
+            timeout = (
+                connection_timeout if connection_timeout is not None else self._timeout
             )
+            if is_v2_device:
+                call_in_bluesky_event_loop(
+                    device.connect(timeout=timeout, mock=is_mock)
+                )
+            else:
+                assert is_v1_device_type(type(device))
+                device.wait_for_connection(timeout=timeout)
 
         if name:
             device.set_name(name)
