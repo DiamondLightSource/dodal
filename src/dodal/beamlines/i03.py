@@ -322,35 +322,27 @@ def xspress3mini() -> Xspress3:
     )
 
 
-def panda(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> HDFPanda:
+@device_factory()
+def panda() -> HDFPanda:
     """Get the i03 panda device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        HDFPanda,
-        "panda",
-        "-EA-PANDA-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+    return HDFPanda(
+        f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
         path_provider=get_path_provider(),
+        name="panda",
     )
 
 
+@device_factory()
 @skip_device(lambda: BL == "s03")
-def sample_shutter(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> ZebraShutter:
+def sample_shutter() -> ZebraShutter:
     """Get the i03 sample shutter device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        ZebraShutter,
+    return ZebraShutter(
+        f"{PREFIX.beamline_prefix}-EA-SHTR-01:",
         "sample_shutter",
-        "-EA-SHTR-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
     )
 
 
