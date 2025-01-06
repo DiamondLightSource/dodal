@@ -1,10 +1,7 @@
 from ophyd_async.core import SubsetEnum
 
 
-class FilterSelection(SubsetEnum): ...
-
-
-class p99StageSelections(FilterSelection):
+class p99StageSelections(SubsetEnum):
     EMPTY = "Empty"
     MN5UM = "Mn 5um"
     FE = "Fe (empty)"
@@ -23,7 +20,7 @@ class p99StageSelections(FilterSelection):
     USER = "User"
 
 
-class I02_1FilterOneSelections(FilterSelection):
+class I02_1FilterOneSelections(SubsetEnum):
     EMPTY = "Empty"
     AL8 = "Al8"
     AL15 = "Al15"
@@ -36,7 +33,7 @@ class I02_1FilterOneSelections(FilterSelection):
     TWO_TIMES_TI500 = "2xTi500"
 
 
-class I02_1FilterTwoSelections(FilterSelection):
+class I02_1FilterTwoSelections(SubsetEnum):
     EMPTY = "Empty"
     AL50 = "Al50"
     AL100 = "Al100"
@@ -49,7 +46,7 @@ class I02_1FilterTwoSelections(FilterSelection):
     TWO_TIMES_TI500 = "2xTi500"
 
 
-class I02_1FilterThreeSelections(FilterSelection):
+class I02_1FilterThreeSelections(SubsetEnum):
     EMPTY = "Empty"
     AL15 = "Al15"
     AL25 = "Al25"
@@ -62,7 +59,7 @@ class I02_1FilterThreeSelections(FilterSelection):
     TI200 = "Ti200"
 
 
-class I02_1FilterFourSelections(FilterSelection):
+class I02_1FilterFourSelections(SubsetEnum):
     EMPTY = "Empty"
     AL15 = "Al15"
     AL25 = "Al25"
