@@ -1,7 +1,7 @@
 from ophyd_async.core import SubsetEnum
 
 
-class p99StageSelections(SubsetEnum):
+class P99FilterSelections(SubsetEnum):
     EMPTY = "Empty"
     MN5UM = "Mn 5um"
     FE = "Fe (empty)"
