@@ -7,12 +7,12 @@ from ophyd_async.core import (
     DeviceVector,
     SignalR,
     StandardReadable,
+    SubsetEnum,
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_x
 
 from dodal.devices.attenuator.filter import FilterMotor
-from dodal.devices.attenuator.filter_selections import FilterSelection
 from dodal.log import LOGGER
 
 
@@ -100,13 +100,13 @@ class EnumFilterAttenuator(ReadOnlyAttenuator):
     def __init__(
         self,
         prefix: str,
-        filter_selection: tuple[type[FilterSelection]],
+        filter_selection: tuple[type[SubsetEnum]],
         name: str = "",
     ):
         with self.add_children_as_readables():
             self.filters: DeviceVector[FilterMotor] = DeviceVector(
                 {
-                    index: FilterMotor(filter , f"{prefix}MP{index+1}:", name)
+                    index: FilterMotor(filter, f"{prefix}MP{index+1}:", name)
                     for index, filter in enumerate(filter_selection)
                 }
             )
