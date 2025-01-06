@@ -100,13 +100,13 @@ class EnumFilterAttenuator(ReadOnlyAttenuator):
     def __init__(
         self,
         prefix: str,
-        filter_selection: tuple[type[SubsetEnum]],
+        filter_selection: tuple[type[SubsetEnum], ...],
         name: str = "",
     ):
         with self.add_children_as_readables():
             self.filters: DeviceVector[FilterMotor] = DeviceVector(
                 {
-                    index: FilterMotor(filter, f"{prefix}MP{index+1}:", name)
+                    index: FilterMotor(f"{prefix}MP{index+1}:", filter, name)
                     for index, filter in enumerate(filter_selection)
                 }
             )
