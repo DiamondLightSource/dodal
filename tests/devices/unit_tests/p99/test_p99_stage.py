@@ -27,9 +27,8 @@ async def sim_sampleAngleStage():
 async def sim_filter_wheel():
     async with DeviceCollector(mock=True):
         sim_filter_wheel = FilterMotor(
-            filter_selections=p99StageSelections,
-            prefix="p99-MO-TABLE-01:",
-            name="sim_filter_wheel",
+            "p99-MO-TABLE-01:",
+            p99StageSelections,
         )
     yield sim_filter_wheel
 
