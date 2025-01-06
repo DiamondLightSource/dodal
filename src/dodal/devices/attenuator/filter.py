@@ -6,7 +6,7 @@ from dodal.devices.attenuator.filter_selections import FilterSelection
 
 class FilterMotor(StandardReadable):
     def __init__(
-        self, filter_selections: type[FilterSelection], prefix: str, name: str = ""
+        self, prefix: str, filter_selections: type[FilterSelection], name: str = ""
     ):
         with self.add_children_as_readables():
             self.user_setpoint = epics_signal_rw(filter_selections, f"{prefix}SELECT")
