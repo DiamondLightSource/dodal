@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.p38 &#8212; dodal 1.36.4.dev11+g75f101999 documentation</title>
+    <title>dodal.beamlines.p38 &#8212; dodal 1.36.4.dev12+g6e13d857a documentation</title>
   
   
   
@@ -29,7 +29,7 @@
   <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=5fd0b10c"></script>
+    <script src="../../../_static/documentation_options.js?v=6549e8b9"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -453,34 +453,34 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for dodal.beamlines.p38</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span> <span class="nn">ophyd_async.epics.adaravis</span> <span class="kn">import</span> <span class="n">AravisDetector</span>
-<span class="kn">from</span> <span class="nn">ophyd_async.fastcs.panda</span> <span class="kn">import</span> <span class="n">HDFPanda</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.adaravis</span><span class="w"> </span><span class="kn">import</span> <span class="n">AravisDetector</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.fastcs.panda</span><span class="w"> </span><span class="kn">import</span> <span class="n">HDFPanda</span>
 
-<span class="kn">from</span> <span class="nn">dodal.common.beamlines.beamline_utils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">device_instantiation</span><span class="p">,</span>
     <span class="n">get_path_provider</span><span class="p">,</span>
     <span class="n">set_path_provider</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">dodal.common.beamlines.beamline_utils</span> <span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_utils_beamline</span>
-<span class="kn">from</span> <span class="nn">dodal.common.beamlines.device_helpers</span> <span class="kn">import</span> <span class="n">numbered_slits</span>
-<span class="kn">from</span> <span class="nn">dodal.common.crystal_metadata</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_utils_beamline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.device_helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">numbered_slits</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.crystal_metadata</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">MaterialsEnum</span><span class="p">,</span>
     <span class="n">make_crystal_metadata_from_material</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">dodal.common.visit</span> <span class="kn">import</span> <span class="n">LocalDirectoryServiceClient</span><span class="p">,</span> <span class="n">StaticVisitPathProvider</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.focusing_mirror</span> <span class="kn">import</span> <span class="n">FocusingMirror</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.i22.dcm</span> <span class="kn">import</span> <span class="n">DoubleCrystalMonochromator</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.i22.fswitch</span> <span class="kn">import</span> <span class="n">FSwitch</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.linkam3</span> <span class="kn">import</span> <span class="n">Linkam3</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.pressure_jump_cell</span> <span class="kn">import</span> <span class="n">PressureJumpCell</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.slits</span> <span class="kn">import</span> <span class="n">Slits</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.tetramm</span> <span class="kn">import</span> <span class="n">TetrammDetector</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.undulator</span> <span class="kn">import</span> <span class="n">Undulator</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.watsonmarlow323_pump</span> <span class="kn">import</span> <span class="n">WatsonMarlow323Pump</span>
-<span class="kn">from</span> <span class="nn">dodal.log</span> <span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_log_beamline</span>
-<span class="kn">from</span> <span class="nn">dodal.utils</span> <span class="kn">import</span> <span class="n">BeamlinePrefix</span><span class="p">,</span> <span class="n">get_beamline_name</span><span class="p">,</span> <span class="n">skip_device</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.visit</span><span class="w"> </span><span class="kn">import</span> <span class="n">LocalDirectoryServiceClient</span><span class="p">,</span> <span class="n">StaticVisitPathProvider</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.focusing_mirror</span><span class="w"> </span><span class="kn">import</span> <span class="n">FocusingMirror</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.i22.dcm</span><span class="w"> </span><span class="kn">import</span> <span class="n">DoubleCrystalMonochromator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.i22.fswitch</span><span class="w"> </span><span class="kn">import</span> <span class="n">FSwitch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.linkam3</span><span class="w"> </span><span class="kn">import</span> <span class="n">Linkam3</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.pressure_jump_cell</span><span class="w"> </span><span class="kn">import</span> <span class="n">PressureJumpCell</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.slits</span><span class="w"> </span><span class="kn">import</span> <span class="n">Slits</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.tetramm</span><span class="w"> </span><span class="kn">import</span> <span class="n">TetrammDetector</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.undulator</span><span class="w"> </span><span class="kn">import</span> <span class="n">Undulator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.watsonmarlow323_pump</span><span class="w"> </span><span class="kn">import</span> <span class="n">WatsonMarlow323Pump</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_log_beamline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">BeamlinePrefix</span><span class="p">,</span> <span class="n">get_beamline_name</span><span class="p">,</span> <span class="n">skip_device</span>
 
 <span class="n">BL</span> <span class="o">=</span> <span class="n">get_beamline_name</span><span class="p">(</span><span class="s2">&quot;p38&quot;</span><span class="p">)</span>
 <span class="n">set_log_beamline</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>
@@ -502,7 +502,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="d3">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.p38.html#dodal.beamlines.p38.d3">[docs]</a>
-<span class="k">def</span> <span class="nf">d3</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">d3</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AravisDetector</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
@@ -522,7 +522,7 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="d11">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.p38.html#dodal.beamlines.p38.d11">[docs]</a>
 <span class="nd">@skip_device</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">d11</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">d11</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AravisDetector</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
@@ -540,7 +540,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="d12">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.p38.html#dodal.beamlines.p38.d12">[docs]</a>
-<span class="k">def</span> <span class="nf">d12</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">d12</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AravisDetector</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
@@ -558,7 +558,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="i0">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.p38.html#dodal.beamlines.p38.i0">[docs]</a>
-<span class="k">def</span> <span class="nf">i0</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">i0</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TetrammDetector</span><span class="p">:</span>
@@ -582,7 +582,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="slits_1">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.p38.html#dodal.beamlines.p38.slits_1">[docs]</a>
-<span class="k">def</span> <span class="nf">slits_1</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">slits_1</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Slits</span><span class="p">:</span>
@@ -596,7 +596,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="slits_2">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.p38.html#dodal.beamlines.p38.slits_2">[docs]</a>
-<span class="k">def</span> <span class="nf">slits_2</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">slits_2</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Slits</span><span class="p">:</span>
@@ -610,7 +610,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="slits_3">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.p38.html#dodal.beamlines.p38.slits_3">[docs]</a>
-<span class="k">def</span> <span class="nf">slits_3</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">slits_3</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Slits</span><span class="p">:</span>
@@ -624,7 +624,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="slits_4">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.p38.html#dodal.beamlines.p38.slits_4">[docs]</a>
-<span class="k">def</span> <span class="nf">slits_4</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">slits_4</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Slits</span><span class="p">:</span>
@@ -638,7 +638,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="slits_5">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.p38.html#dodal.beamlines.p38.slits_5">[docs]</a>
-<span class="k">def</span> <span class="nf">slits_5</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">slits_5</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Slits</span><span class="p">:</span>
@@ -652,7 +652,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="slits_6">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.p38.html#dodal.beamlines.p38.slits_6">[docs]</a>
-<span class="k">def</span> <span class="nf">slits_6</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">slits_6</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Slits</span><span class="p">:</span>
@@ -666,7 +666,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="fswitch">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.p38.html#dodal.beamlines.p38.fswitch">[docs]</a>
-<span class="k">def</span> <span class="nf">fswitch</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">fswitch</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FSwitch</span><span class="p">:</span>
@@ -685,7 +685,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="vfm">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.p38.html#dodal.beamlines.p38.vfm">[docs]</a>
-<span class="k">def</span> <span class="nf">vfm</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">vfm</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FocusingMirror</span><span class="p">:</span>
@@ -701,7 +701,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="hfm">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.p38.html#dodal.beamlines.p38.hfm">[docs]</a>
-<span class="k">def</span> <span class="nf">hfm</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">hfm</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FocusingMirror</span><span class="p">:</span>
@@ -717,7 +717,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="dcm">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.p38.html#dodal.beamlines.p38.dcm">[docs]</a>
-<span class="k">def</span> <span class="nf">dcm</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">dcm</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DoubleCrystalMonochromator</span><span class="p">:</span>
@@ -741,7 +741,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="undulator">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.p38.html#dodal.beamlines.p38.undulator">[docs]</a>
-<span class="k">def</span> <span class="nf">undulator</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">undulator</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Undulator</span><span class="p">:</span>
@@ -764,7 +764,7 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="panda1">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.p38.html#dodal.beamlines.p38.panda1">[docs]</a>
 <span class="nd">@skip_device</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">panda1</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">panda1</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HDFPanda</span><span class="p">:</span>
@@ -782,7 +782,7 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="panda2">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.p38.html#dodal.beamlines.p38.panda2">[docs]</a>
 <span class="nd">@skip_device</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">panda2</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">panda2</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HDFPanda</span><span class="p">:</span>
@@ -800,7 +800,7 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="panda3">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.p38.html#dodal.beamlines.p38.panda3">[docs]</a>
 <span class="nd">@skip_device</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">panda3</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">panda3</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HDFPanda</span><span class="p">:</span>
@@ -818,7 +818,7 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="linkam">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.p38.html#dodal.beamlines.p38.linkam">[docs]</a>
 <span class="nd">@skip_device</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">linkam</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">linkam</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Linkam3</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
@@ -833,7 +833,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="ppump">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.p38.html#dodal.beamlines.p38.ppump">[docs]</a>
-<span class="k">def</span> <span class="nf">ppump</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">ppump</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WatsonMarlow323Pump</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Peristaltic Pump&quot;&quot;&quot;</span>
@@ -849,7 +849,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="high_pressure_xray_cell">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.p38.html#dodal.beamlines.p38.high_pressure_xray_cell">[docs]</a>
-<span class="k">def</span> <span class="nf">high_pressure_xray_cell</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">high_pressure_xray_cell</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PressureJumpCell</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>

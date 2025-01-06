@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Getting Started &#8212; dodal 1.36.4.dev11+g75f101999 documentation</title>
+    <title>Getting Started &#8212; dodal 1.36.4.dev12+g6e13d857a documentation</title>
   
   
   
@@ -30,7 +30,7 @@
   <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=5fd0b10c"></script>
+    <script src="../_static/documentation_options.js?v=6549e8b9"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -470,7 +470,7 @@
 <h2>Using Devices<a class="headerlink" href="#using-devices" title="Link to this heading">#</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">dodal</span></code> contains devices to cover anything you would like to do using a beamline’s hardware.</p>
 <p>To use these devices you can do the following:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dodal.beamlines</span> <span class="kn">import</span> <span class="n">i03</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dodal.beamlines</span><span class="w"> </span><span class="kn">import</span> <span class="n">i03</span>
 <span class="n">dcm</span> <span class="o">=</span> <span class="n">i03</span><span class="o">.</span><span class="n">dcm</span><span class="p">()</span>
 <span class="c1"># You can now use the DCM as you would any other device in Bluesky plans</span>
 </pre></div>
@@ -482,8 +482,8 @@ beamline workstation it will default to connecting to a simulated instrument.</p
 <h2>Adding Logging<a class="headerlink" href="#adding-logging" title="Link to this heading">#</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">dodal</span></code> provides some helper functions to help you log what’s going on.</p>
 <p>You can set these up using:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dodal.beamlines</span> <span class="kn">import</span> <span class="n">i03</span>
-<span class="kn">from</span> <span class="nn">dodal.log</span> <span class="kn">import</span> <span class="n">set_up_logging_handlers</span><span class="p">,</span> <span class="n">LOGGER</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dodal.beamlines</span><span class="w"> </span><span class="kn">import</span> <span class="n">i03</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_up_logging_handlers</span><span class="p">,</span> <span class="n">LOGGER</span>
 
 <span class="n">set_up_logging_handlers</span><span class="p">()</span>
 </pre></div>

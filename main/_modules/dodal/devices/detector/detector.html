@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.detector.detector &#8212; dodal 1.36.4.dev11+g75f101999 documentation</title>
+    <title>dodal.devices.detector.detector &#8212; dodal 1.36.4.dev12+g6e13d857a documentation</title>
   
   
   
@@ -29,7 +29,7 @@
   <link href="../../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=5fd0b10c"></script>
+    <script src="../../../../_static/documentation_options.js?v=6549e8b9"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -450,27 +450,27 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.detector.detector</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">auto</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">auto</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">field_serializer</span><span class="p">,</span> <span class="n">field_validator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">field_serializer</span><span class="p">,</span> <span class="n">field_validator</span>
 
-<span class="kn">from</span> <span class="nn">dodal.devices.detector.det_dim_constants</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.detector.det_dim_constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">EIGER2_X_16M_SIZE</span><span class="p">,</span>
     <span class="n">DetectorSize</span><span class="p">,</span>
     <span class="n">DetectorSizeConstants</span><span class="p">,</span>
     <span class="n">constants_from_type</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.detector.det_dist_to_beam_converter</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.detector.det_dist_to_beam_converter</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Axis</span><span class="p">,</span>
     <span class="n">DetectorDistanceToBeamXYConverter</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">dodal.utils</span> <span class="kn">import</span> <span class="n">get_run_number</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_run_number</span>
 
 
 <div class="viewcode-block" id="TriggerMode">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.detector.TriggerMode.html#dodal.devices.detector.TriggerMode">[docs]</a>
-<span class="k">class</span> <span class="nc">TriggerMode</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TriggerMode</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;In set frames the number of frames is known at arm time. In free run they are</span>
 <span class="sd">    not known until the detector is unstaged.&quot;&quot;&quot;</span>
 
@@ -481,7 +481,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="DetectorParams">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.detector.DetectorParams.html#dodal.devices.detector.DetectorParams">[docs]</a>
-<span class="k">class</span> <span class="nc">DetectorParams</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DetectorParams</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Holds parameters for the detector. Provides access to a list of Dectris detector</span>
 <span class="sd">    sizes and a converter for distance to beam centre.&quot;&quot;&quot;</span>
 
@@ -507,11 +507,11 @@ window.addEventListener("load", () => mermaid.run());
     <span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">beam_xy_converter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DetectorDistanceToBeamXYConverter</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">beam_xy_converter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DetectorDistanceToBeamXYConverter</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">DetectorDistanceToBeamXYConverter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">det_dist_to_beam_converter_path</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">run_number</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_number</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="n">get_run_number</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">directory</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">override_run_number</span> <span class="ow">is</span> <span class="kc">None</span>
@@ -519,12 +519,12 @@ window.addEventListener("load", () => mermaid.run());
         <span class="p">)</span>
 
     <span class="nd">@field_serializer</span><span class="p">(</span><span class="s2">&quot;detector_size_constants&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">serialize_detector_size_constants</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="n">DetectorSizeConstants</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">serialize_detector_size_constants</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="n">DetectorSizeConstants</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">size</span><span class="o">.</span><span class="n">det_type_string</span>
 
     <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;detector_size_constants&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_parse_detector_size_constants</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">det_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DetectorSizeConstants</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_detector_size_constants</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">det_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DetectorSizeConstants</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="n">det_type</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">det_type</span><span class="p">,</span> <span class="n">DetectorSizeConstants</span><span class="p">)</span>
@@ -533,12 +533,12 @@ window.addEventListener("load", () => mermaid.run());
 
     <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;directory&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;before&quot;</span><span class="p">)</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_parse_directory</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">directory</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_directory</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">directory</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">/&quot;</span>
 
-    <span class="k">def</span> <span class="nf">get_beam_position_mm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">detector_distance</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_beam_position_mm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">detector_distance</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
         <span class="n">x_beam_mm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">beam_xy_converter</span><span class="o">.</span><span class="n">get_beam_xy_from_det_dist</span><span class="p">(</span>
             <span class="n">detector_distance</span><span class="p">,</span> <span class="n">Axis</span><span class="o">.</span><span class="n">X_AXIS</span>
         <span class="p">)</span>
@@ -558,12 +558,12 @@ window.addEventListener("load", () => mermaid.run());
 
         <span class="k">return</span> <span class="n">x_beam_mm</span> <span class="o">-</span> <span class="n">offset_x</span><span class="p">,</span> <span class="n">y_beam_mm</span> <span class="o">-</span> <span class="n">offset_y</span>
 
-    <span class="k">def</span> <span class="nf">get_detector_size_pizels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DetectorSize</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_detector_size_pizels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DetectorSize</span><span class="p">:</span>
         <span class="n">full_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector_size_constants</span><span class="o">.</span><span class="n">det_size_pixels</span>
         <span class="n">roi_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector_size_constants</span><span class="o">.</span><span class="n">roi_size_pixels</span>
         <span class="k">return</span> <span class="n">roi_size</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_roi_mode</span> <span class="k">else</span> <span class="n">full_size</span>
 
-    <span class="k">def</span> <span class="nf">get_beam_position_pixels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">detector_distance</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_beam_position_pixels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">detector_distance</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
         <span class="n">full_size_pixels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector_size_constants</span><span class="o">.</span><span class="n">det_size_pixels</span>
         <span class="n">roi_size_pixels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_detector_size_pizels</span><span class="p">()</span>
 
@@ -584,11 +584,11 @@ window.addEventListener("load", () => mermaid.run());
         <span class="k">return</span> <span class="n">x_beam_pixels</span> <span class="o">-</span> <span class="n">offset_x</span><span class="p">,</span> <span class="n">y_beam_pixels</span> <span class="o">-</span> <span class="n">offset_y</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">full_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">full_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">run_number</span><span class="si">}</span><span class="s2">&quot;</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">full_number_of_images</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">full_number_of_images</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_triggers</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_images_per_trigger</span></div>
 
 </pre></div>

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.zocalo.zocalo_results &#8212; dodal 1.36.4.dev11+g75f101999 documentation</title>
+    <title>dodal.devices.zocalo.zocalo_results &#8212; dodal 1.36.4.dev12+g6e13d857a documentation</title>
   
   
   
@@ -29,7 +29,7 @@
   <link href="../../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=5fd0b10c"></script>
+    <script src="../../../../_static/documentation_options.js?v=6549e8b9"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -450,49 +450,49 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.zocalo.zocalo_results</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">asyncio</span>
-<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">Sequence</span>
-<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
-<span class="kn">from</span> <span class="nn">inspect</span> <span class="kn">import</span> <span class="n">get_annotations</span>
-<span class="kn">from</span> <span class="nn">queue</span> <span class="kn">import</span> <span class="n">Empty</span><span class="p">,</span> <span class="n">Queue</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">TypedDict</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">inspect</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_annotations</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">queue</span><span class="w"> </span><span class="kn">import</span> <span class="n">Empty</span><span class="p">,</span> <span class="n">Queue</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">TypedDict</span>
 
-<span class="kn">import</span> <span class="nn">bluesky.plan_stubs</span> <span class="k">as</span> <span class="nn">bps</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">workflows.recipe</span>
-<span class="kn">import</span> <span class="nn">workflows.transport</span>
-<span class="kn">from</span> <span class="nn">bluesky.protocols</span> <span class="kn">import</span> <span class="n">Triggerable</span>
-<span class="kn">from</span> <span class="nn">bluesky.utils</span> <span class="kn">import</span> <span class="n">Msg</span>
-<span class="kn">from</span> <span class="nn">deepdiff.diff</span> <span class="kn">import</span> <span class="n">DeepDiff</span>
-<span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">bluesky.plan_stubs</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">bps</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">workflows.recipe</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">workflows.transport</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Triggerable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">Msg</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">deepdiff.diff</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeepDiff</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Array1D</span><span class="p">,</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
     <span class="n">StandardReadable</span><span class="p">,</span>
     <span class="n">StandardReadableFormat</span><span class="p">,</span>
     <span class="n">soft_signal_r_and_setter</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">workflows.transport.common_transport</span> <span class="kn">import</span> <span class="n">CommonTransport</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">workflows.transport.common_transport</span><span class="w"> </span><span class="kn">import</span> <span class="n">CommonTransport</span>
 
-<span class="kn">from</span> <span class="nn">dodal.devices.zocalo.zocalo_constants</span> <span class="kn">import</span> <span class="n">ZOCALO_ENV</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.zocalo.zocalo_interaction</span> <span class="kn">import</span> <span class="n">_get_zocalo_connection</span>
-<span class="kn">from</span> <span class="nn">dodal.log</span> <span class="kn">import</span> <span class="n">LOGGER</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.zocalo.zocalo_constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">ZOCALO_ENV</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.zocalo.zocalo_interaction</span><span class="w"> </span><span class="kn">import</span> <span class="n">_get_zocalo_connection</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
 
 
-<span class="k">class</span> <span class="nc">NoResultsFromZocalo</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">NoResultsFromZocalo</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="k">pass</span>
 
 
-<span class="k">class</span> <span class="nc">NoZocaloSubscription</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">NoZocaloSubscription</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="k">pass</span>
 
 
-<span class="k">class</span> <span class="nc">SortKeys</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SortKeys</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
     <span class="n">max_count</span> <span class="o">=</span> <span class="s2">&quot;max_count&quot;</span>
     <span class="n">total_count</span> <span class="o">=</span> <span class="s2">&quot;total_count&quot;</span>
     <span class="n">n_voxels</span> <span class="o">=</span> <span class="s2">&quot;n_voxels&quot;</span>
 
 
-<span class="k">class</span> <span class="nc">ZocaloSource</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ZocaloSource</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
     <span class="n">CPU</span> <span class="o">=</span> <span class="s2">&quot;CPU&quot;</span>
     <span class="n">GPU</span> <span class="o">=</span> <span class="s2">&quot;GPU&quot;</span>
 
@@ -506,7 +506,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="XrcResult">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.zocalo.XrcResult.html#dodal.devices.zocalo.XrcResult">[docs]</a>
-<span class="k">class</span> <span class="nc">XrcResult</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">XrcResult</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Information about a diffracting centre.</span>
 
@@ -536,14 +536,14 @@ window.addEventListener("load", () => mermaid.run());
 
 
 
-<span class="k">def</span> <span class="nf">bbox_size</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">XrcResult</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">bbox_size</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">XrcResult</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">[</span>
         <span class="nb">abs</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;bounding_box&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;bounding_box&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
     <span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">get_dict_differences</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_dict_differences</span><span class="p">(</span>
     <span class="n">dict1</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">dict1_source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dict2</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">dict2_source</span><span class="p">:</span> <span class="nb">str</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a string containing dict1 and dict2 if there are differences between them, greater than a</span>
@@ -555,7 +555,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Zocalo results from </span><span class="si">{</span><span class="n">dict1_source</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">dict2_source</span><span class="si">}</span><span class="s2"> are not identical.</span><span class="se">\n</span><span class="s2"> Results from </span><span class="si">{</span><span class="n">dict1_source</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">dict1</span><span class="si">}</span><span class="se">\n</span><span class="s2"> Results from </span><span class="si">{</span><span class="n">dict2_source</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">dict2</span><span class="si">}</span><span class="s2">&quot;</span>
 
 
-<span class="k">def</span> <span class="nf">source_from_results</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">source_from_results</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="n">ZocaloSource</span><span class="o">.</span><span class="n">GPU</span><span class="o">.</span><span class="n">value</span>
         <span class="k">if</span> <span class="n">results</span><span class="p">[</span><span class="s2">&quot;recipe_parameters&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gpu&quot;</span><span class="p">)</span>
@@ -565,7 +565,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="ZocaloResults">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.zocalo.ZocaloResults.html#dodal.devices.zocalo.ZocaloResults">[docs]</a>
-<span class="k">class</span> <span class="nc">ZocaloResults</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Triggerable</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ZocaloResults</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Triggerable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;An ophyd device which can wait for results from a Zocalo job. These jobs should</span>
 <span class="sd">    be triggered from a plan-subscribed callback using the run_start() and run_end()</span>
 <span class="sd">    methods on dodal.devices.zocalo.ZocaloTrigger.</span>
@@ -590,7 +590,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;zocalo&quot;</span><span class="p">,</span>
         <span class="n">zocalo_environment</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">ZOCALO_ENV</span><span class="p">,</span>
@@ -648,7 +648,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_put_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">XrcResult</span><span class="p">],</span> <span class="n">recipe_parameters</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_put_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">results</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">XrcResult</span><span class="p">],</span> <span class="n">recipe_parameters</span><span class="p">):</span>
         <span class="n">centres_of_mass</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;centre_of_mass&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_com_setter</span><span class="p">(</span><span class="n">centres_of_mass</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_bounding_box_setter</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">r</span><span class="p">[</span><span class="s2">&quot;bounding_box&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">]))</span>
@@ -659,14 +659,14 @@ window.addEventListener("load", () => mermaid.run());
         <span class="bp">self</span><span class="o">.</span><span class="n">_ispyb_dcid_setter</span><span class="p">(</span><span class="n">recipe_parameters</span><span class="p">[</span><span class="s2">&quot;dcid&quot;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ispyb_dcgid_setter</span><span class="p">(</span><span class="n">recipe_parameters</span><span class="p">[</span><span class="s2">&quot;dcgid&quot;</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">_clear_old_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_clear_old_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Clearing queue&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_raw_results_received</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
 
 <div class="viewcode-block" id="ZocaloResults.stage">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.zocalo.ZocaloResults.html#dodal.devices.zocalo.ZocaloResults.stage">[docs]</a>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">stage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Stages the Zocalo device by: subscribing to the queue, doing a background</span>
 <span class="sd">        sleep for a few seconds to wait for any stale messages to be received, then</span>
 <span class="sd">        clearing the queue. Plans using this device should wait on ZOCALO_STAGE_GROUP</span>
@@ -684,7 +684,7 @@ window.addEventListener("load", () => mermaid.run());
 
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">unstage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">unstage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Disconnecting from Zocalo&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
@@ -693,7 +693,7 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="ZocaloResults.trigger">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.zocalo.ZocaloResults.html#dodal.devices.zocalo.ZocaloResults.trigger">[docs]</a>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns an AsyncStatus waiting for results to be received from Zocalo.&quot;&quot;&quot;</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Zocalo trigger called&quot;</span><span class="p">)</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
@@ -780,15 +780,15 @@ window.addEventListener("load", () => mermaid.run());
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Timed out waiting for zocalo results!&quot;</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">NoResultsFromZocalo</span><span class="p">(</span>
                 <span class="s2">&quot;Timed out waiting for Zocalo results&quot;</span>
-            <span class="p">)</span> <span class="kn">from</span> <span class="nn">timeout_exception</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">timeout_exception</span>
         <span class="k">finally</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_kickoff_run</span> <span class="o">=</span> <span class="kc">False</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_subscribe_to_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_subscribe_to_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">transport</span> <span class="o">=</span> <span class="n">_get_zocalo_connection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">zocalo_environment</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">_receive_result</span><span class="p">(</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_receive_result</span><span class="p">(</span>
             <span class="n">rw</span><span class="p">:</span> <span class="n">workflows</span><span class="o">.</span><span class="n">recipe</span><span class="o">.</span><span class="n">RecipeWrapper</span><span class="p">,</span> <span class="n">header</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">dict</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Received </span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -822,7 +822,7 @@ window.addEventListener("load", () => mermaid.run());
 
 
 
-<span class="k">def</span> <span class="nf">_corrected_xrc_result</span><span class="p">(</span><span class="n">uncorrected</span><span class="p">:</span> <span class="n">XrcResult</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">XrcResult</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_corrected_xrc_result</span><span class="p">(</span><span class="n">uncorrected</span><span class="p">:</span> <span class="n">XrcResult</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">XrcResult</span><span class="p">:</span>
     <span class="n">corrected</span> <span class="o">=</span> <span class="n">XrcResult</span><span class="p">(</span><span class="o">**</span><span class="n">uncorrected</span><span class="p">)</span>
     <span class="n">corrected</span><span class="p">[</span><span class="s2">&quot;centre_of_mass&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
         <span class="n">coord</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="k">for</span> <span class="n">coord</span> <span class="ow">in</span> <span class="n">uncorrected</span><span class="p">[</span><span class="s2">&quot;centre_of_mass&quot;</span><span class="p">]</span>
@@ -832,7 +832,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="get_full_processing_results">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.zocalo.html#dodal.devices.zocalo.get_full_processing_results">[docs]</a>
-<span class="k">def</span> <span class="nf">get_full_processing_results</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_full_processing_results</span><span class="p">(</span>
     <span class="n">zocalo</span><span class="p">:</span> <span class="n">ZocaloResults</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Msg</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">XrcResult</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A plan that will return the raw zocalo results, ranked in descending order according to the sort key.</span>
@@ -862,7 +862,7 @@ window.addEventListener("load", () => mermaid.run());
 
 
 
-<span class="k">def</span> <span class="nf">get_processing_results_from_event</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_processing_results_from_event</span><span class="p">(</span>
     <span class="n">device_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">doc</span><span class="p">:</span> <span class="nb">dict</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">XrcResult</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -879,7 +879,7 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">results_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">doc</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">device_name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">results_keys</span><span class="p">}</span>
     <span class="n">results_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">results_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">results_keys</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">create_result</span><span class="p">(</span><span class="o">*</span><span class="n">argv</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_result</span><span class="p">(</span><span class="o">*</span><span class="n">argv</span><span class="p">):</span>
         <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">results_keys</span><span class="p">,</span> <span class="n">argv</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">XrcResult</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.tetramm &#8212; dodal 1.36.4.dev11+g75f101999 documentation</title>
+    <title>dodal.devices.tetramm &#8212; dodal 1.36.4.dev12+g6e13d857a documentation</title>
   
   
   
@@ -29,7 +29,7 @@
   <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=5fd0b10c"></script>
+    <script src="../../../_static/documentation_options.js?v=6549e8b9"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -450,10 +450,10 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.tetramm</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">asyncio</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 
-<span class="kn">from</span> <span class="nn">bluesky.protocols</span> <span class="kn">import</span> <span class="n">Hints</span>
-<span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hints</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DatasetDescriber</span><span class="p">,</span>
     <span class="n">DetectorController</span><span class="p">,</span>
     <span class="n">DetectorTrigger</span><span class="p">,</span>
@@ -465,8 +465,8 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">set_and_wait_for_value</span><span class="p">,</span>
     <span class="n">soft_signal_r_and_setter</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ophyd_async.epics.adcore</span> <span class="kn">import</span> <span class="n">ADHDFWriter</span><span class="p">,</span> <span class="n">NDFileHDFIO</span><span class="p">,</span> <span class="n">stop_busy_record</span>
-<span class="kn">from</span> <span class="nn">ophyd_async.epics.core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.adcore</span><span class="w"> </span><span class="kn">import</span> <span class="n">ADHDFWriter</span><span class="p">,</span> <span class="n">NDFileHDFIO</span><span class="p">,</span> <span class="n">stop_busy_record</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">epics_signal_r</span><span class="p">,</span>
     <span class="n">epics_signal_rw</span><span class="p">,</span>
     <span class="n">epics_signal_rw_rbv</span><span class="p">,</span>
@@ -475,7 +475,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="TetrammRange">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.tetramm.TetrammRange.html#dodal.devices.tetramm.TetrammRange">[docs]</a>
-<span class="k">class</span> <span class="nc">TetrammRange</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TetrammRange</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
     <span class="n">UA</span> <span class="o">=</span> <span class="s2">&quot;+- 120 uA&quot;</span>
     <span class="n">NA</span> <span class="o">=</span> <span class="s2">&quot;+- 120 nA&quot;</span></div>
 
@@ -483,7 +483,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="TetrammTrigger">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.tetramm.TetrammTrigger.html#dodal.devices.tetramm.TetrammTrigger">[docs]</a>
-<span class="k">class</span> <span class="nc">TetrammTrigger</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TetrammTrigger</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
     <span class="n">FREE_RUN</span> <span class="o">=</span> <span class="s2">&quot;Free run&quot;</span>
     <span class="n">EXT_TRIGGER</span> <span class="o">=</span> <span class="s2">&quot;Ext. trig.&quot;</span>
     <span class="n">EXT_BULB</span> <span class="o">=</span> <span class="s2">&quot;Ext. bulb&quot;</span>
@@ -493,7 +493,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="TetrammChannels">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.tetramm.TetrammChannels.html#dodal.devices.tetramm.TetrammChannels">[docs]</a>
-<span class="k">class</span> <span class="nc">TetrammChannels</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TetrammChannels</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
     <span class="n">ONE</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span>
     <span class="n">TWO</span> <span class="o">=</span> <span class="s2">&quot;2&quot;</span>
     <span class="n">FOUR</span> <span class="o">=</span> <span class="s2">&quot;4&quot;</span></div>
@@ -502,7 +502,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="TetrammResolution">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.tetramm.TetrammResolution.html#dodal.devices.tetramm.TetrammResolution">[docs]</a>
-<span class="k">class</span> <span class="nc">TetrammResolution</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TetrammResolution</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
     <span class="n">SIXTEEN_BITS</span> <span class="o">=</span> <span class="s2">&quot;16 bits&quot;</span>
     <span class="n">TWENTY_FOUR_BITS</span> <span class="o">=</span> <span class="s2">&quot;24 bits&quot;</span></div>
 
@@ -510,7 +510,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="TetrammGeometry">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.tetramm.TetrammGeometry.html#dodal.devices.tetramm.TetrammGeometry">[docs]</a>
-<span class="k">class</span> <span class="nc">TetrammGeometry</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TetrammGeometry</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
     <span class="n">DIAMOND</span> <span class="o">=</span> <span class="s2">&quot;Diamond&quot;</span>
     <span class="n">SQUARE</span> <span class="o">=</span> <span class="s2">&quot;Square&quot;</span></div>
 
@@ -518,8 +518,8 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="TetrammDriver">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.tetramm.TetrammDriver.html#dodal.devices.tetramm.TetrammDriver">[docs]</a>
-<span class="k">class</span> <span class="nc">TetrammDriver</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TetrammDriver</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
@@ -552,7 +552,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="TetrammController">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.tetramm.TetrammController.html#dodal.devices.tetramm.TetrammController">[docs]</a>
-<span class="k">class</span> <span class="nc">TetrammController</span><span class="p">(</span><span class="n">DetectorController</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TetrammController</span><span class="p">(</span><span class="n">DetectorController</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Controller for a TetrAMM current monitor</span>
 
 <span class="sd">    Attributes:</span>
@@ -568,7 +568,7 @@ window.addEventListener("load", () => mermaid.run());
 
     <span class="n">base_sample_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100_000</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">drv</span><span class="p">:</span> <span class="n">TetrammDriver</span><span class="p">,</span>
         <span class="n">minimum_values_per_reading</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
@@ -581,11 +581,11 @@ window.addEventListener("load", () => mermaid.run());
         <span class="bp">self</span><span class="o">.</span><span class="n">minimum_values_per_reading</span> <span class="o">=</span> <span class="n">minimum_values_per_reading</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">readings_per_frame</span> <span class="o">=</span> <span class="n">readings_per_frame</span>
 
-    <span class="k">def</span> <span class="nf">get_deadtime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exposure</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_deadtime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exposure</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="c1"># 2 internal clock cycles. Best effort approximation</span>
         <span class="k">return</span> <span class="mi">2</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_sample_rate</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trigger_info</span><span class="p">:</span> <span class="n">TriggerInfo</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">prepare</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trigger_info</span><span class="p">:</span> <span class="n">TriggerInfo</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_trigger</span><span class="p">(</span><span class="n">trigger_info</span><span class="o">.</span><span class="n">trigger</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">trigger_info</span><span class="o">.</span><span class="n">livetime</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
@@ -597,14 +597,14 @@ window.addEventListener("load", () => mermaid.run());
             <span class="bp">self</span><span class="o">.</span><span class="n">set_exposure</span><span class="p">(</span><span class="n">trigger_info</span><span class="o">.</span><span class="n">livetime</span><span class="p">),</span>
         <span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">arm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">arm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_arm_status</span> <span class="o">=</span> <span class="k">await</span> <span class="n">set_and_wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_drv</span><span class="o">.</span><span class="n">acquire</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">wait_for_idle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">wait_for_idle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arm_status</span><span class="p">:</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arm_status</span>
 
-    <span class="k">def</span> <span class="nf">_validate_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trigger</span><span class="p">:</span> <span class="n">DetectorTrigger</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trigger</span><span class="p">:</span> <span class="n">DetectorTrigger</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">supported_trigger_types</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">DetectorTrigger</span><span class="o">.</span><span class="n">EDGE_TRIGGER</span><span class="p">,</span>
             <span class="n">DetectorTrigger</span><span class="o">.</span><span class="n">CONSTANT_GATE</span><span class="p">,</span>
@@ -617,12 +617,12 @@ window.addEventListener("load", () => mermaid.run());
                 <span class="sa">f</span><span class="s2">&quot;use </span><span class="si">{</span><span class="n">trigger</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">disarm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">disarm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">await</span> <span class="n">stop_busy_record</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_drv</span><span class="o">.</span><span class="n">acquire</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
 <div class="viewcode-block" id="TetrammController.set_exposure">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.tetramm.TetrammController.html#dodal.devices.tetramm.TetrammController.set_exposure">[docs]</a>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">set_exposure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exposure</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set_exposure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exposure</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Tries to set the exposure time of a single frame.</span>
 
 <span class="sd">        As during the  exposure time, the device must collect an integer number</span>
@@ -649,21 +649,21 @@ window.addEventListener("load", () => mermaid.run());
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">max_frame_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">max_frame_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Max frame rate in Hz for the current configuration&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">minimum_exposure</span>
 
     <span class="nd">@max_frame_rate</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">max_frame_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mfr</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">max_frame_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mfr</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_minimum_exposure</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">mfr</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">minimum_exposure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">minimum_exposure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Smallest amount of time needed to take a frame&quot;&quot;&quot;</span>
         <span class="n">time_per_reading</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">minimum_values_per_reading</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_sample_rate</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">readings_per_frame</span> <span class="o">*</span> <span class="n">time_per_reading</span>
 
-    <span class="k">def</span> <span class="nf">_set_minimum_exposure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exposure</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_minimum_exposure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exposure</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="n">time_per_reading</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">minimum_values_per_reading</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_sample_rate</span>
         <span class="k">if</span> <span class="n">exposure</span> <span class="o">&lt;</span> <span class="n">time_per_reading</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -678,16 +678,16 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="TetrammDatasetDescriber">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.tetramm.TetrammDatasetDescriber.html#dodal.devices.tetramm.TetrammDatasetDescriber">[docs]</a>
-<span class="k">class</span> <span class="nc">TetrammDatasetDescriber</span><span class="p">(</span><span class="n">DatasetDescriber</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TetrammDatasetDescriber</span><span class="p">(</span><span class="n">DatasetDescriber</span><span class="p">):</span>
     <span class="n">max_channels</span> <span class="o">=</span> <span class="mi">11</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">:</span> <span class="n">TetrammController</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">:</span> <span class="n">TetrammController</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">controller</span> <span class="o">=</span> <span class="n">controller</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">np_datatype</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">np_datatype</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="s2">&quot;&lt;f8&quot;</span>  <span class="c1"># IEEE 754 double precision floating point</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_channels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">controller</span><span class="o">.</span><span class="n">readings_per_frame</span><span class="p">)</span></div>
 
 
@@ -695,8 +695,8 @@ window.addEventListener("load", () => mermaid.run());
 <span class="c1"># TODO: Support MeanValue signals https://github.com/DiamondLightSource/dodal/issues/337</span>
 <div class="viewcode-block" id="TetrammDetector">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.tetramm.TetrammDetector.html#dodal.devices.tetramm.TetrammDetector">[docs]</a>
-<span class="k">class</span> <span class="nc">TetrammDetector</span><span class="p">(</span><span class="n">StandardDetector</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TetrammDetector</span><span class="p">(</span><span class="n">StandardDetector</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">path_provider</span><span class="p">:</span> <span class="n">PathProvider</span><span class="p">,</span>
@@ -731,7 +731,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">hints</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Hints</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">hints</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Hints</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;fields&quot;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]}</span></div>
 
 </pre></div>

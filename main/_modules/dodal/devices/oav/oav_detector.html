@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.oav_detector &#8212; dodal 1.36.4.dev11+g75f101999 documentation</title>
+    <title>dodal.devices.oav.oav_detector &#8212; dodal 1.36.4.dev12+g6e13d857a documentation</title>
   
   
   
@@ -29,7 +29,7 @@
   <link href="../../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=5fd0b10c"></script>
+    <script src="../../../../_static/documentation_options.js?v=6549e8b9"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -450,27 +450,27 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.oav.oav_detector</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">IntEnum</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">IntEnum</span>
 
-<span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="n">DEFAULT_TIMEOUT</span><span class="p">,</span> <span class="n">AsyncStatus</span><span class="p">,</span> <span class="n">LazyMock</span><span class="p">,</span> <span class="n">StandardReadable</span>
-<span class="kn">from</span> <span class="nn">ophyd_async.epics.core</span> <span class="kn">import</span> <span class="n">epics_signal_rw</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_TIMEOUT</span><span class="p">,</span> <span class="n">AsyncStatus</span><span class="p">,</span> <span class="n">LazyMock</span><span class="p">,</span> <span class="n">StandardReadable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_rw</span>
 
-<span class="kn">from</span> <span class="nn">dodal.common.signal_utils</span> <span class="kn">import</span> <span class="n">create_hardware_backed_soft_signal</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.areadetector.plugins.CAM</span> <span class="kn">import</span> <span class="n">Cam</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.oav.oav_parameters</span> <span class="kn">import</span> <span class="n">DEFAULT_OAV_WINDOW</span><span class="p">,</span> <span class="n">OAVConfig</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.oav.snapshots.snapshot_with_beam_centre</span> <span class="kn">import</span> <span class="n">SnapshotWithBeamCentre</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.oav.snapshots.snapshot_with_grid</span> <span class="kn">import</span> <span class="n">SnapshotWithGrid</span>
-<span class="kn">from</span> <span class="nn">dodal.log</span> <span class="kn">import</span> <span class="n">LOGGER</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.signal_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_hardware_backed_soft_signal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.areadetector.plugins.CAM</span><span class="w"> </span><span class="kn">import</span> <span class="n">Cam</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.oav.oav_parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_OAV_WINDOW</span><span class="p">,</span> <span class="n">OAVConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.oav.snapshots.snapshot_with_beam_centre</span><span class="w"> </span><span class="kn">import</span> <span class="n">SnapshotWithBeamCentre</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.oav.snapshots.snapshot_with_grid</span><span class="w"> </span><span class="kn">import</span> <span class="n">SnapshotWithGrid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
 
 
-<span class="k">class</span> <span class="nc">ZoomLevelNotFoundError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">errmsg</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ZoomLevelNotFoundError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">errmsg</span><span class="p">):</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">errmsg</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="Coords">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_detector.Coords.html#dodal.devices.oav.oav_detector.Coords">[docs]</a>
-<span class="k">class</span> <span class="nc">Coords</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Coords</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
     <span class="n">X</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">Y</span> <span class="o">=</span> <span class="mi">1</span></div>
 
@@ -478,7 +478,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <span class="c1"># Workaround to deal with the fact that beamlines may have slightly different string</span>
 <span class="c1"># descriptions of the zoom level&quot;</span>
-<span class="k">def</span> <span class="nf">_get_correct_zoom_string</span><span class="p">(</span><span class="n">zoom</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_correct_zoom_string</span><span class="p">(</span><span class="n">zoom</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">zoom</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">):</span>
         <span class="n">zoom</span> <span class="o">=</span> <span class="n">zoom</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">zoom</span>
@@ -486,7 +486,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="ZoomController">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_detector.ZoomController.html#dodal.devices.oav.oav_detector.ZoomController">[docs]</a>
-<span class="k">class</span> <span class="nc">ZoomController</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ZoomController</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Device to control the zoom level. This should be set like</span>
 <span class="sd">        o = OAV(name=&quot;oav&quot;)</span>
@@ -496,19 +496,19 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">    you should wait on any zoom changs to finish before changing the OAV wiring.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">percentage</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">ZOOMPOSCMD&quot;</span><span class="p">)</span>
 
         <span class="c1"># Level is the string description of the zoom level e.g. &quot;1.0x&quot; or &quot;1.0&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">level</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">MP:SELECT&quot;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_get_allowed_zoom_levels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_get_allowed_zoom_levels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
         <span class="n">zoom_levels</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">zoom_levels</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;choices&quot;</span><span class="p">]</span>  <span class="c1"># type: ignore</span>
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level_to_set</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level_to_set</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">allowed_zoom_levels</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_allowed_zoom_levels</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">level_to_set</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowed_zoom_levels</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ZoomLevelNotFoundError</span><span class="p">(</span>
@@ -520,8 +520,8 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="OAV">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_detector.OAV.html#dodal.devices.oav.oav_detector.OAV">[docs]</a>
-<span class="k">class</span> <span class="nc">OAV</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">OAVConfig</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">OAV</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">OAVConfig</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">oav_config</span> <span class="o">=</span> <span class="n">config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_prefix</span> <span class="o">=</span> <span class="n">prefix</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
@@ -557,18 +557,18 @@ window.addEventListener("load", () => mermaid.run());
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_read_current_zoom</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_read_current_zoom</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">_zoom</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">zoom_controller</span><span class="o">.</span><span class="n">level</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">_get_correct_zoom_string</span><span class="p">(</span><span class="n">_zoom</span><span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_get_microns_per_pixel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coord</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_get_microns_per_pixel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coord</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Extracts the microns per x pixel and y pixel for a given zoom level.&quot;&quot;&quot;</span>
         <span class="n">_zoom</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_current_zoom</span><span class="p">()</span>
         <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">_zoom</span><span class="p">]</span><span class="o">.</span><span class="n">microns_per_pixel</span><span class="p">[</span><span class="n">coord</span><span class="p">]</span>
         <span class="n">size</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="n">coord</span><span class="p">]</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">value</span> <span class="o">*</span> <span class="n">DEFAULT_OAV_WINDOW</span><span class="p">[</span><span class="n">coord</span><span class="p">]</span> <span class="o">/</span> <span class="n">size</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_get_beam_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coord</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_get_beam_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coord</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Extracts the beam location in pixels `xCentre` `yCentre`, for a requested \</span>
 <span class="sd">        zoom level. &quot;&quot;&quot;</span>
         <span class="n">_zoom</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_current_zoom</span><span class="p">()</span>
@@ -576,7 +576,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="n">size</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="n">coord</span><span class="p">]</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span> <span class="o">*</span> <span class="n">size</span> <span class="o">/</span> <span class="n">DEFAULT_OAV_WINDOW</span><span class="p">[</span><span class="n">coord</span><span class="p">])</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">mock</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="n">LazyMock</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">DEFAULT_TIMEOUT</span><span class="p">,</span>

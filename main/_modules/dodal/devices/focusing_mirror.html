@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.focusing_mirror &#8212; dodal 1.36.4.dev11+g75f101999 documentation</title>
+    <title>dodal.devices.focusing_mirror &#8212; dodal 1.36.4.dev12+g6e13d857a documentation</title>
   
   
   
@@ -29,7 +29,7 @@
   <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=5fd0b10c"></script>
+    <script src="../../../_static/documentation_options.js?v=6549e8b9"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -450,9 +450,9 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.focusing_mirror</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TypedDict</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TypedDict</span>
 
-<span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
     <span class="n">Device</span><span class="p">,</span>
     <span class="n">DeviceVector</span><span class="p">,</span>
@@ -462,14 +462,14 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">observe_value</span><span class="p">,</span>
     <span class="n">soft_signal_r_and_setter</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ophyd_async.epics.core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">epics_signal_r</span><span class="p">,</span>
     <span class="n">epics_signal_rw</span><span class="p">,</span>
     <span class="n">epics_signal_x</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ophyd_async.epics.motor</span> <span class="kn">import</span> <span class="n">Motor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Motor</span>
 
-<span class="kn">from</span> <span class="nn">dodal.log</span> <span class="kn">import</span> <span class="n">LOGGER</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
 
 <span class="n">VOLTAGE_POLLING_DELAY_S</span> <span class="o">=</span> <span class="mf">0.5</span>
 
@@ -479,7 +479,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="MirrorType">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.focusing_mirror.MirrorType.html#dodal.devices.focusing_mirror.MirrorType">[docs]</a>
-<span class="k">class</span> <span class="nc">MirrorType</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MirrorType</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;See https://manual.nexusformat.org/classes/base_classes/NXmirror.html&quot;&quot;&quot;</span>
 
     <span class="n">SINGLE</span> <span class="o">=</span> <span class="s2">&quot;single&quot;</span>
@@ -489,7 +489,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="MirrorStripe">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.focusing_mirror.MirrorStripe.html#dodal.devices.focusing_mirror.MirrorStripe">[docs]</a>
-<span class="k">class</span> <span class="nc">MirrorStripe</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MirrorStripe</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
     <span class="n">RHODIUM</span> <span class="o">=</span> <span class="s2">&quot;Rhodium&quot;</span>
     <span class="n">BARE</span> <span class="o">=</span> <span class="s2">&quot;Bare&quot;</span>
     <span class="n">PLATINUM</span> <span class="o">=</span> <span class="s2">&quot;Platinum&quot;</span></div>
@@ -498,7 +498,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="MirrorStripeConfiguration">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.focusing_mirror.MirrorStripeConfiguration.html#dodal.devices.focusing_mirror.MirrorStripeConfiguration">[docs]</a>
-<span class="k">class</span> <span class="nc">MirrorStripeConfiguration</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MirrorStripeConfiguration</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
     <span class="n">stripe</span><span class="p">:</span> <span class="n">MirrorStripe</span>
     <span class="n">yaw_mrad</span><span class="p">:</span> <span class="nb">float</span>
     <span class="n">lat_mm</span><span class="p">:</span> <span class="nb">float</span></div>
@@ -507,7 +507,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="MirrorVoltageDemand">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.focusing_mirror.MirrorVoltageDemand.html#dodal.devices.focusing_mirror.MirrorVoltageDemand">[docs]</a>
-<span class="k">class</span> <span class="nc">MirrorVoltageDemand</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MirrorVoltageDemand</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
     <span class="n">N_A</span> <span class="o">=</span> <span class="s2">&quot;N/A&quot;</span>
     <span class="n">OK</span> <span class="o">=</span> <span class="s2">&quot;OK&quot;</span>
     <span class="n">FAIL</span> <span class="o">=</span> <span class="s2">&quot;FAIL&quot;</span>
@@ -517,12 +517,12 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="SingleMirrorVoltage">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.focusing_mirror.SingleMirrorVoltage.html#dodal.devices.focusing_mirror.SingleMirrorVoltage">[docs]</a>
-<span class="k">class</span> <span class="nc">SingleMirrorVoltage</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SingleMirrorVoltage</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract the bimorph mirror voltage PVs into a single device that can be set asynchronously and returns when</span>
 <span class="sd">    the demanded voltage setpoint is accepted, without blocking the caller as this process can take significant time.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_actual_v</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;R&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_setpoint_v</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;D&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_demand_accepted</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="n">MirrorVoltageDemand</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;DSEV&quot;</span><span class="p">)</span>
@@ -531,7 +531,7 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="SingleMirrorVoltage.set">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.focusing_mirror.SingleMirrorVoltage.html#dodal.devices.focusing_mirror.SingleMirrorVoltage.set">[docs]</a>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Combine the following operations into a single set:</span>
 <span class="sd">        1. apply the value to the setpoint PV</span>
 <span class="sd">        3. Wait until demand is accepted</span>
@@ -583,8 +583,8 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="MirrorVoltages">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.focusing_mirror.MirrorVoltages.html#dodal.devices.focusing_mirror.MirrorVoltages">[docs]</a>
-<span class="k">class</span> <span class="nc">MirrorVoltages</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MirrorVoltages</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">daq_configuration_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">voltage_lookup_table_path</span> <span class="o">=</span> <span class="p">(</span>
@@ -597,7 +597,7 @@ window.addEventListener("load", () => mermaid.run());
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_channels_in_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">start_idx</span><span class="p">,</span> <span class="n">end_idx</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_channels_in_range</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">start_idx</span><span class="p">,</span> <span class="n">end_idx</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">DeviceVector</span><span class="p">(</span>
             <span class="p">{</span>
                 <span class="n">i</span> <span class="o">-</span> <span class="n">start_idx</span><span class="p">:</span> <span class="n">SingleMirrorVoltage</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">BM:V</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -609,10 +609,10 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="FocusingMirror">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.focusing_mirror.FocusingMirror.html#dodal.devices.focusing_mirror.FocusingMirror">[docs]</a>
-<span class="k">class</span> <span class="nc">FocusingMirror</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FocusingMirror</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Focusing Mirror&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
@@ -648,11 +648,11 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="FocusingMirrorWithStripes">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.focusing_mirror.FocusingMirrorWithStripes.html#dodal.devices.focusing_mirror.FocusingMirrorWithStripes">[docs]</a>
-<span class="k">class</span> <span class="nc">FocusingMirrorWithStripes</span><span class="p">(</span><span class="n">FocusingMirror</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FocusingMirrorWithStripes</span><span class="p">(</span><span class="n">FocusingMirror</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A focusing mirror where the stripe material can be changed. This is usually done</span>
 <span class="sd">    based on the energy of the beamline.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stripe</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">MirrorStripe</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;STRP:DVAL&quot;</span><span class="p">)</span>
         <span class="c1"># apply the current set stripe setting</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">apply_stripe</span> <span class="o">=</span> <span class="n">epics_signal_x</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;CHANGE.PROC&quot;</span><span class="p">)</span>
@@ -661,7 +661,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="FocusingMirrorWithStripes.energy_to_stripe">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.focusing_mirror.FocusingMirrorWithStripes.html#dodal.devices.focusing_mirror.FocusingMirrorWithStripes.energy_to_stripe">[docs]</a>
-    <span class="k">def</span> <span class="nf">energy_to_stripe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_kev</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MirrorStripeConfiguration</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">energy_to_stripe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy_kev</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MirrorStripeConfiguration</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the stripe, yaw angle and lateral position for the specified energy&quot;&quot;&quot;</span>
         <span class="c1"># In future, this should be configurable per-mirror</span>
         <span class="k">if</span> <span class="n">energy_kev</span> <span class="o">&lt;</span> <span class="mi">7</span><span class="p">:</span>

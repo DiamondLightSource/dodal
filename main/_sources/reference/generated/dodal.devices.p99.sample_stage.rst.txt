@@ -14,9 +14,7 @@ dodal.devices.p99.sample\_stage
    :toctree:
    :recursive:
 
-   ~sample_stage.FilterMotor
    ~sample_stage.SampleAngleStage
-   ~sample_stage.p99StageSelections
 
 
 

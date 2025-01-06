@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Device Standards &#8212; dodal 1.36.4.dev11+g75f101999 documentation</title>
+    <title>Device Standards &#8212; dodal 1.36.4.dev12+g6e13d857a documentation</title>
   
   
   
@@ -30,7 +30,7 @@
   <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=5fd0b10c"></script>
+    <script src="../_static/documentation_options.js?v=6549e8b9"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -401,6 +401,7 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="generated/dodal.beamlines.html">dodal.beamlines</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="generated/dodal.beamlines.adsim.html">dodal.beamlines.adsim</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/dodal.beamlines.b01_1.html">dodal.beamlines.b01_1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/dodal.beamlines.i02_1.html">dodal.beamlines.i02_1</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/dodal.beamlines.i03.html">dodal.beamlines.i03</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/dodal.beamlines.i04.html">dodal.beamlines.i04</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generated/dodal.beamlines.i10.html">dodal.beamlines.i10</a></li>
@@ -449,11 +450,6 @@
 <li class="toctree-l4"><a class="reference internal" href="generated/dodal.devices.apple2_undulator.UndulatorJawPhase.html">dodal.devices.apple2_undulator.UndulatorJawPhase</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/dodal.devices.apple2_undulator.UndulatorPhaseAxes.html">dodal.devices.apple2_undulator.UndulatorPhaseAxes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/dodal.devices.apple2_undulator.UndulatorPhaseMotor.html">dodal.devices.apple2_undulator.UndulatorPhaseMotor</a></li>
-</ul>
-</details></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="generated/dodal.devices.attenuator.html">dodal.devices.attenuator</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="generated/dodal.devices.attenuator.Attenuator.html">dodal.devices.attenuator.Attenuator</a></li>
-<li class="toctree-l4"><a class="reference internal" href="generated/dodal.devices.attenuator.ReadOnlyAttenuator.html">dodal.devices.attenuator.ReadOnlyAttenuator</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="generated/dodal.devices.backlight.html">dodal.devices.backlight</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -895,8 +891,8 @@ should a given device implement. In addition to this the following guidelines ar
 <section id="pv-suffixes">
 <h2>PV Suffixes<a class="headerlink" href="#pv-suffixes" title="Link to this heading">#</a></h2>
 <p>In general devices should contain only the PV suffixes that are generic for any instance of the device e.g.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bragg</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;BRAGG&quot;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
@@ -904,8 +900,8 @@ should a given device implement. In addition to this the following guidelines ar
 </pre></div>
 </div>
 <p>is preferred over</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bragg</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-MO-DCM-01:BRAGG&quot;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
@@ -925,12 +921,12 @@ prepended.</p>
 <p>Anything in a device that is expected to be set externally e.g. by a plan should be a signal, even if it does not
 connect to EPICS. If it does not connect to EPICS it should be a soft signal.</p>
 <p>Whilst it would be possible to do:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
          <span class="bp">self</span><span class="o">.</span><span class="n">param</span> <span class="o">=</span> <span class="s2">&quot;blah&quot;</span>
 
 <span class="n">my_device</span> <span class="o">=</span> <span class="n">MyDevice</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">my_plan</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">my_plan</span><span class="p">():</span>
     <span class="n">my_device</span><span class="o">.</span><span class="n">param</span> <span class="o">=</span> <span class="s2">&quot;new_value&quot;</span>
 </pre></div>
 </div>
@@ -941,12 +937,12 @@ connect to EPICS. If it does not connect to EPICS it should be a soft signal.</p
 lost</p></li>
 </ul>
 <p>Instead you should make a soft signal:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
          <span class="bp">self</span><span class="o">.</span><span class="n">param</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
 
 <span class="n">my_device</span> <span class="o">=</span> <span class="n">MyDevice</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">my_plan</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">my_plan</span><span class="p">():</span>
     <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">mv</span><span class="p">(</span><span class="n">my_device</span><span class="o">.</span><span class="n">param</span><span class="p">,</span> <span class="s2">&quot;new_value&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -959,19 +955,19 @@ lost</p></li>
 * The hardware has changed independently e.g. via EPICS directly
 * The hardware has failed to do what the device expected</p>
 <p>For example, if I have a device that I would like to treat as moving in/out based on an underlying axis then it would be incorrect to implement it like this:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">InOut</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">InOut</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="n">IN</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">OUT</span> <span class="o">=</span> <span class="mi">0</span>
 
-<span class="k">class</span> <span class="nc">MyDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">underlying_motor</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="s2">&quot;MOTOR&quot;</span><span class="p">)</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">in_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_in_out_setter</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="n">InOut</span><span class="p">)</span>
 
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">InOut</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">InOut</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="n">InOut</span><span class="o">.</span><span class="n">IN</span><span class="p">:</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">underlying_motor</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -981,17 +977,17 @@ lost</p></li>
 </div>
 <p>While this may appear to work fine during normal operation the state of in_out is only ever updated if the ophyd device is set. It is incorrect to assume that underlying_motor only changes
 based on this and so this has the issues listed above. Instead you should make sure to update in_out whenever the device is read e.g.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">InOut</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">InOut</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="n">IN</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">OUT</span> <span class="o">=</span> <span class="mi">0</span>
 
-<span class="k">class</span> <span class="nc">MyDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">underlying_motor</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="s2">&quot;MOTOR&quot;</span><span class="p">)</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">in_out</span> <span class="o">=</span> <span class="n">create_hardware_backed_soft_signal</span><span class="p">(</span><span class="n">InOut</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_in_out_from_hardware</span><span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_get_in_out_from_hardware</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_get_in_out_from_hardware</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">current_position</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">underlying_motor</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">isclose</span><span class="p">(</span><span class="n">current_position</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">InOut</span><span class="o">.</span><span class="n">IN</span>
@@ -1002,7 +998,7 @@ based on this and so this has the issues listed above. Instead you should make s
 
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">InOut</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">InOut</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="n">InOut</span><span class="o">.</span><span class="n">IN</span><span class="p">:</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">underlying_motor</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>

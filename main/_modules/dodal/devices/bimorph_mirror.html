@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.bimorph_mirror &#8212; dodal 1.36.4.dev11+g75f101999 documentation</title>
+    <title>dodal.devices.bimorph_mirror &#8212; dodal 1.36.4.dev12+g6e13d857a documentation</title>
   
   
   
@@ -29,7 +29,7 @@
   <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=5fd0b10c"></script>
+    <script src="../../../_static/documentation_options.js?v=6549e8b9"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -450,12 +450,12 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.bimorph_mirror</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">asyncio</span>
-<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Mapping</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Annotated</span> <span class="k">as</span> <span class="n">A</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Annotated</span> <span class="k">as</span> <span class="n">A</span>
 
-<span class="kn">from</span> <span class="nn">bluesky.protocols</span> <span class="kn">import</span> <span class="n">Movable</span>
-<span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Movable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DEFAULT_TIMEOUT</span><span class="p">,</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
     <span class="n">DeviceVector</span><span class="p">,</span>
@@ -466,8 +466,8 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">StrictEnum</span><span class="p">,</span>
     <span class="n">wait_for_value</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="n">StandardReadableFormat</span> <span class="k">as</span> <span class="n">Format</span>
-<span class="kn">from</span> <span class="nn">ophyd_async.epics.core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">StandardReadableFormat</span> <span class="k">as</span> <span class="n">Format</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">EpicsDevice</span><span class="p">,</span>
     <span class="n">PvSuffix</span><span class="p">,</span>
     <span class="n">epics_signal_r</span><span class="p">,</span>
@@ -478,7 +478,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="BimorphMirrorOnOff">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.bimorph_mirror.BimorphMirrorOnOff.html#dodal.devices.bimorph_mirror.BimorphMirrorOnOff">[docs]</a>
-<span class="k">class</span> <span class="nc">BimorphMirrorOnOff</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BimorphMirrorOnOff</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
     <span class="n">ON</span> <span class="o">=</span> <span class="s2">&quot;ON&quot;</span>
     <span class="n">OFF</span> <span class="o">=</span> <span class="s2">&quot;OFF&quot;</span></div>
 
@@ -486,7 +486,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="BimorphMirrorMode">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.bimorph_mirror.BimorphMirrorMode.html#dodal.devices.bimorph_mirror.BimorphMirrorMode">[docs]</a>
-<span class="k">class</span> <span class="nc">BimorphMirrorMode</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BimorphMirrorMode</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
     <span class="n">HI</span> <span class="o">=</span> <span class="s2">&quot;HI&quot;</span>
     <span class="n">NORMAL</span> <span class="o">=</span> <span class="s2">&quot;NORMAL&quot;</span>
     <span class="n">FAST</span> <span class="o">=</span> <span class="s2">&quot;FAST&quot;</span></div>
@@ -495,7 +495,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="BimorphMirrorStatus">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.bimorph_mirror.BimorphMirrorStatus.html#dodal.devices.bimorph_mirror.BimorphMirrorStatus">[docs]</a>
-<span class="k">class</span> <span class="nc">BimorphMirrorStatus</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BimorphMirrorStatus</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
     <span class="n">IDLE</span> <span class="o">=</span> <span class="s2">&quot;Idle&quot;</span>
     <span class="n">BUSY</span> <span class="o">=</span> <span class="s2">&quot;Busy&quot;</span>
     <span class="n">ERROR</span> <span class="o">=</span> <span class="s2">&quot;Error&quot;</span></div>
@@ -504,7 +504,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="BimorphMirrorChannel">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.bimorph_mirror.BimorphMirrorChannel.html#dodal.devices.bimorph_mirror.BimorphMirrorChannel">[docs]</a>
-<span class="k">class</span> <span class="nc">BimorphMirrorChannel</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">EpicsDevice</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BimorphMirrorChannel</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">EpicsDevice</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Collection of PVs comprising a single bimorph channel.</span>
 
 <span class="sd">    Attributes:</span>
@@ -523,7 +523,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="BimorphMirror">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.bimorph_mirror.BimorphMirror.html#dodal.devices.bimorph_mirror.BimorphMirror">[docs]</a>
-<span class="k">class</span> <span class="nc">BimorphMirror</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BimorphMirror</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Class to represent CAENels Bimorph Mirrors.</span>
 
 <span class="sd">    Attributes:</span>
@@ -533,7 +533,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">        status: Readable BimorphMirrorStatus Busy/Idle status</span>
 <span class="sd">        err: Alarm status&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">number_of_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">number_of_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            prefix: str PV prefix</span>
@@ -563,7 +563,7 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="BimorphMirror.set">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.bimorph_mirror.BimorphMirror.html#dodal.devices.bimorph_mirror.BimorphMirror.set">[docs]</a>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0001</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0001</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets bimorph voltages in parrallel via target voltage and all proc.</span>
 
 <span class="sd">        Args:</span>
@@ -605,8 +605,8 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="tolerance_func_builder">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.bimorph_mirror.html#dodal.devices.bimorph_mirror.tolerance_func_builder">[docs]</a>
-<span class="k">def</span> <span class="nf">tolerance_func_builder</span><span class="p">(</span><span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">target_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">is_within_value</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">tolerance_func_builder</span><span class="p">(</span><span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">target_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_within_value</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">target_value</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">tolerance</span>
 
     <span class="k">return</span> <span class="n">is_within_value</span></div>

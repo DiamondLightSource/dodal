@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.robot &#8212; dodal 1.36.4.dev11+g75f101999 documentation</title>
+    <title>dodal.devices.robot &#8212; dodal 1.36.4.dev12+g6e13d857a documentation</title>
   
   
   
@@ -29,7 +29,7 @@
   <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=5fd0b10c"></script>
+    <script src="../../../_static/documentation_options.js?v=6549e8b9"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -450,39 +450,39 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.robot</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">asyncio</span>
-<span class="kn">from</span> <span class="nn">asyncio</span> <span class="kn">import</span> <span class="n">FIRST_COMPLETED</span><span class="p">,</span> <span class="n">CancelledError</span><span class="p">,</span> <span class="n">Task</span><span class="p">,</span> <span class="n">wait_for</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">asyncio</span><span class="w"> </span><span class="kn">import</span> <span class="n">FIRST_COMPLETED</span><span class="p">,</span> <span class="n">CancelledError</span><span class="p">,</span> <span class="n">Task</span><span class="p">,</span> <span class="n">wait_for</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 
-<span class="kn">from</span> <span class="nn">bluesky.protocols</span> <span class="kn">import</span> <span class="n">Movable</span>
-<span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Movable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
     <span class="n">StandardReadable</span><span class="p">,</span>
     <span class="n">StrictEnum</span><span class="p">,</span>
     <span class="n">set_and_wait_for_value</span><span class="p">,</span>
     <span class="n">wait_for_value</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ophyd_async.epics.core</span> <span class="kn">import</span> <span class="n">epics_signal_r</span><span class="p">,</span> <span class="n">epics_signal_rw_rbv</span><span class="p">,</span> <span class="n">epics_signal_x</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_r</span><span class="p">,</span> <span class="n">epics_signal_rw_rbv</span><span class="p">,</span> <span class="n">epics_signal_x</span>
 
-<span class="kn">from</span> <span class="nn">dodal.log</span> <span class="kn">import</span> <span class="n">LOGGER</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
 
 
-<span class="k">class</span> <span class="nc">RobotLoadFailed</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RobotLoadFailed</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="n">error_code</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">error_string</span><span class="p">:</span> <span class="nb">str</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_code</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">error_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_code</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">error_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">error_code</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_string</span> <span class="o">=</span> <span class="n">error_code</span><span class="p">,</span> <span class="n">error_string</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">error_string</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_string</span>
 
 
 <div class="viewcode-block" id="SampleLocation">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.robot.SampleLocation.html#dodal.devices.robot.SampleLocation">[docs]</a>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">SampleLocation</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SampleLocation</span><span class="p">:</span>
     <span class="n">puck</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">pin</span><span class="p">:</span> <span class="nb">int</span></div>
 
@@ -490,7 +490,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="PinMounted">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.robot.PinMounted.html#dodal.devices.robot.PinMounted">[docs]</a>
-<span class="k">class</span> <span class="nc">PinMounted</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PinMounted</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
     <span class="n">NO_PIN_MOUNTED</span> <span class="o">=</span> <span class="s2">&quot;No Pin Mounted&quot;</span>
     <span class="n">PIN_MOUNTED</span> <span class="o">=</span> <span class="s2">&quot;Pin Mounted&quot;</span></div>
 
@@ -498,7 +498,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="BartRobot">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.robot.BartRobot.html#dodal.devices.robot.BartRobot">[docs]</a>
-<span class="k">class</span> <span class="nc">BartRobot</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BartRobot</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The sample changing robot.&quot;&quot;&quot;</span>
 
     <span class="c1"># How long to wait for the robot if it is busy soaking/drying</span>
@@ -510,7 +510,7 @@ window.addEventListener("load", () => mermaid.run());
     <span class="c1"># How far the gonio position can be out before loading will fail</span>
     <span class="n">LOAD_TOLERANCE_MM</span> <span class="o">=</span> <span class="mf">0.02</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -536,17 +536,17 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="BartRobot.pin_mounted_or_no_pin_found">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.robot.BartRobot.html#dodal.devices.robot.BartRobot.pin_mounted_or_no_pin_found">[docs]</a>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">pin_mounted_or_no_pin_found</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">pin_mounted_or_no_pin_found</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;This co-routine will finish when either a pin is detected or the robot gives</span>
 <span class="sd">        an error saying no pin was found (whichever happens first). In the case where no</span>
 <span class="sd">        pin was found a RobotLoadFailed error is raised.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">async</span> <span class="k">def</span> <span class="nf">raise_if_no_pin</span><span class="p">():</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">raise_if_no_pin</span><span class="p">():</span>
             <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error_code</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">NO_PIN_ERROR_CODE</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">RobotLoadFailed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">NO_PIN_ERROR_CODE</span><span class="p">,</span> <span class="s2">&quot;Pin was not detected&quot;</span><span class="p">)</span>
 
-        <span class="k">async</span> <span class="k">def</span> <span class="nf">wfv</span><span class="p">():</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">wfv</span><span class="p">():</span>
             <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gonio_pin_sensor</span><span class="p">,</span> <span class="n">PinMounted</span><span class="o">.</span><span class="n">PIN_MOUNTED</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
         <span class="n">tasks</span> <span class="o">=</span> <span class="p">[</span>
@@ -570,7 +570,7 @@ window.addEventListener("load", () => mermaid.run());
             <span class="k">raise</span></div>
 
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_load_pin_and_puck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_location</span><span class="p">:</span> <span class="n">SampleLocation</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_load_pin_and_puck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_location</span><span class="p">:</span> <span class="n">SampleLocation</span><span class="p">):</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loading pin </span><span class="si">{</span><span class="n">sample_location</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">program_running</span><span class="o">.</span><span class="n">get_value</span><span class="p">():</span>
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
@@ -592,7 +592,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">pin_mounted_or_no_pin_found</span><span class="p">()</span>
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">SampleLocation</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">SampleLocation</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">await</span> <span class="n">wait_for</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_load_pin_and_puck</span><span class="p">(</span><span class="n">value</span><span class="p">),</span>
@@ -602,7 +602,7 @@ window.addEventListener("load", () => mermaid.run());
             <span class="c1"># Will only need to catch asyncio.TimeoutError after https://github.com/bluesky/ophyd-async/issues/572</span>
             <span class="n">error_code</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_code</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
             <span class="n">error_string</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_str</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
-            <span class="k">raise</span> <span class="n">RobotLoadFailed</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">error_code</span><span class="p">),</span> <span class="n">error_string</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+            <span class="k">raise</span> <span class="n">RobotLoadFailed</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">error_code</span><span class="p">),</span> <span class="n">error_string</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span></div>
 
 </pre></div>
 

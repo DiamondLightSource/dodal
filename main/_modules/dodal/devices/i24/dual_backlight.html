@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.i24.dual_backlight &#8212; dodal 1.36.4.dev11+g75f101999 documentation</title>
+    <title>dodal.devices.i24.dual_backlight &#8212; dodal 1.36.4.dev12+g6e13d857a documentation</title>
   
   
   
@@ -29,7 +29,7 @@
   <link href="../../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=5fd0b10c"></script>
+    <script src="../../../../_static/documentation_options.js?v=6549e8b9"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -450,13 +450,13 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.i24.dual_backlight</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="n">AsyncStatus</span><span class="p">,</span> <span class="n">StandardReadable</span><span class="p">,</span> <span class="n">StrictEnum</span>
-<span class="kn">from</span> <span class="nn">ophyd_async.epics.core</span> <span class="kn">import</span> <span class="n">epics_signal_rw</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncStatus</span><span class="p">,</span> <span class="n">StandardReadable</span><span class="p">,</span> <span class="n">StrictEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_rw</span>
 
 
 <div class="viewcode-block" id="BacklightPositions">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i24.dual_backlight.BacklightPositions.html#dodal.devices.i24.dual_backlight.BacklightPositions">[docs]</a>
-<span class="k">class</span> <span class="nc">BacklightPositions</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BacklightPositions</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
     <span class="n">OUT</span> <span class="o">=</span> <span class="s2">&quot;Out&quot;</span>
     <span class="n">IN</span> <span class="o">=</span> <span class="s2">&quot;In&quot;</span>
     <span class="n">LOAD_CHECK</span> <span class="o">=</span> <span class="s2">&quot;LoadCheck&quot;</span>
@@ -468,7 +468,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="LEDStatus">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i24.dual_backlight.LEDStatus.html#dodal.devices.i24.dual_backlight.LEDStatus">[docs]</a>
-<span class="k">class</span> <span class="nc">LEDStatus</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LEDStatus</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
     <span class="n">OFF</span> <span class="o">=</span> <span class="s2">&quot;OFF&quot;</span>
     <span class="n">ON</span> <span class="o">=</span> <span class="s2">&quot;ON&quot;</span></div>
 
@@ -476,23 +476,23 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="BacklightPositioner">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i24.dual_backlight.BacklightPositioner.html#dodal.devices.i24.dual_backlight.BacklightPositioner">[docs]</a>
-<span class="k">class</span> <span class="nc">BacklightPositioner</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BacklightPositioner</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Device to control the backlight position.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Enum description of the backlight position e.g. &quot;In&quot;, &quot;OAV2&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pos_level</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">BacklightPositions</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;MP:SELECT&quot;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">BacklightPositions</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">BacklightPositions</span><span class="p">):</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_level</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="DualBacklight">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i24.dual_backlight.DualBacklight.html#dodal.devices.i24.dual_backlight.DualBacklight">[docs]</a>
-<span class="k">class</span> <span class="nc">DualBacklight</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DualBacklight</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Device to trigger the dual backlight on I24.</span>
 <span class="sd">    This device is made up by two LEDs:</span>
@@ -507,7 +507,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">    in &quot;Out&quot; position (switched off), LED2 might still be on.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">backlight_state</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">LEDStatus</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-DI-LED-01:TOGGLE&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">backlight_position</span> <span class="o">=</span> <span class="n">BacklightPositioner</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-MO-BL-01:&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
@@ -515,7 +515,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">BacklightPositions</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">BacklightPositions</span><span class="p">):</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlight_position</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="n">BacklightPositions</span><span class="o">.</span><span class="n">OUT</span><span class="p">:</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlight_state</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">LEDStatus</span><span class="o">.</span><span class="n">OFF</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>

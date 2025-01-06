@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.zocalo.zocalo_interaction &#8212; dodal 1.36.4.dev11+g75f101999 documentation</title>
+    <title>dodal.devices.zocalo.zocalo_interaction &#8212; dodal 1.36.4.dev12+g6e13d857a documentation</title>
   
   
   
@@ -29,7 +29,7 @@
   <link href="../../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=5fd0b10c"></script>
+    <script src="../../../../_static/documentation_options.js?v=6549e8b9"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -450,20 +450,20 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.zocalo.zocalo_interaction</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">dataclasses</span>
-<span class="kn">import</span> <span class="nn">getpass</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">socket</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">dataclasses</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">getpass</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">socket</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 
-<span class="kn">import</span> <span class="nn">zocalo.configuration</span>
-<span class="kn">from</span> <span class="nn">workflows.transport</span> <span class="kn">import</span> <span class="n">lookup</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">zocalo.configuration</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">workflows.transport</span><span class="w"> </span><span class="kn">import</span> <span class="n">lookup</span>
 
-<span class="kn">from</span> <span class="nn">dodal.devices.zocalo.zocalo_constants</span> <span class="kn">import</span> <span class="n">ZOCALO_ENV</span>
-<span class="kn">from</span> <span class="nn">dodal.log</span> <span class="kn">import</span> <span class="n">LOGGER</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.zocalo.zocalo_constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">ZOCALO_ENV</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
 
 
-<span class="k">def</span> <span class="nf">_get_zocalo_connection</span><span class="p">(</span><span class="n">environment</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_zocalo_connection</span><span class="p">(</span><span class="n">environment</span><span class="p">):</span>
     <span class="n">zc</span> <span class="o">=</span> <span class="n">zocalo</span><span class="o">.</span><span class="n">configuration</span><span class="o">.</span><span class="n">from_file</span><span class="p">()</span>
     <span class="n">zc</span><span class="o">.</span><span class="n">activate_environment</span><span class="p">(</span><span class="n">environment</span><span class="p">)</span>
 
@@ -475,7 +475,7 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="ZocaloStartInfo">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.zocalo.ZocaloStartInfo.html#dodal.devices.zocalo.ZocaloStartInfo">[docs]</a>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">ZocaloStartInfo</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ZocaloStartInfo</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    ispyb_dcid (int): The ID of the data collection in ISPyB</span>
 <span class="sd">    filename (str): The name of the file that the detector will store into dev/shm</span>
@@ -494,7 +494,7 @@ window.addEventListener("load", () => mermaid.run());
 
 
 
-<span class="k">def</span> <span class="nf">_get_zocalo_headers</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_zocalo_headers</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
     <span class="n">user</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ZOCALO_GO_USER&quot;</span><span class="p">)</span>
 
     <span class="c1"># cannot default as getuser() will throw when called from inside a container</span>
@@ -507,7 +507,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="ZocaloTrigger">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.zocalo.ZocaloTrigger.html#dodal.devices.zocalo.ZocaloTrigger">[docs]</a>
-<span class="k">class</span> <span class="nc">ZocaloTrigger</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ZocaloTrigger</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This class just sends &#39;run_start&#39; and &#39;run_end&#39; messages to zocalo, it is</span>
 <span class="sd">    intended to be used in bluesky callback classes. To get results from zocalo back</span>
 <span class="sd">    into a plan, use the ZocaloResults ophyd device.</span>
@@ -515,10 +515,10 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">    see https://diamondlightsource.github.io/dodal/main/how-to/zocalo.html for</span>
 <span class="sd">    more information about zocalo.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environment</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">ZOCALO_ENV</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environment</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">ZOCALO_ENV</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">zocalo_environment</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">environment</span>
 
-    <span class="k">def</span> <span class="nf">_send_to_zocalo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_send_to_zocalo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="n">transport</span> <span class="o">=</span> <span class="n">_get_zocalo_connection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">zocalo_environment</span><span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
@@ -537,7 +537,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="ZocaloTrigger.run_start">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.zocalo.ZocaloTrigger.html#dodal.devices.zocalo.ZocaloTrigger.run_start">[docs]</a>
-    <span class="k">def</span> <span class="nf">run_start</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_start</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">start_data</span><span class="p">:</span> <span class="n">ZocaloStartInfo</span><span class="p">,</span>
     <span class="p">):</span>
@@ -555,7 +555,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="ZocaloTrigger.run_end">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.zocalo.ZocaloTrigger.html#dodal.devices.zocalo.ZocaloTrigger.run_end">[docs]</a>
-    <span class="k">def</span> <span class="nf">run_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_collection_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_collection_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Tells the data analysis pipeline we have finished a run.</span>
 <span class="sd">        Assumes that appropriate data has already been put into ISPyB</span>
 

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.oav_parameters &#8212; dodal 1.36.4.dev11+g75f101999 documentation</title>
+    <title>dodal.devices.oav.oav_parameters &#8212; dodal 1.36.4.dev12+g6e13d857a documentation</title>
   
   
   
@@ -29,7 +29,7 @@
   <link href="../../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=5fd0b10c"></script>
+    <script src="../../../../_static/documentation_options.js?v=6549e8b9"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -450,12 +450,12 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.oav.oav_parameters</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="k">as</span> <span class="nn">et</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">ChainMap</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
-<span class="kn">from</span> <span class="nn">xml.etree.ElementTree</span> <span class="kn">import</span> <span class="n">Element</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xml.etree.ElementTree</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">et</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChainMap</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">xml.etree.ElementTree</span><span class="w"> </span><span class="kn">import</span> <span class="n">Element</span>
 
 <span class="c1"># GDA currently assumes this aspect ratio for the OAV window size.</span>
 <span class="c1"># For some beamline this doesn&#39;t affect anything as the actual OAV aspect ratio</span>
@@ -468,7 +468,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_element_as_float</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">Element</span><span class="p">,</span> <span class="n">element_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_element_as_float</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">Element</span><span class="p">,</span> <span class="n">element_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
     <span class="n">element</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">element_name</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">element</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">element_name</span><span class="si">}</span><span class="s2"> not found in </span><span class="si">{</span><span class="n">node</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="k">assert</span> <span class="n">element</span><span class="o">.</span><span class="n">text</span>
@@ -477,12 +477,12 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="OAVParameters">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_parameters.OAVParameters.html#dodal.devices.oav.oav_parameters.OAVParameters">[docs]</a>
-<span class="k">class</span> <span class="nc">OAVParameters</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">OAVParameters</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The parameters to set up the OAV depending on the context.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">context</span><span class="o">=</span><span class="s2">&quot;loopCentring&quot;</span><span class="p">,</span>
         <span class="n">oav_config_json</span><span class="o">=</span><span class="n">OAV_CONFIG_JSON</span><span class="p">,</span>
@@ -499,7 +499,7 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="OAVParameters.load_json">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_parameters.OAVParameters.html#dodal.devices.oav.oav_parameters.OAVParameters.load_json">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">load_json</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_json</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Loads the json from the specified file, and returns a dict with all the</span>
 <span class="sd">        individual top-level k-v pairs, and one with all the subdicts.</span>
@@ -515,12 +515,12 @@ window.addEventListener("load", () => mermaid.run());
         <span class="k">return</span> <span class="n">global_params</span><span class="p">,</span> <span class="n">context_dicts</span></div>
 
 
-    <span class="k">def</span> <span class="nf">update_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">active_params</span><span class="o">.</span><span class="n">maps</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">active_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_params</span><span class="o">.</span><span class="n">new_child</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context_dicts</span><span class="p">[</span><span class="n">context</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">update_self_from_current_context</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">param_type</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_self_from_current_context</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">param_type</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
             <span class="n">param</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">param</span> <span class="o">=</span> <span class="n">param_type</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
@@ -529,7 +529,7 @@ window.addEventListener("load", () => mermaid.run());
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;OAV param </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> from the OAV centring params json file has the &quot;</span>
                     <span class="sa">f</span><span class="s2">&quot;wrong type, should be </span><span class="si">{</span><span class="n">param_type</span><span class="si">}</span><span class="s2"> but is </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">param</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
-                <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">exposure</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">update</span><span class="p">(</span><span class="s2">&quot;exposure&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">acquire_period</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">update</span><span class="p">(</span><span class="s2">&quot;acqPeriod&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
@@ -556,7 +556,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="OAVParameters.get_max_tip_distance_in_pixels">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_parameters.OAVParameters.html#dodal.devices.oav.oav_parameters.OAVParameters.get_max_tip_distance_in_pixels">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_max_tip_distance_in_pixels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">micronsPerPixel</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_max_tip_distance_in_pixels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">micronsPerPixel</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the maximum tip distance in pixels.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -568,7 +568,7 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="ZoomParams">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_parameters.ZoomParams.html#dodal.devices.oav.oav_parameters.ZoomParams">[docs]</a>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">ZoomParams</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ZoomParams</span><span class="p">:</span>
     <span class="n">microns_per_pixel</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span>
     <span class="n">crosshair</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span></div>
 
@@ -576,26 +576,26 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="OAVConfig">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.oav.oav_parameters.OAVConfig.html#dodal.devices.oav.oav_parameters.OAVConfig">[docs]</a>
-<span class="k">class</span> <span class="nc">OAVConfig</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">OAVConfig</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; Read the OAV config files and return a dictionary of {&#39;zoom_level&#39;: ZoomParams}\</span>
 <span class="sd">    with information about microns per pixels and crosshairs.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zoom_params_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">display_config_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zoom_params_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">display_config_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">zoom_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_zoom_params</span><span class="p">(</span><span class="n">zoom_params_file</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">display_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_display_config</span><span class="p">(</span><span class="n">display_config_file</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_get_display_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display_config_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_display_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">display_config_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">display_config_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">file_lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">file_lines</span>
 
-    <span class="k">def</span> <span class="nf">_get_zoom_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zoom_params_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_zoom_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zoom_params_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">tree</span> <span class="o">=</span> <span class="n">et</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">zoom_params_file</span><span class="p">)</span>
         <span class="n">root</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;.//zoomLevel&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_read_zoom_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_read_zoom_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="n">um_per_pix</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">zoom_params</span><span class="p">:</span>
             <span class="n">zoom</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">_get_element_as_float</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;level&quot;</span><span class="p">))</span>
@@ -604,7 +604,7 @@ window.addEventListener("load", () => mermaid.run());
             <span class="n">um_per_pix</span><span class="p">[</span><span class="n">zoom</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">um_pix_x</span><span class="p">,</span> <span class="n">um_pix_y</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">um_per_pix</span>
 
-    <span class="k">def</span> <span class="nf">_read_display_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_read_display_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="n">crosshairs</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">display_config</span><span class="p">)):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">display_config</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;zoomLevel&quot;</span><span class="p">):</span>
@@ -614,7 +614,7 @@ window.addEventListener("load", () => mermaid.run());
                 <span class="n">crosshairs</span><span class="p">[</span><span class="n">zoom</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">crosshairs</span>
 
-    <span class="k">def</span> <span class="nf">get_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ZoomParams</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ZoomParams</span><span class="p">]:</span>
         <span class="n">config</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">um_xy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_zoom_params</span><span class="p">()</span>
         <span class="n">bc_xy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_display_config</span><span class="p">()</span>

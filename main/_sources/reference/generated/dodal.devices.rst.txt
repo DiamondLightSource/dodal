@@ -14,7 +14,6 @@
    dodal.devices.aperture
    dodal.devices.aperturescatterguard
    dodal.devices.apple2_undulator
-   dodal.devices.attenuator
    dodal.devices.backlight
    dodal.devices.bimorph_mirror
    dodal.devices.cryostream

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.i10 &#8212; dodal 1.36.4.dev11+g75f101999 documentation</title>
+    <title>dodal.beamlines.i10 &#8212; dodal 1.36.4.dev12+g6e13d857a documentation</title>
   
   
   
@@ -29,7 +29,7 @@
   <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=5fd0b10c"></script>
+    <script src="../../../_static/documentation_options.js?v=6549e8b9"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -453,38 +453,38 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for dodal.beamlines.i10</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span> <span class="nn">dodal.common.beamlines.beamline_utils</span> <span class="kn">import</span> <span class="n">device_factory</span><span class="p">,</span> <span class="n">device_instantiation</span>
-<span class="kn">from</span> <span class="nn">dodal.common.beamlines.beamline_utils</span> <span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_utils_beamline</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.apple2_undulator</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">device_factory</span><span class="p">,</span> <span class="n">device_instantiation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_utils_beamline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.apple2_undulator</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">UndulatorGap</span><span class="p">,</span>
     <span class="n">UndulatorJawPhase</span><span class="p">,</span>
     <span class="n">UndulatorPhaseAxes</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.current_amplifiers</span> <span class="kn">import</span> <span class="n">CurrentAmpDet</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.i10.i10_apple2</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.current_amplifiers</span><span class="w"> </span><span class="kn">import</span> <span class="n">CurrentAmpDet</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.i10.i10_apple2</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">I10Apple2</span><span class="p">,</span>
     <span class="n">I10Apple2PGM</span><span class="p">,</span>
     <span class="n">I10Apple2Pol</span><span class="p">,</span>
     <span class="n">LinearArbitraryAngle</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.i10.i10_setting_data</span> <span class="kn">import</span> <span class="n">I10Grating</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.i10.mirrors</span> <span class="kn">import</span> <span class="n">PiezoMirror</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.i10.rasor.rasor_current_amp</span> <span class="kn">import</span> <span class="n">RasorFemto</span><span class="p">,</span> <span class="n">RasorSR570</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.i10.rasor.rasor_motors</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.i10.i10_setting_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">I10Grating</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.i10.mirrors</span><span class="w"> </span><span class="kn">import</span> <span class="n">PiezoMirror</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.i10.rasor.rasor_current_amp</span><span class="w"> </span><span class="kn">import</span> <span class="n">RasorFemto</span><span class="p">,</span> <span class="n">RasorSR570</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.i10.rasor.rasor_motors</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DetSlits</span><span class="p">,</span>
     <span class="n">Diffractometer</span><span class="p">,</span>
     <span class="n">PaStage</span><span class="p">,</span>
     <span class="n">PinHole</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.i10.rasor.rasor_scaler_cards</span> <span class="kn">import</span> <span class="n">RasorScalerCard1</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.i10.slits</span> <span class="kn">import</span> <span class="n">I10PrimarySlits</span><span class="p">,</span> <span class="n">I10Slits</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.motors</span> <span class="kn">import</span> <span class="n">XYZPositioner</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.pgm</span> <span class="kn">import</span> <span class="n">PGM</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.slits</span> <span class="kn">import</span> <span class="n">MinimalSlits</span>
-<span class="kn">from</span> <span class="nn">dodal.log</span> <span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_log_beamline</span>
-<span class="kn">from</span> <span class="nn">dodal.utils</span> <span class="kn">import</span> <span class="n">BeamlinePrefix</span><span class="p">,</span> <span class="n">get_beamline_name</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.i10.rasor.rasor_scaler_cards</span><span class="w"> </span><span class="kn">import</span> <span class="n">RasorScalerCard1</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.i10.slits</span><span class="w"> </span><span class="kn">import</span> <span class="n">I10PrimarySlits</span><span class="p">,</span> <span class="n">I10Slits</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.motors</span><span class="w"> </span><span class="kn">import</span> <span class="n">XYZPositioner</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.pgm</span><span class="w"> </span><span class="kn">import</span> <span class="n">PGM</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.slits</span><span class="w"> </span><span class="kn">import</span> <span class="n">MinimalSlits</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_log_beamline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">BeamlinePrefix</span><span class="p">,</span> <span class="n">get_beamline_name</span>
 
 <span class="n">BL</span> <span class="o">=</span> <span class="n">get_beamline_name</span><span class="p">(</span><span class="s2">&quot;i10&quot;</span><span class="p">)</span>
 <span class="n">set_log_beamline</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>
@@ -505,7 +505,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="idd_gap">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i10.html#dodal.beamlines.i10.idd_gap">[docs]</a>
-<span class="k">def</span> <span class="nf">idd_gap</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">idd_gap</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UndulatorGap</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
@@ -521,7 +521,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="idd_phase_axes">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i10.html#dodal.beamlines.i10.idd_phase_axes">[docs]</a>
-<span class="k">def</span> <span class="nf">idd_phase_axes</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">idd_phase_axes</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UndulatorPhaseAxes</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
@@ -541,7 +541,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="idd_jaw">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i10.html#dodal.beamlines.i10.idd_jaw">[docs]</a>
-<span class="k">def</span> <span class="nf">idd_jaw</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">idd_jaw</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UndulatorJawPhase</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
@@ -558,7 +558,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="idu_gap">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i10.html#dodal.beamlines.i10.idu_gap">[docs]</a>
-<span class="k">def</span> <span class="nf">idu_gap</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">idu_gap</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UndulatorGap</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
@@ -574,7 +574,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="idu_phase_axes">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i10.html#dodal.beamlines.i10.idu_phase_axes">[docs]</a>
-<span class="k">def</span> <span class="nf">idu_phase_axes</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">idu_phase_axes</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UndulatorPhaseAxes</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
@@ -594,7 +594,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="idu_jaw">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i10.html#dodal.beamlines.i10.idu_jaw">[docs]</a>
-<span class="k">def</span> <span class="nf">idu_jaw</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">idu_jaw</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UndulatorJawPhase</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
@@ -611,7 +611,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="pgm">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i10.html#dodal.beamlines.i10.pgm">[docs]</a>
-<span class="k">def</span> <span class="nf">pgm</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PGM</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">pgm</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PGM</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
         <span class="n">device_factory</span><span class="o">=</span><span class="n">PGM</span><span class="p">,</span>
         <span class="n">name</span><span class="o">=</span><span class="s2">&quot;pgm&quot;</span><span class="p">,</span>
@@ -626,7 +626,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="idu_gap_phase">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i10.html#dodal.beamlines.i10.idu_gap_phase">[docs]</a>
-<span class="k">def</span> <span class="nf">idu_gap_phase</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">idu_gap_phase</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">I10Apple2</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
@@ -651,7 +651,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="idd_gap_phase">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i10.html#dodal.beamlines.i10.idd_gap_phase">[docs]</a>
-<span class="k">def</span> <span class="nf">idd_gap_phase</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">idd_gap_phase</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">I10Apple2</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
@@ -676,7 +676,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="idu_pol">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i10.html#dodal.beamlines.i10.idu_pol">[docs]</a>
-<span class="k">def</span> <span class="nf">idu_pol</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">idu_pol</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">I10Apple2Pol</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
@@ -692,7 +692,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="idd_pol">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i10.html#dodal.beamlines.i10.idd_pol">[docs]</a>
-<span class="k">def</span> <span class="nf">idd_pol</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">idd_pol</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">I10Apple2Pol</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
@@ -708,7 +708,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="idu">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i10.html#dodal.beamlines.i10.idu">[docs]</a>
-<span class="k">def</span> <span class="nf">idu</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">idu</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">I10Apple2PGM</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
@@ -725,7 +725,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="idd">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i10.html#dodal.beamlines.i10.idd">[docs]</a>
-<span class="k">def</span> <span class="nf">idd</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">idd</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">I10Apple2PGM</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
@@ -742,7 +742,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="idu_la_angle">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i10.html#dodal.beamlines.i10.idu_la_angle">[docs]</a>
-<span class="k">def</span> <span class="nf">idu_la_angle</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">idu_la_angle</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearArbitraryAngle</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
@@ -758,7 +758,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="idd_la_angle">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i10.html#dodal.beamlines.i10.idd_la_angle">[docs]</a>
-<span class="k">def</span> <span class="nf">idd_la_angle</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">idd_la_angle</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LinearArbitraryAngle</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
@@ -773,31 +773,31 @@ window.addEventListener("load", () => mermaid.run());
 
 
 <span class="nd">@device_factory</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">first_mirror</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">PiezoMirror</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">first_mirror</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">PiezoMirror</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">PiezoMirror</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-OP-COL-01:&quot;</span><span class="p">)</span>
 
 
 <span class="nd">@device_factory</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">switching_mirror</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">PiezoMirror</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">switching_mirror</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">PiezoMirror</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">PiezoMirror</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-OP-SWTCH-01:&quot;</span><span class="p">)</span>
 
 
 <span class="nd">@device_factory</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">slit_1</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">I10PrimarySlits</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">slit_1</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">I10PrimarySlits</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">I10PrimarySlits</span><span class="p">(</span>
         <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-AL-SLITS-01:&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
 
 <span class="nd">@device_factory</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">slit_2</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">I10Slits</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">slit_2</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">I10Slits</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">I10Slits</span><span class="p">(</span>
         <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-AL-SLITS-02:&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
 
 <span class="nd">@device_factory</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">slit_3</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">I10Slits</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">slit_3</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">I10Slits</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">I10Slits</span><span class="p">(</span>
         <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-AL-SLITS-03:&quot;</span><span class="p">,</span>
     <span class="p">)</span>
@@ -807,12 +807,12 @@ window.addEventListener("load", () => mermaid.run());
 
 
 <span class="nd">@device_factory</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">focusing_mirror</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">PiezoMirror</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">focusing_mirror</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">PiezoMirror</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">PiezoMirror</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-OP-FOCS-01:&quot;</span><span class="p">)</span>
 
 
 <span class="nd">@device_factory</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">slit_4</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">MinimalSlits</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">slit_4</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">MinimalSlits</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">MinimalSlits</span><span class="p">(</span>
         <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-AL-SLITS-04:&quot;</span><span class="p">,</span>
         <span class="n">x_gap</span><span class="o">=</span><span class="s2">&quot;XSIZE&quot;</span><span class="p">,</span>
@@ -821,14 +821,14 @@ window.addEventListener("load", () => mermaid.run());
 
 
 <span class="nd">@device_factory</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">slit_5</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">I10Slits</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">slit_5</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">I10Slits</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">I10Slits</span><span class="p">(</span>
         <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-AL-SLITS-05:&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
 
 <span class="nd">@device_factory</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">slit_6</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">I10Slits</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">slit_6</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">I10Slits</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">I10Slits</span><span class="p">(</span>
         <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-AL-SLITS-06:&quot;</span><span class="p">,</span>
     <span class="p">)</span>
@@ -838,51 +838,51 @@ window.addEventListener("load", () => mermaid.run());
 
 
 <span class="nd">@device_factory</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">pin_hole</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">PinHole</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">pin_hole</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">PinHole</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">PinHole</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;ME01D-EA-PINH-01:&quot;</span><span class="p">)</span>
 
 
 <span class="nd">@device_factory</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">det_slits</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">DetSlits</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">det_slits</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">DetSlits</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">DetSlits</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;ME01D-MO-APTR-0&quot;</span><span class="p">)</span>
 
 
 <span class="nd">@device_factory</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">diffractometer</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Diffractometer</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">diffractometer</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Diffractometer</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">Diffractometer</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;ME01D-MO-DIFF-01:&quot;</span><span class="p">)</span>
 
 
 <span class="nd">@device_factory</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">pa_stage</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">PaStage</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">pa_stage</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">PaStage</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">PaStage</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;ME01D-MO-POLAN-01:&quot;</span><span class="p">)</span>
 
 
 <span class="nd">@device_factory</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">simple_stage</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">XYZPositioner</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">simple_stage</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">XYZPositioner</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">XYZPositioner</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;ME01D-MO-CRYO-01:&quot;</span><span class="p">)</span>
 
 
 <span class="nd">@device_factory</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">rasor_femto</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">RasorFemto</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rasor_femto</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">RasorFemto</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">RasorFemto</span><span class="p">(</span>
         <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;ME01D-EA-IAMP&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
 
 <span class="nd">@device_factory</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">rasor_det_scalers</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">RasorScalerCard1</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rasor_det_scalers</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">RasorScalerCard1</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">RasorScalerCard1</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;ME01D-EA-SCLR-01:SCALER1&quot;</span><span class="p">)</span>
 
 
 <span class="nd">@device_factory</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">rasor_sr570</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">RasorSR570</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rasor_sr570</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">RasorSR570</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">RasorSR570</span><span class="p">(</span>
         <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;ME01D-EA-IAMP&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
 
 <span class="nd">@device_factory</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">rasor_sr570_pa_scaler_det</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">CurrentAmpDet</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rasor_sr570_pa_scaler_det</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">CurrentAmpDet</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">CurrentAmpDet</span><span class="p">(</span>
         <span class="n">current_amp</span><span class="o">=</span><span class="n">rasor_sr570</span><span class="p">()</span><span class="o">.</span><span class="n">ca1</span><span class="p">,</span>
         <span class="n">counter</span><span class="o">=</span><span class="n">rasor_det_scalers</span><span class="p">()</span><span class="o">.</span><span class="n">det</span><span class="p">,</span>
@@ -890,7 +890,7 @@ window.addEventListener("load", () => mermaid.run());
 
 
 <span class="nd">@device_factory</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">rasor_femto_pa_scaler_det</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">CurrentAmpDet</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rasor_femto_pa_scaler_det</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">CurrentAmpDet</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">CurrentAmpDet</span><span class="p">(</span>
         <span class="n">current_amp</span><span class="o">=</span><span class="n">rasor_femto</span><span class="p">()</span><span class="o">.</span><span class="n">ca1</span><span class="p">,</span>
         <span class="n">counter</span><span class="o">=</span><span class="n">rasor_det_scalers</span><span class="p">()</span><span class="o">.</span><span class="n">det</span><span class="p">,</span>
@@ -898,7 +898,7 @@ window.addEventListener("load", () => mermaid.run());
 
 
 <span class="nd">@device_factory</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">rasor_sr570_fluo_scaler_det</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">CurrentAmpDet</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rasor_sr570_fluo_scaler_det</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">CurrentAmpDet</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">CurrentAmpDet</span><span class="p">(</span>
         <span class="n">current_amp</span><span class="o">=</span><span class="n">rasor_sr570</span><span class="p">()</span><span class="o">.</span><span class="n">ca2</span><span class="p">,</span>
         <span class="n">counter</span><span class="o">=</span><span class="n">rasor_det_scalers</span><span class="p">()</span><span class="o">.</span><span class="n">fluo</span><span class="p">,</span>
@@ -906,7 +906,7 @@ window.addEventListener("load", () => mermaid.run());
 
 
 <span class="nd">@device_factory</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">rasor_femto_fluo_scaler_det</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">CurrentAmpDet</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rasor_femto_fluo_scaler_det</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">CurrentAmpDet</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">CurrentAmpDet</span><span class="p">(</span>
         <span class="n">current_amp</span><span class="o">=</span><span class="n">rasor_femto</span><span class="p">()</span><span class="o">.</span><span class="n">ca2</span><span class="p">,</span>
         <span class="n">counter</span><span class="o">=</span><span class="n">rasor_det_scalers</span><span class="p">()</span><span class="o">.</span><span class="n">fluo</span><span class="p">,</span>
@@ -914,7 +914,7 @@ window.addEventListener("load", () => mermaid.run());
 
 
 <span class="nd">@device_factory</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">rasor_sr570_drain_scaler_det</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">CurrentAmpDet</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rasor_sr570_drain_scaler_det</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">CurrentAmpDet</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">CurrentAmpDet</span><span class="p">(</span>
         <span class="n">current_amp</span><span class="o">=</span><span class="n">rasor_sr570</span><span class="p">()</span><span class="o">.</span><span class="n">ca3</span><span class="p">,</span>
         <span class="n">counter</span><span class="o">=</span><span class="n">rasor_det_scalers</span><span class="p">()</span><span class="o">.</span><span class="n">drain</span><span class="p">,</span>
@@ -922,7 +922,7 @@ window.addEventListener("load", () => mermaid.run());
 
 
 <span class="nd">@device_factory</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">rasor_femto_drain_scaler_det</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">CurrentAmpDet</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rasor_femto_drain_scaler_det</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">CurrentAmpDet</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">CurrentAmpDet</span><span class="p">(</span>
         <span class="n">current_amp</span><span class="o">=</span><span class="n">rasor_femto</span><span class="p">()</span><span class="o">.</span><span class="n">ca3</span><span class="p">,</span>
         <span class="n">counter</span><span class="o">=</span><span class="n">rasor_det_scalers</span><span class="p">()</span><span class="o">.</span><span class="n">drain</span><span class="p">,</span>

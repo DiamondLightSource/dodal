@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.i24.pmac &#8212; dodal 1.36.4.dev11+g75f101999 documentation</title>
+    <title>dodal.devices.i24.pmac &#8212; dodal 1.36.4.dev12+g6e13d857a documentation</title>
   
   
   
@@ -29,7 +29,7 @@
   <link href="../../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=5fd0b10c"></script>
+    <script src="../../../../_static/documentation_options.js?v=6549e8b9"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -450,11 +450,11 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for dodal.devices.i24.pmac</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">asyncio</span> <span class="kn">import</span> <span class="n">sleep</span>
-<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">IntEnum</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">asyncio</span><span class="w"> </span><span class="kn">import</span> <span class="n">sleep</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">IntEnum</span>
 
-<span class="kn">from</span> <span class="nn">bluesky.protocols</span> <span class="kn">import</span> <span class="n">Flyable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">,</span> <span class="n">Triggerable</span>
-<span class="kn">from</span> <span class="nn">ophyd_async.core</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flyable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">,</span> <span class="n">Triggerable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DEFAULT_TIMEOUT</span><span class="p">,</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
     <span class="n">Device</span><span class="p">,</span>
@@ -465,8 +465,8 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">soft_signal_rw</span><span class="p">,</span>
     <span class="n">wait_for_value</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ophyd_async.epics.core</span> <span class="kn">import</span> <span class="n">epics_signal_r</span><span class="p">,</span> <span class="n">epics_signal_rw</span>
-<span class="kn">from</span> <span class="nn">ophyd_async.epics.motor</span> <span class="kn">import</span> <span class="n">Motor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_r</span><span class="p">,</span> <span class="n">epics_signal_rw</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Motor</span>
 
 <span class="n">HOME_STR</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;\#1hmz\#2hmz\#3hmz&quot;</span>  <span class="c1"># Command to home the PMAC motors</span>
 <span class="n">ZERO_STR</span> <span class="o">=</span> <span class="s2">&quot;!x0y0z0&quot;</span>  <span class="c1"># Command to blend any ongoing move into new position</span>
@@ -474,7 +474,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="ScanState">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i24.pmac.ScanState.html#dodal.devices.i24.pmac.ScanState">[docs]</a>
-<span class="k">class</span> <span class="nc">ScanState</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ScanState</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
     <span class="n">RUNNING</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">DONE</span> <span class="o">=</span> <span class="mi">0</span></div>
 
@@ -482,7 +482,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="LaserSettings">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i24.pmac.LaserSettings.html#dodal.devices.i24.pmac.LaserSettings">[docs]</a>
-<span class="k">class</span> <span class="nc">LaserSettings</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LaserSettings</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;PMAC strings to switch laser on and off.</span>
 <span class="sd">    Note. On the PMAC, M-variables usually have to do with position compare</span>
 <span class="sd">    set up.</span>
@@ -500,7 +500,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="EncReset">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i24.pmac.EncReset.html#dodal.devices.i24.pmac.EncReset">[docs]</a>
-<span class="k">class</span> <span class="nc">EncReset</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">EncReset</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;PMAC strings for position compare on encoder channels in the controller.</span>
 
 <span class="sd">    For example, for ENC5:</span>
@@ -518,10 +518,10 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="PMACStringMove">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i24.pmac.PMACStringMove.html#dodal.devices.i24.pmac.PMACStringMove">[docs]</a>
-<span class="k">class</span> <span class="nc">PMACStringMove</span><span class="p">(</span><span class="n">Triggerable</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PMACStringMove</span><span class="p">(</span><span class="n">Triggerable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Trigger a PMAC move by setting the pmac_string.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">pmac_str_sig</span><span class="p">:</span> <span class="n">SignalRW</span><span class="p">,</span>
         <span class="n">string_to_send</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -530,17 +530,17 @@ window.addEventListener("load", () => mermaid.run());
         <span class="bp">self</span><span class="o">.</span><span class="n">cmd_string</span> <span class="o">=</span> <span class="n">string_to_send</span>
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">signal_ref</span><span class="p">()</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cmd_string</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="PMACStringLaser">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i24.pmac.PMACStringLaser.html#dodal.devices.i24.pmac.PMACStringLaser">[docs]</a>
-<span class="k">class</span> <span class="nc">PMACStringLaser</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="n">Movable</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PMACStringLaser</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="n">Movable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the pmac_string to control the laser.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">pmac_str_sig</span><span class="p">:</span> <span class="n">SignalRW</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
@@ -549,7 +549,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">set</span><span class="p">(</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">value</span><span class="p">:</span> <span class="n">LaserSettings</span><span class="p">,</span>
     <span class="p">):</span>
@@ -559,10 +559,10 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="PMACStringEncReset">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i24.pmac.PMACStringEncReset.html#dodal.devices.i24.pmac.PMACStringEncReset">[docs]</a>
-<span class="k">class</span> <span class="nc">PMACStringEncReset</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="n">Movable</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PMACStringEncReset</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="n">Movable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Set a pmac_string to control the encoder channels in the controller.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">pmac_str_sig</span><span class="p">:</span> <span class="n">SignalRW</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
@@ -571,7 +571,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">set</span><span class="p">(</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">value</span><span class="p">:</span> <span class="n">EncReset</span><span class="p">,</span>
     <span class="p">):</span>
@@ -581,14 +581,14 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="ProgramRunner">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i24.pmac.ProgramRunner.html#dodal.devices.i24.pmac.ProgramRunner">[docs]</a>
-<span class="k">class</span> <span class="nc">ProgramRunner</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="n">Flyable</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProgramRunner</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="n">Flyable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Run the collection by setting the program number on the PMAC string.</span>
 
 <span class="sd">    Once the program number has been set, wait for the collection to be complete.</span>
 <span class="sd">    This will only be true when the status becomes 0.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">pmac_str_sig</span><span class="p">:</span> <span class="n">SignalRW</span><span class="p">,</span>
         <span class="n">status_sig</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">,</span>
@@ -604,14 +604,14 @@ window.addEventListener("load", () => mermaid.run());
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">_get_prog_number_string</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_get_prog_number_string</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">prog_num</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prog_num_ref</span><span class="p">()</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&amp;2b</span><span class="si">{</span><span class="n">prog_num</span><span class="si">}</span><span class="s2">r&quot;</span>
 
 <div class="viewcode-block" id="ProgramRunner.kickoff">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i24.pmac.ProgramRunner.html#dodal.devices.i24.pmac.ProgramRunner.kickoff">[docs]</a>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">kickoff</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">kickoff</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Kick off the collection by sending a program number to the pmac_string and \</span>
 <span class="sd">            wait for the scan status PV to go to 1.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -627,7 +627,7 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="ProgramRunner.complete">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i24.pmac.ProgramRunner.html#dodal.devices.i24.pmac.ProgramRunner.complete">[docs]</a>
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">complete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">complete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop collecting when the scan status PV goes to 0.</span>
 
 <span class="sd">        Args:</span>
@@ -644,12 +644,12 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="ProgramAbort">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i24.pmac.ProgramAbort.html#dodal.devices.i24.pmac.ProgramAbort">[docs]</a>
-<span class="k">class</span> <span class="nc">ProgramAbort</span><span class="p">(</span><span class="n">Triggerable</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProgramAbort</span><span class="p">(</span><span class="n">Triggerable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Abort a data collection by setting the PMAC string and then wait for the \</span>
 <span class="sd">        status value to go back to 0.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">pmac_str_sig</span><span class="p">:</span> <span class="n">SignalRW</span><span class="p">,</span>
         <span class="n">status_sig</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">,</span>
@@ -658,7 +658,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="bp">self</span><span class="o">.</span><span class="n">_status_ref</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">status_sig</span><span class="p">)</span>
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span> <span class="nf">trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_signal_ref</span><span class="p">()</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">await</span> <span class="n">sleep</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>  <span class="c1"># TODO Check with scientist what this sleep is really for.</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_signal_ref</span><span class="p">()</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;P2401=0&quot;</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -672,10 +672,10 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="PMAC">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i24.pmac.PMAC.html#dodal.devices.i24.pmac.PMAC">[docs]</a>
-<span class="k">class</span> <span class="nc">PMAC</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PMAC</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Device to control the chip stage on I24.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pmac_string</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;PMAC_STRING&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">home</span> <span class="o">=</span> <span class="n">PMACStringMove</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pmac_string</span><span class="p">,</span>

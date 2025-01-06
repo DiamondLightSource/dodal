@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.plan_stubs.check_topup &#8212; dodal 1.36.4.dev11+g75f101999 documentation</title>
+    <title>dodal.plan_stubs.check_topup &#8212; dodal 1.36.4.dev12+g6e13d857a documentation</title>
   
   
   
@@ -29,7 +29,7 @@
   <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=5fd0b10c"></script>
+    <script src="../../../_static/documentation_options.js?v=6549e8b9"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -450,15 +450,15 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for dodal.plan_stubs.check_topup</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
 
-<span class="kn">import</span> <span class="nn">bluesky.plan_stubs</span> <span class="k">as</span> <span class="nn">bps</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">bluesky.plan_stubs</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">bps</span>
 
-<span class="kn">from</span> <span class="nn">dodal.common.beamlines.beamline_parameters</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_parameters</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">get_beamline_parameters</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.synchrotron</span> <span class="kn">import</span> <span class="n">Synchrotron</span><span class="p">,</span> <span class="n">SynchrotronMode</span>
-<span class="kn">from</span> <span class="nn">dodal.log</span> <span class="kn">import</span> <span class="n">LOGGER</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.synchrotron</span><span class="w"> </span><span class="kn">import</span> <span class="n">Synchrotron</span><span class="p">,</span> <span class="n">SynchrotronMode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
 
 <span class="n">ALLOWED_MODES</span> <span class="o">=</span> <span class="p">[</span><span class="n">SynchrotronMode</span><span class="o">.</span><span class="n">USER</span><span class="p">,</span> <span class="n">SynchrotronMode</span><span class="o">.</span><span class="n">SPECIAL</span><span class="p">]</span>
 <span class="n">DECAY_MODE_COUNTDOWN</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># Value of the start_countdown PV when in decay mode</span>
@@ -470,7 +470,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="TopupConfig">
 <a class="viewcode-back" href="../../../reference/generated/dodal.plan_stubs.check_topup.TopupConfig.html#dodal.plan_stubs.check_topup.TopupConfig">[docs]</a>
-<span class="k">class</span> <span class="nc">TopupConfig</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TopupConfig</span><span class="p">:</span>
     <span class="c1"># For planned exposures less than this value, wait for topup to finish instead of</span>
     <span class="c1"># collecting throughout topup.</span>
     <span class="n">THRESHOLD_EXPOSURE_S</span> <span class="o">=</span> <span class="s2">&quot;dodal_topup_threshold_exposure_s&quot;</span>
@@ -482,14 +482,14 @@ window.addEventListener("load", () => mermaid.run());
 
 
 
-<span class="k">def</span> <span class="nf">_in_decay_mode</span><span class="p">(</span><span class="n">time_to_topup</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_in_decay_mode</span><span class="p">(</span><span class="n">time_to_topup</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">time_to_topup</span> <span class="o">==</span> <span class="n">DECAY_MODE_COUNTDOWN</span><span class="p">:</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Machine in decay mode, gating disabled&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">True</span>
     <span class="k">return</span> <span class="kc">False</span>
 
 
-<span class="k">def</span> <span class="nf">_gating_permitted</span><span class="p">(</span><span class="n">machine_mode</span><span class="p">:</span> <span class="n">SynchrotronMode</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_gating_permitted</span><span class="p">(</span><span class="n">machine_mode</span><span class="p">:</span> <span class="n">SynchrotronMode</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">machine_mode</span> <span class="ow">in</span> <span class="n">ALLOWED_MODES</span><span class="p">:</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Machine in allowed mode, gating top up enabled.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">True</span>
@@ -497,7 +497,7 @@ window.addEventListener("load", () => mermaid.run());
     <span class="k">return</span> <span class="kc">False</span>
 
 
-<span class="k">def</span> <span class="nf">_delay_to_avoid_topup</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_delay_to_avoid_topup</span><span class="p">(</span>
     <span class="n">total_run_time_s</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">time_to_topup_s</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">topup_configuration</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
@@ -539,7 +539,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="wait_for_topup_complete">
 <a class="viewcode-back" href="../../../reference/generated/dodal.plan_stubs.check_topup.html#dodal.plan_stubs.check_topup.wait_for_topup_complete">[docs]</a>
-<span class="k">def</span> <span class="nf">wait_for_topup_complete</span><span class="p">(</span><span class="n">synchrotron</span><span class="p">:</span> <span class="n">Synchrotron</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">wait_for_topup_complete</span><span class="p">(</span><span class="n">synchrotron</span><span class="p">:</span> <span class="n">Synchrotron</span><span class="p">):</span>
     <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Waiting for topup to complete&quot;</span><span class="p">)</span>
     <span class="n">start</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">synchrotron</span><span class="o">.</span><span class="n">top_up_start_countdown</span><span class="p">)</span>
     <span class="k">while</span> <span class="n">start</span> <span class="o">==</span> <span class="n">COUNTDOWN_DURING_TOPUP</span><span class="p">:</span>
@@ -550,7 +550,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="check_topup_and_wait_if_necessary">
 <a class="viewcode-back" href="../../../reference/generated/dodal.plan_stubs.check_topup.html#dodal.plan_stubs.check_topup.check_topup_and_wait_if_necessary">[docs]</a>
-<span class="k">def</span> <span class="nf">check_topup_and_wait_if_necessary</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_topup_and_wait_if_necessary</span><span class="p">(</span>
     <span class="n">synchrotron</span><span class="p">:</span> <span class="n">Synchrotron</span><span class="p">,</span>
     <span class="n">total_exposure_time</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">ops_time</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>  <span class="c1"># Account for xray centering, rotation speed, etc</span>
@@ -593,7 +593,7 @@ window.addEventListener("load", () => mermaid.run());
 
 
 
-<span class="k">def</span> <span class="nf">_load_topup_configuration_from_properties_file</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_load_topup_configuration_from_properties_file</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
     <span class="n">params</span> <span class="o">=</span> <span class="n">get_beamline_parameters</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">params</span><span class="o">.</span><span class="n">params</span>
 </pre></div>

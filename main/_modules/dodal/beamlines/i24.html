@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.i24 &#8212; dodal 1.36.4.dev11+g75f101999 documentation</title>
+    <title>dodal.beamlines.i24 &#8212; dodal 1.36.4.dev12+g6e13d857a documentation</title>
   
   
   
@@ -29,7 +29,7 @@
   <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 <link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=5fd0b10c"></script>
+    <script src="../../../_static/documentation_options.js?v=6549e8b9"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -453,27 +453,27 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for dodal.beamlines.i24</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">dodal.common.beamlines.beamline_utils</span> <span class="kn">import</span> <span class="n">BL</span><span class="p">,</span> <span class="n">device_instantiation</span>
-<span class="kn">from</span> <span class="nn">dodal.common.beamlines.beamline_utils</span> <span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_utils_beamline</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.attenuator</span> <span class="kn">import</span> <span class="n">ReadOnlyAttenuator</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.detector</span> <span class="kn">import</span> <span class="n">DetectorParams</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.eiger</span> <span class="kn">import</span> <span class="n">EigerDetector</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.hutch_shutter</span> <span class="kn">import</span> <span class="n">HutchShutter</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.i24.aperture</span> <span class="kn">import</span> <span class="n">Aperture</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.i24.beam_center</span> <span class="kn">import</span> <span class="n">DetectorBeamCenter</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.i24.beamstop</span> <span class="kn">import</span> <span class="n">Beamstop</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.i24.dcm</span> <span class="kn">import</span> <span class="n">DCM</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.i24.dual_backlight</span> <span class="kn">import</span> <span class="n">DualBacklight</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.i24.focus_mirrors</span> <span class="kn">import</span> <span class="n">FocusMirrorsMode</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.i24.i24_detector_motion</span> <span class="kn">import</span> <span class="n">DetectorMotion</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.i24.pilatus_metadata</span> <span class="kn">import</span> <span class="n">PilatusMetadata</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.i24.pmac</span> <span class="kn">import</span> <span class="n">PMAC</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.i24.vgonio</span> <span class="kn">import</span> <span class="n">VerticalGoniometer</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.oav.oav_detector</span> <span class="kn">import</span> <span class="n">OAV</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.oav.oav_parameters</span> <span class="kn">import</span> <span class="n">OAVConfig</span>
-<span class="kn">from</span> <span class="nn">dodal.devices.zebra</span> <span class="kn">import</span> <span class="n">Zebra</span>
-<span class="kn">from</span> <span class="nn">dodal.log</span> <span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_log_beamline</span>
-<span class="kn">from</span> <span class="nn">dodal.utils</span> <span class="kn">import</span> <span class="n">get_beamline_name</span><span class="p">,</span> <span class="n">skip_device</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">BL</span><span class="p">,</span> <span class="n">device_instantiation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_utils_beamline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.attenuator.attenuator</span><span class="w"> </span><span class="kn">import</span> <span class="n">ReadOnlyAttenuator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.detector</span><span class="w"> </span><span class="kn">import</span> <span class="n">DetectorParams</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.eiger</span><span class="w"> </span><span class="kn">import</span> <span class="n">EigerDetector</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.hutch_shutter</span><span class="w"> </span><span class="kn">import</span> <span class="n">HutchShutter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.i24.aperture</span><span class="w"> </span><span class="kn">import</span> <span class="n">Aperture</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.i24.beam_center</span><span class="w"> </span><span class="kn">import</span> <span class="n">DetectorBeamCenter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.i24.beamstop</span><span class="w"> </span><span class="kn">import</span> <span class="n">Beamstop</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.i24.dcm</span><span class="w"> </span><span class="kn">import</span> <span class="n">DCM</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.i24.dual_backlight</span><span class="w"> </span><span class="kn">import</span> <span class="n">DualBacklight</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.i24.focus_mirrors</span><span class="w"> </span><span class="kn">import</span> <span class="n">FocusMirrorsMode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.i24.i24_detector_motion</span><span class="w"> </span><span class="kn">import</span> <span class="n">DetectorMotion</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.i24.pilatus_metadata</span><span class="w"> </span><span class="kn">import</span> <span class="n">PilatusMetadata</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.i24.pmac</span><span class="w"> </span><span class="kn">import</span> <span class="n">PMAC</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.i24.vgonio</span><span class="w"> </span><span class="kn">import</span> <span class="n">VerticalGoniometer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.oav.oav_detector</span><span class="w"> </span><span class="kn">import</span> <span class="n">OAV</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.oav.oav_parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">OAVConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.zebra</span><span class="w"> </span><span class="kn">import</span> <span class="n">Zebra</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_log_beamline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_beamline_name</span><span class="p">,</span> <span class="n">skip_device</span>
 
 <span class="n">ZOOM_PARAMS_FILE</span> <span class="o">=</span> <span class="p">(</span>
     <span class="s2">&quot;/dls_sw/i24/software/gda_versions/gda/config/xml/jCameraManZoomLevels.xml&quot;</span>
@@ -487,7 +487,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="attenuator">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i24.html#dodal.beamlines.i24.attenuator">[docs]</a>
-<span class="k">def</span> <span class="nf">attenuator</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">attenuator</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReadOnlyAttenuator</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get a read-only attenuator device for i24, instantiate it if it hasn&#39;t already</span>
@@ -505,7 +505,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="aperture">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i24.html#dodal.beamlines.i24.aperture">[docs]</a>
-<span class="k">def</span> <span class="nf">aperture</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">aperture</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Aperture</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i24 aperture device, instantiate it if it hasn&#39;t already been.</span>
@@ -519,7 +519,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="beamstop">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i24.html#dodal.beamlines.i24.beamstop">[docs]</a>
-<span class="k">def</span> <span class="nf">beamstop</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">beamstop</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Beamstop</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i24 beamstop device, instantiate it if it hasn&#39;t already been.</span>
@@ -537,7 +537,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="backlight">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i24.html#dodal.beamlines.i24.backlight">[docs]</a>
-<span class="k">def</span> <span class="nf">backlight</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">backlight</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DualBacklight</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i24 backlight device, instantiate it if it hasn&#39;t already been.</span>
@@ -555,7 +555,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="detector_motion">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i24.html#dodal.beamlines.i24.detector_motion">[docs]</a>
-<span class="k">def</span> <span class="nf">detector_motion</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">detector_motion</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DetectorMotion</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i24 detector motion device, instantiate it if it hasn&#39;t already been.</span>
@@ -573,7 +573,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="dcm">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i24.html#dodal.beamlines.i24.dcm">[docs]</a>
-<span class="k">def</span> <span class="nf">dcm</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DCM</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">dcm</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DCM</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i24 DCM device, instantiate it if it hasn&#39;t already been.</span>
 <span class="sd">    If this is called when already instantiated in i24, it will return the existing object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -590,7 +590,7 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="eiger">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i24.html#dodal.beamlines.i24.eiger">[docs]</a>
 <span class="nd">@skip_device</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">BL</span> <span class="o">==</span> <span class="s2">&quot;s24&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">eiger</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">eiger</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">params</span><span class="p">:</span> <span class="n">DetectorParams</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -600,7 +600,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">    If called with params, will update those params to the Eiger object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="n">eiger</span><span class="p">:</span> <span class="n">EigerDetector</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_params</span><span class="p">(</span><span class="n">eiger</span><span class="p">:</span> <span class="n">EigerDetector</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">eiger</span><span class="o">.</span><span class="n">set_detector_parameters</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 
@@ -617,7 +617,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="pmac">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i24.html#dodal.beamlines.i24.pmac">[docs]</a>
-<span class="k">def</span> <span class="nf">pmac</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PMAC</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">pmac</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PMAC</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i24 PMAC device, instantiate it if it hasn&#39;t already been.</span>
 <span class="sd">    If this is called when already instantiated in i24, it will return the existing object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -636,7 +636,7 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="oav">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i24.html#dodal.beamlines.i24.oav">[docs]</a>
 <span class="nd">@skip_device</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">BL</span> <span class="o">==</span> <span class="s2">&quot;s24&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">oav</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OAV</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">oav</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OAV</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
         <span class="n">OAV</span><span class="p">,</span>
         <span class="s2">&quot;oav&quot;</span><span class="p">,</span>
@@ -650,7 +650,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="vgonio">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i24.html#dodal.beamlines.i24.vgonio">[docs]</a>
-<span class="k">def</span> <span class="nf">vgonio</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">vgonio</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">VerticalGoniometer</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i24 vertical goniometer device, instantiate it if it hasn&#39;t already been.</span>
@@ -668,7 +668,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="zebra">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i24.html#dodal.beamlines.i24.zebra">[docs]</a>
-<span class="k">def</span> <span class="nf">zebra</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Zebra</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">zebra</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Zebra</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i24 zebra device, instantiate it if it hasn&#39;t already been.</span>
 <span class="sd">    If this is called when already instantiated in i24, it will return the existing object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -684,7 +684,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="shutter">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i24.html#dodal.beamlines.i24.shutter">[docs]</a>
-<span class="k">def</span> <span class="nf">shutter</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">shutter</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HutchShutter</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i24 hutch shutter device, instantiate it if it hasn&#39;t already been.</span>
@@ -702,7 +702,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="focus_mirrors">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i24.html#dodal.beamlines.i24.focus_mirrors">[docs]</a>
-<span class="k">def</span> <span class="nf">focus_mirrors</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">focus_mirrors</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FocusMirrorsMode</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i24 focus mirror devise to find the beam size.&quot;&quot;&quot;</span>
@@ -718,7 +718,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="eiger_beam_center">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i24.html#dodal.beamlines.i24.eiger_beam_center">[docs]</a>
-<span class="k">def</span> <span class="nf">eiger_beam_center</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">eiger_beam_center</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DetectorBeamCenter</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A device for setting/reading the beamcenter from the eiger on i24.&quot;&quot;&quot;</span>
@@ -734,7 +734,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="pilatus_beam_center">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i24.html#dodal.beamlines.i24.pilatus_beam_center">[docs]</a>
-<span class="k">def</span> <span class="nf">pilatus_beam_center</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">pilatus_beam_center</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DetectorBeamCenter</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A device for setting/reading the beamcenter from the pilatus on i24.&quot;&quot;&quot;</span>
@@ -750,7 +750,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="pilatus_metadata">
 <a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i24.html#dodal.beamlines.i24.pilatus_metadata">[docs]</a>
-<span class="k">def</span> <span class="nf">pilatus_metadata</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">pilatus_metadata</span><span class="p">(</span>
     <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PilatusMetadata</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A small pilatus driver device for figuring out the filename template.&quot;&quot;&quot;</span>
