@@ -27,12 +27,11 @@ def attenuator() -> EnumFilterAttenuator:
     """
 
     return EnumFilterAttenuator(
-        num_filters=4,
-        filter_selection=[
+        f"{PREFIX.beamline_prefix}-OP-ATTN-01:",
+        (
             I02_1FilterOneSelections,
             I02_1FilterTwoSelections,
             I02_1FilterThreeSelections,
             I02_1FilterFourSelections,
-        ],
-        prefix="BL02J-OP-ATTN-01:",
+        ),
     )
