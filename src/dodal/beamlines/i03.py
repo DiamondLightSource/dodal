@@ -360,79 +360,59 @@ def flux(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) ->
     )
 
 
-def xbpm_feedback(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> XBPMFeedback:
+@device_factory()
+def xbpm_feedback() -> XBPMFeedback:
     """Get the i03 XBPM feeback device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        XBPMFeedback,
+    return XBPMFeedback(
+        PREFIX.beamline_prefix,
         "xbpm_feedback",
-        "",
-        wait_for_connection,
-        fake_with_ophyd_sim,
     )
 
 
-def zocalo(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> ZocaloResults:
+@device_factory()
+def zocalo() -> ZocaloResults:
     """Get the i03 ZocaloResults device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        ZocaloResults,
-        "zocalo",
-        "",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+    return ZocaloResults(
+        name="zocalo",
+        prefix=PREFIX.beamline_prefix,
     )
 
 
-def robot(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> BartRobot:
+@device_factory()
+def robot() -> BartRobot:
     """Get the i03 robot device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        BartRobot,
+    return BartRobot(
         "robot",
-        "-MO-ROBOT-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+        f"{PREFIX.beamline_prefix}-MO-ROBOT-01:",
     )
 
 
-def webcam(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Webcam:
+@device_factory()
+def webcam() -> Webcam:
     """Get the i03 webcam, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        Webcam,
+    return Webcam(
         "webcam",
-        "",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+        PREFIX.beamline_prefix,
         url="http://i03-webcam1/axis-cgi/jpg/image.cgi",
     )
 
 
-def thawer(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Thawer:
+@device_factory()
+def thawer() -> Thawer:
     """Get the i03 thawer, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        Thawer,
+    return Thawer(
+        f"{PREFIX.beamline_prefix}-EA-THAW-01",
         "thawer",
-        "-EA-THAW-01",
-        wait_for_connection,
-        fake_with_ophyd_sim,
     )
 
 
