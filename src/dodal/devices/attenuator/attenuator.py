@@ -99,16 +99,15 @@ class EnumFilterAttenuator(ReadOnlyAttenuator):
 
     def __init__(
         self,
-        num_filters: int,
-        filter_selection: list[type[FilterSelection]],
         prefix: str,
+        filter_selection: tuple[type[FilterSelection]],
         name: str = "",
     ):
         with self.add_children_as_readables():
             self.filters: DeviceVector[FilterMotor] = DeviceVector(
                 {
-                    i: FilterMotor(filter_selection[i], f"{prefix}MP{i+1}:", name)
-                    for i in range(num_filters)
+                    index: FilterMotor(filter , f"{prefix}MP{index+1}:", name)
+                    for index, filter in enumerate(filter_selection)
                 }
             )
-        super().__init__(name=name, prefix=prefix)
+        super().__init__(prefix, name=name)
