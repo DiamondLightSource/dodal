@@ -94,7 +94,7 @@ class EnumFilterAttenuator(ReadOnlyAttenuator):
     This device is currently working, but feature incomplete. See https://github.com/DiamondLightSource/dodal/issues/972
 
     In this attenuator, the state of a filter corresponds to the selected material,
-    e.g Ag50, in contrast to either being 'IN' or 'OUT'; see BinaryFilterAttenuator.
+    e.g Ag50, in contrast to being either 'IN' or 'OUT'; see BinaryFilterAttenuator.
     """
 
     def __init__(
