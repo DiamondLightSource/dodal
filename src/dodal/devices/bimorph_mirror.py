@@ -91,7 +91,7 @@ class BimorphMirror(StandardReadable, Movable):
         self.commit_target_voltages = epics_signal_x(f"{prefix}ALLTRGT.PROC")
         self.status = epics_signal_r(BimorphMirrorStatus, f"{prefix}STATUS")
         self.err = epics_signal_r(str, f"{prefix}ERR")
-        self.busy = epics_signal_r(bool, f"{prefix}BUSY")
+        self.busy = epics_signal_r(bool, f"{prefix[:-3]}BUSY")
         super().__init__(name=name)
 
     @AsyncStatus.wrap
