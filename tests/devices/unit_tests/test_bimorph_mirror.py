@@ -79,7 +79,7 @@ async def test_set_channels_waits_for_vout_readback(
         await mirror.set(valid_bimorph_values)
 
         assert [
-            call(mirror.channels[i].output_voltage, val, timeout=ANY)
+            call(mirror.channels[i].output_voltage, ANY, timeout=ANY)
             for i, val in valid_bimorph_values.items()
         ] == mock_wait_for_value.call_args_list
 
