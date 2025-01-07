@@ -412,17 +412,27 @@ def is_any_device_factory(func: Callable) -> TypeGuard[AnyDeviceFactory]:
 
 
 def is_v2_device_type(obj: type[Any]) -> bool:
-    if inspect.isclass(obj):
-        non_parameterized_class = obj
-    elif hasattr(obj, "__origin__"):
-        # typing._GenericAlias is the same as types.GenericAlias, maybe?
-        # This is all very badly documented and possibly prone to change in future versions of Python
-        non_parameterized_class = obj.__origin__
+    non_parameterized_class = None
+    if obj != inspect.Signature.empty:
+        if inspect.isclass(obj):
+            non_parameterized_class = obj
+        elif hasattr(obj, "__origin__"):
+            # typing._GenericAlias is the same as types.GenericAlias, maybe?
+            # This is all very badly documented and possibly prone to change in future versions of Python
+            non_parameterized_class = obj.__origin__
+        if non_parameterized_class:
+            try:
+                return non_parameterized_class and issubclass(
+                    non_parameterized_class, OphydV2Device
+                )
+            except TypeError:
+                # Python 3.10 will return inspect.isclass(t) == True but then
+                # raise TypeError: issubclass() arg 1 must be a class
+                # when inspecting device_factory decorator function itself
+                # Later versions of Python seem not to be affected
+                pass
     else:
         return False
-    return non_parameterized_class and issubclass(
-        non_parameterized_class, OphydV2Device
-    )
 
 
 def is_v1_device_type(obj: type[Any]) -> bool:
