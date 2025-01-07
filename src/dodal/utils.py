@@ -431,8 +431,8 @@ def is_v2_device_type(obj: type[Any]) -> bool:
                 # when inspecting device_factory decorator function itself
                 # Later versions of Python seem not to be affected
                 pass
-    else:
-        return False
+
+    return False
 
 
 def is_v1_device_type(obj: type[Any]) -> bool:
