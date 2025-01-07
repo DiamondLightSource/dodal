@@ -416,48 +416,36 @@ def thawer() -> Thawer:
     )
 
 
-def lower_gonio(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> XYZPositioner:
+@device_factory()
+def lower_gonio() -> XYZPositioner:
     """Get the i03 lower gonio device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        XYZPositioner,
+    return XYZPositioner(
+        f"{PREFIX.beamline_prefix}-MO-GONP-01:",
         "lower_gonio",
-        "-MO-GONP-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
     )
 
 
-def cryo_stream(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> CryoStream:
+@device_factory()
+def cryo_stream() -> CryoStream:
     """Get the i03 cryostream device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        CryoStream,
+    return CryoStream(
+        PREFIX.beamline_prefix,
         "cryo_stream",
-        "",
-        wait_for_connection,
-        fake_with_ophyd_sim,
     )
 
 
-def diamond_filter(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> DiamondFilter[I03Filters]:
+@device_factory()
+def diamond_filter() -> DiamondFilter[I03Filters]:
     """Get the i03 diamond filter device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        DiamondFilter[I03Filters],
-        "diamond_filter",
-        "-MO-FLTR-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+    return DiamondFilter[I03Filters](
+        prefix=f"{PREFIX.beamline_prefix}-MO-FLTR-01:",
+        name="diamond_filter",
         data_type=I03Filters,
     )
 

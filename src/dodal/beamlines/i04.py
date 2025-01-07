@@ -1,5 +1,5 @@
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
-from dodal.common.beamlines.beamline_utils import device_instantiation
+from dodal.common.beamlines.beamline_utils import device_factory, device_instantiation
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.aperturescatterguard import (
     AperturePosition,
@@ -56,6 +56,8 @@ I04_ZEBRA_MAPPING = ZebraMapping(
     outputs=(ZebraTTLOutputs(TTL_DETECTOR=1, TTL_FAST_SHUTTER=2, TTL_XSPRESS3=3)),
     sources=ZebraSources(),
 )
+
+PREFIX = BeamlinePrefix(BL)
 
 
 def smargon(
@@ -438,17 +440,13 @@ def oav_to_redis_forwarder(
     )
 
 
-def diamond_filter(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> DiamondFilter[I04Filters]:
+@device_factory()
+def diamond_filter() -> DiamondFilter[I04Filters]:
     """Get the i04 diamond filter device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        DiamondFilter[I04Filters],
-        "diamond_filter",
-        "-MO-FLTR-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+    return DiamondFilter[I04Filters](
+        prefix=f"{PREFIX.beamline_prefix}-MO-FLTR-01:",
+        name="diamond_filter",
         data_type=I04Filters,
     )

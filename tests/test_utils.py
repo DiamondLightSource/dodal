@@ -29,12 +29,13 @@ def test_finds_device_factories() -> None:
 
     factories = collect_factories(fake_beamline)
 
-    from tests.fake_beamline import device_a, device_b, device_c
+    from tests.fake_beamline import device_a, device_b, device_c, generic_device_d
 
     assert {
         "device_a": device_a,
         "device_b": device_b,
         "device_c": device_c,
+        "generic_device_d": generic_device_d,
     } == factories
 
 
@@ -42,7 +43,9 @@ def test_makes_devices() -> None:
     import tests.fake_beamline as fake_beamline
 
     devices, exceptions = make_all_devices(fake_beamline)
-    assert {"readable", "motor", "cryo"} == devices.keys() and len(exceptions) == 0
+    assert {"readable", "motor", "cryo", "diamond_filter"} == devices.keys() and len(
+        exceptions
+    ) == 0
 
 
 def test_makes_devices_with_dependencies() -> None:
@@ -61,7 +64,9 @@ def test_makes_devices_with_disordered_dependencies() -> None:
 
 def test_makes_devices_with_module_name() -> None:
     devices, exceptions = make_all_devices("tests.fake_beamline")
-    assert {"readable", "motor", "cryo"} == devices.keys() and len(exceptions) == 0
+    assert {"readable", "motor", "cryo", "diamond_filter"} == devices.keys() and len(
+        exceptions
+    ) == 0
 
 
 def test_get_hostname() -> None:
