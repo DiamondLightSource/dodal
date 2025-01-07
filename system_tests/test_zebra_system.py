@@ -1,11 +1,14 @@
 import pytest
 
-from dodal.devices.zebra import ArmDemand, Zebra
+from dodal.devices.zebra.zebra import ArmDemand, Zebra
+from dodal.devices.zebra.zebra_constants_mapping import I03_ZEBRA_CONSTANTS
 
 
 @pytest.fixture()
 async def zebra():
-    zebra = Zebra(name="zebra", prefix="BL03S-EA-ZEBRA-01:")
+    zebra = Zebra(
+        name="zebra", prefix="BL03S-EA-ZEBRA-01:", mapping=I03_ZEBRA_CONSTANTS
+    )
     yield zebra
     await zebra.pc.arm.set(ArmDemand.DISARM)
 

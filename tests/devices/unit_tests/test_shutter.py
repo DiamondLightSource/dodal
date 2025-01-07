@@ -2,7 +2,7 @@ import pytest
 from ophyd_async.core import DeviceCollector
 from ophyd_async.testing import callback_on_mock_put, set_mock_value
 
-from dodal.devices.zebra_controlled_shutter import (
+from dodal.devices.zebra.zebra_controlled_shutter import (
     ZebraShutter,
     ZebraShutterControl,
     ZebraShutterState,

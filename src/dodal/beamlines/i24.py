@@ -16,7 +16,8 @@ from dodal.devices.i24.pmac import PMAC
 from dodal.devices.i24.vgonio import VerticalGoniometer
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.oav_parameters import OAVConfig
-from dodal.devices.zebra import Zebra
+from dodal.devices.zebra.zebra import Zebra
+from dodal.devices.zebra.zebra_constants_mapping import I24_ZEBRA_CONSTANTS
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import get_beamline_name, skip_device
 
@@ -191,6 +192,7 @@ def zebra(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -
         "-EA-ZEBRA-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        mapping=I24_ZEBRA_CONSTANTS,
     )
 
 

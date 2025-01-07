@@ -28,8 +28,9 @@ from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.thawer import Thawer
 from dodal.devices.undulator import Undulator
 from dodal.devices.xbpm_feedback import XBPMFeedback
-from dodal.devices.zebra import Zebra
-from dodal.devices.zebra_controlled_shutter import ZebraShutter
+from dodal.devices.zebra.zebra import Zebra
+from dodal.devices.zebra.zebra_constants_mapping import I04_ZEBRA_CONSTANTS
+from dodal.devices.zebra.zebra_controlled_shutter import ZebraShutter
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
 
@@ -341,6 +342,7 @@ def zebra(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -
         "-EA-ZEBRA-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        mapping=I04_ZEBRA_CONSTANTS,
     )
 
 
