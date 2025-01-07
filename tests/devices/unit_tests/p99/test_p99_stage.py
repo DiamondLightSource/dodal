@@ -2,10 +2,10 @@ import pytest
 from ophyd_async.core import DeviceCollector
 from ophyd_async.testing import set_mock_value
 
+from dodal.devices.attenuator.filter import FilterMotor
+from dodal.devices.attenuator.filter_selections import P99FilterSelections
 from dodal.devices.p99.sample_stage import (
-    FilterMotor,
     SampleAngleStage,
-    p99StageSelections,
 )
 
 # Long enough for multiple asyncio event loop cycles to run so
@@ -26,7 +26,10 @@ async def sim_sampleAngleStage():
 @pytest.fixture
 async def sim_filter_wheel():
     async with DeviceCollector(mock=True):
-        sim_filter_wheel = FilterMotor("p99-MO-TABLE-01:", name="sim_filter_wheel")
+        sim_filter_wheel = FilterMotor(
+            "p99-MO-TABLE-01:",
+            P99FilterSelections,
+        )
     yield sim_filter_wheel
 
 
@@ -39,5 +42,7 @@ async def test_sampleAngleStage(sim_sampleAngleStage: SampleAngleStage) -> None:
 
 async def test_filter_wheel(sim_filter_wheel: FilterMotor) -> None:
     assert sim_filter_wheel.name == "sim_filter_wheel"
-    set_mock_value(sim_filter_wheel.user_setpoint, p99StageSelections.CD25UM)
-    assert await sim_filter_wheel.user_setpoint.get_value() == p99StageSelections.CD25UM
+    set_mock_value(sim_filter_wheel.user_setpoint, P99FilterSelections.CD25UM)
+    assert (
+        await sim_filter_wheel.user_setpoint.get_value() == P99FilterSelections.CD25UM
+    )

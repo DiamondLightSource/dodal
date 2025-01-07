@@ -54,7 +54,7 @@ class BimorphMirrorChannel(StandardReadable, EpicsDevice):
     target_voltage: A[SignalRW[float], PvSuffix.rbv("VTRGT"), Format.CONFIG_SIGNAL]
     output_voltage: A[SignalRW[float], PvSuffix.rbv("VOUT"), Format.HINTED_SIGNAL]
     status: A[SignalR[BimorphMirrorOnOff], PvSuffix("STATUS"), Format.CONFIG_SIGNAL]
-    shift: A[SignalW[float], PvSuffix("STATUS")]
+    shift: A[SignalW[float], PvSuffix("SHIFT")]
 
 
 class BimorphMirror(StandardReadable, Movable):
@@ -92,11 +92,10 @@ class BimorphMirror(StandardReadable, Movable):
         self.status = epics_signal_r(BimorphMirrorStatus, f"{prefix}STATUS")
         self.err = epics_signal_r(str, f"{prefix}ERR")
         self.busy = epics_signal_r(bool, f"{prefix}BUSY")
-
         super().__init__(name=name)
 
     @AsyncStatus.wrap
-    async def set(self, value: Mapping[int, float]) -> None:
+    async def set(self, value: Mapping[int, float], tolerance: float = 0.0001) -> None:
         """Sets bimorph voltages in parrallel via target voltage and all proc.
 
         Args:
@@ -106,12 +105,14 @@ class BimorphMirror(StandardReadable, Movable):
             ValueError: On set to non-existent channel"""
 
         if any(key not in self.channels for key in value):
-            raise ValueError(f"Attempting to put to non-existent channels: {value}")
+            raise ValueError(
+                f"Attempting to put to non-existent channels: {[key  for key in value if (key not in self.channels)]}"
+            )
 
         # Write target voltages:
         await asyncio.gather(
             *[
-                self.channels[i].output_voltage.set(target, wait=True)
+                self.channels[i].target_voltage.set(target, wait=True)
                 for i, target in value.items()
             ]
         )
@@ -123,9 +124,17 @@ class BimorphMirror(StandardReadable, Movable):
         await asyncio.gather(
             *[
                 wait_for_value(
-                    self.channels[i].output_voltage, target, timeout=DEFAULT_TIMEOUT
+                    self.channels[i].output_voltage,
+                    tolerance_func_builder(tolerance, target),
+                    timeout=DEFAULT_TIMEOUT,
                 )
                 for i, target in value.items()
-            ],
-            wait_for_value(self.busy, False, timeout=DEFAULT_TIMEOUT),
+            ]
         )
+
+
+def tolerance_func_builder(tolerance: float, target_value: float):
+    def is_within_value(x):
+        return abs(x - target_value) <= tolerance
+
+    return is_within_value

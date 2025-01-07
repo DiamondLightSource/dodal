@@ -1,7 +1,7 @@
 import asyncio
 
 from bluesky.protocols import Movable
-from ophyd_async.core import AsyncStatus, StandardReadable
+from ophyd_async.core import AsyncStatus, Reference, StandardReadable
 
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 
@@ -33,12 +33,8 @@ class UndulatorDCM(StandardReadable, Movable):
         prefix: str = "",
         name: str = "",
     ):
-        super().__init__(name)
-
-        # Attributes are set after super call so they are not renamed to
-        # <name>-undulator, etc.
-        self.undulator = undulator
-        self.dcm = dcm
+        self.undulator_ref = Reference(undulator)
+        self.dcm_ref = Reference(dcm)
 
         # These attributes are just used by hyperion for lookup purposes
         self.pitch_energy_table_path = (
@@ -53,13 +49,15 @@ class UndulatorDCM(StandardReadable, Movable):
             daq_configuration_path + "/domain/beamlineParameters"
         )["DCM_Perp_Offset_FIXED"]
 
+        super().__init__(name)
+
     @AsyncStatus.wrap
     async def set(self, value: float):
-        await self.undulator.raise_if_not_enabled()
+        await self.undulator_ref().raise_if_not_enabled()
         await asyncio.gather(
-            self.dcm.energy_in_kev.set(value, timeout=ENERGY_TIMEOUT_S),
-            self.undulator.set(value),
+            self.dcm_ref().energy_in_kev.set(value, timeout=ENERGY_TIMEOUT_S),
+            self.undulator_ref().set(value),
         )
         # DCM Perp pitch
         LOGGER.info(f"Adjusting DCM offset to {self.dcm_fixed_offset_mm} mm")
-        await self.dcm.offset_in_mm.set(self.dcm_fixed_offset_mm)
+        await self.dcm_ref().offset_in_mm.set(self.dcm_fixed_offset_mm)
