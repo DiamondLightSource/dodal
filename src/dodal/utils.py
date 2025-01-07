@@ -412,7 +412,17 @@ def is_any_device_factory(func: Callable) -> TypeGuard[AnyDeviceFactory]:
 
 
 def is_v2_device_type(obj: type[Any]) -> bool:
-    return inspect.isclass(obj) and issubclass(obj, OphydV2Device)
+    if inspect.isclass(obj):
+        non_parameterized_class = obj
+    elif hasattr(obj, "__origin__"):
+        # typing._GenericAlias is the same as types.GenericAlias, maybe?
+        # This is all very badly documented and possibly prone to change in future versions of Python
+        non_parameterized_class = obj.__origin__
+    else:
+        return False
+    return non_parameterized_class and issubclass(
+        non_parameterized_class, OphydV2Device
+    )
 
 
 def is_v1_device_type(obj: type[Any]) -> bool:

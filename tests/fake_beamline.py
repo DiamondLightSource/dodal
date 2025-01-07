@@ -4,6 +4,7 @@ from bluesky.protocols import Readable
 from ophyd import EpicsMotor
 
 from dodal.devices.cryostream import CryoStream
+from dodal.devices.diamond_filter import DiamondFilter, I03Filters
 
 
 def device_a() -> Readable:
@@ -16,6 +17,10 @@ def device_b() -> EpicsMotor:
 
 def device_c() -> CryoStream:
     return _mock_with_name("cryo")
+
+
+def generic_device_d() -> DiamondFilter[I03Filters]:
+    return _mock_with_name("diamond_filter")
 
 
 def not_device() -> int:
