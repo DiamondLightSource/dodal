@@ -129,7 +129,8 @@ class BimorphMirror(StandardReadable, Movable):
                     timeout=DEFAULT_TIMEOUT,
                 )
                 for i, target in value.items()
-            ]
+            ],
+            wait_for_value(self.busy, False, timeout=DEFAULT_TIMEOUT),
         )
 
 
