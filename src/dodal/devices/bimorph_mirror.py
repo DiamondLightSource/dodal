@@ -91,6 +91,7 @@ class BimorphMirror(StandardReadable, Movable):
         self.commit_target_voltages = epics_signal_x(f"{prefix}ALLTRGT.PROC")
         self.status = epics_signal_r(BimorphMirrorStatus, f"{prefix}STATUS")
         self.err = epics_signal_r(str, f"{prefix}ERR")
+        self.busy = epics_signal_r(bool, f"{prefix}BUSY")
 
         super().__init__(name=name)
 
@@ -104,14 +105,13 @@ class BimorphMirror(StandardReadable, Movable):
         Raises:
             ValueError: On set to non-existent channel"""
 
-        diff = set(self.channels.keys()) - set(values.keys())
-        if len(diff) > 0:
-            raise ValueError(f"Attempting to put to non-existent channels: {diff}")
+        if any(key not in self.channels for key in value):
+            raise ValueError(f"Attempting to put to non-existent channels: {value}")
 
         # Write target voltages:
         await asyncio.gather(
             *[
-                self.channels[i].target_voltage.set(target, wait=True)
+                self.channels[i].output_voltage.set(target, wait=True)
                 for i, target in value.items()
             ]
         )
@@ -126,5 +126,6 @@ class BimorphMirror(StandardReadable, Movable):
                     self.channels[i].output_voltage, target, timeout=DEFAULT_TIMEOUT
                 )
                 for i, target in value.items()
-            ]
+            ],
+            wait_for_value(self.busy, False, timeout=DEFAULT_TIMEOUT),
         )
