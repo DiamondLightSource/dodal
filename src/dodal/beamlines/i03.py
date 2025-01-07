@@ -450,14 +450,12 @@ def diamond_filter() -> DiamondFilter[I03Filters]:
     )
 
 
-def qbpm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> QBPM:
+@device_factory()
+def qbpm() -> QBPM:
     """Get the i03 qbpm device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        QBPM,
+    return QBPM(
+        f"{PREFIX.beamline_prefix}-DI-QBPM-01:",
         "qbpm",
-        "-DI-QBPM-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
     )
