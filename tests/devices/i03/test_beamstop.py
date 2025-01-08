@@ -39,16 +39,16 @@ async def test_beamstop_pos_select(
 ):
     beamstop = Beamstop("-MO-BS-01:", beamline_parameters, name="beamstop")
     await beamstop.connect(mock=True)
-    set_mock_value(beamstop.x.user_readback, x)
-    set_mock_value(beamstop.y.user_readback, y)
-    set_mock_value(beamstop.z.user_readback, z)
+    set_mock_value(beamstop.x_mm.user_readback, x)
+    set_mock_value(beamstop.y_mm.user_readback, y)
+    set_mock_value(beamstop.z_mm.user_readback, z)
 
     mock_callback = Mock()
     RE.subscribe(mock_callback, "event")
 
     @run_decorator()
     def check_in_beam():
-        current_pos = yield from bps.rd(beamstop.pos_select)
+        current_pos = yield from bps.rd(beamstop.selected_pos)
         assert current_pos == expected_pos
         yield from bps.create()
         yield from bps.read(beamstop)
@@ -60,7 +60,7 @@ async def test_beamstop_pos_select(
         dropwhile(lambda c: c.args[0] != "event", mock_callback.mock_calls)
     )
     data = event_call.args[1]["data"]
-    assert data["beamstop-x"] == x
-    assert data["beamstop-y"] == y
-    assert data["beamstop-z"] == z
-    assert data["beamstop-pos_select"] == expected_pos
+    assert data["beamstop-x_mm"] == x
+    assert data["beamstop-y_mm"] == y
+    assert data["beamstop-z_mm"] == z
+    assert data["beamstop-selected_pos"] == expected_pos

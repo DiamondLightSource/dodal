@@ -36,7 +36,7 @@ class Beamstop(StandardReadable):
         x: beamstop x position in mm
         y: beamstop y position in mm
         z: beamstop z position in mm
-        pos_select: Get the current position of the beamstop as an enum. Currently this
+        selected_pos: Get the current position of the beamstop as an enum. Currently this
             is read-only.
     """
 
@@ -47,18 +47,18 @@ class Beamstop(StandardReadable):
         name: str = "",
     ):
         with self.add_children_as_readables():
-            self.x = Motor(prefix + "X")
-            self.y = Motor(prefix + "Y")
-            self.z = Motor(prefix + "Z")
-            self.pos_select = create_hardware_backed_soft_signal(
+            self.x_mm = Motor(prefix + "X")
+            self.y_mm = Motor(prefix + "Y")
+            self.z_mm = Motor(prefix + "Z")
+            self.selected_pos = create_hardware_backed_soft_signal(
                 BeamstopPositions, self._get_selected_position
             )
 
-        self._in_beam_xyz = [
+        self._in_beam_xyz_mm = [
             float(beamline_parameters[f"in_beam_{axis}_STANDARD"])
             for axis in ("x", "y", "z")
         ]
-        self._xyz_tolerance = [
+        self._xyz_tolerance_mm = [
             float(beamline_parameters[f"bs_{axis}_tolerance"])
             for axis in ("x", "y", "z")
         ]
@@ -67,14 +67,14 @@ class Beamstop(StandardReadable):
 
     async def _get_selected_position(self) -> BeamstopPositions:
         current_pos = await gather(
-            self.x.user_readback.get_value(),
-            self.y.user_readback.get_value(),
-            self.z.user_readback.get_value(),
+            self.x_mm.user_readback.get_value(),
+            self.y_mm.user_readback.get_value(),
+            self.z_mm.user_readback.get_value(),
         )
         if all(
             isclose(axis_pos, axis_in_beam, abs_tol=axis_tolerance)
             for axis_pos, axis_in_beam, axis_tolerance in zip(
-                current_pos, self._in_beam_xyz, self._xyz_tolerance, strict=False
+                current_pos, self._in_beam_xyz_mm, self._xyz_tolerance_mm, strict=False
             )
         ):
             return BeamstopPositions.DATA_COLLECTION
