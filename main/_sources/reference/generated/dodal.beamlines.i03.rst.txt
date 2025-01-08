@@ -27,6 +27,7 @@ dodal.beamlines.i03
       aperture_scatterguard
       attenuator
       backlight
+      beamstop
       cryo_stream
       dcm
       detector_motion
