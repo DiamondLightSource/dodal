@@ -18,6 +18,9 @@ class BeamstopPositions(StrictEnum):
     Until we support moving the beamstop it is only necessary to check whether the
     beamstop is in beam or not.
 
+    See Also:
+        https://github.com/DiamondLightSource/mx-bluesky/issues/484
+
     Attributes:
         DATA_COLLECTION: The beamstop is in beam ready for data collection
         UNKNOWN: The beamstop is in some other position, check the device motor
