@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.bimorph_mirror &#8212; dodal 1.36.4.dev14+ga29f3af81 documentation</title>
+    <title>dodal.devices.bimorph_mirror &#8212; dodal 1.36.4.dev15+ga7a01e7d4 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=25d53129"></script>
+    <script src="../../../_static/documentation_options.js?v=8b52b9a6"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -504,7 +504,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="BimorphMirrorChannel">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.bimorph_mirror.BimorphMirrorChannel.html#dodal.devices.bimorph_mirror.BimorphMirrorChannel">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">BimorphMirrorChannel</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">EpicsDevice</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BimorphMirrorChannel</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">,</span> <span class="n">EpicsDevice</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Collection of PVs comprising a single bimorph channel.</span>
 
 <span class="sd">    Attributes:</span>
@@ -517,7 +517,19 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">target_voltage</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span><span class="n">SignalRW</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">PvSuffix</span><span class="o">.</span><span class="n">rbv</span><span class="p">(</span><span class="s2">&quot;VTRGT&quot;</span><span class="p">),</span> <span class="n">Format</span><span class="o">.</span><span class="n">CONFIG_SIGNAL</span><span class="p">]</span>
     <span class="n">output_voltage</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span><span class="n">SignalRW</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">PvSuffix</span><span class="o">.</span><span class="n">rbv</span><span class="p">(</span><span class="s2">&quot;VOUT&quot;</span><span class="p">),</span> <span class="n">Format</span><span class="o">.</span><span class="n">HINTED_SIGNAL</span><span class="p">]</span>
     <span class="n">status</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span><span class="n">SignalR</span><span class="p">[</span><span class="n">BimorphMirrorOnOff</span><span class="p">],</span> <span class="n">PvSuffix</span><span class="p">(</span><span class="s2">&quot;STATUS&quot;</span><span class="p">),</span> <span class="n">Format</span><span class="o">.</span><span class="n">CONFIG_SIGNAL</span><span class="p">]</span>
-    <span class="n">shift</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span><span class="n">SignalW</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">PvSuffix</span><span class="p">(</span><span class="s2">&quot;SHIFT&quot;</span><span class="p">)]</span></div>
+    <span class="n">shift</span><span class="p">:</span> <span class="n">A</span><span class="p">[</span><span class="n">SignalW</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">PvSuffix</span><span class="p">(</span><span class="s2">&quot;SHIFT&quot;</span><span class="p">)]</span>
+
+<div class="viewcode-block" id="BimorphMirrorChannel.set">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.bimorph_mirror.BimorphMirrorChannel.html#dodal.devices.bimorph_mirror.BimorphMirrorChannel.set">[docs]</a>
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets channel&#39;s VOUT to given value.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value: float to set VOUT to</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_voltage</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+</div>
 
 
 
