@@ -152,3 +152,16 @@ async def test_init_mirror_with_invalid_channels_throws_error(number_of_channels
 async def test_init_mirror_with_zero_channels(number_of_channels):
     mirror = BimorphMirror(prefix="FAKE-PREFIX", number_of_channels=number_of_channels)
     assert len(mirror.channels) == 0
+
+
+@pytest.mark.parametrize("mirror", VALID_BIMORPH_CHANNELS, indirect=True)
+async def test_bimorph_mirror_channel_set(
+    mirror: BimorphMirror,
+    valid_bimorph_values: dict[int, float],
+):
+    for value, channel in zip(
+        valid_bimorph_values.values(), mirror.channels.values(), strict=True
+    ):
+        assert await channel.output_voltage.get_value() != value
+        await channel.set(value)
+        assert await channel.output_voltage.get_value() == value
