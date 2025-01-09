@@ -32,9 +32,9 @@ async def test_set_shutter_open(
     reading = await sim_shutter.read()
 
     shutter_position = reading.get("shutter-position_readback", {})
-    assert (
-        shutter_position["value"] is new_state
-    ), f"Unexpected value: {shutter_position['value']}"
+    assert shutter_position["value"] is new_state, (
+        f"Unexpected value: {shutter_position['value']}"
+    )
 
 
 async def test_given_shutter_in_auto_then_when_set_raises(sim_shutter: ZebraShutter):

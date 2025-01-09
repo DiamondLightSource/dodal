@@ -114,7 +114,7 @@ class BimorphMirror(StandardReadable, Movable):
 
         if any(key not in self.channels for key in value):
             raise ValueError(
-                f"Attempting to put to non-existent channels: {[key  for key in value if (key not in self.channels)]}"
+                f"Attempting to put to non-existent channels: {[key for key in value if (key not in self.channels)]}"
             )
 
         # Write target voltages:
