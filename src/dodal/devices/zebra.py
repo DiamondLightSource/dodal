@@ -81,6 +81,11 @@ class I24Axes:
 
 
 class RotationDirection(StrictEnum):
+    """
+    Defines for a swept angle whether the scan width (sweep) is to be added or subtracted from
+    the initial angle to obtain the final angle.
+    """
+
     POSITIVE = "Positive"
     NEGATIVE = "Negative"
 
