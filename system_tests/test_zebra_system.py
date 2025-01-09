@@ -1,7 +1,7 @@
 import pytest
 
+from dodal.beamlines.i03 import I03_ZEBRA_CONSTANTS
 from dodal.devices.zebra.zebra import ArmDemand, Zebra
-from dodal.devices.zebra.zebra_constants_mapping import I03_ZEBRA_CONSTANTS
 
 
 @pytest.fixture()

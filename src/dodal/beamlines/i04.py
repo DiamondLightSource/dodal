@@ -29,7 +29,7 @@ from dodal.devices.thawer import Thawer
 from dodal.devices.undulator import Undulator
 from dodal.devices.xbpm_feedback import XBPMFeedback
 from dodal.devices.zebra.zebra import Zebra
-from dodal.devices.zebra.zebra_constants_mapping import I04_ZEBRA_CONSTANTS
+from dodal.devices.zebra.zebra_constants_mapping import ZebraMapping, ZebraSources
 from dodal.devices.zebra.zebra_controlled_shutter import ZebraShutter
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
@@ -47,6 +47,11 @@ MURKO_REDIS_DB = 7
 BL = get_beamline_name("s04")
 set_log_beamline(BL)
 set_utils_beamline(BL)
+
+# TODO: Find out zebra is wired up to
+I04_ZEBRA_CONSTANTS = ZebraMapping(
+    sources=ZebraSources(),
+)
 
 
 def smargon(
