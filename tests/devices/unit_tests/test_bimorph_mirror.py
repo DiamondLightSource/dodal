@@ -158,7 +158,6 @@ async def test_init_mirror_with_zero_channels(number_of_channels):
 async def test_bimorph_mirror_channel_set(
     mirror: BimorphMirror,
     valid_bimorph_values: dict[int, float],
-    mock_vtrgt_vout_propogation,
 ):
     for value, channel in zip(
         valid_bimorph_values.values(), mirror.channels.values(), strict=True
