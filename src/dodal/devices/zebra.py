@@ -286,7 +286,7 @@ class LogicGateConfiguration:
         for input, (source, invert) in enumerate(
             zip(self.sources, self.invert, strict=False)
         ):
-            input_strings.append(f"INP{input+1}={'!' if invert else ''}{source}")
+            input_strings.append(f"INP{input + 1}={'!' if invert else ''}{source}")
 
         return ", ".join(input_strings)
 
