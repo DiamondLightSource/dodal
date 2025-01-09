@@ -1,4 +1,7 @@
+from typing import cast
+
 import pytest
+from event_model import StreamDatum, StreamResource
 from ophyd_async.core import (
     DetectorTrigger,
     DeviceCollector,
@@ -65,7 +68,8 @@ async def test_can_collect(
     docs = [(name, doc) async for name, doc in merlin.collect_asset_docs(1)]
     assert len(docs) == 2
     assert docs[0][0] == "stream_resource"
-    stream_resource = docs[0][1]
+    stream_resource = cast(StreamResource, docs[0][1])
+
     sr_uid = stream_resource["uid"]
     assert stream_resource["data_key"] == "merlin"
     assert stream_resource["uri"] == "file://localhost/workspaces/dodal"
@@ -76,7 +80,7 @@ async def test_can_collect(
         "chunk_shape": (1, 20, 10),
     }
     assert docs[1][0] == "stream_datum"
-    stream_datum = docs[1][1]
+    stream_datum = cast(StreamDatum, docs[1][1])
     assert stream_datum["stream_resource"] == sr_uid
     assert stream_datum["seq_nums"] == {"start": 0, "stop": 0}
     assert stream_datum["indices"] == {"start": 0, "stop": 1}
