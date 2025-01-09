@@ -34,7 +34,7 @@ BL = get_beamline_name("s24")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
-I24_ZEBRA_CONSTANTS = ZebraMapping(
+I24_ZEBRA_MAPPING = ZebraMapping(
     outputs=ZebraTTLOutputs(TTL_EIGER=1, TTL_PILATUS=2, TTL_FAST_SHUTTER=4),
     sources=ZebraSources(),
 )
@@ -201,7 +201,7 @@ def zebra(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -
         "-EA-ZEBRA-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        mapping=I24_ZEBRA_CONSTANTS,
+        mapping=I24_ZEBRA_MAPPING,
     )
 
 

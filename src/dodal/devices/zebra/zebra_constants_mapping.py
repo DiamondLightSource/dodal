@@ -5,22 +5,22 @@ class ZebraMappingValidations(BaseModel):
     """Helper BaseModel to error if a None field is accessed, and validate against
     multiple fields mapping to the same integer"""
 
-    def __getattribute__(self, name):
+    def __getattribute__(self, name: str):
         """To protect against mismatch between the Zebra configuration that a plan expects and the Zebra which has
         been instantiated, raise exception if a field which has been set to None is accessed."""
-
         value = object.__getattribute__(self, name)
-        if value is None:
-            raise UnknownZebraMappingException(
-                f"'{type(self).__name__}.{name}' is None. Please check if {name} is valid for the instantiated Zebra"
-            )
+        if not name.startswith("__"):
+            if value is None:
+                raise UnmappedZebraException(
+                    f"'{type(self).__name__}.{name}' was accessed but is set to None. Please check the zebra mappings against the zebra's physical configuration"
+                )
         return value
 
-    # TODO work out of this validator should be in the same class as the above
     @model_validator(mode="after")
     def ensure_no_duplicate_connections(self):
+        """This ensures that TTL outputs and sources are mapped to unique integers"""
         values = list(self.model_dump().values())
-        int_values = [v for v in values if v is int]
+        int_values = [v for v in values if isinstance(v, int)]
         if len(int_values) != len(set(int_values)):
             raise ValueError(
                 f"Each field in {type(self)} must be mapped to a unique integer"
@@ -69,21 +69,19 @@ class ZebraMapping(ZebraMappingValidations):
 
     # Zebra ophyd signal for connection can be accessed
     # with, eg, zebra.output.out_pvs[zebra.mapping.outputs.TTL_DETECTOR]
-    outputs: ZebraTTLOutputs | None = None
+    outputs: ZebraTTLOutputs = ZebraTTLOutputs()
 
     # Zebra ophyd signal sources can be mapped to a zebra output by doing, eg,
     # bps.abs_set(zebra.output.out_pvs[zebra.mapping.outputs.TTL_DETECTOR],
     # zebra.mapping.sources.DISCONNECT)
-    sources: ZebraSources | None = None
+    sources: ZebraSources = ZebraSources()
 
     # Which of the Zebra's four AND gates is used to control the automatic shutter.
     # After defining, the correct GateControl device can be accessed with, eg,
     # zebra.logic_gates.and_gates[zebra.mapping.AND_GATE_FOR_AUTO_SHUTTER]
 
-    # TODO: in zebra init function, make things nicer by doing auto_shutter_gate = zebra.logic_gates.and_gates[zebra.mapping.AND_GATE_FOR_AUTO_SHUTTER]
     AND_GATE_FOR_AUTO_SHUTTER: int | None = Field(default=None, ge=1, le=4)
-    # TODO: No need for the AUTO_SHUTTER_INPUT_1 constants. AUTO_SHUTTER_INPUT_1 is always = 1
 
 
-class UnknownZebraMappingException(Exception):
+class UnmappedZebraException(Exception):
     pass

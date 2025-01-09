@@ -62,14 +62,10 @@ set_utils_beamline(BL)
 
 set_path_provider(PandASubpathProvider())
 
-I03_ZEBRA_CONSTANTS = (
-    ZebraMapping(
-        outputs=ZebraTTLOutputs(
-            TTL_DETECTOR=1, TTL_SHUTTER=2, TTL_XSPRESS3=3, TTL_PANDA=4
-        ),
-        sources=ZebraSources(),
-        AND_GATE_FOR_AUTO_SHUTTER=2,
-    ),
+I03_ZEBRA_MAPPING = ZebraMapping(
+    outputs=ZebraTTLOutputs(TTL_DETECTOR=1, TTL_SHUTTER=2, TTL_XSPRESS3=3, TTL_PANDA=4),
+    sources=ZebraSources(),
+    AND_GATE_FOR_AUTO_SHUTTER=2,
 )
 
 
@@ -366,7 +362,7 @@ def zebra(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -
         "-EA-ZEBRA-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        mapping=I03_ZEBRA_CONSTANTS,
+        mapping=I03_ZEBRA_MAPPING,
     )
 
 

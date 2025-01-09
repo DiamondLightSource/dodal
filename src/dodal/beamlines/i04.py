@@ -29,7 +29,11 @@ from dodal.devices.thawer import Thawer
 from dodal.devices.undulator import Undulator
 from dodal.devices.xbpm_feedback import XBPMFeedback
 from dodal.devices.zebra.zebra import Zebra
-from dodal.devices.zebra.zebra_constants_mapping import ZebraMapping, ZebraSources
+from dodal.devices.zebra.zebra_constants_mapping import (
+    ZebraMapping,
+    ZebraSources,
+    ZebraTTLOutputs,
+)
 from dodal.devices.zebra.zebra_controlled_shutter import ZebraShutter
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
@@ -48,9 +52,12 @@ BL = get_beamline_name("s04")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
-# TODO: Find out zebra is wired up to
-I04_ZEBRA_CONSTANTS = ZebraMapping(
-    sources=ZebraSources(),
+I04_ZEBRA_MAPPING = ZebraMapping(
+    outputs=(
+        ZebraTTLOutputs(
+            TTL_EIGER=1, TTL_FAST_SHUTTER=2, TTL_XSPRESS3=3, sources=ZebraSources()
+        )
+    )
 )
 
 
@@ -347,7 +354,7 @@ def zebra(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -
         "-EA-ZEBRA-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        mapping=I04_ZEBRA_CONSTANTS,
+        mapping=I04_ZEBRA_MAPPING,
     )
 
 
