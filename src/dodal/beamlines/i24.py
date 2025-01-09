@@ -25,6 +25,12 @@ ZOOM_PARAMS_FILE = (
 )
 DISPLAY_CONFIG = "/dls_sw/i24/software/gda_versions/var/display.configuration"
 
+BEAM_CENTER_LUT = {
+    "eiger": "/dls_sw/i24/software/daq_configuration/lookup/DetDistToBeamXYConverterE9M.txt",
+    "pilatus": "/dls_sw/i24/software/daq_configuration/lookup/DetDistToBeamXYConverterP6M.txt",
+}
+
+
 BL = get_beamline_name("s24")
 set_log_beamline(BL)
 set_utils_beamline(BL)
@@ -232,6 +238,7 @@ def eiger_beam_center(
         "-EA-EIGER-01:CAM:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        lut_path=BEAM_CENTER_LUT["eiger"],
     )
 
 
@@ -245,6 +252,7 @@ def pilatus_beam_center(
         "-EA-PILAT-01:cam1:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        lut_path=BEAM_CENTER_LUT["pilatus"],
     )
 
 
