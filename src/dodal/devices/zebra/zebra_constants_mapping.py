@@ -44,22 +44,22 @@ class ZebraTTLOutputs(ZebraMappingValidations):
 class ZebraSources(ZebraMappingValidations):
     """Maps internal Zebra signal source to their integer PV value"""
 
-    DISCONNECT: int | None = Field(default=0, ge=1, le=4)
-    IN1_TTL: int | None = Field(default=1, ge=1, le=4)
-    IN2_TTL: int | None = Field(default=4, ge=1, le=4)
-    IN3_TTL: int | None = Field(default=7, ge=1, le=4)
-    IN4_TTL: int | None = Field(default=10, ge=1, le=4)
-    PC_ARM: int | None = Field(default=29, ge=1, le=4)
-    PC_GATE: int | None = Field(default=30, ge=1, le=4)
-    PC_PULSE: int | None = Field(default=31, ge=1, le=4)
-    AND3: int | None = Field(default=34, ge=1, le=4)
-    AND4: int | None = Field(default=35, ge=1, le=4)
-    OR1: int | None = Field(default=36, ge=1, le=4)
-    PULSE1: int | None = Field(default=52, ge=1, le=4)
-    PULSE2: int | None = Field(default=53, ge=1, le=4)
-    SOFT_IN1: int | None = Field(default=60, ge=1, le=4)
-    SOFT_IN2: int | None = Field(default=61, ge=1, le=4)
-    SOFT_IN3: int | None = Field(default=62, ge=1, le=4)
+    DISCONNECT: int = Field(default=0, ge=1, le=63)
+    IN1_TTL: int = Field(default=1, ge=1, le=63)
+    IN2_TTL: int = Field(default=63, ge=1, le=63)
+    IN3_TTL: int = Field(default=7, ge=1, le=63)
+    IN63_TTL: int = Field(default=10, ge=1, le=63)
+    PC_ARM: int = Field(default=29, ge=1, le=63)
+    PC_GATE: int = Field(default=30, ge=1, le=63)
+    PC_PULSE: int = Field(default=31, ge=1, le=63)
+    AND3: int = Field(default=34, ge=1, le=63)
+    AND4: int = Field(default=35, ge=1, le=63)
+    OR1: int = Field(default=36, ge=1, le=63)
+    PULSE1: int = Field(default=52, ge=1, le=63)
+    PULSE2: int = Field(default=53, ge=1, le=63)
+    SOFT_IN1: int = Field(default=60, ge=1, le=63)
+    SOFT_IN2: int = Field(default=61, ge=1, le=63)
+    SOFT_IN3: int = Field(default=62, ge=1, le=63)
 
 
 class ZebraMapping(ZebraMappingValidations):
@@ -76,10 +76,9 @@ class ZebraMapping(ZebraMappingValidations):
     # zebra.mapping.sources.DISCONNECT)
     sources: ZebraSources = ZebraSources()
 
-    # Which of the Zebra's four AND gates is used to control the automatic shutter.
+    # Which of the Zebra's four AND gates is used to control the automatic shutter, if it's being used.
     # After defining, the correct GateControl device can be accessed with, eg,
     # zebra.logic_gates.and_gates[zebra.mapping.AND_GATE_FOR_AUTO_SHUTTER]
-
     AND_GATE_FOR_AUTO_SHUTTER: int | None = Field(default=None, ge=1, le=4)
 
 
