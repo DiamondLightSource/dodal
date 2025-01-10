@@ -44,7 +44,7 @@ from dodal.devices.zebra import Zebra
 from dodal.devices.zebra_controlled_shutter import ZebraShutter
 from dodal.devices.zocalo import ZocaloResults
 from dodal.log import set_beamline as set_log_beamline
-from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
+from dodal.utils import BeamlinePrefix, get_beamline_name
 
 ZOOM_PARAMS_FILE = (
     "/dls_sw/i03/software/gda/configurations/i03-config/xml/jCameraManZoomLevels.xml"
@@ -308,8 +308,8 @@ def sample_shutter() -> ZebraShutter:
     )
 
 
-@skip_device(lambda: BL == "s03")
-def flux(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> Flux:
+@device_factory(skip=BL == "s03")
+def flux(mock: bool = False) -> Flux:
     """Get the i03 flux device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
@@ -317,8 +317,8 @@ def flux(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) ->
         Flux,
         "flux",
         "-MO-FLUX-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+        wait=False,
+        fake=mock,
     )
 
 
