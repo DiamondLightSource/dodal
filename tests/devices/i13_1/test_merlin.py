@@ -62,6 +62,7 @@ async def test_can_collect(
     set_mock_value(merlin.drv.array_size_x, 10)
     set_mock_value(merlin.drv.array_size_y, 20)
     set_mock_value(merlin.hdf.num_frames_chunks, 1)
+    set_mock_value(merlin.hdf.full_file_name, "/foo/bar.hdf")
 
     await merlin.stage()
     await merlin.prepare(one_shot_trigger_info)
@@ -72,7 +73,7 @@ async def test_can_collect(
 
     sr_uid = stream_resource["uid"]
     assert stream_resource["data_key"] == "merlin"
-    assert stream_resource["uri"] == "file://localhost/workspaces/dodal"
+    assert stream_resource["uri"] == "file://localhost/foo/bar.hdf"
     assert stream_resource["parameters"] == {
         "dataset": "/entry/data/data",
         "swmr": False,
