@@ -18,7 +18,6 @@ from dodal.devices.attenuator.attenuator import BinaryFilterAttenuator
 from dodal.devices.backlight import Backlight
 from dodal.devices.cryostream import CryoStream
 from dodal.devices.dcm import DCM
-from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.diamond_filter import DiamondFilter, I03Filters
 from dodal.devices.eiger import EigerDetector
@@ -158,28 +157,18 @@ def detector_motion() -> DetectorMotion:
     )
 
 
-@skip_device(lambda: BL == "s03")
-def eiger(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-    params: DetectorParams | None = None,
-) -> EigerDetector:
+@device_factory(skip=BL == "s03")
+def eiger(mock: bool = False) -> EigerDetector:
     """Get the i03 Eiger device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
-    If called with params, will update those params to the Eiger object.
     """
-
-    def set_params(eiger: EigerDetector):
-        if params is not None:
-            eiger.set_detector_parameters(params)
 
     return device_instantiation(
         device_factory=EigerDetector,
         name="eiger",
         prefix="-EA-EIGER-01:",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
-        post_create=set_params,
+        wait=False,
+        fake=mock,
     )
 
 
