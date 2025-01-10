@@ -103,25 +103,3 @@ async def test_can_decribe_collect(merlin: Merlin, one_shot_trigger_info: Trigge
             "external": "STREAM:",
         }
     }
-
-
-@pytest.mark.parametrize(
-    "mode", [DetectorTrigger.CONSTANT_GATE, DetectorTrigger.VARIABLE_GATE]
-)
-async def test_unsupported_trigger_excepts(merlin: Merlin, mode: DetectorTrigger):
-    set_mock_value(merlin.hdf.file_path_exists, True)
-
-    with pytest.raises(
-        ValueError,
-        # str(EnumClass.value) handling changed in Python 3.11
-        match=f"{mode} is not a supported trigger mode",
-    ):
-        await merlin.prepare(
-            TriggerInfo(
-                number_of_triggers=0,
-                trigger=mode,
-                deadtime=1,
-                livetime=1,
-                frame_timeout=3,
-            )
-        )

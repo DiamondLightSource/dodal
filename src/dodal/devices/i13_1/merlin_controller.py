@@ -5,7 +5,6 @@ from ophyd_async.core import (
     DEFAULT_TIMEOUT,
     AsyncStatus,
     DetectorController,
-    DetectorTrigger,
     TriggerInfo,
 )
 from ophyd_async.epics import adcore
@@ -30,12 +29,6 @@ class MerlinController(DetectorController):
         return 0.002
 
     async def prepare(self, trigger_info: TriggerInfo):
-        if trigger_info.trigger in {
-            DetectorTrigger.CONSTANT_GATE,
-            DetectorTrigger.VARIABLE_GATE,
-        }:
-            raise ValueError(f"{trigger_info.trigger} is not a supported trigger mode")
-
         self.frame_timeout = (
             DEFAULT_TIMEOUT + await self.driver.acquire_time.get_value()
         )
