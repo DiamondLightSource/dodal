@@ -1,5 +1,6 @@
 import asyncio
 import functools
+import os
 from unittest.mock import ANY, AsyncMock, MagicMock, patch
 
 import pytest
@@ -36,6 +37,8 @@ def flush_event_loop_on_finish(event_loop):
 def setup():
     beamline_utils.clear_devices()
     mock_beamline_module_filepaths("i03", i03)
+    with patch.dict(os.environ, {"BEAMLINE": "i03"}):
+        yield
 
 
 def test_instantiate_function_makes_supplied_device():
@@ -83,7 +86,9 @@ def test_instantiate_v2_function_fake_makes_fake():
 
 
 def test_clear_devices(RE):
-    devices, exceptions = make_all_devices(i03, fake_with_ophyd_sim=True)
+    devices, exceptions = make_all_devices(
+        i03, fake_with_ophyd_sim=True, include_skipped=True
+    )
     assert (
         # These are the only 3 devices remaining in i03 that are still OphydV1
         len(beamline_utils.ACTIVE_DEVICES) == len(["flux", "s4_slit_gaps", "eiger"])
