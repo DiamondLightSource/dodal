@@ -33,7 +33,8 @@ async def energy_distance_table(lookup_table_path: str) -> np.ndarray:
 
 
 def parse_lookup_table(filename: str) -> list[Sequence]:
-    """Parse a generic lookup table and return a list of all the values in it."""
+    """Parse a generic lookup table with a number of columns >= 2 and return a list \
+        of all the values in it."""
     LOGGER.info(f"Parsing lookup table file {filename}")
 
     lut_vals = zip(*loadtxt(filename, comments=["#", "Units"]), strict=False)
