@@ -57,7 +57,7 @@ class ZebraSources(ZebraMappingValidations):
     IN1_TTL: int = Field(default=1, ge=0, le=63)
     IN2_TTL: int = Field(default=63, ge=0, le=63)
     IN3_TTL: int = Field(default=7, ge=0, le=63)
-    IN63_TTL: int = Field(default=10, ge=0, le=63)
+    IN4_TTL: int = Field(default=10, ge=0, le=63)
     PC_ARM: int = Field(default=29, ge=0, le=63)
     PC_GATE: int = Field(default=30, ge=0, le=63)
     PC_PULSE: int = Field(default=31, ge=0, le=63)
