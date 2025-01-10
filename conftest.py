@@ -25,6 +25,9 @@ from dodal.common.visit import (
 )
 from dodal.log import LOGGER, GELFTCPHandler, set_up_all_logging_handlers
 
+# List of pytest markers for tests which won't work without external configuration
+EXTERNAL_TEST_MARKERS = {"s03", "adsim"}
+
 MOCK_DAQ_CONFIG_PATH = "tests/devices/unit_tests/test_daq_configuration"
 mock_paths = [
     ("DAQ_CONFIGURATION_PATH", MOCK_DAQ_CONFIG_PATH),
@@ -53,9 +56,9 @@ def patch_open_to_prevent_dls_reads_in_tests():
         requested_path = Path(args[0])
         if requested_path.is_absolute():
             for p in BANNED_PATHS:
-                assert not requested_path.is_relative_to(p), (
-                    f"Attempt to open {requested_path} from inside a unit test"
-                )
+                assert not requested_path.is_relative_to(
+                    p
+                ), f"Attempt to open {requested_path} from inside a unit test"
         return unpatched_open(*args, **kwargs)
 
     with patch("builtins.open", side_effect=patched_open):
@@ -81,11 +84,15 @@ if os.getenv("PYTEST_RAISE", "0") == "1":
 
 
 def pytest_runtest_setup(item):
+    if item.config.getoption("-m") == "not external_tests":
+        if EXTERNAL_TEST_MARKERS.intersection(
+            mark.name for mark in item.iter_markers()
+        ):
+            pytest.skip()
     beamline_utils.clear_devices()
     if LOGGER.handlers == []:
         mock_graylog_handler = MagicMock(spec=GELFTCPHandler)
         mock_graylog_handler.return_value.level = logging.DEBUG
-
         with patch("dodal.log.GELFTCPHandler", mock_graylog_handler):
             set_up_all_logging_handlers(
                 LOGGER, Path("./tmp/dev"), "dodal.log", True, 10000
