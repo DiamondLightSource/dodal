@@ -27,7 +27,11 @@ async def test_exception_when_accessing_mapping_set_to_none():
 
 
 def test_exception_when_multiple_fields_set_to_same_integer():
-    with pytest.raises(ValueError):
+    expected_error_dict = {"TTL_DETECTOR": 1, "TTL_PANDA": 1}
+    with pytest.raises(
+        ValueError,
+        match=f"must be mapped to a unique integer. Duplicate fields: {expected_error_dict}",
+    ):
         ZebraMapping(outputs=ZebraTTLOutputs(TTL_DETECTOR=1, TTL_PANDA=1))
 
 

@@ -1,3 +1,5 @@
+from collections import Counter
+
 from pydantic import BaseModel, Field, model_validator
 
 
@@ -18,12 +20,19 @@ class ZebraMappingValidations(BaseModel):
 
     @model_validator(mode="after")
     def ensure_no_duplicate_connections(self):
-        """This ensures that TTL outputs and sources are mapped to unique integers"""
-        values = list(self.model_dump().values())
-        int_values = [v for v in values if isinstance(v, int)]
-        if len(int_values) != len(set(int_values)):
+        """Check that TTL outputs and sources are mapped to unique integers"""
+        integer_fields = {
+            key: value
+            for key, value in self.model_dump().items()
+            if isinstance(value, int)
+        }
+        counted_vals = Counter(integer_fields.values())
+        integer_fields_with_duplicates = {
+            k: v for k, v in integer_fields.items() if counted_vals[v] > 1
+        }
+        if len(integer_fields_with_duplicates):
             raise ValueError(
-                f"Each field in {type(self)} must be mapped to a unique integer"
+                f"Each field in {type(self)} must be mapped to a unique integer. Duplicate fields: {integer_fields_with_duplicates}"
             )
         return self
 
