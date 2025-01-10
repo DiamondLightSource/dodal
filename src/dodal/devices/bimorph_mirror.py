@@ -41,7 +41,7 @@ class BimorphMirrorStatus(StrictEnum):
     ERROR = "Error"
 
 
-class BimorphMirrorChannel(StandardReadable, EpicsDevice):
+class BimorphMirrorChannel(StandardReadable, Movable, EpicsDevice):
     """Collection of PVs comprising a single bimorph channel.
 
     Attributes:
@@ -55,6 +55,15 @@ class BimorphMirrorChannel(StandardReadable, EpicsDevice):
     output_voltage: A[SignalRW[float], PvSuffix.rbv("VOUT"), Format.HINTED_SIGNAL]
     status: A[SignalR[BimorphMirrorOnOff], PvSuffix("STATUS"), Format.CONFIG_SIGNAL]
     shift: A[SignalW[float], PvSuffix("SHIFT")]
+
+    @AsyncStatus.wrap
+    async def set(self, value: float):
+        """Sets channel's VOUT to given value.
+
+        Args:
+            value: float to set VOUT to
+        """
+        await self.output_voltage.set(value)
 
 
 class BimorphMirror(StandardReadable, Movable):
@@ -91,7 +100,6 @@ class BimorphMirror(StandardReadable, Movable):
         self.commit_target_voltages = epics_signal_x(f"{prefix}ALLTRGT.PROC")
         self.status = epics_signal_r(BimorphMirrorStatus, f"{prefix}STATUS")
         self.err = epics_signal_r(str, f"{prefix}ERR")
-
         super().__init__(name=name)
 
     @AsyncStatus.wrap
@@ -106,7 +114,7 @@ class BimorphMirror(StandardReadable, Movable):
 
         if any(key not in self.channels for key in value):
             raise ValueError(
-                f"Attempting to put to non-existent channels: {[key  for key in value if (key not in self.channels)]}"
+                f"Attempting to put to non-existent channels: {[key for key in value if (key not in self.channels)]}"
             )
 
         # Write target voltages:
@@ -129,7 +137,10 @@ class BimorphMirror(StandardReadable, Movable):
                     timeout=DEFAULT_TIMEOUT,
                 )
                 for i, target in value.items()
-            ]
+            ],
+            wait_for_value(
+                self.status, BimorphMirrorStatus.IDLE, timeout=DEFAULT_TIMEOUT
+            ),
         )
 
 

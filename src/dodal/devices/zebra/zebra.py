@@ -51,6 +51,11 @@ class I24Axes:
 
 
 class RotationDirection(StrictEnum):
+    """
+    Defines for a swept angle whether the scan width (sweep) is to be added or subtracted from
+    the initial angle to obtain the final angle.
+    """
+
     POSITIVE = "Positive"
     NEGATIVE = "Negative"
 
@@ -251,7 +256,7 @@ class LogicGateConfiguration:
         for input, (source, invert) in enumerate(
             zip(self.sources, self.invert, strict=False)
         ):
-            input_strings.append(f"INP{input+1}={'!' if invert else ''}{source}")
+            input_strings.append(f"INP{input + 1}={'!' if invert else ''}{source}")
 
         return ", ".join(input_strings)
 
