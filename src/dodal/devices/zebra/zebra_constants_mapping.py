@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field, model_validator
 
 
 class ZebraMappingValidations(BaseModel):
-    """Helper BaseModel to error if a None field is accessed, and validate against
+    """Raises an exception if field set to None is accessed, and validate against
     multiple fields mapping to the same integer"""
 
     def __getattribute__(self, name: str):
@@ -53,22 +53,22 @@ class ZebraTTLOutputs(ZebraMappingValidations):
 class ZebraSources(ZebraMappingValidations):
     """Maps internal Zebra signal source to their integer PV value"""
 
-    DISCONNECT: int = Field(default=0, ge=1, le=63)
-    IN1_TTL: int = Field(default=1, ge=1, le=63)
-    IN2_TTL: int = Field(default=63, ge=1, le=63)
-    IN3_TTL: int = Field(default=7, ge=1, le=63)
-    IN63_TTL: int = Field(default=10, ge=1, le=63)
-    PC_ARM: int = Field(default=29, ge=1, le=63)
-    PC_GATE: int = Field(default=30, ge=1, le=63)
-    PC_PULSE: int = Field(default=31, ge=1, le=63)
-    AND3: int = Field(default=34, ge=1, le=63)
-    AND4: int = Field(default=35, ge=1, le=63)
-    OR1: int = Field(default=36, ge=1, le=63)
-    PULSE1: int = Field(default=52, ge=1, le=63)
-    PULSE2: int = Field(default=53, ge=1, le=63)
-    SOFT_IN1: int = Field(default=60, ge=1, le=63)
-    SOFT_IN2: int = Field(default=61, ge=1, le=63)
-    SOFT_IN3: int = Field(default=62, ge=1, le=63)
+    DISCONNECT: int = Field(default=0, ge=0, le=63)
+    IN1_TTL: int = Field(default=1, ge=0, le=63)
+    IN2_TTL: int = Field(default=63, ge=0, le=63)
+    IN3_TTL: int = Field(default=7, ge=0, le=63)
+    IN63_TTL: int = Field(default=10, ge=0, le=63)
+    PC_ARM: int = Field(default=29, ge=0, le=63)
+    PC_GATE: int = Field(default=30, ge=0, le=63)
+    PC_PULSE: int = Field(default=31, ge=0, le=63)
+    AND3: int = Field(default=34, ge=0, le=63)
+    AND4: int = Field(default=35, ge=0, le=63)
+    OR1: int = Field(default=36, ge=0, le=63)
+    PULSE1: int = Field(default=52, ge=0, le=63)
+    PULSE2: int = Field(default=53, ge=0, le=63)
+    SOFT_IN1: int = Field(default=60, ge=0, le=63)
+    SOFT_IN2: int = Field(default=61, ge=0, le=63)
+    SOFT_IN3: int = Field(default=62, ge=0, le=63)
 
 
 class ZebraMapping(ZebraMappingValidations):
@@ -82,7 +82,7 @@ class ZebraMapping(ZebraMappingValidations):
 
     # Zebra ophyd signal sources can be mapped to a zebra output by doing, eg,
     # bps.abs_set(zebra.output.out_pvs[zebra.mapping.outputs.TTL_DETECTOR],
-    # zebra.mapping.sources.DISCONNECT)
+    # zebra.mapping.sources.AND3)
     sources: ZebraSources = ZebraSources()
 
     # Which of the Zebra's four AND gates is used to control the automatic shutter, if it's being used.
