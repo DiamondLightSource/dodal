@@ -45,7 +45,7 @@ from dodal.devices.zebra import Zebra
 from dodal.devices.zebra_controlled_shutter import ZebraShutter
 from dodal.devices.zocalo import ZocaloResults
 from dodal.log import set_beamline as set_log_beamline
-from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
+from dodal.utils import BeamlinePrefix, get_beamline_name
 
 ZOOM_PARAMS_FILE = (
     "/dls_sw/i03/software/gda/configurations/i03-config/xml/jCameraManZoomLevels.xml"
@@ -107,8 +107,7 @@ def dcm() -> DCM:
     )
 
 
-@device_factory()
-@skip_device(lambda: BL == "s03")
+@device_factory(skip=BL == "s03")
 def vfm() -> FocusingMirrorWithStripes:
     return FocusingMirrorWithStripes(
         prefix=f"{PREFIX.beamline_prefix}-OP-VFM-01:",
@@ -120,8 +119,7 @@ def vfm() -> FocusingMirrorWithStripes:
     )
 
 
-@device_factory()
-@skip_device(lambda: BL == "s03")
+@device_factory(skip=BL == "s03")
 def mirror_voltages() -> MirrorVoltages:
     return MirrorVoltages(
         name="mirror_voltages",
@@ -140,8 +138,7 @@ def backlight(
     return Backlight(prefix=PREFIX.beamline_prefix, name="backlight")
 
 
-@device_factory()
-@skip_device(lambda: BL == "s03")
+@device_factory(skip=BL == "s03")
 def detector_motion() -> DetectorMotion:
     """Get the i03 detector motion device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
@@ -152,7 +149,7 @@ def detector_motion() -> DetectorMotion:
     )
 
 
-@skip_device(lambda: BL == "s03")
+@device_factory(skip=BL == "s03")
 def eiger(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
@@ -200,8 +197,7 @@ def panda_fast_grid_scan() -> PandAFastGridScan:
     )
 
 
-@device_factory()
-@skip_device(lambda: BL == "s03")
+@device_factory(skip=BL == "s03")
 def oav(
     params: OAVConfig | None = None,
 ) -> OAV:
@@ -215,8 +211,7 @@ def oav(
     )
 
 
-@device_factory()
-@skip_device(lambda: BL == "s03")
+@device_factory(skip=BL == "s03")
 def pin_tip_detection() -> PinTipDetection:
     """Get the i03 pin tip detection device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
@@ -250,8 +245,7 @@ def s4_slit_gaps(
     )
 
 
-@device_factory()
-@skip_device(lambda: BL == "s03")
+@device_factory(skip=BL == "s03")
 def synchrotron() -> Synchrotron:
     """Get the i03 synchrotron device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
@@ -319,8 +313,7 @@ def panda() -> HDFPanda:
     )
 
 
-@device_factory()
-@skip_device(lambda: BL == "s03")
+@device_factory(skip=BL == "s03")
 def sample_shutter() -> ZebraShutter:
     """Get the i03 sample shutter device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
@@ -331,7 +324,7 @@ def sample_shutter() -> ZebraShutter:
     )
 
 
-@skip_device(lambda: BL == "s03")
+@device_factory(skip=BL == "s03")
 def flux(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> Flux:
     """Get the i03 flux device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
