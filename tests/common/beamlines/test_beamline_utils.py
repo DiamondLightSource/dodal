@@ -86,12 +86,10 @@ def test_instantiate_v2_function_fake_makes_fake():
 
 
 def test_clear_devices(RE):
-    devices, exceptions = make_all_devices(
-        i03, fake_with_ophyd_sim=True, include_skipped=True
-    )
+    devices, exceptions = make_all_devices(i03, fake_with_ophyd_sim=True)
     assert (
-        # These are the only 3 devices remaining in i03 that are still OphydV1
-        len(beamline_utils.ACTIVE_DEVICES) == len(["flux", "s4_slit_gaps", "eiger"])
+        # This is the only device is in i03 and is still OphydV1 and not skipped
+        len(beamline_utils.ACTIVE_DEVICES) == len(["s4_slit_gaps"])
         and len(exceptions) == 0
     )
     beamline_utils.clear_devices()
