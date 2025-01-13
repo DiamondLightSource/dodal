@@ -213,7 +213,7 @@ class DeviceInitializationController(Generic[T]):
                 )
             else:
                 assert is_v1_device_type(type(device))
-                device.wait_for_connection(timeout=timeout)
+                device.wait_for_connection(timeout=timeout)  # type: ignore
 
         if name:
             device.set_name(name)
