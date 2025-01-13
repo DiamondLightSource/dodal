@@ -1,44 +1,43 @@
-from ophyd import Component as Cpt
-from ophyd import EpicsMotor, MotorBundle
-from ophyd.areadetector.base import ADComponent as Cpt
+from ophyd_async.core import Device
+from ophyd_async.epics.motor import Motor
 
 
-class SampleY(MotorBundle):
+class SampleY(Device):
     """
     Motors for controlling the sample's y position and stretch in the y axis.
     """
 
-    base = Cpt(EpicsMotor, "CS:Y")
-    stretch = Cpt(EpicsMotor, "CS:Y:STRETCH")
-    top = Cpt(EpicsMotor, "Y:TOP")
-    bottom = Cpt(EpicsMotor, "Y:BOT")
+    base = Motor("CS:Y")
+    stretch = Motor("CS:Y:STRETCH")
+    top = Motor("Y:TOP")
+    bottom = Motor("Y:BOT")
 
 
-class SampleTheta(MotorBundle):
+class SampleTheta(Device):
     """
     Motors for controlling the sample's theta position and skew
     """
 
-    base = Cpt(EpicsMotor, "THETA:POS")
-    skew = Cpt(EpicsMotor, "THETA:SKEW")
-    top = Cpt(EpicsMotor, "THETA:TOP")
-    bottom = Cpt(EpicsMotor, "THETA:BOT")
+    base = Motor("THETA:POS")
+    skew = Motor("THETA:SKEW")
+    top = Motor("THETA:TOP")
+    bottom = Motor("THETA:BOT")
 
 
-class TomoStageWithStretchAndSkew(MotorBundle):
+class TomoStageWithStretchAndSkew(Device):
     """
     Grouping of motors for the P45 tomography stage
     """
 
-    x = Cpt(EpicsMotor, "X")
-    y = Cpt(SampleY, "")
-    theta = Cpt(SampleTheta, "")
+    x = Motor("X")
+    y = SampleY("")
+    theta = SampleTheta("")
 
 
-class Choppers(MotorBundle):
+class Choppers(Device):
     """
     Grouping for the P45 chopper motors
     """
 
-    x = Cpt(EpicsMotor, "ENDAT")
-    y = Cpt(EpicsMotor, "BISS")
+    x = Motor("ENDAT")
+    y = Motor("BISS")
