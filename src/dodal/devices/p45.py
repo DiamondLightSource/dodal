@@ -1,8 +1,8 @@
-from ophyd_async.core import Device
+from ophyd_async.core import StandardReadable
 from ophyd_async.epics.motor import Motor
 
 
-class SampleY(Device):
+class SampleY(StandardReadable):
     """
     Motors for controlling the sample's y position and stretch in the y axis.
     """
@@ -13,7 +13,7 @@ class SampleY(Device):
     bottom = Motor("Y:BOT")
 
 
-class SampleTheta(Device):
+class SampleTheta(StandardReadable):
     """
     Motors for controlling the sample's theta position and skew
     """
@@ -24,7 +24,7 @@ class SampleTheta(Device):
     bottom = Motor("THETA:BOT")
 
 
-class TomoStageWithStretchAndSkew(Device):
+class TomoStageWithStretchAndSkew(StandardReadable):
     """
     Grouping of motors for the P45 tomography stage
     """
@@ -34,7 +34,7 @@ class TomoStageWithStretchAndSkew(Device):
     theta = SampleTheta("")
 
 
-class Choppers(Device):
+class Choppers(StandardReadable):
     """
     Grouping for the P45 chopper motors
     """
