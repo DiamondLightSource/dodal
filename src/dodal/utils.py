@@ -16,6 +16,7 @@ from typing import (
     Any,
     Generic,
     Protocol,
+    TypeAlias,
     TypeGuard,
     TypeVar,
     runtime_checkable,
@@ -42,12 +43,6 @@ from ophyd.device import Device as OphydV1Device
 from ophyd_async.core import Device as OphydV2Device
 
 import dodal.log
-
-try:
-    from typing import TypeAlias
-except ImportError:
-    from typing import TypeAlias
-
 
 #: Protocols defining interface to hardware
 BLUESKY_PROTOCOLS = [
