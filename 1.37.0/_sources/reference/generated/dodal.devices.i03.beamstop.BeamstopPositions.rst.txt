@@ -1,0 +1,78 @@
+dodal.devices.i03.beamstop.BeamstopPositions
+============================================
+
+.. currentmodule:: dodal.devices.i03.beamstop
+
+.. autoclass:: BeamstopPositions
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~BeamstopPositions.DATA_COLLECTION
+      
+      
+      ~BeamstopPositions.UNKNOWN
+      
+   
+   

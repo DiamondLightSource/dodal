@@ -1,0 +1,40 @@
+dodal.devices.zebra.SoftInputs
+==============================
+
+.. currentmodule:: dodal.devices.zebra
+
+.. autoclass:: SoftInputs
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

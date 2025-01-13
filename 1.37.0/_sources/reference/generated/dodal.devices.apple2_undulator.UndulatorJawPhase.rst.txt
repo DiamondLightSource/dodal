@@ -1,0 +1,49 @@
+dodal.devices.apple2\_undulator.UndulatorJawPhase
+=================================================
+
+.. currentmodule:: dodal.devices.apple2_undulator
+
+.. autoclass:: UndulatorJawPhase
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      ~UndulatorJawPhase.check_id_status
+      
+      
+      
+      
+      
+      
+      ~UndulatorJawPhase.get_timeout
+      
+      
+      
+      
+      ~UndulatorJawPhase.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

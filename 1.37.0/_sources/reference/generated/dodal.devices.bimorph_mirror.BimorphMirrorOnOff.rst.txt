@@ -1,0 +1,78 @@
+dodal.devices.bimorph\_mirror.BimorphMirrorOnOff
+================================================
+
+.. currentmodule:: dodal.devices.bimorph_mirror
+
+.. autoclass:: BimorphMirrorOnOff
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~BimorphMirrorOnOff.ON
+      
+      
+      ~BimorphMirrorOnOff.OFF
+      
+   
+   

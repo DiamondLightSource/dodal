@@ -1,0 +1,52 @@
+dodal.devices.zebra.LogicGateConfigurer
+=======================================
+
+.. currentmodule:: dodal.devices.zebra
+
+.. autoclass:: LogicGateConfigurer
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      ~LogicGateConfigurer.apply_and_gate_config
+      
+      
+      ~LogicGateConfigurer.apply_logic_gate_config
+      
+      
+      ~LogicGateConfigurer.apply_or_gate_config
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~LogicGateConfigurer.DEFAULT_SOURCE_IF_GATE_NOT_USED
+      
+      
+      
+      
+      
+   
+   

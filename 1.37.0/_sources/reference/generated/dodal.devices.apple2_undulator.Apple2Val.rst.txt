@@ -1,0 +1,35 @@
+dodal.devices.apple2\_undulator.Apple2Val
+=========================================
+
+.. currentmodule:: dodal.devices.apple2_undulator
+
+.. autoclass:: Apple2Val
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~Apple2Val.gap
+      
+      
+      ~Apple2Val.top_outer
+      
+      
+      ~Apple2Val.top_inner
+      
+      
+      ~Apple2Val.btm_inner
+      
+      
+      ~Apple2Val.btm_outer
+      
+   
+   

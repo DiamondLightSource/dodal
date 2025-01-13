@@ -1,0 +1,40 @@
+dodal.devices.i24.focus\_mirrors.FocusMirrorsMode
+=================================================
+
+.. currentmodule:: dodal.devices.i24.focus_mirrors
+
+.. autoclass:: FocusMirrorsMode
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

@@ -1,0 +1,64 @@
+dodal.devices.apple2\_undulator.EnergyCoverageEntry
+===================================================
+
+.. currentmodule:: dodal.devices.apple2_undulator
+
+.. autoclass:: EnergyCoverageEntry
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~EnergyCoverageEntry.model_config
+      
+      
+      
+      
+      
+      ~EnergyCoverageEntry.Low
+      
+      
+      ~EnergyCoverageEntry.High
+      
+      
+      ~EnergyCoverageEntry.Poly
+      
+   
+   

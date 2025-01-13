@@ -1,0 +1,46 @@
+dodal.devices.zebra.ArmingDevice
+================================
+
+.. currentmodule:: dodal.devices.zebra
+
+.. autoclass:: ArmingDevice
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~ArmingDevice.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~ArmingDevice.TIMEOUT
+      
+      
+      
+      
+      
+   
+   
