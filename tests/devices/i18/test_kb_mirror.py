@@ -1,7 +1,8 @@
 from unittest.mock import ANY
 
 import pytest
-from ophyd_async.core import DeviceCollector, set_mock_value
+from ophyd_async.core import DeviceCollector
+from ophyd_async.testing import set_mock_value
 
 from dodal.devices.i18.KBMirror import KBMirror, XYPosition
 
