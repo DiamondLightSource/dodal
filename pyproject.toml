@@ -187,8 +187,12 @@ lint.select = [
 root_package = "dodal"
 
 [[tool.importlinter.contracts]]
-name = "Nothing imports"
+name = "Common cannot import from beamlines"
 type = "forbidden"
-source_modules = "*"
-forbidden_modules = ["beamlines"]
-ignore_modules = ["beamlines.tests"]
+source_modules = ["dodal.common"]
+forbidden_modules = ["dodal.beamlines"]
+
+[[tool.importlinter.contracts]]
+name = "Enforce import order"
+type = "layers"
+layers = ["dodal.plans", "dodal.beamlines", "dodal.devices"]
