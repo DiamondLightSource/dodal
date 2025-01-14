@@ -5,7 +5,7 @@ import pytest
 from bluesky.simulators import RunEngineSimulator
 from ophyd_async.fastcs.panda import phase_sorter
 
-from dodal.devices.util.save_panda import _save_panda, main
+from dodal.plans.save_panda import _save_panda, main
 
 
 def test_save_panda():
