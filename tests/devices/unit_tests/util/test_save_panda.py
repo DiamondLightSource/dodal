@@ -13,13 +13,13 @@ def test_save_panda():
     panda = MagicMock()
     with (
         patch(
-            "dodal.devices.util.save_panda.make_device", return_value={"panda": panda}
+            "devices.plans.save_panda.make_device", return_value={"panda": panda}
         ) as mock_make_device,
         patch(
-            "dodal.devices.util.save_panda.RunEngine",
+            "devices.plans.save_panda.RunEngine",
             return_value=MagicMock(side_effect=sim_run_engine.simulate_plan),
         ),
-        patch("dodal.devices.util.save_panda.save_device") as mock_save_device,
+        patch("devices.plans.save_panda.save_device") as mock_save_device,
     ):
         _save_panda("i03", "panda", "test/file.yml")
 
@@ -28,12 +28,12 @@ def test_save_panda():
 
 
 @patch(
-    "dodal.devices.util.save_panda.sys.exit",
+    "devices.plans.save_panda.sys.exit",
     side_effect=AssertionError("This exception expected"),
 )
 def test_save_panda_failure_to_create_device_exits_with_failure_code(mock_exit):
     with patch(
-        "dodal.devices.util.save_panda.make_device",
+        "devices.plans.save_panda.make_device",
         side_effect=ValueError("device does not exist"),
     ):
         with pytest.raises(AssertionError):
@@ -42,7 +42,7 @@ def test_save_panda_failure_to_create_device_exits_with_failure_code(mock_exit):
     mock_exit.assert_called_once_with(1)
 
 
-@patch("dodal.devices.util.save_panda._save_panda")
+@patch("devices.plans.save_panda._save_panda")
 @pytest.mark.parametrize(
     "beamline, args, expected_beamline, expected_device_name, expected_output_file, "
     "expected_return_value",
@@ -115,8 +115,8 @@ def test_main(
         (True, True, True, 0),
     ],
 )
-@patch("dodal.devices.util.save_panda._save_panda")
-@patch("dodal.devices.util.save_panda.Path", autospec=True)
+@patch("devices.plans.save_panda._save_panda")
+@patch("devices.plans.save_panda.Path", autospec=True)
 def test_file_exists_check(
     mock_path: MagicMock,
     mock_save_panda: MagicMock,
