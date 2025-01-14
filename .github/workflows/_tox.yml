@@ -8,6 +8,22 @@ on:
 
 
 jobs:
+  lint:
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          architecture: x64
+      
+      - name: Install import linter
+        run: pip install import-linter
+
+      - name: Run import linter
+        run: lint-imports
+
   run:
     runs-on: "ubuntu-latest"
 
