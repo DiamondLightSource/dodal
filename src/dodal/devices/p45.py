@@ -8,10 +8,10 @@ class SampleY(StandardReadable):
     """
 
     def __init__(self, prefix: str, name="") -> None:
-        self.base = Motor("CS:Y")
-        self.stretch = Motor("CS:Y:STRETCH")
-        self.top = Motor("Y:TOP")
-        self.bottom = Motor("Y:BOT")
+        self.base = Motor(prefix + "CS:Y")
+        self.stretch = Motor(prefix + "CS:Y:STRETCH")
+        self.top = Motor(prefix + "Y:TOP")
+        self.bottom = Motor(prefix + "Y:BOT")
         super().__init__(name=name)
 
 
@@ -21,10 +21,10 @@ class SampleTheta(StandardReadable):
     """
 
     def __init__(self, prefix: str, name="") -> None:
-        self.base = Motor("THETA:POS")
-        self.skew = Motor("THETA:SKEW")
-        self.top = Motor("THETA:TOP")
-        self.bottom = Motor("THETA:BOT")
+        self.base = Motor(prefix + "THETA:POS")
+        self.skew = Motor(prefix + "THETA:SKEW")
+        self.top = Motor(prefix + "THETA:TOP")
+        self.bottom = Motor(prefix + "THETA:BOT")
         super().__init__(name=name)
 
 
@@ -34,9 +34,9 @@ class TomoStageWithStretchAndSkew(StandardReadable):
     """
 
     def __init__(self, prefix: str, name="") -> None:
-        self.x = Motor("X")
-        self.y = SampleY("")
-        self.theta = SampleTheta("")
+        self.x = Motor(prefix + "X")
+        self.y = SampleY(prefix)
+        self.theta = SampleTheta(prefix)
         super().__init__(name=name)
 
 
@@ -46,6 +46,6 @@ class Choppers(StandardReadable):
     """
 
     def __init__(self, prefix: str, name="") -> None:
-        self.x = Motor("ENDAT")
-        self.y = Motor("BISS")
+        self.x = Motor(prefix + "ENDAT")
+        self.y = Motor(prefix + "BISS")
         super().__init__(name=name)
