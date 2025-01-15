@@ -23,23 +23,6 @@ dodal.devices.p45.SampleY
       
       
       
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
    
    
 
@@ -51,36 +34,6 @@ dodal.devices.p45.SampleY
    
       
       
-      
-      ~SampleY.base
-      
-      
-      ~SampleY.bottom
-      
-      
-      ~SampleY.component_names
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      ~SampleY.stretch
-      
-      
-      ~SampleY.subscriptions
-      
-      
-      ~SampleY.top
       
       
    

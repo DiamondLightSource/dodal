@@ -23,23 +23,6 @@ dodal.devices.s4\_slit\_gaps.S4SlitGaps
       
       
       
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
    
    
 
@@ -52,30 +35,6 @@ dodal.devices.s4\_slit\_gaps.S4SlitGaps
       
       
       
-      ~S4SlitGaps.component_names
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      ~S4SlitGaps.subscriptions
-      
-      
-      
-      ~S4SlitGaps.xgap
-      
-      
-      ~S4SlitGaps.ygap
       
    
    

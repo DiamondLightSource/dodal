@@ -23,23 +23,6 @@ dodal.devices.flux.Flux
       
       
       
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
    
    
 
@@ -51,27 +34,6 @@ dodal.devices.flux.Flux
    
       
       
-      
-      ~Flux.component_names
-      
-      
-      
-      
-      
-      
-      ~Flux.flux_reading
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      ~Flux.subscriptions
       
       
    

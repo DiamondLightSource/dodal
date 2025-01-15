@@ -23,23 +23,6 @@ dodal.devices.p45.SampleTheta
       
       
       
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
    
    
 
@@ -51,36 +34,6 @@ dodal.devices.p45.SampleTheta
    
       
       
-      
-      ~SampleTheta.base
-      
-      
-      ~SampleTheta.bottom
-      
-      
-      ~SampleTheta.component_names
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      ~SampleTheta.skew
-      
-      
-      ~SampleTheta.subscriptions
-      
-      
-      ~SampleTheta.top
       
       
    

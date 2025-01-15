@@ -23,23 +23,6 @@ dodal.devices.p45.TomoStageWithStretchAndSkew
       
       
       
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
    
    
 
@@ -52,33 +35,6 @@ dodal.devices.p45.TomoStageWithStretchAndSkew
       
       
       
-      ~TomoStageWithStretchAndSkew.component_names
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      ~TomoStageWithStretchAndSkew.subscriptions
-      
-      
-      ~TomoStageWithStretchAndSkew.theta
-      
-      
-      
-      ~TomoStageWithStretchAndSkew.x
-      
-      
-      ~TomoStageWithStretchAndSkew.y
       
    
    

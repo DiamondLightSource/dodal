@@ -23,23 +23,6 @@ dodal.devices.p45.Choppers
       
       
       
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
    
    
 
@@ -52,30 +35,6 @@ dodal.devices.p45.Choppers
       
       
       
-      ~Choppers.component_names
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      ~Choppers.subscriptions
-      
-      
-      
-      ~Choppers.x
-      
-      
-      ~Choppers.y
       
    
    
