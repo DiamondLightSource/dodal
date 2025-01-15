@@ -187,8 +187,54 @@ def test_device_factory_can_ignore_skip():
     import tests.fake_device_factory_beamline as fake_beamline
 
     devices, exceptions = make_all_devices(fake_beamline, include_skipped=True)
-    assert len(devices) == 3
+    assert len(devices) == 4
     assert len(exceptions) == 0
+
+
+def test_device_factory_can_construct_ophyd_v1_devices():
+    import tests.fake_device_factory_beamline as fake_beamline
+
+    device = fake_beamline.ophyd_v1_device(
+        connect_immediately=True, mock=True, connection_timeout=4.5
+    )
+
+    device.wait_for_connection.assert_called_once_with(timeout=4.5)  # type: ignore
+
+
+def test_device_factory_passes_kwargs_to_wrapped_factory_v1():
+    import tests.fake_device_factory_beamline as fake_beamline
+
+    device = fake_beamline.ophyd_v1_device(
+        connect_immediately=True,
+        mock=True,
+        my_int_kwarg=123,
+        my_str_kwarg="abc",
+        my_float_kwarg=1.23,
+    )
+
+    assert device.my_kwargs == {
+        "my_int_kwarg": 123,
+        "my_str_kwarg": "abc",
+        "my_float_kwarg": 1.23,
+    }
+
+
+def test_device_factory_passes_kwargs_to_wrapped_factory_v2(RE: RunEngine):
+    import tests.fake_device_factory_beamline as fake_beamline
+
+    device = fake_beamline.mock_device(
+        connect_immediately=True,
+        mock=True,
+        my_int_kwarg=123,
+        my_str_kwarg="abc",
+        my_float_kwarg=1.23,
+    )
+
+    assert device.my_kwargs == {
+        "my_int_kwarg": 123,
+        "my_str_kwarg": "abc",
+        "my_float_kwarg": 1.23,
+    }
 
 
 def test_fake_with_ophyd_sim_passed_to_device_factory(RE: RunEngine):
