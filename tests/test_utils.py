@@ -230,7 +230,7 @@ def test_device_factory_passes_kwargs_to_wrapped_factory_v2(RE: RunEngine):
         my_float_kwarg=1.23,
     )
 
-    assert device.my_kwargs == {
+    assert device.my_kwargs == {  # type: ignore
         "my_int_kwarg": 123,
         "my_str_kwarg": "abc",
         "my_float_kwarg": 1.23,
