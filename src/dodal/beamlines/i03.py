@@ -18,7 +18,6 @@ from dodal.devices.attenuator.attenuator import BinaryFilterAttenuator
 from dodal.devices.backlight import Backlight
 from dodal.devices.cryostream import CryoStream
 from dodal.devices.dcm import DCM
-from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.diamond_filter import DiamondFilter, I03Filters
 from dodal.devices.eiger import EigerDetector
@@ -45,7 +44,7 @@ from dodal.devices.zebra import Zebra
 from dodal.devices.zebra_controlled_shutter import ZebraShutter
 from dodal.devices.zocalo import ZocaloResults
 from dodal.log import set_beamline as set_log_beamline
-from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
+from dodal.utils import BeamlinePrefix, get_beamline_name
 
 ZOOM_PARAMS_FILE = (
     "/dls_sw/i03/software/gda/configurations/i03-config/xml/jCameraManZoomLevels.xml"
@@ -149,28 +148,18 @@ def detector_motion() -> DetectorMotion:
     )
 
 
-@skip_device(lambda: BL == "s03")
-def eiger(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-    params: DetectorParams | None = None,
-) -> EigerDetector:
+@device_factory(skip=BL == "s03")
+def eiger(mock: bool = False) -> EigerDetector:
     """Get the i03 Eiger device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
-    If called with params, will update those params to the Eiger object.
     """
-
-    def set_params(eiger: EigerDetector):
-        if params is not None:
-            eiger.set_detector_parameters(params)
 
     return device_instantiation(
         device_factory=EigerDetector,
         name="eiger",
         prefix="-EA-EIGER-01:",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
-        post_create=set_params,
+        wait=False,
+        fake=mock,
     )
 
 
@@ -230,18 +219,13 @@ def smargon() -> Smargon:
     return Smargon(f"{PREFIX.beamline_prefix}-MO-SGON-01:", "smargon")
 
 
-def s4_slit_gaps(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> S4SlitGaps:
+@device_factory()
+def s4_slit_gaps(mock: bool = True) -> S4SlitGaps:
     """Get the i03 s4_slit_gaps device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return device_instantiation(
-        S4SlitGaps,
-        "s4_slit_gaps",
-        "-AL-SLITS-04:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+        S4SlitGaps, "s4_slit_gaps", "-AL-SLITS-04:", wait=False, fake=mock
     )
 
 
@@ -324,8 +308,8 @@ def sample_shutter() -> ZebraShutter:
     )
 
 
-@skip_device(lambda: BL == "s03")
-def flux(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> Flux:
+@device_factory(skip=BL == "s03")
+def flux(mock: bool = False) -> Flux:
     """Get the i03 flux device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
@@ -333,8 +317,8 @@ def flux(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) ->
         Flux,
         "flux",
         "-MO-FLUX-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+        wait=False,
+        fake=mock,
     )
 
 
