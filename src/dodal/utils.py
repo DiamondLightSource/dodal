@@ -102,7 +102,7 @@ class BeamlinePrefix:
 
 
 T = TypeVar("T", bound=AnyDevice)
-D = TypeVar("D", bound=OphydV2Device)
+
 SkipType = bool | Callable[[], bool]
 
 
@@ -184,7 +184,7 @@ class DeviceInitializationController(Generic[T]):
               connect is called on the Device.
 
         Returns:
-            D: a singleton instance of the Device class returned by the wrapped factory.
+            T: a singleton instance of the Device class returned by the wrapped factory.
         """
         is_v2_device = is_v2_device_factory(self._factory)
         is_mock = mock if mock is not None else self._mock
