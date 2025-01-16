@@ -108,6 +108,7 @@ async def test_set_channels_waits_for_vout_readback(
 async def test_set_channels_allows_tolerance(
     mirror: BimorphMirror,
     valid_bimorph_values: dict[int, float],
+    bimorph_functionality,
 ):
     for channel in mirror.channels.values():
 
