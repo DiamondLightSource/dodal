@@ -3,35 +3,19 @@ dodal.devices.zebra
 
 
 
-
-
-
-
-.. currentmodule:: dodal.devices
-.. rubric:: Classes
+.. rubric:: Modules
 
 .. autosummary::
    :toctree:
    :recursive:
 
-   ~zebra.ArmDemand
-   ~zebra.ArmSource
-   ~zebra.ArmingDevice
-   ~zebra.EncEnum
-   ~zebra.GateControl
-   ~zebra.GateType
-   ~zebra.I03Axes
-   ~zebra.I24Axes
-   ~zebra.LogicGateConfiguration
-   ~zebra.LogicGateConfigurer
-   ~zebra.PositionCompare
-   ~zebra.PulseOutput
-   ~zebra.RotationDirection
-   ~zebra.SoftInState
-   ~zebra.SoftInputs
-   ~zebra.TrigSource
-   ~zebra.Zebra
-   ~zebra.ZebraOutputPanel
+   dodal.devices.zebra.zebra
+   dodal.devices.zebra.zebra_constants_mapping
+   dodal.devices.zebra.zebra_controlled_shutter
+
+
+
+
 
 
 
@@ -45,12 +29,6 @@ dodal.devices.zebra
    
 
    
-   
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      boolean_array_to_integer
    
    
 

@@ -61,7 +61,6 @@
    dodal.devices.webcam
    dodal.devices.xbpm_feedback
    dodal.devices.zebra
-   dodal.devices.zebra_controlled_shutter
    dodal.devices.zocalo
 
 
