@@ -114,17 +114,18 @@ class BimorphMirror(StandardReadable, Movable):
 
         if any(key not in self.channels for key in value):
             raise ValueError(
-                f"Attempting to put to non-existent channels: {[key  for key in value if (key not in self.channels)]}"
+                f"Attempting to put to non-existent channels: {[key for key in value if (key not in self.channels)]}"
             )
 
         # Write target voltages:
-        await asyncio.gather(
-            *[
-                self.channels[i].target_voltage.set(target, wait=True)
-                for i, target in value.items()
-            ]
-        )
-
+        for i, target in value.items():
+            await wait_for_value(
+                self.status, BimorphMirrorStatus.IDLE, timeout=DEFAULT_TIMEOUT
+            )
+            await self.channels[i].target_voltage.set(target, wait=True)
+            await wait_for_value(
+                self.status, BimorphMirrorStatus.BUSY, timeout=DEFAULT_TIMEOUT
+            )
         # Trigger set target voltages:
         await self.commit_target_voltages.trigger()
 
