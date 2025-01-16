@@ -1,9 +1,10 @@
+import asyncio
 from unittest.mock import ANY, call, patch
 
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import DeviceCollector
-from ophyd_async.testing import callback_on_mock_put, get_mock_put
+from ophyd_async.core import DeviceCollector, walk_rw_signals
+from ophyd_async.testing import callback_on_mock_put, get_mock_put, set_mock_value
 
 from dodal.devices.bimorph_mirror import BimorphMirror, BimorphMirrorStatus
 
@@ -38,11 +39,36 @@ def mock_vtrgt_vout_propogation(mirror: BimorphMirror):
         callback_on_mock_put(channel.target_voltage, effect)
 
 
+@pytest.fixture
+def mock_bimorph_mirror_status_functionality(mirror: BimorphMirror):
+    """Cause BimorphMirror.status to display BUSY/IDLE on set
+
+    Fixture to make all writeable signals on BimorphMirror and BimorphMirrorChannel
+    cause BimorphMirror.status to go BUSY then IDLE.
+
+    Args:
+        mirror: BimorphMirror to apply effect to
+    """
+
+    async def busy_idle():
+        await asyncio.sleep(2)
+        set_mock_value(mirror.status, BimorphMirrorStatus.BUSY)
+        await asyncio.sleep(2)
+        set_mock_value(mirror.status, BimorphMirrorStatus.IDLE)
+
+    async def effect(*_, **__):
+        asyncio.create_task(busy_idle())
+
+    for signal in walk_rw_signals(mirror).values():
+        callback_on_mock_put(signal, effect)
+
+
 @pytest.mark.parametrize("mirror", VALID_BIMORPH_CHANNELS, indirect=True)
 async def test_set_channels_waits_for_readback(
     mirror: BimorphMirror,
     valid_bimorph_values: dict[int, float],
     mock_vtrgt_vout_propogation,
+    mock_bimorph_mirror_status_functionality,
 ):
     await mirror.set(valid_bimorph_values)
 
