@@ -3,7 +3,7 @@ from unittest.mock import ANY, call, patch
 import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import DeviceCollector
-from ophyd_async.testing import get_mock_put
+from ophyd_async.testing import callback_on_mock_put, get_mock_put
 
 from dodal.devices.bimorph_mirror import BimorphMirror, BimorphMirrorStatus
 
@@ -35,7 +35,7 @@ def mock_vtrgt_vout_propogation(mirror: BimorphMirror):
         def effect(value: float, wait=False, signal=channel.output_voltage):
             signal.set(value, wait=wait)
 
-        get_mock_put(channel.target_voltage).side_effect = effect
+        callback_on_mock_put(channel.target_voltage, effect)
 
 
 @pytest.mark.parametrize("mirror", VALID_BIMORPH_CHANNELS, indirect=True)
