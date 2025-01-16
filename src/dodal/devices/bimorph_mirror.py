@@ -103,7 +103,7 @@ class BimorphMirror(StandardReadable, Movable):
         super().__init__(name=name)
 
     @AsyncStatus.wrap
-    async def set(self, value: Mapping[int, float], tolerance: float = 0.0001) -> None:
+    async def set(self, value: Mapping[int, float]) -> None:
         """Sets bimorph voltages in parrallel via target voltage and all proc.
 
         Args:
