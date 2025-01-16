@@ -40,8 +40,13 @@ from dodal.devices.undulator_dcm import UndulatorDCM
 from dodal.devices.webcam import Webcam
 from dodal.devices.xbpm_feedback import XBPMFeedback
 from dodal.devices.xspress3.xspress3 import Xspress3
-from dodal.devices.zebra import Zebra
-from dodal.devices.zebra_controlled_shutter import ZebraShutter
+from dodal.devices.zebra.zebra import Zebra
+from dodal.devices.zebra.zebra_constants_mapping import (
+    ZebraMapping,
+    ZebraSources,
+    ZebraTTLOutputs,
+)
+from dodal.devices.zebra.zebra_controlled_shutter import ZebraShutter
 from dodal.devices.zocalo import ZocaloResults
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
@@ -57,6 +62,12 @@ set_log_beamline(BL)
 set_utils_beamline(BL)
 
 set_path_provider(PandASubpathProvider())
+
+I03_ZEBRA_MAPPING = ZebraMapping(
+    outputs=ZebraTTLOutputs(TTL_DETECTOR=1, TTL_SHUTTER=2, TTL_XSPRESS3=3, TTL_PANDA=4),
+    sources=ZebraSources(),
+    AND_GATE_FOR_AUTO_SHUTTER=2,
+)
 
 
 def aperture_scatterguard(
@@ -368,6 +379,7 @@ def zebra(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -
         "-EA-ZEBRA-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        mapping=I03_ZEBRA_MAPPING,
     )
 
 

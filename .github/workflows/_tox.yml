@@ -20,5 +20,8 @@ jobs:
       - name: Install python packages
         uses: ./.github/actions/install_requirements
 
+      - name: Run import linter
+        run: lint-imports
+
       - name: Run tox
         run: tox -e ${{ inputs.tox }}
