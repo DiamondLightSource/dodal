@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from ophyd_async.epics.adaravis import AravisDetector
+from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
@@ -33,7 +34,7 @@ set_utils_beamline(BL)
 set_path_provider(
     StaticVisitPathProvider(
         BL,
-        Path("/exports/mybeamline/data"),
+        Path("/data"),
         client=LocalDirectoryServiceClient(),
     )
 )
@@ -51,4 +52,12 @@ def det() -> AravisDetector:
         path_provider=get_path_provider(),
         drv_suffix="DET:",
         hdf_suffix=HDF5_PREFIX,
+    )
+
+
+@device_factory()
+def panda() -> HDFPanda:
+    return HDFPanda(
+        prefix=f"{PREFIX.beamline_prefix}-MO-PANDA-01:",
+        path_provider=get_path_provider(),
     )
