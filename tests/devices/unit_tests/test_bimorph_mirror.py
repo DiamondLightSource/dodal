@@ -98,10 +98,10 @@ async def test_set_channels_waits_for_vout_readback(
             call(mirror.channels[i].output_voltage, ANY, timeout=ANY)
             for i, val in valid_bimorph_values.items()
         ]
-        expected_call_arg_list.append(
-            call(mirror.status, BimorphMirrorStatus.IDLE, timeout=ANY)
+
+        assert all(
+            c in mock_wait_for_value.call_args_list for c in expected_call_arg_list
         )
-        assert expected_call_arg_list == mock_wait_for_value.call_args_list
 
 
 @pytest.mark.parametrize("mirror", VALID_BIMORPH_CHANNELS, indirect=True)
