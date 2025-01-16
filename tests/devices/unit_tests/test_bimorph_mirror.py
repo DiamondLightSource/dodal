@@ -105,22 +105,6 @@ async def test_set_channels_waits_for_vout_readback(
 
 
 @pytest.mark.parametrize("mirror", VALID_BIMORPH_CHANNELS, indirect=True)
-async def test_set_channels_allows_tolerance(
-    mirror: BimorphMirror,
-    valid_bimorph_values: dict[int, float],
-    bimorph_functionality,
-):
-    for channel in mirror.channels.values():
-
-        def out_by_a_little(value: float, wait=False, signal=channel.output_voltage):
-            signal.set(value + 0.00001, wait=wait)
-
-        get_mock_put(channel.target_voltage).side_effect = out_by_a_little
-
-    await mirror.set(valid_bimorph_values)
-
-
-@pytest.mark.parametrize("mirror", VALID_BIMORPH_CHANNELS, indirect=True)
 async def test_set_one_channel(mirror: BimorphMirror, bimorph_functionality):
     values = {1: 1}
 

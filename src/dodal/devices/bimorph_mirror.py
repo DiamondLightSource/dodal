@@ -126,8 +126,8 @@ class BimorphMirror(StandardReadable, Movable):
             await wait_for_value(
                 self.status, BimorphMirrorStatus.BUSY, timeout=DEFAULT_TIMEOUT
             )
-        # Trigger set target voltages:
 
+        # Trigger set target voltages:
         await wait_for_value(
             self.status, BimorphMirrorStatus.IDLE, timeout=DEFAULT_TIMEOUT
         )
@@ -138,7 +138,7 @@ class BimorphMirror(StandardReadable, Movable):
             *[
                 wait_for_value(
                     self.channels[i].output_voltage,
-                    tolerance_func_builder(tolerance, target),
+                    target,
                     timeout=DEFAULT_TIMEOUT,
                 )
                 for i, target in value.items()
@@ -147,10 +147,3 @@ class BimorphMirror(StandardReadable, Movable):
                 self.status, BimorphMirrorStatus.IDLE, timeout=DEFAULT_TIMEOUT
             ),
         )
-
-
-def tolerance_func_builder(tolerance: float, target_value: float):
-    def is_within_value(x):
-        return abs(x - target_value) <= tolerance
-
-    return is_within_value
