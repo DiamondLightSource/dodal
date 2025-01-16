@@ -127,6 +127,10 @@ class BimorphMirror(StandardReadable, Movable):
                 self.status, BimorphMirrorStatus.BUSY, timeout=DEFAULT_TIMEOUT
             )
         # Trigger set target voltages:
+
+        await wait_for_value(
+            self.status, BimorphMirrorStatus.IDLE, timeout=DEFAULT_TIMEOUT
+        )
         await self.commit_target_voltages.trigger()
 
         # Wait for values to propogate to voltage out rbv:
