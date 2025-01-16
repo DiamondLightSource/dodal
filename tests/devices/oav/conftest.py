@@ -7,8 +7,8 @@ from ophyd_async.testing import set_mock_value
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.oav_parameters import OAVConfig
 
-DISPLAY_CONFIGURATION = "tests/devices/unit_tests/test_display.configuration"
-ZOOM_LEVELS_XML = "tests/devices/unit_tests/test_jCameraManZoomLevels.xml"
+DISPLAY_CONFIGURATION = "tests/devices/_data/test_display.configuration"
+ZOOM_LEVELS_XML = "tests/devices/_data/test_jCameraManZoomLevels.xml"
 
 
 @pytest.fixture

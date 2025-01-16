@@ -25,11 +25,11 @@ from dodal.common.visit import (
 )
 from dodal.log import LOGGER, GELFTCPHandler, set_up_all_logging_handlers
 
-MOCK_DAQ_CONFIG_PATH = "tests/devices/unit_tests/test_daq_configuration"
+MOCK_DAQ_CONFIG_PATH = "tests/devices/_data/test_daq_configuration"
 mock_paths = [
     ("DAQ_CONFIGURATION_PATH", MOCK_DAQ_CONFIG_PATH),
-    ("ZOOM_PARAMS_FILE", "tests/devices/unit_tests/test_jCameraManZoomLevels.xml"),
-    ("DISPLAY_CONFIG", "tests/devices/unit_tests/test_display.configuration"),
+    ("ZOOM_PARAMS_FILE", "tests/devices/_data/test_jCameraManZoomLevels.xml"),
+    ("DISPLAY_CONFIG", "tests/devices/_data/test_display.configuration"),
     ("LOOK_UPTABLE_DIR", "tests/devices/i10/lookupTables/"),
 ]
 mock_attributes_table = {
