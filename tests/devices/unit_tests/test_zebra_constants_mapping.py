@@ -16,11 +16,11 @@ async def fake_zebra(zebra_mapping: ZebraMapping):
     return zebra
 
 
-async def test_exception_when_accessing_mapping_set_to_none():
+async def test_exception_when_accessing_mapping_set_to_minus_1():
     mapping_no_output = ZebraMapping(outputs=ZebraTTLOutputs())
     with pytest.raises(
         UnmappedZebraException,
-        match="'ZebraTTLOutputs.TTL_EIGER' was accessed but is set to None. Please check the zebra mappings against the zebra's physical configuration",
+        match="'ZebraTTLOutputs.TTL_EIGER' was accessed but is set to -1. Please check the zebra mappings against the zebra's physical configuration",
     ):
         zebra = await fake_zebra(mapping_no_output)
         zebra.mapping.outputs.TTL_EIGER  # noqa: B018
