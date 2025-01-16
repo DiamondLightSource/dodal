@@ -117,7 +117,8 @@ class BimorphMirror(StandardReadable, Movable):
                 f"Attempting to put to non-existent channels: {[key for key in value if (key not in self.channels)]}"
             )
 
-        # Write target voltages:
+        # Write target voltages in serial
+        # Voltages are written in serial as bimorph PSU cannot handle simultaneous sets
         for i, target in value.items():
             await wait_for_value(
                 self.status, BimorphMirrorStatus.IDLE, timeout=DEFAULT_TIMEOUT
