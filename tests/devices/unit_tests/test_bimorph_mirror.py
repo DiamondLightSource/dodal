@@ -30,45 +30,35 @@ def valid_bimorph_values(mirror: BimorphMirror) -> dict[int, float]:
 
 
 @pytest.fixture
-def mock_vtrgt_vout_propogation(mirror: BimorphMirror):
-    for channel in mirror.channels.values():
-
-        def effect(value: float, wait=False, signal=channel.output_voltage):
-            signal.set(value, wait=wait)
-
-        callback_on_mock_put(channel.target_voltage, effect)
-
-
-@pytest.fixture
-def mock_bimorph_mirror_status_functionality(mirror: BimorphMirror):
-    """Cause BimorphMirror.status to display BUSY/IDLE on set
-
-    Fixture to make all writeable signals on BimorphMirror and BimorphMirrorChannel
-    cause BimorphMirror.status to go BUSY then IDLE.
-
-    Args:
-        mirror: BimorphMirror to apply effect to
-    """
-
+def bimorph_functionality(mirror: BimorphMirror):
     async def busy_idle():
-        await asyncio.sleep(2)
+        await asyncio.sleep(0)
         set_mock_value(mirror.status, BimorphMirrorStatus.BUSY)
-        await asyncio.sleep(2)
+        await asyncio.sleep(0)
         set_mock_value(mirror.status, BimorphMirrorStatus.IDLE)
 
-    async def effect(*_, **__):
+    async def status(*_, **__):
         asyncio.create_task(busy_idle())
 
     for signal in walk_rw_signals(mirror).values():
-        callback_on_mock_put(signal, effect)
+        callback_on_mock_put(signal, status)
+
+    for channel in mirror.channels.values():
+
+        def vout_propogation_and_status(
+            value: float, wait=False, signal=channel.output_voltage
+        ):
+            signal.set(value, wait=wait)
+            asyncio.create_task(busy_idle())
+
+        callback_on_mock_put(channel.target_voltage, vout_propogation_and_status)
 
 
 @pytest.mark.parametrize("mirror", VALID_BIMORPH_CHANNELS, indirect=True)
 async def test_set_channels_waits_for_readback(
     mirror: BimorphMirror,
     valid_bimorph_values: dict[int, float],
-    mock_vtrgt_vout_propogation,
-    mock_bimorph_mirror_status_functionality,
+    bimorph_functionality,
 ):
     await mirror.set(valid_bimorph_values)
 
@@ -82,7 +72,7 @@ async def test_set_channels_waits_for_readback(
 async def test_set_channels_triggers_alltrgt_proc(
     mirror: BimorphMirror,
     valid_bimorph_values: dict[int, float],
-    mock_vtrgt_vout_propogation,
+    bimorph_functionality,
 ):
     mock_alltrgt_proc = get_mock_put(mirror.commit_target_voltages)
 
@@ -97,7 +87,7 @@ async def test_set_channels_triggers_alltrgt_proc(
 async def test_set_channels_waits_for_vout_readback(
     mirror: BimorphMirror,
     valid_bimorph_values: dict[int, float],
-    mock_vtrgt_vout_propogation,
+    bimorph_functionality,
 ):
     with patch("dodal.devices.bimorph_mirror.wait_for_value") as mock_wait_for_value:
         mock_wait_for_value.assert_not_called()
@@ -130,7 +120,7 @@ async def test_set_channels_allows_tolerance(
 
 
 @pytest.mark.parametrize("mirror", VALID_BIMORPH_CHANNELS, indirect=True)
-async def test_set_one_channel(mirror: BimorphMirror, mock_vtrgt_vout_propogation):
+async def test_set_one_channel(mirror: BimorphMirror, bimorph_functionality):
     values = {1: 1}
 
     await mirror.set(values)
@@ -150,7 +140,7 @@ async def test_set_one_channel(mirror: BimorphMirror, mock_vtrgt_vout_propogatio
 async def test_read(
     mirror: BimorphMirror,
     valid_bimorph_values: dict[int, float],
-    mock_vtrgt_vout_propogation,
+    bimorph_functionality,
 ):
     await mirror.set(valid_bimorph_values)
 
