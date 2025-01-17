@@ -34,7 +34,7 @@ async def energy_distance_table(lookup_table_path: str) -> np.ndarray:
 
 def parse_lookup_table(filename: str) -> list[Sequence]:
     """Parse a generic lookup table with a number of columns >= 2 and return a list \
-        of all the values in it."""
+        in column major order of the values in it."""
     LOGGER.info(f"Parsing lookup table file {filename}")
 
     lut_vals = zip(*loadtxt(filename, comments=["#", "Units"]), strict=False)
@@ -51,13 +51,13 @@ def linear_interpolation_lut(
     # numpy interp expects x-values to be increasing
     if not np.all(np.diff(s_values) > 0):
         LOGGER.info(
-            "Configuration file values are not ascending, trying reverse order..."
+            "Configuration values in the lookup table are not ascending, trying reverse order..."
         )
         s_values = list(reversed(s_values))
         t_values = list(reversed(t_values))
         if not np.all(np.diff(s_values) > 0):
             raise AssertionError(
-                "Configuration file lookup table does not monotonically increase or decrease."
+                "Configuration lookup table does not monotonically increase or decrease."
             )
 
     def s_to_t2(s: float) -> float:
