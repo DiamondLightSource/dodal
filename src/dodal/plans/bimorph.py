@@ -20,7 +20,7 @@ class SlitDimension(Enum):
         Y: Represents Y dimension
     """
 
-    X = ("X",)
+    X = "X"
     Y = "Y"
 
 
