@@ -3,7 +3,8 @@ from unittest.mock import ANY
 import pytest
 from bluesky.run_engine import RunEngine
 from bluesky.utils import Msg
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import DeviceCollector, StandardDetector
+from ophyd_async.epics.adsimdetector import SimDetector
 from ophyd_async.testing import callback_on_mock_put, set_mock_value
 
 from dodal.devices.slits import Slits
@@ -24,6 +25,11 @@ def slits(RE: RunEngine) -> Slits:
 
         callback_on_mock_put(motor.user_setpoint, callback)
     return slits
+
+
+@pytest.fixture
+def oav(static_path_provider) -> StandardDetector:
+    return SimDetector("FAKE-PREFIX", path_provider=static_path_provider)
 
 
 @pytest.mark.parametrize("dimension", [SlitDimension.X, SlitDimension.Y])
@@ -50,3 +56,20 @@ async def test_move_slits(
         Msg("set", centre_signal, center, group=ANY),
         Msg("wait", None, group=ANY),
     ] == messages
+
+
+async def test_bimorph_optimisation(
+    mirror_with_mocked_put,
+    slits,
+    oav,
+    voltage_increment,
+    active_dimension,
+    active_slit_center_start,
+    active_slit_center_end,
+    active_slit_size,
+    inactive_slit_center,
+    inactive_slit_size,
+    number_of_slit_positions,
+    bimorph_settle_time,
+    initial_voltage_list,
+): ...
