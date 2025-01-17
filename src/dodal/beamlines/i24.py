@@ -11,6 +11,7 @@ from dodal.devices.i24.dcm import DCM
 from dodal.devices.i24.dual_backlight import DualBacklight
 from dodal.devices.i24.focus_mirrors import FocusMirrorsMode
 from dodal.devices.i24.i24_detector_motion import DetectorMotion
+from dodal.devices.i24.jungfrau import JungFrau1M
 from dodal.devices.i24.pilatus_metadata import PilatusMetadata
 from dodal.devices.i24.pmac import PMAC
 from dodal.devices.i24.vgonio import VerticalGoniometer
@@ -270,4 +271,20 @@ def pilatus_metadata(
         "-EA-PILAT-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+    )
+
+
+@skip_device(lambda: BL == "s24")
+def jungfrau(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> JungFrau1M:
+    """Get the i24 detector motion device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i24, it will return the existing object.
+    """
+    return device_instantiation(
+        device_factory=JungFrau1M,
+        name="jungfrau_m1",
+        prefix="-EA-JNGFR-01:",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
     )
