@@ -33,7 +33,7 @@ def move_slits(slits: Slits, dimension: SlitDimension, gap: float, center: float
         gap: float size of gap
         center: float position of center
     """
-    if SlitDimension == SlitDimension.X:
+    if dimension == SlitDimension.X:
         yield from bps.mv(slits.x_gap, gap)  # type: ignore
         yield from bps.mv(slits.x_centre, center)  # type: ignore
     else:
