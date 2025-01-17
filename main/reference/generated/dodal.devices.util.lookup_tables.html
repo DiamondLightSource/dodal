@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.util.lookup_tables &#8212; dodal 1.37.1.dev6+g413aa3457 documentation</title>
+    <title>dodal.devices.util.lookup_tables &#8212; dodal 1.37.1.dev7+ga822a40ee documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=07528385"></script>
+    <script src="../../_static/documentation_options.js?v=35311d37"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -863,8 +863,11 @@ converts the source value s to a target value t for different values of s.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.util.lookup_tables.energy_distance_table" title="dodal.devices.util.lookup_tables.energy_distance_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">energy_distance_table</span></code></a>(lookup_table_path)</p></td>
 <td><p>Returns a numpy formatted lookup table for required positions of an ID gap to provide emission at a given beam energy.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.util.lookup_tables.linear_interpolation_lut" title="dodal.devices.util.lookup_tables.linear_interpolation_lut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">linear_interpolation_lut</span></code></a>(filename)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.util.lookup_tables.linear_interpolation_lut" title="dodal.devices.util.lookup_tables.linear_interpolation_lut"><code class="xref py py-obj docutils literal notranslate"><span class="pre">linear_interpolation_lut</span></code></a>(s_values, t_values)</p></td>
 <td><p>Returns a callable that converts values by linear interpolation of lookup table values.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.util.lookup_tables.parse_lookup_table" title="dodal.devices.util.lookup_tables.parse_lookup_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_lookup_table</span></code></a>(filename)</p></td>
+<td><p>Parse a generic lookup table with a number of columns &gt;= 2 and return a list         in column major order of the values in it.</p></td>
 </tr>
 </tbody>
 </table>
@@ -888,14 +891,31 @@ provide emission at a given beam energy.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="dodal.devices.util.lookup_tables.parse_lookup_table">
+<span class="sig-prename descclassname"><span class="pre">dodal.devices.util.lookup_tables.</span></span><span class="sig-name descname"><span class="pre">parse_lookup_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.13)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/dodal/devices/util/lookup_tables.html#parse_lookup_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.util.lookup_tables.parse_lookup_table" title="Link to this definition">#</a></dt>
+<dd><p>Parse a generic lookup table with a number of columns &gt;= 2 and return a list         in column major order of the values in it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="dodal.devices.util.lookup_tables.linear_interpolation_lut">
-<span class="sig-prename descclassname"><span class="pre">dodal.devices.util.lookup_tables.</span></span><span class="sig-name descname"><span class="pre">linear_interpolation_lut</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.13)"><span class="pre">Callable</span></a><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/dodal/devices/util/lookup_tables.html#linear_interpolation_lut"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.util.lookup_tables.linear_interpolation_lut" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">dodal.devices.util.lookup_tables.</span></span><span class="sig-name descname"><span class="pre">linear_interpolation_lut</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.13)"><span class="pre">Sequence</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.13)"><span class="pre">Sequence</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.13)"><span class="pre">Callable</span></a><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/dodal/devices/util/lookup_tables.html#linear_interpolation_lut"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.util.lookup_tables.linear_interpolation_lut" title="Link to this definition">#</a></dt>
 <dd><p>Returns a callable that converts values by linear interpolation of lookup table
 values.</p>
 <p>If the value falls outside the lookup table then the closest value will be used.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>filename</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s_values</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a></span>)</p></li>
+<li><p><strong>t_values</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a></span>)</p></li>
+</ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>], <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span></p>
@@ -953,6 +973,7 @@ values.</p>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.util.lookup_tables.energy_distance_table"><code class="docutils literal notranslate"><span class="pre">energy_distance_table()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.util.lookup_tables.parse_lookup_table"><code class="docutils literal notranslate"><span class="pre">parse_lookup_table()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.util.lookup_tables.linear_interpolation_lut"><code class="docutils literal notranslate"><span class="pre">linear_interpolation_lut()</span></code></a></li>
 </ul>
   </nav></div>

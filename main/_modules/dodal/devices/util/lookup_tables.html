@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.util.lookup_tables &#8212; dodal 1.37.1.dev6+g413aa3457 documentation</title>
+    <title>dodal.devices.util.lookup_tables &#8212; dodal 1.37.1.dev7+ga822a40ee documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=07528385"></script>
+    <script src="../../../../_static/documentation_options.js?v=35311d37"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -487,30 +487,37 @@ window.addEventListener("load", () => mermaid.run());
 
 
 
+<div class="viewcode-block" id="parse_lookup_table">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.lookup_tables.html#dodal.devices.util.lookup_tables.parse_lookup_table">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_lookup_table</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Sequence</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parse a generic lookup table with a number of columns &gt;= 2 and return a list \</span>
+<span class="sd">        in column major order of the values in it.&quot;&quot;&quot;</span>
+    <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Parsing lookup table file </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">lut_vals</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">comments</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;#&quot;</span><span class="p">,</span> <span class="s2">&quot;Units&quot;</span><span class="p">]),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">lut_vals</span><span class="p">)</span></div>
+
+
+
 <div class="viewcode-block" id="linear_interpolation_lut">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.lookup_tables.html#dodal.devices.util.lookup_tables.linear_interpolation_lut">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">linear_interpolation_lut</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">linear_interpolation_lut</span><span class="p">(</span>
+    <span class="n">s_values</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">t_values</span><span class="p">:</span> <span class="n">Sequence</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a callable that converts values by linear interpolation of lookup table</span>
 <span class="sd">    values.</span>
 
 <span class="sd">    If the value falls outside the lookup table then the closest value will be used.&quot;&quot;&quot;</span>
-    <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using lookup table </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="n">s_and_t_vals</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">comments</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;#&quot;</span><span class="p">,</span> <span class="s2">&quot;Units&quot;</span><span class="p">]),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-    <span class="n">s_values</span><span class="p">:</span> <span class="n">Sequence</span>
-    <span class="n">t_values</span><span class="p">:</span> <span class="n">Sequence</span>
-    <span class="n">s_values</span><span class="p">,</span> <span class="n">t_values</span> <span class="o">=</span> <span class="n">s_and_t_vals</span>
-
     <span class="c1"># numpy interp expects x-values to be increasing</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">s_values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Configuration file </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2"> values are not ascending, trying reverse order...&quot;</span>
+            <span class="s2">&quot;Configuration values in the lookup table are not ascending, trying reverse order...&quot;</span>
         <span class="p">)</span>
         <span class="n">s_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">s_values</span><span class="p">))</span>
         <span class="n">t_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">t_values</span><span class="p">))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">s_values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Configuration file </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2"> lookup table does not monotonically increase or decrease.&quot;</span>
+                <span class="s2">&quot;Configuration lookup table does not monotonically increase or decrease.&quot;</span>
             <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">s_to_t2</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
