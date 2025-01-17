@@ -14,7 +14,7 @@ from dodal.devices.util.test_utils import patch_motor
 from dodal.log import LOGGER
 
 ID_GAP_LOOKUP_TABLE_PATH: str = (
-    "./tests/test_data/test_beamline_undulator_to_gap_lookup_table.txt"
+    "./tests/devices/_data/test_beamline_undulator_to_gap_lookup_table.txt"
 )
 
 
