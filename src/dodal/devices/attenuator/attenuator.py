@@ -106,7 +106,7 @@ class EnumFilterAttenuator(ReadOnlyAttenuator):
         with self.add_children_as_readables():
             self.filters: DeviceVector[FilterMotor] = DeviceVector(
                 {
-                    index: FilterMotor(f"{prefix}MP{index+1}:", filter, name)
+                    index: FilterMotor(f"{prefix}MP{index + 1}:", filter, name)
                     for index, filter in enumerate(filter_selection)
                 }
             )

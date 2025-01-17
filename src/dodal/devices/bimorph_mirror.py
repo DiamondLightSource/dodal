@@ -103,7 +103,7 @@ class BimorphMirror(StandardReadable, Movable):
         super().__init__(name=name)
 
     @AsyncStatus.wrap
-    async def set(self, value: Mapping[int, float], tolerance: float = 0.0001) -> None:
+    async def set(self, value: Mapping[int, float]) -> None:
         """Sets bimorph voltages in parrallel via target voltage and all proc.
 
         Args:
@@ -114,18 +114,24 @@ class BimorphMirror(StandardReadable, Movable):
 
         if any(key not in self.channels for key in value):
             raise ValueError(
-                f"Attempting to put to non-existent channels: {[key  for key in value if (key not in self.channels)]}"
+                f"Attempting to put to non-existent channels: {[key for key in value if (key not in self.channels)]}"
             )
 
-        # Write target voltages:
-        await asyncio.gather(
-            *[
-                self.channels[i].target_voltage.set(target, wait=True)
-                for i, target in value.items()
-            ]
-        )
+        # Write target voltages in serial
+        # Voltages are written in serial as bimorph PSU cannot handle simultaneous sets
+        for i, target in value.items():
+            await wait_for_value(
+                self.status, BimorphMirrorStatus.IDLE, timeout=DEFAULT_TIMEOUT
+            )
+            await self.channels[i].target_voltage.set(target, wait=True)
+            await wait_for_value(
+                self.status, BimorphMirrorStatus.BUSY, timeout=DEFAULT_TIMEOUT
+            )
 
         # Trigger set target voltages:
+        await wait_for_value(
+            self.status, BimorphMirrorStatus.IDLE, timeout=DEFAULT_TIMEOUT
+        )
         await self.commit_target_voltages.trigger()
 
         # Wait for values to propogate to voltage out rbv:
@@ -133,7 +139,7 @@ class BimorphMirror(StandardReadable, Movable):
             *[
                 wait_for_value(
                     self.channels[i].output_voltage,
-                    tolerance_func_builder(tolerance, target),
+                    target,
                     timeout=DEFAULT_TIMEOUT,
                 )
                 for i, target in value.items()
@@ -142,10 +148,3 @@ class BimorphMirror(StandardReadable, Movable):
                 self.status, BimorphMirrorStatus.IDLE, timeout=DEFAULT_TIMEOUT
             ),
         )
-
-
-def tolerance_func_builder(tolerance: float, target_value: float):
-    def is_within_value(x):
-        return abs(x - target_value) <= tolerance
-
-    return is_within_value
