@@ -12,6 +12,7 @@ from dodal.plans.bimorph import SlitDimension, move_slits
 
 @pytest.fixture
 def slits(RE: RunEngine) -> Slits:
+    """Mock slits with propagation from setpoint to readback."""
     with DeviceCollector(mock=True):
         slits = Slits("FAKE-PREFIX:")
 
