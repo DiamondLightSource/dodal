@@ -15,7 +15,7 @@ TEST_DET_DIST_CONVERTER_LUT = "tests/test_data/test_det_dist_converter.txt"
 
 async def test_energy_to_distance_table_correct_format():
     table = await energy_distance_table(
-        "./tests/test_data/test_beamline_undulator_to_gap_lookup_table.txt"
+        "./tests/devices/_data/test_beamline_undulator_to_gap_lookup_table.txt"
     )
     assert table[0][0] == 5700
     assert table[49][1] == 6.264
