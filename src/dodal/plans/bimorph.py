@@ -77,9 +77,11 @@ def bimorph_optimisation(
         initial_voltage_list: optional list[float] starting voltages for bimorph (defaults to current voltages)
     """
     # Get voltages to return to after plan:
-    original_voltage_list = [
-        channel.output_voltage.get_value() for channel in mirror.channels.values()
-    ]
+    original_voltage_list = []
+
+    for channel in mirror.channels.values():
+        position = yield from bps.rd(channel.output_voltage)
+        original_voltage_list.append(position)
 
     # Get slit position to return to after plan:
     original_x_gap = yield from bps.rd(slits.x_gap)
