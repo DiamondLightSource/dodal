@@ -5,10 +5,9 @@ from dodal.devices.oav.oav_parameters import (
     OAVParameters,
     ZoomParams,
 )
+from tests.devices.oav.conftest import DISPLAY_CONFIGURATION, ZOOM_LEVELS_XML
 
-OAV_CENTRING_JSON = "tests/devices/unit_tests/test_OAVCentring.json"
-DISPLAY_CONFIGURATION = "tests/devices/unit_tests/test_display.configuration"
-ZOOM_LEVELS_XML = "tests/devices/unit_tests/test_jCameraManZoomLevels.xml"
+OAV_CENTRING_JSON = "tests/devices/_data/test_OAVCentring.json"
 
 
 @pytest.fixture

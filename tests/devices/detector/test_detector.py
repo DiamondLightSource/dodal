@@ -20,7 +20,7 @@ def create_det_params_with_dir_and_prefix(directory: str | Path, prefix="test"):
         num_images_per_trigger=1,
         num_triggers=1,
         use_roi_mode=False,
-        det_dist_to_beam_converter_path="tests/devices/unit_tests/test_lookup_table.txt",
+        det_dist_to_beam_converter_path="tests/devices/_data/test_lookup_table.txt",
         detector_size_constants=EIGER2_X_16M_SIZE,
     )
 

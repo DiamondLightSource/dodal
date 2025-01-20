@@ -21,10 +21,10 @@ def fake_converter():
 
 
 def test_converter_eq():
-    test_file = "tests/devices/unit_tests/test_lookup_table.txt"
+    test_file = "tests/devices/_data/test_lookup_table.txt"
     test_converter = DetectorDistanceToBeamXYConverter(test_file)
     test_converter_dupe = DetectorDistanceToBeamXYConverter(test_file)
-    test_file_2 = "tests/devices/unit_tests/test_lookup_table_2.txt"
+    test_file_2 = "tests/devices/_data/test_lookup_table_2.txt"
     test_converter_2 = DetectorDistanceToBeamXYConverter(test_file_2)
     assert test_converter != 1
     assert test_converter == test_converter_dupe
@@ -93,7 +93,7 @@ def test_get_beam_in_pixels(fake_converter: DetectorDistanceToBeamXYConverter):
 
 
 def test_parse_table():
-    test_file = "tests/devices/unit_tests/test_lookup_table.txt"
+    test_file = "tests/devices/_data/test_lookup_table.txt"
     test_converter = DetectorDistanceToBeamXYConverter(test_file)
 
     assert test_converter.lookup_file == test_file

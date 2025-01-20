@@ -28,7 +28,7 @@ TEST_OMEGA_INCREMENT = 1.0
 TEST_NUM_IMAGES_PER_TRIGGER = 1
 TEST_NUM_TRIGGERS = 2000
 TEST_USE_ROI_MODE = False
-TEST_DET_DIST_TO_BEAM_CONVERTER_PATH = "tests/devices/unit_tests/test_lookup_table.txt"
+TEST_DET_DIST_TO_BEAM_CONVERTER_PATH = "tests/devices/_data/test_lookup_table.txt"
 
 
 class StatusException(Exception):
