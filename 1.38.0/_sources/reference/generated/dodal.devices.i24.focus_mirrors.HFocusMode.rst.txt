@@ -1,0 +1,90 @@
+dodal.devices.i24.focus\_mirrors.HFocusMode
+===========================================
+
+.. currentmodule:: dodal.devices.i24.focus_mirrors
+
+.. autoclass:: HFocusMode
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~HFocusMode.FOCUS_10
+      
+      
+      ~HFocusMode.FOCUS_20D
+      
+      
+      ~HFocusMode.FOCUS_30D
+      
+      
+      ~HFocusMode.FOCUS_50D
+      
+      
+      ~HFocusMode.FOCUS_1050D
+      
+      
+      ~HFocusMode.FOCUS_3010D
+      
+   
+   

@@ -1,0 +1,78 @@
+dodal.devices.tetramm.TetrammResolution
+=======================================
+
+.. currentmodule:: dodal.devices.tetramm
+
+.. autoclass:: TetrammResolution
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~TetrammResolution.SIXTEEN_BITS
+      
+      
+      ~TetrammResolution.TWENTY_FOUR_BITS
+      
+   
+   

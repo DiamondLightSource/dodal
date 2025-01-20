@@ -1,0 +1,1182 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dodal.beamlines.i03 &#8212; dodal 1.38.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../_static/documentation_options.js?v=00e097a7"></script>
+    <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=30646c52"></script>
+    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+    <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/dodal/beamlines/i03';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://DiamondLightSource.github.io/dodal/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '1.38.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="icon" href="../../../_static/dls-logo.svg"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="1.38.0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/dls-logo.svg" class="logo__image only-light" alt=""/>
+    <img src="../../../_static/dls-logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">dodal</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/DiamondLightSource/dodal" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/dodal" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/DiamondLightSource/dodal" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/dodal" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../beamlines.html" class="nav-link">dodal.beamlines</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">dodal.beamlines.i03</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for dodal.beamlines.i03</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.fastcs.panda</span><span class="w"> </span><span class="kn">import</span> <span class="n">HDFPanda</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_beamline_parameters</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">device_instantiation</span><span class="p">,</span>
+    <span class="n">get_path_provider</span><span class="p">,</span>
+    <span class="n">set_path_provider</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_utils_beamline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.udc_directory_provider</span><span class="w"> </span><span class="kn">import</span> <span class="n">PandASubpathProvider</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.aperturescatterguard</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AperturePosition</span><span class="p">,</span>
+    <span class="n">ApertureScatterguard</span><span class="p">,</span>
+    <span class="n">load_positions_from_beamline_parameters</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.attenuator.attenuator</span><span class="w"> </span><span class="kn">import</span> <span class="n">BinaryFilterAttenuator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.backlight</span><span class="w"> </span><span class="kn">import</span> <span class="n">Backlight</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.cryostream</span><span class="w"> </span><span class="kn">import</span> <span class="n">CryoStream</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.dcm</span><span class="w"> </span><span class="kn">import</span> <span class="n">DCM</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.detector</span><span class="w"> </span><span class="kn">import</span> <span class="n">DetectorParams</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.detector.detector_motion</span><span class="w"> </span><span class="kn">import</span> <span class="n">DetectorMotion</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.diamond_filter</span><span class="w"> </span><span class="kn">import</span> <span class="n">DiamondFilter</span><span class="p">,</span> <span class="n">I03Filters</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.eiger</span><span class="w"> </span><span class="kn">import</span> <span class="n">EigerDetector</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.fast_grid_scan</span><span class="w"> </span><span class="kn">import</span> <span class="n">PandAFastGridScan</span><span class="p">,</span> <span class="n">ZebraFastGridScan</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.flux</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flux</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.focusing_mirror</span><span class="w"> </span><span class="kn">import</span> <span class="n">FocusingMirrorWithStripes</span><span class="p">,</span> <span class="n">MirrorVoltages</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.i03.beamstop</span><span class="w"> </span><span class="kn">import</span> <span class="n">Beamstop</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.motors</span><span class="w"> </span><span class="kn">import</span> <span class="n">XYZPositioner</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.oav.oav_detector</span><span class="w"> </span><span class="kn">import</span> <span class="n">OAV</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.oav.oav_parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">OAVConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.oav.pin_image_recognition</span><span class="w"> </span><span class="kn">import</span> <span class="n">PinTipDetection</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.qbpm</span><span class="w"> </span><span class="kn">import</span> <span class="n">QBPM</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.robot</span><span class="w"> </span><span class="kn">import</span> <span class="n">BartRobot</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.s4_slit_gaps</span><span class="w"> </span><span class="kn">import</span> <span class="n">S4SlitGaps</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.smargon</span><span class="w"> </span><span class="kn">import</span> <span class="n">Smargon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.synchrotron</span><span class="w"> </span><span class="kn">import</span> <span class="n">Synchrotron</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.thawer</span><span class="w"> </span><span class="kn">import</span> <span class="n">Thawer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.undulator</span><span class="w"> </span><span class="kn">import</span> <span class="n">Undulator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.undulator_dcm</span><span class="w"> </span><span class="kn">import</span> <span class="n">UndulatorDCM</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.webcam</span><span class="w"> </span><span class="kn">import</span> <span class="n">Webcam</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.xbpm_feedback</span><span class="w"> </span><span class="kn">import</span> <span class="n">XBPMFeedback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.xspress3.xspress3</span><span class="w"> </span><span class="kn">import</span> <span class="n">Xspress3</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.zebra.zebra</span><span class="w"> </span><span class="kn">import</span> <span class="n">Zebra</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.zebra.zebra_constants_mapping</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ZebraMapping</span><span class="p">,</span>
+    <span class="n">ZebraSources</span><span class="p">,</span>
+    <span class="n">ZebraTTLOutputs</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.zebra.zebra_controlled_shutter</span><span class="w"> </span><span class="kn">import</span> <span class="n">ZebraShutter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.zocalo</span><span class="w"> </span><span class="kn">import</span> <span class="n">ZocaloResults</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_log_beamline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">BeamlinePrefix</span><span class="p">,</span> <span class="n">get_beamline_name</span><span class="p">,</span> <span class="n">skip_device</span>
+
+<span class="n">ZOOM_PARAMS_FILE</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;/dls_sw/i03/software/gda/configurations/i03-config/xml/jCameraManZoomLevels.xml&quot;</span>
+<span class="p">)</span>
+<span class="n">DISPLAY_CONFIG</span> <span class="o">=</span> <span class="s2">&quot;/dls_sw/i03/software/gda_versions/var/display.configuration&quot;</span>
+<span class="n">DAQ_CONFIGURATION_PATH</span> <span class="o">=</span> <span class="s2">&quot;/dls_sw/i03/software/daq_configuration&quot;</span>
+
+<span class="n">BL</span> <span class="o">=</span> <span class="n">get_beamline_name</span><span class="p">(</span><span class="s2">&quot;s03&quot;</span><span class="p">)</span>
+<span class="n">set_log_beamline</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>
+<span class="n">set_utils_beamline</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>
+
+<span class="n">set_path_provider</span><span class="p">(</span><span class="n">PandASubpathProvider</span><span class="p">())</span>
+
+<span class="n">I03_ZEBRA_MAPPING</span> <span class="o">=</span> <span class="n">ZebraMapping</span><span class="p">(</span>
+    <span class="n">outputs</span><span class="o">=</span><span class="n">ZebraTTLOutputs</span><span class="p">(</span><span class="n">TTL_DETECTOR</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">TTL_SHUTTER</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">TTL_XSPRESS3</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">TTL_PANDA</span><span class="o">=</span><span class="mi">4</span><span class="p">),</span>
+    <span class="n">sources</span><span class="o">=</span><span class="n">ZebraSources</span><span class="p">(),</span>
+    <span class="n">AND_GATE_FOR_AUTO_SHUTTER</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="aperture_scatterguard">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.aperture_scatterguard">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">aperture_scatterguard</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ApertureScatterguard</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i03 aperture and scatterguard device, instantiate it if it hasn&#39;t already</span>
+<span class="sd">    been. If this is called when already instantiated in i03, it will return the existing</span>
+<span class="sd">    object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">get_beamline_parameters</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">device_factory</span><span class="o">=</span><span class="n">ApertureScatterguard</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;aperture_scatterguard&quot;</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">wait</span><span class="o">=</span><span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake</span><span class="o">=</span><span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+        <span class="n">loaded_positions</span><span class="o">=</span><span class="n">load_positions_from_beamline_parameters</span><span class="p">(</span><span class="n">params</span><span class="p">),</span>
+        <span class="n">tolerances</span><span class="o">=</span><span class="n">AperturePosition</span><span class="o">.</span><span class="n">tolerances_from_gda_params</span><span class="p">(</span><span class="n">params</span><span class="p">),</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="attenuator">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.attenuator">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">attenuator</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinaryFilterAttenuator</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i03 attenuator device, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i03, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">BinaryFilterAttenuator</span><span class="p">,</span>
+        <span class="s2">&quot;attenuator&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-EA-ATTN-01:&quot;</span><span class="p">,</span>
+        <span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="beamstop">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.beamstop">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">beamstop</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Beamstop</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i03 beamstop device, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i03, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">Beamstop</span><span class="p">,</span>
+        <span class="s2">&quot;beamstop&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-MO-BS-01:&quot;</span><span class="p">,</span>
+        <span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+        <span class="n">beamline_parameters</span><span class="o">=</span><span class="n">get_beamline_parameters</span><span class="p">(),</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="dcm">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.dcm">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">dcm</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DCM</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i03 DCM device, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i03, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">DCM</span><span class="p">,</span>
+        <span class="s2">&quot;dcm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-MO-DCM-01:&quot;</span><span class="p">,</span>
+        <span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="vfm">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.vfm">[docs]</a>
+<span class="nd">@skip_device</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">BL</span> <span class="o">==</span> <span class="s2">&quot;s03&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">vfm</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FocusingMirrorWithStripes</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">device_factory</span><span class="o">=</span><span class="n">FocusingMirrorWithStripes</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;vfm&quot;</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;-OP-VFM-01:&quot;</span><span class="p">,</span>
+        <span class="n">wait</span><span class="o">=</span><span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake</span><span class="o">=</span><span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+        <span class="n">bragg_to_lat_lut_path</span><span class="o">=</span><span class="n">DAQ_CONFIGURATION_PATH</span>
+        <span class="o">+</span> <span class="s2">&quot;/lookup/BeamLineEnergy_DCM_VFM_x_converter.txt&quot;</span><span class="p">,</span>
+        <span class="n">x_suffix</span><span class="o">=</span><span class="s2">&quot;LAT&quot;</span><span class="p">,</span>
+        <span class="n">y_suffix</span><span class="o">=</span><span class="s2">&quot;VERT&quot;</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="mirror_voltages">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.mirror_voltages">[docs]</a>
+<span class="nd">@skip_device</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">BL</span> <span class="o">==</span> <span class="s2">&quot;s03&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">mirror_voltages</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MirrorVoltages</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">device_factory</span><span class="o">=</span><span class="n">MirrorVoltages</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;mirror_voltages&quot;</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;-MO-PSU-01:&quot;</span><span class="p">,</span>
+        <span class="n">wait</span><span class="o">=</span><span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake</span><span class="o">=</span><span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+        <span class="n">daq_configuration_path</span><span class="o">=</span><span class="n">DAQ_CONFIGURATION_PATH</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="backlight">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.backlight">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">backlight</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Backlight</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i03 backlight device, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i03, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">device_factory</span><span class="o">=</span><span class="n">Backlight</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;backlight&quot;</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">wait</span><span class="o">=</span><span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake</span><span class="o">=</span><span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="detector_motion">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.detector_motion">[docs]</a>
+<span class="nd">@skip_device</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">BL</span> <span class="o">==</span> <span class="s2">&quot;s03&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">detector_motion</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DetectorMotion</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i03 detector motion device, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i03, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">device_factory</span><span class="o">=</span><span class="n">DetectorMotion</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;detector_motion&quot;</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">wait</span><span class="o">=</span><span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake</span><span class="o">=</span><span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="eiger">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.eiger">[docs]</a>
+<span class="nd">@skip_device</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">BL</span> <span class="o">==</span> <span class="s2">&quot;s03&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">eiger</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">params</span><span class="p">:</span> <span class="n">DetectorParams</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EigerDetector</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i03 Eiger device, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i03, it will return the existing object.</span>
+<span class="sd">    If called with params, will update those params to the Eiger object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_params</span><span class="p">(</span><span class="n">eiger</span><span class="p">:</span> <span class="n">EigerDetector</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">eiger</span><span class="o">.</span><span class="n">set_detector_parameters</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">device_factory</span><span class="o">=</span><span class="n">EigerDetector</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;eiger&quot;</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;-EA-EIGER-01:&quot;</span><span class="p">,</span>
+        <span class="n">wait</span><span class="o">=</span><span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake</span><span class="o">=</span><span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+        <span class="n">post_create</span><span class="o">=</span><span class="n">set_params</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="zebra_fast_grid_scan">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.zebra_fast_grid_scan">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">zebra_fast_grid_scan</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ZebraFastGridScan</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i03 zebra_fast_grid_scan device, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i03, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">device_factory</span><span class="o">=</span><span class="n">ZebraFastGridScan</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;zebra_fast_grid_scan&quot;</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;-MO-SGON-01:&quot;</span><span class="p">,</span>
+        <span class="n">wait</span><span class="o">=</span><span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake</span><span class="o">=</span><span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="panda_fast_grid_scan">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.panda_fast_grid_scan">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">panda_fast_grid_scan</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PandAFastGridScan</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i03 panda_fast_grid_scan device, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i03, it will return the existing object.</span>
+<span class="sd">    This is used instead of the zebra_fast_grid_scan device when using the PandA.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">device_factory</span><span class="o">=</span><span class="n">PandAFastGridScan</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;panda_fast_grid_scan&quot;</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;-MO-SGON-01:&quot;</span><span class="p">,</span>
+        <span class="n">wait</span><span class="o">=</span><span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake</span><span class="o">=</span><span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="oav">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.oav">[docs]</a>
+<span class="nd">@skip_device</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">BL</span> <span class="o">==</span> <span class="s2">&quot;s03&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">oav</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">params</span><span class="p">:</span> <span class="n">OAVConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OAV</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i03 OAV device, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i03, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">OAV</span><span class="p">,</span>
+        <span class="s2">&quot;oav&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-DI-OAV-01:&quot;</span><span class="p">,</span>
+        <span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+        <span class="n">config</span><span class="o">=</span><span class="n">params</span> <span class="ow">or</span> <span class="n">OAVConfig</span><span class="p">(</span><span class="n">ZOOM_PARAMS_FILE</span><span class="p">,</span> <span class="n">DISPLAY_CONFIG</span><span class="p">),</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="pin_tip_detection">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.pin_tip_detection">[docs]</a>
+<span class="nd">@skip_device</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">BL</span> <span class="o">==</span> <span class="s2">&quot;s03&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">pin_tip_detection</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PinTipDetection</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i03 pin tip detection device, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i03, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">PinTipDetection</span><span class="p">,</span>
+        <span class="s2">&quot;pin_tip_detection&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-DI-OAV-01:&quot;</span><span class="p">,</span>
+        <span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="smargon">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.smargon">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">smargon</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Smargon</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i03 Smargon device, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i03, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">Smargon</span><span class="p">,</span>
+        <span class="s2">&quot;smargon&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-MO-SGON-01:&quot;</span><span class="p">,</span>
+        <span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="s4_slit_gaps">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.s4_slit_gaps">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">s4_slit_gaps</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">S4SlitGaps</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i03 s4_slit_gaps device, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i03, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">S4SlitGaps</span><span class="p">,</span>
+        <span class="s2">&quot;s4_slit_gaps&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-AL-SLITS-04:&quot;</span><span class="p">,</span>
+        <span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="synchrotron">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.synchrotron">[docs]</a>
+<span class="nd">@skip_device</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">BL</span> <span class="o">==</span> <span class="s2">&quot;s03&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">synchrotron</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Synchrotron</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i03 synchrotron device, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i03, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">Synchrotron</span><span class="p">,</span>
+        <span class="s2">&quot;synchrotron&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+        <span class="n">bl_prefix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="undulator">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.undulator">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">undulator</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Undulator</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i03 undulator device, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i03, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">Undulator</span><span class="p">,</span>
+        <span class="s2">&quot;undulator&quot;</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BeamlinePrefix</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span><span class="o">.</span><span class="n">insertion_prefix</span><span class="si">}</span><span class="s2">-MO-SERVC-01:&quot;</span><span class="p">,</span>
+        <span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+        <span class="n">bl_prefix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">id_gap_lookup_table_path</span><span class="o">=</span><span class="s2">&quot;/dls_sw/i03/software/daq_configuration/lookup/BeamLine_Undulator_toGap.txt&quot;</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="undulator_dcm">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.undulator_dcm">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">undulator_dcm</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UndulatorDCM</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i03 undulator DCM device, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i03, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">UndulatorDCM</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;undulator_dcm&quot;</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">wait</span><span class="o">=</span><span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake</span><span class="o">=</span><span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+        <span class="n">undulator</span><span class="o">=</span><span class="n">undulator</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">),</span>
+        <span class="n">dcm</span><span class="o">=</span><span class="n">dcm</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">),</span>
+        <span class="n">daq_configuration_path</span><span class="o">=</span><span class="n">DAQ_CONFIGURATION_PATH</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="zebra">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.zebra">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">zebra</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Zebra</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i03 zebra device, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i03, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">Zebra</span><span class="p">,</span>
+        <span class="s2">&quot;zebra&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-EA-ZEBRA-01:&quot;</span><span class="p">,</span>
+        <span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+        <span class="n">mapping</span><span class="o">=</span><span class="n">I03_ZEBRA_MAPPING</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="xspress3mini">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.xspress3mini">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">xspress3mini</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Xspress3</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i03 Xspress3Mini device, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i03, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">Xspress3</span><span class="p">,</span>
+        <span class="s2">&quot;xspress3mini&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-EA-XSP3-01:&quot;</span><span class="p">,</span>
+        <span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="panda">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.panda">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">panda</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HDFPanda</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i03 panda device, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i03, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">HDFPanda</span><span class="p">,</span>
+        <span class="s2">&quot;panda&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-EA-PANDA-01:&quot;</span><span class="p">,</span>
+        <span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+        <span class="n">path_provider</span><span class="o">=</span><span class="n">get_path_provider</span><span class="p">(),</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="sample_shutter">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.sample_shutter">[docs]</a>
+<span class="nd">@skip_device</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">BL</span> <span class="o">==</span> <span class="s2">&quot;s03&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sample_shutter</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ZebraShutter</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i03 sample shutter device, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i03, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">ZebraShutter</span><span class="p">,</span>
+        <span class="s2">&quot;sample_shutter&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-EA-SHTR-01:&quot;</span><span class="p">,</span>
+        <span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="flux">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.flux">[docs]</a>
+<span class="nd">@skip_device</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">BL</span> <span class="o">==</span> <span class="s2">&quot;s03&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">flux</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Flux</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i03 flux device, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i03, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">Flux</span><span class="p">,</span>
+        <span class="s2">&quot;flux&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-MO-FLUX-01:&quot;</span><span class="p">,</span>
+        <span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="xbpm_feedback">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.xbpm_feedback">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">xbpm_feedback</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">XBPMFeedback</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i03 XBPM feeback device, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i03, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">XBPMFeedback</span><span class="p">,</span>
+        <span class="s2">&quot;xbpm_feedback&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="zocalo">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.zocalo">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">zocalo</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ZocaloResults</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i03 ZocaloResults device, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i03, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">ZocaloResults</span><span class="p">,</span>
+        <span class="s2">&quot;zocalo&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="robot">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.robot">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">robot</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BartRobot</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i03 robot device, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i03, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">BartRobot</span><span class="p">,</span>
+        <span class="s2">&quot;robot&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-MO-ROBOT-01:&quot;</span><span class="p">,</span>
+        <span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="webcam">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.webcam">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">webcam</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Webcam</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i03 webcam, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i03, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">Webcam</span><span class="p">,</span>
+        <span class="s2">&quot;webcam&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+        <span class="n">url</span><span class="o">=</span><span class="s2">&quot;http://i03-webcam1/axis-cgi/jpg/image.cgi&quot;</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="thawer">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.thawer">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">thawer</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Thawer</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i03 thawer, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i03, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">Thawer</span><span class="p">,</span>
+        <span class="s2">&quot;thawer&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-EA-THAW-01&quot;</span><span class="p">,</span>
+        <span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="lower_gonio">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.lower_gonio">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">lower_gonio</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">XYZPositioner</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i03 lower gonio device, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i03, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">XYZPositioner</span><span class="p">,</span>
+        <span class="s2">&quot;lower_gonio&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-MO-GONP-01:&quot;</span><span class="p">,</span>
+        <span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="cryo_stream">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.cryo_stream">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">cryo_stream</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CryoStream</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i03 cryostream device, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i03, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">CryoStream</span><span class="p">,</span>
+        <span class="s2">&quot;cryo_stream&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="diamond_filter">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.diamond_filter">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">diamond_filter</span><span class="p">(</span>
+    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DiamondFilter</span><span class="p">[</span><span class="n">I03Filters</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i03 diamond filter device, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i03, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">DiamondFilter</span><span class="p">[</span><span class="n">I03Filters</span><span class="p">],</span>
+        <span class="s2">&quot;diamond_filter&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-MO-FLTR-01:&quot;</span><span class="p">,</span>
+        <span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+        <span class="n">data_type</span><span class="o">=</span><span class="n">I03Filters</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="qbpm">
+<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i03.html#dodal.beamlines.i03.qbpm">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">qbpm</span><span class="p">(</span><span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QBPM</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i03 qbpm device, instantiate it if it hasn&#39;t already been.</span>
+<span class="sd">    If this is called when already instantiated in i03, it will return the existing object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
+        <span class="n">QBPM</span><span class="p">,</span>
+        <span class="s2">&quot;qbpm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-DI-QBPM-01:&quot;</span><span class="p">,</span>
+        <span class="n">wait_for_connection</span><span class="p">,</span>
+        <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

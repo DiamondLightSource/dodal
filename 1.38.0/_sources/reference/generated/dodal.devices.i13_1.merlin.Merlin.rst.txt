@@ -1,0 +1,46 @@
+dodal.devices.i13\_1.merlin.Merlin
+==================================
+
+.. currentmodule:: dodal.devices.i13_1.merlin
+
+.. autoclass:: Merlin
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+   
+   

@@ -1,0 +1,40 @@
+dodal.devices.i03.beamstop.Beamstop
+===================================
+
+.. currentmodule:: dodal.devices.i03.beamstop
+
+.. autoclass:: Beamstop
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   
