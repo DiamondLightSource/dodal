@@ -9,7 +9,7 @@ from ophyd_async.testing import callback_on_mock_put, set_mock_value
 from tests.devices.unit_tests.test_bimorph_mirror import mirror, mirror_with_mocked_put
 
 from dodal.devices.slits import Slits
-from dodal.plans.bimorph import SlitDimension, move_slits
+from dodal.plans.bimorph import SlitDimension, bimorph_optimisation, move_slits
 
 
 @pytest.fixture
@@ -74,6 +74,7 @@ async def test_move_slits(
 @pytest.mark.parametrize("number_of_slit_positions", [3])
 @pytest.mark.parametrize("bimorph_settle_time", [0.0])
 async def test_bimorph_optimisation(
+    RE: RunEngine,
     mirror_with_mocked_put,
     slits,
     oav,
@@ -87,4 +88,21 @@ async def test_bimorph_optimisation(
     number_of_slit_positions,
     bimorph_settle_time,
     initial_voltage_list,
-): ...
+):
+    RE(
+        bimorph_optimisation(
+            mirror_with_mocked_put,
+            slits,
+            oav,
+            voltage_increment,
+            active_dimension,
+            active_slit_center_start,
+            active_slit_center_end,
+            active_slit_size,
+            inactive_slit_center,
+            inactive_slit_size,
+            number_of_slit_positions,
+            bimorph_settle_time,
+            initial_voltage_list,
+        )
+    )
