@@ -1,44 +1,55 @@
-from ophyd import Component as Cpt
-from ophyd import EpicsMotor, MotorBundle
-from ophyd.areadetector.base import ADComponent as Cpt
+from ophyd_async.core import StandardReadable
+from ophyd_async.epics.motor import Motor
 
 
-class SampleY(MotorBundle):
+class SampleY(StandardReadable):
     """
     Motors for controlling the sample's y position and stretch in the y axis.
     """
 
-    base = Cpt(EpicsMotor, "CS:Y")
-    stretch = Cpt(EpicsMotor, "CS:Y:STRETCH")
-    top = Cpt(EpicsMotor, "Y:TOP")
-    bottom = Cpt(EpicsMotor, "Y:BOT")
+    def __init__(self, prefix: str, name="") -> None:
+        with self.add_children_as_readables():
+            self.base = Motor(prefix + "CS:Y")
+            self.stretch = Motor(prefix + "CS:Y:STRETCH")
+            self.top = Motor(prefix + "Y:TOP")
+            self.bottom = Motor(prefix + "Y:BOT")
+            super().__init__(name=name)
 
 
-class SampleTheta(MotorBundle):
+class SampleTheta(StandardReadable):
     """
     Motors for controlling the sample's theta position and skew
     """
 
-    base = Cpt(EpicsMotor, "THETA:POS")
-    skew = Cpt(EpicsMotor, "THETA:SKEW")
-    top = Cpt(EpicsMotor, "THETA:TOP")
-    bottom = Cpt(EpicsMotor, "THETA:BOT")
+    def __init__(self, prefix: str, name="") -> None:
+        with self.add_children_as_readables():
+            self.base = Motor(prefix + "THETA:POS")
+            self.skew = Motor(prefix + "THETA:SKEW")
+            self.top = Motor(prefix + "THETA:TOP")
+            self.bottom = Motor(prefix + "THETA:BOT")
+            super().__init__(name=name)
 
 
-class TomoStageWithStretchAndSkew(MotorBundle):
+class TomoStageWithStretchAndSkew(StandardReadable):
     """
     Grouping of motors for the P45 tomography stage
     """
 
-    x = Cpt(EpicsMotor, "X")
-    y = Cpt(SampleY, "")
-    theta = Cpt(SampleTheta, "")
+    def __init__(self, prefix: str, name="") -> None:
+        with self.add_children_as_readables():
+            self.x = Motor(prefix + "X")
+            self.y = SampleY(prefix)
+            self.theta = SampleTheta(prefix)
+            super().__init__(name=name)
 
 
-class Choppers(MotorBundle):
+class Choppers(StandardReadable):
     """
     Grouping for the P45 chopper motors
     """
 
-    x = Cpt(EpicsMotor, "ENDAT")
-    y = Cpt(EpicsMotor, "BISS")
+    def __init__(self, prefix: str, name="") -> None:
+        with self.add_children_as_readables():
+            self.x = Motor(prefix + "ENDAT")
+            self.y = Motor(prefix + "BISS")
+            super().__init__(name=name)

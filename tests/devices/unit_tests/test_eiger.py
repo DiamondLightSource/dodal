@@ -4,11 +4,11 @@ from pathlib import Path
 from unittest.mock import ANY, MagicMock, Mock, call, create_autospec, patch
 
 import pytest
-from conftest import failed_status
 from ophyd.sim import NullStatus, make_fake_device
 from ophyd.status import Status
 from ophyd.utils import UnknownStatusFailure
 
+from conftest import failed_status
 from dodal.devices.detector import DetectorParams, TriggerMode
 from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
 from dodal.devices.eiger import AVAILABLE_TIMEOUTS, EigerDetector

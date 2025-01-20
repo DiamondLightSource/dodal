@@ -48,6 +48,22 @@ TEST_RESULTS: list[XrcResult] = [
         "total_count": 2387574,
         "bounding_box": [[1, 2, 3], [3, 4, 4]],
     },
+    {
+        "centre_of_mass": [0.5, 1, 2],
+        "max_voxel": [0, 1, 2],
+        "max_count": 1500,
+        "n_voxels": 3,
+        "total_count": 1800,
+        "bounding_box": [[0, 1, 1], [1, 2, 4]],
+    },
+    {
+        "centre_of_mass": [2.2, 3.5, 4.7],
+        "max_voxel": [3, 4, 4],
+        "max_count": 150000,
+        "n_voxels": 14,
+        "total_count": 1800000,
+        "bounding_box": [[2, 2, 3], [4, 5, 6]],
+    },
 ]
 
 TEST_READING = {
@@ -145,14 +161,27 @@ async def test_get_full_processing_results(mocked_zocalo_device, RE) -> None:
     def plan():
         yield from bps.trigger(zocalo_device)
         full_results = yield from get_full_processing_results(zocalo_device)
-        assert len(full_results) == 3
+        assert len(full_results) == len(TEST_RESULTS)
         centres_of_mass = [xrc_result["centre_of_mass"] for xrc_result in full_results]
         bbox = [xrc_result["bounding_box"] for xrc_result in full_results]
-        assert centres_of_mass == [[0.5, 1.5, 2.5], [1.5, 2.5, 3.5], [3.5, 4.5, 5.5]]
+        assert np.all(
+            np.isclose(
+                centres_of_mass,
+                [
+                    [0.5, 1.5, 2.5],
+                    [1.5, 2.5, 3.5],
+                    [3.5, 4.5, 5.5],
+                    [0.0, 0.5, 1.5],
+                    [1.7, 3.0, 4.2],
+                ],
+            )
+        )
         assert bbox == [
             [[1, 2, 3], [3, 4, 4]],
             [[1, 2, 3], [3, 4, 4]],
             [[1, 2, 3], [3, 4, 4]],
+            [[0, 1, 1], [1, 2, 4]],
+            [[2, 2, 3], [4, 5, 6]],
         ]
         for prop in ["max_voxel", "max_count", "n_voxels", "total_count"]:
             assert [r[prop] for r in full_results] == [r[prop] for r in TEST_RESULTS]  # type: ignore

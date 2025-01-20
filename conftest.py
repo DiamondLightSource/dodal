@@ -1,5 +1,4 @@
 import asyncio
-import importlib
 import logging
 import os
 import sys
@@ -18,14 +17,13 @@ from ophyd_async.core import (
     PathProvider,
 )
 
-from dodal.common.beamlines import beamline_parameters, beamline_utils
+from dodal.common.beamlines import beamline_utils
 from dodal.common.visit import (
     DirectoryServiceClient,
     LocalDirectoryServiceClient,
     StaticVisitPathProvider,
 )
 from dodal.log import LOGGER, GELFTCPHandler, set_up_all_logging_handlers
-from dodal.utils import make_all_devices
 
 MOCK_DAQ_CONFIG_PATH = "tests/devices/unit_tests/test_daq_configuration"
 mock_paths = [
@@ -55,9 +53,9 @@ def patch_open_to_prevent_dls_reads_in_tests():
         requested_path = Path(args[0])
         if requested_path.is_absolute():
             for p in BANNED_PATHS:
-                assert not requested_path.is_relative_to(
-                    p
-                ), f"Attempt to open {requested_path} from inside a unit test"
+                assert not requested_path.is_relative_to(p), (
+                    f"Attempt to open {requested_path} from inside a unit test"
+                )
         return unpatched_open(*args, **kwargs)
 
     with patch("builtins.open", side_effect=patched_open):
@@ -80,31 +78,6 @@ if os.getenv("PYTEST_RAISE", "0") == "1":
     @pytest.hookimpl(tryfirst=True)
     def pytest_internalerror(excinfo: pytest.ExceptionInfo[Any]):
         raise excinfo.value
-
-
-def mock_beamline_module_filepaths(bl_name, bl_module):
-    if mock_attributes := mock_attributes_table.get(bl_name):
-        [bl_module.__setattr__(attr[0], attr[1]) for attr in mock_attributes]
-        beamline_parameters.BEAMLINE_PARAMETER_PATHS[bl_name] = (
-            "tests/test_data/i04_beamlineParameters"
-        )
-
-
-@pytest.fixture(scope="function")
-def module_and_devices_for_beamline(request):
-    beamline = request.param
-    with patch.dict(os.environ, {"BEAMLINE": beamline}, clear=True):
-        bl_mod = importlib.import_module("dodal.beamlines." + beamline)
-        importlib.reload(bl_mod)
-        mock_beamline_module_filepaths(beamline, bl_mod)
-        devices, exceptions = make_all_devices(
-            bl_mod,
-            include_skipped=True,
-            fake_with_ophyd_sim=True,
-        )
-        yield (bl_mod, devices, exceptions)
-        beamline_utils.clear_devices()
-        del bl_mod
 
 
 def pytest_runtest_setup(item):

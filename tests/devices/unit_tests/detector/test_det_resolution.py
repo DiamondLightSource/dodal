@@ -55,9 +55,9 @@ def test_resolution(
         detector_params.use_roi_mode = roi
         get_detector_max_size.return_value = 434.6
         actual_res = resolution(detector_params, wavelength_angstroms, det_distance_mm)
-    assert isclose(
-        expected_res, actual_res
-    ), f"expected={expected_res}, actual={actual_res}"
+    assert isclose(expected_res, actual_res), (
+        f"expected={expected_res}, actual={actual_res}"
+    )
 
 
 @pytest.mark.parametrize(
@@ -126,6 +126,6 @@ def test_resolution_with_roi_realistic(
 
     actual_res = resolution(detector_params, wavelength_angstroms, det_distance_mm)
 
-    assert isclose(
-        actual_res, expected_res, rtol=1e-3
-    ), f"expected={expected_res}, actual={actual_res}"
+    assert isclose(actual_res, expected_res, rtol=1e-3), (
+        f"expected={expected_res}, actual={actual_res}"
+    )
