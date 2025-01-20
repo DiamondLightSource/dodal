@@ -6,6 +6,7 @@ from bluesky.utils import Msg
 from ophyd_async.core import DeviceCollector, StandardDetector
 from ophyd_async.epics.adsimdetector import SimDetector
 from ophyd_async.testing import callback_on_mock_put, set_mock_value
+from tests.devices.unit_tests.test_bimorph_mirror import mirror, mirror_with_mocked_put
 
 from dodal.devices.slits import Slits
 from dodal.plans.bimorph import SlitDimension, move_slits
@@ -30,6 +31,11 @@ def slits(RE: RunEngine) -> Slits:
 @pytest.fixture
 def oav(static_path_provider) -> StandardDetector:
     return SimDetector("FAKE-PREFIX", path_provider=static_path_provider)
+
+
+@pytest.fixture
+def initial_voltage_list(mirror_with_mocked_put) -> list[float]:
+    return [0.0 for _ in range(len(mirror_with_mocked_put.channels))]
 
 
 @pytest.mark.parametrize("dimension", [SlitDimension.X, SlitDimension.Y])
@@ -58,6 +64,15 @@ async def test_move_slits(
     ] == messages
 
 
+@pytest.mark.parametrize("voltage_increment", [100.0])
+@pytest.mark.parametrize("active_dimension", [SlitDimension.X, SlitDimension.Y])
+@pytest.mark.parametrize("active_slit_center_start", [0.0])
+@pytest.mark.parametrize("active_slit_center_end", [200])
+@pytest.mark.parametrize("active_slit_size", [0.05])
+@pytest.mark.parametrize("inactive_slit_center", [0.0])
+@pytest.mark.parametrize("inactive_slit_size", [0.05])
+@pytest.mark.parametrize("number_of_slit_positions", [3])
+@pytest.mark.parametrize("bimorph_settle_time", [0.0])
 async def test_bimorph_optimisation(
     mirror_with_mocked_put,
     slits,
