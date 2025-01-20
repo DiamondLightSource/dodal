@@ -2,8 +2,9 @@ from pathlib import Path
 
 from ophyd_async.epics.adaravis import AravisDetector
 
+# from ophyd_async.fastcs.panda import HDFPanda
 from dodal.common.beamlines.beamline_utils import (
-    device_instantiation,
+    device_factory,
     get_path_provider,
     set_path_provider,
 )
@@ -12,9 +13,11 @@ from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvi
 from dodal.devices.i13_1.merlin import Merlin
 from dodal.devices.motors import XYZPositioner
 from dodal.log import set_beamline as set_log_beamline
-from dodal.utils import get_beamline_name
+from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("i13-1")
+PREFIX_BL13I = BeamlinePrefix(BL)  # Can't use this yet as returns BL13I
+PREFIX = "BL13J"
 set_log_beamline(BL)
 set_utils_beamline(BL)
 set_path_provider(
@@ -26,59 +29,47 @@ set_path_provider(
 )
 
 
+@device_factory()
 def sample_xyz_stage(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> XYZPositioner:
-    return device_instantiation(
-        XYZPositioner,
-        prefix="BL13J-MO-PI-02:",
-        name="sample_xyz_stage",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
-        bl_prefix=False,
-    )
+    return XYZPositioner(prefix=f"{PREFIX}-MO-PI-02:")
 
 
+@device_factory()
 def sample_xyz_lab_fa_stage(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> XYZPositioner:
-    return device_instantiation(
-        XYZPositioner,
-        prefix="BL13J-MO-PI-02:FIXANG:",
-        name="sample_xyz_lab_fa_stage",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
-        bl_prefix=False,
-    )
+    return XYZPositioner(prefix=f"{PREFIX}-MO-PI-02:FIXANG:")
 
 
+@device_factory()
 def side_camera(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> AravisDetector:
-    return device_instantiation(
-        AravisDetector,
-        prefix="BL13J-OP-FLOAT-03:",
-        name="side_camera",
-        bl_prefix=False,
+    return AravisDetector(
+        prefix=f"{PREFIX}-OP-FLOAT-03:",
         drv_suffix="CAM:",
         hdf_suffix="HDF5:",
         path_provider=get_path_provider(),
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
     )
 
 
 def merlin(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> Merlin:
-    return device_instantiation(
-        Merlin,
-        prefix="BL13J-EA-DET-04:",
+    return Merlin(
+        prefix=f"{PREFIX}-EA-DET-04:",
         name="merlin",
-        bl_prefix=False,
         drv_suffix="CAM:",
         hdf_suffix="HDF5:",
         path_provider=get_path_provider(),
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
     )
+
+
+# @device_factory()
+# def panda() -> HDFPanda:
+#     return HDFPanda(
+#         prefix=f"{PREFIX}-MO-PANDA-01:",
+#         path_provider=get_path_provider(),
+#     )
