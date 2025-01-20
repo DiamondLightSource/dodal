@@ -173,4 +173,4 @@ def inner_scan(
         active_slit_center_start, active_slit_center_end, number_of_slit_positions
     ):
         yield from move_slits(slits, active_dimension, active_slit_size, value)
-        yield from bps.trigger_and_read(oav, slits, mirror)  # type: ignore
+        yield from bps.trigger_and_read((oav, slits, mirror))
