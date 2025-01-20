@@ -132,6 +132,9 @@ dodal.devices.eiger.EigerDetector
       ~EigerDetector.detector_params
       
       
+      ~EigerDetector.disarming_status
+      
+      
       ~EigerDetector.do_arm
       
       

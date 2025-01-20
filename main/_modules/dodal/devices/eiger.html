@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.eiger &#8212; dodal 1.37.1.dev7+ga822a40ee documentation</title>
+    <title>dodal.devices.eiger &#8212; dodal 1.38.1.dev1+gf93183fb5 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=35311d37"></script>
+    <script src="../../../_static/documentation_options.js?v=5ed069f6"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -522,6 +522,9 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">arming_status</span> <span class="o">=</span> <span class="n">Status</span><span class="p">()</span>
     <span class="n">arming_status</span><span class="o">.</span><span class="n">set_finished</span><span class="p">()</span>
 
+    <span class="n">disarming_status</span> <span class="o">=</span> <span class="n">Status</span><span class="p">()</span>
+    <span class="n">disarming_status</span><span class="o">.</span><span class="n">set_finished</span><span class="p">()</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">beamline</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;i03&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">beamline</span> <span class="o">=</span> <span class="n">beamline</span>
@@ -600,6 +603,7 @@ window.addEventListener("load", () => mermaid.run());
     <span class="k">def</span><span class="w"> </span><span class="nf">unstage</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">disarming_status</span> <span class="o">=</span> <span class="n">Status</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">wait_on_arming_if_started</span><span class="p">()</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span><span class="o">.</span><span class="n">trigger_mode</span> <span class="o">==</span> <span class="n">TriggerMode</span><span class="o">.</span><span class="n">FREE_RUN</span><span class="p">:</span>
                 <span class="c1"># In free run mode we have to manually stop odin</span>
@@ -618,6 +622,7 @@ window.addEventListener("load", () => mermaid.run());
                 <span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span><span class="o">.</span><span class="n">general_status_timeout</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">disable_roi_mode</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">disarming_status</span><span class="o">.</span><span class="n">set_finished</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">status_ok</span>
 
 <div class="viewcode-block" id="EigerDetector.stop">
@@ -625,18 +630,22 @@ window.addEventListener("load", () => mermaid.run());
     <span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Emergency stop the device, mainly used to clean up after error.&quot;&quot;&quot;</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Eiger stop() called - cleaning up...&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">wait_on_arming_if_started</span><span class="p">()</span>
-        <span class="n">stop_status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">odin</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">odin</span><span class="o">.</span><span class="n">file_writer</span><span class="o">.</span><span class="n">start_timeout</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span><span class="o">.</span><span class="n">general_status_timeout</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">disarm_detector</span><span class="p">()</span>
-        <span class="n">stop_status</span> <span class="o">&amp;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">disable_roi_mode</span><span class="p">()</span>
-        <span class="n">stop_status</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span><span class="o">.</span><span class="n">general_status_timeout</span><span class="p">)</span>
-        <span class="c1"># See https://github.com/DiamondLightSource/hyperion/issues/1395</span>
-        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Turning off Eiger dev/shm streaming&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">odin</span><span class="o">.</span><span class="n">fan</span><span class="o">.</span><span class="n">dev_shm_enable</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
-        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Eiger has successfully been stopped&quot;</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">disarming_status</span><span class="o">.</span><span class="n">done</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Eiger still disarming, waiting on disarm&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">disarming_status</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span><span class="o">.</span><span class="n">arming_timeout</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wait_on_arming_if_started</span><span class="p">()</span>
+            <span class="n">stop_status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">odin</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">odin</span><span class="o">.</span><span class="n">file_writer</span><span class="o">.</span><span class="n">start_timeout</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span><span class="o">.</span><span class="n">general_status_timeout</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">disarm_detector</span><span class="p">()</span>
+            <span class="n">stop_status</span> <span class="o">&amp;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">disable_roi_mode</span><span class="p">()</span>
+            <span class="n">stop_status</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span><span class="o">.</span><span class="n">general_status_timeout</span><span class="p">)</span>
+            <span class="c1"># See https://github.com/DiamondLightSource/hyperion/issues/1395</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Turning off Eiger dev/shm streaming&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">odin</span><span class="o">.</span><span class="n">fan</span><span class="o">.</span><span class="n">dev_shm_enable</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Eiger has successfully been stopped&quot;</span><span class="p">)</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">disable_roi_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
