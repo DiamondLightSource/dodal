@@ -60,7 +60,7 @@ dev = [
     "pytest-cov",
     "pytest-random-order",
     "ruff",
-    "sphinx<7.4.6",              #  pinned due to https://github.com/sphinx-doc/sphinx/issues/12660
+    "sphinx<8.1.4",              #  pinned due to https://github.com/sphinx-doc/sphinx/issues/12660
     "sphinx-autobuild",
     "sphinx-copybutton",
     "sphinxcontrib-mermaid",
