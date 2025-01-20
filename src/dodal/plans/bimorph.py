@@ -106,8 +106,8 @@ def bimorph_optimisation(
         slits, inactive_dimension, inactive_slit_size, inactive_slit_center
     )
 
-    @stage_decorator(oav, slits, mirror)
-    @run_decorator
+    @stage_decorator((oav, slits, mirror))
+    @run_decorator()
     def outer():
         """Outer part of two-movable scan, which moves bimorph and calls inner."""
         yield from inner_scan(
