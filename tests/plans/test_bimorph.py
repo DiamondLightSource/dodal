@@ -30,8 +30,10 @@ def slits(RE: RunEngine) -> Slits:
 
 
 @pytest.fixture
-def oav(static_path_provider) -> StandardDetector:
-    return SimDetector("FAKE-PREFIX", path_provider=static_path_provider)
+async def oav(RE: RunEngine, static_path_provider) -> StandardDetector:
+    with DeviceCollector(mock=True):
+        det = SimDetector("FAKE-PREFIX", path_provider=static_path_provider)
+    return det
 
 
 @pytest.fixture
