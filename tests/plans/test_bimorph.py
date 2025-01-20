@@ -19,9 +19,10 @@ def slits(RE: RunEngine) -> Slits:
         slits = Slits("FAKE-PREFIX:")
 
     for motor in [slits.x_gap, slits.y_gap, slits.x_centre, slits.y_centre]:
+        # Set velocity to avoid zero velocity error:
+        set_mock_value(motor.velocity, 1)
 
         def callback(value, wait=False, signal=motor.user_readback):
-            breakpoint()
             set_mock_value(signal, value)
 
         callback_on_mock_put(motor.user_setpoint, callback)
