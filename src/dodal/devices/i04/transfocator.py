@@ -67,17 +67,17 @@ class Transfocator(StandardReadable):
 
         if await self.beamsize_set_microns.get_value() != value:
             # Logic in the IOC calculates predicted_vertical_num_lenses when beam_set_microns changes
+
+            # Register an observer before setting beamsize_set_microns to ensure we don't miss changes
             predicted_vertical_num_lenses_iterator = observe_value(
                 self.predicted_vertical_num_lenses, timeout=self.TIMEOUT
             )
+            # Keep initial prediction before setting to later compare with change after setting
             current_prediction = await anext(predicted_vertical_num_lenses_iterator)
-            set_status = self.beamsize_set_microns.set(value)
+            await self.beamsize_set_microns.set(value)
             accepted_prediction = await anext(predicted_vertical_num_lenses_iterator)
             if not math.isclose(current_prediction, accepted_prediction, abs_tol=1e-8):
-                await asyncio.gather(
-                    set_status,
-                    self.set_based_on_prediction(accepted_prediction),
-                )
+                await self.set_based_on_prediction(accepted_prediction)
 
         number_filters_rbv, vertical_lens_size_rbv = await asyncio.gather(
             self.number_filters_sp.get_value(),
