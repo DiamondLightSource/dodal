@@ -337,7 +337,7 @@ def synchrotron(
 def undulator(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
-    daq_configuration_path: str = None,
+    daq_configuration_path: str | None = None,
 ) -> Undulator:
     """Get the i03 undulator device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
@@ -357,7 +357,7 @@ def undulator(
 def undulator_dcm(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
-    daq_configuration_path: str = None,
+    daq_configuration_path: str | None = None,
 ) -> UndulatorDCM:
     """Get the i03 undulator DCM device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
