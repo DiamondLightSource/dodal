@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from ophyd_async.core import SignalR, StandardReadable
+from ophyd_async.epics.core import epics_signal_r
 from ophyd_async.epics.adaravis import AravisDetector
 from ophyd_async.epics.adpilatus import PilatusDetector
 from ophyd_async.fastcs.panda import HDFPanda
@@ -43,7 +45,7 @@ set_utils_beamline(BL)
 set_path_provider(
     StaticVisitPathProvider(
         BL,
-        Path("/dls/i22/data/2024/cm37271-2/bluesky"),
+        Path("/dls/i22/data/2025/nr40718-1"),
         client=RemoteDirectoryServiceClient("http://i22-control:8088/api"),
     )
 )
@@ -102,6 +104,16 @@ def i0() -> TetrammDetector:
         type="Cividec Diamond XBPM",
     )
 
+class BeamDevice(StandardReadable):
+    def __init__(self, name: str = ""):
+        with self.add_children_as_readables():
+            self.topup_countdown = epics_signal_r(float, "SR-CS-FILL-01:COUNTDOWN")
+            self.beam_intensity = epics_signal_r(float, "BL22I-EA-XBPM-00:SumAll:MeanValue_RBV")
+        super().__init__(name)
+
+@device_factory()
+def beam_device() -> BeamDevice:
+    return BeamDevice()
 
 @device_factory()
 def it() -> TetrammDetector:
@@ -136,7 +148,7 @@ def bimorph_hfm() -> BimorphMirror:
 @device_factory()
 def bimorph_vfm() -> BimorphMirror:
     return BimorphMirror(
-        prefix=f"{PREFIX.beamline_prefix}-OP-KBM-01:G1:", number_of_channels=16
+        prefix=f"{PREFIX.beamline_prefix}-OP-KBM-01:G1:", number_of_channels=32
     )
 
 
@@ -264,3 +276,13 @@ def linkam() -> Linkam3:
 def ppump() -> WatsonMarlow323Pump:
     """Sample Environment Peristaltic Pump"""
     return WatsonMarlow323Pump(f"{PREFIX.beamline_prefix}-EA-PUMP-01:")
+
+
+@device_factory()
+def ss() -> AravisDetector:
+    return AravisDetector(
+        prefix=f"{PREFIX.beamline_prefix}-DI-PHDGN-08:",
+        drv_suffix="CAM:",
+        hdf_suffix=HDF5_PREFIX,
+        path_provider=get_path_provider(),
+    )
