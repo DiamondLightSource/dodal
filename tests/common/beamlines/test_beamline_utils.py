@@ -1,9 +1,9 @@
 import asyncio
+import functools
 from unittest.mock import ANY, AsyncMock, MagicMock, patch
 
 import pytest
 from bluesky.run_engine import RunEngine as RE
-from conftest import mock_beamline_module_filepaths
 from ophyd import Device
 from ophyd.device import Device as OphydV1Device
 from ophyd.sim import FakeEpicsSignal
@@ -13,11 +13,13 @@ from ophyd_async.core import StandardReadable
 from dodal.beamlines import i03
 from dodal.common.beamlines import beamline_utils
 from dodal.devices.eiger import EigerDetector
+from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.motors import XYZPositioner
 from dodal.devices.smargon import Smargon
-from dodal.devices.zebra import Zebra
 from dodal.log import LOGGER
-from dodal.utils import make_all_devices
+from dodal.utils import DeviceInitializationController, make_all_devices
+
+from ...conftest import mock_beamline_module_filepaths
 
 
 @pytest.fixture(autouse=True)
@@ -37,7 +39,7 @@ def setup():
 
 
 def test_instantiate_function_makes_supplied_device():
-    device_types = [Zebra, XYZPositioner, Smargon]
+    device_types = [XYZPositioner, Smargon]
     for device in device_types:
         dev = beamline_utils.device_instantiation(
             device, device.__name__, "", False, True, None
@@ -47,7 +49,7 @@ def test_instantiate_function_makes_supplied_device():
 
 def test_instantiating_different_device_with_same_name():
     dev1 = beamline_utils.device_instantiation(  # noqa
-        Zebra, "device", "", False, True, None
+        XYZPositioner, "device", "", False, True, None
     )
     with pytest.raises(TypeError):
         dev2 = beamline_utils.device_instantiation(
@@ -73,11 +75,11 @@ def test_instantiate_v1_function_fake_makes_fake():
 
 def test_instantiate_v2_function_fake_makes_fake():
     RE()
-    fake_zeb: Zebra = beamline_utils.device_instantiation(
-        i03.Zebra, "zebra", "", True, True, None
+    fake_smargon: Smargon = beamline_utils.device_instantiation(
+        i03.Smargon, "smargon", "", True, True, None
     )
-    assert isinstance(fake_zeb, StandardReadable)
-    assert fake_zeb.pc.arm.armed.source.startswith("mock+ca")
+    assert isinstance(fake_smargon, StandardReadable)
+    assert fake_smargon.omega.user_setpoint.source.startswith("mock+ca")
 
 
 def test_clear_devices(RE):
@@ -133,3 +135,83 @@ def test_wait_for_v2_device_connection_passes_through_timeout(kwargs, expected_t
         mock=ANY,
         timeout=expected_timeout,
     )
+
+
+def dummy_mirror() -> FocusingMirror:
+    mirror = MagicMock(spec=FocusingMirror)
+    connect = AsyncMock()
+    mirror.connect = connect
+
+    def set_name(name: str):
+        mirror.name = name  # type: ignore
+
+    mirror.set_name.side_effect = set_name
+    mirror.set_name("")
+    return mirror
+
+
+@beamline_utils.device_factory(mock=True)
+def dummy_mirror_as_device_factory() -> FocusingMirror:
+    return dummy_mirror()
+
+
+@beamline_utils.device_factory(mock=True)
+@functools.lru_cache
+def cached_dummy_mirror_as_device_factory() -> FocusingMirror:
+    return dummy_mirror()
+
+
+def test_device_controller_name_propagated():
+    mirror = dummy_mirror_as_device_factory(name="foo")
+    assert mirror.name == "foo"
+
+
+def test_device_controller_connection_is_lazy():
+    mirror = dummy_mirror_as_device_factory(name="foo")
+    assert mirror.connect.call_count == 0  # type: ignore
+
+
+def test_device_controller_eager_connect(RE):
+    mirror = dummy_mirror_as_device_factory(connect_immediately=True)
+    assert mirror.connect.call_count == 1  # type: ignore
+
+
+@pytest.mark.parametrize(
+    "factory",
+    [
+        dummy_mirror_as_device_factory,
+        # The second test case confirms that if, for some reason, we use a device
+        # factory decorated with @lru_cache, dodal is not affected and will still cache
+        # the same device instance internally. We actually also use lru_cache
+        # internally so this test case is just a sanity check to prove it is
+        # idempotent.
+        cached_dummy_mirror_as_device_factory,
+    ],
+)
+def test_device_cached(factory: DeviceInitializationController):
+    mirror_1 = factory()
+    mirror_2 = factory()
+    assert mirror_1 is mirror_2
+
+
+def test_device_cache_can_be_cleared():
+    mirror_1 = dummy_mirror_as_device_factory()
+    dummy_mirror_as_device_factory.cache_clear()
+
+    mirror_2 = dummy_mirror_as_device_factory()
+    assert mirror_1 is not mirror_2
+
+
+def test_skip(RE):
+    skip = True
+
+    def _skip() -> bool:
+        return skip
+
+    controller = beamline_utils.device_factory(skip=_skip)(dummy_mirror)
+
+    assert isinstance(controller, DeviceInitializationController)
+    assert controller.skip
+
+    skip = False
+    assert not controller.skip

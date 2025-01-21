@@ -13,7 +13,7 @@ from dodal.devices.aperturescatterguard import (
     ApertureScatterguard,
     load_positions_from_beamline_parameters,
 )
-from dodal.devices.attenuator import Attenuator
+from dodal.devices.attenuator.attenuator import BinaryFilterAttenuator
 from dodal.devices.backlight import Backlight
 from dodal.devices.cryostream import CryoStream
 from dodal.devices.dcm import DCM
@@ -24,6 +24,7 @@ from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import PandAFastGridScan, ZebraFastGridScan
 from dodal.devices.flux import Flux
 from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, MirrorVoltages
+from dodal.devices.i03.beamstop import Beamstop
 from dodal.devices.motors import XYZPositioner
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.oav_parameters import OAVConfig
@@ -39,8 +40,13 @@ from dodal.devices.undulator_dcm import UndulatorDCM
 from dodal.devices.webcam import Webcam
 from dodal.devices.xbpm_feedback import XBPMFeedback
 from dodal.devices.xspress3.xspress3 import Xspress3
-from dodal.devices.zebra import Zebra
-from dodal.devices.zebra_controlled_shutter import ZebraShutter
+from dodal.devices.zebra.zebra import Zebra
+from dodal.devices.zebra.zebra_constants_mapping import (
+    ZebraMapping,
+    ZebraSources,
+    ZebraTTLOutputs,
+)
+from dodal.devices.zebra.zebra_controlled_shutter import ZebraShutter
 from dodal.devices.zocalo import ZocaloResults
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
@@ -56,6 +62,12 @@ set_log_beamline(BL)
 set_utils_beamline(BL)
 
 set_path_provider(PandASubpathProvider())
+
+I03_ZEBRA_MAPPING = ZebraMapping(
+    outputs=ZebraTTLOutputs(TTL_DETECTOR=1, TTL_SHUTTER=2, TTL_XSPRESS3=3, TTL_PANDA=4),
+    sources=ZebraSources(),
+    AND_GATE_FOR_AUTO_SHUTTER=2,
+)
 
 
 def aperture_scatterguard(
@@ -80,16 +92,32 @@ def aperture_scatterguard(
 
 def attenuator(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Attenuator:
+) -> BinaryFilterAttenuator:
     """Get the i03 attenuator device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return device_instantiation(
-        Attenuator,
+        BinaryFilterAttenuator,
         "attenuator",
         "-EA-ATTN-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+    )
+
+
+def beamstop(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Beamstop:
+    """Get the i03 beamstop device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return device_instantiation(
+        Beamstop,
+        "beamstop",
+        "-MO-BS-01:",
+        wait_for_connection,
+        fake_with_ophyd_sim,
+        beamline_parameters=get_beamline_parameters(),
     )
 
 
@@ -351,6 +379,7 @@ def zebra(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -
         "-EA-ZEBRA-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        mapping=I03_ZEBRA_MAPPING,
     )
 
 

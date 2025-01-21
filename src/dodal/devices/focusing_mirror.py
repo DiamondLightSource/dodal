@@ -1,3 +1,5 @@
+from typing import TypedDict
+
 from ophyd_async.core import (
     AsyncStatus,
     Device,
@@ -34,6 +36,12 @@ class MirrorStripe(StrictEnum):
     RHODIUM = "Rhodium"
     BARE = "Bare"
     PLATINUM = "Platinum"
+
+
+class MirrorStripeConfiguration(TypedDict):
+    stripe: MirrorStripe
+    yaw_mrad: float
+    lat_mm: float
 
 
 class MirrorVoltageDemand(StrictEnum):
@@ -130,7 +138,12 @@ class FocusingMirror(StandardReadable):
     """Focusing Mirror"""
 
     def __init__(
-        self, name, prefix, bragg_to_lat_lut_path=None, x_suffix="X", y_suffix="Y"
+        self,
+        prefix: str,
+        name: str = "",
+        bragg_to_lat_lut_path: str | None = None,
+        x_suffix: str = "X",
+        y_suffix: str = "Y",
     ):
         self.bragg_to_lat_lookup_table_path = bragg_to_lat_lut_path
         self.yaw_mrad = Motor(prefix + "YAW")
@@ -161,16 +174,17 @@ class FocusingMirrorWithStripes(FocusingMirror):
     """A focusing mirror where the stripe material can be changed. This is usually done
     based on the energy of the beamline."""
 
-    def __init__(self, name, prefix, *args, **kwargs):
+    def __init__(self, prefix: str, name: str = "", *args, **kwargs):
         self.stripe = epics_signal_rw(MirrorStripe, prefix + "STRP:DVAL")
         # apply the current set stripe setting
         self.apply_stripe = epics_signal_x(prefix + "CHANGE.PROC")
 
-        super().__init__(name, prefix, *args, **kwargs)
+        super().__init__(prefix, name, *args, **kwargs)
 
-    def energy_to_stripe(self, energy_kev) -> MirrorStripe:
+    def energy_to_stripe(self, energy_kev) -> MirrorStripeConfiguration:
+        """Return the stripe, yaw angle and lateral position for the specified energy"""
         # In future, this should be configurable per-mirror
         if energy_kev < 7:
-            return MirrorStripe.BARE
+            return {"stripe": MirrorStripe.BARE, "yaw_mrad": 6.2, "lat_mm": 0.0}
         else:
-            return MirrorStripe.RHODIUM
+            return {"stripe": MirrorStripe.RHODIUM, "yaw_mrad": 0.0, "lat_mm": 10.0}

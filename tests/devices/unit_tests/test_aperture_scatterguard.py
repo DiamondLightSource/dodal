@@ -6,8 +6,8 @@ from unittest.mock import MagicMock, call
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import (
-    DeviceCollector,
+from ophyd_async.core import DeviceCollector
+from ophyd_async.testing import (
     callback_on_mock_put,
     get_mock_put,
     set_mock_value,
@@ -426,3 +426,10 @@ def test_get_position_from_gda_aperture_name(
         ap_sg.get_position_from_gda_aperture_name(
             "VERY TINY APERTURE"  # type: ignore
         )
+
+
+def test_aperture_enum_name_formatting():
+    assert f"{ApertureValue.SMALL}" == "Small"
+    assert f"{ApertureValue.MEDIUM}" == "Medium"
+    assert f"{ApertureValue.LARGE}" == "Large"
+    assert f"{ApertureValue.ROBOT_LOAD}" == "Robot_load"

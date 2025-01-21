@@ -1,9 +1,9 @@
 from typing import Any
 
 import pytest
+from ophyd_async.core import NotConnected
 
 from dodal.beamlines import all_beamline_modules
-from dodal.common.beamlines import beamline_utils
 from dodal.utils import BLUESKY_PROTOCOLS, make_all_devices
 
 
@@ -21,15 +21,17 @@ def test_device_creation(RE, module_and_devices_for_beamline):
     Ensures that for every beamline all device factories are using valid args
     and creating types that conform to Bluesky protocols.
     """
-    module, devices, exceptions = module_and_devices_for_beamline
-    assert not exceptions
-    for device_name, device in devices.items():
-        assert device_name in beamline_utils.ACTIVE_DEVICES, (
-            f"No device named {device_name} was created for {module}, "
-            f"devices are {beamline_utils.ACTIVE_DEVICES.keys()}"
-        )
-        assert follows_bluesky_protocols(device)
-    assert len(beamline_utils.ACTIVE_DEVICES) == len(devices)
+    _, devices, exceptions = module_and_devices_for_beamline
+    if len(exceptions) > 0:
+        raise NotConnected(exceptions)
+    devices_not_following_bluesky_protocols = [
+        name
+        for name, device in devices.items()
+        if not follows_bluesky_protocols(device)
+    ]
+    assert len(devices_not_following_bluesky_protocols) == 0, (
+        f"{devices_not_following_bluesky_protocols} do not follow bluesky protocols"
+    )
 
 
 @pytest.mark.parametrize(
@@ -47,5 +49,13 @@ def test_devices_are_identical(RE, module_and_devices_for_beamline):
         include_skipped=True,
         fake_with_ophyd_sim=True,
     )
-    for device_name in devices_a.keys():
-        assert devices_a[device_name] is devices_b[device_name]
+    non_identical_names = [
+        device_name
+        for device_name, device in devices_a.items()
+        if device is not devices_b[device_name]
+    ]
+    total_number_of_devices = len(devices_a)
+    non_identical_number_of_devies = len(devices_a)
+    assert len(non_identical_names) == 0, (
+        f"{non_identical_number_of_devies}/{total_number_of_devices} devices were not identical: {non_identical_names}"
+    )
