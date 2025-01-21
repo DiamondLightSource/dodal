@@ -17,6 +17,21 @@ from dodal.devices.bimorph_mirror import BimorphMirror
 from dodal.devices.slits import Slits
 from dodal.plans.bimorph import SlitDimension, bimorph_optimisation, move_slits
 
+VALID_BIMORPH_CHANNELS = [8, 12, 16, 24]
+
+
+@pytest.fixture(params=VALID_BIMORPH_CHANNELS)
+def mirror(request, RE: RunEngine) -> BimorphMirror:
+    number_of_channels = request.param
+
+    with DeviceCollector(mock=True):
+        bm = BimorphMirror(
+            prefix="FAKE-PREFIX:",
+            number_of_channels=number_of_channels,
+        )
+
+    return bm
+
 
 @pytest.fixture
 def slits(RE: RunEngine) -> Slits:
@@ -43,8 +58,8 @@ async def oav(RE: RunEngine, tmp_path: Path) -> StandardDetector:
 
 
 @pytest.fixture
-def initial_voltage_list(mirror_with_mocked_put) -> list[float]:
-    return [0.0 for _ in range(len(mirror_with_mocked_put.channels))]
+def initial_voltage_list(mirror) -> list[float]:
+    return [0.0 for _ in range(len(mirror.channels))]
 
 
 @pytest.mark.parametrize("dimension", [SlitDimension.X, SlitDimension.Y])
@@ -148,7 +163,7 @@ def inner_scan_message_generator(
 @pytest.mark.parametrize("bimorph_settle_time", [0.0])
 async def test_bimorph_optimisation(
     RE: RunEngine,
-    mirror_with_mocked_put,
+    mirror,
     slits,
     oav,
     voltage_increment,
@@ -163,7 +178,7 @@ async def test_bimorph_optimisation(
     initial_voltage_list,
 ):
     plan = bimorph_optimisation(
-        mirror_with_mocked_put,
+        mirror,
         slits,
         oav,
         voltage_increment,
@@ -179,7 +194,7 @@ async def test_bimorph_optimisation(
     )
 
     for msg in inner_scan_message_generator(
-        mirror_with_mocked_put,
+        mirror,
         slits,
         oav,
         active_dimension,
