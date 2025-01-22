@@ -91,6 +91,9 @@ class ApertureValue(StrictEnum):
     MEDIUM = "MEDIUM_APERTURE"
     LARGE = "LARGE_APERTURE"
 
+    def __str__(self):
+        return self.name.capitalize()
+
 
 def load_positions_from_beamline_parameters(
     params: GDABeamlineParameters,
@@ -269,8 +272,8 @@ class ApertureScatterguard(StandardReadable, Movable):
         prefix: str = "",
         name: str = "",
     ) -> None:
-        self._aperture = Aperture(prefix + "-MO-MAPT-01:")
-        self._scatterguard = Scatterguard(prefix + "-MO-SCAT-01:")
+        self.aperture = Aperture(prefix + "-MO-MAPT-01:")
+        self.scatterguard = Scatterguard(prefix + "-MO-SCAT-01:")
         self.radius = create_hardware_backed_soft_signal(
             float, self._get_current_radius, units="µm"
         )
@@ -278,11 +281,11 @@ class ApertureScatterguard(StandardReadable, Movable):
         self._tolerances = tolerances
         self.add_readables(
             [
-                self._aperture.x.user_readback,
-                self._aperture.y.user_readback,
-                self._aperture.z.user_readback,
-                self._scatterguard.x.user_readback,
-                self._scatterguard.y.user_readback,
+                self.aperture.x.user_readback,
+                self.aperture.y.user_readback,
+                self.aperture.z.user_readback,
+                self.scatterguard.x.user_readback,
+                self.scatterguard.y.user_readback,
                 self.radius,
             ],
         )
@@ -294,8 +297,8 @@ class ApertureScatterguard(StandardReadable, Movable):
 
         # Setting this will select the aperture but not move it into beam
         self.aperture_outside_beam = ApertureSelector(
-            self._aperture,
-            self._scatterguard,
+            self.aperture,
+            self.scatterguard,
             self._is_out_of_beam,
             self._loaded_positions,
             self._tolerances.aperture_z,
@@ -303,7 +306,7 @@ class ApertureScatterguard(StandardReadable, Movable):
 
         # Setting this will just move the assembly out of the beam
         self.move_out = OutTrigger(
-            self._aperture.y, loaded_positions[ApertureValue.ROBOT_LOAD].aperture_y
+            self.aperture.y, loaded_positions[ApertureValue.ROBOT_LOAD].aperture_y
         )
 
         super().__init__(name)
@@ -313,7 +316,7 @@ class ApertureScatterguard(StandardReadable, Movable):
         """This set will move the aperture into the beam or move to robot load"""
         position = self._loaded_positions[value]
         await _safe_move_whilst_in_beam(
-            self._aperture, self._scatterguard, position, self._tolerances.aperture_z
+            self.aperture, self.scatterguard, position, self._tolerances.aperture_z
         )
 
     @AsyncStatus.wrap
@@ -324,15 +327,15 @@ class ApertureScatterguard(StandardReadable, Movable):
         )
 
         await asyncio.gather(
-            self._aperture.x.set(aperture_x),
-            self._aperture.y.set(aperture_y),
-            self._aperture.z.set(aperture_z),
-            self._scatterguard.x.set(scatterguard_x),
-            self._scatterguard.y.set(scatterguard_y),
+            self.aperture.x.set(aperture_x),
+            self.aperture.y.set(aperture_y),
+            self.aperture.z.set(aperture_z),
+            self.scatterguard.x.set(scatterguard_x),
+            self.scatterguard.y.set(scatterguard_y),
         )
 
     async def _is_out_of_beam(self) -> bool:
-        current_ap_y = await self._aperture.y.user_readback.get_value()
+        current_ap_y = await self.aperture.y.user_readback.get_value()
         robot_load_ap_y = self._loaded_positions[ApertureValue.ROBOT_LOAD].aperture_y
         return current_ap_y <= robot_load_ap_y + self._tolerances.aperture_y
 
@@ -343,11 +346,11 @@ class ApertureScatterguard(StandardReadable, Movable):
         mini aperture y <= ROBOT_LOAD.location.aperture_y + tolerance.
         If no position is found then raises InvalidApertureMove.
         """
-        if await self._aperture.large.get_value(cached=False) == 1:
+        if await self.aperture.large.get_value(cached=False) == 1:
             return ApertureValue.LARGE
-        elif await self._aperture.medium.get_value(cached=False) == 1:
+        elif await self.aperture.medium.get_value(cached=False) == 1:
             return ApertureValue.MEDIUM
-        elif await self._aperture.small.get_value(cached=False) == 1:
+        elif await self.aperture.small.get_value(cached=False) == 1:
             return ApertureValue.SMALL
         elif await self._is_out_of_beam():
             return ApertureValue.ROBOT_LOAD

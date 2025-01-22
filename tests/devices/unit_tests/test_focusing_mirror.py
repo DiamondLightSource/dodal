@@ -10,8 +10,8 @@ import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
-from ophyd_async.core import (
-    DeviceCollector,
+from ophyd_async.core import DeviceCollector
+from ophyd_async.testing import (
     callback_on_mock_put,
     get_mock_put,
     set_mock_value,
@@ -20,6 +20,7 @@ from ophyd_async.core import (
 from dodal.devices.focusing_mirror import (
     FocusingMirrorWithStripes,
     MirrorStripe,
+    MirrorStripeConfiguration,
     MirrorVoltageDemand,
     MirrorVoltages,
     SingleMirrorVoltage,
@@ -250,10 +251,16 @@ def test_mirror_populates_voltage_channels(RE):
     assert isinstance(mirror_voltages.horizontal_voltages[0], SingleMirrorVoltage)
 
 
+@pytest.mark.parametrize(
+    "energy_kev, expected_config",
+    [
+        [1, {"stripe": MirrorStripe.BARE, "yaw_mrad": 6.2, "lat_mm": 0.0}],
+        [14, {"stripe": MirrorStripe.RHODIUM, "yaw_mrad": 0.0, "lat_mm": 10.0}],
+    ],
+)
 async def test_given_striped_focussing_mirror_then_energy_to_stripe_returns_expected(
-    RE,
+    RE, energy_kev: float, expected_config: MirrorStripeConfiguration
 ):
     with DeviceCollector(mock=True):
         device = FocusingMirrorWithStripes(prefix="-OP-VFM-01:", name="mirror")
-    assert device.energy_to_stripe(1) == MirrorStripe.BARE
-    assert device.energy_to_stripe(14) == MirrorStripe.RHODIUM
+    assert device.energy_to_stripe(energy_kev) == expected_config

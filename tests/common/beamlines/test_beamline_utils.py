@@ -4,7 +4,6 @@ from unittest.mock import ANY, AsyncMock, MagicMock, patch
 
 import pytest
 from bluesky.run_engine import RunEngine as RE
-from conftest import mock_beamline_module_filepaths
 from ophyd import Device
 from ophyd.device import Device as OphydV1Device
 from ophyd.sim import FakeEpicsSignal
@@ -17,9 +16,10 @@ from dodal.devices.eiger import EigerDetector
 from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.motors import XYZPositioner
 from dodal.devices.smargon import Smargon
-from dodal.devices.zebra import Zebra
 from dodal.log import LOGGER
 from dodal.utils import DeviceInitializationController, make_all_devices
+
+from ...conftest import mock_beamline_module_filepaths
 
 
 @pytest.fixture(autouse=True)
@@ -39,7 +39,7 @@ def setup():
 
 
 def test_instantiate_function_makes_supplied_device():
-    device_types = [Zebra, XYZPositioner, Smargon]
+    device_types = [XYZPositioner, Smargon]
     for device in device_types:
         dev = beamline_utils.device_instantiation(
             device, device.__name__, "", False, True, None
@@ -49,7 +49,7 @@ def test_instantiate_function_makes_supplied_device():
 
 def test_instantiating_different_device_with_same_name():
     dev1 = beamline_utils.device_instantiation(  # noqa
-        Zebra, "device", "", False, True, None
+        XYZPositioner, "device", "", False, True, None
     )
     with pytest.raises(TypeError):
         dev2 = beamline_utils.device_instantiation(
@@ -75,11 +75,11 @@ def test_instantiate_v1_function_fake_makes_fake():
 
 def test_instantiate_v2_function_fake_makes_fake():
     RE()
-    fake_zeb: Zebra = beamline_utils.device_instantiation(
-        i03.Zebra, "zebra", "", True, True, None
+    fake_smargon: Smargon = beamline_utils.device_instantiation(
+        i03.Smargon, "smargon", "", True, True, None
     )
-    assert isinstance(fake_zeb, StandardReadable)
-    assert fake_zeb.pc.arm.armed.source.startswith("mock+ca")
+    assert isinstance(fake_smargon, StandardReadable)
+    assert fake_smargon.omega.user_setpoint.source.startswith("mock+ca")
 
 
 def test_clear_devices(RE):

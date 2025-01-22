@@ -4,8 +4,8 @@ from unittest.mock import ANY
 import bluesky.plans as bp
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import (
-    DeviceCollector,
+from ophyd_async.core import DeviceCollector
+from ophyd_async.testing import (
     assert_configuration,
     assert_emitted,
     assert_reading,

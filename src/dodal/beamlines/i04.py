@@ -6,7 +6,7 @@ from dodal.devices.aperturescatterguard import (
     ApertureScatterguard,
     load_positions_from_beamline_parameters,
 )
-from dodal.devices.attenuator import Attenuator
+from dodal.devices.attenuator.attenuator import BinaryFilterAttenuator
 from dodal.devices.backlight import Backlight
 from dodal.devices.dcm import DCM
 from dodal.devices.detector import DetectorParams
@@ -28,8 +28,13 @@ from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.thawer import Thawer
 from dodal.devices.undulator import Undulator
 from dodal.devices.xbpm_feedback import XBPMFeedback
-from dodal.devices.zebra import Zebra
-from dodal.devices.zebra_controlled_shutter import ZebraShutter
+from dodal.devices.zebra.zebra import Zebra
+from dodal.devices.zebra.zebra_constants_mapping import (
+    ZebraMapping,
+    ZebraSources,
+    ZebraTTLOutputs,
+)
+from dodal.devices.zebra.zebra_controlled_shutter import ZebraShutter
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
 
@@ -46,6 +51,11 @@ MURKO_REDIS_DB = 7
 BL = get_beamline_name("s04")
 set_log_beamline(BL)
 set_utils_beamline(BL)
+
+I04_ZEBRA_MAPPING = ZebraMapping(
+    outputs=(ZebraTTLOutputs(TTL_DETECTOR=1, TTL_FAST_SHUTTER=2, TTL_XSPRESS3=3)),
+    sources=ZebraSources(),
+)
 
 
 def smargon(
@@ -138,12 +148,12 @@ def sample_shutter(
 
 def attenuator(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Attenuator:
+) -> BinaryFilterAttenuator:
     """Get the i04 attenuator device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
     return device_instantiation(
-        Attenuator,
+        BinaryFilterAttenuator,
         "attenuator",
         "-EA-ATTN-01:",
         wait_for_connection,
@@ -341,6 +351,7 @@ def zebra(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -
         "-EA-ZEBRA-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        mapping=I04_ZEBRA_MAPPING,
     )
 
 

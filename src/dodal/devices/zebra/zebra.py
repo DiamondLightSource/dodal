@@ -14,37 +14,7 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-# These constants refer to I03's Zebra. See https://github.com/DiamondLightSource/dodal/issues/772
-# Sources
-DISCONNECT = 0
-IN1_TTL = 1
-IN2_TTL = 4
-IN3_TTL = 7
-IN4_TTL = 10
-PC_ARM = 29
-PC_GATE = 30
-PC_PULSE = 31
-AND3 = 34
-AND4 = 35
-OR1 = 36
-PULSE1 = 52
-PULSE2 = 53
-SOFT_IN1 = 60
-SOFT_IN2 = 61
-SOFT_IN3 = 62
-
-# Instrument specific
-TTL_DETECTOR = 1
-TTL_SHUTTER = 2
-TTL_XSPRESS3 = 3
-TTL_PANDA = 4
-
-# The AND gate that controls the automatic shutter
-AUTO_SHUTTER_GATE = 2
-
-# The first two inputs of the auto shutter gate.
-AUTO_SHUTTER_INPUT_1 = 1
-AUTO_SHUTTER_INPUT_2 = 2
+from dodal.devices.zebra.zebra_constants_mapping import ZebraMapping
 
 
 class ArmSource(StrictEnum):
@@ -59,28 +29,33 @@ class TrigSource(StrictEnum):
 
 
 class EncEnum(StrictEnum):
-    Enc1 = "Enc1"
-    Enc2 = "Enc2"
-    Enc3 = "Enc3"
-    Enc4 = "Enc4"
-    Enc1_4Av = "Enc1-4Av"
+    ENC1 = "Enc1"
+    ENC2 = "Enc2"
+    ENC3 = "Enc3"
+    ENC4 = "Enc4"
+    ENC1_4AV = "Enc1-4Av"
 
 
 class I03Axes:
-    SMARGON_X1 = EncEnum.Enc1
-    SMARGON_Y = EncEnum.Enc2
-    SMARGON_Z = EncEnum.Enc3
-    OMEGA = EncEnum.Enc4
+    SMARGON_X1 = EncEnum.ENC1
+    SMARGON_Y = EncEnum.ENC2
+    SMARGON_Z = EncEnum.ENC3
+    OMEGA = EncEnum.ENC4
 
 
 class I24Axes:
-    VGON_Z = EncEnum.Enc1
-    OMEGA = EncEnum.Enc2
-    VGON_X = EncEnum.Enc3
-    VGON_YH = EncEnum.Enc4
+    VGON_Z = EncEnum.ENC1
+    OMEGA = EncEnum.ENC2
+    VGON_X = EncEnum.ENC3
+    VGON_YH = EncEnum.ENC4
 
 
 class RotationDirection(StrictEnum):
+    """
+    Defines for a swept angle whether the scan width (sweep) is to be added or subtracted from
+    the initial angle to obtain the final angle.
+    """
+
     POSITIVE = "Positive"
     NEGATIVE = "Negative"
 
@@ -281,7 +256,7 @@ class LogicGateConfiguration:
         for input, (source, invert) in enumerate(
             zip(self.sources, self.invert, strict=False)
         ):
-            input_strings.append(f"INP{input+1}={'!' if invert else ''}{source}")
+            input_strings.append(f"INP{input + 1}={'!' if invert else ''}{source}")
 
         return ", ".join(input_strings)
 
@@ -298,7 +273,8 @@ class SoftInputs(StandardReadable):
 class Zebra(StandardReadable):
     """The Zebra device."""
 
-    def __init__(self, name: str, prefix: str) -> None:
+    def __init__(self, mapping: ZebraMapping, name: str, prefix: str) -> None:
+        self.mapping = mapping
         self.pc = PositionCompare(prefix, name)
         self.output = ZebraOutputPanel(prefix, name)
         self.inputs = SoftInputs(prefix, name)
