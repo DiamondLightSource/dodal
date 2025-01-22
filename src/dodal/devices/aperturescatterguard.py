@@ -241,28 +241,29 @@ class ApertureScatterguard(StandardReadable, Movable):
     """Move the aperture and scatterguard assembly in a safe way. There are two ways to
     interact with the device depending on if you want simplicity or move flexibility.
 
-    The simple interface is using:
+    Examples:
+        The simple interface is using::
 
-        await aperture_scatterguard.set(ApertureValue.LARGE)
+            await aperture_scatterguard.set(ApertureValue.LARGE)
 
-    This will move the assembly so that the large aperture is in the beam, regardless
-    of where the assembly currently is.
+        This will move the assembly so that the large aperture is in the beam, regardless
+        of where the assembly currently is.
 
-    However, the aperture Y axis is faster than the others. In some cases we may want to
-    move the assembly out of the beam with this axis without moving others:
+        However, the aperture Y axis is faster than the others. In some cases we may want to
+        move the assembly out of the beam with this axis without moving others::
 
-        await aperture_scatterguard.move_out.trigger()
+            await aperture_scatterguard.move_out.trigger()
 
-    We may then want to keep the assembly out of the beam whilst asynchronously preparing
-    the other axes for the aperture that's to follow:
+        We may then want to keep the assembly out of the beam whilst asynchronously preparing
+        the other axes for the aperture that's to follow::
 
-        await aperture_scatterguard.aperture_outside_beam.set(ApertureValue.LARGE)
+            await aperture_scatterguard.aperture_outside_beam.set(ApertureValue.LARGE)
 
-    Then, at a later time, move back into the beam:
+        Then, at a later time, move back into the beam::
 
-        await aperture_scatterguard.set(ApertureValue.LARGE)
+            await aperture_scatterguard.set(ApertureValue.LARGE)
 
-    This move will now be faster as only the y is left to move.
+        This move will now be faster as only the y is left to move.
     """
 
     def __init__(
