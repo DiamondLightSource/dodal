@@ -6,13 +6,13 @@ from ophyd_async.epics.signal import epics_signal_rw_rbv
 
 
 class PressureJumpCellTriggerMode(str, Enum):
-    internal = "Internal"
-    external = "Exernal"
+    INTERNAL = "Internal"
+    EXTERNAL = "Exernal"
 
 class PressureJumpCellAdcTriggerMode(str, Enum):
-    single = "Single"
-    multiple = "Multiple"
-    continuous = "Continuous"
+    SINGLE = "Single"
+    MULTIPLE = "Multiple"
+    CONTINUOUS = "Continuous"
 
 class PressureJumpCellDriverIO(adcore.ADBaseIO):
     def __init__(self, prefix: str, name: str = "") -> None:
