@@ -3,7 +3,7 @@ from typing import Optional, Tuple
 
 from ophyd_async.core import (
     AsyncStatus,
-    DetectorControl,
+    DetectorController,
     DetectorTrigger,
     set_and_wait_for_value,
 )
@@ -21,7 +21,9 @@ from .pressurejumpcell_io import (
 _HIGHEST_POSSIBLE_DEADTIME = 1e-3
 
 
-class PressureJumpCellController(DetectorControl):
+class PressureJumpCellController(DetectorController):
+    _supported_trigger_types = {
+    }
     
     def __init__(self, driver: PressureJumpCellDriverIO, adc: PressureJumpCellAdcIO) -> None:
         self._drv = driver
@@ -33,13 +35,13 @@ class PressureJumpCellController(DetectorControl):
     async def arm(
         self,
         num: int = 0,
-        trigger: DetectorTrigger = DetectorTrigger.internal,
+        trigger: DetectorTrigger = DetectorTrigger.INTERNAL,
         exposure: Optional[float] = None,
     ) -> AsyncStatus:
         if num == 0:
-            image_mode = adcore.ImageMode.continuous
+            image_mode = adcore.ImageMode.CONTINUOUS
         else:
-            image_mode = adcore.ImageMode.multiple
+            image_mode = adcore.ImageMode.MULTIPLE
         if exposure is not None:
             await self._drv.acquire_time.set(exposure)
 
@@ -61,8 +63,8 @@ class PressureJumpCellController(DetectorControl):
         self, trigger: DetectorTrigger
     ) -> Tuple[PressureJumpCellTriggerMode, PressureJumpCellAdcTriggerMode]:
         supported_trigger_types = (
-            DetectorTrigger.edge_trigger,
-            DetectorTrigger.internal,
+            DetectorTrigger.EDGE_TRIGGER,
+            DetectorTrigger.INTERNAL,
         )
         if trigger not in supported_trigger_types:
             raise ValueError(
@@ -70,10 +72,10 @@ class PressureJumpCellController(DetectorControl):
                 f"types: {supported_trigger_types} but was asked to "
                 f"use {trigger}"
             )
-        if trigger == DetectorTrigger.internal:
-            return (PressureJumpCellTriggerMode.internal, PressureJumpCellAdcTriggerMode.continuous)
+        if trigger == DetectorTrigger.INTERNAL:
+            return (PressureJumpCellTriggerMode.INTERNAL, PressureJumpCellAdcTriggerMode.CONTINUOUS)
         else:
-            return (PressureJumpCellTriggerMode.external, PressureJumpCellAdcTriggerMode.single)
+            return (PressureJumpCellTriggerMode.EXTERNAL, PressureJumpCellAdcTriggerMode.SINGLE)
 
     async def disarm(self):
         await asyncio.gather( 
