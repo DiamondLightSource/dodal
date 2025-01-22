@@ -8,6 +8,7 @@ from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
     Reference,
+    SignalR,
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
@@ -86,6 +87,15 @@ class Lookuptable(RootModel):
 ROW_PHASE_MOTOR_TOLERANCE = 0.004
 MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
 MAXIMUM_GAP_MOTOR_POSITION = 100
+
+
+async def estimate_motor_timeout(
+    setpoint: SignalR, curr_pos: SignalR, velocity: SignalR
+):
+    vel = await velocity.get_value()
+    cur_pos = await curr_pos.get_value()
+    target_pos = float(await setpoint.get_value())
+    return abs((target_pos - cur_pos) * 2.0 / vel) + 1
 
 
 class SafeUndulatorMover(StandardReadable, Movable):
@@ -170,19 +180,15 @@ class UndulatorGap(SafeUndulatorMover):
 
     async def _safe_set(self, value) -> float:
         await self.user_setpoint.set(value=str(value))
-        timeout = await self._cal_timeout()
+        timeout = await self.get_timeout()
         LOGGER.info(f"Moving {self.name} to {value} with timeout = {timeout}")
         await self.set_move.set(value=1, timeout=timeout)
         return timeout
 
-    async def _cal_timeout(self) -> float:
-        vel = await self.velocity.get_value()
-        cur_pos = await self.user_readback.get_value()
-        target_pos = float(await self.user_setpoint.get_value())
-        return abs((target_pos - cur_pos) * 2.0 / vel) + 1
-
     async def get_timeout(self) -> float:
-        return await self._cal_timeout()
+        return await estimate_motor_timeout(
+            self.user_setpoint, self.user_readback, self.velocity
+        )
 
 
 class UndulatorPhaseMotor(StandardReadable):
@@ -262,39 +268,26 @@ class UndulatorPhaseAxes(SafeUndulatorMover):
             self.btm_inner.user_setpoint.set(value=value.btm_inner),
             self.btm_outer.user_setpoint.set(value=value.btm_outer),
         )
-        timeout = await self._cal_timeout()
+        timeout = await self.get_timeout()
         await self.set_move.set(value=1, timeout=timeout)
         return timeout
 
-    async def _cal_timeout(self) -> float:
+    async def get_timeout(self) -> float:
         """
         Get all four motor speed, current positions and target positions to calculate required timeout.
         """
-        velos = await asyncio.gather(
-            self.top_outer.velocity.get_value(),
-            self.top_inner.velocity.get_value(),
-            self.btm_inner.velocity.get_value(),
-            self.btm_outer.velocity.get_value(),
+        axes = [self.top_outer, self.top_inner, self.btm_inner, self.btm_outer]
+        timeouts = await asyncio.gather(
+            *[
+                estimate_motor_timeout(
+                    axis.user_setpoint_demand_readback,
+                    axis.user_setpoint_readback,
+                    axis.velocity,
+                )
+                for axis in axes
+            ]
         )
-        target_pos = await asyncio.gather(
-            self.top_outer.user_setpoint_demand_readback.get_value(),
-            self.top_inner.user_setpoint_demand_readback.get_value(),
-            self.btm_inner.user_setpoint_demand_readback.get_value(),
-            self.btm_outer.user_setpoint_demand_readback.get_value(),
-        )
-        cur_pos = await asyncio.gather(
-            self.top_outer.user_setpoint_readback.get_value(),
-            self.top_inner.user_setpoint_readback.get_value(),
-            self.btm_inner.user_setpoint_readback.get_value(),
-            self.btm_outer.user_setpoint_readback.get_value(),
-        )
-        move_distances = tuple(np.subtract(target_pos, cur_pos))
-        move_times = np.abs(np.divide(move_distances, velos))
-        longest_move_time = np.max(move_times)
-        return longest_move_time * 2 + 1
-
-    async def get_timeout(self) -> float:
-        return await self._cal_timeout()
+        return np.max(timeouts)
 
 
 class UndulatorJawPhase(SafeUndulatorMover):
@@ -319,30 +312,20 @@ class UndulatorJawPhase(SafeUndulatorMover):
         super().__init__(prefix, name)
 
     async def _safe_set(self, value: float) -> float:
-        await asyncio.gather(
-            self.jaw_phase.user_setpoint.set(value=str(value)),
-        )
-        timeout = await self._cal_timeout()
+        await self.jaw_phase.user_setpoint.set(value=str(value))
+        timeout = await self.get_timeout()
         await self.set_move.set(value=1, timeout=timeout)
         return timeout
 
-    async def _cal_timeout(self) -> float:
+    async def get_timeout(self) -> float:
         """
         Get motor speed, current position and target position to calculate required timeout.
         """
-        velo, target_pos, cur_pos = await asyncio.gather(
-            self.jaw_phase.velocity.get_value(),
-            self.jaw_phase.user_setpoint_demand_readback.get_value(),
-            self.jaw_phase.user_setpoint_readback.get_value(),
+        return await estimate_motor_timeout(
+            self.jaw_phase.user_setpoint_demand_readback,
+            self.jaw_phase.user_setpoint_readback,
+            self.jaw_phase.velocity,
         )
-
-        move_distances = target_pos - cur_pos
-        move_times = np.abs(move_distances / velo)
-
-        return move_times * 2 + 1
-
-    async def get_timeout(self) -> float:
-        return await self._cal_timeout()
 
 
 class Apple2(StandardReadable, Movable):
