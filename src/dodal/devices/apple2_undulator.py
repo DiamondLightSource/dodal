@@ -128,11 +128,10 @@ class SafeUndulatorMover(StandardReadable, Movable):
     @abc.abstractmethod
     async def _set_demand_positions(self, value) -> None:
         """Set the demand positions on the device without actually hitting move."""
-        pass
 
     @abc.abstractmethod
     async def get_timeout(self) -> float:
-        pass
+        """Get the timeout for the move based on an estimate of how long it will take."""
 
     async def raise_if_cannot_move(self) -> None:
         if await self.fault.get_value() != 0:
