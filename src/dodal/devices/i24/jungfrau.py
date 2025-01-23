@@ -21,7 +21,7 @@ class AcquireState(StrictEnum):
 
 class WriteState(StrictEnum):
     DONE = "Done"
-    ACQUIRE = "Writing"
+    WRITE = "Writing"
 
 
 class GainMode(StrictEnum):
