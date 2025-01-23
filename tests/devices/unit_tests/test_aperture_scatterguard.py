@@ -287,13 +287,13 @@ async def test_aperture_positions_robot_load(
     set_mock_value(ap_sg.aperture.large, 0)
     set_mock_value(ap_sg.aperture.medium, 0)
     set_mock_value(ap_sg.aperture.small, 0)
-    robot_load = aperture_positions[ApertureValue.ROBOT_LOAD]
+    robot_load = aperture_positions[ApertureValue.OUT_OF_BEAM]
     await ap_sg.aperture.y.set(robot_load.aperture_y)
     reading = await ap_sg.read()
     assert isinstance(reading, dict)
     assert reading[f"{ap_sg.name}-radius"]["value"] == 0.0
     assert (
-        reading[f"{ap_sg.name}-selected_aperture"]["value"] == ApertureValue.ROBOT_LOAD
+        reading[f"{ap_sg.name}-selected_aperture"]["value"] == ApertureValue.OUT_OF_BEAM
     )
 
 
@@ -301,7 +301,7 @@ async def test_aperture_positions_robot_load_within_tolerance(
     ap_sg: ApertureScatterguard,
     aperture_positions: dict[ApertureValue, AperturePosition],
 ):
-    robot_load = aperture_positions[ApertureValue.ROBOT_LOAD]
+    robot_load = aperture_positions[ApertureValue.OUT_OF_BEAM]
     robot_load_ap_y = robot_load.aperture_y
     tolerance = ap_sg._tolerances.aperture_y
     set_mock_value(ap_sg.aperture.large, 0)
@@ -312,7 +312,7 @@ async def test_aperture_positions_robot_load_within_tolerance(
     assert isinstance(reading, dict)
     assert reading[f"{ap_sg.name}-radius"]["value"] == 0.0
     assert (
-        reading[f"{ap_sg.name}-selected_aperture"]["value"] == ApertureValue.ROBOT_LOAD
+        reading[f"{ap_sg.name}-selected_aperture"]["value"] == ApertureValue.OUT_OF_BEAM
     )
 
 
@@ -320,7 +320,7 @@ async def test_aperture_positions_robot_load_outside_tolerance(
     ap_sg: ApertureScatterguard,
     aperture_positions: dict[ApertureValue, AperturePosition],
 ):
-    robot_load = aperture_positions[ApertureValue.ROBOT_LOAD]
+    robot_load = aperture_positions[ApertureValue.OUT_OF_BEAM]
     robot_load_ap_y = robot_load.aperture_y
     tolerance = ap_sg._tolerances.aperture_y + 0.01
     set_mock_value(ap_sg.aperture.large, 0)
@@ -362,7 +362,7 @@ async def test_given_aperture_not_set_through_device_but_motors_in_position_when
         ApertureValue.SMALL,
         ApertureValue.MEDIUM,
         ApertureValue.LARGE,
-        ApertureValue.ROBOT_LOAD,
+        ApertureValue.OUT_OF_BEAM,
     ],
 )
 async def test_when_aperture_set_and_device_read_then_position_returned(
@@ -432,7 +432,7 @@ async def test_given_aperture_out_when_new_aperture_selected_then_aperture_not_m
     aperture_positions: dict[ApertureValue, AperturePosition],
 ):
     ap = ap_sg.aperture
-    y_set_point = aperture_positions[ApertureValue.ROBOT_LOAD].aperture_y
+    y_set_point = aperture_positions[ApertureValue.OUT_OF_BEAM].aperture_y
     ap.y.set(y_set_point)
     set_mock_value(ap.y.user_readback, y_set_point)
 
@@ -476,7 +476,7 @@ async def test_given_in_and_aperture_selected_when_move_out_then_only_aperture_y
 
     assert (
         await y_setpoint.get_value()
-        == aperture_positions[ApertureValue.ROBOT_LOAD].aperture_y
+        == aperture_positions[ApertureValue.OUT_OF_BEAM].aperture_y
     )
 
 
@@ -512,4 +512,4 @@ def test_aperture_enum_name_formatting():
     assert f"{ApertureValue.SMALL}" == "Small"
     assert f"{ApertureValue.MEDIUM}" == "Medium"
     assert f"{ApertureValue.LARGE}" == "Large"
-    assert f"{ApertureValue.ROBOT_LOAD}" == "Robot_load"
+    assert f"{ApertureValue.OUT_OF_BEAM}" == "Out of beam"

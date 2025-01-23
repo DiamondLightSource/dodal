@@ -25,6 +25,15 @@ class InvalidApertureMove(Exception):
     pass
 
 
+class _GDAParamApertureValue(StrictEnum):
+    """Maps from a short usable name to the value name in the GDA Beamline parameters"""
+
+    ROBOT_LOAD = "ROBOT_LOAD"
+    SMALL = "SMALL_APERTURE"
+    MEDIUM = "MEDIUM_APERTURE"
+    LARGE = "LARGE_APERTURE"
+
+
 class AperturePosition(BaseModel):
     """
     Represents one of the available positions for the Aperture-Scatterguard.
@@ -69,7 +78,7 @@ class AperturePosition(BaseModel):
 
     @staticmethod
     def from_gda_params(
-        name: ApertureValue,
+        name: _GDAParamApertureValue,
         radius: float,
         params: GDABeamlineParameters,
     ) -> AperturePosition:
@@ -84,32 +93,32 @@ class AperturePosition(BaseModel):
 
 
 class ApertureValue(StrictEnum):
-    """Maps from a short usable name to the value name in the GDA Beamline parameters"""
+    """The possible apertures that can be selected"""
 
-    ROBOT_LOAD = "ROBOT_LOAD"
-    SMALL = "SMALL_APERTURE"
-    MEDIUM = "MEDIUM_APERTURE"
-    LARGE = "LARGE_APERTURE"
+    SMALL = "Small"
+    MEDIUM = "Medium"
+    LARGE = "Large"
+    OUT_OF_BEAM = "Out of beam"
 
     def __str__(self):
-        return self.name.capitalize()
+        return self.value
 
 
 def load_positions_from_beamline_parameters(
     params: GDABeamlineParameters,
 ) -> dict[ApertureValue, AperturePosition]:
     return {
-        ApertureValue.ROBOT_LOAD: AperturePosition.from_gda_params(
-            ApertureValue.ROBOT_LOAD, 0, params
+        ApertureValue.OUT_OF_BEAM: AperturePosition.from_gda_params(
+            _GDAParamApertureValue.ROBOT_LOAD, 0, params
         ),
         ApertureValue.SMALL: AperturePosition.from_gda_params(
-            ApertureValue.SMALL, 20, params
+            _GDAParamApertureValue.SMALL, 20, params
         ),
         ApertureValue.MEDIUM: AperturePosition.from_gda_params(
-            ApertureValue.MEDIUM, 50, params
+            _GDAParamApertureValue.MEDIUM, 50, params
         ),
         ApertureValue.LARGE: AperturePosition.from_gda_params(
-            ApertureValue.LARGE, 100, params
+            _GDAParamApertureValue.LARGE, 100, params
         ),
     }
 
@@ -307,7 +316,7 @@ class ApertureScatterguard(StandardReadable, Movable):
 
         # Setting this will just move the assembly out of the beam
         self.move_out = OutTrigger(
-            self.aperture.y, loaded_positions[ApertureValue.ROBOT_LOAD].aperture_y
+            self.aperture.y, loaded_positions[ApertureValue.OUT_OF_BEAM].aperture_y
         )
 
         super().__init__(name)
@@ -337,8 +346,8 @@ class ApertureScatterguard(StandardReadable, Movable):
 
     async def _is_out_of_beam(self) -> bool:
         current_ap_y = await self.aperture.y.user_readback.get_value()
-        robot_load_ap_y = self._loaded_positions[ApertureValue.ROBOT_LOAD].aperture_y
-        return current_ap_y <= robot_load_ap_y + self._tolerances.aperture_y
+        out_ap_y = self._loaded_positions[ApertureValue.OUT_OF_BEAM].aperture_y
+        return current_ap_y <= out_ap_y + self._tolerances.aperture_y
 
     async def _get_current_aperture_position(self) -> ApertureValue:
         """
@@ -354,7 +363,7 @@ class ApertureScatterguard(StandardReadable, Movable):
         elif await self.aperture.small.get_value(cached=False) == 1:
             return ApertureValue.SMALL
         elif await self._is_out_of_beam():
-            return ApertureValue.ROBOT_LOAD
+            return ApertureValue.OUT_OF_BEAM
 
         raise InvalidApertureMove("Current aperture/scatterguard state unrecognised")
 
