@@ -70,3 +70,33 @@ class I02_1FilterFourSelections(SubsetEnum):
     TI300 = "Ti300"
     TI400 = "Ti400"
     TI500 = "Ti500"
+
+
+class I24_FilterOneSelections(SubsetEnum):
+    EMPTY = "Empty"
+    AL12_5 = "Al12.5"
+    AL25 = "Al25"
+    AL50 = "Al50"
+    AL75 = "Al75"
+    AL1000 = "Al1000"
+    AL2000 = "Al2000"
+    AL3000 = "Al3000"
+    PT25 = "Pt25"
+    TI500 = "Ti500"
+    TI_SOMETHING = "TiSomething"
+    TI_SOMETHING_2 = "TiSomething2"
+
+
+class I24_FilterTwoSelections(SubsetEnum):
+    EMPTY = "Empty"
+    AL100 = "Al100"
+    AL200 = "Al200"
+    AL300 = "Al300"
+    AL400 = "Al400"
+    AL500 = "Al500"
+    AL600 = "Al600"
+    AL700 = "Al700"
+    AL800 = "Al800"
+    AL900 = "Al900"
+    EMPTY_2 = "Empty"
+    SOMETHING = "something"

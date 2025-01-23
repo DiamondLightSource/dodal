@@ -24,7 +24,8 @@ class ReadOnlyAttenuator(StandardReadable):
 
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
-            self.actual_transmission = epics_signal_r(float, prefix + "MATCH")
+            self.actual_transmission = epics_signal_r(float, f"{prefix}MATCH")
+            self.actual_energy = epics_signal_r(float, f"{prefix}ENERGYMATCH")
 
         super().__init__(name)
 
@@ -103,7 +104,10 @@ class EnumFilterAttenuator(ReadOnlyAttenuator):
         filter_selection: tuple[type[SubsetEnum], ...],
         name: str = "",
     ):
+        self.transmission_setpoint = epics_signal_rw(float, f"{prefix}T2A:SETVAL1")
         with self.add_children_as_readables():
+            self.actual_wavelength = epics_signal_r(float, f"{prefix}WLMATCH")
+            self.actual_absorption = epics_signal_r(float, f"{prefix}ABSORBMATCH")
             self.filters: DeviceVector[FilterMotor] = DeviceVector(
                 {
                     index: FilterMotor(f"{prefix}MP{index + 1}:", filter, name)
