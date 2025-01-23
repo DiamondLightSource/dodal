@@ -9,6 +9,7 @@ from ophyd_async.core import (
     AsyncStatus,
     Reference,
     SignalR,
+    SignalW,
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
@@ -103,26 +104,33 @@ class SafeUndulatorMover(StandardReadable, Movable):
     wait for the undulator to be safe again before calling the move complete.
     """
 
-    def __init__(self, prefix: str, name: str):
+    def __init__(self, set_move: SignalW, prefix: str, name: str):
         # Gate keeper open when move is requested, closed when move is completed
         self.gate = epics_signal_r(UndulatorGateStatus, prefix + "BLGATE")
 
         split_pv = prefix.split("-")
         fault_pv = f"{split_pv[0]}-{split_pv[1]}-STAT-{split_pv[3]}ANYFAULT"
         self.fault = epics_signal_r(float, fault_pv)
+        self.set_move = set_move
         super().__init__(name)
 
     @AsyncStatus.wrap
     async def set(self, value) -> None:
         LOGGER.info(f"Setting {self.name} to {value}")
         await self.raise_if_cannot_move()
-        timeout = await self._safe_set(value)
+        await self._set_demand_positions(value)
+        timeout = await self.get_timeout()
+        LOGGER.info(f"Moving {self.name} to {value} with timeout = {timeout}")
+        await self.set_move.set(value=1, timeout=timeout)
         await wait_for_value(self.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
 
     @abc.abstractmethod
-    async def _safe_set(self, value) -> float:
-        """Set the device moving assuming checks have been performed. Returns the
-        expected time for the move."""
+    async def _set_demand_positions(self, value) -> None:
+        """Set the demand positions on the device without actually hitting move."""
+        pass
+
+    @abc.abstractmethod
+    async def get_timeout(self) -> float:
         pass
 
     async def raise_if_cannot_move(self) -> None:
@@ -176,14 +184,10 @@ class UndulatorGap(SafeUndulatorMover):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             # Gap readback value
             self.user_readback = epics_signal_r(float, prefix + "CURRGAPD")
-        super().__init__(prefix, name)
+        super().__init__(self.set_move, prefix, name)
 
-    async def _safe_set(self, value) -> float:
+    async def _set_demand_positions(self, value) -> None:
         await self.user_setpoint.set(value=str(value))
-        timeout = await self.get_timeout()
-        LOGGER.info(f"Moving {self.name} to {value} with timeout = {timeout}")
-        await self.set_move.set(value=1, timeout=timeout)
-        return timeout
 
     async def get_timeout(self) -> float:
         return await estimate_motor_timeout(
@@ -259,18 +263,15 @@ class UndulatorPhaseAxes(SafeUndulatorMover):
         # Nothing move until this is set to 1 and it will return to 0 when done.
         self.set_move = epics_signal_rw(int, f"{prefix}BL{top_outer}" + "MOVE")
 
-        super().__init__(prefix, name)
+        super().__init__(self.set_move, prefix, name)
 
-    async def _safe_set(self, value: Apple2PhasesVal) -> float:
+    async def _set_demand_positions(self, value: Apple2PhasesVal) -> None:
         await asyncio.gather(
             self.top_outer.user_setpoint.set(value=value.top_outer),
             self.top_inner.user_setpoint.set(value=value.top_inner),
             self.btm_inner.user_setpoint.set(value=value.btm_inner),
             self.btm_outer.user_setpoint.set(value=value.btm_outer),
         )
-        timeout = await self.get_timeout()
-        await self.set_move.set(value=1, timeout=timeout)
-        return timeout
 
     async def get_timeout(self) -> float:
         """
@@ -309,13 +310,10 @@ class UndulatorJawPhase(SafeUndulatorMover):
         # Nothing move until this is set to 1 and it will return to 0 when done
         self.set_move = epics_signal_rw(int, f"{prefix}BL{move_pv}" + "MOVE")
 
-        super().__init__(prefix, name)
+        super().__init__(self.set_move, prefix, name)
 
-    async def _safe_set(self, value: float) -> float:
+    async def _set_demand_positions(self, value: float) -> None:
         await self.jaw_phase.user_setpoint.set(value=str(value))
-        timeout = await self.get_timeout()
-        await self.set_move.set(value=1, timeout=timeout)
-        return timeout
 
     async def get_timeout(self) -> float:
         """
