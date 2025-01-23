@@ -522,3 +522,16 @@ def test_aperture_enum_name_formatting():
     assert f"{ApertureValue.MEDIUM}" == "Medium"
     assert f"{ApertureValue.LARGE}" == "Large"
     assert f"{ApertureValue.OUT_OF_BEAM}" == "Out of beam"
+
+
+async def test_calling_prepare_then_set_in_quick_succession_throws_an_error(
+    ap_sg: ApertureScatterguard,
+):
+    async def set_motor_moving(value, *args, **kwargs):
+        set_mock_value(ap_sg.aperture.x.motor_done_move, 0)
+
+    callback_on_mock_put(ap_sg.aperture.x.user_setpoint, set_motor_moving)
+    await ap_sg.prepare(ApertureValue.SMALL)
+
+    with pytest.raises(InvalidApertureMove):
+        await ap_sg.set(ApertureValue.SMALL)

@@ -199,14 +199,11 @@ class ApertureScatterguard(StandardReadable, Movable, Preparable):
     async def _check_safe_to_move(self, expected_z_position: float):
         """The assembly is moved (in z) to be under the table when the beamline is not
         in use. If we try and move whilst in the incorrect Z position we will collide
-        with the table."""
-        ap_z_in_position = await self.aperture.z.motor_done_move.get_value()
-        if not ap_z_in_position:
-            raise InvalidApertureMove(
-                "ApertureScatterguard z is still moving. Wait for it to finish "
-                "before triggering another move."
-            )
+        with the table.
 
+        Additionally, because there are so many collision possibilities in the device we
+        throw an error if any of the axes are already moving.
+        """
         current_ap_z = await self.aperture.z.user_readback.get_value()
         diff_on_z = abs(current_ap_z - expected_z_position)
         aperture_z_tolerance = self._tolerances.aperture_z
@@ -214,6 +211,21 @@ class ApertureScatterguard(StandardReadable, Movable, Preparable):
             raise InvalidApertureMove(
                 f"Current aperture z ({current_ap_z}), outside of tolerance ({aperture_z_tolerance}) from target ({expected_z_position})."
             )
+
+        all_axes = [
+            self.aperture.x,
+            self.aperture.y,
+            self.aperture.z,
+            self.scatterguard.x,
+            self.scatterguard.y,
+        ]
+        for axis in all_axes:
+            axis_stationary = await axis.motor_done_move.get_value()
+            if not axis_stationary:
+                raise InvalidApertureMove(
+                    f"{axis.name} is still moving. Wait for it to finish before"
+                    "triggering another move."
+                )
 
     async def _safe_move_whilst_in_beam(self, position: AperturePosition):
         """
