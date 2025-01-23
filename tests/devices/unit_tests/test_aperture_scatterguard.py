@@ -361,7 +361,6 @@ async def test_given_aperture_not_set_through_device_but_motors_in_position_when
         ApertureValue.SMALL,
         ApertureValue.MEDIUM,
         ApertureValue.LARGE,
-        ApertureValue.OUT_OF_BEAM,
     ],
 )
 async def test_when_aperture_set_and_device_read_then_position_returned(
@@ -469,7 +468,7 @@ async def test_given_in_and_aperture_selected_when_move_out_then_only_aperture_y
 
     assert await y_setpoint.get_value() == aperture_position.aperture_y
 
-    await ap_sg.move_out.trigger()
+    await ap_sg.set(ApertureValue.OUT_OF_BEAM)
     await assert_all_positions_other_than_y(ap_sg, aperture_position)
 
     assert (
@@ -489,7 +488,7 @@ async def test_given_out_and_aperture_selected_when_move_in_then_correct_y_selec
 ):
     y_setpoint = ap_sg.aperture.y.user_setpoint
     aperture_position = aperture_positions[selected_aperture]
-    await ap_sg.move_out.trigger()
+    await ap_sg.set(ApertureValue.OUT_OF_BEAM)
 
     await ap_sg.prepare(selected_aperture)
 

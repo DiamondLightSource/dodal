@@ -2,15 +2,13 @@ from __future__ import annotations
 
 import asyncio
 
-from bluesky.protocols import Movable, Preparable, Triggerable
+from bluesky.protocols import Movable, Preparable
 from ophyd_async.core import (
     AsyncStatus,
-    Reference,
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
 )
-from ophyd_async.epics.motor import Motor
 from pydantic import BaseModel, Field
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
@@ -121,24 +119,6 @@ def load_positions_from_beamline_parameters(
     }
 
 
-class OutTrigger(StandardReadable, Triggerable):
-    """Allows for moving just the Y stage of the assembly out of the beam."""
-
-    def __init__(
-        self,
-        aperture_y: Motor,
-        out_y: float,
-    ):
-        self.aperture_y = Reference(aperture_y)
-        self.out_y = out_y
-        super().__init__()
-
-    @AsyncStatus.wrap
-    async def trigger(self):
-        """Moves the assembly out of the beam."""
-        await self.aperture_y().set(self.out_y)
-
-
 class ApertureScatterguard(StandardReadable, Movable, Preparable):
     """Move the aperture and scatterguard assembly in a safe way. There are two ways to
     interact with the device depending on if you want simplicity or move flexibility.
@@ -151,10 +131,12 @@ class ApertureScatterguard(StandardReadable, Movable, Preparable):
         This will move the assembly so that the large aperture is in the beam, regardless
         of where the assembly currently is.
 
-        However, the aperture Y axis is faster than the others. In some cases we may want to
-        move the assembly out of the beam with this axis without moving others::
+        We may also want to move the assembly out of the beam with::
 
-            await aperture_scatterguard.move_out.trigger()
+            await aperture_scatterguard.set(ApertureValue.OUT_OF_BEAM)
+
+        Note, to make sure we do this as quickly as possible, the scatterguard will stay
+        in the same position relative to the aperture.
 
         We may then want to keep the assembly out of the beam whilst asynchronously preparing
         the other axes for the aperture that's to follow::
@@ -165,7 +147,8 @@ class ApertureScatterguard(StandardReadable, Movable, Preparable):
 
             await aperture_scatterguard.set(ApertureValue.LARGE)
 
-        This move will now be faster as only the y is left to move.
+        Given the prepare has been done this move will now be faster as only the y is
+        left to move.
     """
 
     def __init__(
@@ -198,18 +181,20 @@ class ApertureScatterguard(StandardReadable, Movable, Preparable):
                 ApertureValue, self._get_current_aperture_position
             )
 
-        # Setting this will just move the assembly out of the beam
-        self.move_out = OutTrigger(
-            self.aperture.y, loaded_positions[ApertureValue.OUT_OF_BEAM].aperture_y
-        )
-
         super().__init__(name)
 
     @AsyncStatus.wrap
     async def set(self, value: ApertureValue):
-        """This set will move the aperture into the beam or move to robot load"""
-        position = self._loaded_positions[value]
-        await self._safe_move_whilst_in_beam(position)
+        """This set will move the aperture into the beam or move the whole assembly out"""
+
+        # Should check z here
+
+        if value == ApertureValue.OUT_OF_BEAM:
+            out_y = self._loaded_positions[ApertureValue.OUT_OF_BEAM].aperture_y
+            await self.aperture.y.set(out_y)
+        else:
+            position = self._loaded_positions[value]
+            await self._safe_move_whilst_in_beam(position)
 
     async def _safe_move_whilst_in_beam(self, position: AperturePosition):
         """
@@ -329,4 +314,4 @@ class ApertureScatterguard(StandardReadable, Movable, Preparable):
                 self.scatterguard.y.set(scatterguard_y),
             )
         else:
-            await self._safe_move_whilst_in_beam(self._loaded_positions[value])
+            await self.set(value)
