@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 import asyncio
-from collections.abc import Callable, Coroutine
-from typing import Any
 
-from bluesky.protocols import Movable, Triggerable
+from bluesky.protocols import Movable, Preparable, Triggerable
 from ophyd_async.core import (
     AsyncStatus,
     Reference,
@@ -123,111 +121,6 @@ def load_positions_from_beamline_parameters(
     }
 
 
-async def _safe_move_whilst_in_beam(
-    aperture: Aperture,
-    scatterguard: Scatterguard,
-    position: AperturePosition,
-    aperture_z_tolerance: float,
-):
-    """
-    Move the aperture and scatterguard combo safely to a new position.
-    See https://github.com/DiamondLightSource/hyperion/wiki/Aperture-Scatterguard-Collisions
-    for why this is required. TLDR is that we have a collision at the top of y so we need
-    to make sure we move the assembly down before we move the scatterguard up.
-
-    We also check that the assembly has been moved into the correct z position
-    previously. If we try and move whilst in the incorrect Z position we will collide
-    with the table.
-    """
-    ap_z_in_position = await aperture.z.motor_done_move.get_value()
-    if not ap_z_in_position:
-        raise InvalidApertureMove(
-            "ApertureScatterguard z is still moving. Wait for it to finish "
-            "before triggering another move."
-        )
-
-    current_ap_z = await aperture.z.user_readback.get_value()
-    diff_on_z = abs(current_ap_z - position.aperture_z)
-    if diff_on_z > aperture_z_tolerance:
-        raise InvalidApertureMove(
-            f"Current aperture z ({current_ap_z}), outside of tolerance ({aperture_z_tolerance}) from target ({position.aperture_z})."
-        )
-
-    current_ap_y = await aperture.y.user_readback.get_value()
-
-    aperture_x, aperture_y, aperture_z, scatterguard_x, scatterguard_y = position.values
-
-    if aperture_y > current_ap_y:
-        # Assembly needs to move up so move the scatterguard down first
-        await asyncio.gather(
-            scatterguard.x.set(scatterguard_x),
-            scatterguard.y.set(scatterguard_y),
-        )
-        await asyncio.gather(
-            aperture.x.set(aperture_x),
-            aperture.y.set(aperture_y),
-            aperture.z.set(aperture_z),
-        )
-    else:
-        await asyncio.gather(
-            aperture.x.set(aperture_x),
-            aperture.y.set(aperture_y),
-            aperture.z.set(aperture_z),
-        )
-
-        await asyncio.gather(
-            scatterguard.x.set(scatterguard_x),
-            scatterguard.y.set(scatterguard_y),
-        )
-
-
-class ApertureSelector(StandardReadable, Movable):
-    """Allows for moving all axes other than Y into the correct position, this means
-    that we can set up the aperture while it is out of the beam then move it in later."""
-
-    def __init__(
-        self,
-        aperture: Aperture,
-        scatterguard: Scatterguard,
-        out_of_beam: Callable[[], Coroutine[Any, Any, bool]],
-        loaded_positions: dict[ApertureValue, AperturePosition],
-        aperture_z_tolerance: float,
-    ):
-        self.aperture = Reference(aperture)
-        self.scatterguard = Reference(scatterguard)
-        self.loaded_positions = loaded_positions
-        self.get_is_out_of_beam = out_of_beam
-        self.aperture_z_tolerance = aperture_z_tolerance
-        super().__init__()
-
-    @AsyncStatus.wrap
-    async def set(self, value: ApertureValue):
-        """Moves the assembly to the position for the specified aperture, whilst keeping
-        it out of the beam if it already is so.
-
-        Moving the assembly whilst out of the beam has no collision risk so we can just
-        move all the motors together.
-        """
-        if await self.get_is_out_of_beam():
-            aperture_x, _, aperture_z, scatterguard_x, scatterguard_y = (
-                self.loaded_positions[value].values
-            )
-
-            await asyncio.gather(
-                self.aperture().x.set(aperture_x),
-                self.aperture().z.set(aperture_z),
-                self.scatterguard().x.set(scatterguard_x),
-                self.scatterguard().y.set(scatterguard_y),
-            )
-        else:
-            await _safe_move_whilst_in_beam(
-                self.aperture(),
-                self.scatterguard(),
-                self.loaded_positions[value],
-                self.aperture_z_tolerance,
-            )
-
-
 class OutTrigger(StandardReadable, Triggerable):
     """Allows for moving just the Y stage of the assembly out of the beam."""
 
@@ -246,7 +139,7 @@ class OutTrigger(StandardReadable, Triggerable):
         await self.aperture_y().set(self.out_y)
 
 
-class ApertureScatterguard(StandardReadable, Movable):
+class ApertureScatterguard(StandardReadable, Movable, Preparable):
     """Move the aperture and scatterguard assembly in a safe way. There are two ways to
     interact with the device depending on if you want simplicity or move flexibility.
 
@@ -266,7 +159,7 @@ class ApertureScatterguard(StandardReadable, Movable):
         We may then want to keep the assembly out of the beam whilst asynchronously preparing
         the other axes for the aperture that's to follow::
 
-            await aperture_scatterguard.aperture_outside_beam.set(ApertureValue.LARGE)
+            await aperture_scatterguard.prepare(ApertureValue.LARGE)
 
         Then, at a later time, move back into the beam::
 
@@ -305,15 +198,6 @@ class ApertureScatterguard(StandardReadable, Movable):
                 ApertureValue, self._get_current_aperture_position
             )
 
-        # Setting this will select the aperture but not move it into beam
-        self.aperture_outside_beam = ApertureSelector(
-            self.aperture,
-            self.scatterguard,
-            self._is_out_of_beam,
-            self._loaded_positions,
-            self._tolerances.aperture_z,
-        )
-
         # Setting this will just move the assembly out of the beam
         self.move_out = OutTrigger(
             self.aperture.y, loaded_positions[ApertureValue.OUT_OF_BEAM].aperture_y
@@ -325,9 +209,63 @@ class ApertureScatterguard(StandardReadable, Movable):
     async def set(self, value: ApertureValue):
         """This set will move the aperture into the beam or move to robot load"""
         position = self._loaded_positions[value]
-        await _safe_move_whilst_in_beam(
-            self.aperture, self.scatterguard, position, self._tolerances.aperture_z
+        await self._safe_move_whilst_in_beam(position)
+
+    async def _safe_move_whilst_in_beam(self, position: AperturePosition):
+        """
+        Move the aperture and scatterguard combo safely to a new position.
+        See https://github.com/DiamondLightSource/hyperion/wiki/Aperture-Scatterguard-Collisions
+        for why this is required. TLDR is that we have a collision at the top of y so we need
+        to make sure we move the assembly down before we move the scatterguard up.
+
+        We also check that the assembly has been moved into the correct z position
+        previously. If we try and move whilst in the incorrect Z position we will collide
+        with the table.
+        """
+
+        ap_z_in_position = await self.aperture.z.motor_done_move.get_value()
+        if not ap_z_in_position:
+            raise InvalidApertureMove(
+                "ApertureScatterguard z is still moving. Wait for it to finish "
+                "before triggering another move."
+            )
+
+        current_ap_z = await self.aperture.z.user_readback.get_value()
+        diff_on_z = abs(current_ap_z - position.aperture_z)
+        aperture_z_tolerance = self._tolerances.aperture_z
+        if diff_on_z > aperture_z_tolerance:
+            raise InvalidApertureMove(
+                f"Current aperture z ({current_ap_z}), outside of tolerance ({aperture_z_tolerance}) from target ({position.aperture_z})."
+            )
+
+        current_ap_y = await self.aperture.y.user_readback.get_value()
+
+        aperture_x, aperture_y, aperture_z, scatterguard_x, scatterguard_y = (
+            position.values
         )
+
+        if aperture_y > current_ap_y:
+            # Assembly needs to move up so move the scatterguard down first
+            await asyncio.gather(
+                self.scatterguard.x.set(scatterguard_x),
+                self.scatterguard.y.set(scatterguard_y),
+            )
+            await asyncio.gather(
+                self.aperture.x.set(aperture_x),
+                self.aperture.y.set(aperture_y),
+                self.aperture.z.set(aperture_z),
+            )
+        else:
+            await asyncio.gather(
+                self.aperture.x.set(aperture_x),
+                self.aperture.y.set(aperture_y),
+                self.aperture.z.set(aperture_z),
+            )
+
+            await asyncio.gather(
+                self.scatterguard.x.set(scatterguard_x),
+                self.scatterguard.y.set(scatterguard_y),
+            )
 
     @AsyncStatus.wrap
     async def _set_raw_unsafe(self, position: AperturePosition):
@@ -370,3 +308,25 @@ class ApertureScatterguard(StandardReadable, Movable):
     async def _get_current_radius(self) -> float:
         current_value = await self._get_current_aperture_position()
         return self._loaded_positions[current_value].radius
+
+    @AsyncStatus.wrap
+    async def prepare(self, value: ApertureValue):
+        """Moves the assembly to the position for the specified aperture, whilst keeping
+        it out of the beam if it already is so.
+
+        Moving the assembly whilst out of the beam has no collision risk so we can just
+        move all the motors together.
+        """
+        if await self._is_out_of_beam():
+            aperture_x, _, aperture_z, scatterguard_x, scatterguard_y = (
+                self._loaded_positions[value].values
+            )
+
+            await asyncio.gather(
+                self.aperture.x.set(aperture_x),
+                self.aperture.z.set(aperture_z),
+                self.scatterguard.x.set(scatterguard_x),
+                self.scatterguard.y.set(scatterguard_y),
+            )
+        else:
+            await self._safe_move_whilst_in_beam(self._loaded_positions[value])
