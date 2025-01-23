@@ -25,9 +25,9 @@ class WriteState(StrictEnum):
 
 
 class GainMode(StrictEnum):
-    dynamic = "dynamic"
-    forceswitchg1 = "forceswitchg1"
-    forceswitchg2 = "forceswitchg2"
+    DYNAMIC = "dynamic"
+    FORCESWITCHG1 = "forceswitchg1"
+    FORCESWITCHG1 = "forceswitchg2"
 
 
 # NOTE In the future, might want to switch this to standard detector?
