@@ -1,4 +1,5 @@
 # type: ignore # Eiger will soon be ophyd-async https://github.com/DiamondLightSource/dodal/issues/700
+import time
 from dataclasses import dataclass
 from enum import Enum
 
@@ -70,6 +71,7 @@ class EigerDetector(Device):
         self.beamline = beamline
         # using i03 timeouts as default
         self.timeouts = AVAILABLE_TIMEOUTS.get(beamline, AVAILABLE_TIMEOUTS["i03"])
+        self.start = time.time()
 
     @classmethod
     def with_params(
@@ -218,6 +220,8 @@ class EigerDetector(Device):
         return status
 
     def set_cam_pvs(self) -> AndStatus:
+        LOGGER.info(f"set_detector_threshold: {time.time() - self.start}")
+        self.start = time.time()
         assert self.detector_params is not None
         status = self.cam.acquire_time.set(
             self.detector_params.exposure_time,
@@ -240,6 +244,8 @@ class EigerDetector(Device):
         return status
 
     def set_odin_number_of_frame_chunks(self) -> Status:
+        LOGGER.info(f"set_cam_pvs: {time.time - self.start}")
+        self.start = time.time()
         assert self.detector_params is not None
         status = self.odin.file_writer.num_frames_chunks.set(
             1, timeout=self.timeouts.general_status_timeout
@@ -247,6 +253,8 @@ class EigerDetector(Device):
         return status
 
     def set_odin_pvs(self) -> StatusBase:
+        LOGGER.info(f"set_odin_number_of_frame_chunks: {time.time() - self.start}")
+        self.start = time.time()
         assert self.detector_params is not None
         file_prefix = self.detector_params.full_filename
         status = self.odin.file_writer.file_path.set(
@@ -268,6 +276,8 @@ class EigerDetector(Device):
         return status
 
     def set_mx_settings_pvs(self):
+        LOGGER.info(f"set_odin_pvs: {time.time() - self.start}")
+        self.start = time.time()
         assert self.detector_params is not None
         beam_x_pixels, beam_y_pixels = self.detector_params.get_beam_position_pixels(
             self.detector_params.detector_distance
@@ -300,7 +310,8 @@ class EigerDetector(Device):
             tolerance (float, optional): If the energy is already set to within
                 this tolerance it is not set again. Defaults to 0.1eV.
         """
-
+        LOGGER.info(f"change_dev_shm: {time.time() - self.start}")
+        self.start = time.time()
         current_energy = self.cam.photon_energy.get()
         if abs(current_energy - energy) > tolerance:
             return self.cam.photon_energy.set(
@@ -316,7 +327,8 @@ class EigerDetector(Device):
         during the datacollection. The number of images is the number of images per
         trigger.
         """
-
+        LOGGER.info(f"set_mx_settings_pvs: {time.time() - self.start}")
+        self.start = time.time()
         assert self.detector_params is not None
         status = self.cam.num_images.set(
             self.detector_params.num_images_per_trigger,
@@ -344,6 +356,8 @@ class EigerDetector(Device):
         return status
 
     def _wait_for_odin_status(self) -> StatusBase:
+        LOGGER.info(f"stale_params: {time.time() - self.start}")
+        self.start = time.time()
         self.forward_bit_depth_to_filewriter()
         await_value(self.odin.meta.active, 1).wait(self.timeouts.general_status_timeout)
 
@@ -357,11 +371,15 @@ class EigerDetector(Device):
         return status
 
     def _wait_fan_ready(self) -> StatusBase:
+        LOGGER.info(f"cam.acquire.set: {time.time() - self.start}")
+        self.start = time.time()
         self.filewriters_finished = self.odin.create_finished_status()
         LOGGER.info("Eiger staging: awaiting odin fan ready")
         return await_value(self.odin.fan.ready, 1, self.timeouts.general_status_timeout)
 
     def _finish_arm(self) -> Status:
+        LOGGER.info(f"_wait_fan_ready: {time.time() - self.start}")
+        self.start = time.time()
         LOGGER.info("Eiger staging: Finishing arming")
         status = Status()
         status.set_finished()
@@ -375,10 +393,30 @@ class EigerDetector(Device):
 
     def change_dev_shm(self, enable_dev_shm: bool):
         LOGGER.info(f"{'Enabling' if enable_dev_shm else 'Disabling'} dev shm")
+        LOGGER.indo(f"odin.stop: {time.time() - self.start}")
+        self.start = time.time()
         return self.odin.fan.dev_shm_enable.set(1 if enable_dev_shm else 0)
 
     def disarm_detector(self):
         self.cam.acquire.set(0).wait(self.timeouts.general_status_timeout)
+
+    def stop_odin(self):
+        LOGGER.info(f"do_arming_chain: {time.time() - self.start}")
+        self.start = time.time()
+        status = self.odin.stop
+        return status
+
+    def acquire_cam(self, value, timeout):
+        LOGGER.info(f"_wait_for_odin_status: {time.time() - self.start}")
+        self.start = time.time()
+        status = self.cam.acquire.set(value, timeout)
+        return status
+
+    def wait_stale_params(self, subscribable, expected_value, timeout):
+        LOGGER.info(f"set_num_triggers_and_captures: {time.time() - self.start}")
+        self.start = time.time()
+        status = await_value(subscribable, expected_value, timeout)
+        return status
 
     def do_arming_chain(self) -> Status:
         functions_to_do_arm = []
@@ -386,12 +424,12 @@ class EigerDetector(Device):
         detector_params: DetectorParams = self.detector_params
         if detector_params.use_roi_mode:
             functions_to_do_arm.append(self.enable_roi_mode)
-
+        self.start = time.time()
         arming_sequence_funcs = [
             # If a beam dump occurs after arming the eiger but prior to eiger staging,
             # the odin may timeout which will cause the arming sequence to be retried;
             # if this previously completed successfully we must reset the odin first
-            self.odin.stop,
+            self.stop_odin,
             lambda: self.change_dev_shm(detector_params.enable_dev_shm),
             lambda: self.set_detector_threshold(detector_params.expected_energy_ev),
             self.set_cam_pvs,
@@ -399,11 +437,9 @@ class EigerDetector(Device):
             self.set_odin_pvs,
             self.set_mx_settings_pvs,
             self.set_num_triggers_and_captures,
-            lambda: await_value(self.stale_params, 0, 60),
+            lambda: self.wait_stale_params(self.stale_params, 0, 60),
             self._wait_for_odin_status,
-            lambda: self.cam.acquire.set(
-                1, timeout=self.timeouts.general_status_timeout
-            ),
+            lambda: self.acquire_cam(1, timeout=self.timeouts.general_status_timeout),
             self._wait_fan_ready,
             self._finish_arm,
         ]
