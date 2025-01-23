@@ -304,7 +304,7 @@ def beam_params(
     """
     return device_instantiation(
         device_factory=ReadOnlyEnergyAndAttenuator,
-        name="jungfrau_m1",
+        name="beam_params",
         prefix="",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
