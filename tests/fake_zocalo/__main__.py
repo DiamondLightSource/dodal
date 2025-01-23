@@ -67,9 +67,9 @@ def get_dcgid_and_prefix(dcid: int, session_maker: sessionmaker) -> tuple[int, s
                 .filter(DataCollection.dataCollectionId == dcid)
                 .first()
             )
-            assert (
-                query is not None
-            ), f"Failed to find dcid {dcid} which matches any in dev ispyb"
+            assert query is not None, (
+                f"Failed to find dcid {dcid} which matches any in dev ispyb"
+            )
             dcgid, prefix = query
 
     except Exception as e:

@@ -55,7 +55,7 @@ def make_crystal_metadata_from_material(
     d_spacing = d_spacing_param or CrystalMetadata.calculate_default_d_spacing(
         material.value.lattice_parameter, reflection_plane
     )
-    assert all(
-        isinstance(i, int) and i > 0 for i in reflection_plane
-    ), "Reflection plane indices must be positive integers"
+    assert all(isinstance(i, int) and i > 0 for i in reflection_plane), (
+        "Reflection plane indices must be positive integers"
+    )
     return CrystalMetadata(usage, material.value.name, reflection_plane, d_spacing)

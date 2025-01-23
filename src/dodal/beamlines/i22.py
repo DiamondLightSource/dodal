@@ -16,6 +16,7 @@ from dodal.common.crystal_metadata import (
     make_crystal_metadata_from_material,
 )
 from dodal.common.visit import RemoteDirectoryServiceClient, StaticVisitPathProvider
+from dodal.devices.bimorph_mirror import BimorphMirror
 from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.i22.dcm import DoubleCrystalMonochromator
 from dodal.devices.i22.fswitch import FSwitch
@@ -122,6 +123,20 @@ def vfm() -> FocusingMirror:
 def hfm() -> FocusingMirror:
     return FocusingMirror(
         prefix=f"{PREFIX.beamline_prefix}-OP-KBM-01:HFM:",
+    )
+
+
+@device_factory()
+def bimorph_hfm() -> BimorphMirror:
+    return BimorphMirror(
+        prefix=f"{PREFIX.beamline_prefix}-OP-KBM-01:G0:", number_of_channels=12
+    )
+
+
+@device_factory()
+def bimorph_vfm() -> BimorphMirror:
+    return BimorphMirror(
+        prefix=f"{PREFIX.beamline_prefix}-OP-KBM-01:G1:", number_of_channels=16
     )
 
 

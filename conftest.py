@@ -53,9 +53,9 @@ def patch_open_to_prevent_dls_reads_in_tests():
         requested_path = Path(args[0])
         if requested_path.is_absolute():
             for p in BANNED_PATHS:
-                assert not requested_path.is_relative_to(
-                    p
-                ), f"Attempt to open {requested_path} from inside a unit test"
+                assert not requested_path.is_relative_to(p), (
+                    f"Attempt to open {requested_path} from inside a unit test"
+                )
         return unpatched_open(*args, **kwargs)
 
     with patch("builtins.open", side_effect=patched_open):

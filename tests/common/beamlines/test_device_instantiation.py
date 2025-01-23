@@ -29,9 +29,9 @@ def test_device_creation(RE, module_and_devices_for_beamline):
         for name, device in devices.items()
         if not follows_bluesky_protocols(device)
     ]
-    assert (
-        len(devices_not_following_bluesky_protocols) == 0
-    ), f"{devices_not_following_bluesky_protocols} do not follow bluesky protocols"
+    assert len(devices_not_following_bluesky_protocols) == 0, (
+        f"{devices_not_following_bluesky_protocols} do not follow bluesky protocols"
+    )
 
 
 @pytest.mark.parametrize(
@@ -56,6 +56,6 @@ def test_devices_are_identical(RE, module_and_devices_for_beamline):
     ]
     total_number_of_devices = len(devices_a)
     non_identical_number_of_devies = len(devices_a)
-    assert (
-        len(non_identical_names) == 0
-    ), f"{non_identical_number_of_devies}/{total_number_of_devices} devices were not identical: {non_identical_names}"
+    assert len(non_identical_names) == 0, (
+        f"{non_identical_number_of_devies}/{total_number_of_devices} devices were not identical: {non_identical_names}"
+    )

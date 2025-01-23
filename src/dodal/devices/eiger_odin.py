@@ -91,10 +91,10 @@ class OdinNodesStatus(Device):
     def wait_for_no_errors(self, timeout) -> dict[SubscriptionStatus, str]:
         errors = {}
         for node_number, node_pv in enumerate(self.nodes):
-            errors[
-                await_value(node_pv.error_status, False, timeout)
-            ] = f"Filewriter {node_number} is in an error state with error message\
+            errors[await_value(node_pv.error_status, False, timeout)] = (
+                f"Filewriter {node_number} is in an error state with error message\
                      - {node_pv.error_message.get()}"
+            )
 
         return errors
 

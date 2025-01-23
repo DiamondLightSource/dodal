@@ -1,6 +1,6 @@
 from dodal.common.beamlines.beamline_utils import BL, device_instantiation
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.attenuator import ReadOnlyAttenuator
+from dodal.devices.attenuator.attenuator import ReadOnlyAttenuator
 from dodal.devices.detector import DetectorParams
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.hutch_shutter import HutchShutter
@@ -16,7 +16,12 @@ from dodal.devices.i24.pmac import PMAC
 from dodal.devices.i24.vgonio import VerticalGoniometer
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.oav_parameters import OAVConfig
-from dodal.devices.zebra import Zebra
+from dodal.devices.zebra.zebra import Zebra
+from dodal.devices.zebra.zebra_constants_mapping import (
+    ZebraMapping,
+    ZebraSources,
+    ZebraTTLOutputs,
+)
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import get_beamline_name, skip_device
 
@@ -25,9 +30,15 @@ ZOOM_PARAMS_FILE = (
 )
 DISPLAY_CONFIG = "/dls_sw/i24/software/gda_versions/var/display.configuration"
 
+
 BL = get_beamline_name("s24")
 set_log_beamline(BL)
 set_utils_beamline(BL)
+
+I24_ZEBRA_MAPPING = ZebraMapping(
+    outputs=ZebraTTLOutputs(TTL_EIGER=1, TTL_PILATUS=2, TTL_FAST_SHUTTER=4),
+    sources=ZebraSources(),
+)
 
 
 def attenuator(
@@ -191,6 +202,7 @@ def zebra(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -
         "-EA-ZEBRA-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        mapping=I24_ZEBRA_MAPPING,
     )
 
 

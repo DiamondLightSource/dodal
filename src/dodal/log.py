@@ -152,7 +152,7 @@ def set_up_graylog_handler(logger: Logger, host: str, port: int):
 def set_up_INFO_file_handler(logger, path: Path, filename: str):
     """Set up a file handler for the logger, at INFO level, which will keep 30 days
     of logs, rotating once per day. Creates the directory if necessary."""
-    print(f"Logging to INFO file handler {path/filename}")
+    print(f"Logging to INFO file handler {path / filename}")
     path.mkdir(parents=True, exist_ok=True)
     file_handler = TimedRotatingFileHandler(
         filename=path / filename, when="MIDNIGHT", backupCount=INFO_LOG_DAYS
@@ -169,7 +169,7 @@ def set_up_DEBUG_memory_handler(
     log file when it sees a message of severity ERROR. Creates the directory if
     necessary"""
     debug_path = path / "debug"
-    print(f"Logging to DEBUG handler {debug_path/filename}")
+    print(f"Logging to DEBUG handler {debug_path / filename}")
     debug_path.mkdir(parents=True, exist_ok=True)
     file_handler = TimedRotatingFileHandler(
         filename=debug_path / filename, when="H", backupCount=DEBUG_LOG_FILES_TO_KEEP

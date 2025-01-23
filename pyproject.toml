@@ -44,6 +44,7 @@ requires-python = ">=3.10"
 dev = [
     "black",
     "diff-cover",
+    "import-linter",
     "mypy",
     # Commented out due to dependency version conflict with pydantic 1.x
     # "copier",
@@ -181,3 +182,17 @@ lint.select = [
 # Remove this line to forbid private member access in tests
 "tests/**/*" = ["SLF001"]
 "system_tests/**/*" = ["SLF001"]
+
+[tool.importlinter]
+root_package = "dodal"
+
+[[tool.importlinter.contracts]]
+name = "Common cannot import from beamlines"
+type = "forbidden"
+source_modules = ["dodal.common"]
+forbidden_modules = ["dodal.beamlines"]
+
+[[tool.importlinter.contracts]]
+name = "Enforce import order"
+type = "layers"
+layers = ["dodal.plans", "dodal.beamlines", "dodal.devices"]

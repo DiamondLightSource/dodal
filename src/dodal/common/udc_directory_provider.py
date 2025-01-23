@@ -46,7 +46,9 @@ class PandASubpathProvider(UpdatingPathProvider):
         self._filename_provider.suffix = suffix
 
     def __call__(self, device_name: str | None = None) -> PathInfo:
-        assert self._output_directory, "Directory unknown for PandA to write into, update() needs to be called at least once"
+        assert self._output_directory, (
+            "Directory unknown for PandA to write into, update() needs to be called at least once"
+        )
         return PathInfo(
             directory_path=self._output_directory,
             filename=self._filename_provider(device_name),
