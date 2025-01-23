@@ -187,27 +187,19 @@ class ApertureScatterguard(StandardReadable, Movable, Preparable):
     async def set(self, value: ApertureValue):
         """This set will move the aperture into the beam or move the whole assembly out"""
 
-        # Should check z here
+        position = self._loaded_positions[value]
+        await self._check_safe_to_move(position.aperture_z)
 
         if value == ApertureValue.OUT_OF_BEAM:
             out_y = self._loaded_positions[ApertureValue.OUT_OF_BEAM].aperture_y
             await self.aperture.y.set(out_y)
         else:
-            position = self._loaded_positions[value]
             await self._safe_move_whilst_in_beam(position)
 
-    async def _safe_move_whilst_in_beam(self, position: AperturePosition):
-        """
-        Move the aperture and scatterguard combo safely to a new position.
-        See https://github.com/DiamondLightSource/hyperion/wiki/Aperture-Scatterguard-Collisions
-        for why this is required. TLDR is that we have a collision at the top of y so we need
-        to make sure we move the assembly down before we move the scatterguard up.
-
-        We also check that the assembly has been moved into the correct z position
-        previously. If we try and move whilst in the incorrect Z position we will collide
-        with the table.
-        """
-
+    async def _check_safe_to_move(self, expected_z_position: float):
+        """The assembly is moved (in z) to be under the table when the beamline is not
+        in use. If we try and move whilst in the incorrect Z position we will collide
+        with the table."""
         ap_z_in_position = await self.aperture.z.motor_done_move.get_value()
         if not ap_z_in_position:
             raise InvalidApertureMove(
@@ -216,13 +208,20 @@ class ApertureScatterguard(StandardReadable, Movable, Preparable):
             )
 
         current_ap_z = await self.aperture.z.user_readback.get_value()
-        diff_on_z = abs(current_ap_z - position.aperture_z)
+        diff_on_z = abs(current_ap_z - expected_z_position)
         aperture_z_tolerance = self._tolerances.aperture_z
         if diff_on_z > aperture_z_tolerance:
             raise InvalidApertureMove(
-                f"Current aperture z ({current_ap_z}), outside of tolerance ({aperture_z_tolerance}) from target ({position.aperture_z})."
+                f"Current aperture z ({current_ap_z}), outside of tolerance ({aperture_z_tolerance}) from target ({expected_z_position})."
             )
 
+    async def _safe_move_whilst_in_beam(self, position: AperturePosition):
+        """
+        Move the aperture and scatterguard combo safely to a new position.
+        See https://github.com/DiamondLightSource/hyperion/wiki/Aperture-Scatterguard-Collisions
+        for why this is required. TLDR is that we have a collision at the top of y so we need
+        to make sure we move the assembly down before we move the scatterguard up.
+        """
         current_ap_y = await self.aperture.y.user_readback.get_value()
 
         aperture_x, aperture_y, aperture_z, scatterguard_x, scatterguard_y = (
