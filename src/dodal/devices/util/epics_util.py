@@ -8,7 +8,7 @@ from ophyd.status import Status, StatusBase
 from ophyd_async.core import AsyncStatus, wait_for_value
 from ophyd_async.core import Device as OphydAsyncDevice
 from ophyd_async.epics.signal import epics_signal_r, epics_signal_rw
-
+import time
 from dodal.log import LOGGER
 
 
@@ -47,7 +47,7 @@ def run_functions_without_blocking(
     Status: A status object which is marked as complete once all of the Status objects
     returned by the unwrapped functions have completed.
     """
-
+    start = time.time()
     # The returned status - marked as finished at the end of the callback chain. If any
     # intermediate statuses have an exception, the full_status will timeout.
     full_status = Status(obj=associated_obj, timeout=timeout)
@@ -85,7 +85,6 @@ def run_functions_without_blocking(
 
     # Each wrapped function needs to attach its callback to the subsequent wrapped
     # function, therefore wrapped_funcs list needs to be created in reverse order
-
     wrapped_funcs = []
     wrapped_funcs.append(
         partial(
@@ -104,7 +103,8 @@ def run_functions_without_blocking(
                 next_func=wrapped_funcs[-1],
             )
         )
-
+    LOGGER.info(f"EIGER-TIMING wrapping functions in reverse: {time.time() - start}")
+    start = time.time()
     # Initiate the chain of functions
     wrap_func(None, functions_to_chain[0], wrapped_funcs[-1])
     return full_status
