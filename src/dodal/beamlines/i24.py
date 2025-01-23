@@ -1,6 +1,10 @@
 from dodal.common.beamlines.beamline_utils import BL, device_instantiation
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.devices.attenuator.attenuator import ReadOnlyAttenuator
+from dodal.devices.attenuator.attenuator import EnumFilterAttenuator
+from dodal.devices.attenuator.filter_selections import (
+    I24_FilterOneSelections,
+    I24_FilterTwoSelections,
+)
 from dodal.devices.detector import DetectorParams
 from dodal.devices.eiger import EigerDetector
 from dodal.devices.hutch_shutter import HutchShutter
@@ -44,16 +48,17 @@ I24_ZEBRA_MAPPING = ZebraMapping(
 
 def attenuator(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> ReadOnlyAttenuator:
+) -> EnumFilterAttenuator:
     """Get a read-only attenuator device for i24, instantiate it if it hasn't already
     been. If this is called when already instantiated in i24, it will return the
     existing object."""
     return device_instantiation(
-        ReadOnlyAttenuator,
+        EnumFilterAttenuator,
         "attenuator",
         "-OP-ATTN-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
+        filter_selection=(I24_FilterOneSelections, I24_FilterTwoSelections),
     )
 
 
@@ -278,7 +283,7 @@ def pilatus_metadata(
 def jungfrau(
     wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
 ) -> JungFrau1M:
-    """Get the i24 detector motion device, instantiate it if it hasn't already been.
+    """Get the i24 jungfrau device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i24, it will return the existing object.
     """
     return device_instantiation(
