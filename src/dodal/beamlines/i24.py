@@ -10,6 +10,7 @@ from dodal.devices.eiger import EigerDetector
 from dodal.devices.hutch_shutter import HutchShutter
 from dodal.devices.i24.aperture import Aperture
 from dodal.devices.i24.beam_center import DetectorBeamCenter
+from dodal.devices.i24.beam_params import ReadOnlyEnergyAndAttenuator
 from dodal.devices.i24.beamstop import Beamstop
 from dodal.devices.i24.dcm import DCM
 from dodal.devices.i24.dual_backlight import DualBacklight
@@ -290,6 +291,21 @@ def jungfrau(
         device_factory=JungFrau1M,
         name="jungfrau_m1",
         prefix="-EA-JNGFR-01:",
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+    )
+
+
+def beam_params(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> ReadOnlyEnergyAndAttenuator:
+    """Get the i24 ROEnergyandAttenuator device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i24, it will return the existing object.
+    """
+    return device_instantiation(
+        device_factory=ReadOnlyEnergyAndAttenuator,
+        name="jungfrau_m1",
+        prefix="",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
     )
