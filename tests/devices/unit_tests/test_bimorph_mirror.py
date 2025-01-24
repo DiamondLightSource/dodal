@@ -1,13 +1,18 @@
 import asyncio
+from collections.abc import Callable
 from typing import Any
 from unittest.mock import ANY, call, patch
 
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import DeviceCollector, SignalRW, walk_rw_signals
+from ophyd_async.core import DeviceCollector, walk_rw_signals
 from ophyd_async.testing import callback_on_mock_put, get_mock_put, set_mock_value
 
-from dodal.devices.bimorph_mirror import BimorphMirror, BimorphMirrorStatus
+from dodal.devices.bimorph_mirror import (
+    BimorphMirror,
+    BimorphMirrorChannel,
+    BimorphMirrorStatus,
+)
 
 VALID_BIMORPH_CHANNELS = [8, 12, 16, 24]
 
@@ -32,6 +37,16 @@ def valid_bimorph_values(mirror: BimorphMirror) -> dict[int, float]:
 
 @pytest.fixture
 def mirror_with_mocked_put(mirror: BimorphMirror):
+    """Returns BimorphMirror with some simulated behaviour.
+
+    BimorphMirror that simulates BimorphMirrorStatus BUSY/IDLE behaviour on all
+    rw_signals, and propogation from target_voltage to output_voltage on each
+    channel.
+
+    Args:
+        mirror: BimorphMirror fixture
+    """
+
     async def busy_idle():
         await asyncio.sleep(0)
         set_mock_value(mirror.status, BimorphMirrorStatus.BUSY)
@@ -44,19 +59,20 @@ def mirror_with_mocked_put(mirror: BimorphMirror):
     for signal in walk_rw_signals(mirror).values():
         callback_on_mock_put(signal, status)
 
-    for channel in mirror.channels.values():
-
+    def callback_function(
+        channel: BimorphMirrorChannel,
+    ) -> Callable[[float, bool], None]:
         def output_voltage_propogation_and_status(
             value: float,
             wait: bool = False,
-            signal: SignalRW[float] = channel.output_voltage,
         ):
-            signal.set(value, wait=wait)
+            channel.output_voltage.set(value, wait=wait)
             asyncio.create_task(busy_idle())
 
-        callback_on_mock_put(
-            channel.target_voltage, output_voltage_propogation_and_status
-        )
+        return output_voltage_propogation_and_status
+
+    for channel in mirror.channels.values():
+        callback_on_mock_put(channel.target_voltage, callback_function(channel))
 
     return mirror
 
