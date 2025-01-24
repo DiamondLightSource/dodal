@@ -70,8 +70,8 @@ def undulator(
         wait_for_connection,
         fake_with_ophyd_sim,
         bl_prefix=False,
-        poles=80,
-        length=2.0,
+        poles=None,  # todo check the real values
+        length=None,  # todo check the real values
     )
 
 
@@ -121,6 +121,7 @@ def xspress3_odin(
     )
 
 
+@skip_device
 def dcm(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
@@ -138,6 +139,7 @@ def dcm(
         reflection=(1, 1, 1),
         d_spacing=(3.13475, "nm"),
     )
+    # todo double check if crystal metdata is correct
 
     return device_instantiation(
         DoubleCrystalMonochromator,
