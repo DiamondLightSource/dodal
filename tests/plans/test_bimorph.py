@@ -25,8 +25,7 @@ from dodal.plans.bimorph import (
     restore_bimorph_state,
 )
 
-# VALID_BIMORPH_CHANNELS = [8, 12, 16, 24]
-VALID_BIMORPH_CHANNELS = [2]
+VALID_BIMORPH_CHANNELS = [8, 12, 16, 24]
 
 
 @pytest.fixture(params=VALID_BIMORPH_CHANNELS)
@@ -201,7 +200,7 @@ def test_inner_scan(
 @pytest.mark.parametrize("voltage_increment", [100.0])
 @pytest.mark.parametrize("active_dimension", [SlitDimension.X, SlitDimension.Y])
 @pytest.mark.parametrize("active_slit_center_start", [0.0])
-@pytest.mark.parametrize("active_slit_center_end", [200])
+@pytest.mark.parametrize("active_slit_center_end", [200.0])
 @pytest.mark.parametrize("active_slit_size", [0.05])
 @pytest.mark.parametrize("inactive_slit_center", [0.0])
 @pytest.mark.parametrize("inactive_slit_size", [0.05])
