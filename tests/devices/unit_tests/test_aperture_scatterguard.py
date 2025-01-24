@@ -521,7 +521,7 @@ def test_aperture_enum_name_formatting():
     assert f"{ApertureValue.SMALL}" == "Small"
     assert f"{ApertureValue.MEDIUM}" == "Medium"
     assert f"{ApertureValue.LARGE}" == "Large"
-    assert f"{ApertureValue.OUT_OF_BEAM}" == "Out of beam"
+    assert f"{ApertureValue.OUT_OF_BEAM}" == "Out_of_beam"
 
 
 async def test_calling_prepare_then_set_in_quick_succession_throws_an_error(
