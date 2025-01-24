@@ -46,7 +46,7 @@ def mirror_with_mocked_put(mirror: BimorphMirror):
 
     for channel in mirror.channels.values():
 
-        def vout_propogation_and_status(
+        def output_voltage_propogation_and_status(
             value: float,
             wait: bool = False,
             signal: SignalRW[float] = channel.output_voltage,
@@ -54,7 +54,9 @@ def mirror_with_mocked_put(mirror: BimorphMirror):
             signal.set(value, wait=wait)
             asyncio.create_task(busy_idle())
 
-        callback_on_mock_put(channel.target_voltage, vout_propogation_and_status)
+        callback_on_mock_put(
+            channel.target_voltage, output_voltage_propogation_and_status
+        )
 
     return mirror
 
@@ -84,7 +86,7 @@ async def test_set_channels_triggers_alltrgt_proc(
     mock_alltrgt_proc.assert_called_once()
 
 
-async def test_set_channels_waits_for_vout_readback(
+async def test_set_channels_waits_for_output_voltage_readback(
     mirror_with_mocked_put: BimorphMirror,
     valid_bimorph_values: dict[int, float],
 ):
