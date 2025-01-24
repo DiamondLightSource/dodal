@@ -1,7 +1,7 @@
 from unittest.mock import ANY
 
 import pytest
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import init_devices
 from ophyd_async.testing import assert_reading
 
 from dodal.devices.diamond_filter import DiamondFilter, I03Filters, I04Filters
@@ -9,14 +9,14 @@ from dodal.devices.diamond_filter import DiamondFilter, I03Filters, I04Filters
 
 @pytest.fixture
 async def i03_diamond_filter() -> DiamondFilter[I03Filters]:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         i03_diamond_filter = DiamondFilter("", I03Filters, name="diamond_filter")
     return i03_diamond_filter
 
 
 @pytest.fixture
 async def i04_diamond_filter() -> DiamondFilter[I04Filters]:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         i04_diamond_filter = DiamondFilter("", I04Filters, name="diamond_filter")
     return i04_diamond_filter
 

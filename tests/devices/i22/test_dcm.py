@@ -4,7 +4,7 @@ from unittest.mock import ANY
 import bluesky.plans as bp
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import init_devices
 from ophyd_async.testing import (
     assert_configuration,
     assert_emitted,
@@ -23,7 +23,7 @@ from dodal.devices.i22.dcm import DoubleCrystalMonochromator
 async def dcm() -> DoubleCrystalMonochromator:
     metadata_1 = make_crystal_metadata_from_material(MaterialsEnum.Si, (1, 1, 1))
     metadata_2 = make_crystal_metadata_from_material(MaterialsEnum.Si, (1, 1, 1))
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         dcm = DoubleCrystalMonochromator(
             prefix="FOO-MO",
             temperature_prefix="FOO-DI",

@@ -1,5 +1,5 @@
 import pytest
-from ophyd_async.core import DeviceCollector, PathProvider
+from ophyd_async.core import PathProvider, init_devices
 from ophyd_async.epics.adpilatus import PilatusDetector
 
 from dodal.devices.i22.nxsas import NXSasMetadataHolder, NXSasPilatus
@@ -7,11 +7,11 @@ from dodal.devices.i22.nxsas import NXSasMetadataHolder, NXSasPilatus
 
 @pytest.fixture
 def saxs(static_path_provider: PathProvider, RE) -> PilatusDetector:
-    with DeviceCollector(mock=True):
+    with init_devices(mock=True):
         saxs = NXSasPilatus(
             prefix="-EA-PILAT-01:",
             drv_suffix="CAM:",
-            hdf_suffix="HDF5:",
+            fileio_suffix="HDF5:",
             metadata_holder=NXSasMetadataHolder(
                 x_pixel_size=(1.72e-1, "mm"),
                 y_pixel_size=(1.72e-1, "mm"),

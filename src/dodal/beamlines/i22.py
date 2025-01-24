@@ -64,7 +64,7 @@ def saxs() -> PilatusDetector:
         prefix=f"{PREFIX.beamline_prefix}-EA-PILAT-01:",
         path_provider=get_path_provider(),
         drv_suffix="CAM:",
-        hdf_suffix=HDF5_PREFIX,
+        fileio_suffix=HDF5_PREFIX,
         metadata_holder=metadata_holder,
     )
 
@@ -89,7 +89,7 @@ def waxs() -> PilatusDetector:
         prefix=f"{PREFIX.beamline_prefix}-EA-PILAT-03:",
         path_provider=get_path_provider(),
         drv_suffix="CAM:",
-        hdf_suffix=HDF5_PREFIX,
+        fileio_suffix=HDF5_PREFIX,
         metadata_holder=metadata_holder,
     )
 
@@ -249,7 +249,7 @@ def oav() -> AravisDetector:
     return NXSasOAV(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
         drv_suffix="DET:",
-        hdf_suffix=HDF5_PREFIX,
+        fileio_suffix=HDF5_PREFIX,
         path_provider=get_path_provider(),
         metadata_holder=metadata_holder,
     )

@@ -5,7 +5,7 @@ import pytest
 from bluesky.callbacks import CallbackBase
 from bluesky.run_engine import RunEngine
 from event_model import Event
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import init_devices
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
 from dodal.devices.aperturescatterguard import (
@@ -28,7 +28,7 @@ async def ap_sg():
     positions = load_positions_from_beamline_parameters(params)
     tolerances = AperturePosition.tolerances_from_gda_params(params)
 
-    async with DeviceCollector():
+    async with init_devices():
         ap_sg = ApertureScatterguard(
             prefix="BL03S",
             name="ap_sg",

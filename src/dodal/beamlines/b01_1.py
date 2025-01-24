@@ -58,5 +58,5 @@ def manta() -> AravisDetector:
         f"{PREFIX.beamline_prefix}-DI-DCAM-02:",
         path_provider=get_path_provider(),
         drv_suffix="CAM:",
-        hdf_suffix=HDF5_PREFIX,
+        fileio_suffix=HDF5_PREFIX,
     )

@@ -61,7 +61,7 @@ def det(
         wait_for_connection,
         fake_with_ophyd_sim,
         drv_suffix="DET:",
-        hdf_suffix="HDF5:",
+        fileio_suffix="HDF5:",
         path_provider=get_path_provider(),
     )
 
@@ -78,7 +78,7 @@ def diff(
         wait_for_connection,
         fake_with_ophyd_sim,
         drv_suffix="DET:",
-        hdf_suffix="HDF5:",
+        fileio_suffix="HDF5:",
         path_provider=get_path_provider(),
     )
 

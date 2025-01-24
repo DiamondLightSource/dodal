@@ -71,5 +71,5 @@ def det() -> SimDetector:
         f"{PREFIX.beamline_prefix}-DI-CAM-01:",
         path_provider=get_path_provider(),
         drv_suffix="DET:",
-        hdf_suffix="HDF:",
+        fileio_suffix="HDF:",
     )

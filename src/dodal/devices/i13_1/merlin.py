@@ -14,11 +14,11 @@ class Merlin(StandardDetector):
         prefix: str,
         path_provider: PathProvider,
         drv_suffix="CAM:",
-        hdf_suffix="HDF:",
+        fileio_suffix="HDF:",
         name: str = "",
     ):
         self.drv = MerlinDriverIO(prefix + drv_suffix)
-        self.hdf = adcore.NDFileHDFIO(prefix + hdf_suffix)
+        self.hdf = adcore.NDFileHDFIO(prefix + fileio_suffix)
 
         super().__init__(
             MerlinController(self.drv),

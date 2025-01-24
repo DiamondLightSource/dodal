@@ -1,7 +1,7 @@
 from unittest.mock import ANY
 
 import pytest
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import init_devices
 from ophyd_async.testing import assert_reading
 
 from dodal.devices.qbpm import QBPM
@@ -9,7 +9,7 @@ from dodal.devices.qbpm import QBPM
 
 @pytest.fixture
 async def qbpm() -> QBPM:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         qbpm = QBPM("", name="qbpm")
     return qbpm
 

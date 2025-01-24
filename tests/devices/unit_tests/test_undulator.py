@@ -2,7 +2,7 @@ from unittest.mock import ANY
 
 import numpy as np
 import pytest
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import init_devices
 from ophyd_async.testing import (
     assert_configuration,
     assert_reading,
@@ -23,7 +23,7 @@ ID_GAP_LOOKUP_TABLE_PATH: str = (
 
 @pytest.fixture
 async def undulator() -> Undulator:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         undulator = Undulator(
             "UND-01",
             name="undulator",
@@ -91,7 +91,7 @@ async def test_configuration_includes_configuration_fields(undulator: Undulator)
 
 
 async def test_poles_not_propagated_if_not_supplied():
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         undulator = Undulator(
             "UND-01",
             name="undulator",
@@ -103,7 +103,7 @@ async def test_poles_not_propagated_if_not_supplied():
 
 
 async def test_length_not_propagated_if_not_supplied():
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         undulator = Undulator(
             "UND-01",
             name="undulator",

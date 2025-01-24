@@ -7,7 +7,7 @@ from bluesky import plan_stubs as bps
 from bluesky import preprocessors as bpp
 from bluesky.run_engine import RunEngine
 from ophyd.status import DeviceStatus, Status
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import init_devices
 from ophyd_async.testing import get_mock_put, set_mock_value
 
 from dodal.devices.fast_grid_scan import (
@@ -30,7 +30,7 @@ def discard_status(st: Status | DeviceStatus):
 
 @pytest.fixture
 async def zebra_fast_grid_scan():
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         zebra_fast_grid_scan = ZebraFastGridScan(name="fake_FGS", prefix="FGS")
 
     return zebra_fast_grid_scan
@@ -38,7 +38,7 @@ async def zebra_fast_grid_scan():
 
 @pytest.fixture
 async def panda_fast_grid_scan():
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         panda_fast_grid_scan = PandAFastGridScan(name="fake_PGS", prefix="PGS")
 
     return panda_fast_grid_scan

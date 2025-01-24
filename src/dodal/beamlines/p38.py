@@ -55,7 +55,7 @@ def d3(
         wait_for_connection,
         fake_with_ophyd_sim,
         drv_suffix="DET:",
-        hdf_suffix="HDF5:",
+        fileio_suffix="HDF5:",
         path_provider=get_path_provider(),
     )
 
@@ -72,7 +72,7 @@ def d11(
         wait_for_connection,
         fake_with_ophyd_sim,
         drv_suffix="DET:",
-        hdf_suffix="HDF5:",
+        fileio_suffix="HDF5:",
         path_provider=get_path_provider(),
     )
 
@@ -87,7 +87,7 @@ def d12(
         wait_for_connection,
         fake_with_ophyd_sim,
         drv_suffix="DET:",
-        hdf_suffix="HDF5:",
+        fileio_suffix="HDF5:",
         path_provider=get_path_provider(),
     )
 

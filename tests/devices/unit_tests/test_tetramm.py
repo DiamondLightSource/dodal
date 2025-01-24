@@ -1,6 +1,6 @@
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import DetectorTrigger, DeviceCollector, PathProvider, TriggerInfo
+from ophyd_async.core import DetectorTrigger, PathProvider, TriggerInfo, init_devices
 from ophyd_async.epics.adcore import FileWriteMode
 from ophyd_async.testing import set_mock_value
 
@@ -16,7 +16,7 @@ TEST_TETRAMM_NAME = "foobar"
 
 @pytest.fixture
 async def tetramm_driver(RE: RunEngine) -> TetrammDriver:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         driver = TetrammDriver("DRIVER:")
 
     return driver
@@ -26,7 +26,7 @@ async def tetramm_driver(RE: RunEngine) -> TetrammDriver:
 async def tetramm_controller(
     RE: RunEngine, tetramm_driver: TetrammDriver
 ) -> TetrammController:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         controller = TetrammController(
             tetramm_driver,
             maximum_readings_per_frame=2_000,
@@ -37,7 +37,7 @@ async def tetramm_controller(
 
 @pytest.fixture
 async def tetramm(static_path_provider: PathProvider) -> TetrammDetector:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         tetramm = TetrammDetector(
             "MY-TETRAMM:",
             static_path_provider,

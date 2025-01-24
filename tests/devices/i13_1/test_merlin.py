@@ -4,9 +4,9 @@ import pytest
 from event_model import StreamDatum, StreamResource
 from ophyd_async.core import (
     DetectorTrigger,
-    DeviceCollector,
     PathProvider,
     TriggerInfo,
+    init_devices,
 )
 from ophyd_async.testing import set_mock_value
 
@@ -26,12 +26,12 @@ def one_shot_trigger_info() -> TriggerInfo:
 
 @pytest.fixture
 async def merlin(static_path_provider: PathProvider) -> Merlin:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         merlin = Merlin(
             prefix="BL13J-EA-DET-04",
             # name="merlin",
             # drv_suffix="CAM:",
-            # hdf_suffix="HDF5:",
+            # fileio_suffix="HDF5:",
             path_provider=static_path_provider,
         )
 
