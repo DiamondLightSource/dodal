@@ -1,17 +1,24 @@
 import asyncio
 from pathlib import Path
-from unittest.mock import ANY
+from unittest.mock import ANY, call
 
+import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
 from bluesky.utils import Msg
 from ophyd_async.core import DeviceCollector, StandardDetector, walk_rw_signals
 from ophyd_async.sim.demo import PatternDetector
-from ophyd_async.testing import callback_on_mock_put, set_mock_value
+from ophyd_async.testing import callback_on_mock_put, get_mock_put, set_mock_value
 
 from dodal.devices.bimorph_mirror import BimorphMirror, BimorphMirrorStatus
 from dodal.devices.slits import Slits
-from dodal.plans.bimorph import SlitDimension, bimorph_optimisation, move_slits
+from dodal.plans.bimorph import (
+    SlitDimension,
+    bimorph_optimisation,
+    capture_bimorph_state,
+    move_slits,
+    restore_bimorph_state,
+)
 
 # VALID_BIMORPH_CHANNELS = [8, 12, 16, 24]
 VALID_BIMORPH_CHANNELS = [2]
@@ -110,6 +117,30 @@ async def test_move_slits(
         Msg("set", centre_signal, center, group=ANY),
         Msg("wait", None, group=ANY),
     ] == messages
+
+
+def test_save_and_restore(RE: RunEngine, mirror: BimorphMirror, slits: Slits):
+    signals = [
+        slits.x_gap.user_setpoint,
+        slits.y_gap.user_setpoint,
+        slits.x_centre.user_setpoint,
+        slits.y_centre.user_setpoint,
+        mirror.channels[1].output_voltage,
+    ]
+    puts = [get_mock_put(signal) for signal in signals]
+
+    def plan():
+        state = yield from capture_bimorph_state(mirror, slits)
+
+        for signal in signals:
+            yield from bps.abs_set(signal, 4.0, wait=True)
+
+        yield from restore_bimorph_state(mirror, slits, state)
+
+    RE(plan())
+
+    for put in puts:
+        assert put.call_args_list == [call(4.0, wait=True), call(0.0, wait=True)]
 
 
 @pytest.mark.parametrize("voltage_increment", [100.0])
