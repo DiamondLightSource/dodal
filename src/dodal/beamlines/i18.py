@@ -67,7 +67,7 @@ def slits_1() -> Slits:
 
 # Must document what PandAs are physically connected to
 # See: https://github.com/bluesky/ophyd-async/issues/284
-@device_factory()
+@device_factory(skip=True)
 def panda1() -> HDFPanda:
     return HDFPanda(
         f"{PREFIX.beamline_prefix}-MO-PANDA-01:",
@@ -125,7 +125,7 @@ def it() -> TetrammDetector:
     )
 
 
-@device_factory()
+@device_factory(skip=True)
 def vfm() -> KBMirror:
     return KBMirror(f"{PREFIX.beamline_prefix}-OP-VFM-01:")
 
