@@ -4,8 +4,10 @@ from unittest.mock import ANY, call
 
 import bluesky.plan_stubs as bps
 import pytest
+from bluesky.preprocessors import run_decorator
 from bluesky.run_engine import RunEngine
 from bluesky.utils import Msg
+from numpy import linspace
 from ophyd_async.core import DeviceCollector, StandardDetector, walk_rw_signals
 from ophyd_async.sim.demo import PatternDetector
 from ophyd_async.testing import callback_on_mock_put, get_mock_put, set_mock_value
@@ -16,6 +18,7 @@ from dodal.plans.bimorph import (
     SlitDimension,
     bimorph_optimisation,
     capture_bimorph_state,
+    inner_scan,
     move_slits,
     restore_bimorph_state,
 )
@@ -84,7 +87,7 @@ def slits(RE: RunEngine) -> Slits:
 @pytest.fixture
 async def oav(RE: RunEngine, tmp_path: Path) -> StandardDetector:
     with DeviceCollector(mock=True):
-        det = PatternDetector(tmp_path)
+        det = PatternDetector(tmp_path / "foo.temp")
     return det
 
 
@@ -141,6 +144,53 @@ def test_save_and_restore(RE: RunEngine, mirror: BimorphMirror, slits: Slits):
 
     for put in puts:
         assert put.call_args_list == [call(4.0, wait=True), call(0.0, wait=True)]
+
+
+@pytest.mark.parametrize("active_dimension", [SlitDimension.X, SlitDimension.Y])
+@pytest.mark.parametrize("active_slit_center_start", [0.0])
+@pytest.mark.parametrize("active_slit_center_end", [200])
+@pytest.mark.parametrize("active_slit_size", [0.05])
+@pytest.mark.parametrize("number_of_slit_positions", [3])
+def test_inner_scan(
+    RE: RunEngine,
+    mirror: BimorphMirror,
+    slits: Slits,
+    oav: StandardDetector,
+    active_dimension: SlitDimension,
+    active_slit_center_start: float,
+    active_slit_center_end: float,
+    active_slit_size: float,
+    number_of_slit_positions: int,
+):
+    @run_decorator()
+    def plan():
+        yield from inner_scan(
+            mirror,
+            slits,
+            oav,
+            active_dimension,
+            active_slit_center_start,
+            active_slit_center_end,
+            active_slit_size,
+            number_of_slit_positions,
+        )
+
+    put = (
+        get_mock_put(slits.x_centre.user_setpoint)
+        if active_dimension == SlitDimension.X
+        else get_mock_put(slits.y_centre.user_setpoint)
+    )
+
+    call_list = [
+        call(value, wait=True)
+        for value in linspace(
+            active_slit_center_start, active_slit_center_end, number_of_slit_positions
+        )
+    ]
+
+    RE(plan())
+
+    assert put.call_args_list == call_list
 
 
 @pytest.mark.parametrize("voltage_increment", [100.0])
