@@ -58,7 +58,11 @@ def undulator() -> Undulator:
 
 @device_factory()
 def slits_1() -> Slits:
-    return Slits(f"{PREFIX.beamline_prefix}-AL-SLITS-01:")
+    return Slits(
+        f"{PREFIX.beamline_prefix}-AL-SLITS-01:",
+        x_centre="X:CENTER",
+        y_centre="Y:CENTER",
+    )
 
 
 # Must document what PandAs are physically connected to
