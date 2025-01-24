@@ -278,26 +278,39 @@ class EigerDetector(Device):
 
     def set_mx_settings_pvs(self):
         LOGGER.info(f"EIGER-TIMING set_odin_pvs: {time.time() - self.start}")
-        self.start = time.time()
         assert self.detector_params is not None
         beam_x_pixels, beam_y_pixels = self.detector_params.get_beam_position_pixels(
             self.detector_params.detector_distance
         )
-        status = self.cam.beam_center_x.set(
+
+        local_start = time.time()
+        self.cam.beam_center_x.set(
             beam_x_pixels, timeout=self.timeouts.general_status_timeout
-        )
-        status &= self.cam.beam_center_y.set(
+        ).wait()
+        LOGGER.info(f"EIGER-TIMING cam.beam_center_x.set: {time.time() - local_start}")
+
+        local_start = time.time()
+        self.cam.beam_center_y.set(
             beam_y_pixels, timeout=self.timeouts.general_status_timeout
-        )
-        status &= self.cam.det_distance.set(
+        ).wait()
+        LOGGER.info(f"EIGER-TIMING cam.beam_center_y.set: {time.time() - local_start}")
+
+        local_start = time.time()
+        self.cam.det_distance.set(
             self.detector_params.detector_distance,
             timeout=self.timeouts.general_status_timeout,
-        )
-        status &= self.cam.omega_start.set(
+        ).wait()
+        LOGGER.info(f"EIGER-TIMING cam.det_distance.set: {time.time() - local_start}")
+
+        local_start = time.time()
+        self.cam.omega_start.set(
             self.detector_params.omega_start,
             timeout=self.timeouts.general_status_timeout,
-        )
-        status &= self.cam.omega_incr.set(
+        ).wait()
+        LOGGER.info(f"EIGER-TIMING cam.omega_start.set: {time.time() - local_start}")
+
+        self.start = time.time()
+        status = self.cam.omega_incr.set(
             self.detector_params.omega_increment,
             timeout=self.timeouts.general_status_timeout,
         )
@@ -328,7 +341,7 @@ class EigerDetector(Device):
         during the datacollection. The number of images is the number of images per
         trigger.
         """
-        LOGGER.info(f"EIGER-TIMING set_mx_settings_pvs: {time.time() - self.start}")
+        LOGGER.info(f"EIGER-TIMING cam.omega_incr.set: {time.time() - self.start}")
         self.start = time.time()
         assert self.detector_params is not None
         status = self.cam.num_images.set(
@@ -421,6 +434,7 @@ class EigerDetector(Device):
         return status
 
     def stop_odin(self):
+        LOGGER.info(f"EIGER-TIMING enable_roi_mode: {time.time() - self.start}")
         self.start = time.time()
         status = self.odin.stop()
         return status
