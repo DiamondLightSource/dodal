@@ -3,12 +3,11 @@ from pathlib import Path
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
-    device_instantiation,
+    device_factory,
     get_path_provider,
     set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.beamlines.device_helpers import numbered_slits
 from dodal.common.visit import (
     LocalDirectoryServiceClient,
     StaticVisitPathProvider,
@@ -24,9 +23,10 @@ from dodal.devices.tetramm import TetrammDetector
 from dodal.devices.undulator import Undulator
 from dodal.devices.xspress3.xspress3 import Xspress3
 from dodal.log import set_beamline as set_log_beamline
-from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
+from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("i18")
+PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
@@ -45,61 +45,28 @@ set_path_provider(
 )
 
 
-def synchrotron(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Synchrotron:
-    return device_instantiation(
-        Synchrotron,
-        "synchrotron",
-        "",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
+@device_factory()
+def synchrotron() -> Synchrotron:
+    return Synchrotron()
 
 
 # not ready yet
-@skip_device()
-def undulator(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-) -> Undulator:
-    return device_instantiation(
-        Undulator,
-        "undulator",
-        f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-        bl_prefix=False,
-        poles=80,
-        length=2.0,
-    )
+@device_factory()
+def undulator() -> Undulator:
+    return Undulator(f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
 
 
-@skip_device()
-def slits_1(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-) -> Slits:
-    return numbered_slits(
-        1,
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
+@device_factory()
+def slits_1() -> Slits:
+    return Slits(f"{PREFIX.beamline_prefix}-AL-SLITS-01:")
 
 
 # Must document what PandAs are physically connected to
 # See: https://github.com/bluesky/ophyd-async/issues/284
-@skip_device()
-def panda1(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-) -> HDFPanda:
-    return device_instantiation(
-        HDFPanda,
-        "panda1",
-        "-MO-PANDA-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+@device_factory()
+def panda1() -> HDFPanda:
+    return HDFPanda(
+        f"{PREFIX.beamline_prefix}-MO-PANDA-01:",
         path_provider=get_path_provider(),
     )
 
@@ -107,24 +74,16 @@ def panda1(
 # odin detectors are not yet supported.
 # There is a controls project in the works,
 # not ready anytime soon
-@skip_device()
-def xspress3_odin(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Xspress3:
-    return device_instantiation(
-        Xspress3,
-        prefix="-EA-XSP-02:",
-        name="xspress3_odin",
+@device_factory()
+def xspress3_odin() -> Xspress3:
+    return Xspress3(
+        f"{PREFIX.beamline_prefix}-EA-XSP-02:",
         num_channels=4,
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
     )
 
 
-def dcm(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-) -> DoubleCrystalMonochromator:
+@device_factory()
+def dcm() -> DoubleCrystalMonochromator:
     crystal_1_metadata = CrystalMetadata(
         usage="Bragg",
         type="silicon",
@@ -139,126 +98,58 @@ def dcm(
         d_spacing=(3.13475, "nm"),
     )
 
-    return device_instantiation(
-        DoubleCrystalMonochromator,
-        "dcm",
-        f"{BeamlinePrefix(BL).beamline_prefix}-MO-DCM-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-        bl_prefix=False,
+    return DoubleCrystalMonochromator(
         temperature_prefix=f"{BeamlinePrefix(BL).beamline_prefix}-DI-DCM-01:",
         crystal_1_metadata=crystal_1_metadata,
         crystal_2_metadata=crystal_2_metadata,
     )
 
 
-@skip_device()
-def i0(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-) -> TetrammDetector:
-    return device_instantiation(
-        TetrammDetector,
-        "i0",
-        "-DI-XBPM-02:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+@device_factory()
+def i0() -> TetrammDetector:
+    return TetrammDetector(
+        f"{PREFIX.beamline_prefix}-DI-XBPM-02:",
         type="Cividec Diamond XBPM",
         path_provider=get_path_provider(),
     )
 
 
-@skip_device()
-def it(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-) -> TetrammDetector:
-    return device_instantiation(
-        TetrammDetector,
-        "it",
-        "-DI-XBPM-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+@device_factory()
+def it() -> TetrammDetector:
+    return TetrammDetector(
+        f"{PREFIX.beamline_prefix}-DI-XBPM-01:",
         type="Tetramm",
         path_provider=get_path_provider(),
     )
 
 
-@skip_device
-def vfm(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-) -> KBMirror:
-    return device_instantiation(
-        KBMirror,
-        "vfm",
-        "-OP-VFM-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+@device_factory()
+def vfm() -> KBMirror:
+    return KBMirror(f"{PREFIX.beamline_prefix}-OP-VFM-01:")
+
+
+@device_factory()
+def hfm() -> KBMirror:
+    return KBMirror(f"{PREFIX.beamline_prefix}-OP-HFM-01:")
+
+
+@device_factory()
+def d7diode() -> Diode:
+    return Diode(f"{PREFIX.beamline_prefix}-DI-PHDGN-07:")
+
+
+@device_factory()
+def main_table() -> Table:
+    return Table(
+        f"{PREFIX.beamline_prefix}-MO-TABLE-01:",
     )
 
 
-def hfm(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-) -> KBMirror:
-    return device_instantiation(
-        KBMirror,
-        "hfm",
-        "-OP-HFM-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
+@device_factory()
+def thor_labs_stage() -> ThorLabsStage:
+    return ThorLabsStage(f"{PREFIX.beamline_prefix}-MO-TABLE-02:")
 
 
-def d7diode(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Diode:
-    return device_instantiation(
-        Diode,
-        "d7diode",
-        "-DI-PHDGN-07:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
-
-
-def main_table(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Table:
-    return device_instantiation(
-        Table,
-        "table",
-        "-MO-TABLE-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
-
-
-def thor_labs_table(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> ThorLabsStage:
-    return device_instantiation(
-        ThorLabsStage,
-        "thor_labs_stage",
-        "-MO-TABLE-02:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
-
-
-# SIMULATED DEVICES
-
-
-# this is a mock table, not sure how does it relate to the real Table, maybe just a fake option in instantiation is needed
-@skip_device()
-def raster_stage(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Table:
-    return device_instantiation(
-        Table,
-        "raster_stage",
-        "-MO-SIM-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
+@device_factory()
+def raster_stage() -> Table:
+    return Table(f"{PREFIX.beamline_prefix}-MO-SIM-01:")

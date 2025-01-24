@@ -4,7 +4,7 @@ import pytest
 from ophyd_async.core import DeviceCollector
 from ophyd_async.testing import set_mock_value
 
-from dodal.devices.i18.table import Four_D_Position, Table
+from dodal.devices.i18.table import Table, TablePosition
 
 
 @pytest.fixture
@@ -23,7 +23,7 @@ async def test_setting_xy_position_table(table: Table):
     set_mock_value(table.y.user_readback, 4.56)
 
     # Create a position object
-    position = Four_D_Position(x=1.23, y=4.56, z=0.0, theta=0.0)
+    position = TablePosition(x=1.23, y=4.56, z=0.0, theta=0.0)
 
     # Call set to update the position
     await table.set(position)
