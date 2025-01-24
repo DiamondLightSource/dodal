@@ -68,7 +68,6 @@ def capture_bimorph_state(mirror: BimorphMirror, slits: Slits):
         position = yield from bps.rd(channel.output_voltage)
         original_voltage_list.append(position)
 
-    # Get slit position to return to after plan:
     original_x_gap = yield from bps.rd(slits.x_gap)
     original_y_gap = yield from bps.rd(slits.y_gap)
     original_x_center = yield from bps.rd(slits.x_centre)
