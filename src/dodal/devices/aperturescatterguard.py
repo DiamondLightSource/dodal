@@ -89,15 +89,19 @@ class AperturePosition(BaseModel):
 
 
 class ApertureValue(StrictEnum):
-    """The possible apertures that can be selected"""
+    """The possible apertures that can be selected.
 
-    SMALL = "Small"
-    MEDIUM = "Medium"
-    LARGE = "Large"
+    Changing these means changing the external paramter model of Hyperion.
+    See https://github.com/DiamondLightSource/mx-bluesky/issues/760
+    """
+
+    SMALL = "SMALL_APERTURE"
+    MEDIUM = "MEDIUM_APERTURE"
+    LARGE = "LARGE_APERTURE"
     OUT_OF_BEAM = "Out of beam"
 
     def __str__(self):
-        return self.value
+        return self.name.capitalize()
 
 
 def load_positions_from_beamline_parameters(
