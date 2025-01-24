@@ -16,7 +16,6 @@ dependencies = [
     "click",
     "ophyd",
     "ophyd-async >= 0.9.0a1",
-    "ophyd-async[sim]",
     "bluesky",
     "pyepics",
     "dataclasses-json",

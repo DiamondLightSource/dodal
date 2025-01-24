@@ -51,7 +51,7 @@ def synchrotron() -> Synchrotron:
 
 
 # not ready yet
-@device_factory()
+@device_factory(skip=True)
 def undulator() -> Undulator:
     return Undulator(f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
 
@@ -74,7 +74,7 @@ def panda1() -> HDFPanda:
 # odin detectors are not yet supported.
 # There is a controls project in the works,
 # not ready anytime soon
-@device_factory()
+@device_factory(skip=True)
 def xspress3_odin() -> Xspress3:
     return Xspress3(
         f"{PREFIX.beamline_prefix}-EA-XSP-02:",
@@ -82,7 +82,7 @@ def xspress3_odin() -> Xspress3:
     )
 
 
-@device_factory()
+@device_factory(skip=True)
 def dcm() -> DoubleCrystalMonochromator:
     crystal_1_metadata = CrystalMetadata(
         usage="Bragg",
@@ -109,7 +109,6 @@ def dcm() -> DoubleCrystalMonochromator:
 def i0() -> TetrammDetector:
     return TetrammDetector(
         f"{PREFIX.beamline_prefix}-DI-XBPM-02:",
-        type="Cividec Diamond XBPM",
         path_provider=get_path_provider(),
     )
 
@@ -118,7 +117,6 @@ def i0() -> TetrammDetector:
 def it() -> TetrammDetector:
     return TetrammDetector(
         f"{PREFIX.beamline_prefix}-DI-XBPM-01:",
-        type="Tetramm",
         path_provider=get_path_provider(),
     )
 
@@ -140,16 +138,9 @@ def d7diode() -> Diode:
 
 @device_factory()
 def main_table() -> Table:
-    return Table(
-        f"{PREFIX.beamline_prefix}-MO-TABLE-01:",
-    )
+    return Table(f"{PREFIX.beamline_prefix}-MO-TABLE-01:")
 
 
 @device_factory()
 def thor_labs_stage() -> ThorLabsStage:
     return ThorLabsStage(f"{PREFIX.beamline_prefix}-MO-TABLE-02:")
-
-
-@device_factory()
-def raster_stage() -> Table:
-    return Table(f"{PREFIX.beamline_prefix}-MO-SIM-01:")
