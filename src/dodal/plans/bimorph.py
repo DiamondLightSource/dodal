@@ -135,6 +135,7 @@ def bimorph_optimisation(
 
     # If a starting set of voltages is not provided, default to current:
     initial_voltage_list = initial_voltage_list or state.voltages
+
     inactive_dimension = (
         SlitDimension.Y if active_dimension == SlitDimension.X else SlitDimension.X
     )
