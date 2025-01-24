@@ -12,6 +12,7 @@ from ophyd_async.core import (
     SignalW,
     StandardReadable,
     StrictEnum,
+    set_and_wait_for_other_value,
     wait_for_value,
 )
 from ophyd_async.core import StandardReadableFormat as Format
@@ -123,9 +124,11 @@ class BimorphMirror(StandardReadable, Movable):
             await wait_for_value(
                 self.status, BimorphMirrorStatus.IDLE, timeout=DEFAULT_TIMEOUT
             )
-            await self.channels[i].target_voltage.set(target, wait=True)
-            await wait_for_value(
-                self.status, BimorphMirrorStatus.BUSY, timeout=DEFAULT_TIMEOUT
+            await set_and_wait_for_other_value(
+                self.channels[i].target_voltage,
+                target,
+                self.status,
+                BimorphMirrorStatus.BUSY,
             )
 
         # Trigger set target voltages:
