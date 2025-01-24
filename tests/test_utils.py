@@ -1,6 +1,6 @@
 import os
 from collections.abc import Iterable, Mapping
-from typing import cast
+from typing import Any, cast
 from unittest.mock import ANY, MagicMock, Mock, patch
 
 import pytest
@@ -9,6 +9,7 @@ from bluesky.run_engine import RunEngine
 from ophyd import EpicsMotor
 
 from dodal.beamlines import i03, i23
+from dodal.devices.diamond_filter import DiamondFilter, I03Filters
 from dodal.utils import (
     AnyDevice,
     OphydV1Device,
@@ -19,6 +20,7 @@ from dodal.utils import (
     get_beamline_based_on_environment_variable,
     get_hostname,
     get_run_number,
+    is_v2_device_type,
     make_all_devices,
     make_device,
 )
@@ -29,12 +31,19 @@ def test_finds_device_factories() -> None:
 
     factories = collect_factories(fake_beamline)
 
-    from tests.fake_beamline import device_a, device_b, device_c, generic_device_d
+    from tests.fake_beamline import (
+        device_a,
+        device_b,
+        device_c,
+        generic_device_d,
+        plain_ophyd_v2_device,
+    )
 
     assert {
         "device_a": device_a,
         "device_b": device_b,
         "device_c": device_c,
+        "plain_ophyd_v2_device": plain_ophyd_v2_device,
         "generic_device_d": generic_device_d,
     } == factories
 
@@ -43,9 +52,13 @@ def test_makes_devices() -> None:
     import tests.fake_beamline as fake_beamline
 
     devices, exceptions = make_all_devices(fake_beamline)
-    assert {"readable", "motor", "cryo", "diamond_filter"} == devices.keys() and len(
-        exceptions
-    ) == 0
+    assert {
+        "readable",
+        "motor",
+        "cryo",
+        "diamond_filter",
+        "ophyd_v2_device",
+    } == devices.keys() and len(exceptions) == 0
 
 
 def test_makes_devices_with_dependencies() -> None:
@@ -64,9 +77,13 @@ def test_makes_devices_with_disordered_dependencies() -> None:
 
 def test_makes_devices_with_module_name() -> None:
     devices, exceptions = make_all_devices("tests.fake_beamline")
-    assert {"readable", "motor", "cryo", "diamond_filter"} == devices.keys() and len(
-        exceptions
-    ) == 0
+    assert {
+        "readable",
+        "motor",
+        "cryo",
+        "diamond_filter",
+        "ophyd_v2_device",
+    } == devices.keys() and len(exceptions) == 0
 
 
 def test_get_hostname() -> None:
@@ -393,3 +410,18 @@ def test_filter_ophyd_devices_raises_for_extra_types():
                 "ab": 3,  # type: ignore
             }
         )
+
+
+@pytest.mark.parametrize(
+    "input, expected_result",
+    [
+        [Readable, False],
+        [OphydV1Device, False],
+        [OphydV2Device, True],
+        [DiamondFilter[I03Filters], True],
+        [None, False],
+        [1, False],
+    ],
+)
+def test_is_v2_device_type(input: Any, expected_result: bool):
+    assert is_v2_device_type(input) == expected_result
