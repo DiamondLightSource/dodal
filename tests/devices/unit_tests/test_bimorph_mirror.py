@@ -4,7 +4,7 @@ from unittest.mock import ANY, call, patch
 
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import DeviceCollector, walk_rw_signals
+from ophyd_async.core import DeviceCollector, SignalRW, walk_rw_signals
 from ophyd_async.testing import callback_on_mock_put, get_mock_put, set_mock_value
 
 from dodal.devices.bimorph_mirror import BimorphMirror, BimorphMirrorStatus
@@ -47,7 +47,9 @@ def mirror_with_mocked_put(mirror: BimorphMirror):
     for channel in mirror.channels.values():
 
         def vout_propogation_and_status(
-            value: float, wait=False, signal=channel.output_voltage
+            value: float,
+            wait: bool = False,
+            signal: SignalRW[float] = channel.output_voltage,
         ):
             signal.set(value, wait=wait)
             asyncio.create_task(busy_idle())
