@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from enum import Enum
 
 import bluesky.plan_stubs as bps
@@ -41,6 +42,61 @@ def move_slits(slits: Slits, dimension: SlitDimension, gap: float, center: float
         yield from bps.mv(slits.y_centre, center)  # type: ignore
 
 
+@dataclass
+class BimorphState:
+    """Data class containing positions of BimorphMirror and Slits"""
+
+    voltages: list[float]
+    x_gap: float
+    y_gap: float
+    x_center: float
+    y_center: float
+
+
+def capture_bimorph_state(mirror: BimorphMirror, slits: Slits):
+    """Plan stub that captures current position of BimorphMirror and Slits.
+
+    Args:
+        mirror: BimorphMirror to read from
+        slits: Slits to read from
+
+    Returns:
+        A BimorphState containing BimorphMirror and Slits positions"""
+    original_voltage_list = []
+
+    for channel in mirror.channels.values():
+        position = yield from bps.rd(channel.output_voltage)
+        original_voltage_list.append(position)
+
+    # Get slit position to return to after plan:
+    original_x_gap = yield from bps.rd(slits.x_gap)
+    original_y_gap = yield from bps.rd(slits.y_gap)
+    original_x_center = yield from bps.rd(slits.x_centre)
+    original_y_center = yield from bps.rd(slits.y_centre)
+    return BimorphState(
+        original_voltage_list,
+        original_x_gap,
+        original_y_gap,
+        original_x_center,
+        original_y_center,
+    )
+
+
+def restore_bimorph_state(mirror: BimorphMirror, slits: Slits, state: BimorphState):
+    """Moves BimorphMirror and Slits to state given in BirmophState.
+
+    Args:
+        mirror: BimorphMirror to move
+        slits: Slits to move
+        state: BimorphState to move to.
+    """
+    yield from move_slits(slits, SlitDimension.X, state.x_gap, state.x_center)
+    yield from move_slits(slits, SlitDimension.Y, state.y_gap, state.y_center)
+
+    for value, channel in zip(state.voltages, mirror.channels.values(), strict=True):
+        yield from bps.mv(channel, value)  # type: ignore
+
+
 def bimorph_optimisation(
     mirror: BimorphMirror,
     slits: Slits,
@@ -76,27 +132,13 @@ def bimorph_optimisation(
         bimorph_settle_time: float time in seconds to wait after bimorph move
         initial_voltage_list: optional list[float] starting voltages for bimorph (defaults to current voltages)
     """
-    # Get voltages to return to after plan:
-    original_voltage_list = []
-
-    for channel in mirror.channels.values():
-        position = yield from bps.rd(channel.output_voltage)
-        original_voltage_list.append(position)
-
-    # Get slit position to return to after plan:
-    original_x_gap = yield from bps.rd(slits.x_gap)
-    original_y_gap = yield from bps.rd(slits.y_gap)
-    original_x_center = yield from bps.rd(slits.x_centre)
-    original_y_center = yield from bps.rd(slits.y_centre)
+    state = yield from capture_bimorph_state(mirror, slits)
 
     # If a starting set of voltages is not provided, default to current:
-    if initial_voltage_list is None:
-        initial_voltage_list = original_voltage_list
-
-    if active_dimension == SlitDimension.X:
-        inactive_dimension = SlitDimension.Y
-    else:
-        inactive_dimension = SlitDimension.X
+    initial_voltage_list = initial_voltage_list or state.voltages
+    inactive_dimension = (
+        SlitDimension.Y if active_dimension == SlitDimension.X else SlitDimension.X
+    )
 
     # Move slits into starting position:
     yield from move_slits(
@@ -137,14 +179,7 @@ def bimorph_optimisation(
 
     yield from outer()
 
-    # return to start slit positions
-    yield from move_slits(slits, SlitDimension.X, original_x_gap, original_x_center)
-    yield from move_slits(slits, SlitDimension.Y, original_y_gap, original_y_center)
-    # return to start voltages
-    for value, channel in zip(
-        original_voltage_list, mirror.channels.values(), strict=True
-    ):
-        yield from bps.mv(channel, value)  # type: ignore
+    yield from restore_bimorph_state(mirror, slits, state)
 
 
 def inner_scan(
