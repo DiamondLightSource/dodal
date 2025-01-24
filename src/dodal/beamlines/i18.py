@@ -16,12 +16,10 @@ from dodal.devices.i18.diode import Diode
 from dodal.devices.i18.KBMirror import KBMirror
 from dodal.devices.i18.table import Table
 from dodal.devices.i18.thor_labs_stage import ThorLabsStage
-from dodal.devices.i22.dcm import CrystalMetadata, DoubleCrystalMonochromator
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.tetramm import TetrammDetector
 from dodal.devices.undulator import Undulator
-from dodal.devices.xspress3.xspress3 import Xspress3
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -50,8 +48,7 @@ def synchrotron() -> Synchrotron:
     return Synchrotron()
 
 
-# not ready yet
-@device_factory(skip=True)
+@device_factory()
 def undulator() -> Undulator:
     return Undulator(f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
 
@@ -65,47 +62,12 @@ def slits_1() -> Slits:
     )
 
 
-# Must document what PandAs are physically connected to
-# See: https://github.com/bluesky/ophyd-async/issues/284
+# PandA IOC needs to be updated to support PVI
 @device_factory(skip=True)
 def panda1() -> HDFPanda:
     return HDFPanda(
         f"{PREFIX.beamline_prefix}-MO-PANDA-01:",
         path_provider=get_path_provider(),
-    )
-
-
-# odin detectors are not yet supported.
-# There is a controls project in the works,
-# not ready anytime soon
-@device_factory(skip=True)
-def xspress3_odin() -> Xspress3:
-    return Xspress3(
-        f"{PREFIX.beamline_prefix}-EA-XSP-02:",
-        num_channels=4,
-    )
-
-
-@device_factory(skip=True)
-def dcm() -> DoubleCrystalMonochromator:
-    crystal_1_metadata = CrystalMetadata(
-        usage="Bragg",
-        type="silicon",
-        reflection=(1, 1, 1),
-        d_spacing=(3.13475, "nm"),
-    )
-
-    crystal_2_metadata = CrystalMetadata(
-        usage="Bragg",
-        type="silicon",
-        reflection=(1, 1, 1),
-        d_spacing=(3.13475, "nm"),
-    )
-
-    return DoubleCrystalMonochromator(
-        temperature_prefix=f"{BeamlinePrefix(BL).beamline_prefix}-DI-DCM-01:",
-        crystal_1_metadata=crystal_1_metadata,
-        crystal_2_metadata=crystal_2_metadata,
     )
 
 
@@ -126,6 +88,7 @@ def it() -> TetrammDetector:
 
 
 @device_factory(skip=True)
+# VFM uses different IOC than HFM
 def vfm() -> KBMirror:
     return KBMirror(f"{PREFIX.beamline_prefix}-OP-VFM-01:")
 
