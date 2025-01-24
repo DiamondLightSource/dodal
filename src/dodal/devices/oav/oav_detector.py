@@ -13,12 +13,6 @@ from dodal.devices.areadetector.plugins.CAM import Cam
 from dodal.devices.oav.oav_parameters import DEFAULT_OAV_WINDOW, OAVConfig
 from dodal.devices.oav.snapshots.snapshot_with_beam_centre import SnapshotWithBeamCentre
 from dodal.devices.oav.snapshots.snapshot_with_grid import SnapshotWithGrid
-from dodal.log import LOGGER
-
-
-class ZoomLevelNotFoundError(Exception):
-    def __init__(self, errmsg):
-        LOGGER.error(errmsg)
 
 
 class Coords(IntEnum):
