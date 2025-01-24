@@ -1,19 +1,15 @@
-from collections.abc import Generator
+import asyncio
 from pathlib import Path
 from unittest.mock import ANY
 
 import pytest
 from bluesky.run_engine import RunEngine
 from bluesky.utils import Msg
-from numpy import linspace
-from ophyd_async.core import (
-    DeviceCollector,
-    StandardDetector,
-)
+from ophyd_async.core import DeviceCollector, StandardDetector, walk_rw_signals
 from ophyd_async.sim.demo import PatternDetector
 from ophyd_async.testing import callback_on_mock_put, set_mock_value
 
-from dodal.devices.bimorph_mirror import BimorphMirror
+from dodal.devices.bimorph_mirror import BimorphMirror, BimorphMirrorStatus
 from dodal.devices.slits import Slits
 from dodal.plans.bimorph import SlitDimension, bimorph_optimisation, move_slits
 
@@ -32,6 +28,33 @@ def mirror(request, RE: RunEngine) -> BimorphMirror:
         )
 
     return bm
+
+
+@pytest.fixture
+def mirror_with_mocked_put(mirror: BimorphMirror):
+    async def busy_idle():
+        await asyncio.sleep(0)
+        set_mock_value(mirror.status, BimorphMirrorStatus.BUSY)
+        await asyncio.sleep(0)
+        set_mock_value(mirror.status, BimorphMirrorStatus.IDLE)
+
+    async def status(*_, **__):
+        asyncio.create_task(busy_idle())
+
+    for signal in walk_rw_signals(mirror).values():
+        callback_on_mock_put(signal, status)
+
+    for channel in mirror.channels.values():
+
+        def vout_propogation_and_status(
+            value: float, wait=False, signal=channel.output_voltage
+        ):
+            signal.set(value, wait=wait)
+            asyncio.create_task(busy_idle())
+
+        callback_on_mock_put(channel.target_voltage, vout_propogation_and_status)
+
+    return mirror
 
 
 @pytest.fixture
@@ -89,176 +112,6 @@ async def test_move_slits(
     ] == messages
 
 
-def move_slits_message_generator(
-    slits: Slits, dimension: SlitDimension, gap: float, center: float
-) -> Generator[Msg, None, None]:
-    """Generates messages produced by move_slits
-    Args:
-        slits: Slits to move
-        dimension: SlitDimension (X or Y)
-        gap: float size of gap
-        center: float position of center
-
-    Yields:
-        A series of Msg objects which would be yielded by move_slits
-    """
-    if dimension == SlitDimension.X:
-        yield Msg("set", slits.x_gap, gap, group=ANY)
-        yield Msg("wait", None, group=ANY)
-        yield Msg("set", slits.x_centre, center, group=ANY)
-        yield Msg("wait", None, group=ANY)
-
-    else:
-        yield Msg("set", slits.y_gap, gap, group=ANY)
-        yield Msg("wait", None, group=ANY)
-        yield Msg("set", slits.y_centre, center, group=ANY)
-        yield Msg("wait", None, group=ANY)
-
-
-def inner_scan_message_generator(
-    mirror: BimorphMirror,
-    slits: Slits,
-    oav: StandardDetector,
-    active_dimension: SlitDimension,
-    active_slit_center_start: float,
-    active_slit_center_end: float,
-    active_slit_size: float,
-    number_of_slit_positions: int,
-) -> Generator[Msg, None, None]:
-    """Generates messages produced by inner_scan.
-
-    Args:
-        mirror: BimorphMirror to move
-        slit: Slits
-        oav: oav on-axis viewer
-        active_dimension: SlitDimension that slit will move in (X or Y)
-        active_slit_center_start: float start position of center of slit in active dimension
-        active_slit_center_end: float final position of center of slit in active dimension
-        active_slit_size: float size of slit in active dimension
-        number_of_slit_positions: int number of slit positions per pencil beam scan
-
-    Yields:
-        A series of Msg objects which would be yielded by inner_scan"""
-    for value in linspace(
-        active_slit_center_start, active_slit_center_end, number_of_slit_positions
-    ):
-        yield from move_slits_message_generator(
-            slits, active_dimension, active_slit_size, value
-        )
-        yield Msg("trigger", oav, group=ANY)
-        yield Msg("wait", None, group=ANY, move_on=False, timeout=None)
-        yield Msg("create", None, name=ANY)
-        for device in [oav, slits, mirror]:
-            yield Msg("read", device)
-        yield Msg("save", None)
-
-
-def setup_message_generator(
-    mirror: BimorphMirror,
-    slits: Slits,
-    oav: StandardDetector,
-    voltage_increment: float,
-    active_dimension: SlitDimension,
-    active_slit_center_start: float,
-    active_slit_center_end: float,
-    active_slit_size: float,
-    inactive_slit_center: float,
-    inactive_slit_size: float,
-    number_of_slit_positions: int,
-    bimorph_settle_time: float,
-    initial_voltage_list: list | None,
-) -> Generator[Msg, None, None]:
-    original_voltage_list = [0.0 for _ in range(len(mirror.channels))]
-
-    for channel in mirror.channels.values():
-        yield Msg("read", channel)
-
-    for motor in [slits.x_centre, slits.y_gap, slits.x_centre, slits.y_centre]:
-        yield Msg("read", motor)
-
-    if active_dimension == SlitDimension.X:
-        inactive_dimension = SlitDimension.Y
-    else:
-        inactive_dimension = SlitDimension.X
-
-    yield from move_slits_message_generator(
-        slits, active_dimension, active_slit_size, active_slit_center_start
-    )
-    yield from move_slits_message_generator(
-        slits, inactive_dimension, inactive_slit_size, inactive_slit_center
-    )
-
-    yield from outer_message_generator(
-        mirror,
-        slits,
-        oav,
-        active_dimension,
-        active_slit_center_start,
-        active_slit_center_end,
-        active_slit_size,
-        number_of_slit_positions,
-        bimorph_settle_time,
-        initial_voltage_list,
-        voltage_increment,
-    )
-
-    yield from move_slits(slits, SlitDimension.X, 0.0, 0.0)
-    yield from move_slits(slits, SlitDimension.Y, 0.0, 0.0)
-
-    for value, channel in zip(
-        original_voltage_list, mirror.channels.values(), strict=True
-    ):
-        yield Msg("set", channel, value)
-
-
-def outer_message_generator(
-    mirror: BimorphMirror,
-    slits: Slits,
-    oav: StandardDetector,
-    active_dimension: SlitDimension,
-    active_slit_center_start: float,
-    active_slit_center_end: float,
-    active_slit_size: float,
-    number_of_slit_positions: int,
-    bimorph_settle_time: float,
-    initial_voltage_list: list[float],
-    voltage_increment: float,
-) -> Generator[Msg, None, None]:
-    """Generates messages produced by outer:
-
-    Args:
-        mirror: BimorphMirror to move
-        slits: Slits
-        oav: oav on-axis viewer
-        active_dimension: SlitDimension that slit will move in (X or Y)
-        active_slit_center_start: float start position of center of slit in active dimension
-        active_slit_center_end: float final position of center of slit in active dimension
-        active_slit_size: float size of slit in active dimension
-        number_of_slit_positions: int number of slit positions per pencil beam scan
-        bimorph_settle_time: float time in seconds to wait after bimorph move
-        initial_voltage_list: optional list[float] starting voltages for bimorph (defaults to current voltages)
-        voltage_increment: float voltage increment applied to each bimorph electrode
-    """
-    for i, channel in enumerate(mirror.channels.values()):
-        yield Msg(
-            "set", channel, initial_voltage_list[i] + voltage_increment, group=ANY
-        )
-        yield Msg("wait", None, group=ANY)
-        yield Msg("sleep", None, 0.0)
-        print("foo")
-
-        yield from inner_scan_message_generator(
-            mirror,
-            slits,
-            oav,
-            active_dimension,
-            active_slit_center_start,
-            active_slit_center_end,
-            active_slit_size,
-            number_of_slit_positions,
-        )
-
-
 @pytest.mark.parametrize("voltage_increment", [100.0])
 @pytest.mark.parametrize("active_dimension", [SlitDimension.X, SlitDimension.Y])
 @pytest.mark.parametrize("active_slit_center_start", [0.0])
@@ -270,7 +123,7 @@ def outer_message_generator(
 @pytest.mark.parametrize("bimorph_settle_time", [0.0])
 async def test_bimorph_optimisation(
     RE: RunEngine,
-    mirror,
+    mirror_with_mocked_put,
     slits,
     oav,
     voltage_increment,
@@ -284,34 +137,18 @@ async def test_bimorph_optimisation(
     bimorph_settle_time,
     initial_voltage_list,
 ):
-    assert list(
-        bimorph_optimisation(
-            mirror,
-            slits,
-            oav,
-            voltage_increment,
-            active_dimension,
-            active_slit_center_start,
-            active_slit_center_end,
-            active_slit_size,
-            inactive_slit_center,
-            inactive_slit_size,
-            number_of_slit_positions,
-            bimorph_settle_time,
-            initial_voltage_list,
-        )
-    ) == list(
-        outer_message_generator(
-            mirror,
-            slits,
-            oav,
-            active_dimension,
-            active_slit_center_start,
-            active_slit_center_end,
-            active_slit_size,
-            number_of_slit_positions,
-            bimorph_settle_time,
-            initial_voltage_list,
-            voltage_increment,
-        )
+    bimorph_optimisation(
+        mirror_with_mocked_put,
+        slits,
+        oav,
+        voltage_increment,
+        active_dimension,
+        active_slit_center_start,
+        active_slit_center_end,
+        active_slit_size,
+        inactive_slit_center,
+        inactive_slit_size,
+        number_of_slit_positions,
+        bimorph_settle_time,
+        initial_voltage_list,
     )
