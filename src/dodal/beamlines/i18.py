@@ -8,6 +8,7 @@ from dodal.common.beamlines.beamline_utils import (
     set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.crystal_metadata import CrystalMetadata
 from dodal.common.visit import (
     LocalDirectoryServiceClient,
     StaticVisitPathProvider,
@@ -16,6 +17,7 @@ from dodal.devices.i18.diode import Diode
 from dodal.devices.i18.KBMirror import KBMirror
 from dodal.devices.i18.table import Table
 from dodal.devices.i18.thor_labs_stage import ThorLabsStage
+from dodal.devices.i22.dcm import DoubleCrystalMonochromator
 from dodal.devices.slits import Slits
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.tetramm import TetrammDetector
@@ -51,6 +53,30 @@ def synchrotron() -> Synchrotron:
 @device_factory()
 def undulator() -> Undulator:
     return Undulator(f"{PREFIX.insertion_prefix}-MO-SERVC-01:")
+
+
+@device_factory()
+def dcm() -> DoubleCrystalMonochromator:
+    crystal_1_metadata = CrystalMetadata(
+        usage="Bragg",
+        type="silicon",
+        reflection=(1, 1, 1),
+        d_spacing=(3.13475, "nm"),
+    )
+
+    crystal_2_metadata = CrystalMetadata(
+        usage="Bragg",
+        type="silicon",
+        reflection=(1, 1, 1),
+        d_spacing=(3.13475, "nm"),
+    )
+
+    return DoubleCrystalMonochromator(
+        prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:",
+        temperature_prefix=f"{PREFIX.beamline_prefix}-DI-DCM-01:",
+        crystal_1_metadata=crystal_1_metadata,
+        crystal_2_metadata=crystal_2_metadata,
+    )
 
 
 @device_factory()
