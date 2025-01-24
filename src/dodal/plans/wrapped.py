@@ -49,9 +49,9 @@ def count(
     Wraps bluesky.plans.count(det, num, delay, md=metadata) exposing only serializable
     parameters and metadata."""
     if isinstance(delay, Sequence):
-        assert len(delay) == num - 1, (
-            f"Number of delays given must be {num - 1}: was given {len(delay)}"
-        )
+        assert (
+            len(delay) == num - 1
+        ), f"Number of delays given must be {num - 1}: was given {len(delay)}"
     metadata = metadata or {}
     metadata["shape"] = (num,)
     yield from bp.count(tuple(detectors), num, delay=delay, md=metadata)

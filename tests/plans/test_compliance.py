@@ -53,13 +53,13 @@ def assert_hard_requirements(plan: PlanGenerator, signature: inspect.Signature):
 
 
 def assert_metadata_requirements(plan: PlanGenerator, signature: inspect.Signature):
-    assert "metadata" in signature.parameters, (
-        f"'{plan.__name__}' does not allow metadata"
-    )
+    assert (
+        "metadata" in signature.parameters
+    ), f"'{plan.__name__}' does not allow metadata"
     metadata = signature.parameters["metadata"]
-    assert metadata.annotation == dict[str, Any] | None and metadata.default is None, (
-        f"'{plan.__name__}' metadata is not optional"
-    )
+    assert (
+        metadata.annotation == dict[str, Any] | None and metadata.default is None
+    ), f"'{plan.__name__}' metadata is not optional"
     assert metadata.default is None, f"'{plan.__name__}' metadata default is mutable"
 
 

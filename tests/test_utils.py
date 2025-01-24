@@ -308,13 +308,15 @@ OPHYD_ASYNC_DEVICE_A = OphydV2Device(name="OPHYD_ASYNC_DEVICE_A")
 OPHYD_ASYNC_DEVICE_B = OphydV2Device(name="OPHYD_ASYNC_DEVICE_B")
 
 
-def _filtering_test_cases() -> Iterable[
-    tuple[
-        Mapping[str, AnyDevice],
-        Mapping[str, OphydV1Device],
-        Mapping[str, OphydV2Device],
+def _filtering_test_cases() -> (
+    Iterable[
+        tuple[
+            Mapping[str, AnyDevice],
+            Mapping[str, OphydV1Device],
+            Mapping[str, OphydV2Device],
+        ]
     ]
-]:
+):
     yield {}, {}, {}
     yield (
         {"oa": OPHYD_DEVICE_A},
