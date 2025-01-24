@@ -4,8 +4,8 @@ from dodal.common.beamlines import beamline_utils
 
 def test_list_1():
     i19_1.zebra(connect_immediately=True, mock=True)
-    i19_1.oav(connect_immediately=True, mock=True)
-    assert beamline_utils.list_active_devices() == ["zebra", "oav"]
+    i19_1.synchrotron(connect_immediately=True, mock=True)
+    assert beamline_utils.list_active_devices() == ["zebra", "synchrotron"]
     beamline_utils.clear_devices()
     assert beamline_utils.list_active_devices() == []
 
