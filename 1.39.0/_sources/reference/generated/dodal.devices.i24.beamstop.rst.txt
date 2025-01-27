@@ -1,0 +1,37 @@
+dodal.devices.i24.beamstop
+==========================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.i24
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~beamstop.Beamstop
+   ~beamstop.BeamstopPositions
+
+
+
+
+.. automodule:: dodal.devices.i24.beamstop
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

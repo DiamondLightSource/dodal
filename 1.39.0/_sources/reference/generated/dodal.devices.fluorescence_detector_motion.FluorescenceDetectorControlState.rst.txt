@@ -1,0 +1,78 @@
+dodal.devices.fluorescence\_detector\_motion.FluorescenceDetectorControlState
+=============================================================================
+
+.. currentmodule:: dodal.devices.fluorescence_detector_motion
+
+.. autoclass:: FluorescenceDetectorControlState
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~FluorescenceDetectorControlState.OUT
+      
+      
+      ~FluorescenceDetectorControlState.IN
+      
+   
+   

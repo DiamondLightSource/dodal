@@ -1,0 +1,40 @@
+dodal.devices.i24.beam\_center.DetectorBeamCenter
+=================================================
+
+.. currentmodule:: dodal.devices.i24.beam_center
+
+.. autoclass:: DetectorBeamCenter
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

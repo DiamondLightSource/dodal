@@ -1,0 +1,55 @@
+dodal.devices.current\_amplifiers.CurrentAmpDet
+===============================================
+
+.. currentmodule:: dodal.devices.current_amplifiers
+
+.. autoclass:: CurrentAmpDet
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      ~CurrentAmpDet.auto_gain
+      
+      
+      
+      
+      
+      
+      ~CurrentAmpDet.get_corrected_current
+      
+      
+      ~CurrentAmpDet.prepare
+      
+      
+      ~CurrentAmpDet.read
+      
+      
+      
+      
+      ~CurrentAmpDet.stage
+      
+      
+      ~CurrentAmpDet.unstage
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

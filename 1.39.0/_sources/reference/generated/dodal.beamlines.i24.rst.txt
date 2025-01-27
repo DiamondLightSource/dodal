@@ -1,0 +1,48 @@
+dodal.beamlines.i24
+===================
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.beamlines.i24
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      aperture
+      attenuator
+      backlight
+      beamstop
+      dcm
+      detector_motion
+      eiger
+      eiger_beam_center
+      focus_mirrors
+      oav
+      pilatus_beam_center
+      pilatus_metadata
+      pmac
+      shutter
+      vgonio
+      zebra
+   
+   
+
+   
+   
+   
