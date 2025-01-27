@@ -6,6 +6,7 @@ from ophyd_async.core import (
     LazyMock,
     StandardReadable,
 )
+from bluesky.protocols import Movable
 from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.common.signal_utils import create_hardware_backed_soft_signal
@@ -28,7 +29,7 @@ def _get_correct_zoom_string(zoom: str) -> str:
     return zoom
 
 
-class ZoomController(StandardReadable):
+class ZoomController(StandardReadable, Movable):
     """
     Device to control the zoom level. This should be set like
         o = OAV(name="oav")
