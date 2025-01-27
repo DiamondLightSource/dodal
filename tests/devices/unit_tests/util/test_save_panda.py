@@ -3,7 +3,6 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from bluesky.simulators import RunEngineSimulator
-from ophyd_async.fastcs.panda import phase_sorter
 
 from dodal.plans.save_panda import _save_panda, main
 
@@ -11,6 +10,8 @@ from dodal.plans.save_panda import _save_panda, main
 def test_save_panda():
     sim_run_engine = RunEngineSimulator()
     panda = MagicMock()
+    directory = "test"
+    filename = "file.yml"
     with (
         patch(
             "dodal.plans.save_panda.make_device", return_value={"panda": panda}
@@ -19,64 +20,97 @@ def test_save_panda():
             "dodal.plans.save_panda.RunEngine",
             return_value=MagicMock(side_effect=sim_run_engine.simulate_plan),
         ),
-        patch("dodal.plans.save_panda.save_device") as mock_save_device,
+        patch("dodal.plans.save_panda.store_settings") as mock_store_settings,
+        patch("dodal.plans.save_panda.YamlSettingsProvider") as mock_settings_provider,
     ):
-        _save_panda("i03", "panda", "test/file.yml")
+        _save_panda("i03", "panda", directory, filename)
 
         mock_make_device.assert_called_with("dodal.beamlines.i03", "panda")
-        mock_save_device.assert_called_with(panda, "test/file.yml", sorter=phase_sorter)
+        mock_store_settings.assert_called_with(
+            mock_settings_provider(),
+            "file.yml",
+            panda,
+        )
 
 
 @patch(
     "dodal.plans.save_panda.sys.exit",
     side_effect=AssertionError("This exception expected"),
 )
-def test_save_panda_failure_to_create_device_exits_with_failure_code(mock_exit):
+def test_save_panda_failure_to_create_device_exits_with_failure_code(mock_exit, tmpdir):
     with patch(
         "dodal.plans.save_panda.make_device",
         side_effect=ValueError("device does not exist"),
     ):
         with pytest.raises(AssertionError):
-            _save_panda("i03", "panda", "test/file.yml")
+            _save_panda("i03", "panda", tmpdir, "filename")
 
     mock_exit.assert_called_once_with(1)
 
 
 @patch("dodal.plans.save_panda._save_panda")
 @pytest.mark.parametrize(
-    "beamline, args, expected_beamline, expected_device_name, expected_output_file, "
+    "beamline, args, expected_beamline, expected_device_name, expected_output_dir, expected_output_file, "
     "expected_return_value",
     [
-        ("i03", ["my_file_name.yml"], "i03", "panda", "my_file_name.yml", 0),
+        (
+            "i03",
+            ["--file-name=my_file_name.yml", "--output-directory=my_dir"],
+            "i03",
+            "panda",
+            "my_dir",
+            "my_file_name.yml",
+            0,
+        ),
         (
             "i02",
-            ["--beamline=i04", "my_file_name.yml"],
+            [
+                "--beamline=i04",
+                "--file-name=my_file_name.yml",
+                "--output-directory=my_dir",
+            ],
             "i04",
             "panda",
+            "my_dir",
             "my_file_name.yml",
             0,
         ),
         (
             None,
-            ["--beamline=i04", "my_file_name.yml"],
+            [
+                "--beamline=i04",
+                "--file-name=my_file_name.yml",
+                "--output-directory=my_dir",
+            ],
             "i04",
             "panda",
+            "my_dir",
             "my_file_name.yml",
             0,
         ),
         (
             "i03",
-            ["--device-name=my_panda", "my_file_name.yml"],
+            [
+                "--device-name=my_panda",
+                "--file-name=my_file_name.yml",
+                "--output-directory=my_dir",
+            ],
             "i03",
             "my_panda",
+            "my_dir",
             "my_file_name.yml",
             0,
         ),
         (
             None,
-            ["--device-name=my_panda", "my_file_name.yml"],
+            [
+                "--device-name=my_panda",
+                "--file-name=my_file_name.yml",
+                "--output-directory=my_dir",
+            ],
             "i03",
             "my_panda",
+            "my_dir",
             "my_file_name.yml",
             1,
         ),
@@ -88,6 +122,7 @@ def test_main(
     args: list[str],
     expected_beamline,
     expected_device_name,
+    expected_output_dir,
     expected_output_file,
     expected_return_value,
 ):
@@ -102,7 +137,10 @@ def test_main(
     assert return_value == expected_return_value
     if not expected_return_value:
         mock_save_panda.assert_called_with(
-            expected_beamline, expected_device_name, expected_output_file
+            expected_beamline,
+            expected_device_name,
+            expected_output_dir,
+            expected_output_file,
         )
 
 
@@ -124,10 +162,16 @@ def test_file_exists_check(
     force: bool,
     save_panda_called: bool,
     expected_return_value: int,
+    tmpdir,
 ):
     exists = mock_path.return_value.exists
     exists.return_value = file_exists
-    argv = ["save_panda", "--beamline=i03", "test_output_file.yml"]
+    argv = [
+        "save_panda",
+        "--beamline=i03",
+        "--file-name=test_output_file.yml",
+        f"--output-directory={tmpdir}",
+    ]
     if force:
         argv.insert(1, "--force")
 
@@ -137,7 +181,9 @@ def test_file_exists_check(
     mock_path.assert_called_with("test_output_file.yml")
     exists.assert_called_once()
     if save_panda_called:
-        mock_save_panda.assert_called_with("i03", "panda", "test_output_file.yml")
+        mock_save_panda.assert_called_with(
+            "i03", "panda", tmpdir, "test_output_file.yml"
+        )
     else:
         mock_save_panda.assert_not_called()
 
