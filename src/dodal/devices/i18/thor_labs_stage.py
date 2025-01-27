@@ -12,7 +12,7 @@ class XYPosition(BaseModel):
 
 
 class ThorLabsStage(StandardReadable):
-    def __init__(self, prefix: str = "", name: str = "") -> None:
+    def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
             self.x = Motor(prefix + "X")
             self.y = Motor(prefix + "Y")
