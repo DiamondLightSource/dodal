@@ -115,7 +115,7 @@ def it() -> TetrammDetector:
 
 
 @device_factory(skip=True)
-# VFM uses different IOC than HFM
+# VFM uses different IOC than HFM https://github.com/DiamondLightSource/dodal/issues/1009
 def vfm() -> KBMirror:
     return KBMirror(f"{PREFIX.beamline_prefix}-OP-VFM-01:")
 
