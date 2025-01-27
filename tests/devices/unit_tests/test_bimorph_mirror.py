@@ -53,11 +53,11 @@ def mirror_with_mocked_put(mirror: BimorphMirror):
         await asyncio.sleep(0)
         set_mock_value(mirror.status, BimorphMirrorStatus.IDLE)
 
-    async def status(*_: Any, **__: Any):
+    async def start_busy_idle(*_: Any, **__: Any):
         asyncio.create_task(busy_idle())
 
     for signal in walk_rw_signals(mirror).values():
-        callback_on_mock_put(signal, status)
+        callback_on_mock_put(signal, start_busy_idle)
 
     def callback_function(
         channel: BimorphMirrorChannel,
