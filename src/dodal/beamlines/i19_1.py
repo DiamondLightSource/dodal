@@ -18,7 +18,7 @@ from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
 # NOTE All PVs for both hutches have the prefix BL19I
-BL = get_beamline_name("s19")
+BL = get_beamline_name("i19_1")
 PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
@@ -35,7 +35,7 @@ ZOOM_PARAMS_FILE = (
 DISPLAY_CONFIG = "/dls_sw/i19-1/software/daq_configuration/domain/display.configuration"
 
 
-@device_factory(skip=BL == "s19")
+@device_factory()
 def oav() -> OAV:
     return OAV(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
