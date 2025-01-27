@@ -26,3 +26,7 @@ class Table(StandardReadable):
     async def set(self, value: TablePosition):
         self.x.set(value.x)
         self.y.set(value.y)
+        if value.z:
+            self.z.set(value.z)
+        if value.theta:
+            self.theta.set(value.theta)
