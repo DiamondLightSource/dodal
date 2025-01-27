@@ -17,9 +17,9 @@ from dodal.devices.zebra.zebra_constants_mapping import (
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
-# NOTE All PVs for both hutches have the prefix BL19I
+# NOTE All PVs for both hutches and the optics have the prefix BL19I
 BL = get_beamline_name("i19_1")
-PREFIX = BeamlinePrefix(BL)
+PREFIX = BeamlinePrefix("i19", "I")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
@@ -39,7 +39,6 @@ DISPLAY_CONFIG = "/dls_sw/i19-1/software/daq_configuration/domain/display.config
 def oav() -> OAV:
     return OAV(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
-        name="oav",
         config=OAVConfig(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
     )
 
@@ -50,9 +49,9 @@ def zebra() -> Zebra:
     If this is called when already instantiated in i19-1, it will return the existing object.
     """
     return Zebra(
-        I19_1_ZEBRA_MAPPING,
-        "zebra",
-        f"{PREFIX.beamline_prefix}-EA-ZEBRA-03:",
+        mapping=I19_1_ZEBRA_MAPPING,
+        name="zebra",
+        prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-03:",
     )
 
 
@@ -63,8 +62,7 @@ def shutter() -> HutchShutter:
     """
     # See https://github.com/DiamondLightSource/dodal/issues/1020
     return HutchShutter(
-        f"{PREFIX.beamline_prefix}-PS-SHTR-01:",
-        "shutter",
+        prefix=f"{PREFIX.beamline_prefix}-PS-SHTR-01:",
     )
 
 
@@ -73,7 +71,4 @@ def synchrotron() -> Synchrotron:
     """Get the i19-1 synchrotron device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i19-1, it will return the existing object.
     """
-    return Synchrotron(
-        "",
-        "synchrotron",
-    )
+    return Synchrotron()
