@@ -33,8 +33,9 @@ class HutchConditionalShutter(StandardReadable, Movable):
     An error will instead be raised if the hutch state reads as "INVALID".
     """
 
-    def __init__(self, bl_prefix: str, hutch: HutchState, name: str = "") -> None:
-        self.shutter = HutchShutter(prefix=f"{bl_prefix}-PS-SHTR-01:", name=name)
+    def __init__(self, prefix: str, hutch: HutchState, name: str = "") -> None:
+        self.shutter = HutchShutter(prefix=prefix, name=name)
+        bl_prefix = prefix.split("-")[0]
         self.hutch_state = epics_signal_r(str, f"{bl_prefix}-OP-STAT-01:EHStatus.VALA")
         self.hutch_request = hutch
         super().__init__(name)
