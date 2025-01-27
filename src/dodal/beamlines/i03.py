@@ -335,7 +335,9 @@ def synchrotron(
 
 
 def undulator(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+    wait_for_connection: bool = True,
+    fake_with_ophyd_sim: bool = False,
+    daq_configuration_path: str | None = None,
 ) -> Undulator:
     """Get the i03 undulator device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
@@ -347,12 +349,15 @@ def undulator(
         wait_for_connection,
         fake_with_ophyd_sim,
         bl_prefix=False,
-        id_gap_lookup_table_path="/dls_sw/i03/software/daq_configuration/lookup/BeamLine_Undulator_toGap.txt",
+        # evaluate here not as parameter default to enable post-import mocking
+        id_gap_lookup_table_path=f"{daq_configuration_path or DAQ_CONFIGURATION_PATH}/lookup/BeamLine_Undulator_toGap.txt",
     )
 
 
 def undulator_dcm(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+    wait_for_connection: bool = True,
+    fake_with_ophyd_sim: bool = False,
+    daq_configuration_path: str | None = None,
 ) -> UndulatorDCM:
     """Get the i03 undulator DCM device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
@@ -363,9 +368,14 @@ def undulator_dcm(
         prefix="",
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
-        undulator=undulator(wait_for_connection, fake_with_ophyd_sim),
+        undulator=undulator(
+            wait_for_connection,
+            fake_with_ophyd_sim,
+            daq_configuration_path=daq_configuration_path,
+        ),
         dcm=dcm(wait_for_connection, fake_with_ophyd_sim),
-        daq_configuration_path=DAQ_CONFIGURATION_PATH,
+        # evaluate here not as parameter default to enable post-import mocking
+        daq_configuration_path=daq_configuration_path or DAQ_CONFIGURATION_PATH,
     )
 
 
