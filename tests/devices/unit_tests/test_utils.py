@@ -63,11 +63,12 @@ def test_full_status_gives_error_if_intermediate_status_fails():
 
 def test_check_call_back_error_gives_correct_error():
     LOGGER.error = MagicMock()
-    with pytest.raises(StatusException):
-        returned_status = run_functions_without_blocking([get_bad_status])
-        returned_status.wait(0.1)
+    with patch("time.sleep", side_effect=lambda _: None):  # Simulate no delay
+        with pytest.raises(StatusException):
+            returned_status = run_functions_without_blocking([get_bad_status])
+            returned_status.wait(0.1)
 
-        assert isinstance(returned_status.exception(), StatusException)
+            assert isinstance(returned_status.exception(), StatusException)
 
     LOGGER.error.assert_called()
 
@@ -88,25 +89,28 @@ def test_wrap_function_callback_errors_on_wrong_return_type(caplog):
         return status
 
     dummy_func = MagicMock(return_value=3)
-    returned_status = run_functions_without_blocking(
-        [lambda: get_good_status(), dummy_func], timeout=0.05
-    )
-    with pytest.raises(StatusTimeoutError):
-        returned_status.wait(0.2)
+
+    with patch("time.sleep", side_effect=lambda _: None):  # Simulate no delay
+        returned_status = run_functions_without_blocking(
+            [lambda: get_good_status(), dummy_func], timeout=0.05
+        )
+
+        with pytest.raises(StatusTimeoutError):
+            returned_status.wait(0.2)
+
     assert returned_status.done is True
     assert returned_status.success is False
-
     dummy_func.assert_called_once()
-
     assert "does not return a Status" in caplog.text
 
 
 def test_status_points_to_provided_device_object():
     expected_obj = MagicMock()
-    returned_status = run_functions_without_blocking(
-        [NullStatus], associated_obj=expected_obj
-    )
-    returned_status.wait(0.1)
+    with patch("time.sleep", side_effect=lambda _: None):  # Simulate no delay
+        returned_status = run_functions_without_blocking(
+            [NullStatus], associated_obj=expected_obj
+        )
+        returned_status.wait(0.1)
     assert returned_status.obj == expected_obj
 
 
@@ -135,11 +139,12 @@ def test_if_one_status_errors_then_later_functions_not_called():
         NullStatus,
         tester,
     ]
-    returned_status = run_functions_without_blocking(
-        status_calls, associated_obj=MagicMock()
-    )
-    with pytest.raises(StatusException):
-        returned_status.wait(0.1)
+    with patch("time.sleep", side_effect=lambda _: None):  # Simulate no delay
+        returned_status = run_functions_without_blocking(
+            status_calls, associated_obj=MagicMock()
+        )
+        with pytest.raises(StatusException):
+            returned_status.wait(0.1)
     assert returned_status.done
     tester.assert_not_called()
 
@@ -154,13 +159,15 @@ def test_if_one_status_pending_then_later_functions_not_called():
         NullStatus,
         tester,
     ]
-    returned_status = run_functions_without_blocking(
+    with patch("time.sleep", side_effect=lambda _: None):  # Simulate no delay
+        returned_status = run_functions_without_blocking(
         status_calls, associated_obj=MagicMock()
     )
-    with pytest.raises(WaitTimeoutError):
-        returned_status.wait(0.1)
-    tester.assert_not_called()
-    pending_status.set_exception(StatusException)
-    with pytest.raises(StatusException):
-        returned_status.wait(0.1)
+        with pytest.raises(WaitTimeoutError):
+            returned_status.wait(0.1)
+        tester.assert_not_called()
+    with patch("time.sleep", side_effect=lambda _: None):  # Simulate no delay
+        pending_status.set_exception(StatusException)
+        with pytest.raises(StatusException):
+            returned_status.wait(0.1)
     tester.assert_not_called()
