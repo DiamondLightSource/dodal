@@ -35,7 +35,7 @@ ZOOM_PARAMS_FILE = (
 DISPLAY_CONFIG = "/dls_sw/i19-1/software/daq_configuration/domain/display.configuration"
 
 
-@device_factory()
+@device_factory(skip=True)
 def oav() -> OAV:
     return OAV(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
