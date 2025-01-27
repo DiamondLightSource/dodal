@@ -30,12 +30,12 @@ async def test_reading_includes_read_fields(
             "diamond_filter-y_motor": {
                 "value": 0.0,
                 "timestamp": ANY,
-                "alarm_severity": ANY,
+                "alarm_severity": 0,
             },
             "diamond_filter-thickness": {
                 "value": I03Filters.EMPTY,
                 "timestamp": ANY,
-                "alarm_severity": ANY,
+                "alarm_severity": 0,
             },
         },
     )

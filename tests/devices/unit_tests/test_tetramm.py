@@ -273,7 +273,7 @@ async def test_disarm_disarms_driver(
         )
     )
     assert (await tetramm_driver.acquire.get_value()) == 1
-    await tetramm.controller.disarm()
+    await tetramm._controller.disarm()
     assert (await tetramm_driver.acquire.get_value()) == 0
 
 
@@ -285,7 +285,7 @@ async def test_prepare_with_too_low_a_deadtime_raises_error(
     tetramm: TetrammDetector,
 ):
     with pytest.raises(
-        AssertionError,
+        ValueError,
         match=r"Detector .* needs at least 2e-05s deadtime, but trigger logic "
         "provides only 1e-05s",
     ):
@@ -327,7 +327,7 @@ async def test_prepare_sets_up_writer(
     assert (await tetramm.hdf.num_extra_dims.get_value()) == 0
     assert await tetramm.hdf.lazy_open.get_value()
     assert await tetramm.hdf.swmr_mode.get_value()
-    assert (await tetramm.hdf.file_template.get_value()) == "%s/%s.h5"
+    assert (await tetramm.hdf.file_template.get_value()) == "%s%s.h5"
     assert (await tetramm.hdf.file_write_mode.get_value()) == FileWriteMode.STREAM
 
 
@@ -362,7 +362,7 @@ async def test_pilatus_controller(
     RE,
     tetramm: TetrammDetector,
 ):
-    controller = tetramm.controller
+    controller = tetramm._controller
     driver = tetramm.drv
     await controller.prepare(
         TriggerInfo(

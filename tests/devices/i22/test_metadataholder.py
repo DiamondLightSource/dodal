@@ -34,4 +34,4 @@ async def test_config_data_present(saxs: PilatusDetector):
         assert config["source"] == "calibration"
         assert config["dtype"] == "number"
     assert not hasattr(dc, f"{saxs.name}-type")
-    assert dc[f"{saxs.name}-drv-acquire_time"] is not None
+    assert dc[f"{saxs.name}-driver-acquire_time"] is not None

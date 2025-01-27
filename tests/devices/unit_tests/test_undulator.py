@@ -41,17 +41,17 @@ async def test_reading_includes_read_fields(undulator: Undulator):
             "undulator-gap_access": {
                 "value": UndulatorGapAccess.ENABLED,
                 "timestamp": ANY,
-                "alarm_severity": ANY,
+                "alarm_severity": 0,
             },
             "undulator-gap_motor": {
                 "value": 0.0,
                 "timestamp": ANY,
-                "alarm_severity": ANY,
+                "alarm_severity": 0,
             },
             "undulator-current_gap": {
                 "value": 0.0,
                 "timestamp": ANY,
-                "alarm_severity": ANY,
+                "alarm_severity": 0,
             },
         },
     )
@@ -64,27 +64,32 @@ async def test_configuration_includes_configuration_fields(undulator: Undulator)
             "undulator-gap_motor-motor_egu": {
                 "value": "",
                 "timestamp": ANY,
-                "alarm_severity": ANY,
+                "alarm_severity": 0,
             },
             "undulator-gap_motor-velocity": {
                 "value": 0.0,
                 "timestamp": ANY,
-                "alarm_severity": ANY,
+                "alarm_severity": 0,
             },
             "undulator-length": {
                 "value": 2.0,
                 "timestamp": ANY,
-                "alarm_severity": ANY,
+                "alarm_severity": 0,
             },
             "undulator-poles": {
                 "value": 80,
                 "timestamp": ANY,
-                "alarm_severity": ANY,
+                "alarm_severity": 0,
             },
             "undulator-gap_discrepancy_tolerance_mm": {
                 "value": 0.002,
                 "timestamp": ANY,
-                "alarm_severity": ANY,
+                "alarm_severity": 0,
+            },
+            "undulator-gap_motor-offset": {
+                "alarm_severity": 0,
+                "timestamp": ANY,
+                "value": 0.0,
             },
         },
     )

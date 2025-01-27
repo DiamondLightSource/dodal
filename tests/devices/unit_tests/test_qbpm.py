@@ -21,7 +21,7 @@ async def test_reading_includes_read_fields(qbpm: QBPM):
             "qbpm-intensity_uA": {
                 "value": 0.0,
                 "timestamp": ANY,
-                "alarm_severity": ANY,
+                "alarm_severity": 0,
             },
         },
     )

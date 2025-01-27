@@ -46,11 +46,11 @@ async def test_trigger(
 
     await merlin.stage()
     await merlin.prepare(one_shot_trigger_info)
-    await merlin.controller.arm()
+    await merlin._controller.arm()
 
     assert await merlin.drv.acquire.get_value()
 
-    await merlin.controller.wait_for_idle()
+    await merlin._controller.wait_for_idle()
 
 
 async def test_can_collect(
