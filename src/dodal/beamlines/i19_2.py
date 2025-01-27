@@ -17,9 +17,9 @@ from dodal.utils import BeamlinePrefix
 
 # NOTE all workstations on I19 default to i19-1 as beamline name
 # Unless variable is exported (which is not usually done by scientists)
-# NOTE All PVs for both hutches have the prefix BL19I
+# NOTE All PVs for both hutches and the optics have the prefix BL19I
 BL = "i19-2"
-PREFIX = BeamlinePrefix(BL)
+PREFIX = BeamlinePrefix("i19", "I")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
@@ -36,9 +36,9 @@ def zebra() -> Zebra:
     If this is called when already instantiated in i19-2, it will return the existing object.
     """
     return Zebra(
-        I19_2_ZEBRA_MAPPING,
-        "zebra",
-        f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:",
+        mapping=I19_2_ZEBRA_MAPPING,
+        name="zebra",
+        prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:",
     )
 
 
@@ -49,8 +49,7 @@ def shutter() -> HutchShutter:
     """
     # See https://github.com/DiamondLightSource/dodal/issues/1020
     return HutchShutter(
-        f"{PREFIX.beamline_prefix}-PS-SHTR-01:",
-        "shutter",
+        prefix=f"{PREFIX.beamline_prefix}-PS-SHTR-01:",
     )
 
 
@@ -59,7 +58,4 @@ def synchrotron() -> Synchrotron:
     """Get the i19-2 synchrotron device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i19-2, it will return the existing object.
     """
-    return Synchrotron(
-        "",
-        "synchrotron",
-    )
+    return Synchrotron()
