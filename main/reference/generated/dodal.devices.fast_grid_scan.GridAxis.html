@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.fast_grid_scan.GridAxis &#8212; dodal 1.38.1.dev4+g497f39008 documentation</title>
+    <title>dodal.devices.fast_grid_scan.GridAxis &#8212; dodal 1.38.1.dev5+gaab178f1c documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=b1fef952"></script>
+    <script src="../../_static/documentation_options.js?v=12201f8c"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -870,8 +870,8 @@
 <p class="rubric">Methods</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_within</span></code>(steps)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.fast_grid_scan.GridAxis.is_within" title="dodal.devices.fast_grid_scan.GridAxis.is_within"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_within</span></code></a>(steps)</p></td>
+<td><p>Determine whether a single axis coordinate is within the grid.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.fast_grid_scan.GridAxis.steps_to_motor_position" title="dodal.devices.fast_grid_scan.GridAxis.steps_to_motor_position"><code class="xref py py-obj docutils literal notranslate"><span class="pre">steps_to_motor_position</span></code></a>(steps)</p></td>
 <td><p>Gives the motor position based on steps, where steps are 0 indexed</p></td>
@@ -907,6 +907,22 @@
 <dt class="sig sig-object py" id="dodal.devices.fast_grid_scan.GridAxis.end">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">end</span></span><a class="headerlink" href="#dodal.devices.fast_grid_scan.GridAxis.end" title="Link to this definition">#</a></dt>
 <dd><p>Gives the point where the final frame is taken</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dodal.devices.fast_grid_scan.GridAxis.is_within">
+<span class="sig-name descname"><span class="pre">is_within</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/fast_grid_scan.html#GridAxis.is_within"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.fast_grid_scan.GridAxis.is_within" title="Link to this definition">#</a></dt>
+<dd><p>Determine whether a single axis coordinate is within the grid.
+The coordinate is from a continuous coordinate space based on the
+XRC grid where the origin corresponds to the centre of the first grid box.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>steps</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – The coordinate to check</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the coordinate falls within the grid.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -963,6 +979,7 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.fast_grid_scan.GridAxis"><code class="docutils literal notranslate"><span class="pre">GridAxis</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.fast_grid_scan.GridAxis.steps_to_motor_position"><code class="docutils literal notranslate"><span class="pre">GridAxis.steps_to_motor_position()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.fast_grid_scan.GridAxis.end"><code class="docutils literal notranslate"><span class="pre">GridAxis.end</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.fast_grid_scan.GridAxis.is_within"><code class="docutils literal notranslate"><span class="pre">GridAxis.is_within()</span></code></a></li>
 </ul>
 </li>
 </ul>

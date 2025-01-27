@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.fast_grid_scan &#8212; dodal 1.38.1.dev4+g497f39008 documentation</title>
+    <title>dodal.devices.fast_grid_scan &#8212; dodal 1.38.1.dev5+gaab178f1c documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=b1fef952"></script>
+    <script src="../../../_static/documentation_options.js?v=12201f8c"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -502,8 +502,22 @@ window.addEventListener("load", () => mermaid.run());
         <span class="c1"># refering to the first position</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">steps_to_motor_position</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">full_steps</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">is_within</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">steps</span><span class="p">):</span>
-        <span class="k">return</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">steps</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">full_steps</span></div>
+<div class="viewcode-block" id="GridAxis.is_within">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.fast_grid_scan.GridAxis.html#dodal.devices.fast_grid_scan.GridAxis.is_within">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_within</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">steps</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determine whether a single axis coordinate is within the grid.</span>
+<span class="sd">        The coordinate is from a continuous coordinate space based on the</span>
+<span class="sd">        XRC grid where the origin corresponds to the centre of the first grid box.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            steps: The coordinate to check</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if the coordinate falls within the grid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">&lt;=</span> <span class="n">steps</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">full_steps</span> <span class="o">-</span> <span class="mf">0.5</span></div>
+</div>
 
 
 
