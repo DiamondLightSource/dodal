@@ -160,7 +160,7 @@ def undulator() -> Undulator:
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
         id_gap_lookup_table_path="/dls_sw/i22/software/daq_configuration/lookup/BeamLine_Undulator_toGap.txt",
         poles=80,
-        length=2.0
+        length=2.0,
     )
 
 
