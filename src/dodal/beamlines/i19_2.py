@@ -47,6 +47,7 @@ def shutter() -> HutchShutter:
     """Get the i19-2 hutch shutter device, instantiate it if it hasn't already been.
     If this is called when already instantiated, it will return the existing object.
     """
+    # See https://github.com/DiamondLightSource/dodal/issues/1020
     return HutchShutter(
         f"{PREFIX.beamline_prefix}-PS-SHTR-01:",
         "shutter",
