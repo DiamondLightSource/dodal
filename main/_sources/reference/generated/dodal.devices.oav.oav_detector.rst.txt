@@ -35,10 +35,4 @@ dodal.devices.oav.oav\_detector
 
    
    
-   .. rubric:: Exceptions
-
-   .. autosummary::
-   
-      ZoomLevelNotFoundError
-   
    
