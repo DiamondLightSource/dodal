@@ -1,12 +1,12 @@
 from enum import IntEnum
 
+from bluesky.protocols import Movable
 from ophyd_async.core import (
     DEFAULT_TIMEOUT,
     AsyncStatus,
     LazyMock,
     StandardReadable,
 )
-from bluesky.protocols import Movable
 from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.common.signal_utils import create_hardware_backed_soft_signal
@@ -47,8 +47,8 @@ class ZoomController(StandardReadable, Movable):
         super().__init__(name=name)
 
     @AsyncStatus.wrap
-    async def set(self, level_to_set: str):
-        await self.level.set(level_to_set, wait=True)
+    async def set(self, value: str):
+        await self.level.set(value, wait=True)
 
 
 class OAV(StandardReadable):
