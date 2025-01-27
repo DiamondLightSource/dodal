@@ -64,8 +64,8 @@ class HutchShutter(StandardReadable, Movable):
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        self.control = epics_signal_w(ShutterDemand, prefix + "CON")
-        self.status = epics_signal_r(ShutterState, prefix + "STA")
+        self.control = epics_signal_w(ShutterDemand, f"{prefix}CON")
+        self.status = epics_signal_r(ShutterState, f"{prefix}STA")
 
         bl_prefix = prefix.split("-")[0]
         self.interlock = HutchInterlock(bl_prefix)
