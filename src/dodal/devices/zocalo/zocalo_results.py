@@ -129,7 +129,12 @@ class ZocaloResults(StandardReadable, Triggerable):
 
         prefix (str): EPICS PV prefix for the device
 
-        use_cpu_and_gpu (bool): When True, ZocaloResults will wait for results from the CPU and the GPU, compare them, and provide a warning if the results differ. When False, ZocaloResults will only use results from the CPU
+        use_cpu_and_gpu (bool): When True, ZocaloResults will wait for results from the
+        CPU and the GPU, compare them, and provide a warning if the results differ. When
+        False, ZocaloResults will only use results from the CPU
+
+        use_gpu (bool): When True, ZocaloResults will take the first set of
+        results that it receives (which are likely the GPU results)
 
     """
 
@@ -142,6 +147,7 @@ class ZocaloResults(StandardReadable, Triggerable):
         timeout_s: float = DEFAULT_TIMEOUT,
         prefix: str = "",
         use_cpu_and_gpu: bool = False,
+        use_gpu: bool = False,
     ) -> None:
         self.zocalo_environment = zocalo_environment
         self.sort_key = SortKeys[sort_key]
@@ -151,6 +157,7 @@ class ZocaloResults(StandardReadable, Triggerable):
         self._raw_results_received: Queue = Queue()
         self.transport: CommonTransport | None = None
         self.use_cpu_and_gpu = use_cpu_and_gpu
+        self.use_gpu = use_gpu
 
         self.centre_of_mass, self._com_setter = soft_signal_r_and_setter(
             Array1D[np.float64], name="centre_of_mass"
@@ -253,8 +260,13 @@ class ZocaloResults(StandardReadable, Triggerable):
             raw_results = self._raw_results_received.get(timeout=self.timeout_s)
             source_of_first_results = source_from_results(raw_results)
 
-            # Wait for results from CPU and GPU, warn and continue if only GPU times out. Error if CPU times out
+            if self.use_gpu and source_of_first_results == ZocaloSource.CPU:
+                LOGGER.warning(
+                    "Configured to use GPU results but CPU came first, using CPU results."
+                )
+
             if self.use_cpu_and_gpu:
+                # Wait for results from CPU and GPU, warn and continue if only GPU times out. Error if CPU times out
                 if source_of_first_results == ZocaloSource.CPU:
                     LOGGER.warning("Received zocalo results from CPU before GPU")
                 raw_results_two_sources = [raw_results]
@@ -303,7 +315,7 @@ class ZocaloResults(StandardReadable, Triggerable):
                         raise err
 
             LOGGER.info(
-                f"Zocalo results from {ZocaloSource.CPU.value} processing: found {len(raw_results['results'])} crystals."
+                f"Zocalo results from {source_from_results(raw_results)} processing: found {len(raw_results['results'])} crystals."
             )
             # Sort from strongest to weakest in case of multiple crystals
             await self._put_results(
@@ -335,7 +347,7 @@ class ZocaloResults(StandardReadable, Triggerable):
 
             results = message.get("results", [])
 
-            if self.use_cpu_and_gpu:
+            if self.use_cpu_and_gpu or self.use_gpu:
                 self._raw_results_received.put(
                     {"results": results, "recipe_parameters": recipe_parameters}
                 )
