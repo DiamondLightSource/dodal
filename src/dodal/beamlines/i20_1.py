@@ -20,7 +20,7 @@ def turbo_slit() -> TurboSlit:
     return TurboSlit(f"{PREFIX.beamline_prefix}-OP-PCHRO-01:TS:")
 
 
-@device_factory()
+@device_factory(skip=True)
 def xspress3() -> Xspress3:
     """
     16 channels Xspress3 detector
