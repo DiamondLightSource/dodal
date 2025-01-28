@@ -1,8 +1,10 @@
 import asyncio
 import unittest
 import unittest.mock
+from collections.abc import Generator
 from pathlib import Path
-from unittest.mock import ANY, call
+from typing import Any
+from unittest.mock import ANY, Mock, call
 
 import bluesky.plan_stubs as bps
 import pytest
@@ -43,7 +45,7 @@ def mirror(request, RE: RunEngine) -> BimorphMirror:
 
 
 @pytest.fixture
-def mirror_with_mocked_put(mirror: BimorphMirror):
+def mirror_with_mocked_put(mirror: BimorphMirror) -> BimorphMirror:
     async def busy_idle():
         await asyncio.sleep(0)
         set_mock_value(mirror.status, BimorphMirrorStatus.BUSY)
@@ -225,12 +227,16 @@ class TestBimorphOptimisation:
         )
 
     @pytest.fixture
-    def mock_capture_bimorph_state(self, start_state):
+    def mock_capture_bimorph_state(
+        self, start_state: BimorphState
+    ) -> Generator[Mock, None, None]:
         with unittest.mock.patch(
             "dodal.plans.bimorph.capture_bimorph_state"
         ) as mock_obj:
 
-            def mock_capture_plan_stub(*args, **kwargs):
+            def mock_capture_plan_stub(
+                *args: Any, **kwargs: Any
+            ) -> Generator[None, None, BimorphState]:
                 # return start_state without yielding Msg to RE:
                 yield from iter([])
                 return start_state
@@ -241,11 +247,11 @@ class TestBimorphOptimisation:
 
     async def test_settle_time_called(
         self,
-        mock_inner_scan,
-        mock_move_slits,
-        mock_restore_bimorph_state,
-        mock_bps_sleep,
-        mock_capture_bimorph_state,
+        mock_inner_scan: Mock,
+        mock_move_slits: Mock,
+        mock_restore_bimorph_state: Mock,
+        mock_bps_sleep: Mock,
+        mock_capture_bimorph_state: Mock,
         RE: RunEngine,
         mirror_with_mocked_put: BimorphMirror,
         slits: Slits,
@@ -285,11 +291,11 @@ class TestBimorphOptimisation:
 
     async def test_bimorph_state_captured(
         self,
-        mock_inner_scan,
-        mock_move_slits,
-        mock_restore_bimorph_state,
-        mock_bps_sleep,
-        mock_capture_bimorph_state,
+        mock_inner_scan: Mock,
+        mock_move_slits: Mock,
+        mock_restore_bimorph_state: Mock,
+        mock_bps_sleep: Mock,
+        mock_capture_bimorph_state: Mock,
         RE: RunEngine,
         mirror_with_mocked_put: BimorphMirror,
         slits: Slits,
@@ -330,11 +336,11 @@ class TestBimorphOptimisation:
 
     async def test_plan_sets_mirror_start_position(
         self,
-        mock_inner_scan,
-        mock_move_slits,
-        mock_restore_bimorph_state,
-        mock_bps_sleep,
-        mock_capture_bimorph_state,
+        mock_inner_scan: Mock,
+        mock_move_slits: Mock,
+        mock_restore_bimorph_state: Mock,
+        mock_bps_sleep: Mock,
+        mock_capture_bimorph_state: Mock,
         RE: RunEngine,
         mirror_with_mocked_put: BimorphMirror,
         slits: Slits,
@@ -379,11 +385,11 @@ class TestBimorphOptimisation:
 
     async def test_plan_calls_inner_scan(
         self,
-        mock_inner_scan,
-        mock_move_slits,
-        mock_restore_bimorph_state,
-        mock_bps_sleep,
-        mock_capture_bimorph_state,
+        mock_inner_scan: Mock,
+        mock_move_slits: Mock,
+        mock_restore_bimorph_state: Mock,
+        mock_bps_sleep: Mock,
+        mock_capture_bimorph_state: Mock,
         RE: RunEngine,
         mirror_with_mocked_put: BimorphMirror,
         slits: Slits,
@@ -433,11 +439,11 @@ class TestBimorphOptimisation:
 
     async def test_plan_puts_to_bimorph(
         self,
-        mock_inner_scan,
-        mock_move_slits,
-        mock_restore_bimorph_state,
-        mock_bps_sleep,
-        mock_capture_bimorph_state,
+        mock_inner_scan: Mock,
+        mock_move_slits: Mock,
+        mock_restore_bimorph_state: Mock,
+        mock_bps_sleep: Mock,
+        mock_capture_bimorph_state: Mock,
         RE: RunEngine,
         mirror_with_mocked_put: BimorphMirror,
         slits: Slits,
@@ -482,11 +488,11 @@ class TestBimorphOptimisation:
 
     async def test_bimorph_state_restored(
         self,
-        mock_inner_scan,
-        mock_move_slits,
-        mock_restore_bimorph_state,
-        mock_bps_sleep,
-        mock_capture_bimorph_state,
+        mock_inner_scan: Mock,
+        mock_move_slits: Mock,
+        mock_restore_bimorph_state: Mock,
+        mock_bps_sleep: Mock,
+        mock_capture_bimorph_state: Mock,
         RE: RunEngine,
         mirror_with_mocked_put: BimorphMirror,
         slits: Slits,
