@@ -241,18 +241,14 @@ def smargon() -> Smargon:
     return Smargon(f"{PREFIX.beamline_prefix}-MO-SGON-01:", "smargon")
 
 
-def s4_slit_gaps(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> S4SlitGaps:
+@device_factory()
+def s4_slit_gaps() -> S4SlitGaps:
     """Get the i03 s4_slit_gaps device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        S4SlitGaps,
+    return S4SlitGaps(
+        f"{PREFIX.beamline_prefix}-AL-SLITS-04:",
         "s4_slit_gaps",
-        "-AL-SLITS-04:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
     )
 
 
@@ -299,8 +295,8 @@ def zebra() -> Zebra:
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return Zebra(
-        "zebra",
-        f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:",
+        name="zebra",
+        prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:",
         mapping=I03_ZEBRA_MAPPING,
     )
 
@@ -339,17 +335,14 @@ def sample_shutter() -> ZebraShutter:
     )
 
 
-@skip_device(lambda: BL == "s03")
-def flux(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> Flux:
+@device_factory(skip=BL == "s03")
+def flux() -> Flux:
     """Get the i03 flux device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        Flux,
+    return Flux(
+        f"{PREFIX.beamline_prefix}-MO-FLUX-01:",
         "flux",
-        "-MO-FLUX-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
     )
 
 

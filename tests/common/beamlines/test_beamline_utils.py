@@ -18,7 +18,7 @@ from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.motors import XYZPositioner
 from dodal.devices.smargon import Smargon
 from dodal.log import LOGGER
-from dodal.utils import DeviceInitializationController, make_all_devices
+from dodal.utils import DeviceInitializationController
 
 from ...conftest import mock_beamline_module_filepaths
 
@@ -83,17 +83,6 @@ def test_instantiate_v2_function_fake_makes_fake():
     )
     assert isinstance(fake_smargon, StandardReadable)
     assert fake_smargon.omega.user_setpoint.source.startswith("mock+ca")
-
-
-def test_clear_devices(RE):
-    devices, exceptions = make_all_devices(i03, fake_with_ophyd_sim=True)
-    assert (
-        # This is the only device is in i03 and is still OphydV1 and not skipped
-        len(beamline_utils.ACTIVE_DEVICES) == len(["s4_slit_gaps"])
-        and len(exceptions) == 0
-    )
-    beamline_utils.clear_devices()
-    assert beamline_utils.ACTIVE_DEVICES == {}
 
 
 @pytest.mark.parametrize(
