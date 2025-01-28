@@ -351,7 +351,7 @@ class TestBimorphOptimisation:
             for _ in range(len(mirror_with_mocked_put.channels) + 1)
         ] == mock_inner_scan.call_args_list
 
-    async def test_bimorph_puts(
+    async def test_plan_puts_to_bimorph(
         self,
         mock_inner_scan,
         mock_move_slits,
