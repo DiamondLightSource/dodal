@@ -1,5 +1,6 @@
 import asyncio
 import unittest
+import unittest.mock
 from pathlib import Path
 from unittest.mock import ANY, call
 
@@ -206,75 +207,14 @@ def test_inner_scan(
 @pytest.mark.parametrize("inactive_slit_size", [0.05])
 @pytest.mark.parametrize("number_of_slit_positions", [3])
 @pytest.mark.parametrize("bimorph_settle_time", [0.0])
-@unittest.mock.patch("bluesky.plan_stubs.sleep")
-@unittest.mock.patch("dodal.plans.bimorph.capture_bimorph_state")
+@unittest.mock.patch("dodal.plans.bimorph.bps.sleep")
 @unittest.mock.patch("dodal.plans.bimorph.restore_bimorph_state")
 @unittest.mock.patch("dodal.plans.bimorph.move_slits")
 @unittest.mock.patch("dodal.plans.bimorph.inner_scan")
 class TestBimorphOptimisation:
-    @pytest.mark.fixture
-    async def run_scan(
-        self,
-        RE: RunEngine,
-        mirror_with_mocked_put: BimorphMirror,
-        slits: Slits,
-        oav: StandardDetector,
-        voltage_increment: float,
-        active_dimension: SlitDimension,
-        active_slit_center_start: float,
-        active_slit_center_end: float,
-        active_slit_size: float,
-        inactive_slit_center: float,
-        inactive_slit_size: float,
-        number_of_slit_positions: int,
-        bimorph_settle_time: float,
-        initial_voltage_list: list[float],
-    ):
-        RE(
-            bimorph_optimisation(
-                mirror_with_mocked_put,
-                slits,
-                oav,
-                voltage_increment,
-                active_dimension,
-                active_slit_center_start,
-                active_slit_center_end,
-                active_slit_size,
-                inactive_slit_center,
-                inactive_slit_size,
-                number_of_slit_positions,
-                bimorph_settle_time,
-                initial_voltage_list,
-            )
-        )
-
-    async def test(
-        self,
-        mock_inner_scan,
-        mock_move_slits,
-        mock_restore_bimorph_state,
-        mock_capture_bimorph_state,
-        mock_bps_sleep,
-        RE: RunEngine,
-        mirror_with_mocked_put: BimorphMirror,
-        slits: Slits,
-        oav: StandardDetector,
-        voltage_increment: float,
-        active_dimension: SlitDimension,
-        active_slit_center_start: float,
-        active_slit_center_end: float,
-        active_slit_size: float,
-        inactive_slit_center: float,
-        inactive_slit_size: float,
-        number_of_slit_positions: int,
-        bimorph_settle_time: float,
-        initial_voltage_list: list[float],
-    ):
-        inactive_dimension = (
-            SlitDimension.Y if active_dimension == SlitDimension.X else SlitDimension.X
-        )
-
-        start_state = BimorphState(
+    @pytest.fixture
+    def start_state(self, mirror_with_mocked_put: BimorphMirror) -> BimorphState:
+        return BimorphState(
             [10.0 for _ in range(len(mirror_with_mocked_put.channels))],
             0.0,
             0.0,
@@ -282,12 +222,91 @@ class TestBimorphOptimisation:
             0.0,
         )
 
-        def effect(*args, **kwargs):
-            # Does not yield anything to RE, but does return data class we need:
-            yield from iter([])
-            return start_state
+    @pytest.fixture
+    def mock_capture_bimorph_state(self, start_state):
+        with unittest.mock.patch(
+            "dodal.plans.bimorph.capture_bimorph_state"
+        ) as mock_obj:
 
-        mock_capture_bimorph_state.side_effect = effect
+            def effect(*args, **kwargs):
+                # Does not yield anything to RE, but does return data class we need:
+                yield from iter([])
+                return start_state
+
+            mock_obj.side_effect = effect
+
+            yield mock_obj
+
+    async def test_settle_time_called(
+        self,
+        mock_inner_scan,
+        mock_move_slits,
+        mock_restore_bimorph_state,
+        mock_bps_sleep,
+        mock_capture_bimorph_state,
+        RE: RunEngine,
+        mirror_with_mocked_put: BimorphMirror,
+        slits: Slits,
+        oav: StandardDetector,
+        voltage_increment: float,
+        active_dimension: SlitDimension,
+        active_slit_center_start: float,
+        active_slit_center_end: float,
+        active_slit_size: float,
+        inactive_slit_center: float,
+        inactive_slit_size: float,
+        number_of_slit_positions: int,
+        bimorph_settle_time: float,
+        initial_voltage_list: list[float],
+    ):
+        RE(
+            bimorph_optimisation(
+                mirror_with_mocked_put,
+                slits,
+                oav,
+                voltage_increment,
+                active_dimension,
+                active_slit_center_start,
+                active_slit_center_end,
+                active_slit_size,
+                inactive_slit_center,
+                inactive_slit_size,
+                number_of_slit_positions,
+                bimorph_settle_time,
+                initial_voltage_list,
+            )
+        )
+        assert [
+            call(bimorph_settle_time)
+            for _ in range(len(mirror_with_mocked_put.channels))
+        ] == mock_bps_sleep.call_args_list
+
+    async def test(
+        self,
+        mock_inner_scan,
+        mock_move_slits,
+        mock_restore_bimorph_state,
+        mock_bps_sleep,
+        mock_capture_bimorph_state,
+        RE: RunEngine,
+        mirror_with_mocked_put: BimorphMirror,
+        slits: Slits,
+        oav: StandardDetector,
+        voltage_increment: float,
+        active_dimension: SlitDimension,
+        active_slit_center_start: float,
+        active_slit_center_end: float,
+        active_slit_size: float,
+        inactive_slit_center: float,
+        inactive_slit_size: float,
+        number_of_slit_positions: int,
+        bimorph_settle_time: float,
+        initial_voltage_list: list[float],
+        start_state,
+    ):
+        inactive_dimension = (
+            SlitDimension.Y if active_dimension == SlitDimension.X else SlitDimension.X
+        )
 
         RE(
             bimorph_optimisation(
@@ -306,11 +325,6 @@ class TestBimorphOptimisation:
                 initial_voltage_list,
             )
         )
-
-        assert [
-            call(bimorph_settle_time)
-            for _ in range(len(mirror_with_mocked_put.channels))
-        ] == mock_bps_sleep.call_args_list
 
         initial_voltage_list = initial_voltage_list or start_state.voltages
 
@@ -342,6 +356,47 @@ class TestBimorphOptimisation:
             == get_mock_put(channel.target_voltage).call_args
             for i, channel in enumerate(mirror_with_mocked_put.channels.values())
         ]
+
+    async def test_bimorph_state_restored(
+        self,
+        mock_inner_scan,
+        mock_move_slits,
+        mock_restore_bimorph_state,
+        mock_bps_sleep,
+        mock_capture_bimorph_state,
+        RE: RunEngine,
+        mirror_with_mocked_put: BimorphMirror,
+        slits: Slits,
+        oav: StandardDetector,
+        voltage_increment: float,
+        active_dimension: SlitDimension,
+        active_slit_center_start: float,
+        active_slit_center_end: float,
+        active_slit_size: float,
+        inactive_slit_center: float,
+        inactive_slit_size: float,
+        number_of_slit_positions: int,
+        bimorph_settle_time: float,
+        initial_voltage_list: list[float],
+        start_state: BimorphState,
+    ):
+        RE(
+            bimorph_optimisation(
+                mirror_with_mocked_put,
+                slits,
+                oav,
+                voltage_increment,
+                active_dimension,
+                active_slit_center_start,
+                active_slit_center_end,
+                active_slit_size,
+                inactive_slit_center,
+                inactive_slit_size,
+                number_of_slit_positions,
+                bimorph_settle_time,
+                initial_voltage_list,
+            )
+        )
 
         assert [
             call(mirror_with_mocked_put, slits, start_state)
