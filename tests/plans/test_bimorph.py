@@ -353,8 +353,6 @@ class TestBimorphOptimisation:
             SlitDimension.Y if active_dimension == SlitDimension.X else SlitDimension.X
         )
 
-        initial_voltage_list = initial_voltage_list or start_state.voltages
-
         RE(
             bimorph_optimisation(
                 mirror_with_mocked_put,
@@ -400,7 +398,6 @@ class TestBimorphOptimisation:
         initial_voltage_list: list[float],
         start_state: BimorphState,
     ):
-        initial_voltage_list = initial_voltage_list or start_state.voltages
         RE(
             bimorph_optimisation(
                 mirror_with_mocked_put,
@@ -455,7 +452,6 @@ class TestBimorphOptimisation:
         initial_voltage_list: list[float],
         start_state: BimorphState,
     ):
-        initial_voltage_list = initial_voltage_list or start_state.voltages
         RE(
             bimorph_optimisation(
                 mirror_with_mocked_put,
@@ -473,6 +469,9 @@ class TestBimorphOptimisation:
                 initial_voltage_list,
             )
         )
+
+        initial_voltage_list = initial_voltage_list or start_state.voltages
+
         assert [
             call(initial_voltage_list[i] + voltage_increment)
             == get_mock_put(channel.target_voltage).call_args
@@ -502,8 +501,6 @@ class TestBimorphOptimisation:
         initial_voltage_list: list[float],
         start_state: BimorphState,
     ):
-        initial_voltage_list = initial_voltage_list or start_state.voltages
-
         RE(
             bimorph_optimisation(
                 mirror_with_mocked_put,
