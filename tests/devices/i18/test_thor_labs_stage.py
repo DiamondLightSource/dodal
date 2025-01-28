@@ -9,9 +9,9 @@ from dodal.devices.i18.thor_labs_stage import ThorLabsStage, XYPosition
 @pytest.fixture
 async def thor_labs_stage():
     async with DeviceCollector(mock=True):
-        fake_thor_labs_stage = ThorLabsStage("")
+        thor_labs_stage = ThorLabsStage("")
 
-    return fake_thor_labs_stage
+    return thor_labs_stage
 
 
 async def test_setting(thor_labs_stage: ThorLabsStage):
