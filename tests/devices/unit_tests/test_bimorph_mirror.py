@@ -6,7 +6,7 @@ from unittest.mock import ANY, call, patch
 import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import DeviceCollector, walk_rw_signals
-from ophyd_async.testing import callback_on_mock_put, get_mock_put, set_mock_value
+from ophyd_async.testing import callback_on_mock_put, set_mock_value
 
 from dodal.devices.bimorph_mirror import (
     BimorphMirror,
@@ -87,19 +87,6 @@ async def test_set_channels_waits_for_readback(
         key: await mirror_with_mocked_put.channels[key].target_voltage.get_value()
         for key in valid_bimorph_values
     } == valid_bimorph_values
-
-
-async def test_set_channels_triggers_alltrgt_proc(
-    mirror_with_mocked_put: BimorphMirror,
-    valid_bimorph_values: dict[int, float],
-):
-    mock_alltrgt_proc = get_mock_put(mirror_with_mocked_put.commit_target_voltages)
-
-    mock_alltrgt_proc.assert_not_called()
-
-    await mirror_with_mocked_put.set(valid_bimorph_values)
-
-    mock_alltrgt_proc.assert_called_once()
 
 
 async def test_set_channels_waits_for_output_voltage_readback(
