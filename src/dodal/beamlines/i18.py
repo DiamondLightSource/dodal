@@ -57,25 +57,9 @@ def undulator() -> Undulator:
 
 @device_factory()
 def dcm() -> DoubleCrystalMonochromator:
-    crystal_1_metadata = CrystalMetadata(
-        usage="Bragg",
-        type="silicon",
-        reflection=(1, 1, 1),
-        d_spacing=(3.13475, "nm"),
-    )
-
-    crystal_2_metadata = CrystalMetadata(
-        usage="Bragg",
-        type="silicon",
-        reflection=(1, 1, 1),
-        d_spacing=(3.13475, "nm"),
-    )
-
     return DoubleCrystalMonochromator(
         prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:",
         temperature_prefix=f"{PREFIX.beamline_prefix}-DI-DCM-01:",
-        crystal_1_metadata=crystal_1_metadata,
-        crystal_2_metadata=crystal_2_metadata,
     )
 
 
