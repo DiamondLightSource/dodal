@@ -161,7 +161,7 @@ class DeviceInitializationController(Generic[D]):
         Once the device is connected, the value of mock must be consistent, or connect
         must be False.
 
-        Additional keyword arguments will be passed through to the wrapped factory function
+        Additional keyword arguments will be passed through to the wrapped factory function.
 
         Args:
             connect_immediately (bool, default False): whether to call connect on the
@@ -185,8 +185,17 @@ class DeviceInitializationController(Generic[D]):
 
         Returns:
             D: a singleton instance of the Device class returned by the wrapped factory.
+
+        Raises:
+            RuntimeError:   If the device factory was invoked again with different
+             keyword arguments, without previously invoking cache_clear()
         """
         device = self._factory(**kwargs)
+        if self._factory.cache_info().currsize > 1:  # type: ignore
+            raise RuntimeError(
+                f"Device factory method called multiple times with different parameters: "
+                f"{self.__name__}"
+            )  # type: ignore
 
         if connect_immediately:
             call_in_bluesky_event_loop(

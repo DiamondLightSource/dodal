@@ -140,9 +140,7 @@ def mirror_voltages() -> MirrorVoltages:
 
 
 @device_factory()
-def backlight(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Backlight:
+def backlight() -> Backlight:
     """Get the i03 backlight device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
@@ -280,12 +278,17 @@ def undulator_dcm(daq_configuration_path: str | None = None) -> UndulatorDCM:
     """
     # evaluate here not as parameter default to enable post-import mocking
     daq_configuration_path = daq_configuration_path or DAQ_CONFIGURATION_PATH
+    undulator_singleton = (
+        undulator(daq_configuration_path=daq_configuration_path)
+        if (daq_configuration_path and daq_configuration_path != DAQ_CONFIGURATION_PATH)
+        else undulator()
+    )
     return UndulatorDCM(
         name="undulator_dcm",
         prefix=PREFIX.beamline_prefix,
-        undulator=undulator(daq_configuration_path=daq_configuration_path),
+        undulator=undulator_singleton,
         dcm=dcm(),
-        daq_configuration_path=daq_configuration_path,
+        daq_configuration_path=daq_configuration_path or DAQ_CONFIGURATION_PATH,
     )
 
 

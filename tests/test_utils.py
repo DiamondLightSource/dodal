@@ -25,6 +25,8 @@ from dodal.utils import (
     make_device,
 )
 
+MOCK_DAQ_CONFIG_PATH = "tests/devices/unit_tests/test_daq_configuration"
+
 
 def test_finds_device_factories() -> None:
     import tests.fake_beamline as fake_beamline
@@ -425,3 +427,28 @@ def test_filter_ophyd_devices_raises_for_extra_types():
 )
 def test_is_v2_device_type(input: Any, expected_result: bool):
     assert is_v2_device_type(input) == expected_result
+
+
+def test_calling_factory_with_different_args_raises_an_exception():
+    i03.undulator(daq_configuration_path=MOCK_DAQ_CONFIG_PATH)
+    with pytest.raises(
+        RuntimeError,
+        match="Device factory method called multiple times with different parameters",
+    ):
+        i03.undulator(daq_configuration_path=MOCK_DAQ_CONFIG_PATH + "x")
+
+
+def test_calling_factory_with_different_args_does_not_raise_an_exception_after_cache_clear():
+    i03.undulator(daq_configuration_path=MOCK_DAQ_CONFIG_PATH)
+    i03.undulator.cache_clear()  # type: ignore
+    i03.undulator(daq_configuration_path=MOCK_DAQ_CONFIG_PATH + "x")
+
+
+def test_factories_can_be_called_in_any_order():
+    pass
+
+
+def test_factory_calls_are_cached():
+    undulator1 = i03.undulator(daq_configuration_path=MOCK_DAQ_CONFIG_PATH)
+    undulator2 = i03.undulator(daq_configuration_path=MOCK_DAQ_CONFIG_PATH)
+    assert undulator1 is undulator2

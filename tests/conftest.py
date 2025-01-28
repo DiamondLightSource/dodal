@@ -15,7 +15,6 @@ def module_and_devices_for_beamline(request):
     beamline = request.param
     with patch.dict(os.environ, {"BEAMLINE": beamline}, clear=True):
         bl_mod = importlib.import_module("dodal.beamlines." + beamline)
-        importlib.reload(bl_mod)
         mock_beamline_module_filepaths(beamline, bl_mod)
         devices, exceptions = make_all_devices(
             bl_mod,
