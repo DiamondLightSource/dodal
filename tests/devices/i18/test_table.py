@@ -49,3 +49,41 @@ async def test_setting_xy_position_table(table: Table):
     }
 
     assert reading == expected_reading
+
+
+async def test_setting_xyztheta_position_table(table: Table):
+    """
+    Test setting x and y positions on the Table using the ophyd_async mock tools.
+    """
+    set_mock_value(table.x.user_readback, 1.23)
+    set_mock_value(table.y.user_readback, 4.56)
+    set_mock_value(table.z.user_readback, 7.89)
+    set_mock_value(table.theta.user_readback, 10.11)
+
+    # Create a position object
+    position = TablePosition(x=1.23, y=4.56, z=7.89, theta=10.11)
+
+    # Call set to update the position
+    await table.set(position)
+
+    reading = await table.read()
+    expected_reading = {
+        "table-y": {
+            "value": 4.56,
+            "timestamp": ANY,
+            "alarm_severity": 0,
+        },
+        "table-x": {
+            "value": 1.23,
+            "timestamp": ANY,
+            "alarm_severity": 0,
+        },
+        "table-theta": {
+            "alarm_severity": 0,
+            "timestamp": ANY,
+            "value": 10.11,
+        },
+        "table-z": {"alarm_severity": 0, "timestamp": ANY, "value": 7.89},
+    }
+
+    assert reading == expected_reading
