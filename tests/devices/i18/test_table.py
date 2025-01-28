@@ -19,8 +19,6 @@ async def test_setting_xy_position_table(table: Table):
     """
     Test setting x and y positions on the Table using the ophyd_async mock tools.
     """
-    set_mock_value(table.x.user_readback, 0.0)
-    set_mock_value(table.y.user_readback, 0.0)
 
     reading = await table.read()
     expected_reading = {
@@ -77,11 +75,6 @@ async def test_setting_xyztheta_position_table(table: Table):
     """
     Test setting x and y positions on the Table using the ophyd_async mock tools.
     """
-    set_mock_value(table.x.user_readback, 0.0)
-    set_mock_value(table.y.user_readback, 0.0)
-    set_mock_value(table.z.user_readback, 0.0)
-    set_mock_value(table.theta.user_readback, 0.0)
-
     reading = await table.read()
     expected_reading = {
         "table-y": {
