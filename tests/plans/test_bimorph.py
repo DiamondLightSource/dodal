@@ -351,6 +351,47 @@ class TestBimorphOptimisation:
             for _ in range(len(mirror_with_mocked_put.channels) + 1)
         ] == mock_inner_scan.call_args_list
 
+    async def test_bimorph_puts(
+        self,
+        mock_inner_scan,
+        mock_move_slits,
+        mock_restore_bimorph_state,
+        mock_bps_sleep,
+        mock_capture_bimorph_state,
+        RE: RunEngine,
+        mirror_with_mocked_put: BimorphMirror,
+        slits: Slits,
+        oav: StandardDetector,
+        voltage_increment: float,
+        active_dimension: SlitDimension,
+        active_slit_center_start: float,
+        active_slit_center_end: float,
+        active_slit_size: float,
+        inactive_slit_center: float,
+        inactive_slit_size: float,
+        number_of_slit_positions: int,
+        bimorph_settle_time: float,
+        initial_voltage_list: list[float],
+        start_state: BimorphState,
+    ):
+        initial_voltage_list = initial_voltage_list or start_state.voltages
+        RE(
+            bimorph_optimisation(
+                mirror_with_mocked_put,
+                slits,
+                oav,
+                voltage_increment,
+                active_dimension,
+                active_slit_center_start,
+                active_slit_center_end,
+                active_slit_size,
+                inactive_slit_center,
+                inactive_slit_size,
+                number_of_slit_positions,
+                bimorph_settle_time,
+                initial_voltage_list,
+            )
+        )
         assert [
             call(initial_voltage_list[i] + voltage_increment)
             == get_mock_put(channel.target_voltage).call_args
@@ -380,6 +421,8 @@ class TestBimorphOptimisation:
         initial_voltage_list: list[float],
         start_state: BimorphState,
     ):
+        initial_voltage_list = initial_voltage_list or start_state.voltages
+
         RE(
             bimorph_optimisation(
                 mirror_with_mocked_put,
