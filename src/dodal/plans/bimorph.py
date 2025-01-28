@@ -151,7 +151,7 @@ def bimorph_optimisation(
     @stage_decorator((oav, slits, mirror))
     @run_decorator()
     def outer():
-        """Outer part of two-movable scan, which moves bimorph and calls inner."""
+        """Outer plan stub, which moves mirror and calls inner_scan."""
         yield from inner_scan(
             mirror,
             slits,
@@ -192,7 +192,7 @@ def inner_scan(
     active_slit_size: float,
     number_of_slit_positions: int,
 ):
-    """Inner part of two-movable scan, which moves Slits and performs a read.
+    """Inner plan stub, which moves Slits and performs a read.
 
     Args:
         mirror: BimorphMirror to move
