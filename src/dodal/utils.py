@@ -194,8 +194,8 @@ class DeviceInitializationController(Generic[D]):
         if self._factory.cache_info().currsize > 1:  # type: ignore
             raise RuntimeError(
                 f"Device factory method called multiple times with different parameters: "
-                f"{self.__name__}"
-            )  # type: ignore
+                f"{self.__name__}"  # type: ignore
+            )
 
         if connect_immediately:
             call_in_bluesky_event_loop(
