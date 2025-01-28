@@ -4,7 +4,6 @@ from typing import Annotated as A
 
 from bluesky.protocols import Movable
 from ophyd_async.core import (
-    DEFAULT_TIMEOUT,
     AsyncStatus,
     DeviceVector,
     SignalR,
@@ -107,7 +106,7 @@ class BimorphMirror(StandardReadable, Movable):
 
     @AsyncStatus.wrap
     async def set(self, value: Mapping[int, float]) -> None:
-        """Sets bimorph voltages in parrallel via target voltage and all proc.
+        """Sets bimorph voltages in serial via VOUT.
 
         Args:
             value: Dict of channel numbers to target voltages
@@ -127,17 +126,11 @@ class BimorphMirror(StandardReadable, Movable):
                 self.status, BimorphMirrorStatus.IDLE, timeout=DEFAULT_TIMEOUT
             )
             await set_and_wait_for_other_value(
-                self.channels[i].target_voltage,
+                self.channels[i].output_voltage,
                 target,
                 self.status,
                 BimorphMirrorStatus.BUSY,
             )
-
-        # Trigger set target voltages:
-        await wait_for_value(
-            self.status, BimorphMirrorStatus.IDLE, timeout=DEFAULT_TIMEOUT
-        )
-        await self.commit_target_voltages.trigger()
 
         # Wait for values to propogate to voltage out rbv:
         await asyncio.gather(
