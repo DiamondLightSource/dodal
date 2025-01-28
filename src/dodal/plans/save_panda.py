@@ -32,7 +32,9 @@ def main(argv: list[str]):
         default="panda_settings.yaml",
     )
     parser.add_argument(
-        "--output-directory", help="Directory in which save file is output"
+        "--output-directory",
+        help="Directory in which save file is output",
+        required=True,
     )
     parser.add_argument(
         "-f",
