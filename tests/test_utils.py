@@ -1,5 +1,6 @@
 import os
 from collections.abc import Iterable, Mapping
+from shutil import copytree
 from typing import Any, cast
 from unittest.mock import ANY, MagicMock, Mock, patch
 
@@ -25,7 +26,19 @@ from dodal.utils import (
     make_device,
 )
 
+# Duplicated here because of top-level import issues
 MOCK_DAQ_CONFIG_PATH = "tests/devices/unit_tests/test_daq_configuration"
+
+
+@pytest.fixture()
+def alternate_config(tmp_path) -> str:
+    """
+    Alternate config dir as MOCK_DAQ_CONFIG_PATH replaces i03.DAQ_CONFIGURATION_PATH
+    in conftest.py
+    """
+    alt_config_path = tmp_path / "alt_daq_configuration"
+    copytree(MOCK_DAQ_CONFIG_PATH, alt_config_path)
+    return str(alt_config_path)
 
 
 def test_finds_device_factories() -> None:
@@ -438,17 +451,26 @@ def test_calling_factory_with_different_args_raises_an_exception():
         i03.undulator(daq_configuration_path=MOCK_DAQ_CONFIG_PATH + "x")
 
 
-def test_calling_factory_with_different_args_does_not_raise_an_exception_after_cache_clear():
+def test_calling_factory_with_different_args_does_not_raise_an_exception_after_cache_clear(
+    alternate_config,
+):
     i03.undulator(daq_configuration_path=MOCK_DAQ_CONFIG_PATH)
     i03.undulator.cache_clear()  # type: ignore
-    i03.undulator(daq_configuration_path=MOCK_DAQ_CONFIG_PATH + "x")
+    i03.undulator(daq_configuration_path=alternate_config)
 
 
-def test_factories_can_be_called_in_any_order():
-    pass
+def test_factories_can_be_called_in_any_order(alternate_config):
+    i03.undulator_dcm(daq_configuration_path=alternate_config)
+    i03.undulator(daq_configuration_path=alternate_config)
+
+    i03.undulator_dcm.cache_clear()
+    i03.undulator.cache_clear()
+
+    i03.undulator(daq_configuration_path=alternate_config)
+    i03.undulator_dcm(daq_configuration_path=alternate_config)
 
 
-def test_factory_calls_are_cached():
-    undulator1 = i03.undulator(daq_configuration_path=MOCK_DAQ_CONFIG_PATH)
-    undulator2 = i03.undulator(daq_configuration_path=MOCK_DAQ_CONFIG_PATH)
+def test_factory_calls_are_cached(alternate_config):
+    undulator1 = i03.undulator(daq_configuration_path=alternate_config)
+    undulator2 = i03.undulator(daq_configuration_path=alternate_config)
     assert undulator1 is undulator2

@@ -277,10 +277,9 @@ def undulator_dcm(daq_configuration_path: str | None = None) -> UndulatorDCM:
     If this is called when already instantiated in i03, it will return the existing object.
     """
     # evaluate here not as parameter default to enable post-import mocking
-    daq_configuration_path = daq_configuration_path or DAQ_CONFIGURATION_PATH
     undulator_singleton = (
         undulator(daq_configuration_path=daq_configuration_path)
-        if (daq_configuration_path and daq_configuration_path != DAQ_CONFIGURATION_PATH)
+        if daq_configuration_path and daq_configuration_path != DAQ_CONFIGURATION_PATH
         else undulator()
     )
     return UndulatorDCM(
