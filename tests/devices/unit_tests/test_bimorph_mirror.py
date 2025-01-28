@@ -84,7 +84,7 @@ async def test_set_channels_waits_for_readback(
     await mirror_with_mocked_put.set(valid_bimorph_values)
 
     assert {
-        key: await mirror_with_mocked_put.channels[key].target_voltage.get_value()
+        key: await mirror_with_mocked_put.channels[key].output_voltage.get_value()
         for key in valid_bimorph_values
     } == valid_bimorph_values
 
