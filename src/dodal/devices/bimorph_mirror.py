@@ -24,6 +24,8 @@ from ophyd_async.epics.core import (
     epics_signal_x,
 )
 
+DEFAULT_TIMEOUT = 60
+
 
 class BimorphMirrorOnOff(StrictEnum):
     ON = "ON"
