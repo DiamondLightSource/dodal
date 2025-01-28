@@ -548,3 +548,12 @@ async def test_given_using_gpu_results_if_results_from_cpu_first_then_warn_and_u
     mock_logger.warning.assert_called_with(
         "Configured to use GPU results but CPU came first, using CPU results."
     )
+
+
+async def test_given_using_gpu_results_and_comparing_results_both_on_then_error_when_staged(
+    zocalo_results: ZocaloResults,
+):
+    zocalo_results.use_gpu = True
+    zocalo_results.use_cpu_and_gpu = True
+    with pytest.raises(ValueError):
+        await zocalo_results.stage()

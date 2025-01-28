@@ -220,6 +220,11 @@ class ZocaloResults(StandardReadable, Triggerable):
         clearing the queue. Plans using this device should wait on ZOCALO_STAGE_GROUP
         before triggering processing for the experiment"""
 
+        if self.use_cpu_and_gpu and self.use_gpu:
+            raise ValueError(
+                "Cannot compare GPU and CPU results and use GPU results at the same time."
+            )
+
         LOGGER.info("Subscribing to results queue")
         try:
             self._subscribe_to_results()
