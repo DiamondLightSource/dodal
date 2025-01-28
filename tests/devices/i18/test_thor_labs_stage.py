@@ -34,12 +34,12 @@ async def test_setting(thor_labs_stage: ThorLabsStage):
 
     # Define the expected position values after the set operation
     expected_reading = {
-        "stage-x": {
+        "thor_labs_stage-x": {
             "value": 5.0,
             "timestamp": ANY,
             "alarm_severity": 0,
         },
-        "stage-y": {
+        "thor_labs_stage-y": {
             "value": 5.0,
             "timestamp": ANY,
             "alarm_severity": 0,
