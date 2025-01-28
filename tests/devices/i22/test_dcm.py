@@ -1,4 +1,3 @@
-from collections.abc import Mapping
 from unittest.mock import ANY
 
 import bluesky.plans as bp
@@ -36,7 +35,7 @@ async def dcm() -> DoubleCrystalMonochromator:
 
 def test_count_dcm(
     RE: RunEngine,
-    run_engine_documents: Mapping[str, list[dict]],
+    run_engine_documents: dict[str, list[dict]],
     dcm: DoubleCrystalMonochromator,
 ):
     RE(bp.count([dcm]))
