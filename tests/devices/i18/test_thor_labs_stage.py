@@ -20,8 +20,28 @@ async def test_setting(thor_labs_stage: ThorLabsStage):
     Test setting x and y positions on the ThorLabsStage using ophyd_async mock tools.
     """
     # Set initial mock values for the stage's position readbacks
-    set_mock_value(thor_labs_stage.x.user_readback, 5.0)
-    set_mock_value(thor_labs_stage.y.user_readback, 5.0)
+    set_mock_value(thor_labs_stage.x.user_readback, 0.0)
+    set_mock_value(thor_labs_stage.y.user_readback, 0.0)
+
+    # Read the stage's current position
+    reading = await thor_labs_stage.read()
+
+    # Define the expected position values after the set operation
+    expected_reading = {
+        "thor_labs_stage-x": {
+            "value": 0.0,
+            "timestamp": ANY,
+            "alarm_severity": 0,
+        },
+        "thor_labs_stage-y": {
+            "value": 0.0,
+            "timestamp": ANY,
+            "alarm_severity": 0,
+        },
+    }
+
+    # Assert the actual reading matches the expected reading
+    assert reading == expected_reading
 
     # Define the new position to be set
     pos = XYPosition(x=5, y=5)
