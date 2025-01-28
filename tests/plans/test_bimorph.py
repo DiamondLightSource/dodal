@@ -212,6 +212,8 @@ def test_inner_scan(
 @unittest.mock.patch("dodal.plans.bimorph.move_slits")
 @unittest.mock.patch("dodal.plans.bimorph.inner_scan")
 class TestBimorphOptimisation:
+    """Run full bimorph_optimisation plan with mocked devices and plan stubs."""
+
     @pytest.fixture
     def start_state(self, mirror_with_mocked_put: BimorphMirror) -> BimorphState:
         return BimorphState(
