@@ -228,12 +228,12 @@ class TestBimorphOptimisation:
             "dodal.plans.bimorph.capture_bimorph_state"
         ) as mock_obj:
 
-            def effect(*args, **kwargs):
-                # Does not yield anything to RE, but does return data class we need:
+            def mock_capture_plan_stub(*args, **kwargs):
+                # return start_state without yielding Msg to RE:
                 yield from iter([])
                 return start_state
 
-            mock_obj.side_effect = effect
+            mock_obj.side_effect = mock_capture_plan_stub
 
             yield mock_obj
 
