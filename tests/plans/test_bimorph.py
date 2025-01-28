@@ -281,7 +281,7 @@ class TestBimorphOptimisation:
             for _ in range(len(mirror_with_mocked_put.channels))
         ] == mock_bps_sleep.call_args_list
 
-    async def test(
+    async def test_bimorph_state_captured(
         self,
         mock_inner_scan,
         mock_move_slits,
@@ -321,8 +321,6 @@ class TestBimorphOptimisation:
                 initial_voltage_list,
             )
         )
-
-        initial_voltage_list = initial_voltage_list or start_state.voltages
 
         assert mock_capture_bimorph_state.call_args == call(
             mirror_with_mocked_put, slits
