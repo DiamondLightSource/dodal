@@ -32,16 +32,16 @@ async def set_beamsize_to_same_value_as_mock_signal(
     await transfocator.set(value)
 
 
-@patch("dodal.devices.i04.transfocator.Transfocator._observe_beamsize_microns")
+@patch("dodal.devices.i04.transfocator.Transfocator.set_based_on_prediction")
 async def test_given_beamsize_already_set_then_when_transfocator_set_then_returns_immediately(
-    mock_observe_beamsize_microns,
+    mock_set_based_on_prediction,
     fake_transfocator: Transfocator,
 ):
     await asyncio.wait_for(
         set_beamsize_to_same_value_as_mock_signal(fake_transfocator, 100.0),
         timeout=0.01,
     )
-    mock_observe_beamsize_microns.assert_not_awaited()
+    mock_set_based_on_prediction.assert_not_awaited()
 
 
 @patch("dodal.devices.i04.transfocator.wait_for_value")
@@ -72,3 +72,11 @@ async def test_if_timeout_exceeded_and_start_rbv_not_equal_to_set_value_then_tim
         fake_transfocator.start_rbv.get_value = AsyncMock(side_effect=[0, 1])
         with pytest.raises((TimeoutError, asyncio.exceptions.TimeoutError)):
             await fake_transfocator.set(315)
+
+
+async def test_given_number_of_lenses_is_already_correct_then_transfocator_set_returns_immediately(
+    fake_transfocator: Transfocator,
+):
+    given_predicted_lenses_is_half_of_beamsize(fake_transfocator)
+    set_mock_value(fake_transfocator.predicted_vertical_num_lenses, 10)
+    await fake_transfocator.set(20)

@@ -30,6 +30,7 @@ ZOOM_PARAMS_FILE = (
 )
 DISPLAY_CONFIG = "/dls_sw/i24/software/gda_versions/var/display.configuration"
 
+
 BL = get_beamline_name("s24")
 set_log_beamline(BL)
 set_utils_beamline(BL)
