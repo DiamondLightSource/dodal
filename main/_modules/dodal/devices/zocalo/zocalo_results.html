@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.zocalo.zocalo_results &#8212; dodal 1.39.1.dev2+g5c82bbd70 documentation</title>
+    <title>dodal.devices.zocalo.zocalo_results &#8212; dodal 1.39.1.dev3+g388db6ab2 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=f4751063"></script>
+    <script src="../../../../_static/documentation_options.js?v=2676c0ff"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -586,7 +586,12 @@ window.addEventListener("load", () => mermaid.run());
 
 <span class="sd">        prefix (str): EPICS PV prefix for the device</span>
 
-<span class="sd">        use_cpu_and_gpu (bool): When True, ZocaloResults will wait for results from the CPU and the GPU, compare them, and provide a warning if the results differ. When False, ZocaloResults will only use results from the CPU</span>
+<span class="sd">        use_cpu_and_gpu (bool): When True, ZocaloResults will wait for results from the</span>
+<span class="sd">        CPU and the GPU, compare them, and provide a warning if the results differ. When</span>
+<span class="sd">        False, ZocaloResults will only use results from the CPU</span>
+
+<span class="sd">        use_gpu (bool): When True, ZocaloResults will take the first set of</span>
+<span class="sd">        results that it receives (which are likely the GPU results)</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -599,6 +604,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="n">timeout_s</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">DEFAULT_TIMEOUT</span><span class="p">,</span>
         <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
         <span class="n">use_cpu_and_gpu</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">use_gpu</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">zocalo_environment</span> <span class="o">=</span> <span class="n">zocalo_environment</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sort_key</span> <span class="o">=</span> <span class="n">SortKeys</span><span class="p">[</span><span class="n">sort_key</span><span class="p">]</span>
@@ -608,6 +614,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="bp">self</span><span class="o">.</span><span class="n">_raw_results_received</span><span class="p">:</span> <span class="n">Queue</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="p">:</span> <span class="n">CommonTransport</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">use_cpu_and_gpu</span> <span class="o">=</span> <span class="n">use_cpu_and_gpu</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_gpu</span> <span class="o">=</span> <span class="n">use_gpu</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">centre_of_mass</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_com_setter</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span>
             <span class="n">Array1D</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;centre_of_mass&quot;</span>
@@ -672,6 +679,11 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">        clearing the queue. Plans using this device should wait on ZOCALO_STAGE_GROUP</span>
 <span class="sd">        before triggering processing for the experiment&quot;&quot;&quot;</span>
 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cpu_and_gpu</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_gpu</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Cannot compare GPU and CPU results and use GPU results at the same time.&quot;</span>
+            <span class="p">)</span>
+
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Subscribing to results queue&quot;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_subscribe_to_results</span><span class="p">()</span>
@@ -715,8 +727,13 @@ window.addEventListener("load", () => mermaid.run());
             <span class="n">raw_results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_results_received</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout_s</span><span class="p">)</span>
             <span class="n">source_of_first_results</span> <span class="o">=</span> <span class="n">source_from_results</span><span class="p">(</span><span class="n">raw_results</span><span class="p">)</span>
 
-            <span class="c1"># Wait for results from CPU and GPU, warn and continue if only GPU times out. Error if CPU times out</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_gpu</span> <span class="ow">and</span> <span class="n">source_of_first_results</span> <span class="o">==</span> <span class="n">ZocaloSource</span><span class="o">.</span><span class="n">CPU</span><span class="p">:</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;Configured to use GPU results but CPU came first, using CPU results.&quot;</span>
+                <span class="p">)</span>
+
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cpu_and_gpu</span><span class="p">:</span>
+                <span class="c1"># Wait for results from CPU and GPU, warn and continue if only GPU times out. Error if CPU times out</span>
                 <span class="k">if</span> <span class="n">source_of_first_results</span> <span class="o">==</span> <span class="n">ZocaloSource</span><span class="o">.</span><span class="n">CPU</span><span class="p">:</span>
                     <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Received zocalo results from CPU before GPU&quot;</span><span class="p">)</span>
                 <span class="n">raw_results_two_sources</span> <span class="o">=</span> <span class="p">[</span><span class="n">raw_results</span><span class="p">]</span>
@@ -765,7 +782,7 @@ window.addEventListener("load", () => mermaid.run());
                         <span class="k">raise</span> <span class="n">err</span>
 
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Zocalo results from </span><span class="si">{</span><span class="n">ZocaloSource</span><span class="o">.</span><span class="n">CPU</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> processing: found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">raw_results</span><span class="p">[</span><span class="s1">&#39;results&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> crystals.&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Zocalo results from </span><span class="si">{</span><span class="n">source_from_results</span><span class="p">(</span><span class="n">raw_results</span><span class="p">)</span><span class="si">}</span><span class="s2"> processing: found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">raw_results</span><span class="p">[</span><span class="s1">&#39;results&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> crystals.&quot;</span>
             <span class="p">)</span>
             <span class="c1"># Sort from strongest to weakest in case of multiple crystals</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_put_results</span><span class="p">(</span>
@@ -798,7 +815,7 @@ window.addEventListener("load", () => mermaid.run());
 
             <span class="n">results</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;results&quot;</span><span class="p">,</span> <span class="p">[])</span>
 
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cpu_and_gpu</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cpu_and_gpu</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_gpu</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_raw_results_received</span><span class="o">.</span><span class="n">put</span><span class="p">(</span>
                     <span class="p">{</span><span class="s2">&quot;results&quot;</span><span class="p">:</span> <span class="n">results</span><span class="p">,</span> <span class="s2">&quot;recipe_parameters&quot;</span><span class="p">:</span> <span class="n">recipe_parameters</span><span class="p">}</span>
                 <span class="p">)</span>
