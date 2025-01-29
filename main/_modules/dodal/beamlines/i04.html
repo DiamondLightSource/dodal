@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.i04 &#8212; dodal 1.39.1.dev3+g388db6ab2 documentation</title>
+    <title>dodal.beamlines.i04 &#8212; dodal 1.39.1.dev4+ga95f64f9f documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=2676c0ff"></script>
+    <script src="../../../_static/documentation_options.js?v=dcb5fbeb"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -454,7 +454,7 @@ window.addEventListener("load", () => mermaid.run());
                   
   <h1>Source code for dodal.beamlines.i04</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_beamline_parameters</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">device_instantiation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">device_factory</span><span class="p">,</span> <span class="n">device_instantiation</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_utils_beamline</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.aperturescatterguard</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AperturePosition</span><span class="p">,</span>
@@ -511,6 +511,8 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">outputs</span><span class="o">=</span><span class="p">(</span><span class="n">ZebraTTLOutputs</span><span class="p">(</span><span class="n">TTL_DETECTOR</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">TTL_FAST_SHUTTER</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">TTL_XSPRESS3</span><span class="o">=</span><span class="mi">3</span><span class="p">)),</span>
     <span class="n">sources</span><span class="o">=</span><span class="n">ZebraSources</span><span class="p">(),</span>
 <span class="p">)</span>
+
+<span class="n">PREFIX</span> <span class="o">=</span> <span class="n">BeamlinePrefix</span><span class="p">(</span><span class="n">BL</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="smargon">
@@ -965,23 +967,16 @@ window.addEventListener("load", () => mermaid.run());
 
 
 
-<div class="viewcode-block" id="diamond_filter">
-<a class="viewcode-back" href="../../../reference/generated/dodal.beamlines.i04.html#dodal.beamlines.i04.diamond_filter">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">diamond_filter</span><span class="p">(</span>
-    <span class="n">wait_for_connection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">fake_with_ophyd_sim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DiamondFilter</span><span class="p">[</span><span class="n">I04Filters</span><span class="p">]:</span>
+<span class="nd">@device_factory</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">diamond_filter</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">DiamondFilter</span><span class="p">[</span><span class="n">I04Filters</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the i04 diamond filter device, instantiate it if it hasn&#39;t already been.</span>
 <span class="sd">    If this is called when already instantiated in i03, it will return the existing object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">device_instantiation</span><span class="p">(</span>
-        <span class="n">DiamondFilter</span><span class="p">[</span><span class="n">I04Filters</span><span class="p">],</span>
-        <span class="s2">&quot;diamond_filter&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;-MO-FLTR-01:&quot;</span><span class="p">,</span>
-        <span class="n">wait_for_connection</span><span class="p">,</span>
-        <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
+    <span class="k">return</span> <span class="n">DiamondFilter</span><span class="p">[</span><span class="n">I04Filters</span><span class="p">](</span>
+        <span class="n">prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX</span><span class="o">.</span><span class="n">beamline_prefix</span><span class="si">}</span><span class="s2">-MO-FLTR-01:&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;diamond_filter&quot;</span><span class="p">,</span>
         <span class="n">data_type</span><span class="o">=</span><span class="n">I04Filters</span><span class="p">,</span>
-    <span class="p">)</span></div>
-
+    <span class="p">)</span>
 </pre></div>
 
                 </article>
