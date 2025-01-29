@@ -41,6 +41,20 @@ def alternate_config(tmp_path) -> str:
     return str(alt_config_path)
 
 
+@pytest.fixture()
+def fake_device_factory_beamline():
+    import tests.fake_device_factory_beamline as beamline
+
+    factories = [
+        f
+        for f in collect_factories(beamline, include_skipped=True).values()
+        if hasattr(f, "cache_clear")
+    ]
+    yield beamline
+    for f in factories:
+        f.cache_clear()  # type: ignore
+
+
 def test_finds_device_factories() -> None:
     import tests.fake_beamline as fake_beamline
 
@@ -175,36 +189,32 @@ def test_make_device_dependency_throws():
         make_device(fake_beamline, "device_z")
 
 
-def test_device_factory_skips():
-    import tests.fake_device_factory_beamline as fake_beamline
-
-    devices, exceptions = make_all_devices(fake_beamline)
+def test_device_factory_skips(fake_device_factory_beamline):
+    devices, exceptions = make_all_devices(fake_device_factory_beamline)
     assert len(devices) == 0
     assert len(exceptions) == 0
 
 
-def test_device_factory_can_ignore_skip():
-    import tests.fake_device_factory_beamline as fake_beamline
-
-    devices, exceptions = make_all_devices(fake_beamline, include_skipped=True)
+def test_device_factory_can_ignore_skip(fake_device_factory_beamline):
+    devices, exceptions = make_all_devices(
+        fake_device_factory_beamline, include_skipped=True
+    )
     assert len(devices) == 4
     assert len(exceptions) == 0
 
 
-def test_device_factory_can_construct_ophyd_v1_devices():
-    import tests.fake_device_factory_beamline as fake_beamline
-
-    device = fake_beamline.ophyd_v1_device(
+def test_device_factory_can_construct_ophyd_v1_devices(fake_device_factory_beamline):
+    device = fake_device_factory_beamline.ophyd_v1_device(
         connect_immediately=True, mock=True, connection_timeout=4.5
     )
 
     device.wait_for_connection.assert_called_once_with(timeout=4.5)  # type: ignore
 
 
-def test_device_factory_passes_kwargs_to_wrapped_factory_v1():
-    import tests.fake_device_factory_beamline as fake_beamline
-
-    device = fake_beamline.ophyd_v1_device(
+def test_device_factory_passes_kwargs_to_wrapped_factory_v1(
+    fake_device_factory_beamline,
+):
+    device = fake_device_factory_beamline.ophyd_v1_device(
         connect_immediately=True,
         mock=True,
         my_int_kwarg=123,
@@ -219,10 +229,10 @@ def test_device_factory_passes_kwargs_to_wrapped_factory_v1():
     }
 
 
-def test_device_factory_passes_kwargs_to_wrapped_factory_v2(RE: RunEngine):
-    import tests.fake_device_factory_beamline as fake_beamline
-
-    device = fake_beamline.mock_device(
+def test_device_factory_passes_kwargs_to_wrapped_factory_v2(
+    RE: RunEngine, fake_device_factory_beamline
+):
+    device = fake_device_factory_beamline.mock_device(
         connect_immediately=True,
         mock=True,
         my_int_kwarg=123,
@@ -237,13 +247,13 @@ def test_device_factory_passes_kwargs_to_wrapped_factory_v2(RE: RunEngine):
     }
 
 
-def test_fake_with_ophyd_sim_passed_to_device_factory(RE: RunEngine):
-    import tests.fake_device_factory_beamline as fake_beamline
-
-    fake_beamline.mock_device.cache_clear()
+def test_fake_with_ophyd_sim_passed_to_device_factory(
+    RE: RunEngine, fake_device_factory_beamline
+):
+    fake_device_factory_beamline.mock_device.cache_clear()
 
     devices, exceptions = make_all_devices(
-        fake_beamline,
+        fake_device_factory_beamline,
         include_skipped=True,
         fake_with_ophyd_sim=True,
         connect_immediately=True,
@@ -254,13 +264,11 @@ def test_fake_with_ophyd_sim_passed_to_device_factory(RE: RunEngine):
     mock_device.connect.assert_called_once_with(timeout=ANY, mock=True)
 
 
-def test_mock_passed_to_device_factory(RE: RunEngine):
-    import tests.fake_device_factory_beamline as fake_beamline
-
-    fake_beamline.mock_device.cache_clear()
+def test_mock_passed_to_device_factory(RE: RunEngine, fake_device_factory_beamline):
+    fake_device_factory_beamline.mock_device.cache_clear()
 
     devices, exceptions = make_all_devices(
-        fake_beamline,
+        fake_device_factory_beamline,
         include_skipped=True,
         mock=True,
         connect_immediately=True,
@@ -271,13 +279,13 @@ def test_mock_passed_to_device_factory(RE: RunEngine):
     mock_device.connect.assert_called_once_with(timeout=ANY, mock=True)
 
 
-def test_connect_immediately_passed_to_device_factory(RE: RunEngine):
-    import tests.fake_device_factory_beamline as fake_beamline
-
-    fake_beamline.mock_device.cache_clear()
+def test_connect_immediately_passed_to_device_factory(
+    RE: RunEngine, fake_device_factory_beamline
+):
+    fake_device_factory_beamline.mock_device.cache_clear()
 
     devices, exceptions = make_all_devices(
-        fake_beamline,
+        fake_device_factory_beamline,
         include_skipped=True,
         connect_immediately=False,
     )
@@ -287,14 +295,12 @@ def test_connect_immediately_passed_to_device_factory(RE: RunEngine):
     mock_device.connect.assert_not_called()
 
 
-def test_device_factory_can_rename(RE):
-    from tests.fake_device_factory_beamline import device_c
-
-    cryo = device_c(mock=True, connect_immediately=True)
+def test_device_factory_can_rename(RE, fake_device_factory_beamline):
+    cryo = fake_device_factory_beamline.device_c(mock=True, connect_immediately=True)
     assert cryo.name == "device_c"
     assert cryo.fine.name == "device_c-fine"
 
-    cryo_2 = device_c(name="cryo")
+    cryo_2 = fake_device_factory_beamline.device_c(name="cryo")
     assert cryo is cryo_2
     assert cryo_2.name == "cryo"
     assert cryo_2.fine.name == "cryo-fine"
