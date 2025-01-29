@@ -128,7 +128,7 @@ class DeviceInitializationController(Generic[D]):
         mock: bool,
         skip: SkipType,
     ):
-        self._factory: Callable[[], D] = functools.cache(factory)
+        self._factory: Callable[..., D] = functools.cache(factory)
         self._use_factory_name = use_factory_name
         self._timeout = timeout
         self._mock = mock
@@ -153,6 +153,7 @@ class DeviceInitializationController(Generic[D]):
         name: str | None = None,
         connection_timeout: float | None = None,
         mock: bool | None = None,
+        **kwargs,
     ) -> D:
         """Returns an instance of the Device the wrapped factory produces: the same
         instance will be returned if this method is called multiple times, and arguments
@@ -160,6 +161,7 @@ class DeviceInitializationController(Generic[D]):
         Once the device is connected, the value of mock must be consistent, or connect
         must be False.
 
+        Additional keyword arguments will be passed through to the wrapped factory function.
 
         Args:
             connect_immediately (bool, default False): whether to call connect on the
@@ -183,8 +185,17 @@ class DeviceInitializationController(Generic[D]):
 
         Returns:
             D: a singleton instance of the Device class returned by the wrapped factory.
+
+        Raises:
+            RuntimeError:   If the device factory was invoked again with different
+             keyword arguments, without previously invoking cache_clear()
         """
-        device = self._factory()
+        device = self._factory(**kwargs)
+        if self._factory.cache_info().currsize > 1:  # type: ignore
+            raise RuntimeError(
+                f"Device factory method called multiple times with different parameters: "
+                f"{self.__name__}"  # type: ignore
+            )
 
         if connect_immediately:
             call_in_bluesky_event_loop(
@@ -410,7 +421,27 @@ def is_any_device_factory(func: Callable) -> TypeGuard[AnyDeviceFactory]:
 
 
 def is_v2_device_type(obj: type[Any]) -> bool:
-    return inspect.isclass(obj) and isinstance(obj, OphydV2Device)
+    non_parameterized_class = None
+    if obj != inspect.Signature.empty:
+        if inspect.isclass(obj):
+            non_parameterized_class = obj
+        elif hasattr(obj, "__origin__"):
+            # typing._GenericAlias is the same as types.GenericAlias, maybe?
+            # This is all very badly documented and possibly prone to change in future versions of Python
+            non_parameterized_class = obj.__origin__
+        if non_parameterized_class:
+            try:
+                return non_parameterized_class and issubclass(
+                    non_parameterized_class, OphydV2Device
+                )
+            except TypeError:
+                # Python 3.10 will return inspect.isclass(t) == True but then
+                # raise TypeError: issubclass() arg 1 must be a class
+                # when inspecting device_factory decorator function itself
+                # Later versions of Python seem not to be affected
+                pass
+
+    return False
 
 
 def is_v1_device_type(obj: type[Any]) -> bool:
