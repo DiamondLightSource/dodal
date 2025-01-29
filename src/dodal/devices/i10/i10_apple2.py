@@ -8,6 +8,7 @@ import numpy as np
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
+    Device,
     Reference,
     StandardReadable,
     StandardReadableFormat,
@@ -15,6 +16,7 @@ from ophyd_async.core import (
     soft_signal_rw,
 )
 
+# from dodal.beamlines.i10 import pgm
 from dodal.devices.apple2_undulator import (
     Apple2,
     Apple2Val,
@@ -111,15 +113,14 @@ class I10Apple2(Apple2):
             max_energy=max_energy,
             poly_deg=poly_deg,
         )
-
-        super().__init__(
-            id_gap=id_gap,
-            id_phase=id_phase,
-            prefix=prefix,
-            name=name,
-        )
         with self.add_children_as_readables():
-            self.id_jaw_phase = Reference(id_jaw_phase)
+            super().__init__(
+                id_gap=id_gap,
+                id_phase=id_phase,
+                prefix=prefix,
+                name=name,
+            )
+            self.id_jaw_phase = id_jaw_phase
 
     @AsyncStatus.wrap
     async def set(self, value: SupportsFloat) -> None:
@@ -148,8 +149,8 @@ class I10Apple2(Apple2):
         LOGGER.info(f"Setting polarisation to {self.pol}, with {id_set_val}")
         await self._set(value=id_set_val, energy=value)
         if self.pol != "la":
-            await self.id_jaw_phase().set(0)
-            await self.id_jaw_phase().set_move.set(1)
+            await self.id_jaw_phase.set(0)
+            await self.id_jaw_phase.set_move.set(1)
 
     def update_lookuptable(self):
         """
@@ -197,7 +198,7 @@ class I10Apple2PGM(StandardReadable, Movable):
             New device name.
         """
         super().__init__(name=name)
-        self.id_ref = Reference(id)
+        self.id = id
         self.pgm_ref = Reference(pgm)
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.energy_offset = soft_signal_rw(float, initial_value=0)
@@ -206,7 +207,7 @@ class I10Apple2PGM(StandardReadable, Movable):
     async def set(self, value: float) -> None:
         LOGGER.info(f"Moving f{self.name} energy to {value}.")
         await asyncio.gather(
-            self.id_ref().set(value=value + await self.energy_offset.get_value()),
+            self.id.set(value=value + await self.energy_offset.get_value()),
             self.pgm_ref().energy.set(value),
         )
 
@@ -229,14 +230,14 @@ class I10Apple2Pol(StandardReadable, Movable):
         """
         super().__init__(name=name)
         with self.add_children_as_readables():
-            self.id = id
+            self.id = Reference(id)
 
     @AsyncStatus.wrap
     async def set(self, value: str) -> None:
-        self.id.pol = value  # change polarisation.
+        self.id().pol = value  # change polarisation.
         LOGGER.info(f"Changing f{self.name} polarisation to {value}.")
-        await self.id.set(
-            await self.id.energy.get_value()
+        await self.id().set(
+            await self.id().energy.get_value()
         )  # Move id to new polarisation
 
 
@@ -299,8 +300,71 @@ class LinearArbitraryAngle(StandardReadable, Movable):
                 f"jaw_phase position for angle ({value}) is outside permitted range"
                 f" [-{self.jaw_phase_limit}, {self.jaw_phase_limit}]"
             )
-        await self.id_ref().id_jaw_phase().set(jaw_phase)
+        await self.id_ref().id_jaw_phase.set(jaw_phase)
         self._angle_set(value)
+
+
+class I10Id(Device):
+    def __init__(
+        self,
+        pgm: PGM,
+        prefix: str,
+        look_up_table_dir: str,
+        jaw_phase_limit=12.0,
+        jaw_phase_poly_param=DEFAULT_JAW_PHASE_POLY_PARAMS,
+        angle_threshold_deg=30.0,
+        name: str = "",
+    ) -> None:
+        """A compounded device to make up the full I10 insertion device.
+
+        Attributes
+        ----------
+            energy: I10Apple2PGM
+                Devices that move both pgm and id energy at the same time.
+            pol: I10Apple2Pol
+                Devices that control the x-ray polarization.
+            laa: LinearArbitraryAngle
+                Devices that allow alteration of the beam polarization angle in LA mode.
+        """
+
+        self.energy = I10Apple2PGM(
+            id=I10Apple2(
+                id_gap=UndulatorGap(name="id_gap", prefix=prefix),
+                id_phase=UndulatorPhaseAxes(
+                    name="id_phase",
+                    prefix=prefix,
+                    top_outer="RPQ1",
+                    top_inner="RPQ2",
+                    btm_inner="RPQ3",
+                    btm_outer="RPQ4",
+                ),
+                id_jaw_phase=UndulatorJawPhase(
+                    prefix=prefix,
+                    move_pv="RPQ1",
+                ),
+                energy_gap_table_path=Path(
+                    look_up_table_dir + "IDEnergy2GapCalibrations.csv",
+                ),
+                energy_phase_table_path=Path(
+                    look_up_table_dir + "IDEnergy2PhaseCalibrations.csv",
+                ),
+                name="idd_energy",
+                source=("Source", "idd"),
+                prefix="",
+            ),
+            pgm=pgm,
+            name="energy",
+        )
+        self.pol = I10Apple2Pol(id=self.energy.id, name="pol")
+        self.laa = LinearArbitraryAngle(
+            id=self.energy.id,
+            name="laa",
+            jaw_phase_limit=jaw_phase_limit,
+            jaw_phase_poly_param=jaw_phase_poly_param,
+            angle_threshold_deg=angle_threshold_deg,
+        )
+
+        super().__init__(name=name)
 
 
 def convert_csv_to_lookup(
