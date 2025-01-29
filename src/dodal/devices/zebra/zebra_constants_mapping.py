@@ -77,7 +77,7 @@ class ZebraMapping(ZebraMappingValidations):
     Zebra's hardware configuration and wiring.
     """
 
-    # Zebra ophyd signal for connection can be accessed
+    # Zebra ophyd signal for output can be accessed
     # with, eg, zebra.output.out_pvs[zebra.mapping.outputs.TTL_DETECTOR]
     outputs: ZebraTTLOutputs = ZebraTTLOutputs()
 

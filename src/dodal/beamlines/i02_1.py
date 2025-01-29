@@ -11,6 +11,11 @@ from dodal.devices.attenuator.filter_selections import (
     I02_1FilterThreeSelections,
     I02_1FilterTwoSelections,
 )
+from dodal.devices.zebra.zebra_constants_mapping import (
+    ZebraMapping,
+    ZebraSources,
+    ZebraTTLOutputs,
+)
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
 
@@ -18,6 +23,13 @@ BL = get_beamline_name("i02-1")
 PREFIX = BeamlinePrefix(BL, suffix="J")
 set_log_beamline(BL)
 set_utils_beamline(BL)
+
+I02_1_ZEBRA_MAPPING = ZebraMapping(
+    outputs=ZebraTTLOutputs(
+        TTL_EIGER=4, TTL_XSPRESS3=3, TTL_FAST_SHUTTER=1, TTL_PILATUS=2
+    ),
+    sources=ZebraSources(),
+)
 
 
 @device_factory()
