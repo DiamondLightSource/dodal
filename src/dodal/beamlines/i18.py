@@ -56,6 +56,8 @@ def undulator() -> Undulator:
 
 @device_factory()
 def dcm() -> DCM:
+    # once spacing is added Si111 d-spacing is 3.135 angsterm , and Si311 is 1.637
+    # calculations are in gda/config/lookupTables/Si111/eV_Deg_converter.xml
     return DCM(
         prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:",
     )
