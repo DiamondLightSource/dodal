@@ -20,12 +20,6 @@ dodal.beamlines.i03
 
    
    
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      eiger
-   
    
 
    
