@@ -123,10 +123,9 @@ class I10Apple2(Apple2):
             self.id_jaw_phase = id_jaw_phase
 
     async def read(self) -> dict[str, Reading]:
-        if await self.polarisation.get_value() == "":
-            pol, _ = await self.determinePhaseFromHardware()
-            if pol is not None:
-                self._polarisation_set(pol)
+        pol, _ = await self.determinePhaseFromHardware()
+        if pol is not None:
+            self._polarisation_set(pol)
         return await super().read()
 
     @AsyncStatus.wrap
