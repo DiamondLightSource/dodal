@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, SupportsFloat
 
 import numpy as np
-from bluesky.protocols import Movable
+from bluesky.protocols import Movable, Reading
 from ophyd_async.core import (
     AsyncStatus,
     Device,
@@ -122,6 +122,13 @@ class I10Apple2(Apple2):
             )
             self.id_jaw_phase = id_jaw_phase
 
+    async def read(self) -> dict[str, Reading]:
+        if await self.polarisation.get_value() == "":
+            pol, _ = await self.determinePhaseFromHardware()
+            if pol is not None:
+                self._polarisation_set(pol)
+        return await super().read()
+
     @AsyncStatus.wrap
     async def set(self, value: SupportsFloat) -> None:
         """
@@ -129,16 +136,17 @@ class I10Apple2(Apple2):
         to calculate the required gap and phases before setting it.
         """
         value = float(value)
-        if self.pol is None:
+        pol = await self.polarisation.get_value()
+        if pol is None:
             LOGGER.warning("Polarisation not set attempting to read from hardware")
             pol, phase = await self.determinePhaseFromHardware()
             if pol is None:
-                raise ValueError(f"Pol is not set for {self.name}")
-            self.pol = pol
-
-        self._polarisation_set(self.pol)
-        gap, phase = self._get_id_gap_phase(value)
-        phase3 = phase * (-1 if self.pol == "la" else (1))
+                raise ValueError(
+                    f"Polarisation cannot be determine from hardware for {self.name}"
+                )
+            self._polarisation_set(pol)
+        gap, phase = await self._get_id_gap_phase(value)
+        phase3 = phase * (-1 if pol == "la" else (1))
         id_set_val = Apple2Val(
             top_outer=str(phase),
             top_inner="0.0",
@@ -146,9 +154,9 @@ class I10Apple2(Apple2):
             btm_outer="0.0",
             gap=str(gap),
         )
-        LOGGER.info(f"Setting polarisation to {self.pol}, with {id_set_val}")
+        LOGGER.info(f"Setting polarisation to {pol}, with {id_set_val}")
         await self._set(value=id_set_val, energy=value)
-        if self.pol != "la":
+        if pol != "la":
             await self.id_jaw_phase.set(0)
             await self.id_jaw_phase.set_move.set(1)
 
@@ -200,7 +208,9 @@ class I10Apple2PGM(StandardReadable, Movable):
         super().__init__(name=name)
         self.id = id
         self.pgm_ref = Reference(pgm)
-        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
+
+        self.add_readables([self.id.energy], StandardReadableFormat.HINTED_SIGNAL)
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.energy_offset = soft_signal_rw(float, initial_value=0)
 
     @AsyncStatus.wrap
@@ -234,7 +244,8 @@ class I10Apple2Pol(StandardReadable, Movable):
 
     @AsyncStatus.wrap
     async def set(self, value: str) -> None:
-        self.id().pol = value  # change polarisation.
+        # Check before set
+        self.id().set_pol(value)
         LOGGER.info(f"Changing f{self.name} polarisation to {value}.")
         await self.id().set(
             await self.id().energy.get_value()
@@ -287,7 +298,7 @@ class LinearArbitraryAngle(StandardReadable, Movable):
     @AsyncStatus.wrap
     async def set(self, value: SupportsFloat) -> None:
         value = float(value)
-        pol = self.id_ref().pol
+        pol = await self.id_ref().polarisation.get_value()
         if pol != "la":
             raise RuntimeError(
                 f"Angle control is not available in polarisation {pol} with {self.id_ref().name}"
@@ -322,9 +333,9 @@ class I10Id(Device):
             energy: I10Apple2PGM
                 Devices that move both pgm and id energy at the same time.
             pol: I10Apple2Pol
-                Devices that control the x-ray polarization.
+                Devices that control the x-ray polarisation.
             laa: LinearArbitraryAngle
-                Devices that allow alteration of the beam polarization angle in LA mode.
+                Devices that allow alteration of the beam polarisation angle in LA mode.
         """
 
         self.energy = I10Apple2PGM(

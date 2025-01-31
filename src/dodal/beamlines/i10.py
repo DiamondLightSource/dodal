@@ -51,8 +51,8 @@ def idd() -> I10Id:
     """i10 downstream insertion device:
     id.energy.set(<energy>) to change beamline energy.
     id.energy.energy_offset.set(<off_set>) to change id energy offset relative to pgm.
-    id.pol.set(<polarization>) to change polarization.
-    id.laa.set(<linear polarization angle>) to change polarization angle, must be in LA mode.
+    id.pol.set(<polarisation>) to change polarisation.
+    id.laa.set(<linear polarisation angle>) to change polarisation angle, must be in LA mode.
     """
     return I10Id(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
@@ -66,8 +66,8 @@ def idu() -> I10Id:
     """i10 upstream insertion device:
     id.energy.set(<energy>) to change beamline energy.
     id.energy.energy_offset.set(<off_set>) to change id energy offset relative to pgm.
-    id.pol.set(<polarization>) to change polarization.
-    id.laa.set(<linear polarization angle>) to change polarization angle, must be in LA mode.
+    id.pol.set(<polarisation>) to change polarisation.
+    id.laa.set(<linear polarisation angle>) to change polarisation angle, must be in LA mode.
     """
     return I10Id(
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:",

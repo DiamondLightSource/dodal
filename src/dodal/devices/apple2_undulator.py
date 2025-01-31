@@ -183,11 +183,10 @@ class UndulatorPhaseMotor(StandardReadable):
         """
         fullPV = f"{prefix}BL{infix}"
         self.user_setpoint = epics_signal_w(str, fullPV + "SET")
-        self.user_setpoint_demand_readback = epics_signal_r(float, fullPV + "DMD")
-
+        self.user_setpoint_readback = epics_signal_r(float, fullPV + "DMD")
         fullPV = fullPV + "MTR"
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.user_setpoint_readback = epics_signal_r(float, fullPV + ".RBV")
+            self.user_readback = epics_signal_r(float, fullPV + ".RBV")
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.motor_egu = epics_signal_r(str, fullPV + ".EGU")
@@ -263,16 +262,16 @@ class UndulatorPhaseAxes(StandardReadable, Movable):
             self.btm_outer.velocity.get_value(),
         )
         target_pos = await asyncio.gather(
-            self.top_outer.user_setpoint_demand_readback.get_value(),
-            self.top_inner.user_setpoint_demand_readback.get_value(),
-            self.btm_inner.user_setpoint_demand_readback.get_value(),
-            self.btm_outer.user_setpoint_demand_readback.get_value(),
-        )
-        cur_pos = await asyncio.gather(
             self.top_outer.user_setpoint_readback.get_value(),
             self.top_inner.user_setpoint_readback.get_value(),
             self.btm_inner.user_setpoint_readback.get_value(),
             self.btm_outer.user_setpoint_readback.get_value(),
+        )
+        cur_pos = await asyncio.gather(
+            self.top_outer.user_readback.get_value(),
+            self.top_inner.user_readback.get_value(),
+            self.btm_inner.user_readback.get_value(),
+            self.btm_outer.user_readback.get_value(),
         )
         move_distances = tuple(np.subtract(target_pos, cur_pos))
         move_times = np.abs(np.divide(move_distances, velos))
@@ -332,8 +331,8 @@ class UndulatorJawPhase(StandardReadable, Movable):
         """
         velo, target_pos, cur_pos = await asyncio.gather(
             self.jaw_phase.velocity.get_value(),
-            self.jaw_phase.user_setpoint_demand_readback.get_value(),
             self.jaw_phase.user_setpoint_readback.get_value(),
+            self.jaw_phase.user_readback.get_value(),
         )
 
         move_distances = target_pos - cur_pos
@@ -406,28 +405,25 @@ class Apple2(StandardReadable, Movable):
         }
         # List of available polarisation according to the lookup table.
         self._available_pol = []
-        # The polarisation state of the id that are use for internal checking before setting.
-        self._pol = None
         """
         Abstract method that run at start up to load lookup tables into  self.lookup_tables
          and set available_pol.
         """
         self.update_lookuptable()
 
-    @property
-    def pol(self):
-        return self._pol
-
-    @pol.setter
-    def pol(self, pol: str):
-        # This set the polarisation but does not actually move hardware.
+    def check_pol(self, pol: str) -> bool:
         if pol in self._available_pol:
-            self._pol = pol
+            return True
         else:
             raise ValueError(
                 f"Polarisation {pol} is not available:"
                 + f"/n Polarisations available:  {self._available_pol}"
             )
+
+    def set_pol(self, pol: str) -> None:
+        # This set the polarisation but does not actually move hardware.
+        if self.check_pol(pol):
+            self._polarisation_set(pol)
 
     async def _set(self, value: Apple2Val, energy: float) -> None:
         """
@@ -448,7 +444,7 @@ class Apple2(StandardReadable, Movable):
             await asyncio.gather(self.gap.get_timeout(), self.phase.get_timeout())
         )
         LOGGER.info(
-            f"Moving f{self.name} energy and polorisation to {energy}, {self.pol}"
+            f"Moving f{self.name} energy and polorisation to {energy}, {await self.polarisation.get_value()}"
             + f"with motor position {value}, timeout = {timeout}"
         )
 
@@ -459,19 +455,19 @@ class Apple2(StandardReadable, Movable):
         await wait_for_value(self.gap.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
         self._energy_set(energy)  # Update energy for after move for readback.
 
-    def _get_id_gap_phase(self, energy: float) -> tuple[float, float]:
+    async def _get_id_gap_phase(self, energy: float) -> tuple[float, float]:
         """
         Converts energy and polarisation to gap and phase.
         """
-        gap_poly = self._get_poly(
+        gap_poly = await self._get_poly(
             lookup_table=self.lookup_tables["Gap"], new_energy=energy
         )
-        phase_poly = self._get_poly(
+        phase_poly = await self._get_poly(
             lookup_table=self.lookup_tables["Phase"], new_energy=energy
         )
         return gap_poly(energy), phase_poly(energy)
 
-    def _get_poly(
+    async def _get_poly(
         self,
         new_energy: float,
         lookup_table: dict[str | None, dict[str, dict[str, Any]]],
@@ -480,19 +476,19 @@ class Apple2(StandardReadable, Movable):
         Get the correct polynomial for a given energy form lookuptable
          for any given polarisation.
         """
-
+        pol = await self.polarisation.get_value()
         if (
-            new_energy < lookup_table[self.pol]["Limit"]["Minimum"]
-            or new_energy > lookup_table[self.pol]["Limit"]["Maximum"]
+            new_energy < lookup_table[pol]["Limit"]["Minimum"]
+            or new_energy > lookup_table[pol]["Limit"]["Maximum"]
         ):
             raise ValueError(
                 "Demanding energy must lie between {} and {} eV!".format(
-                    lookup_table[self.pol]["Limit"]["Minimum"],
-                    lookup_table[self.pol]["Limit"]["Maximum"],
+                    lookup_table[pol]["Limit"]["Minimum"],
+                    lookup_table[pol]["Limit"]["Maximum"],
                 )
             )
         else:
-            for energy_range in lookup_table[self.pol]["Energies"].values():
+            for energy_range in lookup_table[pol]["Energies"].values():
                 if (
                     new_energy >= energy_range["Low"]
                     and new_energy < energy_range["High"]

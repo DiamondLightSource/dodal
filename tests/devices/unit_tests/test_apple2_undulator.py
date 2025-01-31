@@ -52,14 +52,14 @@ async def mock_phaseAxes(prefix: str = "BLXX-EA-DET-007:") -> UndulatorPhaseAxes
     set_mock_value(mock_phaseAxes.top_inner.velocity, 2)
     set_mock_value(mock_phaseAxes.btm_outer.velocity, 2)
     set_mock_value(mock_phaseAxes.btm_inner.velocity, 2)
+    set_mock_value(mock_phaseAxes.top_outer.user_readback, 2)
+    set_mock_value(mock_phaseAxes.top_inner.user_readback, 2)
+    set_mock_value(mock_phaseAxes.btm_outer.user_readback, 2)
+    set_mock_value(mock_phaseAxes.btm_inner.user_readback, 2)
     set_mock_value(mock_phaseAxes.top_outer.user_setpoint_readback, 2)
     set_mock_value(mock_phaseAxes.top_inner.user_setpoint_readback, 2)
     set_mock_value(mock_phaseAxes.btm_outer.user_setpoint_readback, 2)
     set_mock_value(mock_phaseAxes.btm_inner.user_setpoint_readback, 2)
-    set_mock_value(mock_phaseAxes.top_outer.user_setpoint_demand_readback, 2)
-    set_mock_value(mock_phaseAxes.top_inner.user_setpoint_demand_readback, 2)
-    set_mock_value(mock_phaseAxes.btm_outer.user_setpoint_demand_readback, 2)
-    set_mock_value(mock_phaseAxes.btm_inner.user_setpoint_demand_readback, 2)
     set_mock_value(mock_phaseAxes.fault, 0)
     return mock_phaseAxes
 
@@ -72,8 +72,8 @@ async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndulatorJawPhase:
         )
     set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.CLOSE)
     set_mock_value(mock_jaw_phase.jaw_phase.velocity, 2)
+    set_mock_value(mock_jaw_phase.jaw_phase.user_readback, 0)
     set_mock_value(mock_jaw_phase.jaw_phase.user_setpoint_readback, 0)
-    set_mock_value(mock_jaw_phase.jaw_phase.user_setpoint_demand_readback, 0)
     set_mock_value(mock_jaw_phase.fault, 0)
     return mock_jaw_phase
 
@@ -202,15 +202,15 @@ async def test_phase_cal_timout(
     set_mock_value(mock_phaseAxes.btm_inner.velocity, velocity[2])
     set_mock_value(mock_phaseAxes.btm_outer.velocity, velocity[3])
 
-    set_mock_value(mock_phaseAxes.top_inner.user_setpoint_readback, readback[0])
-    set_mock_value(mock_phaseAxes.top_outer.user_setpoint_readback, readback[1])
-    set_mock_value(mock_phaseAxes.btm_inner.user_setpoint_readback, readback[2])
-    set_mock_value(mock_phaseAxes.btm_outer.user_setpoint_readback, readback[3])
+    set_mock_value(mock_phaseAxes.top_inner.user_readback, readback[0])
+    set_mock_value(mock_phaseAxes.top_outer.user_readback, readback[1])
+    set_mock_value(mock_phaseAxes.btm_inner.user_readback, readback[2])
+    set_mock_value(mock_phaseAxes.btm_outer.user_readback, readback[3])
 
-    set_mock_value(mock_phaseAxes.top_inner.user_setpoint_demand_readback, target[0])
-    set_mock_value(mock_phaseAxes.top_outer.user_setpoint_demand_readback, target[1])
-    set_mock_value(mock_phaseAxes.btm_inner.user_setpoint_demand_readback, target[2])
-    set_mock_value(mock_phaseAxes.btm_outer.user_setpoint_demand_readback, target[3])
+    set_mock_value(mock_phaseAxes.top_inner.user_setpoint_readback, target[0])
+    set_mock_value(mock_phaseAxes.top_outer.user_setpoint_readback, target[1])
+    set_mock_value(mock_phaseAxes.btm_inner.user_setpoint_readback, target[2])
+    set_mock_value(mock_phaseAxes.btm_outer.user_setpoint_readback, target[3])
 
     assert await mock_phaseAxes.get_timeout() == pytest.approx(
         expected_timeout, rel=0.1
@@ -228,19 +228,19 @@ async def test_phase_success_set(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngi
 
     def set_complete_move():
         set_mock_value(
-            mock_phaseAxes.top_inner.user_setpoint_readback,
+            mock_phaseAxes.top_inner.user_readback,
             3,
         )
         set_mock_value(
-            mock_phaseAxes.top_outer.user_setpoint_readback,
+            mock_phaseAxes.top_outer.user_readback,
             2,
         )
         set_mock_value(
-            mock_phaseAxes.btm_inner.user_setpoint_readback,
+            mock_phaseAxes.btm_inner.user_readback,
             5,
         )
         set_mock_value(
-            mock_phaseAxes.btm_outer.user_setpoint_readback,
+            mock_phaseAxes.btm_outer.user_readback,
             7,
         )
         set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.CLOSE)
@@ -262,22 +262,22 @@ async def test_phase_success_set(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngi
     )
 
     assert await mock_phaseAxes.read() == {
-        "mock_phaseAxes-top_inner-user_setpoint_readback": {
+        "mock_phaseAxes-top_inner-user_readback": {
             "value": 3,
             "timestamp": ANY,
             "alarm_severity": 0,
         },
-        "mock_phaseAxes-top_outer-user_setpoint_readback": {
+        "mock_phaseAxes-top_outer-user_readback": {
             "value": 2,
             "timestamp": ANY,
             "alarm_severity": 0,
         },
-        "mock_phaseAxes-btm_inner-user_setpoint_readback": {
+        "mock_phaseAxes-btm_inner-user_readback": {
             "value": 5,
             "timestamp": ANY,
             "alarm_severity": 0,
         },
-        "mock_phaseAxes-btm_outer-user_setpoint_readback": {
+        "mock_phaseAxes-btm_outer-user_readback": {
             "value": 7,
             "timestamp": ANY,
             "alarm_severity": 0,
@@ -318,8 +318,8 @@ async def test_jaw_phase_cal_timout(
     expected_timeout: float,
 ):
     set_mock_value(mock_jaw_phase.jaw_phase.velocity, velocity)
-    set_mock_value(mock_jaw_phase.jaw_phase.user_setpoint_readback, readback)
-    set_mock_value(mock_jaw_phase.jaw_phase.user_setpoint_demand_readback, target)
+    set_mock_value(mock_jaw_phase.jaw_phase.user_readback, readback)
+    set_mock_value(mock_jaw_phase.jaw_phase.user_setpoint_readback, target)
 
     assert await mock_jaw_phase.get_timeout() == pytest.approx(
         expected_timeout, rel=0.1
@@ -339,7 +339,7 @@ async def test_jaw_phase_success_scan(mock_jaw_phase: UndulatorJawPhase, RE: Run
     pos = new_pos()
 
     def set_complete_move():
-        set_mock_value(mock_jaw_phase.jaw_phase.user_setpoint_readback, next(pos))
+        set_mock_value(mock_jaw_phase.jaw_phase.user_readback, next(pos))
         set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.CLOSE)
 
     callback_on_mock_put(mock_jaw_phase.set_move, lambda *_, **__: set_complete_move())
@@ -351,7 +351,4 @@ async def test_jaw_phase_success_scan(mock_jaw_phase: UndulatorJawPhase, RE: Run
     RE(scan([mock_jaw_phase], mock_jaw_phase, 0, 10, 11), capture_emitted)
     assert_emitted(docs, start=1, descriptor=1, event=11, stop=1)
     for i in output:
-        assert (
-            docs["event"][i]["data"]["mock_jaw_phase-jaw_phase-user_setpoint_readback"]
-            == i
-        )
+        assert docs["event"][i]["data"]["mock_jaw_phase-jaw_phase-user_readback"] == i

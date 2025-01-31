@@ -67,14 +67,14 @@ async def mock_phaseAxes(prefix: str = "BLXX-EA-DET-007:") -> UndulatorPhaseAxes
     set_mock_value(mock_phaseAxes.top_inner.velocity, 2)
     set_mock_value(mock_phaseAxes.btm_outer.velocity, 2)
     set_mock_value(mock_phaseAxes.btm_inner.velocity, 2)
+    set_mock_value(mock_phaseAxes.top_outer.user_readback, 0)
+    set_mock_value(mock_phaseAxes.top_inner.user_readback, 0)
+    set_mock_value(mock_phaseAxes.btm_outer.user_readback, 0)
+    set_mock_value(mock_phaseAxes.btm_inner.user_readback, 0)
     set_mock_value(mock_phaseAxes.top_outer.user_setpoint_readback, 0)
     set_mock_value(mock_phaseAxes.top_inner.user_setpoint_readback, 0)
     set_mock_value(mock_phaseAxes.btm_outer.user_setpoint_readback, 0)
     set_mock_value(mock_phaseAxes.btm_inner.user_setpoint_readback, 0)
-    set_mock_value(mock_phaseAxes.top_outer.user_setpoint_demand_readback, 0)
-    set_mock_value(mock_phaseAxes.top_inner.user_setpoint_demand_readback, 0)
-    set_mock_value(mock_phaseAxes.btm_outer.user_setpoint_demand_readback, 0)
-    set_mock_value(mock_phaseAxes.btm_inner.user_setpoint_demand_readback, 0)
     set_mock_value(mock_phaseAxes.fault, 0)
     return mock_phaseAxes
 
@@ -94,7 +94,7 @@ async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndulatorJawPhase:
         )
     set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.CLOSE)
     set_mock_value(mock_jaw_phase.jaw_phase.velocity, 2)
-    set_mock_value(mock_jaw_phase.jaw_phase.user_setpoint_readback, 0)
+    set_mock_value(mock_jaw_phase.jaw_phase.user_readback, 0)
     set_mock_value(mock_jaw_phase.fault, 0)
     return mock_jaw_phase
 
@@ -164,10 +164,10 @@ async def test_I10Apple2_determine_pol(
     btm_inner_phase: float,
     btm_outer_phase: float,
 ):
-    set_mock_value(mock_id.phase().top_inner.user_setpoint_readback, top_inner_phase)
-    set_mock_value(mock_id.phase().top_outer.user_setpoint_readback, top_outer_phase)
-    set_mock_value(mock_id.phase().btm_inner.user_setpoint_readback, btm_inner_phase)
-    set_mock_value(mock_id.phase().btm_outer.user_setpoint_readback, btm_outer_phase)
+    set_mock_value(mock_id.phase().top_inner.user_readback, top_inner_phase)
+    set_mock_value(mock_id.phase().top_outer.user_readback, top_outer_phase)
+    set_mock_value(mock_id.phase().btm_inner.user_readback, btm_inner_phase)
+    set_mock_value(mock_id.phase().btm_outer.user_readback, btm_outer_phase)
 
     if pol is None:
         with pytest.raises(ValueError):
