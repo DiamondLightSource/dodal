@@ -114,14 +114,34 @@ async def mock_id(
             energy_phase_table_path=Path(ID_PHASE_LOOKUP_TABLE),
             source=("Source", "idu"),
         )
-        return mock_id
+    set_mock_value(mock_id.gap.gate, UndulatorGateStatus.CLOSE)
+    set_mock_value(mock_id.phase.gate, UndulatorGateStatus.CLOSE)
+    set_mock_value(mock_id.id_jaw_phase.gate, UndulatorGateStatus.CLOSE)
+    set_mock_value(mock_id.id_jaw_phase.jaw_phase.velocity, 1)
+    set_mock_value(mock_id.gap.velocity, 1)
+    set_mock_value(mock_id.phase.btm_inner.velocity, 1)
+    set_mock_value(mock_id.phase.top_inner.velocity, 1)
+    set_mock_value(mock_id.phase.btm_outer.velocity, 1)
+    set_mock_value(mock_id.phase.top_outer.velocity, 1)
+    return mock_id
 
 
 @pytest.fixture
 async def mock_id_pgm(mock_id: I10Apple2, mock_pgm: PGM) -> I10Apple2PGM:
     async with DeviceCollector(mock=True):
         mock_id_pgm = I10Apple2PGM(id=mock_id, pgm=mock_pgm)
-        set_mock_value(mock_id_pgm.pgm_ref().energy.velocity, 1)
+    set_mock_value(mock_id_pgm.id.gap.velocity, 1)
+    set_mock_value(mock_id_pgm.id.phase.btm_inner.velocity, 1)
+    set_mock_value(mock_id_pgm.id.phase.top_inner.velocity, 1)
+    set_mock_value(mock_id_pgm.id.phase.btm_outer.velocity, 1)
+    set_mock_value(mock_id_pgm.id.phase.top_outer.velocity, 1)
+    set_mock_value(mock_id_pgm.id.id_jaw_phase.jaw_phase.velocity, 1)
+    set_mock_value(mock_id_pgm.pgm_ref().energy.velocity, 1)
+
+    set_mock_value(mock_id_pgm.id.gap.gate, UndulatorGateStatus.CLOSE)
+    set_mock_value(mock_id_pgm.id.id_jaw_phase.gate, UndulatorGateStatus.CLOSE)
+
+    set_mock_value(mock_id_pgm.pgm_ref().energy.velocity, 1)
     return mock_id_pgm
 
 
@@ -152,8 +172,8 @@ async def mock_linear_arbitrary_angle(
         ("la", 12, 0, -12, 0),
         ("la", 0, 12, 0, -12),
         ("la", -11, 0, 11, 0),
-        (None, 8, 12, 2, -12),
-        (None, 11, 0, 10, 0),
+        ("None", 8, 12, 2, -12),
+        ("None", 11, 0, 10, 0),
     ],
 )
 async def test_I10Apple2_determine_pol(
@@ -164,18 +184,17 @@ async def test_I10Apple2_determine_pol(
     btm_inner_phase: float,
     btm_outer_phase: float,
 ):
-    set_mock_value(mock_id.phase().top_inner.user_readback, top_inner_phase)
-    set_mock_value(mock_id.phase().top_outer.user_readback, top_outer_phase)
-    set_mock_value(mock_id.phase().btm_inner.user_readback, btm_inner_phase)
-    set_mock_value(mock_id.phase().btm_outer.user_readback, btm_outer_phase)
-
-    if pol is None:
+    set_mock_value(mock_id.phase.top_inner.user_readback, top_inner_phase)
+    set_mock_value(mock_id.phase.top_outer.user_readback, top_outer_phase)
+    set_mock_value(mock_id.phase.btm_inner.user_readback, btm_inner_phase)
+    set_mock_value(mock_id.phase.btm_outer.user_readback, btm_outer_phase)
+    mock_id._polarisation_set("")
+    if pol == "None":
         with pytest.raises(ValueError):
             await mock_id.set(800)
     else:
         await mock_id.set(800)
-
-    assert mock_id.pol == pol
+        assert await mock_id.polarisation.get_value() == pol
 
 
 async def test_fail_I10Apple2_no_lookup(
@@ -203,8 +222,12 @@ async def test_fail_I10Apple2_set_outside_energy_limits(
     with pytest.raises(ValueError) as e:
         await mock_id.set(energy)
     assert str(e.value) == "Demanding energy must lie between {} and {} eV!".format(
-        mock_id.lookup_tables["Gap"][mock_id.pol]["Limit"]["Minimum"],
-        mock_id.lookup_tables["Gap"][mock_id.pol]["Limit"]["Maximum"],
+        mock_id.lookup_tables["Gap"][await mock_id.polarisation.get_value()]["Limit"][
+            "Minimum"
+        ],
+        mock_id.lookup_tables["Gap"][await mock_id.polarisation.get_value()]["Limit"][
+            "Maximum"
+        ],
     )
 
 
@@ -234,7 +257,7 @@ async def test_fail_I10Apple2_set_lookup_gap_pol(mock_id: I10Apple2):
 
 
 async def test_fail_I10Apple2_set_undefined_pol(mock_id: I10Apple2):
-    set_mock_value(mock_id.gap().user_readback, 101)
+    set_mock_value(mock_id.gap.user_readback, 101)
     with pytest.raises(RuntimeError) as e:
         await mock_id.set(600)
     assert (
@@ -244,15 +267,15 @@ async def test_fail_I10Apple2_set_undefined_pol(mock_id: I10Apple2):
 
 
 async def test_fail_I10Apple2_set_id_not_ready(mock_id: I10Apple2):
-    set_mock_value(mock_id.gap().fault, 1)
+    set_mock_value(mock_id.gap.fault, 1)
     with pytest.raises(RuntimeError) as e:
         await mock_id.set(600)
-    assert str(e.value) == mock_id.gap().name + " is in fault state"
-    set_mock_value(mock_id.gap().fault, 0)
-    set_mock_value(mock_id.gap().gate, UndulatorGateStatus.OPEN)
+    assert str(e.value) == mock_id.gap.name + " is in fault state"
+    set_mock_value(mock_id.gap.fault, 0)
+    set_mock_value(mock_id.gap.gate, UndulatorGateStatus.OPEN)
     with pytest.raises(RuntimeError) as e:
         await mock_id.set(600)
-    assert str(e.value) == mock_id.gap().name + " is already in motion."
+    assert str(e.value) == mock_id.gap.name + " is already in motion."
 
 
 async def test_I10Apple2_RE_scan(mock_id: I10Apple2, RE: RunEngine):
@@ -271,10 +294,10 @@ async def test_I10Apple2_pgm_RE_scan(mock_id_pgm: I10Apple2PGM, RE: RunEngine):
     def capture_emitted(name, doc):
         docs[name].append(doc)
 
-    mock_id_pgm.id_ref().pol = "lh3"
+    mock_id_pgm.id._polarisation_set("lh3")
     RE(scan([mock_id_pgm], mock_id_pgm, 1700, 1800, num=11), capture_emitted)
     assert_emitted(docs, start=1, descriptor=1, event=11, stop=1)
-    # with enevery offset
+    # with energy offset
     docs = defaultdict(list)
     await mock_id_pgm.energy_offset.set(20)
     rbv_mocks = Mock()
@@ -287,7 +310,7 @@ async def test_I10Apple2_pgm_RE_scan(mock_id_pgm: I10Apple2PGM, RE: RunEngine):
     )
     RE(
         scan(
-            [mock_id_pgm, mock_id_pgm.pgm_ref(), mock_id_pgm.id_ref()],
+            [mock_id_pgm, mock_id_pgm.pgm_ref(), mock_id_pgm.id],
             mock_id_pgm,
             1700,
             1800,
@@ -296,7 +319,8 @@ async def test_I10Apple2_pgm_RE_scan(mock_id_pgm: I10Apple2PGM, RE: RunEngine):
         capture_emitted,
     )
     for cnt, data in enumerate(docs["event"]):
-        assert data["data"]["mock_id-energy"] == 1700 + cnt * 10 + 20
+        print(data)
+        assert data["data"]["mock_id_pgm-id-energy"] == 1700 + cnt * 10 + 20
         assert data["data"]["mock_pgm-energy"] == 1700 + cnt * 10
 
 
@@ -334,30 +358,30 @@ async def test_I10Apple2_pol_set(
     expect_btm_outer: float,
     expect_gap: float,
 ):
-    mock_id_pol.id._energy_set(energy)
+    mock_id_pol.id()._energy_set(energy)
     if pol == "dsf":
         with pytest.raises(ValueError):
             await mock_id_pol.set(pol)
     else:
         await mock_id_pol.set(pol)
-        assert mock_id_pol.id.pol == pol
-        top_inner = get_mock_put(mock_id_pol.id.phase().top_inner.user_setpoint)
+        assert await mock_id_pol.id().polarisation.get_value() == pol
+        top_inner = get_mock_put(mock_id_pol.id().phase.top_inner.user_setpoint)
         top_inner.assert_called_once()
         assert float(top_inner.call_args[0][0]) == pytest.approx(expect_top_inner, 0.01)
 
-        top_outer = get_mock_put(mock_id_pol.id.phase().top_outer.user_setpoint)
+        top_outer = get_mock_put(mock_id_pol.id().phase.top_outer.user_setpoint)
         top_outer.assert_called_once()
         assert float(top_outer.call_args[0][0]) == pytest.approx(expect_top_outer, 0.01)
 
-        btm_inner = get_mock_put(mock_id_pol.id.phase().btm_inner.user_setpoint)
+        btm_inner = get_mock_put(mock_id_pol.id().phase.btm_inner.user_setpoint)
         btm_inner.assert_called_once()
         assert float(btm_inner.call_args[0][0]) == pytest.approx(expect_btm_inner, 0.01)
 
-        btm_outer = get_mock_put(mock_id_pol.id.phase().btm_outer.user_setpoint)
+        btm_outer = get_mock_put(mock_id_pol.id().phase.btm_outer.user_setpoint)
         btm_outer.assert_called_once()
         assert float(btm_outer.call_args[0][0]) == pytest.approx(expect_btm_outer, 0.01)
 
-        gap = get_mock_put(mock_id_pol.id.gap().user_setpoint)
+        gap = get_mock_put(mock_id_pol.id().gap.user_setpoint)
         gap.assert_called_once()
         assert float(gap.call_args[0][0]) == pytest.approx(expect_gap, 0.05)
 
@@ -370,7 +394,7 @@ async def test_linear_arbitrary_pol_fail(
         await mock_linear_arbitrary_angle.set(20)
     assert str(e.value) == (
         f"Angle control is not available in polarisation"
-        f" {mock_linear_arbitrary_angle.id_ref().pol} with {mock_linear_arbitrary_angle.id_ref().name}"
+        f" {await mock_linear_arbitrary_angle.id_ref().polarisation.get_value()} with {mock_linear_arbitrary_angle.id_ref().name}"
     )
 
 
@@ -381,7 +405,7 @@ async def test_linear_arbitrary_pol_fail(
 async def test_linear_arbitrary_limit_fail(
     mock_linear_arbitrary_angle: LinearArbitraryAngle, poly: float
 ):
-    mock_linear_arbitrary_angle.id_ref().pol = "la"
+    mock_linear_arbitrary_angle.id_ref()._polarisation_set("la")
     mock_linear_arbitrary_angle.jaw_phase_from_angle = poly1d([poly])
     with pytest.raises(RuntimeError) as e:
         await mock_linear_arbitrary_angle.set(20)
@@ -395,7 +419,7 @@ async def test_linear_arbitrary_limit_fail(
 @pytest.mark.parametrize(
     "start, stop, num_point",
     [
-        (0, 180, 11),
+        (-1, 180, 11),
         (-20, 170, 31),
         (-90, -25, 18),
     ],
@@ -413,7 +437,7 @@ async def test_linear_arbitrary_RE_scan(
     def capture_emitted(name, doc):
         docs[name].append(doc)
 
-    mock_linear_arbitrary_angle.id_ref().pol = "la"
+    mock_linear_arbitrary_angle.id_ref()._polarisation_set("la")
 
     RE(
         scan(
@@ -426,9 +450,14 @@ async def test_linear_arbitrary_RE_scan(
         capture_emitted,
     )
     assert_emitted(docs, start=1, descriptor=1, event=num_point, stop=1)
-
+    set_mock_value(
+        mock_linear_arbitrary_angle.id_ref().gap.gate, UndulatorGateStatus.CLOSE
+    )
+    set_mock_value(
+        mock_linear_arbitrary_angle.id_ref().phase.gate, UndulatorGateStatus.CLOSE
+    )
     jaw_phase = get_mock_put(
-        mock_linear_arbitrary_angle.id_ref().id_jaw_phase().jaw_phase.user_setpoint
+        mock_linear_arbitrary_angle.id_ref().id_jaw_phase.jaw_phase.user_setpoint
     )
 
     poly = poly1d(

@@ -334,7 +334,7 @@ class UndulatorJawPhase(StandardReadable, Movable):
             self.jaw_phase.user_setpoint_readback.get_value(),
             self.jaw_phase.user_readback.get_value(),
         )
-
+        print(target_pos, cur_pos, "dfnskfndkfndk")
         move_distances = target_pos - cur_pos
         move_times = np.abs(move_distances / velo)
 
@@ -517,10 +517,10 @@ class Apple2(StandardReadable, Movable):
         (May be for future one can use the inverse poly to work out the energy and try to match it with the current energy
         to workout the polarisation but during my test the inverse poly is too unstable for general use.)
         """
-        top_outer = await self.phase.top_outer.user_setpoint_readback.get_value()
-        top_inner = await self.phase.top_inner.user_setpoint_readback.get_value()
-        btm_inner = await self.phase.btm_inner.user_setpoint_readback.get_value()
-        btm_outer = await self.phase.btm_outer.user_setpoint_readback.get_value()
+        top_outer = await self.phase.top_outer.user_readback.get_value()
+        top_inner = await self.phase.top_inner.user_readback.get_value()
+        btm_inner = await self.phase.btm_inner.user_readback.get_value()
+        btm_outer = await self.phase.btm_outer.user_readback.get_value()
         gap = await self.gap.user_readback.get_value()
         if gap > MAXIMUM_GAP_MOTOR_POSITION:
             raise RuntimeError(

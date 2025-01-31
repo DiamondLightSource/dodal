@@ -130,14 +130,13 @@ class I10Apple2(Apple2):
         return await super().read()
 
     @AsyncStatus.wrap
-    async def set(self, value: SupportsFloat) -> None:
+    async def set(self, value: float) -> None:
         """
         Check polarisation state and use it together with the energy(value)
         to calculate the required gap and phases before setting it.
         """
-        value = float(value)
         pol = await self.polarisation.get_value()
-        if pol is None:
+        if pol not in self._available_pol:
             LOGGER.warning("Polarisation not set attempting to read from hardware")
             pol, phase = await self.determinePhaseFromHardware()
             if pol is None:
