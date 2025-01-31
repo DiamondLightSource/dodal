@@ -5,7 +5,6 @@ from ophyd_async.core import (
     AsyncStatus,
     LazyMock,
     StandardReadable,
-    SubsetEnum,
 )
 from ophyd_async.epics.core import epics_signal_rw
 
@@ -49,7 +48,7 @@ class ZoomController(StandardReadable):
         self.percentage = epics_signal_rw(float, f"{prefix}ZOOMPOSCMD")
 
         # Level is the string description of the zoom level e.g. "1.0x" or "1.0"
-        self.level = epics_signal_rw(SubsetEnum, f"{prefix}MP:SELECT")
+        self.level = epics_signal_rw(str, f"{prefix}MP:SELECT")
         super().__init__(name=name)
 
     async def _get_allowed_zoom_levels(self) -> list:
