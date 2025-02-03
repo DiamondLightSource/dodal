@@ -16,8 +16,10 @@ from ophyd_async.core import (
     soft_signal_rw,
 )
 
+from dodal.log import LOGGER
+
 # from dodal.beamlines.i10 import pgm
-from dodal.devices.apple2_undulator import (
+from ..apple2_undulator import (
     Apple2,
     Apple2Val,
     Lookuptable,
@@ -25,8 +27,7 @@ from dodal.devices.apple2_undulator import (
     UndulatorJawPhase,
     UndulatorPhaseAxes,
 )
-from dodal.devices.pgm import PGM
-from dodal.log import LOGGER
+from ..pgm import PGM
 
 ROW_PHASE_MOTOR_TOLERANCE = 0.004
 MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
@@ -184,7 +185,7 @@ class I10Apple2(Apple2):
 
 class I10Apple2PGM(StandardReadable, Movable):
     """
-    Compound device to set both ID and PGM energy at the sample time,poly_deg
+    Compound device to set both ID and PGM energy at the same time.
 
     """
 
@@ -319,12 +320,17 @@ class I10Id(Device):
         pgm: PGM,
         prefix: str,
         look_up_table_dir: str,
+        source: tuple[str, str],
         jaw_phase_limit=12.0,
         jaw_phase_poly_param=DEFAULT_JAW_PHASE_POLY_PARAMS,
         angle_threshold_deg=30.0,
         name: str = "",
     ) -> None:
         """A compounded device to make up the full I10 insertion device.
+
+        UML
+        ---
+        .. figure:: /explanations/umls/i10_id_design.png
 
         Attributes
         ----------
@@ -358,7 +364,7 @@ class I10Id(Device):
                     look_up_table_dir + "IDEnergy2PhaseCalibrations.csv",
                 ),
                 name="idd_energy",
-                source=("Source", "idd"),
+                source=source,
                 prefix="",
             ),
             pgm=pgm,
@@ -405,18 +411,7 @@ def convert_csv_to_lookup(
 
     return
     ------
-        return a dictionary that conform to Apple2 lookup table format:
-
-        {mode: {'Energies': {Any: {'Low': float,
-                                'High': float,
-                                'Poly':np.poly1d
-                                }
-                            }
-                'Limit': {'Minimum': float,
-                        'Maximum': float
-                        }
-            }
-        }
+        return a dictionary that conform to Apple2 lookup table format: Lookuptable
     """
     if poly_deg is None:
         poly_deg = [

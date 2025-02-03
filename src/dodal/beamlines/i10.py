@@ -1,3 +1,10 @@
+"""
+I10 has two insertion devices one up(idu) and one down stream(idd).
+It is worth noting that the down stream device is slightly longer,
+so it can reach Mn edge for linear arbitrary.
+ idd == id1,    idu == id2.
+"""
+
 from dodal.common.beamlines.beamline_utils import device_factory
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.current_amplifiers import CurrentAmpDet
@@ -28,12 +35,6 @@ PREFIX = BeamlinePrefix(BL)
 
 
 LOOK_UPTABLE_DIR = "/dls_sw/i10/software/gda/workspace_git/gda-diamond.git/configurations/i10-shared/lookupTables/"
-"""
-I10 has two insertion devices one up(idu) and one down stream(idd).
-It is worth noting that the down stream device is slightly longer,
-so it can reach Mn edge for linear arbitrary.
- idd == id1,    idu == id2.
-"""
 
 
 @device_factory()
@@ -58,6 +59,7 @@ def idd() -> I10Id:
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
         pgm=pgm(),
         look_up_table_dir=LOOK_UPTABLE_DIR,
+        source=("Source", "idd"),
     )
 
 
@@ -73,6 +75,7 @@ def idu() -> I10Id:
         prefix=f"{PREFIX.insertion_prefix}-MO-SERVC-21:",
         pgm=pgm(),
         look_up_table_dir=LOOK_UPTABLE_DIR,
+        source=("Source", "idu"),
     )
 
 

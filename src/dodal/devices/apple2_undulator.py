@@ -63,8 +63,7 @@ class LookupTableEntries(BaseModel):
 
 
 class Lookuptable(RootModel):
-    """
-    BaseModel class for the lookup table.
+    """BaseModel class for the lookup table.
     Apple2 lookup table should be in this format.
 
     {mode: {'Energies': {Any: {'Low': float,
