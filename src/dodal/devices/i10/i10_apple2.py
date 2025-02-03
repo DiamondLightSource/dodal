@@ -208,7 +208,11 @@ class I10Apple2PGM(StandardReadable, Movable):
         self.id = id
         self.pgm_ref = Reference(pgm)
 
-        self.add_readables([self.id.energy], StandardReadableFormat.HINTED_SIGNAL)
+        self.add_readables(
+            [self.id.energy, self.pgm_ref().energy.user_readback],
+            StandardReadableFormat.HINTED_SIGNAL,
+        )
+
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.energy_offset = soft_signal_rw(float, initial_value=0)
 
@@ -238,8 +242,8 @@ class I10Apple2Pol(StandardReadable, Movable):
             New device name.
         """
         super().__init__(name=name)
-        with self.add_children_as_readables():
-            self.id = Reference(id)
+        self.id = Reference(id)
+        self.add_readables([self.id().polarisation])
 
     @AsyncStatus.wrap
     async def set(self, value: str) -> None:
@@ -249,6 +253,12 @@ class I10Apple2Pol(StandardReadable, Movable):
         await self.id().set(
             await self.id().energy.get_value()
         )  # Move id to new polarisation
+
+    async def read(self) -> dict[str, Reading]:
+        pol, _ = await self.id().determinePhaseFromHardware()
+        if pol is not None:
+            self.id().set_pol(pol=pol)
+        return await super().read()
 
 
 class LinearArbitraryAngle(StandardReadable, Movable):

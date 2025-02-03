@@ -284,7 +284,7 @@ async def test_I10Apple2_RE_scan(mock_id: I10Apple2, RE: RunEngine):
     def capture_emitted(name, doc):
         docs[name].append(doc)
 
-    RE(scan([mock_id], mock_id, 500, 600, num=11), capture_emitted)
+    RE(scan([], mock_id, 500, 600, num=11), capture_emitted)
     assert_emitted(docs, start=1, descriptor=1, event=11, stop=1)
 
 
@@ -295,7 +295,7 @@ async def test_I10Apple2_pgm_RE_scan(mock_id_pgm: I10Apple2PGM, RE: RunEngine):
         docs[name].append(doc)
 
     mock_id_pgm.id._polarisation_set("lh3")
-    RE(scan([mock_id_pgm], mock_id_pgm, 1700, 1800, num=11), capture_emitted)
+    RE(scan([], mock_id_pgm, 1700, 1800, num=11), capture_emitted)
     assert_emitted(docs, start=1, descriptor=1, event=11, stop=1)
     # with energy offset
     docs = defaultdict(list)
@@ -310,7 +310,7 @@ async def test_I10Apple2_pgm_RE_scan(mock_id_pgm: I10Apple2PGM, RE: RunEngine):
     )
     RE(
         scan(
-            [mock_id_pgm, mock_id_pgm.pgm_ref(), mock_id_pgm.id],
+            [],
             mock_id_pgm,
             1700,
             1800,
@@ -319,7 +319,6 @@ async def test_I10Apple2_pgm_RE_scan(mock_id_pgm: I10Apple2PGM, RE: RunEngine):
         capture_emitted,
     )
     for cnt, data in enumerate(docs["event"]):
-        print(data)
         assert data["data"]["mock_id_pgm-id-energy"] == 1700 + cnt * 10 + 20
         assert data["data"]["mock_pgm-energy"] == 1700 + cnt * 10
 
@@ -441,7 +440,7 @@ async def test_linear_arbitrary_RE_scan(
 
     RE(
         scan(
-            [mock_linear_arbitrary_angle],
+            [],
             mock_linear_arbitrary_angle,
             start,
             stop,
