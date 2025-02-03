@@ -2,6 +2,7 @@ from unittest.mock import ANY
 
 import pytest
 from ophyd_async.core import DeviceCollector
+from ophyd_async.testing import set_mock_value
 
 from dodal.devices.i18.thor_labs_stage import ThorLabsStage
 
@@ -37,8 +38,8 @@ async def test_setting(thor_labs_stage: ThorLabsStage):
     assert reading == expected_reading
 
     # Call set to update the position
-    await thor_labs_stage.x.set(5)
-    await thor_labs_stage.y.set(5)
+    set_mock_value(thor_labs_stage.x.user_readback, 5)
+    set_mock_value(thor_labs_stage.y.user_readback, 5)
 
     # Read the stage's current position
     reading = await thor_labs_stage.read()
