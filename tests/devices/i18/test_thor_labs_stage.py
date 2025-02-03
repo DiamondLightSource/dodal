@@ -3,7 +3,7 @@ from unittest.mock import ANY
 import pytest
 from ophyd_async.core import DeviceCollector
 
-from dodal.devices.i18.thor_labs_stage import ThorLabsStage, XYPosition
+from dodal.devices.i18.thor_labs_stage import ThorLabsStage
 
 
 @pytest.fixture
@@ -36,11 +36,9 @@ async def test_setting(thor_labs_stage: ThorLabsStage):
 
     assert reading == expected_reading
 
-    # Define the new position to be set
-    pos = XYPosition(x=5, y=5)
-
     # Call set to update the position
-    await thor_labs_stage.set(pos)
+    await thor_labs_stage.x.set(5)
+    await thor_labs_stage.y.set(5)
 
     # Read the stage's current position
     reading = await thor_labs_stage.read()

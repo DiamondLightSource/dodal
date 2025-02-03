@@ -4,7 +4,7 @@ import pytest
 from ophyd_async.core import DeviceCollector
 from ophyd_async.testing import set_mock_value
 
-from dodal.devices.i18.KBMirror import KBMirror, XYPosition
+from dodal.devices.i18.KBMirror import KBMirror
 
 
 @pytest.fixture
@@ -23,11 +23,9 @@ async def test_setting_xy_position_kbmirror(kbmirror: KBMirror):
     set_mock_value(kbmirror.x, 0.0)
     set_mock_value(kbmirror.y, 0.0)
 
-    # Create a position object
-    position = XYPosition(x=1.23, y=4.56)
-
     # Call set to update the position
-    await kbmirror.set(position)
+    await kbmirror.x.set(1.32)
+    await kbmirror.y.set(4.56)
 
     reading = await kbmirror.read()
     expected_reading = {

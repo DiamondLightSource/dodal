@@ -2,9 +2,8 @@ from unittest.mock import ANY
 
 import pytest
 from ophyd_async.core import DeviceCollector
-from ophyd_async.testing import set_mock_value
 
-from dodal.devices.i18.table import Table, TablePosition
+from dodal.devices.i18.table import Table
 
 
 @pytest.fixture
@@ -42,11 +41,9 @@ async def test_setting_xy_position_table(table: Table):
 
     assert reading == expected_reading
 
-    # Create a position object
-    position = TablePosition(x=1.23, y=4.56, z=0.0, theta=0.0)
-
     # Call set to update the position
-    await table.set(position)
+    await table.x.set(1.23)
+    await table.y.set(4.56)
 
     reading = await table.read()
     expected_reading = {
@@ -97,11 +94,11 @@ async def test_setting_xyztheta_position_table(table: Table):
 
     assert reading == expected_reading
 
-    # Create a position object
-    position = TablePosition(x=1.23, y=4.56, z=7.89, theta=10.11)
-
     # Call set to update the position
-    await table.set(position)
+    await table.x.set(1.23)
+    await table.y.set(4.56)
+    await table.z.set(7.89)
+    await table.theta.set(10.11)
 
     reading = await table.read()
     expected_reading = {
