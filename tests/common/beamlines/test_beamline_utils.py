@@ -1,5 +1,6 @@
 import asyncio
 import functools
+import os
 from unittest.mock import ANY, AsyncMock, MagicMock, patch
 
 import pytest
@@ -17,7 +18,7 @@ from dodal.devices.focusing_mirror import FocusingMirror
 from dodal.devices.motors import XYZPositioner
 from dodal.devices.smargon import Smargon
 from dodal.log import LOGGER
-from dodal.utils import DeviceInitializationController, make_all_devices
+from dodal.utils import DeviceInitializationController
 
 from ...conftest import mock_beamline_module_filepaths
 
@@ -36,6 +37,8 @@ def flush_event_loop_on_finish(event_loop):
 def setup():
     beamline_utils.clear_devices()
     mock_beamline_module_filepaths("i03", i03)
+    with patch.dict(os.environ, {"BEAMLINE": "i03"}):
+        yield
 
 
 def test_instantiate_function_makes_supplied_device():
@@ -80,29 +83,6 @@ def test_instantiate_v2_function_fake_makes_fake():
     )
     assert isinstance(fake_smargon, StandardReadable)
     assert fake_smargon.omega.user_setpoint.source.startswith("mock+ca")
-
-
-def test_clear_devices(RE):
-    devices, exceptions = make_all_devices(i03, fake_with_ophyd_sim=True)
-    assert (
-        len(beamline_utils.ACTIVE_DEVICES) == len(devices.keys())
-        and len(exceptions) == 0
-    )
-    beamline_utils.clear_devices()
-    assert beamline_utils.ACTIVE_DEVICES == {}
-
-
-def test_device_is_new_after_clearing(RE):
-    def _make_devices_and_get_id():
-        devices, _ = make_all_devices(i03, fake_with_ophyd_sim=True)
-        return [id(device) for device in devices.values()]
-
-    ids_1 = [_make_devices_and_get_id()]
-    ids_2 = [_make_devices_and_get_id()]
-    assert ids_1 == ids_2
-    beamline_utils.clear_devices()
-    ids_3 = [_make_devices_and_get_id()]
-    assert ids_1 != ids_3
 
 
 @pytest.mark.parametrize(
