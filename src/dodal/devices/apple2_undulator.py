@@ -17,7 +17,6 @@ from ophyd_async.core import (
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
-from ophyd_async.epics.motor import Motor
 from pydantic import BaseModel, ConfigDict, RootModel
 
 from dodal.log import LOGGER
@@ -195,7 +194,7 @@ class UndulatorGap(SafeUndulatorMover):
         )
 
 
-class UndulatorPhaseMotor(Motor):
+class UndulatorPhaseMotor(StandardReadable):
     """A collection of epics signals for ID phase motion.
     Only PV used by beamline are added the full list is here:
     /dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDPhaseSoftMotor.template
@@ -217,11 +216,22 @@ class UndulatorPhaseMotor(Motor):
         self.user_setpoint = epics_signal_w(str, fullPV + "SET")
         self.user_setpoint_demand_readback = epics_signal_r(float, fullPV + "DMD")
 
-        motor_PV = fullPV + "MTR"
+        fullPV = fullPV + "MTR"
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.user_setpoint_readback = epics_signal_r(float, motor_PV + ".RBV")
+            self.user_setpoint_readback = epics_signal_r(float, fullPV + ".RBV")
 
-        super().__init__(motor_PV, name)
+        with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
+            self.motor_egu = epics_signal_r(str, fullPV + ".EGU")
+            self.velocity = epics_signal_rw(float, fullPV + ".VELO")
+
+        self.max_velocity = epics_signal_r(float, fullPV + ".VMAX")
+        self.acceleration_time = epics_signal_rw(float, fullPV + ".ACCL")
+        self.precision = epics_signal_r(int, fullPV + ".PREC")
+        self.deadband = epics_signal_r(float, fullPV + ".RDBD")
+        self.motor_done_move = epics_signal_r(int, fullPV + ".DMOV")
+        self.low_limit_travel = epics_signal_rw(float, fullPV + ".LLM")
+        self.high_limit_travel = epics_signal_rw(float, fullPV + ".HLM")
+        super().__init__(name=name)
 
 
 class UndulatorPhaseAxes(SafeUndulatorMover):
