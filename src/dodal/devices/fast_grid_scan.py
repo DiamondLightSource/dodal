@@ -45,8 +45,19 @@ class GridAxis:
         # refering to the first position
         return self.steps_to_motor_position(self.full_steps - 1)
 
-    def is_within(self, steps):
-        return 0 <= steps <= self.full_steps
+    def is_within(self, steps: float):
+        """
+        Determine whether a single axis coordinate is within the grid.
+        The coordinate is from a continuous coordinate space based on the
+        XRC grid where the origin corresponds to the centre of the first grid box.
+
+        Args:
+            steps: The coordinate to check
+
+        Returns:
+            True if the coordinate falls within the grid.
+        """
+        return -0.5 <= steps <= self.full_steps - 0.5
 
 
 class GridScanParamsCommon(AbstractExperimentWithBeamParams):
