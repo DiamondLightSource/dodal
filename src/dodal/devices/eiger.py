@@ -161,7 +161,7 @@ class EigerDetector(Device):
             status_ok = self.odin.check_and_wait_for_odin_state(
                 self.timeouts.general_status_timeout
             )
-            self.disable_roi_mode()
+            self.disable_roi_mode().wait(self.timeouts.general_status_timeout)
         self.disarming_status.set_finished()
         return status_ok
 
