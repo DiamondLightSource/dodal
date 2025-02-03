@@ -58,6 +58,7 @@ dev = [
     "pytest",
     "pytest-asyncio",
     "pytest-cov",
+    "pytest-json-report",
     "pytest-random-order",
     "ruff",
     "sphinx<7.4.6",              #  pinned due to https://github.com/sphinx-doc/sphinx/issues/12660
@@ -156,6 +157,7 @@ commands =
     type-checking: pyright src tests {posargs}
     pre-commit: pre-commit run --all-files --show-diff-on-failure {posargs}
     docs: sphinx-{posargs:build -E} -T docs build/html
+    tests-report: pytest -m 'not (s03 or adsim)' --cov=dodal --cov-report term --cov-report xml:cov.xml --json-resport --json-report-file=report.json {posargs}
 """
 
 [tool.ruff]
