@@ -24,7 +24,7 @@ async def test_setting_xy_position_kbmirror(kbmirror: KBMirror):
     set_mock_value(kbmirror.y, 0.0)
 
     # Call set to update the position
-    await kbmirror.x.set(1.32)
+    await kbmirror.x.set(1.23)
     await kbmirror.y.set(4.56)
 
     reading = await kbmirror.read()
