@@ -207,6 +207,45 @@ class TestInnerScan:
 
         assert mock_move_slits.call_args_list == call_list
 
+    def test_inner_scan_triggers_and_reads(
+        self,
+        mock_move_slits: Mock,
+        mock_bps_trigger_and_read: Mock,
+        detectors: list[Readable],
+        RE: RunEngine,
+        mirror: BimorphMirror,
+        slits: Slits,
+        active_dimension: SlitDimension,
+        active_slit_center_start: float,
+        active_slit_center_end: float,
+        active_slit_size: float,
+        number_of_slit_positions: int,
+    ):
+        @run_decorator()
+        def plan():
+            yield from inner_scan(
+                detectors,
+                mirror,
+                slits,
+                active_dimension,
+                active_slit_center_start,
+                active_slit_center_end,
+                active_slit_size,
+                number_of_slit_positions,
+            )
+
+        RE(plan())
+
+        call_list = [
+            call((*detectors, slits, mirror))
+            for _ in linspace(
+                active_slit_center_start,
+                active_slit_center_end,
+                number_of_slit_positions,
+            )
+        ]
+        assert mock_bps_trigger_and_read.call_args_list == call_list
+
 
 @pytest.mark.parametrize("voltage_increment", [100.0])
 @pytest.mark.parametrize("active_dimension", [SlitDimension.X, SlitDimension.Y])
