@@ -9,6 +9,7 @@ from unittest.mock import ANY, Mock, call
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.preprocessors import run_decorator
+from bluesky.protocols import Readable
 from bluesky.run_engine import RunEngine
 from bluesky.utils import Msg
 from numpy import linspace
@@ -95,6 +96,11 @@ async def oav(RE: RunEngine, tmp_path: Path) -> StandardDetector:
     return det
 
 
+@pytest.fixture(params=list(range(2)))
+async def detectors(request, oav: StandardDetector) -> list[Readable]:
+    return [oav] * request.param
+
+
 @pytest.fixture(params=[True, False])
 def initial_voltage_list(request, mirror) -> list[float] | None:
     if request.param:
@@ -159,10 +165,10 @@ def test_save_and_restore(RE: RunEngine, mirror: BimorphMirror, slits: Slits):
 @pytest.mark.parametrize("active_slit_size", [0.05])
 @pytest.mark.parametrize("number_of_slit_positions", [3])
 def test_inner_scan(
+    detectors: list[Readable],
     RE: RunEngine,
     mirror: BimorphMirror,
     slits: Slits,
-    oav: StandardDetector,
     active_dimension: SlitDimension,
     active_slit_center_start: float,
     active_slit_center_end: float,
@@ -172,9 +178,9 @@ def test_inner_scan(
     @run_decorator()
     def plan():
         yield from inner_scan(
+            detectors,
             mirror,
             slits,
-            oav,
             active_dimension,
             active_slit_center_start,
             active_slit_center_end,
