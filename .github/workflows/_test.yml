@@ -51,7 +51,8 @@ jobs:
           pip-install: ".[dev]"
 
       - name: Run tests
-        run: tox -e tests-report
+        run: tox -e report
+
       - name: Check test durations
         run: |
           python .github/scripts/check_test_durations.py
