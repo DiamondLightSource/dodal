@@ -157,7 +157,8 @@ commands =
     type-checking: pyright src tests {posargs}
     pre-commit: pre-commit run --all-files --show-diff-on-failure {posargs}
     docs: sphinx-{posargs:build -E} -T docs build/html
-    report: pytest -m 'not (s03 or adsim)' --cov=dodal --cov-report term --cov-report xml:cov.xml --json-report --json-report-file=report.json {posargs}
+    unit-report: pytest -m 'not (s03 or adsim)' --cov=dodal --cov-report term --cov-report xml:cov.xml --json-report --json-report-file=unit-report.json tests {posargs}
+    system-report: pytest -m 'not (s03 or adsim)' --cov=dodal --cov-report term --cov-report xml:cov.xml --json-report --json-report-file=system-report.json system_tests {posargs}
 """
 
 [tool.ruff]
