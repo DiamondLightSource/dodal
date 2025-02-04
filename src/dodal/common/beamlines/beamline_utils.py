@@ -13,7 +13,6 @@ from dodal.common.types import UpdatingPathProvider
 from dodal.utils import (
     AnyDevice,
     BeamlinePrefix,
-    D,
     DeviceInitializationController,
     SkipType,
     skip_device,
@@ -141,8 +140,8 @@ def device_factory(
         SkipType,
         "mark the factory to be (conditionally) skipped when beamline is imported by external program",
     ] = False,
-) -> Callable[[Callable[[], D]], DeviceInitializationController[D]]:
-    def decorator(factory: Callable[[], D]) -> DeviceInitializationController[D]:
+) -> Callable[[Callable[[], T]], DeviceInitializationController[T]]:
+    def decorator(factory: Callable[[], T]) -> DeviceInitializationController[T]:
         return DeviceInitializationController(
             factory,
             use_factory_name,
