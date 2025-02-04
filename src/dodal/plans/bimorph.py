@@ -3,8 +3,8 @@ from enum import Enum
 
 import bluesky.plan_stubs as bps
 from bluesky.preprocessors import run_decorator, stage_decorator
+from bluesky.protocols import Readable
 from numpy import linspace
-from ophyd_async.core import StandardDetector
 
 from dodal.devices.bimorph_mirror import BimorphMirror
 from dodal.devices.slits import Slits
@@ -97,9 +97,9 @@ def restore_bimorph_state(mirror: BimorphMirror, slits: Slits, state: BimorphSta
 
 
 def bimorph_optimisation(
+    detectors: list[Readable],
     mirror: BimorphMirror,
     slits: Slits,
-    oav: StandardDetector,
     voltage_increment: float,
     active_dimension: SlitDimension,
     active_slit_center_start: float,
@@ -148,14 +148,14 @@ def bimorph_optimisation(
         slits, inactive_dimension, inactive_slit_size, inactive_slit_center
     )
 
-    @stage_decorator((oav, slits, mirror))
+    @stage_decorator(*(detectors), slits, mirror)
     @run_decorator()
     def outer():
         """Outer plan stub, which moves mirror and calls inner_scan."""
         yield from inner_scan(
+            detectors,
             mirror,
             slits,
-            oav,
             active_dimension,
             active_slit_center_start,
             active_slit_center_end,
@@ -167,9 +167,9 @@ def bimorph_optimisation(
             yield from bps.sleep(bimorph_settle_time)
 
             yield from inner_scan(
+                detectors,
                 mirror,
                 slits,
-                oav,
                 active_dimension,
                 active_slit_center_start,
                 active_slit_center_end,
@@ -183,9 +183,9 @@ def bimorph_optimisation(
 
 
 def inner_scan(
+    detectors: list[Readable],
     mirror: BimorphMirror,
     slits: Slits,
-    oav: StandardDetector,
     active_dimension: SlitDimension,
     active_slit_center_start: float,
     active_slit_center_end: float,
@@ -208,4 +208,4 @@ def inner_scan(
         active_slit_center_start, active_slit_center_end, number_of_slit_positions
     ):
         yield from move_slits(slits, active_dimension, active_slit_size, value)
-        yield from bps.trigger_and_read((oav, slits, mirror))
+        yield from bps.trigger_and_read((*detectors, slits, mirror))
