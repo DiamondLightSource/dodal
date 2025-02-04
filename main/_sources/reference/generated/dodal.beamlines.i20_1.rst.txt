@@ -20,13 +20,6 @@ dodal.beamlines.i20\_1
 
    
    
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      turbo_slit
-      xspress3
-   
    
 
    
