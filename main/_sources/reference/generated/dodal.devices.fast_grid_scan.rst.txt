@@ -14,7 +14,6 @@ dodal.devices.fast\_grid\_scan
    :toctree:
    :recursive:
 
-   ~fast_grid_scan.ExpectedImages
    ~fast_grid_scan.FastGridScanCommon
    ~fast_grid_scan.GridAxis
    ~fast_grid_scan.GridScanParamsCommon
