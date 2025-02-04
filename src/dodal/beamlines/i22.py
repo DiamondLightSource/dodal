@@ -10,7 +10,7 @@ from dodal.common.beamlines.beamline_utils import (
     set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.beamlines.device_helpers import HDF5_PREFIX
+from dodal.common.beamlines.device_helpers import CAM_SUFFIX, DET_SUFFIX, HDF5_SUFFIX
 from dodal.common.crystal_metadata import (
     MaterialsEnum,
     make_crystal_metadata_from_material,
@@ -63,8 +63,8 @@ def saxs() -> PilatusDetector:
     return NXSasPilatus(
         prefix=f"{PREFIX.beamline_prefix}-EA-PILAT-01:",
         path_provider=get_path_provider(),
-        drv_suffix="CAM:",
-        fileio_suffix=HDF5_PREFIX,
+        drv_suffix=CAM_SUFFIX,
+        fileio_suffix=HDF5_SUFFIX,
         metadata_holder=metadata_holder,
     )
 
@@ -88,8 +88,8 @@ def waxs() -> PilatusDetector:
     return NXSasPilatus(
         prefix=f"{PREFIX.beamline_prefix}-EA-PILAT-03:",
         path_provider=get_path_provider(),
-        drv_suffix="CAM:",
-        fileio_suffix=HDF5_PREFIX,
+        drv_suffix=CAM_SUFFIX,
+        fileio_suffix=HDF5_SUFFIX,
         metadata_holder=metadata_holder,
     )
 
@@ -248,8 +248,8 @@ def oav() -> AravisDetector:
     )
     return NXSasOAV(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
-        drv_suffix="DET:",
-        fileio_suffix=HDF5_PREFIX,
+        drv_suffix=DET_SUFFIX,
+        fileio_suffix=HDF5_SUFFIX,
         path_provider=get_path_provider(),
         metadata_holder=metadata_holder,
     )

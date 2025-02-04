@@ -2,6 +2,7 @@ import pytest
 from ophyd_async.core import PathProvider, init_devices
 from ophyd_async.epics.adpilatus import PilatusDetector
 
+from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
 from dodal.devices.i22.nxsas import NXSasMetadataHolder, NXSasPilatus
 
 
@@ -10,8 +11,8 @@ def saxs(static_path_provider: PathProvider, RE) -> PilatusDetector:
     with init_devices(mock=True):
         saxs = NXSasPilatus(
             prefix="-EA-PILAT-01:",
-            drv_suffix="CAM:",
-            fileio_suffix="HDF5:",
+            drv_suffix=CAM_SUFFIX,
+            fileio_suffix=HDF5_SUFFIX,
             metadata_holder=NXSasMetadataHolder(
                 x_pixel_size=(1.72e-1, "mm"),
                 y_pixel_size=(1.72e-1, "mm"),

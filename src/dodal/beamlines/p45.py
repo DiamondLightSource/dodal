@@ -9,6 +9,7 @@ from dodal.common.beamlines.beamline_utils import (
     set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.device_helpers import DET_SUFFIX, HDF5_SUFFIX
 from dodal.common.visit import StaticVisitPathProvider
 from dodal.devices.p45 import Choppers, TomoStageWithStretchAndSkew
 from dodal.log import set_beamline as set_log_beamline
@@ -60,8 +61,8 @@ def det(
         "-EA-MAP-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        drv_suffix="DET:",
-        fileio_suffix="HDF5:",
+        drv_suffix=DET_SUFFIX,
+        fileio_suffix=HDF5_SUFFIX,
         path_provider=get_path_provider(),
     )
 
@@ -77,8 +78,8 @@ def diff(
         "-EA-DIFF-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        drv_suffix="DET:",
-        fileio_suffix="HDF5:",
+        drv_suffix=DET_SUFFIX,
+        fileio_suffix=HDF5_SUFFIX,
         path_provider=get_path_provider(),
     )
 

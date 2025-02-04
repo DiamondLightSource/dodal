@@ -8,6 +8,7 @@ from dodal.common.beamlines.beamline_utils import (
     set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
+from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.i13_1.merlin import Merlin
 from dodal.devices.motors import XYZPositioner
@@ -60,8 +61,8 @@ def side_camera(
         prefix="BL13J-OP-FLOAT-03:",
         name="side_camera",
         bl_prefix=False,
-        drv_suffix="CAM:",
-        fileio_suffix="HDF5:",
+        drv_suffix=CAM_SUFFIX,
+        fileio_suffix=HDF5_SUFFIX,
         path_provider=get_path_provider(),
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
@@ -76,8 +77,8 @@ def merlin(
         prefix="BL13J-EA-DET-04:",
         name="merlin",
         bl_prefix=False,
-        drv_suffix="CAM:",
-        fileio_suffix="HDF5:",
+        drv_suffix=CAM_SUFFIX,
+        fileio_suffix=HDF5_SUFFIX,
         path_provider=get_path_provider(),
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,
