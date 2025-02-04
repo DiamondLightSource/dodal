@@ -148,7 +148,7 @@ def bimorph_optimisation(
         slits, inactive_dimension, inactive_slit_size, inactive_slit_center
     )
 
-    @stage_decorator(*(detectors), slits, mirror)
+    @stage_decorator((*(detectors), slits, mirror))
     @run_decorator()
     def outer():
         """Outer plan stub, which moves mirror and calls inner_scan."""
