@@ -164,7 +164,9 @@ def test_save_and_restore(RE: RunEngine, mirror: BimorphMirror, slits: Slits):
 @pytest.mark.parametrize("active_slit_center_end", [200])
 @pytest.mark.parametrize("active_slit_size", [0.05])
 @pytest.mark.parametrize("number_of_slit_positions", [3])
+@unittest.mock.patch("dodal.plans.bimorph.move_slits")
 def test_inner_scan(
+    mock_move_slits: Mock,
     detectors: list[Readable],
     RE: RunEngine,
     mirror: BimorphMirror,
@@ -188,14 +190,8 @@ def test_inner_scan(
             number_of_slit_positions,
         )
 
-    put = (
-        get_mock_put(slits.x_centre.user_setpoint)
-        if active_dimension == SlitDimension.X
-        else get_mock_put(slits.y_centre.user_setpoint)
-    )
-
     call_list = [
-        call(value, wait=True)
+        call(slits, active_dimension, active_slit_size, value)
         for value in linspace(
             active_slit_center_start, active_slit_center_end, number_of_slit_positions
         )
@@ -203,7 +199,7 @@ def test_inner_scan(
 
     RE(plan())
 
-    assert put.call_args_list == call_list
+    assert mock_move_slits.call_args_list == call_list
 
 
 @pytest.mark.parametrize("voltage_increment", [100.0])
