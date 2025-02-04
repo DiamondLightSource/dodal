@@ -299,10 +299,10 @@ class TestBimorphOptimisation:
         mock_restore_bimorph_state: Mock,
         mock_bps_sleep: Mock,
         mock_capture_bimorph_state: Mock,
+        detectors: list[Readable],
         RE: RunEngine,
         mirror_with_mocked_put: BimorphMirror,
         slits: Slits,
-        oav: StandardDetector,
         voltage_increment: float,
         active_dimension: SlitDimension,
         active_slit_center_start: float,
@@ -316,9 +316,9 @@ class TestBimorphOptimisation:
     ):
         RE(
             bimorph_optimisation(
+                detectors,
                 mirror_with_mocked_put,
                 slits,
-                oav,
                 voltage_increment,
                 active_dimension,
                 active_slit_center_start,
@@ -343,10 +343,10 @@ class TestBimorphOptimisation:
         mock_restore_bimorph_state: Mock,
         mock_bps_sleep: Mock,
         mock_capture_bimorph_state: Mock,
+        detectors: list[Readable],
         RE: RunEngine,
         mirror_with_mocked_put: BimorphMirror,
         slits: Slits,
-        oav: StandardDetector,
         voltage_increment: float,
         active_dimension: SlitDimension,
         active_slit_center_start: float,
@@ -361,9 +361,9 @@ class TestBimorphOptimisation:
     ):
         RE(
             bimorph_optimisation(
+                detectors,
                 mirror_with_mocked_put,
                 slits,
-                oav,
                 voltage_increment,
                 active_dimension,
                 active_slit_center_start,
@@ -388,10 +388,10 @@ class TestBimorphOptimisation:
         mock_restore_bimorph_state: Mock,
         mock_bps_sleep: Mock,
         mock_capture_bimorph_state: Mock,
+        detectors: list[Readable],
         RE: RunEngine,
         mirror_with_mocked_put: BimorphMirror,
         slits: Slits,
-        oav: StandardDetector,
         voltage_increment: float,
         active_dimension: SlitDimension,
         active_slit_center_start: float,
@@ -410,9 +410,9 @@ class TestBimorphOptimisation:
 
         RE(
             bimorph_optimisation(
+                detectors,
                 mirror_with_mocked_put,
                 slits,
-                oav,
                 voltage_increment,
                 active_dimension,
                 active_slit_center_start,
@@ -437,10 +437,10 @@ class TestBimorphOptimisation:
         mock_restore_bimorph_state: Mock,
         mock_bps_sleep: Mock,
         mock_capture_bimorph_state: Mock,
+        detectors: list[Readable],
         RE: RunEngine,
         mirror_with_mocked_put: BimorphMirror,
         slits: Slits,
-        oav: StandardDetector,
         voltage_increment: float,
         active_dimension: SlitDimension,
         active_slit_center_start: float,
@@ -455,9 +455,9 @@ class TestBimorphOptimisation:
     ):
         RE(
             bimorph_optimisation(
+                detectors,
                 mirror_with_mocked_put,
                 slits,
-                oav,
                 voltage_increment,
                 active_dimension,
                 active_slit_center_start,
@@ -472,9 +472,9 @@ class TestBimorphOptimisation:
         )
         assert [
             call(
+                detectors,
                 mirror_with_mocked_put,
                 slits,
-                oav,
                 active_dimension,
                 active_slit_center_start,
                 active_slit_center_end,
@@ -491,10 +491,10 @@ class TestBimorphOptimisation:
         mock_restore_bimorph_state: Mock,
         mock_bps_sleep: Mock,
         mock_capture_bimorph_state: Mock,
+        detectors: list[Readable],
         RE: RunEngine,
         mirror_with_mocked_put: BimorphMirror,
         slits: Slits,
-        oav: StandardDetector,
         voltage_increment: float,
         active_dimension: SlitDimension,
         active_slit_center_start: float,
@@ -509,9 +509,9 @@ class TestBimorphOptimisation:
     ):
         RE(
             bimorph_optimisation(
+                detectors,
                 mirror_with_mocked_put,
                 slits,
-                oav,
                 voltage_increment,
                 active_dimension,
                 active_slit_center_start,
@@ -540,10 +540,10 @@ class TestBimorphOptimisation:
         mock_restore_bimorph_state: Mock,
         mock_bps_sleep: Mock,
         mock_capture_bimorph_state: Mock,
+        detectors: list[Readable],
         RE: RunEngine,
         mirror_with_mocked_put: BimorphMirror,
         slits: Slits,
-        oav: StandardDetector,
         voltage_increment: float,
         active_dimension: SlitDimension,
         active_slit_center_start: float,
@@ -558,9 +558,9 @@ class TestBimorphOptimisation:
     ):
         RE(
             bimorph_optimisation(
+                detectors,
                 mirror_with_mocked_put,
                 slits,
-                oav,
                 voltage_increment,
                 active_dimension,
                 active_slit_center_start,
