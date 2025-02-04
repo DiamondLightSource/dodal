@@ -178,7 +178,9 @@ class FastValveControl(StandardReadable):
 
         super().__init__(name)
 
-    def set(self, request: FastValveControlRequest | ValveOpenSeqRequest) -> AsyncStatus:
+    def set(
+        self, request: FastValveControlRequest | ValveOpenSeqRequest
+    ) -> AsyncStatus:
         set_status = None
 
         if isinstance(request, FastValveControlRequest):
@@ -229,7 +231,9 @@ class PressureTransducer(StandardReadable):
             self.omron_pressure = epics_signal_r(
                 float, f"{final_prefix}PP{transducer_number}:PRES"
             )
-            self.omron_voltage = epics_signal_r(float, f"{final_prefix}PP{transducer_number}:RAW")
+            self.omron_voltage = epics_signal_r(
+                float, f"{final_prefix}PP{transducer_number}:RAW"
+            )
             self.beckhoff_pressure = epics_signal_r(
                 float, f"{final_prefix}STATP{transducer_number}:MeanValue_RBV"
             )
