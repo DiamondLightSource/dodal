@@ -69,9 +69,6 @@ dodal.devices.aperturescatterguard.ApertureValue
    .. autosummary::
    
       
-      ~ApertureValue.ROBOT_LOAD
-      
-      
       ~ApertureValue.SMALL
       
       
@@ -79,6 +76,9 @@ dodal.devices.aperturescatterguard.ApertureValue
       
       
       ~ApertureValue.LARGE
+      
+      
+      ~ApertureValue.OUT_OF_BEAM
       
    
    

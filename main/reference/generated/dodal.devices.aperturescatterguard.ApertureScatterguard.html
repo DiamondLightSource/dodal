@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.aperturescatterguard.ApertureScatterguard &#8212; dodal 1.39.1.dev10+g80d3586a8 documentation</title>
+    <title>dodal.devices.aperturescatterguard.ApertureScatterguard &#8212; dodal 1.39.1.dev11+g9e3ef3c3b documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=cb0fadc7"></script>
+    <script src="../../_static/documentation_options.js?v=effbddca"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -860,7 +860,33 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="dodal.devices.aperturescatterguard.ApertureScatterguard">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dodal.devices.aperturescatterguard.</span></span><span class="sig-name descname"><span class="pre">ApertureScatterguard</span></span><a class="reference internal" href="../../_modules/dodal/devices/aperturescatterguard.html#ApertureScatterguard"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.aperturescatterguard.ApertureScatterguard" title="Link to this definition">#</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Move the aperture and scatterguard assembly in a safe way. There are two ways to
+interact with the device depending on if you want simplicity or move flexibility.</p>
+<p class="rubric">Examples</p>
+<p>The simple interface is using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">await</span> <span class="n">aperture_scatterguard</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ApertureValue</span><span class="o">.</span><span class="n">LARGE</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will move the assembly so that the large aperture is in the beam, regardless
+of where the assembly currently is.</p>
+<p>We may also want to move the assembly out of the beam with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">await</span> <span class="n">aperture_scatterguard</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ApertureValue</span><span class="o">.</span><span class="n">OUT_OF_BEAM</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note, to make sure we do this as quickly as possible, the scatterguard will stay
+in the same position relative to the aperture.</p>
+<p>We may then want to keep the assembly out of the beam whilst asynchronously preparing
+the other axes for the aperture that’s to follow:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">await</span> <span class="n">aperture_scatterguard</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">ApertureValue</span><span class="o">.</span><span class="n">LARGE</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Then, at a later time, move back into the beam:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">await</span> <span class="n">aperture_scatterguard</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ApertureValue</span><span class="o">.</span><span class="n">LARGE</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Given the prepare has been done this move will now be faster as only the y is
+left to move.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>loaded_positions</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference internal" href="dodal.devices.aperturescatterguard.ApertureValue.html#dodal.devices.aperturescatterguard.ApertureValue" title="dodal.devices.aperturescatterguard.ApertureValue"><code class="xref py py-class docutils literal notranslate"><span class="pre">ApertureValue</span></code></a>, <a class="reference internal" href="dodal.devices.aperturescatterguard.AperturePosition.html#dodal.devices.aperturescatterguard.AperturePosition" title="dodal.devices.aperturescatterguard.AperturePosition"><code class="xref py py-class docutils literal notranslate"><span class="pre">AperturePosition</span></code></a>]</span>)</p></li>
@@ -873,11 +899,11 @@
 <p class="rubric">Methods</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_position_from_gda_aperture_name</span></code>(...)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.aperturescatterguard.ApertureScatterguard.prepare" title="dodal.devices.aperturescatterguard.ApertureScatterguard.prepare"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare</span></code></a>(value)</p></td>
+<td><p>Moves the assembly to the position for the specified aperture, whilst keeping it out of the beam if it already is so.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code>(value)</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#dodal.devices.aperturescatterguard.ApertureScatterguard.set" title="dodal.devices.aperturescatterguard.ApertureScatterguard.set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code></a>(value)</p></td>
+<td><p>This set will move the aperture into the beam or move the whole assembly out</p></td>
 </tr>
 </tbody>
 </table>
@@ -888,6 +914,31 @@
 </tbody>
 </table>
 </div>
+<dl class="py method">
+<dt class="sig sig-object py" id="dodal.devices.aperturescatterguard.ApertureScatterguard.set">
+<span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dodal.devices.aperturescatterguard.ApertureValue.html#dodal.devices.aperturescatterguard.ApertureValue" title="dodal.devices.aperturescatterguard.ApertureValue"><span class="pre">ApertureValue</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/aperturescatterguard.html#ApertureScatterguard.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.aperturescatterguard.ApertureScatterguard.set" title="Link to this definition">#</a></dt>
+<dd><p>This set will move the aperture into the beam or move the whole assembly out</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.aperturescatterguard.ApertureValue.html#dodal.devices.aperturescatterguard.ApertureValue" title="dodal.devices.aperturescatterguard.ApertureValue"><code class="xref py py-class docutils literal notranslate"><span class="pre">ApertureValue</span></code></a></span>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dodal.devices.aperturescatterguard.ApertureScatterguard.prepare">
+<span class="sig-name descname"><span class="pre">prepare</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="dodal.devices.aperturescatterguard.ApertureValue.html#dodal.devices.aperturescatterguard.ApertureValue" title="dodal.devices.aperturescatterguard.ApertureValue"><span class="pre">ApertureValue</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/dodal/devices/aperturescatterguard.html#ApertureScatterguard.prepare"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.aperturescatterguard.ApertureScatterguard.prepare" title="Link to this definition">#</a></dt>
+<dd><p>Moves the assembly to the position for the specified aperture, whilst keeping
+it out of the beam if it already is so.</p>
+<p>Moving the assembly whilst out of the beam has no collision risk so we can just
+move all the motors together.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="dodal.devices.aperturescatterguard.ApertureValue.html#dodal.devices.aperturescatterguard.ApertureValue" title="dodal.devices.aperturescatterguard.ApertureValue"><code class="xref py py-class docutils literal notranslate"><span class="pre">ApertureValue</span></code></a></span>)</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -939,7 +990,11 @@
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.aperturescatterguard.ApertureScatterguard"><code class="docutils literal notranslate"><span class="pre">ApertureScatterguard</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.aperturescatterguard.ApertureScatterguard"><code class="docutils literal notranslate"><span class="pre">ApertureScatterguard</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.aperturescatterguard.ApertureScatterguard.set"><code class="docutils literal notranslate"><span class="pre">ApertureScatterguard.set()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.aperturescatterguard.ApertureScatterguard.prepare"><code class="docutils literal notranslate"><span class="pre">ApertureScatterguard.prepare()</span></code></a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 

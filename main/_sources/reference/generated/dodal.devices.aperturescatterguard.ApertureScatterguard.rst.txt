@@ -19,7 +19,7 @@ dodal.devices.aperturescatterguard.ApertureScatterguard
       
       
       
-      ~ApertureScatterguard.get_position_from_gda_aperture_name
+      ~ApertureScatterguard.prepare
       
       
       
