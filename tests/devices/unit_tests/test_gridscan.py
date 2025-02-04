@@ -109,7 +109,11 @@ async def test_given_different_step_numbers_then_expected_images_correct(
     set_mock_value(zebra_fast_grid_scan.y_steps, steps[1])
     set_mock_value(zebra_fast_grid_scan.z_steps, steps[2])
 
-    assert await zebra_fast_grid_scan.expected_images.get_value() == expected_images
+    RE = RunEngine(call_returns_result=True)
+
+    result = RE(bps.rd(zebra_fast_grid_scan.expected_images))
+
+    assert result.plan_result == expected_images  # type: ignore
 
 
 @pytest.mark.parametrize(
