@@ -164,42 +164,48 @@ def test_save_and_restore(RE: RunEngine, mirror: BimorphMirror, slits: Slits):
 @pytest.mark.parametrize("active_slit_center_end", [200])
 @pytest.mark.parametrize("active_slit_size", [0.05])
 @pytest.mark.parametrize("number_of_slit_positions", [3])
+@unittest.mock.patch("dodal.plans.bimorph.bps.trigger_and_read")
 @unittest.mock.patch("dodal.plans.bimorph.move_slits")
-def test_inner_scan(
-    mock_move_slits: Mock,
-    detectors: list[Readable],
-    RE: RunEngine,
-    mirror: BimorphMirror,
-    slits: Slits,
-    active_dimension: SlitDimension,
-    active_slit_center_start: float,
-    active_slit_center_end: float,
-    active_slit_size: float,
-    number_of_slit_positions: int,
-):
-    @run_decorator()
-    def plan():
-        yield from inner_scan(
-            detectors,
-            mirror,
-            slits,
-            active_dimension,
-            active_slit_center_start,
-            active_slit_center_end,
-            active_slit_size,
-            number_of_slit_positions,
-        )
+class TestInnerScan:
+    def test_inner_scan_moves_slits(
+        self,
+        mock_move_slits: Mock,
+        mock_bps_trigger_and_read: Mock,
+        detectors: list[Readable],
+        RE: RunEngine,
+        mirror: BimorphMirror,
+        slits: Slits,
+        active_dimension: SlitDimension,
+        active_slit_center_start: float,
+        active_slit_center_end: float,
+        active_slit_size: float,
+        number_of_slit_positions: int,
+    ):
+        @run_decorator()
+        def plan():
+            yield from inner_scan(
+                detectors,
+                mirror,
+                slits,
+                active_dimension,
+                active_slit_center_start,
+                active_slit_center_end,
+                active_slit_size,
+                number_of_slit_positions,
+            )
 
-    call_list = [
-        call(slits, active_dimension, active_slit_size, value)
-        for value in linspace(
-            active_slit_center_start, active_slit_center_end, number_of_slit_positions
-        )
-    ]
+        call_list = [
+            call(slits, active_dimension, active_slit_size, value)
+            for value in linspace(
+                active_slit_center_start,
+                active_slit_center_end,
+                number_of_slit_positions,
+            )
+        ]
 
-    RE(plan())
+        RE(plan())
 
-    assert mock_move_slits.call_args_list == call_list
+        assert mock_move_slits.call_args_list == call_list
 
 
 @pytest.mark.parametrize("voltage_increment", [100.0])
