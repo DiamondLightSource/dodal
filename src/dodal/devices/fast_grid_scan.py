@@ -1,3 +1,4 @@
+import asyncio
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 
@@ -230,9 +231,13 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
         super().__init__(name)
 
     async def _calculate_expected_images(self):
-        x = await self.x_steps.get_value()
-        y = await self.y_steps.get_value()
-        z = await self.z_steps.get_value()
+        x, y, z = asyncio.gather(
+            [
+                await self.x_steps.get_value(),
+                await self.y_steps.get_value(),
+                await self.z_steps.get_value(),
+            ]
+        )
         LOGGER.info(f"Reading num of images found {x, y, z} images in each axis")
         first_grid = x * y
         second_grid = x * z
