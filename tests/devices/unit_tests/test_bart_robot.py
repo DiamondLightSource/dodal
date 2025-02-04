@@ -2,7 +2,13 @@ from asyncio import create_task, sleep
 from unittest.mock import ANY, AsyncMock, MagicMock, call, patch
 
 import pytest
-from ophyd_async.testing import callback_on_mock_put, get_mock, set_mock_value
+from ophyd_async.core import AsyncStatus
+from ophyd_async.testing import (
+    callback_on_mock_put,
+    get_mock,
+    get_mock_put,
+    set_mock_value,
+)
 
 from dodal.devices.robot import BartRobot, PinMounted, RobotLoadFailed, SampleLocation
 
@@ -82,25 +88,29 @@ async def test_given_program_not_running_and_pin_unmounting_but_new_pin_not_moun
     assert "Waiting on new pin loaded" in last_log
 
 
-async def test_given_program_not_running_and_pin_unmounts_then_mounts_when_load_pin_then_pin_loaded():
-    device = await _get_bart_robot()
+async def set_with_happy_path(device: BartRobot) -> AsyncStatus:
+    """Mocks the logic that the robot would do on a successful load"""
     device.LOAD_TIMEOUT = 0.05  # type: ignore
     set_mock_value(device.program_running, False)
     set_mock_value(device.gonio_pin_sensor, PinMounted.PIN_MOUNTED)
-    device.load = AsyncMock(side_effect=device.load)
     status = device.set(SampleLocation(15, 10))
     await sleep(0.025)
-    device.load.trigger.assert_called_once()  # type:ignore
 
     set_mock_value(device.gonio_pin_sensor, PinMounted.NO_PIN_MOUNTED)
     await sleep(0.025)
 
     set_mock_value(device.gonio_pin_sensor, PinMounted.PIN_MOUNTED)
+    return status
+
+
+async def test_given_program_not_running_and_pin_unmounts_then_mounts_when_load_pin_then_pin_loaded():
+    device = await _get_bart_robot()
+    status = await set_with_happy_path(device)
     await status
     assert status.success
     assert (await device.next_puck.get_value()) == 15
     assert (await device.next_pin.get_value()) == 10
-    device.load.trigger.assert_called_once()  # type:ignore
+    get_mock_put(device.load).assert_called_once()
 
 
 async def test_given_waiting_for_pin_to_mount_when_no_pin_mounted_then_error_raised():
@@ -130,7 +140,25 @@ async def test_set_waits_for_both_timeouts(mock_wait_for: AsyncMock):
     mock_wait_for.assert_awaited_once_with(ANY, timeout=0.02)
 
 
-async def test_when_error_40_trying_to_move_the_robot_will_reset_it_first():
+async def test_when_error_40_trying_to_move_the_robot_will_reset_it_first_but_still_throws_if_error_not_reset():
+    device = await _get_bart_robot()
+    set_mock_value(device.controller_error.code, 40)
+
+    with pytest.raises(RobotLoadFailed) as e:
+        await device.set(SampleLocation(1, 2))
+        assert e.value.error_code == 40
+
+    get_mock(device).assert_has_calls(
+        [
+            call.reset.put(None, wait=True),
+            call.next_puck.put(ANY, wait=True),
+            call.next_pin.put(ANY, wait=True),
+            call.load.put(None, wait=True),
+        ]
+    )
+
+
+async def test_when_error_40_trying_to_move_the_robot_will_reset_it_and_pass_if_error_is_cleared():
     device = await _get_bart_robot()
     set_mock_value(device.controller_error.code, 40)
 
@@ -139,7 +167,7 @@ async def test_when_error_40_trying_to_move_the_robot_will_reset_it_first():
         lambda *_, **__: set_mock_value(device.controller_error.code, 0),
     )
 
-    await device.set(SampleLocation(1, 2))
+    await (await set_with_happy_path(device))
 
     get_mock(device).assert_has_calls(
         [
