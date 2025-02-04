@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 from enum import Enum
 
+from bluesky.protocols import Stageable
 from ophyd import Component, Device, EpicsSignalRO, Signal
 from ophyd.areadetector.cam import EigerDetectorCam
 from ophyd.status import AndStatus, Status, StatusBase
@@ -42,7 +43,7 @@ AVAILABLE_TIMEOUTS = {
 }
 
 
-class EigerDetector(Device):
+class EigerDetector(Device, Stageable):
     class ArmingSignal(Signal):
         def set(self, value, *, timeout=None, settle_time=None, **kwargs):
             assert isinstance(self.parent, EigerDetector)
