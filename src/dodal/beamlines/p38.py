@@ -342,7 +342,7 @@ def high_pressure_xray_cell(
     return device_instantiation(
         PressureJumpCell,
         "high_pressure_xray_cell",
-        f"{BeamlinePrefix(BL).insertion_prefix}-EA",
+        f"-EA",
         wait_for_connection,
         fake_with_ophyd_sim,
         cell_prefix="-HPXC-01:",

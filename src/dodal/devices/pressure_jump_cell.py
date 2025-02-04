@@ -174,7 +174,7 @@ class FastValveControl(StandardReadable):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
             self.close = epics_signal_rw(FastValveControlRequest, prefix + ":CON")
-            self.open = epics_signal_rw(ValveOpenSeqRequest, prefix + ":OPENSEQ")
+            self.open = epics_signal_rw(int, prefix + ":OPENSEQ")
 
         super().__init__(name)
 
