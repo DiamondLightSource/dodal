@@ -212,7 +212,7 @@ def test_mirror_set_voltage_sets_and_waits_demand_accepted_fail(
     RE(plan())
 
 
-@patch("dodal.devices.focusing_mirror.DEFAULT_SETTLE_TIME_S", 3)
+@patch("dodal.devices.focusing_mirror.DEFAULT_SETTLE_TIME_S", 0.1)
 def test_mirror_set_voltage_sets_and_waits_settle_timeout_expires(
     RE: RunEngine,
     mirror_voltage_with_set_timing_out: SingleMirrorVoltage,

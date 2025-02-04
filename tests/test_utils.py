@@ -1,6 +1,7 @@
 import os
 from collections.abc import Iterable, Mapping
-from typing import cast
+from shutil import copytree
+from typing import Any, cast
 from unittest.mock import ANY, MagicMock, Mock, patch
 
 import pytest
@@ -9,6 +10,7 @@ from bluesky.run_engine import RunEngine
 from ophyd import EpicsMotor
 
 from dodal.beamlines import i03, i23
+from dodal.devices.diamond_filter import DiamondFilter, I03Filters
 from dodal.utils import (
     AnyDevice,
     OphydV1Device,
@@ -19,9 +21,38 @@ from dodal.utils import (
     get_beamline_based_on_environment_variable,
     get_hostname,
     get_run_number,
+    is_v2_device_type,
     make_all_devices,
     make_device,
 )
+
+# Duplicated here because of top-level import issues
+MOCK_DAQ_CONFIG_PATH = "tests/devices/unit_tests/test_daq_configuration"
+
+
+@pytest.fixture()
+def alternate_config(tmp_path) -> str:
+    """
+    Alternate config dir as MOCK_DAQ_CONFIG_PATH replaces i03.DAQ_CONFIGURATION_PATH
+    in conftest.py
+    """
+    alt_config_path = tmp_path / "alt_daq_configuration"
+    copytree(MOCK_DAQ_CONFIG_PATH, alt_config_path)
+    return str(alt_config_path)
+
+
+@pytest.fixture()
+def fake_device_factory_beamline():
+    import tests.fake_device_factory_beamline as beamline
+
+    factories = [
+        f
+        for f in collect_factories(beamline, include_skipped=True).values()
+        if hasattr(f, "cache_clear")
+    ]
+    yield beamline
+    for f in factories:
+        f.cache_clear()  # type: ignore
 
 
 def test_finds_device_factories() -> None:
@@ -29,12 +60,20 @@ def test_finds_device_factories() -> None:
 
     factories = collect_factories(fake_beamline)
 
-    from tests.fake_beamline import device_a, device_b, device_c
+    from tests.fake_beamline import (
+        device_a,
+        device_b,
+        device_c,
+        generic_device_d,
+        plain_ophyd_v2_device,
+    )
 
     assert {
         "device_a": device_a,
         "device_b": device_b,
         "device_c": device_c,
+        "plain_ophyd_v2_device": plain_ophyd_v2_device,
+        "generic_device_d": generic_device_d,
     } == factories
 
 
@@ -42,7 +81,13 @@ def test_makes_devices() -> None:
     import tests.fake_beamline as fake_beamline
 
     devices, exceptions = make_all_devices(fake_beamline)
-    assert {"readable", "motor", "cryo"} == devices.keys() and len(exceptions) == 0
+    assert {
+        "readable",
+        "motor",
+        "cryo",
+        "diamond_filter",
+        "ophyd_v2_device",
+    } == devices.keys() and len(exceptions) == 0
 
 
 def test_makes_devices_with_dependencies() -> None:
@@ -61,7 +106,13 @@ def test_makes_devices_with_disordered_dependencies() -> None:
 
 def test_makes_devices_with_module_name() -> None:
     devices, exceptions = make_all_devices("tests.fake_beamline")
-    assert {"readable", "motor", "cryo"} == devices.keys() and len(exceptions) == 0
+    assert {
+        "readable",
+        "motor",
+        "cryo",
+        "diamond_filter",
+        "ophyd_v2_device",
+    } == devices.keys() and len(exceptions) == 0
 
 
 def test_get_hostname() -> None:
@@ -138,29 +189,71 @@ def test_make_device_dependency_throws():
         make_device(fake_beamline, "device_z")
 
 
-def test_device_factory_skips():
-    import tests.fake_device_factory_beamline as fake_beamline
-
-    devices, exceptions = make_all_devices(fake_beamline)
+def test_device_factory_skips(fake_device_factory_beamline):
+    devices, exceptions = make_all_devices(fake_device_factory_beamline)
     assert len(devices) == 0
     assert len(exceptions) == 0
 
 
-def test_device_factory_can_ignore_skip():
-    import tests.fake_device_factory_beamline as fake_beamline
-
-    devices, exceptions = make_all_devices(fake_beamline, include_skipped=True)
-    assert len(devices) == 3
+def test_device_factory_can_ignore_skip(fake_device_factory_beamline):
+    devices, exceptions = make_all_devices(
+        fake_device_factory_beamline, include_skipped=True
+    )
+    assert len(devices) == 4
     assert len(exceptions) == 0
 
 
-def test_fake_with_ophyd_sim_passed_to_device_factory(RE: RunEngine):
-    import tests.fake_device_factory_beamline as fake_beamline
+def test_device_factory_can_construct_ophyd_v1_devices(fake_device_factory_beamline):
+    device = fake_device_factory_beamline.ophyd_v1_device(
+        connect_immediately=True, mock=True, connection_timeout=4.5
+    )
 
-    fake_beamline.mock_device.cache_clear()
+    device.wait_for_connection.assert_called_once_with(timeout=4.5)  # type: ignore
+
+
+def test_device_factory_passes_kwargs_to_wrapped_factory_v1(
+    fake_device_factory_beamline,
+):
+    device = fake_device_factory_beamline.ophyd_v1_device(
+        connect_immediately=True,
+        mock=True,
+        my_int_kwarg=123,
+        my_str_kwarg="abc",
+        my_float_kwarg=1.23,
+    )
+
+    assert device.my_kwargs == {
+        "my_int_kwarg": 123,
+        "my_str_kwarg": "abc",
+        "my_float_kwarg": 1.23,
+    }
+
+
+def test_device_factory_passes_kwargs_to_wrapped_factory_v2(
+    RE: RunEngine, fake_device_factory_beamline
+):
+    device = fake_device_factory_beamline.mock_device(
+        connect_immediately=True,
+        mock=True,
+        my_int_kwarg=123,
+        my_str_kwarg="abc",
+        my_float_kwarg=1.23,
+    )
+
+    assert device.my_kwargs == {  # type: ignore
+        "my_int_kwarg": 123,
+        "my_str_kwarg": "abc",
+        "my_float_kwarg": 1.23,
+    }
+
+
+def test_fake_with_ophyd_sim_passed_to_device_factory(
+    RE: RunEngine, fake_device_factory_beamline
+):
+    fake_device_factory_beamline.mock_device.cache_clear()
 
     devices, exceptions = make_all_devices(
-        fake_beamline,
+        fake_device_factory_beamline,
         include_skipped=True,
         fake_with_ophyd_sim=True,
         connect_immediately=True,
@@ -171,13 +264,11 @@ def test_fake_with_ophyd_sim_passed_to_device_factory(RE: RunEngine):
     mock_device.connect.assert_called_once_with(timeout=ANY, mock=True)
 
 
-def test_mock_passed_to_device_factory(RE: RunEngine):
-    import tests.fake_device_factory_beamline as fake_beamline
-
-    fake_beamline.mock_device.cache_clear()
+def test_mock_passed_to_device_factory(RE: RunEngine, fake_device_factory_beamline):
+    fake_device_factory_beamline.mock_device.cache_clear()
 
     devices, exceptions = make_all_devices(
-        fake_beamline,
+        fake_device_factory_beamline,
         include_skipped=True,
         mock=True,
         connect_immediately=True,
@@ -188,13 +279,13 @@ def test_mock_passed_to_device_factory(RE: RunEngine):
     mock_device.connect.assert_called_once_with(timeout=ANY, mock=True)
 
 
-def test_connect_immediately_passed_to_device_factory(RE: RunEngine):
-    import tests.fake_device_factory_beamline as fake_beamline
-
-    fake_beamline.mock_device.cache_clear()
+def test_connect_immediately_passed_to_device_factory(
+    RE: RunEngine, fake_device_factory_beamline
+):
+    fake_device_factory_beamline.mock_device.cache_clear()
 
     devices, exceptions = make_all_devices(
-        fake_beamline,
+        fake_device_factory_beamline,
         include_skipped=True,
         connect_immediately=False,
     )
@@ -204,14 +295,12 @@ def test_connect_immediately_passed_to_device_factory(RE: RunEngine):
     mock_device.connect.assert_not_called()
 
 
-def test_device_factory_can_rename(RE):
-    from tests.fake_device_factory_beamline import device_c
-
-    cryo = device_c(mock=True, connect_immediately=True)
+def test_device_factory_can_rename(RE, fake_device_factory_beamline):
+    cryo = fake_device_factory_beamline.device_c(mock=True, connect_immediately=True)
     assert cryo.name == "device_c"
     assert cryo.fine.name == "device_c-fine"
 
-    cryo_2 = device_c(name="cryo")
+    cryo_2 = fake_device_factory_beamline.device_c(name="cryo")
     assert cryo is cryo_2
     assert cryo_2.name == "cryo"
     assert cryo_2.fine.name == "cryo-fine"
@@ -388,3 +477,52 @@ def test_filter_ophyd_devices_raises_for_extra_types():
                 "ab": 3,  # type: ignore
             }
         )
+
+
+@pytest.mark.parametrize(
+    "input, expected_result",
+    [
+        [Readable, False],
+        [OphydV1Device, False],
+        [OphydV2Device, True],
+        [DiamondFilter[I03Filters], True],
+        [None, False],
+        [1, False],
+    ],
+)
+def test_is_v2_device_type(input: Any, expected_result: bool):
+    assert is_v2_device_type(input) == expected_result
+
+
+def test_calling_factory_with_different_args_raises_an_exception():
+    i03.undulator(daq_configuration_path=MOCK_DAQ_CONFIG_PATH)
+    with pytest.raises(
+        RuntimeError,
+        match="Device factory method called multiple times with different parameters",
+    ):
+        i03.undulator(daq_configuration_path=MOCK_DAQ_CONFIG_PATH + "x")
+
+
+def test_calling_factory_with_different_args_does_not_raise_an_exception_after_cache_clear(
+    alternate_config,
+):
+    i03.undulator(daq_configuration_path=MOCK_DAQ_CONFIG_PATH)
+    i03.undulator.cache_clear()  # type: ignore
+    i03.undulator(daq_configuration_path=alternate_config)
+
+
+def test_factories_can_be_called_in_any_order(alternate_config):
+    i03.undulator_dcm(daq_configuration_path=alternate_config)
+    i03.undulator(daq_configuration_path=alternate_config)
+
+    i03.undulator_dcm.cache_clear()
+    i03.undulator.cache_clear()
+
+    i03.undulator(daq_configuration_path=alternate_config)
+    i03.undulator_dcm(daq_configuration_path=alternate_config)
+
+
+def test_factory_calls_are_cached(alternate_config):
+    undulator1 = i03.undulator(daq_configuration_path=alternate_config)
+    undulator2 = i03.undulator(daq_configuration_path=alternate_config)
+    assert undulator1 is undulator2
