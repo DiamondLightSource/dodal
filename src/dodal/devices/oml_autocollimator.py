@@ -1,15 +1,22 @@
-from typing import Annotated as A
+from ophyd_async.core import StandardReadable, StrictEnum
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-from ophyd_async.core import SignalR, StandardReadable
-from ophyd_async.core import StandardReadableFormat as Format
-from ophyd_async.epics.core import PvSuffix
+
+class AutocollimatorAcquire(StrictEnum):
+    DONE = "Done"
+    ACQUIRE = "Acquire"
 
 
 class Autocollimator(StandardReadable):
     """Device representing Autocollimator in Optical Metrology Lab"""
 
-    x_average: A[SignalR[float], PvSuffix("X:AVG"), Format.HINTED_SIGNAL]
-    y_average: A[SignalR[float], PvSuffix("X:AVG")]
+    def __init__(self, prefix: str):
+        with self.add_children_as_readables():
+            self.x_average = epics_signal_r(float, f"{prefix}X:AVG")
 
-    x_rms: A[SignalR[float], PvSuffix("X:RMS")]
-    y_rms: A[SignalR[float], PvSuffix("Y:RMS")]
+        self.y_average = epics_signal_r(float, f"{prefix}Y:AVG")
+
+        self.x_rms = epics_signal_r(float, f"{prefix}X:RMS")
+        self.y_rms = epics_signal_r(float, f"{prefix}Y:RMS")
+
+        self.acquire = epics_signal_rw(AutocollimatorAcquire, f"{prefix}Acquire")
