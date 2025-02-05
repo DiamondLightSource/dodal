@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.beamlines.p45 &#8212; dodal 1.39.1.dev12+gf69b1e61a documentation</title>
+    <title>dodal.beamlines.p45 &#8212; dodal 1.39.1.dev13+g2b18524b2 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=69dab3c5"></script>
+    <script src="../../../_static/documentation_options.js?v=6e4eecce"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -464,6 +464,7 @@ window.addEventListener("load", () => mermaid.run());
     <span class="n">set_path_provider</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_utils_beamline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.device_helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">DET_SUFFIX</span><span class="p">,</span> <span class="n">HDF5_SUFFIX</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.visit</span><span class="w"> </span><span class="kn">import</span> <span class="n">StaticVisitPathProvider</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.p45</span><span class="w"> </span><span class="kn">import</span> <span class="n">Choppers</span><span class="p">,</span> <span class="n">TomoStageWithStretchAndSkew</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">set_beamline</span> <span class="k">as</span> <span class="n">set_log_beamline</span>
@@ -523,8 +524,8 @@ window.addEventListener("load", () => mermaid.run());
         <span class="s2">&quot;-EA-MAP-01:&quot;</span><span class="p">,</span>
         <span class="n">wait_for_connection</span><span class="p">,</span>
         <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
-        <span class="n">drv_suffix</span><span class="o">=</span><span class="s2">&quot;DET:&quot;</span><span class="p">,</span>
-        <span class="n">hdf_suffix</span><span class="o">=</span><span class="s2">&quot;HDF5:&quot;</span><span class="p">,</span>
+        <span class="n">drv_suffix</span><span class="o">=</span><span class="n">DET_SUFFIX</span><span class="p">,</span>
+        <span class="n">fileio_suffix</span><span class="o">=</span><span class="n">HDF5_SUFFIX</span><span class="p">,</span>
         <span class="n">path_provider</span><span class="o">=</span><span class="n">get_path_provider</span><span class="p">(),</span>
     <span class="p">)</span></div>
 
@@ -543,8 +544,8 @@ window.addEventListener("load", () => mermaid.run());
         <span class="s2">&quot;-EA-DIFF-01:&quot;</span><span class="p">,</span>
         <span class="n">wait_for_connection</span><span class="p">,</span>
         <span class="n">fake_with_ophyd_sim</span><span class="p">,</span>
-        <span class="n">drv_suffix</span><span class="o">=</span><span class="s2">&quot;DET:&quot;</span><span class="p">,</span>
-        <span class="n">hdf_suffix</span><span class="o">=</span><span class="s2">&quot;HDF5:&quot;</span><span class="p">,</span>
+        <span class="n">drv_suffix</span><span class="o">=</span><span class="n">DET_SUFFIX</span><span class="p">,</span>
+        <span class="n">fileio_suffix</span><span class="o">=</span><span class="n">HDF5_SUFFIX</span><span class="p">,</span>
         <span class="n">path_provider</span><span class="o">=</span><span class="n">get_path_provider</span><span class="p">(),</span>
     <span class="p">)</span></div>
 

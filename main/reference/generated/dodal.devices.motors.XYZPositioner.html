@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.motors.XYZPositioner &#8212; dodal 1.39.1.dev12+gf69b1e61a documentation</title>
+    <title>dodal.devices.motors.XYZPositioner &#8212; dodal 1.39.1.dev13+g2b18524b2 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=69dab3c5"></script>
+    <script src="../../_static/documentation_options.js?v=6e4eecce"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -874,12 +874,12 @@ with added infix for extra flexibliy to allow different axes other than x,y,z.</
 <p class="rubric">Notes</p>
 <dl class="simple">
 <dt>Example usage::</dt><dd><dl class="simple">
-<dt>async with DeviceCollector():</dt><dd><p>xyz_stage = XYZPositioner(“BLXX-MO-STAGE-XX:”)</p>
+<dt>async with init_devices():</dt><dd><p>xyz_stage = XYZPositioner(“BLXX-MO-STAGE-XX:”)</p>
 </dd>
 </dl>
 </dd>
 <dt>Or::</dt><dd><dl class="simple">
-<dt>with DeviceCollector():</dt><dd><p>xyz_stage = XYZPositioner(“BLXX-MO-STAGE-XX:”, infix = (“A”, “B”, “C”))</p>
+<dt>with init_devices():</dt><dd><p>xyz_stage = XYZPositioner(“BLXX-MO-STAGE-XX:”, infix = (“A”, “B”, “C”))</p>
 </dd>
 </dl>
 </dd>

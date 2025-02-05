@@ -13,8 +13,6 @@ dodal.devices.i13\_1.merlin\_controller.MerlinController
    .. autosummary::
    
       
-      ~MerlinController.arm
-      
       
       ~MerlinController.disarm
       
@@ -23,6 +21,8 @@ dodal.devices.i13\_1.merlin\_controller.MerlinController
       
       
       ~MerlinController.prepare
+      
+      
       
       
       ~MerlinController.wait_for_idle
