@@ -17,7 +17,7 @@ class Autocollimator(StandardReadable):
         y_rms: float readable root mean squared y value over two seconds
         acquire: AutocollimatorAcquire RW to start/start/monitor acquisition"""
 
-    def __init__(self, prefix: str):
+    def __init__(self, prefix: str, name: str = ""):
         with self.add_children_as_readables():
             self.x_average = epics_signal_r(float, f"{prefix}X:AVG")
 
@@ -27,3 +27,5 @@ class Autocollimator(StandardReadable):
         self.y_rms = epics_signal_r(float, f"{prefix}Y:RMS")
 
         self.acquire = epics_signal_rw(AutocollimatorAcquire, f"{prefix}Acquire")
+
+        super().__init__(name=name)
