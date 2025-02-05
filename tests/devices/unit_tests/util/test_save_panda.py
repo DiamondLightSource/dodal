@@ -25,7 +25,9 @@ def test_save_panda():
     ):
         _save_panda("i03", "panda", directory, filename)
 
-        mock_make_device.assert_called_with("dodal.beamlines.i03", "panda")
+        mock_make_device.assert_called_with(
+            "dodal.beamlines.i03", "panda", connect_immediately=True
+        )
         mock_store_settings.assert_called_with(
             mock_settings_provider(),
             "file.yml",
@@ -55,63 +57,59 @@ def test_save_panda_failure_to_create_device_exits_with_failure_code(mock_exit, 
     [
         (
             "i03",
-            ["--file-name=my_file_name.yml", "--output-directory=my_dir"],
+            ["--output-file=my_dir/my_file_name"],
             "i03",
             "panda",
             "my_dir",
-            "my_file_name.yml",
+            "my_file_name",
             0,
         ),
         (
             "i02",
             [
                 "--beamline=i04",
-                "--file-name=my_file_name.yml",
-                "--output-directory=my_dir",
+                "--output-file=my_dir/my_file_name",
             ],
             "i04",
             "panda",
             "my_dir",
-            "my_file_name.yml",
+            "my_file_name",
             0,
         ),
         (
             None,
             [
                 "--beamline=i04",
-                "--file-name=my_file_name.yml",
-                "--output-directory=my_dir",
+                "--output-file=my_dir/my_file_name",
             ],
             "i04",
             "panda",
             "my_dir",
-            "my_file_name.yml",
+            "my_file_name",
             0,
         ),
         (
             "i03",
             [
                 "--device-name=my_panda",
-                "--file-name=my_file_name.yml",
-                "--output-directory=my_dir",
+                "--output-file=my_dir/my_file_name",
             ],
             "i03",
             "my_panda",
             "my_dir",
-            "my_file_name.yml",
+            "my_file_name",
             0,
         ),
         (
             None,
             [
                 "--device-name=my_panda",
-                "--file-name=my_file_name.yml",
-                "--output-directory=my_dir",
+                "--output-file=my_dir/my_file_name",
             ],
             "i03",
             "my_panda",
             "my_dir",
-            "my_file_name.yml",
+            "my_file_name",
             1,
         ),
     ],
@@ -169,8 +167,7 @@ def test_file_exists_check(
     argv = [
         "save_panda",
         "--beamline=i03",
-        "--file-name=test_output_file.yml",
-        f"--output-directory={tmpdir}",
+        f"--output-file={tmpdir}/test_output_file.yml",
     ]
     if force:
         argv.insert(1, "--force")
@@ -178,11 +175,16 @@ def test_file_exists_check(
     with patch.dict("os.environ"):
         return_value = main(argv)
 
-    mock_path.assert_called_with("test_output_file.yml")
+    mock_path.assert_called_with(
+        f"{mock_path.return_value.parent}/{mock_path.return_value.name}"
+    )
     exists.assert_called_once()
     if save_panda_called:
         mock_save_panda.assert_called_with(
-            "i03", "panda", tmpdir, "test_output_file.yml"
+            "i03",
+            "panda",
+            str(mock_path.return_value.parent),
+            str(mock_path.return_value.name),
         )
     else:
         mock_save_panda.assert_not_called()

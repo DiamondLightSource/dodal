@@ -97,7 +97,7 @@ async def test_can_decribe_collect(merlin: Merlin, one_shot_trigger_info: Trigge
     await merlin.prepare(one_shot_trigger_info)
     assert (await merlin.describe_collect()) == {
         "merlin": {
-            "source": "mock+ca://BL13J-EA-DET-04HDF:FullFileName_RBV",
+            "source": "mock+ca://BL13J-EA-DET-04HDF5:FullFileName_RBV",
             "shape": [20, 10],
             "dtype": "array",
             "dtype_numpy": "|i1",
