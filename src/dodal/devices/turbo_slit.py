@@ -17,7 +17,7 @@ class TurboSlit(Device):
         - xfine selects the energy as part of the high frequency scan
     """
 
-    def __init__(self, prefix: str, name: str):
+    def __init__(self, prefix: str, name: str = ""):
         self.gap = Motor(prefix=prefix + "GAP")
         self.arc = Motor(prefix=prefix + "ARC")
         self.xfine = Motor(prefix=prefix + "XFINE")
