@@ -3,14 +3,14 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 from aiohttp.client_exceptions import ClientConnectorError
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import init_devices
 from ophyd_async.testing import set_mock_value
 
 from dodal.devices.oav.oav_to_redis_forwarder import OAVToRedisForwarder, Source
 
 
 def _oav_to_redis_forwarder(mock):
-    with DeviceCollector(mock=mock):
+    with init_devices(mock=mock):
         oav_forwarder = OAVToRedisForwarder("BL04I-DI-OAV-01:", "", "")
     oav_forwarder.redis_client.hset = AsyncMock()
     oav_forwarder.redis_client.expire = AsyncMock()
