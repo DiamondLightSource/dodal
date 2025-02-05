@@ -13,7 +13,7 @@ from event_model.documents import (
     StreamResource,
 )
 from ophyd_async.core import StandardDetector
-from ophyd_async.sim.demo import SimMotor
+from ophyd_async.sim import SimMotor
 from scanspec.specs import Line
 
 from dodal.plans import spec_scan
