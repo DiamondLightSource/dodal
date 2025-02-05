@@ -10,6 +10,7 @@ from dodal.common.beamlines.beamline_utils import (
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.bimorph_mirror import BimorphMirror
+from dodal.devices.oml_autocollimator import Autocollimator
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix
 
@@ -70,3 +71,8 @@ class FakeSlits(StandardReadable):
 @device_factory()
 def slits() -> FakeSlits:
     return FakeSlits(prefix=f"{PREFIX.beamline_prefix}-MO-NOM-01:", name="slits")
+
+
+@device_factory()
+def autocollimator() -> Autocollimator:
+    return Autocollimator(prefix="BL32P-EA-ACOLL-01:DET:", name="autocollimator")
