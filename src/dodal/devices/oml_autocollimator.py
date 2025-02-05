@@ -8,7 +8,14 @@ class AutocollimatorAcquire(StrictEnum):
 
 
 class Autocollimator(StandardReadable):
-    """Device representing Autocollimator in Optical Metrology Lab"""
+    """Device representing Autocollimator in Optical Metrology Lab
+
+    Attributes:
+        x_average: float readable average x value over two seconds
+        y_average: float readable average y value over two seconds
+        x_rms: float readable root mean sqaured x value over two seconds
+        y_rms: float readable root mean squared y value over two seconds
+        acquire: AutocollimatorAcquire RW to start/start/monitor acquisition"""
 
     def __init__(self, prefix: str):
         with self.add_children_as_readables():
