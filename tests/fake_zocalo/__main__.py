@@ -148,6 +148,12 @@ def main() -> None:
         durable=True,
         arguments={"x-single-active-consumer": False, "x-queue-type": "quorum"},
     )
+    # Also create the processing_recipe queue
+    channel.queue_declare(
+        queue="processing_recipe",
+        durable=True,
+        arguments={"x-single-active-consumer": False, "x-queue-type": "quorum"},
+    )
 
     # Route messages from the 'results' exchange to the 'xrc.i03' channel
     channel.queue_bind(exchange="results", queue="xrc.i03", routing_key="xrc.i03")
