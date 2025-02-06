@@ -185,8 +185,8 @@ class UndulatorGap(SafeUndulatorMover):
             self.user_readback = epics_signal_r(float, prefix + "CURRGAPD")
         super().__init__(self.set_move, prefix, name)
 
-    async def _set_demand_positions(self, value: str) -> None:
-        await self.user_setpoint.set(value)
+    async def _set_demand_positions(self, value) -> None:
+        await self.user_setpoint.set(str(value))
 
     async def get_timeout(self) -> float:
         return await estimate_motor_timeout(
