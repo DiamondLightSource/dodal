@@ -1,7 +1,7 @@
 from unittest.mock import ANY
 
 import pytest
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import init_devices
 from ophyd_async.testing import set_mock_value
 
 from dodal.devices.i18.thor_labs_stage import ThorLabsStage
@@ -9,7 +9,7 @@ from dodal.devices.i18.thor_labs_stage import ThorLabsStage
 
 @pytest.fixture
 async def thor_labs_stage():
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         thor_labs_stage = ThorLabsStage("")
 
     return thor_labs_stage

@@ -1,7 +1,7 @@
 from unittest.mock import ANY
 
 import pytest
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import init_devices
 from ophyd_async.testing import set_mock_value
 
 from dodal.devices.i18.table import Table
@@ -9,8 +9,8 @@ from dodal.devices.i18.table import Table
 
 @pytest.fixture
 async def table() -> Table:
-    """Fixture to set up a mock Table device using DeviceCollector."""
-    async with DeviceCollector(mock=True):
+    """Fixture to set up a mock Table device using init_devices."""
+    async with init_devices(mock=True):
         table = Table(prefix="MIRROR:")
     return table
 

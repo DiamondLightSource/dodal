@@ -2,7 +2,7 @@ import asyncio
 from unittest.mock import ANY
 
 import pytest
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import init_devices
 from ophyd_async.testing import assert_reading, set_mock_value
 
 from dodal.devices.pressure_jump_cell import (
@@ -18,7 +18,7 @@ from dodal.devices.pressure_jump_cell import (
 
 @pytest.fixture
 async def cell() -> PressureJumpCell:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         pjump = PressureJumpCell("DEMO-PJUMPCELL-01:")
 
     return pjump
