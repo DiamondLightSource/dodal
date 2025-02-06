@@ -15,9 +15,6 @@ dodal.devices.apple2\_undulator.UndulatorJawPhase
       
       
       
-      ~UndulatorJawPhase.check_id_status
-      
-      
       
       
       
@@ -27,7 +24,6 @@ dodal.devices.apple2\_undulator.UndulatorJawPhase
       
       
       
-      ~UndulatorJawPhase.set
       
       
       

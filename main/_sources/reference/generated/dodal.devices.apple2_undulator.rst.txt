@@ -22,6 +22,7 @@ dodal.devices.apple2\_undulator
    ~apple2_undulator.EnergyMinMax
    ~apple2_undulator.LookupTableEntries
    ~apple2_undulator.Lookuptable
+   ~apple2_undulator.SafeUndulatorMover
    ~apple2_undulator.UndulatorGap
    ~apple2_undulator.UndulatorGateStatus
    ~apple2_undulator.UndulatorJawPhase
@@ -45,6 +46,7 @@ dodal.devices.apple2\_undulator
 
    .. autosummary::
    
+      estimate_motor_timeout
       motor_position_equal
    
    

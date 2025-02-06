@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; dodal 1.39.1.dev15+gf370749b7 documentation</title>
+    <title>Index &#8212; dodal 1.39.1.dev16+g3f6af7a1d documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=51030da2"></script>
+    <script src="_static/documentation_options.js?v=c4d84d07"></script>
     <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -449,6 +449,7 @@ window.addEventListener("load", () => mermaid.run());
 <li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.apple2_undulator.EnergyMinMax.html">dodal.devices.apple2_undulator.EnergyMinMax</a></li>
 <li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.apple2_undulator.LookupTableEntries.html">dodal.devices.apple2_undulator.LookupTableEntries</a></li>
 <li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.apple2_undulator.Lookuptable.html">dodal.devices.apple2_undulator.Lookuptable</a></li>
+<li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.apple2_undulator.SafeUndulatorMover.html">dodal.devices.apple2_undulator.SafeUndulatorMover</a></li>
 <li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.apple2_undulator.UndulatorGap.html">dodal.devices.apple2_undulator.UndulatorGap</a></li>
 <li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.apple2_undulator.UndulatorGateStatus.html">dodal.devices.apple2_undulator.UndulatorGateStatus</a></li>
 <li class="toctree-l4"><a class="reference internal" href="reference/generated/dodal.devices.apple2_undulator.UndulatorJawPhase.html">dodal.devices.apple2_undulator.UndulatorJawPhase</a></li>
@@ -1924,10 +1925,10 @@ window.addEventListener("load", () => mermaid.run());
 </li>
       <li><a href="reference/generated/dodal.devices.fast_grid_scan.GridAxis.html#dodal.devices.fast_grid_scan.GridAxis.end">end (dodal.devices.fast_grid_scan.GridAxis property)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/dodal.devices.util.lookup_tables.html#dodal.devices.util.lookup_tables.energy_distance_table">energy_distance_table() (in module dodal.devices.util.lookup_tables)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/dodal.devices.focusing_mirror.FocusingMirrorWithStripes.html#dodal.devices.focusing_mirror.FocusingMirrorWithStripes.energy_to_stripe">energy_to_stripe() (dodal.devices.focusing_mirror.FocusingMirrorWithStripes method)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.apple2_undulator.EnergyCoverage.html#dodal.devices.apple2_undulator.EnergyCoverage">EnergyCoverage (class in dodal.devices.apple2_undulator)</a>
@@ -1943,6 +1944,8 @@ window.addEventListener("load", () => mermaid.run());
       <li><a href="reference/generated/dodal.devices.oav.pin_image_recognition.utils.html#dodal.devices.oav.pin_image_recognition.utils.erode">erode() (in module dodal.devices.oav.pin_image_recognition.utils)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.bimorph_mirror.BimorphMirror.html#dodal.devices.bimorph_mirror.BimorphMirror.err">err (dodal.devices.bimorph_mirror.BimorphMirror attribute)</a>
+</li>
+      <li><a href="reference/generated/dodal.devices.apple2_undulator.html#dodal.devices.apple2_undulator.estimate_motor_timeout">estimate_motor_timeout() (in module dodal.devices.apple2_undulator)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.util.motor_utils.ExtendedEpicsMotor.html#dodal.devices.util.motor_utils.ExtendedEpicsMotor">ExtendedEpicsMotor (class in dodal.devices.util.motor_utils)</a>
 </li>
@@ -2020,16 +2023,24 @@ window.addEventListener("load", () => mermaid.run());
 </li>
       <li><a href="reference/generated/dodal.devices.current_amplifiers.CurrentAmp.html#dodal.devices.current_amplifiers.CurrentAmp.get_gain">get_gain() (dodal.devices.current_amplifiers.CurrentAmp method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/dodal.devices.current_amplifiers.CurrentAmp.html#dodal.devices.current_amplifiers.CurrentAmp.get_lowerlimit">get_lowerlimit() (dodal.devices.current_amplifiers.CurrentAmp method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/dodal.devices.oav.oav_parameters.OAVParameters.html#dodal.devices.oav.oav_parameters.OAVParameters.get_max_tip_distance_in_pixels">get_max_tip_distance_in_pixels() (dodal.devices.oav.oav_parameters.OAVParameters method)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.oav.utils.html#dodal.devices.oav.utils.get_move_required_so_that_beam_is_at_pixel">get_move_required_so_that_beam_is_at_pixel() (in module dodal.devices.oav.utils)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.oav.oav_to_redis_forwarder.html#dodal.devices.oav.oav_to_redis_forwarder.get_next_jpeg">get_next_jpeg() (in module dodal.devices.oav.oav_to_redis_forwarder)</a>
 </li>
+      <li><a href="reference/generated/dodal.devices.apple2_undulator.SafeUndulatorMover.html#dodal.devices.apple2_undulator.SafeUndulatorMover.get_timeout">get_timeout() (dodal.devices.apple2_undulator.SafeUndulatorMover method)</a>
+
+      <ul>
+        <li><a href="reference/generated/dodal.devices.apple2_undulator.UndulatorJawPhase.html#dodal.devices.apple2_undulator.UndulatorJawPhase.get_timeout">(dodal.devices.apple2_undulator.UndulatorJawPhase method)</a>
+</li>
+        <li><a href="reference/generated/dodal.devices.apple2_undulator.UndulatorPhaseAxes.html#dodal.devices.apple2_undulator.UndulatorPhaseAxes.get_timeout">(dodal.devices.apple2_undulator.UndulatorPhaseAxes method)</a>
+</li>
+      </ul></li>
       <li><a href="reference/generated/dodal.devices.current_amplifiers.CurrentAmp.html#dodal.devices.current_amplifiers.CurrentAmp.get_upperlimit">get_upperlimit() (dodal.devices.current_amplifiers.CurrentAmp method)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.current_amplifiers.CurrentAmpCounter.html#dodal.devices.current_amplifiers.CurrentAmpCounter.get_voltage_per_sec">get_voltage_per_sec() (dodal.devices.current_amplifiers.CurrentAmpCounter method)</a>
@@ -2641,6 +2652,8 @@ window.addEventListener("load", () => mermaid.run());
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/generated/dodal.devices.s4_slit_gaps.S4SlitGaps.html#dodal.devices.s4_slit_gaps.S4SlitGaps">S4SlitGaps (class in dodal.devices.s4_slit_gaps)</a>
 </li>
+      <li><a href="reference/generated/dodal.devices.apple2_undulator.SafeUndulatorMover.html#dodal.devices.apple2_undulator.SafeUndulatorMover">SafeUndulatorMover (class in dodal.devices.apple2_undulator)</a>
+</li>
       <li><a href="reference/generated/dodal.beamlines.p45.html#dodal.beamlines.p45.sample">sample() (in module dodal.beamlines.p45)</a>
 </li>
       <li><a href="reference/generated/dodal.beamlines.i13_1.html#dodal.beamlines.i13_1.sample_xyz_lab_fa_stage">sample_xyz_lab_fa_stage() (in module dodal.beamlines.i13_1)</a>
@@ -2711,10 +2724,10 @@ window.addEventListener("load", () => mermaid.run());
 </li>
       <li><a href="reference/generated/dodal.devices.hutch_shutter.ShutterState.html#dodal.devices.hutch_shutter.ShutterState">ShutterState (class in dodal.devices.hutch_shutter)</a>
 </li>
-      <li><a href="reference/generated/dodal.beamlines.i13_1.html#dodal.beamlines.i13_1.side_camera">side_camera() (in module dodal.beamlines.i13_1)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/generated/dodal.beamlines.i13_1.html#dodal.beamlines.i13_1.side_camera">side_camera() (in module dodal.beamlines.i13_1)</a>
+</li>
       <li><a href="reference/generated/dodal.devices.adsim.SimStage.html#dodal.devices.adsim.SimStage">SimStage (class in dodal.devices.adsim)</a>
 </li>
       <li><a href="reference/generated/dodal.devices.focusing_mirror.SingleMirrorVoltage.html#dodal.devices.focusing_mirror.SingleMirrorVoltage">SingleMirrorVoltage (class in dodal.devices.focusing_mirror)</a>

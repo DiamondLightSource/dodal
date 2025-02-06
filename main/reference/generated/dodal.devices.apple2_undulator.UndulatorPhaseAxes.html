@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.apple2_undulator.UndulatorPhaseAxes &#8212; dodal 1.39.1.dev15+gf370749b7 documentation</title>
+    <title>dodal.devices.apple2_undulator.UndulatorPhaseAxes &#8212; dodal 1.39.1.dev16+g3f6af7a1d documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=51030da2"></script>
+    <script src="../../_static/documentation_options.js?v=c4d84d07"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -448,6 +448,7 @@
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.EnergyMinMax.html">dodal.devices.apple2_undulator.EnergyMinMax</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.LookupTableEntries.html">dodal.devices.apple2_undulator.LookupTableEntries</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.Lookuptable.html">dodal.devices.apple2_undulator.Lookuptable</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.SafeUndulatorMover.html">dodal.devices.apple2_undulator.SafeUndulatorMover</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.UndulatorGap.html">dodal.devices.apple2_undulator.UndulatorGap</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.UndulatorGateStatus.html">dodal.devices.apple2_undulator.UndulatorGateStatus</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.apple2_undulator.UndulatorJawPhase.html">dodal.devices.apple2_undulator.UndulatorJawPhase</a></li>
@@ -882,14 +883,8 @@ btm_outer == q4</p>
 <p class="rubric">Methods</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_id_status</span></code>()</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_timeout</span></code>()</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set</span></code>(value)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#dodal.devices.apple2_undulator.UndulatorPhaseAxes.get_timeout" title="dodal.devices.apple2_undulator.UndulatorPhaseAxes.get_timeout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_timeout</span></code></a>()</p></td>
+<td><p>Get all four motor speed, current positions and target positions to calculate required timeout.</p></td>
 </tr>
 </tbody>
 </table>
@@ -900,6 +895,17 @@ btm_outer == q4</p>
 </tbody>
 </table>
 </div>
+<dl class="py method">
+<dt class="sig sig-object py" id="dodal.devices.apple2_undulator.UndulatorPhaseAxes.get_timeout">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_timeout</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="reference internal" href="../../_modules/dodal/devices/apple2_undulator.html#UndulatorPhaseAxes.get_timeout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dodal.devices.apple2_undulator.UndulatorPhaseAxes.get_timeout" title="Link to this definition">#</a></dt>
+<dd><p>Get all four motor speed, current positions and target positions to calculate required timeout.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -951,7 +957,10 @@ btm_outer == q4</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.apple2_undulator.UndulatorPhaseAxes"><code class="docutils literal notranslate"><span class="pre">UndulatorPhaseAxes</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.apple2_undulator.UndulatorPhaseAxes"><code class="docutils literal notranslate"><span class="pre">UndulatorPhaseAxes</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dodal.devices.apple2_undulator.UndulatorPhaseAxes.get_timeout"><code class="docutils literal notranslate"><span class="pre">UndulatorPhaseAxes.get_timeout()</span></code></a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
