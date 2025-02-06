@@ -5,6 +5,8 @@ import bluesky.plan_stubs as bps
 from bluesky.preprocessors import run_decorator, stage_decorator
 from bluesky.protocols import Readable
 from numpy import linspace
+from ophyd_async.core import Device
+from ophyd_async.plan_stubs import ensure_connected
 
 from dodal.devices.bimorph_mirror import BimorphMirror
 from dodal.devices.slits import Slits
@@ -131,6 +133,10 @@ def bimorph_optimisation(
         bimorph_settle_time: float time in seconds to wait after bimorph move
         initial_voltage_list: optional list[float] starting voltages for bimorph (defaults to current voltages)
     """
+    devices = [
+        device for device in [*detectors, mirror, slits] if isinstance(device, Device)
+    ]
+    yield from ensure_connected(*devices)
     state = yield from capture_bimorph_state(mirror, slits)
 
     # If a starting set of voltages is not provided, default to current:
