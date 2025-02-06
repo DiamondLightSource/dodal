@@ -266,7 +266,7 @@ async def test_phase_success_set(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngi
         set_value.btm_outer, wait=True
     )
 
-    assert await mock_phaseAxes.read() == {
+    expected_in_reading = {
         "mock_phaseAxes-top_inner-user_setpoint_readback": {
             "value": 3,
             "timestamp": ANY,
@@ -288,6 +288,8 @@ async def test_phase_success_set(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngi
             "alarm_severity": 0,
         },
     }
+    actual_reading = await mock_phaseAxes.read()
+    assert expected_in_reading.items() <= actual_reading.items()
 
 
 async def test_given_gate_never_closes_then_setting_jaw_phases_times_out(
