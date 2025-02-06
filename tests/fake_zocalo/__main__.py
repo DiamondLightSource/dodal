@@ -10,9 +10,12 @@ import pika
 import yaml
 from ispyb.sqlalchemy import DataCollection
 from pika.adapters.blocking_connection import BlockingChannel
+from pika.exceptions import AMQPConnectionError
 from pika.spec import BasicProperties
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
+
+RABBITMQ_START_TIMEOUT_S = 20
 
 TEST_RESULT_LARGE = [
     {
@@ -120,7 +123,19 @@ def main() -> None:
         [*TEST_RESULT_LARGE, *TEST_RESULT_SMALL]
     )
 
-    conn = pika.BlockingConnection(params)
+    start = time.time()
+    while True:
+        try:
+            conn = pika.BlockingConnection(params)
+        except AMQPConnectionError:
+            print("Unable to connect, retrying...")
+            if time.time() - start > RABBITMQ_START_TIMEOUT_S:
+                print(f"RabbitMQ did not start after {RABBITMQ_START_TIMEOUT_S}s")
+                exit(1)
+            time.sleep(1)
+        else:
+            break
+
     channel = conn.channel()
 
     # Create the results exchange if it doesn't already exist
