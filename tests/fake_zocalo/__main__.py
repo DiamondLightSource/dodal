@@ -152,7 +152,12 @@ def main() -> None:
     channel.queue_declare(
         queue="processing_recipe",
         durable=True,
-        arguments={"x-single-active-consumer": False, "x-queue-type": "quorum"},
+        arguments={
+            "x-single-active-consumer": False,
+            "x-queue-type": "quorum",
+            "x-dead-letter-exchange": "",
+            "x-dead-letter-routing-key": "dlq.processing_recipe",
+        },
     )
 
     # Route messages from the 'results' exchange to the 'xrc.i03' channel
