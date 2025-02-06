@@ -21,7 +21,7 @@ class HutchState(str, Enum):
 class HutchConditionalShutter(StandardReadable, Movable):
     """ I19-specific device to operate the hutch shutter.
 
-    This device evaluates the hutch state valut to work out which of the two I19 \
+    This device evaluates the hutch state value to work out which of the two I19 \
     hutches is in use and then implements the HutchShutter device to operate the \
     experimental shutter.
     As the two hutches are located in series, checking the hutch in use is necessary to \
