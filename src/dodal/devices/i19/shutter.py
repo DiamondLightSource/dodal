@@ -45,7 +45,9 @@ class HutchConditionalShutter(StandardReadable, Movable):
         hutch_in_use = await self.hutch_state.get_value()
         LOGGER.info(f"Current hutch in use: {hutch_in_use}")
         if hutch_in_use == HutchState.INVALID:
-            raise HutchInvalidError("The hutch state is invalid.")
+            raise HutchInvalidError(
+                "The hutch state is invalid. Contact the beamline staff."
+            )
         if hutch_in_use != self.hutch_request:
             # NOTE Warn but don't fail
             LOGGER.warning(
