@@ -4,15 +4,15 @@ import logging
 from ophyd_async.core import (
     DEFAULT_TIMEOUT,
     AsyncStatus,
-    DetectorController,
     TriggerInfo,
 )
 from ophyd_async.epics import adcore
+from ophyd_async.epics.adcore import ADBaseController
 
 from dodal.devices.i13_1.merlin_io import MerlinDriverIO, MerlinImageMode
 
 
-class MerlinController(DetectorController):
+class MerlinController(ADBaseController):
     def __init__(
         self,
         driver: MerlinDriverIO,
@@ -35,11 +35,6 @@ class MerlinController(DetectorController):
         await asyncio.gather(
             self.driver.num_images.set(trigger_info.total_number_of_triggers),
             self.driver.image_mode.set(MerlinImageMode.MULTIPLE),
-        )
-
-    async def arm(self):
-        self._arm_status = await adcore.start_acquiring_driver_and_ensure_status(
-            self.driver, good_states=self.good_states, timeout=self.frame_timeout
         )
 
     async def wait_for_idle(self):
