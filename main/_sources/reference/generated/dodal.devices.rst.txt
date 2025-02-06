@@ -30,6 +30,7 @@
    dodal.devices.hutch_shutter
    dodal.devices.i03
    dodal.devices.i13_1
+   dodal.devices.i19
    dodal.devices.i20_1
    dodal.devices.i24
    dodal.devices.ipin

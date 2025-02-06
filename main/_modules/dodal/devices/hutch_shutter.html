@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.hutch_shutter &#8212; dodal 1.39.1.dev16+g3f6af7a1d documentation</title>
+    <title>dodal.devices.hutch_shutter &#8212; dodal 1.39.1.dev17+g5672e5542 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=c4d84d07"></script>
+    <script src="../../../_static/documentation_options.js?v=b21a4ef0"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -460,7 +460,14 @@ window.addEventListener("load", () => mermaid.run());
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_r</span><span class="p">,</span> <span class="n">epics_signal_w</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
+
 <span class="n">HUTCH_SAFE_FOR_OPERATIONS</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Hutch is locked and can&#39;t be entered</span>
+
+
+<span class="c1"># Enable to allow testing when the beamline is down, do not change in production!</span>
+<span class="n">TEST_MODE</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="c1"># will be made more generic in https://github.com/DiamondLightSource/dodal/issues/754</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">ShutterNotSafeToOperateError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
@@ -530,8 +537,8 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">control</span> <span class="o">=</span> <span class="n">epics_signal_w</span><span class="p">(</span><span class="n">ShutterDemand</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;CON&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="n">ShutterState</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;STA&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">control</span> <span class="o">=</span> <span class="n">epics_signal_w</span><span class="p">(</span><span class="n">ShutterDemand</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">CON&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="n">ShutterState</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">STA&quot;</span><span class="p">)</span>
 
         <span class="n">bl_prefix</span> <span class="o">=</span> <span class="n">prefix</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">interlock</span> <span class="o">=</span> <span class="n">HutchInterlock</span><span class="p">(</span><span class="n">bl_prefix</span><span class="p">)</span>
@@ -541,20 +548,26 @@ window.addEventListener("load", () => mermaid.run());
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">ShutterDemand</span><span class="p">):</span>
         <span class="n">interlock_state</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">interlock</span><span class="o">.</span><span class="n">shutter_safe_to_operate</span><span class="p">()</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">interlock_state</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">interlock_state</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">TEST_MODE</span><span class="p">:</span>
+            <span class="c1"># If not in test mode, fail. If in test mode, the optics hutch may be open.</span>
             <span class="k">raise</span> <span class="n">ShutterNotSafeToOperateError</span><span class="p">(</span>
                 <span class="s2">&quot;The hutch has not been locked, not operating shutter.&quot;</span>
             <span class="p">)</span>
-        <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="n">ShutterDemand</span><span class="o">.</span><span class="n">OPEN</span><span class="p">:</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ShutterDemand</span><span class="o">.</span><span class="n">RESET</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="k">return</span> <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="n">match</span><span class="o">=</span><span class="n">ShutterState</span><span class="o">.</span><span class="n">OPEN</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">DEFAULT_TIMEOUT</span>
-            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">TEST_MODE</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="n">ShutterDemand</span><span class="o">.</span><span class="n">OPEN</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ShutterDemand</span><span class="o">.</span><span class="n">RESET</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">return</span> <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="n">match</span><span class="o">=</span><span class="n">ShutterState</span><span class="o">.</span><span class="n">OPEN</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">DEFAULT_TIMEOUT</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">return</span> <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="n">match</span><span class="o">=</span><span class="n">ShutterState</span><span class="o">.</span><span class="n">CLOSED</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">DEFAULT_TIMEOUT</span>
+                <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="k">return</span> <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> <span class="n">match</span><span class="o">=</span><span class="n">ShutterState</span><span class="o">.</span><span class="n">CLOSED</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">DEFAULT_TIMEOUT</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Running in test mode, will not operate the experiment shutter.&quot;</span>
             <span class="p">)</span></div>
 
 </pre></div>
