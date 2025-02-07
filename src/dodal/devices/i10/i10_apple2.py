@@ -147,11 +147,11 @@ class I10Apple2(Apple2):
         gap, phase = await self._get_id_gap_phase(value)
         phase3 = phase * (-1 if pol == "la" else (1))
         id_set_val = Apple2Val(
-            top_outer=str(phase),
+            top_outer=f"{phase:.6f}",
             top_inner="0.0",
-            btm_inner=str(phase3),
+            btm_inner=f"{phase3:.6f}",
             btm_outer="0.0",
-            gap=str(gap),
+            gap=f"{gap:.6f}",
         )
         LOGGER.info(f"Setting polarisation to {pol}, with {id_set_val}")
         await self._set(value=id_set_val, energy=value)

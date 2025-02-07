@@ -1,6 +1,6 @@
 import asyncio
 from collections import defaultdict
-from unittest.mock import ANY
+from unittest.mock import ANY, AsyncMock
 
 import bluesky.plan_stubs as bps
 import pytest
@@ -15,6 +15,7 @@ from ophyd_async.testing import (
 )
 
 from dodal.devices.apple2_undulator import (
+    DEFAULT_MOTOR_MIN_TIMEOUT,
     Apple2PhasesVal,
     UndulatorGap,
     UndulatorGateStatus,
@@ -98,9 +99,9 @@ async def test_in_motion_error(
 @pytest.mark.parametrize(
     "velocity, readback,target, expected_timeout",
     [
-        (0.7, 20.1, 5.2, 42.5),
-        (0.2, 2, 8, 60.0),
-        (-0.2, 2, 8, 60.0),
+        (0.7, 20.1, 5.2, 42.5 + DEFAULT_MOTOR_MIN_TIMEOUT),
+        (0.2, 2, 8, 60.0 + DEFAULT_MOTOR_MIN_TIMEOUT),
+        (-0.2, 2, 8, 60.0 + DEFAULT_MOTOR_MIN_TIMEOUT),
     ],
 )
 async def test_gap_cal_timout(
@@ -122,7 +123,8 @@ async def test_gap_time_out_error(mock_id_gap: UndulatorGap, RE: RunEngine):
         mock_id_gap.user_setpoint,
         lambda *_, **__: set_mock_value(mock_id_gap.gate, UndulatorGateStatus.OPEN),
     )
-    set_mock_value(mock_id_gap.velocity, 1000)
+    mock_id_gap._cal_timeout = AsyncMock(return_value=0.002)
+
     with pytest.raises(asyncio.TimeoutError):
         await mock_id_gap.set("2")
 
@@ -169,7 +171,7 @@ async def test_phase_time_out_error(mock_phaseAxes: UndulatorPhaseAxes, RE: RunE
         mock_phaseAxes.top_outer.user_setpoint,
         lambda *_, **__: set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.OPEN),
     )
-    set_mock_value(mock_phaseAxes.top_inner.velocity, 1000)
+    mock_phaseAxes._cal_timeout = AsyncMock(return_value=0.002)
     with pytest.raises(asyncio.TimeoutError):
         await mock_phaseAxes.set(setValue)
 
@@ -184,10 +186,25 @@ async def test_phase_status_error(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEng
 @pytest.mark.parametrize(
     "velocity, readback,target, expected_timeout",
     [
-        ([-1, 2, 3, 4], [5, 2, 3, 4], [-2, 2, 3, 4], 14.0),
-        ([-1, 0.8, 3, 4], [5, -8.5, 3, 4], [-2, 0, 3, 4], 21.2),
-        ([-1, 0.8, 0.6, 4], [5, -8.5, 2, 4], [-2, 0, -5.5, 4], 25.0),
-        ([-1, 0.8, 0.6, 2.7], [5, -8.5, 2, 30], [-2, 0, -5.5, -8.8], 28.7),
+        ([-1, 2, 3, 4], [5, 2, 3, 4], [-2, 2, 3, 4], 28.0 + DEFAULT_MOTOR_MIN_TIMEOUT),
+        (
+            [-1, 0.8, 3, 4],
+            [5, -8.5, 3, 4],
+            [-2, 0, 3, 4],
+            42.4 + DEFAULT_MOTOR_MIN_TIMEOUT,
+        ),
+        (
+            [-1, 0.8, 0.6, 4],
+            [5, -8.5, 2, 4],
+            [-2, 0, -5.5, 4],
+            50.0 + DEFAULT_MOTOR_MIN_TIMEOUT,
+        ),
+        (
+            [-1, 0.8, 0.6, 2.7],
+            [5, -8.5, 2, 30],
+            [-2, 0, -5.5, -8.8],
+            57.4 + DEFAULT_MOTOR_MIN_TIMEOUT,
+        ),
     ],
 )
 async def test_phase_cal_timout(
@@ -290,7 +307,7 @@ async def test_jaw_phase_time_out_error(mock_jaw_phase: UndulatorJawPhase):
         mock_jaw_phase.jaw_phase.user_setpoint,
         lambda *_, **__: set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.OPEN),
     )
-    set_mock_value(mock_jaw_phase.jaw_phase.velocity, 1000)
+    mock_jaw_phase._cal_timeout = AsyncMock(return_value=0.002)
     with pytest.raises(asyncio.TimeoutError):
         await mock_jaw_phase.set(2)
 
@@ -305,9 +322,9 @@ async def test_jaw_phase_status_error(mock_jaw_phase: UndulatorJawPhase):
 @pytest.mark.parametrize(
     "velocity, readback,target, expected_timeout",
     [
-        (0.7, 20.1, 5.2, 42.5),
-        (0.2, 2, 8, 60.0),
-        (-0.2, 2, 8, 60.0),
+        (0.7, 20.1, 5.2, 42.5 + DEFAULT_MOTOR_MIN_TIMEOUT),
+        (0.2, 2, 8, 60.0 + DEFAULT_MOTOR_MIN_TIMEOUT),
+        (-0.2, 2, 8, 60.0 + DEFAULT_MOTOR_MIN_TIMEOUT),
     ],
 )
 async def test_jaw_phase_cal_timout(

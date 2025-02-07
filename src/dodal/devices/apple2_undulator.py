@@ -18,6 +18,8 @@ from pydantic import BaseModel, ConfigDict, RootModel
 
 from dodal.log import LOGGER
 
+DEFAULT_MOTOR_MIN_TIMEOUT = 10
+
 
 class UndulatorGateStatus(StrictEnum):
     OPEN = "Open"
@@ -150,7 +152,7 @@ class UndulatorGap(StandardReadable, Movable):
         vel = await self.velocity.get_value()
         cur_pos = await self.user_readback.get_value()
         target_pos = float(await self.user_setpoint.get_value())
-        return abs((target_pos - cur_pos) * 2.0 / vel) + 1
+        return abs((target_pos - cur_pos) * 2.0 / vel) + DEFAULT_MOTOR_MIN_TIMEOUT
 
     async def check_id_status(self) -> None:
         if await self.fault.get_value() != 0:
@@ -275,7 +277,7 @@ class UndulatorPhaseAxes(StandardReadable, Movable):
         move_distances = tuple(np.subtract(target_pos, cur_pos))
         move_times = np.abs(np.divide(move_distances, velos))
         longest_move_time = np.max(move_times)
-        return longest_move_time * 2 + 1
+        return longest_move_time * 4.0 + DEFAULT_MOTOR_MIN_TIMEOUT
 
     async def check_id_status(self) -> None:
         if await self.fault.get_value() != 0:
@@ -290,7 +292,7 @@ class UndulatorPhaseAxes(StandardReadable, Movable):
 class UndulatorJawPhase(StandardReadable, Movable):
     """
     A JawPhase movable, this is use for moving the jaw phase which is use to control the
-    linear arbitrary polarisation but only one some of the beamline.
+    linear arbitrary polarisation but only on some of the beamline.
     """
 
     def __init__(
@@ -333,11 +335,10 @@ class UndulatorJawPhase(StandardReadable, Movable):
             self.jaw_phase.user_setpoint_readback.get_value(),
             self.jaw_phase.user_readback.get_value(),
         )
-        print(target_pos, cur_pos, "dfnskfndkfndk")
         move_distances = target_pos - cur_pos
         move_times = np.abs(move_distances / velo)
 
-        return move_times * 2 + 1
+        return move_times * 2 + DEFAULT_MOTOR_MIN_TIMEOUT
 
     async def check_id_status(self) -> None:
         if await self.fault.get_value() != 0:
@@ -446,10 +447,9 @@ class Apple2(StandardReadable, Movable):
             f"Moving f{self.name} energy and polorisation to {energy}, {await self.polarisation.get_value()}"
             + f"with motor position {value}, timeout = {timeout}"
         )
-
         await asyncio.gather(
-            self.gap.set_move.set(value=1, timeout=timeout),
-            self.phase.set_move.set(value=1, timeout=timeout),
+            self.gap.set_move.set(value=1, wait=False, timeout=timeout),
+            self.phase.set_move.set(value=1, wait=False, timeout=timeout),
         )
         await wait_for_value(self.gap.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
         self._energy_set(energy)  # Update energy for after move for readback.
