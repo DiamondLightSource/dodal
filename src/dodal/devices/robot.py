@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
+    Device,
     StandardReadable,
     StrictEnum,
     set_and_wait_for_value,
@@ -38,23 +39,36 @@ class PinMounted(StrictEnum):
     PIN_MOUNTED = "Pin Mounted"
 
 
+class ErrorStatus(Device):
+    def __init__(self, prefix: str) -> None:
+        self.str = epics_signal_r(str, prefix + "_ERR_MSG")
+        self.code = epics_signal_r(int, prefix + "_ERR_CODE")
+        super().__init__()
+
+    async def raise_if_error(self, raise_from: Exception):
+        error_code = await self.code.get_value()
+        if error_code:
+            error_string = await self.str.get_value()
+            raise RobotLoadFailed(int(error_code), error_string) from raise_from
+
+
 class BartRobot(StandardReadable, Movable):
     """The sample changing robot."""
 
     # How long to wait for the robot if it is busy soaking/drying
     NOT_BUSY_TIMEOUT = 5 * 60
+
     # How long to wait for the actual load to happen
     LOAD_TIMEOUT = 60
+
+    # Error codes that we do special things on
     NO_PIN_ERROR_CODE = 25
+    LIGHT_CURTAIN_TRIPPED = 40
 
     # How far the gonio position can be out before loading will fail
     LOAD_TOLERANCE_MM = 0.02
 
-    def __init__(
-        self,
-        name: str,
-        prefix: str,
-    ) -> None:
+    def __init__(self, name: str, prefix: str) -> None:
         self.barcode = epics_signal_r(str, prefix + "BARCODE")
         self.gonio_pin_sensor = epics_signal_r(PinMounted, prefix + "PIN_MOUNTED")
 
@@ -69,8 +83,10 @@ class BartRobot(StandardReadable, Movable):
         self.load = epics_signal_x(prefix + "LOAD.PROC")
         self.program_running = epics_signal_r(bool, prefix + "PROGRAM_RUNNING")
         self.program_name = epics_signal_r(str, prefix + "PROGRAM_NAME")
-        self.error_str = epics_signal_r(str, prefix + "PRG_ERR_MSG")
-        self.error_code = epics_signal_r(int, prefix + "PRG_ERR_CODE")
+
+        self.prog_error = ErrorStatus(prefix + "PRG")
+        self.controller_error = ErrorStatus(prefix + "CNTL")
+
         self.reset = epics_signal_x(prefix + "RESET.PROC")
         super().__init__(name=name)
 
@@ -81,7 +97,7 @@ class BartRobot(StandardReadable, Movable):
         """
 
         async def raise_if_no_pin():
-            await wait_for_value(self.error_code, self.NO_PIN_ERROR_CODE, None)
+            await wait_for_value(self.prog_error.code, self.NO_PIN_ERROR_CODE, None)
             raise RobotLoadFailed(self.NO_PIN_ERROR_CODE, "Pin was not detected")
 
         async def wfv():
@@ -108,6 +124,9 @@ class BartRobot(StandardReadable, Movable):
             raise
 
     async def _load_pin_and_puck(self, sample_location: SampleLocation):
+        if await self.controller_error.code.get_value() == self.LIGHT_CURTAIN_TRIPPED:
+            LOGGER.info("Light curtain tripped, trying again")
+            await self.reset.trigger()
         LOGGER.info(f"Loading pin {sample_location}")
         if await self.program_running.get_value():
             LOGGER.info(
@@ -137,6 +156,6 @@ class BartRobot(StandardReadable, Movable):
             )
         except (asyncio.TimeoutError, TimeoutError) as e:
             # Will only need to catch asyncio.TimeoutError after https://github.com/bluesky/ophyd-async/issues/572
-            error_code = await self.error_code.get_value()
-            error_string = await self.error_str.get_value()
-            raise RobotLoadFailed(int(error_code), error_string) from e
+            await self.prog_error.raise_if_error(e)
+            await self.controller_error.raise_if_error(e)
+            raise RobotLoadFailed(0, "Robot timed out") from e
