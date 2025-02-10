@@ -1,8 +1,8 @@
-from ophyd_async.core import Device
+from ophyd_async.core import Device, StandardReadable
 from ophyd_async.epics.motor import Motor
 
 
-class TurboSlit(Device):
+class TurboSlit(StandardReadable, Device):
     """
     This collection of motors coordinates time resolved XAS experiments.
     It selects a beam out of the polychromatic fan.
@@ -18,7 +18,8 @@ class TurboSlit(Device):
     """
 
     def __init__(self, prefix: str, name: str = ""):
-        self.gap = Motor(prefix=prefix + "GAP")
-        self.arc = Motor(prefix=prefix + "ARC")
-        self.xfine = Motor(prefix=prefix + "XFINE")
+        with self.add_children_as_readables():
+            self.gap = Motor(prefix=prefix + "GAP")
+            self.arc = Motor(prefix=prefix + "ARC")
+            self.xfine = Motor(prefix=prefix + "XFINE")
         super().__init__(name=name)
