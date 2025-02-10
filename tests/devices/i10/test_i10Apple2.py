@@ -357,30 +357,30 @@ async def test_I10Apple2_pol_set(
     expect_btm_outer: float,
     expect_gap: float,
 ):
-    mock_id_pol.id()._energy_set(energy)
+    mock_id_pol.id_ref()._energy_set(energy)
     if pol == "dsf":
         with pytest.raises(ValueError):
             await mock_id_pol.set(pol)
     else:
         await mock_id_pol.set(pol)
-        assert await mock_id_pol.id().polarisation.get_value() == pol
-        top_inner = get_mock_put(mock_id_pol.id().phase.top_inner.user_setpoint)
+        assert await mock_id_pol.id_ref().polarisation.get_value() == pol
+        top_inner = get_mock_put(mock_id_pol.id_ref().phase.top_inner.user_setpoint)
         top_inner.assert_called_once()
         assert float(top_inner.call_args[0][0]) == pytest.approx(expect_top_inner, 0.01)
 
-        top_outer = get_mock_put(mock_id_pol.id().phase.top_outer.user_setpoint)
+        top_outer = get_mock_put(mock_id_pol.id_ref().phase.top_outer.user_setpoint)
         top_outer.assert_called_once()
         assert float(top_outer.call_args[0][0]) == pytest.approx(expect_top_outer, 0.01)
 
-        btm_inner = get_mock_put(mock_id_pol.id().phase.btm_inner.user_setpoint)
+        btm_inner = get_mock_put(mock_id_pol.id_ref().phase.btm_inner.user_setpoint)
         btm_inner.assert_called_once()
         assert float(btm_inner.call_args[0][0]) == pytest.approx(expect_btm_inner, 0.01)
 
-        btm_outer = get_mock_put(mock_id_pol.id().phase.btm_outer.user_setpoint)
+        btm_outer = get_mock_put(mock_id_pol.id_ref().phase.btm_outer.user_setpoint)
         btm_outer.assert_called_once()
         assert float(btm_outer.call_args[0][0]) == pytest.approx(expect_btm_outer, 0.01)
 
-        gap = get_mock_put(mock_id_pol.id().gap.user_setpoint)
+        gap = get_mock_put(mock_id_pol.id_ref().gap.user_setpoint)
         gap.assert_called_once()
         assert float(gap.call_args[0][0]) == pytest.approx(expect_gap, 0.05)
 
@@ -404,12 +404,12 @@ async def test_I10Apple2_pol_read_check_pol_from_hardware(
     btm_inner: float,
     btm_outer: float,
 ):
-    mock_id_pol.id()._energy_set(energy)
+    mock_id_pol.id_ref()._energy_set(energy)
 
-    set_mock_value(mock_id_pol.id().phase.top_inner.user_readback, top_inner)
-    set_mock_value(mock_id_pol.id().phase.top_outer.user_readback, top_outer)
-    set_mock_value(mock_id_pol.id().phase.btm_inner.user_readback, btm_inner)
-    set_mock_value(mock_id_pol.id().phase.btm_outer.user_readback, btm_outer)
+    set_mock_value(mock_id_pol.id_ref().phase.top_inner.user_readback, top_inner)
+    set_mock_value(mock_id_pol.id_ref().phase.top_outer.user_readback, top_outer)
+    set_mock_value(mock_id_pol.id_ref().phase.btm_inner.user_readback, btm_inner)
+    set_mock_value(mock_id_pol.id_ref().phase.btm_outer.user_readback, btm_outer)
 
     assert (await mock_id_pol.read())["mock_id-polarisation"]["value"] == pol
 
@@ -429,12 +429,12 @@ async def test_I10Apple2_pol_read_leave_lh3_unchange(
     btm_inner: float,
     btm_outer: float,
 ):
-    mock_id_pol.id()._energy_set(energy)
-    mock_id_pol.id()._polarisation_set("lh3")
-    set_mock_value(mock_id_pol.id().phase.top_inner.user_readback, top_inner)
-    set_mock_value(mock_id_pol.id().phase.top_outer.user_readback, top_outer)
-    set_mock_value(mock_id_pol.id().phase.btm_inner.user_readback, btm_inner)
-    set_mock_value(mock_id_pol.id().phase.btm_outer.user_readback, btm_outer)
+    mock_id_pol.id_ref()._energy_set(energy)
+    mock_id_pol.id_ref()._polarisation_set("lh3")
+    set_mock_value(mock_id_pol.id_ref().phase.top_inner.user_readback, top_inner)
+    set_mock_value(mock_id_pol.id_ref().phase.top_outer.user_readback, top_outer)
+    set_mock_value(mock_id_pol.id_ref().phase.btm_inner.user_readback, btm_inner)
+    set_mock_value(mock_id_pol.id_ref().phase.btm_outer.user_readback, btm_outer)
     assert (await mock_id_pol.read())["mock_id-polarisation"]["value"] == pol
 
 

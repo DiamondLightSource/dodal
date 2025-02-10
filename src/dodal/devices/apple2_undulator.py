@@ -428,7 +428,7 @@ class Apple2(StandardReadable, Movable):
             self.phase.set_move.set(value=1, wait=False, timeout=timeout),
         )
         await wait_for_value(self.gap.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
-        self._energy_set(energy)  # Update energy for after move for readback.
+        self._energy_set(energy)  # Update energy after move for readback.
 
     async def _get_id_gap_phase(self, energy: float) -> tuple[float, float]:
         """

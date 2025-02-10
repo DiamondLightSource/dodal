@@ -244,24 +244,24 @@ class I10Apple2Pol(StandardReadable, Movable):
             New device name.
         """
         super().__init__(name=name)
-        self.id = Reference(id)
-        self.add_readables([self.id().polarisation])
+        self.id_ref = Reference(id)
+        self.add_readables([self.id_ref().polarisation])
 
     @AsyncStatus.wrap
     async def set(self, value: str) -> None:
         # Check before set
-        self.id().set_pol(value)
+        self.id_ref().set_pol(value)
         LOGGER.info(f"Changing f{self.name} polarisation to {value}.")
-        await self.id().set(
-            await self.id().energy.get_value()
+        await self.id_ref().set(
+            await self.id_ref().energy.get_value()
         )  # Move id to new polarisation
 
     async def read(self) -> dict[str, Reading]:
         # It is not possible to get lh3 from hardware so if pol is in lh3 we skip check.
-        if await self.id().polarisation.get_value() != "lh3":
-            pol, _ = await self.id().determinePhaseFromHardware()
+        if await self.id_ref().polarisation.get_value() != "lh3":
+            pol, _ = await self.id_ref().determinePhaseFromHardware()
             if pol is not None:
-                self.id().set_pol(pol=pol)
+                self.id_ref().set_pol(pol=pol)
         return await super().read()
 
 
@@ -345,6 +345,8 @@ class I10Id(Device):
         UML
         ---
         .. figure:: /explanations/umls/i10_id_design.png
+
+        `This </_images/i10_id_design.png>`__ is a reference to a section in another
 
         Attributes
         ----------
