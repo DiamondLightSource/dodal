@@ -45,6 +45,7 @@ dev = [
     "black",
     "diff-cover",
     "import-linter",
+    "ispyb",
     "mypy",
     # Commented out due to dependency version conflict with pydantic 1.x
     # "copier",
