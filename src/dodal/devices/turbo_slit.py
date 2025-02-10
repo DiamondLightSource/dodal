@@ -1,4 +1,4 @@
-from ophyd_async.core import Device, StandardReadable
+from ophyd_async.core import StandardReadable
 from ophyd_async.epics.motor import Motor
 
 
