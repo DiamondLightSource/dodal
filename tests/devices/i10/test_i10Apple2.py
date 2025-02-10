@@ -9,7 +9,7 @@ import pytest
 from bluesky.plans import scan
 from bluesky.run_engine import RunEngine
 from numpy import poly1d
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import init_devices
 from ophyd_async.testing import (
     assert_emitted,
     callback_on_mock_put,
@@ -40,7 +40,7 @@ ID_PHASE_LOOKUP_TABLE = "tests/devices/i10/lookupTables/IDEnergy2PhaseCalibratio
 
 @pytest.fixture
 async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         mock_id_gap = UndulatorGap(prefix, "mock_id_gap")
     assert mock_id_gap.name == "mock_id_gap"
     set_mock_value(mock_id_gap.gate, UndulatorGateStatus.CLOSE)
@@ -53,7 +53,7 @@ async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
 
 @pytest.fixture
 async def mock_phaseAxes(prefix: str = "BLXX-EA-DET-007:") -> UndulatorPhaseAxes:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         mock_phaseAxes = UndulatorPhaseAxes(
             prefix=prefix,
             top_outer="RPQ1",
@@ -81,14 +81,14 @@ async def mock_phaseAxes(prefix: str = "BLXX-EA-DET-007:") -> UndulatorPhaseAxes
 
 @pytest.fixture
 async def mock_pgm(prefix: str = "BLXX-EA-DET-007:") -> PGM:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         mock_pgm = PGM(prefix=prefix, grating=I10Grating, gratingPv="NLINES2")
     return mock_pgm
 
 
 @pytest.fixture
 async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndulatorJawPhase:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         mock_jaw_phase = UndulatorJawPhase(
             prefix=prefix, move_pv="RPQ1", jaw_phase="JAW"
         )
@@ -105,7 +105,7 @@ async def mock_id(
     mock_id_gap: UndulatorGap,
     mock_jaw_phase: UndulatorJawPhase,
 ) -> I10Apple2:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         mock_id = I10Apple2(
             id_gap=mock_id_gap,
             id_phase=mock_phaseAxes,
@@ -128,7 +128,7 @@ async def mock_id(
 
 @pytest.fixture
 async def mock_id_pgm(mock_id: I10Apple2, mock_pgm: PGM) -> I10Apple2PGM:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         mock_id_pgm = I10Apple2PGM(id=mock_id, pgm=mock_pgm)
     set_mock_value(mock_id_pgm.id.gap.velocity, 1)
     set_mock_value(mock_id_pgm.id.phase.btm_inner.velocity, 1)
@@ -147,7 +147,7 @@ async def mock_id_pgm(mock_id: I10Apple2, mock_pgm: PGM) -> I10Apple2PGM:
 
 @pytest.fixture
 async def mock_id_pol(mock_id: I10Apple2) -> I10Apple2Pol:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         mock_id_pol = I10Apple2Pol(id=mock_id)
 
     return mock_id_pol
@@ -157,7 +157,7 @@ async def mock_id_pol(mock_id: I10Apple2) -> I10Apple2Pol:
 async def mock_linear_arbitrary_angle(
     mock_id: I10Apple2, prefix: str = "BLXX-EA-DET-007:"
 ) -> LinearArbitraryAngle:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         mock_linear_arbitrary_angle = LinearArbitraryAngle(id=mock_id)
     return mock_linear_arbitrary_angle
 

@@ -4,7 +4,7 @@ from dodal.common.beamlines.beamline_utils import (
 from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
-from dodal.devices.hutch_shutter import HutchShutter
+from dodal.devices.i19.shutter import HutchConditionalShutter, HutchState
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.oav_parameters import OAVConfig
 from dodal.devices.synchrotron import Synchrotron
@@ -56,13 +56,13 @@ def zebra() -> Zebra:
 
 
 @device_factory()
-def shutter() -> HutchShutter:
-    """Get the i19-1 hutch shutter device, instantiate it if it hasn't already been.
+def shutter() -> HutchConditionalShutter:
+    """Get the i19-2 hutch shutter device, instantiate it if it hasn't already been.
     If this is called when already instantiated, it will return the existing object.
     """
-    # See https://github.com/DiamondLightSource/dodal/issues/1020
-    return HutchShutter(
+    return HutchConditionalShutter(
         prefix=f"{PREFIX.beamline_prefix}-PS-SHTR-01:",
+        hutch=HutchState.EH1,
     )
 
 

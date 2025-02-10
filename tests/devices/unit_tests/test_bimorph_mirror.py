@@ -2,7 +2,7 @@ from unittest.mock import ANY, call, patch
 
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import init_devices
 from ophyd_async.testing import get_mock_put
 
 from dodal.devices.bimorph_mirror import BimorphMirror, BimorphMirrorStatus
@@ -14,7 +14,7 @@ VALID_BIMORPH_CHANNELS = [8, 12, 16, 24]
 def mirror(request, RE: RunEngine) -> BimorphMirror:
     number_of_channels = request.param
 
-    with DeviceCollector(mock=True):
+    with init_devices(mock=True):
         bm = BimorphMirror(
             prefix="FAKE-PREFIX:",
             number_of_channels=number_of_channels,
