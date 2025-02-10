@@ -151,7 +151,7 @@ class AllValvesControl(StandardReadable, Movable):
         )
 
 
-class ValveControl(StandardReadable):
+class ValveControl(StandardReadable, Movable):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
             self.close = epics_signal_rw(ValveControlRequest, prefix + ":CON")
@@ -159,18 +159,18 @@ class ValveControl(StandardReadable):
 
         super().__init__(name)
 
-    def set(self, request: ValveControlRequest | ValveOpenSeqRequest) -> AsyncStatus:
+    def set(self, value: ValveControlRequest | ValveOpenSeqRequest) -> AsyncStatus:
         set_status = None
 
-        if isinstance(request, ValveControlRequest):
-            set_status = self.close.set(request)
-        elif isinstance(request, ValveOpenSeqRequest):
-            set_status = self.open.set(request.value)
+        if isinstance(value, ValveControlRequest):
+            set_status = self.close.set(value)
+        elif isinstance(value, ValveOpenSeqRequest):
+            set_status = self.open.set(value.value)
 
         return set_status
 
 
-class FastValveControl(StandardReadable):
+class FastValveControl(StandardReadable, Movable):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
             self.close = epics_signal_rw(FastValveControlRequest, prefix + ":CON")
@@ -178,15 +178,13 @@ class FastValveControl(StandardReadable):
 
         super().__init__(name)
 
-    def set(
-        self, request: FastValveControlRequest | ValveOpenSeqRequest
-    ) -> AsyncStatus:
+    def set(self, value: FastValveControlRequest | ValveOpenSeqRequest) -> AsyncStatus:
         set_status = None
 
-        if isinstance(request, FastValveControlRequest):
-            set_status = self.close.set(request)
-        elif isinstance(request, ValveOpenSeqRequest):
-            set_status = self.open.set(request.value)
+        if isinstance(value, FastValveControlRequest):
+            set_status = self.close.set(value)
+        elif isinstance(value, ValveOpenSeqRequest):
+            set_status = self.open.set(value.value)
 
         return set_status
 
