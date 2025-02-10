@@ -2,7 +2,7 @@ from ophyd_async.core import Device, StandardReadable
 from ophyd_async.epics.motor import Motor
 
 
-class TurboSlit(StandardReadable, Device):
+class TurboSlit(StandardReadable):
     """
     This collection of motors coordinates time resolved XAS experiments.
     It selects a beam out of the polychromatic fan.
