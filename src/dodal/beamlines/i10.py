@@ -1,8 +1,9 @@
 """
-I10 has two insertion devices one up(idu) and one down stream(idd).
-It is worth noting that the down stream device is slightly longer,
-so it can reach Mn edge for linear arbitrary.
- idd == id1,    idu == id2.
+note:
+    I10 has two insertion devices one up(idu) and one down stream(idd).
+    It is worth noting that the down stream device is slightly longer,
+    so it can reach Mn edge for linear arbitrary.
+    idd == id1,    idu == id2.
 """
 
 from dodal.common.beamlines.beamline_utils import device_factory

@@ -327,16 +327,19 @@ class UndulatorJawPhase(SafeUndulatorMover):
 
 
 class Apple2(StandardReadable, Movable):
-    """
-    Apple 2 ID/undulator has 4 extra degrees of freedom compare to the standard Undulator,
-     each bank of magnet can move independently to each other,
-     which allow the production of different x-ray polarisation as well as energy.
-     This type of ID is use on I10, I21, I09, I17 and I06 for soft x-ray.
+    """Apple 2 ID/undulator has 4 extra degrees of freedom compare to the standard Undulator,
+    each bank of magnet can move independently to each other,
+    which allow the production of different x-ray polarisation as well as energy.
+    This type of ID is use on I10, I21, I09, I17 and I06 for soft x-ray.
 
     A pair of look up tables are needed to provide the conversion between motor position
-     and energy.
+    and energy.
+
     This conversion (update_lookuptable) and the way the id move (set) are two abstract
-     methods that are beamline specific and need to be implemented.
+    methods that are beamline specific and need to be implemented. For more detail see
+    `UML </_images/apple2_design.png>`__ for detail.
+
+    .. figure:: /explanations/umls/apple2_design.png
     """
 
     def __init__(
@@ -347,16 +350,13 @@ class Apple2(StandardReadable, Movable):
         name: str = "",
     ) -> None:
         """
+
         Parameters
         ----------
-        id_gap:
-            An UndulatorGap device.
-        id_phase:
-            An UndulatorPhaseAxes device.
-        prefix:
-            Not in use but needed for device_instantiation.
-        name:
-            Name of the device.
+        id_gap: An UndulatorGap device.
+        id_phase: An UndulatorPhaseAxes device.
+        prefix: Not in use but needed for device_instantiation.
+        name: Name of the device.
         """
         super().__init__(name)
 
@@ -383,7 +383,7 @@ class Apple2(StandardReadable, Movable):
         self._available_pol = []
         """
         Abstract method that run at start up to load lookup tables into  self.lookup_tables
-         and set available_pol.
+        and set available_pol.
         """
         self.update_lookuptable()
 
@@ -404,7 +404,6 @@ class Apple2(StandardReadable, Movable):
     async def _set(self, value: Apple2Val, energy: float) -> None:
         """
         Check ID is in a movable state and set all the demand value before moving.
-
         """
 
         # Only need to check gap as the phase motors share both fault and gate with gap.
@@ -449,7 +448,7 @@ class Apple2(StandardReadable, Movable):
     ) -> np.poly1d:
         """
         Get the correct polynomial for a given energy form lookuptable
-         for any given polarisation.
+        for any given polarisation.
         """
         pol = await self.polarisation.get_value()
         if (

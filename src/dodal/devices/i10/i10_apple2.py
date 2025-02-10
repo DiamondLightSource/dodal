@@ -54,12 +54,11 @@ class LookupTableConfig:
 
 
 class I10Apple2(Apple2):
-    """
-    I10Apple2 is the i10 version of Apple2 ID.
-    The set and update_lookuptable should be the only part that is I10 specific.
+    """I10Apple2 is the i10 version of Apple2 ID, set and update_lookuptable function
+    should be the only part that is I10 specific.
 
-    A pair of look up tables are needed to provide the conversion
-     between motor position and energy.
+    A pair of look up tables are needed to provide the conversion between motor position and energy.
+
     Set is in energy(eV).
     """
 
@@ -341,13 +340,10 @@ class I10Id(Device):
         name: str = "",
     ) -> None:
         """A compounded device to make up the full I10 insertion device.
-
-        UML
-        ---
+         This is in effect a single I10Apple with three different set methods for
+         energy, polarisation and linear arbitrary angle. See
+         `UML </_images/i10_id_design.png>`__ for detail.
         .. figure:: /explanations/umls/i10_id_design.png
-
-        `This </_images/i10_id_design.png>`__ is a reference to a section in another
-
         Attributes
         ----------
             energy: I10Apple2PGM
