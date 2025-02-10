@@ -385,6 +385,59 @@ async def test_I10Apple2_pol_set(
         assert float(gap.call_args[0][0]) == pytest.approx(expect_gap, 0.05)
 
 
+@pytest.mark.parametrize(
+    "pol,energy, top_outer, top_inner, btm_inner,btm_outer",
+    [
+        ("lh", 500, 0.0, 0.0, 0.0, 0.0),
+        ("lv", 600, 24.0, 0.0, 24.0, 0.0),
+        ("pc", 500, 15.5, 0.0, 15.5, 0.0),
+        ("nc", 500, -15.5, 0.0, -15.5, 0.0),
+        ("la", 1300, -16.4, 0.0, 16.4, 0.0),
+    ],
+)
+async def test_I10Apple2_pol_read_check_pol_from_hardware(
+    mock_id_pol: I10Apple2Pol,
+    pol: str,
+    energy: float,
+    top_inner: float,
+    top_outer: float,
+    btm_inner: float,
+    btm_outer: float,
+):
+    mock_id_pol.id()._energy_set(energy)
+
+    set_mock_value(mock_id_pol.id().phase.top_inner.user_readback, top_inner)
+    set_mock_value(mock_id_pol.id().phase.top_outer.user_readback, top_outer)
+    set_mock_value(mock_id_pol.id().phase.btm_inner.user_readback, btm_inner)
+    set_mock_value(mock_id_pol.id().phase.btm_outer.user_readback, btm_outer)
+
+    assert (await mock_id_pol.read())["mock_id-polarisation"]["value"] == pol
+
+
+@pytest.mark.parametrize(
+    "pol,energy, top_outer, top_inner, btm_inner,btm_outer",
+    [
+        ("lh3", 500, 24.0, 0.0, 24.0, 0.0),
+    ],
+)
+async def test_I10Apple2_pol_read_leave_lh3_unchange(
+    mock_id_pol: I10Apple2Pol,
+    pol: str,
+    energy: float,
+    top_inner: float,
+    top_outer: float,
+    btm_inner: float,
+    btm_outer: float,
+):
+    mock_id_pol.id()._energy_set(energy)
+    mock_id_pol.id()._polarisation_set("lh3")
+    set_mock_value(mock_id_pol.id().phase.top_inner.user_readback, top_inner)
+    set_mock_value(mock_id_pol.id().phase.top_outer.user_readback, top_outer)
+    set_mock_value(mock_id_pol.id().phase.btm_inner.user_readback, btm_inner)
+    set_mock_value(mock_id_pol.id().phase.btm_outer.user_readback, btm_outer)
+    assert (await mock_id_pol.read())["mock_id-polarisation"]["value"] == pol
+
+
 async def test_linear_arbitrary_pol_fail(
     mock_linear_arbitrary_angle: LinearArbitraryAngle,
 ):

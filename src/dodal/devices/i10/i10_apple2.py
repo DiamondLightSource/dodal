@@ -124,9 +124,11 @@ class I10Apple2(Apple2):
             self.id_jaw_phase = id_jaw_phase
 
     async def read(self) -> dict[str, Reading]:
-        pol, _ = await self.determinePhaseFromHardware()
-        if pol is not None:
-            self._polarisation_set(pol)
+        # It is not possible to get lh3 from hardware so if pol is in lh3 we skip check.
+        if await self.polarisation.get_value() != "lh3":
+            pol, _ = await self.determinePhaseFromHardware()
+            if pol is not None:
+                self.set_pol(pol=pol)
         return await super().read()
 
     @AsyncStatus.wrap
@@ -255,9 +257,11 @@ class I10Apple2Pol(StandardReadable, Movable):
         )  # Move id to new polarisation
 
     async def read(self) -> dict[str, Reading]:
-        pol, _ = await self.id().determinePhaseFromHardware()
-        if pol is not None:
-            self.id().set_pol(pol=pol)
+        # It is not possible to get lh3 from hardware so if pol is in lh3 we skip check.
+        if await self.id().polarisation.get_value() != "lh3":
+            pol, _ = await self.id().determinePhaseFromHardware()
+            if pol is not None:
+                self.id().set_pol(pol=pol)
         return await super().read()
 
 
