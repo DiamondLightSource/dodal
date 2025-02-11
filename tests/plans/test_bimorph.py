@@ -14,7 +14,7 @@ from bluesky.run_engine import RunEngine
 from bluesky.utils import Msg
 from numpy import linspace
 from ophyd_async.core import StandardDetector, init_devices, walk_rw_signals
-from ophyd_async.sim.demo import PatternDetector
+from ophyd_async.sim import PatternDetector
 from ophyd_async.testing import callback_on_mock_put, get_mock_put, set_mock_value
 
 from dodal.devices.bimorph_mirror import BimorphMirror, BimorphMirrorStatus
