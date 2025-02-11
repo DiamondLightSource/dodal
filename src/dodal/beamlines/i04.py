@@ -1,3 +1,5 @@
+import os
+
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.common.beamlines.beamline_utils import device_factory, device_instantiation
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
@@ -44,8 +46,8 @@ ZOOM_PARAMS_FILE = (
 DISPLAY_CONFIG = "/dls_sw/i04/software/gda_versions/var/display.configuration"
 DAQ_CONFIGURATION_PATH = "/dls_sw/i04/software/daq_configuration"
 
-REDIS_HOST = "i04-control.diamond.ac.uk"
-REDIS_PASSWORD = "not_telling"
+REDIS_HOST = os.environ.get("VALKEY_PROD_SVC_SERVICE_HOST", "test_redis")
+REDIS_PASSWORD = os.environ.get("VALKEY_PASSWORD", "test_redis_password")
 MURKO_REDIS_DB = 7
 
 BL = get_beamline_name("s04")

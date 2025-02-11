@@ -3,7 +3,7 @@ from typing import Any
 from unittest.mock import ANY
 
 import pytest
-from ophyd_async.core import DeviceCollector, StandardReadable
+from ophyd_async.core import StandardReadable, init_devices
 from ophyd_async.testing import set_mock_value
 
 from dodal.devices.slits import Slits
@@ -11,7 +11,7 @@ from dodal.devices.slits import Slits
 
 @pytest.fixture
 async def slits() -> Slits:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         slits = Slits("DEMO-SLITS-01:")
 
     return slits

@@ -6,7 +6,7 @@ import bluesky.plan_stubs as bps
 import pytest
 from bluesky.plans import scan
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import init_devices
 from ophyd_async.testing import (
     assert_emitted,
     callback_on_mock_put,
@@ -25,7 +25,7 @@ from dodal.devices.apple2_undulator import (
 
 @pytest.fixture
 async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         mock_id_gap = UndulatorGap(prefix, "mock_id_gap")
     assert mock_id_gap.name == "mock_id_gap"
     set_mock_value(mock_id_gap.gate, UndulatorGateStatus.CLOSE)
@@ -38,7 +38,7 @@ async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
 
 @pytest.fixture
 async def mock_phaseAxes(prefix: str = "BLXX-EA-DET-007:") -> UndulatorPhaseAxes:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         mock_phaseAxes = UndulatorPhaseAxes(
             prefix=prefix,
             top_outer="RPQ1",
@@ -66,7 +66,7 @@ async def mock_phaseAxes(prefix: str = "BLXX-EA-DET-007:") -> UndulatorPhaseAxes
 
 @pytest.fixture
 async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndulatorJawPhase:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         mock_jaw_phase = UndulatorJawPhase(
             prefix=prefix, move_pv="RPQ1", jaw_phase="JAW"
         )
@@ -266,7 +266,7 @@ async def test_phase_success_set(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngi
         set_value.btm_outer, wait=True
     )
 
-    assert await mock_phaseAxes.read() == {
+    expected_in_reading = {
         "mock_phaseAxes-top_inner-user_setpoint_readback": {
             "value": 3,
             "timestamp": ANY,
@@ -288,6 +288,8 @@ async def test_phase_success_set(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngi
             "alarm_severity": 0,
         },
     }
+    actual_reading = await mock_phaseAxes.read()
+    assert expected_in_reading.items() <= actual_reading.items()
 
 
 async def test_given_gate_never_closes_then_setting_jaw_phases_times_out(

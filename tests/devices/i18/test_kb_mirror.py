@@ -1,7 +1,7 @@
 from unittest.mock import ANY
 
 import pytest
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import init_devices
 from ophyd_async.testing import set_mock_value
 
 from dodal.devices.i18.KBMirror import KBMirror
@@ -9,8 +9,8 @@ from dodal.devices.i18.KBMirror import KBMirror
 
 @pytest.fixture
 async def kbmirror() -> KBMirror:
-    """Fixture to set up a mock KBMirror device using DeviceCollector."""
-    async with DeviceCollector(mock=True):
+    """Fixture to set up a mock KBMirror device using init_devices."""
+    async with init_devices(mock=True):
         kbmirror = KBMirror(prefix="MIRROR:")
     return kbmirror
 
