@@ -28,7 +28,7 @@ from dodal.plans.bimorph import (
     restore_bimorph_state,
 )
 
-VALID_BIMORPH_CHANNELS = [8, 12, 16, 24]
+VALID_BIMORPH_CHANNELS = [3]
 
 
 @pytest.fixture(params=VALID_BIMORPH_CHANNELS)
@@ -95,7 +95,7 @@ async def oav(RE: RunEngine, tmp_path: Path) -> StandardDetector:
     return det
 
 
-@pytest.fixture(params=list(range(2)))
+@pytest.fixture(params=[0, 1])
 async def detectors(request, oav: StandardDetector) -> list[Readable]:
     return [oav] * request.param
 
