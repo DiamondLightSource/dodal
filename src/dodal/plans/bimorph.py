@@ -132,6 +132,7 @@ def bimorph_optimisation(
         bimorph_settle_time: float time in seconds to wait after bimorph move
         initial_voltage_list: optional list[float] starting voltages for bimorph (defaults to current voltages)
     """
+    outer_uid = yield from bps.open_run()
     state = yield from capture_bimorph_state(mirror, slits)
 
     # If a starting set of voltages is not provided, default to current:
@@ -151,7 +152,6 @@ def bimorph_optimisation(
 
     @stage_decorator((*(detectors), slits, mirror))
     def outer():
-        outer_uid = yield from bps.open_run()
         inner_run_metadata = {"outer_uid": outer_uid, "bimorph_position_index": 0}
         """Outer plan stub, which moves mirror and calls inner_scan."""
         yield from inner_scan(
@@ -182,11 +182,11 @@ def bimorph_optimisation(
                 run_metadata=inner_run_metadata,
             )
 
-        yield from outer()
+    yield from outer()
 
-        yield from restore_bimorph_state(mirror, slits, state)
+    yield from restore_bimorph_state(mirror, slits, state)
 
-        yield from bps.close_run()
+    yield from bps.close_run()
 
 
 def inner_scan(
