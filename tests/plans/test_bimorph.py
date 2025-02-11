@@ -13,7 +13,7 @@ from bluesky.protocols import Readable
 from bluesky.run_engine import RunEngine
 from bluesky.utils import Msg
 from numpy import linspace
-from ophyd_async.core import DeviceCollector, StandardDetector, walk_rw_signals
+from ophyd_async.core import StandardDetector, init_devices, walk_rw_signals
 from ophyd_async.sim.demo import PatternDetector
 from ophyd_async.testing import callback_on_mock_put, get_mock_put, set_mock_value
 
@@ -36,7 +36,7 @@ VALID_BIMORPH_CHANNELS = [8, 12, 16, 24]
 def mirror(request, RE: RunEngine) -> BimorphMirror:
     number_of_channels = request.param
 
-    with DeviceCollector(mock=True):
+    with init_devices(mock=True):
         bm = BimorphMirror(
             prefix="FAKE-PREFIX:",
             number_of_channels=number_of_channels,
@@ -75,7 +75,7 @@ def mirror_with_mocked_put(mirror: BimorphMirror) -> BimorphMirror:
 @pytest.fixture
 def slits(RE: RunEngine) -> Slits:
     """Mock slits with propagation from setpoint to readback."""
-    with DeviceCollector(mock=True):
+    with init_devices(mock=True):
         slits = Slits("FAKE-PREFIX:")
 
     for motor in [slits.x_gap, slits.y_gap, slits.x_centre, slits.y_centre]:
@@ -91,7 +91,7 @@ def slits(RE: RunEngine) -> Slits:
 
 @pytest.fixture
 async def oav(RE: RunEngine, tmp_path: Path) -> StandardDetector:
-    with DeviceCollector(mock=True):
+    with init_devices(mock=True):
         det = PatternDetector(tmp_path / "foo.temp")
     return det
 
