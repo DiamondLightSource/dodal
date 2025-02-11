@@ -140,9 +140,9 @@ async def test_set_waits_for_both_timeouts(mock_wait_for: AsyncMock):
     mock_wait_for.assert_awaited_once_with(ANY, timeout=0.02)
 
 
-async def test_when_error_40_trying_to_move_the_robot_will_reset_it_first_but_still_throws_if_error_not_reset():
+async def test_moving_the_robot_will_reset_error_if_light_curtain_is_tripped_and_still_throw_if_error_not_cleared():
     device = await _get_bart_robot()
-    set_mock_value(device.controller_error.code, 40)
+    set_mock_value(device.controller_error.code, BartRobot.LIGHT_CURTAIN_TRIPPED)
 
     with pytest.raises(RobotLoadFailed) as e:
         await device.set(SampleLocation(1, 2))
@@ -158,9 +158,9 @@ async def test_when_error_40_trying_to_move_the_robot_will_reset_it_first_but_st
     )
 
 
-async def test_when_error_40_trying_to_move_the_robot_will_reset_it_and_pass_if_error_is_cleared():
+async def test_moving_the_robot_will_reset_error_if_light_curtain_is_tripped_and_continue_if_error_cleared():
     device = await _get_bart_robot()
-    set_mock_value(device.controller_error.code, 40)
+    set_mock_value(device.controller_error.code, BartRobot.LIGHT_CURTAIN_TRIPPED)
 
     callback_on_mock_put(
         device.reset,
