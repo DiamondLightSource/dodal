@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.pressure_jump_cell &#8212; dodal 1.39.1.dev20+g65edfe249 documentation</title>
+    <title>dodal.devices.pressure_jump_cell &#8212; dodal 1.39.1.dev21+gffdd9e843 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=63c854dc"></script>
+    <script src="../../../_static/documentation_options.js?v=93f48ae3"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -635,11 +635,11 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="ValveControl">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.pressure_jump_cell.ValveControl.html#dodal.devices.pressure_jump_cell.ValveControl">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">ValveControl</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ValveControl</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">close</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">ValveControlRequest</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;:CON&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">open</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">ValveOpenSeqRequest</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;:OPENSEQ&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">open</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;:OPENSEQ&quot;</span><span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
@@ -649,7 +649,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">ValveControlRequest</span><span class="p">):</span>
             <span class="n">set_status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">ValveOpenSeqRequest</span><span class="p">):</span>
-            <span class="n">set_status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">open</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">set_status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">open</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">set_status</span></div>
 
@@ -657,11 +657,11 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="FastValveControl">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.pressure_jump_cell.FastValveControl.html#dodal.devices.pressure_jump_cell.FastValveControl">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">FastValveControl</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FastValveControl</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">close</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">FastValveControlRequest</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;:CON&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">open</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">ValveOpenSeqRequest</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;:OPENSEQ&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">open</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;:OPENSEQ&quot;</span><span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
@@ -671,7 +671,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">FastValveControlRequest</span><span class="p">):</span>
             <span class="n">set_status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">ValveOpenSeqRequest</span><span class="p">):</span>
-            <span class="n">set_status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">open</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">set_status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">open</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">set_status</span></div>
 
@@ -712,21 +712,24 @@ window.addEventListener("load", () => mermaid.run());
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">cell_prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">transducer_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">ethercat_channel_number</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
         <span class="n">full_different_prefix_adc</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">final_prefix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">cell_prefix</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">omron_pressure</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
-                <span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">final_prefix</span><span class="si">}</span><span class="s2">PP</span><span class="si">{</span><span class="n">number</span><span class="si">}</span><span class="s2">:PRES&quot;</span>
+                <span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">final_prefix</span><span class="si">}</span><span class="s2">PP</span><span class="si">{</span><span class="n">transducer_number</span><span class="si">}</span><span class="s2">:PRES&quot;</span>
             <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">omron_voltage</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">final_prefix</span><span class="si">}</span><span class="s2">PP</span><span class="si">{</span><span class="n">number</span><span class="si">}</span><span class="s2">:RAW&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">omron_voltage</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
+                <span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">final_prefix</span><span class="si">}</span><span class="s2">PP</span><span class="si">{</span><span class="n">transducer_number</span><span class="si">}</span><span class="s2">:RAW&quot;</span>
+            <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">beckhoff_pressure</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
-                <span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">final_prefix</span><span class="si">}</span><span class="s2">STATP</span><span class="si">{</span><span class="n">number</span><span class="si">}</span><span class="s2">:MeanValue_RBV&quot;</span>
+                <span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">final_prefix</span><span class="si">}</span><span class="s2">STATP</span><span class="si">{</span><span class="n">transducer_number</span><span class="si">}</span><span class="s2">:MeanValue_RBV&quot;</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">slow_beckhoff_voltage_readout</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
-                <span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">full_different_prefix_adc</span><span class="si">}</span><span class="s2">CH1&quot;</span>
+                <span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">full_different_prefix_adc</span><span class="si">}</span><span class="s2">CH</span><span class="si">{</span><span class="n">ethercat_channel_number</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
@@ -783,13 +786,27 @@ window.addEventListener("load", () => mermaid.run());
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pressure_transducers</span><span class="p">:</span> <span class="n">DeviceVector</span><span class="p">[</span><span class="n">PressureTransducer</span><span class="p">]</span> <span class="o">=</span> <span class="n">DeviceVector</span><span class="p">(</span>
                 <span class="p">{</span>
-                    <span class="n">i</span><span class="p">:</span> <span class="n">PressureTransducer</span><span class="p">(</span>
+                    <span class="mi">1</span><span class="p">:</span> <span class="n">PressureTransducer</span><span class="p">(</span>
                         <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
-                        <span class="n">number</span><span class="o">=</span><span class="n">i</span><span class="p">,</span>
                         <span class="n">cell_prefix</span><span class="o">=</span><span class="n">cell_prefix</span><span class="p">,</span>
-                        <span class="n">full_different_prefix_adc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">adc_prefix</span><span class="si">}</span><span class="s2">-0</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">,</span>
-                    <span class="p">)</span>
-                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+                        <span class="n">transducer_number</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="n">full_different_prefix_adc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">adc_prefix</span><span class="si">}</span><span class="s2">-02:&quot;</span><span class="p">,</span>
+                        <span class="n">ethercat_channel_number</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="mi">2</span><span class="p">:</span> <span class="n">PressureTransducer</span><span class="p">(</span>
+                        <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
+                        <span class="n">cell_prefix</span><span class="o">=</span><span class="n">cell_prefix</span><span class="p">,</span>
+                        <span class="n">transducer_number</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                        <span class="n">full_different_prefix_adc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">adc_prefix</span><span class="si">}</span><span class="s2">-01:&quot;</span><span class="p">,</span>
+                        <span class="n">ethercat_channel_number</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="mi">3</span><span class="p">:</span> <span class="n">PressureTransducer</span><span class="p">(</span>
+                        <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
+                        <span class="n">cell_prefix</span><span class="o">=</span><span class="n">cell_prefix</span><span class="p">,</span>
+                        <span class="n">transducer_number</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                        <span class="n">full_different_prefix_adc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">adc_prefix</span><span class="si">}</span><span class="s2">-01:&quot;</span><span class="p">,</span>
+                        <span class="n">ethercat_channel_number</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                    <span class="p">),</span>
                 <span class="p">}</span>
             <span class="p">)</span>
 
