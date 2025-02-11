@@ -8,7 +8,6 @@ from unittest.mock import ANY, Mock, call
 
 import bluesky.plan_stubs as bps
 import pytest
-from bluesky.preprocessors import run_decorator
 from bluesky.protocols import Readable
 from bluesky.run_engine import RunEngine
 from bluesky.utils import Msg
@@ -181,9 +180,8 @@ class TestInnerScan:
         active_slit_size: float,
         number_of_slit_positions: int,
     ):
-        @run_decorator()
-        def plan():
-            yield from inner_scan(
+        RE(
+            inner_scan(
                 detectors,
                 mirror,
                 slits,
@@ -193,6 +191,7 @@ class TestInnerScan:
                 active_slit_size,
                 number_of_slit_positions,
             )
+        )
 
         call_list = [
             call(slits, active_dimension, active_slit_size, value)
@@ -202,8 +201,6 @@ class TestInnerScan:
                 number_of_slit_positions,
             )
         ]
-
-        RE(plan())
 
         assert mock_move_slits.call_args_list == call_list
 
@@ -221,9 +218,8 @@ class TestInnerScan:
         active_slit_size: float,
         number_of_slit_positions: int,
     ):
-        @run_decorator()
-        def plan():
-            yield from inner_scan(
+        RE(
+            inner_scan(
                 detectors,
                 mirror,
                 slits,
@@ -233,8 +229,7 @@ class TestInnerScan:
                 active_slit_size,
                 number_of_slit_positions,
             )
-
-        RE(plan())
+        )
 
         call_list = [
             call((*detectors, slits, mirror))
