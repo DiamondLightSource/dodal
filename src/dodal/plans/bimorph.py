@@ -152,7 +152,6 @@ def bimorph_optimisation(
 
     @stage_decorator((*(detectors), slits, mirror))
     def outer():
-        inner_run_metadata = {"outer_uid": outer_uid, "bimorph_position_index": 0}
         """Outer plan stub, which moves mirror and calls inner_scan."""
         yield from inner_scan(
             detectors,
@@ -163,11 +162,10 @@ def bimorph_optimisation(
             active_slit_center_end,
             active_slit_size,
             number_of_slit_positions,
-            run_metadata=inner_run_metadata,
+            run_metadata={"outer_uid": outer_uid, "bimorph_position_index": 0},
         )
         for i, channel in enumerate(mirror.channels.values()):
             yield from bps.mv(channel, initial_voltage_list[i] + voltage_increment)  # type: ignore
-            inner_run_metadata["bimorph_position_index"] = i + 1
             yield from bps.sleep(bimorph_settle_time)
 
             yield from inner_scan(
@@ -179,7 +177,7 @@ def bimorph_optimisation(
                 active_slit_center_end,
                 active_slit_size,
                 number_of_slit_positions,
-                run_metadata=inner_run_metadata,
+                run_metadata={"outer_uid": outer_uid, "bimorph_position_index": i + 1},
             )
 
     yield from outer()
