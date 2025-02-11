@@ -8,13 +8,12 @@ from unittest.mock import ANY, Mock, call
 
 import bluesky.plan_stubs as bps
 import pytest
-from bluesky.preprocessors import run_decorator
 from bluesky.protocols import Readable
 from bluesky.run_engine import RunEngine
 from bluesky.utils import Msg
 from numpy import linspace
-from ophyd_async.core import DeviceCollector, StandardDetector, walk_rw_signals
-from ophyd_async.sim.demo import PatternDetector
+from ophyd_async.core import StandardDetector, init_devices, walk_rw_signals
+from ophyd_async.sim import PatternDetector
 from ophyd_async.testing import callback_on_mock_put, get_mock_put, set_mock_value
 
 from dodal.devices.bimorph_mirror import BimorphMirror, BimorphMirrorStatus
@@ -29,14 +28,14 @@ from dodal.plans.bimorph import (
     restore_bimorph_state,
 )
 
-VALID_BIMORPH_CHANNELS = [8, 12, 16, 24]
+VALID_BIMORPH_CHANNELS = [3]
 
 
 @pytest.fixture(params=VALID_BIMORPH_CHANNELS)
 def mirror(request, RE: RunEngine) -> BimorphMirror:
     number_of_channels = request.param
 
-    with DeviceCollector(mock=True):
+    with init_devices(mock=True):
         bm = BimorphMirror(
             prefix="FAKE-PREFIX:",
             number_of_channels=number_of_channels,
@@ -75,7 +74,7 @@ def mirror_with_mocked_put(mirror: BimorphMirror) -> BimorphMirror:
 @pytest.fixture
 def slits(RE: RunEngine) -> Slits:
     """Mock slits with propagation from setpoint to readback."""
-    with DeviceCollector(mock=True):
+    with init_devices(mock=True):
         slits = Slits("FAKE-PREFIX:")
 
     for motor in [slits.x_gap, slits.y_gap, slits.x_centre, slits.y_centre]:
@@ -91,12 +90,12 @@ def slits(RE: RunEngine) -> Slits:
 
 @pytest.fixture
 async def oav(RE: RunEngine, tmp_path: Path) -> StandardDetector:
-    with DeviceCollector(mock=True):
+    with init_devices(mock=True):
         det = PatternDetector(tmp_path / "foo.temp")
     return det
 
 
-@pytest.fixture(params=list(range(2)))
+@pytest.fixture(params=[0, 1])
 async def detectors(request, oav: StandardDetector) -> list[Readable]:
     return [oav] * request.param
 
@@ -164,6 +163,9 @@ def test_save_and_restore(RE: RunEngine, mirror: BimorphMirror, slits: Slits):
 @pytest.mark.parametrize("active_slit_center_end", [200])
 @pytest.mark.parametrize("active_slit_size", [0.05])
 @pytest.mark.parametrize("number_of_slit_positions", [3])
+@pytest.mark.parametrize(
+    "run_metadata", [None, {"outer_uid": "0", "bimorph_position_index": 0}]
+)
 @unittest.mock.patch("dodal.plans.bimorph.bps.trigger_and_read")
 @unittest.mock.patch("dodal.plans.bimorph.move_slits")
 class TestInnerScan:
@@ -180,10 +182,10 @@ class TestInnerScan:
         active_slit_center_end: float,
         active_slit_size: float,
         number_of_slit_positions: int,
+        run_metadata: dict[str, Any] | None,
     ):
-        @run_decorator()
-        def plan():
-            yield from inner_scan(
+        RE(
+            inner_scan(
                 detectors,
                 mirror,
                 slits,
@@ -192,7 +194,9 @@ class TestInnerScan:
                 active_slit_center_end,
                 active_slit_size,
                 number_of_slit_positions,
+                run_metadata,
             )
+        )
 
         call_list = [
             call(slits, active_dimension, active_slit_size, value)
@@ -202,8 +206,6 @@ class TestInnerScan:
                 number_of_slit_positions,
             )
         ]
-
-        RE(plan())
 
         assert mock_move_slits.call_args_list == call_list
 
@@ -220,10 +222,10 @@ class TestInnerScan:
         active_slit_center_end: float,
         active_slit_size: float,
         number_of_slit_positions: int,
+        run_metadata: dict[str, Any] | None,
     ):
-        @run_decorator()
-        def plan():
-            yield from inner_scan(
+        RE(
+            inner_scan(
                 detectors,
                 mirror,
                 slits,
@@ -232,9 +234,9 @@ class TestInnerScan:
                 active_slit_center_end,
                 active_slit_size,
                 number_of_slit_positions,
+                run_metadata,
             )
-
-        RE(plan())
+        )
 
         call_list = [
             call((*detectors, slits, mirror))
@@ -245,6 +247,49 @@ class TestInnerScan:
             )
         ]
         assert mock_bps_trigger_and_read.call_args_list == call_list
+
+    def test_inner_scan_writes_run_metadata(
+        self,
+        mock_move_slits: Mock,
+        mock_bps_trigger_and_read: Mock,
+        detectors: list[Readable],
+        RE: RunEngine,
+        mirror: BimorphMirror,
+        slits: Slits,
+        active_dimension: SlitDimension,
+        active_slit_center_start: float,
+        active_slit_center_end: float,
+        active_slit_size: float,
+        number_of_slit_positions: int,
+        run_metadata: dict[str, Any] | None,
+    ):
+        start_docs = []
+
+        def get_start(_, doc):
+            start_docs.append(doc)
+
+        RE(
+            inner_scan(
+                detectors,
+                mirror,
+                slits,
+                active_dimension,
+                active_slit_center_start,
+                active_slit_center_end,
+                active_slit_size,
+                number_of_slit_positions,
+                run_metadata,
+            ),
+            {"start": [get_start]},
+        )
+
+        start_doc = start_docs[0]
+
+        if run_metadata is not None:
+            assert (
+                start_doc["outer_uid"] == "0"
+                and start_doc["bimorph_position_index"] == 0
+            )
 
 
 @pytest.mark.parametrize("voltage_increment", [100.0])
@@ -480,8 +525,9 @@ class TestBimorphOptimisation:
                 active_slit_center_end,
                 active_slit_size,
                 number_of_slit_positions,
+                run_metadata={"outer_uid": ANY, "bimorph_position_index": i},
             )
-            for _ in range(len(mirror_with_mocked_put.channels) + 1)
+            for i in range(len(mirror_with_mocked_put.channels) + 1)
         ] == mock_inner_scan.call_args_list
 
     async def test_plan_puts_to_bimorph(

@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any
 
 import bluesky.plan_stubs as bps
-from bluesky.preprocessors import run_decorator, stage_decorator
+from bluesky.preprocessors import stage_decorator
 from bluesky.protocols import Readable
 from numpy import linspace
 
@@ -131,6 +132,7 @@ def bimorph_optimisation(
         bimorph_settle_time: float time in seconds to wait after bimorph move
         initial_voltage_list: optional list[float] starting voltages for bimorph (defaults to current voltages)
     """
+    outer_uid = yield from bps.open_run()
     state = yield from capture_bimorph_state(mirror, slits)
 
     # If a starting set of voltages is not provided, default to current:
@@ -149,7 +151,6 @@ def bimorph_optimisation(
     )
 
     @stage_decorator((*(detectors), slits, mirror))
-    @run_decorator()
     def outer():
         """Outer plan stub, which moves mirror and calls inner_scan."""
         yield from inner_scan(
@@ -161,6 +162,7 @@ def bimorph_optimisation(
             active_slit_center_end,
             active_slit_size,
             number_of_slit_positions,
+            run_metadata={"outer_uid": outer_uid, "bimorph_position_index": 0},
         )
         for i, channel in enumerate(mirror.channels.values()):
             yield from bps.mv(channel, initial_voltage_list[i] + voltage_increment)  # type: ignore
@@ -175,11 +177,14 @@ def bimorph_optimisation(
                 active_slit_center_end,
                 active_slit_size,
                 number_of_slit_positions,
+                run_metadata={"outer_uid": outer_uid, "bimorph_position_index": i + 1},
             )
 
     yield from outer()
 
     yield from restore_bimorph_state(mirror, slits, state)
+
+    yield from bps.close_run()
 
 
 def inner_scan(
@@ -191,6 +196,7 @@ def inner_scan(
     active_slit_center_end: float,
     active_slit_size: float,
     number_of_slit_positions: int,
+    run_metadata: dict[str, Any] | None = None,
 ):
     """Inner plan stub, which moves Slits and performs a read.
 
@@ -203,9 +209,13 @@ def inner_scan(
         active_slit_center_end: float final position of center of slit in active dimension
         active_slit_size: float size of slit in active dimension
         number_of_slit_positions: int number of slit positions per pencil beam scan
+        run_metadata: Optional dict[str, Any] to add as metadata to run start
     """
+    yield from bps.open_run(run_metadata)
     for value in linspace(
         active_slit_center_start, active_slit_center_end, number_of_slit_positions
     ):
         yield from move_slits(slits, active_dimension, active_slit_size, value)
         yield from bps.trigger_and_read((*detectors, slits, mirror))
+
+    yield from bps.close_run()

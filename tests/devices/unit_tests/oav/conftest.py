@@ -1,7 +1,7 @@
 from unittest.mock import AsyncMock
 
 import pytest
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import init_devices
 from ophyd_async.testing import set_mock_value
 
 from dodal.devices.oav.oav_detector import OAV
@@ -14,7 +14,7 @@ ZOOM_LEVELS_XML = "tests/devices/unit_tests/test_jCameraManZoomLevels.xml"
 @pytest.fixture
 async def oav() -> OAV:
     oav_config = OAVConfig(ZOOM_LEVELS_XML, DISPLAY_CONFIGURATION)
-    async with DeviceCollector(mock=True, connect=True):
+    async with init_devices(mock=True, connect=True):
         oav = OAV("", config=oav_config, name="fake_oav")
     zoom_levels_list = ["1.0x", "3.0x", "5.0x", "7.5x", "10.0x"]
     oav.zoom_controller.level.describe = AsyncMock(

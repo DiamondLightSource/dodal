@@ -5,7 +5,7 @@ import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import init_devices
 from ophyd_async.testing import (
     callback_on_mock_put,
     get_mock_put,
@@ -22,7 +22,7 @@ from dodal.devices.xspress3.xspress3 import (
 
 @pytest.fixture
 async def mock_xspress3mini(prefix: str = "BLXX-EA-DET-007:") -> Xspress3:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         mock_xspress3mini = Xspress3(prefix, "Xspress3Mini", 2)
     assert mock_xspress3mini.channels[1].name == "Xspress3Mini-channels-1"
     assert mock_xspress3mini.channels[2].name == "Xspress3Mini-channels-2"
