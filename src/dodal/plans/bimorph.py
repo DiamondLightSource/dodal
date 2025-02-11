@@ -186,6 +186,8 @@ def bimorph_optimisation(
 
         yield from restore_bimorph_state(mirror, slits, state)
 
+        yield from bps.close_run()
+
 
 def inner_scan(
     detectors: list[Readable],
@@ -217,3 +219,5 @@ def inner_scan(
     ):
         yield from move_slits(slits, active_dimension, active_slit_size, value)
         yield from bps.trigger_and_read((*detectors, slits, mirror))
+
+    yield from bps.close_run()
