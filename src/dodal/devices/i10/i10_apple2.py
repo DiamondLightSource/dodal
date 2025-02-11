@@ -339,8 +339,8 @@ class I10Id(Device):
         angle_threshold_deg=30.0,
         name: str = "",
     ) -> None:
-        """A compounded device to make up the full I10 insertion device.
-         This is in effect a single I10Apple with three different set methods for
+        """A compound device to make up the full I10 insertion device.
+         This is in effect a single I10Apple2 with three different set methods for
          energy, polarisation and linear arbitrary angle. See
          `UML </_images/i10_id_design.png>`__ for detail.
         .. figure:: /explanations/umls/i10_id_design.png

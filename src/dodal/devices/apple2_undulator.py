@@ -93,7 +93,7 @@ MAXIMUM_GAP_MOTOR_POSITION = 100
 async def estimate_motor_timeout(
     setpoint: SignalR, curr_pos: SignalR, velocity: SignalR
 ):
-    vel = abs(await velocity.get_value())
+    vel = await velocity.get_value()
     cur_pos = await curr_pos.get_value()
     target_pos = float(await setpoint.get_value())
     return abs((target_pos - cur_pos) * 2.0 / vel) + DEFAULT_MOTOR_MIN_TIMEOUT
