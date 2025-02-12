@@ -1,8 +1,9 @@
-from dodal.common.beamlines.beamline_utils import BL, device_instantiation
+from dodal.common.beamlines.beamline_utils import (
+    BL,
+    device_factory,
+)
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.attenuator.attenuator import ReadOnlyAttenuator
-from dodal.devices.detector import DetectorParams
-from dodal.devices.eiger import EigerDetector
 from dodal.devices.hutch_shutter import HutchShutter
 from dodal.devices.i24.aperture import Aperture
 from dodal.devices.i24.beam_center import DetectorBeamCenter
@@ -16,246 +17,212 @@ from dodal.devices.i24.pmac import PMAC
 from dodal.devices.i24.vgonio import VerticalGoniometer
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.oav_parameters import OAVConfig
-from dodal.devices.zebra import Zebra
+from dodal.devices.zebra.zebra import Zebra
+from dodal.devices.zebra.zebra_constants_mapping import (
+    ZebraMapping,
+    ZebraSources,
+    ZebraTTLOutputs,
+)
 from dodal.log import set_beamline as set_log_beamline
-from dodal.utils import get_beamline_name, skip_device
+from dodal.utils import BeamlinePrefix, get_beamline_name
 
 ZOOM_PARAMS_FILE = (
     "/dls_sw/i24/software/gda_versions/gda/config/xml/jCameraManZoomLevels.xml"
 )
 DISPLAY_CONFIG = "/dls_sw/i24/software/gda_versions/var/display.configuration"
 
+
 BL = get_beamline_name("s24")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
+I24_ZEBRA_MAPPING = ZebraMapping(
+    outputs=ZebraTTLOutputs(TTL_EIGER=1, TTL_PILATUS=2, TTL_FAST_SHUTTER=4),
+    sources=ZebraSources(),
+)
 
-def attenuator(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> ReadOnlyAttenuator:
+PREFIX = BeamlinePrefix(BL)
+
+
+@device_factory()
+def attenuator() -> ReadOnlyAttenuator:
     """Get a read-only attenuator device for i24, instantiate it if it hasn't already
     been. If this is called when already instantiated in i24, it will return the
     existing object."""
-    return device_instantiation(
-        ReadOnlyAttenuator,
+    return ReadOnlyAttenuator(
+        f"{PREFIX.beamline_prefix}-OP-ATTN-01:",
         "attenuator",
-        "-OP-ATTN-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
     )
 
 
-def aperture(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Aperture:
+@device_factory()
+def aperture() -> Aperture:
     """Get the i24 aperture device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i24, it will return the existing object.
     """
-    return device_instantiation(
-        Aperture, "aperture", "-AL-APTR-01:", wait_for_connection, fake_with_ophyd_sim
+    return Aperture(
+        f"{PREFIX.beamline_prefix}-AL-APTR-01:",
+        "aperture",
     )
 
 
-def beamstop(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Beamstop:
+@device_factory()
+def beamstop() -> Beamstop:
     """Get the i24 beamstop device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i24, it will return the existing object.
     """
-    return device_instantiation(
-        Beamstop,
+    return Beamstop(
+        f"{PREFIX.beamline_prefix}-MO-BS-01:",
         "beamstop",
-        "-MO-BS-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
     )
 
 
-def backlight(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> DualBacklight:
+@device_factory()
+def backlight() -> DualBacklight:
     """Get the i24 backlight device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i24, it will return the existing object.
     """
-    return device_instantiation(
-        device_factory=DualBacklight,
+    return DualBacklight(
+        prefix=PREFIX.beamline_prefix,
         name="backlight",
-        prefix="",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
     )
 
 
-def detector_motion(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> DetectorMotion:
+@device_factory()
+def detector_motion() -> DetectorMotion:
     """Get the i24 detector motion device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i24, it will return the existing object.
     """
-    return device_instantiation(
-        device_factory=DetectorMotion,
+    return DetectorMotion(
         name="detector_motion",
-        prefix="-EA-DET-01:",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
+        prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:",
     )
 
 
-def dcm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> DCM:
+@device_factory()
+def dcm() -> DCM:
     """Get the i24 DCM device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i24, it will return the existing object.
     """
-    return device_instantiation(
-        device_factory=DCM,
+    return DCM(
         name="dcm",
-        prefix="",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
+        prefix=PREFIX.beamline_prefix,
     )
 
 
-@skip_device(lambda: BL == "s24")
-def eiger(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-    params: DetectorParams | None = None,
-) -> EigerDetector:
-    """Get the i24 Eiger device, instantiate it if it hasn't already been.
-    If this is called when already instantiated, it will return the existing object.
-    If called with params, will update those params to the Eiger object.
-    """
+# TODO implement ophyd-async eiger see
+# https://github.com/DiamondLightSource/mx-bluesky/issues/62
+# @skip_device(lambda: BL == "s24")
+# def eiger(
+#     wait_for_connection: bool = True,
+#     fake_with_ophyd_sim: bool = False,
+#     params: DetectorParams | None = None,
+# ) -> EigerDetector:
+#     """Get the i24 Eiger device, instantiate it if it hasn't already been.
+#     If this is called when already instantiated, it will return the existing object.
+#     If called with params, will update those params to the Eiger object.
+#     """
+#
+#     def set_params(eiger: EigerDetector):
+#         if params is not None:
+#             eiger.set_detector_parameters(params)
+#
+#     return device_instantiation(
+#         device_factory=EigerDetector,
+#         name="eiger",
+#         prefix="-EA-EIGER-01:",
+#         wait=wait_for_connection,
+#         fake=fake_with_ophyd_sim,
+#         post_create=set_params,
+#     )
 
-    def set_params(eiger: EigerDetector):
-        if params is not None:
-            eiger.set_detector_parameters(params)
 
-    return device_instantiation(
-        device_factory=EigerDetector,
-        name="eiger",
-        prefix="-EA-EIGER-01:",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
-        post_create=set_params,
-    )
-
-
-def pmac(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> PMAC:
+@device_factory()
+def pmac() -> PMAC:
     """Get the i24 PMAC device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i24, it will return the existing object.
     """
     # prefix not BL but ME14E
-    return device_instantiation(
-        PMAC,
-        "pmac",
+    return PMAC(
         "ME14E-MO-CHIP-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-        bl_prefix=False,
+        "pmac",
     )
 
 
-@skip_device(lambda: BL == "s24")
-def oav(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> OAV:
-    return device_instantiation(
-        OAV,
-        "oav",
-        "-DI-OAV-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+@device_factory(skip=BL == "s24")
+def oav() -> OAV:
+    return OAV(
+        prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
+        name="oav",
         config=OAVConfig(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
     )
 
 
-def vgonio(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> VerticalGoniometer:
+@device_factory()
+def vgonio() -> VerticalGoniometer:
     """Get the i24 vertical goniometer device, instantiate it if it hasn't already been.
     If this is called when already instantiated, it will return the existing object.
     """
-    return device_instantiation(
-        VerticalGoniometer,
+    return VerticalGoniometer(
+        f"{PREFIX.beamline_prefix}-MO-VGON-01:",
         "vgonio",
-        "-MO-VGON-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
     )
 
 
-def zebra(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> Zebra:
+@device_factory()
+def zebra() -> Zebra:
     """Get the i24 zebra device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i24, it will return the existing object.
     """
-    return device_instantiation(
-        Zebra,
-        "zebra",
-        "-EA-ZEBRA-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+    return Zebra(
+        name="zebra",
+        prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:",
+        mapping=I24_ZEBRA_MAPPING,
     )
 
 
-def shutter(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> HutchShutter:
+@device_factory()
+def shutter() -> HutchShutter:
     """Get the i24 hutch shutter device, instantiate it if it hasn't already been.
     If this is called when already instantiated, it will return the existing object.
     """
-    return device_instantiation(
-        HutchShutter,
+    return HutchShutter(
+        f"{PREFIX.beamline_prefix}-PS-SHTR-01:",
         "shutter",
-        "-PS-SHTR-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
     )
 
 
-def focus_mirrors(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> FocusMirrorsMode:
+@device_factory()
+def focus_mirrors() -> FocusMirrorsMode:
     """Get the i24 focus mirror devise to find the beam size."""
-    return device_instantiation(
-        FocusMirrorsMode,
+    return FocusMirrorsMode(
+        f"{PREFIX.beamline_prefix}-OP-MFM-01:",
         "focus_mirrors",
-        "-OP-MFM-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
     )
 
 
-def eiger_beam_center(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> DetectorBeamCenter:
+@device_factory()
+def eiger_beam_center() -> DetectorBeamCenter:
     """A device for setting/reading the beamcenter from the eiger on i24."""
-    return device_instantiation(
-        DetectorBeamCenter,
+    return DetectorBeamCenter(
+        f"{PREFIX.beamline_prefix}-EA-EIGER-01:CAM:",
         "eiger_bc",
-        "-EA-EIGER-01:CAM:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
     )
 
 
-def pilatus_beam_center(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> DetectorBeamCenter:
+@device_factory()
+def pilatus_beam_center() -> DetectorBeamCenter:
     """A device for setting/reading the beamcenter from the pilatus on i24."""
-    return device_instantiation(
-        DetectorBeamCenter,
+    return DetectorBeamCenter(
+        f"{PREFIX.beamline_prefix}-EA-PILAT-01:cam1:",
         "pilatus_bc",
-        "-EA-PILAT-01:cam1:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
     )
 
 
-def pilatus_metadata(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> PilatusMetadata:
+@device_factory()
+def pilatus_metadata() -> PilatusMetadata:
     """A small pilatus driver device for figuring out the filename template."""
-    return device_instantiation(
-        PilatusMetadata,
+    return PilatusMetadata(
+        f"{PREFIX.beamline_prefix}-EA-PILAT-01:",
         "pilatus_meta",
-        "-EA-PILAT-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
     )

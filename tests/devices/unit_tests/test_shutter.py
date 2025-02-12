@@ -1,8 +1,8 @@
 import pytest
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import init_devices
 from ophyd_async.testing import callback_on_mock_put, set_mock_value
 
-from dodal.devices.zebra_controlled_shutter import (
+from dodal.devices.zebra.zebra_controlled_shutter import (
     ZebraShutter,
     ZebraShutterControl,
     ZebraShutterState,
@@ -11,7 +11,7 @@ from dodal.devices.zebra_controlled_shutter import (
 
 @pytest.fixture
 async def sim_shutter():
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         sim_shutter = ZebraShutter(
             prefix="sim_shutter",
             name="shutter",

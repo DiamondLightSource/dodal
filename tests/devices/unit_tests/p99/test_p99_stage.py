@@ -1,5 +1,5 @@
 import pytest
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import init_devices
 from ophyd_async.testing import set_mock_value
 
 from dodal.devices.attenuator.filter import FilterMotor
@@ -15,7 +15,7 @@ A_BIT = 0.001
 
 @pytest.fixture
 async def sim_sampleAngleStage():
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         sim_sampleAngleStage = SampleAngleStage(
             "p99-MO-TABLE-01:", name="sim_sampleAngleStage"
         )
@@ -25,7 +25,7 @@ async def sim_sampleAngleStage():
 
 @pytest.fixture
 async def sim_filter_wheel():
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         sim_filter_wheel = FilterMotor(
             "p99-MO-TABLE-01:",
             P99FilterSelections,

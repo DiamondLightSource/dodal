@@ -12,7 +12,7 @@ from dodal.devices.webcam import Webcam, create_placeholder_image
 @pytest.fixture
 def webcam() -> Webcam:
     RunEngine()
-    return i03.webcam(fake_with_ophyd_sim=True)
+    return i03.webcam(connect_immediately=True, mock=True)
 
 
 async def test_given_last_saved_path_when_device_read_then_returns_path(webcam: Webcam):

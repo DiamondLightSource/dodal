@@ -7,7 +7,7 @@ import pytest
 from bluesky.plan_stubs import abs_set
 from bluesky.plans import count
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import init_devices
 from ophyd_async.testing import (
     callback_on_mock_put,
     get_mock_put,
@@ -33,7 +33,7 @@ from dodal.devices.current_amplifiers.struck_scaler_counter import (
 async def mock_femto(
     prefix: str = "BLXX-EA-DET-007:", suffix: str = "Gain"
 ) -> FemtoDDPCA:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         mock_femto = FemtoDDPCA(
             prefix=prefix,
             suffix=suffix,
@@ -50,7 +50,7 @@ async def mock_femto(
 async def mock_StruckScaler(
     prefix: str = "BLXX-EA-DET-007:", suffix: str = ".s17"
 ) -> StruckScaler:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         mock_StruckScaler = StruckScaler(
             prefix=prefix,
             suffix=suffix,
@@ -66,7 +66,7 @@ async def mock_femto_struck_scaler_detector(
     mock_femto: FemtoDDPCA,
     prefix: str = "BLXX-EA-DET-007:",
 ) -> CurrentAmpDet:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         mock_femto_struck_scaler_detector = CurrentAmpDet(
             current_amp=mock_femto,
             counter=mock_StruckScaler,

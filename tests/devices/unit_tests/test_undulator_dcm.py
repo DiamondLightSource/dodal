@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pytest
-from ophyd_async.core import AsyncStatus, DeviceCollector
+from ophyd_async.core import AsyncStatus, init_devices
 from ophyd_async.testing import get_mock_put, set_mock_value
 
 from conftest import MOCK_DAQ_CONFIG_PATH
@@ -30,7 +30,7 @@ def flush_event_loop_on_finish(event_loop):
 
 @pytest.fixture
 async def fake_undulator_dcm() -> UndulatorDCM:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         undulator = Undulator(
             "UND-01",
             name="undulator",

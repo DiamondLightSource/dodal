@@ -14,37 +14,7 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-# These constants refer to I03's Zebra. See https://github.com/DiamondLightSource/dodal/issues/772
-# Sources
-DISCONNECT = 0
-IN1_TTL = 1
-IN2_TTL = 4
-IN3_TTL = 7
-IN4_TTL = 10
-PC_ARM = 29
-PC_GATE = 30
-PC_PULSE = 31
-AND3 = 34
-AND4 = 35
-OR1 = 36
-PULSE1 = 52
-PULSE2 = 53
-SOFT_IN1 = 60
-SOFT_IN2 = 61
-SOFT_IN3 = 62
-
-# Instrument specific
-TTL_DETECTOR = 1
-TTL_SHUTTER = 2
-TTL_XSPRESS3 = 3
-TTL_PANDA = 4
-
-# The AND gate that controls the automatic shutter
-AUTO_SHUTTER_GATE = 2
-
-# The first two inputs of the auto shutter gate.
-AUTO_SHUTTER_INPUT_1 = 1
-AUTO_SHUTTER_INPUT_2 = 2
+from dodal.devices.zebra.zebra_constants_mapping import ZebraMapping
 
 
 class ArmSource(StrictEnum):
@@ -303,7 +273,8 @@ class SoftInputs(StandardReadable):
 class Zebra(StandardReadable):
     """The Zebra device."""
 
-    def __init__(self, name: str, prefix: str) -> None:
+    def __init__(self, mapping: ZebraMapping, name: str, prefix: str) -> None:
+        self.mapping = mapping
         self.pc = PositionCompare(prefix, name)
         self.output = ZebraOutputPanel(prefix, name)
         self.inputs = SoftInputs(prefix, name)

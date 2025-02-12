@@ -151,11 +151,11 @@ class AllValvesControl(StandardReadable, Movable):
         )
 
 
-class ValveControl(StandardReadable):
+class ValveControl(StandardReadable, Movable):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
             self.close = epics_signal_rw(ValveControlRequest, prefix + ":CON")
-            self.open = epics_signal_rw(ValveOpenSeqRequest, prefix + ":OPENSEQ")
+            self.open = epics_signal_rw(int, prefix + ":OPENSEQ")
 
         super().__init__(name)
 
@@ -165,16 +165,16 @@ class ValveControl(StandardReadable):
         if isinstance(value, ValveControlRequest):
             set_status = self.close.set(value)
         elif isinstance(value, ValveOpenSeqRequest):
-            set_status = self.open.set(value)
+            set_status = self.open.set(value.value)
 
         return set_status
 
 
-class FastValveControl(StandardReadable):
+class FastValveControl(StandardReadable, Movable):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
             self.close = epics_signal_rw(FastValveControlRequest, prefix + ":CON")
-            self.open = epics_signal_rw(ValveOpenSeqRequest, prefix + ":OPENSEQ")
+            self.open = epics_signal_rw(int, prefix + ":OPENSEQ")
 
         super().__init__(name)
 
@@ -184,7 +184,7 @@ class FastValveControl(StandardReadable):
         if isinstance(value, FastValveControlRequest):
             set_status = self.close.set(value)
         elif isinstance(value, ValveOpenSeqRequest):
-            set_status = self.open.set(value)
+            set_status = self.open.set(value.value)
 
         return set_status
 
@@ -219,21 +219,24 @@ class PressureTransducer(StandardReadable):
         self,
         prefix: str,
         cell_prefix: str,
-        number: int,
+        transducer_number: int,
+        ethercat_channel_number: int,
         name: str = "",
         full_different_prefix_adc: str = "",
     ) -> None:
         final_prefix = f"{prefix}{cell_prefix}"
         with self.add_children_as_readables():
             self.omron_pressure = epics_signal_r(
-                float, f"{final_prefix}PP{number}:PRES"
+                float, f"{final_prefix}PP{transducer_number}:PRES"
             )
-            self.omron_voltage = epics_signal_r(float, f"{final_prefix}PP{number}:RAW")
+            self.omron_voltage = epics_signal_r(
+                float, f"{final_prefix}PP{transducer_number}:RAW"
+            )
             self.beckhoff_pressure = epics_signal_r(
-                float, f"{final_prefix}STATP{number}:MeanValue_RBV"
+                float, f"{final_prefix}STATP{transducer_number}:MeanValue_RBV"
             )
             self.slow_beckhoff_voltage_readout = epics_signal_r(
-                float, f"{full_different_prefix_adc}CH1"
+                float, f"{full_different_prefix_adc}CH{ethercat_channel_number}"
             )
 
         super().__init__(name)
@@ -284,13 +287,27 @@ class PressureJumpCell(StandardReadable):
         with self.add_children_as_readables():
             self.pressure_transducers: DeviceVector[PressureTransducer] = DeviceVector(
                 {
-                    i: PressureTransducer(
+                    1: PressureTransducer(
                         prefix=prefix,
-                        number=i,
                         cell_prefix=cell_prefix,
-                        full_different_prefix_adc=f"{prefix}{adc_prefix}-0{i}:",
-                    )
-                    for i in [1, 2, 3]
+                        transducer_number=1,
+                        full_different_prefix_adc=f"{prefix}{adc_prefix}-02:",
+                        ethercat_channel_number=1,
+                    ),
+                    2: PressureTransducer(
+                        prefix=prefix,
+                        cell_prefix=cell_prefix,
+                        transducer_number=2,
+                        full_different_prefix_adc=f"{prefix}{adc_prefix}-01:",
+                        ethercat_channel_number=2,
+                    ),
+                    3: PressureTransducer(
+                        prefix=prefix,
+                        cell_prefix=cell_prefix,
+                        transducer_number=3,
+                        full_different_prefix_adc=f"{prefix}{adc_prefix}-01:",
+                        ethercat_channel_number=1,
+                    ),
                 }
             )
 
