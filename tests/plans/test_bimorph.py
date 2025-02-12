@@ -623,3 +623,51 @@ class TestBimorphOptimisation:
         assert [
             call(mirror_with_mocked_put, slits, start_state)
         ] == mock_restore_bimorph_state.call_args_list
+
+
+@pytest.mark.parametrize("voltage_increment", [100.0])
+@pytest.mark.parametrize("active_dimension", [SlitDimension.X, SlitDimension.Y])
+@pytest.mark.parametrize("active_slit_center_start", [0.0])
+@pytest.mark.parametrize("active_slit_center_end", [200.0])
+@pytest.mark.parametrize("active_slit_size", [0.05])
+@pytest.mark.parametrize("inactive_slit_center", [0.0])
+@pytest.mark.parametrize("inactive_slit_size", [0.05])
+@pytest.mark.parametrize("number_of_slit_positions", [3])
+@pytest.mark.parametrize("bimorph_settle_time", [0.0])
+class TestIntegration:
+    def test_full_plan(
+        self,
+        detectors: list[Readable],
+        RE: RunEngine,
+        mirror_with_mocked_put: BimorphMirror,
+        slits: Slits,
+        voltage_increment: float,
+        active_dimension: SlitDimension,
+        active_slit_center_start: float,
+        active_slit_center_end: float,
+        active_slit_size: float,
+        inactive_slit_center: float,
+        inactive_slit_size: float,
+        number_of_slit_positions: int,
+        bimorph_settle_time: float,
+        initial_voltage_list: list[float],
+    ):
+        RE(
+            bimorph_optimisation(
+                detectors,
+                mirror_with_mocked_put,
+                slits,
+                voltage_increment,
+                active_dimension,
+                active_slit_center_start,
+                active_slit_center_end,
+                active_slit_size,
+                inactive_slit_center,
+                inactive_slit_size,
+                number_of_slit_positions,
+                bimorph_settle_time,
+                initial_voltage_list,
+            )
+        )
+
+    assert True
