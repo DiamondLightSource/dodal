@@ -1,0 +1,42 @@
+dodal.plan\_stubs.motor\_utils
+==============================
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.plan_stubs.motor_utils
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      check_and_cache_values
+      home_and_reset_decorator
+      home_and_reset_wrapper
+      move_and_reset_wrapper
+   
+   
+
+   
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      MoveTooLarge
+   
+   

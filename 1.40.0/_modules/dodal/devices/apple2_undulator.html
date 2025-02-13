@@ -1,0 +1,1143 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dodal.devices.apple2_undulator &#8212; dodal 1.40.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../_static/documentation_options.js?v=44fa7dab"></script>
+    <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=30646c52"></script>
+    <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+    <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+    <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/dodal/devices/apple2_undulator';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://DiamondLightSource.github.io/dodal/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '1.40.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="icon" href="../../../_static/dls-logo.svg"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="1.40.0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/dls-logo.svg" class="logo__image only-light" alt=""/>
+    <img src="../../../_static/dls-logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">dodal</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/DiamondLightSource/dodal" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/dodal" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../how-to.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../explanations.html">
+    Explanations
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference.html">
+    Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/DiamondLightSource/dodal" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/dodal" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">dodal.devices.apple2_undulator</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for dodal.devices.apple2_undulator</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">abc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Movable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AsyncStatus</span><span class="p">,</span>
+    <span class="n">Reference</span><span class="p">,</span>
+    <span class="n">SignalR</span><span class="p">,</span>
+    <span class="n">SignalW</span><span class="p">,</span>
+    <span class="n">StandardReadable</span><span class="p">,</span>
+    <span class="n">StandardReadableFormat</span><span class="p">,</span>
+    <span class="n">StrictEnum</span><span class="p">,</span>
+    <span class="n">soft_signal_r_and_setter</span><span class="p">,</span>
+    <span class="n">wait_for_value</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_r</span><span class="p">,</span> <span class="n">epics_signal_rw</span><span class="p">,</span> <span class="n">epics_signal_w</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">ConfigDict</span><span class="p">,</span> <span class="n">RootModel</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
+
+
+<div class="viewcode-block" id="UndulatorGateStatus">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.UndulatorGateStatus.html#dodal.devices.apple2_undulator.UndulatorGateStatus">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">UndulatorGateStatus</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
+    <span class="n">OPEN</span> <span class="o">=</span> <span class="s2">&quot;Open&quot;</span>
+    <span class="n">CLOSE</span> <span class="o">=</span> <span class="s2">&quot;Closed&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="Apple2PhasesVal">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.Apple2PhasesVal.html#dodal.devices.apple2_undulator.Apple2PhasesVal">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Apple2PhasesVal</span><span class="p">:</span>
+    <span class="n">top_outer</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">top_inner</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">btm_inner</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">btm_outer</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+
+<div class="viewcode-block" id="Apple2Val">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.Apple2Val.html#dodal.devices.apple2_undulator.Apple2Val">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Apple2Val</span><span class="p">:</span>
+    <span class="n">gap</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">top_outer</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">top_inner</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">btm_inner</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">btm_outer</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+
+<div class="viewcode-block" id="EnergyMinMax">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.EnergyMinMax.html#dodal.devices.apple2_undulator.EnergyMinMax">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EnergyMinMax</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">Minimum</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">Maximum</span><span class="p">:</span> <span class="nb">float</span></div>
+
+
+
+<div class="viewcode-block" id="EnergyCoverageEntry">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.EnergyCoverageEntry.html#dodal.devices.apple2_undulator.EnergyCoverageEntry">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EnergyCoverageEntry</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">arbitrary_types_allowed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">Low</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">High</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">Poly</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span></div>
+
+
+
+<div class="viewcode-block" id="EnergyCoverage">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.EnergyCoverage.html#dodal.devices.apple2_undulator.EnergyCoverage">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EnergyCoverage</span><span class="p">(</span><span class="n">RootModel</span><span class="p">):</span>
+    <span class="n">root</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">EnergyCoverageEntry</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="LookupTableEntries">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.LookupTableEntries.html#dodal.devices.apple2_undulator.LookupTableEntries">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LookupTableEntries</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">Energies</span><span class="p">:</span> <span class="n">EnergyCoverage</span>
+    <span class="n">Limit</span><span class="p">:</span> <span class="n">EnergyMinMax</span></div>
+
+
+
+<div class="viewcode-block" id="Lookuptable">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.Lookuptable.html#dodal.devices.apple2_undulator.Lookuptable">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Lookuptable</span><span class="p">(</span><span class="n">RootModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    BaseModel class for the lookup table.</span>
+<span class="sd">    Apple2 lookup table should be in this format.</span>
+
+<span class="sd">    {mode: {&#39;Energies&#39;: {Any: {&#39;Low&#39;: float,</span>
+<span class="sd">                            &#39;High&#39;: float,</span>
+<span class="sd">                            &#39;Poly&#39;:np.poly1d</span>
+<span class="sd">                            }</span>
+<span class="sd">                        }</span>
+<span class="sd">            &#39;Limit&#39;: {&#39;Minimum&#39;: float,</span>
+<span class="sd">                    &#39;Maximum&#39;: float</span>
+<span class="sd">                    }</span>
+<span class="sd">        }</span>
+<span class="sd">    }</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">root</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">LookupTableEntries</span><span class="p">]</span></div>
+
+
+
+<span class="n">ROW_PHASE_MOTOR_TOLERANCE</span> <span class="o">=</span> <span class="mf">0.004</span>
+<span class="n">MAXIMUM_ROW_PHASE_MOTOR_POSITION</span> <span class="o">=</span> <span class="mf">24.0</span>
+<span class="n">MAXIMUM_GAP_MOTOR_POSITION</span> <span class="o">=</span> <span class="mi">100</span>
+
+
+<div class="viewcode-block" id="estimate_motor_timeout">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.html#dodal.devices.apple2_undulator.estimate_motor_timeout">[docs]</a>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">estimate_motor_timeout</span><span class="p">(</span>
+    <span class="n">setpoint</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">,</span> <span class="n">curr_pos</span><span class="p">:</span> <span class="n">SignalR</span><span class="p">,</span> <span class="n">velocity</span><span class="p">:</span> <span class="n">SignalR</span>
+<span class="p">):</span>
+    <span class="n">vel</span> <span class="o">=</span> <span class="k">await</span> <span class="n">velocity</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+    <span class="n">cur_pos</span> <span class="o">=</span> <span class="k">await</span> <span class="n">curr_pos</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+    <span class="n">target_pos</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="k">await</span> <span class="n">setpoint</span><span class="o">.</span><span class="n">get_value</span><span class="p">())</span>
+    <span class="k">return</span> <span class="nb">abs</span><span class="p">((</span><span class="n">target_pos</span> <span class="o">-</span> <span class="n">cur_pos</span><span class="p">)</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="n">vel</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span></div>
+
+
+
+<div class="viewcode-block" id="SafeUndulatorMover">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.SafeUndulatorMover.html#dodal.devices.apple2_undulator.SafeUndulatorMover">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SafeUndulatorMover</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A device that will check it&#39;s safe to move the undulator before moving it and</span>
+<span class="sd">    wait for the undulator to be safe again before calling the move complete.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">set_move</span><span class="p">:</span> <span class="n">SignalW</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="c1"># Gate keeper open when move is requested, closed when move is completed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gate</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="n">UndulatorGateStatus</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;BLGATE&quot;</span><span class="p">)</span>
+
+        <span class="n">split_pv</span> <span class="o">=</span> <span class="n">prefix</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+        <span class="n">fault_pv</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">split_pv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">split_pv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">-STAT-</span><span class="si">{</span><span class="n">split_pv</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="si">}</span><span class="s2">ANYFAULT&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fault</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">fault_pv</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_move</span> <span class="o">=</span> <span class="n">set_move</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">raise_if_cannot_move</span><span class="p">()</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_demand_positions</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">timeout</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_timeout</span><span class="p">()</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Moving </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2"> with timeout = </span><span class="si">{</span><span class="n">timeout</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_move</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gate</span><span class="p">,</span> <span class="n">UndulatorGateStatus</span><span class="o">.</span><span class="n">CLOSE</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_demand_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the demand positions on the device without actually hitting move.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SafeUndulatorMover.get_timeout">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.SafeUndulatorMover.html#dodal.devices.apple2_undulator.SafeUndulatorMover.get_timeout">[docs]</a>
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the timeout for the move based on an estimate of how long it will take.&quot;&quot;&quot;</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">raise_if_cannot_move</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">fault</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> is in fault state&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">gate</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span> <span class="o">==</span> <span class="n">UndulatorGateStatus</span><span class="o">.</span><span class="n">OPEN</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> is already in motion.&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="UndulatorGap">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.UndulatorGap.html#dodal.devices.apple2_undulator.UndulatorGap">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">UndulatorGap</span><span class="p">(</span><span class="n">SafeUndulatorMover</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A device with a collection of epics signals to set Apple 2 undulator gap motion.</span>
+<span class="sd">    Only PV used by beamline are added the full list is here:</span>
+<span class="sd">    /dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDGapVelocityControl.template</span>
+<span class="sd">    /dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDPhaseSoftMotor.template</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            prefix : str</span>
+<span class="sd">                Beamline specific part of the PV</span>
+<span class="sd">            name : str</span>
+<span class="sd">                Name of the Id device</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Gap demand set point and readback</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_setpoint</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span>
+            <span class="nb">str</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;GAPSET.B&quot;</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;BLGSET&quot;</span>
+        <span class="p">)</span>
+        <span class="c1"># Nothing move until this is set to 1 and it will return to 0 when done</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_move</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;BLGSETP&quot;</span><span class="p">)</span>
+
+        <span class="c1"># These are gap velocity limit.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_velocity</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;BLGSETVEL.HOPR&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_velocity</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;BLGSETVEL.LOPR&quot;</span><span class="p">)</span>
+        <span class="c1"># These are gap limit.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">high_limit_travel</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;BLGAPMTR.HLM&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">low_limit_travel</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;BLGAPMTR.LLM&quot;</span><span class="p">)</span>
+
+        <span class="c1"># This is calculated acceleration from speed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">acceleration_time</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;IDGSETACC&quot;</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">CONFIG_SIGNAL</span><span class="p">):</span>
+            <span class="c1"># Unit</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">motor_egu</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;BLGAPMTR.EGU&quot;</span><span class="p">)</span>
+            <span class="c1"># Gap velocity</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">velocity</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;BLGSETVEL&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">HINTED_SIGNAL</span><span class="p">):</span>
+            <span class="c1"># Gap readback value</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">user_readback</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;CURRGAPD&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">set_move</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_demand_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="n">estimate_motor_timeout</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">user_setpoint</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_readback</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">velocity</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="UndulatorPhaseMotor">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.UndulatorPhaseMotor.html#dodal.devices.apple2_undulator.UndulatorPhaseMotor">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">UndulatorPhaseMotor</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A collection of epics signals for ID phase motion.</span>
+<span class="sd">    Only PV used by beamline are added the full list is here:</span>
+<span class="sd">    /dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDPhaseSoftMotor.template</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">infix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        prefix : str</span>
+<span class="sd">            The setting prefix PV.</span>
+<span class="sd">        infix: str</span>
+<span class="sd">            Collection of pv that are different between beamlines</span>
+<span class="sd">        name : str</span>
+<span class="sd">            Name of the Id phase device</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fullPV</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">BL</span><span class="si">{</span><span class="n">infix</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_setpoint</span> <span class="o">=</span> <span class="n">epics_signal_w</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">fullPV</span> <span class="o">+</span> <span class="s2">&quot;SET&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_setpoint_demand_readback</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">fullPV</span> <span class="o">+</span> <span class="s2">&quot;DMD&quot;</span><span class="p">)</span>
+
+        <span class="n">fullPV</span> <span class="o">=</span> <span class="n">fullPV</span> <span class="o">+</span> <span class="s2">&quot;MTR&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">HINTED_SIGNAL</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">user_setpoint_readback</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">fullPV</span> <span class="o">+</span> <span class="s2">&quot;.RBV&quot;</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">CONFIG_SIGNAL</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">motor_egu</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">fullPV</span> <span class="o">+</span> <span class="s2">&quot;.EGU&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">velocity</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">fullPV</span> <span class="o">+</span> <span class="s2">&quot;.VELO&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_velocity</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">fullPV</span> <span class="o">+</span> <span class="s2">&quot;.VMAX&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">acceleration_time</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">fullPV</span> <span class="o">+</span> <span class="s2">&quot;.ACCL&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">precision</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">fullPV</span> <span class="o">+</span> <span class="s2">&quot;.PREC&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deadband</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">fullPV</span> <span class="o">+</span> <span class="s2">&quot;.RDBD&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">motor_done_move</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">fullPV</span> <span class="o">+</span> <span class="s2">&quot;.DMOV&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">low_limit_travel</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">fullPV</span> <span class="o">+</span> <span class="s2">&quot;.LLM&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">high_limit_travel</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">fullPV</span> <span class="o">+</span> <span class="s2">&quot;.HLM&quot;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="UndulatorPhaseAxes">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.UndulatorPhaseAxes.html#dodal.devices.apple2_undulator.UndulatorPhaseAxes">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">UndulatorPhaseAxes</span><span class="p">(</span><span class="n">SafeUndulatorMover</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A collection of 4 phase Motor to make up the full id phase motion. We are using the diamond pv convention.</span>
+<span class="sd">    e.g. top_outer == Q1</span>
+<span class="sd">         top_inner == Q2</span>
+<span class="sd">         btm_inner == q3</span>
+<span class="sd">         btm_outer == q4</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">top_outer</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">top_inner</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">btm_inner</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">btm_outer</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="c1"># Gap demand set point and readback</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">top_outer</span> <span class="o">=</span> <span class="n">UndulatorPhaseMotor</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span> <span class="n">infix</span><span class="o">=</span><span class="n">top_outer</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">top_inner</span> <span class="o">=</span> <span class="n">UndulatorPhaseMotor</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span> <span class="n">infix</span><span class="o">=</span><span class="n">top_inner</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">btm_inner</span> <span class="o">=</span> <span class="n">UndulatorPhaseMotor</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span> <span class="n">infix</span><span class="o">=</span><span class="n">btm_inner</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">btm_outer</span> <span class="o">=</span> <span class="n">UndulatorPhaseMotor</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span> <span class="n">infix</span><span class="o">=</span><span class="n">btm_outer</span><span class="p">)</span>
+        <span class="c1"># Nothing move until this is set to 1 and it will return to 0 when done.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_move</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">BL</span><span class="si">{</span><span class="n">top_outer</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;MOVE&quot;</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">set_move</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_demand_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Apple2PhasesVal</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">top_outer</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">top_outer</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">top_inner</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">top_inner</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">btm_inner</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">btm_inner</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">btm_outer</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">btm_outer</span><span class="p">),</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="UndulatorPhaseAxes.get_timeout">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.UndulatorPhaseAxes.html#dodal.devices.apple2_undulator.UndulatorPhaseAxes.get_timeout">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get all four motor speed, current positions and target positions to calculate required timeout.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">axes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">top_outer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">top_inner</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">btm_inner</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">btm_outer</span><span class="p">]</span>
+        <span class="n">timeouts</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+            <span class="o">*</span><span class="p">[</span>
+                <span class="n">estimate_motor_timeout</span><span class="p">(</span>
+                    <span class="n">axis</span><span class="o">.</span><span class="n">user_setpoint_demand_readback</span><span class="p">,</span>
+                    <span class="n">axis</span><span class="o">.</span><span class="n">user_setpoint_readback</span><span class="p">,</span>
+                    <span class="n">axis</span><span class="o">.</span><span class="n">velocity</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="n">axes</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">timeouts</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="UndulatorJawPhase">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.UndulatorJawPhase.html#dodal.devices.apple2_undulator.UndulatorJawPhase">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">UndulatorJawPhase</span><span class="p">(</span><span class="n">SafeUndulatorMover</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A JawPhase movable, this is use for moving the jaw phase which is use to control the</span>
+<span class="sd">    linear arbitrary polarisation but only one some of the beamline.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">move_pv</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">jaw_phase</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;JAW&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="c1"># Gap demand set point and readback</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jaw_phase</span> <span class="o">=</span> <span class="n">UndulatorPhaseMotor</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span> <span class="n">infix</span><span class="o">=</span><span class="n">jaw_phase</span><span class="p">)</span>
+        <span class="c1"># Nothing move until this is set to 1 and it will return to 0 when done</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_move</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">BL</span><span class="si">{</span><span class="n">move_pv</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;MOVE&quot;</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">set_move</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_demand_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">jaw_phase</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+
+<div class="viewcode-block" id="UndulatorJawPhase.get_timeout">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.UndulatorJawPhase.html#dodal.devices.apple2_undulator.UndulatorJawPhase.get_timeout">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get motor speed, current position and target position to calculate required timeout.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="n">estimate_motor_timeout</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jaw_phase</span><span class="o">.</span><span class="n">user_setpoint_demand_readback</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jaw_phase</span><span class="o">.</span><span class="n">user_setpoint_readback</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">jaw_phase</span><span class="o">.</span><span class="n">velocity</span><span class="p">,</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Apple2">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.Apple2.html#dodal.devices.apple2_undulator.Apple2">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Apple2</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apple 2 ID/undulator has 4 extra degrees of freedom compare to the standard Undulator,</span>
+<span class="sd">     each bank of magnet can move independently to each other,</span>
+<span class="sd">     which allow the production of different x-ray polarisation as well as energy.</span>
+<span class="sd">     This type of ID is use on I10, I21, I09, I17 and I06 for soft x-ray.</span>
+
+<span class="sd">    A pair of look up tables are needed to provide the conversion between motor position</span>
+<span class="sd">     and energy.</span>
+<span class="sd">    This conversion (update_lookuptable) and the way the id move (set) are two abstract</span>
+<span class="sd">     methods that are beamline specific and need to be implemented.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">id_gap</span><span class="p">:</span> <span class="n">UndulatorGap</span><span class="p">,</span>
+        <span class="n">id_phase</span><span class="p">:</span> <span class="n">UndulatorPhaseAxes</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        id_gap:</span>
+<span class="sd">            An UndulatorGap device.</span>
+<span class="sd">        id_phase:</span>
+<span class="sd">            An UndulatorPhaseAxes device.</span>
+<span class="sd">        prefix:</span>
+<span class="sd">            Not in use but needed for device_instantiation.</span>
+<span class="sd">        name:</span>
+<span class="sd">            Name of the device.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="c1"># Attributes are set after super call so they are not renamed to</span>
+        <span class="c1"># &lt;name&gt;-undulator, etc.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gap</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">id_gap</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">phase</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">id_phase</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">HINTED_SIGNAL</span><span class="p">):</span>
+            <span class="c1"># Store the polarisation for readback.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">polarisation</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_polarisation_set</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span>
+                <span class="nb">str</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="kc">None</span>
+            <span class="p">)</span>
+            <span class="c1"># Store the set energy for readback.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_energy_set</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span>
+                <span class="nb">float</span><span class="p">,</span> <span class="n">initial_value</span><span class="o">=</span><span class="kc">None</span>
+            <span class="p">)</span>
+        <span class="c1"># This store two lookup tables, Gap and Phase in the Lookuptable format</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;Gap&quot;</span><span class="p">:</span> <span class="p">{},</span>
+            <span class="s2">&quot;Phase&quot;</span><span class="p">:</span> <span class="p">{},</span>
+        <span class="p">}</span>
+        <span class="c1"># List of available polarisation according to the lookup table.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_available_pol</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># The polarisation state of the id that are use for internal checking before setting.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pol</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Abstract method that run at start up to load lookup tables into  self.lookup_tables</span>
+<span class="sd">         and set available_pol.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_lookuptable</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pol</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pol</span>
+
+    <span class="nd">@pol</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pol</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="c1"># This set the polarisation but does not actually move hardware.</span>
+        <span class="k">if</span> <span class="n">pol</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_available_pol</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pol</span> <span class="o">=</span> <span class="n">pol</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Polarisation </span><span class="si">{</span><span class="n">pol</span><span class="si">}</span><span class="s2"> is not available:&quot;</span>
+                <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;/n Polarisations available:  </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_available_pol</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Apple2Val</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check ID is in a movable state and set all the demand value before moving.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Only need to check gap as the phase motors share both fault and gate with gap.</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">gap</span><span class="p">()</span><span class="o">.</span><span class="n">raise_if_cannot_move</span><span class="p">()</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">()</span><span class="o">.</span><span class="n">top_outer</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">top_outer</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">()</span><span class="o">.</span><span class="n">top_inner</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">top_inner</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">()</span><span class="o">.</span><span class="n">btm_inner</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">btm_inner</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">()</span><span class="o">.</span><span class="n">btm_outer</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">btm_outer</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gap</span><span class="p">()</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">gap</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">timeout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span>
+            <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gap</span><span class="p">()</span><span class="o">.</span><span class="n">get_timeout</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">()</span><span class="o">.</span><span class="n">get_timeout</span><span class="p">())</span>
+        <span class="p">)</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Moving f</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> energy and polorisation to </span><span class="si">{</span><span class="n">energy</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">pol</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;with motor position </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">, timeout = </span><span class="si">{</span><span class="n">timeout</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gap</span><span class="p">()</span><span class="o">.</span><span class="n">set_move</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">()</span><span class="o">.</span><span class="n">set_move</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gap</span><span class="p">()</span><span class="o">.</span><span class="n">gate</span><span class="p">,</span> <span class="n">UndulatorGateStatus</span><span class="o">.</span><span class="n">CLOSE</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_energy_set</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span>  <span class="c1"># Update energy for after move for readback.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_id_gap_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts energy and polarisation to gap and phase.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">gap_poly</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_poly</span><span class="p">(</span>
+            <span class="n">lookup_table</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="p">[</span><span class="s2">&quot;Gap&quot;</span><span class="p">],</span> <span class="n">new_energy</span><span class="o">=</span><span class="n">energy</span>
+        <span class="p">)</span>
+        <span class="n">phase_poly</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_poly</span><span class="p">(</span>
+            <span class="n">lookup_table</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_tables</span><span class="p">[</span><span class="s2">&quot;Phase&quot;</span><span class="p">],</span> <span class="n">new_energy</span><span class="o">=</span><span class="n">energy</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">gap_poly</span><span class="p">(</span><span class="n">energy</span><span class="p">),</span> <span class="n">phase_poly</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_poly</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">new_energy</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">lookup_table</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">poly1d</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the correct polynomial for a given energy form lookuptable</span>
+<span class="sd">         for any given polarisation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">new_energy</span> <span class="o">&lt;</span> <span class="n">lookup_table</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">pol</span><span class="p">][</span><span class="s2">&quot;Limit&quot;</span><span class="p">][</span><span class="s2">&quot;Minimum&quot;</span><span class="p">]</span>
+            <span class="ow">or</span> <span class="n">new_energy</span> <span class="o">&gt;</span> <span class="n">lookup_table</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">pol</span><span class="p">][</span><span class="s2">&quot;Limit&quot;</span><span class="p">][</span><span class="s2">&quot;Maximum&quot;</span><span class="p">]</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Demanding energy must lie between </span><span class="si">{}</span><span class="s2"> and </span><span class="si">{}</span><span class="s2"> eV!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">lookup_table</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">pol</span><span class="p">][</span><span class="s2">&quot;Limit&quot;</span><span class="p">][</span><span class="s2">&quot;Minimum&quot;</span><span class="p">],</span>
+                    <span class="n">lookup_table</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">pol</span><span class="p">][</span><span class="s2">&quot;Limit&quot;</span><span class="p">][</span><span class="s2">&quot;Maximum&quot;</span><span class="p">],</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">energy_range</span> <span class="ow">in</span> <span class="n">lookup_table</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">pol</span><span class="p">][</span><span class="s2">&quot;Energies&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">new_energy</span> <span class="o">&gt;=</span> <span class="n">energy_range</span><span class="p">[</span><span class="s2">&quot;Low&quot;</span><span class="p">]</span>
+                    <span class="ow">and</span> <span class="n">new_energy</span> <span class="o">&lt;</span> <span class="n">energy_range</span><span class="p">[</span><span class="s2">&quot;High&quot;</span><span class="p">]</span>
+                <span class="p">):</span>
+                    <span class="k">return</span> <span class="n">energy_range</span><span class="p">[</span><span class="s2">&quot;Poly&quot;</span><span class="p">]</span>
+
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Cannot find polynomial coefficients for your requested energy.</span>
+<span class="sd">        There might be gap in the calibration lookup table.&quot;&quot;&quot;</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="Apple2.update_lookuptable">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.Apple2.html#dodal.devices.apple2_undulator.Apple2.update_lookuptable">[docs]</a>
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_lookuptable</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Abstract method to update the stored lookup tabled from file.</span>
+<span class="sd">        This function should include check to ensure the lookuptable is in the correct format:</span>
+<span class="sd">            # ensure the importing lookup table is the correct format</span>
+<span class="sd">            Lookuptable.model_validate(&lt;loockuptable&gt;)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="Apple2.determinePhaseFromHardware">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.Apple2.html#dodal.devices.apple2_undulator.Apple2.determinePhaseFromHardware">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">determinePhaseFromHardware</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Try to determine polarisation and phase value using row phase motor position pattern.</span>
+<span class="sd">        However there is no way to return lh3 polarisation or higher harmonic setting.</span>
+<span class="sd">        (May be for future one can use the inverse poly to work out the energy and try to match it with the current energy</span>
+<span class="sd">        to workout the polarisation but during my test the inverse poly is too unstable for general use.)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">top_outer</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">()</span><span class="o">.</span><span class="n">top_outer</span><span class="o">.</span><span class="n">user_setpoint_readback</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="n">top_inner</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">()</span><span class="o">.</span><span class="n">top_inner</span><span class="o">.</span><span class="n">user_setpoint_readback</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="n">btm_inner</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">()</span><span class="o">.</span><span class="n">btm_inner</span><span class="o">.</span><span class="n">user_setpoint_readback</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="n">btm_outer</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">()</span><span class="o">.</span><span class="n">btm_outer</span><span class="o">.</span><span class="n">user_setpoint_readback</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="n">gap</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">gap</span><span class="p">()</span><span class="o">.</span><span class="n">user_readback</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">gap</span> <span class="o">&gt;</span> <span class="n">MAXIMUM_GAP_MOTOR_POSITION</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> is not in use, close gap or set polarisation to use this ID&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="n">motor_position_equal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="n">top_outer</span><span class="p">,</span> <span class="n">top_inner</span><span class="p">,</span> <span class="n">btm_inner</span><span class="p">,</span> <span class="n">btm_outer</span><span class="p">]</span>
+        <span class="p">):</span>
+            <span class="c1"># Linear Horizontal</span>
+            <span class="n">polarisation</span> <span class="o">=</span> <span class="s2">&quot;lh&quot;</span>
+            <span class="n">phase</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="k">return</span> <span class="n">polarisation</span><span class="p">,</span> <span class="n">phase</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">motor_position_equal</span><span class="p">(</span><span class="n">top_outer</span><span class="p">,</span> <span class="n">MAXIMUM_ROW_PHASE_MOTOR_POSITION</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">motor_position_equal</span><span class="p">(</span><span class="n">top_inner</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">motor_position_equal</span><span class="p">(</span><span class="n">btm_inner</span><span class="p">,</span> <span class="n">MAXIMUM_ROW_PHASE_MOTOR_POSITION</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">motor_position_equal</span><span class="p">(</span><span class="n">btm_outer</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="c1"># Linear Vertical</span>
+            <span class="n">polarisation</span> <span class="o">=</span> <span class="s2">&quot;lv&quot;</span>
+            <span class="n">phase</span> <span class="o">=</span> <span class="n">MAXIMUM_ROW_PHASE_MOTOR_POSITION</span>
+            <span class="k">return</span> <span class="n">polarisation</span><span class="p">,</span> <span class="n">phase</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">motor_position_equal</span><span class="p">(</span><span class="n">top_outer</span><span class="p">,</span> <span class="n">btm_inner</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">top_outer</span> <span class="o">&gt;</span> <span class="mf">0.0</span>
+            <span class="ow">and</span> <span class="n">motor_position_equal</span><span class="p">(</span><span class="n">top_inner</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">motor_position_equal</span><span class="p">(</span><span class="n">btm_outer</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="c1"># Positive Circular</span>
+            <span class="n">polarisation</span> <span class="o">=</span> <span class="s2">&quot;pc&quot;</span>
+            <span class="n">phase</span> <span class="o">=</span> <span class="n">top_outer</span>
+            <span class="k">return</span> <span class="n">polarisation</span><span class="p">,</span> <span class="n">phase</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">motor_position_equal</span><span class="p">(</span><span class="n">top_outer</span><span class="p">,</span> <span class="n">btm_inner</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">top_outer</span> <span class="o">&lt;</span> <span class="mf">0.0</span>
+            <span class="ow">and</span> <span class="n">motor_position_equal</span><span class="p">(</span><span class="n">top_inner</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">motor_position_equal</span><span class="p">(</span><span class="n">btm_outer</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="c1"># Negative Circular</span>
+            <span class="n">polarisation</span> <span class="o">=</span> <span class="s2">&quot;nc&quot;</span>
+            <span class="n">phase</span> <span class="o">=</span> <span class="n">top_outer</span>
+            <span class="k">return</span> <span class="n">polarisation</span><span class="p">,</span> <span class="n">phase</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">motor_position_equal</span><span class="p">(</span><span class="n">top_outer</span><span class="p">,</span> <span class="o">-</span><span class="n">btm_inner</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">motor_position_equal</span><span class="p">(</span><span class="n">top_inner</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">motor_position_equal</span><span class="p">(</span><span class="n">btm_outer</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="c1"># Positive Linear Arbitrary</span>
+            <span class="n">polarisation</span> <span class="o">=</span> <span class="s2">&quot;la&quot;</span>
+            <span class="n">phase</span> <span class="o">=</span> <span class="n">top_outer</span>
+            <span class="k">return</span> <span class="n">polarisation</span><span class="p">,</span> <span class="n">phase</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">motor_position_equal</span><span class="p">(</span><span class="n">top_inner</span><span class="p">,</span> <span class="o">-</span><span class="n">btm_outer</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">motor_position_equal</span><span class="p">(</span><span class="n">top_outer</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">motor_position_equal</span><span class="p">(</span><span class="n">btm_inner</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="c1"># Negative Linear Arbitrary</span>
+            <span class="n">polarisation</span> <span class="o">=</span> <span class="s2">&quot;la&quot;</span>
+            <span class="n">phase</span> <span class="o">=</span> <span class="n">top_inner</span>
+            <span class="k">return</span> <span class="n">polarisation</span><span class="p">,</span> <span class="n">phase</span>
+        <span class="c1"># UNKNOWN default</span>
+        <span class="n">polarisation</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">phase</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">polarisation</span><span class="p">,</span> <span class="n">phase</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="motor_position_equal">
+<a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.html#dodal.devices.apple2_undulator.motor_position_equal">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">motor_position_equal</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check motor is within tolerance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">ROW_PHASE_MOTOR_TOLERANCE</span></div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

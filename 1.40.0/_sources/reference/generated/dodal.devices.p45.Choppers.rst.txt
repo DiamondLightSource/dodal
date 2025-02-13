@@ -1,0 +1,40 @@
+dodal.devices.p45.Choppers
+==========================
+
+.. currentmodule:: dodal.devices.p45
+
+.. autoclass:: Choppers
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

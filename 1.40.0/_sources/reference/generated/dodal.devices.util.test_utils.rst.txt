@@ -1,0 +1,33 @@
+dodal.devices.util.test\_utils
+==============================
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.devices.util.test_utils
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      patch_motor
+   
+   
+
+   
+   
+   
