@@ -15,6 +15,7 @@ dodal.devices.robot
    :recursive:
 
    ~robot.BartRobot
+   ~robot.ErrorStatus
    ~robot.PinMounted
    ~robot.SampleLocation
 

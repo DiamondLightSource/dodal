@@ -39,6 +39,9 @@ dodal.devices.robot.BartRobot
    .. autosummary::
    
       
+      ~BartRobot.LIGHT_CURTAIN_TRIPPED
+      
+      
       ~BartRobot.LOAD_TIMEOUT
       
       
