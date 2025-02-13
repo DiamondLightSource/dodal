@@ -9,7 +9,7 @@ from dodal.common.beamlines.beamline_utils import (
     set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.beamlines.device_helpers import HDF5_PREFIX
+from dodal.common.beamlines.device_helpers import HDF5_SUFFIX
 from dodal.common.crystal_metadata import (
     MaterialsEnum,
     make_crystal_metadata_from_material,
@@ -52,7 +52,7 @@ def d3() -> AravisDetector:
         f"{PREFIX.beamline_prefix}-DI-DCAM-01:",
         path_provider=get_path_provider(),
         drv_suffix="DET:",
-        hdf_suffix=HDF5_PREFIX,
+        fileio_suffix=HDF5_SUFFIX,
     )
 
 
@@ -63,7 +63,7 @@ def d11() -> AravisDetector:
         f"{PREFIX.beamline_prefix}-DI-DCAM-03:",
         path_provider=get_path_provider(),
         drv_suffix="DET:",
-        hdf_suffix=HDF5_PREFIX,
+        fileio_suffix=HDF5_SUFFIX,
     )
 
 
@@ -73,7 +73,7 @@ def d12() -> AravisDetector:
         f"{PREFIX.beamline_prefix}-DI-DCAM-04:",
         path_provider=get_path_provider(),
         drv_suffix="DET:",
-        hdf_suffix=HDF5_PREFIX,
+        fileio_suffix=HDF5_SUFFIX,
     )
 
 
