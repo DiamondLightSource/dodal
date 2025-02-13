@@ -4,7 +4,7 @@ from typing import Literal
 
 from aiohttp import ClientSession
 from ophyd_async.core import FilenameProvider, PathInfo
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from dodal.common.types import UpdatingPathProvider
 from dodal.log import LOGGER
@@ -150,3 +150,69 @@ class StaticVisitPathProvider(UpdatingPathProvider):
         return PathInfo(
             directory_path=self._root, filename=self._filename_provider(device_name)
         )
+
+
+class NumtrackerNewScanVisit(BaseModel):
+    beamline: str
+    directory: Path
+
+
+class NumtrackerNewScanScan(BaseModel):
+    scan_file: str = Field(alias="scanFile")
+    scan_number: int = Field(alias="scanNumber")
+    visit: NumtrackerNewScanVisit
+
+
+class NumtrackerNewScan(BaseModel):
+    scan: NumtrackerNewScanScan
+
+
+class NumtrackerPathProvider(UpdatingPathProvider):
+    def __init__(self, visit: str, beamline: str, numtracker_url: str) -> None:
+        self._visit = visit
+        self._beamline = beamline
+        self._numtracker_url = numtracker_url
+        self._cached_response: NumtrackerNewScan | None = None
+
+    async def data_session(self) -> str:
+        if self._cached_response is None:
+            raise KeyError()
+        return f"{self._beamline}-{self._cached_response.scan.scan_number}"
+
+    async def update(self, **__) -> None:
+        query = {
+            "query": f'mutation{{scan(beamline: "{self._beamline}", visit: "{self._visit}") {{scanFile scanNumber visit{{beamline directory}}}}}}'
+        }
+
+        async with (
+            ClientSession() as session,
+            session.request("POST", self._numtracker_url, json=query) as response,
+        ):
+            response.raise_for_status()
+            json = await response.json()
+            print(json)
+            new_collection = NumtrackerNewScan.model_validate(json["data"])
+            LOGGER.debug("New NumtrackerNewScan: %s", new_collection)
+            self._cached_response = new_collection
+
+    def __call__(self, device_name: str | None = None) -> PathInfo:
+        if device_name is None:
+            raise KeyError("Must call PathProvider with device_name")
+        elif self._cached_response is None:
+            raise KeyError()
+
+        filename = f"{self._cached_response.scan.scan_file}-{device_name}"
+        return PathInfo(
+            directory_path=self._cached_response.scan.visit.directory,
+            filename=filename,
+        )
+
+
+if __name__ == "__main__":
+    import asyncio
+    import pprint
+
+    p = NumtrackerPathProvider("cm12345", "i22", "http://localhost:8000/graphql")
+    asyncio.run(p.update())
+    path_info = p("saxs")
+    pprint.pprint(path_info)
