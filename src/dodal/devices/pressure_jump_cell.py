@@ -76,6 +76,52 @@ class AllValvesControlState:
     valve_6: FastValveControlRequest | None = None
 
 
+class ValveControlBase(StandardReadable, Movable):
+    @AsyncStatus.wrap
+    async def _set_open_seq(self):
+        await self.set(ValveOpenSeqRequest.OPEN_SEQ)
+        await asyncio.sleep(OPENSEQ_PULSE_LENGTH)
+        await self.set(ValveOpenSeqRequest.INACTIVE)
+
+
+class ValveControl(ValveControlBase):
+    def __init__(self, prefix: str, name: str = "") -> None:
+        with self.add_children_as_readables():
+            self.close = epics_signal_rw(ValveControlRequest, prefix + ":CON")
+            self.open = epics_signal_rw(int, prefix + ":OPENSEQ")
+
+        super().__init__(name)
+
+    def set(self, value: ValveControlRequest) -> AsyncStatus:
+        set_status = None
+
+        if value == ValveControlRequest.OPEN:
+            set_status = self._set_open_seq()
+        else:
+            set_status = self.close.set(value)
+
+        return set_status
+
+
+class FastValveControl(ValveControlBase):
+    def __init__(self, prefix: str, name: str = "") -> None:
+        with self.add_children_as_readables():
+            self.close = epics_signal_rw(FastValveControlRequest, prefix + ":CON")
+            self.open = epics_signal_rw(int, prefix + ":OPENSEQ")
+
+        super().__init__(name)
+
+    def set(self, value: FastValveControlRequest) -> AsyncStatus:
+        set_status = None
+
+        if value == FastValveControlRequest.OPEN:
+            set_status = self._set_open_seq()
+        else:
+            set_status = self.close.set(value)
+
+        return set_status
+
+
 class AllValvesControl(StandardReadable, Movable):
     """
     valves 2, 4, 7, 8 are not controlled by the IOC,
@@ -119,26 +165,17 @@ class AllValvesControl(StandardReadable, Movable):
 
         super().__init__(name)
 
+
     async def set_valve(
         self,
         valve: int,
         value: ValveControlRequest | FastValveControlRequest,
     ):
         if valve in self.slow_valves and (isinstance(value, ValveControlRequest)):
-            if value == ValveControlRequest.OPEN:
-                await self.valve_control[valve].set(ValveOpenSeqRequest.OPEN_SEQ)
-                await asyncio.sleep(OPENSEQ_PULSE_LENGTH)
-                await self.valve_control[valve].set(ValveOpenSeqRequest.INACTIVE)
-            else:
-                await self.valve_control[valve].set(value)
+            await self.valve_control[valve].set(value)
 
         elif valve in self.fast_valves and (isinstance(value, FastValveControlRequest)):
-            if value == FastValveControlRequest.OPEN:
-                await self.fast_valve_control[valve].set(ValveOpenSeqRequest.OPEN_SEQ)
-                await asyncio.sleep(OPENSEQ_PULSE_LENGTH)
-                await self.fast_valve_control[valve].set(ValveOpenSeqRequest.INACTIVE)
-            else:
-                await self.fast_valve_control[valve].set(value)
+            await self.fast_valve_control[valve].set(value)
 
     @AsyncStatus.wrap
     async def set(self, value: AllValvesControlState):
@@ -149,44 +186,6 @@ class AllValvesControl(StandardReadable, Movable):
                 if value is not None
             )
         )
-
-
-class ValveControl(StandardReadable, Movable):
-    def __init__(self, prefix: str, name: str = "") -> None:
-        with self.add_children_as_readables():
-            self.close = epics_signal_rw(ValveControlRequest, prefix + ":CON")
-            self.open = epics_signal_rw(int, prefix + ":OPENSEQ")
-
-        super().__init__(name)
-
-    def set(self, value: ValveControlRequest | ValveOpenSeqRequest) -> AsyncStatus:
-        set_status = None
-
-        if isinstance(value, ValveControlRequest):
-            set_status = self.close.set(value)
-        elif isinstance(value, ValveOpenSeqRequest):
-            set_status = self.open.set(value.value)
-
-        return set_status
-
-
-class FastValveControl(StandardReadable, Movable):
-    def __init__(self, prefix: str, name: str = "") -> None:
-        with self.add_children_as_readables():
-            self.close = epics_signal_rw(FastValveControlRequest, prefix + ":CON")
-            self.open = epics_signal_rw(int, prefix + ":OPENSEQ")
-
-        super().__init__(name)
-
-    def set(self, value: FastValveControlRequest | ValveOpenSeqRequest) -> AsyncStatus:
-        set_status = None
-
-        if isinstance(value, FastValveControlRequest):
-            set_status = self.close.set(value)
-        elif isinstance(value, ValveOpenSeqRequest):
-            set_status = self.open.set(value.value)
-
-        return set_status
 
 
 class Pump(StandardReadable):
