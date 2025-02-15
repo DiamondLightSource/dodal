@@ -13,6 +13,7 @@ from dodal.devices.pressure_jump_cell import (
     ValveControlRequest,
     ValveOpenSeqRequest,
     ValveState,
+    OPENSEQ_PULSE_LENGTH
 )
 
 
@@ -142,42 +143,47 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
     await cell.all_valves_control.set_valve(1, ValveControlRequest.CLOSE)
     await cell.all_valves_control.set_valve(6, FastValveControlRequest.ARM)
 
-    await asyncio.gather(
+    opening_status = asyncio.gather(
         cell.all_valves_control.set_valve(1, ValveControlRequest.OPEN),
         cell.all_valves_control.set_valve(6, FastValveControlRequest.OPEN),
-        # Check valves requested to open are set to OPEN_SEQ on initially calling
-        # set_valve()
-        assert_reading(
-            cell.all_valves_control.valve_control[1],
-            {
-                "pjump-all_valves_control-valve_control-1-open": {
-                    "value": int(ValveOpenSeqRequest.OPEN_SEQ.value),
-                    "timestamp": ANY,
-                    "alarm_severity": 0,
-                },
-                "pjump-all_valves_control-valve_control-1-close": {
-                    "value": ANY,
-                    "timestamp": ANY,
-                    "alarm_severity": 0,
-                },
-            },
-        ),
-        assert_reading(
-            cell.all_valves_control.fast_valve_control[6],
-            {
-                "pjump-all_valves_control-fast_valve_control-6-open": {
-                    "value": int(ValveOpenSeqRequest.OPEN_SEQ.value),
-                    "timestamp": ANY,
-                    "alarm_severity": 0,
-                },
-                "pjump-all_valves_control-fast_valve_control-6-close": {
-                    "value": ANY,
-                    "timestamp": ANY,
-                    "alarm_severity": 0,
-                },
-            },
-        ),
     )
+
+    # During openseq pulse
+    await asyncio.sleep(OPENSEQ_PULSE_LENGTH/2)
+
+    #Check valves requested to open are set to OPEN_SEQ after calling set_valve()
+    await assert_reading(
+        cell.all_valves_control.valve_control[1],
+        {
+            "pjump-all_valves_control-valve_control-1-open": {
+                "value": int(ValveOpenSeqRequest.OPEN_SEQ.value),
+                "timestamp": ANY,
+                "alarm_severity": 0,
+            },
+            "pjump-all_valves_control-valve_control-1-close": {
+                "value": ValveControlRequest.CLOSE,
+                "timestamp": ANY,
+                "alarm_severity": 0,
+            },
+        },
+    )
+    await assert_reading(
+        cell.all_valves_control.fast_valve_control[6],
+        {
+            "pjump-all_valves_control-fast_valve_control-6-open": {
+                "value": int(ValveOpenSeqRequest.OPEN_SEQ.value),
+                "timestamp": ANY,
+                "alarm_severity": 0,
+            },
+            "pjump-all_valves_control-fast_valve_control-6-close": {
+                "value": FastValveControlRequest.ARM,
+                "timestamp": ANY,
+                "alarm_severity": 0,
+            },
+        },
+    )
+    # After openseq pulse
+    await opening_status
 
     # Check slow valves have been set to the new value and valves requested to open are
     # set to INACTIVE after set_valve() completes
@@ -202,13 +208,13 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
     await assert_reading(
         cell.all_valves_control.fast_valve_control[6],
         {
-            "pjump-all_valves_control-fast_valve_control-6-close": {
-                "value": FastValveControlRequest.ARM,
+            "pjump-all_valves_control-fast_valve_control-6-open": {
+                "value": int(ValveOpenSeqRequest.INACTIVE.value),
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
-            "pjump-all_valves_control-fast_valve_control-6-open": {
-                "value": int(ValveOpenSeqRequest.INACTIVE.value),
+            "pjump-all_valves_control-fast_valve_control-6-close": {
+                "value": FastValveControlRequest.ARM,
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
