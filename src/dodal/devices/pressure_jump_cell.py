@@ -9,6 +9,7 @@ from ophyd_async.core import (
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
+    SignalRW,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
@@ -77,11 +78,13 @@ class AllValvesControlState:
 
 
 class ValveControlBase(StandardReadable, Movable):
+    open: SignalRW[ValveControlRequest|FastValveControlRequest|int]
+    close: SignalRW[ValveControlRequest|FastValveControlRequest|int]
     @AsyncStatus.wrap
     async def _set_open_seq(self):
-        await self.set(ValveOpenSeqRequest.OPEN_SEQ)
+        await self.open.set(ValveOpenSeqRequest.OPEN_SEQ.value)
         await asyncio.sleep(OPENSEQ_PULSE_LENGTH)
-        await self.set(ValveOpenSeqRequest.INACTIVE)
+        await self.open.set(ValveOpenSeqRequest.INACTIVE.value)
 
 
 class ValveControl(ValveControlBase):
