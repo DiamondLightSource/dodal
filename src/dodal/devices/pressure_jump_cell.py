@@ -1,11 +1,12 @@
 import asyncio
-from dataclasses import dataclass
+from collections.abc import Mapping
 
 from bluesky.protocols import HasName, Movable
 from ophyd_async.core import (
     AsyncStatus,
     DeviceVector,
     SignalR,
+    SignalRW,
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
@@ -68,12 +69,53 @@ class FastValveState(StrictEnum):
     NONE = "Unused"
 
 
-@dataclass
-class AllValvesControlState:
-    valve_1: ValveControlRequest | None = None
-    valve_3: ValveControlRequest | None = None
-    valve_5: FastValveControlRequest | None = None
-    valve_6: FastValveControlRequest | None = None
+class ValveControlBase(StandardReadable, Movable):
+    open: SignalRW[ValveControlRequest | FastValveControlRequest | int]
+    close: SignalRW[ValveControlRequest | FastValveControlRequest | int]
+
+    @AsyncStatus.wrap
+    async def _set_open_seq(self):
+        await self.open.set(ValveOpenSeqRequest.OPEN_SEQ.value)
+        await asyncio.sleep(OPENSEQ_PULSE_LENGTH)
+        await self.open.set(ValveOpenSeqRequest.INACTIVE.value)
+
+
+class ValveControl(ValveControlBase):
+    def __init__(self, prefix: str, name: str = "") -> None:
+        with self.add_children_as_readables():
+            self.close = epics_signal_rw(ValveControlRequest, prefix + ":CON")
+            self.open = epics_signal_rw(int, prefix + ":OPENSEQ")
+
+        super().__init__(name)
+
+    def set(self, value: ValveControlRequest) -> AsyncStatus:
+        set_status = None
+
+        if value == ValveControlRequest.OPEN:
+            set_status = self._set_open_seq()
+        else:
+            set_status = self.close.set(value)
+
+        return set_status
+
+
+class FastValveControl(ValveControlBase):
+    def __init__(self, prefix: str, name: str = "") -> None:
+        with self.add_children_as_readables():
+            self.close = epics_signal_rw(FastValveControlRequest, prefix + ":CON")
+            self.open = epics_signal_rw(int, prefix + ":OPENSEQ")
+
+        super().__init__(name)
+
+    def set(self, value: FastValveControlRequest) -> AsyncStatus:
+        set_status = None
+
+        if value == FastValveControlRequest.OPEN:
+            set_status = self._set_open_seq()
+        else:
+            set_status = self.close.set(value)
+
+        return set_status
 
 
 class AllValvesControl(StandardReadable, Movable):
@@ -125,68 +167,21 @@ class AllValvesControl(StandardReadable, Movable):
         value: ValveControlRequest | FastValveControlRequest,
     ):
         if valve in self.slow_valves and (isinstance(value, ValveControlRequest)):
-            if value == ValveControlRequest.OPEN:
-                await self.valve_control[valve].set(ValveOpenSeqRequest.OPEN_SEQ)
-                await asyncio.sleep(OPENSEQ_PULSE_LENGTH)
-                await self.valve_control[valve].set(ValveOpenSeqRequest.INACTIVE)
-            else:
-                await self.valve_control[valve].set(value)
+            await self.valve_control[valve].set(value)
 
         elif valve in self.fast_valves and (isinstance(value, FastValveControlRequest)):
-            if value == FastValveControlRequest.OPEN:
-                await self.fast_valve_control[valve].set(ValveOpenSeqRequest.OPEN_SEQ)
-                await asyncio.sleep(OPENSEQ_PULSE_LENGTH)
-                await self.fast_valve_control[valve].set(ValveOpenSeqRequest.INACTIVE)
-            else:
-                await self.fast_valve_control[valve].set(value)
+            await self.fast_valve_control[valve].set(value)
 
     @AsyncStatus.wrap
-    async def set(self, value: AllValvesControlState):
+    async def set(
+        self, value: Mapping[int, ValveControlRequest | FastValveControlRequest]
+    ):
         await asyncio.gather(
             *(
-                self.set_valve(int(i[-1]), value)
-                for i, value in value.__dict__.items()
-                if value is not None
+                self.set_valve(valve_number, value[valve_number])
+                for valve_number in value
             )
         )
-
-
-class ValveControl(StandardReadable, Movable):
-    def __init__(self, prefix: str, name: str = "") -> None:
-        with self.add_children_as_readables():
-            self.close = epics_signal_rw(ValveControlRequest, prefix + ":CON")
-            self.open = epics_signal_rw(int, prefix + ":OPENSEQ")
-
-        super().__init__(name)
-
-    def set(self, value: ValveControlRequest | ValveOpenSeqRequest) -> AsyncStatus:
-        set_status = None
-
-        if isinstance(value, ValveControlRequest):
-            set_status = self.close.set(value)
-        elif isinstance(value, ValveOpenSeqRequest):
-            set_status = self.open.set(value.value)
-
-        return set_status
-
-
-class FastValveControl(StandardReadable, Movable):
-    def __init__(self, prefix: str, name: str = "") -> None:
-        with self.add_children_as_readables():
-            self.close = epics_signal_rw(FastValveControlRequest, prefix + ":CON")
-            self.open = epics_signal_rw(int, prefix + ":OPENSEQ")
-
-        super().__init__(name)
-
-    def set(self, value: FastValveControlRequest | ValveOpenSeqRequest) -> AsyncStatus:
-        set_status = None
-
-        if isinstance(value, FastValveControlRequest):
-            set_status = self.close.set(value)
-        elif isinstance(value, ValveOpenSeqRequest):
-            set_status = self.open.set(value.value)
-
-        return set_status
 
 
 class Pump(StandardReadable):
