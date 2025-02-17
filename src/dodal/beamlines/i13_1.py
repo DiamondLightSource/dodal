@@ -8,7 +8,9 @@ from dodal.common.beamlines.beamline_utils import (
     set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.visit import StaticVisitPathProvider
+from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
+from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
+from dodal.devices.i13_1.merlin import Merlin
 from dodal.devices.motors import XYZPositioner
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import get_beamline_name
@@ -19,7 +21,8 @@ set_utils_beamline(BL)
 set_path_provider(
     StaticVisitPathProvider(
         BL,
-        Path("/data/2024/cm37257-4/"),  # latest commissioning visit
+        Path("/dls/i13-1/data/2024/cm37257-5/tmp/"),  # latest commissioning visit
+        client=LocalDirectoryServiceClient(),
     )
 )
 
@@ -58,8 +61,24 @@ def side_camera(
         prefix="BL13J-OP-FLOAT-03:",
         name="side_camera",
         bl_prefix=False,
-        drv_suffix="CAM:",
-        hdf_suffix="HDF5:",
+        drv_suffix=CAM_SUFFIX,
+        fileio_suffix=HDF5_SUFFIX,
+        path_provider=get_path_provider(),
+        wait=wait_for_connection,
+        fake=fake_with_ophyd_sim,
+    )
+
+
+def merlin(
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+) -> Merlin:
+    return device_instantiation(
+        Merlin,
+        prefix="BL13J-EA-DET-04:",
+        name="merlin",
+        bl_prefix=False,
+        drv_suffix=CAM_SUFFIX,
+        fileio_suffix=HDF5_SUFFIX,
         path_provider=get_path_provider(),
         wait=wait_for_connection,
         fake=fake_with_ophyd_sim,

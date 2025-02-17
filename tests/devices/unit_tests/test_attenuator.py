@@ -3,32 +3,36 @@ import asyncio
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import init_devices
 from ophyd_async.testing import callback_on_mock_put, set_mock_value
 
-from dodal.devices.attenuator import Attenuator
+from dodal.devices.attenuator.attenuator import BinaryFilterAttenuator
 
 CALCULATED_VALUE = [True, False, True] * 6  # Some "random" values
 
 
 @pytest.fixture
 async def fake_attenuator():
-    async with DeviceCollector(mock=True):
-        fake_attenuator: Attenuator = Attenuator("", "attenuator")
+    async with init_devices(mock=True):
+        fake_attenuator: BinaryFilterAttenuator = BinaryFilterAttenuator(
+            "", "attenuator"
+        )
 
     return fake_attenuator
 
 
-async def test_set_transmission_success(fake_attenuator: Attenuator):
+async def test_set_transmission_success(fake_attenuator: BinaryFilterAttenuator):
     await fake_attenuator.set(1.0)
 
 
-def test_set_transmission_in_run_engine(fake_attenuator: Attenuator, RE: RunEngine):
+def test_set_transmission_in_run_engine(
+    fake_attenuator: BinaryFilterAttenuator, RE: RunEngine
+):
     RE(bps.abs_set(fake_attenuator, 1, wait=True))
 
 
 async def test_given_attenuator_sets_filters_to_expected_value_then_set_returns(
-    fake_attenuator: Attenuator,
+    fake_attenuator: BinaryFilterAttenuator,
 ):
     def mock_apply_values(*args, **kwargs):
         for i in range(16):
@@ -43,7 +47,7 @@ async def test_given_attenuator_sets_filters_to_expected_value_then_set_returns(
 
 
 async def test_given_attenuator_fails_to_set_filters_then_set_timeout(
-    fake_attenuator: Attenuator,
+    fake_attenuator: BinaryFilterAttenuator,
 ):
     def mock_apply_values(*args, **kwargs):
         for i in range(16):

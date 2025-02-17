@@ -2,10 +2,10 @@ from unittest.mock import ANY, call, patch
 
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import init_devices
 from ophyd_async.testing import get_mock_put
 
-from dodal.devices.bimorph_mirror import BimorphMirror
+from dodal.devices.bimorph_mirror import BimorphMirror, BimorphMirrorStatus
 
 VALID_BIMORPH_CHANNELS = [8, 12, 16, 24]
 
@@ -14,7 +14,7 @@ VALID_BIMORPH_CHANNELS = [8, 12, 16, 24]
 def mirror(request, RE: RunEngine) -> BimorphMirror:
     number_of_channels = request.param
 
-    with DeviceCollector(mock=True):
+    with init_devices(mock=True):
         bm = BimorphMirror(
             prefix="FAKE-PREFIX:",
             number_of_channels=number_of_channels,
@@ -78,10 +78,14 @@ async def test_set_channels_waits_for_vout_readback(
 
         await mirror.set(valid_bimorph_values)
 
-        assert [
+        expected_call_arg_list = [
             call(mirror.channels[i].output_voltage, ANY, timeout=ANY)
             for i, val in valid_bimorph_values.items()
-        ] == mock_wait_for_value.call_args_list
+        ]
+        expected_call_arg_list.append(
+            call(mirror.status, BimorphMirrorStatus.IDLE, timeout=ANY)
+        )
+        assert expected_call_arg_list == mock_wait_for_value.call_args_list
 
 
 @pytest.mark.parametrize("mirror", VALID_BIMORPH_CHANNELS, indirect=True)
@@ -148,3 +152,16 @@ async def test_init_mirror_with_invalid_channels_throws_error(number_of_channels
 async def test_init_mirror_with_zero_channels(number_of_channels):
     mirror = BimorphMirror(prefix="FAKE-PREFIX", number_of_channels=number_of_channels)
     assert len(mirror.channels) == 0
+
+
+@pytest.mark.parametrize("mirror", VALID_BIMORPH_CHANNELS, indirect=True)
+async def test_bimorph_mirror_channel_set(
+    mirror: BimorphMirror,
+    valid_bimorph_values: dict[int, float],
+):
+    for value, channel in zip(
+        valid_bimorph_values.values(), mirror.channels.values(), strict=True
+    ):
+        assert await channel.output_voltage.get_value() != value
+        await channel.set(value)
+        assert await channel.output_voltage.get_value() == value

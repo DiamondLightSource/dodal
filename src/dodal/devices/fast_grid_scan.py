@@ -1,3 +1,4 @@
+import asyncio
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 
@@ -9,9 +10,7 @@ from ophyd_async.core import (
     AsyncStatus,
     Device,
     Signal,
-    SignalR,
     SignalRW,
-    SoftSignalBackend,
     StandardReadable,
     wait_for_value,
 )
@@ -24,6 +23,7 @@ from ophyd_async.epics.core import (
 from pydantic import field_validator
 from pydantic.dataclasses import dataclass
 
+from dodal.common.signal_utils import create_hardware_backed_soft_signal
 from dodal.log import LOGGER
 from dodal.parameters.experiment_parameter_base import AbstractExperimentWithBeamParams
 
@@ -45,8 +45,19 @@ class GridAxis:
         # refering to the first position
         return self.steps_to_motor_position(self.full_steps - 1)
 
-    def is_within(self, steps):
-        return 0 <= steps <= self.full_steps
+    def is_within(self, steps: float):
+        """
+        Determine whether a single axis coordinate is within the grid.
+        The coordinate is from a continuous coordinate space based on the
+        XRC grid where the origin corresponds to the centre of the first grid box.
+
+        Args:
+            steps: The coordinate to check
+
+        Returns:
+            True if the coordinate falls within the grid.
+        """
+        return -0.5 <= steps <= self.full_steps - 0.5
 
 
 class GridScanParamsCommon(AbstractExperimentWithBeamParams):
@@ -159,21 +170,6 @@ class MotionProgram(Device):
         self.program_number = epics_signal_r(float, prefix + "CS1:PROG_NUM")
 
 
-class ExpectedImages(SignalR[int]):
-    def __init__(self, parent: "FastGridScanCommon") -> None:
-        super().__init__(SoftSignalBackend(int))
-        self.parent = parent
-
-    async def get_value(self, cached: bool | None = None):
-        assert isinstance(self.parent, FastGridScanCommon)
-        x = await self.parent.x_steps.get_value()
-        y = await self.parent.y_steps.get_value()
-        z = await self.parent.z_steps.get_value()
-        first_grid = x * y
-        second_grid = x * z
-        return first_grid + second_grid
-
-
 class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
     """Device for a general fast grid scan
 
@@ -206,7 +202,9 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
         self.run_cmd = epics_signal_x(f"{prefix}RUN.PROC")
         self.status = epics_signal_r(int, f"{prefix}SCAN_STATUS")
 
-        self.expected_images = ExpectedImages(parent=self)
+        self.expected_images = create_hardware_backed_soft_signal(
+            float, self._calculate_expected_images
+        )
 
         self.motion_program = MotionProgram(smargon_prefix)
 
@@ -231,6 +229,17 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
             "z2_start_mm": self.z2_start,
         }
         super().__init__(name)
+
+    async def _calculate_expected_images(self):
+        x, y, z = await asyncio.gather(
+            self.x_steps.get_value(),
+            self.y_steps.get_value(),
+            self.z_steps.get_value(),
+        )
+        LOGGER.info(f"Reading num of images found {x, y, z} images in each axis")
+        first_grid = x * y
+        second_grid = x * z
+        return first_grid + second_grid
 
     @AsyncStatus.wrap
     async def kickoff(self):
