@@ -72,3 +72,6 @@ def set_odin_pvs(
     yield from bps.abs_set(
         eiger.odin.file_name, detector_params.full_filename, group=group
     )
+
+    if wait:
+        yield from bps.wait(group)
