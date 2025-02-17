@@ -1,16 +1,25 @@
 import bluesky.plan_stubs as bps
-from ophyd_async.epics.eiger import EigerDetector
+from ophyd_async.epics.eiger import EigerDetector, EigerTriggerInfo
 
 from dodal.devices.detector import DetectorParams
 
 
 def load_metadata(
-    eiger: EigerDetector, energy: float, enable: bool, detector_params: DetectorParams
+    eiger: EigerDetector,
+    enable: bool,
+    detector_params: DetectorParams,
 ):
+    assert detector_params.expected_energy_ev
     yield from change_roi_mode(eiger, enable, detector_params)
-    yield from bps.abs_set(eiger.drv.photon_energy, energy)
     yield from bps.abs_set(eiger.odin.num_frames_chunks, 1)
     yield from set_mx_settings_pvs(eiger, detector_params, wait=True)
+
+    trigger_info = EigerTriggerInfo(
+        number_of_triggers=detector_params.num_triggers,
+        energy_ev=detector_params.expected_energy_ev,
+    )
+
+    yield from bps.prepare(eiger, trigger_info)
 
 
 def change_roi_mode(
