@@ -3,6 +3,7 @@ from enum import Enum
 from typing import Any
 
 import bluesky.plan_stubs as bps
+import bluesky.preprocessors as bpp
 from bluesky.preprocessors import stage_decorator
 from bluesky.protocols import Readable
 from numpy import linspace
@@ -132,7 +133,6 @@ def bimorph_optimisation(
         bimorph_settle_time: float time in seconds to wait after bimorph move
         initial_voltage_list: optional list[float] starting voltages for bimorph (defaults to current voltages)
     """
-    outer_uid = yield from bps.open_run()
     state = yield from capture_bimorph_state(mirror, slits)
 
     # If a starting set of voltages is not provided, default to current:
@@ -150,10 +150,12 @@ def bimorph_optimisation(
         slits, inactive_dimension, inactive_slit_size, inactive_slit_center
     )
 
+    @bpp.set_run_key_decorator(f"outer_key_{0}")
     @stage_decorator((*(detectors), slits, mirror))
-    def outer():
+    def outer_scan():
         """Outer plan stub, which moves mirror and calls inner_scan."""
-        yield from inner_scan(
+        outer_uid = yield from bps.open_run()
+        inner = inner_scan(
             detectors,
             mirror,
             slits,
@@ -162,13 +164,19 @@ def bimorph_optimisation(
             active_slit_center_end,
             active_slit_size,
             number_of_slit_positions,
-            run_metadata={"outer_uid": outer_uid, "bimorph_position_index": 0},
+            run_metadata={
+                # "run_key": f"inner_key_{0}",
+                "outer_uid": outer_uid,
+                "bimorph_position_index": 0,
+            },
         )
+        yield from bpp.set_run_key_wrapper(inner, f"inner_key_{0}")
+
         for i, channel in enumerate(mirror.channels.values()):
             yield from bps.mv(channel, initial_voltage_list[i] + voltage_increment)  # type: ignore
             yield from bps.sleep(bimorph_settle_time)
 
-            yield from inner_scan(
+            inner = inner_scan(
                 detectors,
                 mirror,
                 slits,
@@ -177,14 +185,19 @@ def bimorph_optimisation(
                 active_slit_center_end,
                 active_slit_size,
                 number_of_slit_positions,
-                run_metadata={"outer_uid": outer_uid, "bimorph_position_index": i + 1},
+                run_metadata={
+                    # "run_key": f"inner_key_{i + 1}",
+                    "outer_uid": outer_uid,
+                    "bimorph_position_index": i + 1,
+                },
             )
+            yield from bpp.set_run_key_wrapper(inner, f"inner_key_{i + 1}")
 
-    yield from outer()
+        yield from bps.close_run()
+
+    yield from outer_scan()
 
     yield from restore_bimorph_state(mirror, slits, state)
-
-    yield from bps.close_run()
 
 
 def inner_scan(
@@ -212,10 +225,17 @@ def inner_scan(
         run_metadata: Optional dict[str, Any] to add as metadata to run start
     """
     yield from bps.open_run(run_metadata)
+
+    yield from bps.declare_stream(*detectors, name="detectors")
+    yield from bps.declare_stream(mirror, slits, name="primary")
+
     for value in linspace(
         active_slit_center_start, active_slit_center_end, number_of_slit_positions
     ):
         yield from move_slits(slits, active_dimension, active_slit_size, value)
-        yield from bps.trigger_and_read((*detectors, slits, mirror))
+        # yield from bps.trigger_and_read((*detectors, slits, mirror))
+        yield from bps.trigger_and_read(detectors, name="detectors")
+        yield from bps.trigger_and_read((mirror, slits), name="primary")
+        # yield from bps.trigger_and_read((mirror, slits, *detectors))
 
     yield from bps.close_run()
