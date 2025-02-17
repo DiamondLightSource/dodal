@@ -10,6 +10,7 @@ def load_metadata(
     detector_params: DetectorParams,
 ):
     assert detector_params.expected_energy_ev
+    yield from set_odin_pvs(eiger, detector_params, wait=True)
     yield from change_roi_mode(eiger, enable, detector_params)
     yield from bps.abs_set(eiger.odin.num_frames_chunks, 1)
     yield from set_mx_settings_pvs(eiger, detector_params, wait=True)
@@ -61,3 +62,12 @@ def set_mx_settings_pvs(
 
     if wait:
         yield from bps.wait(group)
+
+
+def set_odin_pvs(
+    eiger: EigerDetector, detector_params: DetectorParams, wait: bool, group="odin_pvs"
+):
+    yield from bps.abs_set(eiger.odin.file_path, detector_params.directory, group=group)
+    yield from bps.abs_set(
+        eiger.odin.file_name, detector_params.full_filename, group=group
+    )
