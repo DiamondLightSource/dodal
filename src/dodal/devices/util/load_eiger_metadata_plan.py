@@ -10,6 +10,7 @@ def load_metadata(
     detector_params: DetectorParams,
 ):
     assert detector_params.expected_energy_ev
+    yield from bps.stage(eiger)
     yield from set_odin_pvs(eiger, detector_params, wait=True)
     yield from change_roi_mode(eiger, enable, detector_params)
     yield from bps.abs_set(eiger.odin.num_frames_chunks, 1)
