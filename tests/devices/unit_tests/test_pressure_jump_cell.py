@@ -6,6 +6,7 @@ from ophyd_async.core import init_devices
 from ophyd_async.testing import assert_reading, set_mock_value
 
 from dodal.devices.pressure_jump_cell import (
+    OPENSEQ_PULSE_LENGTH,
     FastValveControlRequest,
     FastValveState,
     PressureJumpCell,
@@ -13,7 +14,6 @@ from dodal.devices.pressure_jump_cell import (
     ValveControlRequest,
     ValveOpenSeqRequest,
     ValveState,
-    OPENSEQ_PULSE_LENGTH
 )
 
 
@@ -149,9 +149,9 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
     )
 
     # During openseq pulse
-    await asyncio.sleep(OPENSEQ_PULSE_LENGTH/2)
+    await asyncio.sleep(OPENSEQ_PULSE_LENGTH / 2)
 
-    #Check valves requested to open are set to OPEN_SEQ after calling set_valve()
+    # Check valves requested to open are set to OPEN_SEQ after calling set_valve()
     await assert_reading(
         cell.all_valves_control.valve_control[1],
         {
@@ -359,6 +359,117 @@ async def test_reading_pjumpcell_includes_read_fields(
         {
             "pjump-cell_temperature": {
                 "value": 12.3,
+                "timestamp": ANY,
+                "alarm_severity": 0,
+            },
+        },
+    )
+
+
+async def test_all_valves_can_be_set(
+    cell: PressureJumpCell,
+):
+    # Set some initial values
+    set_mock_value(
+        cell.all_valves_control.valve_control[1].close, ValveControlRequest.OPEN
+    )
+    set_mock_value(
+        cell.all_valves_control.valve_control[3].close, ValveControlRequest.OPEN
+    )
+    set_mock_value(
+        cell.all_valves_control.valve_control[1].open,
+        ValveOpenSeqRequest.INACTIVE.value,
+    )
+    set_mock_value(
+        cell.all_valves_control.valve_control[3].open,
+        ValveOpenSeqRequest.INACTIVE.value,
+    )
+
+    set_mock_value(
+        cell.all_valves_control.fast_valve_control[5].close,
+        FastValveControlRequest.OPEN,
+    )
+    set_mock_value(
+        cell.all_valves_control.fast_valve_control[6].close,
+        FastValveControlRequest.OPEN,
+    )
+    set_mock_value(
+        cell.all_valves_control.fast_valve_control[5].open,
+        ValveOpenSeqRequest.INACTIVE.value,
+    )
+    set_mock_value(
+        cell.all_valves_control.fast_valve_control[6].open,
+        ValveOpenSeqRequest.INACTIVE.value,
+    )
+
+    # Set new values
+    all_valve_request = {
+        1: ValveControlRequest.CLOSE,
+        3: ValveControlRequest.CLOSE,
+        5: FastValveControlRequest.CLOSE,
+        6: FastValveControlRequest.CLOSE,
+    }
+
+    await cell.all_valves_control.set(all_valve_request)
+
+    await assert_reading(
+        cell.all_valves_control.valve_control[1],
+        {
+            "pjump-all_valves_control-valve_control-1-close": {
+                "value": ValveControlRequest.CLOSE,
+                "timestamp": ANY,
+                "alarm_severity": 0,
+            },
+            "pjump-all_valves_control-valve_control-1-open": {
+                "value": int(ValveOpenSeqRequest.INACTIVE.value),
+                "timestamp": ANY,
+                "alarm_severity": 0,
+            },
+        },
+    )
+
+    await assert_reading(
+        cell.all_valves_control.valve_control[3],
+        {
+            "pjump-all_valves_control-valve_control-3-close": {
+                "value": ValveControlRequest.CLOSE,
+                "timestamp": ANY,
+                "alarm_severity": 0,
+            },
+            "pjump-all_valves_control-valve_control-3-open": {
+                "value": int(ValveOpenSeqRequest.INACTIVE.value),
+                "timestamp": ANY,
+                "alarm_severity": 0,
+            },
+        },
+    )
+
+    await assert_reading(
+        cell.all_valves_control.fast_valve_control[5],
+        {
+            "pjump-all_valves_control-fast_valve_control-5-close": {
+                "value": FastValveControlRequest.CLOSE,
+                "timestamp": ANY,
+                "alarm_severity": 0,
+            },
+            "pjump-all_valves_control-fast_valve_control-5-open": {
+                "value": int(ValveOpenSeqRequest.INACTIVE.value),
+                "timestamp": ANY,
+                "alarm_severity": 0,
+            },
+        },
+    )
+
+    await assert_reading(
+        cell.all_valves_control.fast_valve_control[6],
+        {
+            "pjump-all_valves_control-fast_valve_control-6-close": {
+                "value": FastValveControlRequest.CLOSE,
+                "timestamp": ANY,
+                "alarm_severity": 0,
+            },
+            "pjump-all_valves_control-fast_valve_control-6-open": {
+                "value": int(ValveOpenSeqRequest.INACTIVE.value),
                 "timestamp": ANY,
                 "alarm_severity": 0,
             },
