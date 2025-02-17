@@ -1,15 +1,15 @@
 import asyncio
-from dataclasses import dataclass
+from collections.abc import Mapping
 
 from bluesky.protocols import HasName, Movable
 from ophyd_async.core import (
     AsyncStatus,
     DeviceVector,
     SignalR,
+    SignalRW,
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
-    SignalRW,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
@@ -69,17 +69,10 @@ class FastValveState(StrictEnum):
     NONE = "Unused"
 
 
-@dataclass
-class AllValvesControlState:
-    valve_1: ValveControlRequest | None = None
-    valve_3: ValveControlRequest | None = None
-    valve_5: FastValveControlRequest | None = None
-    valve_6: FastValveControlRequest | None = None
-
-
 class ValveControlBase(StandardReadable, Movable):
-    open: SignalRW[ValveControlRequest|FastValveControlRequest|int]
-    close: SignalRW[ValveControlRequest|FastValveControlRequest|int]
+    open: SignalRW[ValveControlRequest | FastValveControlRequest | int]
+    close: SignalRW[ValveControlRequest | FastValveControlRequest | int]
+
     @AsyncStatus.wrap
     async def _set_open_seq(self):
         await self.open.set(ValveOpenSeqRequest.OPEN_SEQ.value)
@@ -168,7 +161,6 @@ class AllValvesControl(StandardReadable, Movable):
 
         super().__init__(name)
 
-
     async def set_valve(
         self,
         valve: int,
@@ -181,12 +173,13 @@ class AllValvesControl(StandardReadable, Movable):
             await self.fast_valve_control[valve].set(value)
 
     @AsyncStatus.wrap
-    async def set(self, value: AllValvesControlState):
+    async def set(
+        self, value: Mapping[int, ValveControlRequest | FastValveControlRequest]
+    ):
         await asyncio.gather(
             *(
-                self.set_valve(int(i[-1]), value)
-                for i, value in value.__dict__.items()
-                if value is not None
+                self.set_valve(valve_number, value[valve_number])
+                for valve_number in value
             )
         )
 
