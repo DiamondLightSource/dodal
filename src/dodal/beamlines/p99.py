@@ -1,7 +1,9 @@
 from pathlib import Path
 
 from ophyd_async.core import AutoIncrementFilenameProvider, StaticPathProvider
-from ophyd_async.epics.adandor import Andor2Detector
+from ophyd_async.epics.adandor import Andor2Detector, Andor2DriverIO
+from ophyd_async.epics.adcore import SingleTriggerDetector
+from ophyd_async.epics.core import epics_signal_r
 
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
@@ -48,9 +50,20 @@ andor_data_path = StaticPathProvider(
 
 @device_factory()
 def andor2_det() -> Andor2Detector:
+    """Andor model:DU897_BV."""
     return Andor2Detector(
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-03:",
         path_provider=andor_data_path,
         drv_suffix="CAM:",
         fileio_suffix="HDF5:",
+    )
+
+
+@device_factory()
+def andor2_point() -> SingleTriggerDetector:
+    """Using the andor2 as if it is a massive point detector, read the meanValue after
+    a picture is taken."""
+    return SingleTriggerDetector(
+        drv=Andor2DriverIO(f"{PREFIX.beamline_prefix}-EA-DET-03:CAM:"),
+        read_uncached=[epics_signal_r(float, "BL10I-EA-PIMTE-01:STAT:MeanValue_RBV")],
     )
