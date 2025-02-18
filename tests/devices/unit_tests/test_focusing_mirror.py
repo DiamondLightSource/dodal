@@ -10,7 +10,7 @@ import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import init_devices
 from ophyd_async.testing import (
     callback_on_mock_put,
     get_mock_put,
@@ -66,7 +66,7 @@ def mirror_voltage_with_set_to_value(
 
 @pytest.fixture
 def mirror_voltage():
-    with DeviceCollector(mock=True):
+    with init_devices(mock=True):
         mirror_voltage = SingleMirrorVoltage()
     return mirror_voltage
 
@@ -212,7 +212,7 @@ def test_mirror_set_voltage_sets_and_waits_demand_accepted_fail(
     RE(plan())
 
 
-@patch("dodal.devices.focusing_mirror.DEFAULT_SETTLE_TIME_S", 3)
+@patch("dodal.devices.focusing_mirror.DEFAULT_SETTLE_TIME_S", 0.1)
 def test_mirror_set_voltage_sets_and_waits_settle_timeout_expires(
     RE: RunEngine,
     mirror_voltage_with_set_timing_out: SingleMirrorVoltage,
@@ -244,7 +244,7 @@ def test_mirror_set_voltage_returns_immediately_if_voltage_already_demanded(
 
 
 def test_mirror_populates_voltage_channels(RE):
-    with DeviceCollector(mock=True):
+    with init_devices(mock=True):
         mirror_voltages = MirrorVoltages("", "", daq_configuration_path="")
     assert len(mirror_voltages.horizontal_voltages) == 14
     assert len(mirror_voltages.vertical_voltages) == 8
@@ -261,6 +261,6 @@ def test_mirror_populates_voltage_channels(RE):
 async def test_given_striped_focussing_mirror_then_energy_to_stripe_returns_expected(
     RE, energy_kev: float, expected_config: MirrorStripeConfiguration
 ):
-    with DeviceCollector(mock=True):
+    with init_devices(mock=True):
         device = FocusingMirrorWithStripes(prefix="-OP-VFM-01:", name="mirror")
     assert device.energy_to_stripe(energy_kev) == expected_config

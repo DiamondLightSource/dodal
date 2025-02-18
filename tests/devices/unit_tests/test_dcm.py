@@ -1,6 +1,6 @@
 import pytest
 from ophyd_async.core import (
-    DeviceCollector,
+    init_devices,
 )
 
 from dodal.devices.dcm import DCM
@@ -8,7 +8,7 @@ from dodal.devices.dcm import DCM
 
 @pytest.fixture
 async def dcm() -> DCM:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         dcm = DCM("DCM-01", name="dcm")
     return dcm
 

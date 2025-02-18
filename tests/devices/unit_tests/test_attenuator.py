@@ -3,7 +3,7 @@ import asyncio
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import init_devices
 from ophyd_async.testing import callback_on_mock_put, set_mock_value
 
 from dodal.devices.attenuator.attenuator import BinaryFilterAttenuator
@@ -13,7 +13,7 @@ CALCULATED_VALUE = [True, False, True] * 6  # Some "random" values
 
 @pytest.fixture
 async def fake_attenuator():
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         fake_attenuator: BinaryFilterAttenuator = BinaryFilterAttenuator(
             "", "attenuator"
         )

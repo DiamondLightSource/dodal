@@ -9,7 +9,11 @@ from dodal.common.beamlines.beamline_utils import (
     set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.beamlines.device_helpers import numbered_slits
+from dodal.common.beamlines.device_helpers import (
+    DET_SUFFIX,
+    HDF5_SUFFIX,
+    numbered_slits,
+)
 from dodal.common.crystal_metadata import (
     MaterialsEnum,
     make_crystal_metadata_from_material,
@@ -54,8 +58,8 @@ def d3(
         "-DI-DCAM-01:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        drv_suffix="DET:",
-        hdf_suffix="HDF5:",
+        drv_suffix=DET_SUFFIX,
+        fileio_suffix=HDF5_SUFFIX,
         path_provider=get_path_provider(),
     )
 
@@ -71,8 +75,8 @@ def d11(
         "-DI-DCAM-03:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        drv_suffix="DET:",
-        hdf_suffix="HDF5:",
+        drv_suffix=DET_SUFFIX,
+        fileio_suffix=HDF5_SUFFIX,
         path_provider=get_path_provider(),
     )
 
@@ -86,8 +90,8 @@ def d12(
         "-DI-DCAM-04:",
         wait_for_connection,
         fake_with_ophyd_sim,
-        drv_suffix="DET:",
-        hdf_suffix="HDF5:",
+        drv_suffix=DET_SUFFIX,
+        fileio_suffix=HDF5_SUFFIX,
         path_provider=get_path_provider(),
     )
 
@@ -338,7 +342,7 @@ def high_pressure_xray_cell(
     return device_instantiation(
         PressureJumpCell,
         "high_pressure_xray_cell",
-        f"{BeamlinePrefix(BL).insertion_prefix}-EA",
+        "-EA",
         wait_for_connection,
         fake_with_ophyd_sim,
         cell_prefix="-HPXC-01:",

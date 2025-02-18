@@ -103,7 +103,7 @@ class NXSasPilatus(PilatusDetector):
         prefix: str,
         path_provider: PathProvider,
         drv_suffix: str,
-        hdf_suffix: str,
+        fileio_suffix: str,
         metadata_holder: NXSasMetadataHolder,
         name: str = "",
     ):
@@ -116,7 +116,7 @@ class NXSasPilatus(PilatusDetector):
             prefix,
             path_provider,
             drv_suffix=drv_suffix,
-            hdf_suffix=hdf_suffix,
+            fileio_suffix=fileio_suffix,
             name=name,
         )
         self._metadata_holder = metadata_holder
@@ -146,7 +146,7 @@ class NXSasOAV(AravisDetector):
         prefix: str,
         path_provider: PathProvider,
         drv_suffix: str,
-        hdf_suffix: str,
+        fileio_suffix: str,
         metadata_holder: NXSasMetadataHolder,
         name: str = "",
         gpio_number: AravisController.GPIO_NUMBER = 1,
@@ -160,7 +160,7 @@ class NXSasOAV(AravisDetector):
             prefix,
             path_provider,
             drv_suffix=drv_suffix,
-            hdf_suffix=hdf_suffix,
+            fileio_suffix=fileio_suffix,
             name=name,
             gpio_number=gpio_number,
         )

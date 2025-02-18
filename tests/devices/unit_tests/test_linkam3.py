@@ -1,7 +1,7 @@
 from unittest.mock import ANY
 
 import pytest
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import init_devices
 from ophyd_async.testing import (
     callback_on_mock_put,
     get_mock_put,
@@ -13,7 +13,7 @@ from dodal.devices.linkam3 import Linkam3
 
 @pytest.fixture
 async def fake_linkam():
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         fake_linkam: Linkam3 = Linkam3("", "linkam")
 
     def set_temp(value: float, *args, **kwargs):

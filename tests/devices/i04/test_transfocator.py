@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 from ophyd_async.core import (
-    DeviceCollector,
+    init_devices,
     wait_for_value,
 )
 from ophyd_async.testing import set_mock_value
@@ -13,7 +13,7 @@ from dodal.devices.i04.transfocator import Transfocator
 
 @pytest.fixture
 async def fake_transfocator() -> Transfocator:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         transfocator = Transfocator(prefix="", name="transfocator")
     return transfocator
 

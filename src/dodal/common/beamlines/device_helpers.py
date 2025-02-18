@@ -2,7 +2,9 @@ from dodal.common.beamlines.beamline_utils import device_instantiation
 from dodal.devices.slits import Slits
 from dodal.utils import skip_device
 
-HDF5_PREFIX = "HDF5:"
+HDF5_SUFFIX = "HDF5:"
+CAM_SUFFIX = "CAM:"
+DET_SUFFIX = "DET:"
 
 
 @skip_device()

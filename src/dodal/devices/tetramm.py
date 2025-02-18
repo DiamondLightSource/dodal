@@ -13,7 +13,12 @@ from ophyd_async.core import (
     set_and_wait_for_value,
     soft_signal_r_and_setter,
 )
-from ophyd_async.epics.adcore import ADHDFWriter, NDFileHDFIO, stop_busy_record
+from ophyd_async.epics.adcore import (
+    ADHDFWriter,
+    NDFileHDFIO,
+    NDPluginBaseIO,
+    stop_busy_record,
+)
 from ophyd_async.epics.core import (
     epics_signal_r,
     epics_signal_rw,
@@ -221,7 +226,7 @@ class TetrammDetector(StandardDetector):
         path_provider: PathProvider,
         name: str = "",
         type: str | None = None,
-        **scalar_sigs: str,
+        plugins: dict[str, NDPluginBaseIO] | None = None,
     ) -> None:
         self.drv = TetrammDriver(prefix + "DRV:")
         self.hdf = NDFileHDFIO(prefix + "HDF5:")
@@ -243,7 +248,7 @@ class TetrammDetector(StandardDetector):
                 path_provider,
                 lambda: self.name,
                 TetrammDatasetDescriber(controller),
-                **scalar_sigs,
+                plugins=plugins,
             ),
             config_signals,
             name,

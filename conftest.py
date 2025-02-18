@@ -38,6 +38,7 @@ mock_attributes_table = {
     "s03": mock_paths,
     "i04": mock_paths,
     "s04": mock_paths,
+    "i19_1": mock_paths,
     "i24": mock_paths,
 }
 

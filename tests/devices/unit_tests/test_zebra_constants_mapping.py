@@ -1,5 +1,5 @@
 import pytest
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import init_devices
 
 from dodal.beamlines.i03 import I03_ZEBRA_MAPPING
 from dodal.devices.zebra.zebra import Zebra
@@ -11,7 +11,7 @@ from dodal.devices.zebra.zebra_constants_mapping import (
 
 
 async def fake_zebra(zebra_mapping: ZebraMapping):
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         zebra = Zebra(mapping=zebra_mapping, name="", prefix="")
     return zebra
 

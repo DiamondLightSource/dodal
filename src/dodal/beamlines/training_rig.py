@@ -9,7 +9,7 @@ from dodal.common.beamlines.beamline_utils import (
     set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.beamlines.device_helpers import HDF5_PREFIX
+from dodal.common.beamlines.device_helpers import DET_SUFFIX, HDF5_SUFFIX
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.training_rig.sample_stage import TrainingRigSampleStage
 from dodal.log import set_beamline as set_log_beamline
@@ -34,7 +34,7 @@ set_utils_beamline(BL)
 set_path_provider(
     StaticVisitPathProvider(
         BL,
-        Path("/data"),
+        Path("/exports/mybeamline/data/2025"),
         client=LocalDirectoryServiceClient(),
     )
 )
@@ -50,8 +50,8 @@ def det() -> AravisDetector:
     return AravisDetector(
         f"{PREFIX.beamline_prefix}-EA-DET-01:",
         path_provider=get_path_provider(),
-        drv_suffix="DET:",
-        hdf_suffix=HDF5_PREFIX,
+        drv_suffix=DET_SUFFIX,
+        fileio_suffix=HDF5_SUFFIX,
     )
 
 

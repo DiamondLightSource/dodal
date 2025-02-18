@@ -1,14 +1,14 @@
 from unittest import mock
 
 import pytest
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import init_devices
 
 from dodal.devices.training_rig.sample_stage import TrainingRigSampleStage
 
 
 @pytest.fixture
 async def stage() -> TrainingRigSampleStage:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         stage = TrainingRigSampleStage(prefix="DEMO-STAGE-01:")
 
     return stage

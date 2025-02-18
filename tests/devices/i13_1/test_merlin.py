@@ -4,9 +4,9 @@ import pytest
 from event_model import StreamDatum, StreamResource
 from ophyd_async.core import (
     DetectorTrigger,
-    DeviceCollector,
     PathProvider,
     TriggerInfo,
+    init_devices,
 )
 from ophyd_async.testing import set_mock_value
 
@@ -26,12 +26,12 @@ def one_shot_trigger_info() -> TriggerInfo:
 
 @pytest.fixture
 async def merlin(static_path_provider: PathProvider) -> Merlin:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         merlin = Merlin(
             prefix="BL13J-EA-DET-04",
             # name="merlin",
             # drv_suffix="CAM:",
-            # hdf_suffix="HDF5:",
+            # fileio_suffix="HDF5:",
             path_provider=static_path_provider,
         )
 
@@ -46,11 +46,11 @@ async def test_trigger(
 
     await merlin.stage()
     await merlin.prepare(one_shot_trigger_info)
-    await merlin.controller.arm()
+    await merlin._controller.arm()
 
     assert await merlin.drv.acquire.get_value()
 
-    await merlin.controller.wait_for_idle()
+    await merlin._controller.wait_for_idle()
 
 
 async def test_can_collect(
@@ -97,7 +97,7 @@ async def test_can_decribe_collect(merlin: Merlin, one_shot_trigger_info: Trigge
     await merlin.prepare(one_shot_trigger_info)
     assert (await merlin.describe_collect()) == {
         "merlin": {
-            "source": "mock+ca://BL13J-EA-DET-04HDF:FullFileName_RBV",
+            "source": "mock+ca://BL13J-EA-DET-04HDF5:FullFileName_RBV",
             "shape": [20, 10],
             "dtype": "array",
             "dtype_numpy": "|i1",

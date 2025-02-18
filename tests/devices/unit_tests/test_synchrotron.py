@@ -5,7 +5,7 @@ from typing import Any
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import DeviceCollector, StandardReadable
+from ophyd_async.core import StandardReadable, init_devices
 from ophyd_async.testing import set_mock_value
 
 from dodal.devices.synchrotron import (
@@ -112,7 +112,7 @@ EXPECTED_DESCRIBE_CONFIG_RESULT = f"""{{
 
 @pytest.fixture
 async def sim_synchrotron() -> Synchrotron:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         sim_synchrotron = Synchrotron()
     set_mock_value(sim_synchrotron.current, CURRENT)
     set_mock_value(sim_synchrotron.machine_user_countdown, USER_COUNTDOWN)

@@ -1,5 +1,5 @@
 import pytest
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import init_devices
 
 from dodal.devices.undulator import Undulator
 
@@ -12,7 +12,7 @@ ID_GAP_LOOKUP_TABLE_PATH: str = (
 
 @pytest.mark.s03
 def test_undulator_connects():
-    with DeviceCollector():
+    with init_devices():
         undulator = Undulator(  # noqa: F841
             f"{SIM_INSERTION_PREFIX}-MO-SERVC-01:",
             id_gap_lookup_table_path=ID_GAP_LOOKUP_TABLE_PATH,

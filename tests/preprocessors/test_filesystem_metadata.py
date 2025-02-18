@@ -16,7 +16,7 @@ from bluesky.protocols import HasName, Readable, Reading, Triggerable
 from bluesky.run_engine import RunEngine
 from bluesky.utils import MsgGenerator
 from event_model.documents.event_descriptor import DataKey
-from ophyd_async.core import AsyncStatus, DeviceCollector, PathProvider
+from ophyd_async.core import AsyncStatus, PathProvider, init_devices
 from pydantic import BaseModel
 
 from dodal.common.types import UpdatingPathProvider
@@ -112,7 +112,7 @@ def provider(client: DirectoryServiceClient, tmp_path: Path) -> UpdatingPathProv
 @pytest.fixture(params=[1, 2])
 def detectors(request, provider: UpdatingPathProvider) -> list[Readable]:
     number_of_detectors = request.param
-    with DeviceCollector(mock=True):
+    with init_devices(mock=True):
         dets: list[Readable] = [
             FakeDetector(name=f"det{i}", provider=provider)
             for i in range(number_of_detectors)

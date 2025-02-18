@@ -4,7 +4,7 @@ import pytest
 from bluesky.plans import count
 from bluesky.run_engine import RunEngine
 from event_model import DataKey
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import init_devices
 from ophyd_async.testing import set_mock_value
 
 from dodal.devices.i22.fswitch import FilterState, FSwitch
@@ -12,7 +12,7 @@ from dodal.devices.i22.fswitch import FilterState, FSwitch
 
 @pytest.fixture
 async def fswitch() -> FSwitch:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         fswitch = FSwitch(
             "DEMO-FSWT-01:",
             lens_geometry="paraboloid",
