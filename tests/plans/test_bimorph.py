@@ -90,7 +90,7 @@ def slits(RE: RunEngine) -> Slits:
 
 @pytest.fixture
 async def oav(RE: RunEngine, tmp_path: Path) -> StandardDetector:
-    with init_devices():
+    with init_devices(mock=True):
         det = PatternDetector(tmp_path / "foo.temp")
     return det
 
