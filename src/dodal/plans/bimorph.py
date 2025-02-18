@@ -7,6 +7,7 @@ import bluesky.preprocessors as bpp
 from bluesky.preprocessors import stage_decorator
 from bluesky.protocols import Readable
 from numpy import linspace
+from ophyd_async.core import TriggerInfo
 
 from dodal.devices.bimorph_mirror import BimorphMirror
 from dodal.devices.slits import Slits
@@ -226,16 +227,15 @@ def inner_scan(
     """
     yield from bps.open_run(run_metadata)
 
-    yield from bps.declare_stream(*detectors, name="detectors")
-    yield from bps.declare_stream(mirror, slits, name="primary")
+    for detector in detectors:
+        detector.prepare(TriggerInfo(number_of_triggers=number_of_slit_positions))
 
     for value in linspace(
         active_slit_center_start, active_slit_center_end, number_of_slit_positions
     ):
         yield from move_slits(slits, active_dimension, active_slit_size, value)
-        # yield from bps.trigger_and_read((*detectors, slits, mirror))
-        yield from bps.trigger_and_read(detectors, name="detectors")
-        yield from bps.trigger_and_read((mirror, slits), name="primary")
-        # yield from bps.trigger_and_read((mirror, slits, *detectors))
+        # yield from bps.trigger_and_read(detectors, name="detectors")
+        # yield from bps.trigger_and_read((mirror, slits), name="primary")
+        yield from bps.trigger_and_read([*detectors, mirror, slits])
 
     yield from bps.close_run()
