@@ -3,11 +3,8 @@ from enum import Enum
 from typing import Any
 
 import bluesky.plan_stubs as bps
-import bluesky.preprocessors as bpp
-from bluesky.preprocessors import stage_decorator
 from bluesky.protocols import Readable
 from numpy import linspace
-from ophyd_async.core import TriggerInfo
 
 from dodal.devices.bimorph_mirror import BimorphMirror
 from dodal.devices.slits import Slits
@@ -152,10 +149,10 @@ def bimorph_optimisation(
     )
 
     # @bpp.set_run_key_decorator(f"outer_key_{0}")
-    @stage_decorator((*(detectors), slits, mirror))
     def outer_scan():
         """Outer plan stub, which moves mirror and calls inner_scan."""
-        outer_uid = yield from bps.open_run()
+        # outer_uid = yield from bps.open_run()
+        outer_uid = 0
         inner = inner_scan(
             detectors,
             mirror,
@@ -171,7 +168,8 @@ def bimorph_optimisation(
                 "bimorph_position_index": 0,
             },
         )
-        yield from bpp.set_run_key_wrapper(inner, f"inner_key_{0}")
+        # yield from bpp.set_run_key_wrapper(inner, f"inner_key_{0}")
+        yield from inner
 
         for i, channel in enumerate(mirror.channels.values()):
             yield from bps.mv(channel, initial_voltage_list[i] + voltage_increment)  # type: ignore
@@ -192,9 +190,10 @@ def bimorph_optimisation(
                     "bimorph_position_index": i + 1,
                 },
             )
-            yield from bpp.set_run_key_wrapper(inner, f"inner_key_{i + 1}")
+            # yield from bpp.set_run_key_wrapper(inner, f"inner_key_{i + 1}")
+            yield from inner
 
-        yield from bps.close_run()
+        # yield from bps.close_run()
 
     yield from outer_scan()
 
@@ -226,9 +225,10 @@ def inner_scan(
         run_metadata: Optional dict[str, Any] to add as metadata to run start
     """
     yield from bps.open_run(run_metadata)
+    yield from bps.stage_all(*detectors, mirror, slits)
 
-    for detector in detectors:
-        detector.prepare(TriggerInfo(number_of_triggers=1))
+    # for detector in detectors:
+    #     detector.prepare(TriggerInfo(number_of_triggers=1))
 
     for value in linspace(
         active_slit_center_start, active_slit_center_end, number_of_slit_positions
@@ -236,4 +236,7 @@ def inner_scan(
         yield from move_slits(slits, active_dimension, active_slit_size, value)
         yield from bps.trigger_and_read([*detectors, mirror, slits])
 
+    breakpoint()
+
+    yield from bps.unstage_all(*detectors, mirror, slits)
     yield from bps.close_run()
