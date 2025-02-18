@@ -90,7 +90,7 @@ def slits(RE: RunEngine) -> Slits:
 
 @pytest.fixture
 async def oav(RE: RunEngine, tmp_path: Path) -> StandardDetector:
-    with init_devices(mock=True):
+    with init_devices():
         det = PatternDetector(tmp_path / "foo.temp")
     return det
 
@@ -667,7 +667,8 @@ class TestIntegration:
                 number_of_slit_positions,
                 bimorph_settle_time,
                 initial_voltage_list,
-            )
+            ),
+            print,
         )
 
     assert True
