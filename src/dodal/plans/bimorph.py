@@ -151,7 +151,7 @@ def bimorph_optimisation(
         slits, inactive_dimension, inactive_slit_size, inactive_slit_center
     )
 
-    @bpp.set_run_key_decorator(f"outer_key_{0}")
+    # @bpp.set_run_key_decorator(f"outer_key_{0}")
     @stage_decorator((*(detectors), slits, mirror))
     def outer_scan():
         """Outer plan stub, which moves mirror and calls inner_scan."""
@@ -228,14 +228,12 @@ def inner_scan(
     yield from bps.open_run(run_metadata)
 
     for detector in detectors:
-        detector.prepare(TriggerInfo(number_of_triggers=number_of_slit_positions))
+        detector.prepare(TriggerInfo(number_of_triggers=1))
 
     for value in linspace(
         active_slit_center_start, active_slit_center_end, number_of_slit_positions
     ):
         yield from move_slits(slits, active_dimension, active_slit_size, value)
-        # yield from bps.trigger_and_read(detectors, name="detectors")
-        # yield from bps.trigger_and_read((mirror, slits), name="primary")
         yield from bps.trigger_and_read([*detectors, mirror, slits])
 
     yield from bps.close_run()
