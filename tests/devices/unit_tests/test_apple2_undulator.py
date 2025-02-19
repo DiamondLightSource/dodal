@@ -124,7 +124,7 @@ async def test_given_gate_never_closes_then_setting_gaps_times_out(
         mock_id_gap.user_setpoint,
         lambda *_, **__: set_mock_value(mock_id_gap.gate, UndulatorGateStatus.OPEN),
     )
-    mock_id_gap._cal_timeout = AsyncMock(return_value=0.01)
+    mock_id_gap.get_timeout = AsyncMock(return_value=0.01)
     with pytest.raises(asyncio.TimeoutError):
         await mock_id_gap.set("2")
 
@@ -173,7 +173,7 @@ async def test_given_gate_never_closes_then_setting_phases_times_out(
         mock_phaseAxes.top_outer.user_setpoint,
         lambda *_, **__: set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.OPEN),
     )
-    mock_phaseAxes._cal_timeout = AsyncMock(return_value=0.01)
+    mock_phaseAxes.get_timeout = AsyncMock(return_value=0.01)
 
     with pytest.raises(asyncio.TimeoutError):
         await mock_phaseAxes.set(setValue)
@@ -299,7 +299,7 @@ async def test_given_gate_never_closes_then_setting_jaw_phases_times_out(
         mock_jaw_phase.jaw_phase.user_setpoint,
         lambda *_, **__: set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.OPEN),
     )
-    mock_jaw_phase._cal_timeout = AsyncMock(return_value=0.01)
+    mock_jaw_phase.get_timeout = AsyncMock(return_value=0.01)
     with pytest.raises(asyncio.TimeoutError):
         await mock_jaw_phase.set(2)
 
