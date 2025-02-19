@@ -20,12 +20,6 @@ dodal.beamlines.i23
 
    
    
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      oav_pin_tip_detection
-   
    
 
    
