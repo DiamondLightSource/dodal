@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any
 
 import bluesky.plan_stubs as bps
 import bluesky.preprocessors as bpp
@@ -155,10 +154,8 @@ def bimorph_optimisation(
     def outer_scan():
         """Outer plan stub, which moves mirror and calls inner_scan."""
         # outer_uid = yield from bps.open_run()
-        outer_uid = 0
-        # yield from bps.declare_stream(
-        #     *detectors, mirror, slits, name=f"bimorph_position_{0}"
-        # )
+        stream_name = "0"
+        yield from bps.declare_stream(*detectors, mirror, slits, name=stream_name)
         inner = inner_scan(
             detectors,
             mirror,
@@ -168,11 +165,7 @@ def bimorph_optimisation(
             active_slit_center_end,
             active_slit_size,
             number_of_slit_positions,
-            run_metadata={
-                # "run_key": f"inner_key_{0}",
-                "outer_uid": outer_uid,
-                "bimorph_position_index": 0,
-            },
+            stream_name,
         )
         # yield from bpp.set_run_key_wrapper(inner, f"inner_key_{0}")
         yield from inner
@@ -181,9 +174,8 @@ def bimorph_optimisation(
             yield from bps.mv(channel, initial_voltage_list[i] + voltage_increment)  # type: ignore
             yield from bps.sleep(bimorph_settle_time)
 
-            yield from bps.declare_stream(
-                *detectors, mirror, slits, name=f"bimorph_position_{i + 1}"
-            )
+            stream_name = str(int(stream_name) + 1)
+            yield from bps.declare_stream(*detectors, mirror, slits, name=stream_name)
 
             inner = inner_scan(
                 detectors,
@@ -194,11 +186,7 @@ def bimorph_optimisation(
                 active_slit_center_end,
                 active_slit_size,
                 number_of_slit_positions,
-                run_metadata={
-                    # "run_key": f"inner_key_{i + 1}",
-                    "outer_uid": outer_uid,
-                    "bimorph_position_index": i + 1,
-                },
+                stream_name,
             )
             # yield from bpp.set_run_key_wrapper(inner, f"inner_key_{i + 1}")
             yield from inner
@@ -220,7 +208,7 @@ def inner_scan(
     active_slit_center_end: float,
     active_slit_size: float,
     number_of_slit_positions: int,
-    run_metadata: dict[str, Any] | None = None,
+    stream_name: str,
 ):
     """Inner plan stub, which moves Slits and performs a read.
 
@@ -246,7 +234,7 @@ def inner_scan(
         active_slit_center_start, active_slit_center_end, number_of_slit_positions
     ):
         yield from move_slits(slits, active_dimension, active_slit_size, value)
-        yield from bps.trigger_and_read([*detectors, mirror, slits])
+        yield from bps.trigger_and_read([*detectors, mirror, slits], name=stream_name)
 
     # yield from bps.unstage_all(*detectors, mirror, slits)
     # yield from bps.close_run()
