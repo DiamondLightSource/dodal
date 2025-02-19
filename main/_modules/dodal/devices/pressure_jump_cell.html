@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.pressure_jump_cell &#8212; dodal 1.39.1.dev22+g611af93c4 documentation</title>
+    <title>dodal.devices.pressure_jump_cell &#8212; dodal 1.40.1.dev1+ga2003819e documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=2414a3aa"></script>
+    <script src="../../../_static/documentation_options.js?v=8c1469c9"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -507,8 +507,8 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="ValveOpenSeqRequest">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.pressure_jump_cell.ValveOpenSeqRequest.html#dodal.devices.pressure_jump_cell.ValveOpenSeqRequest">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ValveOpenSeqRequest</span><span class="p">(</span><span class="n">StrictEnum</span><span class="p">):</span>
-    <span class="n">INACTIVE</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">OPEN_SEQ</span> <span class="o">=</span> <span class="mi">1</span></div>
+    <span class="n">INACTIVE</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span>
+    <span class="n">OPEN_SEQ</span> <span class="o">=</span> <span class="s2">&quot;1&quot;</span></div>
 
 
 
@@ -728,6 +728,9 @@ window.addEventListener("load", () => mermaid.run());
             <span class="bp">self</span><span class="o">.</span><span class="n">beckhoff_pressure</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
                 <span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">final_prefix</span><span class="si">}</span><span class="s2">STATP</span><span class="si">{</span><span class="n">transducer_number</span><span class="si">}</span><span class="s2">:MeanValue_RBV&quot;</span>
             <span class="p">)</span>
+            <span class="c1"># P1 beckhoff voltage = BL38P-EA-ADC-02:CH1</span>
+            <span class="c1"># P2 beckhoff voltage = BL38P-EA-ADC-01:CH2</span>
+            <span class="c1"># P3 beckhoff voltage = BL38P-EA-ADC-01:CH1</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">slow_beckhoff_voltage_readout</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span>
                 <span class="nb">float</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">full_different_prefix_adc</span><span class="si">}</span><span class="s2">CH</span><span class="si">{</span><span class="n">ethercat_channel_number</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>

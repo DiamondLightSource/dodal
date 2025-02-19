@@ -20,32 +20,6 @@ dodal.beamlines.p38
 
    
    
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      d11
-      d12
-      d3
-      dcm
-      fswitch
-      hfm
-      high_pressure_xray_cell
-      i0
-      linkam
-      panda1
-      panda2
-      panda3
-      ppump
-      slits_1
-      slits_2
-      slits_3
-      slits_4
-      slits_5
-      slits_6
-      undulator
-      vfm
-   
    
 
    
