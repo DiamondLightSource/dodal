@@ -237,7 +237,7 @@ class TestInnerScan:
         )
 
         call_list = [
-            call((*detectors, slits, mirror))
+            call([*detectors, mirror, slits], name=stream_name)
             for _ in linspace(
                 active_slit_center_start,
                 active_slit_center_end,
