@@ -3,6 +3,7 @@ from enum import Enum
 from typing import Any
 
 import bluesky.plan_stubs as bps
+import bluesky.preprocessors as bpp
 from bluesky.protocols import Readable
 from numpy import linspace
 
@@ -149,10 +150,15 @@ def bimorph_optimisation(
     )
 
     # @bpp.set_run_key_decorator(f"outer_key_{0}")
+    @bpp.run_decorator()
+    @bpp.stage_decorator((*detectors, mirror, slits))
     def outer_scan():
         """Outer plan stub, which moves mirror and calls inner_scan."""
         # outer_uid = yield from bps.open_run()
         outer_uid = 0
+        # yield from bps.declare_stream(
+        #     *detectors, mirror, slits, name=f"bimorph_position_{0}"
+        # )
         inner = inner_scan(
             detectors,
             mirror,
@@ -174,6 +180,10 @@ def bimorph_optimisation(
         for i, channel in enumerate(mirror.channels.values()):
             yield from bps.mv(channel, initial_voltage_list[i] + voltage_increment)  # type: ignore
             yield from bps.sleep(bimorph_settle_time)
+
+            yield from bps.declare_stream(
+                *detectors, mirror, slits, name=f"bimorph_position_{i + 1}"
+            )
 
             inner = inner_scan(
                 detectors,
@@ -200,6 +210,7 @@ def bimorph_optimisation(
     yield from restore_bimorph_state(mirror, slits, state)
 
 
+# @bpp.set_run_key_decorator("run_1")
 def inner_scan(
     detectors: list[Readable],
     mirror: BimorphMirror,
@@ -224,8 +235,9 @@ def inner_scan(
         number_of_slit_positions: int number of slit positions per pencil beam scan
         run_metadata: Optional dict[str, Any] to add as metadata to run start
     """
-    yield from bps.open_run(run_metadata)
-    yield from bps.stage_all(*detectors, mirror, slits)
+    # yield from bps.open_run(run_metadata)
+    # yield from bps.stage_all(*detectors, mirror, slits)
+    # yield from bps.collect()
 
     # for detector in detectors:
     #     detector.prepare(TriggerInfo(number_of_triggers=1))
@@ -236,7 +248,5 @@ def inner_scan(
         yield from move_slits(slits, active_dimension, active_slit_size, value)
         yield from bps.trigger_and_read([*detectors, mirror, slits])
 
-    breakpoint()
-
-    yield from bps.unstage_all(*detectors, mirror, slits)
-    yield from bps.close_run()
+    # yield from bps.unstage_all(*detectors, mirror, slits)
+    # yield from bps.close_run()
