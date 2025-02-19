@@ -214,7 +214,7 @@ def inner_scan(
         active_slit_center_end: float final position of center of slit in active dimension
         active_slit_size: float size of slit in active dimension
         number_of_slit_positions: int number of slit positions per pencil beam scan
-        run_metadata: Optional dict[str, Any] to add as metadata to run start
+        stream_name: str name to pass to trigger_and_read
     """
     for value in linspace(
         active_slit_center_start, active_slit_center_end, number_of_slit_positions
