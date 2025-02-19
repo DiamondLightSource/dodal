@@ -480,7 +480,7 @@ class TestBimorphOptimisation:
                 active_slit_center_end,
                 active_slit_size,
                 number_of_slit_positions,
-                run_metadata={"outer_uid": ANY, "bimorph_position_index": i},
+                str(i),
             )
             for i in range(len(mirror_with_mocked_put.channels) + 1)
         ] == mock_inner_scan.call_args_list
