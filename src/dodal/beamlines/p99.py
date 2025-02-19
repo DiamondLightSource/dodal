@@ -1,6 +1,5 @@
 from pathlib import Path
 
-from ophyd_async.core import AutoIncrementFilenameProvider, StaticPathProvider
 from ophyd_async.epics.adandor import Andor2Detector, Andor2DriverIO
 from ophyd_async.epics.adcore import SingleTriggerDetector
 from ophyd_async.epics.core import epics_signal_r
@@ -46,12 +45,6 @@ def sample_stage() -> XYZPositioner:
 @device_factory()
 def lab_stage() -> XYZPositioner:
     return XYZPositioner(f"{PREFIX.beamline_prefix}-MO-STAGE-02:LAB:")
-
-
-andor_data_path = StaticPathProvider(
-    filename_provider=AutoIncrementFilenameProvider(base_filename="andor2"),
-    directory_path=Path("/dls/p99/data/2024/cm37284-2/processing/writenData"),
-)
 
 
 set_path_provider(
