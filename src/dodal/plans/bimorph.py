@@ -3,8 +3,9 @@ from enum import Enum
 
 import bluesky.plan_stubs as bps
 import bluesky.preprocessors as bpp
-from bluesky.protocols import Readable
+from bluesky.protocols import Preparable, Readable
 from numpy import linspace
+from ophyd_async.core import TriggerInfo
 
 from dodal.devices.bimorph_mirror import BimorphMirror
 from dodal.devices.slits import Slits
@@ -152,6 +153,12 @@ def bimorph_optimisation(
     @bpp.stage_decorator((*detectors, mirror, slits))
     def outer_scan():
         """Outer plan stub, which moves mirror and calls inner_scan."""
+        for detector in detectors:
+            if isinstance(detector, Preparable):
+                yield from bps.prepare(
+                    detector, TriggerInfo(number_of_triggers=1), wait=True
+                )
+
         stream_name = "0"
         yield from bps.declare_stream(*detectors, mirror, slits, name=stream_name)
         yield from inner_scan(
