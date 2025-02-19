@@ -154,7 +154,7 @@ def bimorph_optimisation(
         """Outer plan stub, which moves mirror and calls inner_scan."""
         stream_name = "0"
         yield from bps.declare_stream(*detectors, mirror, slits, name=stream_name)
-        inner = inner_scan(
+        yield from inner_scan(
             detectors,
             mirror,
             slits,
@@ -165,7 +165,6 @@ def bimorph_optimisation(
             number_of_slit_positions,
             stream_name,
         )
-        yield from inner
 
         for i, channel in enumerate(mirror.channels.values()):
             yield from bps.mv(channel, initial_voltage_list[i] + voltage_increment)  # type: ignore
@@ -174,7 +173,7 @@ def bimorph_optimisation(
             stream_name = str(int(stream_name) + 1)
             yield from bps.declare_stream(*detectors, mirror, slits, name=stream_name)
 
-            inner = inner_scan(
+            yield from inner_scan(
                 detectors,
                 mirror,
                 slits,
@@ -185,7 +184,6 @@ def bimorph_optimisation(
                 number_of_slit_positions,
                 stream_name,
             )
-            yield from inner
 
     yield from outer_scan()
 
