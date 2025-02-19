@@ -163,9 +163,7 @@ def test_save_and_restore(RE: RunEngine, mirror: BimorphMirror, slits: Slits):
 @pytest.mark.parametrize("active_slit_center_end", [200])
 @pytest.mark.parametrize("active_slit_size", [0.05])
 @pytest.mark.parametrize("number_of_slit_positions", [3])
-@pytest.mark.parametrize(
-    "run_metadata", [None, {"outer_uid": "0", "bimorph_position_index": 0}]
-)
+@pytest.mark.parametrize("stream_name", [0])
 @unittest.mock.patch("dodal.plans.bimorph.bps.trigger_and_read")
 @unittest.mock.patch("dodal.plans.bimorph.move_slits")
 class TestInnerScan:
@@ -182,7 +180,7 @@ class TestInnerScan:
         active_slit_center_end: float,
         active_slit_size: float,
         number_of_slit_positions: int,
-        run_metadata: dict[str, Any] | None,
+        stream_name: str,
     ):
         RE(
             inner_scan(
@@ -194,7 +192,7 @@ class TestInnerScan:
                 active_slit_center_end,
                 active_slit_size,
                 number_of_slit_positions,
-                run_metadata,
+                stream_name,
             )
         )
 
@@ -222,7 +220,7 @@ class TestInnerScan:
         active_slit_center_end: float,
         active_slit_size: float,
         number_of_slit_positions: int,
-        run_metadata: dict[str, Any] | None,
+        stream_name: str,
     ):
         RE(
             inner_scan(
@@ -234,7 +232,7 @@ class TestInnerScan:
                 active_slit_center_end,
                 active_slit_size,
                 number_of_slit_positions,
-                run_metadata,
+                stream_name,
             )
         )
 
@@ -247,49 +245,6 @@ class TestInnerScan:
             )
         ]
         assert mock_bps_trigger_and_read.call_args_list == call_list
-
-    def test_inner_scan_writes_run_metadata(
-        self,
-        mock_move_slits: Mock,
-        mock_bps_trigger_and_read: Mock,
-        detectors: list[Readable],
-        RE: RunEngine,
-        mirror: BimorphMirror,
-        slits: Slits,
-        active_dimension: SlitDimension,
-        active_slit_center_start: float,
-        active_slit_center_end: float,
-        active_slit_size: float,
-        number_of_slit_positions: int,
-        run_metadata: dict[str, Any] | None,
-    ):
-        start_docs = []
-
-        def get_start(_, doc):
-            start_docs.append(doc)
-
-        RE(
-            inner_scan(
-                detectors,
-                mirror,
-                slits,
-                active_dimension,
-                active_slit_center_start,
-                active_slit_center_end,
-                active_slit_size,
-                number_of_slit_positions,
-                run_metadata,
-            ),
-            {"start": [get_start]},
-        )
-
-        start_doc = start_docs[0]
-
-        if run_metadata is not None:
-            assert (
-                start_doc["outer_uid"] == "0"
-                and start_doc["bimorph_position_index"] == 0
-            )
 
 
 @pytest.mark.parametrize("voltage_increment", [100.0])
