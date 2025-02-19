@@ -148,12 +148,10 @@ def bimorph_optimisation(
         slits, inactive_dimension, inactive_slit_size, inactive_slit_center
     )
 
-    # @bpp.set_run_key_decorator(f"outer_key_{0}")
     @bpp.run_decorator()
     @bpp.stage_decorator((*detectors, mirror, slits))
     def outer_scan():
         """Outer plan stub, which moves mirror and calls inner_scan."""
-        # outer_uid = yield from bps.open_run()
         stream_name = "0"
         yield from bps.declare_stream(*detectors, mirror, slits, name=stream_name)
         inner = inner_scan(
@@ -167,7 +165,6 @@ def bimorph_optimisation(
             number_of_slit_positions,
             stream_name,
         )
-        # yield from bpp.set_run_key_wrapper(inner, f"inner_key_{0}")
         yield from inner
 
         for i, channel in enumerate(mirror.channels.values()):
@@ -188,17 +185,13 @@ def bimorph_optimisation(
                 number_of_slit_positions,
                 stream_name,
             )
-            # yield from bpp.set_run_key_wrapper(inner, f"inner_key_{i + 1}")
             yield from inner
-
-        # yield from bps.close_run()
 
     yield from outer_scan()
 
     yield from restore_bimorph_state(mirror, slits, state)
 
 
-# @bpp.set_run_key_decorator("run_1")
 def inner_scan(
     detectors: list[Readable],
     mirror: BimorphMirror,
@@ -223,18 +216,8 @@ def inner_scan(
         number_of_slit_positions: int number of slit positions per pencil beam scan
         run_metadata: Optional dict[str, Any] to add as metadata to run start
     """
-    # yield from bps.open_run(run_metadata)
-    # yield from bps.stage_all(*detectors, mirror, slits)
-    # yield from bps.collect()
-
-    # for detector in detectors:
-    #     detector.prepare(TriggerInfo(number_of_triggers=1))
-
     for value in linspace(
         active_slit_center_start, active_slit_center_end, number_of_slit_positions
     ):
         yield from move_slits(slits, active_dimension, active_slit_size, value)
         yield from bps.trigger_and_read([*detectors, mirror, slits], name=stream_name)
-
-    # yield from bps.unstage_all(*detectors, mirror, slits)
-    # yield from bps.close_run()
