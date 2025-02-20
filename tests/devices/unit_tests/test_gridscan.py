@@ -392,3 +392,4 @@ async def test_timeout_on_complete_triggers_stop_and_logs_error(
     with pytest.raises(asyncio.TimeoutError):
         await zebra_fast_grid_scan.complete()
     mock_log_error.assert_called_once()
+    zebra_fast_grid_scan.stop_cmd.trigger.assert_awaited_once()

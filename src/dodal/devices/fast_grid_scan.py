@@ -262,7 +262,8 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
             await wait_for_value(self.status, 0, self.COMPLETE_STATUS)
         except asyncio.TimeoutError:
             LOGGER.error(
-                "Hyperion timed out waiting for FGS motion to complete. This may have been caused by a goniometer stage getting stuck"
+                "Hyperion timed out waiting for FGS motion to complete. This may have been caused by a goniometer stage getting stuck.\n\
+                Forcably stopping the FGS motion program...def"
             )
             await self.stop_cmd.trigger()
             raise
