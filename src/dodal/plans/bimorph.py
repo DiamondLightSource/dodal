@@ -149,7 +149,14 @@ def bimorph_optimisation(
         slits, inactive_dimension, inactive_slit_size, inactive_slit_center
     )
 
-    @bpp.run_decorator()
+    metadata = {
+        "voltage_increment": voltage_increment,
+        "dimension": active_dimension,
+        "slit_positions": number_of_slit_positions,
+        "channels": len(mirror.channels),
+    }
+
+    @bpp.run_decorator(md=metadata)
     @bpp.stage_decorator((*detectors, mirror, slits))
     def outer_scan():
         """Outer plan stub, which moves mirror and calls inner_scan."""
