@@ -200,6 +200,7 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
         self.scan_invalid = epics_signal_r(float, f"{prefix}SCAN_INVALID")
 
         self.run_cmd = epics_signal_x(f"{prefix}RUN.PROC")
+        self.stop_cmd = epics_signal_x(f"{prefix}STOP.PROC")
         self.status = epics_signal_r(int, f"{prefix}SCAN_STATUS")
 
         self.expected_images = create_hardware_backed_soft_signal(
@@ -257,7 +258,14 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
 
     @AsyncStatus.wrap
     async def complete(self):
-        await wait_for_value(self.status, 0, self.COMPLETE_STATUS)
+        try:
+            await wait_for_value(self.status, 0, self.COMPLETE_STATUS)
+        except asyncio.TimeoutError:
+            LOGGER.error(
+                "Hyperion timed out waiting for FGS motion to complete. This may have been caused by a goniometer stage getting stuck"
+            )
+            await self.stop_cmd.trigger()
+            raise
 
     @abstractmethod
     def _create_position_counter(self, prefix: str) -> SignalRW[int]:

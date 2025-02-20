@@ -1,6 +1,8 @@
+import asyncio
 from asyncio import TimeoutError, wait_for
 from contextlib import nullcontext
 from dataclasses import dataclass
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import numpy as np
 import pytest
@@ -377,3 +379,16 @@ def test_non_test_integer_dwell_time(test_dwell_times, expected_dwell_time_is_in
                 dwell_time_ms=test_dwell_times,
                 transmission_fraction=0.01,
             )
+
+
+@patch("dodal.devices.fast_grid_scan.LOGGER.error")
+async def test_timeout_on_complete_triggers_stop_and_logs_error(
+    mock_log_error: MagicMock,
+    zebra_fast_grid_scan: ZebraFastGridScan,
+):
+    zebra_fast_grid_scan.COMPLETE_STATUS = 0.01
+    zebra_fast_grid_scan.stop_cmd = AsyncMock()
+    set_mock_value(zebra_fast_grid_scan.status, 1)
+    with pytest.raises(asyncio.TimeoutError):
+        await zebra_fast_grid_scan.complete()
+    mock_log_error.assert_called_once()
