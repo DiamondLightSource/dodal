@@ -27,7 +27,9 @@ class I10SlitsBlades(Slits):
 
 
 class BladeDrainCurrents(Device):
-    """ "The drain current measurements on each blade."""
+    """ "The drain current measurements on each blade. The drain current are due to
+    photoelectric effect (https://en.wikipedia.org/wiki/Photoelectric_effect).
+    Note the readings are in voltage as it is the output of a current amplifier."""
 
     def __init__(
         self,

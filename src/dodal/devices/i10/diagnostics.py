@@ -1,13 +1,14 @@
-import asyncio
-
-from bluesky.protocols import Triggerable
-from ophyd_async.core import AsyncStatus, Device, StandardReadable, StrictEnum
+from bluesky.protocols import Movable
+from ophyd_async.core import (
+    AsyncStatus,
+    Device,
+    StandardReadable,
+    StrictEnum,
+)
 from ophyd_async.core import StandardReadableFormat as Format
 from ophyd_async.core._device import DeviceConnector
 from ophyd_async.epics.adaravis import AravisDriverIO
-from ophyd_async.epics.adcore import (
-    ImageMode,
-)
+from ophyd_async.epics.adcore import SingleTriggerDetector
 from ophyd_async.epics.core import (
     epics_signal_r,
     epics_signal_rw,
@@ -74,7 +75,7 @@ class I10WebCamIODataType(StrictEnum):
     INT16 = "UInt16"
 
 
-class DropDownStage(StandardReadable):
+class DropDownStage(StandardReadable, Movable):
     """1D stage with a enum table to select positions."""
 
     def __init__(
@@ -85,12 +86,22 @@ class DropDownStage(StandardReadable):
         dropdown_pv_suffix: str = ":MP:SELECT",
         name: str = "",
     ) -> None:
-        self.stage_motion = Motor(prefix=prefix + positioner_suffix)
+        self._stage_motion = Motor(prefix=prefix + positioner_suffix)
         with self.add_children_as_readables(Format.CONFIG_SIGNAL):
             self.stage_drop_down = epics_signal_rw(
                 positioner_enum, read_pv=prefix + positioner_suffix + dropdown_pv_suffix
             )
         super().__init__(name=name)
+        self.positioner_enum = positioner_enum
+
+    @AsyncStatus.wrap
+    async def set(self, value: StrictEnum) -> None:
+        if value in self.positioner_enum:
+            await self.stage_drop_down.set(value=value)
+        else:
+            raise ValueError(
+                f"{value} is not an allow position. Position must be: {self.positioner_enum}"
+            )
 
 
 class I10PneumaticStage(StandardReadable):
@@ -101,20 +112,16 @@ class I10PneumaticStage(StandardReadable):
     def __init__(
         self,
         prefix: str,
-        stage_write_enum: type[StrictEnum],
-        stage_read_enum: type[StrictEnum],
-        stage_read_suffix: str = "STA",
-        stage_write_suffix: str = "CON",
         name: str = "",
     ) -> None:
         with self.add_children_as_readables(Format.HINTED_SIGNAL):
             self.stage_drop_down_set = epics_signal_rw(
-                stage_write_enum,
-                read_pv=prefix + stage_write_suffix,
+                InOutTable,
+                read_pv=prefix + "CON",
             )
             self.stage_drop_down_readback = epics_signal_r(
-                stage_read_enum,
-                read_pv=prefix + stage_read_suffix,
+                InOutReadBackTable,
+                read_pv=prefix + "STA",
             )
         super().__init__(name=name)
 
@@ -128,7 +135,6 @@ class I10AravisDriverIO(AravisDriverIO):
         self,
         prefix: str,
         cam_infix: str = "CAM:",
-        stat_infix: str = "STAT:",
         name: str = "",
     ) -> None:
         super().__init__(prefix + cam_infix, name)
@@ -137,48 +143,6 @@ class I10AravisDriverIO(AravisDriverIO):
         self.data_type = epics_signal_r(
             I10WebCamIODataType, prefix + cam_infix + "DataType_RBV"
         )
-        # centroid x-y position
-        self.centroid_x = epics_signal_r(float, prefix + stat_infix + "CentroidX_RBV")
-        self.centroid_x_sigma = epics_signal_r(
-            float, prefix + stat_infix + "CentroidX_RBV"
-        )
-        self.centroid_y = epics_signal_r(float, prefix + stat_infix + "CentroidX_RBV")
-        self.centroid_x_sigma = epics_signal_r(
-            float, prefix + stat_infix + "CentroidY_RBV"
-        )
-
-
-class I10CentroidDetector(StandardReadable, Triggerable):
-    """Detector to read out the centroid position,
-    this is base off the SingleTriggerDetector in ophyd_async with added
-    readable default"""
-
-    def __init__(
-        self,
-        prefix: str,
-        name: str = "",
-    ) -> None:
-        self.drv = I10AravisDriverIO(prefix=prefix)
-        self.add_readables(
-            [self.drv.array_counter, self.drv.centroid_x, self.drv.centroid_y],
-            Format.HINTED_UNCACHED_SIGNAL,
-        )
-
-        self.add_readables([self.drv.acquire_time], Format.CONFIG_SIGNAL)
-
-        super().__init__(name=name)
-
-    @AsyncStatus.wrap
-    async def stage(self) -> None:
-        await asyncio.gather(
-            self.drv.image_mode.set(ImageMode.SINGLE),
-            self.drv.wait_for_plugins.set(True),
-        )
-        await super().stage()
-
-    @AsyncStatus.wrap
-    async def trigger(self) -> None:
-        await self.drv.acquire.set(True)
 
 
 class ScreenCam(Device):
@@ -187,22 +151,19 @@ class ScreenCam(Device):
     def __init__(
         self,
         prefix: str,
-        stage_write_enum: type[StrictEnum] = InOutTable,
-        stage_read_enum: type[StrictEnum] = InOutReadBackTable,
-        stage_read_suffix: str = "STA",
-        stage_write_suffix: str = "CON",
         cam_infix="DCAM:",
         name: str = "",
     ) -> None:
         self.screen_stage = I10PneumaticStage(
             prefix=prefix,
-            stage_read_enum=stage_read_enum,
-            stage_write_enum=stage_write_enum,
-            stage_read_suffix=stage_read_suffix,
-            stage_write_suffix=stage_write_suffix,
         )
-        self.single_trigger_centroid = I10CentroidDetector(
-            prefix=prefix + cam_infix,
+        cam_pv = prefix = prefix + cam_infix
+        self.single_trigger_centroid = SingleTriggerDetector(
+            drv=I10AravisDriverIO(prefix=cam_pv),
+            read_uncached=[
+                epics_signal_r(float, read_pv=f"{cam_pv}CentroidX_RBV"),
+                epics_signal_r(float, read_pv=f"{cam_pv}CentroidY_RBV"),
+            ],
         )
         super().__init__(name=name)
 
@@ -216,10 +177,6 @@ class FullDiagnostic(Device):
         positioner_enum: type[StrictEnum],
         positioner_suffix: str = "",
         dropdown_pv_suffix: str = ":MP:SELECT",
-        stage_write_enum: type[StrictEnum] = InOutTable,
-        stage_read_enum: type[StrictEnum] = InOutReadBackTable,
-        stage_read_suffix: str = "STA",
-        stage_write_suffix: str = "CON",
         cam_infix: str = "DCAM:",
         name: str = "",
     ) -> None:
@@ -231,10 +188,6 @@ class FullDiagnostic(Device):
         )
         self.screen = ScreenCam(
             prefix,
-            stage_write_enum,
-            stage_read_enum,
-            stage_read_suffix,
-            stage_write_suffix,
             cam_infix,
             name,
         )
