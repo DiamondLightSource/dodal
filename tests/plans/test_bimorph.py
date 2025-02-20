@@ -292,6 +292,55 @@ class TestBimorphOptimisation:
 
             yield mock_obj
 
+    async def test_metadata(
+        self,
+        mock_inner_scan: Mock,
+        mock_move_slits: Mock,
+        mock_restore_bimorph_state: Mock,
+        mock_bps_sleep: Mock,
+        mock_capture_bimorph_state: Mock,
+        detectors: list[Readable],
+        RE: RunEngine,
+        mirror_with_mocked_put: BimorphMirror,
+        slits: Slits,
+        voltage_increment: float,
+        active_dimension: SlitDimension,
+        active_slit_center_start: float,
+        active_slit_center_end: float,
+        active_slit_size: float,
+        inactive_slit_center: float,
+        inactive_slit_size: float,
+        number_of_slit_positions: int,
+        bimorph_settle_time: float,
+        initial_voltage_list: list[float],
+    ):
+        def start_subscription(name, doc):
+            assert {
+                "voltage_increment": voltage_increment,
+                "dimension": active_dimension,
+                "slit_positions": number_of_slit_positions,
+                "channels": len(mirror_with_mocked_put.channels),
+            }.items() <= doc.items()
+
+        RE(
+            bimorph_optimisation(
+                detectors,
+                mirror_with_mocked_put,
+                slits,
+                voltage_increment,
+                active_dimension,
+                active_slit_center_start,
+                active_slit_center_end,
+                active_slit_size,
+                inactive_slit_center,
+                inactive_slit_size,
+                number_of_slit_positions,
+                bimorph_settle_time,
+                initial_voltage_list,
+            ),
+            {"start": start_subscription},
+        )
+
     async def test_settle_time_called(
         self,
         mock_inner_scan: Mock,
