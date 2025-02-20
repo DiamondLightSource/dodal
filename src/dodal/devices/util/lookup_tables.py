@@ -64,3 +64,37 @@ def linear_interpolation_lut(
         return float(interp(s, s_values, t_values))
 
     return s_to_t2
+
+
+def linear_extrapolation_lut(
+    s_values: Sequence[float], t_values: Sequence[float]
+) -> Callable[[float], float]:
+    """
+    Return a callable that implements f(s) = t according to the conversion table data
+    supplied, with linear extrapolation outside that range. Inside the range of the table,
+    the function is equivalent to that returned by linear_interpolation_lut
+
+    Args:
+        s_values:  Values of the independent axis
+        t_values:  Values of the dependent axis
+
+    Returns:
+        A callable that returns t for the given s
+    """
+    assert len(s_values) == len(t_values), (
+        "Lookup table does not have the same number of values for each axis"
+    )
+    assert len(s_values) > 1, "Need at least 2 points in the lookup table"
+    interp = linear_interpolation_lut(s_values, t_values)
+    s_min = s_values[0]
+    s_max = s_values[-1]
+
+    def s_to_t(s: float) -> float:
+        if s < s_min:
+            return t_values[0] + (s - s_min) / (t_values[1] - t_values[0])
+        elif s > s_max:
+            return t_values[-1] + (s - s_max) / (t_values[-1] - t_values[-2])
+        else:
+            return interp(s)
+
+    return s_to_t
