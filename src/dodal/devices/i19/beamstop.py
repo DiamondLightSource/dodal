@@ -21,10 +21,10 @@ class HomingControl(StandardReadable):
 class BeamStop(StandardReadable):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
-            self.x = Motor(f"{prefix}:X")
-            self.y = Motor(f"{prefix}:Y")
-            self.z = Motor(f"{prefix}:Z")
+            self.x = Motor(f"{prefix}X")
+            self.y = Motor(f"{prefix}Y")
+            self.z = Motor(f"{prefix}Z")
 
-        self.homing = HomingControl(f"{prefix}:HM", name)
+        self.homing = HomingControl(f"{prefix}HM", name)
 
         super().__init__(name)
