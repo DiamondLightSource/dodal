@@ -37,6 +37,8 @@ class HutchConditionalShutter(StandardReadable, Movable):
         self.shutter = HutchShutter(prefix=prefix, name=name)
         bl_prefix = prefix.split("-")[0]
         self.hutch_state = epics_signal_r(str, f"{bl_prefix}-OP-STAT-01:EHStatus.VALA")
+        if hutch == HutchState.INVALID:
+            raise HutchInvalidError("Cannot define experimental shutter for invalid hutch")
         self.hutch_request = hutch
         super().__init__(name)
 
