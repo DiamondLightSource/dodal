@@ -43,6 +43,40 @@ def move_slits(slits: Slits, dimension: SlitDimension, gap: float, center: float
         yield from bps.mv(slits.y_centre, center)  # type: ignore
 
 
+def check_valid_bimorph_state(
+    voltage_list: list[float], abs_range: float, abs_diff: float
+) -> bool:
+    for voltage in voltage_list:
+        if abs(voltage) > abs_range:
+            return False
+
+    for i in range(len(voltage_list) - 1):
+        if abs(voltage_list[i] - voltage_list[i - 1]) > abs_diff:
+            return False
+
+    return True
+
+
+def validate_bimorph_plan(
+    initial_voltage_list: list[float],
+    voltage_increment: float,
+    abs_range: float,
+    abs_diff: float,
+) -> bool:
+    voltage_list = initial_voltage_list.copy()
+
+    if not check_valid_bimorph_state(voltage_list, abs_range, abs_diff):
+        return False
+
+    for i in range(len(initial_voltage_list)):
+        voltage_list[i] += voltage_increment
+
+        if not check_valid_bimorph_state(voltage_list, abs_range, abs_diff):
+            return False
+
+    return True
+
+
 @dataclass
 class BimorphState:
     """Data class containing positions of BimorphMirror and Slits"""
