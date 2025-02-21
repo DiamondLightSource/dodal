@@ -26,7 +26,6 @@ from dodal.devices.attenuator.filter_selections import (
     I02_1FilterThreeSelections,
     I02_1FilterTwoSelections,
 )
-from dodal.devices.backlight import Backlight
 from dodal.devices.cryostream import CryoStream
 from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.diamond_filter import DiamondFilter, I03Filters
@@ -34,6 +33,8 @@ from dodal.devices.eiger import EigerDetector
 from dodal.devices.fast_grid_scan import PandAFastGridScan, ZebraFastGridScan
 from dodal.devices.flux import Flux
 from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, MirrorVoltages
+from dodal.devices.i02_1.backlight import Backlight
+from dodal.devices.i02_1.sample_motors import SampleMotors
 from dodal.devices.i03.beamstop import Beamstop
 from dodal.devices.i24.dcm import DCM
 from dodal.devices.motors import XYZPositioner
@@ -93,13 +94,15 @@ def attenuator() -> EnumFilterAttenuator:
     )
 
 
-# Devuce is the same as i03's but prefix is different - needs some adjusting
-# @device_factory()
-# def backlight() -> Backlight:
-#     """Get the i02-1 backlight device, instantiate it if it hasn't already been.
-#     If this is called when already instantiated in i02-1, it will return the existing object.
-#     """
-#     return Backlight(prefix=PREFIX.beamline_prefix, name="backlight")
+@device_factory()
+def backlight() -> Backlight:
+    """Get the i02-1 backlight device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i02-1, it will return the existing object.
+    """
+    return Backlight(
+        prefix=PREFIX.beamline_prefix,
+        name="backlight",
+    )
 
 
 # Need the same device but without devshm here
@@ -172,13 +175,12 @@ def zocalo() -> ZocaloResults:
     )
 
 
-# This actually has to be a motor bundle not a smargon device: https://github.com/DiamondLightSource/dodal/blob/76c639100b06f89be82089708becc11de499a9e2/src/dodal/devices/vmxm/vmxm_sample_motors.py
-# @device_factory()
-# def smargon() -> Smargon:
-#     """Get the i03 Smargon device, instantiate it if it hasn't already been.
-#     If this is called when already instantiated in i03, it will return the existing object.
-#     """
-#     return Smargon(f"{PREFIX.beamline_prefix}-MO-SAMP-01:", "smargon")
+@device_factory()
+def goniometer() -> SampleMotors:
+    """Get the i02-1 goniometer device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return SampleMotors(f"{PREFIX.beamline_prefix}-MO-SAMP-01:", "goniometer")
 
 
 @device_factory()
