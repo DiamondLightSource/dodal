@@ -1,12 +1,12 @@
 import asyncio
 from collections.abc import Mapping
+from typing import Generic, TypeVar
 
 from bluesky.protocols import HasName, Movable
 from ophyd_async.core import (
     AsyncStatus,
     DeviceVector,
     SignalR,
-    SignalRW,
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
@@ -27,18 +27,21 @@ class StopState(StrictEnum):
     STOP = "STOP"
 
 
+OPEN_STR = "Open"
+
+
+class ValveControlRequest(StrictEnum):
+    OPEN = OPEN_STR
+    CLOSE = "Close"
+    RESET = "Reset"
+
+
 class FastValveControlRequest(StrictEnum):
-    OPEN = "Open"
+    OPEN = OPEN_STR
     CLOSE = "Close"
     RESET = "Reset"
     ARM = "Arm"
     DISARM = "Disarm"
-
-
-class ValveControlRequest(StrictEnum):
-    OPEN = "Open"
-    CLOSE = "Close"
-    RESET = "Reset"
 
 
 class ValveOpenSeqRequest(StrictEnum):
@@ -69,53 +72,25 @@ class FastValveState(StrictEnum):
     NONE = "Unused"
 
 
-class ValveControlBase(StandardReadable, Movable):
-    open: SignalRW[ValveControlRequest | FastValveControlRequest | int]
-    close: SignalRW[ValveControlRequest | FastValveControlRequest | int]
+T = TypeVar("T", bound=ValveControlRequest | FastValveControlRequest)
+
+
+class ValveControl(StandardReadable, Movable, Generic[T]):
+    def __init__(self, prefix: str, data_type: type[T], name: str = "") -> None:
+        with self.add_children_as_readables():
+            self.close = epics_signal_rw(data_type, prefix + ":CON")
+            self.open = epics_signal_rw(int, prefix + ":OPENSEQ")
+
+        super().__init__(name)
 
     @AsyncStatus.wrap
-    async def _set_open_seq(self):
-        await self.open.set(ValveOpenSeqRequest.OPEN_SEQ.value)
-        await asyncio.sleep(OPENSEQ_PULSE_LENGTH)
-        await self.open.set(ValveOpenSeqRequest.INACTIVE.value)
-
-
-class ValveControl(ValveControlBase):
-    def __init__(self, prefix: str, name: str = "") -> None:
-        with self.add_children_as_readables():
-            self.close = epics_signal_rw(ValveControlRequest, prefix + ":CON")
-            self.open = epics_signal_rw(int, prefix + ":OPENSEQ")
-
-        super().__init__(name)
-
-    def set(self, value: ValveControlRequest) -> AsyncStatus:
-        set_status = None
-
-        if value == ValveControlRequest.OPEN:
-            set_status = self._set_open_seq()
+    async def set(self, value: T):
+        if value == OPEN_STR:
+            await self.open.set(ValveOpenSeqRequest.OPEN_SEQ.value)
+            await asyncio.sleep(OPENSEQ_PULSE_LENGTH)
+            await self.open.set(ValveOpenSeqRequest.INACTIVE.value)
         else:
-            set_status = self.close.set(value)
-
-        return set_status
-
-
-class FastValveControl(ValveControlBase):
-    def __init__(self, prefix: str, name: str = "") -> None:
-        with self.add_children_as_readables():
-            self.close = epics_signal_rw(FastValveControlRequest, prefix + ":CON")
-            self.open = epics_signal_rw(int, prefix + ":OPENSEQ")
-
-        super().__init__(name)
-
-    def set(self, value: FastValveControlRequest) -> AsyncStatus:
-        set_status = None
-
-        if value == FastValveControlRequest.OPEN:
-            set_status = self._set_open_seq()
-        else:
-            set_status = self.close.set(value)
-
-        return set_status
+            await self.close.set(value)
 
 
 class AllValvesControl(StandardReadable, Movable):
@@ -151,12 +126,22 @@ class AllValvesControl(StandardReadable, Movable):
                 )
             )
 
-        self.fast_valve_control: DeviceVector[FastValveControl] = DeviceVector(
-            {i: FastValveControl(f"{prefix}V{i}") for i in self.fast_valves}
+        self.fast_valve_control: DeviceVector[ValveControl] = DeviceVector(
+            {
+                i: ValveControl[FastValveControlRequest](
+                    f"{prefix}V{i}", FastValveControlRequest
+                )
+                for i in self.fast_valves
+            }
         )
 
         self.valve_control: DeviceVector[ValveControl] = DeviceVector(
-            {i: ValveControl(f"{prefix}V{i}") for i in self.slow_valves}
+            {
+                i: ValveControl[ValveControlRequest](
+                    f"{prefix}V{i}", ValveControlRequest
+                )
+                for i in self.slow_valves
+            }
         )
 
         super().__init__(name)
