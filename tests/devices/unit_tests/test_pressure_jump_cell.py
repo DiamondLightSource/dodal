@@ -475,3 +475,15 @@ async def test_all_valves_can_be_set(
             },
         },
     )
+
+
+def test_setting_pressure_cell_valves(cell: PressureJumpCell):
+    # Easily open/close all valves without needing to know what they are
+    for valve in cell.all_valves_control.valve_control.values():
+        valve.set(ValveControlRequest.OPEN)
+
+    for valve in cell.all_valves_control.valve_control.values():
+        valve.set(ValveControlRequest.CLOSE)
+
+    # Can have finer control over the fast valves if I need
+    cell.all_valves_control.fast_valves[5].fine_control.set(FastValveControlRequest.ARM)
