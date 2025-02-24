@@ -91,9 +91,13 @@ def linear_extrapolation_lut(
 
     def s_to_t(s: float) -> float:
         if s < s_min:
-            return t_values[0] + (s - s_min) / (t_values[1] - t_values[0])
+            return t_values[0] + (s - s_min) * (t_values[1] - t_values[0]) / (
+                s_values[1] - s_values[0]
+            )
         elif s > s_max:
-            return t_values[-1] + (s - s_max) / (t_values[-1] - t_values[-2])
+            return t_values[-1] + (s - s_max) * (t_values[-1] - t_values[-2]) / (
+                s_values[-1] - s_values[-2]
+            )
         else:
             return interp(s)
 

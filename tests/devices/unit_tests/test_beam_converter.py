@@ -8,11 +8,13 @@ from dodal.devices.detector.det_dist_to_beam_converter import (
     DetectorDistanceToBeamXYConverter,
 )
 
+# fmt: off
 LOOKUP_TABLE_TEST_VALUES = [
     (100.0, 200.0),  # distance
     (150.0, 151.0),  # x
-    (160.0, 165.0),
-]  # y
+    (160.0, 165.0),  # y
+]
+# fmt: on
 
 
 @pytest.fixture
