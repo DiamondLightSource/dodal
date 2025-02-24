@@ -1,8 +1,9 @@
 from enum import Enum
 
-from numpy import loadtxt
-
-from dodal.devices.util.lookup_tables import linear_extrapolation_lut
+from dodal.devices.util.lookup_tables import (
+    linear_extrapolation_lut,
+    parse_lookup_table,
+)
 
 
 class Axis(Enum):
@@ -13,7 +14,7 @@ class Axis(Enum):
 class DetectorDistanceToBeamXYConverter:
     def __init__(self, lookup_file: str):
         self.lookup_file: str = lookup_file
-        lookup_table_columns: list = self.parse_table()
+        lookup_table_columns: list = parse_lookup_table(self.lookup_file)
         self._d_to_x = linear_extrapolation_lut(
             lookup_table_columns[0], lookup_table_columns[1]
         )
@@ -51,9 +52,3 @@ class DetectorDistanceToBeamXYConverter:
         return self.get_beam_axis_pixels(
             det_distance, image_size_pixels, det_dim, Axis.X_AXIS
         )
-
-    def parse_table(self) -> list:
-        rows = loadtxt(self.lookup_file, delimiter=" ", comments=["#", "Units"])
-        columns = list(zip(*rows, strict=False))
-
-        return columns

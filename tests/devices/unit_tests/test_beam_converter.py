@@ -19,9 +19,8 @@ LOOKUP_TABLE_TEST_VALUES = [
 
 @pytest.fixture
 def fake_converter():
-    with patch.object(
-        DetectorDistanceToBeamXYConverter,
-        "parse_table",
+    with patch(
+        "dodal.devices.detector.det_dist_to_beam_converter.parse_lookup_table",
         return_value=LOOKUP_TABLE_TEST_VALUES,
     ):
         yield DetectorDistanceToBeamXYConverter("test.txt")
