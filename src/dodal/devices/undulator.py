@@ -46,7 +46,7 @@ def _get_closest_gap_for_energy(
     return table[1][idx]
 
 
-class Undulator(StandardReadable, Movable):
+class Undulator(StandardReadable, Movable[float]):
     """
     An Undulator-type insertion device, used to control photon emission at a given
     beam energy.

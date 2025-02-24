@@ -4,6 +4,7 @@ import asyncio
 from enum import Enum
 from functools import partialmethod
 
+from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
     DeviceVector,
@@ -74,7 +75,7 @@ class SoftInState(StrictEnum):
     NO = "No"
 
 
-class ArmingDevice(StandardReadable):
+class ArmingDevice(StandardReadable, Movable[ArmDemand]):
     """A useful device that can abstract some of the logic of arming.
     Allows a user to just call arm.set(ArmDemand.ARM)"""
 

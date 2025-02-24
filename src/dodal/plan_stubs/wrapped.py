@@ -1,6 +1,6 @@
 import itertools
 from collections.abc import Mapping
-from typing import Annotated, Any
+from typing import Annotated, TypeVar
 
 import bluesky.plan_stubs as bps
 from bluesky.protocols import Movable
@@ -12,17 +12,17 @@ Wrappers for Bluesky built-in plan stubs with type hinting
 
 Group = Annotated[str, "String identifier used by 'wait' or stubs that await"]
 
+T = TypeVar("T")
 
-# After bluesky 1.14, bounds for stubs that move can be narrowed
-# https://github.com/bluesky/bluesky/issues/1821
+
 def set_absolute(
-    movable: Movable, value: Any, group: Group | None = None, wait: bool = False
+    movable: Movable[T], value: T, group: Group | None = None, wait: bool = False
 ) -> MsgGenerator:
     """
     Set a device, wrapper for `bp.abs_set`.
 
     Args:
-        movable (Movable): The device to set
+        movable (Movable[T]): The device to set
         value (T): The new value
         group (Group | None, optional): The message group to associate with the
                                            setting, for sequencing. Defaults to None.
@@ -39,7 +39,7 @@ def set_absolute(
 
 
 def set_relative(
-    movable: Movable, value: Any, group: Group | None = None, wait: bool = False
+    movable: Movable[T], value: T, group: Group | None = None, wait: bool = False
 ) -> MsgGenerator:
     """
     Change a device, wrapper for `bp.rel_set`.
@@ -62,7 +62,7 @@ def set_relative(
     return (yield from bps.rel_set(movable, value, group=group, wait=wait))
 
 
-def move(moves: Mapping[Movable, Any], group: Group | None = None) -> MsgGenerator:
+def move(moves: Mapping[Movable[T], T], group: Group | None = None) -> MsgGenerator:
     """
     Move a device, wrapper for `bp.mv`.
 
@@ -84,7 +84,7 @@ def move(moves: Mapping[Movable, Any], group: Group | None = None) -> MsgGenerat
 
 
 def move_relative(
-    moves: Mapping[Movable, Any], group: Group | None = None
+    moves: Mapping[Movable[T], T], group: Group | None = None
 ) -> MsgGenerator:
     """
     Move a device relative to its current position, wrapper for `bp.mvr`.
