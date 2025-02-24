@@ -28,11 +28,11 @@ class ThawingTimer(Device, Stoppable, Movable[float]):
         super().__init__("thaw_for_time_s")
 
     @AsyncStatus.wrap
-    async def set(self, time_to_thaw_for: float):
+    async def set(self, value: float):
         await self._control_signal_ref().set(ThawerStates.ON)
         if self._thawing_task and not self._thawing_task.done():
             raise ThawingException("Thawing task already in progress")
-        self._thawing_task = create_task(sleep(time_to_thaw_for))
+        self._thawing_task = create_task(sleep(value))
         try:
             await self._thawing_task
         finally:
