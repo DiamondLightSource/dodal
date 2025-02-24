@@ -46,6 +46,15 @@ def move_slits(slits: Slits, dimension: SlitDimension, gap: float, center: float
 def check_valid_bimorph_state(
     voltage_list: list[float], abs_range: float, abs_diff: float
 ) -> bool:
+    """Checks that a set of bimorph voltages is valid.
+    Args:
+        voltage_list: float amount each actuator will be increased by per scan
+        abs_range: float absolute value of maximum possible voltage of each actuator
+        abs_diff: float absolute maximum difference between two consecutive actuators
+
+    Returns:
+        Bool representing state validity
+    """
     for voltage in voltage_list:
         if abs(voltage) > abs_range:
             return False
@@ -63,16 +72,26 @@ def validate_bimorph_plan(
     abs_range: float,
     abs_diff: float,
 ) -> bool:
+    """Checks that every position the bimorph will move through will not error.
+
+    Args:
+        initial_voltage_list: float list starting position
+        voltage_increment: float amount each actuator will be increased by per scan
+        abs_range: float absolute value of maximum possible voltage of each actuator
+        abs_diff: float absolute maximum difference between two consecutive actuators
+
+    Raises:
+        Exception if the plan will lead to an error state"""
     voltage_list = initial_voltage_list.copy()
 
     if not check_valid_bimorph_state(voltage_list, abs_range, abs_diff):
-        return False
+        raise Exception(f"Bimorph plan reaches invalid state at: {voltage_list}")
 
     for i in range(len(initial_voltage_list)):
         voltage_list[i] += voltage_increment
 
         if not check_valid_bimorph_state(voltage_list, abs_range, abs_diff):
-            return False
+            raise Exception(f"Bimorph plan reaches invalid state at: {voltage_list}")
 
     return True
 
@@ -166,10 +185,13 @@ def bimorph_optimisation(
         bimorph_settle_time: float time in seconds to wait after bimorph move
         initial_voltage_list: optional list[float] starting voltages for bimorph (defaults to current voltages)
     """
+
     state = yield from capture_bimorph_state(mirror, slits)
 
     # If a starting set of voltages is not provided, default to current:
     initial_voltage_list = initial_voltage_list or state.voltages
+
+    validate_bimorph_plan(initial_voltage_list, voltage_increment, 1000, 500)
 
     inactive_dimension = (
         SlitDimension.Y if active_dimension == SlitDimension.X else SlitDimension.X
