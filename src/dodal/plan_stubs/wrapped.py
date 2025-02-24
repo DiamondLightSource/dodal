@@ -79,8 +79,7 @@ def move(moves: Mapping[Movable, Any], group: Group | None = None) -> MsgGenerat
     """
 
     return (
-        # type ignore until https://github.com/bluesky/bluesky/issues/1809
-        yield from bps.mv(*itertools.chain.from_iterable(moves.items()), group=group)  # type: ignore
+        yield from bps.mv(*itertools.chain.from_iterable(moves.items()), group=group)
     )
 
 
@@ -103,8 +102,7 @@ def move_relative(
     """
 
     return (
-        # type ignore until https://github.com/bluesky/bluesky/issues/1809
-        yield from bps.mvr(*itertools.chain.from_iterable(moves.items()), group=group)  # type: ignore
+        yield from bps.mvr(*itertools.chain.from_iterable(moves.items()), group=group)
     )
 
 
