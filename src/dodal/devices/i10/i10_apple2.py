@@ -64,11 +64,7 @@ class I10Apple2(Apple2):
 
     def __init__(
         self,
-        id_gap: UndulatorGap,
-        id_phase: UndulatorPhaseAxes,
-        id_jaw_phase: UndulatorJawPhase,
-        energy_gap_table_path: Path,
-        energy_phase_table_path: Path,
+        look_up_table_dir: str,
         source: tuple[str, str],
         prefix: str = "",
         mode: str = "Mode",
@@ -80,14 +76,8 @@ class I10Apple2(Apple2):
         """
         Parameters
         ----------
-        id_gap:
-            An UndulatorGap device.
-        id_phase:
-            An UndulatorPhaseAxes device.
-        energy_gap_table_path:
-            The path to id gap look up table.
-        energy_phase_table_path:
-            The path to id phase look up table.
+        look_up_table_dir:
+            The path to look up table.
         source:
             The column name and the name of the source in look up table. e.g. ("source", "idu")
         mode:
@@ -99,11 +89,17 @@ class I10Apple2(Apple2):
         poly_deg:
             The column names for the parameters for the energy conversion polynomial, starting with the least significant.
         prefix:
-            Not in use but needed for device_instantiation.
+            epic pv for id
         Name:
             Name of the device
         """
 
+        energy_gap_table_path = Path(
+            look_up_table_dir + "IDEnergy2GapCalibrations.csv",
+        )
+        energy_phase_table_path = Path(
+            look_up_table_dir + "IDEnergy2PhaseCalibrations.csv",
+        )
         # A dataclass contains the path to the look up table and the expected column names.
         self.lookup_table_config = LookupTableConfig(
             path=LookupPath(Gap=energy_gap_table_path, Phase=energy_phase_table_path),
@@ -113,14 +109,25 @@ class I10Apple2(Apple2):
             max_energy=max_energy,
             poly_deg=poly_deg,
         )
+
         with self.add_children_as_readables():
             super().__init__(
-                id_gap=id_gap,
-                id_phase=id_phase,
+                id_gap=UndulatorGap(name="id_gap", prefix=prefix),
+                id_phase=UndulatorPhaseAxes(
+                    name="id_phase",
+                    prefix=prefix,
+                    top_outer="RPQ1",
+                    top_inner="RPQ2",
+                    btm_inner="RPQ3",
+                    btm_outer="RPQ4",
+                ),
                 prefix=prefix,
                 name=name,
             )
-            self.id_jaw_phase = id_jaw_phase
+            self.id_jaw_phase = UndulatorJawPhase(
+                prefix=prefix,
+                move_pv="RPQ1",
+            )
 
     async def read(self) -> dict[str, Reading]:
         # It is not possible to get lh3 from hardware so if pol is in lh3 we skip check.
@@ -353,31 +360,12 @@ class I10Id(Device):
             laa: LinearArbitraryAngle
                 Devices that allow alteration of the beam polarisation angle in LA mode.
         """
-
         self.energy = I10Apple2PGM(
             id=I10Apple2(
-                id_gap=UndulatorGap(name="id_gap", prefix=prefix),
-                id_phase=UndulatorPhaseAxes(
-                    name="id_phase",
-                    prefix=prefix,
-                    top_outer="RPQ1",
-                    top_inner="RPQ2",
-                    btm_inner="RPQ3",
-                    btm_outer="RPQ4",
-                ),
-                id_jaw_phase=UndulatorJawPhase(
-                    prefix=prefix,
-                    move_pv="RPQ1",
-                ),
-                energy_gap_table_path=Path(
-                    look_up_table_dir + "IDEnergy2GapCalibrations.csv",
-                ),
-                energy_phase_table_path=Path(
-                    look_up_table_dir + "IDEnergy2PhaseCalibrations.csv",
-                ),
-                name="idd_energy",
+                look_up_table_dir=look_up_table_dir,
+                name="id_energy",
                 source=source,
-                prefix="",
+                prefix=prefix,
             ),
             pgm=pgm,
             name="energy",

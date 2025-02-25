@@ -1,6 +1,5 @@
 import pickle
 from collections import defaultdict
-from pathlib import Path
 from unittest import mock
 from unittest.mock import Mock
 
@@ -34,6 +33,7 @@ from dodal.devices.i10.i10_apple2 import (
 from dodal.devices.i10.i10_setting_data import I10Grating
 from dodal.devices.pgm import PGM
 
+LOOK_UP_TABLE_DIR = "tests/devices/i10/lookupTables/"
 ID_GAP_LOOKUP_TABLE = "tests/devices/i10/lookupTables/IDEnergy2GapCalibrations.csv"
 ID_PHASE_LOOKUP_TABLE = "tests/devices/i10/lookupTables/IDEnergy2PhaseCalibrations.csv"
 
@@ -100,19 +100,12 @@ async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndulatorJawPhase:
 
 
 @pytest.fixture
-async def mock_id(
-    mock_phaseAxes: UndulatorPhaseAxes,
-    mock_id_gap: UndulatorGap,
-    mock_jaw_phase: UndulatorJawPhase,
-) -> I10Apple2:
+async def mock_id() -> I10Apple2:
     async with init_devices(mock=True):
         mock_id = I10Apple2(
-            id_gap=mock_id_gap,
-            id_phase=mock_phaseAxes,
-            id_jaw_phase=mock_jaw_phase,
-            energy_gap_table_path=Path(ID_GAP_LOOKUP_TABLE),
-            energy_phase_table_path=Path(ID_PHASE_LOOKUP_TABLE),
+            look_up_table_dir=LOOK_UP_TABLE_DIR,
             source=("Source", "idu"),
+            prefix="BLWOW-MO-SERVC-01:",
         )
     set_mock_value(mock_id.gap.gate, UndulatorGateStatus.CLOSE)
     set_mock_value(mock_id.phase.gate, UndulatorGateStatus.CLOSE)
@@ -197,22 +190,18 @@ async def test_I10Apple2_determine_pol(
         assert await mock_id.polarisation.get_value() == pol
 
 
-async def test_fail_I10Apple2_no_lookup(
-    mock_phaseAxes: UndulatorPhaseAxes,
-    mock_id_gap: UndulatorGap,
-    mock_jaw_phase: UndulatorJawPhase,
-):
-    wrong_path = Path("fnslkfndlsnf")
+async def test_fail_I10Apple2_no_lookup():
+    wrong_path = "fnslkfndlsnf"
     with pytest.raises(FileNotFoundError) as e:
         I10Apple2(
-            id_gap=mock_id_gap,
-            id_phase=mock_phaseAxes,
-            id_jaw_phase=mock_jaw_phase,
-            energy_gap_table_path=wrong_path,
-            energy_phase_table_path=Path(ID_PHASE_LOOKUP_TABLE),
+            look_up_table_dir=wrong_path,
             source=("Source", "idu"),
+            prefix="BLWOW-MO-SERVC-01:",
         )
-    assert str(e.value) == f"Gap look up table is not in path: {wrong_path}"
+    assert (
+        str(e.value)
+        == f"Gap look up table is not in path: {wrong_path}IDEnergy2GapCalibrations.csv"
+    )
 
 
 @pytest.mark.parametrize("energy", [(100), (2500), (-299)])
