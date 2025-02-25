@@ -125,7 +125,7 @@ class I10Apple2(Apple2):
     async def read(self) -> dict[str, Reading]:
         # It is not possible to get lh3 from hardware so if pol is in lh3 we skip check.
         if await self.polarisation.get_value() != "lh3":
-            pol, _ = await self.determinePhaseFromHardware()
+            pol, _ = await self.determine_phase_from_hardware()
             if pol is not None:
                 self.set_pol(pol=pol)
         return await super().read()
@@ -139,7 +139,7 @@ class I10Apple2(Apple2):
         pol = await self.polarisation.get_value()
         if pol not in self._available_pol:
             LOGGER.warning("Polarisation not set attempting to read from hardware")
-            pol, phase = await self.determinePhaseFromHardware()
+            pol, phase = await self.determine_phase_from_hardware()
             if pol is None:
                 raise ValueError(
                     f"Polarisation cannot be determine from hardware for {self.name}"
@@ -258,7 +258,7 @@ class I10Apple2Pol(StandardReadable, Movable):
     async def read(self) -> dict[str, Reading]:
         # It is not possible to get lh3 from hardware so if pol is in lh3 we skip check.
         if await self.id_ref().polarisation.get_value() != "lh3":
-            pol, _ = await self.id_ref().determinePhaseFromHardware()
+            pol, _ = await self.id_ref().determine_phase_from_hardware()
             if pol is not None:
                 self.id_ref().set_pol(pol=pol)
         return await super().read()

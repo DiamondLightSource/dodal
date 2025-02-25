@@ -286,8 +286,8 @@ class UndulatorPhaseAxes(SafeUndulatorMover):
                 for axis in axes
             ]
         )
-        # The extra 2.0 is needed as motors timeout too quicky due
-        # to readback speed is amost twice the actual speed.
+        # The extra 2.0 is needed as motors timeout too quick due
+        # to readback speed is almost twice the actual speed.
         return np.max(timeouts) * 2.0
 
 
@@ -484,7 +484,7 @@ class Apple2(StandardReadable, Movable):
 
         """
 
-    async def determinePhaseFromHardware(self) -> tuple[str | None, float]:
+    async def determine_phase_from_hardware(self) -> tuple[str | None, float]:
         """
         Try to determine polarisation and phase value using row phase motor position pattern.
         However there is no way to return lh3 polarisation or higher harmonic setting.
