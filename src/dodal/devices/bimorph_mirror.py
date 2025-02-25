@@ -66,7 +66,7 @@ class BimorphMirrorChannel(StandardReadable, Movable, EpicsDevice):
         Args:
             value: float to set VOUT to
         """
-        await self.target_voltage.set(value)
+        await self.output_voltage.set(value)
 
 
 class BimorphMirror(StandardReadable, Movable):
