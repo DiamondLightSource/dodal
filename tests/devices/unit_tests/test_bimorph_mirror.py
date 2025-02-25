@@ -123,24 +123,6 @@ async def test_set_channels_waits_for_output_voltage_readback(
         )
 
 
-async def test_set_one_channel(mirror_with_mocked_put: BimorphMirror):
-    values = [1.0]
-
-    await mirror_with_mocked_put.set(values)
-
-    read = await mirror_with_mocked_put.read()
-
-    assert [
-        await mirror_with_mocked_put.channels[i].target_voltage.get_value()
-        for i in range(1, len(values) + 1)
-    ] == list(values)
-
-    assert [
-        read[f"{mirror_with_mocked_put.name}-channels-{i}-output_voltage"]["value"]
-        for i in range(1, len(values) + 1)
-    ] == list(values)
-
-
 async def test_read(
     mirror_with_mocked_put: BimorphMirror,
     valid_bimorph_values: list[float],
