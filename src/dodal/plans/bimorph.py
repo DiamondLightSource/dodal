@@ -236,8 +236,11 @@ def bimorph_optimisation(
             stream_name,
         )
 
-        for i, channel in enumerate(mirror.channels.values()):
-            yield from bps.mv(channel, initial_voltage_list[i] + voltage_increment)  # type: ignore
+        for i in range(len(mirror.channels)):
+            yield from bps.mv(
+                mirror,  # type: ignore
+                {i + 1: initial_voltage_list[i] + voltage_increment},  # type: ignore
+            )
             yield from bps.sleep(bimorph_settle_time)
 
             stream_name = str(int(stream_name) + 1)
