@@ -134,23 +134,25 @@ async def test_move_slits(
     ] == messages
 
 
-def test_save_and_restore(RE: RunEngine, mirror: BimorphMirror, slits: Slits):
+async def test_save_and_restore(
+    RE: RunEngine, mirror_with_mocked_put: BimorphMirror, slits: Slits
+):
     signals = [
         slits.x_gap.user_setpoint,
         slits.y_gap.user_setpoint,
         slits.x_centre.user_setpoint,
         slits.y_centre.user_setpoint,
-        mirror.channels[1].output_voltage,
+        mirror_with_mocked_put.channels[1].output_voltage,
     ]
     puts = [get_mock_put(signal) for signal in signals]
 
     def plan():
-        state = yield from capture_bimorph_state(mirror, slits)
+        state = yield from capture_bimorph_state(mirror_with_mocked_put, slits)
 
         for signal in signals:
             yield from bps.abs_set(signal, 4.0, wait=True)
 
-        yield from restore_bimorph_state(mirror, slits, state)
+        yield from restore_bimorph_state(mirror_with_mocked_put, slits, state)
 
     RE(plan())
 
