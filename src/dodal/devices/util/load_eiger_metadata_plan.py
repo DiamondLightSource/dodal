@@ -20,7 +20,7 @@ def load_metadata(
     LOGGER.info(f"Setting Odin PVs: {time.time() - start}s")
     yield from change_roi_mode(eiger, enable, detector_params, wait=True)
     LOGGER.info(f"Changing ROI Mode: {time.time() - start}s")
-    yield from bps.abs_set(eiger.odin.num_frames_chunks, 1)
+    yield from bps.abs_set(eiger.odin.file_writer.num_frames_chunks, 1)  # type: ignore
     LOGGER.info(f"Setting # of Frame Chunks: {time.time() - start}s")
     yield from set_mx_settings_pvs(eiger, detector_params, wait=True)
     LOGGER.info(f"Setting MX PVs: {time.time() - start}s")
