@@ -192,6 +192,8 @@ def bimorph_optimisation(
     # If a starting set of voltages is not provided, default to current:
     initial_voltage_list = initial_voltage_list or state.voltages
 
+    current_voltage_list = initial_voltage_list.copy()
+
     validate_bimorph_plan(initial_voltage_list, voltage_increment, 1000, 500)
 
     inactive_dimension = (
@@ -238,9 +240,11 @@ def bimorph_optimisation(
         )
 
         for i in range(len(mirror.channels)):
+            current_voltage_list[i] += voltage_increment
+
             yield from bps.mv(
                 mirror,  # type: ignore
-                {i + 1: initial_voltage_list[i] + voltage_increment},  # type: ignore
+                current_voltage_list,
             )
             yield from bps.sleep(bimorph_settle_time)
 
