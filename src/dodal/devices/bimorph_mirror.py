@@ -1,5 +1,4 @@
 import asyncio
-from collections.abc import Mapping
 from typing import Annotated as A
 
 from bluesky.protocols import Movable
@@ -102,11 +101,11 @@ class BimorphMirror(StandardReadable, Movable):
         super().__init__(name=name)
 
     @AsyncStatus.wrap
-    async def set(self, value: Mapping[int, float]) -> None:
-        """Sets bimorph voltages in serial via VOUT.
+    async def set(self, value: list[float]) -> None:
+        """Sets bimorph voltages in parrallel via target voltage and all proc.
 
         Args:
-            value: Dict of channel numbers to target voltages
+            value: List of float target voltages
 
         Raises:
             ValueError: On set to non-existent channel"""
@@ -118,7 +117,7 @@ class BimorphMirror(StandardReadable, Movable):
 
         # Write target voltages in serial
         # Voltages are written in serial as bimorph PSU cannot handle simultaneous sets
-        for i, target in value.items():
+        for i, target in enumerate(value):
             await wait_for_value(
                 self.status, BimorphMirrorStatus.IDLE, timeout=DEFAULT_TIMEOUT
             )
@@ -137,7 +136,7 @@ class BimorphMirror(StandardReadable, Movable):
                     target,
                     timeout=DEFAULT_TIMEOUT,
                 )
-                for i, target in value.items()
+                for i, target in enumerate(value)
             ],
             wait_for_value(
                 self.status, BimorphMirrorStatus.IDLE, timeout=DEFAULT_TIMEOUT
