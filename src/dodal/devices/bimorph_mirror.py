@@ -66,16 +66,7 @@ class BimorphMirrorChannel(StandardReadable, Movable, EpicsDevice):
         Args:
             value: float to set VOUT to
         """
-            await set_and_wait_for_other_value(
-                self.channels[i].target_voltage,
-                target,
-                self.status,
-                BimorphMirrorStatus.BUSY,
-            )
-        await wait_for_value(self.status, BimorphMirrorStatus.IDLE, timeout=DEFAULT_TIMEOUT)
-
-        await set_and_wait_for_other_value(
-            self.output_voltage, value, self.status, BimorphMirrorStatus.BUSY)
+        await self.target_voltage.set(value)
 
 
 class BimorphMirror(StandardReadable, Movable):
