@@ -48,16 +48,24 @@ def change_roi_mode(
 
     yield from bps.abs_set(eiger.drv.roi_mode, 1 if enable else 0, group=group)
     yield from bps.abs_set(
-        eiger.odin.image_height, detector_dimensions.height, group=group
+        eiger.odin.file_writer.image_height,  # type: ignore
+        detector_dimensions.height,
+        group=group,
     )
     yield from bps.abs_set(
-        eiger.odin.image_width, detector_dimensions.width, group=group
+        eiger.odin.file_writer.image_width,  # type: ignore
+        detector_dimensions.width,
+        group=group,
     )
     yield from bps.abs_set(
-        eiger.odin.num_row_chunks, detector_dimensions.height, group=group
+        eiger.odin.file_writer.num_row_chunks,  # type: ignore
+        detector_dimensions.height,
+        group=group,
     )
     yield from bps.abs_set(
-        eiger.odin.num_col_chunks, detector_dimensions.width, group=group
+        eiger.odin.file_writer.num_col_chunks,  # type: ignore
+        detector_dimensions.width,
+        group=group,
     )
 
     if wait:
@@ -90,11 +98,20 @@ def set_mx_settings_pvs(
 
 
 def set_odin_pvs(
-    eiger: EigerDetector, detector_params: DetectorParams, wait: bool, group="odin_pvs"
+    eiger: EigerDetector,
+    detector_params: DetectorParams,
+    wait: bool,
+    group="odin_pvs",
 ):
-    yield from bps.abs_set(eiger.odin.file_path, detector_params.directory, group=group)
     yield from bps.abs_set(
-        eiger.odin.file_name, detector_params.full_filename, group=group
+        eiger.odin.file_writer.file_path,  # type: ignore
+        detector_params.directory,
+        group=group,
+    )
+    yield from bps.abs_set(
+        eiger.odin.file_writer.file_name,  # type: ignore
+        detector_params.full_filename,
+        group=group,
     )
 
     if wait:
