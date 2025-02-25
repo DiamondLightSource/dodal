@@ -1,4 +1,7 @@
+import time
+
 import bluesky.plan_stubs as bps
+from mx_bluesky.common.utils.log import LOGGER
 from ophyd_async.epics.eiger import EigerDetector, EigerTriggerInfo
 
 from dodal.devices.detector import DetectorParams
@@ -9,12 +12,18 @@ def load_metadata(
     enable: bool,
     detector_params: DetectorParams,
 ):
+    start = time.time()
     assert detector_params.expected_energy_ev
     yield from bps.stage(eiger)
+    LOGGER.info(f"Staging Eiger: {time.time() - start}s")
     yield from set_odin_pvs(eiger, detector_params, wait=True)
-    yield from change_roi_mode(eiger, enable, detector_params)
+    LOGGER.info(f"Setting Odin PVs: {time.time() - start}s")
+    yield from change_roi_mode(eiger, enable, detector_params, wait=True)
+    LOGGER.info(f"Changing ROI Mode: {time.time() - start}s")
     yield from bps.abs_set(eiger.odin.num_frames_chunks, 1)
+    LOGGER.info(f"Setting # of Frame Chunks: {time.time() - start}s")
     yield from set_mx_settings_pvs(eiger, detector_params, wait=True)
+    LOGGER.info(f"Setting MX PVs: {time.time() - start}s")
 
     trigger_info = EigerTriggerInfo(
         number_of_triggers=detector_params.num_triggers,
@@ -25,7 +34,11 @@ def load_metadata(
 
 
 def change_roi_mode(
-    eiger: EigerDetector, enable: bool, detector_params: DetectorParams
+    eiger: EigerDetector,
+    enable: bool,
+    detector_params: DetectorParams,
+    wait: bool,
+    group="roi_mode",
 ):
     detector_dimensions = (
         detector_params.detector_size_constants.roi_size_pixels
@@ -33,11 +46,22 @@ def change_roi_mode(
         else detector_params.detector_size_constants.det_size_pixels
     )
 
-    yield from bps.abs_set(eiger.drv.roi_mode, 1 if enable else 0)
-    yield from bps.abs_set(eiger.odin.image_height, detector_dimensions.height)
-    yield from bps.abs_set(eiger.odin.image_width, detector_dimensions.width)
-    yield from bps.abs_set(eiger.odin.num_row_chunks, detector_dimensions.height)
-    yield from bps.abs_set(eiger.odin.num_col_chunks, detector_dimensions.width)
+    yield from bps.abs_set(eiger.drv.roi_mode, 1 if enable else 0, group=group)
+    yield from bps.abs_set(
+        eiger.odin.image_height, detector_dimensions.height, group=group
+    )
+    yield from bps.abs_set(
+        eiger.odin.image_width, detector_dimensions.width, group=group
+    )
+    yield from bps.abs_set(
+        eiger.odin.num_row_chunks, detector_dimensions.height, group=group
+    )
+    yield from bps.abs_set(
+        eiger.odin.num_col_chunks, detector_dimensions.width, group=group
+    )
+
+    if wait:
+        yield from bps.wait(group)
 
 
 def set_mx_settings_pvs(
