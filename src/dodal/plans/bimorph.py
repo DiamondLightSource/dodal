@@ -146,9 +146,9 @@ def restore_bimorph_state(mirror: BimorphMirror, slits: Slits, state: BimorphSta
     yield from move_slits(slits, SlitDimension.X, state.x_gap, state.x_center)
     yield from move_slits(slits, SlitDimension.Y, state.y_gap, state.y_center)
 
-    for value, channel in zip(state.voltages, mirror.channels.values(), strict=True):
-        yield from bps.mv(channel, value)  # type: ignore
-
+    original = {channel: value for channel, value in zip(mirror.channels, state.voltages, strict=True}
+    
+    yield from bps.mv(mirror, original)
 
 def bimorph_optimisation(
     detectors: list[Readable],
