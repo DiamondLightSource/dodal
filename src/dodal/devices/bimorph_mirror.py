@@ -19,6 +19,7 @@ from ophyd_async.epics.core import (
     PvSuffix,
     epics_signal_r,
     epics_signal_w,
+    epics_signal_x,
 )
 
 DEFAULT_TIMEOUT = 60
@@ -96,6 +97,7 @@ class BimorphMirror(StandardReadable, Movable):
                 }
             )
         self.enabled = epics_signal_w(BimorphMirrorOnOff, f"{prefix}ONOFF")
+        self.commit_target_voltages = epics_signal_x(f"{prefix}ALLTRGT.PROC")
         self.status = epics_signal_r(BimorphMirrorStatus, f"{prefix}STATUS")
         self.err = epics_signal_r(str, f"{prefix}ERR")
         super().__init__(name=name)
