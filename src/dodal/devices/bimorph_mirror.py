@@ -102,7 +102,7 @@ class BimorphMirror(StandardReadable, Movable):
 
     @AsyncStatus.wrap
     async def set(self, value: list[float]) -> None:
-        """Sets bimorph voltages in parrallel via target voltage and all proc.
+        """Sets bimorph voltages in parallel via target voltage and all proc.
 
         Args:
             value: List of float target voltages
@@ -110,9 +110,10 @@ class BimorphMirror(StandardReadable, Movable):
         Raises:
             ValueError: On set to non-existent channel"""
 
-        if any(key not in self.channels for key in value):
+        if len(value) != len(self.channels):
             raise ValueError(
-                f"Attempting to put to non-existent channels: {[key for key in value if (key not in self.channels)]}"
+                f"Length of value input array does not match number of \
+                             channels: {len(value)} and {len(self.channels)}"
             )
 
         # Write target voltages in serial
@@ -122,17 +123,23 @@ class BimorphMirror(StandardReadable, Movable):
                 self.status, BimorphMirrorStatus.IDLE, timeout=DEFAULT_TIMEOUT
             )
             await set_and_wait_for_other_value(
-                self.channels[i].output_voltage,
+                self.channels[i + 1].target_voltage,
                 target,
                 self.status,
                 BimorphMirrorStatus.BUSY,
             )
 
+        # Trigger set target voltages:
+        await wait_for_value(
+            self.status, BimorphMirrorStatus.IDLE, timeout=DEFAULT_TIMEOUT
+        )
+        await self.commit_target_voltages.trigger()
+
         # Wait for values to propogate to voltage out rbv:
         await asyncio.gather(
             *[
                 wait_for_value(
-                    self.channels[i].output_voltage,
+                    self.channels[i + 1].output_voltage,
                     target,
                     timeout=DEFAULT_TIMEOUT,
                 )
