@@ -31,8 +31,8 @@ def mirror(request, RE: RunEngine) -> BimorphMirror:
 
 
 @pytest.fixture
-def valid_bimorph_values(mirror: BimorphMirror) -> dict[int, float]:
-    return {i: float(i) for i in range(1, len(mirror.channels) + 1)}
+def valid_bimorph_values(mirror: BimorphMirror) -> list[float]:
+    return [float(i) for i in range(1, len(mirror.channels) + 1)]
 
 
 @pytest.fixture
@@ -79,19 +79,19 @@ def mirror_with_mocked_put(mirror: BimorphMirror):
 
 async def test_set_channels_waits_for_readback(
     mirror_with_mocked_put: BimorphMirror,
-    valid_bimorph_values: dict[int, float],
+    valid_bimorph_values: list[float],
 ):
     await mirror_with_mocked_put.set(valid_bimorph_values)
 
-    assert {
-        key: await mirror_with_mocked_put.channels[key].target_voltage.get_value()
-        for key in valid_bimorph_values
-    } == valid_bimorph_values
+    assert [
+        await mirror_with_mocked_put.channels[i].target_voltage.get_value()
+        for i in range(1, len(valid_bimorph_values) + 1)
+    ] == valid_bimorph_values
 
 
 async def test_set_channels_triggers_alltrgt_proc(
     mirror_with_mocked_put: BimorphMirror,
-    valid_bimorph_values: dict[int, float],
+    valid_bimorph_values: list[float],
 ):
     mock_alltrgt_proc = get_mock_put(mirror_with_mocked_put.commit_target_voltages)
 
@@ -104,7 +104,7 @@ async def test_set_channels_triggers_alltrgt_proc(
 
 async def test_set_channels_waits_for_output_voltage_readback(
     mirror_with_mocked_put: BimorphMirror,
-    valid_bimorph_values: dict[int, float],
+    valid_bimorph_values: list[float],
 ):
     with patch("dodal.devices.bimorph_mirror.wait_for_value") as mock_wait_for_value:
         mock_wait_for_value.assert_not_called()
@@ -112,8 +112,10 @@ async def test_set_channels_waits_for_output_voltage_readback(
         await mirror_with_mocked_put.set(valid_bimorph_values)
 
         expected_call_arg_list = [
-            call(mirror_with_mocked_put.channels[i].output_voltage, ANY, timeout=ANY)
-            for i, val in valid_bimorph_values.items()
+            call(
+                mirror_with_mocked_put.channels[i + 1].output_voltage, ANY, timeout=ANY
+            )
+            for i, val in enumerate(valid_bimorph_values)
         ]
 
         assert all(
@@ -121,27 +123,9 @@ async def test_set_channels_waits_for_output_voltage_readback(
         )
 
 
-async def test_set_one_channel(mirror_with_mocked_put: BimorphMirror):
-    values = {1: 1}
-
-    await mirror_with_mocked_put.set(values)
-
-    read = await mirror_with_mocked_put.read()
-
-    assert [
-        await mirror_with_mocked_put.channels[key].target_voltage.get_value()
-        for key in values
-    ] == list(values)
-
-    assert [
-        read[f"{mirror_with_mocked_put.name}-channels-{key}-output_voltage"]["value"]
-        for key in values
-    ] == list(values)
-
-
 async def test_read(
     mirror_with_mocked_put: BimorphMirror,
-    valid_bimorph_values: dict[int, float],
+    valid_bimorph_values: list[float],
 ):
     await mirror_with_mocked_put.set(valid_bimorph_values)
 
@@ -150,13 +134,13 @@ async def test_read(
     assert [
         read[f"{mirror_with_mocked_put.name}-channels-{i}-output_voltage"]["value"]
         for i in range(1, len(mirror_with_mocked_put.channels) + 1)
-    ] == list(valid_bimorph_values.values())
+    ] == list(valid_bimorph_values)
 
 
-async def test_set_invalid_channel_throws_error(mirror_with_mocked_put: BimorphMirror):
+async def test_set_invalid_value_throws_error(mirror_with_mocked_put: BimorphMirror):
     with pytest.raises(ValueError):
         await mirror_with_mocked_put.set(
-            {len(mirror_with_mocked_put.channels) + 1: 0.0}
+            list(range(len(mirror_with_mocked_put.channels) + 1))
         )
 
 
@@ -176,10 +160,10 @@ async def test_init_mirror_with_zero_channels(number_of_channels):
 
 async def test_bimorph_mirror_channel_set(
     mirror_with_mocked_put: BimorphMirror,
-    valid_bimorph_values: dict[int, float],
+    valid_bimorph_values: list[float],
 ):
     for value, channel in zip(
-        valid_bimorph_values.values(),
+        valid_bimorph_values,
         mirror_with_mocked_put.channels.values(),
         strict=True,
     ):

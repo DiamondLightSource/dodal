@@ -1,10 +1,8 @@
 import asyncio
-from collections.abc import Mapping
 from typing import Annotated as A
 
 from bluesky.protocols import Movable
 from ophyd_async.core import (
-    DEFAULT_TIMEOUT,
     AsyncStatus,
     DeviceVector,
     SignalR,
@@ -75,7 +73,6 @@ class BimorphMirror(StandardReadable, Movable):
     Attributes:
         channels: DeviceVector of BimorphMirrorChannel, indexed from 1, for each channel
         enabled: Writeable BimorphOnOff
-        commit_target_voltages: Procable signal that writes values in each channel's VTRGT to VOUT
         status: Readable BimorphMirrorStatus Busy/Idle status
         err: Alarm status"""
 
@@ -106,28 +103,29 @@ class BimorphMirror(StandardReadable, Movable):
         super().__init__(name=name)
 
     @AsyncStatus.wrap
-    async def set(self, value: Mapping[int, float]) -> None:
-        """Sets bimorph voltages in parrallel via target voltage and all proc.
+    async def set(self, value: list[float]) -> None:
+        """Sets bimorph voltages in parallel via target voltage and all proc.
 
         Args:
-            value: Dict of channel numbers to target voltages
+            value: List of float target voltages
 
         Raises:
             ValueError: On set to non-existent channel"""
 
-        if any(key not in self.channels for key in value):
+        if len(value) != len(self.channels):
             raise ValueError(
-                f"Attempting to put to non-existent channels: {[key for key in value if (key not in self.channels)]}"
+                f"Length of value input array does not match number of \
+                             channels: {len(value)} and {len(self.channels)}"
             )
 
         # Write target voltages in serial
         # Voltages are written in serial as bimorph PSU cannot handle simultaneous sets
-        for i, target in value.items():
+        for i, target in enumerate(value):
             await wait_for_value(
                 self.status, BimorphMirrorStatus.IDLE, timeout=DEFAULT_TIMEOUT
             )
             await set_and_wait_for_other_value(
-                self.channels[i].target_voltage,
+                self.channels[i + 1].target_voltage,
                 target,
                 self.status,
                 BimorphMirrorStatus.BUSY,
@@ -143,11 +141,11 @@ class BimorphMirror(StandardReadable, Movable):
         await asyncio.gather(
             *[
                 wait_for_value(
-                    self.channels[i].output_voltage,
+                    self.channels[i + 1].output_voltage,
                     target,
                     timeout=DEFAULT_TIMEOUT,
                 )
-                for i, target in value.items()
+                for i, target in enumerate(value)
             ],
             wait_for_value(
                 self.status, BimorphMirrorStatus.IDLE, timeout=DEFAULT_TIMEOUT
