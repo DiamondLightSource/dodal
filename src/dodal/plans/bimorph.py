@@ -227,6 +227,7 @@ def bimorph_optimisation(
 
         stream_name = "0"
         yield from bps.declare_stream(*detectors, mirror, slits, name=stream_name)
+        yield from bps.mv(mirror, current_voltage_list)
         yield from inner_scan(
             detectors,
             mirror,
