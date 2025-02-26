@@ -162,6 +162,7 @@ def bimorph_optimisation(
     inactive_slit_size: float,
     number_of_slit_positions: int,
     bimorph_settle_time: float,
+    slit_settle_time: float,
     initial_voltage_list: list | None = None,
 ):
     """Plan for performing bimorph mirror optimisation.
@@ -182,6 +183,7 @@ def bimorph_optimisation(
         inactive_slit_size: float size of slit in inactive dimension
         number_of_slit_positions: int number of slit positions per pencil beam scan
         bimorph_settle_time: float time in seconds to wait after bimorph move
+        slit_settle_time: float time in seconds to wait after slit move
         initial_voltage_list: optional list[float] starting voltages for bimorph (defaults to current voltages)
     """
 
@@ -234,6 +236,7 @@ def bimorph_optimisation(
             active_slit_center_end,
             active_slit_size,
             number_of_slit_positions,
+            slit_settle_time,
             stream_name,
         )
 
@@ -258,6 +261,7 @@ def bimorph_optimisation(
                 active_slit_center_end,
                 active_slit_size,
                 number_of_slit_positions,
+                slit_settle_time,
                 stream_name,
             )
 
@@ -275,6 +279,7 @@ def inner_scan(
     active_slit_center_end: float,
     active_slit_size: float,
     number_of_slit_positions: int,
+    slit_settle_time: float,
     stream_name: str,
 ):
     """Inner plan stub, which moves Slits and performs a read.
@@ -288,10 +293,12 @@ def inner_scan(
         active_slit_center_end: float final position of center of slit in active dimension
         active_slit_size: float size of slit in active dimension
         number_of_slit_positions: int number of slit positions per pencil beam scan
+        slit_settle_time: float time in seconds to wait after slit move
         stream_name: str name to pass to trigger_and_read
     """
     for value in linspace(
         active_slit_center_start, active_slit_center_end, number_of_slit_positions
     ):
         yield from move_slits(slits, active_dimension, active_slit_size, value)
+        yield from bps.sleep(slit_settle_time)
         yield from bps.trigger_and_read([*detectors, mirror, slits], name=stream_name)

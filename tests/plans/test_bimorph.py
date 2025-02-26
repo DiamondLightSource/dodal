@@ -165,7 +165,9 @@ async def test_save_and_restore(
 @pytest.mark.parametrize("active_slit_center_end", [200])
 @pytest.mark.parametrize("active_slit_size", [0.05])
 @pytest.mark.parametrize("number_of_slit_positions", [3])
+@pytest.mark.parametrize("slit_settle_time", [0.0])
 @pytest.mark.parametrize("stream_name", [0])
+@unittest.mock.patch("dodal.plans.bimorph.bps.sleep")
 @unittest.mock.patch("dodal.plans.bimorph.bps.trigger_and_read")
 @unittest.mock.patch("dodal.plans.bimorph.move_slits")
 class TestInnerScan:
@@ -173,6 +175,7 @@ class TestInnerScan:
         self,
         mock_move_slits: Mock,
         mock_bps_trigger_and_read: Mock,
+        mock_bps_sleep: Mock,
         detectors: list[Readable],
         RE: RunEngine,
         mirror: BimorphMirror,
@@ -182,6 +185,7 @@ class TestInnerScan:
         active_slit_center_end: float,
         active_slit_size: float,
         number_of_slit_positions: int,
+        slit_settle_time: float,
         stream_name: str,
     ):
         RE(
@@ -194,6 +198,7 @@ class TestInnerScan:
                 active_slit_center_end,
                 active_slit_size,
                 number_of_slit_positions,
+                slit_settle_time,
                 stream_name,
             )
         )
@@ -213,6 +218,7 @@ class TestInnerScan:
         self,
         mock_move_slits: Mock,
         mock_bps_trigger_and_read: Mock,
+        mock_bps_sleep: Mock,
         detectors: list[Readable],
         RE: RunEngine,
         mirror: BimorphMirror,
@@ -222,6 +228,7 @@ class TestInnerScan:
         active_slit_center_end: float,
         active_slit_size: float,
         number_of_slit_positions: int,
+        slit_settle_time: float,
         stream_name: str,
     ):
         RE(
@@ -234,6 +241,7 @@ class TestInnerScan:
                 active_slit_center_end,
                 active_slit_size,
                 number_of_slit_positions,
+                slit_settle_time,
                 stream_name,
             )
         )
@@ -248,6 +256,41 @@ class TestInnerScan:
         ]
         assert mock_bps_trigger_and_read.call_args_list == call_list
 
+    def test_inner_scan_slit_settle(
+        self,
+        mock_move_slits: Mock,
+        mock_bps_trigger_and_read: Mock,
+        mock_bps_sleep: Mock,
+        detectors: list[Readable],
+        RE: RunEngine,
+        mirror: BimorphMirror,
+        slits: Slits,
+        active_dimension: SlitDimension,
+        active_slit_center_start: float,
+        active_slit_center_end: float,
+        active_slit_size: float,
+        number_of_slit_positions: int,
+        slit_settle_time: float,
+        stream_name: str,
+    ):
+        RE(
+            inner_scan(
+                detectors,
+                mirror,
+                slits,
+                active_dimension,
+                active_slit_center_start,
+                active_slit_center_end,
+                active_slit_size,
+                number_of_slit_positions,
+                slit_settle_time,
+                stream_name,
+            )
+        )
+        assert [
+            call(slit_settle_time) for _ in range(number_of_slit_positions)
+        ] == mock_bps_sleep.call_args_list
+
 
 @pytest.mark.parametrize("voltage_increment", [100.0])
 @pytest.mark.parametrize("active_dimension", [SlitDimension.X, SlitDimension.Y])
@@ -258,6 +301,7 @@ class TestInnerScan:
 @pytest.mark.parametrize("inactive_slit_size", [0.05])
 @pytest.mark.parametrize("number_of_slit_positions", [3])
 @pytest.mark.parametrize("bimorph_settle_time", [0.0])
+@pytest.mark.parametrize("slit_settle_time", [0.0])
 @unittest.mock.patch("dodal.plans.bimorph.bps.sleep")
 @unittest.mock.patch("dodal.plans.bimorph.restore_bimorph_state")
 @unittest.mock.patch("dodal.plans.bimorph.move_slits")
@@ -314,6 +358,7 @@ class TestBimorphOptimisation:
         inactive_slit_size: float,
         number_of_slit_positions: int,
         bimorph_settle_time: float,
+        slit_settle_time: float,
         initial_voltage_list: list[float],
     ):
         def start_subscription(name, doc):
@@ -338,6 +383,7 @@ class TestBimorphOptimisation:
                 inactive_slit_size,
                 number_of_slit_positions,
                 bimorph_settle_time,
+                slit_settle_time,
                 initial_voltage_list,
             ),
             {"start": start_subscription},
@@ -363,6 +409,7 @@ class TestBimorphOptimisation:
         inactive_slit_size: float,
         number_of_slit_positions: int,
         bimorph_settle_time: float,
+        slit_settle_time: float,
         initial_voltage_list: list[float],
     ):
         RE(
@@ -379,6 +426,7 @@ class TestBimorphOptimisation:
                 inactive_slit_size,
                 number_of_slit_positions,
                 bimorph_settle_time,
+                slit_settle_time,
                 initial_voltage_list,
             )
         )
@@ -407,6 +455,7 @@ class TestBimorphOptimisation:
         inactive_slit_size: float,
         number_of_slit_positions: int,
         bimorph_settle_time: float,
+        slit_settle_time: float,
         initial_voltage_list: list[float],
         start_state,
     ):
@@ -424,6 +473,7 @@ class TestBimorphOptimisation:
                 inactive_slit_size,
                 number_of_slit_positions,
                 bimorph_settle_time,
+                slit_settle_time,
                 initial_voltage_list,
             )
         )
@@ -452,6 +502,7 @@ class TestBimorphOptimisation:
         inactive_slit_size: float,
         number_of_slit_positions: int,
         bimorph_settle_time: float,
+        slit_settle_time: float,
         initial_voltage_list: list[float],
         start_state: BimorphState,
     ):
@@ -473,6 +524,7 @@ class TestBimorphOptimisation:
                 inactive_slit_size,
                 number_of_slit_positions,
                 bimorph_settle_time,
+                slit_settle_time,
                 initial_voltage_list,
             )
         )
@@ -501,6 +553,7 @@ class TestBimorphOptimisation:
         inactive_slit_size: float,
         number_of_slit_positions: int,
         bimorph_settle_time: float,
+        slit_settle_time: float,
         initial_voltage_list: list[float],
         start_state: BimorphState,
     ):
@@ -518,6 +571,7 @@ class TestBimorphOptimisation:
                 inactive_slit_size,
                 number_of_slit_positions,
                 bimorph_settle_time,
+                slit_settle_time,
                 initial_voltage_list,
             )
         )
@@ -531,6 +585,7 @@ class TestBimorphOptimisation:
                 active_slit_center_end,
                 active_slit_size,
                 number_of_slit_positions,
+                slit_settle_time,
                 str(i),
             )
             for i in range(len(mirror_with_mocked_put.channels) + 1)
@@ -556,6 +611,7 @@ class TestBimorphOptimisation:
         inactive_slit_size: float,
         number_of_slit_positions: int,
         bimorph_settle_time: float,
+        slit_settle_time: float,
         initial_voltage_list: list[float],
         start_state: BimorphState,
     ):
@@ -573,6 +629,7 @@ class TestBimorphOptimisation:
                 inactive_slit_size,
                 number_of_slit_positions,
                 bimorph_settle_time,
+                slit_settle_time,
                 initial_voltage_list,
             )
         )
@@ -605,6 +662,7 @@ class TestBimorphOptimisation:
         inactive_slit_size: float,
         number_of_slit_positions: int,
         bimorph_settle_time: float,
+        slit_settle_time: float,
         initial_voltage_list: list[float],
         start_state: BimorphState,
     ):
@@ -622,6 +680,7 @@ class TestBimorphOptimisation:
                 inactive_slit_size,
                 number_of_slit_positions,
                 bimorph_settle_time,
+                slit_settle_time,
                 initial_voltage_list,
             )
         )
@@ -640,6 +699,7 @@ class TestBimorphOptimisation:
 @pytest.mark.parametrize("inactive_slit_size", [0.05])
 @pytest.mark.parametrize("number_of_slit_positions", [3])
 @pytest.mark.parametrize("bimorph_settle_time", [0.0])
+@pytest.mark.parametrize("slit_settle_time", [0.0])
 class TestIntegration:
     def test_full_plan(
         self,
@@ -656,6 +716,7 @@ class TestIntegration:
         inactive_slit_size: float,
         number_of_slit_positions: int,
         bimorph_settle_time: float,
+        slit_settle_time: float,
         initial_voltage_list: list[float],
     ):
         RE(
@@ -672,9 +733,9 @@ class TestIntegration:
                 inactive_slit_size,
                 number_of_slit_positions,
                 bimorph_settle_time,
+                slit_settle_time,
                 initial_voltage_list,
             ),
-            print,
         )
 
     assert True
