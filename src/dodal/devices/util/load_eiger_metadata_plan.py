@@ -1,6 +1,7 @@
 import time
 
 import bluesky.plan_stubs as bps
+from bluesky.run_engine import RunEngine
 from mx_bluesky.common.utils.log import LOGGER
 from ophyd_async.epics.eiger import EigerDetector, EigerTriggerInfo
 
@@ -116,3 +117,7 @@ def set_odin_pvs(
 
     if wait:
         yield from bps.wait(group)
+
+
+if __name__ == "__main__":
+    RE = RunEngine()
