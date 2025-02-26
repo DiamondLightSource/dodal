@@ -1,3 +1,7 @@
+from pathlib import Path
+
+from ophyd_async.core import StaticFilenameProvider, StaticPathProvider
+from ophyd_async.epics.eiger import EigerDetector as FastEiger
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
@@ -167,6 +171,25 @@ def eiger(mock: bool = False) -> EigerDetector:
         device_factory=EigerDetector,
         name="eiger",
         prefix="-EA-EIGER-01:",
+        wait=False,
+        fake=mock,
+    )
+
+
+@device_factory(skip=BL == "s03")
+def fastcs_eiger(mock: bool = False) -> FastEiger:
+    """Get the i03 Eiger device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+
+    file_name = StaticFilenameProvider("eiger_test_file")
+    path_provider = StaticPathProvider(file_name, Path("/scratch/qqh35939"))
+
+    return device_instantiation(
+        device_factory=FastEiger,
+        name="fastcs_eiger",
+        path_provider=path_provider,
+        prefix="",
         wait=False,
         fake=mock,
     )
