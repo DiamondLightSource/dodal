@@ -34,6 +34,7 @@ from dodal.devices.fast_grid_scan import PandAFastGridScan, ZebraFastGridScan
 from dodal.devices.flux import Flux
 from dodal.devices.focusing_mirror import FocusingMirrorWithStripes, MirrorVoltages
 from dodal.devices.i02_1.backlight import Backlight
+from dodal.devices.i02_1.eiger import VMXMEiger
 from dodal.devices.i02_1.sample_motors import SampleMotors
 from dodal.devices.i03.beamstop import Beamstop
 from dodal.devices.i24.dcm import DCM
@@ -105,19 +106,18 @@ def backlight() -> Backlight:
     )
 
 
-# Need the same device but without devshm here
-# @device_factory()
-# def eiger(mock: bool = False) -> EigerDetector:
-#     """Get the i02-1 Eiger device, instantiate it if it hasn't already been.
-#     If this is called when already instantiated in i02-1, it will return the existing object.
-#     """
-#     return device_instantiation(
-#         device_factory=EigerDetector,
-#         name="eiger",
-#         prefix="-EA-EIGER-01:",
-#         wait=False,
-#         fake=mock,
-#     )
+@device_factory()
+def eiger(mock: bool = False) -> VMXMEiger:
+    """Get the i02-1 Eiger device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i02-1, it will return the existing object.
+    """
+    return device_instantiation(
+        device_factory=VMXMEiger,
+        name="eiger",
+        prefix="-EA-EIGER-01:",
+        wait=False,
+        fake=mock,
+    )
 
 
 # FGS device looks quite different on vmxm - need a new device
