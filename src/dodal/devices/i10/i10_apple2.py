@@ -191,7 +191,7 @@ class I10Apple2(Apple2):
         self._available_pol = list(self.lookup_tables["Gap"].keys())
 
 
-class I10Apple2PGM(StandardReadable, Movable):
+class EnergySetter(StandardReadable, Movable):
     """
     Compound device to set both ID and PGM energy at the same time.
 
@@ -353,14 +353,14 @@ class I10Id(Device):
         .. figure:: /explanations/umls/i10_id_design.png
         Attributes
         ----------
-            energy: I10Apple2PGM
+            energy: EnergySetter
                 Devices that move both pgm and id energy at the same time.
             pol: I10Apple2Pol
                 Devices that control the x-ray polarisation.
             laa: LinearArbitraryAngle
                 Devices that allow alteration of the beam polarisation angle in LA mode.
         """
-        self.energy = I10Apple2PGM(
+        self.energy = EnergySetter(
             id=I10Apple2(
                 look_up_table_dir=look_up_table_dir,
                 name="id_energy",

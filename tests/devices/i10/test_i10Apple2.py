@@ -24,8 +24,8 @@ from dodal.devices.apple2_undulator import (
 )
 from dodal.devices.i10.i10_apple2 import (
     DEFAULT_JAW_PHASE_POLY_PARAMS,
+    EnergySetter,
     I10Apple2,
-    I10Apple2PGM,
     I10Apple2Pol,
     LinearArbitraryAngle,
     convert_csv_to_lookup,
@@ -120,9 +120,9 @@ async def mock_id() -> I10Apple2:
 
 
 @pytest.fixture
-async def mock_id_pgm(mock_id: I10Apple2, mock_pgm: PGM) -> I10Apple2PGM:
+async def mock_id_pgm(mock_id: I10Apple2, mock_pgm: PGM) -> EnergySetter:
     async with init_devices(mock=True):
-        mock_id_pgm = I10Apple2PGM(id=mock_id, pgm=mock_pgm)
+        mock_id_pgm = EnergySetter(id=mock_id, pgm=mock_pgm)
     set_mock_value(mock_id_pgm.id.gap.velocity, 1)
     set_mock_value(mock_id_pgm.id.phase.btm_inner.velocity, 1)
     set_mock_value(mock_id_pgm.id.phase.top_inner.velocity, 1)
@@ -277,7 +277,7 @@ async def test_I10Apple2_RE_scan(mock_id: I10Apple2, RE: RunEngine):
     assert_emitted(docs, start=1, descriptor=1, event=11, stop=1)
 
 
-async def test_I10Apple2_pgm_RE_scan(mock_id_pgm: I10Apple2PGM, RE: RunEngine):
+async def test_EnergySetter_RE_scan(mock_id_pgm: EnergySetter, RE: RunEngine):
     docs = defaultdict(list)
 
     def capture_emitted(name, doc):
