@@ -286,8 +286,10 @@ class UndulatorPhaseAxes(SafeUndulatorMover):
                 for axis in axes
             ]
         )
-        # The extra 2.0 is needed as motors timeout too quick due
-        # to readback speed is almost twice the actual speed.
+        """A 2.0-second buffer is required to prevent premature motor timeouts in phase
+        axes as it is a master-slave system, where the slave's movement,
+        being dependent on the master, can take up to twice as long to complete
+        """
         return np.max(timeouts) * 2.0
 
 
@@ -366,13 +368,15 @@ class Apple2(StandardReadable, Movable):
         self.phase = id_phase
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            # Store the polarisation for readback.
-            self.polarisation, self._polarisation_set = soft_signal_r_and_setter(
-                str, initial_value=None
-            )
             # Store the set energy for readback.
             self.energy, self._energy_set = soft_signal_r_and_setter(
                 float, initial_value=None
+            )
+
+        with self.add_children_as_readables():
+            # Store the polarisation for readback.
+            self.polarisation, self._polarisation_set = soft_signal_r_and_setter(
+                str, initial_value=None
             )
         # This store two lookup tables, Gap and Phase in the Lookuptable format
         self.lookup_tables: dict[str, dict[str | None, dict[str, dict[str, Any]]]] = {
