@@ -1,0 +1,43 @@
+dodal.devices.focusing\_mirror
+==============================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~focusing_mirror.FocusingMirror
+   ~focusing_mirror.FocusingMirrorWithStripes
+   ~focusing_mirror.MirrorStripe
+   ~focusing_mirror.MirrorStripeConfiguration
+   ~focusing_mirror.MirrorType
+   ~focusing_mirror.MirrorVoltageDemand
+   ~focusing_mirror.MirrorVoltages
+   ~focusing_mirror.SingleMirrorVoltage
+
+
+
+
+.. automodule:: dodal.devices.focusing_mirror
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

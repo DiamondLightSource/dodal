@@ -1,0 +1,46 @@
+dodal.devices.aperturescatterguard.ApertureScatterguard
+=======================================================
+
+.. currentmodule:: dodal.devices.aperturescatterguard
+
+.. autoclass:: ApertureScatterguard
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~ApertureScatterguard.prepare
+      
+      
+      
+      
+      ~ApertureScatterguard.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

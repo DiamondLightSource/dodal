@@ -1,0 +1,34 @@
+dodal.devices.robot.ErrorStatus
+===============================
+
+.. currentmodule:: dodal.devices.robot
+
+.. autoclass:: ErrorStatus
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      ~ErrorStatus.raise_if_error
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+   
+   

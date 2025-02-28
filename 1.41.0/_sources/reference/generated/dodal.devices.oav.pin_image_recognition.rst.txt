@@ -1,0 +1,51 @@
+dodal.devices.oav.pin\_image\_recognition
+=========================================
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   dodal.devices.oav.pin_image_recognition.manual_test
+   dodal.devices.oav.pin_image_recognition.utils
+
+
+
+
+
+.. currentmodule:: dodal.devices.oav
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~pin_image_recognition.PinTipDetection
+
+
+
+
+.. automodule:: dodal.devices.oav.pin_image_recognition
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+   
+      InvalidPinException
+   
+   

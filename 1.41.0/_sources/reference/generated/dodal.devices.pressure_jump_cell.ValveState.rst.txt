@@ -1,0 +1,87 @@
+dodal.devices.pressure\_jump\_cell.ValveState
+=============================================
+
+.. currentmodule:: dodal.devices.pressure_jump_cell
+
+.. autoclass:: ValveState
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~ValveState.FAULT
+      
+      
+      ~ValveState.OPEN
+      
+      
+      ~ValveState.OPENING
+      
+      
+      ~ValveState.CLOSED
+      
+      
+      ~ValveState.CLOSING
+      
+   
+   

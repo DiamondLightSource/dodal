@@ -1,0 +1,43 @@
+dodal.devices.i19.shutter.HutchConditionalShutter
+=================================================
+
+.. currentmodule:: dodal.devices.i19.shutter
+
+.. autoclass:: HutchConditionalShutter
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~HutchConditionalShutter.set
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

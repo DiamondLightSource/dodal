@@ -1,0 +1,32 @@
+dodal.devices.oav.pin\_image\_recognition.utils.SampleLocation
+==============================================================
+
+.. currentmodule:: dodal.devices.oav.pin_image_recognition.utils
+
+.. autoclass:: SampleLocation
+   :members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~SampleLocation.tip_x
+      
+      
+      ~SampleLocation.tip_y
+      
+      
+      ~SampleLocation.edge_top
+      
+      
+      ~SampleLocation.edge_bottom
+      
+   
+   
