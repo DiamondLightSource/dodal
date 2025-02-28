@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.thawer &#8212; dodal 1.40.1.dev6+g5893821fb documentation</title>
+    <title>dodal.devices.thawer &#8212; dodal 1.40.1.dev7+ga3b1b8c54 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=695ed527"></script>
+    <script src="../../../_static/documentation_options.js?v=f631cf31"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -452,7 +452,7 @@ window.addEventListener("load", () => mermaid.run());
   <h1>Source code for dodal.devices.thawer</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">asyncio</span><span class="w"> </span><span class="kn">import</span> <span class="n">Task</span><span class="p">,</span> <span class="n">create_task</span><span class="p">,</span> <span class="n">sleep</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Stoppable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Movable</span><span class="p">,</span> <span class="n">Stoppable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AsyncStatus</span><span class="p">,</span>
     <span class="n">Device</span><span class="p">,</span>
@@ -478,18 +478,18 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="ThawingTimer">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.thawer.ThawingTimer.html#dodal.devices.thawer.ThawingTimer">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">ThawingTimer</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="n">Stoppable</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ThawingTimer</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="n">Stoppable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">control_signal</span><span class="p">:</span> <span class="n">SignalRW</span><span class="p">[</span><span class="n">ThawerStates</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_control_signal_ref</span> <span class="o">=</span> <span class="n">Reference</span><span class="p">(</span><span class="n">control_signal</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_thawing_task</span><span class="p">:</span> <span class="n">Task</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">&quot;thaw_for_time_s&quot;</span><span class="p">)</span>
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time_to_thaw_for</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_control_signal_ref</span><span class="p">()</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ThawerStates</span><span class="o">.</span><span class="n">ON</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_thawing_task</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_thawing_task</span><span class="o">.</span><span class="n">done</span><span class="p">():</span>
             <span class="k">raise</span> <span class="n">ThawingException</span><span class="p">(</span><span class="s2">&quot;Thawing task already in progress&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_thawing_task</span> <span class="o">=</span> <span class="n">create_task</span><span class="p">(</span><span class="n">sleep</span><span class="p">(</span><span class="n">time_to_thaw_for</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_thawing_task</span> <span class="o">=</span> <span class="n">create_task</span><span class="p">(</span><span class="n">sleep</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_thawing_task</span>
         <span class="k">finally</span><span class="p">:</span>
