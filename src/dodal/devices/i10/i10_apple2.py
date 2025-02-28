@@ -197,9 +197,7 @@ class EnergySetter(StandardReadable, Movable):
 
     """
 
-    def __init__(
-        self, id: I10Apple2, pgm: PGM, prefix: str = "", name: str = ""
-    ) -> None:
+    def __init__(self, id: I10Apple2, pgm: PGM, name: str = "") -> None:
         """
         Parameters
         ----------
@@ -207,8 +205,6 @@ class EnergySetter(StandardReadable, Movable):
             An Apple2 device.
         pgm:
             A PGM/mono device.
-        prefix:
-            Not in use but needed for device_instantiation.
         name:
             New device name.
         """
@@ -238,14 +234,12 @@ class I10Apple2Pol(StandardReadable, Movable):
     Compound device to set polorisation of ID.
     """
 
-    def __init__(self, id: I10Apple2, prefix: str = "", name: str = "") -> None:
+    def __init__(self, id: I10Apple2, name: str = "") -> None:
         """
         Parameters
         ----------
         id:
             An I10Apple2 device.
-        prefix:
-            Not in use but needed for device_instantiation.
         name:
             New device name.
         """
@@ -284,7 +278,6 @@ class LinearArbitraryAngle(StandardReadable, Movable):
     def __init__(
         self,
         id: I10Apple2,
-        prefix: str = "",
         name: str = "",
         jaw_phase_limit: float = 12.0,
         jaw_phase_poly_param: list[float] = DEFAULT_JAW_PHASE_POLY_PARAMS,
@@ -295,8 +288,6 @@ class LinearArbitraryAngle(StandardReadable, Movable):
         ----------
         id: I10Apple2
             An I10Apple2 device.
-        prefix: str
-            Not in use but needed for device_instantiation.
         name: str
             New device name.
         jaw_phase_limit: float

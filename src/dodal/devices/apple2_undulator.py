@@ -286,9 +286,9 @@ class UndulatorPhaseAxes(SafeUndulatorMover):
                 for axis in axes
             ]
         )
-        """A 2.0-second buffer is required to prevent premature motor timeouts in phase
+        """A 2.0 multiplier is required to prevent premature motor timeouts in phase
         axes as it is a master-slave system, where the slave's movement,
-        being dependent on the master, can take up to twice as long to complete
+        being dependent on the master, can take up to twice as long to complete.
         """
         return np.max(timeouts) * 2.0
 
