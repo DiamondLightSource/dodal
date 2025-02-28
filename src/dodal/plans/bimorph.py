@@ -200,19 +200,6 @@ def bimorph_optimisation(
         SlitDimension.Y if active_dimension == SlitDimension.X else SlitDimension.X
     )
 
-    # Move slits into starting position:
-    yield from move_slits(
-        slits, active_dimension, active_slit_size, active_slit_center_start
-    )
-    yield from move_slits(
-        slits, inactive_dimension, inactive_slit_size, inactive_slit_center
-    )
-    yield from bps.sleep(slit_settle_time)
-
-    # Move bimorph into starting position:
-    yield from bps.mv(mirror, current_voltage_list)
-    yield from bps.sleep(bimorph_settle_time)
-
     metadata = {
         "voltage_increment": voltage_increment,
         "dimension": active_dimension,
@@ -232,6 +219,19 @@ def bimorph_optimisation(
 
         stream_name = "0"
         yield from bps.declare_stream(*detectors, mirror, slits, name=stream_name)
+
+        # Move slits into starting position:
+        yield from move_slits(
+            slits, active_dimension, active_slit_size, active_slit_center_start
+        )
+        yield from move_slits(
+            slits, inactive_dimension, inactive_slit_size, inactive_slit_center
+        )
+        yield from bps.sleep(slit_settle_time)
+
+        # Move bimorph into starting position:
+        yield from bps.mv(mirror, current_voltage_list)
+        yield from bps.sleep(bimorph_settle_time)
 
         yield from inner_scan(
             detectors,
