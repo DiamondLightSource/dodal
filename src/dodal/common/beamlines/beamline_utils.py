@@ -1,23 +1,17 @@
 import inspect
 from collections.abc import Callable
-from pathlib import Path
 from typing import Annotated, Final, TypeVar, cast
 
 from bluesky.run_engine import call_in_bluesky_event_loop
-from event_model import RunStart
 from ophyd import Device as OphydV1Device
 from ophyd.sim import make_fake_device
 from ophyd_async.core import (
     DEFAULT_TIMEOUT,
-    FilenameProvider,
     PathProvider,
-    StaticPathProvider,
-    UUIDFilenameProvider,
 )
 from ophyd_async.core import Device as OphydV2Device
 from ophyd_async.core import wait_for_connection as v2_device_wait_for_connection
 
-from dodal.common.types import UpdatingPathProvider
 from dodal.utils import (
     AnyDevice,
     BeamlinePrefix,
@@ -30,29 +24,6 @@ DEFAULT_CONNECTION_TIMEOUT: Final[float] = 5.0
 
 ACTIVE_DEVICES: dict[str, AnyDevice] = {}
 BL = ""
-
-DEFAULT_TEMPLATE = "{device_name}-{instrument}-{scan_id}"
-
-
-class StartDocumentBasedPathProvider(PathProvider):
-    def __init__(self) -> None:
-        self._doc = {}
-
-    def update_run(self, name: str, start_doc: RunStart) -> None:
-        self._doc = start_doc
-
-    def __call__(self, device_name: str | None) -> str:
-        template = self._doc.get("template", DEFAULT_TEMPLATE)
-        sub_path = template.format_map(self._doc | {"device_name": device_name})
-        data_session_directory = Path(self._doc.get("data_session_directory", "/tmp"))
-        return data_session_directory / sub_path
-
-
-# FILENAME_PROVIDER: FilenameProvider = UUIDFilenameProvider()
-PATH_PROVIDER: UpdatingPathProvider = StaticPathProvider(
-    UUIDFilenameProvider(), Path("/tmp")
-)
-
 
 def set_beamline(beamline: str):
     global BL
@@ -182,11 +153,11 @@ def device_factory(
     return decorator
 
 
-def set_path_provider(provider: UpdatingPathProvider):
+def set_path_provider(provider: PathProvider):
     global PATH_PROVIDER
 
     PATH_PROVIDER = provider
 
 
-def get_path_provider() -> UpdatingPathProvider:
+def get_path_provider() -> PathProvider:
     return PATH_PROVIDER

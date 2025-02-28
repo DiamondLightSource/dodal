@@ -3,7 +3,8 @@ from pathlib import Path
 from typing import Literal
 
 from aiohttp import ClientSession
-from ophyd_async.core import FilenameProvider, PathInfo
+from event_model import RunStart
+from ophyd_async.core import FilenameProvider, PathInfo, PathProvider
 from pydantic import BaseModel
 
 from dodal.common.types import UpdatingPathProvider
@@ -149,4 +150,24 @@ class StaticVisitPathProvider(UpdatingPathProvider):
         assert device_name, "Must call PathProvider with device_name"
         return PathInfo(
             directory_path=self._root, filename=self._filename_provider(device_name)
+        )
+
+
+DEFAULT_TEMPLATE = "{device_name}-{instrument}-{scan_id}"
+
+
+class StartDocumentBasedPathProvider(PathProvider):
+    def __init__(self) -> None:
+        self._doc = {}
+
+    def update_run(self, name: str, start_doc: RunStart) -> None:
+        self._doc = start_doc
+
+    def __call__(self, device_name: str | None = None) -> PathInfo:
+
+        template = self._doc.get("template", DEFAULT_TEMPLATE)
+        sub_path = template.format_map(self._doc | {"device_name": device_name})
+        data_session_directory = Path(self._doc.get("data_session_directory", "/tmp"))
+        return PathInfo(
+            directory_path=data_session_directory, filename=sub_path
         )
