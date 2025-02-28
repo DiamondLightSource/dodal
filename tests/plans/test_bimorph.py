@@ -160,6 +160,10 @@ async def test_save_and_restore(
         assert put.call_args_list == [call(4.0, wait=True), call(0.0, wait=True)]
 
 
+def test_bimorph_position_generator():
+    raise NotImplementedError()
+
+
 @pytest.mark.parametrize("active_dimension", [SlitDimension.X, SlitDimension.Y])
 @pytest.mark.parametrize("active_slit_center_start", [0.0])
 @pytest.mark.parametrize("active_slit_center_end", [200])
@@ -430,9 +434,10 @@ class TestBimorphOptimisation:
                 initial_voltage_list,
             )
         )
+        # Once for each bimorph position, once for initial slit position:
         assert [
             call(bimorph_settle_time)
-            for _ in range(len(mirror_with_mocked_put.channels))
+            for _ in range(len(mirror_with_mocked_put.channels) + 2)
         ] == mock_bps_sleep.call_args_list
 
     async def test_bimorph_state_captured(
