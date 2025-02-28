@@ -1,3 +1,4 @@
+from collections.abc import Generator
 from dataclasses import dataclass
 from enum import Enum
 
@@ -149,6 +150,26 @@ def restore_bimorph_state(mirror: BimorphMirror, slits: Slits, state: BimorphSta
     yield from bps.mv(mirror, state.voltages)  # type: ignore
 
 
+def bimorph_position_generator(
+    initial_voltage_list: list[float], voltage_increment: float
+) -> Generator[list[float], None, None]:
+    """Generator that produces bimorph positions, starting with the initial_voltage_list.
+
+    Args:
+        initial_voltage_list: list starting position for bimorph
+        voltage_increment: float amount to increase each actuator by in turn
+
+    Yields:
+        List bimorph positions, starting with initial_voltage_list
+    """
+    current_voltage_list = initial_voltage_list.copy()
+    yield current_voltage_list
+
+    for i in range(len(initial_voltage_list)):
+        current_voltage_list[i] += voltage_increment
+        yield current_voltage_list
+
+
 def bimorph_optimisation(
     detectors: list[Readable],
     mirror: BimorphMirror,
@@ -192,7 +213,9 @@ def bimorph_optimisation(
     # If a starting set of voltages is not provided, default to current:
     initial_voltage_list = initial_voltage_list or state.voltages
 
-    current_voltage_list = initial_voltage_list.copy()
+    bimorph_positions = bimorph_position_generator(
+        initial_voltage_list, voltage_increment
+    )
 
     validate_bimorph_plan(initial_voltage_list, voltage_increment, 1000, 500)
 
@@ -229,33 +252,13 @@ def bimorph_optimisation(
         )
         yield from bps.sleep(slit_settle_time)
 
-        # Move bimorph into starting position:
-        yield from bps.mv(mirror, current_voltage_list)
-        yield from bps.sleep(bimorph_settle_time)
-
-        yield from inner_scan(
-            detectors,
-            mirror,
-            slits,
-            active_dimension,
-            active_slit_center_start,
-            active_slit_center_end,
-            active_slit_size,
-            number_of_slit_positions,
-            slit_settle_time,
-            stream_name,
-        )
-
-        for i in range(len(mirror.channels)):
-            current_voltage_list[i] += voltage_increment
-
+        for bimorph_position in bimorph_positions:
             yield from bps.mv(
                 mirror,  # type: ignore
-                current_voltage_list,  # type: ignore
+                bimorph_position,
             )
             yield from bps.sleep(bimorph_settle_time)
 
-            stream_name = str(int(stream_name) + 1)
             yield from bps.declare_stream(*detectors, mirror, slits, name=stream_name)
 
             yield from inner_scan(
@@ -270,6 +273,8 @@ def bimorph_optimisation(
                 slit_settle_time,
                 stream_name,
             )
+
+            stream_name = str(int(stream_name) + 1)
 
     yield from outer_scan()
 
