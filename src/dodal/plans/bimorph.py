@@ -207,6 +207,7 @@ def bimorph_optimisation(
     yield from move_slits(
         slits, inactive_dimension, inactive_slit_size, inactive_slit_center
     )
+    yield from bps.sleep(slit_settle_time)
 
     metadata = {
         "voltage_increment": voltage_increment,
