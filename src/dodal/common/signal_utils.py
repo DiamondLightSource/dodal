@@ -4,12 +4,14 @@ from typing import Any
 from bluesky.protocols import Reading
 from ophyd_async.core import SignalDatatypeT, SignalR, SignalRW, SoftSignalBackend
 
+SetHardwareType = Callable[[SignalDatatypeT], Coroutine[Any, Any, None]]
+
 
 class HardwareBackedSoftSignalBackend(SoftSignalBackend[SignalDatatypeT]):
     def __init__(
         self,
         get_from_hardware_func: Callable[[], Coroutine[Any, Any, SignalDatatypeT]],
-        set_to_hardware_func: Callable[[], Coroutine[SignalDatatypeT, Any, Any]] = None,
+        set_to_hardware_func: SetHardwareType | None = None,
         *args,
         **kwargs,
     ) -> None:
@@ -40,7 +42,7 @@ class HardwareBackedSoftSignalBackend(SoftSignalBackend[SignalDatatypeT]):
 def create_rw_hardware_backed_soft_signal(
     datatype: type[SignalDatatypeT],
     get_from_hardware_func: Callable[[], Coroutine[Any, Any, SignalDatatypeT]],
-    set_to_hardware_func: Callable[[SignalDatatypeT], Coroutine[Any, Any, None]],
+    set_to_hardware_func: SetHardwareType,
     units: str | None = None,
     precision: int | None = None,
 ):
