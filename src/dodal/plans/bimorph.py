@@ -209,6 +209,10 @@ def bimorph_optimisation(
     )
     yield from bps.sleep(slit_settle_time)
 
+    # Move bimorph into starting position:
+    yield from bps.mv(mirror, current_voltage_list)
+    yield from bps.sleep(bimorph_settle_time)
+
     metadata = {
         "voltage_increment": voltage_increment,
         "dimension": active_dimension,
@@ -228,8 +232,7 @@ def bimorph_optimisation(
 
         stream_name = "0"
         yield from bps.declare_stream(*detectors, mirror, slits, name=stream_name)
-        yield from bps.mv(mirror, current_voltage_list)
-        yield from bps.sleep(bimorph_settle_time)
+
         yield from inner_scan(
             detectors,
             mirror,
