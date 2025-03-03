@@ -164,10 +164,7 @@ class StartDocumentBasedPathProvider(PathProvider):
         self._doc = start_doc
 
     def __call__(self, device_name: str | None = None) -> PathInfo:
-
         template = self._doc.get("template", DEFAULT_TEMPLATE)
         sub_path = template.format_map(self._doc | {"device_name": device_name})
         data_session_directory = Path(self._doc.get("data_session_directory", "/tmp"))
-        return PathInfo(
-            directory_path=data_session_directory, filename=sub_path
-        )
+        return PathInfo(directory_path=data_session_directory, filename=sub_path)
