@@ -31,7 +31,14 @@ def attach_data_session_metadata_wrapper(
         Iterator[Msg]: Plan messages
     """
     if provider is None:
-        provider = get_path_provider()
+        p = get_path_provider()
+        if isinstance(p, UpdatingPathProvider):
+            provider = p
+        else:
+            raise ValueError(
+                "UpdatingPathProvider required for using the attach_data_session_metadata_wrapper"
+            )
+
     yield from bps.wait_for([provider.update])
     ress = yield from bps.wait_for([provider.data_session])
     data_session = ress[0].result()
