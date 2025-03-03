@@ -85,6 +85,16 @@ class Lookuptable(RootModel):
     root: dict[str, LookupTableEntries]
 
 
+class Pol(StrictEnum):
+    NONE = "None"
+    LH = "lh"
+    LV = "lv"
+    PC = "pc"
+    NC = "nc"
+    LA = "la"
+    LH3 = "lh3"
+
+
 ROW_PHASE_MOTOR_TOLERANCE = 0.004
 MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
 MAXIMUM_GAP_MOTOR_POSITION = 100
@@ -375,9 +385,7 @@ class Apple2(StandardReadable, Movable):
 
         with self.add_children_as_readables():
             # Store the polarisation for readback.
-            self.polarisation, self._polarisation_set = soft_signal_r_and_setter(
-                str, initial_value=None
-            )
+            self.polarisation, self._polarisation_set = soft_signal_r_and_setter(Pol)
         # This store two lookup tables, Gap and Phase in the Lookuptable format
         self.lookup_tables: dict[str, dict[str | None, dict[str, dict[str, Any]]]] = {
             "Gap": {},
@@ -391,19 +399,9 @@ class Apple2(StandardReadable, Movable):
         """
         self.update_lookuptable()
 
-    def check_pol(self, pol: str) -> bool:
-        if pol in self._available_pol:
-            return True
-        else:
-            raise ValueError(
-                f"Polarisation {pol} is not available:"
-                + f"/n Polarisations available:  {self._available_pol}"
-            )
-
-    def set_pol(self, pol: str) -> None:
+    def set_pol(self, pol: Pol) -> None:
         # This set the polarisation but does not actually move hardware.
-        if self.check_pol(pol):
-            self._polarisation_set(pol)
+        self._polarisation_set(pol)
 
     async def _set(self, value: Apple2Val, energy: float) -> None:
         """
@@ -488,7 +486,7 @@ class Apple2(StandardReadable, Movable):
 
         """
 
-    async def determine_phase_from_hardware(self) -> tuple[str | None, float]:
+    async def determine_phase_from_hardware(self) -> tuple[Pol, float]:
         """
         Try to determine polarisation and phase value using row phase motor position pattern.
         However there is no way to return lh3 polarisation or higher harmonic setting.
@@ -510,7 +508,7 @@ class Apple2(StandardReadable, Movable):
             for x in [top_outer, top_inner, btm_inner, btm_outer]
         ):
             # Linear Horizontal
-            polarisation = "lh"
+            polarisation = Pol("lh")
             phase = 0.0
             return polarisation, phase
         if (
@@ -520,7 +518,7 @@ class Apple2(StandardReadable, Movable):
             and motor_position_equal(btm_outer, 0.0)
         ):
             # Linear Vertical
-            polarisation = "lv"
+            polarisation = Pol("lv")
             phase = MAXIMUM_ROW_PHASE_MOTOR_POSITION
             return polarisation, phase
         if (
@@ -530,7 +528,7 @@ class Apple2(StandardReadable, Movable):
             and motor_position_equal(btm_outer, 0.0)
         ):
             # Positive Circular
-            polarisation = "pc"
+            polarisation = Pol("pc")
             phase = top_outer
             return polarisation, phase
         if (
@@ -540,7 +538,7 @@ class Apple2(StandardReadable, Movable):
             and motor_position_equal(btm_outer, 0.0)
         ):
             # Negative Circular
-            polarisation = "nc"
+            polarisation = Pol("nc")
             phase = top_outer
             return polarisation, phase
         if (
@@ -549,7 +547,7 @@ class Apple2(StandardReadable, Movable):
             and motor_position_equal(btm_outer, 0.0)
         ):
             # Positive Linear Arbitrary
-            polarisation = "la"
+            polarisation = Pol("la")
             phase = top_outer
             return polarisation, phase
         if (
@@ -558,11 +556,11 @@ class Apple2(StandardReadable, Movable):
             and motor_position_equal(btm_inner, 0.0)
         ):
             # Negative Linear Arbitrary
-            polarisation = "la"
+            polarisation = Pol("la")
             phase = top_inner
             return polarisation, phase
         # UNKNOWN default
-        polarisation = None
+        polarisation = Pol("None")
         phase = 0.0
         return (polarisation, phase)
 

@@ -181,7 +181,6 @@ async def test_I10Apple2_determine_pol(
     set_mock_value(mock_id.phase.top_outer.user_readback, top_outer_phase)
     set_mock_value(mock_id.phase.btm_inner.user_readback, btm_inner_phase)
     set_mock_value(mock_id.phase.btm_outer.user_readback, btm_outer_phase)
-    mock_id._polarisation_set("")
     if pol == "None":
         with pytest.raises(ValueError):
             await mock_id.set(800)

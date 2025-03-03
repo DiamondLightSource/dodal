@@ -23,6 +23,7 @@ from ..apple2_undulator import (
     Apple2,
     Apple2Val,
     Lookuptable,
+    Pol,
     UndulatorGap,
     UndulatorJawPhase,
     UndulatorPhaseAxes,
@@ -144,10 +145,10 @@ class I10Apple2(Apple2):
         to calculate the required gap and phases before setting it.
         """
         pol = await self.polarisation.get_value()
-        if pol not in self._available_pol:
+        if pol.value == Pol.NONE:
             LOGGER.warning("Polarisation not set attempting to read from hardware")
             pol, phase = await self.determine_phase_from_hardware()
-            if pol is None:
+            if pol.value == "None":
                 raise ValueError(
                     f"Polarisation cannot be determine from hardware for {self.name}"
                 )
@@ -248,7 +249,7 @@ class I10Apple2Pol(StandardReadable, Movable):
         self.add_readables([self.id_ref().polarisation])
 
     @AsyncStatus.wrap
-    async def set(self, value: str) -> None:
+    async def set(self, value: Pol) -> None:
         # Check before set
         self.id_ref().set_pol(value)
         LOGGER.info(f"Changing f{self.name} polarisation to {value}.")
