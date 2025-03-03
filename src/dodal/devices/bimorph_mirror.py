@@ -41,7 +41,7 @@ class BimorphMirrorStatus(StrictEnum):
     ERROR = "Error"
 
 
-class BimorphMirrorChannel(StandardReadable, Movable[float], EpicsDevice):
+class BimorphMirrorChannel(StandardReadable, Movable, EpicsDevice):
     """Collection of PVs comprising a single bimorph channel.
 
     Attributes:
@@ -66,7 +66,7 @@ class BimorphMirrorChannel(StandardReadable, Movable[float], EpicsDevice):
         await self.output_voltage.set(value)
 
 
-class BimorphMirror(StandardReadable, Movable[Mapping[int, float]]):
+class BimorphMirror(StandardReadable, Movable):
     """Class to represent CAENels Bimorph Mirrors.
 
     Attributes:

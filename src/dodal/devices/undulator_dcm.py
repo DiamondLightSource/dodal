@@ -12,7 +12,7 @@ from .undulator import Undulator
 ENERGY_TIMEOUT_S: float = 30.0
 
 
-class UndulatorDCM(StandardReadable, Movable[float]):
+class UndulatorDCM(StandardReadable, Movable):
     """
     Composite device to handle changing beamline energies, wraps the Undulator and the
     DCM. The DCM has a motor which controls the beam energy, when it moves, the
