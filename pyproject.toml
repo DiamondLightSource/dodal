@@ -55,14 +55,14 @@ dev = [
     "pre-commit",
     "psutil",
     "pydata-sphinx-theme>=0.12",
-    "pyright==1.1.394",          # See https://github.com/DiamondLightSource/dodal/issues/1079
+    "pyright==1.1.396",          # See https://github.com/DiamondLightSource/dodal/issues/1079
     "pytest",
     "pytest-asyncio",
     "pytest-cov",
     "pytest-json-report",
     "pytest-random-order",
     "ruff",
-    "sphinx<7.4.6",              #  pinned due to https://github.com/sphinx-doc/sphinx/issues/12660
+    "sphinx<8.2.4",              #  pinned due to https://github.com/sphinx-doc/sphinx/issues/12660
     "sphinx-autobuild",
     "sphinx-copybutton",
     "sphinxcontrib-mermaid",
