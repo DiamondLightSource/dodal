@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.plan_stubs.wrapped &#8212; dodal 1.40.1.dev7+ga3b1b8c54 documentation</title>
+    <title>dodal.plan_stubs.wrapped &#8212; dodal 1.41.1.dev1+ge3ec09dbb documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=f631cf31"></script>
+    <script src="../../../_static/documentation_options.js?v=16bdc312"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -452,7 +452,7 @@ window.addEventListener("load", () => mermaid.run());
   <h1>Source code for dodal.plan_stubs.wrapped</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Annotated</span><span class="p">,</span> <span class="n">TypeVar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Annotated</span><span class="p">,</span> <span class="n">Any</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">bluesky.plan_stubs</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">bps</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Movable</span>
@@ -464,19 +464,19 @@ window.addEventListener("load", () => mermaid.run());
 
 <span class="n">Group</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;String identifier used by &#39;wait&#39; or stubs that await&quot;</span><span class="p">]</span>
 
-<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
 
-
+<span class="c1"># After bluesky 1.14, bounds for stubs that move can be narrowed</span>
+<span class="c1"># https://github.com/bluesky/bluesky/issues/1821</span>
 <div class="viewcode-block" id="set_absolute">
 <a class="viewcode-back" href="../../../reference/generated/dodal.plan_stubs.wrapped.html#dodal.plan_stubs.wrapped.set_absolute">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_absolute</span><span class="p">(</span>
-    <span class="n">movable</span><span class="p">:</span> <span class="n">Movable</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">value</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="n">Group</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">wait</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">movable</span><span class="p">:</span> <span class="n">Movable</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="n">Group</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">wait</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Set a device, wrapper for `bp.abs_set`.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        movable (Movable[T]): The device to set</span>
+<span class="sd">        movable (Movable): The device to set</span>
 <span class="sd">        value (T): The new value</span>
 <span class="sd">        group (Group | None, optional): The message group to associate with the</span>
 <span class="sd">                                           setting, for sequencing. Defaults to None.</span>
@@ -496,7 +496,7 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="set_relative">
 <a class="viewcode-back" href="../../../reference/generated/dodal.plan_stubs.wrapped.html#dodal.plan_stubs.wrapped.set_relative">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">set_relative</span><span class="p">(</span>
-    <span class="n">movable</span><span class="p">:</span> <span class="n">Movable</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">value</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="n">Group</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">wait</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">movable</span><span class="p">:</span> <span class="n">Movable</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">group</span><span class="p">:</span> <span class="n">Group</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">wait</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Change a device, wrapper for `bp.rel_set`.</span>
@@ -522,7 +522,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="move">
 <a class="viewcode-back" href="../../../reference/generated/dodal.plan_stubs.wrapped.html#dodal.plan_stubs.wrapped.move">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">move</span><span class="p">(</span><span class="n">moves</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Movable</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">T</span><span class="p">],</span> <span class="n">group</span><span class="p">:</span> <span class="n">Group</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">move</span><span class="p">(</span><span class="n">moves</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Movable</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">group</span><span class="p">:</span> <span class="n">Group</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Move a device, wrapper for `bp.mv`.</span>
 
@@ -539,7 +539,8 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">return</span> <span class="p">(</span>
-        <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">mv</span><span class="p">(</span><span class="o">*</span><span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">moves</span><span class="o">.</span><span class="n">items</span><span class="p">()),</span> <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span>
+        <span class="c1"># type ignore until https://github.com/bluesky/bluesky/issues/1809</span>
+        <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">mv</span><span class="p">(</span><span class="o">*</span><span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">moves</span><span class="o">.</span><span class="n">items</span><span class="p">()),</span> <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
     <span class="p">)</span></div>
 
 
@@ -547,7 +548,7 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="move_relative">
 <a class="viewcode-back" href="../../../reference/generated/dodal.plan_stubs.wrapped.html#dodal.plan_stubs.wrapped.move_relative">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">move_relative</span><span class="p">(</span>
-    <span class="n">moves</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Movable</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">T</span><span class="p">],</span> <span class="n">group</span><span class="p">:</span> <span class="n">Group</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">moves</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">Movable</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">group</span><span class="p">:</span> <span class="n">Group</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Move a device relative to its current position, wrapper for `bp.mvr`.</span>
@@ -565,7 +566,8 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">return</span> <span class="p">(</span>
-        <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">mvr</span><span class="p">(</span><span class="o">*</span><span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">moves</span><span class="o">.</span><span class="n">items</span><span class="p">()),</span> <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span>
+        <span class="c1"># type ignore until https://github.com/bluesky/bluesky/issues/1809</span>
+        <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">mvr</span><span class="p">(</span><span class="o">*</span><span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">moves</span><span class="o">.</span><span class="n">items</span><span class="p">()),</span> <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
     <span class="p">)</span></div>
 
 
