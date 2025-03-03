@@ -25,6 +25,7 @@ DEFAULT_CONNECTION_TIMEOUT: Final[float] = 5.0
 ACTIVE_DEVICES: dict[str, AnyDevice] = {}
 BL = ""
 
+
 def set_beamline(beamline: str):
     global BL
     BL = beamline
