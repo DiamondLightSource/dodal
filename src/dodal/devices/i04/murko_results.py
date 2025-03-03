@@ -35,10 +35,11 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
 
     def __init__(
         self,
+        prefix="",
         redis_host=REDIS_HOST,
         redis_password=REDIS_PASSWORD,
         db=MURKO_REDIS_DB,
-        redis_channel="murko",
+        name="",
     ):
         self.redis_client = StrictRedis(
             host=redis_host,
@@ -58,6 +59,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
             self.x_um, self._x_um_setter = soft_signal_r_and_setter(float | None)
             self.y_um, self._y_um_setter = soft_signal_r_and_setter(float | None)
             self.z_um, self._z_um_setter = soft_signal_r_and_setter(float | None)
+        super().__init__(name=name)
 
     @AsyncStatus.wrap
     async def stage(self):
@@ -66,7 +68,6 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         self._x_um_setter(None)
         self._y_um_setter(None)
         self._z_um_setter(None)
-        self.found_90 = False
 
     @AsyncStatus.wrap
     async def unstage(self):
