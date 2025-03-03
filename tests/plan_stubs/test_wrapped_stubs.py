@@ -125,24 +125,20 @@ def test_sleep():
 
 def test_wait():
     # Waits for all groups
-    assert list(wait()) == [
-        Msg("wait", group=None, timeout=None, error_on_timeout=True)
-    ]
+    assert list(wait()) == [Msg("wait", group=None, timeout=None, move_on=False)]
 
 
 def test_wait_group():
-    assert list(wait("foo")) == [
-        Msg("wait", group="foo", timeout=None, error_on_timeout=True)
-    ]
+    assert list(wait("foo")) == [Msg("wait", group="foo", timeout=None, move_on=False)]
 
 
 def test_wait_timeout():
     assert list(wait(timeout=5.0)) == [
-        Msg("wait", group=None, timeout=5.0, error_on_timeout=True)
+        Msg("wait", group=None, timeout=5.0, move_on=False)
     ]
 
 
 def test_wait_group_and_timeout():
     assert list(wait("foo", 5.0)) == [
-        Msg("wait", group="foo", timeout=5.0, error_on_timeout=True)
+        Msg("wait", group="foo", timeout=5.0, move_on=False)
     ]

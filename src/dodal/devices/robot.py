@@ -52,7 +52,7 @@ class ErrorStatus(Device):
             raise RobotLoadFailed(int(error_code), error_string) from raise_from
 
 
-class BartRobot(StandardReadable, Movable[SampleLocation]):
+class BartRobot(StandardReadable, Movable):
     """The sample changing robot."""
 
     # How long to wait for the robot if it is busy soaking/drying
