@@ -16,7 +16,7 @@ dependencies = [
     "click",
     "ophyd",
     "ophyd-async >= 0.9.0a2",
-    "bluesky",
+    "bluesky == 1.13.0",
     "pyepics",
     "dataclasses-json",
     "pillow",
@@ -55,7 +55,7 @@ dev = [
     "pre-commit",
     "psutil",
     "pydata-sphinx-theme>=0.12",
-    "pyright",
+    "pyright==1.1.394",          # See https://github.com/DiamondLightSource/dodal/issues/1079
     "pytest",
     "pytest-asyncio",
     "pytest-cov",
