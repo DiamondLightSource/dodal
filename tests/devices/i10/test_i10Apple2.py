@@ -17,6 +17,7 @@ from ophyd_async.testing import (
 )
 
 from dodal.devices.apple2_undulator import (
+    Pol,
     UndulatorGap,
     UndulatorGateStatus,
     UndulatorJawPhase,
@@ -186,7 +187,7 @@ async def test_I10Apple2_determine_pol(
             await mock_id.set(800)
     else:
         await mock_id.set(800)
-        assert await mock_id.polarisation.get_value() == pol
+        assert await mock_id.polarisation_readback.get_value() == pol
 
 
 async def test_fail_I10Apple2_no_lookup():
@@ -210,12 +211,12 @@ async def test_fail_I10Apple2_set_outside_energy_limits(
     with pytest.raises(ValueError) as e:
         await mock_id.set(energy)
     assert str(e.value) == "Demanding energy must lie between {} and {} eV!".format(
-        mock_id.lookup_tables["Gap"][await mock_id.polarisation.get_value()]["Limit"][
-            "Minimum"
-        ],
-        mock_id.lookup_tables["Gap"][await mock_id.polarisation.get_value()]["Limit"][
-            "Maximum"
-        ],
+        mock_id.lookup_tables["Gap"][await mock_id.polarisation_setpoint.get_value()][
+            "Limit"
+        ]["Minimum"],
+        mock_id.lookup_tables["Gap"][await mock_id.polarisation_setpoint.get_value()][
+            "Limit"
+        ]["Maximum"],
     )
 
 
@@ -282,7 +283,7 @@ async def test_EnergySetter_RE_scan(mock_id_pgm: EnergySetter, RE: RunEngine):
     def capture_emitted(name, doc):
         docs[name].append(doc)
 
-    mock_id_pgm.id._polarisation_set("lh3")
+    mock_id_pgm.id._polarisation_setpoint_set(Pol("lh3"))
     RE(scan([], mock_id_pgm, 1700, 1800, num=11), capture_emitted)
     assert_emitted(docs, start=1, descriptor=1, event=11, stop=1)
     # with energy offset
@@ -348,10 +349,10 @@ async def test_I10Apple2_pol_set(
     mock_id_pol.id_ref()._energy_set(energy)
     if pol == "dsf":
         with pytest.raises(ValueError):
-            await mock_id_pol.set(pol)
+            await mock_id_pol.set(Pol(pol))
     else:
-        await mock_id_pol.set(pol)
-        assert await mock_id_pol.id_ref().polarisation.get_value() == pol
+        await mock_id_pol.set(Pol(pol))
+        assert await mock_id_pol.id_ref().polarisation_setpoint.get_value() == pol
         top_inner = get_mock_put(mock_id_pol.id_ref().phase.top_inner.user_setpoint)
         top_inner.assert_called_once()
         assert float(top_inner.call_args[0][0]) == pytest.approx(expect_top_inner, 0.01)
@@ -399,7 +400,7 @@ async def test_I10Apple2_pol_read_check_pol_from_hardware(
     set_mock_value(mock_id_pol.id_ref().phase.btm_inner.user_readback, btm_inner)
     set_mock_value(mock_id_pol.id_ref().phase.btm_outer.user_readback, btm_outer)
 
-    assert (await mock_id_pol.read())["mock_id-polarisation"]["value"] == pol
+    assert (await mock_id_pol.read())["mock_id-polarisation_readback"]["value"] == pol
 
 
 @pytest.mark.parametrize(
@@ -418,23 +419,25 @@ async def test_I10Apple2_pol_read_leave_lh3_unchange(
     btm_outer: float,
 ):
     mock_id_pol.id_ref()._energy_set(energy)
-    mock_id_pol.id_ref()._polarisation_set("lh3")
+    mock_id_pol.id_ref()._polarisation_setpoint_set(Pol("lh3"))
     set_mock_value(mock_id_pol.id_ref().phase.top_inner.user_readback, top_inner)
     set_mock_value(mock_id_pol.id_ref().phase.top_outer.user_readback, top_outer)
     set_mock_value(mock_id_pol.id_ref().phase.btm_inner.user_readback, btm_inner)
     set_mock_value(mock_id_pol.id_ref().phase.btm_outer.user_readback, btm_outer)
-    assert (await mock_id_pol.read())["mock_id-polarisation"]["value"] == pol
+    assert (await mock_id_pol.read())["mock_id-polarisation_readback"]["value"] == pol
 
 
 async def test_linear_arbitrary_pol_fail(
     mock_linear_arbitrary_angle: LinearArbitraryAngle,
 ):
-    mock_linear_arbitrary_angle.id_ref().pol = "lh"
+    set_mock_value(
+        mock_linear_arbitrary_angle.id_ref().polarisation_readback, (Pol("la"))
+    )
     with pytest.raises(RuntimeError) as e:
         await mock_linear_arbitrary_angle.set(20)
     assert str(e.value) == (
         f"Angle control is not available in polarisation"
-        f" {await mock_linear_arbitrary_angle.id_ref().polarisation.get_value()} with {mock_linear_arbitrary_angle.id_ref().name}"
+        f" {await mock_linear_arbitrary_angle.id_ref().polarisation_readback.get_value()} with {mock_linear_arbitrary_angle.id_ref().name}"
     )
 
 
@@ -445,7 +448,19 @@ async def test_linear_arbitrary_pol_fail(
 async def test_linear_arbitrary_limit_fail(
     mock_linear_arbitrary_angle: LinearArbitraryAngle, poly: float
 ):
-    mock_linear_arbitrary_angle.id_ref()._polarisation_set("la")
+    set_mock_value(
+        mock_linear_arbitrary_angle.id_ref().phase.top_inner.user_readback,
+        16.4,
+    )
+    set_mock_value(
+        mock_linear_arbitrary_angle.id_ref().phase.top_outer.user_readback, 0
+    )
+    set_mock_value(
+        mock_linear_arbitrary_angle.id_ref().phase.btm_inner.user_readback, 0
+    )
+    set_mock_value(
+        mock_linear_arbitrary_angle.id_ref().phase.btm_outer.user_readback, -16.4
+    )
     mock_linear_arbitrary_angle.jaw_phase_from_angle = poly1d([poly])
     with pytest.raises(RuntimeError) as e:
         await mock_linear_arbitrary_angle.set(20)
@@ -477,8 +492,19 @@ async def test_linear_arbitrary_RE_scan(
     def capture_emitted(name, doc):
         docs[name].append(doc)
 
-    mock_linear_arbitrary_angle.id_ref()._polarisation_set("la")
-
+    set_mock_value(
+        mock_linear_arbitrary_angle.id_ref().phase.top_inner.user_readback,
+        16.4,
+    )
+    set_mock_value(
+        mock_linear_arbitrary_angle.id_ref().phase.top_outer.user_readback, 0
+    )
+    set_mock_value(
+        mock_linear_arbitrary_angle.id_ref().phase.btm_inner.user_readback, 0
+    )
+    set_mock_value(
+        mock_linear_arbitrary_angle.id_ref().phase.btm_outer.user_readback, -16.4
+    )
     RE(
         scan(
             [],

@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, SupportsFloat
 
 import numpy as np
-from bluesky.protocols import Movable, Reading
+from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
     Device,
@@ -130,21 +130,13 @@ class I10Apple2(Apple2):
                 move_pv="RPQ1",
             )
 
-    async def read(self) -> dict[str, Reading]:
-        # It is not possible to get lh3 from hardware so if pol is in lh3 we skip check.
-        if await self.polarisation.get_value() != "lh3":
-            pol, _ = await self.determine_phase_from_hardware()
-            if pol is not None:
-                self.set_pol(pol=pol)
-        return await super().read()
-
     @AsyncStatus.wrap
     async def set(self, value: float) -> None:
         """
         Check polarisation state and use it together with the energy(value)
         to calculate the required gap and phases before setting it.
         """
-        pol = await self.polarisation.get_value()
+        pol = await self.polarisation_setpoint.get_value()
         if pol.value == Pol.NONE:
             LOGGER.warning("Polarisation not set attempting to read from hardware")
             pol, phase = await self.determine_phase_from_hardware()
@@ -152,7 +144,7 @@ class I10Apple2(Apple2):
                 raise ValueError(
                     f"Polarisation cannot be determine from hardware for {self.name}"
                 )
-            self._polarisation_set(pol)
+            self._polarisation_setpoint_set(pol)
         gap, phase = await self._get_id_gap_phase(value)
         phase3 = phase * (-1 if pol == "la" else (1))
         id_set_val = Apple2Val(
@@ -246,7 +238,7 @@ class I10Apple2Pol(StandardReadable, Movable):
         """
         super().__init__(name=name)
         self.id_ref = Reference(id)
-        self.add_readables([self.id_ref().polarisation])
+        self.add_readables([self.id_ref().polarisation_readback])
 
     @AsyncStatus.wrap
     async def set(self, value: Pol) -> None:
@@ -257,13 +249,13 @@ class I10Apple2Pol(StandardReadable, Movable):
             await self.id_ref().energy.get_value()
         )  # Move id to new polarisation
 
-    async def read(self) -> dict[str, Reading]:
-        # It is not possible to get lh3 from hardware so if pol is in lh3 we skip check.
-        if await self.id_ref().polarisation.get_value() != "lh3":
-            pol, _ = await self.id_ref().determine_phase_from_hardware()
-            if pol is not None:
-                self.id_ref().set_pol(pol=pol)
-        return await super().read()
+    # async def read(self) -> dict[str, Reading]:
+    #     # It is not possible to get lh3 from hardware so if pol is in lh3 we skip check.
+    #     if await self.id_ref().polarisation.get_value() != "lh3":
+    #         pol, _ = await self.id_ref().determine_phase_from_hardware()
+    #         if pol is not None:
+    #             self.id_ref().set_pol(pol=pol)
+    #     return await super().read()
 
 
 class LinearArbitraryAngle(StandardReadable, Movable):
@@ -309,7 +301,7 @@ class LinearArbitraryAngle(StandardReadable, Movable):
     @AsyncStatus.wrap
     async def set(self, value: SupportsFloat) -> None:
         value = float(value)
-        pol = await self.id_ref().polarisation.get_value()
+        pol = await self.id_ref().polarisation_readback.get_value()
         if pol != "la":
             raise RuntimeError(
                 f"Angle control is not available in polarisation {pol} with {self.id_ref().name}"

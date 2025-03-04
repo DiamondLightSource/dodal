@@ -18,6 +18,7 @@ from ophyd_async.core import (
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
 from pydantic import BaseModel, ConfigDict, RootModel
 
+from dodal.common.signal_utils import create_hardware_backed_soft_signal
 from dodal.log import LOGGER
 
 DEFAULT_MOTOR_MIN_TIMEOUT = 10
@@ -383,14 +384,20 @@ class Apple2(StandardReadable, Movable):
                 float, initial_value=None
             )
 
-        with self.add_children_as_readables():
-            # Store the polarisation for readback.
-            self.polarisation, self._polarisation_set = soft_signal_r_and_setter(Pol)
+        # Store the polarisation for setpoint.
+        self.polarisation_setpoint, self._polarisation_setpoint_set = (
+            soft_signal_r_and_setter(Pol)
+        )
         # This store two lookup tables, Gap and Phase in the Lookuptable format
         self.lookup_tables: dict[str, dict[str | None, dict[str, dict[str, Any]]]] = {
             "Gap": {},
             "Phase": {},
         }
+        with self.add_children_as_readables():
+            # Hardware backed readback for polarisation.
+            self.polarisation_readback = create_hardware_backed_soft_signal(
+                datatype=Pol, get_from_hardware_func=self.read_pol_setpoint
+            )
         # List of available polarisation according to the lookup table.
         self._available_pol = []
         """
@@ -399,9 +406,19 @@ class Apple2(StandardReadable, Movable):
         """
         self.update_lookuptable()
 
+    # Hardward backed polarisation function,
+    async def read_pol_setpoint(self):
+        pol = await self.polarisation_setpoint.get_value()
+        # LH3 is not hardware readable as it is the same as lh but it is needed for energy.
+        if pol.value != "lh3":
+            pol, _ = await self.determine_phase_from_hardware()
+            if pol != Pol.NONE:
+                self.set_pol(pol=pol)
+        return pol
+
     def set_pol(self, pol: Pol) -> None:
         # This set the polarisation but does not actually move hardware.
-        self._polarisation_set(pol)
+        self._polarisation_setpoint_set(pol)
 
     async def _set(self, value: Apple2Val, energy: float) -> None:
         """
@@ -421,7 +438,7 @@ class Apple2(StandardReadable, Movable):
             await asyncio.gather(self.gap.get_timeout(), self.phase.get_timeout())
         )
         LOGGER.info(
-            f"Moving f{self.name} energy and polorisation to {energy}, {await self.polarisation.get_value()}"
+            f"Moving f{self.name} energy and polorisation to {energy}, {await self.polarisation_setpoint.get_value()}"
             + f"with motor position {value}, timeout = {timeout}"
         )
         await asyncio.gather(
@@ -452,7 +469,7 @@ class Apple2(StandardReadable, Movable):
         Get the correct polynomial for a given energy form lookuptable
         for any given polarisation.
         """
-        pol = await self.polarisation.get_value()
+        pol = await self.polarisation_setpoint.get_value()
         if (
             new_energy < lookup_table[pol]["Limit"]["Minimum"]
             or new_energy > lookup_table[pol]["Limit"]["Maximum"]
