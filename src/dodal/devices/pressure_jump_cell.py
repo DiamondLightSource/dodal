@@ -41,8 +41,8 @@ class ValveControlRequest(StrictEnum):
 
 
 class ValveOpenSeqRequest(StrictEnum):
-    INACTIVE = 0
-    OPEN_SEQ = 1
+    INACTIVE = "0"
+    OPEN_SEQ = "1"
 
 
 class PumpMotorDirectionState(StrictEnum):
@@ -235,6 +235,9 @@ class PressureTransducer(StandardReadable):
             self.beckhoff_pressure = epics_signal_r(
                 float, f"{final_prefix}STATP{transducer_number}:MeanValue_RBV"
             )
+            # P1 beckhoff voltage = BL38P-EA-ADC-02:CH1
+            # P2 beckhoff voltage = BL38P-EA-ADC-01:CH2
+            # P3 beckhoff voltage = BL38P-EA-ADC-01:CH1
             self.slow_beckhoff_voltage_readout = epics_signal_r(
                 float, f"{full_different_prefix_adc}CH{ethercat_channel_number}"
             )
