@@ -249,14 +249,6 @@ class I10Apple2Pol(StandardReadable, Movable):
             await self.id_ref().energy.get_value()
         )  # Move id to new polarisation
 
-    # async def read(self) -> dict[str, Reading]:
-    #     # It is not possible to get lh3 from hardware so if pol is in lh3 we skip check.
-    #     if await self.id_ref().polarisation.get_value() != "lh3":
-    #         pol, _ = await self.id_ref().determine_phase_from_hardware()
-    #         if pol is not None:
-    #             self.id_ref().set_pol(pol=pol)
-    #     return await super().read()
-
 
 class LinearArbitraryAngle(StandardReadable, Movable):
     """
