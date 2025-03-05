@@ -22,6 +22,7 @@ from dodal.plans.bimorph import (
     BimorphState,
     SlitDimension,
     bimorph_optimisation,
+    bimorph_position_generator,
     capture_bimorph_state,
     inner_scan,
     move_slits,
@@ -160,8 +161,40 @@ async def test_save_and_restore(
         assert put.call_args_list == [call(4.0, wait=True), call(0.0, wait=True)]
 
 
-def test_bimorph_position_generator():
-    raise NotImplementedError()
+@pytest.mark.parametrize("initial_voltage_list", [[0 for _ in range(8)]])
+@pytest.mark.parametrize("voltage_increment", [200.0])
+class TestBimorphPositionGenerator:
+    def test_copies_list(
+        self, initial_voltage_list: list[float], voltage_increment: float
+    ):
+        list_copy = initial_voltage_list.copy()
+
+        positions = list(
+            bimorph_position_generator(initial_voltage_list, voltage_increment)
+        )
+
+        assert positions[1] != initial_voltage_list
+
+        assert initial_voltage_list == list_copy
+
+    def test_generated_positions(
+        self, initial_voltage_list: list[float], voltage_increment: float
+    ):
+        positions = list(
+            bimorph_position_generator(initial_voltage_list, voltage_increment)
+        )
+
+        assert positions == [
+            [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [200.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [200.0, 200.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [200.0, 200.0, 200.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [200.0, 200.0, 200.0, 200.0, 0.0, 0.0, 0.0, 0.0],
+            [200.0, 200.0, 200.0, 200.0, 200.0, 0.0, 0.0, 0],
+            [200.0, 200.0, 200.0, 200.0, 200.0, 200.0, 0.0, 0.0],
+            [200.0, 200.0, 200.0, 200.0, 200.0, 200.0, 200.0, 0.0],
+            [200.0, 200.0, 200.0, 200.0, 200.0, 200.0, 200.0, 200.0],
+        ]
 
 
 @pytest.mark.parametrize("active_dimension", [SlitDimension.X, SlitDimension.Y])
