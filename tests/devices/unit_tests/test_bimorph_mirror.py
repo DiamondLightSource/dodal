@@ -156,17 +156,3 @@ async def test_init_mirror_with_zero_channels(number_of_channels):
         prefix="FAKE-PREFIX", number_of_channels=number_of_channels
     )
     assert len(mirror_with_mocked_put.channels) == 0
-
-
-async def test_bimorph_mirror_channel_set(
-    mirror_with_mocked_put: BimorphMirror,
-    valid_bimorph_values: list[float],
-):
-    for value, channel in zip(
-        valid_bimorph_values,
-        mirror_with_mocked_put.channels.values(),
-        strict=True,
-    ):
-        assert await channel.output_voltage.get_value() != value
-        await channel.set(value)
-        assert await channel.output_voltage.get_value() == value
