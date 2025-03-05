@@ -2,6 +2,7 @@ from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.common.beamlines.beamline_utils import (
+    device_factory,
     device_instantiation,
     get_path_provider,
     set_path_provider,
@@ -17,7 +18,6 @@ from dodal.devices.attenuator.attenuator import BinaryFilterAttenuator
 from dodal.devices.backlight import Backlight
 from dodal.devices.cryostream import CryoStream
 from dodal.devices.dcm import DCM
-from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.diamond_filter import DiamondFilter, I03Filters
 from dodal.devices.eiger import EigerDetector
@@ -49,7 +49,7 @@ from dodal.devices.zebra.zebra_constants_mapping import (
 from dodal.devices.zebra.zebra_controlled_shutter import ZebraShutter
 from dodal.devices.zocalo import ZocaloResults
 from dodal.log import set_beamline as set_log_beamline
-from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
+from dodal.utils import BeamlinePrefix, get_beamline_name
 
 ZOOM_PARAMS_FILE = (
     "/dls_sw/i03/software/gda/configurations/i03-config/xml/jCameraManZoomLevels.xml"
@@ -69,81 +69,59 @@ I03_ZEBRA_MAPPING = ZebraMapping(
     AND_GATE_FOR_AUTO_SHUTTER=2,
 )
 
+PREFIX = BeamlinePrefix(BL)
 
-def aperture_scatterguard(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-) -> ApertureScatterguard:
+
+@device_factory()
+def aperture_scatterguard() -> ApertureScatterguard:
     """Get the i03 aperture and scatterguard device, instantiate it if it hasn't already
     been. If this is called when already instantiated in i03, it will return the existing
     object.
     """
     params = get_beamline_parameters()
-    return device_instantiation(
-        device_factory=ApertureScatterguard,
-        name="aperture_scatterguard",
-        prefix="",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
+    return ApertureScatterguard(
+        prefix=PREFIX.beamline_prefix,
         loaded_positions=load_positions_from_beamline_parameters(params),
         tolerances=AperturePosition.tolerances_from_gda_params(params),
     )
 
 
-def attenuator(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> BinaryFilterAttenuator:
+@device_factory()
+def attenuator() -> BinaryFilterAttenuator:
     """Get the i03 attenuator device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        BinaryFilterAttenuator,
-        "attenuator",
-        "-EA-ATTN-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
+    return BinaryFilterAttenuator(f"{PREFIX.beamline_prefix}-EA-ATTN-01:")
 
 
-def beamstop(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Beamstop:
+@device_factory()
+def beamstop() -> Beamstop:
     """Get the i03 beamstop device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        Beamstop,
-        "beamstop",
-        "-MO-BS-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+    return Beamstop(
+        prefix=f"{PREFIX.beamline_prefix}-MO-BS-01:",
+        name="beamstop",
         beamline_parameters=get_beamline_parameters(),
     )
 
 
-def dcm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> DCM:
+@device_factory()
+def dcm() -> DCM:
     """Get the i03 DCM device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        DCM,
+    return DCM(
+        f"{PREFIX.beamline_prefix}-MO-DCM-01:",
         "dcm",
-        "-MO-DCM-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
     )
 
 
-@skip_device(lambda: BL == "s03")
-def vfm(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> FocusingMirrorWithStripes:
-    return device_instantiation(
-        device_factory=FocusingMirrorWithStripes,
+@device_factory(skip=BL == "s03")
+def vfm() -> FocusingMirrorWithStripes:
+    return FocusingMirrorWithStripes(
+        prefix=f"{PREFIX.beamline_prefix}-OP-VFM-01:",
         name="vfm",
-        prefix="-OP-VFM-01:",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
         bragg_to_lat_lut_path=DAQ_CONFIGURATION_PATH
         + "/lookup/BeamLineEnergy_DCM_VFM_x_converter.txt",
         x_suffix="LAT",
@@ -151,439 +129,310 @@ def vfm(
     )
 
 
-@skip_device(lambda: BL == "s03")
-def mirror_voltages(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> MirrorVoltages:
-    return device_instantiation(
-        device_factory=MirrorVoltages,
+@device_factory(skip=BL == "s03")
+def mirror_voltages() -> MirrorVoltages:
+    return MirrorVoltages(
         name="mirror_voltages",
-        prefix="-MO-PSU-01:",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
+        prefix=f"{PREFIX.beamline_prefix}-MO-PSU-01:",
         daq_configuration_path=DAQ_CONFIGURATION_PATH,
     )
 
 
-def backlight(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Backlight:
+@device_factory()
+def backlight() -> Backlight:
     """Get the i03 backlight device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        device_factory=Backlight,
-        name="backlight",
-        prefix="",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
-    )
+    return Backlight(prefix=PREFIX.beamline_prefix, name="backlight")
 
 
-@skip_device(lambda: BL == "s03")
-def detector_motion(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> DetectorMotion:
+@device_factory(skip=BL == "s03")
+def detector_motion() -> DetectorMotion:
     """Get the i03 detector motion device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        device_factory=DetectorMotion,
+    return DetectorMotion(
+        prefix=PREFIX.beamline_prefix,
         name="detector_motion",
-        prefix="",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
     )
 
 
-@skip_device(lambda: BL == "s03")
-def eiger(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-    params: DetectorParams | None = None,
-) -> EigerDetector:
+@device_factory(skip=BL == "s03")
+def eiger(mock: bool = False) -> EigerDetector:
     """Get the i03 Eiger device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
-    If called with params, will update those params to the Eiger object.
     """
-
-    def set_params(eiger: EigerDetector):
-        if params is not None:
-            eiger.set_detector_parameters(params)
 
     return device_instantiation(
         device_factory=EigerDetector,
         name="eiger",
         prefix="-EA-EIGER-01:",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
-        post_create=set_params,
+        wait=False,
+        fake=mock,
     )
 
 
-def zebra_fast_grid_scan(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> ZebraFastGridScan:
+@device_factory()
+def zebra_fast_grid_scan() -> ZebraFastGridScan:
     """Get the i03 zebra_fast_grid_scan device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        device_factory=ZebraFastGridScan,
+    return ZebraFastGridScan(
+        prefix=f"{PREFIX.beamline_prefix}-MO-SGON-01:",
         name="zebra_fast_grid_scan",
-        prefix="-MO-SGON-01:",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
     )
 
 
-def panda_fast_grid_scan(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> PandAFastGridScan:
+@device_factory()
+def panda_fast_grid_scan() -> PandAFastGridScan:
     """Get the i03 panda_fast_grid_scan device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     This is used instead of the zebra_fast_grid_scan device when using the PandA.
     """
-    return device_instantiation(
-        device_factory=PandAFastGridScan,
+    return PandAFastGridScan(
+        prefix=f"{PREFIX.beamline_prefix}-MO-SGON-01:",
         name="panda_fast_grid_scan",
-        prefix="-MO-SGON-01:",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
     )
 
 
-@skip_device(lambda: BL == "s03")
+@device_factory(skip=BL == "s03")
 def oav(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
     params: OAVConfig | None = None,
 ) -> OAV:
     """Get the i03 OAV device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        OAV,
-        "oav",
-        "-DI-OAV-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+    return OAV(
+        prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
+        name="oav",
         config=params or OAVConfig(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
     )
 
 
-@skip_device(lambda: BL == "s03")
-def pin_tip_detection(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> PinTipDetection:
+@device_factory(skip=BL == "s03")
+def pin_tip_detection() -> PinTipDetection:
     """Get the i03 pin tip detection device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        PinTipDetection,
+    return PinTipDetection(
+        f"{PREFIX.beamline_prefix}-DI-OAV-01:",
         "pin_tip_detection",
-        "-DI-OAV-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
     )
 
 
-def smargon(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Smargon:
+@device_factory()
+def smargon() -> Smargon:
     """Get the i03 Smargon device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        Smargon,
-        "smargon",
-        "-MO-SGON-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
+    return Smargon(f"{PREFIX.beamline_prefix}-MO-SGON-01:", "smargon")
 
 
-def s4_slit_gaps(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> S4SlitGaps:
+@device_factory()
+def s4_slit_gaps() -> S4SlitGaps:
     """Get the i03 s4_slit_gaps device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        S4SlitGaps,
+    return S4SlitGaps(
+        f"{PREFIX.beamline_prefix}-AL-SLITS-04:",
         "s4_slit_gaps",
-        "-AL-SLITS-04:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
     )
 
 
-@skip_device(lambda: BL == "s03")
-def synchrotron(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Synchrotron:
+@device_factory(skip=BL == "s03")
+def synchrotron() -> Synchrotron:
     """Get the i03 synchrotron device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        Synchrotron,
-        "synchrotron",
-        "",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-        bl_prefix=False,
-    )
+    return Synchrotron("", "synchrotron")
 
 
-def undulator(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-    daq_configuration_path: str | None = None,
-) -> Undulator:
+@device_factory()
+def undulator(daq_configuration_path: str | None = None) -> Undulator:
     """Get the i03 undulator device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        Undulator,
-        "undulator",
+    return Undulator(
         f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-        bl_prefix=False,
+        name="undulator",
         # evaluate here not as parameter default to enable post-import mocking
         id_gap_lookup_table_path=f"{daq_configuration_path or DAQ_CONFIGURATION_PATH}/lookup/BeamLine_Undulator_toGap.txt",
     )
 
 
-def undulator_dcm(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-    daq_configuration_path: str | None = None,
-) -> UndulatorDCM:
+@device_factory()
+def undulator_dcm(daq_configuration_path: str | None = None) -> UndulatorDCM:
     """Get the i03 undulator DCM device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        UndulatorDCM,
+    # evaluate here not as parameter default to enable post-import mocking
+    undulator_singleton = (
+        undulator(daq_configuration_path=daq_configuration_path)
+        if daq_configuration_path and daq_configuration_path != DAQ_CONFIGURATION_PATH
+        else undulator()
+    )
+    return UndulatorDCM(
         name="undulator_dcm",
-        prefix="",
-        wait=wait_for_connection,
-        fake=fake_with_ophyd_sim,
-        undulator=undulator(
-            wait_for_connection,
-            fake_with_ophyd_sim,
-            daq_configuration_path=daq_configuration_path,
-        ),
-        dcm=dcm(wait_for_connection, fake_with_ophyd_sim),
-        # evaluate here not as parameter default to enable post-import mocking
+        prefix=PREFIX.beamline_prefix,
+        undulator=undulator_singleton,
+        dcm=dcm(),
         daq_configuration_path=daq_configuration_path or DAQ_CONFIGURATION_PATH,
     )
 
 
-def zebra(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> Zebra:
+@device_factory()
+def zebra() -> Zebra:
     """Get the i03 zebra device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        Zebra,
-        "zebra",
-        "-EA-ZEBRA-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+    return Zebra(
+        name="zebra",
+        prefix=f"{PREFIX.beamline_prefix}-EA-ZEBRA-01:",
         mapping=I03_ZEBRA_MAPPING,
     )
 
 
-def xspress3mini(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Xspress3:
+@device_factory()
+def xspress3mini() -> Xspress3:
     """Get the i03 Xspress3Mini device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        Xspress3,
+    return Xspress3(
+        f"{PREFIX.beamline_prefix}-EA-XSP3-01:",
         "xspress3mini",
-        "-EA-XSP3-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
     )
 
 
-def panda(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> HDFPanda:
+@device_factory()
+def panda() -> HDFPanda:
     """Get the i03 panda device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        HDFPanda,
-        "panda",
-        "-EA-PANDA-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+    return HDFPanda(
+        f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
         path_provider=get_path_provider(),
+        name="panda",
     )
 
 
-@skip_device(lambda: BL == "s03")
-def sample_shutter(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> ZebraShutter:
+@device_factory(skip=BL == "s03")
+def sample_shutter() -> ZebraShutter:
     """Get the i03 sample shutter device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        ZebraShutter,
+    return ZebraShutter(
+        f"{PREFIX.beamline_prefix}-EA-SHTR-01:",
         "sample_shutter",
-        "-EA-SHTR-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
     )
 
 
-@skip_device(lambda: BL == "s03")
-def flux(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> Flux:
+@device_factory(skip=BL == "s03")
+def flux() -> Flux:
     """Get the i03 flux device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        Flux,
+    return Flux(
+        f"{PREFIX.beamline_prefix}-MO-FLUX-01:",
         "flux",
-        "-MO-FLUX-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
     )
 
 
-def xbpm_feedback(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> XBPMFeedback:
+@device_factory()
+def xbpm_feedback() -> XBPMFeedback:
     """Get the i03 XBPM feeback device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        XBPMFeedback,
+    return XBPMFeedback(
+        PREFIX.beamline_prefix,
         "xbpm_feedback",
-        "",
-        wait_for_connection,
-        fake_with_ophyd_sim,
     )
 
 
-def zocalo(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> ZocaloResults:
+@device_factory()
+def zocalo() -> ZocaloResults:
     """Get the i03 ZocaloResults device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        ZocaloResults,
-        "zocalo",
-        "",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+    return ZocaloResults(
+        name="zocalo",
+        prefix=PREFIX.beamline_prefix,
     )
 
 
-def robot(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> BartRobot:
+@device_factory()
+def robot() -> BartRobot:
     """Get the i03 robot device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        BartRobot,
+    return BartRobot(
         "robot",
-        "-MO-ROBOT-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+        f"{PREFIX.beamline_prefix}-MO-ROBOT-01:",
     )
 
 
-def webcam(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Webcam:
+@device_factory()
+def webcam() -> Webcam:
     """Get the i03 webcam, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        Webcam,
+    return Webcam(
         "webcam",
-        "",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+        PREFIX.beamline_prefix,
         url="http://i03-webcam1/axis-cgi/jpg/image.cgi",
     )
 
 
-def thawer(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Thawer:
+@device_factory()
+def thawer() -> Thawer:
     """Get the i03 thawer, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        Thawer,
+    return Thawer(
+        f"{PREFIX.beamline_prefix}-EA-THAW-01",
         "thawer",
-        "-EA-THAW-01",
-        wait_for_connection,
-        fake_with_ophyd_sim,
     )
 
 
-def lower_gonio(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> XYZPositioner:
+@device_factory()
+def lower_gonio() -> XYZPositioner:
     """Get the i03 lower gonio device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        XYZPositioner,
+    return XYZPositioner(
+        f"{PREFIX.beamline_prefix}-MO-GONP-01:",
         "lower_gonio",
-        "-MO-GONP-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
     )
 
 
-def cryo_stream(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> CryoStream:
+@device_factory()
+def cryo_stream() -> CryoStream:
     """Get the i03 cryostream device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        CryoStream,
+    return CryoStream(
+        PREFIX.beamline_prefix,
         "cryo_stream",
-        "",
-        wait_for_connection,
-        fake_with_ophyd_sim,
     )
 
 
-def diamond_filter(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> DiamondFilter[I03Filters]:
+@device_factory()
+def diamond_filter() -> DiamondFilter[I03Filters]:
     """Get the i03 diamond filter device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        DiamondFilter[I03Filters],
-        "diamond_filter",
-        "-MO-FLTR-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+    return DiamondFilter[I03Filters](
+        prefix=f"{PREFIX.beamline_prefix}-MO-FLTR-01:",
+        name="diamond_filter",
         data_type=I03Filters,
     )
 
 
-def qbpm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> QBPM:
+@device_factory()
+def qbpm() -> QBPM:
     """Get the i03 qbpm device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-    return device_instantiation(
-        QBPM,
+    return QBPM(
+        f"{PREFIX.beamline_prefix}-DI-QBPM-01:",
         "qbpm",
-        "-DI-QBPM-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
     )

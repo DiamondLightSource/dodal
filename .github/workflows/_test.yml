@@ -50,13 +50,24 @@ jobs:
           python-version: ${{ inputs.python-version }}
           pip-install: ".[dev]"
 
-      - name: Run tests
-        run: tox -e tests
+      - name: Run unit tests
+        run: tox -e unit-report
+
+      - name: Check unit test durations
+        run: |
+          python .github/scripts/check_test_durations.py unit-report.json 1
+
+      - name: Run system tests
+        run: tox -e system-report
+
+      - name: Check system test durations
+        run: |
+          python .github/scripts/check_test_durations.py system-report.json 5
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
           name: ${{ inputs.python-version }}/${{ inputs.runs-on }}
-          files: cov.xml
+          files: ./unit_cov.xml,./system_cov.xml
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

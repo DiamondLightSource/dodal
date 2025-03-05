@@ -1,6 +1,8 @@
+import asyncio
 from asyncio import TimeoutError, wait_for
 from contextlib import nullcontext
 from dataclasses import dataclass
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import numpy as np
 import pytest
@@ -8,7 +10,7 @@ from bluesky import plan_stubs as bps
 from bluesky import preprocessors as bpp
 from bluesky.run_engine import RunEngine
 from ophyd.status import DeviceStatus, Status
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import init_devices
 from ophyd_async.testing import get_mock_put, set_mock_value
 
 from dodal.devices.fast_grid_scan import (
@@ -32,7 +34,7 @@ def discard_status(st: Status | DeviceStatus):
 
 @pytest.fixture
 async def zebra_fast_grid_scan():
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         zebra_fast_grid_scan = ZebraFastGridScan(name="fake_FGS", prefix="FGS")
 
     return zebra_fast_grid_scan
@@ -40,7 +42,7 @@ async def zebra_fast_grid_scan():
 
 @pytest.fixture
 async def panda_fast_grid_scan():
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         panda_fast_grid_scan = PandAFastGridScan(name="fake_PGS", prefix="PGS")
 
     return panda_fast_grid_scan
@@ -109,7 +111,11 @@ async def test_given_different_step_numbers_then_expected_images_correct(
     set_mock_value(zebra_fast_grid_scan.y_steps, steps[1])
     set_mock_value(zebra_fast_grid_scan.z_steps, steps[2])
 
-    assert await zebra_fast_grid_scan.expected_images.get_value() == expected_images
+    RE = RunEngine(call_returns_result=True)
+
+    result = RE(bps.rd(zebra_fast_grid_scan.expected_images))
+
+    assert result.plan_result == expected_images  # type: ignore
 
 
 @pytest.mark.parametrize(
@@ -373,3 +379,17 @@ def test_non_test_integer_dwell_time(test_dwell_times, expected_dwell_time_is_in
                 dwell_time_ms=test_dwell_times,
                 transmission_fraction=0.01,
             )
+
+
+@patch("dodal.devices.fast_grid_scan.LOGGER.error")
+async def test_timeout_on_complete_triggers_stop_and_logs_error(
+    mock_log_error: MagicMock,
+    zebra_fast_grid_scan: ZebraFastGridScan,
+):
+    zebra_fast_grid_scan.COMPLETE_STATUS = 0.01
+    zebra_fast_grid_scan.stop_cmd = AsyncMock()
+    set_mock_value(zebra_fast_grid_scan.status, 1)
+    with pytest.raises(asyncio.TimeoutError):
+        await zebra_fast_grid_scan.complete()
+    mock_log_error.assert_called_once()
+    zebra_fast_grid_scan.stop_cmd.trigger.assert_awaited_once()
