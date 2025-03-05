@@ -162,12 +162,13 @@ def bimorph_position_generator(
     Yields:
         List bimorph positions, starting with initial_voltage_list
     """
-    current_voltage_list = initial_voltage_list.copy()
-    yield current_voltage_list.copy()
+    voltage_list = initial_voltage_list.copy()
 
-    for i in range(len(initial_voltage_list)):
-        current_voltage_list[i] += voltage_increment
-        yield current_voltage_list.copy()
+    for i in range(-1, len(initial_voltage_list)):
+        yield [
+            voltage + voltage_increment if i >= j else voltage
+            for (j, voltage) in enumerate(voltage_list)
+        ]
 
 
 def bimorph_optimisation(
