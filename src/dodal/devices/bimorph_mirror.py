@@ -42,7 +42,7 @@ class BimorphMirrorStatus(StrictEnum):
     ERROR = "Error"
 
 
-class BimorphMirrorChannel(StandardReadable, Movable, EpicsDevice):
+class BimorphMirrorChannel(StandardReadable, EpicsDevice):
     """Collection of PVs comprising a single bimorph channel.
 
     Attributes:
@@ -56,15 +56,6 @@ class BimorphMirrorChannel(StandardReadable, Movable, EpicsDevice):
     output_voltage: A[SignalRW[float], PvSuffix.rbv("VOUT"), Format.HINTED_SIGNAL]
     status: A[SignalR[BimorphMirrorOnOff], PvSuffix("STATUS"), Format.CONFIG_SIGNAL]
     shift: A[SignalW[float], PvSuffix("SHIFT")]
-
-    @AsyncStatus.wrap
-    async def set(self, value: float):
-        """Sets channel's VOUT to given value.
-
-        Args:
-            value: float to set VOUT to
-        """
-        await self.output_voltage.set(value)
 
 
 class BimorphMirror(StandardReadable, Movable):
