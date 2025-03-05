@@ -167,7 +167,7 @@ def bimorph_position_generator(
 
     for i in range(len(initial_voltage_list)):
         current_voltage_list[i] += voltage_increment
-        yield current_voltage_list
+        yield current_voltage_list.copy()
 
 
 def bimorph_optimisation(
