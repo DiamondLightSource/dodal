@@ -163,7 +163,7 @@ def bimorph_position_generator(
         List bimorph positions, starting with initial_voltage_list
     """
     current_voltage_list = initial_voltage_list.copy()
-    yield current_voltage_list
+    yield current_voltage_list.copy()
 
     for i in range(len(initial_voltage_list)):
         current_voltage_list[i] += voltage_increment
