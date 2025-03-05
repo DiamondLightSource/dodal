@@ -24,9 +24,11 @@ from dodal.plans.bimorph import (
     bimorph_optimisation,
     bimorph_position_generator,
     capture_bimorph_state,
+    check_valid_bimorph_state,
     inner_scan,
     move_slits,
     restore_bimorph_state,
+    validate_bimorph_plan,
 )
 
 VALID_BIMORPH_CHANNELS = [3]
@@ -159,6 +161,37 @@ async def test_save_and_restore(
 
     for put in puts:
         assert put.call_args_list == [call(4.0, wait=True), call(0.0, wait=True)]
+
+
+@pytest.mark.parametrize("voltage_list", [[0.0 for _ in range(8)]])
+@pytest.mark.parametrize("abs_range", [1000.0])
+@pytest.mark.parametrize("abs_diff", [200.0])
+class TestPlanValidation:
+    def test_valid_bimorph_state(
+        self, voltage_list: list[float], abs_range: float, abs_diff: float
+    ):
+        assert check_valid_bimorph_state(voltage_list, abs_range, abs_diff)
+
+    def test_invalid_range_bimorph_state(
+        self, voltage_list: list[float], abs_range: float, abs_diff: float
+    ):
+        assert not check_valid_bimorph_state([abs_range + 1], abs_range, abs_diff)
+
+    def test_invalid_diff_bimorph_state(
+        self, voltage_list: list[float], abs_range: float, abs_diff: float
+    ):
+        assert not check_valid_bimorph_state([abs_diff, -abs_diff], abs_range, abs_diff)
+
+    def test_invalid_plan(
+        self, voltage_list: list[float], abs_range: float, abs_diff: float
+    ):
+        with pytest.raises(Exception):  # noqa: B017
+            validate_bimorph_plan([1000.0, 0.0], 200.0, abs_range, abs_diff)
+
+    def test_valid_plan(
+        self, voltage_list: list[float], abs_range: float, abs_diff: float
+    ):
+        assert validate_bimorph_plan(voltage_list, 200.0, abs_range, abs_diff)
 
 
 @pytest.mark.parametrize("initial_voltage_list", [[0 for _ in range(8)]])
