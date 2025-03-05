@@ -255,7 +255,7 @@ def bimorph_optimisation(
 
         for bimorph_position in bimorph_positions:
             yield from bps.mv(
-                mirror,
+                mirror,  # type: ignore
                 bimorph_position,  # type: ignore
             )
             yield from bps.sleep(bimorph_settle_time)
