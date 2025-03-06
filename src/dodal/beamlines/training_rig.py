@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from ophyd_async.epics.adaravis import AravisDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
@@ -10,7 +8,7 @@ from dodal.common.beamlines.beamline_utils import (
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import DET_SUFFIX, HDF5_SUFFIX
-from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
+from dodal.common.visit import StartDocumentBasedPathProvider
 from dodal.devices.training_rig.sample_stage import TrainingRigSampleStage
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix, get_beamline_name
@@ -31,13 +29,18 @@ PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
-set_path_provider(
-    StaticVisitPathProvider(
-        BL,
-        Path("/exports/mybeamline/data/2025"),
-        client=LocalDirectoryServiceClient(),
-    )
-)
+# Leave the old path provider so it can be uncommented and used in the meantime while
+# we transition
+
+# set_path_provider(
+#     StaticVisitPathProvider(
+#         BL,
+#         Path("/exports/mybeamline/data/2025"),
+#         client=LocalDirectoryServiceClient(),
+#     )
+# )
+
+set_path_provider(StartDocumentBasedPathProvider())
 
 
 @device_factory()
