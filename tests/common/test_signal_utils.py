@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock
 import pytest
 
 from dodal.common.signal_utils import (
-    create_hardware_backed_soft_signal,
+    create_r_hardware_backed_soft_signal,
     create_rw_hardware_backed_soft_signal,
 )
 
@@ -22,7 +22,10 @@ def do_nothing_on_write_rw_hardware_backed_signal(data_type: type, read_func):
 
 @pytest.mark.parametrize(
     "create_hardware_func",
-    [create_hardware_backed_soft_signal, do_nothing_on_write_rw_hardware_backed_signal],
+    [
+        create_r_hardware_backed_soft_signal,
+        do_nothing_on_write_rw_hardware_backed_signal,
+    ],
 )
 async def test_given_a_hardware_backed_signal_when_read_then_get_from_hardware_called(
     create_hardware_func,
@@ -35,7 +38,10 @@ async def test_given_a_hardware_backed_signal_when_read_then_get_from_hardware_c
 
 @pytest.mark.parametrize(
     "create_hardware_func",
-    [create_hardware_backed_soft_signal, do_nothing_on_write_rw_hardware_backed_signal],
+    [
+        create_r_hardware_backed_soft_signal,
+        do_nothing_on_write_rw_hardware_backed_signal,
+    ],
 )
 async def test_given_a_hardware_backed_signal_when_read_then_get_data_from_hardware_func(
     create_hardware_func,
@@ -47,7 +53,10 @@ async def test_given_a_hardware_backed_signal_when_read_then_get_data_from_hardw
 
 @pytest.mark.parametrize(
     "create_hardware_func",
-    [create_hardware_backed_soft_signal, do_nothing_on_write_rw_hardware_backed_signal],
+    [
+        create_r_hardware_backed_soft_signal,
+        do_nothing_on_write_rw_hardware_backed_signal,
+    ],
 )
 async def test_given_a_hardware_backed_signal_when_get_value_then_get_data_from_hardware_func(
     create_hardware_func,

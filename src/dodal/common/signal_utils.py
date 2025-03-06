@@ -66,7 +66,7 @@ def create_rw_hardware_backed_soft_signal(
     )
 
 
-def create_hardware_backed_soft_signal(
+def create_r_hardware_backed_soft_signal(
     datatype: type[SignalDatatypeT],
     get_from_hardware_func: Callable[[], Coroutine[Any, Any, SignalDatatypeT]],
     units: str | None = None,
