@@ -1,7 +1,6 @@
-from ophyd_async.core import Reference, SignalR
-from PIL import Image, ImageDraw
+from collections.abc import Sequence
 
-from dodal.devices.areadetector.plugins.MJPG import MJPG
+from PIL import Image, ImageDraw
 
 CROSSHAIR_LENGTH_PX = 20
 CROSSHAIR_OUTLINE_COLOUR = "Black"
@@ -9,6 +8,13 @@ CROSSHAIR_FILL_COLOUR = "White"
 
 
 def draw_crosshair(image: Image.Image, beam_x: int, beam_y: int):
+    """
+    Draw a crosshair at the beam centre coordinates specified.
+    Args:
+        image: The image to draw the crosshair onto. This is mutated.
+        beam_x: The x-coordinate of the crosshair (pixels)
+        beam_y: The y-coordinate of the crosshair (pixels)
+    """
     draw = ImageDraw.Draw(image)
     OUTLINE_WIDTH = 1
     HALF_LEN = CROSSHAIR_LENGTH_PX / 2
@@ -40,20 +46,17 @@ def draw_crosshair(image: Image.Image, beam_x: int, beam_y: int):
     )
 
 
-class SnapshotWithBeamCentre(MJPG):
-    """A child of MJPG which, when triggered, saves the image to disk."""
+def compute_beam_centre_pixel_xy_for_mm_position(
+    sample_pos_mm: Sequence[float],
+    beam_pos_at_origin_px: Sequence[int],
+    microns_per_pixel: Sequence[float],
+) -> Sequence[int]:
+    def centre(sample_pos, beam_pos, um_per_px) -> int:
+        return beam_pos + sample_pos * 1000 / um_per_px
 
-    def __init__(
-        self,
-        prefix: str,
-        beam_x_signal: SignalR,
-        beam_y_signal: SignalR,
-        name: str = "",
-    ) -> None:
-        with self.add_children_as_readables():
-            self._beam_centre_i_ref = Reference(beam_x_signal)
-            self._beam_centre_j_ref = Reference(beam_y_signal)
-        super().__init__(prefix, name)
-
-    async def post_processing(self, image: Image.Image):
-        await self._save_image(image)
+    return tuple(
+        centre(sp, bp, mpp)
+        for sp, bp, mpp in zip(
+            sample_pos_mm, beam_pos_at_origin_px, microns_per_pixel, strict=True
+        )
+    )
