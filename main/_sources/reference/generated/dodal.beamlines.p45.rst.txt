@@ -20,17 +20,6 @@ dodal.beamlines.p45
 
    
    
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      choppers
-      det
-      diff
-      panda1
-      panda2
-      sample
-   
    
 
    
