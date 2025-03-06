@@ -36,7 +36,7 @@ class ToJson:
 class SESRegion(ToJson):
     name : str = field(default="New_region")
     enabled : bool = field(default=False)
-    regionId : str = field(default=uuid.uuid4())
+    regionId : str = field(default=str(uuid.uuid4()))
     lensMode : str = field(default="Angular45")
     passEnergy : int = field(default=5)
     slices : int = field(default=1)
@@ -61,7 +61,7 @@ class SESRegion(ToJson):
 @dataclass
 class SESExcitationEnergySource(ToJson):
     name: str = field(default="source1")
-    scannableName: str = field(default=None)
+    scannableName: str = field(default="")
     value : float = field(default=0)
 
 @dataclass
@@ -76,7 +76,7 @@ class SESSequence(ToJson):
     def get_region_names(self) -> list[str]:
         return [r.name for r in self.regions]
 
-    def get_excitation_energy_source_by_region(self, region: SESRegion)  -> list[SESExcitationEnergySource]:
+    def get_excitation_energy_source_by_region(self, region: SESRegion)  -> SESExcitationEnergySource:
         filtered_excitation_energy_sources = [e for e in self.excitationEnergySources if e.name == region.excitationEnergySource]
         return filtered_excitation_energy_sources[0] if len(filtered_excitation_energy_sources) == 1 else None
 
