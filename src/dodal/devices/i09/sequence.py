@@ -1,6 +1,6 @@
 import json
 import uuid
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 
 
@@ -23,51 +23,67 @@ class EnergyMode(Enum):
     KINETIC = "Kinetic"
     BINDING = "Binding"
 
-@dataclass
-class SESRegion:
-    name : str = "Region"
-    enabled : bool = False
-    regionId : str = uuid.uuid4()
-    lensMode : str = "Angular45"
-    passEnergy : int = 5
-    slices : int = 1
-    iterations : int = 1
-    acquisitionMode : AcquisitionMode = AcquisitionMode.SWEPT
-    excitationEnergySource : str = "source1"
-    energyMode : EnergyMode = EnergyMode.KINETIC
-    lowEnergy : float = 8
-    highEnergy : float = 10
-    fixEnergy : float = 9
-    stepTime : float = 1
-    totalSteps : float = 15
-    totalTime : float = 15
-    energyStep : float = 200
-    exposureTime : float = 1.
-    firstXChannel : int = 1
-    lastXChannel : int = 1000
-    firstYChannel : int = 101
-    lastYChannel : int = 800
-    detectorMode : DetectorMode = DetectorMode.ADC
-
-    def __init__(self, **args):
-        self.status = Status.READY #This shouldn't be serialised
+class ToJson:
+    def toJSON(self):
+        return json.dumps(
+            self,
+            default=lambda o: o.__dict__,
+            sort_keys=True,
+            indent=4
+        )
 
 @dataclass
-class SESExcitationEnergySource:
-    name: str
-    scannableName: str
-    value : float
+class SESRegion(ToJson):
+    name : str = field(default="New_region")
+    enabled : bool = field(default=False)
+    regionId : str = field(default=uuid.uuid4())
+    lensMode : str = field(default="Angular45")
+    passEnergy : int = field(default=5)
+    slices : int = field(default=1)
+    iterations : int = field(default=1)
+    acquisitionMode : AcquisitionMode = field(default=AcquisitionMode.FIXED)
+    excitationEnergySource : str = field(default="source1")
+    energyMode : EnergyMode = field(default=EnergyMode.KINETIC)
+    lowEnergy : float = field(default=8)
+    highEnergy : float = field(default=10)
+    fixEnergy : float = field(default=9)
+    stepTime : float = field(default=1)
+    totalSteps : float = field(default=15)
+    totalTime : float = field(default=15)
+    energyStep : float = field(default=200)
+    exposureTime : float = field(default=1)
+    firstXChannel : int = field(default=1)
+    lastXChannel : int = field(default=1000)
+    firstYChannel : int = field(default=101)
+    lastYChannel : int = field(default=800)
+    detectorMode : DetectorMode = field(default=DetectorMode.ADC)
 
 @dataclass
-class SESSequence:
-    elementSet : str
-    excitationEnergySources: list[SESExcitationEnergySource]
-    regions : list[SESRegion]
+class SESExcitationEnergySource(ToJson):
+    name: str = field(default="source1")
+    scannableName: str = field(default=None)
+    value : float = field(default=0)
+
+@dataclass
+class SESSequence(ToJson):
+    elementSet : str = field(default="Unknown")
+    excitationEnergySources: list[SESExcitationEnergySource] = field(default_factory=[])
+    regions : list[SESRegion] = field(default_factory=[])
+
+    def get_enabled_regions(self) -> list[SESRegion]:
+        return [r for r in self.regions if r.enabled]
+
+    def get_region_names(self) -> list[str]:
+        return [r.name for r in self.regions]
+
+    def get_excitation_energy_source_by_region(self, region: SESRegion)  -> list[SESExcitationEnergySource]:
+        filtered_excitation_energy_sources = [e for e in self.excitationEnergySources if e.name == region.excitationEnergySource]
+        return filtered_excitation_energy_sources[0] if len(filtered_excitation_energy_sources) == 1 else None
 
 class SESSequenceHelper:
 
     @staticmethod
-    def loadSequence(sequence_file : str) -> SESSequence:
+    def load_sequence(sequence_file : str) -> SESSequence:
         with open(sequence_file) as f:
             json_obj = json.load(f)
             sequence = SESSequence(**json_obj)
@@ -76,17 +92,29 @@ class SESSequenceHelper:
             sequence.excitationEnergySources = [SESExcitationEnergySource(**e) for e in sequence.excitationEnergySources]
             return sequence
 
+    @staticmethod
+    def save_sequence(sequence : SESSequence, sequence_file : str) -> None:
+        with open(sequence_file, 'w') as f:
+            f.write(sequence.toJSON())
+
 if __name__ == "__main__":
-    pass
     print("===START===")
 
-    sequence_file = "/scratch/gda_development/gda-master-default/eclipse/gda_data_non_live/2025/0-0/xml/user.seq"
+    sequence_file1 = "/scratch/gda_development/gda-master-default/eclipse/gda_data_non_live/2025/0-0/xml/user.seq"
+    sequence_file2 = "/scratch/gda_development/gda-master-default/eclipse/gda_data_non_live/2025/0-0/xml/save_test.seq"
 
-    sequence = SESSequenceHelper.loadSequence(sequence_file)
-    regions = sequence.regions[0]
-    print(regions.status)
+    sequence = SESSequenceHelper.load_sequence(sequence_file1)
 
-    print(sequence)
+    test_region = SESRegion()
+    print(test_region)
+    print(sequence.toJSON())
+    SESSequenceHelper.save_sequence(sequence, sequence_file2)
+
+    print(sequence.get_excitation_energy_source_by_region(sequence.regions[1]))
+
+    print(sequence.get_region_names())
+
+
     print("===END===")
 
 

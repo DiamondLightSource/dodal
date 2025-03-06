@@ -12,25 +12,25 @@ class VGScientaAnalyser(StandardReadable):
     Device to configure electron analyser with new region settings.
     """
 
-    LOW_ENERGY = "LOW_ENERGY"
-    HIGH_ENERGY = "HIGH_ENERGY"
-    CENTRE_ENERGY = "CENTRE_ENERGY"
+    PV_LOW_ENERGY = "LOW_ENERGY"
+    PV_HIGH_ENERGY = "HIGH_ENERGY"
+    PV_CENTRE_ENERGY = "CENTRE_ENERGY"
 
-    SLICES = "SLICES"
-    DETECTOR_MODE = "DETECTOR_MODE"
-    LENS_MODE = "LENS_MODE"
-    PASS_ENERGY = "PASS_ENERGY"
-    ENERGY_STEP = "AcquireTime"
+    PV_SLICES = "SLICES"
+    PV_DETECTOR_MODE = "DETECTOR_MODE"
+    PV_LENS_MODE = "LENS_MODE"
+    PV_PASS_ENERGY = "PASS_ENERGY"
+    PV_ENERGY_STEP = "AcquireTime"
 
-    ACQISITION_MODE = "ACQ_MODE"
+    PV_ACQISITION_MODE = "ACQ_MODE"
 
     ADBASE = "CAM:"
-    FIRST_X_CHANNEL = ADBASE + "MinX"
-    FIRST_Y_CHANNEL = ADBASE + "MinY"
-    LAST_X_CHANNEL = ADBASE + "SizeX"
-    LAST_Y_CHANNEL = ADBASE + "SizeY"
-    ITERATIONS = ADBASE + "NumExposures"
-    IMAGE_MODE = ADBASE + "ImageMode"
+    PV_FIRST_X_CHANNEL = ADBASE + "MinX"
+    PV_FIRST_Y_CHANNEL = ADBASE + "MinY"
+    PV_LAST_X_CHANNEL = ADBASE + "SizeX"
+    PV_LAST_Y_CHANNEL = ADBASE + "SizeY"
+    PV_ITERATIONS = ADBASE + "NumExposures"
+    PV_IMAGE_MODE = ADBASE + "ImageMode"
 
     def __init__(self, prefix: str, name: str = "") -> None:
         self.prefix = prefix
@@ -62,25 +62,25 @@ class VGScientaAnalyser(StandardReadable):
         last_x_channel = region.lastXChannel - region.firstXChannel + 1
         last_y_channel = region.lastYChannel - region.firstYChannel + 1
 
-        epics_signal_w(low_energy, self.prefix + VGScientaAnalyser.LOW_ENERGY)
-        epics_signal_w(high_energy, self.prefix + VGScientaAnalyser.HIGH_ENERGY)
-        epics_signal_w(centre_energy, self.prefix + VGScientaAnalyser.CENTRE_ENERGY)
+        epics_signal_w(low_energy, self.prefix + VGScientaAnalyser.PV_LOW_ENERGY)
+        epics_signal_w(high_energy, self.prefix + VGScientaAnalyser.PV_HIGH_ENERGY)
+        epics_signal_w(centre_energy, self.prefix + VGScientaAnalyser.PV_CENTRE_ENERGY)
 
-        epics_signal_w(region.firstXChannel, self.prefix + VGScientaAnalyser.FIRST_X_CHANNEL)
-        epics_signal_w(region.firstYChannel, self.prefix + VGScientaAnalyser.FIRST_Y_CHANNEL)
-        epics_signal_w(last_x_channel, self.prefix + VGScientaAnalyser.LAST_X_CHANNEL)
-        epics_signal_w(last_y_channel, self.prefix + VGScientaAnalyser.LAST_Y_CHANNEL)
+        epics_signal_w(region.firstXChannel, self.prefix + VGScientaAnalyser.PV_FIRST_X_CHANNEL)
+        epics_signal_w(region.firstYChannel, self.prefix + VGScientaAnalyser.PV_FIRST_Y_CHANNEL)
+        epics_signal_w(last_x_channel, self.prefix + VGScientaAnalyser.PV_LAST_X_CHANNEL)
+        epics_signal_w(last_y_channel, self.prefix + VGScientaAnalyser.PV_LAST_Y_CHANNEL)
 
-        epics_signal_w(region.slices, self.prefix + VGScientaAnalyser.SLICES)
-        epics_signal_w(region.detectorMode, self.prefix + VGScientaAnalyser.DETECTOR_MODE)
-        epics_signal_w(region.lensMode, self.prefix + VGScientaAnalyser.LENS_MODE)
-        epics_signal_w(region.passEnergy, self.prefix + VGScientaAnalyser.PASS_ENERGY)
-        epics_signal_w(energy_step_eV, self.prefix + VGScientaAnalyser.ENERGY_STEP)
+        epics_signal_w(region.slices, self.prefix + VGScientaAnalyser.PV_SLICES)
+        epics_signal_w(region.detectorMode, self.prefix + VGScientaAnalyser.PV_DETECTOR_MODE)
+        epics_signal_w(region.lensMode, self.prefix + VGScientaAnalyser.PV_LENS_MODE)
+        epics_signal_w(region.passEnergy, self.prefix + VGScientaAnalyser.PV_PASS_ENERGY)
+        epics_signal_w(energy_step_eV, self.prefix + VGScientaAnalyser.PV_ENERGY_STEP)
 
-        epics_signal_w(region.iterations, self.prefix + VGScientaAnalyser.ITERATIONS)
-        epics_signal_w(region.iterations, self.prefix + VGScientaAnalyser.IMAGE_MODE)
+        epics_signal_w(region.iterations, self.prefix + VGScientaAnalyser.PV_ITERATIONS)
+        epics_signal_w(region.iterations, self.prefix + VGScientaAnalyser.PV_IMAGE_MODE)
 
-        epics_signal_w("SINGLE", self.prefix + VGScientaAnalyser.ACQISITION_MODE)
+        epics_signal_w("SINGLE", self.prefix + VGScientaAnalyser.PV_ACQISITION_MODE)
 
         LOGGER.info("Successfully configured region!")
 
