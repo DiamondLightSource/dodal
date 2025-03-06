@@ -3,10 +3,10 @@ from unittest.mock import ANY, AsyncMock, MagicMock, call, patch
 
 import pytest
 from ophyd_async.core import (
-    DeviceCollector,
-    set_mock_value,
+    init_devices,
     soft_signal_r_and_setter,
 )
+from ophyd_async.testing import set_mock_value
 from PIL import Image
 
 from dodal.devices.oav.snapshots.snapshot_with_beam_centre import (
@@ -29,7 +29,7 @@ async def create_and_set_mock_signal_r(dtype, name, value):
 async def snapshot() -> SnapshotWithBeamCentre:
     mock_beam_x = await create_and_set_mock_signal_r(int, "mock_beam_x", 510)
     mock_beam_y = await create_and_set_mock_signal_r(int, "mock_beam_y", 380)
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         snapshot = SnapshotWithBeamCentre("", mock_beam_x, mock_beam_y, "fake_snapshot")
     set_mock_value(snapshot.directory, "/tmp/")
     set_mock_value(snapshot.filename, "test")
@@ -39,7 +39,7 @@ async def snapshot() -> SnapshotWithBeamCentre:
 
 @pytest.fixture
 async def grid_snapshot() -> SnapshotWithGrid:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         grid_snapshot = SnapshotWithGrid("", "fake_grid")
 
     set_mock_value(grid_snapshot.top_left_x, 100)

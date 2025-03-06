@@ -3,7 +3,8 @@ from datetime import timedelta
 from unittest.mock import ANY, AsyncMock, MagicMock, patch
 
 import pytest
-from ophyd_async.core import DeviceCollector, set_mock_value
+from ophyd_async.core import init_devices
+from ophyd_async.testing import set_mock_value
 
 from dodal.devices.oav.oav_to_redis_forwarder import (
     OAVToRedisForwarder,
@@ -15,7 +16,7 @@ from dodal.devices.oav.oav_to_redis_forwarder import (
 @pytest.fixture
 @patch("dodal.devices.oav.oav_to_redis_forwarder.StrictRedis", new=AsyncMock)
 async def oav_forwarder(RE):
-    with DeviceCollector(mock=True):
+    with init_devices(mock=True):
         oav_forwarder = OAVToRedisForwarder("prefix", "host", "password")
     set_mock_value(
         oav_forwarder.sources[Source.FULL_SCREEN.value].url,

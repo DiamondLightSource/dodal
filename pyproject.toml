@@ -15,8 +15,8 @@ description = "Ophyd devices and other utils that could be used across DLS beaml
 dependencies = [
     "click",
     "ophyd",
-    "ophyd-async >= 0.8.0a5",
-    "bluesky",
+    "ophyd-async >= 0.9.0a2",
+    "bluesky == 1.13.0",
     "pyepics",
     "dataclasses-json",
     "pillow",
@@ -27,7 +27,7 @@ dependencies = [
     "opencv-python-headless", # For pin-tip detection.
     "aioca",                  # Required for CA support with ophyd-async.
     "p4p",                    # Required for PVA support with ophyd-async.
-    "numpy<2.0",              # Unpin when https://github.com/bluesky/ophyd-async/issues/387 resolved
+    "numpy",
     "aiofiles",
     "aiohttp",
     "redis",
@@ -44,6 +44,8 @@ requires-python = ">=3.10"
 dev = [
     "black",
     "diff-cover",
+    "import-linter",
+    "ispyb",
     "mypy",
     # Commented out due to dependency version conflict with pydantic 1.x
     # "copier",
@@ -53,10 +55,11 @@ dev = [
     "pre-commit",
     "psutil",
     "pydata-sphinx-theme>=0.12",
-    "pyright",
+    "pyright==1.1.394",          # See https://github.com/DiamondLightSource/dodal/issues/1079
     "pytest",
     "pytest-asyncio",
     "pytest-cov",
+    "pytest-json-report",
     "pytest-random-order",
     "ruff",
     "sphinx<7.4.6",              #  pinned due to https://github.com/sphinx-doc/sphinx/issues/12660
@@ -101,6 +104,7 @@ reportMissingImports = false  # Ignore missing stubs in imported modules
 asyncio_mode = "auto"
 markers = [
     "s03: marks tests as requiring the s03 simulator running (deselect with '-m \"not s03\"')",
+    "adsim: marks tests as requiring the containerised AreaDetector simulator running (deselect with '-m \"not adsim\"')",
     "skip_in_pycharm: marks test as not working in pycharm testrunner",
 ]
 addopts = """
@@ -139,7 +143,7 @@ legacy_tox_ini = """
 [tox]
 skipsdist=True
 
-[testenv:{pre-commit,type-checking,tests,docs}]
+[testenv:{pre-commit,type-checking,tests,docs,unit-report,system-report}]
 # Don't create a virtualenv for the command, requires tox-direct plugin
 direct = True
 passenv = *
@@ -150,10 +154,12 @@ allowlist_externals =
     sphinx-build
     sphinx-autobuild
 commands =
-    tests: pytest -m 'not s03' --cov=dodal --cov-report term --cov-report xml:cov.xml {posargs}
+    tests: pytest -m 'not (s03 or adsim)' --cov=dodal --cov-report term --cov-report xml:cov.xml {posargs}
     type-checking: pyright src tests {posargs}
     pre-commit: pre-commit run --all-files --show-diff-on-failure {posargs}
     docs: sphinx-{posargs:build -E} -T docs build/html
+    unit-report: pytest -m 'not (s03 or adsim)' --cov=dodal --cov-report term --cov-report xml:unit_cov.xml --json-report --json-report-file=unit-report.json tests {posargs}
+    system-report: pytest -m 'not (s03 or adsim)' --cov=dodal --cov-report term --cov-report xml:system_cov.xml --json-report --json-report-file=system-report.json system_tests {posargs}
 """
 
 [tool.ruff]
@@ -180,3 +186,17 @@ lint.select = [
 # Remove this line to forbid private member access in tests
 "tests/**/*" = ["SLF001"]
 "system_tests/**/*" = ["SLF001"]
+
+[tool.importlinter]
+root_package = "dodal"
+
+[[tool.importlinter.contracts]]
+name = "Common cannot import from beamlines"
+type = "forbidden"
+source_modules = ["dodal.common"]
+forbidden_modules = ["dodal.beamlines"]
+
+[[tool.importlinter.contracts]]
+name = "Enforce import order"
+type = "layers"
+layers = ["dodal.plans", "dodal.beamlines", "dodal.devices"]

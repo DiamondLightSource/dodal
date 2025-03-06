@@ -2,14 +2,15 @@ import asyncio
 from unittest.mock import ANY, AsyncMock, call, patch
 
 import pytest
-from ophyd_async.core import DeviceCollector, get_mock_put
+from ophyd_async.core import init_devices
+from ophyd_async.testing import get_mock_put
 
 from dodal.devices.thawer import Thawer, ThawerStates, ThawingException, ThawingTimer
 
 
 @pytest.fixture
 def thawer(RE):
-    with DeviceCollector(mock=True):
+    with init_devices(mock=True):
         thawer = Thawer("", name="thawer")
     return thawer
 

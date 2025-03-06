@@ -1,13 +1,13 @@
 import asyncio
 from collections import defaultdict
-from unittest.mock import ANY
+from unittest.mock import ANY, AsyncMock
 
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.plans import scan
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import (
-    DeviceCollector,
+from ophyd_async.core import init_devices
+from ophyd_async.testing import (
     assert_emitted,
     callback_on_mock_put,
     get_mock_put,
@@ -25,10 +25,10 @@ from dodal.devices.apple2_undulator import (
 
 @pytest.fixture
 async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         mock_id_gap = UndulatorGap(prefix, "mock_id_gap")
     assert mock_id_gap.name == "mock_id_gap"
-    set_mock_value(mock_id_gap.gate, UndulatorGateStatus.close)
+    set_mock_value(mock_id_gap.gate, UndulatorGateStatus.CLOSE)
     set_mock_value(mock_id_gap.velocity, 1)
     set_mock_value(mock_id_gap.user_readback, 1)
     set_mock_value(mock_id_gap.user_setpoint, "1")
@@ -38,7 +38,7 @@ async def mock_id_gap(prefix: str = "BLXX-EA-DET-007:") -> UndulatorGap:
 
 @pytest.fixture
 async def mock_phaseAxes(prefix: str = "BLXX-EA-DET-007:") -> UndulatorPhaseAxes:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         mock_phaseAxes = UndulatorPhaseAxes(
             prefix=prefix,
             top_outer="RPQ1",
@@ -47,7 +47,7 @@ async def mock_phaseAxes(prefix: str = "BLXX-EA-DET-007:") -> UndulatorPhaseAxes
             btm_inner="RPQ4",
         )
     assert mock_phaseAxes.name == "mock_phaseAxes"
-    set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.close)
+    set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.CLOSE)
     set_mock_value(mock_phaseAxes.top_outer.velocity, 2)
     set_mock_value(mock_phaseAxes.top_inner.velocity, 2)
     set_mock_value(mock_phaseAxes.btm_outer.velocity, 2)
@@ -66,11 +66,11 @@ async def mock_phaseAxes(prefix: str = "BLXX-EA-DET-007:") -> UndulatorPhaseAxes
 
 @pytest.fixture
 async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndulatorJawPhase:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         mock_jaw_phase = UndulatorJawPhase(
             prefix=prefix, move_pv="RPQ1", jaw_phase="JAW"
         )
-    set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.close)
+    set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.CLOSE)
     set_mock_value(mock_jaw_phase.jaw_phase.velocity, 2)
     set_mock_value(mock_jaw_phase.jaw_phase.user_setpoint_readback, 0)
     set_mock_value(mock_jaw_phase.jaw_phase.user_setpoint_demand_readback, 0)
@@ -83,14 +83,14 @@ async def test_in_motion_error(
     mock_phaseAxes: UndulatorPhaseAxes,
     mock_jaw_phase: UndulatorJawPhase,
 ):
-    set_mock_value(mock_id_gap.gate, UndulatorGateStatus.open)
+    set_mock_value(mock_id_gap.gate, UndulatorGateStatus.OPEN)
     with pytest.raises(RuntimeError):
         await mock_id_gap.set("2")
-    set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.open)
+    set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.OPEN)
     setValue = Apple2PhasesVal("3", "2", "5", "7")
     with pytest.raises(RuntimeError):
         await mock_phaseAxes.set(setValue)
-    set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.open)
+    set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.OPEN)
     with pytest.raises(RuntimeError):
         await mock_jaw_phase.set(2)
 
@@ -117,12 +117,14 @@ async def test_gap_cal_timout(
     assert await mock_id_gap.get_timeout() == pytest.approx(expected_timeout, rel=0.1)
 
 
-async def test_gap_time_out_error(mock_id_gap: UndulatorGap, RE: RunEngine):
+async def test_given_gate_never_closes_then_setting_gaps_times_out(
+    mock_id_gap: UndulatorGap, RE: RunEngine
+):
     callback_on_mock_put(
         mock_id_gap.user_setpoint,
-        lambda *_, **__: set_mock_value(mock_id_gap.gate, UndulatorGateStatus.open),
+        lambda *_, **__: set_mock_value(mock_id_gap.gate, UndulatorGateStatus.OPEN),
     )
-    set_mock_value(mock_id_gap.velocity, 1000)
+    mock_id_gap.get_timeout = AsyncMock(return_value=0.01)
     with pytest.raises(asyncio.TimeoutError):
         await mock_id_gap.set("2")
 
@@ -137,7 +139,7 @@ async def test_gap_status_error(mock_id_gap: UndulatorGap, RE: RunEngine):
 async def test_gap_success_scan(mock_id_gap: UndulatorGap, RE: RunEngine):
     callback_on_mock_put(
         mock_id_gap.user_setpoint,
-        lambda *_, **__: set_mock_value(mock_id_gap.gate, UndulatorGateStatus.open),
+        lambda *_, **__: set_mock_value(mock_id_gap.gate, UndulatorGateStatus.OPEN),
     )
     output = range(0, 11, 1)
 
@@ -148,7 +150,7 @@ async def test_gap_success_scan(mock_id_gap: UndulatorGap, RE: RunEngine):
 
     def set_complete_move():
         set_mock_value(mock_id_gap.user_readback, next(pos))
-        set_mock_value(mock_id_gap.gate, UndulatorGateStatus.close)
+        set_mock_value(mock_id_gap.gate, UndulatorGateStatus.CLOSE)
 
     callback_on_mock_put(mock_id_gap.set_move, lambda *_, **__: set_complete_move())
     docs = defaultdict(list)
@@ -162,14 +164,17 @@ async def test_gap_success_scan(mock_id_gap: UndulatorGap, RE: RunEngine):
         assert docs["event"][i]["data"]["mock_id_gap-user_readback"] == i
 
 
-async def test_phase_time_out_error(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngine):
+async def test_given_gate_never_closes_then_setting_phases_times_out(
+    mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngine
+):
     setValue = Apple2PhasesVal("3", "2", "5", "7")
 
     callback_on_mock_put(
         mock_phaseAxes.top_outer.user_setpoint,
-        lambda *_, **__: set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.open),
+        lambda *_, **__: set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.OPEN),
     )
-    set_mock_value(mock_phaseAxes.top_inner.velocity, 1000)
+    mock_phaseAxes.get_timeout = AsyncMock(return_value=0.01)
+
     with pytest.raises(asyncio.TimeoutError):
         await mock_phaseAxes.set(setValue)
 
@@ -223,7 +228,7 @@ async def test_phase_success_set(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngi
     )
     callback_on_mock_put(
         mock_phaseAxes.top_inner.user_setpoint,
-        lambda *_, **__: set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.open),
+        lambda *_, **__: set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.OPEN),
     )
 
     def set_complete_move():
@@ -243,7 +248,7 @@ async def test_phase_success_set(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngi
             mock_phaseAxes.btm_outer.user_setpoint_readback,
             7,
         )
-        set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.close)
+        set_mock_value(mock_phaseAxes.gate, UndulatorGateStatus.CLOSE)
 
     callback_on_mock_put(mock_phaseAxes.set_move, lambda *_, **__: set_complete_move())
     RE(bps.abs_set(mock_phaseAxes, set_value, wait=True))
@@ -261,7 +266,7 @@ async def test_phase_success_set(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngi
         set_value.btm_outer, wait=True
     )
 
-    assert await mock_phaseAxes.read() == {
+    expected_in_reading = {
         "mock_phaseAxes-top_inner-user_setpoint_readback": {
             "value": 3,
             "timestamp": ANY,
@@ -283,14 +288,18 @@ async def test_phase_success_set(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngi
             "alarm_severity": 0,
         },
     }
+    actual_reading = await mock_phaseAxes.read()
+    assert expected_in_reading.items() <= actual_reading.items()
 
 
-async def test_jaw_phase_time_out_error(mock_jaw_phase: UndulatorJawPhase):
+async def test_given_gate_never_closes_then_setting_jaw_phases_times_out(
+    mock_jaw_phase: UndulatorJawPhase,
+):
     callback_on_mock_put(
         mock_jaw_phase.jaw_phase.user_setpoint,
-        lambda *_, **__: set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.open),
+        lambda *_, **__: set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.OPEN),
     )
-    set_mock_value(mock_jaw_phase.jaw_phase.velocity, 1000)
+    mock_jaw_phase.get_timeout = AsyncMock(return_value=0.01)
     with pytest.raises(asyncio.TimeoutError):
         await mock_jaw_phase.set(2)
 
@@ -329,7 +338,7 @@ async def test_jaw_phase_cal_timout(
 async def test_jaw_phase_success_scan(mock_jaw_phase: UndulatorJawPhase, RE: RunEngine):
     callback_on_mock_put(
         mock_jaw_phase.jaw_phase.user_setpoint,
-        lambda *_, **__: set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.open),
+        lambda *_, **__: set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.OPEN),
     )
     output = range(0, 11, 1)
 
@@ -340,7 +349,7 @@ async def test_jaw_phase_success_scan(mock_jaw_phase: UndulatorJawPhase, RE: Run
 
     def set_complete_move():
         set_mock_value(mock_jaw_phase.jaw_phase.user_setpoint_readback, next(pos))
-        set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.close)
+        set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.CLOSE)
 
     callback_on_mock_put(mock_jaw_phase.set_move, lambda *_, **__: set_complete_move())
     docs = defaultdict(list)

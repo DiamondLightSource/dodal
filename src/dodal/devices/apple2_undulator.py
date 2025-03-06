@@ -8,6 +8,8 @@ from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
     Reference,
+    SignalR,
+    SignalW,
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
@@ -21,8 +23,8 @@ from dodal.log import LOGGER
 
 
 class UndulatorGateStatus(StrictEnum):
-    open = "Open"
-    close = "Closed"
+    OPEN = "Open"
+    CLOSE = "Closed"
 
 
 @dataclass
@@ -88,7 +90,56 @@ MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
 MAXIMUM_GAP_MOTOR_POSITION = 100
 
 
-class UndulatorGap(StandardReadable, Movable):
+async def estimate_motor_timeout(
+    setpoint: SignalR, curr_pos: SignalR, velocity: SignalR
+):
+    vel = await velocity.get_value()
+    cur_pos = await curr_pos.get_value()
+    target_pos = float(await setpoint.get_value())
+    return abs((target_pos - cur_pos) * 2.0 / vel) + 1
+
+
+class SafeUndulatorMover(StandardReadable, Movable):
+    """A device that will check it's safe to move the undulator before moving it and
+    wait for the undulator to be safe again before calling the move complete.
+    """
+
+    def __init__(self, set_move: SignalW, prefix: str, name: str = ""):
+        # Gate keeper open when move is requested, closed when move is completed
+        self.gate = epics_signal_r(UndulatorGateStatus, prefix + "BLGATE")
+
+        split_pv = prefix.split("-")
+        fault_pv = f"{split_pv[0]}-{split_pv[1]}-STAT-{split_pv[3]}ANYFAULT"
+        self.fault = epics_signal_r(float, fault_pv)
+        self.set_move = set_move
+        super().__init__(name)
+
+    @AsyncStatus.wrap
+    async def set(self, value) -> None:
+        LOGGER.info(f"Setting {self.name} to {value}")
+        await self.raise_if_cannot_move()
+        await self._set_demand_positions(value)
+        timeout = await self.get_timeout()
+        LOGGER.info(f"Moving {self.name} to {value} with timeout = {timeout}")
+        await self.set_move.set(value=1, timeout=timeout)
+        await wait_for_value(self.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
+
+    @abc.abstractmethod
+    async def _set_demand_positions(self, value) -> None:
+        """Set the demand positions on the device without actually hitting move."""
+
+    @abc.abstractmethod
+    async def get_timeout(self) -> float:
+        """Get the timeout for the move based on an estimate of how long it will take."""
+
+    async def raise_if_cannot_move(self) -> None:
+        if await self.fault.get_value() != 0:
+            raise RuntimeError(f"{self.name} is in fault state")
+        if await self.gate.get_value() == UndulatorGateStatus.OPEN:
+            raise RuntimeError(f"{self.name} is already in motion.")
+
+
+class UndulatorGap(SafeUndulatorMover):
     """A device with a collection of epics signals to set Apple 2 undulator gap motion.
     Only PV used by beamline are added the full list is here:
     /dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDGapVelocityControl.template
@@ -113,21 +164,17 @@ class UndulatorGap(StandardReadable, Movable):
         )
         # Nothing move until this is set to 1 and it will return to 0 when done
         self.set_move = epics_signal_rw(int, prefix + "BLGSETP")
-        # Gate keeper open when move is requested, closed when move is completed
-        self.gate = epics_signal_r(UndulatorGateStatus, prefix + "BLGATE")
+
         # These are gap velocity limit.
         self.max_velocity = epics_signal_r(float, prefix + "BLGSETVEL.HOPR")
         self.min_velocity = epics_signal_r(float, prefix + "BLGSETVEL.LOPR")
         # These are gap limit.
         self.high_limit_travel = epics_signal_r(float, prefix + "BLGAPMTR.HLM")
         self.low_limit_travel = epics_signal_r(float, prefix + "BLGAPMTR.LLM")
-        split_pv = prefix.split("-")
-        self.fault = epics_signal_r(
-            float,
-            f"{split_pv[0]}-{split_pv[1]}-STAT-{split_pv[3]}ANYFAULT",
-        )
+
         # This is calculated acceleration from speed
         self.acceleration_time = epics_signal_r(float, prefix + "IDGSETACC")
+
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             # Unit
             self.motor_egu = epics_signal_r(str, prefix + "BLGAPMTR.EGU")
@@ -136,32 +183,15 @@ class UndulatorGap(StandardReadable, Movable):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             # Gap readback value
             self.user_readback = epics_signal_r(float, prefix + "CURRGAPD")
-        super().__init__(name)
+        super().__init__(self.set_move, prefix, name)
 
-    @AsyncStatus.wrap
-    async def set(self, value) -> None:
-        LOGGER.info(f"Setting {self.name} to {value}")
-        await self.check_id_status()
-        await self.user_setpoint.set(value=str(value))
-        timeout = await self._cal_timeout()
-        LOGGER.info(f"Moving {self.name} to {value} with timeout = {timeout}")
-        await self.set_move.set(value=1, timeout=timeout)
-        await wait_for_value(self.gate, UndulatorGateStatus.close, timeout=timeout)
-
-    async def _cal_timeout(self) -> float:
-        vel = await self.velocity.get_value()
-        cur_pos = await self.user_readback.get_value()
-        target_pos = float(await self.user_setpoint.get_value())
-        return abs((target_pos - cur_pos) * 2.0 / vel) + 1
-
-    async def check_id_status(self) -> None:
-        if await self.fault.get_value() != 0:
-            raise RuntimeError(f"{self.name} is in fault state")
-        if await self.gate.get_value() == UndulatorGateStatus.open:
-            raise RuntimeError(f"{self.name} is already in motion.")
+    async def _set_demand_positions(self, value) -> None:
+        await self.user_setpoint.set(str(value))
 
     async def get_timeout(self) -> float:
-        return await self._cal_timeout()
+        return await estimate_motor_timeout(
+            self.user_setpoint, self.user_readback, self.velocity
+        )
 
 
 class UndulatorPhaseMotor(StandardReadable):
@@ -204,7 +234,7 @@ class UndulatorPhaseMotor(StandardReadable):
         super().__init__(name=name)
 
 
-class UndulatorPhaseAxes(StandardReadable, Movable):
+class UndulatorPhaseAxes(SafeUndulatorMover):
     """
     A collection of 4 phase Motor to make up the full id phase motion. We are using the diamond pv convention.
     e.g. top_outer == Q1
@@ -231,66 +261,36 @@ class UndulatorPhaseAxes(StandardReadable, Movable):
             self.btm_outer = UndulatorPhaseMotor(prefix=prefix, infix=btm_outer)
         # Nothing move until this is set to 1 and it will return to 0 when done.
         self.set_move = epics_signal_rw(int, f"{prefix}BL{top_outer}" + "MOVE")
-        self.gate = epics_signal_r(UndulatorGateStatus, prefix + "BLGATE")
-        split_pv = prefix.split("-")
-        temp_pv = f"{split_pv[0]}-{split_pv[1]}-STAT-{split_pv[3]}ANYFAULT"
-        self.fault = epics_signal_r(float, temp_pv)
-        super().__init__(name=name)
 
-    @AsyncStatus.wrap
-    async def set(self, value: Apple2PhasesVal) -> None:
-        LOGGER.info(f"Setting {self.name} to {value}")
+        super().__init__(self.set_move, prefix, name)
 
-        await self.check_id_status()
-
+    async def _set_demand_positions(self, value: Apple2PhasesVal) -> None:
         await asyncio.gather(
             self.top_outer.user_setpoint.set(value=value.top_outer),
             self.top_inner.user_setpoint.set(value=value.top_inner),
             self.btm_inner.user_setpoint.set(value=value.btm_inner),
             self.btm_outer.user_setpoint.set(value=value.btm_outer),
         )
-        timeout = await self._cal_timeout()
-        await self.set_move.set(value=1, timeout=timeout)
-        await wait_for_value(self.gate, UndulatorGateStatus.close, timeout=timeout)
 
-    async def _cal_timeout(self) -> float:
+    async def get_timeout(self) -> float:
         """
         Get all four motor speed, current positions and target positions to calculate required timeout.
         """
-        velos = await asyncio.gather(
-            self.top_outer.velocity.get_value(),
-            self.top_inner.velocity.get_value(),
-            self.btm_inner.velocity.get_value(),
-            self.btm_outer.velocity.get_value(),
+        axes = [self.top_outer, self.top_inner, self.btm_inner, self.btm_outer]
+        timeouts = await asyncio.gather(
+            *[
+                estimate_motor_timeout(
+                    axis.user_setpoint_demand_readback,
+                    axis.user_setpoint_readback,
+                    axis.velocity,
+                )
+                for axis in axes
+            ]
         )
-        target_pos = await asyncio.gather(
-            self.top_outer.user_setpoint_demand_readback.get_value(),
-            self.top_inner.user_setpoint_demand_readback.get_value(),
-            self.btm_inner.user_setpoint_demand_readback.get_value(),
-            self.btm_outer.user_setpoint_demand_readback.get_value(),
-        )
-        cur_pos = await asyncio.gather(
-            self.top_outer.user_setpoint_readback.get_value(),
-            self.top_inner.user_setpoint_readback.get_value(),
-            self.btm_inner.user_setpoint_readback.get_value(),
-            self.btm_outer.user_setpoint_readback.get_value(),
-        )
-        move_distances = tuple(np.subtract(target_pos, cur_pos))
-        move_times = np.abs(np.divide(move_distances, velos))
-        longest_move_time = np.max(move_times)
-        return longest_move_time * 2 + 1
-
-    async def check_id_status(self) -> None:
-        if await self.fault.get_value() != 0:
-            raise RuntimeError(f"{self.name} is in fault state")
-        if await self.gate.get_value() == UndulatorGateStatus.open:
-            raise RuntimeError(f"{self.name} is already in motion.")
-
-    async def get_timeout(self) -> float:
-        return await self._cal_timeout()
+        return np.max(timeouts)
 
 
-class UndulatorJawPhase(StandardReadable, Movable):
+class UndulatorJawPhase(SafeUndulatorMover):
     """
     A JawPhase movable, this is use for moving the jaw phase which is use to control the
     linear arbitrary polarisation but only one some of the beamline.
@@ -308,48 +308,21 @@ class UndulatorJawPhase(StandardReadable, Movable):
             self.jaw_phase = UndulatorPhaseMotor(prefix=prefix, infix=jaw_phase)
         # Nothing move until this is set to 1 and it will return to 0 when done
         self.set_move = epics_signal_rw(int, f"{prefix}BL{move_pv}" + "MOVE")
-        self.gate = epics_signal_r(UndulatorGateStatus, prefix + "BLGATE")
-        split_pv = prefix.split("-")
-        temp_pv = f"{split_pv[0]}-{split_pv[1]}-STAT-{split_pv[3]}ANYFAULT"
-        self.fault = epics_signal_r(float, temp_pv)
-        super().__init__(name=name)
 
-    @AsyncStatus.wrap
-    async def set(self, value: float) -> None:
-        LOGGER.info(f"Setting {self.name} to {value}")
+        super().__init__(self.set_move, prefix, name)
 
-        await self.check_id_status()
+    async def _set_demand_positions(self, value: float) -> None:
+        await self.jaw_phase.user_setpoint.set(value=str(value))
 
-        await asyncio.gather(
-            self.jaw_phase.user_setpoint.set(value=str(value)),
-        )
-        timeout = await self._cal_timeout()
-        await self.set_move.set(value=1, timeout=timeout)
-        await wait_for_value(self.gate, UndulatorGateStatus.close, timeout=timeout)
-
-    async def _cal_timeout(self) -> float:
+    async def get_timeout(self) -> float:
         """
         Get motor speed, current position and target position to calculate required timeout.
         """
-        velo, target_pos, cur_pos = await asyncio.gather(
-            self.jaw_phase.velocity.get_value(),
-            self.jaw_phase.user_setpoint_demand_readback.get_value(),
-            self.jaw_phase.user_setpoint_readback.get_value(),
+        return await estimate_motor_timeout(
+            self.jaw_phase.user_setpoint_demand_readback,
+            self.jaw_phase.user_setpoint_readback,
+            self.jaw_phase.velocity,
         )
-
-        move_distances = target_pos - cur_pos
-        move_times = np.abs(move_distances / velo)
-
-        return move_times * 2 + 1
-
-    async def check_id_status(self) -> None:
-        if await self.fault.get_value() != 0:
-            raise RuntimeError(f"{self.name} is in fault state")
-        if await self.gate.get_value() == UndulatorGateStatus.open:
-            raise RuntimeError(f"{self.name} is already in motion.")
-
-    async def get_timeout(self) -> float:
-        return await self._cal_timeout()
 
 
 class Apple2(StandardReadable, Movable):
@@ -437,7 +410,7 @@ class Apple2(StandardReadable, Movable):
         """
 
         # Only need to check gap as the phase motors share both fault and gate with gap.
-        await self.gap().check_id_status()
+        await self.gap().raise_if_cannot_move()
         await asyncio.gather(
             self.phase().top_outer.user_setpoint.set(value=value.top_outer),
             self.phase().top_inner.user_setpoint.set(value=value.top_inner),
@@ -458,7 +431,7 @@ class Apple2(StandardReadable, Movable):
             self.phase().set_move.set(value=1, timeout=timeout),
         )
         await wait_for_value(
-            self.gap().gate, UndulatorGateStatus.close, timeout=timeout
+            self.gap().gate, UndulatorGateStatus.CLOSE, timeout=timeout
         )
         self._energy_set(energy)  # Update energy for after move for readback.
 

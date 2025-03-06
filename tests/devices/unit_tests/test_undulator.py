@@ -2,8 +2,8 @@ from unittest.mock import ANY
 
 import numpy as np
 import pytest
-from ophyd_async.core import (
-    DeviceCollector,
+from ophyd_async.core import init_devices
+from ophyd_async.testing import (
     assert_configuration,
     assert_reading,
     set_mock_value,
@@ -23,7 +23,7 @@ ID_GAP_LOOKUP_TABLE_PATH: str = (
 
 @pytest.fixture
 async def undulator() -> Undulator:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         undulator = Undulator(
             "UND-01",
             name="undulator",
@@ -41,17 +41,17 @@ async def test_reading_includes_read_fields(undulator: Undulator):
             "undulator-gap_access": {
                 "value": UndulatorGapAccess.ENABLED,
                 "timestamp": ANY,
-                "alarm_severity": ANY,
+                "alarm_severity": 0,
             },
             "undulator-gap_motor": {
                 "value": 0.0,
                 "timestamp": ANY,
-                "alarm_severity": ANY,
+                "alarm_severity": 0,
             },
             "undulator-current_gap": {
                 "value": 0.0,
                 "timestamp": ANY,
-                "alarm_severity": ANY,
+                "alarm_severity": 0,
             },
         },
     )
@@ -64,34 +64,39 @@ async def test_configuration_includes_configuration_fields(undulator: Undulator)
             "undulator-gap_motor-motor_egu": {
                 "value": "",
                 "timestamp": ANY,
-                "alarm_severity": ANY,
+                "alarm_severity": 0,
             },
             "undulator-gap_motor-velocity": {
                 "value": 0.0,
                 "timestamp": ANY,
-                "alarm_severity": ANY,
+                "alarm_severity": 0,
             },
             "undulator-length": {
                 "value": 2.0,
                 "timestamp": ANY,
-                "alarm_severity": ANY,
+                "alarm_severity": 0,
             },
             "undulator-poles": {
                 "value": 80,
                 "timestamp": ANY,
-                "alarm_severity": ANY,
+                "alarm_severity": 0,
             },
             "undulator-gap_discrepancy_tolerance_mm": {
                 "value": 0.002,
                 "timestamp": ANY,
-                "alarm_severity": ANY,
+                "alarm_severity": 0,
+            },
+            "undulator-gap_motor-offset": {
+                "alarm_severity": 0,
+                "timestamp": ANY,
+                "value": 0.0,
             },
         },
     )
 
 
 async def test_poles_not_propagated_if_not_supplied():
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         undulator = Undulator(
             "UND-01",
             name="undulator",
@@ -103,7 +108,7 @@ async def test_poles_not_propagated_if_not_supplied():
 
 
 async def test_length_not_propagated_if_not_supplied():
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         undulator = Undulator(
             "UND-01",
             name="undulator",

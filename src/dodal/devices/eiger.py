@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 from enum import Enum
 
+from bluesky.protocols import Stageable
 from ophyd import Component, Device, EpicsSignalRO, Signal
 from ophyd.areadetector.cam import EigerDetectorCam
 from ophyd.status import AndStatus, Status, StatusBase
@@ -42,7 +43,7 @@ AVAILABLE_TIMEOUTS = {
 }
 
 
-class EigerDetector(Device):
+class EigerDetector(Device, Stageable):
     class ArmingSignal(Signal):
         def set(self, value, *, timeout=None, settle_time=None, **kwargs):
             assert isinstance(self.parent, EigerDetector)
@@ -61,6 +62,9 @@ class EigerDetector(Device):
 
     arming_status = Status()
     arming_status.set_finished()
+
+    disarming_status = Status()
+    disarming_status.set_finished()
 
     def __init__(self, beamline: str = "i03", *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -140,6 +144,7 @@ class EigerDetector(Device):
     def unstage(self) -> bool:
         assert self.detector_params is not None
         try:
+            self.disarming_status = Status()
             self.wait_on_arming_if_started()
             if self.detector_params.trigger_mode == TriggerMode.FREE_RUN:
                 # In free run mode we have to manually stop odin
@@ -157,24 +162,29 @@ class EigerDetector(Device):
             status_ok = self.odin.check_and_wait_for_odin_state(
                 self.timeouts.general_status_timeout
             )
-            self.disable_roi_mode()
+            self.disable_roi_mode().wait(self.timeouts.general_status_timeout)
+        self.disarming_status.set_finished()
         return status_ok
 
     def stop(self, *args):
         """Emergency stop the device, mainly used to clean up after error."""
         LOGGER.info("Eiger stop() called - cleaning up...")
-        self.wait_on_arming_if_started()
-        stop_status = self.odin.stop()
-        self.odin.file_writer.start_timeout.set(1).wait(
-            self.timeouts.general_status_timeout
-        )
-        self.disarm_detector()
-        stop_status &= self.disable_roi_mode()
-        stop_status.wait(self.timeouts.general_status_timeout)
-        # See https://github.com/DiamondLightSource/hyperion/issues/1395
-        LOGGER.info("Turning off Eiger dev/shm streaming")
-        self.odin.fan.dev_shm_enable.set(0).wait()
-        LOGGER.info("Eiger has successfully been stopped")
+        if not self.disarming_status.done:
+            LOGGER.info("Eiger still disarming, waiting on disarm")
+            self.disarming_status.wait(self.timeouts.arming_timeout)
+        else:
+            self.wait_on_arming_if_started()
+            stop_status = self.odin.stop()
+            self.odin.file_writer.start_timeout.set(1).wait(
+                self.timeouts.general_status_timeout
+            )
+            self.disarm_detector()
+            stop_status &= self.disable_roi_mode()
+            stop_status.wait(self.timeouts.general_status_timeout)
+            # See https://github.com/DiamondLightSource/hyperion/issues/1395
+            LOGGER.info("Turning off Eiger dev/shm streaming")
+            self.odin.fan.dev_shm_enable.set(0).wait()
+            LOGGER.info("Eiger has successfully been stopped")
 
     def disable_roi_mode(self):
         return self.change_roi_mode(False)

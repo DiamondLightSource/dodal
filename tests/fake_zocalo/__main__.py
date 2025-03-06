@@ -10,9 +10,12 @@ import pika
 import yaml
 from ispyb.sqlalchemy import DataCollection
 from pika.adapters.blocking_connection import BlockingChannel
+from pika.exceptions import AMQPConnectionError
 from pika.spec import BasicProperties
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
+
+RABBITMQ_START_TIMEOUT_S = 20
 
 TEST_RESULT_LARGE = [
     {
@@ -67,9 +70,9 @@ def get_dcgid_and_prefix(dcid: int, session_maker: sessionmaker) -> tuple[int, s
                 .filter(DataCollection.dataCollectionId == dcid)
                 .first()
             )
-            assert (
-                query is not None
-            ), f"Failed to find dcid {dcid} which matches any in dev ispyb"
+            assert query is not None, (
+                f"Failed to find dcid {dcid} which matches any in dev ispyb"
+            )
             dcgid, prefix = query
 
     except Exception as e:
@@ -120,7 +123,19 @@ def main() -> None:
         [*TEST_RESULT_LARGE, *TEST_RESULT_SMALL]
     )
 
-    conn = pika.BlockingConnection(params)
+    start = time.time()
+    while True:
+        try:
+            conn = pika.BlockingConnection(params)
+        except AMQPConnectionError:
+            print("Unable to connect, retrying...")
+            if time.time() - start > RABBITMQ_START_TIMEOUT_S:
+                print(f"RabbitMQ did not start after {RABBITMQ_START_TIMEOUT_S}s")
+                exit(1)
+            time.sleep(1)
+        else:
+            break
+
     channel = conn.channel()
 
     # Create the results exchange if it doesn't already exist
@@ -132,6 +147,17 @@ def main() -> None:
         queue="xrc.i03",
         durable=True,
         arguments={"x-single-active-consumer": False, "x-queue-type": "quorum"},
+    )
+    # Also create the processing_recipe queue
+    channel.queue_declare(
+        queue="processing_recipe",
+        durable=True,
+        arguments={
+            "x-single-active-consumer": False,
+            "x-queue-type": "quorum",
+            "x-dead-letter-exchange": "",
+            "x-dead-letter-routing-key": "dlq.processing_recipe",
+        },
     )
 
     # Route messages from the 'results' exchange to the 'xrc.i03' channel

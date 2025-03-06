@@ -1,9 +1,9 @@
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import DeviceCollector
+from ophyd_async.core import init_devices
 
-from dodal.devices.oav.oav_detector import OAV, OAVConfig, ZoomController
+from dodal.devices.oav.oav_detector import OAV, OAVConfig
 
 TEST_GRID_TOP_LEFT_X = 100
 TEST_GRID_TOP_LEFT_Y = 100
@@ -19,7 +19,7 @@ ZOOM_LEVELS_XML = "tests/devices/unit_tests/test_jCameraManZoomLevels.xml"
 @pytest.fixture
 async def oav() -> OAV:
     oav_config = OAVConfig(ZOOM_LEVELS_XML, DISPLAY_CONFIGURATION)
-    async with DeviceCollector(connect=True):
+    async with init_devices(connect=True):
         oav = OAV("", config=oav_config, name="oav")
     return oav
 
@@ -44,12 +44,3 @@ def test_grid_overlay(RE: RunEngine):
     snapshot_filename = "snapshot"
     snapshot_directory = "."
     RE(take_snapshot_with_grid(oav, snapshot_filename, snapshot_directory))
-
-
-@pytest.mark.skip(reason="No OAV in S03")
-@pytest.mark.s03
-async def test_get_zoom_levels():
-    my_zoom_controller = ZoomController("BL03S-EA-OAV-01:FZOOM:", name="test_zoom")
-    await my_zoom_controller.connect()
-    description = await my_zoom_controller.level.describe()
-    assert description["zoom_controller-level"]["choices"][0] == "1.0x"  # type: ignore

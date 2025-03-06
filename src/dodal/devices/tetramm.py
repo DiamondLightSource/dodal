@@ -13,7 +13,12 @@ from ophyd_async.core import (
     set_and_wait_for_value,
     soft_signal_r_and_setter,
 )
-from ophyd_async.epics.adcore import ADHDFWriter, NDFileHDFIO, stop_busy_record
+from ophyd_async.epics.adcore import (
+    ADHDFWriter,
+    NDFileHDFIO,
+    NDPluginBaseIO,
+    stop_busy_record,
+)
 from ophyd_async.epics.core import (
     epics_signal_r,
     epics_signal_rw,
@@ -22,31 +27,31 @@ from ophyd_async.epics.core import (
 
 
 class TetrammRange(StrictEnum):
-    uA = "+- 120 uA"
-    nA = "+- 120 nA"
+    UA = "+- 120 uA"
+    NA = "+- 120 nA"
 
 
 class TetrammTrigger(StrictEnum):
-    FreeRun = "Free run"
-    ExtTrigger = "Ext. trig."
-    ExtBulb = "Ext. bulb"
-    ExtGate = "Ext. gate"
+    FREE_RUN = "Free run"
+    EXT_TRIGGER = "Ext. trig."
+    EXT_BULB = "Ext. bulb"
+    EXT_GATE = "Ext. gate"
 
 
 class TetrammChannels(StrictEnum):
-    One = "1"
-    Two = "2"
-    Four = "4"
+    ONE = "1"
+    TWO = "2"
+    FOUR = "4"
 
 
 class TetrammResolution(StrictEnum):
-    SixteenBits = "16 bits"
-    TwentyFourBits = "24 bits"
+    SIXTEEN_BITS = "16 bits"
+    TWENTY_FOUR_BITS = "24 bits"
 
 
 class TetrammGeometry(StrictEnum):
-    Diamond = "Diamond"
-    Square = "Square"
+    DIAMOND = "Diamond"
+    SQUARE = "Square"
 
 
 class TetrammDriver(Device):
@@ -118,7 +123,7 @@ class TetrammController(DetectorController):
         assert trigger_info.livetime is not None
 
         # trigger mode must be set first and on its own!
-        await self._drv.trigger_mode.set(TetrammTrigger.ExtTrigger)
+        await self._drv.trigger_mode.set(TetrammTrigger.EXT_TRIGGER)
 
         await asyncio.gather(
             self._drv.averaging_time.set(trigger_info.livetime),
@@ -134,8 +139,8 @@ class TetrammController(DetectorController):
 
     def _validate_trigger(self, trigger: DetectorTrigger) -> None:
         supported_trigger_types = {
-            DetectorTrigger.edge_trigger,
-            DetectorTrigger.constant_gate,
+            DetectorTrigger.EDGE_TRIGGER,
+            DetectorTrigger.CONSTANT_GATE,
         }
 
         if trigger not in supported_trigger_types:
@@ -221,7 +226,7 @@ class TetrammDetector(StandardDetector):
         path_provider: PathProvider,
         name: str = "",
         type: str | None = None,
-        **scalar_sigs: str,
+        plugins: dict[str, NDPluginBaseIO] | None = None,
     ) -> None:
         self.drv = TetrammDriver(prefix + "DRV:")
         self.hdf = NDFileHDFIO(prefix + "HDF5:")
@@ -243,7 +248,7 @@ class TetrammDetector(StandardDetector):
                 path_provider,
                 lambda: self.name,
                 TetrammDatasetDescriber(controller),
-                **scalar_sigs,
+                plugins=plugins,
             ),
             config_signals,
             name,

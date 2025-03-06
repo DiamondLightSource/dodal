@@ -2,9 +2,9 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import set_mock_value
+from ophyd_async.testing import set_mock_value
 
-from dodal.devices.zebra import (
+from dodal.devices.zebra.zebra import (
     ArmDemand,
     ArmingDevice,
     ArmSource,

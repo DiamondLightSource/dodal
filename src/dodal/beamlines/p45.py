@@ -9,7 +9,7 @@ from dodal.common.beamlines.beamline_utils import (
     set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.beamlines.device_helpers import HDF5_PREFIX
+from dodal.common.beamlines.device_helpers import DET_SUFFIX, HDF5_SUFFIX
 from dodal.common.visit import StaticVisitPathProvider
 from dodal.devices.p45 import Choppers, TomoStageWithStretchAndSkew
 from dodal.log import set_beamline as set_log_beamline
@@ -44,7 +44,7 @@ def det() -> AravisDetector:
     return AravisDetector(
         f"{PREFIX.beamline_prefix}-EA-MAP-01:",
         path_provider=get_path_provider(),
-        drv_suffix="DET:",
+        drv_suffix=DET_SUFFIX,
         hdf_suffix=HDF5_PREFIX,
     )
 
@@ -55,7 +55,7 @@ def diff() -> AravisDetector:
     return AravisDetector(
         f"{PREFIX.beamline_prefix}-EA-DIFF-01:",
         path_provider=get_path_provider(),
-        drv_suffix="DET:",
+        drv_suffix=DET_SUFFIX,
         hdf_suffix=HDF5_PREFIX,
     )
 

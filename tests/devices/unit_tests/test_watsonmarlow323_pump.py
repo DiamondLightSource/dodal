@@ -1,7 +1,8 @@
 from unittest.mock import ANY
 
 import pytest
-from ophyd_async.core import DeviceCollector, assert_reading, set_mock_value
+from ophyd_async.core import init_devices
+from ophyd_async.testing import assert_reading, set_mock_value
 
 from dodal.devices.watsonmarlow323_pump import (
     WatsonMarlow323Pump,
@@ -12,7 +13,7 @@ from dodal.devices.watsonmarlow323_pump import (
 
 @pytest.fixture
 async def watsonmarlow323() -> WatsonMarlow323Pump:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         wm_pump = WatsonMarlow323Pump("DEMO-WMPUMP-01:")
 
     return wm_pump

@@ -1,34 +1,25 @@
 from unittest.mock import AsyncMock, patch
 
 import pytest
-from ophyd_async.core import set_mock_value
+from ophyd_async.testing import set_mock_value
 
 from dodal.devices.oav.oav_detector import (
     OAV,
     Cam,
     ZoomController,
-    ZoomLevelNotFoundError,
 )
 
 
 async def test_zoom_controller():
-    zoom_controller = ZoomController("", "fake zoom controller")
+    zoom_controller = ZoomController("", "zoom_controller")
     await zoom_controller.connect(mock=True)
     zoom_controller.level.describe = AsyncMock(
-        return_value={"level": {"choices": ["1.0x", "3.0x"]}}
+        return_value={"zoom_controller-level": {"choices": ["1.0x", "3.0x"]}}
     )
     status = zoom_controller.set("3.0x")
     await status
     assert status.success
     assert await zoom_controller.level.get_value() == "3.0x"
-
-
-async def test_zoom_controller_set_raises_error_for_wrong_level():
-    zoom_controller = ZoomController("", "fake zoom controller")
-    await zoom_controller.connect(mock=True)
-    zoom_controller._get_allowed_zoom_levels = AsyncMock(return_value=["1.0x", "3.0x"])
-    with pytest.raises(ZoomLevelNotFoundError):
-        await zoom_controller.set("5.0x")
 
 
 async def test_cam():

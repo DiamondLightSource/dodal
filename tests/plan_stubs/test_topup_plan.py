@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import set_mock_value
+from ophyd_async.testing import set_mock_value
 
 from dodal.beamlines import i03
 from dodal.devices.synchrotron import Synchrotron, SynchrotronMode
@@ -15,7 +15,7 @@ from dodal.plan_stubs.check_topup import (
 
 @pytest.fixture
 def synchrotron(RE) -> Synchrotron:
-    return i03.synchrotron(fake_with_ophyd_sim=True)
+    return i03.synchrotron(connect_immediately=True, mock=True)
 
 
 @patch("dodal.plan_stubs.check_topup.wait_for_topup_complete")

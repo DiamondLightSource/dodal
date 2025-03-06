@@ -1,24 +1,22 @@
 from unittest.mock import ANY
 
 import pytest
-from ophyd_async.core import (
-    DeviceCollector,
-    assert_reading,
-)
+from ophyd_async.core import init_devices
+from ophyd_async.testing import assert_reading
 
 from dodal.devices.diamond_filter import DiamondFilter, I03Filters, I04Filters
 
 
 @pytest.fixture
 async def i03_diamond_filter() -> DiamondFilter[I03Filters]:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         i03_diamond_filter = DiamondFilter("", I03Filters, name="diamond_filter")
     return i03_diamond_filter
 
 
 @pytest.fixture
 async def i04_diamond_filter() -> DiamondFilter[I04Filters]:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         i04_diamond_filter = DiamondFilter("", I04Filters, name="diamond_filter")
     return i04_diamond_filter
 
@@ -32,12 +30,12 @@ async def test_reading_includes_read_fields(
             "diamond_filter-y_motor": {
                 "value": 0.0,
                 "timestamp": ANY,
-                "alarm_severity": ANY,
+                "alarm_severity": 0,
             },
             "diamond_filter-thickness": {
                 "value": I03Filters.EMPTY,
                 "timestamp": ANY,
-                "alarm_severity": ANY,
+                "alarm_severity": 0,
             },
         },
     )

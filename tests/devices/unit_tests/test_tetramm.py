@@ -1,13 +1,8 @@
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import (
-    DetectorTrigger,
-    DeviceCollector,
-    PathProvider,
-    TriggerInfo,
-    set_mock_value,
-)
+from ophyd_async.core import DetectorTrigger, PathProvider, TriggerInfo, init_devices
 from ophyd_async.epics.adcore import FileWriteMode
+from ophyd_async.testing import set_mock_value
 
 from dodal.devices.tetramm import (
     TetrammController,
@@ -21,7 +16,7 @@ TEST_TETRAMM_NAME = "foobar"
 
 @pytest.fixture
 async def tetramm_driver(RE: RunEngine) -> TetrammDriver:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         driver = TetrammDriver("DRIVER:")
 
     return driver
@@ -31,7 +26,7 @@ async def tetramm_driver(RE: RunEngine) -> TetrammDriver:
 async def tetramm_controller(
     RE: RunEngine, tetramm_driver: TetrammDriver
 ) -> TetrammController:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         controller = TetrammController(
             tetramm_driver,
             maximum_readings_per_frame=2_000,
@@ -42,7 +37,7 @@ async def tetramm_controller(
 
 @pytest.fixture
 async def tetramm(static_path_provider: PathProvider) -> TetrammDetector:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         tetramm = TetrammDetector(
             "MY-TETRAMM:",
             static_path_provider,
@@ -57,7 +52,7 @@ async def tetramm(static_path_provider: PathProvider) -> TetrammDetector:
 def supported_trigger_info() -> TriggerInfo:
     return TriggerInfo(
         number_of_triggers=1,
-        trigger=DetectorTrigger.constant_gate,
+        trigger=DetectorTrigger.CONSTANT_GATE,
         deadtime=1.0,
         livetime=0.02,
         frame_timeout=None,
@@ -69,7 +64,7 @@ async def test_max_frame_rate_is_calculated_correctly(
 ):
     await tetramm_controller.prepare(
         TriggerInfo(
-            number_of_triggers=1, trigger=DetectorTrigger.edge_trigger, livetime=2.0
+            number_of_triggers=1, trigger=DetectorTrigger.EDGE_TRIGGER, livetime=2.0
         )
     )
 
@@ -112,7 +107,7 @@ async def test_min_exposure_is_calculated_correctly(
     # 100_000 / 17 ~ 5800; 5800 * 0.01 = 58; 58 << tetramm_controller.maximum_readings_per_frame
     await tetramm_controller.prepare(
         TriggerInfo(
-            number_of_triggers=1, trigger=DetectorTrigger.edge_trigger, livetime=0.01
+            number_of_triggers=1, trigger=DetectorTrigger.EDGE_TRIGGER, livetime=0.01
         )
     )
     assert tetramm_controller.readings_per_frame == int(readings_per_time * 0.01)
@@ -120,7 +115,7 @@ async def test_min_exposure_is_calculated_correctly(
     # 100_000 / 17 ~ 5800; 5800 * 0.2 = 1160; 1160 > tetramm_controller.maximum_readings_per_frame
     await tetramm_controller.prepare(
         TriggerInfo(
-            number_of_triggers=1, trigger=DetectorTrigger.edge_trigger, livetime=0.2
+            number_of_triggers=1, trigger=DetectorTrigger.EDGE_TRIGGER, livetime=0.2
         )
     )
     assert (
@@ -132,7 +127,7 @@ async def test_min_exposure_is_calculated_correctly(
     tetramm_controller.maximum_readings_per_frame = 1200
     await tetramm_controller.prepare(
         TriggerInfo(
-            number_of_triggers=1, trigger=DetectorTrigger.edge_trigger, livetime=0.1
+            number_of_triggers=1, trigger=DetectorTrigger.EDGE_TRIGGER, livetime=0.1
         )
     )
     assert tetramm_controller.readings_per_frame == int(readings_per_time * 0.1)
@@ -170,7 +165,7 @@ async def test_set_invalid_exposure_for_number_of_values_per_reading(
         await tetramm_controller.prepare(
             TriggerInfo(
                 number_of_triggers=0,
-                trigger=DetectorTrigger.edge_trigger,
+                trigger=DetectorTrigger.EDGE_TRIGGER,
                 livetime=4e-5,
             )
         )
@@ -200,7 +195,7 @@ async def test_sample_rate_scales_with_exposure_time(
     await tetramm.prepare(
         TriggerInfo(
             number_of_triggers=100,
-            trigger=DetectorTrigger.edge_trigger,
+            trigger=DetectorTrigger.EDGE_TRIGGER,
             deadtime=2e-5,
             livetime=exposure,
             frame_timeout=None,
@@ -213,8 +208,8 @@ async def test_sample_rate_scales_with_exposure_time(
 @pytest.mark.parametrize(
     "trigger_type",
     [
-        DetectorTrigger.internal,
-        DetectorTrigger.variable_gate,
+        DetectorTrigger.INTERNAL,
+        DetectorTrigger.VARIABLE_GATE,
     ],
 )
 async def test_arm_raises_value_error_for_invalid_trigger_type(
@@ -222,8 +217,8 @@ async def test_arm_raises_value_error_for_invalid_trigger_type(
     trigger_type: DetectorTrigger,
 ):
     accepted_types = {
-        DetectorTrigger.edge_trigger,
-        DetectorTrigger.constant_gate,
+        DetectorTrigger.EDGE_TRIGGER,
+        DetectorTrigger.CONSTANT_GATE,
     }
     with pytest.raises(
         ValueError,
@@ -244,8 +239,8 @@ async def test_arm_raises_value_error_for_invalid_trigger_type(
 @pytest.mark.parametrize(
     "trigger_type",
     [
-        DetectorTrigger.edge_trigger,
-        DetectorTrigger.constant_gate,
+        DetectorTrigger.EDGE_TRIGGER,
+        DetectorTrigger.CONSTANT_GATE,
     ],
 )
 async def test_arm_sets_signals_correctly_given_valid_inputs(
@@ -272,13 +267,13 @@ async def test_disarm_disarms_driver(
     await tetramm.prepare(
         TriggerInfo(
             number_of_triggers=0,
-            trigger=DetectorTrigger.edge_trigger,
+            trigger=DetectorTrigger.EDGE_TRIGGER,
             livetime=VALID_TEST_EXPOSURE_TIME,
             deadtime=VALID_TEST_DEADTIME,
         )
     )
     assert (await tetramm_driver.acquire.get_value()) == 1
-    await tetramm.controller.disarm()
+    await tetramm._controller.disarm()
     assert (await tetramm_driver.acquire.get_value()) == 0
 
 
@@ -290,14 +285,14 @@ async def test_prepare_with_too_low_a_deadtime_raises_error(
     tetramm: TetrammDetector,
 ):
     with pytest.raises(
-        AssertionError,
+        ValueError,
         match=r"Detector .* needs at least 2e-05s deadtime, but trigger logic "
         "provides only 1e-05s",
     ):
         await tetramm.prepare(
             TriggerInfo(
                 number_of_triggers=5,
-                trigger=DetectorTrigger.edge_trigger,
+                trigger=DetectorTrigger.EDGE_TRIGGER,
                 deadtime=1.0 / 100_000.0,
                 livetime=VALID_TEST_EXPOSURE_TIME,
                 frame_timeout=None,
@@ -312,7 +307,7 @@ async def test_prepare_arms_tetramm(
     await tetramm.prepare(
         TriggerInfo(
             number_of_triggers=5,
-            trigger=DetectorTrigger.edge_trigger,
+            trigger=DetectorTrigger.EDGE_TRIGGER,
             deadtime=0.1,
             livetime=VALID_TEST_EXPOSURE_TIME,
             frame_timeout=None,
@@ -332,8 +327,8 @@ async def test_prepare_sets_up_writer(
     assert (await tetramm.hdf.num_extra_dims.get_value()) == 0
     assert await tetramm.hdf.lazy_open.get_value()
     assert await tetramm.hdf.swmr_mode.get_value()
-    assert (await tetramm.hdf.file_template.get_value()) == "%s/%s.h5"
-    assert (await tetramm.hdf.file_write_mode.get_value()) == FileWriteMode.stream
+    assert (await tetramm.hdf.file_template.get_value()) == "%s%s.h5"
+    assert (await tetramm.hdf.file_write_mode.get_value()) == FileWriteMode.STREAM
 
 
 async def test_stage_sets_up_accurate_describe_output(
@@ -359,7 +354,7 @@ async def test_stage_sets_up_accurate_describe_output(
 async def test_error_if_armed_without_exposure(tetramm_controller: TetrammController):
     with pytest.raises(ValueError):
         await tetramm_controller.prepare(
-            TriggerInfo(number_of_triggers=10, trigger=DetectorTrigger.internal)
+            TriggerInfo(number_of_triggers=10, trigger=DetectorTrigger.INTERNAL)
         )
 
 
@@ -367,12 +362,12 @@ async def test_pilatus_controller(
     RE,
     tetramm: TetrammDetector,
 ):
-    controller = tetramm.controller
+    controller = tetramm._controller
     driver = tetramm.drv
     await controller.prepare(
         TriggerInfo(
             number_of_triggers=1,
-            trigger=DetectorTrigger.constant_gate,
+            trigger=DetectorTrigger.CONSTANT_GATE,
             livetime=VALID_TEST_EXPOSURE_TIME,
             deadtime=VALID_TEST_DEADTIME,
         )
@@ -388,7 +383,7 @@ async def test_pilatus_controller(
 
 
 async def assert_armed(driver: TetrammDriver) -> None:
-    assert (await driver.trigger_mode.get_value()) is TetrammTrigger.ExtTrigger
+    assert (await driver.trigger_mode.get_value()) is TetrammTrigger.EXT_TRIGGER
     assert (await driver.averaging_time.get_value()) == VALID_TEST_EXPOSURE_TIME
     assert (await driver.values_per_reading.get_value()) == 5
     assert (await driver.acquire.get_value()) == 1

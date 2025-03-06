@@ -1,14 +1,15 @@
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import DeviceCollector, observe_value, set_mock_value
+from ophyd_async.core import init_devices, observe_value
+from ophyd_async.testing import set_mock_value
 
 from dodal.devices.smargon import Smargon, StubPosition
 
 
 @pytest.fixture
 async def smargon() -> Smargon:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         smargon = Smargon(name="smargon")
     return smargon
 

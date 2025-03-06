@@ -4,12 +4,12 @@ from ophyd_async.epics.adaravis import AravisDetector
 from ophyd_async.fastcs.panda import HDFPanda
 
 from dodal.common.beamlines.beamline_utils import (
-    device_instantiation,
+    device_factory,
     get_path_provider,
     set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.beamlines.device_helpers import numbered_slits
+from dodal.common.beamlines.device_helpers import HDF5_SUFFIX
 from dodal.common.crystal_metadata import (
     MaterialsEnum,
     make_crystal_metadata_from_material,
@@ -25,9 +25,10 @@ from dodal.devices.tetramm import TetrammDetector
 from dodal.devices.undulator import Undulator
 from dodal.devices.watsonmarlow323_pump import WatsonMarlow323Pump
 from dodal.log import set_beamline as set_log_beamline
-from dodal.utils import BeamlinePrefix, get_beamline_name, skip_device
+from dodal.utils import BeamlinePrefix, get_beamline_name
 
 BL = get_beamline_name("p38")
+PREFIX = BeamlinePrefix(BL)
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
@@ -45,63 +46,41 @@ set_path_provider(
 )
 
 
-def d3(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> AravisDetector:
-    return device_instantiation(
-        AravisDetector,
-        "d3",
-        "-DI-DCAM-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-        drv_suffix="DET:",
-        hdf_suffix="HDF5:",
+@device_factory()
+def d3() -> AravisDetector:
+    return AravisDetector(
+        f"{PREFIX.beamline_prefix}-DI-DCAM-01:",
         path_provider=get_path_provider(),
+        drv_suffix="DET:",
+        fileio_suffix=HDF5_SUFFIX,
     )
 
 
 # Disconnected
-@skip_device()
-def d11(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> AravisDetector:
-    return device_instantiation(
-        AravisDetector,
-        "d11",
-        "-DI-DCAM-03:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-        drv_suffix="DET:",
-        hdf_suffix="HDF5:",
+@device_factory(skip=True)
+def d11() -> AravisDetector:
+    return AravisDetector(
+        f"{PREFIX.beamline_prefix}-DI-DCAM-03:",
         path_provider=get_path_provider(),
+        drv_suffix="DET:",
+        fileio_suffix=HDF5_SUFFIX,
     )
 
 
-def d12(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> AravisDetector:
-    return device_instantiation(
-        AravisDetector,
-        "d12",
-        "-DI-DCAM-04:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-        drv_suffix="DET:",
-        hdf_suffix="HDF5:",
+@device_factory()
+def d12() -> AravisDetector:
+    return AravisDetector(
+        f"{PREFIX.beamline_prefix}-DI-DCAM-04:",
         path_provider=get_path_provider(),
+        drv_suffix="DET:",
+        fileio_suffix=HDF5_SUFFIX,
     )
 
 
-def i0(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-) -> TetrammDetector:
-    return device_instantiation(
-        TetrammDetector,
-        "i0",
-        "-EA-XBPM-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+@device_factory()
+def i0() -> TetrammDetector:
+    return TetrammDetector(
+        f"{PREFIX.beamline_prefix}-EA-XBPM-01:",
         path_provider=get_path_provider(),
     )
 
@@ -113,126 +92,60 @@ def i0(
 #
 
 
-def slits_1(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
-) -> Slits:
-    return numbered_slits(
-        1,
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
+@device_factory(mock=True)
+def slits_1() -> Slits:
+    return Slits(f"{PREFIX.beamline_prefix}-AL-SLITS-01:")
 
 
-def slits_2(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
-) -> Slits:
-    return numbered_slits(
-        2,
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
+@device_factory(mock=True)
+def slits_2() -> Slits:
+    return Slits(f"{PREFIX.beamline_prefix}-AL-SLITS-02:")
 
 
-def slits_3(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
-) -> Slits:
-    return numbered_slits(
-        3,
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
+@device_factory(mock=True)
+def slits_3() -> Slits:
+    return Slits(f"{PREFIX.beamline_prefix}-AL-SLITS-03:")
 
 
-def slits_4(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
-) -> Slits:
-    return numbered_slits(
-        4,
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
+@device_factory(mock=True)
+def slits_4() -> Slits:
+    return Slits(f"{PREFIX.beamline_prefix}-AL-SLITS-04:")
 
 
-def slits_5(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
-) -> Slits:
-    return numbered_slits(
-        5,
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
+@device_factory(mock=True)
+def slits_5() -> Slits:
+    return Slits(f"{PREFIX.beamline_prefix}-AL-SLITS-05:")
 
 
-def slits_6(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
-) -> Slits:
-    return numbered_slits(
-        6,
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
+@device_factory(mock=True)
+def slits_6() -> Slits:
+    return Slits(f"{PREFIX.beamline_prefix}-AL-SLITS-06:")
 
 
-def fswitch(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
-) -> FSwitch:
-    return device_instantiation(
-        FSwitch,
-        "fswitch",
-        "-MO-FSWT-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+@device_factory(mock=True)
+def fswitch() -> FSwitch:
+    return FSwitch(
+        f"{PREFIX.beamline_prefix}-MO-FSWT-01:",
         lens_geometry="paraboloid",
         cylindrical=True,
         lens_material="Beryllium",
     )
 
 
-def vfm(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
-) -> FocusingMirror:
-    return device_instantiation(
-        FocusingMirror,
-        "vfm",
-        "-OP-KBM-01:VFM:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
+@device_factory(mock=True)
+def vfm() -> FocusingMirror:
+    return FocusingMirror(f"{PREFIX.beamline_prefix}-OP-KBM-01:VFM:")
 
 
-def hfm(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
-) -> FocusingMirror:
-    return device_instantiation(
-        FocusingMirror,
-        "hfm",
-        "-OP-KBM-01:HFM:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
+@device_factory(mock=True)
+def hfm() -> FocusingMirror:
+    return FocusingMirror(f"{PREFIX.beamline_prefix}-OP-KBM-01:HFM:")
 
 
-def dcm(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
-) -> DoubleCrystalMonochromator:
-    return device_instantiation(
-        DoubleCrystalMonochromator,
-        "dcm",
-        f"{BeamlinePrefix(BL).beamline_prefix}-MO-DCM-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-        bl_prefix=False,
-        temperature_prefix=f"{BeamlinePrefix(BL).beamline_prefix}-DI-DCM-01:",
+@device_factory(mock=True)
+def dcm() -> DoubleCrystalMonochromator:
+    return DoubleCrystalMonochromator(
+        temperature_prefix=f"{PREFIX.beamline_prefix}-DI-DCM-01:",
         crystal_1_metadata=make_crystal_metadata_from_material(
             MaterialsEnum.Si, (1, 1, 1)
         ),
@@ -242,105 +155,56 @@ def dcm(
     )
 
 
-def undulator(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = True,
-) -> Undulator:
-    return device_instantiation(
-        Undulator,
-        "undulator",
-        f"{BeamlinePrefix(BL).insertion_prefix}-MO-SERVC-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-        bl_prefix=False,
+@device_factory(mock=True)
+def undulator() -> Undulator:
+    return Undulator(
+        f"{PREFIX.insertion_prefix}-MO-SERVC-01:",
         poles=80,
         length=2.0,
     )
 
 
-# Must find which PandA IOC(s) are compatible
 # Must document what PandAs are physically connected to
 # See: https://github.com/bluesky/ophyd-async/issues/284
-@skip_device()
-def panda1(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-) -> HDFPanda:
-    return device_instantiation(
-        HDFPanda,
-        "panda1",
-        "-EA-PANDA-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+@device_factory(skip=True)
+def panda1() -> HDFPanda:
+    return HDFPanda(
+        f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
         path_provider=get_path_provider(),
     )
 
 
-@skip_device()
-def panda2(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-) -> HDFPanda:
-    return device_instantiation(
-        HDFPanda,
-        "panda2",
-        "-EA-PANDA-02:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+@device_factory(skip=True)
+def panda2() -> HDFPanda:
+    return HDFPanda(
+        f"{PREFIX.beamline_prefix}-EA-PANDA-02:",
         path_provider=get_path_provider(),
     )
 
 
-@skip_device()
-def panda3(
-    wait_for_connection: bool = True,
-    fake_with_ophyd_sim: bool = False,
-) -> HDFPanda:
-    return device_instantiation(
-        HDFPanda,
-        "panda3",
-        "-EA-PANDA-03:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+@device_factory(skip=True)
+def panda3() -> HDFPanda:
+    return HDFPanda(
+        f"{PREFIX.beamline_prefix}-EA-PANDA-03:",
         path_provider=get_path_provider(),
     )
 
 
-@skip_device()
-def linkam(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Linkam3:
-    return device_instantiation(
-        Linkam3,
-        "linkam",
-        f"{BeamlinePrefix(BL).insertion_prefix}-EA-LINKM-02:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
+@device_factory(skip=True)
+def linkam() -> Linkam3:
+    return Linkam3(f"{PREFIX.beamline_prefix}-EA-LINKM-02:")
 
 
-def ppump(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = True
-) -> WatsonMarlow323Pump:
+@device_factory()
+def ppump() -> WatsonMarlow323Pump:
     """Peristaltic Pump"""
-    return device_instantiation(
-        WatsonMarlow323Pump,
-        "ppump",
-        "-EA-PUMP-01:",
-        wait_for_connection,
-        fake_with_ophyd_sim,
-    )
+    return WatsonMarlow323Pump(f"{PREFIX.beamline_prefix}-EA-PUMP-01:")
 
 
-def high_pressure_xray_cell(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> PressureJumpCell:
-    return device_instantiation(
-        PressureJumpCell,
-        "high_pressure_xray_cell",
-        f"{BeamlinePrefix(BL).insertion_prefix}-EA",
-        wait_for_connection,
-        fake_with_ophyd_sim,
+@device_factory()
+def high_pressure_xray_cell() -> PressureJumpCell:
+    return PressureJumpCell(
+        f"{PREFIX.beamline_prefix}-EA",
         cell_prefix="-HPXC-01:",
         adc_prefix="-ADC",
     )

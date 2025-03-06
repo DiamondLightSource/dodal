@@ -7,15 +7,31 @@ from ophyd_async.core import (
     DeviceVector,
     SignalR,
     StandardReadable,
+    SubsetEnum,
     wait_for_value,
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_x
 
+from dodal.devices.attenuator.filter import FilterMotor
 from dodal.log import LOGGER
 
 
-class Attenuator(StandardReadable, Movable):
+class ReadOnlyAttenuator(StandardReadable):
+    """A read-only attenuator class with a minimum set of PVs for reading.
+
+    The actual_transmission will return a fractional transmission between 0-1.
+    """
+
+    def __init__(self, prefix: str, name: str = "") -> None:
+        with self.add_children_as_readables():
+            self.actual_transmission = epics_signal_r(float, prefix + "MATCH")
+
+        super().__init__(name)
+
+
+class BinaryFilterAttenuator(ReadOnlyAttenuator, Movable):
     """The attenuator will insert filters into the beam to reduce its transmission.
+    In this attenuator, each filter can be in one of two states: IN or OUT
 
     This device should be set with:
         yield from bps.set(attenuator, desired_transmission)
@@ -42,10 +58,7 @@ class Attenuator(StandardReadable, Movable):
         self._use_current_energy = epics_signal_x(prefix + "E2WL:USECURRENTENERGY.PROC")
         self._change = epics_signal_x(prefix + "FANOUT")
 
-        with self.add_children_as_readables():
-            self.actual_transmission = epics_signal_r(float, prefix + "MATCH")
-
-        super().__init__(name)
+        super().__init__(prefix, name)
 
     @AsyncStatus.wrap
     async def set(self, value: float):
@@ -73,3 +86,28 @@ class Attenuator(StandardReadable, Movable):
                 for i in range(16)
             ]
         )
+
+
+class EnumFilterAttenuator(ReadOnlyAttenuator):
+    """The attenuator will insert filters into the beam to reduce its transmission.
+
+    This device is currently working, but feature incomplete. See https://github.com/DiamondLightSource/dodal/issues/972
+
+    In this attenuator, the state of a filter corresponds to the selected material,
+    e.g Ag50, in contrast to being either 'IN' or 'OUT'; see BinaryFilterAttenuator.
+    """
+
+    def __init__(
+        self,
+        prefix: str,
+        filter_selection: tuple[type[SubsetEnum], ...],
+        name: str = "",
+    ):
+        with self.add_children_as_readables():
+            self.filters: DeviceVector[FilterMotor] = DeviceVector(
+                {
+                    index: FilterMotor(f"{prefix}MP{index + 1}:", filter, name)
+                    for index, filter in enumerate(filter_selection)
+                }
+            )
+        super().__init__(prefix, name=name)

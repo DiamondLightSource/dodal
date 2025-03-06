@@ -1,14 +1,15 @@
 import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
-from ophyd_async.core import DeviceCollector, set_mock_value
+from ophyd_async.core import init_devices
+from ophyd_async.testing import set_mock_value
 
 from dodal.devices.xbpm_feedback import XBPMFeedback
 
 
 @pytest.fixture
 async def fake_xbpm_feedback() -> XBPMFeedback:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         xbpm = XBPMFeedback()
     return xbpm
 

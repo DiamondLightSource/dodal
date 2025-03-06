@@ -3,12 +3,14 @@ from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pytest
-from conftest import MOCK_DAQ_CONFIG_PATH
-from ophyd_async.core import AsyncStatus, DeviceCollector, get_mock_put, set_mock_value
+from ophyd_async.core import AsyncStatus, init_devices
+from ophyd_async.testing import get_mock_put, set_mock_value
 
+from conftest import MOCK_DAQ_CONFIG_PATH
 from dodal.devices.dcm import DCM
 from dodal.devices.undulator import AccessError, Undulator, UndulatorGapAccess
 from dodal.devices.undulator_dcm import UndulatorDCM
+from dodal.devices.util.test_utils import patch_motor
 from dodal.log import LOGGER
 
 ID_GAP_LOOKUP_TABLE_PATH: str = (
@@ -28,7 +30,7 @@ def flush_event_loop_on_finish(event_loop):
 
 @pytest.fixture
 async def fake_undulator_dcm() -> UndulatorDCM:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         undulator = Undulator(
             "UND-01",
             name="undulator",
@@ -43,12 +45,13 @@ async def fake_undulator_dcm() -> UndulatorDCM:
             daq_configuration_path=MOCK_DAQ_CONFIG_PATH,
             name="undulator_dcm",
         )
+    patch_motor(dcm.offset_in_mm)
     return undulator_dcm
 
 
 def test_lookup_table_paths_passed(fake_undulator_dcm: UndulatorDCM):
     assert (
-        fake_undulator_dcm.undulator.id_gap_lookup_table_path
+        fake_undulator_dcm.undulator_ref().id_gap_lookup_table_path
         == ID_GAP_LOOKUP_TABLE_PATH
     )
     assert (
@@ -70,17 +73,22 @@ async def test_fixed_offset_decoded(fake_undulator_dcm: UndulatorDCM):
 async def test_if_gap_is_wrong_then_logger_info_is_called_and_gap_is_set_correctly(
     mock_logger: MagicMock, mock_load: MagicMock, fake_undulator_dcm: UndulatorDCM
 ):
-    set_mock_value(fake_undulator_dcm.undulator.current_gap, 5.3)
-    set_mock_value(fake_undulator_dcm.dcm.energy_in_kev.user_readback, 5.7)
+    set_mock_value(fake_undulator_dcm.undulator_ref().current_gap, 5.3)
+    set_mock_value(fake_undulator_dcm.dcm_ref().energy_in_kev.user_readback, 5.7)
 
     mock_load.return_value = np.array([[5700, 5.4606], [7000, 6.045], [9700, 6.404]])
 
     await fake_undulator_dcm.set(6.9)
 
-    assert (await fake_undulator_dcm.dcm.energy_in_kev.user_setpoint.get_value()) == 6.9
     assert (
-        await fake_undulator_dcm.undulator.gap_motor.user_setpoint.get_value()
+        await fake_undulator_dcm.dcm_ref().energy_in_kev.user_setpoint.get_value()
+    ) == 6.9
+    assert (
+        await fake_undulator_dcm.undulator_ref().gap_motor.user_setpoint.get_value()
     ) == 6.045
+    assert (
+        await fake_undulator_dcm.dcm_ref().offset_in_mm.user_setpoint.get_value()
+    ) == 25.6
     mock_logger.info.assert_called()
 
 
@@ -90,21 +98,25 @@ async def test_if_gap_is_wrong_then_logger_info_is_called_and_gap_is_set_correct
 async def test_when_gap_access_is_not_checked_if_test_mode_enabled(
     mock_logger: MagicMock, mock_load: MagicMock, fake_undulator_dcm: UndulatorDCM
 ):
-    set_mock_value(fake_undulator_dcm.undulator.gap_access, UndulatorGapAccess.DISABLED)
-    set_mock_value(fake_undulator_dcm.undulator.current_gap, 5.3)
-    set_mock_value(fake_undulator_dcm.dcm.energy_in_kev.user_readback, 5.7)
+    set_mock_value(
+        fake_undulator_dcm.undulator_ref().gap_access, UndulatorGapAccess.DISABLED
+    )
+    set_mock_value(fake_undulator_dcm.undulator_ref().current_gap, 5.3)
+    set_mock_value(fake_undulator_dcm.dcm_ref().energy_in_kev.user_readback, 5.7)
 
-    set_mock_value(fake_undulator_dcm.undulator.gap_motor.user_setpoint, 0.0)
-    set_mock_value(fake_undulator_dcm.undulator.gap_motor.user_readback, 0.0)
+    set_mock_value(fake_undulator_dcm.undulator_ref().gap_motor.user_setpoint, 0.0)
+    set_mock_value(fake_undulator_dcm.undulator_ref().gap_motor.user_readback, 0.0)
 
     mock_load.return_value = np.array([[5700, 5.4606], [7000, 6.045], [9700, 6.404]])
 
     await fake_undulator_dcm.set(6.9)
 
-    assert (await fake_undulator_dcm.dcm.energy_in_kev.user_setpoint.get_value()) == 6.9
+    assert (
+        await fake_undulator_dcm.dcm_ref().energy_in_kev.user_setpoint.get_value()
+    ) == 6.9
     # Verify undulator has not been asked to move
     assert (
-        await fake_undulator_dcm.undulator.gap_motor.user_setpoint.get_value()
+        await fake_undulator_dcm.undulator_ref().gap_motor.user_setpoint.get_value()
     ) == 0.0
 
     mock_logger.info.assert_called()
@@ -116,41 +128,71 @@ async def test_when_gap_access_is_not_checked_if_test_mode_enabled(
 async def test_if_gap_is_already_correct_then_dont_move_gap(
     mock_logger: MagicMock, mock_load: MagicMock, fake_undulator_dcm: UndulatorDCM
 ):
-    set_mock_value(fake_undulator_dcm.dcm.energy_in_kev.user_setpoint, 0.0)
-    set_mock_value(fake_undulator_dcm.dcm.energy_in_kev.user_readback, 0.0)
+    set_mock_value(fake_undulator_dcm.dcm_ref().energy_in_kev.user_setpoint, 0.0)
+    set_mock_value(fake_undulator_dcm.dcm_ref().energy_in_kev.user_readback, 0.0)
 
     mock_load.return_value = np.array([[5700, 5.4606], [7000, 6.045], [9700, 6.404]])
-    set_mock_value(fake_undulator_dcm.undulator.current_gap, 5.4605)
+    set_mock_value(fake_undulator_dcm.undulator_ref().current_gap, 5.4605)
 
     await fake_undulator_dcm.set(5.8)
 
     # Verify undulator has not been asked to move
     assert (
-        await fake_undulator_dcm.undulator.gap_motor.user_setpoint.get_value()
+        await fake_undulator_dcm.undulator_ref().gap_motor.user_setpoint.get_value()
     ) == 0.0
     mock_logger.info.assert_called_once()
     mock_logger.debug.assert_called_once()
 
 
-async def test_energy_set_only_complete_when_all_statuses_are_finished(
+async def test_dcm_offset_only_set_when_energy_set_completes(
     fake_undulator_dcm: UndulatorDCM,
 ):
-    set_mock_value(fake_undulator_dcm.undulator.current_gap, 5.0)
+    set_mock_value(fake_undulator_dcm.undulator_ref().current_gap, 5.0)
 
     release_dcm = asyncio.Event()
     release_undulator = asyncio.Event()
 
-    fake_undulator_dcm.dcm.energy_in_kev.set = MagicMock(
+    fake_undulator_dcm.dcm_ref().energy_in_kev.set = MagicMock(
         return_value=AsyncStatus(release_dcm.wait())
     )
-    fake_undulator_dcm.undulator.gap_motor.set = MagicMock(
+    fake_undulator_dcm.undulator_ref().gap_motor.set = MagicMock(
+        return_value=AsyncStatus(release_undulator.wait())
+    )
+
+    offset_put = get_mock_put(fake_undulator_dcm.dcm_ref().offset_in_mm.user_setpoint)
+    status = fake_undulator_dcm.set(5.0)
+
+    await asyncio.wait([status.task], timeout=0.1)  # type: ignore
+    offset_put.assert_not_called()
+    release_dcm.set()
+    await asyncio.wait([status.task], timeout=0.1)  # type: ignore
+    offset_put.assert_not_called()
+    release_undulator.set()
+    await asyncio.wait_for(status, timeout=1)
+    offset_put.assert_called_with(25.6, wait=True)
+
+
+async def test_energy_set_only_complete_when_all_statuses_are_finished(
+    fake_undulator_dcm: UndulatorDCM,
+):
+    set_mock_value(fake_undulator_dcm.undulator_ref().current_gap, 5.0)
+
+    release_dcm = asyncio.Event()
+    release_undulator = asyncio.Event()
+
+    fake_undulator_dcm.dcm_ref().energy_in_kev.set = MagicMock(
+        return_value=AsyncStatus(release_dcm.wait())
+    )
+    fake_undulator_dcm.undulator_ref().gap_motor.set = MagicMock(
         return_value=AsyncStatus(release_undulator.wait())
     )
 
     status = fake_undulator_dcm.set(5.0)
 
+    await asyncio.wait([status.task], timeout=0.1)  # type: ignore
     assert not status.done
     release_dcm.set()
+    await asyncio.wait([status.task], timeout=0.1)  # type: ignore
     assert not status.done
     release_undulator.set()
     await asyncio.wait_for(status, timeout=0.02)
@@ -159,9 +201,13 @@ async def test_energy_set_only_complete_when_all_statuses_are_finished(
 async def test_when_undulator_gap_is_disabled_setting_energy_errors_and_dcm_energy_is_not_set(
     fake_undulator_dcm: UndulatorDCM,
 ):
-    set_mock_value(fake_undulator_dcm.undulator.gap_access, UndulatorGapAccess.DISABLED)
+    set_mock_value(
+        fake_undulator_dcm.undulator_ref().gap_access, UndulatorGapAccess.DISABLED
+    )
 
     with pytest.raises(AccessError):
         await fake_undulator_dcm.set(5)
 
-    get_mock_put(fake_undulator_dcm.dcm.energy_in_kev.user_setpoint).assert_not_called()
+    get_mock_put(
+        fake_undulator_dcm.dcm_ref().energy_in_kev.user_setpoint
+    ).assert_not_called()

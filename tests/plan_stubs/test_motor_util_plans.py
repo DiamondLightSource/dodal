@@ -4,14 +4,12 @@ import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
-from ophyd_async.core import (
-    Device,
-    DeviceCollector,
+from ophyd_async.core import Device, init_devices, soft_signal_rw
+from ophyd_async.epics.motor import Motor
+from ophyd_async.testing import (
     get_mock_put,
     set_mock_value,
-    soft_signal_rw,
 )
-from ophyd_async.epics.motor import Motor
 
 from dodal.devices.util.test_utils import patch_motor
 from dodal.plan_stubs.motor_utils import (
@@ -50,7 +48,7 @@ class DeviceWithSomeMotors(Device):
 
 @pytest.fixture
 def my_device(RE):
-    with DeviceCollector(mock=True):
+    with init_devices(mock=True):
         my_device = DeviceWithOnlyMotors()
     return my_device
 
@@ -63,7 +61,7 @@ def my_device(RE):
 def test_given_types_of_device_when_home_and_reset_wrapper_called_then_motors_and_zeros_passed_to_move_and_reset_wrapper(
     patch_move_and_reset, device_type, RE
 ):
-    with DeviceCollector(mock=True):
+    with init_devices(mock=True):
         device = device_type()
     home_and_reset_wrapper(MagicMock(), device, 0, 0)
 
