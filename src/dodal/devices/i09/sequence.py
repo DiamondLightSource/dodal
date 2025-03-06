@@ -67,8 +67,8 @@ class SESExcitationEnergySource(ToJson):
 @dataclass
 class SESSequence(ToJson):
     elementSet : str = field(default="Unknown")
-    excitationEnergySources: list[SESExcitationEnergySource] = field(default_factory=[])
-    regions : list[SESRegion] = field(default_factory=[])
+    excitationEnergySources: list[SESExcitationEnergySource] = field(default_factory = lambda : [])
+    regions : list[SESRegion] = field(default_factory = lambda : [])
 
     def get_enabled_regions(self) -> list[SESRegion]:
         return [r for r in self.regions if r.enabled]
@@ -113,6 +113,9 @@ if __name__ == "__main__":
     print(sequence.get_excitation_energy_source_by_region(sequence.regions[1]))
 
     print(sequence.get_region_names())
+
+    new_seq = SESSequence()
+    print(new_seq)
 
 
     print("===END===")

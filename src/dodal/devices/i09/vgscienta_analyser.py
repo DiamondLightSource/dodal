@@ -32,12 +32,12 @@ class VGScientaAnalyser(StandardReadable):
     PV_ITERATIONS = ADBASE + "NumExposures"
     PV_IMAGE_MODE = ADBASE + "ImageMode"
 
-    def __init__(self, prefix: str, name: str = "") -> None:
+    def __init__(self, prefix: str, name: str) -> None:
         self.prefix = prefix
 
         self.name = name
+        self.region = None
         self.excitation_energy = 0
-        self.energy_mode = EnergyMode.KINETIC
 
         self.low_energy_signal = epics_signal_w(float, self.prefix + VGScientaAnalyser.PV_LOW_ENERGY)
         self.high_energy_signal = epics_signal_w(float, self.prefix + VGScientaAnalyser.PV_HIGH_ENERGY)
@@ -70,9 +70,8 @@ class VGScientaAnalyser(StandardReadable):
         LOGGER.info("Configuring electron analyser with region {} and excitation_energy {}eV.", region.name, excitation_energy_eV)
 
         #Cache these values as not stored in epics
-        self.name = region.name
         self.excitation_energy = excitation_energy_eV
-        self.energy_mode = region.energyMode
+        self.region = region
 
         low_energy = region.lowEnergy if region.energyMode == EnergyMode.KINETIC else excitation_energy_eV - region.highEnergy
         high_energy = region.highEnergy if region.energyMode == EnergyMode.KINETIC else excitation_energy_eV - region.lowEnergy
