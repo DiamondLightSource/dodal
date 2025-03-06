@@ -32,7 +32,6 @@ The following example creates a fictitious beamline ``w41``, with a simulated tw
     from dodal.utils import get_beamline_name, skip_device
 
     BL = get_beamline_name("s41")  # Default used when not on a live beamline
-    PREFIX = BeamlinePrefix(BL)
     set_log_beamline(BL)  # Configure logging and util functions
     set_utils_beamline(BL)
 
