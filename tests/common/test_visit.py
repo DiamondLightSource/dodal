@@ -81,8 +81,48 @@ def test_start_document_based_path_provider_with_default_template_returns_correc
 
     assert path == PathInfo(directory_path=PosixPath('/p01/ab123'), filename='det-p01-22', create_dir_depth=0)
 
+
+@pytest.fixture
+def start_doc_custom_template() -> dict:
+    return {
+            "uid":"27c48d2f-d8c6-4ac0-8146-fedf467ce11f",
+            "time":1741264729.96875,
+            "versions":{
+                "ophyd":"1.10.0",
+                "bluesky":"1.13"
+            },
+            "data_session":"ab123",
+            "instrument":"p01",
+            "data_session_directory":"/p01/ab123",
+            "scan_id":22,
+            "template": "{device_name}-{instrument}-{scan_id}-custom",
+            "plan_type":"generator",
+            "plan_name":"count",
+            "detectors":[
+                "det"
+            ],
+            "num_points":1,
+            "num_intervals":0,
+            "plan_args":{
+                "detectors":[
+                    "<ophyd_async.epics.adaravis._aravis.AravisDetector object at 0x7f74c02b8710>"
+                ],
+                "num":1,
+                "delay":0.0
+            },
+            "hints":{
+                "dimensions":[[["time"],"primary"]]
+            },
+            "shape":[1]
+    }
+
 def test_start_document_based_path_provider_with_custom_template_returns_correct_path_info(start_doc_custom_template: RunStart):
-    ...
+    pp = StartDocumentBasedPathProvider()
+    pp.update_run(name = "start", start_doc = start_doc_custom_template)
+    path = pp("det")
+
+    assert path == PathInfo(directory_path=PosixPath('/p01/ab123'), filename='det-p01-22-custom', create_dir_depth=0)
+
 
 def test_start_document_based_path_provider_fails_with_missing_keys(start_doc_missing_keys: RunStart):
     """Raise exception with sensible error"""
