@@ -231,3 +231,12 @@ def test_start_document_based_path_provider_sets_data_session_directory_default_
     assert path == PathInfo(
         directory_path=PosixPath("/tmp"), filename="det-p01-22", create_dir_depth=0
     )
+
+
+def test_start_document_based_path_provider_update_called_with_different_document_skips(
+    start_doc_default_template: RunStart,
+):
+    pp = StartDocumentBasedPathProvider()
+    pp.update_run(name="descriptor", start_doc=start_doc_default_template)
+
+    assert pp._doc == {}
