@@ -1,37 +1,10 @@
-import pickle
-from collections import defaultdict
-from pathlib import Path
-from unittest import mock
-from unittest.mock import Mock
-
-import numpy as np
 import pytest
-from bluesky.plans import scan
-from bluesky.run_engine import RunEngine
-from numpy import poly1d
 from ophyd_async.core import init_devices
 from ophyd_async.testing import (
-    assert_emitted,
-    callback_on_mock_put,
     get_mock_put,
-    set_mock_value,
 )
 
-from dodal.devices.apple2_undulator import (
-    UndulatorGap,
-    UndulatorGateStatus,
-    UndulatorJawPhase,
-    UndulatorPhaseAxes,
-)
 from dodal.devices.i10.diagnostics import D3Position, D5APosition, Positioner
-from dodal.devices.i10.i10_apple2 import (
-    DEFAULT_JAW_PHASE_POLY_PARAMS,
-    I10Apple2,
-    I10Apple2PGM,
-    I10Apple2Pol,
-    LinearArbitraryAngle,
-    convert_csv_to_lookup,
-)
 
 
 @pytest.fixture
