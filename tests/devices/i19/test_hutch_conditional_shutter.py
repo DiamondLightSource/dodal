@@ -49,10 +49,10 @@ async def test_shutter_created_for_eh_one_without_raising_errors():
     fake_prefix = "B52"
     hutch_one_from_which_shutter_is_controlled = HutchState.EH1
     shutter_name = "shutter_of_hutch_one"
-    hcs = HutchConditionalShutter(
+    hcs1 = HutchConditionalShutter(
         fake_prefix, hutch_one_from_which_shutter_is_controlled, shutter_name
     )
-    assertIsInstance(hcs, HutchConditionalShutter)
+    assert_is_instance(hcs1, HutchConditionalShutter)
 
 
 # Constructor Test
@@ -60,10 +60,10 @@ async def test_shutter_created_for_eh_two_without_raising_errors():
     fake_prefix = "J2"
     hutch_two_from_which_shutter_is_controlled = HutchState.EH2
     shutter_name = "shutter_of_hutch_two"
-    hcs = HutchConditionalShutter(
+    hcs2 = HutchConditionalShutter(
         fake_prefix, hutch_two_from_which_shutter_is_controlled, shutter_name
     )
-    assertIsInstance(hcs, HutchConditionalShutter)
+    assert_is_instance(hcs2, HutchConditionalShutter)
 
 
 # Functional Test
@@ -146,15 +146,5 @@ async def test_shutter_raises_error_for_hutch_in_use_but_not_safe_to_operate(
 # Auxiliary functions below
 
 
-def assertIsInstance(an_instance, expected_type):
+def assert_is_instance(an_instance, expected_type):
     assert isinstance(an_instance, expected_type)
-
-
-# Constructor auxiliary
-async def assert_shutter_created_without_raising_errors(
-    hutch_controlling_shutter: HutchState,
-    fake_prefix="I74",
-    shutter_name="GrandOldHutchShutter",
-):
-    hcs = HutchConditionalShutter(fake_prefix, hutch_controlling_shutter, shutter_name)
-    assertIsInstance(hcs, HutchConditionalShutter)
