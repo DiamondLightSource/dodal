@@ -55,7 +55,7 @@ dev = [
     "pre-commit",
     "psutil",
     "pydata-sphinx-theme>=0.12",
-    "pyright==1.1.394",          # See https://github.com/DiamondLightSource/dodal/issues/1079
+    "pyright",
     "pytest",
     "pytest-asyncio",
     "pytest-cov",
