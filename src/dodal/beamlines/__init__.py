@@ -13,6 +13,7 @@ _BEAMLINE_NAME_OVERRIDES = {
     "i20-1": "i20_1",
     "i19-1": "i19_1",
     "i19-2": "i19_2",
+    "i19-optics": "i19_optics",
     "s03": "i03",
     "p46": "training_rig",
     "p47": "training_rig",
