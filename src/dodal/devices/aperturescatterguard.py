@@ -123,7 +123,7 @@ def load_positions_from_beamline_parameters(
     }
 
 
-class ApertureScatterguard(StandardReadable, Movable, Preparable):
+class ApertureScatterguard(StandardReadable, Movable[ApertureValue], Preparable):
     """Move the aperture and scatterguard assembly in a safe way. There are two ways to
     interact with the device depending on if you want simplicity or move flexibility.
 
