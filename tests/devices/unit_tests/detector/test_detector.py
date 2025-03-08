@@ -45,7 +45,11 @@ def test_if_path_provided_check_is_dir(tmp_path: Path):
 
 
 @patch(
-    "src.dodal.devices.detector.DetectorDistanceToBeamXYConverter.parse_table",
+    "dodal.devices.detector.det_dist_to_beam_converter.parse_lookup_table",
+)
+@patch(
+    "dodal.devices.detector.det_dist_to_beam_converter.linear_extrapolation_lut",
+    MagicMock(),
 )
 def test_correct_det_dist_to_beam_converter_path_passed_in(
     mocked_parse_table, tmp_path: Path
@@ -69,7 +73,7 @@ def test_correct_det_dist_to_beam_converter_path_passed_in(
 
 
 @patch(
-    "src.dodal.devices.detector.DetectorDistanceToBeamXYConverter.parse_table",
+    "dodal.devices.detector.det_dist_to_beam_converter.parse_lookup_table",
 )
 def test_run_number_correct_when_not_specified(mocked_parse_table, tmp_path):
     params = DetectorParams(
@@ -90,7 +94,7 @@ def test_run_number_correct_when_not_specified(mocked_parse_table, tmp_path):
 
 
 @patch(
-    "src.dodal.devices.detector.DetectorDistanceToBeamXYConverter.parse_table",
+    "dodal.devices.detector.det_dist_to_beam_converter.parse_lookup_table",
 )
 def test_run_number_correct_when_specified(mocked_parse_table, tmp_path):
     params = DetectorParams(
