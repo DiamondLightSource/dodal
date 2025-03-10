@@ -46,7 +46,7 @@ ZOOM_PARAMS_FILE = (
 DISPLAY_CONFIG = "/dls_sw/i04/software/gda_versions/var/display.configuration"
 DAQ_CONFIGURATION_PATH = "/dls_sw/i04/software/daq_configuration"
 
-REDIS_HOST = os.environ.get("VALKEY_PROD_SVC_SERVICE_HOST", "test_redis")
+REDIS_HOST = "i04-valkey-murko.diamond.ac.uk"
 REDIS_PASSWORD = os.environ.get("VALKEY_PASSWORD", "test_redis_password")
 MURKO_REDIS_DB = 7
 
