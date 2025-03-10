@@ -16,7 +16,7 @@ dependencies = [
     "click",
     "ophyd",
     "ophyd-async >= 0.9.0a2",
-    "bluesky",
+    "bluesky == 1.13.0",
     "pyepics",
     "dataclasses-json",
     "pillow",
@@ -45,6 +45,7 @@ dev = [
     "black",
     "diff-cover",
     "import-linter",
+    "ispyb",
     "mypy",
     # Commented out due to dependency version conflict with pydantic 1.x
     # "copier",

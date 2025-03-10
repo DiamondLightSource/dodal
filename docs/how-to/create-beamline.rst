@@ -7,7 +7,7 @@ They include motors in the experiment hutch, optical components in the optics hu
 Beamline Modules
 ----------------
 
-Each beamline should have its own file in the ``doodal.beamlines`` folder, in which the particular devices for the 
+Each beamline should have its own file in the ``dodal.beamlines`` folder, in which the particular devices for the 
 beamline are instantiated. The file should be named after the colloquial name for the beamline. For example:
 
 * ``i03.py``
@@ -24,56 +24,67 @@ The following example creates a fictitious beamline ``w41``, with a simulated tw
 ``s41`` has a simulated clone of the AdAravisDetector, but not of the Synchrotron machine.
 
 .. code-block:: python
+    from ophyd_async.epics.adaravis import AravisDetector
 
-    from dodal.common.beamlines.beamline_utils import device_instantiation
+    from dodal.common.beamlines.beamline_utils import (
+        device_factory,
+        get_path_provider,
+        set_path_provider,
+    )
     from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-    from dodal.devices.areadetector.adaravis import AdAravisDetector
+    from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
+    from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
     from dodal.devices.synchrotron import Synchrotron
     from dodal.log import set_beamline as set_log_beamline
-    from dodal.utils import get_beamline_name, skip_device
+    from dodal.utils import BeamlinePrefix
 
     BL = get_beamline_name("s41")  # Default used when not on a live beamline
+    PREFIX = BeamlinePrefix(BL)
     set_log_beamline(BL)  # Configure logging and util functions
     set_utils_beamline(BL)
 
+    # Currently we must hard-code the visit, determining the visit is WIP.
+    set_path_provider(
+        StaticVisitPathProvider(
+            BL,
+            # Root directory for all detectors
+            Path("/dls/w41/data/YYYY/cm12345-1"),
+            # Uses an existing GDA server to ensure filename uniqueness
+            client=RemoteDirectoryServiceClient("http://s41-control:8088/api"),
+            # Else if no GDA server use a LocalDirectoryServiceClient(),
+        )
+    )
 
     """
     Define device factory functions below this point.
-    A device factory function is any function that has a return type which conforms 
+    A device factory function is any function that has a return type which conforms
     to one or more Bluesky Protocols.
     """
 
-
     """
-    A valid factory function which is:
-    - instantiated only on the live beamline
-    - a maximum of once
-    - can optionally be faked with ophyd simulated axes
-    - can optionally be connected concurrently by not waiting for connect to complete
-    - if constructor took a prefix, could optionally exclude the BLIXX prefix
+    A valid factory function which:
+    - may be instantiated automatically, selectively on live beamline
+        - caches and re-uses the result for subsequent calls
+    - automatically names the device
+    - may be skipped when make_all_devices is called on this module
+    - must be explicitly connected (may be automated by tools)
+        - when connected may connect to a simulated backend
+        - may be connected concurrently (when automated by tools)
     """"
-    @skip_device(lambda: BL == "s41")  # Conditionally do not instantiate this device
-    def synchrotron(
-        wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-    ) -> Synchrotron:
-        """Calls the Synchrotron class's constructor with name="synchrotron", prefix=""
-        If this is called when already instantiated, it will return the existing object.
-        """
-        return device_instantiation(
-            Synchrotron,
-            "synchrotron",
-            "",
-            wait_for_connection,
-            fake_with_ophyd_sim,
-            bl_prefix=False,
+    @device_factory(skip = BL == "s41")
+    def synchrotron() -> Synchrotron:
+        return Synchrotron()
+
+
+    @device_factory()
+    def d11() -> AravisDetector:
+        return AravisDetector(
+            f"{PREFIX.beamline_prefix}-DI-DCAM-01:",
+            path_provider=get_path_provider(),
+            drv_suffix=CAM_SUFFIX,
+            fileio_suffix=HDF5_SUFFIX,
         )
 
-    def d11(name: str = "D11") -> AdAravisDetector:
-        """
-        Also a valid Device factory function, but as multiple calls would instantiate
-        multiple copies of a device, discouraged.
-        """
-        return AdAravisDetector(name=name, prefix=f"{BL}-DI-DCAM-01:")
 
 ``w41`` should also be added to the list of ``ALL_BEAMLINES`` in ``tests/beamlines/test_device_instantiation``.
 This test checks that the function returns a type that conforms to Bluesky protocols, 
