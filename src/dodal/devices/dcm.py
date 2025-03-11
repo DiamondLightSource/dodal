@@ -20,6 +20,27 @@ class DCM(StandardReadable):
     offset ensures that the beam exits the DCM at the same point, regardless of energy.
     """
 
+    """
+    Common signals:
+    - brag_degrees
+    - roll mrad / urad (convert this in device?)
+    - offset
+    - energy in kev (virtual)
+    - pitch
+    - wavelength (virtual) - but vmxm and i22 still need to add this
+    - dspacing
+    
+        
+    """
+
+    """
+    specific:
+    - perp motor (i03/i04)
+    - beam_height_offset (i03/4)
+        
+            
+    """
+
     def __init__(
         self,
         prefix: str,
