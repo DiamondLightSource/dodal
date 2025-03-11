@@ -79,7 +79,7 @@ dodal.devices.detector.DetectorParams
       ~DetectorParams.expected_energy_ev
       
       
-      ~DetectorParams.exposure_time
+      ~DetectorParams.exposure_time_s
       
       
       ~DetectorParams.directory

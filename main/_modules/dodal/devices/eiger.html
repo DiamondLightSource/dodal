@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.eiger &#8212; dodal 1.41.1.dev8+gfcfe95f33 documentation</title>
+    <title>dodal.devices.eiger &#8212; dodal 1.41.1.dev9+g94519bfa5 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=7784f5f8"></script>
+    <script src="../../../_static/documentation_options.js?v=408309ed"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -684,11 +684,11 @@ window.addEventListener("load", () => mermaid.run());
     <span class="k">def</span><span class="w"> </span><span class="nf">set_cam_pvs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AndStatus</span><span class="p">:</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">acquire_time</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span><span class="o">.</span><span class="n">exposure_time</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span><span class="o">.</span><span class="n">exposure_time_s</span><span class="p">,</span>
             <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span><span class="o">.</span><span class="n">general_status_timeout</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">status</span> <span class="o">&amp;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">acquire_period</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span><span class="o">.</span><span class="n">exposure_time</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">detector_params</span><span class="o">.</span><span class="n">exposure_time_s</span><span class="p">,</span>
             <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeouts</span><span class="o">.</span><span class="n">general_status_timeout</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">status</span> <span class="o">&amp;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cam</span><span class="o">.</span><span class="n">num_exposures</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
