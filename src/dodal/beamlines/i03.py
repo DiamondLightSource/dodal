@@ -112,8 +112,8 @@ def dcm() -> DCM:
     If this is called when already instantiated in i03, it will return the existing object.
     """
     return DCM(
-        f"{PREFIX.beamline_prefix}-MO-DCM-01:",
-        "dcm",
+        prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:",
+        name="dcm",
     )
 
 
