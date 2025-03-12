@@ -110,6 +110,11 @@ class ZoomParams:
     crosshair: tuple[int, int]
 
 
+@dataclass
+class ZoomParamsBeamCentre:
+    microns_per_pixel: tuple[float, float]
+
+
 class OAVConfig:
     """ Read the OAV config files and return a dictionary of {'zoom_level': ZoomParams}\
     with information about microns per pixels and crosshairs.
@@ -156,5 +161,19 @@ class OAVConfig:
             config[zoom_key] = ZoomParams(
                 microns_per_pixel=um_xy[zoom_key],
                 crosshair=bc_xy[zoom_key],
+            )
+        return config
+
+
+class OAVConfigBeamCentre(OAVConfig):
+    def __init__(self, zoom_params_file: str):
+        self.zoom_params = self._get_zoom_params(zoom_params_file)
+
+    def get_parameters(self) -> dict[str, ZoomParams]:
+        config = {}
+        um_xy = self._read_zoom_params()
+        for zoom_key in list(um_xy.keys()):
+            config[zoom_key] = ZoomParamsBeamCentre(
+                microns_per_pixel=um_xy[zoom_key],
             )
         return config

@@ -11,9 +11,10 @@ from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.common.signal_utils import create_hardware_backed_soft_signal
 from dodal.devices.areadetector.plugins.CAM import Cam
-from dodal.devices.oav.oav_parameters import DEFAULT_OAV_WINDOW, OAVConfig
+from dodal.devices.oav.oav_parameters import DEFAULT_OAV_WINDOW, OAVConfig, OAVConfigBeamCentre
 from dodal.devices.oav.snapshots.snapshot_with_beam_centre import SnapshotWithBeamCentre
 from dodal.devices.oav.snapshots.snapshot_with_grid import SnapshotWithGrid
+from ophyd_async.epics.core import epics_signal_r
 
 
 class Coords(IntEnum):
@@ -116,3 +117,24 @@ class OAV(StandardReadable):
         self.parameters = self.oav_config.get_parameters()
 
         return await super().connect(mock, timeout, force_reconnect)
+
+
+class OAVBeamCenter(OAV):
+    def __init__(self, prefix: str,
+                 config: OAVConfigBeamCentre,
+                 name: str = "",
+                 roi=True):
+        if roi:
+            beam_centre_x = epics_signal_r(int, prefix + "OVER:1:CenterX")
+            beam_centre_y = epics_signal_r(int, prefix + "OVER:1:CenterY")
+        else:
+            beam_centre_x = epics_signal_r(int, prefix + "OVER:3:CenterX")
+            beam_centre_y = epics_signal_r(int, prefix + "OVER:3:CenterY")
+        self.beam_centre = (beam_centre_x, beam_centre_y)
+        super().__init__(prefix, config, name)
+
+    async def _get_beam_position(self, coord: int) -> int:
+        """Extracts the beam location in pixels `xCentre` `yCentre`. """
+        value = await self.beam_centre[coord].get_value()
+        size = await self.sizes[coord].get_value()
+        return int(value * size / DEFAULT_OAV_WINDOW[coord])
