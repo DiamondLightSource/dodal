@@ -111,7 +111,7 @@ class ZoomParams:
 
 
 @dataclass
-class ZoomParamsBeamCentre:
+class ZoomParamsNoBeamCentre:
     microns_per_pixel: tuple[float, float]
 
 
@@ -165,7 +165,7 @@ class OAVConfig:
         return config
 
 
-class OAVConfigBeamCentre(OAVConfig):
+class OAVConfigNoBeamCentre(OAVConfig):
     def __init__(self, zoom_params_file: str):
         self.zoom_params = self._get_zoom_params(zoom_params_file)
 
@@ -173,7 +173,7 @@ class OAVConfigBeamCentre(OAVConfig):
         config = {}
         um_xy = self._read_zoom_params()
         for zoom_key in list(um_xy.keys()):
-            config[zoom_key] = ZoomParamsBeamCentre(
+            config[zoom_key] = ZoomParamsNoBeamCentre(
                 microns_per_pixel=um_xy[zoom_key],
             )
         return config

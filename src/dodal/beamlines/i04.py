@@ -20,8 +20,8 @@ from dodal.devices.flux import Flux
 from dodal.devices.i04.transfocator import Transfocator
 from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZPositioner
-from dodal.devices.oav.oav_detector import OAV, OAVBeamCenter
-from dodal.devices.oav.oav_parameters import OAVConfig, OAVConfigBeamCentre
+from dodal.devices.oav.oav_detector import OAV, OAVBeamCentre
+from dodal.devices.oav.oav_parameters import OAVConfig, OAVConfigNoBeamCentre
 from dodal.devices.oav.oav_to_redis_forwarder import OAVToRedisForwarder
 from dodal.devices.robot import BartRobot
 from dodal.devices.s4_slit_gaps import S4SlitGaps
@@ -297,16 +297,16 @@ def zebra() -> Zebra:
 def oav(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
-    params: OAVConfigBeamCentre | None = None,
+    params: OAVConfigNoBeamCentre | None = None,
     roi: bool = True,
-) -> OAVBeamCenter:
+) -> OAVBeamCentre:
     """Get the i04 OAV device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return OAVBeamCenter(
+    return OAVBeamCentre(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
         name="oav",
-        config=params or OAVConfigBeamCentre(ZOOM_PARAMS_FILE),
+        config=params or OAVConfigNoBeamCentre(ZOOM_PARAMS_FILE),
         roi=roi,
     )
 

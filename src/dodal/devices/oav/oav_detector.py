@@ -14,7 +14,7 @@ from dodal.devices.areadetector.plugins.CAM import Cam
 from dodal.devices.oav.oav_parameters import (
     DEFAULT_OAV_WINDOW,
     OAVConfig,
-    OAVConfigBeamCentre,
+    OAVConfigNoBeamCentre,
 )
 from dodal.devices.oav.snapshots.snapshot_with_beam_centre import SnapshotWithBeamCentre
 from dodal.devices.oav.snapshots.snapshot_with_grid import SnapshotWithGrid
@@ -122,9 +122,9 @@ class OAV(StandardReadable):
         return await super().connect(mock, timeout, force_reconnect)
 
 
-class OAVBeamCenter(OAV):
+class OAVBeamCentre(OAV):
     def __init__(
-        self, prefix: str, config: OAVConfigBeamCentre, name: str = "", roi=True
+        self, prefix: str, config: OAVConfigNoBeamCentre, name: str = "", roi=True
     ):
         beam_centre_roi_x = epics_signal_r(int, prefix + "OVER:1:CenterX")
         beam_centre_roi_y = epics_signal_r(int, prefix + "OVER:1:CenterY")
