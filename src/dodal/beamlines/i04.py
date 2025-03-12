@@ -307,7 +307,7 @@ def oav(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
         name="oav",
         config=params or OAVConfigBeamCentre(ZOOM_PARAMS_FILE),
-        roi=roi
+        roi=roi,
     )
 
 

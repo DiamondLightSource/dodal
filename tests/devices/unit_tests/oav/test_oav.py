@@ -6,6 +6,7 @@ from ophyd_async.testing import set_mock_value
 from dodal.devices.oav.oav_detector import (
     OAV,
     Cam,
+    OAVBeamCenter,
     ZoomController,
 )
 
@@ -118,3 +119,6 @@ async def test_when_snapshot_triggered_post_processing_called_correctly(
     await oav.snapshot.trigger()
 
     mock_proc.assert_awaited_once()
+
+
+test_oav_beam
