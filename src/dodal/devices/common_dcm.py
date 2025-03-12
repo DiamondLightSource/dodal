@@ -10,9 +10,6 @@ from ophyd_async.epics.motor import Motor
 
 class Crystal(StandardReadable):
     def __init__(self, prefix):
-        self.crystal_metadata_d_spacing_a = epics_signal_r(
-            float, prefix + "DSPACING:RBV"
-        )
         super().__init__(prefix)
 
 
@@ -56,6 +53,10 @@ class BaseDCM(StandardReadable, Generic[Xtals]):
             self.bragg_in_degrees = Motor(prefix + "BRAGG")
             # Offset ensures that the beam exits the DCM at the same point, regardless of energy.
             self.offset_in_mm = Motor(prefix + "OFFSET")
+
+            self.crystal_metadata_d_spacing_a = epics_signal_r(
+                float, prefix + "DSPACING:RBV"
+            )
 
             _device_vector_dict = self._make_device_vector_dict(prefix, crystal_type)
             self.crystals: DeviceVector[Crystal] = DeviceVector(_device_vector_dict)
