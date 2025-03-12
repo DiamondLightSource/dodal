@@ -69,13 +69,12 @@ class SingleMirrorVoltage(Device):
         3. Wait until demand is accepted
         4. When either demand is accepted or DEFAULT_SETTLE_TIME expires, signal the result on the Status
         """
-
         setpoint_v = self._setpoint_v
         demand_accepted = self._demand_accepted
 
         if await demand_accepted.get_value() != MirrorVoltageDemand.OK:
             raise AssertionError(
-                f"Attempted to set {setpoint_v.name} when demand is not accepted."
+                f"Attempted to set {setpoint_v.name} when demand is not accepted.",
             )
 
         if await setpoint_v.get_value() == value:
@@ -87,7 +86,7 @@ class SingleMirrorVoltage(Device):
         # Register an observer up front to ensure we don't miss events after we
         # perform the set
         demand_accepted_iterator = observe_value(
-            demand_accepted, timeout=DEFAULT_SETTLE_TIME_S
+            demand_accepted, timeout=DEFAULT_SETTLE_TIME_S,
         )
         # discard the current value (OK) so we can await a subsequent change
         await anext(demand_accepted_iterator)
@@ -99,21 +98,21 @@ class SingleMirrorVoltage(Device):
         accepted_value = await anext(demand_accepted_iterator)
         assert accepted_value == MirrorVoltageDemand.SLEW
         LOGGER.debug(f"Waiting for {setpoint_v.name} to set")
-        while MirrorVoltageDemand.SLEW == (
+        while (
             accepted_value := await anext(demand_accepted_iterator)
-        ):
+        ) == MirrorVoltageDemand.SLEW:
             pass
 
         if accepted_value != MirrorVoltageDemand.OK:
             raise AssertionError(
-                f"Voltage slew failed for {setpoint_v.name}, new state={accepted_value}"
+                f"Voltage slew failed for {setpoint_v.name}, new state={accepted_value}",
             )
         await set_status
 
 
 class MirrorVoltages(StandardReadable):
     def __init__(
-        self, name: str, prefix: str, *args, daq_configuration_path: str, **kwargs
+        self, name: str, prefix: str, *args, daq_configuration_path: str, **kwargs,
     ):
         self.voltage_lookup_table_path = (
             daq_configuration_path + "/json/mirrorFocus.json"
@@ -130,7 +129,7 @@ class MirrorVoltages(StandardReadable):
             {
                 i - start_idx: SingleMirrorVoltage(prefix=f"{prefix}BM:V{i}")
                 for i in range(start_idx, end_idx)
-            }
+            },
         )
 
 
@@ -172,7 +171,8 @@ class FocusingMirror(StandardReadable):
 
 class FocusingMirrorWithStripes(FocusingMirror):
     """A focusing mirror where the stripe material can be changed. This is usually done
-    based on the energy of the beamline."""
+    based on the energy of the beamline.
+    """
 
     def __init__(self, prefix: str, name: str = "", *args, **kwargs):
         self.stripe = epics_signal_rw(MirrorStripe, prefix + "STRP:DVAL")
@@ -186,5 +186,4 @@ class FocusingMirrorWithStripes(FocusingMirror):
         # In future, this should be configurable per-mirror
         if energy_kev < 7:
             return {"stripe": MirrorStripe.BARE, "yaw_mrad": 6.2, "lat_mm": 0.0}
-        else:
-            return {"stripe": MirrorStripe.RHODIUM, "yaw_mrad": 0.0, "lat_mm": 10.0}
+        return {"stripe": MirrorStripe.RHODIUM, "yaw_mrad": 0.0, "lat_mm": 10.0}

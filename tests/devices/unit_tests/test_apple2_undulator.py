@@ -68,7 +68,7 @@ async def mock_phaseAxes(prefix: str = "BLXX-EA-DET-007:") -> UndulatorPhaseAxes
 async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndulatorJawPhase:
     async with init_devices(mock=True):
         mock_jaw_phase = UndulatorJawPhase(
-            prefix=prefix, move_pv="RPQ1", jaw_phase="JAW"
+            prefix=prefix, move_pv="RPQ1", jaw_phase="JAW",
         )
     set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.CLOSE)
     set_mock_value(mock_jaw_phase.jaw_phase.velocity, 2)
@@ -118,7 +118,7 @@ async def test_gap_cal_timout(
 
 
 async def test_given_gate_never_closes_then_setting_gaps_times_out(
-    mock_id_gap: UndulatorGap, RE: RunEngine
+    mock_id_gap: UndulatorGap, RE: RunEngine,
 ):
     callback_on_mock_put(
         mock_id_gap.user_setpoint,
@@ -165,7 +165,7 @@ async def test_gap_success_scan(mock_id_gap: UndulatorGap, RE: RunEngine):
 
 
 async def test_given_gate_never_closes_then_setting_phases_times_out(
-    mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngine
+    mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngine,
 ):
     setValue = Apple2PhasesVal("3", "2", "5", "7")
 
@@ -218,13 +218,13 @@ async def test_phase_cal_timout(
     set_mock_value(mock_phaseAxes.btm_outer.user_setpoint_demand_readback, target[3])
 
     assert await mock_phaseAxes.get_timeout() == pytest.approx(
-        expected_timeout, rel=0.1
+        expected_timeout, rel=0.1,
     )
 
 
 async def test_phase_success_set(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngine):
     set_value = Apple2PhasesVal(
-        top_inner="3", top_outer="2", btm_inner="5", btm_outer="7"
+        top_inner="3", top_outer="2", btm_inner="5", btm_outer="7",
     )
     callback_on_mock_put(
         mock_phaseAxes.top_inner.user_setpoint,
@@ -254,16 +254,16 @@ async def test_phase_success_set(mock_phaseAxes: UndulatorPhaseAxes, RE: RunEngi
     RE(bps.abs_set(mock_phaseAxes, set_value, wait=True))
     get_mock_put(mock_phaseAxes.set_move).assert_called_once_with(1, wait=True)
     get_mock_put(mock_phaseAxes.top_inner.user_setpoint).assert_called_once_with(
-        set_value.top_inner, wait=True
+        set_value.top_inner, wait=True,
     )
     get_mock_put(mock_phaseAxes.top_outer.user_setpoint).assert_called_once_with(
-        set_value.top_outer, wait=True
+        set_value.top_outer, wait=True,
     )
     get_mock_put(mock_phaseAxes.btm_inner.user_setpoint).assert_called_once_with(
-        set_value.btm_inner, wait=True
+        set_value.btm_inner, wait=True,
     )
     get_mock_put(mock_phaseAxes.btm_outer.user_setpoint).assert_called_once_with(
-        set_value.btm_outer, wait=True
+        set_value.btm_outer, wait=True,
     )
 
     expected_in_reading = {
@@ -331,7 +331,7 @@ async def test_jaw_phase_cal_timout(
     set_mock_value(mock_jaw_phase.jaw_phase.user_setpoint_demand_readback, target)
 
     assert await mock_jaw_phase.get_timeout() == pytest.approx(
-        expected_timeout, rel=0.1
+        expected_timeout, rel=0.1,
     )
 
 

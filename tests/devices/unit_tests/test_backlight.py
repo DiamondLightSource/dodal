@@ -38,7 +38,7 @@ async def test_backlight_can_be_written_and_read_from(fake_backlight: Backlight)
 
 @patch("dodal.devices.backlight.sleep", autospec=True)
 async def test_when_backlight_moved_out_it_switches_off(
-    mock_sleep: AsyncMock, fake_backlight: Backlight, RE: RunEngine
+    mock_sleep: AsyncMock, fake_backlight: Backlight, RE: RunEngine,
 ):
     RE(bps.mv(fake_backlight, BacklightPosition.OUT))  # type: ignore # See: https://github.com/DiamondLightSource/dodal/issues/827
     assert await fake_backlight.position.get_value() == BacklightPosition.OUT
@@ -47,7 +47,7 @@ async def test_when_backlight_moved_out_it_switches_off(
 
 @patch("dodal.devices.backlight.sleep", autospec=True)
 async def test_when_backlight_moved_in_it_switches_on(
-    mock_sleep, fake_backlight: Backlight, RE: RunEngine
+    mock_sleep, fake_backlight: Backlight, RE: RunEngine,
 ):
     RE(bps.mv(fake_backlight, BacklightPosition.IN))  # type: ignore # See: https://github.com/DiamondLightSource/dodal/issues/827
     assert await fake_backlight.position.get_value() == BacklightPosition.IN
@@ -56,7 +56,7 @@ async def test_when_backlight_moved_in_it_switches_on(
 
 @patch("dodal.devices.backlight.sleep", autospec=True)
 async def test_given_backlight_in_when_backlight_moved_in_it_does_not_sleep(
-    mock_sleep: AsyncMock, fake_backlight: Backlight, RE: RunEngine
+    mock_sleep: AsyncMock, fake_backlight: Backlight, RE: RunEngine,
 ):
     set_mock_value(fake_backlight.position, BacklightPosition.IN)
     RE(bps.mv(fake_backlight, BacklightPosition.IN))  # type: ignore # See: https://github.com/DiamondLightSource/dodal/issues/827
@@ -65,7 +65,7 @@ async def test_given_backlight_in_when_backlight_moved_in_it_does_not_sleep(
 
 @patch("dodal.devices.backlight.sleep", autospec=True)
 async def test_given_backlight_out_when_backlight_moved_in_it_sleeps(
-    mock_sleep: AsyncMock, fake_backlight: Backlight, RE: RunEngine
+    mock_sleep: AsyncMock, fake_backlight: Backlight, RE: RunEngine,
 ):
     set_mock_value(fake_backlight.position, BacklightPosition.OUT)
     RE(bps.mv(fake_backlight, BacklightPosition.IN))  # type: ignore # See: https://github.com/DiamondLightSource/dodal/issues/827

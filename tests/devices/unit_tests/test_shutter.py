@@ -26,7 +26,7 @@ async def sim_shutter():
 
 @pytest.mark.parametrize("new_state", [ZebraShutterState.OPEN, ZebraShutterState.CLOSE])
 async def test_set_shutter_open(
-    sim_shutter: ZebraShutter, new_state: ZebraShutterState
+    sim_shutter: ZebraShutter, new_state: ZebraShutterState,
 ):
     await sim_shutter.set(new_state)
     reading = await sim_shutter.read()

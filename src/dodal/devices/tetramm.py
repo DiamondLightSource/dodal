@@ -147,7 +147,7 @@ class TetrammController(DetectorController):
             raise ValueError(
                 f"{self.__class__.__name__} only supports the following trigger "
                 f"types: {supported_trigger_types} but was asked to "
-                f"use {trigger}"
+                f"use {trigger}",
             )
 
     async def disarm(self):
@@ -167,13 +167,13 @@ class TetrammController(DetectorController):
         Raises:
             ValueError: If exposure is too low to collect the required number
             of readings per frame.
-        """
 
+        """
         # Set up the number of readings across the exposure period to scale with
         # the exposure time
         self._set_minimum_exposure(exposure)
         values_per_reading: int = int(
-            exposure * self.base_sample_rate / self.readings_per_frame
+            exposure * self.base_sample_rate / self.readings_per_frame,
         )
 
         await self._drv.values_per_reading.set(values_per_reading)
@@ -198,10 +198,10 @@ class TetrammController(DetectorController):
         if exposure < time_per_reading:
             raise ValueError(
                 "Tetramm exposure time must be at least "
-                f"{time_per_reading}s, asked to set it to {exposure}s"
+                f"{time_per_reading}s, asked to set it to {exposure}s",
             )
         self.readings_per_frame = int(
-            min(self.maximum_readings_per_frame, exposure / time_per_reading)
+            min(self.maximum_readings_per_frame, exposure / time_per_reading),
         )
 
 

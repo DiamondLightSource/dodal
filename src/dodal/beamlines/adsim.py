@@ -24,7 +24,7 @@ set_path_provider(
         BL,
         Path("/tmp"),
         client=LocalDirectoryServiceClient(),
-    )
+    ),
 )
 
 """

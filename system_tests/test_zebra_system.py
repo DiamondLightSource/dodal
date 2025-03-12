@@ -4,7 +4,7 @@ from dodal.beamlines.i03 import I03_ZEBRA_MAPPING
 from dodal.devices.zebra.zebra import ArmDemand, Zebra
 
 
-@pytest.fixture()
+@pytest.fixture
 async def zebra():
     zebra = Zebra(name="zebra", prefix="BL03S-EA-ZEBRA-01:", mapping=I03_ZEBRA_MAPPING)
     yield zebra

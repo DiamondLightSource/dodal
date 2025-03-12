@@ -30,8 +30,7 @@ def _get_correct_zoom_string(zoom: str) -> str:
 
 
 class ZoomController(StandardReadable, Movable):
-    """
-    Device to control the zoom level. This should be set like
+    """Device to control the zoom level. This should be set like
         o = OAV(name="oav")
         oav.zoom_controller.set("1.0x")
 
@@ -72,10 +71,10 @@ class OAV(StandardReadable):
                 lambda: self._get_microns_per_pixel(Coords.Y),
             )
             self.beam_centre_i = create_hardware_backed_soft_signal(
-                int, lambda: self._get_beam_position(Coords.X)
+                int, lambda: self._get_beam_position(Coords.X),
             )
             self.beam_centre_j = create_hardware_backed_soft_signal(
-                int, lambda: self._get_beam_position(Coords.Y)
+                int, lambda: self._get_beam_position(Coords.Y),
             )
             self.snapshot = SnapshotWithBeamCentre(
                 f"{self._prefix}MJPG:",
@@ -101,7 +100,8 @@ class OAV(StandardReadable):
 
     async def _get_beam_position(self, coord: int) -> int:
         """Extracts the beam location in pixels `xCentre` `yCentre`, for a requested \
-        zoom level. """
+        zoom level.
+        """
         _zoom = await self._read_current_zoom()
         value = self.parameters[_zoom].crosshair[coord]
         size = await self.sizes[coord].get_value()

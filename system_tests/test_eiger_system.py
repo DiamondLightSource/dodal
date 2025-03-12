@@ -6,7 +6,7 @@ import pytest
 from dodal.devices.eiger import DetectorParams, EigerDetector
 
 
-@pytest.fixture()
+@pytest.fixture
 def eiger(tmp_path: Path):
     detector_params: DetectorParams = DetectorParams(
         expected_energy_ev=100,
@@ -22,7 +22,7 @@ def eiger(tmp_path: Path):
         det_dist_to_beam_converter_path="src/dodal/devices/unit_tests/test_lookup_table.txt",
     )
     eiger = EigerDetector(
-        detector_params=detector_params, name="eiger", prefix="BL03S-EA-EIGER-01:"
+        detector_params=detector_params, name="eiger", prefix="BL03S-EA-EIGER-01:",
     )
 
     # Otherwise odin moves too fast to be tested
@@ -31,7 +31,7 @@ def eiger(tmp_path: Path):
     # S03 currently does not have StaleParameters_RBV
     eiger.wait_for_stale_parameters = lambda: None
 
-    yield eiger
+    return eiger
 
 
 @pytest.mark.skip(reason="Eiger/odin is broken in S03")

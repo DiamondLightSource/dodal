@@ -102,5 +102,5 @@ async def test_can_decribe_collect(merlin: Merlin, one_shot_trigger_info: Trigge
             "dtype": "array",
             "dtype_numpy": "|i1",
             "external": "STREAM:",
-        }
+        },
     }

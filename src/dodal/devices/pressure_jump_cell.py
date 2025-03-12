@@ -77,8 +77,7 @@ class AllValvesControlState:
 
 
 class AllValvesControl(StandardReadable, Movable):
-    """
-    valves 2, 4, 7, 8 are not controlled by the IOC,
+    """valves 2, 4, 7, 8 are not controlled by the IOC,
     as they are under manual control.
     fast_valves: tuple[int, ...] = (5, 6)
     slow_valves: tuple[int, ...] = (1, 3)
@@ -98,23 +97,23 @@ class AllValvesControl(StandardReadable, Movable):
                 {
                     i: epics_signal_r(ValveState, f"{prefix}V{i}:STA")
                     for i in self.slow_valves
-                }
+                },
             )
             self.fast_valve_states: DeviceVector[SignalR[FastValveState]] = (
                 DeviceVector(
                     {
                         i: epics_signal_r(FastValveState, f"{prefix}V{i}:STA")
                         for i in self.fast_valves
-                    }
+                    },
                 )
             )
 
         self.fast_valve_control: DeviceVector[FastValveControl] = DeviceVector(
-            {i: FastValveControl(f"{prefix}V{i}") for i in self.fast_valves}
+            {i: FastValveControl(f"{prefix}V{i}") for i in self.fast_valves},
         )
 
         self.valve_control: DeviceVector[ValveControl] = DeviceVector(
-            {i: ValveControl(f"{prefix}V{i}") for i in self.slow_valves}
+            {i: ValveControl(f"{prefix}V{i}") for i in self.slow_valves},
         )
 
         super().__init__(name)
@@ -147,7 +146,7 @@ class AllValvesControl(StandardReadable, Movable):
                 self.set_valve(int(i[-1]), value)
                 for i, value in value.__dict__.items()
                 if value is not None
-            )
+            ),
         )
 
 
@@ -194,10 +193,10 @@ class Pump(StandardReadable):
         with self.add_children_as_readables():
             self.pump_position = epics_signal_r(float, prefix + "POS")
             self.pump_motor_direction = epics_signal_r(
-                PumpMotorDirectionState, prefix + "MTRDIR"
+                PumpMotorDirectionState, prefix + "MTRDIR",
             )
             self.pump_speed = epics_signal_rw(
-                float, write_pv=prefix + "MSPEED", read_pv=prefix + "MSPEED_RBV"
+                float, write_pv=prefix + "MSPEED", read_pv=prefix + "MSPEED_RBV",
             )
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
@@ -207,8 +206,7 @@ class Pump(StandardReadable):
 
 
 class PressureTransducer(StandardReadable):
-    """
-    Pressure transducer for a high pressure X-ray cell.
+    """Pressure transducer for a high pressure X-ray cell.
     This is the chamber and there are three of them.
     1 is the start, 3 is where the sample is.
     NOTE: the distinction between the adc prefix and the cell prefix is kept here.
@@ -227,19 +225,19 @@ class PressureTransducer(StandardReadable):
         final_prefix = f"{prefix}{cell_prefix}"
         with self.add_children_as_readables():
             self.omron_pressure = epics_signal_r(
-                float, f"{final_prefix}PP{transducer_number}:PRES"
+                float, f"{final_prefix}PP{transducer_number}:PRES",
             )
             self.omron_voltage = epics_signal_r(
-                float, f"{final_prefix}PP{transducer_number}:RAW"
+                float, f"{final_prefix}PP{transducer_number}:RAW",
             )
             self.beckhoff_pressure = epics_signal_r(
-                float, f"{final_prefix}STATP{transducer_number}:MeanValue_RBV"
+                float, f"{final_prefix}STATP{transducer_number}:MeanValue_RBV",
             )
             # P1 beckhoff voltage = BL38P-EA-ADC-02:CH1
             # P2 beckhoff voltage = BL38P-EA-ADC-01:CH2
             # P3 beckhoff voltage = BL38P-EA-ADC-01:CH1
             self.slow_beckhoff_voltage_readout = epics_signal_r(
-                float, f"{full_different_prefix_adc}CH{ethercat_channel_number}"
+                float, f"{full_different_prefix_adc}CH{ethercat_channel_number}",
             )
 
         super().__init__(name)
@@ -267,8 +265,7 @@ class PressureJumpCellController(HasName):
 
 
 class PressureJumpCell(StandardReadable):
-    """
-    High pressure X-ray cell, used to apply pressure or pressure jumps to a sample.
+    """High pressure X-ray cell, used to apply pressure or pressure jumps to a sample.
     prefix: str
         The prefix of beamline - SPECIAL - unusual that the cell prefix is computed separately
     """
@@ -284,7 +281,7 @@ class PressureJumpCell(StandardReadable):
         self.pump = Pump(f"{prefix}{cell_prefix}", name)
 
         self.controller = PressureJumpCellController(
-            f"{prefix}{cell_prefix}CTRL:", name
+            f"{prefix}{cell_prefix}CTRL:", name,
         )
 
         with self.add_children_as_readables():
@@ -311,7 +308,7 @@ class PressureJumpCell(StandardReadable):
                         full_different_prefix_adc=f"{prefix}{adc_prefix}-01:",
                         ethercat_channel_number=1,
                     ),
-                }
+                },
             )
 
             self.cell_temperature = epics_signal_r(float, f"{prefix}{cell_prefix}TEMP")

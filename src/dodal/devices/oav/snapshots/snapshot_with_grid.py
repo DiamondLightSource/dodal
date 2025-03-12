@@ -40,7 +40,7 @@ class SnapshotWithGrid(MJPG):
         assert isinstance(directory_str, str)
 
         add_grid_border_overlay_to_image(
-            image, int(top_left_x), int(top_left_y), box_width, num_boxes_x, num_boxes_y
+            image, int(top_left_x), int(top_left_y), box_width, num_boxes_x, num_boxes_y,
         )
 
         path = path_join(directory_str, f"{filename_str}_outer_overlay.{IMG_FORMAT}")
@@ -49,7 +49,7 @@ class SnapshotWithGrid(MJPG):
         await asyncio_save_image(image, path)
 
         add_grid_overlay_to_image(
-            image, int(top_left_x), int(top_left_y), box_width, num_boxes_x, num_boxes_y
+            image, int(top_left_x), int(top_left_y), box_width, num_boxes_x, num_boxes_y,
         )
 
         path = path_join(directory_str, f"{filename_str}_grid_overlay.{IMG_FORMAT}")

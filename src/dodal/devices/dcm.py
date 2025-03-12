@@ -11,8 +11,7 @@ from dodal.common.crystal_metadata import (
 
 
 class DCM(StandardReadable):
-    """
-    A double crystal monochromator (DCM), used to select the energy of the beam.
+    """A double crystal monochromator (DCM), used to select the energy of the beam.
 
     perp describes the gap between the 2 DCM crystals which has to change as you alter
     the angle to select the requested energy.
@@ -27,7 +26,7 @@ class DCM(StandardReadable):
         crystal_metadata: CrystalMetadata | None = None,
     ) -> None:
         cm = crystal_metadata or make_crystal_metadata_from_material(
-            MaterialsEnum.Si, (1, 1, 1)
+            MaterialsEnum.Si, (1, 1, 1),
         )
         with self.add_children_as_readables():
             self.bragg_in_degrees = Motor(prefix + "BRAGG")
@@ -48,10 +47,10 @@ class DCM(StandardReadable):
             self.perp_sub_assembly_temp = epics_signal_r(float, prefix + "TEMP7")
 
             self.crystal_metadata_usage, _ = soft_signal_r_and_setter(
-                str, initial_value=cm.usage
+                str, initial_value=cm.usage,
             )
             self.crystal_metadata_type, _ = soft_signal_r_and_setter(
-                str, initial_value=cm.type
+                str, initial_value=cm.type,
             )
             reflection_array = np.array(cm.reflection)
             self.crystal_metadata_reflection, _ = soft_signal_r_and_setter(
@@ -59,6 +58,6 @@ class DCM(StandardReadable):
                 initial_value=reflection_array,
             )
             self.crystal_metadata_d_spacing = epics_signal_r(
-                float, prefix + "DSPACING:RBV"
+                float, prefix + "DSPACING:RBV",
             )
         super().__init__(name)

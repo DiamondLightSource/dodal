@@ -28,7 +28,7 @@ def test_given_pos_stable_when_xbpm_feedback_kickoff_then_return_immediately(
 
 
 def test_given_pos_not_stable_and_goes_stable_when_xbpm_feedback_kickoff_then_return(
-    RE: RunEngine, fake_xbpm_feedback: XBPMFeedback
+    RE: RunEngine, fake_xbpm_feedback: XBPMFeedback,
 ):
     set_mock_value(fake_xbpm_feedback.pos_stable, False)
 

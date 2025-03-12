@@ -18,17 +18,18 @@ from dodal.log import LOGGER
 
 
 class CurrentAmpDet(StandardReadable, Preparable):
-    """
-    CurrentAmpDet composed of a CurrentAmp and a CurrentAmpCounter. It provides
+    """CurrentAmpDet composed of a CurrentAmp and a CurrentAmpCounter. It provides
       the option for automatically changing the CurrentAmp gain to within the optimal
       range. It also converts the currentAmp/counter output back into the detector
       current output in Amp.
+
     Attributes:
         current_amp (currentAmp): Current amplifier type device.
         counter (CurrentAmpCounter): Counter that capture the current amplifier output.
         current (SignalRW([float]): Soft signal to store the corrected current.
         auto_mode (signalR([bool])): Soft signal to store the flag for auto gain.
         name (str): Name of the device.
+
     """
 
     def __init__(
@@ -41,16 +42,15 @@ class CurrentAmpDet(StandardReadable, Preparable):
         self.counter = Reference(counter)
         with self.add_children_as_readables():
             self.current, self._set_current = soft_signal_r_and_setter(
-                float, initial_value=None, units="Amp"
+                float, initial_value=None, units="Amp",
             )
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.auto_mode = soft_signal_rw(bool, initial_value=True)
         super().__init__(name)
 
     async def read(self) -> dict[str, Reading]:
-        """
-        Read is modified so that if auto_mode is true it will optimise gain before
-         taking the final reading
+        """Read is modified so that if auto_mode is true it will optimise gain before
+        taking the final reading
         """
         if await self.auto_mode.get_value():
             LOGGER.info(f"{self.name}-Attempting auto-gain")
@@ -58,7 +58,7 @@ class CurrentAmpDet(StandardReadable, Preparable):
             try:
                 await status
                 LOGGER.info(
-                    f"{self.name} new gain = {await self.current_amp().get_gain()}."
+                    f"{self.name} new gain = {await self.current_amp().get_gain()}.",
                 )
             except ValueError as ex:
                 LOGGER.warning(f"{self.name} gain went outside limits")
@@ -85,8 +85,7 @@ class CurrentAmpDet(StandardReadable, Preparable):
                 within_limits = True
 
     async def get_corrected_current(self) -> float:
-        """
-        Convert the output(count and gain) back into the read detector output in Amp.
+        """Convert the output(count and gain) back into the read detector output in Amp.
         """
         current_gain, voltage_per_sec = await asyncio.gather(
             self.current_amp().get_gain(),

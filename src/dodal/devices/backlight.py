@@ -24,7 +24,7 @@ class Backlight(StandardReadable, Movable):
         with self.add_children_as_readables():
             self.power = epics_signal_rw(BacklightPower, prefix + "-EA-BLIT-01:TOGGLE")
             self.position = epics_signal_rw(
-                BacklightPosition, prefix + "-EA-BL-01:CTRL"
+                BacklightPosition, prefix + "-EA-BL-01:CTRL",
             )
         super().__init__(name)
 

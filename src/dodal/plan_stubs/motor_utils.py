@@ -15,7 +15,7 @@ MovableReadableDevice = TypeVar("MovableReadableDevice", bound=MovableReadable)
 
 class MoveTooLarge(Exception):
     def __init__(
-        self, axis: MovableReadable, maximum_move: float, position: float, *args: object
+        self, axis: MovableReadable, maximum_move: float, position: float, *args: object,
     ) -> None:
         self.axis = axis
         self.maximum_move = maximum_move
@@ -56,7 +56,7 @@ def home_and_reset_wrapper(
         if isinstance(axis, Motor)
     }
     return move_and_reset_wrapper(
-        plan, home_positions, smallest_move, maximum_move, group, wait_for_all
+        plan, home_positions, smallest_move, maximum_move, group, wait_for_all,
     )
 
 
@@ -88,9 +88,10 @@ def move_and_reset_wrapper(
         wait_for_all (bool, optional): If true the home and reset to cache will be waited
                                        on. If false it is left up to the caller to wait on
                                        them. Defaults to True.
+
     """
     initial_positions = yield from check_and_cache_values(
-        device_and_positions, smallest_move, maximum_move
+        device_and_positions, smallest_move, maximum_move,
     )
 
     def move_to_home():

@@ -60,17 +60,15 @@ class GDABeamlineParameters:
     def parse_value(cls, value: str):
         if value[0] == "[":
             return cls.parse_list(value[1:].strip())
-        else:
-            return cls.parse_list_element(value)
+        return cls.parse_list_element(value)
 
     @classmethod
     def parse_list_element(cls, value: str):
         if value == "Yes":
             return True
-        elif value == "No":
+        if value == "No":
             return False
-        else:
-            return float(value)
+        return float(value)
 
     @classmethod
     def parse_list(cls, value: str):
@@ -90,12 +88,13 @@ class GDABeamlineParameters:
 
 def get_beamline_parameters(beamline_param_path: str | None = None):
     """Loads the beamline parameters from the specified path, or according to the
-    environment variable if none is given"""
+    environment variable if none is given
+    """
     if not beamline_param_path:
         beamline_name = get_beamline_name("s03")
         beamline_param_path = BEAMLINE_PARAMETER_PATHS.get(beamline_name)
         if beamline_param_path is None:
             raise KeyError(
-                "No beamline parameter path found, maybe 'BEAMLINE' environment variable is not set!"
+                "No beamline parameter path found, maybe 'BEAMLINE' environment variable is not set!",
             )
     return GDABeamlineParameters.from_file(beamline_param_path)

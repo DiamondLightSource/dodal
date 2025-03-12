@@ -162,7 +162,6 @@ def eiger(mock: bool = False) -> EigerDetector:
     """Get the i03 Eiger device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i03, it will return the existing object.
     """
-
     return device_instantiation(
         device_factory=EigerDetector,
         name="eiger",

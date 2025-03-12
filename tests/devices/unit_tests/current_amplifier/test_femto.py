@@ -31,7 +31,7 @@ from dodal.devices.current_amplifiers.struck_scaler_counter import (
 
 @pytest.fixture
 async def mock_femto(
-    prefix: str = "BLXX-EA-DET-007:", suffix: str = "Gain"
+    prefix: str = "BLXX-EA-DET-007:", suffix: str = "Gain",
 ) -> FemtoDDPCA:
     async with init_devices(mock=True):
         mock_femto = FemtoDDPCA(
@@ -48,7 +48,7 @@ async def mock_femto(
 
 @pytest.fixture
 async def mock_StruckScaler(
-    prefix: str = "BLXX-EA-DET-007:", suffix: str = ".s17"
+    prefix: str = "BLXX-EA-DET-007:", suffix: str = ".s17",
 ) -> StruckScaler:
     async with init_devices(mock=True):
         mock_StruckScaler = StruckScaler(
@@ -88,13 +88,13 @@ async def mock_femto_struck_scaler_detector(
 )
 @mock.patch("asyncio.sleep")
 async def test_femto_set(
-    sleep: AsyncMock, mock_femto: FemtoDDPCA, RE: RunEngine, gain, wait_time, gain_value
+    sleep: AsyncMock, mock_femto: FemtoDDPCA, RE: RunEngine, gain, wait_time, gain_value,
 ):
     RE(abs_set(mock_femto, gain, wait=True))
     assert await mock_femto.gain.get_value() == gain_value
     # extra sleeps either side of set are bluesky's sleep which are set to 0.
     for actual, expected in zip(
-        sleep.call_args[0], [0, 0, wait_time, 0, 0], strict=False
+        sleep.call_args[0], [0, 0, wait_time, 0, 0], strict=False,
     ):
         assert actual == expected
 
@@ -109,7 +109,7 @@ async def test_femto_set(
 )
 @mock.patch("asyncio.sleep")
 async def test_femto_set_fail_out_of_range(
-    sleep: AsyncMock, mock_femto: FemtoDDPCA, gain
+    sleep: AsyncMock, mock_femto: FemtoDDPCA, gain,
 ):
     with pytest.raises(ValueError) as e:
         await mock_femto.set(gain)
@@ -144,7 +144,7 @@ async def test_femto_increase_gain(
         await mock_femto.increase_gain()
     assert (await mock_femto.gain.get_value()) == Femto3xxGainTable[final_gain]
     assert sleep.call_count == int(final_gain.split("_")[-1]) - int(
-        starting_gain.split("_")[-1]
+        starting_gain.split("_")[-1],
     )
 
 
@@ -159,7 +159,7 @@ async def test_femto_increase_gain_fail_at_max_gain(
         await mock_femto.increase_gain()
     assert (await mock_femto.gain.get_value()) == Femto3xxGainTable[final_gain]
     assert sleep.call_count == int(final_gain.split("_")[-1]) - int(
-        starting_gain.split("_")[-1]
+        starting_gain.split("_")[-1],
     )
 
 
@@ -184,7 +184,7 @@ async def test_femto_decrease_gain(
         await mock_femto.decrease_gain()
     assert (await mock_femto.gain.get_value()) == Femto3xxGainTable[final_gain]
     assert sleep.call_count == int(starting_gain.split("_")[-1]) - int(
-        final_gain.split("_")[-1]
+        final_gain.split("_")[-1],
     )
 
 
@@ -199,7 +199,7 @@ async def test_femto_decrease_gain_fail_at_min_gain(
         await mock_femto.decrease_gain()
     assert (await mock_femto.gain.get_value()) == Femto3xxGainTable[final_gain]
     assert sleep.call_count == int(final_gain.split("_")[-1]) - int(
-        starting_gain.split("_")[-1]
+        starting_gain.split("_")[-1],
     )
 
 
@@ -287,10 +287,10 @@ async def test_femto_struck_scaler_read_with_autoGain(
 
     def set_mock_counter():
         set_mock_value(
-            mock_femto_struck_scaler_detector.counter().trigger_start, CountState.DONE
+            mock_femto_struck_scaler_detector.counter().trigger_start, CountState.DONE,
         )
         set_mock_value(
-            mock_femto_struck_scaler_detector.counter().readout, rbv_mocks.get()
+            mock_femto_struck_scaler_detector.counter().readout, rbv_mocks.get(),
         )
 
     callback_on_mock_put(

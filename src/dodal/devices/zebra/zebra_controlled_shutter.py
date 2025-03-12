@@ -26,11 +26,12 @@ class ZebraShutter(StandardReadable, Movable):
     automatic control. A soft input (aliased to control_mode) will switch between
     which of these AND gates to use. For the manual gate the shutter is then controlled
     by a different soft input (aliased to manual_position_setpoint). Both these AND
-    gates then feed into an OR gate, which then feeds to the shutter."""
+    gates then feed into an OR gate, which then feeds to the shutter.
+    """
 
     def __init__(self, prefix: str, name: str):
         self._manual_position_setpoint = epics_signal_w(
-            ZebraShutterState, prefix + "CTRL2"
+            ZebraShutterState, prefix + "CTRL2",
         )
         self.control_mode = epics_signal_rw(ZebraShutterControl, prefix + "CTRL1")
 
@@ -42,7 +43,7 @@ class ZebraShutter(StandardReadable, Movable):
     async def set(self, value: ZebraShutterState):
         if await self.control_mode.get_value() == ZebraShutterControl.AUTO:
             raise UserWarning(
-                f"Tried to set shutter to {value.value} but the shutter is in auto mode."
+                f"Tried to set shutter to {value.value} but the shutter is in auto mode.",
             )
         await self._manual_position_setpoint.set(value)
         return await wait_for_value(

@@ -89,7 +89,7 @@ async def test_aperturescatterguard_move_in_plan(
 
 @pytest.mark.s03
 async def test_move_fails_when_not_in_good_starting_pos(
-    ap_sg: ApertureScatterguard, move_to_large, RE
+    ap_sg: ApertureScatterguard, move_to_large, RE,
 ):
     await ap_sg.aperture.z.set(0)
 
@@ -133,7 +133,7 @@ class MonitorCallback(CallbackBase):
     ],
 )
 async def test_aperturescatterguard_moves_in_correct_order(
-    pos_name_1, pos_name_2, sg_first, ap_sg: ApertureScatterguard
+    pos_name_1, pos_name_2, sg_first, ap_sg: ApertureScatterguard,
 ):
     cb = MonitorCallback()
     assert ap_sg._loaded_positions

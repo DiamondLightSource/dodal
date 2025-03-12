@@ -19,10 +19,10 @@ def _get_detector_max_size_mm(detector_params):
 
 def _get_beam_xy_accounting_for_roi(detector_params, det_distance_mm):
     beam_x = detector_params.beam_xy_converter.get_beam_xy_from_det_dist(
-        det_distance_mm, Axis.X_AXIS
+        det_distance_mm, Axis.X_AXIS,
     )
     beam_y = detector_params.beam_xy_converter.get_beam_xy_from_det_dist(
-        det_distance_mm, Axis.Y_AXIS
+        det_distance_mm, Axis.Y_AXIS,
     )
     if detector_params.use_roi_mode:
         size_constants = detector_params.detector_size_constants
@@ -50,40 +50,38 @@ def _calc_res_at_angle(wavelength_angstroms, angular_shift_radians):
 
 
 def _calc_res_off_axis_detector(
-    wavelength_angstroms, usable_radius, det_distance_mm, two_theta_radians
+    wavelength_angstroms, usable_radius, det_distance_mm, two_theta_radians,
 ):
-    """
-    Calculate maximum resolution given detector distance and extent (radius) that detector face extends
+    """Calculate maximum resolution given detector distance and extent (radius) that detector face extends
     No correction for position of beam centre on detector face at twoTheta=0
     Here radius and distance parameters can be in any length unit, provided it is the same, millimetres is the convention
     """
     angular_shift_radians = atan(usable_radius / det_distance_mm)
     return _calc_res_at_angle(
-        wavelength_angstroms, 0.5 * (angular_shift_radians + two_theta_radians)
+        wavelength_angstroms, 0.5 * (angular_shift_radians + two_theta_radians),
     )
 
 
 def _max_res_for_mx(
-    wavelength_angstroms, detector_radius_mm, det_distance_mm, beam_x_mm, beam_y_mm
+    wavelength_angstroms, detector_radius_mm, det_distance_mm, beam_x_mm, beam_y_mm,
 ):
-    """
-    Calculate maximum resolution given MX Use Case (detector at twoTheta=0) and beam centre on detector face
+    """Calculate maximum resolution given MX Use Case (detector at twoTheta=0) and beam centre on detector face
     Correct the radius for position of beam centre on detector face at twoTheta=0
     """
     usable_radius = _calc_useful_radius(detector_radius_mm, beam_x_mm, beam_y_mm)
     return _calc_res_off_axis_detector(
-        wavelength_angstroms, usable_radius, det_distance_mm, 0
+        wavelength_angstroms, usable_radius, det_distance_mm, 0,
     )
 
 
 def resolution(
-    detector_params: DetectorParams, wavelength_angstroms: float, det_distance_mm: float
+    detector_params: DetectorParams, wavelength_angstroms: float, det_distance_mm: float,
 ):
     detector_radius_mm = _get_detector_radius_mm(detector_params)
     (beam_x_mm, beam_y_mm) = _get_beam_xy_accounting_for_roi(
-        detector_params, det_distance_mm
+        detector_params, det_distance_mm,
     )
 
     return _max_res_for_mx(
-        wavelength_angstroms, detector_radius_mm, det_distance_mm, beam_x_mm, beam_y_mm
+        wavelength_angstroms, detector_radius_mm, det_distance_mm, beam_x_mm, beam_y_mm,
     )

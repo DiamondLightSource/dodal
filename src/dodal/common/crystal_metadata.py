@@ -6,8 +6,7 @@ from typing import Literal
 
 @dataclass(frozen=True)
 class Material:
-    """
-    Class representing a crystalline material with a specific lattice parameter.
+    """Class representing a crystalline material with a specific lattice parameter.
     """
 
     name: str
@@ -21,8 +20,7 @@ class MaterialsEnum(Enum):
 
 @dataclass(frozen=True)
 class CrystalMetadata:
-    """
-    Metadata used in the NeXus format,
+    """Metadata used in the NeXus format,
     see https://manual.nexusformat.org/classes/base_classes/NXcrystal.html
     """
 
@@ -33,14 +31,13 @@ class CrystalMetadata:
 
     @staticmethod
     def calculate_default_d_spacing(
-        lattice_parameter: float, reflection: tuple[int, int, int]
+        lattice_parameter: float, reflection: tuple[int, int, int],
     ) -> tuple[float, str]:
-        """
-        Calculates the d-spacing value in nanometers based on the given lattice parameter and reflection indices.
+        """Calculates the d-spacing value in nanometers based on the given lattice parameter and reflection indices.
         """
         h_index, k_index, l_index = reflection
         d_spacing_m = lattice_parameter / math.sqrt(
-            h_index**2 + k_index**2 + l_index**2
+            h_index**2 + k_index**2 + l_index**2,
         )
         d_spacing_nm = d_spacing_m * 1e9  # Convert meters to nanometers
         return round(d_spacing_nm, 5), "nm"
@@ -53,7 +50,7 @@ def make_crystal_metadata_from_material(
     d_spacing_param: tuple[float, str] | None = None,
 ):
     d_spacing = d_spacing_param or CrystalMetadata.calculate_default_d_spacing(
-        material.value.lattice_parameter, reflection_plane
+        material.value.lattice_parameter, reflection_plane,
     )
     assert all(isinstance(i, int) and i > 0 for i in reflection_plane), (
         "Reflection plane indices must be positive integers"

@@ -90,7 +90,7 @@ async def mock_pgm(prefix: str = "BLXX-EA-DET-007:") -> PGM:
 async def mock_jaw_phase(prefix: str = "BLXX-EA-DET-007:") -> UndulatorJawPhase:
     async with init_devices(mock=True):
         mock_jaw_phase = UndulatorJawPhase(
-            prefix=prefix, move_pv="RPQ1", jaw_phase="JAW"
+            prefix=prefix, move_pv="RPQ1", jaw_phase="JAW",
         )
     set_mock_value(mock_jaw_phase.gate, UndulatorGateStatus.CLOSE)
     set_mock_value(mock_jaw_phase.jaw_phase.velocity, 2)
@@ -135,7 +135,7 @@ async def mock_id_pol(mock_id: I10Apple2) -> I10Apple2Pol:
 
 @pytest.fixture
 async def mock_linear_arbitrary_angle(
-    mock_id: I10Apple2, prefix: str = "BLXX-EA-DET-007:"
+    mock_id: I10Apple2, prefix: str = "BLXX-EA-DET-007:",
 ) -> LinearArbitraryAngle:
     async with init_devices(mock=True):
         mock_linear_arbitrary_angle = LinearArbitraryAngle(id=mock_id)
@@ -198,7 +198,7 @@ async def test_fail_I10Apple2_no_lookup(
 
 @pytest.mark.parametrize("energy", [(100), (2500), (-299)])
 async def test_fail_I10Apple2_set_outside_energy_limits(
-    mock_id: I10Apple2, energy: float
+    mock_id: I10Apple2, energy: float,
 ):
     with pytest.raises(ValueError) as e:
         await mock_id.set(energy)
@@ -215,14 +215,14 @@ async def test_fail_I10Apple2_set_lookup_gap_pol(mock_id: I10Apple2):
             "Low": 255.3,
             "High": 500,
             "Poly": poly1d([4.33435e-08, -7.52562e-05, 6.41791e-02, 3.88755e00]),
-        }
+        },
     }
     mock_id.lookup_tables["Gap"]["lh"]["Energies"] = {
         "2": {
             "Low": 600,
             "High": 1000,
             "Poly": poly1d([4.33435e-08, -7.52562e-05, 6.41791e-02, 3.88755e00]),
-        }
+        },
     }
     with pytest.raises(ValueError) as e:
         await mock_id.set(555)
@@ -282,7 +282,7 @@ async def test_I10Apple2_pgm_RE_scan(mock_id_pgm: I10Apple2PGM, RE: RunEngine):
     callback_on_mock_put(
         mock_id_pgm.pgm_ref().energy.user_setpoint,
         lambda *_, **__: set_mock_value(
-            mock_id_pgm.pgm_ref().energy.user_readback, rbv_mocks.get()
+            mock_id_pgm.pgm_ref().energy.user_readback, rbv_mocks.get(),
         ),
     )
     RE(
@@ -379,7 +379,7 @@ async def test_linear_arbitrary_pol_fail(
     [18, -18, 12.01, -12.01],
 )
 async def test_linear_arbitrary_limit_fail(
-    mock_linear_arbitrary_angle: LinearArbitraryAngle, poly: float
+    mock_linear_arbitrary_angle: LinearArbitraryAngle, poly: float,
 ):
     mock_linear_arbitrary_angle.id_ref().pol = "la"
     mock_linear_arbitrary_angle.jaw_phase_from_angle = poly1d([poly])
@@ -428,11 +428,11 @@ async def test_linear_arbitrary_RE_scan(
     assert_emitted(docs, start=1, descriptor=1, event=num_point, stop=1)
 
     jaw_phase = get_mock_put(
-        mock_linear_arbitrary_angle.id_ref().id_jaw_phase().jaw_phase.user_setpoint
+        mock_linear_arbitrary_angle.id_ref().id_jaw_phase().jaw_phase.user_setpoint,
     )
 
     poly = poly1d(
-        DEFAULT_JAW_PHASE_POLY_PARAMS
+        DEFAULT_JAW_PHASE_POLY_PARAMS,
     )  # default setting for i10 jaw phase to angle
     for cnt, data in enumerate(docs["event"]):
         temp_angle = angles[cnt]
@@ -443,7 +443,7 @@ async def test_linear_arbitrary_RE_scan(
             else temp_angle + 180.0
         )  # convert angle to jawphase.
         assert jaw_phase.call_args_list[cnt] == mock.call(
-            str(poly(alpha_real)), wait=True
+            str(poly(alpha_real)), wait=True,
         )
 
 

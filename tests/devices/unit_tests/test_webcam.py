@@ -49,7 +49,7 @@ async def test_given_filename_and_directory_when_trigger_and_read_then_returns_e
 @patch("dodal.devices.webcam.aiofiles", autospec=True)
 @patch("dodal.devices.webcam.ClientSession.get", autospec=True)
 async def test_given_data_returned_from_url_when_trigger_then_data_written(
-    mock_get: MagicMock, mock_aiofiles, webcam: Webcam
+    mock_get: MagicMock, mock_aiofiles, webcam: Webcam,
 ):
     mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
     mock_response.read.return_value = (test_web_data := "TEST")
@@ -64,7 +64,7 @@ async def test_given_data_returned_from_url_when_trigger_then_data_written(
 
 @patch("dodal.devices.webcam.ClientSession.get", autospec=True)
 async def test_given_response_has_bad_status_but_response_read_still_returns_then_still_write_data(
-    mock_get: MagicMock, webcam: Webcam
+    mock_get: MagicMock, webcam: Webcam,
 ):
     mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
     mock_response.ok = MagicMock(return_value=False)
@@ -82,7 +82,7 @@ async def test_given_response_has_bad_status_but_response_read_still_returns_the
 @patch("dodal.devices.webcam.create_placeholder_image", autospec=True)
 @patch("dodal.devices.webcam.ClientSession.get", autospec=True)
 async def test_given_response_read_fails_then_placeholder_image_written(
-    mock_get: MagicMock, mock_placeholder_image: MagicMock, webcam: Webcam
+    mock_get: MagicMock, mock_placeholder_image: MagicMock, webcam: Webcam,
 ):
     mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
     mock_response.read = AsyncMock(side_effect=Exception())

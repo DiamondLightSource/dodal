@@ -32,7 +32,7 @@ EXPECTED_RUN_END_MESSAGE = {
 @patch("zocalo.configuration.from_file", autospec=True)
 @patch("dodal.devices.zocalo.zocalo_interaction.lookup", autospec=True)
 def _test_zocalo(
-    func_testing: Callable, expected_params: dict, mock_transport_lookup, mock_from_file
+    func_testing: Callable, expected_params: dict, mock_transport_lookup, mock_from_file,
 ):
     mock_zc = MagicMock()
     mock_from_file.return_value = mock_zc
@@ -54,7 +54,7 @@ def _test_zocalo(
         "zocalo.go.host": socket.gethostname(),
     }
     mock_transport.send.assert_called_once_with(
-        "processing_recipe", expected_message, headers=expected_headers
+        "processing_recipe", expected_message, headers=expected_headers,
     )
     mock_transport.disconnect.assert_called_once()
 
@@ -84,10 +84,10 @@ zc = ZocaloTrigger(environment=SIM_ZOCALO_ENV)
     ],
 )
 def test_run_start(function_wrapper: Callable, expected_message: dict):
-    """
-    Args:
-        function_wrapper (Callable): A wrapper used to test for expected exceptions
-        expected_message (Dict): The expected dictionary sent to zocalo
+    """Args:
+    function_wrapper (Callable): A wrapper used to test for expected exceptions
+    expected_message (Dict): The expected dictionary sent to zocalo
+
     """
     data = ZocaloStartInfo(EXPECTED_DCID, EXPECTED_FILENAME, 0, 100, 0)
     function_to_run = partial(zc.run_start, data)
@@ -103,10 +103,10 @@ def test_run_start(function_wrapper: Callable, expected_message: dict):
     ],
 )
 def test__run_start_and_end(function_wrapper: Callable, expected_message: dict):
-    """
-    Args:
-        function_wrapper (Callable): A wrapper used to test for expected exceptions
-        expected_message (Dict): The expected dictionary sent to zocalo
+    """Args:
+    function_wrapper (Callable): A wrapper used to test for expected exceptions
+    expected_message (Dict): The expected dictionary sent to zocalo
+
     """
     function_to_run = partial(zc.run_end, EXPECTED_DCID)
     function_to_run = partial(function_wrapper, function_to_run)

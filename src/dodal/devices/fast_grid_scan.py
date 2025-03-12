@@ -46,8 +46,7 @@ class GridAxis:
         return self.steps_to_motor_position(self.full_steps - 1)
 
     def is_within(self, steps: float):
-        """
-        Determine whether a single axis coordinate is within the grid.
+        """Determine whether a single axis coordinate is within the grid.
         The coordinate is from a continuous coordinate space based on the
         XRC grid where the origin corresponds to the centre of the first grid box.
 
@@ -56,13 +55,13 @@ class GridAxis:
 
         Returns:
             True if the coordinate falls within the grid.
+
         """
         return -0.5 <= steps <= self.full_steps - 0.5
 
 
 class GridScanParamsCommon(AbstractExperimentWithBeamParams):
-    """
-    Common holder class for the parameters of a grid scan in a similar
+    """Common holder class for the parameters of a grid scan in a similar
     layout to EPICS. The parameters and functions of this class are common
     to both the zebra and panda triggered fast grid scans.
 
@@ -113,11 +112,13 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
                 centre of the first grid box
         Returns:
             The motor position this corresponds to.
+
         Raises:
             IndexError if the desired position is outside the grid.
+
         """
         for position, axis in zip(
-            grid_position, [self.x_axis, self.y_axis, self.z_axis], strict=False
+            grid_position, [self.x_axis, self.y_axis, self.z_axis], strict=False,
         ):
             if not axis.is_within(position):
                 raise IndexError(f"{grid_position} is outside the bounds of the grid")
@@ -127,7 +128,7 @@ class GridScanParamsCommon(AbstractExperimentWithBeamParams):
                 self.x_axis.steps_to_motor_position(grid_position[0]),
                 self.y_axis.steps_to_motor_position(grid_position[1]),
                 self.z_axis.steps_to_motor_position(grid_position[2]),
-            ]
+            ],
         )
 
 
@@ -135,8 +136,7 @@ ParamType = TypeVar("ParamType", bound=GridScanParamsCommon)
 
 
 class ZebraGridScanParams(GridScanParamsCommon):
-    """
-    Params for standard Zebra FGS. Adds on the dwell time
+    """Params for standard Zebra FGS. Adds on the dwell time
     """
 
     dwell_time_ms: float = 10
@@ -146,18 +146,17 @@ class ZebraGridScanParams(GridScanParamsCommon):
     def non_integer_dwell_time(cls, dwell_time_ms: float) -> float:
         dwell_time_floor_rounded = np.floor(dwell_time_ms)
         dwell_time_is_close = np.isclose(
-            dwell_time_ms, dwell_time_floor_rounded, rtol=1e-3
+            dwell_time_ms, dwell_time_floor_rounded, rtol=1e-3,
         )
         if not dwell_time_is_close:
             raise ValueError(
-                f"Dwell time of {dwell_time_ms}ms is not an integer value. Fast Grid Scan only accepts integer values"
+                f"Dwell time of {dwell_time_ms}ms is not an integer value. Fast Grid Scan only accepts integer values",
             )
         return dwell_time_ms
 
 
 class PandAGridScanParams(GridScanParamsCommon):
-    """
-    Params for panda constant-motion scan. Adds on the goniometer run-up distance
+    """Params for panda constant-motion scan. Adds on the goniometer run-up distance
     """
 
     run_up_distance_mm: float = 0.17
@@ -183,10 +182,10 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
     def __init__(self, prefix: str, smargon_prefix: str, name: str = "") -> None:
         self.x_steps = epics_signal_rw_rbv(int, f"{prefix}X_NUM_STEPS")
         self.y_steps = epics_signal_rw_rbv(
-            int, f"{prefix}Y_NUM_STEPS"
+            int, f"{prefix}Y_NUM_STEPS",
         )  # Number of vertical steps during the first grid scan
         self.z_steps = epics_signal_rw_rbv(
-            int, f"{prefix}Z_NUM_STEPS"
+            int, f"{prefix}Z_NUM_STEPS",
         )  # Number of vertical steps during the second grid scan, after the rotation in omega
         self.x_step_size = epics_signal_rw_rbv(float, f"{prefix}X_STEP_SIZE")
         self.y_step_size = epics_signal_rw_rbv(float, f"{prefix}Y_STEP_SIZE")
@@ -204,7 +203,7 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
         self.status = epics_signal_r(int, f"{prefix}SCAN_STATUS")
 
         self.expected_images = create_hardware_backed_soft_signal(
-            float, self._calculate_expected_images
+            float, self._calculate_expected_images,
         )
 
         self.motion_program = MotionProgram(smargon_prefix)
@@ -263,7 +262,7 @@ class FastGridScanCommon(StandardReadable, Flyable, ABC, Generic[ParamType]):
         except asyncio.TimeoutError:
             LOGGER.error(
                 "Hyperion timed out waiting for FGS motion to complete. This may have been caused by a goniometer stage getting stuck.\n\
-                Forcibly stopping the FGS motion program..."
+                Forcibly stopping the FGS motion program...",
             )
             await self.stop_cmd.trigger()
             raise
@@ -292,7 +291,7 @@ class ZebraFastGridScan(FastGridScanCommon[ZebraGridScanParams]):
 
     def _create_position_counter(self, prefix: str):
         return epics_signal_rw(
-            int, f"{prefix}POS_COUNTER", write_pv=f"{prefix}POS_COUNTER_WRITE"
+            int, f"{prefix}POS_COUNTER", write_pv=f"{prefix}POS_COUNTER_WRITE",
         )
 
 
@@ -303,14 +302,14 @@ class PandAFastGridScan(FastGridScanCommon[PandAGridScanParams]):
         full_prefix = prefix + "PGS:"
         self.time_between_x_steps_ms = (
             epics_signal_rw_rbv(  # Used by motion controller to set goniometer velocity
-                float, f"{full_prefix}TIME_BETWEEN_X_STEPS"
+                float, f"{full_prefix}TIME_BETWEEN_X_STEPS",
             )
         )
 
         # Distance before and after the grid given to allow goniometer to reach desired speed while it is within the
         # grid
         self.run_up_distance_mm = epics_signal_rw_rbv(
-            float, f"{full_prefix}RUNUP_DISTANCE"
+            float, f"{full_prefix}RUNUP_DISTANCE",
         )
         super().__init__(full_prefix, prefix, name)
 

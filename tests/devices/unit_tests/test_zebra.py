@@ -94,7 +94,7 @@ def test_logic_gate_configuration_62_and_34_inv_and_15_inv():
 
 
 async def run_configurer_test(
-    gate_type: GateType, gate_num, config, expected_pv_values
+    gate_type: GateType, gate_num, config, expected_pv_values,
 ):
     configurer = LogicGateConfigurer(prefix="", name="test fake logicconfigurer")
     await configurer.connect(mock=True)

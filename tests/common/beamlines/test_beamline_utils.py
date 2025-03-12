@@ -45,22 +45,22 @@ def test_instantiate_function_makes_supplied_device():
     device_types = [XYZPositioner, Smargon]
     for device in device_types:
         dev = beamline_utils.device_instantiation(
-            device, device.__name__, "", False, True, None
+            device, device.__name__, "", False, True, None,
         )
         assert isinstance(dev, device)
 
 
 def test_instantiating_different_device_with_same_name():
-    dev1 = beamline_utils.device_instantiation(  # noqa
-        XYZPositioner, "device", "", False, True, None
+    dev1 = beamline_utils.device_instantiation(
+        XYZPositioner, "device", "", False, True, None,
     )
     with pytest.raises(TypeError):
         dev2 = beamline_utils.device_instantiation(
-            Smargon, "device", "", False, True, None
+            Smargon, "device", "", False, True, None,
         )
     beamline_utils.clear_device("device")
-    dev2 = beamline_utils.device_instantiation(  # noqa
-        Smargon, "device", "", False, True, None
+    dev2 = beamline_utils.device_instantiation(
+        Smargon, "device", "", False, True, None,
     )
     assert dev1.name == dev2.name
     assert type(dev1) is not type(dev2)
@@ -70,7 +70,7 @@ def test_instantiating_different_device_with_same_name():
 
 def test_instantiate_v1_function_fake_makes_fake():
     eiger: EigerDetector = beamline_utils.device_instantiation(
-        EigerDetector, "eiger", "", True, True, None
+        EigerDetector, "eiger", "", True, True, None,
     )
     assert isinstance(eiger, Device)
     assert isinstance(eiger.stale_params, FakeEpicsSignal)
@@ -79,14 +79,14 @@ def test_instantiate_v1_function_fake_makes_fake():
 def test_instantiate_v2_function_fake_makes_fake():
     RE()
     fake_smargon: Smargon = beamline_utils.device_instantiation(
-        i03.Smargon, "smargon", "", True, True, None
+        i03.Smargon, "smargon", "", True, True, None,
     )
     assert isinstance(fake_smargon, StandardReadable)
     assert fake_smargon.omega.user_setpoint.source.startswith("mock+ca")
 
 
 @pytest.mark.parametrize(
-    "kwargs,expected_timeout", [({}, 5.0), ({"timeout": 15.0}, 15.0)]
+    "kwargs,expected_timeout", [({}, 5.0), ({"timeout": 15.0}, 15.0)],
 )
 def test_wait_for_v1_device_connection_passes_through_timeout(kwargs, expected_timeout):
     device = OphydV1Device(name="")
@@ -98,7 +98,7 @@ def test_wait_for_v1_device_connection_passes_through_timeout(kwargs, expected_t
 
 
 @pytest.mark.parametrize(
-    "kwargs,expected_timeout", [({}, 5.0), ({"timeout": 15.0}, 15.0)]
+    "kwargs,expected_timeout", [({}, 5.0), ({"timeout": 15.0}, 15.0)],
 )
 @patch(
     "dodal.common.beamlines.beamline_utils.v2_device_wait_for_connection",

@@ -19,7 +19,7 @@ def test_verify_undulator_gap_decorator_does_nothing_on_wrong_run(
     mock_undulator_and_dcm: UndulatorGapCheckDevices,
 ):
     @verify_undulator_gap_before_run_decorator(
-        devices=mock_undulator_and_dcm, run_key_to_wrap=RUN_KEY
+        devices=mock_undulator_and_dcm, run_key_to_wrap=RUN_KEY,
     )
     def boring_plan():
         yield from bps.null()
@@ -35,7 +35,7 @@ def test_verify_undulator_gap_decorator_runs_on_run_key_only(
     mock_undulator_and_dcm: UndulatorGapCheckDevices,
 ):
     @verify_undulator_gap_before_run_decorator(
-        devices=mock_undulator_and_dcm, run_key_to_wrap=RUN_KEY
+        devices=mock_undulator_and_dcm, run_key_to_wrap=RUN_KEY,
     )
     @bpp.run_decorator()
     def outer_plan():

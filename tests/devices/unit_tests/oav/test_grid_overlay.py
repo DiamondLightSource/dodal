@@ -11,7 +11,7 @@ from dodal.devices.oav.snapshots.grid_overlay import (
 def _test_expected_calls_to_image_draw_line(mock_image_draw: MagicMock, expected_lines):
     mock_image_draw_line = mock_image_draw.return_value.line
     mock_image_draw_line.assert_has_calls(
-        [call(line) for line in expected_lines], any_order=True
+        [call(line) for line in expected_lines], any_order=True,
     )
     assert mock_image_draw_line.call_count == len(expected_lines)
 
@@ -59,7 +59,7 @@ def test_add_grid_border_overlay_to_image_makes_correct_calls_to_imagedraw(
 ):
     image = MagicMock()
     add_grid_border_overlay_to_image(
-        image, top_left_x, top_left_y, box_width, num_boxes_x, num_boxes_y
+        image, top_left_x, top_left_y, box_width, num_boxes_x, num_boxes_y,
     )
     _test_expected_calls_to_image_draw_line(mock_imagedraw, expected_lines)
 
@@ -109,6 +109,6 @@ def test_add_grid_overlay_to_image_makes_correct_calls_to_imagedraw(
 ):
     image = MagicMock()
     add_grid_overlay_to_image(
-        image, top_left_x, top_left_y, box_width, num_boxes_x, num_boxes_y
+        image, top_left_x, top_left_y, box_width, num_boxes_x, num_boxes_y,
     )
     _test_expected_calls_to_image_draw_line(mock_imagedraw, expected_lines)

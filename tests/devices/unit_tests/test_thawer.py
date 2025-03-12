@@ -85,7 +85,7 @@ async def test_given_thawing_already_triggered_when_stop_called_then_stop_thawin
         [
             call(ThawerStates.ON, wait=ANY),
             call(ThawerStates.OFF, wait=ANY),
-        ]
+        ],
     )
 
 
@@ -99,7 +99,7 @@ async def test_calling_stop_on_thawer_stops_thawing_timer_and_turns_thawer_off(
 
 
 @pytest.mark.skip(
-    "Re-enable when https://github.com/bluesky/ophyd-async/issues/410 done"
+    "Re-enable when https://github.com/bluesky/ophyd-async/issues/410 done",
 )
 async def test_thawing_timer_does_not_override_the_name_of_the_control_signal(
     thawer: Thawer,

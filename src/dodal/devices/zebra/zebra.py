@@ -51,8 +51,7 @@ class I24Axes:
 
 
 class RotationDirection(StrictEnum):
-    """
-    Defines for a swept angle whether the scan width (sweep) is to be added or subtracted from
+    """Defines for a swept angle whether the scan width (sweep) is to be added or subtracted from
     the initial angle to obtain the final angle.
     """
 
@@ -76,7 +75,8 @@ class SoftInState(StrictEnum):
 
 class ArmingDevice(StandardReadable):
     """A useful device that can abstract some of the logic of arming.
-    Allows a user to just call arm.set(ArmDemand.ARM)"""
+    Allows a user to just call arm.set(ArmDemand.ARM)
+    """
 
     TIMEOUT: float = 3
 
@@ -143,7 +143,7 @@ class ZebraOutputPanel(StandardReadable):
         self.pulse_2 = PulseOutput(prefix + "PULSE2")
 
         self.out_pvs: DeviceVector[SignalRW] = DeviceVector(
-            {i: epics_signal_rw(float, prefix + f"OUT{i}_TTL") for i in range(1, 5)}
+            {i: epics_signal_rw(float, prefix + f"OUT{i}_TTL") for i in range(1, 5)},
         )
         super().__init__(name)
 
@@ -157,6 +157,7 @@ def boolean_array_to_integer(values: list[bool]) -> int:
 
     Returns:
         int: The interpretted integer.
+
     """
     return sum(v << i for i, v in enumerate(values))
 
@@ -165,7 +166,7 @@ class GateControl(StandardReadable):
     def __init__(self, prefix: str, name: str = "") -> None:
         self.enable = epics_signal_rw(int, prefix + "_ENA")
         self.sources = DeviceVector(
-            {i: epics_signal_rw(float, prefix + f"_INP{i}") for i in range(1, 5)}
+            {i: epics_signal_rw(float, prefix + f"_INP{i}") for i in range(1, 5)},
         )
         self.invert = epics_signal_rw(int, prefix + "_INV")
         super().__init__(name)
@@ -181,11 +182,11 @@ class LogicGateConfigurer(StandardReadable):
 
     def __init__(self, prefix: str, name: str = "") -> None:
         self.and_gates: DeviceVector[GateControl] = DeviceVector(
-            {i: GateControl(prefix + f"AND{i}") for i in range(1, 5)}
+            {i: GateControl(prefix + f"AND{i}") for i in range(1, 5)},
         )
 
         self.or_gates: DeviceVector[GateControl] = DeviceVector(
-            {i: GateControl(prefix + f"OR{i}") for i in range(1, 5)}
+            {i: GateControl(prefix + f"OR{i}") for i in range(1, 5)},
         )
 
         self.all_gates = {
@@ -196,7 +197,7 @@ class LogicGateConfigurer(StandardReadable):
         super().__init__(name)
 
     def apply_logic_gate_config(
-        self, type: GateType, gate_number: int, config: LogicGateConfiguration
+        self, type: GateType, gate_number: int, config: LogicGateConfiguration,
     ):
         """Uses the specified `LogicGateConfiguration` to configure a gate on the Zebra.
 
@@ -204,6 +205,7 @@ class LogicGateConfigurer(StandardReadable):
             type (GateType): The type of gate e.g. AND/OR
             gate_number (int): Which gate to configure.
             config (LogicGateConfiguration): A configuration for the gate.
+
         """
         gate: GateControl = self.all_gates[type][gate_number - 1]
 
@@ -232,7 +234,7 @@ class LogicGateConfiguration:
         self.add_input(input_source, invert)
 
     def add_input(
-        self, input_source: int, invert: bool = False
+        self, input_source: int, invert: bool = False,
     ) -> LogicGateConfiguration:
         """Add an input to the gate. This will throw an assertion error if more than 4
         inputs are added to the Zebra.
@@ -244,6 +246,7 @@ class LogicGateConfiguration:
 
         Returns:
             LogicGateConfiguration: A description of the gate configuration.
+
         """
         assert len(self.sources) < 4
         assert 0 <= input_source <= 63
@@ -254,7 +257,7 @@ class LogicGateConfiguration:
     def __str__(self) -> str:
         input_strings = []
         for input, (source, invert) in enumerate(
-            zip(self.sources, self.invert, strict=False)
+            zip(self.sources, self.invert, strict=False),
         ):
             input_strings.append(f"INP{input + 1}={'!' if invert else ''}{source}")
 

@@ -80,7 +80,7 @@ async def test_shutter_operations(
 @patch("dodal.devices.hutch_shutter.LOGGER")
 @patch("dodal.devices.hutch_shutter.TEST_MODE")
 async def test_shutter_does_not_operate_in_test_mode(
-    patch_test_mode, patch_log, fake_shutter: HutchShutter, RE: RunEngine
+    patch_test_mode, patch_log, fake_shutter: HutchShutter, RE: RunEngine,
 ):
     patch_test_mode.return_value = True
     set_mock_value(fake_shutter.interlock.status, 1)  # Optics hutch open
@@ -90,6 +90,6 @@ async def test_shutter_does_not_operate_in_test_mode(
 
     # Assert shutter state didn't change and warning was logged
     patch_log.warning.assert_called_once_with(
-        "Running in test mode, will not operate the experiment shutter."
+        "Running in test mode, will not operate the experiment shutter.",
     )
     assert await fake_shutter.status.get_value() == ShutterState.CLOSED

@@ -20,8 +20,7 @@ _CONVERSION_CONSTANT = 12.3984
 
 
 class DoubleCrystalMonochromator(StandardReadable):
-    """
-    A double crystal monochromator (DCM), used to select the energy of the beam.
+    """A double crystal monochromator (DCM), used to select the energy of the beam.
 
     perp describes the gap between the 2 DCM crystals which has to change as you alter
     the angle to select the requested energy.
@@ -52,21 +51,21 @@ class DoubleCrystalMonochromator(StandardReadable):
             self.perp_temp = epics_signal_r(float, temperature_prefix + "TC-1")
             self.crystal_1_temp = epics_signal_r(float, temperature_prefix + "PT100-1")
             self.crystal_1_heater_temp = epics_signal_r(
-                float, temperature_prefix + "PT100-2"
+                float, temperature_prefix + "PT100-2",
             )
             self.crystal_2_temp = epics_signal_r(float, temperature_prefix + "PT100-4")
             self.crystal_2_heater_temp = epics_signal_r(
-                float, temperature_prefix + "PT100-5"
+                float, temperature_prefix + "PT100-5",
             )
 
         # Soft metadata
         # If supplied include crystal details in output of read_configuration
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.crystal_1_usage, _ = soft_signal_r_and_setter(
-                str, initial_value=crystal_1_metadata.usage
+                str, initial_value=crystal_1_metadata.usage,
             )
             self.crystal_1_type, _ = soft_signal_r_and_setter(
-                str, initial_value=crystal_1_metadata.type
+                str, initial_value=crystal_1_metadata.type,
             )
             self.crystal_1_reflection, _ = soft_signal_r_and_setter(
                 Array1D[np.int32],
@@ -78,10 +77,10 @@ class DoubleCrystalMonochromator(StandardReadable):
                 units=crystal_1_metadata.d_spacing[1],
             )
             self.crystal_2_usage, _ = soft_signal_r_and_setter(
-                str, initial_value=crystal_2_metadata.usage
+                str, initial_value=crystal_2_metadata.usage,
             )
             self.crystal_2_type, _ = soft_signal_r_and_setter(
-                str, initial_value=crystal_2_metadata.type
+                str, initial_value=crystal_2_metadata.type,
             )
             self.crystal_2_reflection, _ = soft_signal_r_and_setter(
                 Array1D[np.int32],

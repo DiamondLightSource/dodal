@@ -21,22 +21,22 @@ class DetectorMotion(Device):
         self.yaw = Motor(f"{prefix}{device_prefix}YAW")
 
         self.shutter = epics_signal_rw(
-            ShutterState, f"{prefix}{device_prefix}SET_SHUTTER_STATE"
+            ShutterState, f"{prefix}{device_prefix}SET_SHUTTER_STATE",
         )
         self.shutter_closed_lim = epics_signal_r(
-            float, f"{prefix}{device_prefix}CLOSE_LIMIT"
+            float, f"{prefix}{device_prefix}CLOSE_LIMIT",
         )  # on limit = 1, off = 0
         self.shutter_open_lim = epics_signal_r(
-            float, f"{prefix}{device_prefix}OPEN_LIMIT"
+            float, f"{prefix}{device_prefix}OPEN_LIMIT",
         )  # on limit = 1, off = 0
         self.z_disabled = epics_signal_r(
-            float, f"{prefix}{device_prefix}Z:DISABLED"
+            float, f"{prefix}{device_prefix}Z:DISABLED",
         )  # robot interlock, 0=ok to move, 1=blocked
         self.crate_power = epics_signal_r(
-            float, f"{prefix}{pmac_prefix}CRATE2_HEALTHY"
+            float, f"{prefix}{pmac_prefix}CRATE2_HEALTHY",
         )  # returns 0 if no power
         self.in_robot_load_safe_position = epics_signal_r(
-            int, f"{prefix}{pmac_prefix}GPIO_INP_BITS.B2"
+            int, f"{prefix}{pmac_prefix}GPIO_INP_BITS.B2",
         )  # returns 1 if safe
 
         super().__init__(name)

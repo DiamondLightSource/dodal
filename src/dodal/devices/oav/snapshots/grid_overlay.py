@@ -36,7 +36,9 @@ def _add_parallel_lines_to_image(
             there are spacing-1 pixels between each line
         num_lines (int): The total number of parallel lines to draw.
         orientation (Orientation): The orientation (horizontal or vertical) of the \
-            parallel lines to draw."""
+            parallel lines to draw.
+
+    """
     lines = [
         (
             (
@@ -57,12 +59,12 @@ def _add_parallel_lines_to_image(
 
 
 _add_vertical_parallel_lines_to_image = partial(
-    _add_parallel_lines_to_image, orientation=Orientation.vertical
+    _add_parallel_lines_to_image, orientation=Orientation.vertical,
 )
 
 
 _add_horizontal_parallel_lines_to_image = partial(
-    _add_parallel_lines_to_image, orientation=Orientation.horizontal
+    _add_parallel_lines_to_image, orientation=Orientation.horizontal,
 )
 
 

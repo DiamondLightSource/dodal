@@ -26,10 +26,10 @@ def test_locate_sample_simple_forward():
     assert location.edge_bottom is not None
 
     np.testing.assert_array_equal(
-        location.edge_top, np.array([NONE_VALUE, 1, 1, 1, 2], dtype=np.int32)
+        location.edge_top, np.array([NONE_VALUE, 1, 1, 1, 2], dtype=np.int32),
     )
     np.testing.assert_array_equal(
-        location.edge_bottom, np.array([NONE_VALUE, 3, 3, 3, 2], dtype=np.int32)
+        location.edge_bottom, np.array([NONE_VALUE, 3, 3, 3, 2], dtype=np.int32),
     )
 
     assert location.tip_x == 1
@@ -49,17 +49,17 @@ def test_locate_sample_simple_reverse():
     )
 
     location = MxSampleDetect(
-        min_tip_height=1, scan_direction=ScanDirections.REVERSE
+        min_tip_height=1, scan_direction=ScanDirections.REVERSE,
     )._locate_sample(test_arr)
 
     assert location.edge_top is not None
     assert location.edge_bottom is not None
 
     np.testing.assert_array_equal(
-        location.edge_top, np.array([2, 1, 1, 1, NONE_VALUE], dtype=np.int32)
+        location.edge_top, np.array([2, 1, 1, 1, NONE_VALUE], dtype=np.int32),
     )
     np.testing.assert_array_equal(
-        location.edge_bottom, np.array([2, 3, 3, 3, NONE_VALUE], dtype=np.int32)
+        location.edge_bottom, np.array([2, 3, 3, 3, NONE_VALUE], dtype=np.int32),
     )
 
     assert location.tip_x == 3
@@ -97,7 +97,7 @@ def test_locate_sample_no_edges():
 
 
 @pytest.mark.parametrize(
-    "direction,x_centre", [(ScanDirections.FORWARD, 0), (ScanDirections.REVERSE, 4)]
+    "direction,x_centre", [(ScanDirections.FORWARD, 0), (ScanDirections.REVERSE, 4)],
 )
 def test_locate_sample_tip_off_screen(direction, x_centre):
     test_arr = np.array(
@@ -112,17 +112,17 @@ def test_locate_sample_tip_off_screen(direction, x_centre):
     )
 
     location = MxSampleDetect(
-        min_tip_height=1, scan_direction=direction
+        min_tip_height=1, scan_direction=direction,
     )._locate_sample(test_arr)
 
     assert location.edge_top is not None
     assert location.edge_bottom is not None
 
     np.testing.assert_array_equal(
-        location.edge_top, np.array([1, 1, 1, 1, 1], dtype=np.int32)
+        location.edge_top, np.array([1, 1, 1, 1, 1], dtype=np.int32),
     )
     np.testing.assert_array_equal(
-        location.edge_bottom, np.array([3, 3, 3, 3, 3], dtype=np.int32)
+        location.edge_bottom, np.array([3, 3, 3, 3, 3], dtype=np.int32),
     )
 
     # Currently sample "off screen" is not considered an error so a centre is still returned.
@@ -138,7 +138,7 @@ def test_locate_sample_tip_off_screen(direction, x_centre):
     ],
 )
 def test_locate_sample_with_min_tip_height(
-    min_tip_width, sample_x_location, expected_top_edge, expected_bottom_edge
+    min_tip_width, sample_x_location, expected_top_edge, expected_bottom_edge,
 ):
     # "noise" at (0, 2) should be ignored by "min tip width" mechanism if it has min width >1
     # Tip should therefore be detected at (2, 2) for min_tip_width = 3, or (0, 2) for min_tip_width = 1
@@ -161,7 +161,7 @@ def test_locate_sample_with_min_tip_height(
     # Even though an edge is detected at x=4, it should be explicitly set to NONE_VALUE
     # as this is past the detected "tip"
     np.testing.assert_array_equal(
-        location.edge_top, np.array(expected_top_edge, dtype=np.int32)
+        location.edge_top, np.array(expected_top_edge, dtype=np.int32),
     )
     np.testing.assert_array_equal(
         location.edge_bottom,

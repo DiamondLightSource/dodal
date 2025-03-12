@@ -26,7 +26,7 @@ class Transfocator(StandardReadable):
         with self.add_children_as_readables():
             self.beamsize_set_microns = epics_signal_rw(float, prefix + "VERT_REQ")
             self.predicted_vertical_num_lenses = epics_signal_rw(
-                float, prefix + "LENS_PRED"
+                float, prefix + "LENS_PRED",
             )
             self.number_filters_sp = epics_signal_rw(int, prefix + "NUM_FILTERS")
             self.start = epics_signal_rw(int, prefix + "START.PROC")
@@ -70,7 +70,7 @@ class Transfocator(StandardReadable):
 
             # Register an observer before setting beamsize_set_microns to ensure we don't miss changes
             predicted_vertical_num_lenses_iterator = observe_value(
-                self.predicted_vertical_num_lenses, timeout=self.TIMEOUT
+                self.predicted_vertical_num_lenses, timeout=self.TIMEOUT,
             )
             # Keep initial prediction before setting to later compare with change after setting
             current_prediction = await anext(predicted_vertical_num_lenses_iterator)
@@ -85,5 +85,5 @@ class Transfocator(StandardReadable):
         )
 
         LOGGER.info(
-            f"Transfocator set complete. Number of filters is: {number_filters_rbv} and Vertical beam size is: {vertical_lens_size_rbv}"
+            f"Transfocator set complete. Number of filters is: {number_filters_rbv} and Vertical beam size is: {vertical_lens_size_rbv}",
         )

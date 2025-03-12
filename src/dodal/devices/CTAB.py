@@ -35,7 +35,7 @@ class CTAB(StandardReadable):
             self.yaw = Motor(prefix + "-MO-TABLE-01:YAW")
 
             self.crate_power = epics_signal_r(
-                int, prefix + "-MO-PMAC-02:CRATE2_HEALTHY"
+                int, prefix + "-MO-PMAC-02:CRATE2_HEALTHY",
             )  # returns 0 if no power
 
             super().__init__(name)

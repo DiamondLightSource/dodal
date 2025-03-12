@@ -24,7 +24,7 @@ set_path_provider(
     StaticVisitPathProvider(
         BL,
         Path("/data/2024/cm37283-2/"),  # latest commissioning visit
-    )
+    ),
 )
 
 

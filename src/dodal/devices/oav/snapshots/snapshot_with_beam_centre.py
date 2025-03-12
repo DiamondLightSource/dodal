@@ -42,7 +42,8 @@ def draw_crosshair(image: Image.Image, beam_x: int, beam_y: int):
 
 class SnapshotWithBeamCentre(MJPG):
     """A child of MJPG which, when triggered, draws an outlined crosshair at the beam
-    centre in the image and saves the image to disk."""
+    centre in the image and saves the image to disk.
+    """
 
     def __init__(
         self,

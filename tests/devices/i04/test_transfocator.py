@@ -26,7 +26,7 @@ def given_predicted_lenses_is_half_of_beamsize(transfocator: Transfocator):
 
 
 async def set_beamsize_to_same_value_as_mock_signal(
-    transfocator: Transfocator, value: float
+    transfocator: Transfocator, value: float,
 ):
     set_mock_value(transfocator.beamsize_set_microns, value)
     await transfocator.set(value)

@@ -52,8 +52,8 @@ def aperture_positions() -> dict[ApertureValue, AperturePosition]:
                 "miniap_z_ROBOT_LOAD": 15.8,
                 "sg_x_ROBOT_LOAD": 5.25,
                 "sg_y_ROBOT_LOAD": 4.43,
-            }
-        )
+            },
+        ),
     )
 
 
@@ -67,8 +67,8 @@ def aperture_tolerances():
                 "miniap_z_tolerance": 0.1,
                 "sg_x_tolerance": 0.1,
                 "sg_y_tolerance": 0.1,
-            }
-        )
+            },
+        ),
     )
 
 
@@ -109,7 +109,7 @@ async def ap_sg(ap_sg_and_call_log: ApSgAndLog):
 
 
 async def set_to_position(
-    aperture_scatterguard: ApertureScatterguard, position: AperturePosition
+    aperture_scatterguard: ApertureScatterguard, position: AperturePosition,
 ):
     aperture_x, aperture_y, aperture_z, scatterguard_x, scatterguard_y = position.values
 
@@ -132,7 +132,7 @@ async def aperture_in_medium_pos_w_call_log(
 
     set_mock_value(ap_sg.aperture.medium, 1)
 
-    yield ap_sg, call_log
+    return ap_sg, call_log
 
 
 @pytest.fixture
@@ -261,7 +261,7 @@ async def test_aperture_scatterguard_returns_status_if_within_tolerance(
     set_mock_value(ap_sg.aperture.z.motor_done_move, 1)
 
     pos = AperturePosition(
-        aperture_x=0, aperture_y=0, aperture_z=1, scatterguard_x=0, scatterguard_y=0
+        aperture_x=0, aperture_y=0, aperture_z=1, scatterguard_x=0, scatterguard_y=0,
     )
     await ap_sg._safe_move_whilst_in_beam(pos)
 
@@ -434,7 +434,7 @@ async def test_ap_sg_descriptor(
 
 
 async def assert_all_positions_other_than_y(
-    ap_sg: ApertureScatterguard, position: AperturePosition
+    ap_sg: ApertureScatterguard, position: AperturePosition,
 ):
     ap = ap_sg.aperture
     sg = ap_sg.scatterguard
@@ -457,7 +457,7 @@ async def test_given_aperture_out_when_new_aperture_selected_then_aperture_not_m
     assert await ap.y.user_setpoint.get_value() == y_set_point
 
     await assert_all_positions_other_than_y(
-        ap_sg, aperture_positions[ApertureValue.SMALL]
+        ap_sg, aperture_positions[ApertureValue.SMALL],
     )
 
 
@@ -468,7 +468,7 @@ async def test_given_aperture_in_when_new_aperture_set_then_aperture_moved_safel
     aperture_in_medium_pos._safe_move_whilst_in_beam = AsyncMock()
     await aperture_in_medium_pos.prepare(ApertureValue.SMALL)
     aperture_in_medium_pos._safe_move_whilst_in_beam.assert_called_once_with(
-        aperture_positions[ApertureValue.SMALL]
+        aperture_positions[ApertureValue.SMALL],
     )
 
 

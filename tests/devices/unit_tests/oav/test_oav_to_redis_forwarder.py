@@ -39,7 +39,7 @@ def get_mock_response(jpeg_bytes: bytes | None = None):
 @pytest.fixture
 def oav_forwarder_with_valid_response(oav_forwarder: OAVToRedisForwarder):
     client_session_patch = patch(
-        "dodal.devices.oav.oav_to_redis_forwarder.ClientSession.get", autospec=True
+        "dodal.devices.oav.oav_to_redis_forwarder.ClientSession.get", autospec=True,
     )
     mock_get = client_session_patch.start()
     mock_get.return_value.__aenter__.return_value = (
@@ -52,7 +52,7 @@ def oav_forwarder_with_valid_response(oav_forwarder: OAVToRedisForwarder):
 
 @patch("dodal.devices.oav.oav_to_redis_forwarder.ClientSession.get", autospec=True)
 async def test_given_response_is_not_mjpeg_when_oav_forwarder_kicked_off_then_exception_raised(
-    mock_get, oav_forwarder
+    mock_get, oav_forwarder,
 ):
     mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
     mock_response.content_type = "bad_content_type"
@@ -123,7 +123,7 @@ async def test_when_get_frame_and_put_to_redis_called_then_data_is_jpeg_bytes(
 ):
     expected_bytes = b"\xff\xd8\x67\xce\xff\xd9"
     await oav_forwarder._get_frame_and_put_to_redis(
-        ANY, get_mock_response(expected_bytes)
+        ANY, get_mock_response(expected_bytes),
     )
     redis_call = oav_forwarder.redis_client.hset.call_args[0]
     assert redis_call[2] == expected_bytes
@@ -148,7 +148,7 @@ async def test_when_get_frame_and_put_to_redis_called_then_data_put_in_redis_wit
     ],
 )
 async def test_when_different_sources_selected_then_different_urls_used(
-    oav_forwarder_with_valid_response, source, expected_url
+    oav_forwarder_with_valid_response, source, expected_url,
 ):
     oav_forwarder, _, mock_get = oav_forwarder_with_valid_response
     set_mock_value(oav_forwarder.selected_source, source.value)
@@ -167,7 +167,7 @@ async def test_when_different_sources_selected_then_different_urls_used(
     ],
 )
 async def test_when_different_sources_selected_then_different_uuids_used(
-    oav_forwarder_with_valid_response, source, expected_uuid_prefix
+    oav_forwarder_with_valid_response, source, expected_uuid_prefix,
 ):
     oav_forwarder, _, _ = oav_forwarder_with_valid_response
     set_mock_value(oav_forwarder.selected_source, source.value)
@@ -188,7 +188,7 @@ async def test_when_different_sources_selected_then_different_uuids_used(
     ],
 )
 async def test_oav_only_forwards_data_when_the_unique_id_updates(
-    oav_forwarder_with_valid_response, source, expected_uuid_prefix
+    oav_forwarder_with_valid_response, source, expected_uuid_prefix,
 ):
     oav_forwarder, _, _ = oav_forwarder_with_valid_response
     set_mock_value(oav_forwarder.selected_source, source.value)

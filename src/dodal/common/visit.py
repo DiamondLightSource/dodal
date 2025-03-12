@@ -15,8 +15,7 @@ Functionality required for/from the API of a DirectoryService which exposes the 
 
 
 class DataCollectionIdentifier(BaseModel):
-    """
-    Equivalent to a `Scan Number` or `scan_id`, non-globally unique scan identifier.
+    """Equivalent to a `Scan Number` or `scan_id`, non-globally unique scan identifier.
     Should be always incrementing, unique per-visit, co-ordinated with any other scan engines.
     """
 
@@ -24,8 +23,7 @@ class DataCollectionIdentifier(BaseModel):
 
 
 class DirectoryServiceClient(ABC):
-    """
-    Object responsible for I/O in determining collection number
+    """Object responsible for I/O in determining collection number
     """
 
     @abstractmethod
@@ -98,8 +96,7 @@ class LocalDirectoryServiceClient(DirectoryServiceClient):
 
 
 class StaticVisitPathProvider(UpdatingPathProvider):
-    """
-    Static (single visit) implementation of PathProvider whilst awaiting auth infrastructure to generate necessary information per-scan.
+    """Static (single visit) implementation of PathProvider whilst awaiting auth infrastructure to generate necessary information per-scan.
     Allows setting a singular visit into which all run files will be saved.
     update() queries a visit service to get the next DataCollectionIdentifier to increment the suffix of all file writers' next files.
     Requires that all detectors are running with a mutual view on the filesystem.
@@ -115,7 +112,7 @@ class StaticVisitPathProvider(UpdatingPathProvider):
     ):
         self._beamline = beamline
         self._client = client or RemoteDirectoryServiceClient(
-            f"{beamline}-control:8088/api"
+            f"{beamline}-control:8088/api",
         )
         self._filename_provider = DiamondFilenameProvider(self._beamline, self._client)
         self._root = root
@@ -123,8 +120,7 @@ class StaticVisitPathProvider(UpdatingPathProvider):
         self._session: ClientSession | None
 
     async def update(self, **kwargs) -> None:
-        """
-        Creates a new data collection in the current visit.
+        """Creates a new data collection in the current visit.
         """
         # https://github.com/DiamondLightSource/dodal/issues/452
         # TODO: Allow selecting visit as part of a request
@@ -136,7 +132,7 @@ class StaticVisitPathProvider(UpdatingPathProvider):
             )
         except Exception:
             LOGGER.error(
-                "Exception while updating data collection, preventing overwriting data by setting current_collection to None"
+                "Exception while updating data collection, preventing overwriting data by setting current_collection to None",
             )
             self._collection_id_info = None
             raise
@@ -148,5 +144,5 @@ class StaticVisitPathProvider(UpdatingPathProvider):
     def __call__(self, device_name: str | None = None) -> PathInfo:
         assert device_name, "Must call PathProvider with device_name"
         return PathInfo(
-            directory_path=self._root, filename=self._filename_provider(device_name)
+            directory_path=self._root, filename=self._filename_provider(device_name),
         )

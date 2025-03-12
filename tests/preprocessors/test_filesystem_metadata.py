@@ -60,7 +60,7 @@ class FakeDetector(Readable, HasName, Triggerable):
                 "dtype": "string",
                 "shape": [1],
                 "source": source,
-            }
+            },
         }
 
     @AsyncStatus.wrap
@@ -83,13 +83,13 @@ class MockDirectoryServiceClient(LocalDirectoryServiceClient):
 
     async def create_new_collection(self) -> DataCollectionIdentifier:
         if self.fail:
-            raise ValueError()
+            raise ValueError
 
         return await super().create_new_collection()
 
     async def get_current_collection(self) -> DataCollectionIdentifier:
         if self.fail:
-            raise ValueError()
+            raise ValueError
 
         return await super().get_current_collection()
 
@@ -370,7 +370,7 @@ def assert_all_detectors_used_collection_numbers(
     assert len(descriptors) == len(dataCollectionIds)
 
     for descriptor, dataCollectionId in zip(
-        descriptors, dataCollectionIds, strict=False
+        descriptors, dataCollectionIds, strict=False,
     ):
         for detector in detectors:
             source = descriptor.doc.get("data_keys", {}).get(f"{detector.name}_data")[

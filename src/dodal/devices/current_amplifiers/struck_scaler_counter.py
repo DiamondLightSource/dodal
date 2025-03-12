@@ -25,19 +25,20 @@ COUNT_PER_VOLTAGE = 100000
 
 
 class StruckScaler(CurrentAmpCounter):
-    """
-    StruckScaler is a counting card that record the output signal from a wide
+    """StruckScaler is a counting card that record the output signal from a wide
       range of detectors. This class contains the basic control to run the struckscaler
       card together with a current amplifier. It has functions that provide conversion
       between count and voltage.
+
     Attributes:
         readout(SignalR): Scaler card output.
         count_mode (SignalR[CountMode]): Counting card setting.
         count_time (SignalRW([float]): Count time.
+
     """
 
     def __init__(
-        self, prefix: str, suffix: str, count_per_volt=COUNT_PER_VOLTAGE, name: str = ""
+        self, prefix: str, suffix: str, count_per_volt=COUNT_PER_VOLTAGE, name: str = "",
     ):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.readout = epics_signal_r(float, prefix + suffix)

@@ -46,7 +46,8 @@ class SR570RaiseTimeTable(float, Enum):
 
 class SR570FullGainTable(Enum):
     """Combined gain table, as each gain step is a combination of both coarse gain and
-    fine gain setting"""
+    fine gain setting
+    """
 
     SEN_1 = [SR570GainTable.SEN_1, SR570FineGainTable.SEN_1]
     SEN_2 = [SR570GainTable.SEN_2, SR570FineGainTable.SEN_9]
@@ -112,10 +113,10 @@ class SR570GainToCurrentTable(float, Enum):
 
 
 class SR570(CurrentAmp):
-    """
-    SR570 current amplifier device. This is similar to Femto with the only different
+    """SR570 current amplifier device. This is similar to Femto with the only different
      is SR570 has two gain setting fine and coarse, therefore it requires extra
      gain tables.
+
     Attributes:
         fine_gain (SignalRW): This is the epic signal that control SR570 fine gain.
         coarse_gain (SignalRW): This is the epic signal that control SR570 coarse gain.
@@ -166,7 +167,7 @@ class SR570(CurrentAmp):
             raise ValueError(
                 f"Gain value {value} is not within {self.name} range."
                 + "\n Available gain:"
-                + f" {[f'{c.value:.0e}' for c in self.gain_conversion_table]}"
+                + f" {[f'{c.value:.0e}' for c in self.gain_conversion_table]}",
             )
         SEN_setting = self.gain_conversion_table(value).name
         LOGGER.info(f"{self.name} gain change to {value}")
@@ -184,7 +185,7 @@ class SR570(CurrentAmp):
         current_gain += value
         if current_gain > len(self.combined_table):
             await self.set(
-                self.gain_conversion_table[f"SEN_{len(self.combined_table)}"]
+                self.gain_conversion_table[f"SEN_{len(self.combined_table)}"],
             )
             raise ValueError("Gain at max value")
         await self.set(self.gain_conversion_table[f"SEN_{current_gain}"])
@@ -201,7 +202,7 @@ class SR570(CurrentAmp):
     @AsyncStatus.wrap
     async def get_gain(self) -> Enum:
         result = await asyncio.gather(
-            self.coarse_gain.get_value(), self.fine_gain.get_value()
+            self.coarse_gain.get_value(), self.fine_gain.get_value(),
         )
         return self.gain_conversion_table[self.combined_table(result).name]
 

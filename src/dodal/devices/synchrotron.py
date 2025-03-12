@@ -52,19 +52,19 @@ class Synchrotron(StandardReadable):
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.probe, _ = soft_signal_r_and_setter(str, initial_value="x-ray")
             self.type, _ = soft_signal_r_and_setter(
-                str, initial_value="Synchrotron X-ray Source"
+                str, initial_value="Synchrotron X-ray Source",
             )
             self.synchrotron_mode = epics_signal_r(
-                SynchrotronMode, status_prefix + Suffix.MODE
+                SynchrotronMode, status_prefix + Suffix.MODE,
             )
         self.machine_user_countdown = epics_signal_r(
-            float, status_prefix + Suffix.USER_COUNTDOWN
+            float, status_prefix + Suffix.USER_COUNTDOWN,
         )
         self.top_up_start_countdown = epics_signal_r(
-            float, topup_prefix + Suffix.COUNTDOWN
+            float, topup_prefix + Suffix.COUNTDOWN,
         )
         self.top_up_end_countdown = epics_signal_r(
-            float, topup_prefix + Suffix.END_COUNTDOWN
+            float, topup_prefix + Suffix.END_COUNTDOWN,
         )
 
         super().__init__(name=name)

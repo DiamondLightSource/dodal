@@ -1,5 +1,4 @@
-"""
-Note: this file exists exclusively to make it easier to manually run
+"""Note: this file exists exclusively to make it easier to manually run
 image recognition on a beamline without setting up all of the
 bluesky infrastructure.
 
@@ -20,7 +19,7 @@ if __name__ == "__main__":
         return img, tip
 
     img, tip = asyncio.get_event_loop().run_until_complete(
-        asyncio.wait_for(acquire(), timeout=10)
+        asyncio.wait_for(acquire(), timeout=10),
     )
     print(tip)
     print("Tip: {}".format(tip["edgeDetect"]["value"]))

@@ -42,7 +42,7 @@ set_path_provider(
         BL,
         Path("/dls/p38/data/2024/cm37282-2/bluesky"),
         client=LocalDirectoryServiceClient(),
-    )
+    ),
 )
 
 
@@ -147,10 +147,10 @@ def dcm() -> DoubleCrystalMonochromator:
     return DoubleCrystalMonochromator(
         temperature_prefix=f"{PREFIX.beamline_prefix}-DI-DCM-01:",
         crystal_1_metadata=make_crystal_metadata_from_material(
-            MaterialsEnum.Si, (1, 1, 1)
+            MaterialsEnum.Si, (1, 1, 1),
         ),
         crystal_2_metadata=make_crystal_metadata_from_material(
-            MaterialsEnum.Si, (1, 1, 1)
+            MaterialsEnum.Si, (1, 1, 1),
         ),
     )
 

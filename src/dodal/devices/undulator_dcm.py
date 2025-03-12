@@ -13,8 +13,7 @@ ENERGY_TIMEOUT_S: float = 30.0
 
 
 class UndulatorDCM(StandardReadable, Movable):
-    """
-    Composite device to handle changing beamline energies, wraps the Undulator and the
+    """Composite device to handle changing beamline energies, wraps the Undulator and the
     DCM. The DCM has a motor which controls the beam energy, when it moves, the
     Undulator gap may also have to change to enable emission at the new energy.
     The relationship between the two motor motor positions is provided via a lookup
@@ -46,7 +45,7 @@ class UndulatorDCM(StandardReadable, Movable):
         # I03 configures the DCM Perp as a side effect of applying this fixed value to the DCM Offset after an energy change
         # Nb this parameter is misleadingly named to confuse you
         self.dcm_fixed_offset_mm = get_beamline_parameters(
-            daq_configuration_path + "/domain/beamlineParameters"
+            daq_configuration_path + "/domain/beamlineParameters",
         )["DCM_Perp_Offset_FIXED"]
 
         super().__init__(name)

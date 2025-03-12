@@ -29,17 +29,17 @@ class DetectorDistanceToBeamXYConverter:
         return beam_mm * image_size_pixels / det_dim
 
     def get_beam_y_pixels(
-        self, det_distance: float, image_size_pixels: int, det_dim: float
+        self, det_distance: float, image_size_pixels: int, det_dim: float,
     ) -> float:
         return self.get_beam_axis_pixels(
-            det_distance, image_size_pixels, det_dim, Axis.Y_AXIS
+            det_distance, image_size_pixels, det_dim, Axis.Y_AXIS,
         )
 
     def get_beam_x_pixels(
-        self, det_distance: float, image_size_pixels: int, det_dim: float
+        self, det_distance: float, image_size_pixels: int, det_dim: float,
     ) -> float:
         return self.get_beam_axis_pixels(
-            det_distance, image_size_pixels, det_dim, Axis.X_AXIS
+            det_distance, image_size_pixels, det_dim, Axis.X_AXIS,
         )
 
     def reload_lookup_table(self):

@@ -49,7 +49,7 @@ class ColoredFormatterWithDeviceName(colorlog.ColoredFormatter):
 
 
 DEFAULT_FORMATTER = ColoredFormatterWithDeviceName(
-    fmt=DEFAULT_FORMAT, datefmt=DEFAULT_DATE_FORMAT, log_colors=DEFAULT_LOG_COLORS
+    fmt=DEFAULT_FORMAT, datefmt=DEFAULT_DATE_FORMAT, log_colors=DEFAULT_LOG_COLORS,
 )
 
 
@@ -76,8 +76,7 @@ class CircularMemoryHandler(logging.Handler):
             self.flush()
 
     def flush(self):
-        """
-        Pass the contents of the buffer forward to the target.
+        """Pass the contents of the buffer forward to the target.
         """
         self.acquire()
         try:
@@ -151,11 +150,12 @@ def set_up_graylog_handler(logger: Logger, host: str, port: int):
 
 def set_up_INFO_file_handler(logger, path: Path, filename: str):
     """Set up a file handler for the logger, at INFO level, which will keep 30 days
-    of logs, rotating once per day. Creates the directory if necessary."""
+    of logs, rotating once per day. Creates the directory if necessary.
+    """
     print(f"Logging to INFO file handler {path / filename}")
     path.mkdir(parents=True, exist_ok=True)
     file_handler = TimedRotatingFileHandler(
-        filename=path / filename, when="MIDNIGHT", backupCount=INFO_LOG_DAYS
+        filename=path / filename, when="MIDNIGHT", backupCount=INFO_LOG_DAYS,
     )
     file_handler.setLevel(logging.INFO)
     _add_handler(logger, file_handler)
@@ -163,16 +163,17 @@ def set_up_INFO_file_handler(logger, path: Path, filename: str):
 
 
 def set_up_DEBUG_memory_handler(
-    logger: Logger, path: Path, filename: str, capacity: int
+    logger: Logger, path: Path, filename: str, capacity: int,
 ):
     """Set up a Memory handler which holds 200k lines, and writes them to an hourly
     log file when it sees a message of severity ERROR. Creates the directory if
-    necessary"""
+    necessary
+    """
     debug_path = path / "debug"
     print(f"Logging to DEBUG handler {debug_path / filename}")
     debug_path.mkdir(parents=True, exist_ok=True)
     file_handler = TimedRotatingFileHandler(
-        filename=debug_path / filename, when="H", backupCount=DEBUG_LOG_FILES_TO_KEEP
+        filename=debug_path / filename, when="H", backupCount=DEBUG_LOG_FILES_TO_KEEP,
     )
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(DEFAULT_FORMATTER)
@@ -203,6 +204,7 @@ def set_up_all_logging_handlers(
     graylog_port: int | None = None,
 ) -> DodalLogHandlers:
     """Set up the default logging environment.
+
     Args:
         logger:                 the logging.Logger object to apply all the handlers to.
         logging_path:           The location to store log files.
@@ -215,16 +217,16 @@ def set_up_all_logging_handlers(
                                 default dodal port
     Returns:
         A DodaLogHandlers TypedDict with the created handlers.
-    """
 
+    """
     handlers: DodalLogHandlers = {
         "stream_handler": set_up_stream_handler(logger),
         "graylog_handler": set_up_graylog_handler(
-            logger, *get_graylog_configuration(dev_mode, graylog_port)
+            logger, *get_graylog_configuration(dev_mode, graylog_port),
         ),
         "info_file_handler": set_up_INFO_file_handler(logger, logging_path, filename),
         "debug_memory_handler": set_up_DEBUG_memory_handler(
-            logger, logging_path, filename, error_log_buffer_lines
+            logger, logging_path, filename, error_log_buffer_lines,
         ),
     }
 
@@ -258,6 +260,7 @@ def get_logging_file_path() -> Path:
 
     Returns:
         logging_path (Path): Path to the log directory for the file handlers to write to.
+
     """
     beamline: str | None = environ.get("BEAMLINE")
     logging_path: Path
@@ -270,7 +273,7 @@ def get_logging_file_path() -> Path:
 
 
 def get_graylog_configuration(
-    dev_mode: bool, graylog_port: int | None = None
+    dev_mode: bool, graylog_port: int | None = None,
 ) -> tuple[str, int]:
     """Get the host and port for the graylog handler.
 
@@ -279,11 +282,11 @@ def get_graylog_configuration(
 
     Returns:
         (host, port): A tuple of the relevant host and port for graylog.
+
     """
     if dev_mode:
         return "localhost", 5555
-    else:
-        return "graylog-log-target.diamond.ac.uk", graylog_port or DEFAULT_GRAYLOG_PORT
+    return "graylog-log-target.diamond.ac.uk", graylog_port or DEFAULT_GRAYLOG_PORT
 
 
 class _NoOpFileHandler:

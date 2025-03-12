@@ -20,7 +20,7 @@ def angle_stage() -> SampleAngleStage:
 @device_factory()
 def filter() -> FilterMotor:
     return FilterMotor(
-        f"{PREFIX.beamline_prefix}-MO-STAGE-02:MP:SELECT", P99FilterSelections
+        f"{PREFIX.beamline_prefix}-MO-STAGE-02:MP:SELECT", P99FilterSelections,
     )
 
 

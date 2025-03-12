@@ -31,8 +31,8 @@ class _GDAParamApertureValue(StrictEnum):
 
 
 class AperturePosition(BaseModel):
-    """
-    Represents one of the available positions for the Aperture-Scatterguard.
+    """Represents one of the available positions for the Aperture-Scatterguard.
+
     Attributes:
         aperture_x: The x position of the aperture component in mm
         aperture_y: The y position of the aperture component in mm
@@ -41,6 +41,7 @@ class AperturePosition(BaseModel):
         scatterguard_y: The y position of the scatterguard component in mm
         radius: Radius of the selected aperture. When in the Robot Load position, the
             radius is defined to be 0
+
     """
 
     aperture_x: float
@@ -109,16 +110,16 @@ def load_positions_from_beamline_parameters(
 ) -> dict[ApertureValue, AperturePosition]:
     return {
         ApertureValue.OUT_OF_BEAM: AperturePosition.from_gda_params(
-            _GDAParamApertureValue.ROBOT_LOAD, 0, params
+            _GDAParamApertureValue.ROBOT_LOAD, 0, params,
         ),
         ApertureValue.SMALL: AperturePosition.from_gda_params(
-            _GDAParamApertureValue.SMALL, 20, params
+            _GDAParamApertureValue.SMALL, 20, params,
         ),
         ApertureValue.MEDIUM: AperturePosition.from_gda_params(
-            _GDAParamApertureValue.MEDIUM, 50, params
+            _GDAParamApertureValue.MEDIUM, 50, params,
         ),
         ApertureValue.LARGE: AperturePosition.from_gda_params(
-            _GDAParamApertureValue.LARGE, 100, params
+            _GDAParamApertureValue.LARGE, 100, params,
         ),
     }
 
@@ -153,6 +154,7 @@ class ApertureScatterguard(StandardReadable, Movable, Preparable):
 
         Given the prepare has been done this move will now be faster as only the y is
         left to move.
+
     """
 
     def __init__(
@@ -165,7 +167,7 @@ class ApertureScatterguard(StandardReadable, Movable, Preparable):
         self.aperture = Aperture(prefix + "-MO-MAPT-01:")
         self.scatterguard = Scatterguard(prefix + "-MO-SCAT-01:")
         self.radius = create_hardware_backed_soft_signal(
-            float, self._get_current_radius, units="µm"
+            float, self._get_current_radius, units="µm",
         )
         self._loaded_positions = loaded_positions
         self._tolerances = tolerances
@@ -182,7 +184,7 @@ class ApertureScatterguard(StandardReadable, Movable, Preparable):
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.selected_aperture = create_hardware_backed_soft_signal(
-                ApertureValue, self._get_current_aperture_position
+                ApertureValue, self._get_current_aperture_position,
             )
 
         super().__init__(name)
@@ -190,7 +192,6 @@ class ApertureScatterguard(StandardReadable, Movable, Preparable):
     @AsyncStatus.wrap
     async def set(self, value: ApertureValue):
         """This set will move the aperture into the beam or move the whole assembly out"""
-
         position = self._loaded_positions[value]
         await self._check_safe_to_move(position.aperture_z)
 
@@ -213,7 +214,7 @@ class ApertureScatterguard(StandardReadable, Movable, Preparable):
         aperture_z_tolerance = self._tolerances.aperture_z
         if diff_on_z > aperture_z_tolerance:
             raise InvalidApertureMove(
-                f"Current aperture z ({current_ap_z}), outside of tolerance ({aperture_z_tolerance}) from target ({expected_z_position})."
+                f"Current aperture z ({current_ap_z}), outside of tolerance ({aperture_z_tolerance}) from target ({expected_z_position}).",
             )
 
         all_axes = [
@@ -228,12 +229,11 @@ class ApertureScatterguard(StandardReadable, Movable, Preparable):
             if not axis_stationary:
                 raise InvalidApertureMove(
                     f"{axis.name} is still moving. Wait for it to finish before"
-                    "triggering another move."
+                    "triggering another move.",
                 )
 
     async def _safe_move_whilst_in_beam(self, position: AperturePosition):
-        """
-        Move the aperture and scatterguard combo safely to a new position.
+        """Move the aperture and scatterguard combo safely to a new position.
         See https://github.com/DiamondLightSource/hyperion/wiki/Aperture-Scatterguard-Collisions
         for why this is required. TLDR is that we have a collision at the top of y so we need
         to make sure we move the assembly down before we move the scatterguard up.
@@ -288,19 +288,18 @@ class ApertureScatterguard(StandardReadable, Movable, Preparable):
         return current_ap_y <= out_ap_y + self._tolerances.aperture_y
 
     async def _get_current_aperture_position(self) -> ApertureValue:
-        """
-        Returns the current aperture position using readback values
+        """Returns the current aperture position using readback values
         for SMALL, MEDIUM, LARGE. ROBOT_LOAD position defined when
         mini aperture y <= ROBOT_LOAD.location.aperture_y + tolerance.
         If no position is found then raises InvalidApertureMove.
         """
         if await self.aperture.large.get_value(cached=False) == 1:
             return ApertureValue.LARGE
-        elif await self.aperture.medium.get_value(cached=False) == 1:
+        if await self.aperture.medium.get_value(cached=False) == 1:
             return ApertureValue.MEDIUM
-        elif await self.aperture.small.get_value(cached=False) == 1:
+        if await self.aperture.small.get_value(cached=False) == 1:
             return ApertureValue.SMALL
-        elif await self._is_out_of_beam():
+        if await self._is_out_of_beam():
             return ApertureValue.OUT_OF_BEAM
 
         raise InvalidApertureMove("Current aperture/scatterguard state unrecognised")

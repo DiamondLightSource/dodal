@@ -156,10 +156,11 @@ class ProgramRunner(Device, Flyable):
         Args:
             complete_time (float): total time required by the collection to \
             finish correctly.
+
         """
         scan_complete_time = await self._collection_time_ref().get_value()
         await wait_for_value(
-            self._status_ref(), ScanState.DONE, timeout=scan_complete_time
+            self._status_ref(), ScanState.DONE, timeout=scan_complete_time,
         )
 
 

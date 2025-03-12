@@ -93,7 +93,7 @@ def test_plan_produces_expected_start_document(
     indirect=["documents_from_expected_shape"],
 )
 def test_plan_produces_expected_stop_document(
-    documents_from_expected_shape: dict[str, list[DocumentType]], shape: tuple[int, ...]
+    documents_from_expected_shape: dict[str, list[DocumentType]], shape: tuple[int, ...],
 ):
     docs = documents_from_expected_shape.get("stop")
     assert docs and len(docs) == 1

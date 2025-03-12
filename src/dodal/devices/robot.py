@@ -130,10 +130,10 @@ class BartRobot(StandardReadable, Movable):
         LOGGER.info(f"Loading pin {sample_location}")
         if await self.program_running.get_value():
             LOGGER.info(
-                f"Waiting on robot to finish {await self.program_name.get_value()}"
+                f"Waiting on robot to finish {await self.program_name.get_value()}",
             )
             await wait_for_value(
-                self.program_running, False, timeout=self.NOT_BUSY_TIMEOUT
+                self.program_running, False, timeout=self.NOT_BUSY_TIMEOUT,
             )
         await asyncio.gather(
             set_and_wait_for_value(self.next_puck, sample_location.puck),

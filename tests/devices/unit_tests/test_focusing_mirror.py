@@ -29,7 +29,7 @@ from dodal.log import LOGGER
 
 
 def mirror_voltage_with_set_to_value(
-    mirror_voltage: SingleMirrorVoltage, new_value: MirrorVoltageDemand, spins: int = 0
+    mirror_voltage: SingleMirrorVoltage, new_value: MirrorVoltageDemand, spins: int = 0,
 ) -> SingleMirrorVoltage:
     async def set_demand_accepted_after_delay():
         await asyncio.sleep(0.1)
@@ -197,7 +197,7 @@ def test_mirror_set_voltage_sets_and_waits_set_fail(
 
 
 def test_mirror_set_voltage_sets_and_waits_demand_accepted_fail(
-    RE: RunEngine, mirror_voltage_with_set_accepted_fail: SingleMirrorVoltage
+    RE: RunEngine, mirror_voltage_with_set_accepted_fail: SingleMirrorVoltage,
 ):
     def plan():
         with pytest.raises(FailedStatus) as e:
@@ -259,7 +259,7 @@ def test_mirror_populates_voltage_channels(RE):
     ],
 )
 async def test_given_striped_focussing_mirror_then_energy_to_stripe_returns_expected(
-    RE, energy_kev: float, expected_config: MirrorStripeConfiguration
+    RE, energy_kev: float, expected_config: MirrorStripeConfiguration,
 ):
     with init_devices(mock=True):
         device = FocusingMirrorWithStripes(prefix="-OP-VFM-01:", name="mirror")

@@ -22,7 +22,7 @@ from dodal.devices.smargon import Smargon
 def test_bottom_right_from_top_left():
     top_left = np.array([123, 123])
     bottom_right = bottom_right_from_top_left(
-        top_left, 20, 30, 0.1, 0.15, 2.7027, 2.7027
+        top_left, 20, 30, 0.1, 0.15, 2.7027, 2.7027,
     )
     assert bottom_right[0] == 863 and bottom_right[1] == 1788
     bottom_right = bottom_right_from_top_left(top_left, 15, 20, 0.005, 0.007, 1, 1)
@@ -72,7 +72,7 @@ async def test_values_for_move_so_that_beam_is_at_pixel(
     set_mock_value(smargon.omega.user_readback, angle)
     RE = RunEngine(call_returns_result=True)
     pos = RE(
-        get_move_required_so_that_beam_is_at_pixel(smargon, pixel_to_move_to, oav)
+        get_move_required_so_that_beam_is_at_pixel(smargon, pixel_to_move_to, oav),
     ).plan_result  # type: ignore
 
     assert pos == pytest.approx(expected_xyz, abs=1e-3)
@@ -81,11 +81,11 @@ async def test_values_for_move_so_that_beam_is_at_pixel(
 @pytest.mark.asyncio
 async def test_given_tip_found_when_wait_for_tip_to_be_found_called_then_tip_immediately_returned():
     mock_pin_tip_detect: PinTipDetection = instantiate_fake_device(
-        PinTipDetection, name="pin_detect"
+        PinTipDetection, name="pin_detect",
     )
     await mock_pin_tip_detect.connect(mock=True)
     mock_pin_tip_detect._get_tip_and_edge_data = AsyncMock(
-        return_value=SampleLocation(100, 100, np.array([]), np.array([]))
+        return_value=SampleLocation(100, 100, np.array([]), np.array([])),
     )
     RE = RunEngine(call_returns_result=True)
     result = RE(wait_for_tip_to_be_found(mock_pin_tip_detect))
@@ -96,7 +96,7 @@ async def test_given_tip_found_when_wait_for_tip_to_be_found_called_then_tip_imm
 @pytest.mark.asyncio
 async def test_given_no_tip_when_wait_for_tip_to_be_found_called_then_exception_thrown():
     mock_pin_tip_detect: PinTipDetection = instantiate_fake_device(
-        PinTipDetection, name="pin_detect"
+        PinTipDetection, name="pin_detect",
     )
     await mock_pin_tip_detect.connect(mock=True)
     await mock_pin_tip_detect.validity_timeout.set(0.2)
@@ -106,7 +106,7 @@ async def test_given_no_tip_when_wait_for_tip_to_be_found_called_then_exception_
             int(PinTipDetection.INVALID_POSITION[1]),
             np.array([]),
             np.array([]),
-        )
+        ),
     )
     RE = RunEngine(call_returns_result=True)
     with pytest.raises(PinNotFoundException):

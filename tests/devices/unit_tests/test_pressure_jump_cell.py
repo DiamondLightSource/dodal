@@ -34,7 +34,7 @@ async def test_reading_pjumpcell_includes_read_fields_valves(
         FastValveState.CLOSED_ARMED,
     )
     set_mock_value(
-        cell.all_valves_control.fast_valve_states[6], FastValveState.OPEN_ARMED
+        cell.all_valves_control.fast_valve_states[6], FastValveState.OPEN_ARMED,
     )
 
     await assert_reading(
@@ -68,10 +68,10 @@ async def test_reading_pjumpcell_includes_config_fields_valves(
     cell: PressureJumpCell,
 ):
     set_mock_value(
-        cell.all_valves_control.valve_control[1].close, ValveControlRequest.CLOSE
+        cell.all_valves_control.valve_control[1].close, ValveControlRequest.CLOSE,
     )
     set_mock_value(
-        cell.all_valves_control.valve_control[3].close, ValveControlRequest.OPEN
+        cell.all_valves_control.valve_control[3].close, ValveControlRequest.OPEN,
     )
     set_mock_value(
         cell.all_valves_control.valve_control[1].open,
@@ -87,7 +87,7 @@ async def test_reading_pjumpcell_includes_config_fields_valves(
         FastValveControlRequest.DISARM,
     )
     set_mock_value(
-        cell.all_valves_control.fast_valve_control[6].close, FastValveControlRequest.ARM
+        cell.all_valves_control.fast_valve_control[6].close, FastValveControlRequest.ARM,
     )
     set_mock_value(
         cell.all_valves_control.fast_valve_control[5].open,
@@ -120,7 +120,7 @@ async def test_pjumpcell_set_valve_sets_valve_fields(
 ):
     # Set some initial values
     set_mock_value(
-        cell.all_valves_control.valve_control[1].close, ValveControlRequest.RESET
+        cell.all_valves_control.valve_control[1].close, ValveControlRequest.RESET,
     )
     set_mock_value(
         cell.all_valves_control.valve_control[1].open,

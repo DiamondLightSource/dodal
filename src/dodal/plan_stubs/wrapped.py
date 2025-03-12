@@ -16,10 +16,9 @@ Group = Annotated[str, "String identifier used by 'wait' or stubs that await"]
 # After bluesky 1.14, bounds for stubs that move can be narrowed
 # https://github.com/bluesky/bluesky/issues/1821
 def set_absolute(
-    movable: Movable, value: Any, group: Group | None = None, wait: bool = False
+    movable: Movable, value: Any, group: Group | None = None, wait: bool = False,
 ) -> MsgGenerator:
-    """
-    Set a device, wrapper for `bp.abs_set`.
+    """Set a device, wrapper for `bp.abs_set`.
 
     Args:
         movable (Movable): The device to set
@@ -34,15 +33,15 @@ def set_absolute(
 
     Yields:
         Iterator[MsgGenerator]: Bluesky messages
+
     """
     return (yield from bps.abs_set(movable, value, group=group, wait=wait))
 
 
 def set_relative(
-    movable: Movable, value: Any, group: Group | None = None, wait: bool = False
+    movable: Movable, value: Any, group: Group | None = None, wait: bool = False,
 ) -> MsgGenerator:
-    """
-    Change a device, wrapper for `bp.rel_set`.
+    """Change a device, wrapper for `bp.rel_set`.
 
     Args:
         movable (Movable): The device to set
@@ -57,14 +56,13 @@ def set_relative(
 
     Yields:
         Iterator[MsgGenerator]: Bluesky messages
-    """
 
+    """
     return (yield from bps.rel_set(movable, value, group=group, wait=wait))
 
 
 def move(moves: Mapping[Movable, Any], group: Group | None = None) -> MsgGenerator:
-    """
-    Move a device, wrapper for `bp.mv`.
+    """Move a device, wrapper for `bp.mv`.
 
     Args:
         moves (Mapping[Movable, T]): Mapping of Movables to target positions
@@ -76,8 +74,8 @@ def move(moves: Mapping[Movable, Any], group: Group | None = None) -> MsgGenerat
 
     Yields:
         Iterator[MsgGenerator]: Bluesky messages
-    """
 
+    """
     return (
         # type ignore until https://github.com/bluesky/bluesky/issues/1809
         yield from bps.mv(*itertools.chain.from_iterable(moves.items()), group=group)  # type: ignore
@@ -85,10 +83,9 @@ def move(moves: Mapping[Movable, Any], group: Group | None = None) -> MsgGenerat
 
 
 def move_relative(
-    moves: Mapping[Movable, Any], group: Group | None = None
+    moves: Mapping[Movable, Any], group: Group | None = None,
 ) -> MsgGenerator:
-    """
-    Move a device relative to its current position, wrapper for `bp.mvr`.
+    """Move a device relative to its current position, wrapper for `bp.mvr`.
 
     Args:
         moves (Mapping[Movable, T]): Mapping of Movables to target deltas
@@ -100,8 +97,8 @@ def move_relative(
 
     Yields:
         Iterator[MsgGenerator]: Bluesky messages
-    """
 
+    """
     return (
         # type ignore until https://github.com/bluesky/bluesky/issues/1809
         yield from bps.mvr(*itertools.chain.from_iterable(moves.items()), group=group)  # type: ignore
@@ -109,8 +106,7 @@ def move_relative(
 
 
 def sleep(time: float) -> MsgGenerator:
-    """
-    Suspend all action for a given time, wrapper for `bp.sleep`
+    """Suspend all action for a given time, wrapper for `bp.sleep`
 
     Args:
         time (float): Time to wait in seconds
@@ -120,8 +116,8 @@ def sleep(time: float) -> MsgGenerator:
 
     Yields:
         Iterator[MsgGenerator]: Bluesky messages
-    """
 
+    """
     return (yield from bps.sleep(time))
 
 
@@ -129,8 +125,7 @@ def wait(
     group: Group | None = None,
     timeout: float | None = None,
 ) -> MsgGenerator:
-    """
-    Wait for a group status to complete, wrapper for `bp.wait`.
+    """Wait for a group status to complete, wrapper for `bp.wait`.
     Does not expose move_on, as when used as a stub will not fail on Timeout.
 
     Args:
@@ -145,6 +140,6 @@ def wait(
 
     Yields:
         Iterator[MsgGenerator]: Bluesky messages
-    """
 
+    """
     return (yield from bps.wait(group, timeout=timeout))

@@ -85,21 +85,19 @@ class HutchShutter(StandardReadable, Movable):
         if not interlock_state and not TEST_MODE:
             # If not in test mode, fail. If in test mode, the optics hutch may be open.
             raise ShutterNotSafeToOperateError(
-                "The hutch has not been locked, not operating shutter."
+                "The hutch has not been locked, not operating shutter.",
             )
         if not TEST_MODE:
             if value == ShutterDemand.OPEN:
                 await self.control.set(ShutterDemand.RESET, wait=True)
                 await self.control.set(value, wait=True)
                 return await wait_for_value(
-                    self.status, match=ShutterState.OPEN, timeout=DEFAULT_TIMEOUT
+                    self.status, match=ShutterState.OPEN, timeout=DEFAULT_TIMEOUT,
                 )
-            else:
-                await self.control.set(value, wait=True)
-                return await wait_for_value(
-                    self.status, match=ShutterState.CLOSED, timeout=DEFAULT_TIMEOUT
-                )
-        else:
-            LOGGER.warning(
-                "Running in test mode, will not operate the experiment shutter."
+            await self.control.set(value, wait=True)
+            return await wait_for_value(
+                self.status, match=ShutterState.CLOSED, timeout=DEFAULT_TIMEOUT,
             )
+        LOGGER.warning(
+            "Running in test mode, will not operate the experiment shutter.",
+        )

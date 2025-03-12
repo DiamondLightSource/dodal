@@ -39,7 +39,7 @@ AVAILABLE_TIMEOUTS = {
         meta_file_ready_timeout=30,
         all_frames_timeout=120,  # Long timeout for meta file to compensate for filesystem issues
         arming_timeout=60,
-    )
+    ),
 }
 
 
@@ -107,7 +107,7 @@ class EigerDetector(Device, Stageable):
     def async_stage(self):
         self.odin.nodes.clear_odin_errors()
         status_ok, error_message = self.odin.wait_for_odin_initialised(
-            self.timeouts.general_status_timeout
+            self.timeouts.general_status_timeout,
         )
         if not status_ok:
             raise Exception(f"Odin not initialised: {error_message}")
@@ -151,7 +151,7 @@ class EigerDetector(Device, Stageable):
                 self.stop_odin_when_all_frames_collected()
 
             self.odin.file_writer.start_timeout.set(1).wait(
-                self.timeouts.general_status_timeout
+                self.timeouts.general_status_timeout,
             )
             LOGGER.info("Waiting on filewriter to finish")
             self.filewriters_finished.wait(30)
@@ -160,7 +160,7 @@ class EigerDetector(Device, Stageable):
         finally:
             self.disarm_detector()
             status_ok = self.odin.check_and_wait_for_odin_state(
-                self.timeouts.general_status_timeout
+                self.timeouts.general_status_timeout,
             )
             self.disable_roi_mode().wait(self.timeouts.general_status_timeout)
         self.disarming_status.set_finished()
@@ -176,7 +176,7 @@ class EigerDetector(Device, Stageable):
             self.wait_on_arming_if_started()
             stop_status = self.odin.stop()
             self.odin.file_writer.start_timeout.set(1).wait(
-                self.timeouts.general_status_timeout
+                self.timeouts.general_status_timeout,
             )
             self.disarm_detector()
             stop_status &= self.disable_roi_mode()
@@ -201,19 +201,19 @@ class EigerDetector(Device, Stageable):
         )
 
         status = self.cam.roi_mode.set(
-            1 if enable else 0, timeout=self.timeouts.general_status_timeout
+            1 if enable else 0, timeout=self.timeouts.general_status_timeout,
         )
         status &= self.odin.file_writer.image_height.set(
-            detector_dimensions.height, timeout=self.timeouts.general_status_timeout
+            detector_dimensions.height, timeout=self.timeouts.general_status_timeout,
         )
         status &= self.odin.file_writer.image_width.set(
-            detector_dimensions.width, timeout=self.timeouts.general_status_timeout
+            detector_dimensions.width, timeout=self.timeouts.general_status_timeout,
         )
         status &= self.odin.file_writer.num_row_chunks.set(
-            detector_dimensions.height, timeout=self.timeouts.general_status_timeout
+            detector_dimensions.height, timeout=self.timeouts.general_status_timeout,
         )
         status &= self.odin.file_writer.num_col_chunks.set(
-            detector_dimensions.width, timeout=self.timeouts.general_status_timeout
+            detector_dimensions.width, timeout=self.timeouts.general_status_timeout,
         )
 
         return status
@@ -229,10 +229,10 @@ class EigerDetector(Device, Stageable):
             timeout=self.timeouts.general_status_timeout,
         )
         status &= self.cam.num_exposures.set(
-            1, timeout=self.timeouts.general_status_timeout
+            1, timeout=self.timeouts.general_status_timeout,
         )
         status &= self.cam.image_mode.set(
-            self.cam.ImageMode.MULTIPLE, timeout=self.timeouts.general_status_timeout
+            self.cam.ImageMode.MULTIPLE, timeout=self.timeouts.general_status_timeout,
         )
         status &= self.cam.trigger_mode.set(
             InternalEigerTriggerMode.EXTERNAL_SERIES.value,
@@ -243,7 +243,7 @@ class EigerDetector(Device, Stageable):
     def set_odin_number_of_frame_chunks(self) -> Status:
         assert self.detector_params is not None
         status = self.odin.file_writer.num_frames_chunks.set(
-            1, timeout=self.timeouts.general_status_timeout
+            1, timeout=self.timeouts.general_status_timeout,
         )
         return status
 
@@ -251,10 +251,10 @@ class EigerDetector(Device, Stageable):
         assert self.detector_params is not None
         file_prefix = self.detector_params.full_filename
         status = self.odin.file_writer.file_path.set(
-            self.detector_params.directory, timeout=self.timeouts.general_status_timeout
+            self.detector_params.directory, timeout=self.timeouts.general_status_timeout,
         )
         status &= self.odin.file_writer.file_name.set(
-            file_prefix, timeout=self.timeouts.general_status_timeout
+            file_prefix, timeout=self.timeouts.general_status_timeout,
         )
         status &= await_value(
             self.odin.meta.file_name,
@@ -271,13 +271,13 @@ class EigerDetector(Device, Stageable):
     def set_mx_settings_pvs(self):
         assert self.detector_params is not None
         beam_x_pixels, beam_y_pixels = self.detector_params.get_beam_position_pixels(
-            self.detector_params.detector_distance
+            self.detector_params.detector_distance,
         )
         status = self.cam.beam_center_x.set(
-            beam_x_pixels, timeout=self.timeouts.general_status_timeout
+            beam_x_pixels, timeout=self.timeouts.general_status_timeout,
         )
         status &= self.cam.beam_center_y.set(
-            beam_y_pixels, timeout=self.timeouts.general_status_timeout
+            beam_y_pixels, timeout=self.timeouts.general_status_timeout,
         )
         status &= self.cam.det_distance.set(
             self.detector_params.detector_distance,
@@ -296,28 +296,27 @@ class EigerDetector(Device, Stageable):
     def set_detector_threshold(self, energy: float, tolerance: float = 0.1) -> Status:
         """Ensures the energy threshold on the detector is set to the specified energy (in eV),
         within the specified tolerance.
+
         Args:
             energy (float): The energy to set (in eV)
             tolerance (float, optional): If the energy is already set to within
                 this tolerance it is not set again. Defaults to 0.1eV.
-        """
 
+        """
         current_energy = self.cam.photon_energy.get()
         if abs(current_energy - energy) > tolerance:
             return self.cam.photon_energy.set(
-                energy, timeout=self.timeouts.general_status_timeout
+                energy, timeout=self.timeouts.general_status_timeout,
             )
-        else:
-            status = Status()
-            status.set_finished()
-            return status
+        status = Status()
+        status.set_finished()
+        return status
 
     def set_num_triggers_and_captures(self) -> StatusBase:
         """Sets the number of triggers and the number of images for the Eiger to capture
         during the datacollection. The number of images is the number of images per
         trigger.
         """
-
         assert self.detector_params is not None
         status = self.cam.num_images.set(
             self.detector_params.num_images_per_trigger,
@@ -326,11 +325,11 @@ class EigerDetector(Device, Stageable):
         if self.detector_params.trigger_mode == TriggerMode.FREE_RUN:
             # The Eiger can't actually free run so we set a very large number of frames
             status &= self.cam.num_triggers.set(
-                FREE_RUN_MAX_IMAGES, timeout=self.timeouts.general_status_timeout
+                FREE_RUN_MAX_IMAGES, timeout=self.timeouts.general_status_timeout,
             )
             # Setting Odin to write 0 frames tells it to write until externally stopped
             status &= self.odin.file_writer.num_capture.set(
-                0, timeout=self.timeouts.general_status_timeout
+                0, timeout=self.timeouts.general_status_timeout,
             )
         elif self.detector_params.trigger_mode == TriggerMode.SET_FRAMES:
             status &= self.cam.num_triggers.set(
@@ -349,11 +348,11 @@ class EigerDetector(Device, Stageable):
         await_value(self.odin.meta.active, 1).wait(self.timeouts.general_status_timeout)
 
         status = self.odin.file_writer.capture.set(
-            1, timeout=self.timeouts.general_status_timeout
+            1, timeout=self.timeouts.general_status_timeout,
         )
         LOGGER.info("Eiger staging: awaiting odin metadata")
         status &= await_value(
-            self.odin.meta.ready, 1, timeout=self.timeouts.meta_file_ready_timeout
+            self.odin.meta.ready, 1, timeout=self.timeouts.meta_file_ready_timeout,
         )
         return status
 
@@ -371,7 +370,7 @@ class EigerDetector(Device, Stageable):
     def forward_bit_depth_to_filewriter(self):
         bit_depth = self.bit_depth.get()
         self.odin.file_writer.data_type.set(f"UInt{bit_depth}").wait(
-            self.timeouts.general_status_timeout
+            self.timeouts.general_status_timeout,
         )
 
     def change_dev_shm(self, enable_dev_shm: bool):
@@ -403,7 +402,7 @@ class EigerDetector(Device, Stageable):
             lambda: await_value(self.stale_params, 0, 60),
             self._wait_for_odin_status,
             lambda: self.cam.acquire.set(
-                1, timeout=self.timeouts.general_status_timeout
+                1, timeout=self.timeouts.general_status_timeout,
             ),
             self._wait_fan_ready,
             self._finish_arm,

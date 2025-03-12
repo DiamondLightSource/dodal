@@ -36,7 +36,7 @@ set_path_provider(
         BL,
         Path("/exports/mybeamline/data/2025"),
         client=LocalDirectoryServiceClient(),
-    )
+    ),
 )
 
 

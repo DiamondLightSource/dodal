@@ -48,7 +48,8 @@ PREFIX = BeamlinePrefix(BL)
 def attenuator() -> ReadOnlyAttenuator:
     """Get a read-only attenuator device for i24, instantiate it if it hasn't already
     been. If this is called when already instantiated in i24, it will return the
-    existing object."""
+    existing object.
+    """
     return ReadOnlyAttenuator(
         f"{PREFIX.beamline_prefix}-OP-ATTN-01:",
         "attenuator",

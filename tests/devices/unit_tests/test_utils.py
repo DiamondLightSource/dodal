@@ -89,7 +89,7 @@ def test_wrap_function_callback_errors_on_wrong_return_type(caplog):
 
     dummy_func = MagicMock(return_value=3)
     returned_status = run_functions_without_blocking(
-        [lambda: get_good_status(), dummy_func], timeout=0.05
+        [lambda: get_good_status(), dummy_func], timeout=0.05,
     )
     with pytest.raises(StatusTimeoutError):
         returned_status.wait(0.2)
@@ -104,7 +104,7 @@ def test_wrap_function_callback_errors_on_wrong_return_type(caplog):
 def test_status_points_to_provided_device_object():
     expected_obj = MagicMock()
     returned_status = run_functions_without_blocking(
-        [NullStatus], associated_obj=expected_obj
+        [NullStatus], associated_obj=expected_obj,
     )
     returned_status.wait(0.1)
     assert returned_status.obj == expected_obj
@@ -136,7 +136,7 @@ def test_if_one_status_errors_then_later_functions_not_called():
         tester,
     ]
     returned_status = run_functions_without_blocking(
-        status_calls, associated_obj=MagicMock()
+        status_calls, associated_obj=MagicMock(),
     )
     with pytest.raises(StatusException):
         returned_status.wait(0.1)
@@ -155,7 +155,7 @@ def test_if_one_status_pending_then_later_functions_not_called():
         tester,
     ]
     returned_status = run_functions_without_blocking(
-        status_calls, associated_obj=MagicMock()
+        status_calls, associated_obj=MagicMock(),
     )
     with pytest.raises(WaitTimeoutError):
         returned_status.wait(0.1)

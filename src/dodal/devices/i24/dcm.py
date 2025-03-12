@@ -4,8 +4,7 @@ from ophyd_async.epics.motor import Motor
 
 
 class DCM(StandardReadable):
-    """
-    A double crystal monocromator device, used to select the beam energy.
+    """A double crystal monocromator device, used to select the beam energy.
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
@@ -26,11 +25,11 @@ class DCM(StandardReadable):
             # Temperatures
             self.xtal1_temp = epics_signal_r(float, prefix + "-DI-DCM-01:PT100-1")
             self.xtal1_heater_temp = epics_signal_r(
-                float, prefix + "-DI-DCM-01:PT100-2"
+                float, prefix + "-DI-DCM-01:PT100-2",
             )
             self.xtal2_temp = epics_signal_r(float, prefix + "-DI-DCM-01:PT100-4")
             self.xtal2_heater_temp = epics_signal_r(
-                float, prefix + "-DI-DCM-01:PT100-5"
+                float, prefix + "-DI-DCM-01:PT100-5",
             )
 
             self.roll_plate_temp = epics_signal_r(float, prefix + "-DI-DCM-01:PT100-3")

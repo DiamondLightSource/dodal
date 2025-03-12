@@ -39,7 +39,7 @@ def mock_device(**kwargs) -> ReadableDevice:
 @device_factory(skip=True)
 def ophyd_v1_device(mock: bool = False, **kwargs) -> ophyd.Device:
     device = device_instantiation(
-        ophyd.Device, "my_v1_device", "my_prefix", False, mock
+        ophyd.Device, "my_v1_device", "my_prefix", False, mock,
     )
     device.wait_for_connection = MagicMock()
     device.my_kwargs = kwargs

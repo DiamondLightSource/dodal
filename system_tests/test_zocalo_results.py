@@ -59,7 +59,7 @@ def convert_zocalo_device_reading_to_xrc_result(
 
 @pytest.mark.s03
 async def test_read_results_from_fake_zocalo(
-    zocalo_device: ZocaloResults, RE: RunEngine
+    zocalo_device: ZocaloResults, RE: RunEngine,
 ):
     zocalo_device._subscribe_to_results()
     zc = ZocaloTrigger(ZOCALO_ENV)
@@ -80,7 +80,7 @@ async def test_read_results_from_fake_zocalo(
 
 @pytest.mark.s03
 async def test_stage_unstage_controls_read_results_from_fake_zocalo(
-    zocalo_device: ZocaloResults, RE: RunEngine
+    zocalo_device: ZocaloResults, RE: RunEngine,
 ):
     dodal.devices.zocalo.zocalo_results.CLEAR_QUEUE_WAIT_S = 0.05
     zc = ZocaloTrigger(ZOCALO_ENV)
@@ -125,7 +125,7 @@ async def test_stage_unstage_controls_read_results_from_fake_zocalo(
 
 @pytest.mark.s03
 async def test_stale_connections_closed_after_unstage(
-    zocalo_device: ZocaloResults, RE: RunEngine
+    zocalo_device: ZocaloResults, RE: RunEngine,
 ):
     connections_before = len(psutil.net_connections())
 

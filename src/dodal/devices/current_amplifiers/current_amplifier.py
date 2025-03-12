@@ -9,13 +9,13 @@ from ophyd_async.core import AsyncStatus, StandardReadable
 
 
 class CurrentAmp(ABC, StandardReadable, Movable):
-    """
-    Base class for current amplifier, it contains the minimal functionality
+    """Base class for current amplifier, it contains the minimal functionality
      a current amplifier needs:
 
     Attributes:
         gain_conversion_table (Enum): The conversion table between current
         and gain setting.
+
     """
 
     def __init__(self, gain_conversion_table: type[Enum], name: str = "") -> None:
@@ -29,6 +29,7 @@ class CurrentAmp(ABC, StandardReadable, Movable):
 
         Returns:
             bool: True if success.
+
         """
 
     @AsyncStatus.wrap
@@ -38,6 +39,7 @@ class CurrentAmp(ABC, StandardReadable, Movable):
 
         Returns:
             bool: True if success.
+
         """
 
     @AsyncStatus.wrap
@@ -47,6 +49,7 @@ class CurrentAmp(ABC, StandardReadable, Movable):
 
         Returns:
             Enum: The member name of the current gain setting in gain_conversion_table.
+
         """
 
     @AsyncStatus.wrap
@@ -61,12 +64,12 @@ class CurrentAmp(ABC, StandardReadable, Movable):
 
 
 class CurrentAmpCounter(ABC, StandardReadable, Preparable):
-    """
-    Base class for current amplifier counter, it contain the minimal implementations
+    """Base class for current amplifier counter, it contain the minimal implementations
       required for a counter/detector to function with CurrentAmpDet:
 
     Attributes:
         count_per_volt (float): The conversion factor between counter output and voltage.
+
     """
 
     def __init__(self, count_per_volt: float, name: str = ""):
@@ -79,6 +82,7 @@ class CurrentAmpCounter(ABC, StandardReadable, Preparable):
 
         Returns:
             float: Current count
+
         """
 
     @abstractmethod
@@ -87,6 +91,7 @@ class CurrentAmpCounter(ABC, StandardReadable, Preparable):
 
         Returns:
             float: Current count per second
+
         """
 
     @abstractmethod
@@ -95,6 +100,7 @@ class CurrentAmpCounter(ABC, StandardReadable, Preparable):
 
         Returns:
             float: Current count in volt per second
+
         """
 
     @abstractmethod

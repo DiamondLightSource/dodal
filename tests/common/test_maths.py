@@ -21,7 +21,7 @@ def test_in_micros(s: float, us: int):
 
 
 @pytest.mark.parametrize(
-    "s", [-4.000_001, -4.999_999, -4, -4.000_000_5, -4.999_999_9, -4.05]
+    "s", [-4.000_001, -4.999_999, -4, -4.000_000_5, -4.999_999_9, -4.05],
 )
 def test_in_micros_negative(s: float):
     with pytest.raises(ValueError):

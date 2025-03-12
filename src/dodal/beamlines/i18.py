@@ -40,7 +40,7 @@ set_path_provider(
         BL,
         Path("/dls/i18/data/2024/cm37264-2/bluesky"),
         client=LocalDirectoryServiceClient(),
-    )
+    ),
 )
 
 

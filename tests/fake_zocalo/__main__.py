@@ -25,7 +25,7 @@ TEST_RESULT_LARGE = [
         "n_voxels": 35,
         "total_count": 2387574,
         "bounding_box": [[2, 2, 2], [8, 8, 7]],
-    }
+    },
 ]
 TEST_RESULT_MEDIUM = [
     {
@@ -35,7 +35,7 @@ TEST_RESULT_MEDIUM = [
         "n_voxels": 35,
         "total_count": 2387574,
         "bounding_box": [[1, 2, 3], [3, 4, 4]],
-    }
+    },
 ]
 TEST_RESULT_SMALL = [
     {
@@ -45,7 +45,7 @@ TEST_RESULT_SMALL = [
         "n_voxels": 35,
         "total_count": 1387574,
         "bounding_box": [[2, 2, 2], [3, 3, 3]],
-    }
+    },
 ]
 NO_DIFFRACTION_PREFIX = "NO_DIFF"
 
@@ -65,7 +65,7 @@ def get_dcgid_and_prefix(dcid: int, session_maker: sessionmaker) -> tuple[int, s
             assert isinstance(session, Session)
             query = (
                 session.query(
-                    DataCollection.dataCollectionId, DataCollection.imagePrefix
+                    DataCollection.dataCollectionId, DataCollection.imagePrefix,
                 )
                 .filter(DataCollection.dataCollectionId == dcid)
                 .first()
@@ -110,17 +110,17 @@ def main() -> None:
     session_maker = sessionmaker(engine)
 
     config = load_configuration_file(
-        os.path.expanduser("~/.zocalo/rabbitmq-credentials.yml")
+        os.path.expanduser("~/.zocalo/rabbitmq-credentials.yml"),
     )
     creds = pika.PlainCredentials(config["username"], config["password"])
     params = pika.ConnectionParameters(
-        config["host"], config["port"], config["vhost"], creds
+        config["host"], config["port"], config["vhost"], creds,
     )
 
     results: dict[str, Any] = defaultdict(lambda: make_result(TEST_RESULT_LARGE))
     results[NO_DIFFRACTION_PREFIX] = make_result([])
     results[MULTIPLE_CRYSTAL_PREFIX] = make_result(
-        [*TEST_RESULT_LARGE, *TEST_RESULT_SMALL]
+        [*TEST_RESULT_LARGE, *TEST_RESULT_SMALL],
     )
 
     start = time.time()
@@ -165,7 +165,7 @@ def main() -> None:
 
     def on_request(ch: BlockingChannel, method, props, body):
         print(
-            f"Received message: \n properties: \n\n {method} \n\n {props} \n\n{body}\n"
+            f"Received message: \n properties: \n\n {method} \n\n {props} \n\n{body}\n",
         )
         try:
             message = json.loads(body)
@@ -194,7 +194,7 @@ def main() -> None:
 
             result_chan = conn.channel()
             result_chan.basic_publish(
-                "results", "xrc.i03", json.dumps(result), resultprops
+                "results", "xrc.i03", json.dumps(result), resultprops,
             )
             print("Finished.\n")
         ch.basic_ack(method.delivery_tag, False)
