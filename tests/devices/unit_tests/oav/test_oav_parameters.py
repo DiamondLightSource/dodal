@@ -58,6 +58,18 @@ def test_oav_config(
     assert mock_config[zoom_level].microns_per_pixel == expected_microns
 
 
+@pytest.mark.parametrize(
+    "zoom_level, expected_microns",
+    [
+        ("2.5", (2.31, 2.31)),
+        ("10.0", (0.438, 0.438)),
+    ],
+)
+def test_oav_config_no_beam_centre(zoom_level, expected_microns, mock_config: dict):
+    assert isinstance(mock_config[zoom_level], ZoomParams)
+    assert mock_config[zoom_level].microns_per_pixel == expected_microns
+
+
 def test_given_oav_config_get_max_tip_distance_in_pixels(
     mock_parameters: OAVParameters, mock_config: dict
 ):

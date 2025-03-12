@@ -6,7 +6,7 @@ from ophyd_async.testing import set_mock_value
 from dodal.devices.oav.oav_detector import (
     OAV,
     Cam,
-    OAVBeamCenter,
+    OAVBeamCentre,
     ZoomController,
 )
 
@@ -121,4 +121,25 @@ async def test_when_snapshot_triggered_post_processing_called_correctly(
     mock_proc.assert_awaited_once()
 
 
-test_oav_beam
+async def test_oav_beam_centre_gets_beam_centre_from_pvs_roi(
+    oav_beam_centre_roi: OAVBeamCentre,
+):
+    oav = oav_beam_centre_roi
+    set_mock_value(oav.beam_centre_x, 100)
+    set_mock_value(oav.beam_centre_y, 150)
+    beam_x = await oav.beam_centre_i.get_value()
+    beam_y = await oav.beam_centre_j.get_value()
+    assert beam_x == 100
+    assert beam_y == 150
+
+
+async def test_oav_beam_centre_gets_beam_centre_from_pvs_fs(
+    oav_beam_centre_fs: OAVBeamCentre,
+):
+    oav = oav_beam_centre_fs
+    set_mock_value(oav.beam_centre_x, 200)
+    set_mock_value(oav.beam_centre_y, 250)
+    beam_x = await oav.beam_centre_i.get_value()
+    beam_y = await oav.beam_centre_j.get_value()
+    assert beam_x == 200
+    assert beam_y == 250
