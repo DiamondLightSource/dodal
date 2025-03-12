@@ -20,8 +20,8 @@ from dodal.devices.flux import Flux
 from dodal.devices.i04.transfocator import Transfocator
 from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZPositioner
-from dodal.devices.oav.oav_detector import OAV, OAVBeamCentre
-from dodal.devices.oav.oav_parameters import OAVConfig, OAVConfigNoBeamCentre
+from dodal.devices.oav.oav_detector import OAVBeamCentre
+from dodal.devices.oav.oav_parameters import OAVConfigNoBeamCentre
 from dodal.devices.oav.oav_to_redis_forwarder import OAVToRedisForwarder
 from dodal.devices.robot import BartRobot
 from dodal.devices.s4_slit_gaps import S4SlitGaps
