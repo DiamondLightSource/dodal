@@ -11,7 +11,7 @@ from dodal.common.beamlines.beamline_parameters import (
 
 def test_beamline_parameters():
     params = GDABeamlineParameters.from_file(
-        "tests/test_data/test_beamline_parameters.txt"
+        "tests/test_data/test_beamline_parameters.txt",
     )
     assert params["sg_x_MEDIUM_APERTURE"] == 5.285
     assert params["col_parked_downstream_x"] == 0

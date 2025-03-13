@@ -23,12 +23,12 @@ set_path_provider(
         BL,
         Path("/dls/i13-1/data/2024/cm37257-5/tmp/"),  # latest commissioning visit
         client=LocalDirectoryServiceClient(),
-    )
+    ),
 )
 
 
 def sample_xyz_stage(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False,
 ) -> XYZPositioner:
     return device_instantiation(
         XYZPositioner,
@@ -41,7 +41,7 @@ def sample_xyz_stage(
 
 
 def sample_xyz_lab_fa_stage(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False,
 ) -> XYZPositioner:
     return device_instantiation(
         XYZPositioner,
@@ -54,7 +54,7 @@ def sample_xyz_lab_fa_stage(
 
 
 def side_camera(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False,
 ) -> AravisDetector:
     return device_instantiation(
         AravisDetector,
@@ -70,7 +70,7 @@ def side_camera(
 
 
 def merlin(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False,
 ) -> Merlin:
     return device_instantiation(
         Merlin,

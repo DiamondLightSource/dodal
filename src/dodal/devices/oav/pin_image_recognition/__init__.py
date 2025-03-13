@@ -31,8 +31,7 @@ class InvalidPinException(Exception):
 
 
 class PinTipDetection(StandardReadable):
-    """
-    A device which will read from an on-axis view and calculate the location of the
+    """A device which will read from an on-axis view and calculate the location of the
     pin-tip (in pixels) of that frame.
 
     Used for pin tip centring workflow.
@@ -53,13 +52,13 @@ class PinTipDetection(StandardReadable):
         self._name = name
 
         self.triggered_tip, self._tip_setter = soft_signal_r_and_setter(
-            Tip, name="triggered_tip"
+            Tip, name="triggered_tip",
         )
         self.triggered_top_edge, self._top_edge_setter = soft_signal_r_and_setter(
-            Array1D[np.int32], name="triggered_top_edge"
+            Array1D[np.int32], name="triggered_top_edge",
         )
         self.triggered_bottom_edge, self._bottom_edge_setter = soft_signal_r_and_setter(
-            Array1D[np.int32], name="triggered_bottom_edge"
+            Array1D[np.int32], name="triggered_bottom_edge",
         )
         self.array_data = epics_signal_r(np.ndarray, f"pva://{prefix}PVA:ARRAY")
 
@@ -67,14 +66,14 @@ class PinTipDetection(StandardReadable):
         self.preprocess_operation = soft_signal_rw(int, 10, name="preprocess")
         self.preprocess_ksize = soft_signal_rw(int, 5, name="preprocess_ksize")
         self.preprocess_iterations = soft_signal_rw(
-            int, 5, name="preprocess_iterations"
+            int, 5, name="preprocess_iterations",
         )
         self.canny_upper_threshold = soft_signal_rw(int, 100, name="canny_upper")
         self.canny_lower_threshold = soft_signal_rw(int, 50, name="canny_lower")
         self.close_ksize = soft_signal_rw(int, 5, name="close_ksize")
         self.close_iterations = soft_signal_rw(int, 5, name="close_iterations")
         self.scan_direction = soft_signal_rw(
-            int, ScanDirections.FORWARD.value, name="scan_direction"
+            int, ScanDirections.FORWARD.value, name="scan_direction",
         )
         self.min_tip_height = soft_signal_rw(int, 5, name="min_tip_height")
         self.validity_timeout = soft_signal_rw(float, 5.0, name="validity_timeout")
@@ -93,15 +92,13 @@ class PinTipDetection(StandardReadable):
     def _set_triggered_values(self, results: SampleLocation):
         if results.tip_x is None or results.tip_y is None:
             raise InvalidPinException
-        else:
-            tip = np.array([results.tip_x, results.tip_y])
-            self._tip_setter(tip)
+        tip = np.array([results.tip_x, results.tip_y])
+        self._tip_setter(tip)
         self._top_edge_setter(results.edge_top)
         self._bottom_edge_setter(results.edge_bottom)
 
     async def _get_tip_and_edge_data(self, array_data: np.ndarray) -> SampleLocation:
-        """
-        Gets the location of the pin tip and the top and bottom edges.
+        """Gets the location of the pin tip and the top and bottom edges.
         """
         preprocess_key = await self.preprocess_operation.get_value()
         preprocess_iter = await self.preprocess_iterations.get_value()
@@ -109,7 +106,7 @@ class PinTipDetection(StandardReadable):
 
         try:
             preprocess_func = ARRAY_PROCESSING_FUNCTIONS_MAP[preprocess_key](
-                iter=preprocess_iter, ksize=preprocess_ksize
+                iter=preprocess_iter, ksize=preprocess_ksize,
             )
         except KeyError:
             LOGGER.error("Invalid preprocessing function, using identity")
@@ -135,7 +132,7 @@ class PinTipDetection(StandardReadable):
         location = sample_detection.processArray(array_data)
         end_time = time.time()
         LOGGER.debug(
-            f"Sample location detection took {(end_time - start_time) * 1000.0}ms"
+            f"Sample location detection took {(end_time - start_time) * 1000.0}ms",
         )
         return location
 
@@ -154,18 +151,18 @@ class PinTipDetection(StandardReadable):
                     self._set_triggered_values(location)
                 except Exception as e:
                     LOGGER.warning(
-                        f"Failed to detect pin-tip location, will retry with next image: {e}"
+                        f"Failed to detect pin-tip location, will retry with next image: {e}",
                     )
                 else:
                     return
 
         try:
             await asyncio.wait_for(
-                _set_triggered_tip(), timeout=await self.validity_timeout.get_value()
+                _set_triggered_tip(), timeout=await self.validity_timeout.get_value(),
             )
         except asyncio.exceptions.TimeoutError:
             LOGGER.error(
-                f"No tip found in {await self.validity_timeout.get_value()} seconds."
+                f"No tip found in {await self.validity_timeout.get_value()} seconds.",
             )
             self._tip_setter(self.INVALID_POSITION)
             self._bottom_edge_setter(np.array([]))

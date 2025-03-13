@@ -84,7 +84,7 @@ def test_wait_for_odin_initialised(
     patch_await.side_effect = _patch_await
 
     fake_odin.nodes.wait_for_no_errors = Mock(
-        return_value={fake_status(node_error): "node error" if node_error else ""}
+        return_value={fake_status(node_error): "node error" if node_error else ""},
     )
     fake_odin.nodes.get_init_state = Mock(return_value=fake_status(not node_init))
 
@@ -122,7 +122,7 @@ def test_given_node_in_error_node_error_status_gives_message_and_node_number(
     ],
 )
 def test_wait_for_all_filewriters_to_finish(
-    fake_odin: EigerOdin, meta_writing, OD1_writing, OD2_writing
+    fake_odin: EigerOdin, meta_writing, OD1_writing, OD2_writing,
 ):
     fake_odin.meta.ready.sim_put(meta_writing)  # type: ignore
     fake_odin.nodes.nodes[0].writing.sim_put(OD1_writing)  # type: ignore
@@ -160,7 +160,7 @@ def test_given_error_on_node_1_when_clear_odin_errors_called_then_resets_all_err
 
 @patch("dodal.devices.eiger_odin.await_value")
 def test_given_await_value_returns_done_status_then_init_state_returns_done(
-    patch_await, fake_odin: EigerOdin
+    patch_await, fake_odin: EigerOdin,
 ):
     patch_await.side_effect = lambda *_: fake_status(False)
     full_status = fake_odin.nodes.get_init_state(None)
@@ -202,4 +202,3 @@ def test_given_no_frames_dropped_then_check_frames_timed_out_returns_no_error(
     error, message = fake_odin.nodes.check_frames_timed_out()
     assert not error
     assert not message
-    pass

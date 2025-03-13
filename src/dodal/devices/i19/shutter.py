@@ -19,7 +19,7 @@ class HutchState(str, Enum):
 
 
 class HutchConditionalShutter(StandardReadable, Movable):
-    """ I19-specific device to operate the hutch shutter.
+    """I19-specific device to operate the hutch shutter.
 
     This device evaluates the hutch state value to work out which of the two I19 \
     hutches is in use and then implements the HutchShutter device to operate the \
@@ -46,12 +46,12 @@ class HutchConditionalShutter(StandardReadable, Movable):
         LOGGER.info(f"Current hutch in use: {hutch_in_use}")
         if hutch_in_use == HutchState.INVALID:
             raise HutchInvalidError(
-                "The hutch state is invalid. Contact the beamline staff."
+                "The hutch state is invalid. Contact the beamline staff.",
             )
         if hutch_in_use != self.hutch_request:
             # NOTE Warn but don't fail
             LOGGER.warning(
-                f"{self.hutch_request} is not the hutch in use. Shutter will not be operated."
+                f"{self.hutch_request} is not the hutch in use. Shutter will not be operated.",
             )
         else:
             await self.shutter.set(value)

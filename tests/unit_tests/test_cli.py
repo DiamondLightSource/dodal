@@ -63,13 +63,13 @@ def device_results(
     devices = {
         **{
             f"ophyd_async_happy_device_{i}": OphydV2Device(
-                name=f"ophyd_async_happy_device_{i}"
+                name=f"ophyd_async_happy_device_{i}",
             )
             for i in range(ophyd_async_happy_devices)
         },
         **{
             f"ophyd_async_unconnectable_device_{i}": UnconnectableOphydAsyncDevice(
-                name=f"ophyd_async_unconnectable_device_{i}"
+                name=f"ophyd_async_unconnectable_device_{i}",
             )
             for i in range(ophyd_async_connection_failures)
         },
@@ -79,7 +79,7 @@ def device_results(
         },
         **{
             f"ophyd_unconnectable_device_{i}": UnconnectableOphydDevice(
-                name=f"ophyd_unconnectable_device_{i}"
+                name=f"ophyd_unconnectable_device_{i}",
             )
             for i in range(ophyd_connection_failures)
         },
@@ -234,7 +234,7 @@ def test_cli_connect_reports_correct_number_of_connected_devices(
             ophyd_async_connection_failures=3,
         ),
         device_results(
-            ophyd_async_happy_devices=3, ophyd_async_instantiation_failures=3
+            ophyd_async_happy_devices=3, ophyd_async_instantiation_failures=3,
         ),
         device_results(
             ophyd_async_instantiation_failures=3,

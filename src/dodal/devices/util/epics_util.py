@@ -21,6 +21,7 @@ def epics_signal_put_wait(pv_name: str, wait: float = 3.0) -> Component[EpicsSig
 
     Returns:
         EpicsSignal: An EpicsSignal that will wait for a callback.
+
     """
     return Component(EpicsSignal, pv_name, put_complete=True, write_timeout=wait)
 
@@ -46,8 +47,8 @@ def run_functions_without_blocking(
     Returns:
     Status: A status object which is marked as complete once all of the Status objects
     returned by the unwrapped functions have completed.
-    """
 
+    """
     # The returned status - marked as finished at the end of the callback chain. If any
     # intermediate statuses have an exception, the full_status will timeout.
     full_status = Status(obj=associated_obj, timeout=timeout)
@@ -61,7 +62,7 @@ def run_functions_without_blocking(
     # Wrap each function by first checking the previous status and attaching a callback
     # to the next function in the chain
     def wrap_func(
-        old_status: Status | None, current_func: Callable[[], StatusBase], next_func
+        old_status: Status | None, current_func: Callable[[], StatusBase], next_func,
     ):
         if old_status is not None and old_status.exception() is not None:
             set_global_exception_and_log(old_status)
@@ -71,7 +72,7 @@ def run_functions_without_blocking(
 
         if not isinstance(status, StatusBase):
             LOGGER.error(
-                f"wrap_func attempted to wrap {current_func} when it does not return a Status"
+                f"wrap_func attempted to wrap {current_func} when it does not return a Status",
             )
             raise ValueError(f"{current_func} does not return a Status")
 
@@ -92,7 +93,7 @@ def run_functions_without_blocking(
             wrap_func,
             current_func=functions_to_chain[-1],
             next_func=closing_func,
-        )
+        ),
     )
 
     # Wrap each function in reverse
@@ -102,7 +103,7 @@ def run_functions_without_blocking(
                 wrap_func,
                 current_func=func,
                 next_func=wrapped_funcs[-1],
-            )
+            ),
         )
 
     # Initiate the chain of functions

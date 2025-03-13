@@ -74,27 +74,28 @@ class Xspress3(Device, Stageable):
         Number of channel xspress3 has, default is 1 for mini.
     timeout:
         How long to wait for before timing out for staging/arming of detector default is 1 sec
+
     """
 
     def __init__(
-        self, prefix: str, name: str = "", num_channels: int = 1, timeout: float = 1
+        self, prefix: str, name: str = "", num_channels: int = 1, timeout: float = 1,
     ) -> None:
         self.channels = DeviceVector(
-            {i: Xspress3Channel(f"{prefix}C{i}_") for i in range(1, num_channels + 1)}
+            {i: Xspress3Channel(f"{prefix}C{i}_") for i in range(1, num_channels + 1)},
         )
         """MCA on/off switch readback"""
         self.get_roi_calc_status = DeviceVector(
             {
                 i: epics_signal_rw(float, f"{prefix}MCA{i}:Enable_RBV")
                 for i in range(1, num_channels + 1)
-            }
+            },
         )
         """start and size of the multi-channel analyzer (MCA) array"""
         self.roi_mca = DeviceVector(
             {
                 i: Xspress3ROIChannel(f"{prefix}ROISUM{i}:")
                 for i in range(1, num_channels + 1)
-            }
+            },
         )
 
         """signal for the corrected MCA spectrum (1d array)"""
@@ -102,7 +103,7 @@ class Xspress3(Device, Stageable):
             {
                 i: epics_signal_r(Array1D[float64], f"{prefix}ARR{i}:ArrayData")
                 for i in range(1, num_channels + 1)
-            }
+            },
         )
 
         """Shared controls for triggering detection"""
@@ -115,7 +116,7 @@ class Xspress3(Device, Stageable):
         self.trigger_mode = epics_signal_rw_rbv(TriggerMode, prefix + "TriggerMode")
 
         self.detector_state = epics_signal_r(
-            DetectorState, prefix + "DetectorState_RBV"
+            DetectorState, prefix + "DetectorState_RBV",
         )
 
         self.set_num_images = epics_signal_rw(int, prefix + "NumImages")
@@ -137,7 +138,7 @@ class Xspress3(Device, Stageable):
         )
         await self.acquire.set(AcquireState.ACQUIRE)
         await wait_for_value(
-            self.acquire_rbv, AcquireRBVState.ACQUIRE, timeout=self.timeout
+            self.acquire_rbv, AcquireRBVState.ACQUIRE, timeout=self.timeout,
         )
 
     @AsyncStatus.wrap
@@ -145,5 +146,5 @@ class Xspress3(Device, Stageable):
         await self.acquire.set(AcquireState.DONE)
         LOGGER.info("unstaging Xspress3 detector...")
         await wait_for_value(
-            self.acquire_rbv, AcquireRBVState.DONE, timeout=self.timeout
+            self.acquire_rbv, AcquireRBVState.DONE, timeout=self.timeout,
         )

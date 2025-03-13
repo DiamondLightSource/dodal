@@ -53,12 +53,12 @@ ZOCALO_STAGE_GROUP = "clear zocalo queue"
 
 
 class XrcResult(TypedDict):
-    """
-    Information about a diffracting centre.
+    """Information about a diffracting centre.
 
     NOTE: the coordinate systems of centre_of_mass and max_voxel/bounding_box are not
         the same; centre_of_mass coordinates are continuous whereas max_voxel and bounding_box
         coordinates are discrete.
+
     Attributes:
          centre_of_mass: The position of the centre of mass of the crystal, adjusted so that
          grid box centres lie on integer grid coordinates, such that a 1x1x1 crystal detected in
@@ -71,6 +71,7 @@ class XrcResult(TypedDict):
             as the volume of whole boxes as a half-open range i.e such that
             p1 = (x1, y1, z1) <= p < p2 = (x2, y2, z2) and
             p2 - p1 gives the dimensions in whole voxels.
+
     """
 
     centre_of_mass: list[float]
@@ -89,11 +90,11 @@ def bbox_size(result: XrcResult):
 
 
 def get_dict_differences(
-    dict1: dict, dict1_source: str, dict2: dict, dict2_source: str
+    dict1: dict, dict1_source: str, dict2: dict, dict2_source: str,
 ) -> str | None:
     """Returns a string containing dict1 and dict2 if there are differences between them, greater than a
-    1e-5 tolerance. If dictionaries are identical, return None"""
-
+    1e-5 tolerance. If dictionaries are identical, return None
+    """
     diff = DeepDiff(dict1, dict2, math_epsilon=1e-5, ignore_numeric_type_changes=True)
 
     if diff:
@@ -160,28 +161,28 @@ class ZocaloResults(StandardReadable, Triggerable):
         self.use_gpu = use_gpu
 
         self.centre_of_mass, self._com_setter = soft_signal_r_and_setter(
-            Array1D[np.float64], name="centre_of_mass"
+            Array1D[np.float64], name="centre_of_mass",
         )
         self.bounding_box, self._bounding_box_setter = soft_signal_r_and_setter(
-            Array1D[np.uint64], name="bounding_box"
+            Array1D[np.uint64], name="bounding_box",
         )
         self.max_voxel, self._max_voxel_setter = soft_signal_r_and_setter(
-            Array1D[np.uint64], name="max_voxel"
+            Array1D[np.uint64], name="max_voxel",
         )
         self.max_count, self._max_count_setter = soft_signal_r_and_setter(
-            Array1D[np.uint64], name="max_count"
+            Array1D[np.uint64], name="max_count",
         )
         self.n_voxels, self._n_voxels_setter = soft_signal_r_and_setter(
-            Array1D[np.uint64], name="n_voxels"
+            Array1D[np.uint64], name="n_voxels",
         )
         self.total_count, self._total_count_setter = soft_signal_r_and_setter(
-            Array1D[np.uint64], name="total_count"
+            Array1D[np.uint64], name="total_count",
         )
         self.ispyb_dcid, self._ispyb_dcid_setter = soft_signal_r_and_setter(
-            int, name="ispyb_dcid"
+            int, name="ispyb_dcid",
         )
         self.ispyb_dcgid, self._ispyb_dcgid_setter = soft_signal_r_and_setter(
-            int, name="ispyb_dcgid"
+            int, name="ispyb_dcgid",
         )
         self.add_readables(
             [
@@ -218,11 +219,11 @@ class ZocaloResults(StandardReadable, Triggerable):
         """Stages the Zocalo device by: subscribing to the queue, doing a background
         sleep for a few seconds to wait for any stale messages to be received, then
         clearing the queue. Plans using this device should wait on ZOCALO_STAGE_GROUP
-        before triggering processing for the experiment"""
-
+        before triggering processing for the experiment
+        """
         if self.use_cpu_and_gpu and self.use_gpu:
             raise ValueError(
-                "Cannot compare GPU and CPU results and use GPU results at the same time."
+                "Cannot compare GPU and CPU results and use GPU results at the same time.",
             )
 
         LOGGER.info("Subscribing to results queue")
@@ -253,13 +254,13 @@ class ZocaloResults(StandardReadable, Triggerable):
         )
         if not self.transport:
             LOGGER.warning(
-                msg  # AsyncStatus exception messages are poorly propagated, remove after https://github.com/bluesky/ophyd-async/issues/103
+                msg,  # AsyncStatus exception messages are poorly propagated, remove after https://github.com/bluesky/ophyd-async/issues/103
             )
             raise NoZocaloSubscription(msg)
 
         try:
             LOGGER.info(
-                f"waiting for results in queue - currently {self._raw_results_received.qsize()} items"
+                f"waiting for results in queue - currently {self._raw_results_received.qsize()} items",
             )
 
             raw_results = self._raw_results_received.get(timeout=self.timeout_s)
@@ -267,7 +268,7 @@ class ZocaloResults(StandardReadable, Triggerable):
 
             if self.use_gpu and source_of_first_results == ZocaloSource.CPU:
                 LOGGER.warning(
-                    "Configured to use GPU results but CPU came first, using CPU results."
+                    "Configured to use GPU results but CPU came first, using CPU results.",
                 )
 
             if self.use_cpu_and_gpu:
@@ -277,10 +278,10 @@ class ZocaloResults(StandardReadable, Triggerable):
                 raw_results_two_sources = [raw_results]
                 try:
                     raw_results_two_sources.append(
-                        self._raw_results_received.get(timeout=self.timeout_s / 2)
+                        self._raw_results_received.get(timeout=self.timeout_s / 2),
                     )
                     source_of_second_results = source_from_results(
-                        raw_results_two_sources[1]
+                        raw_results_two_sources[1],
                     )
                     first_results = raw_results_two_sources[0]["results"]
                     second_results = raw_results_two_sources[1]["results"]
@@ -311,16 +312,16 @@ class ZocaloResults(StandardReadable, Triggerable):
                     )
                     if source_of_missing_results == ZocaloSource.GPU.value:
                         LOGGER.warning(
-                            f"Zocalo results from {source_of_missing_results} timed out. Using results from {source_of_first_results}"
+                            f"Zocalo results from {source_of_missing_results} timed out. Using results from {source_of_first_results}",
                         )
                     else:
                         LOGGER.error(
-                            f"Zocalo results from {source_of_missing_results} timed out and GPU results not yet reliable"
+                            f"Zocalo results from {source_of_missing_results} timed out and GPU results not yet reliable",
                         )
                         raise err
 
             LOGGER.info(
-                f"Zocalo results from {source_from_results(raw_results)} processing: found {len(raw_results['results'])} crystals."
+                f"Zocalo results from {source_from_results(raw_results)} processing: found {len(raw_results['results'])} crystals.",
             )
             # Sort from strongest to weakest in case of multiple crystals
             await self._put_results(
@@ -334,7 +335,7 @@ class ZocaloResults(StandardReadable, Triggerable):
         except Empty as timeout_exception:
             LOGGER.warning("Timed out waiting for zocalo results!")
             raise NoResultsFromZocalo(
-                "Timed out waiting for Zocalo results"
+                "Timed out waiting for Zocalo results",
             ) from timeout_exception
         finally:
             self._kickoff_run = False
@@ -343,7 +344,7 @@ class ZocaloResults(StandardReadable, Triggerable):
         self.transport = _get_zocalo_connection(self.zocalo_environment)
 
         def _receive_result(
-            rw: workflows.recipe.RecipeWrapper, header: dict, message: dict
+            rw: workflows.recipe.RecipeWrapper, header: dict, message: dict,
         ) -> None:
             LOGGER.info(f"Received {message}")
             recipe_parameters = rw.recipe_step["parameters"]  # type: ignore # this rw is initialised with a message so recipe step is not None
@@ -352,16 +353,10 @@ class ZocaloResults(StandardReadable, Triggerable):
 
             results = message.get("results", [])
 
-            if self.use_cpu_and_gpu or self.use_gpu:
+            if self.use_cpu_and_gpu or self.use_gpu or not recipe_parameters.get("gpu"):
                 self._raw_results_received.put(
-                    {"results": results, "recipe_parameters": recipe_parameters}
+                    {"results": results, "recipe_parameters": recipe_parameters},
                 )
-            else:
-                # Only add to queue if results are from CPU
-                if not recipe_parameters.get("gpu"):
-                    self._raw_results_received.put(
-                        {"results": results, "recipe_parameters": recipe_parameters}
-                    )
 
         subscription = workflows.recipe.wrap_subscribe(
             self.transport,
@@ -371,7 +366,7 @@ class ZocaloResults(StandardReadable, Triggerable):
             allow_non_recipe_messages=False,
         )
         LOGGER.info(
-            f"Made zocalo queue subscription: {subscription} - stored transport connection {self.transport}."
+            f"Made zocalo queue subscription: {subscription} - stored transport connection {self.transport}.",
         )
 
 
@@ -387,7 +382,8 @@ def get_full_processing_results(
     zocalo: ZocaloResults,
 ) -> Generator[Msg, Any, Sequence[XrcResult]]:
     """A plan that will return the raw zocalo results, ranked in descending order according to the sort key.
-    Returns empty list in the event no results found."""
+    Returns empty list in the event no results found.
+    """
     LOGGER.info("Retrieving raw zocalo processing results")
     com = yield from bps.rd(zocalo.centre_of_mass, default_value=[])  # type: ignore
     max_voxel = yield from bps.rd(zocalo.max_voxel, default_value=[])  # type: ignore
@@ -404,19 +400,18 @@ def get_full_processing_results(
                 n_voxels=int(n),
                 total_count=int(tc),
                 bounding_box=bb.tolist(),
-            )
+            ),
         )
         for com, mv, mc, n, tc, bb in zip(
-            com, max_voxel, max_count, n_voxels, total_count, bounding_box, strict=True
+            com, max_voxel, max_count, n_voxels, total_count, bounding_box, strict=True,
         )
     ]
 
 
 def get_processing_results_from_event(
-    device_name: str, doc: dict
+    device_name: str, doc: dict,
 ) -> Sequence[XrcResult]:
-    """
-    Decode an event document into the corresponding x-ray centring results
+    """Decode an event document into the corresponding x-ray centring results
 
     Args:
     doc         A bluesky event document containing the signals read from the ZocaloResults
@@ -424,6 +419,7 @@ def get_processing_results_from_event(
 
     Returns:
         The list of XrcResults decoded from the event document
+
     """
     results_keys = get_annotations(XrcResult).keys()
     results_dict = {k: doc["data"][f"{device_name}-{k}"] for k in results_keys}

@@ -18,7 +18,8 @@ from dodal.utils import get_run_number
 
 class TriggerMode(Enum):
     """In set frames the number of frames is known at arm time. In free run they are
-    not known until the detector is unstaged."""
+    not known until the detector is unstaged.
+    """
 
     SET_FRAMES = auto()
     FREE_RUN = auto()
@@ -26,7 +27,8 @@ class TriggerMode(Enum):
 
 class DetectorParams(BaseModel):
     """Holds parameters for the detector. Provides access to a list of Dectris detector
-    sizes and a converter for distance to beam centre."""
+    sizes and a converter for distance to beam centre.
+    """
 
     # https://github.com/pydantic/pydantic/issues/8379
     # Must use model_dump(by_alias=True) if serialising!
@@ -83,10 +85,10 @@ class DetectorParams(BaseModel):
 
     def get_beam_position_mm(self, detector_distance: float) -> tuple[float, float]:
         x_beam_mm = self.beam_xy_converter.get_beam_xy_from_det_dist(
-            detector_distance, Axis.X_AXIS
+            detector_distance, Axis.X_AXIS,
         )
         y_beam_mm = self.beam_xy_converter.get_beam_xy_from_det_dist(
-            detector_distance, Axis.Y_AXIS
+            detector_distance, Axis.Y_AXIS,
         )
 
         full_size_mm = self.detector_size_constants.det_dimension

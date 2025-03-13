@@ -33,7 +33,7 @@ class WatsonMarlow323Pump(StandardReadable):
                 write_pv=prefix + "SET:RUN",
             )
             self.speed = epics_signal_rw(
-                float, read_pv=prefix + "INFO:SPD", write_pv=prefix + "SET:SPD"
+                float, read_pv=prefix + "INFO:SPD", write_pv=prefix + "SET:SPD",
             )
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):

@@ -23,13 +23,13 @@ from dodal.log import (
 )
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_logger():
     with patch("dodal.log.LOGGER") as mock_LOGGER:
         yield mock_LOGGER
 
 
-@pytest.fixture()
+@pytest.fixture
 def dodal_logger_for_tests():
     logger = logging.getLogger("Dodal")
     for handler in list(logger.handlers):
@@ -54,7 +54,7 @@ def test_handlers_set_at_correct_default_level(
     mock_file_handler.return_value.level = logging.INFO
     mock_GELFTCPHandler.return_value.level = logging.INFO
     mock_stream_handler.return_value.level = logging.DEBUG
-    handlers = set_up_all_logging_handlers(mock_logger, Path(""), "", True, 10000)
+    handlers = set_up_all_logging_handlers(mock_logger, Path(), "", True, 10000)
 
     for handler in handlers.values():
         mock_logger.addHandler.assert_any_call(handler)
@@ -73,7 +73,7 @@ def test_dev_mode_sets_correct_graypy_handler(
 ):
     mock_GELFTCPHandler.return_value.level = logging.INFO
     handler_config = set_up_all_logging_handlers(
-        mock_logger, Path("tmp/dev"), "dodal.log", True, 10000
+        mock_logger, Path("tmp/dev"), "dodal.log", True, 10000,
     )
     mock_GELFTCPHandler.assert_called_once_with("localhost", 5555)
     _close_all_handlers(handler_config)
@@ -86,10 +86,10 @@ def test_prod_mode_sets_correct_graypy_handler(
 ):
     mock_GELFTCPHandler.return_value.level = logging.INFO
     handler_config = set_up_all_logging_handlers(
-        mock_logger, Path("tmp/dev"), "dodal.log", False, 10000
+        mock_logger, Path("tmp/dev"), "dodal.log", False, 10000,
     )
     mock_GELFTCPHandler.assert_called_once_with(
-        "graylog-log-target.diamond.ac.uk", 12231
+        "graylog-log-target.diamond.ac.uk", 12231,
     )
     _close_all_handlers(handler_config)
 
@@ -108,7 +108,7 @@ def test_no_env_variable_sets_correct_file_handler(
     mock_GELFTCPHandler.return_value.level = logging.INFO
     clear_all_loggers_and_handlers()
     handler_config = set_up_all_logging_handlers(
-        LOGGER, get_logging_file_path(), "dodal.log", True, ERROR_LOG_BUFFER_LINES
+        LOGGER, get_logging_file_path(), "dodal.log", True, ERROR_LOG_BUFFER_LINES,
     )
     integrate_bluesky_and_ophyd_logging(LOGGER)
 
@@ -138,13 +138,13 @@ def test_messages_logged_from_dodal_get_sent_to_graylog_and_file(
     mock_graylog_handler_class.return_value.level = logging.DEBUG
     with patch("dodal.log.GELFTCPHandler", mock_graylog_handler_class):
         handlers = set_up_all_logging_handlers(
-            LOGGER, Path("tmp/dev"), "dodal.log", False, 10000
+            LOGGER, Path("tmp/dev"), "dodal.log", False, 10000,
         )
     LOGGER.info("test")
     mock_GELFTCPHandler = handlers["graylog_handler"]
     assert mock_GELFTCPHandler is not None
     mock_graylog_handler_class.assert_called_once_with(
-        "graylog-log-target.diamond.ac.uk", 12231
+        "graylog-log-target.diamond.ac.uk", 12231,
     )
     mock_GELFTCPHandler.handle.assert_called()  # type: ignore
     mock_filehandler_emit.assert_called()
@@ -174,7 +174,7 @@ def test_various_messages_to_graylog_get_beamline_filter(
     clear_all_loggers_and_handlers()
     with patch("dodal.log.set_up_graylog_handler", mock_set_up_graylog_handler):
         handlers = set_up_all_logging_handlers(
-            LOGGER, Path("tmp/dev"), "dodal.log", True, 10000
+            LOGGER, Path("tmp/dev"), "dodal.log", True, 10000,
         )
         integrate_bluesky_and_ophyd_logging(LOGGER)
 
@@ -202,7 +202,7 @@ def test_various_messages_to_graylog_get_beamline_filter(
     [(5, 0), (20, 11), (500, 491)],
 )
 def test_given_circular_memory_handler_with_varying_number_of_messages_when_record_of_correct_level_comes_in_then_flushed_with_expected_messages(
-    num_info_messages, expected_messages_start_idx
+    num_info_messages, expected_messages_start_idx,
 ):
     target: logging.Handler = MagicMock(spec=logging.Handler)
     circular_handler = CircularMemoryHandler(10, target=target)
@@ -226,7 +226,7 @@ def test_given_circular_memory_handler_with_varying_number_of_messages_when_reco
 def test_when_circular_memory_handler_closed_then_clears_buffer_and_target():
     circular_handler = CircularMemoryHandler(10, target=MagicMock())
     circular_handler.emit(
-        logging.LogRecord("Info", logging.INFO, "", 0, None, None, None)
+        logging.LogRecord("Info", logging.INFO, "", 0, None, None, None),
     )
     assert len(circular_handler.buffer) == 1
     circular_handler.close()

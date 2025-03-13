@@ -22,7 +22,7 @@ from dodal.plans.wrapped import count
 
 @pytest.fixture
 def documents_from_num(
-    request: pytest.FixtureRequest, det: StandardDetector, RE: RunEngine
+    request: pytest.FixtureRequest, det: StandardDetector, RE: RunEngine,
 ) -> dict[str, list[DocumentType]]:
     docs: dict[str, list[DocumentType]] = {}
     RE(
@@ -78,10 +78,10 @@ def test_count_num_validation(det: StandardDetector, RE):
 
 
 @pytest.mark.parametrize(
-    "documents_from_num, shape", ([1, (1,)], [3, (3,)]), indirect=["documents_from_num"]
+    "documents_from_num, shape", ([1, (1,)], [3, (3,)]), indirect=["documents_from_num"],
 )
 def test_plan_produces_expected_start_document(
-    documents_from_num: dict[str, list[DocumentType]], shape: tuple[int, ...]
+    documents_from_num: dict[str, list[DocumentType]], shape: tuple[int, ...],
 ):
     docs = documents_from_num.get("start")
     assert docs and len(docs) == 1
@@ -93,10 +93,10 @@ def test_plan_produces_expected_start_document(
 
 
 @pytest.mark.parametrize(
-    "documents_from_num, length", ([1, 1], [3, 3]), indirect=["documents_from_num"]
+    "documents_from_num, length", ([1, 1], [3, 3]), indirect=["documents_from_num"],
 )
 def test_plan_produces_expected_stop_document(
-    documents_from_num: dict[str, list[DocumentType]], length: int
+    documents_from_num: dict[str, list[DocumentType]], length: int,
 ):
     docs = documents_from_num.get("stop")
     assert docs and len(docs) == 1
@@ -107,7 +107,7 @@ def test_plan_produces_expected_stop_document(
 
 @pytest.mark.parametrize("documents_from_num", [1], indirect=True)
 def test_plan_produces_expected_descriptor(
-    documents_from_num: dict[str, list[DocumentType]], det: StandardDetector
+    documents_from_num: dict[str, list[DocumentType]], det: StandardDetector,
 ):
     docs = documents_from_num.get("descriptor")
     assert docs and len(docs) == 1
@@ -118,7 +118,7 @@ def test_plan_produces_expected_descriptor(
 
 
 @pytest.mark.parametrize(
-    "documents_from_num, length", ([1, 1], [3, 3]), indirect=["documents_from_num"]
+    "documents_from_num, length", ([1, 1], [3, 3]), indirect=["documents_from_num"],
 )
 def test_plan_produces_expected_events(
     documents_from_num: dict[str, list[DocumentType]],
@@ -147,7 +147,7 @@ def test_plan_produces_expected_resources(
 
 
 @pytest.mark.parametrize(
-    "documents_from_num, length", ([1, 1], [3, 3]), indirect=["documents_from_num"]
+    "documents_from_num, length", ([1, 1], [3, 3]), indirect=["documents_from_num"],
 )
 def test_plan_produces_expected_datums(
     documents_from_num: dict[str, list[DocumentType]],

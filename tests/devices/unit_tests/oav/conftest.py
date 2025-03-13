@@ -18,7 +18,7 @@ async def oav() -> OAV:
         oav = OAV("", config=oav_config, name="fake_oav")
     zoom_levels_list = ["1.0x", "3.0x", "5.0x", "7.5x", "10.0x"]
     oav.zoom_controller.level.describe = AsyncMock(
-        return_value={"level": {"choices": zoom_levels_list}}
+        return_value={"level": {"choices": zoom_levels_list}},
     )
     set_mock_value(oav.grid_snapshot.x_size, 1024)
     set_mock_value(oav.grid_snapshot.y_size, 768)

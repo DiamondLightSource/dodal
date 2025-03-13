@@ -32,7 +32,7 @@ def sim_stage(RE) -> SimStage:
 
 @pytest.fixture
 def documents_from_num(
-    request: pytest.FixtureRequest, det: StandardDetector, RE: RunEngine
+    request: pytest.FixtureRequest, det: StandardDetector, RE: RunEngine,
 ) -> dict[str, list[DocumentType]]:
     docs: dict[str, list[DocumentType]] = {}
     RE(
@@ -44,10 +44,10 @@ def documents_from_num(
 
 @pytest.mark.adsim
 @pytest.mark.parametrize(
-    "documents_from_num, shape", ([1, (1,)], [3, (3,)]), indirect=["documents_from_num"]
+    "documents_from_num, shape", ([1, (1,)], [3, (3,)]), indirect=["documents_from_num"],
 )
 def test_plan_produces_expected_start_document(
-    documents_from_num: dict[str, list[DocumentType]], shape: tuple[int, ...]
+    documents_from_num: dict[str, list[DocumentType]], shape: tuple[int, ...],
 ):
     docs = documents_from_num.get("start")
     assert docs and len(docs) == 1
@@ -66,10 +66,10 @@ def test_plan_produces_expected_start_document(
 
 @pytest.mark.adsim
 @pytest.mark.parametrize(
-    "documents_from_num, length", ([1, 1], [3, 3]), indirect=["documents_from_num"]
+    "documents_from_num, length", ([1, 1], [3, 3]), indirect=["documents_from_num"],
 )
 def test_plan_produces_expected_stop_document(
-    documents_from_num: dict[str, list[DocumentType]], length: int
+    documents_from_num: dict[str, list[DocumentType]], length: int,
 ):
     docs = documents_from_num.get("stop")
     assert docs and len(docs) == 1
@@ -81,7 +81,7 @@ def test_plan_produces_expected_stop_document(
 @pytest.mark.adsim
 @pytest.mark.parametrize("documents_from_num", [1], indirect=True)
 def test_plan_produces_expected_descriptor(
-    documents_from_num: dict[str, list[DocumentType]], det: StandardDetector
+    documents_from_num: dict[str, list[DocumentType]], det: StandardDetector,
 ):
     docs = documents_from_num.get("descriptor")
     assert docs and len(docs) == 1
@@ -93,7 +93,7 @@ def test_plan_produces_expected_descriptor(
 
 @pytest.mark.adsim
 @pytest.mark.parametrize(
-    "documents_from_num, length", ([1, 1], [3, 3]), indirect=["documents_from_num"]
+    "documents_from_num, length", ([1, 1], [3, 3]), indirect=["documents_from_num"],
 )
 def test_plan_produces_expected_events(
     documents_from_num: dict[str, list[DocumentType]],
@@ -131,7 +131,7 @@ def test_plan_produces_expected_resources(
 
 @pytest.mark.adsim
 @pytest.mark.parametrize(
-    "documents_from_num, length", ([1, 1], [3, 3]), indirect=["documents_from_num"]
+    "documents_from_num, length", ([1, 1], [3, 3]), indirect=["documents_from_num"],
 )
 def test_plan_produces_expected_datums(
     documents_from_num: dict[str, list[DocumentType]],
@@ -153,7 +153,7 @@ def test_plan_produces_expected_datums(
         stream_resource = [
             resource
             for resource in cast(
-                list[StreamResource], documents_from_num.get("stream_resource")
+                list[StreamResource], documents_from_num.get("stream_resource"),
             )
             if resource.get("data_key") == data_key
         ][0]
@@ -176,7 +176,7 @@ def test_plan_produces_expected_datums(
         data_key_docs = docs_for_stream(data_key)
         assert_all_seq_nums_accounted(data_key_docs)
         stream_resource = data_key_docs[0].get(
-            "stream_resource"
+            "stream_resource",
         )  # each data_key uses a consistent resource
         assert all(
             doc.get("stream_resource") == stream_resource for doc in data_key_docs

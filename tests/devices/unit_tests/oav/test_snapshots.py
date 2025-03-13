@@ -57,7 +57,7 @@ async def grid_snapshot() -> SnapshotWithGrid:
 @pytest.fixture
 def mock_session_with_valid_response():
     with patch(
-        "dodal.devices.areadetector.plugins.MJPG.ClientSession.get", autospec=True
+        "dodal.devices.areadetector.plugins.MJPG.ClientSession.get", autospec=True,
     ) as mock_get:
         mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
         mock_response.ok = True
@@ -75,7 +75,7 @@ def mock_image_open():
 
 @patch("dodal.devices.oav.snapshots.snapshot_with_beam_centre.ImageDraw")
 async def test_snapshot_with_beam_centre_triggered_then_crosshair_drawn_and_saved(
-    patch_image_draw, mock_image_open, mock_session_with_valid_response, snapshot
+    patch_image_draw, mock_image_open, mock_session_with_valid_response, snapshot,
 ):
     patch_line = MagicMock()
     patch_image_draw.Draw.return_value.line = patch_line
@@ -140,7 +140,7 @@ def test_snapshot_draws_expected_crosshair(tmp_path: Path):
 
 
 @patch(
-    "dodal.devices.oav.snapshots.snapshot_with_grid.add_grid_border_overlay_to_image"
+    "dodal.devices.oav.snapshots.snapshot_with_grid.add_grid_border_overlay_to_image",
 )
 @patch("dodal.devices.oav.snapshots.snapshot_with_grid.add_grid_overlay_to_image")
 @patch("dodal.devices.oav.snapshots.snapshot_with_grid.asyncio_save_image")
@@ -158,10 +158,10 @@ async def test_snapshot_with_grid_triggered_saves_image_and_draws_correct_grid(
 
     mock_save.assert_awaited_once()
     patch_add_border.assert_called_once_with(
-        mock_image_open.return_value.__enter__.return_value, 100, 100, 50, 15, 10
+        mock_image_open.return_value.__enter__.return_value, 100, 100, 50, 15, 10,
     )
     patch_add_grid.assert_called_once_with(
-        mock_image_open.return_value.__enter__.return_value, 100, 100, 50, 15, 10
+        mock_image_open.return_value.__enter__.return_value, 100, 100, 50, 15, 10,
     )
     assert mock_save_grid.await_count == 2
     expected_grid_save_calls = [

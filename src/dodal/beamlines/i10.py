@@ -49,7 +49,7 @@ It is worth noting that the down stream device is slightly longer,
 
 
 def idd_gap(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False,
 ) -> UndulatorGap:
     return device_instantiation(
         device_factory=UndulatorGap,
@@ -62,7 +62,7 @@ def idd_gap(
 
 
 def idd_phase_axes(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False,
 ) -> UndulatorPhaseAxes:
     return device_instantiation(
         device_factory=UndulatorPhaseAxes,
@@ -79,7 +79,7 @@ def idd_phase_axes(
 
 
 def idd_jaw(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False,
 ) -> UndulatorJawPhase:
     return device_instantiation(
         device_factory=UndulatorJawPhase,
@@ -93,7 +93,7 @@ def idd_jaw(
 
 
 def idu_gap(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False,
 ) -> UndulatorGap:
     return device_instantiation(
         device_factory=UndulatorGap,
@@ -106,7 +106,7 @@ def idu_gap(
 
 
 def idu_phase_axes(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False,
 ) -> UndulatorPhaseAxes:
     return device_instantiation(
         device_factory=UndulatorPhaseAxes,
@@ -123,7 +123,7 @@ def idu_phase_axes(
 
 
 def idu_jaw(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False,
 ) -> UndulatorJawPhase:
     return device_instantiation(
         device_factory=UndulatorJawPhase,
@@ -149,7 +149,7 @@ def pgm(wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False) -> 
 
 
 def idu_gap_phase(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False,
 ) -> I10Apple2:
     return device_instantiation(
         device_factory=I10Apple2,
@@ -171,7 +171,7 @@ def idu_gap_phase(
 
 
 def idd_gap_phase(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False,
 ) -> I10Apple2:
     return device_instantiation(
         device_factory=I10Apple2,
@@ -193,7 +193,7 @@ def idd_gap_phase(
 
 
 def idu_pol(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False,
 ) -> I10Apple2Pol:
     return device_instantiation(
         device_factory=I10Apple2Pol,
@@ -206,7 +206,7 @@ def idu_pol(
 
 
 def idd_pol(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False,
 ) -> I10Apple2Pol:
     return device_instantiation(
         device_factory=I10Apple2Pol,
@@ -219,7 +219,7 @@ def idd_pol(
 
 
 def idu(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False,
 ) -> I10Apple2PGM:
     return device_instantiation(
         device_factory=I10Apple2PGM,
@@ -233,7 +233,7 @@ def idu(
 
 
 def idd(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False,
 ) -> I10Apple2PGM:
     return device_instantiation(
         device_factory=I10Apple2PGM,
@@ -247,7 +247,7 @@ def idd(
 
 
 def idu_la_angle(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False,
 ) -> LinearArbitraryAngle:
     return device_instantiation(
         device_factory=LinearArbitraryAngle,
@@ -260,7 +260,7 @@ def idu_la_angle(
 
 
 def idd_la_angle(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
+    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False,
 ) -> LinearArbitraryAngle:
     return device_instantiation(
         device_factory=LinearArbitraryAngle,

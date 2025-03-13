@@ -33,7 +33,7 @@ async def test_reading_fswitch(fswitch: FSwitch):
         "number_of_lenses": {
             "timestamp": mock.ANY,
             "value": 125,  # three filters out
-        }
+        },
     }
 
 
@@ -51,7 +51,7 @@ def test_fswitch_count_plan(RE: RunEngine, fswitch: FSwitch):
     event_doc = docs[names.index("event")]
 
     expected_data_key = DataKey(
-        dtype="integer", shape=[], source="fswitch", object_name="fswitch"
+        dtype="integer", shape=[], source="fswitch", object_name="fswitch",
     )
     assert descriptor_doc["data_keys"] == {"number_of_lenses": expected_data_key}
 

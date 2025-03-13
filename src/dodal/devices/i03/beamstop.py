@@ -9,8 +9,7 @@ from dodal.common.signal_utils import create_hardware_backed_soft_signal
 
 
 class BeamstopPositions(StrictEnum):
-    """
-    Beamstop positions.
+    """Beamstop positions.
     GDA supports Standard/High/Low resolution positions, as well as parked and
     robot load however all 3 resolution positions are the same. We also
     do not use the robot load position in Hyperion.
@@ -25,6 +24,7 @@ class BeamstopPositions(StrictEnum):
         DATA_COLLECTION: The beamstop is in beam ready for data collection
         UNKNOWN: The beamstop is in some other position, check the device motor
             positions to determine it.
+
     """
 
     DATA_COLLECTION = "Data Collection"
@@ -32,8 +32,7 @@ class BeamstopPositions(StrictEnum):
 
 
 class Beamstop(StandardReadable):
-    """
-    Beamstop for I03.
+    """Beamstop for I03.
 
     Attributes:
         x: beamstop x position in mm
@@ -41,6 +40,7 @@ class Beamstop(StandardReadable):
         z: beamstop z position in mm
         selected_pos: Get the current position of the beamstop as an enum. Currently this
             is read-only.
+
     """
 
     def __init__(
@@ -54,7 +54,7 @@ class Beamstop(StandardReadable):
             self.y_mm = Motor(prefix + "Y")
             self.z_mm = Motor(prefix + "Z")
             self.selected_pos = create_hardware_backed_soft_signal(
-                BeamstopPositions, self._get_selected_position
+                BeamstopPositions, self._get_selected_position,
             )
 
         self._in_beam_xyz_mm = [
@@ -77,9 +77,8 @@ class Beamstop(StandardReadable):
         if all(
             isclose(axis_pos, axis_in_beam, abs_tol=axis_tolerance)
             for axis_pos, axis_in_beam, axis_tolerance in zip(
-                current_pos, self._in_beam_xyz_mm, self._xyz_tolerance_mm, strict=False
+                current_pos, self._in_beam_xyz_mm, self._xyz_tolerance_mm, strict=False,
             )
         ):
             return BeamstopPositions.DATA_COLLECTION
-        else:
-            return BeamstopPositions.UNKNOWN
+        return BeamstopPositions.UNKNOWN

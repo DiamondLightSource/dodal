@@ -21,7 +21,7 @@ def synchrotron(RE) -> Synchrotron:
 @patch("dodal.plan_stubs.check_topup.wait_for_topup_complete")
 @patch("dodal.plan_stubs.check_topup.bps.sleep")
 def test_when_topup_before_end_of_collection_wait(
-    fake_sleep: MagicMock, fake_wait: MagicMock, synchrotron: Synchrotron, RE: RunEngine
+    fake_sleep: MagicMock, fake_wait: MagicMock, synchrotron: Synchrotron, RE: RunEngine,
 ):
     set_mock_value(synchrotron.synchrotron_mode, SynchrotronMode.USER)
     set_mock_value(synchrotron.top_up_start_countdown, 20.0)
@@ -32,7 +32,7 @@ def test_when_topup_before_end_of_collection_wait(
             synchrotron=synchrotron,
             total_exposure_time=40.0,
             ops_time=30.0,
-        )
+        ),
     )
     fake_sleep.assert_called_once_with(61.0)
 
@@ -40,7 +40,7 @@ def test_when_topup_before_end_of_collection_wait(
 @patch("dodal.plan_stubs.check_topup.bps.rd")
 @patch("dodal.plan_stubs.check_topup.bps.sleep")
 def test_wait_for_topup_complete(
-    fake_sleep: MagicMock, fake_rd: MagicMock, synchrotron: Synchrotron, RE: RunEngine
+    fake_sleep: MagicMock, fake_rd: MagicMock, synchrotron: Synchrotron, RE: RunEngine,
 ):
     def fake_generator(value):
         yield from bps.null()
@@ -62,7 +62,7 @@ def test_wait_for_topup_complete(
 @patch("dodal.plan_stubs.check_topup.bps.sleep")
 @patch("dodal.plan_stubs.check_topup.bps.null")
 def test_no_waiting_if_decay_mode(
-    fake_null: MagicMock, fake_sleep: MagicMock, synchrotron: Synchrotron, RE: RunEngine
+    fake_null: MagicMock, fake_sleep: MagicMock, synchrotron: Synchrotron, RE: RunEngine,
 ):
     set_mock_value(synchrotron.top_up_start_countdown, -1)
 
@@ -71,7 +71,7 @@ def test_no_waiting_if_decay_mode(
             synchrotron=synchrotron,
             total_exposure_time=10.0,
             ops_time=1.0,
-        )
+        ),
     )
     fake_null.assert_called_once()
     assert fake_sleep.call_count == 0
@@ -79,7 +79,7 @@ def test_no_waiting_if_decay_mode(
 
 @patch("dodal.plan_stubs.check_topup.bps.null")
 def test_no_waiting_when_mode_does_not_allow_gating(
-    fake_null: MagicMock, synchrotron: Synchrotron, RE: RunEngine
+    fake_null: MagicMock, synchrotron: Synchrotron, RE: RunEngine,
 ):
     set_mock_value(synchrotron.top_up_start_countdown, 1.0)
     set_mock_value(synchrotron.synchrotron_mode, SynchrotronMode.SHUTDOWN)
@@ -89,7 +89,7 @@ def test_no_waiting_when_mode_does_not_allow_gating(
             synchrotron=synchrotron,
             total_exposure_time=10.0,
             ops_time=1.0,
-        )
+        ),
     )
     fake_null.assert_called_once()
 
@@ -142,8 +142,8 @@ def test_topup_not_allowed_when_exceeds_threshold_percentage_of_topup_time(
     ):
         RE(
             check_topup_and_wait_if_necessary(
-                synchrotron, total_exposure_time, ops_time
-            )
+                synchrotron, total_exposure_time, ops_time,
+            ),
         )
 
     mock_sleep.assert_called_with(expected_wait)

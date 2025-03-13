@@ -43,8 +43,8 @@ def main(ctx: click.Context) -> None:
 )
 def connect(beamline: str, all: bool, sim_backend: bool) -> None:
     """Initialises a beamline module, connects to all devices, reports
-    any connection issues."""
-
+    any connection issues.
+    """
     os.environ["BEAMLINE"] = beamline
 
     module_name = module_name_for_beamline(beamline)
@@ -82,7 +82,7 @@ def _report_successful_devices(
 ) -> None:
     sim_statement = " (sim mode)" if sim_backend else ""
     connected_devices = "\n".join(
-        sorted([f"\t{device_name}" for device_name in devices.keys()])
+        sorted([f"\t{device_name}" for device_name in devices.keys()]),
     )
 
     print(f"{len(devices)} devices connected{sim_statement}:")

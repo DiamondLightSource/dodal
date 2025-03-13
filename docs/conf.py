@@ -174,7 +174,7 @@ html_theme_options = {
             "name": "PyPI",
             "url": f"https://pypi.org/project/{project}",
             "icon": "fas fa-cube",
-        }
+        },
     ],
     "switcher": {
         "json_url": switcher_json,

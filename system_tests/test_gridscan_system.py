@@ -20,23 +20,23 @@ def wait_for_fgs_valid(fgs_motors: ZebraFastGridScan, timeout=0.5):
     raise Exception(f"Scan parameters invalid after {timeout} seconds")
 
 
-@pytest.fixture()
+@pytest.fixture
 def zebra_fast_grid_scan():
     zebra_fast_grid_scan = ZebraFastGridScan(
-        name="zebra_fast_grid_scan", prefix="BL03S-MO-SGON-01:FGS:"
+        name="zebra_fast_grid_scan", prefix="BL03S-MO-SGON-01:FGS:",
     )
-    yield zebra_fast_grid_scan
+    return zebra_fast_grid_scan
 
 
 @pytest.mark.s03
 async def test_when_program_data_set_and_staged_then_expected_images_correct(
-    zebra_fast_grid_scan: ZebraFastGridScan, RE, RunEngine
+    zebra_fast_grid_scan: ZebraFastGridScan, RE, RunEngine,
 ):
     RE(
         set_fast_grid_scan_params(
             zebra_fast_grid_scan,
             ZebraGridScanParams(transmission_fraction=0.01, x_steps=2, y_steps=2),
-        )
+        ),
     )
     assert await zebra_fast_grid_scan.expected_images.get_value() == 2 * 2
     zebra_fast_grid_scan.stage()

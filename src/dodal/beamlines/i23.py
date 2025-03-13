@@ -12,8 +12,7 @@ PREFIX = BeamlinePrefix(BL)
 
 
 def _is_i23_machine():
-    """
-    Devices using PVA can only connect from i23 machines, due to the absence of
+    """Devices using PVA can only connect from i23 machines, due to the absence of
     PVA gateways at present.
     """
     hostname = get_hostname()
@@ -23,7 +22,6 @@ def _is_i23_machine():
 @device_factory(skip=lambda: not _is_i23_machine())
 def oav_pin_tip_detection() -> PinTipDetection:
     """Get the i23 OAV pin-tip detection device"""
-
     return PinTipDetection(
         f"{PREFIX.beamline_prefix}-DI-OAV-01:",
         "pin_tip_detection",

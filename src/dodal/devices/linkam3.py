@@ -28,6 +28,7 @@ class Linkam3(StandardReadable):
     Args:
         prefix (str): PV prefix for this device
         name (str): unique name for this device
+
     """
 
     tolerance: float = 0.5
@@ -39,18 +40,18 @@ class Linkam3(StandardReadable):
         self.start_heat = epics_signal_rw(bool, prefix + "STARTHEAT:")
 
         self.ramp_rate = epics_signal_rw(
-            float, prefix + "RAMPRATE:", prefix + "RAMPRATE:SET:"
+            float, prefix + "RAMPRATE:", prefix + "RAMPRATE:SET:",
         )
         self.ramp_time = epics_signal_r(float, prefix + "RAMPTIME:")
         self.set_point = epics_signal_rw(
-            float, prefix + "SETPOINT:", prefix + "SETPOINT:SET:"
+            float, prefix + "SETPOINT:", prefix + "SETPOINT:SET:",
         )
         self.pump_control = epics_signal_r(
             PumpControl,
             prefix + "LNP_MODE:SET:",
         )
         self.speed = epics_signal_rw(
-            float, prefix + "LNP_SPEED:", prefix + "LNP_SPEED:SET:"
+            float, prefix + "LNP_SPEED:", prefix + "LNP_SPEED:SET:",
         )
 
         self.chamber_vac = epics_signal_r(float, prefix + "VAC_CHAMBER:")

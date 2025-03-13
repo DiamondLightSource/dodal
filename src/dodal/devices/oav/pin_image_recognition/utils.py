@@ -29,7 +29,7 @@ def dilate(ksize: int, iterations: int) -> Callable[[np.ndarray], np.ndarray]:
 
 
 def _morph(
-    ksize: int, iterations: int, morph_type: int
+    ksize: int, iterations: int, morph_type: int,
 ) -> Callable[[np.ndarray], np.ndarray]:
     element = cv2.getStructuringElement(cv2.MORPH_RECT, (ksize, ksize))
     return lambda arr: cv2.morphologyEx(arr, morph_type, element, iterations=iterations)
@@ -94,8 +94,7 @@ NONE_VALUE: Final[int] = -1
 
 @dataclass
 class SampleLocation:
-    """
-    Holder type for results from sample detection.
+    """Holder type for results from sample detection.
     """
 
     tip_x: int | None
@@ -116,8 +115,7 @@ class MxSampleDetect:
         scan_direction: ScanDirections = ScanDirections.FORWARD,
         min_tip_height: int = 5,
     ):
-        """
-        Configures sample detection parameters.
+        """Configures sample detection parameters.
 
         Args:
             preprocess: A preprocessing function applied to the array after conversion to grayscale.
@@ -129,8 +127,8 @@ class MxSampleDetect:
             close_iterations: number of iterations for "close" operation
             scan_direction: ScanDirections.FORWARD for left-to-right, ScanDirections.REVERSE for right-to-left
             min_tip_height: minimum height of pin tip
-        """
 
+        """
         self.preprocess = preprocess
         self.canny_upper = canny_upper
         self.canny_lower = canny_lower
@@ -163,8 +161,7 @@ class MxSampleDetect:
     def _first_and_last_nonzero_by_columns(
         arr: np.ndarray,
     ) -> tuple[np.ndarray, np.ndarray]:
-        """
-        Finds the indexes of the first & last non-zero values by column in a 2d array.
+        """Finds the indexes of the first & last non-zero values by column in a 2d array.
 
         Outputs will contain NONE_VALUE if no non-zero values exist in a column.
 
@@ -182,7 +179,7 @@ class MxSampleDetect:
         any_nonzero_in_column = nonzero.any(axis=0)
 
         first_nonzero = np.where(
-            any_nonzero_in_column, nonzero.argmax(axis=0), NONE_VALUE
+            any_nonzero_in_column, nonzero.argmax(axis=0), NONE_VALUE,
         )
 
         flipped = nonzero.shape[0] - np.flip(nonzero, axis=0).argmax(axis=0) - 1
@@ -207,10 +204,10 @@ class MxSampleDetect:
             # No non-narrow locations - sample not in picture?
             # Or wrong parameters for edge-finding, ...
             LOGGER.warning(
-                "pin-tip detection: No non-narrow edges found - cannot locate pin tip"
+                "pin-tip detection: No non-narrow edges found - cannot locate pin tip",
             )
             return SampleLocation(
-                tip_x=None, tip_y=None, edge_bottom=bottom, edge_top=top
+                tip_x=None, tip_y=None, edge_bottom=bottom, edge_top=top,
             )
 
         # Choose our starting point - i.e. first column with non-narrow width for positive scan, last one for negative scan.
@@ -227,7 +224,7 @@ class MxSampleDetect:
             if x == -1 or x == width:
                 # (In this case the sample is off the edge of the picture.)
                 LOGGER.warning(
-                    "pin-tip detection: Pin tip may be outside image area - assuming at edge."
+                    "pin-tip detection: Pin tip may be outside image area - assuming at edge.",
                 )
                 break
         x += self.scan_direction.value  # ...and forward one step. x is now at the tip.
@@ -244,8 +241,8 @@ class MxSampleDetect:
             bottom[x + 1 :] = NONE_VALUE
 
         LOGGER.info(
-            f"pin-tip detection: Successfully located pin tip at (x={tip_x}, y={tip_y})"
+            f"pin-tip detection: Successfully located pin tip at (x={tip_x}, y={tip_y})",
         )
         return SampleLocation(
-            tip_x=tip_x, tip_y=tip_y, edge_bottom=bottom, edge_top=top
+            tip_x=tip_x, tip_y=tip_y, edge_bottom=bottom, edge_top=top,
         )

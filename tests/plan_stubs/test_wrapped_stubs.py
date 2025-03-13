@@ -38,7 +38,7 @@ def test_set_absolute(x_axis: SimMotor):
 
 def test_set_absolute_with_group(x_axis: SimMotor):
     assert list(set_absolute(x_axis, 0.5, group="foo")) == [
-        Msg("set", x_axis, 0.5, group="foo")
+        Msg("set", x_axis, 0.5, group="foo"),
     ]
 
 
@@ -134,11 +134,11 @@ def test_wait_group():
 
 def test_wait_timeout():
     assert list(wait(timeout=5.0)) == [
-        Msg("wait", group=None, timeout=5.0, move_on=False)
+        Msg("wait", group=None, timeout=5.0, move_on=False),
     ]
 
 
 def test_wait_group_and_timeout():
     assert list(wait("foo", 5.0)) == [
-        Msg("wait", group="foo", timeout=5.0, move_on=False)
+        Msg("wait", group="foo", timeout=5.0, move_on=False),
     ]

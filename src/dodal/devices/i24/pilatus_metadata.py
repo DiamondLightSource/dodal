@@ -15,13 +15,12 @@ class PilatusMetadata(StandardReadable):
         self.filenumber = epics_signal_r(int, prefix + "cam1:FileNumber_RBV")
         with self.add_children_as_readables():
             self.filename_template = create_hardware_backed_soft_signal(
-                str, self._get_full_filename_template
+                str, self._get_full_filename_template,
             )
         super().__init__(name)
 
     async def _get_full_filename_template(self) -> str:
-        """
-        Get the template file path by querying the detector PVs.
+        """Get the template file path by querying the detector PVs.
         Mirror the construction that the PPU does.
 
         Returns: A template string, with the image numbers replaced with '#'
@@ -31,7 +30,7 @@ class PilatusMetadata(StandardReadable):
         file_number = await self.filenumber.get_value()
         # Exploit fact that passing negative numbers will put the - before the 0's
         expected_filename = str(
-            filename_template % (filename, f"{file_number:05d}_", -9)
+            filename_template % (filename, f"{file_number:05d}_", -9),
         )
         # Now, find the -09 part of this
         numberpart = re.search(r"(-0+9)", expected_filename)

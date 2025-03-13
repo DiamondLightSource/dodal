@@ -154,7 +154,7 @@ async def test_moving_the_robot_will_reset_error_if_light_curtain_is_tripped_and
             call.next_puck.put(ANY, wait=True),
             call.next_pin.put(ANY, wait=True),
             call.load.put(None, wait=True),
-        ]
+        ],
     )
 
 
@@ -175,5 +175,5 @@ async def test_moving_the_robot_will_reset_error_if_light_curtain_is_tripped_and
             call.next_puck.put(ANY, wait=True),
             call.next_pin.put(ANY, wait=True),
             call.load.put(None, wait=True),
-        ]
+        ],
     )

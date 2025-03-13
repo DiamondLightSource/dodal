@@ -39,7 +39,7 @@ class UndulatorGapAccess(StrictEnum):
 
 
 def _get_closest_gap_for_energy(
-    dcm_energy_ev: float, energy_to_distance_table: ndarray
+    dcm_energy_ev: float, energy_to_distance_table: ndarray,
 ) -> float:
     table = energy_to_distance_table.transpose()
     idx = argmin(np.abs(table[0] - dcm_energy_ev))
@@ -47,8 +47,7 @@ def _get_closest_gap_for_energy(
 
 
 class Undulator(StandardReadable, Movable):
-    """
-    An Undulator-type insertion device, used to control photon emission at a given
+    """An Undulator-type insertion device, used to control photon emission at a given
     beam energy.
     """
 
@@ -67,8 +66,8 @@ class Undulator(StandardReadable, Movable):
             poles (int): Number of magnetic poles built into the undulator
             length (float): Length of the undulator in meters
             name (str, optional): Name for device. Defaults to "".
-        """
 
+        """
         self.id_gap_lookup_table_path = id_gap_lookup_table_path
         with self.add_children_as_readables():
             self.gap_motor = Motor(prefix + "BLGAPMTR")
@@ -100,11 +99,11 @@ class Undulator(StandardReadable, Movable):
 
     @AsyncStatus.wrap
     async def set(self, value: float):
-        """
-        Set the undulator gap to a given energy in keV
+        """Set the undulator gap to a given energy in keV
 
         Args:
             value: energy in keV
+
         """
         await self._set_undulator_gap(value)
 
@@ -125,7 +124,7 @@ class Undulator(StandardReadable, Movable):
         if difference > tolerance:
             LOGGER.info(
                 f"Undulator gap mismatch. {difference:.3f}mm is outside tolerance.\
-                Moving gap to nominal value, {target_gap:.3f}mm"
+                Moving gap to nominal value, {target_gap:.3f}mm",
             )
             if not TEST_MODE:
                 # Only move if the gap is sufficiently different to the value from the
@@ -139,16 +138,15 @@ class Undulator(StandardReadable, Movable):
         else:
             LOGGER.debug(
                 "Gap is already in the correct place for the new energy value "
-                f"{energy_kev}, no need to ask it to move"
+                f"{energy_kev}, no need to ask it to move",
             )
 
     async def _get_gap_to_match_energy(self, energy_kev: float) -> float:
-        """
-        get a 2d np.array from lookup table that
+        """Get a 2d np.array from lookup table that
         converts energies to undulator gap distance
         """
         energy_to_distance_table: np.ndarray = await energy_distance_table(
-            self.id_gap_lookup_table_path
+            self.id_gap_lookup_table_path,
         )
 
         # Use the lookup table to get the undulator gap associated with this dcm energy

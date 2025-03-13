@@ -44,6 +44,6 @@ def create_hardware_backed_soft_signal(
     """
     return SignalR(
         backend=HardwareBackedSoftSignalBackend(
-            get_from_hardware_func, datatype, units=units, precision=precision
-        )
+            get_from_hardware_func, datatype, units=units, precision=precision,
+        ),
     )

@@ -14,7 +14,7 @@ async def test_zoom_controller():
     zoom_controller = ZoomController("", "zoom_controller")
     await zoom_controller.connect(mock=True)
     zoom_controller.level.describe = AsyncMock(
-        return_value={"zoom_controller-level": {"choices": ["1.0x", "3.0x"]}}
+        return_value={"zoom_controller-level": {"choices": ["1.0x", "3.0x"]}},
     )
     status = zoom_controller.set("3.0x")
     await status
@@ -51,15 +51,15 @@ async def test_cam():
     ],
 )
 async def test_get_micronsperpixel_from_oav(
-    zoom_level, expected_microns_x, expected_microns_y, oav: OAV
+    zoom_level, expected_microns_x, expected_microns_y, oav: OAV,
 ):
     set_mock_value(oav.zoom_controller.level, zoom_level)
 
     assert await oav.microns_per_pixel_x.get_value() == pytest.approx(
-        expected_microns_x, abs=1e-2
+        expected_microns_x, abs=1e-2,
     )
     assert await oav.microns_per_pixel_y.get_value() == pytest.approx(
-        expected_microns_y, abs=1e-2
+        expected_microns_y, abs=1e-2,
     )
 
 
@@ -104,7 +104,7 @@ async def test_oav_returns_rescaled_beam_position_and_microns_per_pixel_correctl
 )
 @patch("dodal.devices.areadetector.plugins.MJPG.Image")
 async def test_when_snapshot_triggered_post_processing_called_correctly(
-    patch_image, mock_get, oav: OAV
+    patch_image, mock_get, oav: OAV,
 ):
     mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
     mock_response.ok = True

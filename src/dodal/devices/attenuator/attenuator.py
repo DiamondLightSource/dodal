@@ -37,7 +37,8 @@ class BinaryFilterAttenuator(ReadOnlyAttenuator, Movable):
         yield from bps.set(attenuator, desired_transmission)
 
     Where desired_transmission is fraction e.g. 0-1. When the actual_transmission is
-    read from the device it is also fractional"""
+    read from the device it is also fractional
+    """
 
     def __init__(self, prefix: str, name: str = ""):
         self._calculated_filter_states: DeviceVector[SignalR[int]] = DeviceVector(
@@ -45,13 +46,13 @@ class BinaryFilterAttenuator(ReadOnlyAttenuator, Movable):
                 int(digit, 16): epics_signal_r(int, f"{prefix}DEC_TO_BIN.B{digit}")
                 for digit in string.hexdigits
                 if not digit.islower()
-            }
+            },
         )
         self._filters_in_position: DeviceVector[SignalR[bool]] = DeviceVector(
             {
                 i - 1: epics_signal_r(bool, f"{prefix}FILTER{i}:INLIM")
                 for i in range(1, 17)
-            }
+            },
         )
 
         self._desired_transmission = epics_signal_rw(float, prefix + "T2A:SETVAL1")
@@ -68,7 +69,6 @@ class BinaryFilterAttenuator(ReadOnlyAttenuator, Movable):
         the current beamline energy, the set will only complete when they have all been
         applied.
         """
-
         LOGGER.debug("Using current energy ")
         await self._use_current_energy.trigger()
         LOGGER.info(f"Setting desired transmission to {value}")
@@ -84,7 +84,7 @@ class BinaryFilterAttenuator(ReadOnlyAttenuator, Movable):
                     None,
                 )
                 for i in range(16)
-            ]
+            ],
         )
 
 
@@ -108,6 +108,6 @@ class EnumFilterAttenuator(ReadOnlyAttenuator):
                 {
                     index: FilterMotor(f"{prefix}MP{index + 1}:", filter, name)
                     for index, filter in enumerate(filter_selection)
-                }
+                },
             )
         super().__init__(prefix, name=name)

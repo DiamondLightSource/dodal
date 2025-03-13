@@ -64,7 +64,7 @@ class OdinNodesStatus(Device):
         return [self.node_0, self.node_1, self.node_2, self.node_3]
 
     def _check_node_frames_from_attr(
-        self, node_get_func, error_message_verb: str
+        self, node_get_func, error_message_verb: str,
     ) -> tuple[bool, str]:
         nodes_frames_values = [0] * len(self.nodes)
         frames_details = []
@@ -80,12 +80,12 @@ class OdinNodesStatus(Device):
 
     def check_frames_timed_out(self) -> tuple[bool, str]:
         return self._check_node_frames_from_attr(
-            lambda node: node.frames_timed_out.get(), "timed out"
+            lambda node: node.frames_timed_out.get(), "timed out",
         )
 
     def check_frames_dropped(self) -> tuple[bool, str]:
         return self._check_node_frames_from_attr(
-            lambda node: node.frames_dropped.get(), "dropped"
+            lambda node: node.frames_dropped.get(), "dropped",
         )
 
     def wait_for_no_errors(self, timeout) -> dict[SubscriptionStatus, str]:
@@ -146,7 +146,7 @@ class EigerOdin(Device):
         await_true = partial(await_value, expected_value=True, timeout=timeout)
         errors[
             await_value(
-                self.fan.consumers_connected, expected_value=True, timeout=timeout
+                self.fan.consumers_connected, expected_value=True, timeout=timeout,
             )
         ] = "EigerFan is not connected"
         errors[await_true(self.fan.on)] = "EigerFan is not initialised"

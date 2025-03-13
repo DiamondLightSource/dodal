@@ -45,7 +45,7 @@ set_path_provider(
         BL,
         Path("/dls/i22/data/2024/cm37271-2/bluesky"),
         client=RemoteDirectoryServiceClient("http://i22-control:8088/api"),
-    )
+    ),
 )
 
 
@@ -129,14 +129,14 @@ def hfm() -> FocusingMirror:
 @device_factory()
 def bimorph_hfm() -> BimorphMirror:
     return BimorphMirror(
-        prefix=f"{PREFIX.beamline_prefix}-OP-KBM-01:G0:", number_of_channels=12
+        prefix=f"{PREFIX.beamline_prefix}-OP-KBM-01:G0:", number_of_channels=12,
     )
 
 
 @device_factory()
 def bimorph_vfm() -> BimorphMirror:
     return BimorphMirror(
-        prefix=f"{PREFIX.beamline_prefix}-OP-KBM-01:G1:", number_of_channels=16
+        prefix=f"{PREFIX.beamline_prefix}-OP-KBM-01:G1:", number_of_channels=16,
     )
 
 
@@ -146,10 +146,10 @@ def dcm() -> DoubleCrystalMonochromator:
         prefix=f"{PREFIX.beamline_prefix}-MO-DCM-01:",
         temperature_prefix=f"{PREFIX.beamline_prefix}-DI-DCM-01:",
         crystal_1_metadata=make_crystal_metadata_from_material(
-            MaterialsEnum.Si, (1, 1, 1)
+            MaterialsEnum.Si, (1, 1, 1),
         ),
         crystal_2_metadata=make_crystal_metadata_from_material(
-            MaterialsEnum.Si, (1, 1, 1)
+            MaterialsEnum.Si, (1, 1, 1),
         ),
     )
 

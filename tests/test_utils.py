@@ -30,10 +30,9 @@ from dodal.utils import (
 MOCK_DAQ_CONFIG_PATH = "tests/devices/unit_tests/test_daq_configuration"
 
 
-@pytest.fixture()
+@pytest.fixture
 def alternate_config(tmp_path) -> str:
-    """
-    Alternate config dir as MOCK_DAQ_CONFIG_PATH replaces i03.DAQ_CONFIGURATION_PATH
+    """Alternate config dir as MOCK_DAQ_CONFIG_PATH replaces i03.DAQ_CONFIGURATION_PATH
     in conftest.py
     """
     alt_config_path = tmp_path / "alt_daq_configuration"
@@ -41,7 +40,7 @@ def alternate_config(tmp_path) -> str:
     return str(alt_config_path)
 
 
-@pytest.fixture()
+@pytest.fixture
 def fake_device_factory_beamline():
     import tests.fake_device_factory_beamline as beamline
 
@@ -56,7 +55,7 @@ def fake_device_factory_beamline():
 
 
 def test_finds_device_factories() -> None:
-    import tests.fake_beamline as fake_beamline
+    from tests import fake_beamline
 
     factories = collect_factories(fake_beamline)
 
@@ -78,7 +77,7 @@ def test_finds_device_factories() -> None:
 
 
 def test_makes_devices() -> None:
-    import tests.fake_beamline as fake_beamline
+    from tests import fake_beamline
 
     devices, exceptions = make_all_devices(fake_beamline)
     assert {
@@ -197,7 +196,7 @@ def test_device_factory_skips(fake_device_factory_beamline):
 
 def test_device_factory_can_ignore_skip(fake_device_factory_beamline):
     devices, exceptions = make_all_devices(
-        fake_device_factory_beamline, include_skipped=True
+        fake_device_factory_beamline, include_skipped=True,
     )
     assert len(devices) == 4
     assert len(exceptions) == 0
@@ -205,7 +204,7 @@ def test_device_factory_can_ignore_skip(fake_device_factory_beamline):
 
 def test_device_factory_can_construct_ophyd_v1_devices(fake_device_factory_beamline):
     device = fake_device_factory_beamline.ophyd_v1_device(
-        connect_immediately=True, mock=True, connection_timeout=4.5
+        connect_immediately=True, mock=True, connection_timeout=4.5,
     )
 
     device.wait_for_connection.assert_called_once_with(timeout=4.5)  # type: ignore
@@ -230,7 +229,7 @@ def test_device_factory_passes_kwargs_to_wrapped_factory_v1(
 
 
 def test_device_factory_passes_kwargs_to_wrapped_factory_v2(
-    RE: RunEngine, fake_device_factory_beamline
+    RE: RunEngine, fake_device_factory_beamline,
 ):
     device = fake_device_factory_beamline.mock_device(
         connect_immediately=True,
@@ -248,7 +247,7 @@ def test_device_factory_passes_kwargs_to_wrapped_factory_v2(
 
 
 def test_fake_with_ophyd_sim_passed_to_device_factory(
-    RE: RunEngine, fake_device_factory_beamline
+    RE: RunEngine, fake_device_factory_beamline,
 ):
     fake_device_factory_beamline.mock_device.cache_clear()
 
@@ -280,7 +279,7 @@ def test_mock_passed_to_device_factory(RE: RunEngine, fake_device_factory_beamli
 
 
 def test_connect_immediately_passed_to_device_factory(
-    RE: RunEngine, fake_device_factory_beamline
+    RE: RunEngine, fake_device_factory_beamline,
 ):
     fake_device_factory_beamline.mock_device.cache_clear()
 
@@ -329,7 +328,7 @@ def test_valid_beamline_variable_causes_get_device_module_to_return_module(bl, m
 def test_find_next_run_number_from_files_gets_correct_number():
     assert (
         _find_next_run_number_from_files(
-            ["V31-1-x0093_1.nxs", "V31-1-x0093_2.nxs", "V31-1-x0093_265.nxs"]
+            ["V31-1-x0093_1.nxs", "V31-1-x0093_2.nxs", "V31-1-x0093_265.nxs"],
         )
         == 266
     )
@@ -341,7 +340,7 @@ def test_find_next_run_number_gives_warning_with_wrong_nexus_names(
 ):
     assert (
         _find_next_run_number_from_files(
-            ["V31-1-x0093.nxs", "eggs", "V31-1-x0093_1.nxs"]
+            ["V31-1-x0093.nxs", "eggs", "V31-1-x0093_1.nxs"],
         )
         == 2
     )
@@ -351,7 +350,7 @@ def test_find_next_run_number_gives_warning_with_wrong_nexus_names(
 @patch("os.listdir")
 @patch("dodal.utils._find_next_run_number_from_files")
 def test_get_run_number_finds_all_nexus_files(
-    mock_find_next_run_number: MagicMock, mock_list_dir: MagicMock
+    mock_find_next_run_number: MagicMock, mock_list_dir: MagicMock,
 ):
     files = ["blah.nxs", "foo", "bar.nxs", "ham.h5"]
     mock_list_dir.return_value = files
@@ -369,7 +368,7 @@ def test_if_nexus_files_are_unnumbered_then_return_one(
 @patch("os.listdir")
 @patch("dodal.utils._find_next_run_number_from_files")
 def test_run_number_1_given_on_first_nexus_file(
-    mock_find_next_run_number: MagicMock, mock_list_dir: MagicMock
+    mock_find_next_run_number: MagicMock, mock_list_dir: MagicMock,
 ):
     files = ["blah", "foo", "bar"]
     mock_list_dir.return_value = files
@@ -475,7 +474,7 @@ def test_filter_ophyd_devices_raises_for_extra_types():
                 "oa": OphydV1Device(prefix="", name="oa"),
                 "aa": OphydV2Device(name="aa"),
                 "ab": 3,  # type: ignore
-            }
+            },
         )
 
 

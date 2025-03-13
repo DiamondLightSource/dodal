@@ -14,8 +14,7 @@ from ophyd_async.epics.core import epics_signal_r
 
 
 class FilterState(StrictEnum):
-    """
-    Note that the in/out here refers to the internal rocker
+    """Note that the in/out here refers to the internal rocker
     position so a PV value of IN implies a filter OUT of beam
     """
 
@@ -24,8 +23,7 @@ class FilterState(StrictEnum):
 
 
 class FSwitch(StandardReadable):
-    """
-    Device for i22's fswitch. A filter switch for manipulating
+    """Device for i22's fswitch. A filter switch for manipulating
     compound refractive lenses. Also referred to as a transfocator.
 
     This currently only implements the minimum
@@ -52,26 +50,26 @@ class FSwitch(StandardReadable):
             {
                 i: epics_signal_r(FilterState, f"{prefix}FILTER-{i:03}:STATUS_RBV")
                 for i in range(FSwitch.NUM_FILTERS)
-            }
+            },
         )
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             if lens_geometry is not None:
                 self.lens_geometry, _ = soft_signal_r_and_setter(
-                    str, initial_value=lens_geometry
+                    str, initial_value=lens_geometry,
                 )
             else:
                 self.lens_geometry = None
 
             if cylindrical is not None:
                 self.cylindrical, _ = soft_signal_r_and_setter(
-                    bool, initial_value=cylindrical
+                    bool, initial_value=cylindrical,
                 )
             else:
                 self.cylindrical = None
 
             if lens_material is not None:
                 self.lens_material, _ = soft_signal_r_and_setter(
-                    str, initial_value=lens_material
+                    str, initial_value=lens_material,
                 )
             else:
                 self.lens_material = None
@@ -82,14 +80,14 @@ class FSwitch(StandardReadable):
         default_describe = await super().describe()
         return {
             FSwitch.NUM_LENSES_FIELD_NAME: DataKey(
-                dtype="integer", shape=[], source=self.name
+                dtype="integer", shape=[], source=self.name,
             ),
             **default_describe,
         }
 
     async def read(self) -> dict[str, Reading]:
         result = await asyncio.gather(
-            *(filter.get_value() for filter in self.filters.values())
+            *(filter.get_value() for filter in self.filters.values()),
         )
         num_in = sum(r.value == FilterState.IN_BEAM for r in result)
         default_reading = await super().read()

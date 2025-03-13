@@ -5,23 +5,24 @@ from pydantic import BaseModel, Field, model_validator
 
 class ZebraMappingValidations(BaseModel):
     """Raises an exception if field set to -1 is accessed, and validate against
-    multiple fields mapping to the same integer"""
+    multiple fields mapping to the same integer
+    """
 
     def __getattribute__(self, name: str):
         """To protect against mismatch between the Zebra configuration that a plan expects and the Zebra which has
-        been instantiated, raise exception if a field which has been set to -1 is accessed."""
+        been instantiated, raise exception if a field which has been set to -1 is accessed.
+        """
         value = object.__getattribute__(self, name)
         if not name.startswith("__"):
             if value == -1:
                 raise UnmappedZebraException(
-                    f"'{type(self).__name__}.{name}' was accessed but is set to -1. Please check the zebra mappings against the zebra's physical configuration"
+                    f"'{type(self).__name__}.{name}' was accessed but is set to -1. Please check the zebra mappings against the zebra's physical configuration",
                 )
         return value
 
     @model_validator(mode="after")
     def ensure_no_duplicate_connections(self):
         """Check that TTL outputs and sources are mapped to unique integers"""
-
         integer_fields = {
             key: value
             for key, value in self.model_dump().items()
@@ -33,14 +34,15 @@ class ZebraMappingValidations(BaseModel):
         }
         if len(integer_fields_with_duplicates):
             raise ValueError(
-                f"Each field in {type(self)} must be mapped to a unique integer. Duplicate fields: {integer_fields_with_duplicates}"
+                f"Each field in {type(self)} must be mapped to a unique integer. Duplicate fields: {integer_fields_with_duplicates}",
             )
         return self
 
 
 class ZebraTTLOutputs(ZebraMappingValidations):
     """Maps hardware to the Zebra TTL output (1-4) that they're physically wired to, or
-    None if that hardware is not connected. A value of -1 means this hardware is not connected."""
+    None if that hardware is not connected. A value of -1 means this hardware is not connected.
+    """
 
     TTL_EIGER: int = Field(default=-1, ge=-1, le=4)
     TTL_PILATUS: int = Field(default=-1, ge=-1, le=4)

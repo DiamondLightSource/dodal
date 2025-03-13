@@ -57,10 +57,12 @@ def _delay_to_avoid_topup(
         total_run_time_s: Anticipated time until end of the collection in seconds
         time_to_topup_s: Time to the start of the topup as measured from the PV
         topup_configuration: configuration dictionary
-        total_exposure_time_s: Total exposure time of the sample in s"""
+        total_exposure_time_s: Total exposure time of the sample in s
+
+    """
     if total_run_time_s > time_to_topup_s:
         limit_s = topup_configuration.get(
-            TopupConfig.THRESHOLD_EXPOSURE_S, DEFAULT_THRESHOLD_EXPOSURE_S
+            TopupConfig.THRESHOLD_EXPOSURE_S, DEFAULT_THRESHOLD_EXPOSURE_S,
         )
         gate = total_exposure_time_s < limit_s
         if gate:
@@ -77,7 +79,7 @@ def _delay_to_avoid_topup(
     LOGGER.info(
         """
         Total run time less than time to next topup. Proceeding with collection.
-        """
+        """,
     )
     return False
 
@@ -104,6 +106,7 @@ def check_topup_and_wait_if_necessary(
             collection, in seconds.
         ops_time (float): Additional time to account for various operations,\
             eg. x-ray centering, in seconds. Defaults to 30.0.
+
     """
     machine_mode = yield from bps.rd(synchrotron.synchrotron_mode)
     assert isinstance(machine_mode, SynchrotronMode)
@@ -121,7 +124,7 @@ def check_topup_and_wait_if_necessary(
         total_exposure_time,
     )
     topup_gate_delay = topup_configuration.get(
-        TopupConfig.TOPUP_GATE_DELAY_S, DEFAULT_TOPUP_GATE_DELAY_S
+        TopupConfig.TOPUP_GATE_DELAY_S, DEFAULT_TOPUP_GATE_DELAY_S,
     )
     time_to_wait = end_topup + topup_gate_delay if should_wait else 0.0
 

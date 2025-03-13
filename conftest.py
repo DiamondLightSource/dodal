@@ -71,10 +71,9 @@ if os.getenv("PYTEST_RAISE", "0") == "1":
     def pytest_exception_interact(call: pytest.CallInfo[Any]):
         if call.excinfo is not None:
             raise call.excinfo.value
-        else:
-            raise RuntimeError(
-                f"{call} has no exception data, an unknown error has occurred"
-            )
+        raise RuntimeError(
+            f"{call} has no exception data, an unknown error has occurred",
+        )
 
     @pytest.hookimpl(tryfirst=True)
     def pytest_internalerror(excinfo: pytest.ExceptionInfo[Any]):
@@ -89,7 +88,7 @@ def pytest_runtest_setup(item):
 
         with patch("dodal.log.GELFTCPHandler", mock_graylog_handler):
             set_up_all_logging_handlers(
-                LOGGER, Path("./tmp/dev"), "dodal.log", True, 10000
+                LOGGER, Path("./tmp/dev"), "dodal.log", True, 10000,
             )
 
 
@@ -121,10 +120,10 @@ def dummy_visit_client() -> DirectoryServiceClient:
 
 @pytest.fixture
 async def static_path_provider(
-    tmp_path: Path, dummy_visit_client: DirectoryServiceClient
+    tmp_path: Path, dummy_visit_client: DirectoryServiceClient,
 ) -> PathProvider:
     svpp = StaticVisitPathProvider(
-        beamline="ixx", root=tmp_path, client=dummy_visit_client
+        beamline="ixx", root=tmp_path, client=dummy_visit_client,
     )
     await svpp.update()
     return svpp
@@ -159,4 +158,4 @@ async def RE():
         await asyncio.sleep(0)
         if time.monotonic() > timeout:
             raise TimeoutError("This really shouldn't happen but just in case...")
-    yield RE
+    return RE

@@ -10,10 +10,9 @@ DATA_GROUPS = "data_groups"
 
 
 def attach_data_session_metadata_wrapper(
-    plan: MsgGenerator, provider: UpdatingPathProvider | None = None
+    plan: MsgGenerator, provider: UpdatingPathProvider | None = None,
 ) -> MsgGenerator:
-    """
-    Attach data session metadata to the runs within a plan and make it correlate
+    """Attach data session metadata to the runs within a plan and make it correlate
     with an ophyd-async PathProvider.
 
     This updates the path provider (which in turn makes a call to to a service
@@ -29,6 +28,7 @@ def attach_data_session_metadata_wrapper(
 
     Yields:
         Iterator[Msg]: Plan messages
+
     """
     if provider is None:
         provider = get_path_provider()
@@ -41,5 +41,5 @@ def attach_data_session_metadata_wrapper(
 
 
 attach_data_session_metadata_decorator = make_decorator(
-    attach_data_session_metadata_wrapper
+    attach_data_session_metadata_wrapper,
 )

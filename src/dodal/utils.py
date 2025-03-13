@@ -136,8 +136,8 @@ class DeviceInitializationController(Generic[T]):
 
     def cache_clear(self) -> None:
         """Clears the controller's internal cached instance of the device, if present.
-        Noop if not."""
-
+        Noop if not.
+        """
         # Functools adds the cache_clear function via setattr so the type checker
         # does not pick it up.
         self._factory.cache_clear()  # type: ignore
@@ -184,6 +184,7 @@ class DeviceInitializationController(Generic[T]):
         Raises:
             RuntimeError:   If the device factory was invoked again with different
              keyword arguments, without previously invoking cache_clear()
+
         """
         is_v2_device = is_v2_device_factory(self._factory)
         is_mock = mock if mock is not None else self._mock
@@ -195,7 +196,7 @@ class DeviceInitializationController(Generic[T]):
         if self._factory.cache_info().currsize > 1:  # type: ignore
             raise RuntimeError(
                 f"Device factory method called multiple times with different parameters: "
-                f"{self.__name__}"  # type: ignore
+                f"{self.__name__}",  # type: ignore
             )
 
         if connect_immediately:
@@ -204,7 +205,7 @@ class DeviceInitializationController(Generic[T]):
             )
             if is_v2_device:
                 call_in_bluesky_event_loop(
-                    device.connect(timeout=timeout, mock=is_mock)
+                    device.connect(timeout=timeout, mock=is_mock),
                 )
             else:
                 assert is_v1_device_type(type(device))
@@ -232,6 +233,7 @@ def make_device(
 
     Returns:
         dict[str, AnyDevice]: A dict mapping device names to the constructed devices
+
     """
     if isinstance(module, str):
         module = import_module(module)
@@ -239,13 +241,13 @@ def make_device(
     device_collector = {}
     factories = collect_factories(module)
     device_collector[device_name] = _make_one_device(
-        module, device_name, device_collector, factories, **kwargs
+        module, device_name, device_collector, factories, **kwargs,
     )
     return device_collector
 
 
 def make_all_devices(
-    module: str | ModuleType | None = None, include_skipped: bool = False, **kwargs
+    module: str | ModuleType | None = None, include_skipped: bool = False, **kwargs,
 ) -> tuple[dict[str, AnyDevice], dict[str, Exception]]:
     """Makes all devices in the given beamline module.
 
@@ -261,12 +263,13 @@ def make_all_devices(
 
     A dictionary where the keys are device names and the values are devices.
     A dictionary where the keys are device names and the values are exceptions.
+
     """
     if isinstance(module, str) or module is None:
         module = import_module(module or __name__)
     factories = collect_factories(module, include_skipped)
     devices: tuple[dict[str, AnyDevice], dict[str, Exception]] = invoke_factories(
-        factories, **kwargs
+        factories, **kwargs,
     )
 
     return devices
@@ -290,8 +293,8 @@ def invoke_factories(
         Tuple[Dict[str, AnyDevice], Dict[str, Exception]]: Tuple of two dictionaries.
         One mapping device name to device, one mapping device name to exception for
         any failed devices
-    """
 
+    """
     devices: dict[str, AnyDevice] = {}
     exceptions: dict[str, Exception] = {}
 
@@ -346,7 +349,7 @@ def invoke_factories(
 
 
 def extract_dependencies(
-    factories: Mapping[str, AnyDeviceFactory], factory_name: str
+    factories: Mapping[str, AnyDeviceFactory], factory_name: str,
 ) -> Iterable[str]:
     """Compute dependencies for a device factory. Dependencies are named in the
     factory function signature, similar to pytest fixtures. For example given
@@ -363,15 +366,15 @@ def extract_dependencies(
 
     Yields:
         Iterator[Iterable[str]]: Factory names
-    """
 
+    """
     for name, param in inspect.signature(factories[factory_name]).parameters.items():
         if param.default is inspect.Parameter.empty and name in factories:
             yield name
 
 
 def collect_factories(
-    module: ModuleType, include_skipped: bool = False
+    module: ModuleType, include_skipped: bool = False,
 ) -> dict[str, AnyDeviceFactory]:
     """Automatically detect device factory functions within a module. They are detected
     via the return type signature e.g. def my_device() -> ADeviceType:
@@ -383,8 +386,8 @@ def collect_factories(
 
     Returns:
         dict[str, AnyDeviceFactory]: Mapping of factory name -> factory.
-    """
 
+    """
     factories: dict[str, AnyDeviceFactory] = {}
 
     for var in module.__dict__.values():
@@ -435,7 +438,7 @@ def is_v2_device_type(obj: type[Any]) -> bool:
         if non_parameterized_class:
             try:
                 return non_parameterized_class and issubclass(
-                    non_parameterized_class, OphydV2Device
+                    non_parameterized_class, OphydV2Device,
                 )
             except TypeError:
                 # Python 3.10 will return inspect.isclass(t) == True but then
@@ -456,8 +459,7 @@ def is_v1_device_type(obj: type[Any]) -> bool:
 def filter_ophyd_devices(
     devices: Mapping[str, AnyDevice],
 ) -> tuple[Mapping[str, OphydV1Device], Mapping[str, OphydV2Device]]:
-    """
-    Split a dictionary of ophyd and ophyd-async devices
+    """Split a dictionary of ophyd and ophyd-async devices
     (i.e. the output of make_all_devices) into 2 separate dictionaries of the
     different types. Useful when special handling is needed for each type of device.
 
@@ -470,8 +472,8 @@ def filter_ophyd_devices(
     Returns:
         Tuple of two dictionaries, one mapping names to ophyd devices and one mapping
         names to ophyd-async devices.
-    """
 
+    """
     ophyd_devices = {}
     ophyd_async_devices = {}
     for name, device in devices.items():
@@ -485,15 +487,14 @@ def filter_ophyd_devices(
 
 
 def get_beamline_based_on_environment_variable() -> ModuleType:
-    """
-    Gets the dodal module for the current beamline, as specified by the
+    """Gets the dodal module for the current beamline, as specified by the
     BEAMLINE environment variable.
     """
     beamline = get_beamline_name("")
 
     if beamline == "":
         raise ValueError(
-            "Cannot determine beamline - BEAMLINE environment variable not set."
+            "Cannot determine beamline - BEAMLINE environment variable not set.",
         )
 
     beamline = beamline.replace("-", "_")
@@ -505,7 +506,7 @@ def get_beamline_based_on_environment_variable() -> ModuleType:
         or any(c not in valid_characters for c in beamline)
     ):
         raise ValueError(
-            f"Invalid BEAMLINE variable - module name is not a permissible python module name, got '{beamline}'"
+            f"Invalid BEAMLINE variable - module name is not a permissible python module name, got '{beamline}'",
         )
 
     try:
@@ -513,7 +514,7 @@ def get_beamline_based_on_environment_variable() -> ModuleType:
     except ImportError as e:
         raise ValueError(
             f"Failed to import beamline-specific dodal module 'dodal.beamlines.{beamline}'."
-            " Ensure your BEAMLINE environment variable is set to a known instrument."
+            " Ensure your BEAMLINE environment variable is set to a known instrument.",
         ) from e
 
 
@@ -528,7 +529,7 @@ def _find_next_run_number_from_files(file_names: list[str]) -> int:
             valid_numbers.append(int(re.findall(r"\d+", file_name)[-1]))
         else:
             dodal.log.LOGGER.warning(
-                f"Identified nexus file {file_name} with unexpected format"
+                f"Identified nexus file {file_name} with unexpected format",
             )
     return max(valid_numbers) + 1 if valid_numbers else 1
 
@@ -536,7 +537,8 @@ def _find_next_run_number_from_files(file_names: list[str]) -> int:
 def get_run_number(directory: str, prefix: str = "") -> int:
     """Looks at the numbers coming from all nexus files with the format
     "{prefix}_(any number}.nxs", and returns the highest number + 1, or 1 if there are
-    no matching numbers found. If no prefix is given, considers all files in the dir."""
+    no matching numbers found. If no prefix is given, considers all files in the dir.
+    """
     nexus_file_names = [
         file
         for file in os.listdir(directory)
@@ -545,8 +547,7 @@ def get_run_number(directory: str, prefix: str = "") -> int:
 
     if len(nexus_file_names) == 0:
         return 1
-    else:
-        return _find_next_run_number_from_files(nexus_file_names)
+    return _find_next_run_number_from_files(nexus_file_names)
 
 
 def _make_one_device(
@@ -565,11 +566,11 @@ def _make_one_device(
         if dependency_name not in devices:
             try:
                 devices[dependency_name] = _make_one_device(
-                    module, dependency_name, devices, factories, **kwargs
+                    module, dependency_name, devices, factories, **kwargs,
                 )
             except Exception as e:
                 raise RuntimeError(
-                    f"Unable to construct device {dependency_name}"
+                    f"Unable to construct device {dependency_name}",
                 ) from e
 
     params = {name: devices[name] for name in dependencies}

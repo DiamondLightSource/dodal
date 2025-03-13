@@ -4,7 +4,8 @@ from ophyd_async.epics.motor import Motor
 
 class SimStage(StandardReadable):
     """Simulated Sample Stage for use with the containerised simulated beamline
-    https://github.com/epics-containers/example-services"""
+    https://github.com/epics-containers/example-services
+    """
 
     def __init__(self, prefix: str, name: str = "sim"):
         with self.add_children_as_readables():

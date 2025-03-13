@@ -48,7 +48,7 @@ def test_if_path_provided_check_is_dir(tmp_path: Path):
     "src.dodal.devices.detector.DetectorDistanceToBeamXYConverter.parse_table",
 )
 def test_correct_det_dist_to_beam_converter_path_passed_in(
-    mocked_parse_table, tmp_path: Path
+    mocked_parse_table, tmp_path: Path,
 ):
     params = DetectorParams(
         expected_energy_ev=100,
@@ -161,7 +161,7 @@ def test_detector_params_deserialisation_unchanged(tmp_path: Path):
 
 @patch("os.listdir")
 def test_prefix_is_used_to_determine_run_number(
-    mock_listdir: MagicMock, tmp_path: Path
+    mock_listdir: MagicMock, tmp_path: Path,
 ):
     foos = (f"foo_{i}.nxs" for i in range(4))
     bars = (f"bar_{i}.nxs" for i in range(7))

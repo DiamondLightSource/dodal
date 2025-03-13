@@ -19,7 +19,7 @@ def main(argv: list[str]):
     """CLI Utility to save the panda configuration."""
     parser = ArgumentParser(description="Save an ophyd_async panda to yaml")
     parser.add_argument(
-        "--beamline", help="Beamline to save from e.g. i03. Defaults to BEAMLINE"
+        "--beamline", help="Beamline to save from e.g. i03. Defaults to BEAMLINE",
     )
     parser.add_argument(
         "--device-name",
@@ -60,7 +60,7 @@ def main(argv: list[str]):
 
     if Path(f"{output_directory}/{file_name}").exists() and not force:
         sys.stderr.write(
-            f"Output file {output_directory}/{file_name} already exists and --force not specified."
+            f"Output file {output_directory}/{file_name} already exists and --force not specified.",
         )
         return 1
 
@@ -76,7 +76,7 @@ def _save_panda(beamline, device_name, output_directory, file_name):
     module_name = module_name_for_beamline(beamline)
     try:
         devices = make_device(
-            f"dodal.beamlines.{module_name}", device_name, connect_immediately=True
+            f"dodal.beamlines.{module_name}", device_name, connect_immediately=True,
         )
     except Exception as error:
         sys.stderr.write(f"Couldn't create device {device_name}: {error}\n")
@@ -84,13 +84,13 @@ def _save_panda(beamline, device_name, output_directory, file_name):
 
     panda = devices[device_name]
     print(
-        f"Saving to {output_directory}/{file_name} from {device_name} on {beamline}..."
+        f"Saving to {output_directory}/{file_name} from {device_name} on {beamline}...",
     )
     _save_panda_to_yaml(RE, cast(Device, panda), file_name, output_directory)
 
 
 def _save_panda_to_yaml(
-    RE: RunEngine, panda: Device, file_name: str, output_directory: str
+    RE: RunEngine, panda: Device, file_name: str, output_directory: str,
 ):
     def save_to_file():
         provider = YamlSettingsProvider(output_directory)

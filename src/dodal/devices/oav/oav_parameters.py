@@ -24,8 +24,7 @@ def _get_element_as_float(node: Element, element_name: str) -> float:
 
 
 class OAVParameters:
-    """
-    The parameters to set up the OAV depending on the context.
+    """The parameters to set up the OAV depending on the context.
     """
 
     def __init__(
@@ -38,14 +37,13 @@ class OAVParameters:
 
         self.global_params, self.context_dicts = self.load_json(self.oav_config_json)
         self.active_params: ChainMap = ChainMap(
-            self.context_dicts[self.context], self.global_params
+            self.context_dicts[self.context], self.global_params,
         )
         self.update_self_from_current_context()
 
     @staticmethod
     def load_json(filename: str) -> tuple[dict[str, Any], dict[str, dict]]:
-        """
-        Loads the json from the specified file, and returns a dict with all the
+        """Loads the json from the specified file, and returns a dict with all the
         individual top-level k-v pairs, and one with all the subdicts.
         """
         with open(filename) as f:
@@ -71,25 +69,25 @@ class OAVParameters:
             except AssertionError as e:
                 raise TypeError(
                     f"OAV param {name} from the OAV centring params json file has the "
-                    f"wrong type, should be {param_type} but is {type(param)}."
+                    f"wrong type, should be {param_type} but is {type(param)}.",
                 ) from e
 
         self.exposure: float = update("exposure", float)
         self.acquire_period: float = update("acqPeriod", float)
         self.gain: float = update("gain", float)
         self.canny_edge_upper_threshold: float = update(
-            "CannyEdgeUpperThreshold", float
+            "CannyEdgeUpperThreshold", float,
         )
         self.canny_edge_lower_threshold: float = update(
-            "CannyEdgeLowerThreshold", float, default=5.0
+            "CannyEdgeLowerThreshold", float, default=5.0,
         )
         self.minimum_height: int = update("minheight", int)
         self.zoom: float = update("zoom", float)
         self.preprocess: int = update(
-            "preprocess", int
+            "preprocess", int,
         )  # gets blur type, e.g. 8 = gaussianBlur, 9 = medianBlur
         self.preprocess_K_size: int = update(
-            "preProcessKSize", int
+            "preProcessKSize", int,
         )  # length scale for blur preprocessing
         self.detection_script_filename: str = update("filename", str)
         self.close_ksize: int = update("close_ksize", int, default=11)
@@ -98,8 +96,7 @@ class OAVParameters:
         self.max_tip_distance: float = update("max_tip_distance", float, default=300)
 
     def get_max_tip_distance_in_pixels(self, micronsPerPixel: float) -> float:
-        """
-        Get the maximum tip distance in pixels.
+        """Get the maximum tip distance in pixels.
         """
         return self.max_tip_distance / micronsPerPixel
 

@@ -50,7 +50,7 @@ async def mock_sr570(prefix: str = "BLXX-EA-DET-007:", suffix: str = "Gain") -> 
 
 @pytest.fixture
 async def mock_StruckScaler(
-    prefix: str = "BLXX-EA-DET-007:", suffix: str = ".s17"
+    prefix: str = "BLXX-EA-DET-007:", suffix: str = ".s17",
 ) -> StruckScaler:
     async with init_devices(mock=True):
         mock_StruckScaler = StruckScaler(
@@ -91,13 +91,13 @@ async def mock_sr570_struck_scaler_detector(
 )
 @mock.patch("asyncio.sleep")
 async def test_sr570_set(
-    sleep: AsyncMock, mock_sr570: SR570, RE: RunEngine, gain, wait_time, gain_value
+    sleep: AsyncMock, mock_sr570: SR570, RE: RunEngine, gain, wait_time, gain_value,
 ):
     RE(abs_set(mock_sr570, gain, wait=True))
     assert (await mock_sr570.get_gain()).name == gain_value
     # extra sleeps either side of set are bluesky's sleep which are set to 0.
     for actual, expected in zip(
-        sleep.call_args[0], [0, 0, wait_time, 0, 0], strict=False
+        sleep.call_args[0], [0, 0, wait_time, 0, 0], strict=False,
     ):
         assert actual == expected
 
@@ -278,7 +278,7 @@ async def test_SR570_struck_scaler_read_with_autoGain(
         MockSR570RaiseTimeTable
     )
     await mock_sr570_struck_scaler_detector.current_amp().set(
-        SR570GainToCurrentTable[gain]
+        SR570GainToCurrentTable[gain],
     )
     set_mock_value(mock_sr570_struck_scaler_detector.auto_mode, True)
     rbv_mocks = Mock()
@@ -286,10 +286,10 @@ async def test_SR570_struck_scaler_read_with_autoGain(
 
     def set_mock_counter():
         set_mock_value(
-            mock_sr570_struck_scaler_detector.counter().trigger_start, CountState.DONE
+            mock_sr570_struck_scaler_detector.counter().trigger_start, CountState.DONE,
         )
         set_mock_value(
-            mock_sr570_struck_scaler_detector.counter().readout, rbv_mocks.get()
+            mock_sr570_struck_scaler_detector.counter().readout, rbv_mocks.get(),
         )
 
     callback_on_mock_put(

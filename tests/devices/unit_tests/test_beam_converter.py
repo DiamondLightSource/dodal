@@ -51,7 +51,7 @@ def test_interpolate_beam_xy_from_det_distance(
     expected_value: float,
 ):
     assert isinstance(
-        fake_converter.get_beam_xy_from_det_dist(detector_distance, axis), float
+        fake_converter.get_beam_xy_from_det_dist(detector_distance, axis), float,
     )
 
     assert (
@@ -80,13 +80,13 @@ def test_get_beam_in_pixels(fake_converter: DetectorDistanceToBeamXYConverter):
     expected_x_value = interpolated_x_value * image_size_pixels / detector_dimensions
 
     calculated_y_value = fake_converter.get_beam_y_pixels(
-        detector_distance, image_size_pixels, detector_dimensions
+        detector_distance, image_size_pixels, detector_dimensions,
     )
 
     assert calculated_y_value == expected_y_value
     assert (
         fake_converter.get_beam_x_pixels(
-            detector_distance, image_size_pixels, detector_dimensions
+            detector_distance, image_size_pixels, detector_dimensions,
         )
         == expected_x_value
     )

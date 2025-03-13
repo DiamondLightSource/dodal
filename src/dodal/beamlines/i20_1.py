@@ -28,25 +28,21 @@ set_path_provider(
         BL,
         Path("/dls/i20-1/data/2023/cm33897-5/bluesky"),
         client=RemoteDirectoryServiceClient("http://i20-1-control:8088/api"),
-    )
+    ),
 )
 
 
 @device_factory()
 def turbo_slit() -> TurboSlit:
+    """Turboslit for selecting energy from the polychromator
     """
-    turboslit for selecting energy from the polychromator
-    """
-
     return TurboSlit(f"{PREFIX.beamline_prefix}-OP-PCHRO-01:TS:")
 
 
 @device_factory(skip=True)
 def xspress3() -> Xspress3:
+    """16 channels Xspress3 detector
     """
-    16 channels Xspress3 detector
-    """
-
     return Xspress3(
         f"{PREFIX.beamline_prefix}-EA-DET-03:",
         num_channels=16,

@@ -100,5 +100,5 @@ async def test_abort_program(mock_sleep, fake_pmac: PMAC, RE):
         [
             call("A", wait=True),
             call("P2401=0", wait=True),
-        ]
+        ],
     )

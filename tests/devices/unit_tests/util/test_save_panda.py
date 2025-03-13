@@ -14,7 +14,7 @@ def test_save_panda():
     filename = "file.yml"
     with (
         patch(
-            "dodal.plans.save_panda.make_device", return_value={"panda": panda}
+            "dodal.plans.save_panda.make_device", return_value={"panda": panda},
         ) as mock_make_device,
         patch(
             "dodal.plans.save_panda.RunEngine",
@@ -26,7 +26,7 @@ def test_save_panda():
         _save_panda("i03", "panda", directory, filename)
 
         mock_make_device.assert_called_with(
-            "dodal.beamlines.i03", "panda", connect_immediately=True
+            "dodal.beamlines.i03", "panda", connect_immediately=True,
         )
         mock_store_settings.assert_called_with(
             mock_settings_provider(),
@@ -176,7 +176,7 @@ def test_file_exists_check(
         return_value = main(argv)
 
     mock_path.assert_called_with(
-        f"{mock_path.return_value.parent}/{mock_path.return_value.name}"
+        f"{mock_path.return_value.parent}/{mock_path.return_value.name}",
     )
     exists.assert_called_once()
     if save_panda_called:

@@ -47,7 +47,7 @@ def list_active_devices() -> list[str]:
 
 
 def active_device_is_same_type(
-    active_device: AnyDevice, device: Callable[..., AnyDevice]
+    active_device: AnyDevice, device: Callable[..., AnyDevice],
 ) -> bool:
     return inspect.isclass(device) and isinstance(active_device, device)
 
@@ -62,12 +62,12 @@ def wait_for_connection(
     elif isinstance(device, OphydV2Device):
         call_in_bluesky_event_loop(
             v2_device_wait_for_connection(
-                coros=device.connect(mock=mock, timeout=timeout)
+                coros=device.connect(mock=mock, timeout=timeout),
             ),
         )
     else:
         raise TypeError(
-            f"Invalid type {device.__class__.__name__} in _wait_for_connection"
+            f"Invalid type {device.__class__.__name__} in _wait_for_connection",
         )
 
 
@@ -100,6 +100,7 @@ def device_instantiation(
         bl_prefix: bool             if true, add the beamline prefix when instantiating
     Returns:
         The instance of the device.
+
     """
     already_existing_device: AnyDevice | None = ACTIVE_DEVICES.get(name)
     if fake:
@@ -123,7 +124,7 @@ def device_instantiation(
             raise TypeError(
                 f"Can't instantiate device of type {device_factory} with the same "
                 f"name as an existing device. Device name '{name}' already used for "
-                f"a(n) {type(already_existing_device)}."
+                f"a(n) {type(already_existing_device)}.",
             )
         device_instance = cast(T, already_existing_device)
     if post_create:
@@ -162,6 +163,6 @@ def set_path_provider(provider: UpdatingPathProvider):
 def get_path_provider() -> UpdatingPathProvider:
     if PATH_PROVIDER is None:
         raise ValueError(
-            "PathProvider has not been set! Ophyd-async StandardDetectors will not be able to write!"
+            "PathProvider has not been set! Ophyd-async StandardDetectors will not be able to write!",
         )
     return PATH_PROVIDER

@@ -13,7 +13,7 @@ class CryoStream(StandardReadable):
         self.fine = epics_signal_rw(InOut, f"{prefix}-EA-CJET-01:FINE:CTRL")
         self.temperature_k = epics_signal_r(float, f"{prefix}-EA-CSTRM-01:TEMP")
         self.back_pressure_bar = epics_signal_r(
-            float, f"{prefix}-EA-CSTRM-01:BACKPRESS"
+            float, f"{prefix}-EA-CSTRM-01:BACKPRESS",
         )
 
         super().__init__(name)

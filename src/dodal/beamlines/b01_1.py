@@ -25,7 +25,7 @@ set_path_provider(
         BL,
         Path("/dls/b01-1/data/"),
         client=LocalDirectoryServiceClient(),
-    )
+    ),
 )
 
 """

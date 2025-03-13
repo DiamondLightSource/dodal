@@ -105,7 +105,7 @@ async def test_waits_for_running_motion(
     ],
 )
 async def test_given_different_step_numbers_then_expected_images_correct(
-    zebra_fast_grid_scan: ZebraFastGridScan, steps, expected_images
+    zebra_fast_grid_scan: ZebraFastGridScan, steps, expected_images,
 ):
     set_mock_value(zebra_fast_grid_scan.x_steps, steps[0])
     set_mock_value(zebra_fast_grid_scan.y_steps, steps[1])
@@ -135,9 +135,9 @@ async def test_running_finished_with_all_images_done_then_complete_status_finish
             set_fast_grid_scan_params(
                 grid_scan,
                 PandAGridScanParams(
-                    transmission_fraction=0.01, x_steps=num_pos_1d, y_steps=num_pos_1d
+                    transmission_fraction=0.01, x_steps=num_pos_1d, y_steps=num_pos_1d,
                 ),
-            )
+            ),
         )
     else:
         grid_scan = zebra_fast_grid_scan
@@ -145,9 +145,9 @@ async def test_running_finished_with_all_images_done_then_complete_status_finish
             set_fast_grid_scan_params(
                 grid_scan,
                 ZebraGridScanParams(
-                    transmission_fraction=0.01, x_steps=num_pos_1d, y_steps=num_pos_1d
+                    transmission_fraction=0.01, x_steps=num_pos_1d, y_steps=num_pos_1d,
                 ),
-            )
+            ),
         )
     set_mock_value(grid_scan.status, 1)
 
@@ -194,7 +194,7 @@ def composite_with_smargon(motor_bundle_with_limits):
     ],
 )
 async def test_within_limits_check(
-    RE: RunEngine, motor_bundle_with_limits, position, expected_in_limit
+    RE: RunEngine, motor_bundle_with_limits, position, expected_in_limit,
 ):
     def check_limits_plan():
         limits = yield from motor_bundle_with_limits.get_xyz_limits()
@@ -220,7 +220,7 @@ def check_parameter_validation(params, composite, expected_in_limits):
 
 @pytest.fixture
 def zebra_grid_scan_params():
-    yield ZebraGridScanParams(
+    return ZebraGridScanParams(
         transmission_fraction=0.01,
         x_steps=10,
         y_steps=15,
@@ -238,7 +238,7 @@ def zebra_grid_scan_params():
 
 @pytest.fixture
 def panda_grid_scan_params():
-    yield PandAGridScanParams(
+    return PandAGridScanParams(
         transmission_fraction=0.01,
         x_steps=10,
         y_steps=15,
@@ -303,11 +303,11 @@ def common_grid_scan_params(request):
     ],
 )
 def test_given_x_y_z_out_of_range_then_converting_to_motor_coords_raises(
-    common_grid_scan_params: GridScanParamsCommon, grid_position, expected
+    common_grid_scan_params: GridScanParamsCommon, grid_position, expected,
 ):
     with expected as expected_value:
         motor_position = common_grid_scan_params.grid_position_to_motor_position(
-            grid_position
+            grid_position,
         )
         assert np.allclose(motor_position, expected_value)
 

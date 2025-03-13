@@ -16,8 +16,7 @@ async def kbmirror() -> KBMirror:
 
 
 async def test_setting_xy_position_kbmirror(kbmirror: KBMirror):
-    """
-    Test setting x and y positions on the KBMirror using the ophyd_async mock tools.
+    """Test setting x and y positions on the KBMirror using the ophyd_async mock tools.
     """
     # Mock the initial values of the x and y signals
     set_mock_value(kbmirror.x, 0.0)

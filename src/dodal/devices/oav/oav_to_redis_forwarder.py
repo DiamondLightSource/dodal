@@ -76,6 +76,7 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
             redis_password: str     the password for the redis database
             redis_db: int           which redis database to connect to, defaults to 0
             name: str               the name of this device
+
         """
         self.counter = epics_signal_r(int, f"{prefix}CAM:ArrayCounter_RBV")
 
@@ -83,13 +84,13 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
             {
                 Source.ROI.value: OAVSource(f"{prefix}MJPG:", "roi"),
                 Source.FULL_SCREEN.value: OAVSource(f"{prefix}XTAL:", "fullscreen"),
-            }
+            },
         )
         self.selected_source = soft_signal_rw(int)
 
         self.forwarding_task = None
         self.redis_client = StrictRedis(
-            host=redis_host, password=redis_password, db=redis_db
+            host=redis_host, password=redis_password, db=redis_db,
         )
 
         self._stop_flag = asyncio.Event()
@@ -104,11 +105,12 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
         super().__init__(name=name)
 
     async def _get_frame_and_put_to_redis(
-        self, redis_uuid: str, response: ClientResponse
+        self, redis_uuid: str, response: ClientResponse,
     ):
         """Stores the raw bytes of the jpeg image in redis. Murko ultimately wants a
         pickled numpy array of pixel values but raw byes are more space efficient. There
-        may be better ways of doing this, see https://github.com/DiamondLightSource/mx-bluesky/issues/592"""
+        may be better ways of doing this, see https://github.com/DiamondLightSource/mx-bluesky/issues/592
+        """
         jpeg_bytes = await get_next_jpeg(response)
         self.uuid_setter(redis_uuid)
         sample_id = await self.sample_id.get_value()
@@ -117,11 +119,11 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
         await self.redis_client.expire(redis_key, timedelta(days=self.DATA_EXPIRY_DAYS))
 
     async def _open_connection_and_do_function(
-        self, function_to_do: Callable[[ClientResponse, OAVSource], Awaitable]
+        self, function_to_do: Callable[[ClientResponse, OAVSource], Awaitable],
     ):
         source_idx = await self.selected_source.get_value()
         LOGGER.info(
-            f"Forwarding data from sample {await self.sample_id.get_value()} and OAV {source_idx}"
+            f"Forwarding data from sample {await self.sample_id.get_value()} and OAV {source_idx}",
         )
         source = self.sources[source_idx]
         stream_url = await source.url.get_value()
@@ -138,7 +140,7 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
         but in this case a best effort on getting as many frames as possible is sufficient.
         """
         done_status = AsyncStatus(
-            asyncio.wait_for(self._stop_flag.wait(), timeout=self.TIMEOUT)
+            asyncio.wait_for(self._stop_flag.wait(), timeout=self.TIMEOUT),
         )
         async for frame_count in observe_value(self.counter, done_status=done_status):
             redis_uuid = f"{source.oav_name}-{frame_count}-{uuid4()}"
@@ -153,7 +155,7 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
         self._stop_flag.clear()
         await self._open_connection_and_do_function(self._confirm_mjpg_stream)
         self.forwarding_task = asyncio.create_task(
-            self._open_connection_and_do_function(self._stream_to_redis)
+            self._open_connection_and_do_function(self._stream_to_redis),
         )
 
     @AsyncStatus.wrap
@@ -165,7 +167,7 @@ class OAVToRedisForwarder(StandardReadable, Flyable, Stoppable):
     async def stop(self, success=True):
         if self.forwarding_task:
             LOGGER.info(
-                f"Stopping forwarding for source id {await self.selected_source.get_value()}"
+                f"Stopping forwarding for source id {await self.selected_source.get_value()}",
             )
             self._stop_flag.set()
             await self.forwarding_task

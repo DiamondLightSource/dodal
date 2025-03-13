@@ -14,7 +14,7 @@ from dodal.devices.i03.beamstop import Beamstop, BeamstopPositions
 @pytest.fixture
 def beamline_parameters() -> GDABeamlineParameters:
     return GDABeamlineParameters.from_file(
-        "tests/test_data/test_beamline_parameters.txt"
+        "tests/test_data/test_beamline_parameters.txt",
     )
 
 
@@ -57,7 +57,7 @@ async def test_beamstop_pos_select(
     RE(check_in_beam())
 
     event_call = next(
-        dropwhile(lambda c: c.args[0] != "event", mock_callback.mock_calls)
+        dropwhile(lambda c: c.args[0] != "event", mock_callback.mock_calls),
     )
     data = event_call.args[1]["data"]
     assert data["beamstop-x_mm"] == x

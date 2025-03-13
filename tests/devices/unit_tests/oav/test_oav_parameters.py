@@ -50,7 +50,7 @@ def test_given_key_in_context_and_default_when_load_parameters_then_value_found_
     ],
 )
 def test_oav_config(
-    zoom_level, expected_microns, expected_crosshair, mock_config: dict
+    zoom_level, expected_microns, expected_crosshair, mock_config: dict,
 ):
     assert isinstance(mock_config[zoom_level], ZoomParams)
 
@@ -59,7 +59,7 @@ def test_oav_config(
 
 
 def test_given_oav_config_get_max_tip_distance_in_pixels(
-    mock_parameters: OAVParameters, mock_config: dict
+    mock_parameters: OAVParameters, mock_config: dict,
 ):
     zoom_level = mock_parameters.zoom
 
@@ -67,7 +67,7 @@ def test_given_oav_config_get_max_tip_distance_in_pixels(
     microns_per_pixel_x = mock_config[str(zoom_level)].microns_per_pixel[0]
     assert microns_per_pixel_x
     assert mock_parameters.get_max_tip_distance_in_pixels(
-        microns_per_pixel_x
+        microns_per_pixel_x,
     ) == pytest.approx(189.873, abs=1e-3)
 
 

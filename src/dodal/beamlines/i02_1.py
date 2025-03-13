@@ -25,7 +25,6 @@ def attenuator() -> EnumFilterAttenuator:
     """Get the i02-1 attenuator device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i02-1, it will return the existing object.
     """
-
     return EnumFilterAttenuator(
         f"{PREFIX.beamline_prefix}-OP-ATTN-01:",
         (

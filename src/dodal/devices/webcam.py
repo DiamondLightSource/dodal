@@ -33,7 +33,7 @@ class Webcam(StandardReadable, Triggerable):
         self.last_saved_path = soft_signal_rw(str, name="last_saved_path")
 
         self.add_readables(
-            [self.last_saved_path], format=StandardReadableFormat.HINTED_SIGNAL
+            [self.last_saved_path], format=StandardReadableFormat.HINTED_SIGNAL,
         )
         super().__init__(name=name)
 
@@ -46,14 +46,14 @@ class Webcam(StandardReadable, Triggerable):
             async with session.get(self.url) as response:
                 if not response.ok:
                     LOGGER.warning(
-                        f"Webcam responded with {response.status}: {response.reason}. Attempting to read anyway."
+                        f"Webcam responded with {response.status}: {response.reason}. Attempting to read anyway.",
                     )
                 try:
                     data = await response.read()
                     LOGGER.info(f"Saving webcam image from {self.url} to {file_path}")
                 except Exception as e:
                     LOGGER.warning(
-                        f"Failed to read data from {self.url} ({e}). Using placeholder image."
+                        f"Failed to read data from {self.url} ({e}). Using placeholder image.",
                     )
                     data = create_placeholder_image()
 
