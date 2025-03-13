@@ -8,7 +8,7 @@ from dodal.devices.apple2_undulator import (
     UndulatorPhaseAxes,
 )
 from dodal.devices.current_amplifiers import CurrentAmpDet
-from dodal.devices.i10.diagnostics import I10Diagnostic, I10Diagnotic5ADet
+from dodal.devices.i10.diagnostics import I10Diagnostic, I10Diagnostic5ADet
 from dodal.devices.i10.i10_apple2 import (
     I10Apple2,
     I10Apple2PGM,
@@ -314,8 +314,8 @@ def diagnostics() -> I10Diagnostic:
 
 
 @device_factory()
-def d5a_det() -> I10Diagnotic5ADet:
-    return I10Diagnotic5ADet(prefix=f"{PREFIX.beamline_prefix}-DI-")
+def d5a_det() -> I10Diagnostic5ADet:
+    return I10Diagnostic5ADet(prefix=f"{PREFIX.beamline_prefix}-DI-")
 
 
 """Rasor devices"""
