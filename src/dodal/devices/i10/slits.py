@@ -59,7 +59,7 @@ class BladeDrainCurrents(Device):
 
 class I10PrimarySlits(Slits):
     """First slits of the beamline with very high power load, they are two square water
-    cooled blocks that overlap to produce slit like behavior."""
+    cooled blocks(aperture) that overlap to produce slit like behavior."""
 
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
