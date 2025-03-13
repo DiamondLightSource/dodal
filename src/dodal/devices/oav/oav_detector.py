@@ -138,17 +138,15 @@ class OAVBeamCentreFile(OAV):
 
 
 class OAVBeamCentrePV(OAV):
-    def __init__(self, prefix: str, config: OAVConfig, name: str = "", roi=True):
-        beam_centre_roi_x = epics_signal_r(int, prefix + "OVER:1:CenterX")
-        beam_centre_roi_y = epics_signal_r(int, prefix + "OVER:1:CenterY")
-        beam_centre_fs_x = epics_signal_r(int, prefix + "OVER:3:CenterX")
-        beam_centre_fs_y = epics_signal_r(int, prefix + "OVER:3:CenterY")
-        if roi:
-            self.beam_centre_x = beam_centre_roi_x
-            self.beam_centre_y = beam_centre_roi_y
-        else:
-            self.beam_centre_x = beam_centre_fs_x
-            self.beam_centre_y = beam_centre_fs_y
+    def __init__(
+        self, prefix: str, config: OAVConfig, name: str = "", overlay_channel: int = 1
+    ):
+        self.beam_centre_x = epics_signal_r(
+            int, prefix + f"OVER:{overlay_channel}:CenterX"
+        )
+        self.beam_centre_y = epics_signal_r(
+            int, prefix + f"OVER:{overlay_channel}:CenterY"
+        )
         super().__init__(prefix, config, name)
 
     async def _get_beam_position(self, coord: int) -> int:
