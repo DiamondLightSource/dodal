@@ -215,8 +215,8 @@ class I10Diagnostic(Device):
         super().__init__(name)
 
 
-class I10Diagnotic5ADet(Device):
-    """Diagnotic 5a detection with drain current and photo diode"""
+class I10Diagnostic5ADet(Device):
+    """Diagnostic 5a detection with drain current and photo diode"""
 
     def __init__(
         self, prefix: str, name: str = "", connector: DeviceConnector | None = None
