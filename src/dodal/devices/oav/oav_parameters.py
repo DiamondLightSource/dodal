@@ -2,7 +2,7 @@ import json
 import xml.etree.ElementTree as et
 from collections import ChainMap
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Generic, TypeVar
 from xml.etree.ElementTree import Element
 
 # GDA currently assumes this aspect ratio for the OAV window size.
@@ -114,7 +114,10 @@ class ZoomParamsCrosshair(ZoomParams):
     crosshair: tuple[int, int]
 
 
-class OAVConfig:
+ParamType = TypeVar("ParamType", bound="ZoomParams")
+
+
+class OAVConfig(Generic[ParamType]):
     def __init__(self, zoom_params_file: str):
         self.zoom_params = self._get_zoom_params(zoom_params_file)
 
@@ -132,7 +135,7 @@ class OAVConfig:
             um_per_pix[zoom] = (um_pix_x, um_pix_y)
         return um_per_pix
 
-    def get_parameters(self) -> dict[str, ZoomParams]:
+    def get_parameters(self) -> dict[str, ParamType]:
         config = {}
         um_xy = self._read_zoom_params()
         for zoom_key in list(um_xy.keys()):
@@ -142,12 +145,16 @@ class OAVConfig:
         return config
 
 
-class OAVConfigBeamCentre(OAVConfig):
+class OAVConfigBeamCentre(OAVConfig[ZoomParamsCrosshair]):
     """ Read the OAV config files and return a dictionary of {'zoom_level': ZoomParams}\
     with information about microns per pixels and crosshairs.
     """
 
-    def __init__(self, zoom_params_file: str, display_config_file: str):
+    def __init__(
+        self,
+        zoom_params_file: str,
+        display_config_file: str,
+    ):
         self.display_config = self._get_display_config(display_config_file)
         super().__init__(zoom_params_file)
 
@@ -166,7 +173,7 @@ class OAVConfigBeamCentre(OAVConfig):
                 crosshairs[zoom] = (x, y)
         return crosshairs
 
-    def get_parameters(self) -> dict[str, ZoomParams]:
+    def get_parameters(self) -> dict[str, ZoomParamsCrosshair]:
         config = {}
         um_xy = self._read_zoom_params()
         bc_xy = self._read_display_config()

@@ -1,6 +1,5 @@
 from abc import abstractmethod
 from enum import IntEnum
-from typing import cast
 
 from bluesky.protocols import Movable
 from ophyd_async.core import (
@@ -17,7 +16,6 @@ from dodal.devices.oav.oav_parameters import (
     DEFAULT_OAV_WINDOW,
     OAVConfig,
     OAVConfigBeamCentre,
-    ZoomParamsCrosshair,
 )
 from dodal.devices.oav.snapshots.snapshot_with_beam_centre import SnapshotWithBeamCentre
 from dodal.devices.oav.snapshots.snapshot_with_grid import SnapshotWithGrid
@@ -131,7 +129,6 @@ class OAVBeamCentreFile(OAV):
         """Extracts the beam location in pixels `xCentre` `yCentre`, for a requested \
         zoom level. """
         _zoom = await self._read_current_zoom()
-        self.parameters = cast(dict[str, ZoomParamsCrosshair], self.parameters)
         value = self.parameters[_zoom].crosshair[coord]
         size = await self.sizes[coord].get_value()
         return int(value * size / DEFAULT_OAV_WINDOW[coord])
