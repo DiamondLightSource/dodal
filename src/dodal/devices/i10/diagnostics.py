@@ -127,25 +127,6 @@ class I10PneumaticStage(StandardReadable):
         super().__init__(name=name)
 
 
-class I10AravisDriverIO(AravisDriverIO):
-    """This is the standard webcam that can be found in ophyd_async
-    with four extra centroid signal. There is also a change in data_type due to it being
-    an older/different model"""
-
-    def __init__(
-        self,
-        prefix: str,
-        cam_infix: str = "CAM:",
-        name: str = "",
-    ) -> None:
-        super().__init__(prefix + cam_infix, name)
-
-        # data type correction for i10 model.
-        self.data_type = epics_signal_r(
-            I10WebCamIODataType, prefix + cam_infix + "DataType_RBV"
-        )
-
-
 class ScreenCam(Device):
     """Compound device of pneumatic stage(fluorescent screen) and webcam"""
 
@@ -158,12 +139,14 @@ class ScreenCam(Device):
         self.screen_stage = I10PneumaticStage(
             prefix=prefix,
         )
-        cam_pv = prefix = prefix + cam_infix
+        cam_pv = prefix + cam_infix
+        centroid_x = epics_signal_r(float, read_pv=f"{cam_pv}CentroidX_RBV")
+        centroid_y = epics_signal_r(float, read_pv=f"{cam_pv}CentroidY_RBV")
         self.single_trigger_centroid = SingleTriggerDetector(
-            drv=I10AravisDriverIO(prefix=cam_pv),
+            drv=AravisDriverIO(prefix=cam_pv + "CAM:"),
             read_uncached=[
-                epics_signal_r(float, read_pv=f"{cam_pv}CentroidX_RBV"),
-                epics_signal_r(float, read_pv=f"{cam_pv}CentroidY_RBV"),
+                centroid_x,
+                centroid_y,
             ],
         )
         super().__init__(name=name)
