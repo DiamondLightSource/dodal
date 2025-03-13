@@ -1,4 +1,6 @@
+from abc import abstractmethod
 from enum import IntEnum
+from typing import cast
 
 from bluesky.protocols import Movable
 from ophyd_async.core import (
@@ -14,7 +16,8 @@ from dodal.devices.areadetector.plugins.CAM import Cam
 from dodal.devices.oav.oav_parameters import (
     DEFAULT_OAV_WINDOW,
     OAVConfig,
-    OAVConfigNoBeamCentre,
+    OAVConfigBeamCentre,
+    ZoomParamsCrosshair,
 )
 from dodal.devices.oav.snapshots.snapshot_with_beam_centre import SnapshotWithBeamCentre
 from dodal.devices.oav.snapshots.snapshot_with_grid import SnapshotWithGrid
@@ -103,13 +106,11 @@ class OAV(StandardReadable):
         size = await self.sizes[coord].get_value()
         return value * DEFAULT_OAV_WINDOW[coord] / size
 
+    @abstractmethod
     async def _get_beam_position(self, coord: int) -> int:
         """Extracts the beam location in pixels `xCentre` `yCentre`, for a requested \
         zoom level. """
-        _zoom = await self._read_current_zoom()
-        value = self.parameters[_zoom].crosshair[coord]
-        size = await self.sizes[coord].get_value()
-        return int(value * size / DEFAULT_OAV_WINDOW[coord])
+        pass
 
     async def connect(
         self,
@@ -122,10 +123,22 @@ class OAV(StandardReadable):
         return await super().connect(mock, timeout, force_reconnect)
 
 
-class OAVBeamCentre(OAV):
-    def __init__(
-        self, prefix: str, config: OAVConfigNoBeamCentre, name: str = "", roi=True
-    ):
+class OAVBeamCentreFile(OAV):
+    def __init__(self, prefix: str, config: OAVConfigBeamCentre, name: str = ""):
+        super().__init__(prefix, config, name)
+
+    async def _get_beam_position(self, coord: int) -> int:
+        """Extracts the beam location in pixels `xCentre` `yCentre`, for a requested \
+        zoom level. """
+        _zoom = await self._read_current_zoom()
+        self.parameters = cast(dict[str, ZoomParamsCrosshair], self.parameters)
+        value = self.parameters[_zoom].crosshair[coord]
+        size = await self.sizes[coord].get_value()
+        return int(value * size / DEFAULT_OAV_WINDOW[coord])
+
+
+class OAVBeamCentrePV(OAV):
+    def __init__(self, prefix: str, config: OAVConfig, name: str = "", roi=True):
         beam_centre_roi_x = epics_signal_r(int, prefix + "OVER:1:CenterX")
         beam_centre_roi_y = epics_signal_r(int, prefix + "OVER:1:CenterY")
         beam_centre_fs_x = epics_signal_r(int, prefix + "OVER:3:CenterX")

@@ -107,27 +107,16 @@ class OAVParameters:
 @dataclass
 class ZoomParams:
     microns_per_pixel: tuple[float, float]
-    crosshair: tuple[int, int]
 
 
 @dataclass
-class ZoomParamsNoBeamCentre:
-    microns_per_pixel: tuple[float, float]
+class ZoomParamsCrosshair(ZoomParams):
+    crosshair: tuple[int, int]
 
 
 class OAVConfig:
-    """ Read the OAV config files and return a dictionary of {'zoom_level': ZoomParams}\
-    with information about microns per pixels and crosshairs.
-    """
-
-    def __init__(self, zoom_params_file: str, display_config_file: str):
+    def __init__(self, zoom_params_file: str):
         self.zoom_params = self._get_zoom_params(zoom_params_file)
-        self.display_config = self._get_display_config(display_config_file)
-
-    def _get_display_config(self, display_config_file: str):
-        with open(display_config_file) as f:
-            file_lines = f.readlines()
-        return file_lines
 
     def _get_zoom_params(self, zoom_params_file: str):
         tree = et.parse(zoom_params_file)
@@ -142,6 +131,30 @@ class OAVConfig:
             um_pix_y = _get_element_as_float(node, "micronsPerYPixel")
             um_per_pix[zoom] = (um_pix_x, um_pix_y)
         return um_per_pix
+
+    def get_parameters(self) -> dict[str, ZoomParams]:
+        config = {}
+        um_xy = self._read_zoom_params()
+        for zoom_key in list(um_xy.keys()):
+            config[zoom_key] = ZoomParams(
+                microns_per_pixel=um_xy[zoom_key],
+            )
+        return config
+
+
+class OAVConfigBeamCentre(OAVConfig):
+    """ Read the OAV config files and return a dictionary of {'zoom_level': ZoomParams}\
+    with information about microns per pixels and crosshairs.
+    """
+
+    def __init__(self, zoom_params_file: str, display_config_file: str):
+        self.display_config = self._get_display_config(display_config_file)
+        super().__init__(zoom_params_file)
+
+    def _get_display_config(self, display_config_file: str):
+        with open(display_config_file) as f:
+            file_lines = f.readlines()
+        return file_lines
 
     def _read_display_config(self) -> dict:
         crosshairs = {}
@@ -158,22 +171,7 @@ class OAVConfig:
         um_xy = self._read_zoom_params()
         bc_xy = self._read_display_config()
         for zoom_key in list(bc_xy.keys()):
-            config[zoom_key] = ZoomParams(
-                microns_per_pixel=um_xy[zoom_key],
-                crosshair=bc_xy[zoom_key],
-            )
-        return config
-
-
-class OAVConfigNoBeamCentre(OAVConfig):
-    def __init__(self, zoom_params_file: str):
-        self.zoom_params = self._get_zoom_params(zoom_params_file)
-
-    def get_parameters(self) -> dict[str, ZoomParams]:
-        config = {}
-        um_xy = self._read_zoom_params()
-        for zoom_key in list(um_xy.keys()):
-            config[zoom_key] = ZoomParamsNoBeamCentre(
-                microns_per_pixel=um_xy[zoom_key],
+            config[zoom_key] = ZoomParamsCrosshair(
+                microns_per_pixel=um_xy[zoom_key], crosshair=bc_xy[zoom_key]
             )
         return config
