@@ -1,5 +1,6 @@
 import json
 import xml.etree.ElementTree as et
+from abc import abstractmethod
 from collections import ChainMap
 from dataclasses import dataclass
 from typing import Any, Generic, TypeVar
@@ -117,7 +118,7 @@ class ZoomParamsCrosshair(ZoomParams):
 ParamType = TypeVar("ParamType", bound="ZoomParams")
 
 
-class OAVConfig(Generic[ParamType]):
+class OAVConfigBase(Generic[ParamType]):
     def __init__(self, zoom_params_file: str):
         self.zoom_params = self._get_zoom_params(zoom_params_file)
 
@@ -135,7 +136,12 @@ class OAVConfig(Generic[ParamType]):
             um_per_pix[zoom] = (um_pix_x, um_pix_y)
         return um_per_pix
 
-    def get_parameters(self) -> dict[str, ParamType]:
+    @abstractmethod
+    def get_parameters(self) -> dict[str, ParamType]: ...
+
+
+class OAVConfig(OAVConfigBase[ZoomParams]):
+    def get_parameters(self) -> dict[str, ZoomParams]:
         config = {}
         um_xy = self._read_zoom_params()
         for zoom_key in list(um_xy.keys()):
@@ -145,7 +151,7 @@ class OAVConfig(Generic[ParamType]):
         return config
 
 
-class OAVConfigBeamCentre(OAVConfig[ZoomParamsCrosshair]):
+class OAVConfigBeamCentre(OAVConfigBase[ZoomParamsCrosshair]):
     """ Read the OAV config files and return a dictionary of {'zoom_level': ZoomParams}\
     with information about microns per pixels and crosshairs.
     """

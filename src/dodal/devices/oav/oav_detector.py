@@ -15,6 +15,7 @@ from dodal.devices.areadetector.plugins.CAM import Cam
 from dodal.devices.oav.oav_parameters import (
     DEFAULT_OAV_WINDOW,
     OAVConfig,
+    OAVConfigBase,
     OAVConfigBeamCentre,
 )
 from dodal.devices.oav.snapshots.snapshot_with_beam_centre import SnapshotWithBeamCentre
@@ -57,7 +58,7 @@ class ZoomController(StandardReadable, Movable):
 
 
 class OAV(StandardReadable):
-    def __init__(self, prefix: str, config: OAVConfig, name: str = ""):
+    def __init__(self, prefix: str, config: OAVConfigBase, name: str = ""):
         self.oav_config = config
         self._prefix = prefix
         self._name = name
