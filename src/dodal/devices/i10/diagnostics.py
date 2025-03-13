@@ -140,13 +140,13 @@ class ScreenCam(Device):
             prefix=prefix,
         )
         cam_pv = prefix + cam_infix
-        centroid_x = epics_signal_r(float, read_pv=f"{cam_pv}CentroidX_RBV")
-        centroid_y = epics_signal_r(float, read_pv=f"{cam_pv}CentroidY_RBV")
+        self.centroid_x = epics_signal_r(float, read_pv=f"{cam_pv}STAT:CentroidX_RBV")
+        self.centroid_y = epics_signal_r(float, read_pv=f"{cam_pv}STAT:CentroidY_RBV")
         self.single_trigger_centroid = SingleTriggerDetector(
             drv=AravisDriverIO(prefix=cam_pv + "CAM:"),
             read_uncached=[
-                centroid_x,
-                centroid_y,
+                self.centroid_x,
+                self.centroid_y,
             ],
         )
         super().__init__(name=name)
