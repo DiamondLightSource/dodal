@@ -1,9 +1,13 @@
+from typing import cast
+
 import pytest
 
 from dodal.devices.oav.oav_parameters import (
     OAVConfig,
+    OAVConfigBeamCentre,
     OAVParameters,
     ZoomParams,
+    ZoomParamsCrosshair,
 )
 
 OAV_CENTRING_JSON = "tests/devices/unit_tests/test_OAVCentring.json"
@@ -21,7 +25,16 @@ def mock_parameters():
 
 @pytest.fixture
 def mock_config() -> dict[str, ZoomParams]:
-    return OAVConfig(ZOOM_LEVELS_XML, DISPLAY_CONFIGURATION).get_parameters()
+    return OAVConfig(ZOOM_LEVELS_XML).get_parameters()
+
+
+@pytest.fixture
+def mock_config_with_beam_centre() -> dict[str, ZoomParamsCrosshair]:
+    config = OAVConfigBeamCentre(
+        ZOOM_LEVELS_XML, DISPLAY_CONFIGURATION
+    ).get_parameters()
+    config = cast(dict[str, ZoomParamsCrosshair], config)
+    return config
 
 
 def test_given_key_in_context_but_not_default_when_load_parameters_then_value_found(
@@ -49,13 +62,15 @@ def test_given_key_in_context_and_default_when_load_parameters_then_value_found_
         ("10.0", (0.438, 0.438), (613, 344)),
     ],
 )
-def test_oav_config(
-    zoom_level, expected_microns, expected_crosshair, mock_config: dict
+def test_oav_config_with_beam_centre(
+    zoom_level, expected_microns, expected_crosshair, mock_config_with_beam_centre: dict
 ):
-    assert isinstance(mock_config[zoom_level], ZoomParams)
+    assert isinstance(mock_config_with_beam_centre[zoom_level], ZoomParamsCrosshair)
 
-    assert mock_config[zoom_level].crosshair == expected_crosshair
-    assert mock_config[zoom_level].microns_per_pixel == expected_microns
+    assert mock_config_with_beam_centre[zoom_level].crosshair == expected_crosshair
+    assert (
+        mock_config_with_beam_centre[zoom_level].microns_per_pixel == expected_microns
+    )
 
 
 @pytest.mark.parametrize(
@@ -65,7 +80,7 @@ def test_oav_config(
         ("10.0", (0.438, 0.438)),
     ],
 )
-def test_oav_config_no_beam_centre(zoom_level, expected_microns, mock_config: dict):
+def test_oav_config(zoom_level, expected_microns, mock_config: dict):
     assert isinstance(mock_config[zoom_level], ZoomParams)
     assert mock_config[zoom_level].microns_per_pixel == expected_microns
 

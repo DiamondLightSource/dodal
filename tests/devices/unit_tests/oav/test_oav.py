@@ -6,7 +6,8 @@ from ophyd_async.testing import set_mock_value
 from dodal.devices.oav.oav_detector import (
     OAV,
     Cam,
-    OAVBeamCentre,
+    OAVBeamCentreFile,
+    OAVBeamCentrePV,
     ZoomController,
 )
 
@@ -105,7 +106,7 @@ async def test_oav_returns_rescaled_beam_position_and_microns_per_pixel_correctl
 )
 @patch("dodal.devices.areadetector.plugins.MJPG.Image")
 async def test_when_snapshot_triggered_post_processing_called_correctly(
-    patch_image, mock_get, oav: OAV
+    patch_image, mock_get, oav: OAVBeamCentreFile
 ):
     mock_get.return_value.__aenter__.return_value = (mock_response := AsyncMock())
     mock_response.ok = True
@@ -122,9 +123,9 @@ async def test_when_snapshot_triggered_post_processing_called_correctly(
 
 
 async def test_oav_beam_centre_gets_beam_centre_from_pvs_roi(
-    oav_beam_centre_roi: OAVBeamCentre,
+    oav_beam_centre_pv_roi: OAVBeamCentrePV,
 ):
-    oav = oav_beam_centre_roi
+    oav = oav_beam_centre_pv_roi
     set_mock_value(oav.beam_centre_x, 100)
     set_mock_value(oav.beam_centre_y, 150)
     beam_x = await oav.beam_centre_i.get_value()
@@ -134,9 +135,9 @@ async def test_oav_beam_centre_gets_beam_centre_from_pvs_roi(
 
 
 async def test_oav_beam_centre_gets_beam_centre_from_pvs_fs(
-    oav_beam_centre_fs: OAVBeamCentre,
+    oav_beam_centre_pv_fs: OAVBeamCentrePV,
 ):
-    oav = oav_beam_centre_fs
+    oav = oav_beam_centre_pv_fs
     set_mock_value(oav.beam_centre_x, 200)
     set_mock_value(oav.beam_centre_y, 250)
     beam_x = await oav.beam_centre_i.get_value()
