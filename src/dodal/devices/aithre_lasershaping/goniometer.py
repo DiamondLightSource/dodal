@@ -1,10 +1,10 @@
 from ophyd_async.core import StandardReadable
 from ophyd_async.epics.motor import Motor
 
-"""Goniometer and the stages it sits on"""
-
 
 class Goniometer(StandardReadable):
+    """Goniometer and the stages it sits on"""
+
     def __init__(self, prefix: str, name: str = "") -> None:
         self.x = Motor(prefix + "X")
         self.y = Motor(prefix + "Y")
