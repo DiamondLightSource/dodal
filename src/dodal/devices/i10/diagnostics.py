@@ -70,11 +70,6 @@ class InOutReadBackTable(StrictEnum):
     OUT_OF_BEAM = "Out of Beam"
 
 
-class I10WebCamIODataType(StrictEnum):
-    UINT8 = "UInt8"
-    INT16 = "UInt16"
-
-
 class Positioner(StandardReadable, Movable):
     """1D stage with a enum table to select positions."""
 
