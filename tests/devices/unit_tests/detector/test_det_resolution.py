@@ -15,7 +15,7 @@ from dodal.devices.detector.det_resolution import (
 def detector_params(request, tmp_path: Path):
     return DetectorParams(
         expected_energy_ev=100,
-        exposure_time=1.0,
+        exposure_time_s=1.0,
         directory=str(tmp_path),
         prefix="test",
         run_number=0,

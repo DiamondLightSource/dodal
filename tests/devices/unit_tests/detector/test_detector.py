@@ -11,7 +11,7 @@ from dodal.devices.detector.det_dim_constants import EIGER2_X_16M_SIZE
 def create_det_params_with_dir_and_prefix(directory: str | Path, prefix="test"):
     return DetectorParams(
         expected_energy_ev=100,
-        exposure_time=1.0,
+        exposure_time_s=1.0,
         directory=directory,  # type: ignore
         prefix=prefix,
         detector_distance=1.0,
@@ -52,7 +52,7 @@ def test_correct_det_dist_to_beam_converter_path_passed_in(
 ):
     params = DetectorParams(
         expected_energy_ev=100,
-        exposure_time=1.0,
+        exposure_time_s=1.0,
         directory=str(tmp_path),
         prefix="test",
         run_number=0,
@@ -74,7 +74,7 @@ def test_correct_det_dist_to_beam_converter_path_passed_in(
 def test_run_number_correct_when_not_specified(mocked_parse_table, tmp_path):
     params = DetectorParams(
         expected_energy_ev=100,
-        exposure_time=1.0,
+        exposure_time_s=1.0,
         directory=str(tmp_path),
         prefix="test",
         detector_distance=1.0,
@@ -95,7 +95,7 @@ def test_run_number_correct_when_not_specified(mocked_parse_table, tmp_path):
 def test_run_number_correct_when_specified(mocked_parse_table, tmp_path):
     params = DetectorParams(
         expected_energy_ev=100,
-        exposure_time=1.0,
+        exposure_time_s=1.0,
         directory=str(tmp_path),
         run_number=6,
         prefix="test",
@@ -114,7 +114,7 @@ def test_run_number_correct_when_specified(mocked_parse_table, tmp_path):
 def test_detector_params_is_serialisable(tmp_path):
     params = DetectorParams(
         expected_energy_ev=100,
-        exposure_time=1.0,
+        exposure_time_s=1.0,
         directory=str(tmp_path),
         prefix="test",
         detector_distance=1.0,
@@ -140,7 +140,7 @@ def test_detector_params_deserialisation_unchanged(tmp_path: Path):
     # `directory` parameter can accept either a string or a `Path` object, and it is used to set the
     # `directory` attribute of the `DetectorParams` instance.
     json = f'{{"expected_energy_ev": 100.0, \
-    "exposure_time": 1.0, \
+    "exposure_time_s": 1.0, \
     "directory": "{tmp_path}", \
     "prefix": "test", \
     "detector_distance": 1.0, \
