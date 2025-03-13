@@ -151,6 +151,4 @@ class OAVBeamCentrePV(OAV):
 
     async def _get_beam_position(self, coord: int) -> int:
         """Extracts the beam location in pixels `xCentre` `yCentre`."""
-        value = await (self.beam_centre_x, self.beam_centre_y)[coord].get_value()
-        size = await self.sizes[coord].get_value()
-        return int(value * size / DEFAULT_OAV_WINDOW[coord])
+        return await (self.beam_centre_x, self.beam_centre_y)[coord].get_value()
