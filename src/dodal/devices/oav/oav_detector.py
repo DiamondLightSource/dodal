@@ -108,7 +108,6 @@ class OAV(StandardReadable):
     async def _get_beam_position(self, coord: int) -> int:
         """Extracts the beam location in pixels `xCentre` `yCentre`, for a requested \
         zoom level. """
-        pass
 
     async def connect(
         self,
