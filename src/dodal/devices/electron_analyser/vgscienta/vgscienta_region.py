@@ -61,9 +61,6 @@ class VGScientaExcitationEnergySource(BaseModel):
     value: float = 0
 
 
-TVGScientaRegion = TypeVar("TVGScientaRegion", bound=VGScientaRegion)
-
-
 class VGScientaSequence(BaseSequence):
     elementSet: str = Field(default="Unknown")
     excitationEnergySources: list[VGScientaExcitationEnergySource] = Field(
