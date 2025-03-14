@@ -1,6 +1,6 @@
 from pydantic import Field
 
-from dodal.devices.electron_analyser.base_region import BaseRegion
+from dodal.devices.electron_analyser.base_region import BaseRegion, BaseSequence
 
 
 class SpecsRegion(BaseRegion):
@@ -18,3 +18,7 @@ class SpecsRegion(BaseRegion):
     centreEnergy: float = 0
     psuMode: str = "1.5keV"
     acquisitionMode: str = ""
+
+
+class SpecsSequence(BaseSequence):
+    regions: list[SpecsRegion] = Field(default_factory=lambda: [])

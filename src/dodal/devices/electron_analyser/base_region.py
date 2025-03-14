@@ -1,4 +1,6 @@
-from pydantic import BaseModel
+from typing import Generic, TypeVar
+
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class BaseRegion(BaseModel):
@@ -19,3 +21,18 @@ class BaseRegion(BaseModel):
     highEnergy: float
     stepTime: float
     energyStep: float
+
+
+TBaseRegion = TypeVar("TBaseRegion", bound=BaseRegion)
+
+
+class BaseSequence(BaseModel, Generic[TBaseRegion]):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    regions: list[TBaseRegion] = Field(default_factory=lambda: [])
+
+    def get_enabled_regions(self) -> list[BaseRegion]:
+        return [r for r in self.regions if r.enabled]
+
+    def get_region_names(self) -> list[str]:
+        return [r.name for r in self.regions]
