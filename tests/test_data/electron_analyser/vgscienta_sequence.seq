@@ -1,0 +1,61 @@
+{
+  "elementSet" : "High Pass (XPS)",
+  "excitationEnergySources" : [ {
+    "name" : "source1",
+    "scannableName" : "dcmenergyEv",
+    "value" : 3980.0
+  }, {
+    "name" : "source2",
+    "scannableName" : "pgmenergy",
+    "value" : 999.988648033133
+  } ],
+  "regions" : [ {
+    "name" : "New_Region1",
+    "enabled" : true,
+    "regionId" : "_BsJikP6GEe-wnaIqmrmRSw",
+    "lensMode" : "Angular45",
+    "passEnergy" : 5,
+    "slices" : 1,
+    "iterations" : 1,
+    "acquisitionMode" : "Swept",
+    "excitationEnergySource" : "source1",
+    "energyMode" : "Kinetic",
+    "lowEnergy" : 8.0,
+    "highEnergy" : 10.0,
+    "fixEnergy" : 9.0,
+    "stepTime" : 1.0,
+    "totalSteps" : 13.0,
+    "totalTime" : 13.0,
+    "energyStep" : 200.0,
+    "exposureTime" : 1.0,
+    "firstXChannel" : 1,
+    "lastXChannel" : 1000,
+    "firstYChannel" : 101,
+    "lastYChannel" : 800,
+    "detectorMode" : "ADC"
+  }, {
+    "name" : "New_Region2",
+    "enabled" : false,
+    "regionId" : "_er60kP82Ee-wnaIqmrmRSw",
+    "lensMode" : "Angular45",
+    "passEnergy" : 5,
+    "slices" : 1,
+    "iterations" : 1,
+    "acquisitionMode" : "Swept",
+    "excitationEnergySource" : "source2",
+    "energyMode" : "Kinetic",
+    "lowEnergy" : 8.0,
+    "highEnergy" : 10.0,
+    "fixEnergy" : 9.0,
+    "stepTime" : 1.0,
+    "totalSteps" : 13.0,
+    "totalTime" : 13.0,
+    "energyStep" : 200.0,
+    "exposureTime" : 1.0,
+    "firstXChannel" : 1,
+    "lastXChannel" : 1000,
+    "firstYChannel" : 101,
+    "lastYChannel" : 800,
+    "detectorMode" : "ADC"
+  } ]
+}
