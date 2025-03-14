@@ -1,12 +1,9 @@
 import uuid
 from enum import Enum
-from typing import TypeVar
 
 from pydantic import BaseModel, Field
 
-from dodal.devices.i09.base_region import BaseRegion
-
-TBaseModel = TypeVar("TBaseModel", bound=BaseModel)
+from dodal.devices.electron_analyser.base_region import BaseRegion
 
 
 class Status(str, Enum):
@@ -89,26 +86,3 @@ class SESSequence(BaseModel):
             if len(filtered_excitation_energy_sources) == 1
             else None
         )
-
-
-if __name__ == "__main__":
-    from dodal.common.data_util import load_json_file_to_class, save_class_to_json
-
-    print("===START===")
-
-    sequence_file1 = "/scratch/gda_development/gda-master-default/eclipse/gda_data_non_live/2025/0-0/xml/user.seq"
-    sequence_file2 = "/scratch/gda_development/gda-master-default/eclipse/gda_data_non_live/2025/0-0/xml/save_test.seq"
-
-    sequence = load_json_file_to_class(SESSequence, sequence_file1)
-
-    test_region = VGScientaRegion()
-    print(test_region)
-    print(sequence)
-
-    print(sequence.regions)
-    print(sequence.get_excitation_energy_source_by_region(sequence.regions[0]))
-    SESSequence()
-
-    print(sequence.get_region_names())
-
-    print("===END===")
