@@ -1,4 +1,4 @@
-from ophyd_async.epics.core import epics_signal_w
+from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.devices.electron_analyser.base_analyser import BaseAnalyser
 
@@ -12,13 +12,13 @@ class SpecsAnalyser(BaseAnalyser):
         self.prefix = prefix
 
         with self.add_children_as_readables():
-            self.psu_mode_signal = epics_signal_w(
+            self.psu_mode_signal = epics_signal_rw(
                 float, self.prefix + SpecsAnalyser.PV_PSU_MODE
             )
-            self.values_signal = epics_signal_w(
+            self.values_signal = epics_signal_rw(
                 float, self.prefix + SpecsAnalyser.PV_VALUES
             )
-            self.centre_energy_signal = epics_signal_w(
+            self.centre_energy_signal = epics_signal_rw(
                 float, self.prefix + SpecsAnalyser.PV_CENTRE_ENERGY
             )
 

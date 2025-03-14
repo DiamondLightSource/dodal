@@ -1,12 +1,12 @@
 from typing import Generic, TypeVar
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, Field
 
 
 class BaseRegion(BaseModel):
     """
-    Generic region model that holds the region data. Specialised region models
-    should inherit this to extend functionality.
+    Generic region model that holds the region data. Specialised region modelsshould
+    inherit this to extend functionality.
     """
 
     name: str = "New_region"
@@ -27,7 +27,10 @@ TBaseRegion = TypeVar("TBaseRegion", bound=BaseRegion)
 
 
 class BaseSequence(BaseModel, Generic[TBaseRegion]):
-    model_config = ConfigDict(arbitrary_types_allowed=True)
+    """
+    Generic sequence model that holds the list of region data. Specialised sequence models
+    should inherit this to extend functionality.
+    """
 
     regions: list[TBaseRegion] = Field(default_factory=lambda: [])
 
@@ -36,3 +39,6 @@ class BaseSequence(BaseModel, Generic[TBaseRegion]):
 
     def get_region_names(self) -> list[str]:
         return [r.name for r in self.regions]
+
+    def get_enabled_region_names(self) -> list[str]:
+        return [r.name for r in self.get_enabled_regions()]
