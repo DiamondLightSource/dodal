@@ -26,6 +26,7 @@ from dodal.devices.i03.dcm import DCM
 from dodal.devices.i04.transfocator import Transfocator
 from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZPositioner
+from dodal.devices.mx_phase1.beamstop import Beamstop
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.oav_parameters import OAVConfig
 from dodal.devices.oav.oav_to_redis_forwarder import OAVToRedisForwarder
@@ -115,13 +116,14 @@ def ipin() -> IPin:
 
 
 @device_factory()
-def beamstop() -> XYZPositioner:
+def beamstop() -> Beamstop:
     """Get the i04 beamstop device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return XYZPositioner(
+    return Beamstop(
         f"{PREFIX.beamline_prefix}-MO-BS-01:",
-        "beamstop",
+        beamline_parameters=get_beamline_parameters(),
+        name="beamstop",
     )
 
 
