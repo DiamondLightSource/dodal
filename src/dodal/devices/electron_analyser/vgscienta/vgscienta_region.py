@@ -1,9 +1,10 @@
 import uuid
 from enum import Enum
+from typing import TypeVar
 
 from pydantic import BaseModel, Field
 
-from dodal.devices.electron_analyser.base_region import BaseRegion
+from dodal.devices.electron_analyser.base_region import BaseRegion, BaseSequence
 
 
 class Status(str, Enum):
@@ -60,18 +61,15 @@ class VGScientaExcitationEnergySource(BaseModel):
     value: float = 0
 
 
-class VGScientaSequence(BaseModel):
+TVGScientaRegion = TypeVar("TVGScientaRegion", bound=VGScientaRegion)
+
+
+class VGScientaSequence(BaseSequence):
     elementSet: str = Field(default="Unknown")
     excitationEnergySources: list[VGScientaExcitationEnergySource] = Field(
         default_factory=lambda: []
     )
     regions: list[VGScientaRegion] = Field(default_factory=lambda: [])
-
-    def get_enabled_regions(self) -> list[VGScientaRegion]:
-        return [r for r in self.regions if r.enabled]
-
-    def get_region_names(self) -> list[str]:
-        return [r.name for r in self.regions]
 
     def get_excitation_energy_source_by_region(
         self, region: VGScientaRegion
