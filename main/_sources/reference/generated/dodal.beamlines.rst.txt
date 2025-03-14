@@ -10,6 +10,7 @@
    :recursive:
 
    dodal.beamlines.adsim
+   dodal.beamlines.aithre
    dodal.beamlines.b01_1
    dodal.beamlines.i02_1
    dodal.beamlines.i03
