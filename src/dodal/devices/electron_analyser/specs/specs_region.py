@@ -1,0 +1,20 @@
+from pydantic import Field
+
+from dodal.devices.electron_analyser.base_region import BaseRegion
+
+
+class SpecsRegion(BaseRegion):
+    # Override base class with defaults
+    lensMode: str = "SmallArea"
+    passEnergy: int | float = 5.0
+    acquisitionMode: str = "Fixed Transmission"
+    lowEnergy: float = Field(default=800, alias="startEnergy")
+    highEnergy: float = Field(default=850, alias="endEnergy")
+    stepTime: float = Field(default=1.0, alias="exposureTime")
+    energyStep: float = Field(default=0.1, alias="stepEnergy")
+    # Specific to this class
+    bindingEnergy: bool = False
+    value: float = 1
+    centreEnergy: float = 0
+    psuMode: str = "1.5keV"
+    acquisitionMode: str = ""
