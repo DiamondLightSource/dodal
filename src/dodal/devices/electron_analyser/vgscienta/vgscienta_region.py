@@ -54,15 +54,15 @@ class VGScientaRegion(BaseRegion):
     status: Status = Status.READY
 
 
-class SESExcitationEnergySource(BaseModel):
+class VGScientaExcitationEnergySource(BaseModel):
     name: str = "source1"
     scannableName: str = ""
     value: float = 0
 
 
-class SESSequence(BaseModel):
+class VGScientaSequence(BaseModel):
     elementSet: str = Field(default="Unknown")
-    excitationEnergySources: list[SESExcitationEnergySource] = Field(
+    excitationEnergySources: list[VGScientaExcitationEnergySource] = Field(
         default_factory=lambda: []
     )
     regions: list[VGScientaRegion] = Field(default_factory=lambda: [])
@@ -75,7 +75,7 @@ class SESSequence(BaseModel):
 
     def get_excitation_energy_source_by_region(
         self, region: VGScientaRegion
-    ) -> SESExcitationEnergySource | None:
+    ) -> VGScientaExcitationEnergySource | None:
         filtered_excitation_energy_sources = [
             e
             for e in self.excitationEnergySources
