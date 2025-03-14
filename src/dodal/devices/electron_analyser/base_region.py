@@ -3,8 +3,8 @@ from pydantic import BaseModel
 
 class BaseRegion(BaseModel):
     """
-    Load in json file: BaseRegion.model_validate_json(json_str)
-    get as json str: r.model_dump_json()
+    Generic region model that holds the region data. Specialised region models
+    should inherit this to extend functionality.
     """
 
     name: str = "New_region"
