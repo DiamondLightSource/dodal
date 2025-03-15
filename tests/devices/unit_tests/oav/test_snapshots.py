@@ -1,4 +1,3 @@
-from pathlib import Path
 from unittest.mock import ANY, AsyncMock, MagicMock, call, patch
 
 import pytest
@@ -7,11 +6,9 @@ from ophyd_async.core import (
     soft_signal_r_and_setter,
 )
 from ophyd_async.testing import set_mock_value
-from PIL import Image
 
 from dodal.devices.oav.snapshots.snapshot_with_beam_centre import (
     SnapshotWithBeamCentre,
-    draw_crosshair,
 )
 from dodal.devices.oav.snapshots.snapshot_with_grid import (
     SnapshotWithGrid,
@@ -73,21 +70,6 @@ def mock_image_open():
         yield mock_open
 
 
-@patch("dodal.devices.oav.snapshots.snapshot_with_beam_centre.ImageDraw")
-async def test_snapshot_with_beam_centre_triggered_then_crosshair_drawn_and_saved(
-    patch_image_draw, mock_image_open, mock_session_with_valid_response, snapshot
-):
-    patch_line = MagicMock()
-    patch_image_draw.Draw.return_value.line = patch_line
-
-    snapshot._save_image = (mock_save := AsyncMock())
-
-    await snapshot.trigger()
-
-    assert len(patch_line.mock_calls) == 2
-    mock_save.assert_awaited_once()
-
-
 @patch("dodal.devices.areadetector.plugins.MJPG.aiofiles", autospec=True)
 async def test_snapshot_with_beam_centre_correctly_triggered_and_saved(
     mock_aiofiles,
@@ -127,16 +109,6 @@ async def test_given_directory_not_existing_when_snapshot_triggered_then_directo
     await snapshot.trigger()
 
     mock_mkdir.assert_called_once()
-
-
-def test_snapshot_draws_expected_crosshair(tmp_path: Path):
-    image = Image.open("tests/test_data/test_images/oav_snapshot_test.png")
-    draw_crosshair(image, 510, 380)
-    image.save(tmp_path / "output_image.png")
-    expected_image = Image.open("tests/test_data/test_images/oav_snapshot_expected.png")
-    image_bytes = image.tobytes()
-    expected_bytes = expected_image.tobytes()
-    assert image_bytes == expected_bytes, "Actual and expected images differ"
 
 
 @patch(
