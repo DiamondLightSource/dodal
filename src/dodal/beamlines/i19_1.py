@@ -4,6 +4,7 @@ from dodal.common.beamlines.beamline_utils import (
 from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
+from dodal.devices.i19.beamstop import BeamStop
 from dodal.devices.i19.shutter import HutchConditionalShutter, HutchState
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.oav_parameters import OAVConfig
@@ -33,6 +34,14 @@ ZOOM_PARAMS_FILE = (
     "/dls_sw/i19-1/software/gda_versions/gda/config/xml/jCameraManZoomLevels.xml"
 )
 DISPLAY_CONFIG = "/dls_sw/i19-1/software/daq_configuration/domain/display.configuration"
+
+
+@device_factory()
+def beamstop() -> BeamStop:
+    """Get the i19-2 beamstop device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i19-2, it will return the existing object.
+    """
+    return BeamStop(prefix=f"{PREFIX.beamline_prefix}-RS-ABSB-01:")
 
 
 @device_factory()
