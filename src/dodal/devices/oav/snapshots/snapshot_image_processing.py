@@ -1,5 +1,7 @@
 from PIL import Image, ImageDraw
 
+from dodal.devices.oav.utils import Pixel
+
 CROSSHAIR_LENGTH_PX = 20
 CROSSHAIR_OUTLINE_COLOUR = "Black"
 CROSSHAIR_FILL_COLOUR = "White"
@@ -46,15 +48,27 @@ def draw_crosshair(image: Image.Image, beam_x: int, beam_y: int):
 
 def compute_beam_centre_pixel_xy_for_mm_position(
     sample_pos_mm: tuple[float, float],
-    beam_pos_at_origin_px: tuple[int, int],
+    beam_pos_at_origin_px: Pixel,
     microns_per_pixel: tuple[float, float],
-) -> tuple[int, int]:
+) -> Pixel:
+    """
+    Compute the location of the beam centre in pixels on a reference image.
+    Args:
+        sample_pos_mm: x, y location of the sample in mm relative to when the reference image
+            was taken.
+        beam_pos_at_origin_px: x, y position of the beam centre in the reference image (pixels)
+        microns_per_pixel: x, y scaling factor relating the sample position to the position in the image.
+    Returns:
+        x, y location of the beam centre (pixels)
+
+    """
+
     def centre(sample_pos, beam_pos, um_per_px) -> int:
         return beam_pos + sample_pos * 1000 / um_per_px
 
-    return tuple(
+    return Pixel(
         centre(sp, bp, mpp)
         for sp, bp, mpp in zip(
             sample_pos_mm, beam_pos_at_origin_px, microns_per_pixel, strict=True
         )
-    )  # type: ignore
+    )
