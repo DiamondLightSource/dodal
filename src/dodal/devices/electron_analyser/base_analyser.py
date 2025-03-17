@@ -38,7 +38,7 @@ class BaseAnalyser(StandardReadable):
                 str, self.prefix + BaseAnalyser.PV_LENS_MODE
             )
             self.pass_energy_signal = epics_signal_rw(
-                int, self.prefix + BaseAnalyser.PV_PASS_ENERGY
+                str, self.prefix + BaseAnalyser.PV_PASS_ENERGY
             )
             self.energy_step_signal = epics_signal_rw(
                 float, self.prefix + BaseAnalyser.PV_ENERGY_STEP
