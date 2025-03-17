@@ -20,11 +20,6 @@ class DetectorMode(StrictEnum):
     PULSE_COUNTING = "Pulse Counting"
 
 
-class EnergyMode(str, Enum):
-    KINETIC = "Kinetic"
-    BINDING = "Binding"
-
-
 class AcquisitionMode(str, Enum):
     SWEPT = "Swept"
     FIXED = "Fixed"
@@ -38,11 +33,10 @@ class VGScientaRegion(BaseRegion):
     lowEnergy: float = 8.0
     highEnergy: float = 10.0
     stepTime: float = 1.0
-    energyStep: float = Field(default=200.0, alias="stepEnergy")
+    energyStep: float = Field(default=200.0)
     # Specific to this class
     regionId: str = Field(default=str(uuid.uuid4()))
     excitationEnergySource: str = "source1"
-    energyMode: EnergyMode = EnergyMode.KINETIC
     fixEnergy: float = 9.0
     totalSteps: float = 13.0
     totalTime: float = 13.0

@@ -1,10 +1,11 @@
+from bluesky.protocols import Movable
 from ophyd_async.core import StandardReadable
 from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.devices.electron_analyser.base_region import TBaseRegion
 
 
-class BaseAnalyser(StandardReadable):
+class BaseAnalyser(StandardReadable, Movable):
     """
     Generic device to configure electron analyser with new region settings.
     Electron analysers should inherit from this class if they need further
