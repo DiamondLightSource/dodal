@@ -1,7 +1,7 @@
 import uuid
 from enum import Enum
-from typing import TypeVar
 
+from ophyd_async.core import StrictEnum
 from pydantic import BaseModel, Field
 
 from dodal.devices.electron_analyser.base_region import BaseRegion, BaseSequence
@@ -15,9 +15,9 @@ class Status(str, Enum):
     ABORTED = "Aborted"
 
 
-class DetectorMode(str, Enum):
+class DetectorMode(StrictEnum):
     ADC = "ADC"
-    PULSE_COUNTING = "Pulse counting"
+    PULSE_COUNTING = "Pulse Counting"
 
 
 class EnergyMode(str, Enum):
