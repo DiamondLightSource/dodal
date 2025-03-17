@@ -7,8 +7,8 @@ from ophyd_async.core import (
 )
 from ophyd_async.testing import set_mock_value
 
-from dodal.devices.oav.snapshots.snapshot_with_beam_centre import (
-    SnapshotWithBeamCentre,
+from dodal.devices.oav.snapshots.snapshot import (
+    Snapshot,
 )
 from dodal.devices.oav.snapshots.snapshot_with_grid import (
     SnapshotWithGrid,
@@ -23,11 +23,9 @@ async def create_and_set_mock_signal_r(dtype, name, value):
 
 
 @pytest.fixture
-async def snapshot() -> SnapshotWithBeamCentre:
-    mock_beam_x = await create_and_set_mock_signal_r(int, "mock_beam_x", 510)
-    mock_beam_y = await create_and_set_mock_signal_r(int, "mock_beam_y", 380)
+async def snapshot() -> Snapshot:
     async with init_devices(mock=True):
-        snapshot = SnapshotWithBeamCentre("", mock_beam_x, mock_beam_y, "fake_snapshot")
+        snapshot = Snapshot("", "fake_snapshot")
     set_mock_value(snapshot.directory, "/tmp/")
     set_mock_value(snapshot.filename, "test")
     set_mock_value(snapshot.url, "http://test.url")
@@ -71,7 +69,7 @@ def mock_image_open():
 
 
 @patch("dodal.devices.areadetector.plugins.MJPG.aiofiles", autospec=True)
-async def test_snapshot_with_beam_centre_correctly_triggered_and_saved(
+async def test_snapshot_correctly_triggered_and_saved(
     mock_aiofiles,
     mock_image_open,
     mock_session_with_valid_response,
