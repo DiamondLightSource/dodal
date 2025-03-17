@@ -57,4 +57,4 @@ def compute_beam_centre_pixel_xy_for_mm_position(
         for sp, bp, mpp in zip(
             sample_pos_mm, beam_pos_at_origin_px, microns_per_pixel, strict=True
         )
-    )
+    )  # type: ignore
