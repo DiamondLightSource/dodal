@@ -1,5 +1,3 @@
-from collections.abc import Sequence
-
 from PIL import Image, ImageDraw
 
 CROSSHAIR_LENGTH_PX = 20
@@ -47,10 +45,10 @@ def draw_crosshair(image: Image.Image, beam_x: int, beam_y: int):
 
 
 def compute_beam_centre_pixel_xy_for_mm_position(
-    sample_pos_mm: Sequence[float],
-    beam_pos_at_origin_px: Sequence[int],
-    microns_per_pixel: Sequence[float],
-) -> Sequence[int]:
+    sample_pos_mm: tuple[float, float],
+    beam_pos_at_origin_px: tuple[int, int],
+    microns_per_pixel: tuple[float, float],
+) -> tuple[int, int]:
     def centre(sample_pos, beam_pos, um_per_px) -> int:
         return beam_pos + sample_pos * 1000 / um_per_px
 
