@@ -1,9 +1,12 @@
 import os
 
+from ophyd_async.fastcs.panda import HDFPanda
+
 from dodal.common.beamlines.beamline_parameters import get_beamline_parameters
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
     device_instantiation,
+    get_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.devices.aperturescatterguard import (
@@ -18,7 +21,7 @@ from dodal.devices.detector import DetectorParams
 from dodal.devices.detector.detector_motion import DetectorMotion
 from dodal.devices.diamond_filter import DiamondFilter, I04Filters
 from dodal.devices.eiger import EigerDetector
-from dodal.devices.fast_grid_scan import ZebraFastGridScan
+from dodal.devices.fast_grid_scan import PandAFastGridScan, ZebraFastGridScan
 from dodal.devices.flux import Flux
 from dodal.devices.i04.transfocator import Transfocator
 from dodal.devices.ipin import IPin
@@ -166,7 +169,7 @@ def xbpm_feedback() -> XBPMFeedback:
     )
 
 
-@device_factory()
+@device_factory(mock=True)
 def flux(mock: bool = False) -> Flux:
     """Get the i04 flux device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
@@ -392,4 +395,28 @@ def pin_tip_detection() -> PinTipDetection:
     return PinTipDetection(
         f"{PREFIX.beamline_prefix}-DI-OAV-01:",
         "pin_tip_detection",
+    )
+
+
+@device_factory(mock=True)
+def panda_fast_grid_scan() -> PandAFastGridScan:
+    """Get the i04 panda_fast_grid_scan device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i04, it will return the existing object.
+    This is used instead of the zebra_fast_grid_scan device when using the PandA.
+    """
+    return PandAFastGridScan(
+        prefix=f"{PREFIX.beamline_prefix}-MO-SGON-01:",
+        name="panda_fast_grid_scan",
+    )
+
+
+@device_factory(mock=True)
+def panda() -> HDFPanda:
+    """Get the i04 panda device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i04, it will return the existing object.
+    """
+    return HDFPanda(
+        f"{PREFIX.beamline_prefix}-EA-PANDA-01:",
+        path_provider=get_path_provider(),
+        name="panda",
     )
