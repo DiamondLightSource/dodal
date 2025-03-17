@@ -1,12 +1,18 @@
-from typing import Generic, TypeVar
+from enum import Enum
+from typing import Any, Generic, TypeVar
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
+
+
+class EnergyMode(str, Enum):
+    KINETIC = "Kinetic"
+    BINDING = "Binding"
 
 
 class BaseRegion(BaseModel):
     """
-    Generic region model that holds the region data. Specialised region modelsshould
-    inherit this to extend functionality.
+    Generic region model that holds the data. Specialised region models should inherit
+    this to extend functionality.
     """
 
     name: str = "New_region"
@@ -21,6 +27,20 @@ class BaseRegion(BaseModel):
     highEnergy: float
     stepTime: float
     energyStep: float
+    energyMode: EnergyMode = EnergyMode.KINETIC
+
+    @model_validator(mode="before")
+    @classmethod
+    def check_energy_mode(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            # convert bindingEnergy to energyMode to make base region more generic
+            if "bindingEnergy" in data:
+                is_binding_energy = data["bindingEnergy"]
+                del data["bindingEnergy"]
+                data["energyMode"] = (
+                    EnergyMode.BINDING if is_binding_energy else EnergyMode.KINETIC
+                )
+        return data
 
 
 TBaseRegion = TypeVar("TBaseRegion", bound=BaseRegion)
