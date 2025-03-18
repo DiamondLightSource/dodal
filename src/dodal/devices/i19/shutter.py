@@ -18,6 +18,17 @@ class HutchState(str, Enum):
     INVALID = "INVALID"
 
 
+class AccessControlledShutter(StandardReadable, Movable):
+    def __init__(self, prefix: str, hutch: HutchState, name: str = "") -> None:
+        self.hutch_state = epics_signal_r(str, f"{prefix}:EHStatus.VALA")
+        self.hutch_request = hutch
+        super().__init__(name)
+
+    @AsyncStatus.wrap
+    async def set(self, value: ShutterDemand):
+        pass
+
+
 class HutchConditionalShutter(StandardReadable, Movable):
     """ I19-specific device to operate the hutch shutter.
 
