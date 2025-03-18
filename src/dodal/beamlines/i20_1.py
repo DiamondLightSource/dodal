@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from networkx import triad_type
+
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
     set_path_provider,
@@ -32,7 +34,7 @@ set_path_provider(
 )
 
 
-@device_factory()
+@device_factory(mock=True)
 def turbo_slit() -> TurboSlit:
     """
     turboslit for selecting energy from the polychromator
