@@ -49,7 +49,7 @@ def panda() -> HDFPanda:
 
 
 @device_factory()
-def synchrotron_test() -> Synchrotron:
+def synchrotron() -> Synchrotron:
     return Synchrotron()
 
 
@@ -67,6 +67,5 @@ def manta() -> AravisDetector:
 def stage_positioner() -> XYZPositioner:
     return XYZPositioner(
         f"{PREFIX.beamline_prefix}-MO-PPMAC-01:",
-        path_provider=get_path_provider(),
     )
 
