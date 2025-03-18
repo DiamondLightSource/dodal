@@ -64,7 +64,7 @@ def manta() -> AravisDetector:
 
 
 @device_factory()
-def stage_positioner() -> XYZPositioner:
+def sample_stage() -> XYZPositioner:
     return XYZPositioner(
         f"{PREFIX.beamline_prefix}-MO-PPMAC-01:",
     )
