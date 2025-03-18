@@ -48,6 +48,9 @@ class VGScientaRegion(BaseRegion):
     detectorMode: DetectorMode = DetectorMode.ADC
     status: Status = Status.READY
 
+    def get_energy_step_eV(self) -> float:
+        return self.energyStep / 1000
+
 
 class VGScientaExcitationEnergySource(BaseModel):
     name: str = "source1"

@@ -19,6 +19,9 @@ class SpecsRegion(BaseRegion):
     acquisitionMode: str = ""
     estimatedTimeInMs: float = 0
 
+    def get_energy_step_eV(self) -> float:
+        return self.energyStep
+
 
 class SpecsSequence(BaseSequence):
     regions: list[SpecsRegion] = Field(default_factory=lambda: [])

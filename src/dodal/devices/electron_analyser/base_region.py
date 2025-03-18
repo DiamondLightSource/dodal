@@ -26,8 +26,14 @@ class BaseRegion(BaseModel):
     lowEnergy: float
     highEnergy: float
     stepTime: float
-    energyStep: float
+    energyStep: float  # in eV
     energyMode: EnergyMode = EnergyMode.KINETIC
+
+    def get_energy_step_eV(self) -> float:
+        """
+        Each sub class can override this if they are specified in different units
+        """
+        return self.energyStep
 
     @model_validator(mode="before")
     @classmethod

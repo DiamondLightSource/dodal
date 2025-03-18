@@ -1,11 +1,14 @@
+import asyncio
+from typing import Generic, TypeVar
+
 from bluesky.protocols import Movable
-from ophyd_async.core import StandardReadable
+from ophyd_async.core import AsyncStatus, StandardReadable
 from ophyd_async.epics.core import epics_signal_rw
 
-from dodal.devices.electron_analyser.base_region import TBaseRegion
+from dodal.devices.electron_analyser.base_region import EnergyMode, TBaseRegion
 
 
-class BaseAnalyser(StandardReadable, Movable):
+class BaseAnalyser(StandardReadable, Movable, Generic[TBaseRegion]):
     """
     Generic device to configure electron analyser with new region settings.
     Electron analysers should inherit from this class if they need further
@@ -55,9 +58,47 @@ class BaseAnalyser(StandardReadable, Movable):
 
         super().__init__(name)
 
-    def configure_with_region(
-        self, region: type[TBaseRegion], excitation_energy_eV: float
-    ) -> None:
-        # TODO: This needs to be done via plan or within the device for this class and subclasses.
-        # If via device, via Movable.set(...)?
-        pass
+    @AsyncStatus.wrap
+    async def set(
+        self,
+        value: TBaseRegion,
+        excitation_energy_eV: float | None = None,
+        *args,
+        **kwargs,
+    ):
+        """
+        This is intended to be used with plan
+        bps.abs_set(analyser, region, excitation_energy)
+        """
+
+        region = value
+        if excitation_energy_eV is None:
+            raise Exception("excitation_energy_eV must be specified.")
+        is_binding_energy = region.energyMode == EnergyMode.BINDING
+        low_energy = (
+            excitation_energy_eV - region.lowEnergy
+            if is_binding_energy
+            else region.lowEnergy
+        )
+        high_energy = (
+            excitation_energy_eV - region.highEnergy
+            if is_binding_energy
+            else region.highEnergy
+        )
+        # These units need to be converted depending on the region
+        energy_step_eV = region.get_energy_step_eV()
+
+        # Set detector settings, wait for them all to have completed
+        await asyncio.gather(
+            self.low_energy_signal.set(low_energy),
+            self.high_energy_signal.set(high_energy),
+            self.slices_signal.set(region.slices),
+            self.lens_mode_signal.set(region.lensMode),
+            self.pass_energy_signal.set(str(region.passEnergy)),
+            self.energy_step_signal.set(energy_step_eV),
+            self.iterations_signal.set(region.iterations),
+            self.acquisition_mode_signal.set(region.acquisitionMode),
+        )
+
+
+TBaseAnalyser = TypeVar("TBaseAnalyser", bound=BaseAnalyser)
