@@ -1,11 +1,14 @@
 from enum import Enum
 
+import aiohttp
 from bluesky.protocols import Movable
 from ophyd_async.core import AsyncStatus, StandardReadable
 from ophyd_async.epics.core import epics_signal_r
 
 from dodal.devices.hutch_shutter import HutchShutter, ShutterDemand
 from dodal.log import LOGGER
+
+OPTICS_BLUEAPI_URL = "https://i19-blueapi.diamond.ac.uk"
 
 
 class HutchInvalidError(Exception):
@@ -22,11 +25,15 @@ class AccessControlledShutter(StandardReadable, Movable):
     def __init__(self, prefix: str, hutch: HutchState, name: str = "") -> None:
         self.hutch_state = epics_signal_r(str, f"{prefix}:EHStatus.VALA")
         self.hutch_request = hutch
+        self.url = OPTICS_BLUEAPI_URL
         super().__init__(name)
 
     @AsyncStatus.wrap
     async def set(self, value: ShutterDemand):
-        pass
+        async with aiohttp.ClientSession(raise_for_status=True) as session:
+            async with session.put(f"{self.url}/put") as response:
+                print(response)
+                # TBC ...
 
 
 class HutchConditionalShutter(StandardReadable, Movable):
