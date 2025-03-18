@@ -42,7 +42,7 @@ def attach_data_session_metadata_wrapper(
         # As part of 452, write each dataCollection into their own folder, then can use resource_dir directly
         yield from bpp.inject_md_wrapper(plan, md={DATA_SESSION: data_session})
     else:
-        logging.warn(
+        logging.warning(
             f"{provider} is not an UpdatingPathProvider, {attach_data_session_metadata_wrapper.__name__} will have no effect"
         )
         yield from plan
