@@ -13,7 +13,7 @@ class SpecsRegion(BaseRegion):
     stepTime: float = Field(default=1.0, alias="exposureTime")
     energyStep: float = Field(default=0.1, alias="stepEnergy")
     # Specific to this class
-    values: float = 1
+    values: int = 1
     centreEnergy: float = 0
     psuMode: str = "1.5keV"
     acquisitionMode: str = ""

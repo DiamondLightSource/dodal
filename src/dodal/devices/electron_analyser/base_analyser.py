@@ -6,6 +6,7 @@ from ophyd_async.core import AsyncStatus, StandardReadable
 from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.devices.electron_analyser.base_region import EnergyMode, TBaseRegion
+from dodal.log import LOGGER
 
 
 class BaseAnalyser(StandardReadable, Movable, Generic[TBaseRegion]):
@@ -42,7 +43,7 @@ class BaseAnalyser(StandardReadable, Movable, Generic[TBaseRegion]):
                 str, self.prefix + BaseAnalyser.PV_LENS_MODE
             )
             self.pass_energy_signal = epics_signal_rw(
-                str, self.prefix + BaseAnalyser.PV_PASS_ENERGY
+                self.get_pass_energy_type(), self.prefix + BaseAnalyser.PV_PASS_ENERGY
             )
             self.energy_step_signal = epics_signal_rw(
                 float, self.prefix + BaseAnalyser.PV_ENERGY_STEP
@@ -58,6 +59,9 @@ class BaseAnalyser(StandardReadable, Movable, Generic[TBaseRegion]):
 
         super().__init__(name)
 
+    def get_pass_energy_type(self) -> type:
+        return float
+
     @AsyncStatus.wrap
     async def set(
         self,
@@ -67,35 +71,37 @@ class BaseAnalyser(StandardReadable, Movable, Generic[TBaseRegion]):
         **kwargs,
     ):
         """
-        This is intended to be used with plan
+        This is intended to be used with bluesky plan
         bps.abs_set(analyser, region, excitation_energy)
         """
 
         region = value
         if excitation_energy_eV is None:
-            raise Exception("excitation_energy_eV must be specified.")
+            raise ValueError("excitation_energy_eV must be specified.")
+
+        LOGGER.info(f"Configuring analyser with region {region.name}")
+
         is_binding_energy = region.energyMode == EnergyMode.BINDING
         low_energy = (
-            excitation_energy_eV - region.lowEnergy
+            excitation_energy_eV - region.highEnergy
             if is_binding_energy
             else region.lowEnergy
         )
         high_energy = (
-            excitation_energy_eV - region.highEnergy
+            excitation_energy_eV - region.lowEnergy
             if is_binding_energy
             else region.highEnergy
         )
-        # These units need to be converted depending on the region
-        energy_step_eV = region.get_energy_step_eV()
-
+        # Cast pass energy to correct type for PV to take
+        pass_energy_type = self.get_pass_energy_type()
+        pass_energy = pass_energy_type(region.passEnergy)
         # Set detector settings, wait for them all to have completed
         await asyncio.gather(
             self.low_energy_signal.set(low_energy),
             self.high_energy_signal.set(high_energy),
             self.slices_signal.set(region.slices),
             self.lens_mode_signal.set(region.lensMode),
-            self.pass_energy_signal.set(str(region.passEnergy)),
-            self.energy_step_signal.set(energy_step_eV),
+            self.pass_energy_signal.set(pass_energy),
             self.iterations_signal.set(region.iterations),
             self.acquisition_mode_signal.set(region.acquisitionMode),
         )

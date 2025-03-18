@@ -1,6 +1,6 @@
 import asyncio
 
-from ophyd_async.core import AsyncStatus, StandardReadable
+from ophyd_async.core import AsyncStatus
 from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.devices.electron_analyser.base_analyser import BaseAnalyser
@@ -55,6 +55,9 @@ class VGScientaAnalyser(BaseAnalyser):
 
         super().__init__(prefix, name)
 
+    def get_pass_energy_type(self) -> type:
+        return str
+
     @AsyncStatus.wrap
     async def set(
         self, value: VGScientaRegion, excitation_energy_eV: float, *args, **kwargs
@@ -68,14 +71,18 @@ class VGScientaAnalyser(BaseAnalyser):
         last_x_channel = region.lastXChannel - region.firstXChannel + 1
         last_y_channel = region.lastYChannel - region.firstYChannel + 1
 
+        # These units need to be converted depending on the region
+        energy_step_eV = region.get_energy_step_eV()
+
         # Set detector settings, wait for them all to have completed
         await asyncio.gather(
             super().set(region, excitation_energy_eV),
             self.centre_energy_signal.set(centre_energy),
+            self.energy_step_signal.set(energy_step_eV),
             self.first_x_channel_signal.set(region.firstXChannel),
             self.first_y_channel_signal.set(region.firstYChannel),
             self.last_x_channel_signal.set(last_x_channel),
             self.last_y_channel_signal.set(last_y_channel),
             self.detector_mode_signal.set(region.detectorMode),
-            self.image_mode_signal.set("SINGLE"),
+            self.image_mode_signal.set("Single"),
         )
