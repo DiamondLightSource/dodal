@@ -1,0 +1,36 @@
+dodal.beamlines.i13\_1
+======================
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.beamlines.i13_1
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      merlin
+      sample_xyz_lab_fa_stage
+      sample_xyz_stage
+      side_camera
+   
+   
+
+   
+   
+   
