@@ -30,34 +30,26 @@ set_path_provider(
 
 
 @device_factory()
-def sample_xyz_stage(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> XYZPositioner:
+def sample_xyz_stage() -> XYZPositioner:
     return XYZPositioner(prefix=f"{PREFIX}-MO-PI-02:")
 
 
 @device_factory()
-def sample_xyz_lab_fa_stage(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> XYZPositioner:
+def sample_xyz_lab_fa_stage() -> XYZPositioner:
     return XYZPositioner(prefix=f"{PREFIX}-MO-PI-02:FIXANG:")
 
 
 @device_factory()
-def side_camera(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> AravisDetector:
+def side_camera() -> AravisDetector:
     return AravisDetector(
         prefix=f"{PREFIX}-OP-FLOAT-03:",
         drv_suffix="CAM:",
-        hdf_suffix="HDF5:",
+        fileio_suffix="HDF5:",
         path_provider=get_path_provider(),
     )
 
 
-def merlin(
-    wait_for_connection: bool = True, fake_with_ophyd_sim: bool = False
-) -> Merlin:
+def merlin() -> Merlin:
     return Merlin(
         prefix=f"{PREFIX}-EA-DET-04:",
         name="merlin",
@@ -65,11 +57,3 @@ def merlin(
         hdf_suffix="HDF5:",
         path_provider=get_path_provider(),
     )
-
-
-# @device_factory()
-# def panda() -> HDFPanda:
-#     return HDFPanda(
-#         prefix=f"{PREFIX}-MO-PANDA-01:",
-#         path_provider=get_path_provider(),
-#     )
