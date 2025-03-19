@@ -159,7 +159,7 @@ DEFAULT_TEMPLATE = "{device_name}-{instrument}-{scan_id}"
 class StartDocumentPathProvider(PathProvider):
     """A PathProvider that sources from metadata in a RunStart document.
 
-    This uses metadata a RunStart document to determine file names and data session
+    This uses metadata from a RunStart document to determine file names and data session
     directories. The file naming defaults to "{device_name}-{instrument}-{scan_id}", so
     the file name is incremented by scan number. A template can be included in the
     StartDocument to allow for custom naming conventions.
@@ -172,7 +172,7 @@ class StartDocumentPathProvider(PathProvider):
     def update_run(self, name: str, start_doc: RunStart) -> None:
         """Cache a start document.
 
-        This can be plugged into the run engines subscribe method.
+        This can be plugged into the run engine's subscribe method.
         """
         if name == "start":
             self._doc = start_doc
