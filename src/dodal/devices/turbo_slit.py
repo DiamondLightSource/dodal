@@ -29,10 +29,3 @@ class TurboSlit(StandardReadable, Movable):
     async def set(self, value: float):
         """this will move the default XFINE"""
         await self.xfine.set(value)
-
-    @AsyncStatus.wrap
-    async def set_full(self, gap: float, arc: float, xfine: float):
-        """TODO double check the operation order here"""
-        await self.gap.set(gap)
-        await self.arc.set(arc)
-        await self.xfine.set(xfine)
