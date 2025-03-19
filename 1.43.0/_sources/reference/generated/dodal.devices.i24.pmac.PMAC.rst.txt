@@ -1,0 +1,40 @@
+dodal.devices.i24.pmac.PMAC
+===========================
+
+.. currentmodule:: dodal.devices.i24.pmac
+
+.. autoclass:: PMAC
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

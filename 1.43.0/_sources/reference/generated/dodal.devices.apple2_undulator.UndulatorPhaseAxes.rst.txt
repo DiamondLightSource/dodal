@@ -1,0 +1,45 @@
+dodal.devices.apple2\_undulator.UndulatorPhaseAxes
+==================================================
+
+.. currentmodule:: dodal.devices.apple2_undulator
+
+.. autoclass:: UndulatorPhaseAxes
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~UndulatorPhaseAxes.get_timeout
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

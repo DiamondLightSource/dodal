@@ -1,0 +1,40 @@
+dodal.devices.i24.vgonio.VerticalGoniometer
+===========================================
+
+.. currentmodule:: dodal.devices.i24.vgonio
+
+.. autoclass:: VerticalGoniometer
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

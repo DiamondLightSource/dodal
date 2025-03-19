@@ -1,0 +1,38 @@
+dodal.devices.detector.DetectorDistanceToBeamXYConverter
+========================================================
+
+.. currentmodule:: dodal.devices.detector
+
+.. autoclass:: DetectorDistanceToBeamXYConverter
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      ~DetectorDistanceToBeamXYConverter.get_beam_axis_pixels
+      
+      
+      ~DetectorDistanceToBeamXYConverter.get_beam_x_pixels
+      
+      
+      ~DetectorDistanceToBeamXYConverter.get_beam_xy_from_det_dist
+      
+      
+      ~DetectorDistanceToBeamXYConverter.get_beam_y_pixels
+      
+      
+      ~DetectorDistanceToBeamXYConverter.parse_table
+      
+      
+      ~DetectorDistanceToBeamXYConverter.reload_lookup_table
+      
+   
+   
+
+   
+   
+   

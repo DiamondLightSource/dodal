@@ -1,0 +1,87 @@
+dodal.devices.i13\_1.merlin\_io.MerlinImageMode
+===============================================
+
+.. currentmodule:: dodal.devices.i13_1.merlin_io
+
+.. autoclass:: MerlinImageMode
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~MerlinImageMode.SINGLE
+      
+      
+      ~MerlinImageMode.MULTIPLE
+      
+      
+      ~MerlinImageMode.CONTINUOUS
+      
+      
+      ~MerlinImageMode.THRESHOLD
+      
+      
+      ~MerlinImageMode.BACKGROUND
+      
+   
+   
