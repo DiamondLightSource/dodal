@@ -13,10 +13,8 @@ from dodal.devices.electron_analyser.vgscienta.vgscienta_region import (
 
 class VGScientaAnalyser(BaseAnalyser):
     PV_CENTRE_ENERGY = "CENTRE_ENERGY"
-
     PV_DETECTOR_MODE = "DETECTOR_MODE"
     PV_ENERGY_STEP = "STEP_SIZE"
-
     PV_FIRST_X_CHANNEL = "MinX"
     PV_FIRST_Y_CHANNEL = "MinY"
     PV_LAST_X_CHANNEL = "SizeX"
@@ -48,7 +46,6 @@ class VGScientaAnalyser(BaseAnalyser):
             self.energy_step_signal = epics_signal_rw(
                 float, self.prefix + VGScientaAnalyser.PV_ENERGY_STEP
             )
-
             self.image_mode_signal = epics_signal_rw(
                 str, self.prefix + VGScientaAnalyser.PV_IMAGE_MODE
             )
@@ -71,10 +68,8 @@ class VGScientaAnalyser(BaseAnalyser):
         last_x_channel = region.lastXChannel - region.firstXChannel + 1
         last_y_channel = region.lastYChannel - region.firstYChannel + 1
 
-        # These units need to be converted depending on the region
         energy_step_eV = region.get_energy_step_eV()
 
-        # Set detector settings, wait for them all to have completed
         await asyncio.gather(
             super().set(region, excitation_energy_eV),
             self.centre_energy_signal.set(centre_energy),
