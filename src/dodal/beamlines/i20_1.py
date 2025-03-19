@@ -1,7 +1,5 @@
 from pathlib import Path
 
-from networkx import triad_type
-
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
     set_path_provider,
@@ -34,6 +32,7 @@ set_path_provider(
 )
 
 
+# NOTE this is mock as we cannot move items on the beamline until we get sign-off to do so
 @device_factory(mock=True)
 def turbo_slit() -> TurboSlit:
     """
