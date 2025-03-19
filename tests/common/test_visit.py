@@ -67,7 +67,7 @@ def start_doc_default_template() -> dict:
     }
 
 
-def test_start_document_based_path_provider_with_default_template_returns_correct_path_info(
+def test_start_document_path_provider_with_default_template_returns_correct_path_info(
     start_doc_default_template: RunStart,
 ):
     pp = StartDocumentPathProvider()
@@ -109,7 +109,7 @@ def start_doc_custom_template() -> dict:
     }
 
 
-def test_start_document_based_path_provider_with_custom_template_returns_correct_path_info(
+def test_start_document_path_provider_with_custom_template_returns_correct_path_info(
     start_doc_custom_template: RunStart,
 ):
     pp = StartDocumentPathProvider()
@@ -149,7 +149,7 @@ def start_doc_missing_instrument() -> dict:
     }
 
 
-def test_start_document_based_path_provider_fails_with_missing_instrument(
+def test_start_document_path_provider_fails_with_missing_instrument(
     start_doc_missing_instrument: RunStart,
 ):
     pp = StartDocumentPathProvider()
@@ -185,7 +185,7 @@ def start_doc_missing_scan_id() -> dict:
     }
 
 
-def test_start_document_based_path_provider_fails_with_missing_scan_id(
+def test_start_document_path_provider_fails_with_missing_scan_id(
     start_doc_missing_scan_id: RunStart,
 ):
     pp = StartDocumentPathProvider()
@@ -221,7 +221,7 @@ def start_doc_default_data_session_directory() -> dict:
     }
 
 
-def test_start_document_based_path_provider_sets_data_session_directory_default_to_tmp(
+def test_start_document_path_provider_sets_data_session_directory_default_to_tmp(
     start_doc_default_data_session_directory: RunStart,
 ):
     pp = StartDocumentPathProvider()
@@ -233,7 +233,7 @@ def test_start_document_based_path_provider_sets_data_session_directory_default_
     )
 
 
-def test_start_document_based_path_provider_update_called_with_different_document_skips(
+def test_start_document_path_provider_update_called_with_different_document_skips(
     start_doc_default_template: RunStart,
 ):
     pp = StartDocumentPathProvider()
