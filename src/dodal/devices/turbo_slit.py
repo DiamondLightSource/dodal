@@ -1,9 +1,9 @@
-from bluesky.protocols import Movable, Readable
-from ophyd_async.core import AsyncStatus
+from bluesky.protocols import Movable
+from ophyd_async.core import AsyncStatus, StandardReadable
 from ophyd_async.epics.motor import Motor
 
 
-class TurboSlit(Movable, Readable):
+class TurboSlit(StandardReadable, Movable):
     """
     This collection of motors coordinates time resolved XAS experiments.
     It selects a beam out of the polychromatic fan.
