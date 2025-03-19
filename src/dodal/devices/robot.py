@@ -104,6 +104,9 @@ class BartRobot(StandardReadable, Movable):
         self.cryomode_rbv = epics_signal_r(float, prefix + "CRYO_MODE_RBV")
         self.cryomode = epics_signal_rw(str, prefix + "CRYO_MODE_CTRL")
         self.gripper_temp = epics_signal_r(float, prefix + "GRIPPER_TEMP")
+        self.dewar_lid_temperature = epics_signal_rw(
+            float, prefix + "DW_1_TEMP", prefix + "DW_1_SET_POINT"
+        )
         super().__init__(name=name)
 
     async def pin_mounted_or_no_pin_found(self):
