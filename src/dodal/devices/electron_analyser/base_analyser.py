@@ -35,7 +35,6 @@ class BaseAnalyser(StandardReadable, Movable, Generic[TBaseRegion]):
             self.high_energy_signal = epics_signal_rw(
                 float, self.prefix + BaseAnalyser.PV_HIGH_ENERGY
             )
-
             self.slices_signal = epics_signal_rw(
                 int, self.prefix + BaseAnalyser.PV_SLICES
             )
@@ -48,11 +47,9 @@ class BaseAnalyser(StandardReadable, Movable, Generic[TBaseRegion]):
             self.energy_step_signal = epics_signal_rw(
                 float, self.prefix + BaseAnalyser.PV_ENERGY_STEP
             )
-
             self.iterations_signal = epics_signal_rw(
                 int, self.prefix + BaseAnalyser.PV_ITERATIONS
             )
-
             self.acquisition_mode_signal = epics_signal_rw(
                 str, self.prefix + BaseAnalyser.PV_ACQISITION_MODE
             )

@@ -60,7 +60,7 @@ class BaseSequence(BaseModel, Generic[TBaseRegion]):
 
     regions: list[TBaseRegion] = Field(default_factory=lambda: [])
 
-    def get_enabled_regions(self) -> list[BaseRegion]:
+    def get_enabled_regions(self) -> list[TBaseRegion]:
         return [r for r in self.regions if r.enabled]
 
     def get_region_names(self) -> list[str]:
