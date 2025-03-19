@@ -2,8 +2,6 @@ from typing import Any
 
 from dodal.devices.electron_analyser.base_region import TBaseRegion
 
-TEST_DATA_PATH = "tests/test_data/electron_analyser/"
-
 
 def check_region_model_list_to_expected_values(
     regions: list[TBaseRegion], expected_values: list[dict[str, Any]]

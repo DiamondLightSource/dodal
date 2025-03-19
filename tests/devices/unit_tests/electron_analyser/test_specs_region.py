@@ -1,13 +1,23 @@
 import os
 
-from tests.devices.unit_tests.electron_analyser.utils import (
-    TEST_DATA_PATH,
+import pytest
+from tests.devices.unit_tests.electron_analyser.test_utils import (
     check_region_model_list_to_expected_values,
 )
 
 from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.electron_analyser.base_region import EnergyMode
 from dodal.devices.electron_analyser.specs.specs_region import SpecsSequence
+
+
+@pytest.fixture
+def sequence_file() -> str:
+    return "vgscienta_sequence.seq"
+
+
+@pytest.fixture
+def sequence_class() -> type[SpecsSequence]:
+    return SpecsSequence
 
 
 def get_expected_region_values():
@@ -51,10 +61,7 @@ def get_expected_region_values():
     ]
 
 
-def test_specs_file_loads_into_class():
-    file = os.path.join(TEST_DATA_PATH, "specs_sequence.seq")
-    sequence = load_json_file_to_class(SpecsSequence, file)
-
+def test_specs_file_loads_into_class(sequence):
     assert sequence.get_region_names() == ["region", "region2"]
     assert sequence.get_enabled_region_names() == ["region2"]
 
