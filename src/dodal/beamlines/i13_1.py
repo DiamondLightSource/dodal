@@ -2,14 +2,12 @@ from pathlib import Path
 
 from ophyd_async.epics.adaravis import AravisDetector
 
-# from ophyd_async.fastcs.panda import HDFPanda
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
     get_path_provider,
     set_path_provider,
 )
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
-from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
 from dodal.devices.i13_1.merlin import Merlin
 from dodal.devices.motors import XYZPositioner
@@ -50,11 +48,12 @@ def side_camera() -> AravisDetector:
     )
 
 
+@device_factory()
 def merlin() -> Merlin:
     return Merlin(
         prefix=f"{PREFIX}-EA-DET-04:",
         name="merlin",
         drv_suffix="CAM:",
-        hdf_suffix="HDF5:",
+        fileio_suffix="HDF5:",
         path_provider=get_path_provider(),
     )
