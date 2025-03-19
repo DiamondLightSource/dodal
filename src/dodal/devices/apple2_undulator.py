@@ -7,7 +7,6 @@ import numpy as np
 from bluesky.protocols import Movable
 from ophyd_async.core import (
     AsyncStatus,
-    Reference,
     SignalR,
     SignalW,
     StandardReadable,
@@ -19,7 +18,10 @@ from ophyd_async.core import (
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw, epics_signal_w
 from pydantic import BaseModel, ConfigDict, RootModel
 
+from dodal.common.signal_utils import create_hardware_backed_soft_signal
 from dodal.log import LOGGER
+
+DEFAULT_MOTOR_MIN_TIMEOUT = 10
 
 
 class UndulatorGateStatus(StrictEnum):
@@ -66,8 +68,7 @@ class LookupTableEntries(BaseModel):
 
 
 class Lookuptable(RootModel):
-    """
-    BaseModel class for the lookup table.
+    """BaseModel class for the lookup table.
     Apple2 lookup table should be in this format.
 
     {mode: {'Energies': {Any: {'Low': float,
@@ -85,6 +86,16 @@ class Lookuptable(RootModel):
     root: dict[str, LookupTableEntries]
 
 
+class Pol(StrictEnum):
+    NONE = "None"
+    LH = "lh"
+    LV = "lv"
+    PC = "pc"
+    NC = "nc"
+    LA = "la"
+    LH3 = "lh3"
+
+
 ROW_PHASE_MOTOR_TOLERANCE = 0.004
 MAXIMUM_ROW_PHASE_MOTOR_POSITION = 24.0
 MAXIMUM_GAP_MOTOR_POSITION = 100
@@ -96,7 +107,7 @@ async def estimate_motor_timeout(
     vel = await velocity.get_value()
     cur_pos = await curr_pos.get_value()
     target_pos = float(await setpoint.get_value())
-    return abs((target_pos - cur_pos) * 2.0 / vel) + 1
+    return abs((target_pos - cur_pos) * 2.0 / vel) + DEFAULT_MOTOR_MIN_TIMEOUT
 
 
 class SafeUndulatorMover(StandardReadable, Movable):
@@ -214,11 +225,10 @@ class UndulatorPhaseMotor(StandardReadable):
         """
         fullPV = f"{prefix}BL{infix}"
         self.user_setpoint = epics_signal_w(str, fullPV + "SET")
-        self.user_setpoint_demand_readback = epics_signal_r(float, fullPV + "DMD")
-
+        self.user_setpoint_readback = epics_signal_r(float, fullPV + "DMD")
         fullPV = fullPV + "MTR"
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.user_setpoint_readback = epics_signal_r(float, fullPV + ".RBV")
+            self.user_readback = epics_signal_r(float, fullPV + ".RBV")
 
         with self.add_children_as_readables(StandardReadableFormat.CONFIG_SIGNAL):
             self.motor_egu = epics_signal_r(str, fullPV + ".EGU")
@@ -280,20 +290,24 @@ class UndulatorPhaseAxes(SafeUndulatorMover):
         timeouts = await asyncio.gather(
             *[
                 estimate_motor_timeout(
-                    axis.user_setpoint_demand_readback,
                     axis.user_setpoint_readback,
+                    axis.user_readback,
                     axis.velocity,
                 )
                 for axis in axes
             ]
         )
-        return np.max(timeouts)
+        """A 2.0 multiplier is required to prevent premature motor timeouts in phase
+        axes as it is a master-slave system, where the slave's movement,
+        being dependent on the master, can take up to twice as long to complete.
+        """
+        return np.max(timeouts) * 2.0
 
 
 class UndulatorJawPhase(SafeUndulatorMover):
     """
     A JawPhase movable, this is use for moving the jaw phase which is use to control the
-    linear arbitrary polarisation but only one some of the beamline.
+    linear arbitrary polarisation but only on some of the beamline.
     """
 
     def __init__(
@@ -319,23 +333,26 @@ class UndulatorJawPhase(SafeUndulatorMover):
         Get motor speed, current position and target position to calculate required timeout.
         """
         return await estimate_motor_timeout(
-            self.jaw_phase.user_setpoint_demand_readback,
             self.jaw_phase.user_setpoint_readback,
+            self.jaw_phase.user_readback,
             self.jaw_phase.velocity,
         )
 
 
 class Apple2(StandardReadable, Movable):
-    """
-    Apple 2 ID/undulator has 4 extra degrees of freedom compare to the standard Undulator,
-     each bank of magnet can move independently to each other,
-     which allow the production of different x-ray polarisation as well as energy.
-     This type of ID is use on I10, I21, I09, I17 and I06 for soft x-ray.
+    """Apple 2 ID/undulator has 4 extra degrees of freedom compare to the standard Undulator,
+    each bank of magnet can move independently to each other,
+    which allow the production of different x-ray polarisation as well as energy.
+    This type of ID is use on I10, I21, I09, I17 and I06 for soft x-ray.
 
     A pair of look up tables are needed to provide the conversion between motor position
-     and energy.
+    and energy.
+
     This conversion (update_lookuptable) and the way the id move (set) are two abstract
-     methods that are beamline specific and need to be implemented.
+    methods that are beamline specific and need to be implemented. For more detail see
+    `UML </_images/apple2_design.png>`__ for detail.
+
+    .. figure:: /explanations/umls/apple2_design.png
     """
 
     def __init__(
@@ -346,129 +363,125 @@ class Apple2(StandardReadable, Movable):
         name: str = "",
     ) -> None:
         """
+
         Parameters
         ----------
-        id_gap:
-            An UndulatorGap device.
-        id_phase:
-            An UndulatorPhaseAxes device.
-        prefix:
-            Not in use but needed for device_instantiation.
-        name:
-            Name of the device.
+        id_gap: An UndulatorGap device.
+        id_phase: An UndulatorPhaseAxes device.
+        prefix: Not in use but needed for device_instantiation.
+        name: Name of the device.
         """
         super().__init__(name)
 
         # Attributes are set after super call so they are not renamed to
         # <name>-undulator, etc.
-        self.gap = Reference(id_gap)
-        self.phase = Reference(id_phase)
+        self.gap = id_gap
+        self.phase = id_phase
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            # Store the polarisation for readback.
-            self.polarisation, self._polarisation_set = soft_signal_r_and_setter(
-                str, initial_value=None
-            )
             # Store the set energy for readback.
             self.energy, self._energy_set = soft_signal_r_and_setter(
                 float, initial_value=None
             )
+
+        # Store the polarisation for setpoint.
+        self.polarisation_setpoint, self._polarisation_setpoint_set = (
+            soft_signal_r_and_setter(Pol)
+        )
         # This store two lookup tables, Gap and Phase in the Lookuptable format
         self.lookup_tables: dict[str, dict[str | None, dict[str, dict[str, Any]]]] = {
             "Gap": {},
             "Phase": {},
         }
+        with self.add_children_as_readables():
+            # Hardware backed readback for polarisation.
+            self.polarisation_readback = create_hardware_backed_soft_signal(
+                datatype=Pol, get_from_hardware_func=self.read_pol_setpoint
+            )
         # List of available polarisation according to the lookup table.
         self._available_pol = []
-        # The polarisation state of the id that are use for internal checking before setting.
-        self._pol = None
         """
         Abstract method that run at start up to load lookup tables into  self.lookup_tables
-         and set available_pol.
+        and set available_pol.
         """
         self.update_lookuptable()
 
-    @property
-    def pol(self):
-        return self._pol
+    # Hardward backed polarisation function,
+    async def read_pol_setpoint(self):
+        pol = await self.polarisation_setpoint.get_value()
+        # LH3 is not hardware readable as it is the same as lh but it is needed for energy.
+        if pol.value != "lh3":
+            pol, _ = await self.determine_phase_from_hardware()
+            if pol != Pol.NONE:
+                self.set_pol(pol=pol)
+        return pol
 
-    @pol.setter
-    def pol(self, pol: str):
+    def set_pol(self, pol: Pol) -> None:
         # This set the polarisation but does not actually move hardware.
-        if pol in self._available_pol:
-            self._pol = pol
-        else:
-            raise ValueError(
-                f"Polarisation {pol} is not available:"
-                + f"/n Polarisations available:  {self._available_pol}"
-            )
+        self._polarisation_setpoint_set(pol)
 
     async def _set(self, value: Apple2Val, energy: float) -> None:
         """
         Check ID is in a movable state and set all the demand value before moving.
-
         """
 
         # Only need to check gap as the phase motors share both fault and gate with gap.
-        await self.gap().raise_if_cannot_move()
+        await self.gap.raise_if_cannot_move()
         await asyncio.gather(
-            self.phase().top_outer.user_setpoint.set(value=value.top_outer),
-            self.phase().top_inner.user_setpoint.set(value=value.top_inner),
-            self.phase().btm_inner.user_setpoint.set(value=value.btm_inner),
-            self.phase().btm_outer.user_setpoint.set(value=value.btm_outer),
-            self.gap().user_setpoint.set(value=value.gap),
+            self.phase.top_outer.user_setpoint.set(value=value.top_outer),
+            self.phase.top_inner.user_setpoint.set(value=value.top_inner),
+            self.phase.btm_inner.user_setpoint.set(value=value.btm_inner),
+            self.phase.btm_outer.user_setpoint.set(value=value.btm_outer),
+            self.gap.user_setpoint.set(value=value.gap),
         )
         timeout = np.max(
-            await asyncio.gather(self.gap().get_timeout(), self.phase().get_timeout())
+            await asyncio.gather(self.gap.get_timeout(), self.phase.get_timeout())
         )
         LOGGER.info(
-            f"Moving f{self.name} energy and polorisation to {energy}, {self.pol}"
+            f"Moving f{self.name} energy and polorisation to {energy}, {await self.polarisation_setpoint.get_value()}"
             + f"with motor position {value}, timeout = {timeout}"
         )
-
         await asyncio.gather(
-            self.gap().set_move.set(value=1, timeout=timeout),
-            self.phase().set_move.set(value=1, timeout=timeout),
+            self.gap.set_move.set(value=1, wait=False, timeout=timeout),
+            self.phase.set_move.set(value=1, wait=False, timeout=timeout),
         )
-        await wait_for_value(
-            self.gap().gate, UndulatorGateStatus.CLOSE, timeout=timeout
-        )
-        self._energy_set(energy)  # Update energy for after move for readback.
+        await wait_for_value(self.gap.gate, UndulatorGateStatus.CLOSE, timeout=timeout)
+        self._energy_set(energy)  # Update energy after move for readback.
 
-    def _get_id_gap_phase(self, energy: float) -> tuple[float, float]:
+    async def _get_id_gap_phase(self, energy: float) -> tuple[float, float]:
         """
         Converts energy and polarisation to gap and phase.
         """
-        gap_poly = self._get_poly(
+        gap_poly = await self._get_poly(
             lookup_table=self.lookup_tables["Gap"], new_energy=energy
         )
-        phase_poly = self._get_poly(
+        phase_poly = await self._get_poly(
             lookup_table=self.lookup_tables["Phase"], new_energy=energy
         )
         return gap_poly(energy), phase_poly(energy)
 
-    def _get_poly(
+    async def _get_poly(
         self,
         new_energy: float,
         lookup_table: dict[str | None, dict[str, dict[str, Any]]],
     ) -> np.poly1d:
         """
         Get the correct polynomial for a given energy form lookuptable
-         for any given polarisation.
+        for any given polarisation.
         """
-
+        pol = await self.polarisation_setpoint.get_value()
         if (
-            new_energy < lookup_table[self.pol]["Limit"]["Minimum"]
-            or new_energy > lookup_table[self.pol]["Limit"]["Maximum"]
+            new_energy < lookup_table[pol]["Limit"]["Minimum"]
+            or new_energy > lookup_table[pol]["Limit"]["Maximum"]
         ):
             raise ValueError(
                 "Demanding energy must lie between {} and {} eV!".format(
-                    lookup_table[self.pol]["Limit"]["Minimum"],
-                    lookup_table[self.pol]["Limit"]["Maximum"],
+                    lookup_table[pol]["Limit"]["Minimum"],
+                    lookup_table[pol]["Limit"]["Maximum"],
                 )
             )
         else:
-            for energy_range in lookup_table[self.pol]["Energies"].values():
+            for energy_range in lookup_table[pol]["Energies"].values():
                 if (
                     new_energy >= energy_range["Low"]
                     and new_energy < energy_range["High"]
@@ -490,18 +503,18 @@ class Apple2(StandardReadable, Movable):
 
         """
 
-    async def determinePhaseFromHardware(self) -> tuple[str | None, float]:
+    async def determine_phase_from_hardware(self) -> tuple[Pol, float]:
         """
         Try to determine polarisation and phase value using row phase motor position pattern.
         However there is no way to return lh3 polarisation or higher harmonic setting.
         (May be for future one can use the inverse poly to work out the energy and try to match it with the current energy
         to workout the polarisation but during my test the inverse poly is too unstable for general use.)
         """
-        top_outer = await self.phase().top_outer.user_setpoint_readback.get_value()
-        top_inner = await self.phase().top_inner.user_setpoint_readback.get_value()
-        btm_inner = await self.phase().btm_inner.user_setpoint_readback.get_value()
-        btm_outer = await self.phase().btm_outer.user_setpoint_readback.get_value()
-        gap = await self.gap().user_readback.get_value()
+        top_outer = await self.phase.top_outer.user_readback.get_value()
+        top_inner = await self.phase.top_inner.user_readback.get_value()
+        btm_inner = await self.phase.btm_inner.user_readback.get_value()
+        btm_outer = await self.phase.btm_outer.user_readback.get_value()
+        gap = await self.gap.user_readback.get_value()
         if gap > MAXIMUM_GAP_MOTOR_POSITION:
             raise RuntimeError(
                 f"{self.name} is not in use, close gap or set polarisation to use this ID"
@@ -512,7 +525,7 @@ class Apple2(StandardReadable, Movable):
             for x in [top_outer, top_inner, btm_inner, btm_outer]
         ):
             # Linear Horizontal
-            polarisation = "lh"
+            polarisation = Pol("lh")
             phase = 0.0
             return polarisation, phase
         if (
@@ -522,7 +535,7 @@ class Apple2(StandardReadable, Movable):
             and motor_position_equal(btm_outer, 0.0)
         ):
             # Linear Vertical
-            polarisation = "lv"
+            polarisation = Pol("lv")
             phase = MAXIMUM_ROW_PHASE_MOTOR_POSITION
             return polarisation, phase
         if (
@@ -532,7 +545,7 @@ class Apple2(StandardReadable, Movable):
             and motor_position_equal(btm_outer, 0.0)
         ):
             # Positive Circular
-            polarisation = "pc"
+            polarisation = Pol("pc")
             phase = top_outer
             return polarisation, phase
         if (
@@ -542,7 +555,7 @@ class Apple2(StandardReadable, Movable):
             and motor_position_equal(btm_outer, 0.0)
         ):
             # Negative Circular
-            polarisation = "nc"
+            polarisation = Pol("nc")
             phase = top_outer
             return polarisation, phase
         if (
@@ -551,7 +564,7 @@ class Apple2(StandardReadable, Movable):
             and motor_position_equal(btm_outer, 0.0)
         ):
             # Positive Linear Arbitrary
-            polarisation = "la"
+            polarisation = Pol("la")
             phase = top_outer
             return polarisation, phase
         if (
@@ -560,11 +573,11 @@ class Apple2(StandardReadable, Movable):
             and motor_position_equal(btm_inner, 0.0)
         ):
             # Negative Linear Arbitrary
-            polarisation = "la"
+            polarisation = Pol("la")
             phase = top_inner
             return polarisation, phase
         # UNKNOWN default
-        polarisation = None
+        polarisation = Pol("None")
         phase = 0.0
         return (polarisation, phase)
 
