@@ -15,15 +15,15 @@ from dodal.common.crystal_metadata import (
     MaterialsEnum,
     make_crystal_metadata_from_material,
 )
-from dodal.devices.i22.dcm import DoubleCrystalMonochromator
+from dodal.devices.i22.dcm import DCM
 
 
 @pytest.fixture
-async def dcm() -> DoubleCrystalMonochromator:
+async def dcm() -> DCM:
     metadata_1 = make_crystal_metadata_from_material(MaterialsEnum.Si, (1, 1, 1))
     metadata_2 = make_crystal_metadata_from_material(MaterialsEnum.Si, (1, 1, 1))
     async with init_devices(mock=True):
-        dcm = DoubleCrystalMonochromator(
+        dcm = DCM(
             prefix="FOO-MO",
             temperature_prefix="FOO-DI",
             crystal_1_metadata=metadata_1,
@@ -36,7 +36,7 @@ async def dcm() -> DoubleCrystalMonochromator:
 def test_count_dcm(
     RE: RunEngine,
     run_engine_documents: dict[str, list[dict]],
-    dcm: DoubleCrystalMonochromator,
+    dcm: DCM,
 ):
     RE(bp.count([dcm]))
     assert_emitted(
@@ -57,16 +57,16 @@ def test_count_dcm(
     ],
 )
 async def test_wavelength(
-    dcm: DoubleCrystalMonochromator,
+    dcm: DCM,
     energy: float,
     wavelength: float,
 ):
-    set_mock_value(dcm.energy.user_readback, energy)
+    set_mock_value(dcm.energy_in_kev.user_readback, energy)
     reading = await dcm.read()
-    assert reading["dcm-wavelength"]["value"] == wavelength
+    assert reading["dcm-wavelength_in_a"]["value"] == wavelength
 
 
-async def test_reading(dcm: DoubleCrystalMonochromator):
+async def test_reading(dcm: DCM):
     await assert_reading(
         dcm,
         {
@@ -75,7 +75,7 @@ async def test_reading(dcm: DoubleCrystalMonochromator):
                 "timestamp": ANY,
                 "value": 0.0,
             },
-            "dcm-bragg": {
+            "dcm-bragg_in_degrees": {
                 "alarm_severity": 0,
                 "timestamp": ANY,
                 "value": 0.0,
@@ -85,7 +85,7 @@ async def test_reading(dcm: DoubleCrystalMonochromator):
                 "timestamp": ANY,
                 "value": 0.0,
             },
-            "dcm-crystal_1_roll": {
+            "dcm-crystals-0-roll_in_mrad": {
                 "alarm_severity": 0,
                 "timestamp": ANY,
                 "value": 0.0,
@@ -100,12 +100,12 @@ async def test_reading(dcm: DoubleCrystalMonochromator):
                 "timestamp": ANY,
                 "value": 0.0,
             },
-            "dcm-crystal_2_pitch": {
+            "dcm-crystals-1-pitch_in_mrad": {
                 "alarm_severity": 0,
                 "timestamp": ANY,
                 "value": 0.0,
             },
-            "dcm-crystal_2_roll": {
+            "dcm-crystals-1-roll_in_mrad": {
                 "alarm_severity": 0,
                 "timestamp": ANY,
                 "value": 0.0,
@@ -115,12 +115,12 @@ async def test_reading(dcm: DoubleCrystalMonochromator):
                 "timestamp": ANY,
                 "value": 0.0,
             },
-            "dcm-energy": {
+            "dcm-energy_in_kev": {
                 "alarm_severity": 0,
                 "timestamp": ANY,
                 "value": 0.0,
             },
-            "dcm-offset": {
+            "dcm-offset_in_mm": {
                 "alarm_severity": 0,
                 "timestamp": ANY,
                 "value": 0.0,
@@ -135,7 +135,12 @@ async def test_reading(dcm: DoubleCrystalMonochromator):
                 "timestamp": ANY,
                 "value": 0.0,
             },
-            "dcm-wavelength": {
+            "dcm-wavelength_in_a": {
+                "timestamp": ANY,
+                "value": 0.0,
+            },
+            "dcm-crystal_metadata_d_spacing_a": {
+                "alarm_severity": 0,
                 "timestamp": ANY,
                 "value": 0.0,
             },
@@ -147,7 +152,7 @@ async def test_reading(dcm: DoubleCrystalMonochromator):
     reason="https://github.com/bluesky/ophyd-async/issues/618 assert_configuration() on numpy arrays is "
     "broken"
 )
-async def test_configuration(dcm: DoubleCrystalMonochromator):
+async def test_configuration(dcm: DCM):
     await assert_configuration(
         dcm,
         {

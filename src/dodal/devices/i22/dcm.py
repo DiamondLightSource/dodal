@@ -5,7 +5,6 @@ from bluesky.protocols import Reading
 from event_model.documents.event_descriptor import DataKey
 from ophyd_async.core import (
     Array1D,
-    StandardReadable,
     StandardReadableFormat,
     soft_signal_r_and_setter,
 )
@@ -13,13 +12,18 @@ from ophyd_async.epics.core import epics_signal_r
 from ophyd_async.epics.motor import Motor
 
 from dodal.common.crystal_metadata import CrystalMetadata
+from dodal.devices.common_dcm import (
+    BaseDCM,
+    PitchAndRollCrystal,
+    RollCrystal,
+)
 
 # Conversion constant for energy and wavelength, taken from the X-Ray data booklet
 # Converts between energy in KeV and wavelength in angstrom
 _CONVERSION_CONSTANT = 12.3984
 
 
-class DoubleCrystalMonochromator(StandardReadable):
+class DCM(BaseDCM[tuple[type[RollCrystal], type[PitchAndRollCrystal]]]):
     """
     A double crystal monochromator (DCM), used to select the energy of the beam.
 
@@ -39,13 +43,7 @@ class DoubleCrystalMonochromator(StandardReadable):
     ) -> None:
         with self.add_children_as_readables():
             # Positionable Parameters
-            self.bragg = Motor(prefix + "BRAGG")
-            self.offset = Motor(prefix + "OFFSET")
             self.perp = Motor(prefix + "PERP")
-            self.energy = Motor(prefix + "ENERGY")
-            self.crystal_1_roll = Motor(prefix + "XTAL1:ROLL")
-            self.crystal_2_roll = Motor(prefix + "XTAL2:ROLL")
-            self.crystal_2_pitch = Motor(prefix + "XTAL2:PITCH")
 
             # Temperatures
             self.backplate_temp = epics_signal_r(float, temperature_prefix + "PT100-7")
@@ -93,12 +91,12 @@ class DoubleCrystalMonochromator(StandardReadable):
                 units=crystal_2_metadata.d_spacing[1],
             )
 
-        super().__init__(name)
+        super().__init__(prefix, (RollCrystal, PitchAndRollCrystal), name)
 
     async def describe(self) -> dict[str, DataKey]:
         default_describe = await super().describe()
         return {
-            f"{self.name}-wavelength": DataKey(
+            f"{self.name}-wavelength_in_a": DataKey(
                 dtype="number",
                 shape=[],
                 source=self.name,
@@ -109,7 +107,7 @@ class DoubleCrystalMonochromator(StandardReadable):
 
     async def read(self) -> dict[str, Reading]:
         default_reading = await super().read()
-        energy: float = default_reading[f"{self.name}-energy"]["value"]
+        energy: float = default_reading[f"{self.name}-energy_in_kev"]["value"]
         if energy > 0.0:
             wavelength = _CONVERSION_CONSTANT / energy
         else:
@@ -117,7 +115,7 @@ class DoubleCrystalMonochromator(StandardReadable):
 
         return {
             **default_reading,
-            f"{self.name}-wavelength": Reading(
+            f"{self.name}-wavelength_in_a": Reading(
                 value=wavelength,
                 timestamp=time.time(),
             ),

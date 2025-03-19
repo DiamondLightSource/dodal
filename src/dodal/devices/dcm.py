@@ -8,10 +8,14 @@ from dodal.common.crystal_metadata import (
     MaterialsEnum,
     make_crystal_metadata_from_material,
 )
-from dodal.devices.common_dcm import BaseDCM, PitchAndRollCrystal
+from dodal.devices.common_dcm import (
+    BaseDCM,
+    PitchAndRollCrystal,
+    StationaryCrystal,
+)
 
 
-class DCM(BaseDCM[tuple[type[PitchAndRollCrystal], None]]):
+class DCM(BaseDCM[tuple[type[PitchAndRollCrystal], type[StationaryCrystal]]]):
     """
     A double crystal monochromator (DCM), used to select the energy of the beam.
 
@@ -19,12 +23,6 @@ class DCM(BaseDCM[tuple[type[PitchAndRollCrystal], None]]):
     the angle to select the requested energy.
 
     offset ensures that the beam exits the DCM at the same point, regardless of energy.
-    """
-
-    """
-    specific:
-    - perp motor (i03/i04)
-    - beam_height_offset (i03/4)
     """
 
     def __init__(
@@ -59,10 +57,4 @@ class DCM(BaseDCM[tuple[type[PitchAndRollCrystal], None]]):
                 Array1D[np.uint64],
                 initial_value=reflection_array,
             )
-        super().__init__(prefix, (PitchAndRollCrystal, None), name)
-
-
-# def plan(dcm: BaseDCM[tuple[(type[Crystal], type[Crystal])]]): ...
-
-
-# plan(thing)
+        super().__init__(prefix, (PitchAndRollCrystal, StationaryCrystal), name)

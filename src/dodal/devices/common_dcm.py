@@ -8,33 +8,35 @@ from ophyd_async.epics.core import epics_signal_r
 from ophyd_async.epics.motor import Motor
 
 
-class Crystal(StandardReadable):
+class StationaryCrystal(StandardReadable):
     def __init__(self, prefix):
         super().__init__(prefix)
 
 
-class RollCrystal(Crystal):
+class RollCrystal(StationaryCrystal):
     def __init__(self, prefix):
-        self.roll_in_mrad = Motor(prefix + "ROLL")
+        with self.add_children_as_readables():
+            self.roll_in_mrad = Motor(prefix + "ROLL")
         super().__init__(prefix)
 
 
-class PitchAndRollCrystal(Crystal):
+class PitchAndRollCrystal(StationaryCrystal):
     def __init__(self, prefix):
-        self.pitch_in_mrad = Motor(prefix + "PITCH")
-        self.roll_in_mrad = Motor(prefix + "ROLL")
+        with self.add_children_as_readables():
+            self.pitch_in_mrad = Motor(prefix + "PITCH")
+            self.roll_in_mrad = Motor(prefix + "ROLL")
         super().__init__(prefix)
 
 
-Xtals = TypeVar("Xtals", bound=tuple[type[Crystal], type[Crystal] | None])
+Xtals = TypeVar("Xtals", bound=tuple[type[StationaryCrystal], type[StationaryCrystal]])
 
 
 class BaseDCM(StandardReadable, Generic[Xtals]):
     """
     Common device for the double crystal monochromator (DCM), used to select the energy of the beam.
 
-    Features common across all DCM's should include virtual motors to set energy/wavelength and contain one or two
-    crystals. Some DCM's contain crystals with roll motors, and some contain crystals with roll and pitch motors.
+    Features common across all DCM's should include virtual motors to set energy/wavelength and contain two crystals,
+    each of which can be movable. Some DCM's contain crystals with roll motors, and some contain crystals with roll and pitch motors.
     This base device accounts for all combinations of this.
 
     This device should act as a parent for beamline-specific DCM's, in which any other missing signals can be added.
@@ -59,17 +61,19 @@ class BaseDCM(StandardReadable, Generic[Xtals]):
             )
 
             _device_vector_dict = self._make_device_vector_dict(prefix, crystal_type)
-            self.crystals: DeviceVector[Crystal] = DeviceVector(_device_vector_dict)
+            self.crystals: DeviceVector[StationaryCrystal] = DeviceVector(
+                _device_vector_dict
+            )
         super().__init__(name)
 
     # Prefix convention is different depending on whether there are one or two controllable crystals
     def _make_device_vector_dict(
         self, prefix, crystal_types: Xtals
-    ) -> dict[int, Crystal]:
+    ) -> dict[int, StationaryCrystal]:
         _device_vector_dict = {0: crystal_types[0](prefix)}
-        if crystal_types[1]:
-            _device_vector_dict = {0: crystal_types[0](f"{prefix}:XTAL1")}
-            _device_vector_dict[1] = crystal_types[0](f"{prefix}:XTAL2")
+        if StationaryCrystal not in crystal_types:
+            _device_vector_dict = {0: crystal_types[0](f"{prefix}XTAL1:")}
+            _device_vector_dict[1] = crystal_types[1](f"{prefix}XTAL2:")
         else:
             _device_vector_dict = {0: crystal_types[0](f"{prefix}")}
         return _device_vector_dict
