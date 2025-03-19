@@ -156,7 +156,7 @@ class StaticVisitPathProvider(UpdatingPathProvider):
 DEFAULT_TEMPLATE = "{device_name}-{instrument}-{scan_id}"
 
 
-class StartDocumentBasedPathProvider(PathProvider):
+class StartDocumentPathProvider(PathProvider):
     """A PathProvider that sources from metadata in a RunStart document.
 
     This uses metadata a RunStart document to determine file names and data session
