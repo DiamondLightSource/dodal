@@ -1,6 +1,12 @@
 from enum import IntEnum
 
-from ophyd_async.core import DEFAULT_TIMEOUT, AsyncStatus, LazyMock, StandardReadable
+from bluesky.protocols import Movable
+from ophyd_async.core import (
+    DEFAULT_TIMEOUT,
+    AsyncStatus,
+    LazyMock,
+    StandardReadable,
+)
 from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.common.signal_utils import create_hardware_backed_soft_signal
@@ -8,12 +14,6 @@ from dodal.devices.areadetector.plugins.CAM import Cam
 from dodal.devices.oav.oav_parameters import DEFAULT_OAV_WINDOW, OAVConfig
 from dodal.devices.oav.snapshots.snapshot_with_beam_centre import SnapshotWithBeamCentre
 from dodal.devices.oav.snapshots.snapshot_with_grid import SnapshotWithGrid
-from dodal.log import LOGGER
-
-
-class ZoomLevelNotFoundError(Exception):
-    def __init__(self, errmsg):
-        LOGGER.error(errmsg)
 
 
 class Coords(IntEnum):
@@ -29,7 +29,7 @@ def _get_correct_zoom_string(zoom: str) -> str:
     return zoom
 
 
-class ZoomController(StandardReadable):
+class ZoomController(StandardReadable, Movable[str]):
     """
     Device to control the zoom level. This should be set like
         o = OAV(name="oav")
@@ -46,18 +46,9 @@ class ZoomController(StandardReadable):
         self.level = epics_signal_rw(str, f"{prefix}MP:SELECT")
         super().__init__(name=name)
 
-    async def _get_allowed_zoom_levels(self) -> list:
-        zoom_levels = await self.level.describe()
-        return zoom_levels[self.level.name]["choices"]  # type: ignore
-
     @AsyncStatus.wrap
-    async def set(self, level_to_set: str):
-        allowed_zoom_levels = await self._get_allowed_zoom_levels()
-        if level_to_set not in allowed_zoom_levels:
-            raise ZoomLevelNotFoundError(
-                f"{level_to_set} not found, expected one of {allowed_zoom_levels}"
-            )
-        await self.level.set(level_to_set, wait=True)
+    async def set(self, value: str):
+        await self.level.set(value, wait=True)
 
 
 class OAV(StandardReadable):

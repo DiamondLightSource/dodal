@@ -39,7 +39,7 @@ class StatusException(Exception):
 def params(tmp_path: Path) -> DetectorParams:
     return DetectorParams(
         expected_energy_ev=TEST_EXPECTED_ENERGY,
-        exposure_time=TEST_EXPOSURE_TIME,
+        exposure_time_s=TEST_EXPOSURE_TIME,
         directory=str(tmp_path),
         prefix=TEST_PREFIX,
         run_number=TEST_RUN_NUMBER,
@@ -740,3 +740,15 @@ def test_for_other_beamlines_i03_used_as_default(params: DetectorParams):
     )
     assert fake_eiger.beamline == "ixx"
     assert fake_eiger.timeouts == AVAILABLE_TIMEOUTS["i03"]
+
+
+def test_given_eiger_is_disarming_when_eiger_is_stopped_then_wait_for_disarming_to_finish(
+    fake_eiger: EigerDetector,
+):
+    fake_eiger.disarm_detector = MagicMock()
+    fake_eiger.disarming_status = (disarming_status := MagicMock())
+    disarming_status.done = False
+    fake_eiger.stop()
+
+    disarming_status.wait.assert_called_once()
+    fake_eiger.disarm_detector.assert_not_called()

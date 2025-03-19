@@ -8,7 +8,14 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_w
 
+from dodal.log import LOGGER
+
 HUTCH_SAFE_FOR_OPERATIONS = 0  # Hutch is locked and can't be entered
+
+
+# Enable to allow testing when the beamline is down, do not change in production!
+TEST_MODE = False
+# will be made more generic in https://github.com/DiamondLightSource/dodal/issues/754
 
 
 class ShutterNotSafeToOperateError(Exception):
@@ -48,7 +55,7 @@ class HutchInterlock(StandardReadable):
         return interlock_state == HUTCH_SAFE_FOR_OPERATIONS
 
 
-class HutchShutter(StandardReadable, Movable):
+class HutchShutter(StandardReadable, Movable[ShutterDemand]):
     """Device to operate the hutch shutter.
 
     When a demand is sent, the device should first check the hutch status \
@@ -64,8 +71,8 @@ class HutchShutter(StandardReadable, Movable):
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        self.control = epics_signal_w(ShutterDemand, prefix + "CON")
-        self.status = epics_signal_r(ShutterState, prefix + "STA")
+        self.control = epics_signal_w(ShutterDemand, f"{prefix}CON")
+        self.status = epics_signal_r(ShutterState, f"{prefix}STA")
 
         bl_prefix = prefix.split("-")[0]
         self.interlock = HutchInterlock(bl_prefix)
@@ -75,18 +82,24 @@ class HutchShutter(StandardReadable, Movable):
     @AsyncStatus.wrap
     async def set(self, value: ShutterDemand):
         interlock_state = await self.interlock.shutter_safe_to_operate()
-        if not interlock_state:
+        if not interlock_state and not TEST_MODE:
+            # If not in test mode, fail. If in test mode, the optics hutch may be open.
             raise ShutterNotSafeToOperateError(
                 "The hutch has not been locked, not operating shutter."
             )
-        if value == ShutterDemand.OPEN:
-            await self.control.set(ShutterDemand.RESET, wait=True)
-            await self.control.set(value, wait=True)
-            return await wait_for_value(
-                self.status, match=ShutterState.OPEN, timeout=DEFAULT_TIMEOUT
-            )
+        if not TEST_MODE:
+            if value == ShutterDemand.OPEN:
+                await self.control.set(ShutterDemand.RESET, wait=True)
+                await self.control.set(value, wait=True)
+                return await wait_for_value(
+                    self.status, match=ShutterState.OPEN, timeout=DEFAULT_TIMEOUT
+                )
+            else:
+                await self.control.set(value, wait=True)
+                return await wait_for_value(
+                    self.status, match=ShutterState.CLOSED, timeout=DEFAULT_TIMEOUT
+                )
         else:
-            await self.control.set(value, wait=True)
-            return await wait_for_value(
-                self.status, match=ShutterState.CLOSED, timeout=DEFAULT_TIMEOUT
+            LOGGER.warning(
+                "Running in test mode, will not operate the experiment shutter."
             )

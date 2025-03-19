@@ -4,9 +4,9 @@ import pytest
 from bluesky.run_engine import RunEngine
 from bluesky.utils import Msg
 from ophyd_async.core import (
-    DeviceCollector,
+    init_devices,
 )
-from ophyd_async.sim.demo import SimMotor
+from ophyd_async.sim import SimMotor
 
 from dodal.plan_stubs.wrapped import (
     move,
@@ -20,14 +20,14 @@ from dodal.plan_stubs.wrapped import (
 
 @pytest.fixture
 def x_axis(RE: RunEngine) -> SimMotor:
-    with DeviceCollector():
+    with init_devices():
         x_axis = SimMotor()
     return x_axis
 
 
 @pytest.fixture
 def y_axis(RE: RunEngine) -> SimMotor:
-    with DeviceCollector():
+    with init_devices():
         y_axis = SimMotor()
     return y_axis
 
@@ -125,20 +125,24 @@ def test_sleep():
 
 def test_wait():
     # Waits for all groups
-    assert list(wait()) == [Msg("wait", group=None, timeout=None, move_on=False)]
+    assert list(wait()) == [
+        Msg("wait", group=None, timeout=None, error_on_timeout=True)
+    ]
 
 
 def test_wait_group():
-    assert list(wait("foo")) == [Msg("wait", group="foo", timeout=None, move_on=False)]
+    assert list(wait("foo")) == [
+        Msg("wait", group="foo", timeout=None, error_on_timeout=True)
+    ]
 
 
 def test_wait_timeout():
     assert list(wait(timeout=5.0)) == [
-        Msg("wait", group=None, timeout=5.0, move_on=False)
+        Msg("wait", group=None, timeout=5.0, error_on_timeout=True)
     ]
 
 
 def test_wait_group_and_timeout():
     assert list(wait("foo", 5.0)) == [
-        Msg("wait", group="foo", timeout=5.0, move_on=False)
+        Msg("wait", group="foo", timeout=5.0, error_on_timeout=True)
     ]

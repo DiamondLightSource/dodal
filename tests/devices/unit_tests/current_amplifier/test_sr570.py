@@ -8,7 +8,7 @@ from bluesky.plan_stubs import abs_set, prepare
 from bluesky.plans import count
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import (
-    DeviceCollector,
+    init_devices,
 )
 from ophyd_async.testing import callback_on_mock_put, set_mock_value
 
@@ -31,7 +31,7 @@ from dodal.devices.current_amplifiers.struck_scaler_counter import (
 
 @pytest.fixture
 async def mock_sr570(prefix: str = "BLXX-EA-DET-007:", suffix: str = "Gain") -> SR570:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         mock_sr570 = SR570(
             prefix,
             suffix=suffix,
@@ -52,7 +52,7 @@ async def mock_sr570(prefix: str = "BLXX-EA-DET-007:", suffix: str = "Gain") -> 
 async def mock_StruckScaler(
     prefix: str = "BLXX-EA-DET-007:", suffix: str = ".s17"
 ) -> StruckScaler:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         mock_StruckScaler = StruckScaler(
             prefix=prefix,
             suffix=suffix,
@@ -68,7 +68,7 @@ async def mock_sr570_struck_scaler_detector(
     mock_sr570: SR570,
     prefix: str = "BLXX-EA-DET-007:",
 ) -> CurrentAmpDet:
-    async with DeviceCollector(mock=True):
+    async with init_devices(mock=True):
         mock_sr570_struck_scaler_detector = CurrentAmpDet(
             current_amp=mock_sr570,
             counter=mock_StruckScaler,

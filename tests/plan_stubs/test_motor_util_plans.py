@@ -4,7 +4,7 @@ import pytest
 from bluesky import plan_stubs as bps
 from bluesky.run_engine import RunEngine
 from bluesky.utils import FailedStatus
-from ophyd_async.core import Device, DeviceCollector, soft_signal_rw
+from ophyd_async.core import Device, init_devices, soft_signal_rw
 from ophyd_async.epics.motor import Motor
 from ophyd_async.testing import (
     get_mock_put,
@@ -48,7 +48,7 @@ class DeviceWithSomeMotors(Device):
 
 @pytest.fixture
 def my_device(RE):
-    with DeviceCollector(mock=True):
+    with init_devices(mock=True):
         my_device = DeviceWithOnlyMotors()
     return my_device
 
@@ -61,12 +61,12 @@ def my_device(RE):
 def test_given_types_of_device_when_home_and_reset_wrapper_called_then_motors_and_zeros_passed_to_move_and_reset_wrapper(
     patch_move_and_reset, device_type, RE
 ):
-    with DeviceCollector(mock=True):
+    with init_devices(mock=True):
         device = device_type()
     home_and_reset_wrapper(MagicMock(), device, 0, 0)
 
     home_positions = patch_move_and_reset.call_args.args[1]
-    assert home_positions == {motor_obj: 0.0 for motor_obj in device.motors}
+    assert home_positions == dict.fromkeys(device.motors, 0.0)
 
 
 def test_given_a_device_when_check_and_cache_values_then_motor_values_returned(
@@ -78,9 +78,7 @@ def test_given_a_device_when_check_and_cache_values_then_motor_values_returned(
         set_mock_value(motor.user_readback, i * 100)
 
     motors_and_positions: dict[Motor, float] = RE(
-        check_and_cache_values(
-            {motor_obj: 0.0 for motor_obj in my_device.motors}, 0, 1000
-        )
+        check_and_cache_values(dict.fromkeys(my_device.motors, 0.0), 0, 1000)
     ).plan_result  # type: ignore
     cached_positions = motors_and_positions.values()
 
@@ -99,12 +97,12 @@ def test_given_a_device_when_check_and_cache_values_then_motor_values_returned(
     ],
 )
 def test_given_a_device_with_a_too_large_move_when_check_and_cache_values_then_exception_thrown(
-    RE, my_device, initial, max, new_position
+    RE, my_device: DeviceWithOnlyMotors, initial, max, new_position: float
 ):
     set_mock_value(my_device.x.user_readback, 10)
     set_mock_value(my_device.y.user_readback, initial)
 
-    motors_and_positions = {motor_obj: new_position for motor_obj in my_device.motors}
+    motors_and_positions = dict.fromkeys(my_device.motors, new_position)
 
     with pytest.raises(MoveTooLarge) as e:
         RE(check_and_cache_values(motors_and_positions, 0, max))
@@ -122,16 +120,14 @@ def test_given_a_device_with_a_too_large_move_when_check_and_cache_values_then_e
     ],
 )
 def test_given_a_device_where_one_move_too_small_when_check_and_cache_values_then_other_positions_returned(
-    my_device, initial, min, new_position
+    my_device: DeviceWithOnlyMotors, initial, min, new_position: float
 ):
     RE = RunEngine(call_returns_result=True)
 
     set_mock_value(my_device.x.user_readback, initial)
     set_mock_value(my_device.y.user_readback, 200)
 
-    motors_and_new_positions = {
-        motor_obj: new_position for motor_obj in my_device.motors
-    }
+    motors_and_new_positions = dict.fromkeys(my_device.motors, new_position)
 
     motors_and_positions: dict[Motor, float] = RE(
         check_and_cache_values(motors_and_new_positions, min, 1000)
@@ -151,7 +147,7 @@ def test_given_a_device_where_all_moves_too_small_when_check_and_cache_values_th
     set_mock_value(my_device.x.user_readback, 10)
     set_mock_value(my_device.y.user_readback, 20)
 
-    motors_and_new_positions = {motor_obj: 0.0 for motor_obj in my_device.motors}
+    motors_and_new_positions = dict.fromkeys(my_device.motors, 0.0)
 
     motors_and_positions: dict[Motor, float] = RE(
         check_and_cache_values(motors_and_new_positions, 40, 1000)

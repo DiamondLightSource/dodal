@@ -5,15 +5,16 @@ from typing import Annotated, Final, TypeVar, cast
 from bluesky.run_engine import call_in_bluesky_event_loop
 from ophyd import Device as OphydV1Device
 from ophyd.sim import make_fake_device
-from ophyd_async.core import DEFAULT_TIMEOUT
+from ophyd_async.core import (
+    DEFAULT_TIMEOUT,
+    PathProvider,
+)
 from ophyd_async.core import Device as OphydV2Device
 from ophyd_async.core import wait_for_connection as v2_device_wait_for_connection
 
-from dodal.common.types import UpdatingPathProvider
 from dodal.utils import (
     AnyDevice,
     BeamlinePrefix,
-    D,
     DeviceInitializationController,
     SkipType,
     skip_device,
@@ -23,7 +24,6 @@ DEFAULT_CONNECTION_TIMEOUT: Final[float] = 5.0
 
 ACTIVE_DEVICES: dict[str, AnyDevice] = {}
 BL = ""
-PATH_PROVIDER: UpdatingPathProvider | None = None
 
 
 def set_beamline(beamline: str):
@@ -141,8 +141,8 @@ def device_factory(
         SkipType,
         "mark the factory to be (conditionally) skipped when beamline is imported by external program",
     ] = False,
-) -> Callable[[Callable[[], D]], DeviceInitializationController[D]]:
-    def decorator(factory: Callable[[], D]) -> DeviceInitializationController[D]:
+) -> Callable[[Callable[[], T]], DeviceInitializationController[T]]:
+    def decorator(factory: Callable[[], T]) -> DeviceInitializationController[T]:
         return DeviceInitializationController(
             factory,
             use_factory_name,
@@ -154,15 +154,11 @@ def device_factory(
     return decorator
 
 
-def set_path_provider(provider: UpdatingPathProvider):
+def set_path_provider(provider: PathProvider):
     global PATH_PROVIDER
 
     PATH_PROVIDER = provider
 
 
-def get_path_provider() -> UpdatingPathProvider:
-    if PATH_PROVIDER is None:
-        raise ValueError(
-            "PathProvider has not been set! Ophyd-async StandardDetectors will not be able to write!"
-        )
+def get_path_provider() -> PathProvider:
     return PATH_PROVIDER
