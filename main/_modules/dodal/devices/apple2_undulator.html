@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.apple2_undulator &#8212; dodal 1.41.1.dev16+g2cf024e77 documentation</title>
+    <title>dodal.devices.apple2_undulator &#8212; dodal 1.42.1.dev1+g4055ba461 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=e8922439"></script>
+    <script src="../../../_static/documentation_options.js?v=5d6a7be3"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -453,7 +453,7 @@ window.addEventListener("load", () => mermaid.run());
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">abc</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">TypeVar</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Movable</span>
@@ -472,6 +472,8 @@ window.addEventListener("load", () => mermaid.run());
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">ConfigDict</span><span class="p">,</span> <span class="n">RootModel</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="UndulatorGateStatus">
@@ -580,7 +582,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="SafeUndulatorMover">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.SafeUndulatorMover.html#dodal.devices.apple2_undulator.SafeUndulatorMover">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">SafeUndulatorMover</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SafeUndulatorMover</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">Generic</span><span class="p">[</span><span class="n">T</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A device that will check it&#39;s safe to move the undulator before moving it and</span>
 <span class="sd">    wait for the undulator to be safe again before calling the move complete.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -596,7 +598,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">raise_if_cannot_move</span><span class="p">()</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_demand_positions</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
@@ -606,7 +608,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="k">await</span> <span class="n">wait_for_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gate</span><span class="p">,</span> <span class="n">UndulatorGateStatus</span><span class="o">.</span><span class="n">CLOSE</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_demand_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_demand_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the demand positions on the device without actually hitting move.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="SafeUndulatorMover.get_timeout">
@@ -626,7 +628,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="UndulatorGap">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.UndulatorGap.html#dodal.devices.apple2_undulator.UndulatorGap">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">UndulatorGap</span><span class="p">(</span><span class="n">SafeUndulatorMover</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">UndulatorGap</span><span class="p">(</span><span class="n">SafeUndulatorMover</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A device with a collection of epics signals to set Apple 2 undulator gap motion.</span>
 <span class="sd">    Only PV used by beamline are added the full list is here:</span>
 <span class="sd">    /dls_sw/work/R3.14.12.7/support/insertionDevice/db/IDGapVelocityControl.template</span>
@@ -672,7 +674,7 @@ window.addEventListener("load", () => mermaid.run());
             <span class="bp">self</span><span class="o">.</span><span class="n">user_readback</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;CURRGAPD&quot;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">set_move</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_demand_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_set_demand_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_setpoint</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
@@ -727,7 +729,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="UndulatorPhaseAxes">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.UndulatorPhaseAxes.html#dodal.devices.apple2_undulator.UndulatorPhaseAxes">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">UndulatorPhaseAxes</span><span class="p">(</span><span class="n">SafeUndulatorMover</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">UndulatorPhaseAxes</span><span class="p">(</span><span class="n">SafeUndulatorMover</span><span class="p">[</span><span class="n">Apple2PhasesVal</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A collection of 4 phase Motor to make up the full id phase motion. We are using the diamond pv convention.</span>
 <span class="sd">    e.g. top_outer == Q1</span>
@@ -789,7 +791,7 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="UndulatorJawPhase">
 <a class="viewcode-back" href="../../../reference/generated/dodal.devices.apple2_undulator.UndulatorJawPhase.html#dodal.devices.apple2_undulator.UndulatorJawPhase">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">UndulatorJawPhase</span><span class="p">(</span><span class="n">SafeUndulatorMover</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">UndulatorJawPhase</span><span class="p">(</span><span class="n">SafeUndulatorMover</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A JawPhase movable, this is use for moving the jaw phase which is use to control the</span>
 <span class="sd">    linear arbitrary polarisation but only one some of the beamline.</span>
