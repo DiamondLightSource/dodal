@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.plan_stubs.data_session &#8212; dodal 1.42.1.dev1+g4055ba461 documentation</title>
+    <title>dodal.plan_stubs.data_session &#8212; dodal 1.42.1.dev2+gaedf6a380 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=5d6a7be3"></script>
+    <script src="../../../_static/documentation_options.js?v=647e4117"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -450,9 +450,12 @@ window.addEventListener("load", () => mermaid.run());
                 <article class="bd-article">
                   
   <h1>Source code for dodal.plan_stubs.data_session</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">bluesky</span><span class="w"> </span><span class="kn">import</span> <span class="n">plan_stubs</span> <span class="k">as</span> <span class="n">bps</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky</span><span class="w"> </span><span class="kn">import</span> <span class="n">plan_stubs</span> <span class="k">as</span> <span class="n">bps</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky</span><span class="w"> </span><span class="kn">import</span> <span class="n">preprocessors</span> <span class="k">as</span> <span class="n">bpp</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">MsgGenerator</span><span class="p">,</span> <span class="n">make_decorator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">PathProvider</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_path_provider</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">UpdatingPathProvider</span>
@@ -464,7 +467,7 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="attach_data_session_metadata_wrapper">
 <a class="viewcode-back" href="../../../reference/generated/dodal.plan_stubs.data_session.html#dodal.plan_stubs.data_session.attach_data_session_metadata_wrapper">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">attach_data_session_metadata_wrapper</span><span class="p">(</span>
-    <span class="n">plan</span><span class="p">:</span> <span class="n">MsgGenerator</span><span class="p">,</span> <span class="n">provider</span><span class="p">:</span> <span class="n">UpdatingPathProvider</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">plan</span><span class="p">:</span> <span class="n">MsgGenerator</span><span class="p">,</span> <span class="n">provider</span><span class="p">:</span> <span class="n">PathProvider</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Attach data session metadata to the runs within a plan and make it correlate</span>
@@ -484,14 +487,19 @@ window.addEventListener("load", () => mermaid.run());
 <span class="sd">    Yields:</span>
 <span class="sd">        Iterator[Msg]: Plan messages</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">provider</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">provider</span> <span class="o">=</span> <span class="n">get_path_provider</span><span class="p">()</span>
-    <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">wait_for</span><span class="p">([</span><span class="n">provider</span><span class="o">.</span><span class="n">update</span><span class="p">])</span>
-    <span class="n">ress</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">wait_for</span><span class="p">([</span><span class="n">provider</span><span class="o">.</span><span class="n">data_session</span><span class="p">])</span>
-    <span class="n">data_session</span> <span class="o">=</span> <span class="n">ress</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
-    <span class="c1"># https://github.com/DiamondLightSource/dodal/issues/452</span>
-    <span class="c1"># As part of 452, write each dataCollection into their own folder, then can use resource_dir directly</span>
-    <span class="k">yield from</span> <span class="n">bpp</span><span class="o">.</span><span class="n">inject_md_wrapper</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="p">{</span><span class="n">DATA_SESSION</span><span class="p">:</span> <span class="n">data_session</span><span class="p">})</span></div>
+    <span class="n">provider</span> <span class="o">=</span> <span class="n">provider</span> <span class="ow">or</span> <span class="n">get_path_provider</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">provider</span><span class="p">,</span> <span class="n">UpdatingPathProvider</span><span class="p">):</span>
+        <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">wait_for</span><span class="p">([</span><span class="n">provider</span><span class="o">.</span><span class="n">update</span><span class="p">])</span>
+        <span class="n">ress</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">wait_for</span><span class="p">([</span><span class="n">provider</span><span class="o">.</span><span class="n">data_session</span><span class="p">])</span>
+        <span class="n">data_session</span> <span class="o">=</span> <span class="n">ress</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+        <span class="c1"># https://github.com/DiamondLightSource/dodal/issues/452</span>
+        <span class="c1"># As part of 452, write each dataCollection into their own folder, then can use resource_dir directly</span>
+        <span class="k">yield from</span> <span class="n">bpp</span><span class="o">.</span><span class="n">inject_md_wrapper</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="n">md</span><span class="o">=</span><span class="p">{</span><span class="n">DATA_SESSION</span><span class="p">:</span> <span class="n">data_session</span><span class="p">})</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">provider</span><span class="si">}</span><span class="s2"> is not an UpdatingPathProvider, </span><span class="si">{</span><span class="n">attach_data_session_metadata_wrapper</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> will have no effect&quot;</span>
+        <span class="p">)</span>
+        <span class="k">yield from</span> <span class="n">plan</span></div>
 
 
 
