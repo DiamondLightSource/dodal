@@ -1,13 +1,10 @@
-import os
-
 import pytest
 from tests.devices.unit_tests.electron_analyser.test_utils import (
     check_region_model_list_to_expected_values,
 )
 
-from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.electron_analyser.base_region import EnergyMode
-from dodal.devices.electron_analyser.specs.specs_region import SpecsSequence
+from dodal.devices.electron_analyser.specs_region import SpecsSequence
 
 
 @pytest.fixture

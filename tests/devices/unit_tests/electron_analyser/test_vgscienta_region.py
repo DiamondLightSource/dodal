@@ -1,10 +1,12 @@
+from typing import Any
+
 import pytest
 from tests.devices.unit_tests.electron_analyser.test_utils import (
     check_region_model_list_to_expected_values,
 )
 
 from dodal.devices.electron_analyser.base_region import EnergyMode
-from dodal.devices.electron_analyser.vgscienta.vgscienta_region import (
+from dodal.devices.electron_analyser.vgscienta_region import (
     AcquisitionMode,
     DetectorMode,
     Status,
@@ -22,7 +24,8 @@ def sequence_class() -> type[VGScientaSequence]:
     return VGScientaSequence
 
 
-def get_expected_region_values():
+@pytest.fixture
+def expected_region_values() -> list[dict[str, Any]]:
     return [
         {
             "name": "New_Region",
@@ -79,10 +82,7 @@ def get_expected_region_values():
     ]
 
 
-def test_vgscienta_file_loads_into_class(sequence):
-    """
-    Gets sequence from conftest.py
-    """
+def test_vgscienta_file_loads_into_class(sequence, expected_region_values):
     assert sequence.get_region_names() == ["New_Region", "New_Region1"]
     assert sequence.get_enabled_region_names() == ["New_Region"]
 
@@ -94,6 +94,4 @@ def test_vgscienta_file_loads_into_class(sequence):
         sequence.get_excitation_energy_source_by_region(sequence.regions[1])
         == sequence.excitationEnergySources[0]
     )
-    check_region_model_list_to_expected_values(
-        sequence.regions, get_expected_region_values()
-    )
+    check_region_model_list_to_expected_values(sequence.regions, expected_region_values)

@@ -1,11 +1,7 @@
 import pytest
-from bluesky.plan_stubs import abs_set
-from bluesky.run_engine import RunEngine
 
-from dodal.devices.electron_analyser.specs.specs_analyser import SpecsAnalyser
-from dodal.devices.electron_analyser.specs.specs_region import (
-    SpecsSequence,
-)
+from dodal.devices.electron_analyser.specs_analyser import SpecsAnalyser
+from dodal.devices.electron_analyser.specs_region import SpecsSequence
 
 
 @pytest.fixture
@@ -23,8 +19,9 @@ def sequence_class() -> type[SpecsSequence]:
     return SpecsSequence
 
 
-def test_analyser_abs_set(sim_analyser: SpecsAnalyser, sequence: SpecsSequence) -> None:
-    RE = RunEngine()
-    excitation_energy = 100
+async def test_analyser_abs_set(
+    sim_analyser: SpecsAnalyser, sequence: SpecsSequence
+) -> None:
     for r in sequence.get_enabled_regions():
-        RE(abs_set(sim_analyser, r, excitation_energy))
+        excitation_energy = 100
+        await sim_analyser.set(r, excitation_energy)

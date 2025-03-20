@@ -4,7 +4,7 @@ from ophyd_async.core import AsyncStatus
 from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.devices.electron_analyser.base_analyser import BaseAnalyser
-from dodal.devices.electron_analyser.specs.specs_region import SpecsRegion
+from dodal.devices.electron_analyser.specs_region import SpecsRegion
 
 
 class SpecsAnalyser(BaseAnalyser):

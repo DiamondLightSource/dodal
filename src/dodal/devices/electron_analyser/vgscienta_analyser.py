@@ -5,7 +5,7 @@ from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.devices.electron_analyser.base_analyser import BaseAnalyser
 from dodal.devices.electron_analyser.base_region import EnergyMode
-from dodal.devices.electron_analyser.vgscienta.vgscienta_region import (
+from dodal.devices.electron_analyser.vgscienta_region import (
     DetectorMode,
     VGScientaRegion,
 )
