@@ -12,4 +12,4 @@ def goniometer() -> Goniometer:
 
 @device_factory()
 def robot() -> LaserRobot:
-    return LaserRobot("robot", f"{PREFIX}-MO-ROBOT-01")
+    return LaserRobot("robot", f"{PREFIX}-MO-ROBOT-01:")
