@@ -1,10 +1,10 @@
 from typing import Any
 
-from dodal.devices.electron_analyser.base_region import TBaseRegion
+from dodal.devices.electron_analyser.abstract_region import TAbstractBaseRegion
 
 
 def check_region_model_list_to_expected_values(
-    regions: list[TBaseRegion], expected_values: list[dict[str, Any]]
+    regions: list[TAbstractBaseRegion], expected_values: list[dict[str, Any]]
 ) -> None:
     for i, r in enumerate(regions):
         for key in r.__dict__:

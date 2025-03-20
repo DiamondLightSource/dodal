@@ -4,7 +4,7 @@ from tests.devices.unit_tests.electron_analyser.test_utils import (
     is_list_of_custom_type,
 )
 
-from dodal.devices.electron_analyser.base_region import EnergyMode
+from dodal.devices.electron_analyser.abstract_region import EnergyMode
 from dodal.devices.electron_analyser.specs_region import SpecsRegion, SpecsSequence
 
 

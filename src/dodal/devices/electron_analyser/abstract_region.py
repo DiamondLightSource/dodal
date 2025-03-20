@@ -1,3 +1,4 @@
+from abc import abstractmethod
 from enum import Enum
 from typing import Any, Generic, TypeVar
 
@@ -9,7 +10,7 @@ class EnergyMode(str, Enum):
     BINDING = "Binding"
 
 
-class BaseRegion(BaseModel):
+class AbstractBaseRegion(BaseModel):
     """
     Generic region model that holds the data. Specialised region models should inherit
     this to extend functionality.
@@ -29,11 +30,9 @@ class BaseRegion(BaseModel):
     energyStep: float  # in eV
     energyMode: EnergyMode = EnergyMode.KINETIC
 
+    @abstractmethod
     def get_energy_step_eV(self) -> float:
-        """
-        Each sub class can override this if they are specified in different units
-        """
-        return self.energyStep
+        pass
 
     def is_binding_energy(self) -> bool:
         return self.energyMode == EnergyMode.BINDING
@@ -58,18 +57,18 @@ class BaseRegion(BaseModel):
         return data
 
 
-TBaseRegion = TypeVar("TBaseRegion", bound=BaseRegion)
+TAbstractBaseRegion = TypeVar("TAbstractBaseRegion", bound=AbstractBaseRegion)
 
 
-class BaseSequence(BaseModel, Generic[TBaseRegion]):
+class BaseSequence(BaseModel, Generic[TAbstractBaseRegion]):
     """
     Generic sequence model that holds the list of region data. Specialised sequence models
     should inherit this to extend functionality.
     """
 
-    regions: list[TBaseRegion] = Field(default_factory=lambda: [])
+    regions: list[TAbstractBaseRegion] = Field(default_factory=lambda: [])
 
-    def get_enabled_regions(self) -> list[TBaseRegion]:
+    def get_enabled_regions(self) -> list[TAbstractBaseRegion]:
         return [r for r in self.regions if r.enabled]
 
     def get_region_names(self) -> list[str]:

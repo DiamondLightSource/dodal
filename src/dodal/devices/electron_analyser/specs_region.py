@@ -1,9 +1,12 @@
 from pydantic import Field
 
-from dodal.devices.electron_analyser.base_region import BaseRegion, BaseSequence
+from dodal.devices.electron_analyser.abstract_region import (
+    AbstractBaseRegion,
+    BaseSequence,
+)
 
 
-class SpecsRegion(BaseRegion):
+class SpecsRegion(AbstractBaseRegion):
     # Override base class with defaults
     lensMode: str = "SmallArea"
     passEnergy: int | float = 5.0

@@ -4,7 +4,10 @@ from enum import Enum
 from ophyd_async.core import StrictEnum
 from pydantic import BaseModel, Field
 
-from dodal.devices.electron_analyser.base_region import BaseRegion, BaseSequence
+from dodal.devices.electron_analyser.abstract_region import (
+    AbstractBaseRegion,
+    BaseSequence,
+)
 
 
 class Status(str, Enum):
@@ -25,7 +28,7 @@ class AcquisitionMode(str, Enum):
     FIXED = "Fixed"
 
 
-class VGScientaRegion(BaseRegion):
+class VGScientaRegion(AbstractBaseRegion):
     # Override defaults of base region class
     lensMode: str = "Angular45"
     passEnergy: int | float = 5
