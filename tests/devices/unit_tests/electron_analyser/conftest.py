@@ -2,11 +2,10 @@ import os
 
 import pytest
 from ophyd_async.core import init_devices
+from tests.devices.unit_tests.electron_analyser.test_utils import TEST_DATA_PATH
 
 from dodal.common.data_util import TBaseModel, load_json_file_to_class
 from dodal.devices.electron_analyser.abstract_analyser import TAbstractBaseAnalyser
-
-TEST_DATA_PATH = "tests/test_data/electron_analyser/"
 
 
 @pytest.fixture
