@@ -1,10 +1,11 @@
 import pytest
 from tests.devices.unit_tests.electron_analyser.test_utils import (
     check_region_model_list_to_expected_values,
+    is_list_of_custom_type,
 )
 
 from dodal.devices.electron_analyser.base_region import EnergyMode
-from dodal.devices.electron_analyser.specs_region import SpecsSequence
+from dodal.devices.electron_analyser.specs_region import SpecsRegion, SpecsSequence
 
 
 @pytest.fixture
@@ -58,10 +59,17 @@ def get_expected_region_values():
     ]
 
 
-def test_specs_file_loads_into_class(sequence):
+def test_sequence_get_expected_region_type(sequence: SpecsSequence) -> None:
+    assert is_list_of_custom_type(sequence.regions, SpecsRegion)
+    assert is_list_of_custom_type(sequence.get_enabled_regions(), SpecsRegion)
+
+
+def test_sequence_get_expected_region_names(sequence: SpecsSequence):
     assert sequence.get_region_names() == ["region", "region2"]
     assert sequence.get_enabled_region_names() == ["region2"]
 
+
+def test_specs_file_loads_into_class(sequence):
     check_region_model_list_to_expected_values(
         sequence.regions, get_expected_region_values()
     )

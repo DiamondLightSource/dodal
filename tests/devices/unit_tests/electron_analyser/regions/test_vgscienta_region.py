@@ -3,6 +3,7 @@ from typing import Any
 import pytest
 from tests.devices.unit_tests.electron_analyser.test_utils import (
     check_region_model_list_to_expected_values,
+    is_list_of_custom_type,
 )
 
 from dodal.devices.electron_analyser.base_region import EnergyMode
@@ -10,6 +11,7 @@ from dodal.devices.electron_analyser.vgscienta_region import (
     AcquisitionMode,
     DetectorMode,
     Status,
+    VGScientaRegion,
     VGScientaSequence,
 )
 
@@ -82,10 +84,24 @@ def expected_region_values() -> list[dict[str, Any]]:
     ]
 
 
-def test_vgscienta_file_loads_into_class(sequence, expected_region_values):
+def test_sequence_get_expected_region_names(sequence: VGScientaSequence) -> None:
     assert sequence.get_region_names() == ["New_Region", "New_Region1"]
+
+
+def test_sequence_get_expected_enabled_region_names(
+    sequence: VGScientaSequence,
+) -> None:
     assert sequence.get_enabled_region_names() == ["New_Region"]
 
+
+def test_sequence_get_expected_region_type(sequence: VGScientaSequence) -> None:
+    assert is_list_of_custom_type(sequence.regions, VGScientaRegion)
+    assert is_list_of_custom_type(sequence.get_enabled_regions(), VGScientaRegion)
+
+
+def test_sequence_get_expected_excitation_energy_source(
+    sequence: VGScientaSequence,
+) -> None:
     assert (
         sequence.get_excitation_energy_source_by_region(sequence.regions[0])
         == sequence.excitationEnergySources[1]
@@ -94,4 +110,20 @@ def test_vgscienta_file_loads_into_class(sequence, expected_region_values):
         sequence.get_excitation_energy_source_by_region(sequence.regions[1])
         == sequence.excitationEnergySources[0]
     )
+
+
+def test_region_kinetic_and_binding_energy(sequence: VGScientaSequence):
+    for r in sequence.regions:
+        is_binding_energy = r.energyMode == EnergyMode.BINDING
+        is_kinetic_energy = r.energyMode == EnergyMode.KINETIC
+
+        assert r.is_binding_energy() == is_binding_energy
+        assert r.is_binding_energy() != is_kinetic_energy
+        assert r.is_kinetic_energy() == is_kinetic_energy
+        assert r.is_kinetic_energy() != is_binding_energy
+
+
+def test_sequence_file_loads_into_sequence_class(
+    sequence: VGScientaSequence, expected_region_values: list[dict[str, Any]]
+):
     check_region_model_list_to_expected_values(sequence.regions, expected_region_values)

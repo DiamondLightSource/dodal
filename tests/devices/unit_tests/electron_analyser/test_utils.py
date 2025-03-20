@@ -12,3 +12,9 @@ def check_region_model_list_to_expected_values(
                 assert r.__dict__[key] == expected_values[i][key]
             else:
                 raise KeyError('key "' + key + '" is not in the expected values.')
+
+
+def is_list_of_custom_type(value, custom_type: type) -> bool:
+    return isinstance(value, list) and all(
+        isinstance(item, custom_type) for item in value
+    )
