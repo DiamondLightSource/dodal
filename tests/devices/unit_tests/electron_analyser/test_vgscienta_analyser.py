@@ -19,7 +19,7 @@ def sequence_class() -> type[VGScientaSequence]:
     return VGScientaSequence
 
 
-async def test_analyser_abs_set(
+async def test_analyser_set(
     sim_analyser: VGScientaAnalyser, sequence: VGScientaSequence
 ) -> None:
     for r in sequence.get_enabled_regions():

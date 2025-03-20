@@ -51,6 +51,12 @@ class VGScientaRegion(BaseRegion):
     def get_energy_step_eV(self) -> float:
         return self.energyStep / 1000
 
+    def x_channel_size(self) -> int:
+        return self.lastXChannel - self.firstXChannel + 1
+
+    def y_channel_size(self) -> int:
+        return self.lastYChannel - self.firstYChannel + 1
+
 
 class VGScientaExcitationEnergySource(BaseModel):
     name: str = "source1"
@@ -58,7 +64,7 @@ class VGScientaExcitationEnergySource(BaseModel):
     value: float = 0
 
 
-class VGScientaSequence(BaseSequence):
+class VGScientaSequence(BaseSequence[VGScientaRegion]):
     elementSet: str = Field(default="Unknown")
     excitationEnergySources: list[VGScientaExcitationEnergySource] = Field(
         default_factory=lambda: []

@@ -19,7 +19,7 @@ def sequence_class() -> type[SpecsSequence]:
     return SpecsSequence
 
 
-async def test_analyser_abs_set(
+async def test_analyser_set(
     sim_analyser: SpecsAnalyser, sequence: SpecsSequence
 ) -> None:
     for r in sequence.get_enabled_regions():

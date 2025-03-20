@@ -69,6 +69,17 @@ def test_sequence_get_expected_region_names(sequence: SpecsSequence):
     assert sequence.get_enabled_region_names() == ["region2"]
 
 
+def test_region_kinetic_and_binding_energy(sequence: SpecsSequence):
+    for r in sequence.regions:
+        is_binding_energy = r.energyMode == EnergyMode.BINDING
+        is_kinetic_energy = r.energyMode == EnergyMode.KINETIC
+
+        assert r.is_binding_energy() == is_binding_energy
+        assert r.is_binding_energy() != is_kinetic_energy
+        assert r.is_kinetic_energy() == is_kinetic_energy
+        assert r.is_kinetic_energy() != is_binding_energy
+
+
 def test_specs_file_loads_into_class(sequence):
     check_region_model_list_to_expected_values(
         sequence.regions, get_expected_region_values()
