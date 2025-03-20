@@ -20,15 +20,6 @@ dodal.beamlines.i13\_1
 
    
    
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      merlin
-      sample_xyz_lab_fa_stage
-      sample_xyz_stage
-      side_camera
-   
    
 
    
