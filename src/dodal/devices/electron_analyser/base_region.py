@@ -35,6 +35,15 @@ class BaseRegion(BaseModel):
         """
         return self.energyStep
 
+    def is_binding_energy(self) -> bool:
+        return self.energyMode == EnergyMode.BINDING
+
+    def is_kinetic_energy(self) -> bool:
+        return self.energyMode == EnergyMode.KINETIC
+
+    def to_kinetic_energy(self, value: float, excitation_energy: float) -> float:
+        return value if self.is_binding_energy() else excitation_energy - value
+
     @model_validator(mode="before")
     @classmethod
     def check_energy_mode(cls, data: Any) -> Any:

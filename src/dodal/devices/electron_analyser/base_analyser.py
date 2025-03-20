@@ -59,6 +59,11 @@ class BaseAnalyser(StandardReadable, Movable, Generic[TBaseRegion]):
     def get_pass_energy_type(self) -> type:
         return float
 
+    def to_kinetic_energy(
+        self, value: float, excitation_energy_eV: float, mode: EnergyMode
+    ) -> float:
+        return excitation_energy_eV - value if mode == EnergyMode.BINDING else value
+
     @AsyncStatus.wrap
     async def set(
         self,
@@ -77,18 +82,8 @@ class BaseAnalyser(StandardReadable, Movable, Generic[TBaseRegion]):
             raise ValueError("excitation_energy_eV must be specified.")
 
         LOGGER.info(f"Configuring analyser with region {region.name}")
-
-        is_binding_energy = region.energyMode == EnergyMode.BINDING
-        low_energy = (
-            excitation_energy_eV - region.highEnergy
-            if is_binding_energy
-            else region.lowEnergy
-        )
-        high_energy = (
-            excitation_energy_eV - region.lowEnergy
-            if is_binding_energy
-            else region.highEnergy
-        )
+        low_energy = region.to_kinetic_energy(region.lowEnergy, excitation_energy_eV)
+        high_energy = region.to_kinetic_energy(region.highEnergy, excitation_energy_eV)
         # Cast pass energy to correct type for PV to take
         pass_energy_type = self.get_pass_energy_type()
         pass_energy = pass_energy_type(region.passEnergy)

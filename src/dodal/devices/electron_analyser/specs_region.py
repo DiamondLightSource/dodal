@@ -23,5 +23,5 @@ class SpecsRegion(BaseRegion):
         return self.energyStep
 
 
-class SpecsSequence(BaseSequence):
+class SpecsSequence(BaseSequence[SpecsRegion]):
     regions: list[SpecsRegion] = Field(default_factory=lambda: [])
