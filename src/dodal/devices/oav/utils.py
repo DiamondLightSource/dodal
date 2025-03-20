@@ -4,6 +4,7 @@ from enum import IntEnum
 import bluesky.plan_stubs as bps
 import numpy as np
 from bluesky.utils import Msg
+from mx_bluesky.common.utils.exceptions import SampleException
 
 from dodal.devices.oav.oav_calculations import (
     calculate_beam_distance,
@@ -16,7 +17,7 @@ from dodal.devices.smargon import Smargon
 Pixel = tuple[int, int]
 
 
-class PinNotFoundException(Exception):
+class PinNotFoundException(SampleException):
     pass
 
 
