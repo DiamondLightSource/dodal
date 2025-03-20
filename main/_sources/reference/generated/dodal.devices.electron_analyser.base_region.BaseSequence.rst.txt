@@ -1,0 +1,67 @@
+dodal.devices.electron\_analyser.base\_region.BaseSequence
+==========================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.base_region
+
+.. autoclass:: BaseSequence
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      ~BaseSequence.get_enabled_region_names
+      
+      
+      ~BaseSequence.get_enabled_regions
+      
+      
+      ~BaseSequence.get_region_names
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~BaseSequence.model_config
+      
+      
+      
+      
+      
+      ~BaseSequence.regions
+      
+   
+   

@@ -1,0 +1,128 @@
+dodal.devices.electron\_analyser.vgscienta.vgscienta\_region.VGScientaRegion
+============================================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.vgscienta.vgscienta_region
+
+.. autoclass:: VGScientaRegion
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~VGScientaRegion.model_config
+      
+      
+      
+      
+      
+      ~VGScientaRegion.lensMode
+      
+      
+      ~VGScientaRegion.passEnergy
+      
+      
+      ~VGScientaRegion.acquisitionMode
+      
+      
+      ~VGScientaRegion.lowEnergy
+      
+      
+      ~VGScientaRegion.highEnergy
+      
+      
+      ~VGScientaRegion.stepTime
+      
+      
+      ~VGScientaRegion.energyStep
+      
+      
+      ~VGScientaRegion.regionId
+      
+      
+      ~VGScientaRegion.excitationEnergySource
+      
+      
+      ~VGScientaRegion.fixEnergy
+      
+      
+      ~VGScientaRegion.totalSteps
+      
+      
+      ~VGScientaRegion.totalTime
+      
+      
+      ~VGScientaRegion.exposureTime
+      
+      
+      ~VGScientaRegion.firstXChannel
+      
+      
+      ~VGScientaRegion.lastXChannel
+      
+      
+      ~VGScientaRegion.firstYChannel
+      
+      
+      ~VGScientaRegion.lastYChannel
+      
+      
+      ~VGScientaRegion.detectorMode
+      
+      
+      ~VGScientaRegion.status
+      
+      
+      ~VGScientaRegion.name
+      
+      
+      ~VGScientaRegion.enabled
+      
+      
+      ~VGScientaRegion.slices
+      
+      
+      ~VGScientaRegion.iterations
+      
+      
+      ~VGScientaRegion.energyMode
+      
+   
+   

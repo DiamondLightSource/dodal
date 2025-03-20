@@ -1,0 +1,41 @@
+dodal.devices.electron\_analyser.vgscienta.vgscienta\_region
+============================================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.electron_analyser.vgscienta
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~vgscienta_region.AcquisitionMode
+   ~vgscienta_region.DetectorMode
+   ~vgscienta_region.Status
+   ~vgscienta_region.VGScientaExcitationEnergySource
+   ~vgscienta_region.VGScientaRegion
+   ~vgscienta_region.VGScientaSequence
+
+
+
+
+.. automodule:: dodal.devices.electron_analyser.vgscienta.vgscienta_region
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

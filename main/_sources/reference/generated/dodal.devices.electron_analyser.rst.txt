@@ -1,0 +1,37 @@
+dodal.devices.electron\_analyser
+================================
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   dodal.devices.electron_analyser.base_region
+   dodal.devices.electron_analyser.specs
+   dodal.devices.electron_analyser.vgscienta
+
+
+
+
+
+
+
+
+.. automodule:: dodal.devices.electron_analyser
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

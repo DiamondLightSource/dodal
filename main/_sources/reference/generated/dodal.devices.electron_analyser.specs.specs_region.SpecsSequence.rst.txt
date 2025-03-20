@@ -1,0 +1,61 @@
+dodal.devices.electron\_analyser.specs.specs\_region.SpecsSequence
+==================================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.specs.specs_region
+
+.. autoclass:: SpecsSequence
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~SpecsSequence.model_config
+      
+      
+      
+      
+      
+      ~SpecsSequence.regions
+      
+   
+   
