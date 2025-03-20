@@ -20,7 +20,7 @@ from dodal.devices.flux import Flux
 from dodal.devices.i04.transfocator import Transfocator
 from dodal.devices.ipin import IPin
 from dodal.devices.motors import XYZPositioner
-from dodal.devices.oav.oav_detector import OAV
+from dodal.devices.oav.oav_detector import OAVBeamCentrePV
 from dodal.devices.oav.oav_parameters import OAVConfig
 from dodal.devices.oav.oav_to_redis_forwarder import OAVToRedisForwarder
 from dodal.devices.robot import BartRobot
@@ -50,7 +50,7 @@ REDIS_HOST = "i04-valkey-murko.diamond.ac.uk"
 REDIS_PASSWORD = os.environ.get("VALKEY_PASSWORD", "test_redis_password")
 MURKO_REDIS_DB = 7
 
-BL = get_beamline_name("s04")
+BL = get_beamline_name("i04")
 set_log_beamline(BL)
 set_utils_beamline(BL)
 
@@ -298,14 +298,31 @@ def oav(
     wait_for_connection: bool = True,
     fake_with_ophyd_sim: bool = False,
     params: OAVConfig | None = None,
-) -> OAV:
+) -> OAVBeamCentrePV:
     """Get the i04 OAV device, instantiate it if it hasn't already been.
     If this is called when already instantiated in i04, it will return the existing object.
     """
-    return OAV(
+    return OAVBeamCentrePV(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
         name="oav",
-        config=params or OAVConfig(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+        config=params or OAVConfig(ZOOM_PARAMS_FILE),
+    )
+
+
+@device_factory(skip=BL == "s04")
+def oav_full_screen(
+    wait_for_connection: bool = True,
+    fake_with_ophyd_sim: bool = False,
+    params: OAVConfig | None = None,
+) -> OAVBeamCentrePV:
+    """Get the i04 OAV device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i04, it will return the existing object.
+    """
+    return OAVBeamCentrePV(
+        prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
+        name="oav",
+        config=params or OAVConfig(ZOOM_PARAMS_FILE),
+        overlay_channel=3,
     )
 
 
