@@ -30,7 +30,11 @@ class AccessControlledShutter(StandardReadable, Movable):
 
     @AsyncStatus.wrap
     async def set(self, value: ShutterDemand):
-        async with aiohttp.ClientSession(raise_for_status=True) as session:
+        async with aiohttp.ClientSession(base_url=self.url, raise_for_status=True) as session:
+            # First I need to submit the plan to the worker
+            async with session.post("/post") as response:
+                print(response)
+            # Then I can set the task as active and run asap
             async with session.put(f"{self.url}/put") as response:
                 print(response)
                 # TBC ...
