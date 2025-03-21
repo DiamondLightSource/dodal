@@ -12,7 +12,7 @@ from dodal.devices.i19.shutter import (
 
 
 @pytest.fixture
-def eh2_shutter(RE: RunEngine) -> AccessControlledShutter:
+async def eh2_shutter(RE: RunEngine) -> AccessControlledShutter:
     shutter = AccessControlledShutter("", HutchState.EH2, name="mock_shutter")
     await shutter.connect(mock=True)
 
