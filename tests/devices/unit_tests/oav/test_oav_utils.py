@@ -3,6 +3,7 @@ from unittest.mock import AsyncMock
 import numpy as np
 import pytest
 from bluesky.run_engine import RunEngine
+from mx_bluesky.common.utils.exceptions import WarningException
 from ophyd.sim import instantiate_fake_device
 from ophyd_async.testing import set_mock_value
 
@@ -110,4 +111,24 @@ async def test_given_no_tip_when_wait_for_tip_to_be_found_called_then_exception_
     )
     RE = RunEngine(call_returns_result=True)
     with pytest.raises(PinNotFoundException):
+        RE(wait_for_tip_to_be_found(mock_pin_tip_detect))
+
+
+@pytest.mark.asyncio
+async def test_given_no_tip_when_wait_for_tip_to_be_found_called_that_exception_thrown_is_warning():
+    mock_pin_tip_detect: PinTipDetection = instantiate_fake_device(
+        PinTipDetection, name="pin_detect"
+    )
+    await mock_pin_tip_detect.connect(mock=True)
+    await mock_pin_tip_detect.validity_timeout.set(0.2)
+    mock_pin_tip_detect._get_tip_and_edge_data = AsyncMock(
+        return_value=SampleLocation(
+            int(PinTipDetection.INVALID_POSITION[0]),
+            int(PinTipDetection.INVALID_POSITION[1]),
+            np.array([]),
+            np.array([]),
+        )
+    )
+    RE = RunEngine(call_returns_result=True)
+    with pytest.raises(WarningException):
         RE(wait_for_tip_to_be_found(mock_pin_tip_detect))
