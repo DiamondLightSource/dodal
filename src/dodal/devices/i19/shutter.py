@@ -1,7 +1,7 @@
 import time
 from enum import Enum
 
-import aiohttp
+from aiohttp import ClientSession
 from bluesky.protocols import Movable, Reading
 from ophyd_async.core import AsyncStatus, StandardReadable
 from ophyd_async.epics.core import epics_signal_r
@@ -61,7 +61,7 @@ class AccessControlledShutter(StandardReadable, Movable):
             "name": "operate_shutter_plan",
             "params": {"from_hutch": self.hutch_request.value, "shutter_demand": value},
         }
-        async with aiohttp.ClientSession(
+        async with ClientSession(
             base_url=self.url, raise_for_status=True
         ) as session:
             # First I need to submit the plan to the worker

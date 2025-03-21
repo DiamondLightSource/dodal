@@ -22,7 +22,6 @@ async def eh2_shutter(RE: RunEngine) -> AccessControlledShutter:
     set_mock_value(shutter.shutter_status, ShutterState.CLOSED)
     return shutter
 
-
 async def test_read_on_shutter_device_returns_correct_status(
     eh2_shutter: AccessControlledShutter,
 ):
