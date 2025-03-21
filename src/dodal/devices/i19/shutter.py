@@ -21,6 +21,7 @@ class HutchState(str, Enum):
     EH2 = "EH2"
     INVALID = "INVALID"
 
+
 # NOTE Will need to account for the invalid hutch at some point in the
 # plan/optics shutter. But this is an edge case.
 
@@ -61,9 +62,7 @@ class AccessControlledShutter(StandardReadable, Movable):
             "name": "operate_shutter_plan",
             "params": {"from_hutch": self.hutch_request.value, "shutter_demand": value},
         }
-        async with ClientSession(
-            base_url=self.url, raise_for_status=True
-        ) as session:
+        async with ClientSession(base_url=self.url, raise_for_status=True) as session:
             # First I need to submit the plan to the worker
             async with session.post("/tasks", data=REQUEST_PARAMS) as response:
                 LOGGER.debug(
