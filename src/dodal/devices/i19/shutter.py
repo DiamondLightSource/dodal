@@ -38,18 +38,24 @@ class AccessControlledShutter(StandardReadable, Movable):
             base_url=self.url, raise_for_status=True
         ) as session:
             # First I need to submit the plan to the worker
-            async with session.post("/tasks", data=REQUEST_PARAMS) as post_response:
+            async with session.post("/tasks", data=REQUEST_PARAMS) as response:
                 LOGGER.debug(
-                    f"Task submitted to the worker, response status: {post_response.status}"
+                    f"Task submitted to the worker, response status: {response.status}"
                 )
-                # Then I can set the task as active and run asap
-                async with session.put(
-                    "/worker/tasks", data=REQUEST_PARAMS
-                ) as response:
-                    LOGGER.debug(
-                        f"Run operate shutter plan, response status: {response.status}"
-                    )
-                    # TBC ...
+                
+                try:
+                    data = await response.json()
+                    task_id = data["task_id"]
+                except Exception as e:
+                    LOGGER.error(f"Failed to get task_id from {self.url}/tasks POST. ({e})")
+                    raise
+            # Then I can set the task as active and run asap
+            async with session.put(
+                "/worker/tasks", data={"task_id": task_id}
+            ) as response:
+                LOGGER.debug(
+                    f"Run operate shutter plan, response status: {response.status}"
+                )
 
 
 class HutchConditionalShutter(StandardReadable, Movable):
