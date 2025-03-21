@@ -42,12 +42,14 @@ class AccessControlledShutter(StandardReadable, Movable):
                 LOGGER.debug(
                     f"Task submitted to the worker, response status: {response.status}"
                 )
-                
+
                 try:
                     data = await response.json()
                     task_id = data["task_id"]
                 except Exception as e:
-                    LOGGER.error(f"Failed to get task_id from {self.url}/tasks POST. ({e})")
+                    LOGGER.error(
+                        f"Failed to get task_id from {self.url}/tasks POST. ({e})"
+                    )
                     raise
             # Then I can set the task as active and run asap
             async with session.put(
