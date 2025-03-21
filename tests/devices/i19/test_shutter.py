@@ -1,3 +1,5 @@
+from unittest.mock import ANY
+
 import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.testing import set_mock_value
@@ -21,8 +23,16 @@ async def eh2_shutter(RE: RunEngine) -> AccessControlledShutter:
     return shutter
 
 
-def test_read_on_shutter_device_returns_correct_status():
-    pass
+async def test_read_on_shutter_device_returns_correct_status(
+    eh2_shutter: AccessControlledShutter,
+):
+    reading = await eh2_shutter.read()
+    assert reading == {
+        "number_of_lenses": {
+            "timestamp": ANY,
+            "value": "Closed",
+        }
+    }
 
 
 def test_set_corrently_makes_rest_calls():
