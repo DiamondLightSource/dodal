@@ -10,7 +10,6 @@ from dodal.log import LOGGER
 
 OPTICS_BLUEAPI_URL = "https://i19-blueapi.diamond.ac.uk"
 
-
 class HutchInvalidError(Exception):
     pass
 
@@ -30,14 +29,18 @@ class AccessControlledShutter(StandardReadable, Movable):
 
     @AsyncStatus.wrap
     async def set(self, value: ShutterDemand):
+        REQUEST_PARAMS = {
+            "name": "operate_shutter_plan",
+            "params": {"from_hutch": self.hutch_request.value, "shutter_demand": value},
+        }
         async with aiohttp.ClientSession(base_url=self.url, raise_for_status=True) as session:
             # First I need to submit the plan to the worker
-            async with session.post("/post") as response:
-                print(response)
-            # Then I can set the task as active and run asap
-            async with session.put(f"{self.url}/put") as response:
-                print(response)
-                # TBC ...
+            async with session.post("/tasks", data=REQUEST_PARAMS) as post_response:
+                LOGGER.debug(f"Task submitted to the worker, response status: {post_response.status}")
+                # Then I can set the task as active and run asap
+                async with session.put("/worker/tasks", data=REQUEST_PARAMS) as response:
+                    LOGGER.debug(f"Run operate shutter plan, response status: {response.status}")
+                    # TBC ...
 
 
 class HutchConditionalShutter(StandardReadable, Movable):
