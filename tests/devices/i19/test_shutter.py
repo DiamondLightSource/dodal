@@ -27,7 +27,7 @@ async def test_read_on_shutter_device_returns_correct_status(
 ):
     reading = await eh2_shutter.read()
     assert reading == {
-        "number_of_lenses": {
+        "shutter_status": {
             "timestamp": ANY,
             "value": "Closed",
         }

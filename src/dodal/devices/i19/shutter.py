@@ -51,7 +51,7 @@ class AccessControlledShutter(StandardReadable, Movable):
         default_reading = await super().read()
         status = await self.shutter_status.get_value()
         return {
-            "shutter status": Reading(value=status, timestamp=time.time()),
+            "shutter_status": Reading(value=status, timestamp=time.time()),
             **default_reading,
         }
 
