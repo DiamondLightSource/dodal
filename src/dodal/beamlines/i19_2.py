@@ -4,7 +4,7 @@ from dodal.common.beamlines.beamline_utils import (
 from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
-from dodal.devices.i19.shutter import HutchConditionalShutter, HutchState
+from dodal.devices.i19.shutter import AccessControlledShutter, HutchState
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
@@ -43,11 +43,11 @@ def zebra() -> Zebra:
 
 
 @device_factory()
-def shutter() -> HutchConditionalShutter:
+def shutter() -> AccessControlledShutter:
     """Get the i19-2 hutch shutter device, instantiate it if it hasn't already been.
     If this is called when already instantiated, it will return the existing object.
     """
-    return HutchConditionalShutter(
+    return AccessControlledShutter(
         prefix=f"{PREFIX.beamline_prefix}-PS-SHTR-01:",
         hutch=HutchState.EH2,
     )
