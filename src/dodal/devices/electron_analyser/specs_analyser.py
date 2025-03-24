@@ -31,10 +31,14 @@ class SpecsAnalyser(AbstractBaseAnalyser):
             super().set(region, excitation_energy_eV),
             self.values.set(region.values),
             self.psu_mode.set(region.psuMode),
-            self.centre_energy.set(region.centreEnergy)
-            if region.acquisitionMode == "Fixed Transmission"
-            else asyncio.sleep(0),
-            self.energy_step.set(energy_step_eV)
-            if region.acquisitionMode == "Fixed Energy"
-            else asyncio.sleep(0),
+            (
+                self.centre_energy.set(region.centreEnergy)
+                if region.acquisitionMode == "Fixed Transmission"
+                else asyncio.sleep(0)
+            ),
+            (
+                self.energy_step.set(energy_step_eV)
+                if region.acquisitionMode == "Fixed Energy"
+                else asyncio.sleep(0)
+            ),
         )

@@ -13,7 +13,7 @@ from dodal.devices.electron_analyser.abstract_region import (
 from dodal.log import LOGGER
 
 
-class AbstractBaseAnalyser(StandardReadable, Movable, Generic[TAbstractBaseRegion]):
+class AbstractBaseAnalyser(Generic[TAbstractBaseRegion], StandardReadable, Movable):
     """
     Generic device to configure electron analyser with new region settings.
     Electron analysers should inherit from this class if they need further
@@ -61,7 +61,7 @@ class AbstractBaseAnalyser(StandardReadable, Movable, Generic[TAbstractBaseRegio
         if excitation_energy_eV is None:
             raise ValueError("excitation_energy_eV must be specified.")
 
-        LOGGER.info(f"Configuring analyser with region {region.name}")
+        LOGGER.info(f'Configuring analyser with region "{region.name}"')
         low_energy = region.to_kinetic_energy(region.lowEnergy, excitation_energy_eV)
         high_energy = region.to_kinetic_energy(region.highEnergy, excitation_energy_eV)
         # Cast pass energy to correct type for PV to take

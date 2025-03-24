@@ -1,9 +1,7 @@
 import pytest
 from bluesky.plan_stubs import abs_set
 from bluesky.run_engine import RunEngine
-from ophyd_async.testing import (
-    get_mock_put,
-)
+from ophyd_async.testing import get_mock_put
 
 from dodal.devices.electron_analyser.vgscienta_analyser import VGScientaAnalyser
 from dodal.devices.electron_analyser.vgscienta_region import (
