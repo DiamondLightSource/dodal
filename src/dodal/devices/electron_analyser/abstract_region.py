@@ -76,3 +76,6 @@ class BaseSequence(BaseModel, Generic[TAbstractBaseRegion]):
 
     def get_enabled_region_names(self) -> list[str]:
         return [r.name for r in self.get_enabled_regions()]
+
+    def get_region_by_name(self, name: str) -> TAbstractBaseRegion | None:
+        return next((region for region in self.regions if region.name == name), None)

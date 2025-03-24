@@ -84,8 +84,28 @@ def expected_region_values() -> list[dict[str, Any]]:
     ]
 
 
-def test_sequence_get_expected_region_names(sequence: VGScientaSequence) -> None:
-    assert sequence.get_region_names() == ["New_Region", "New_Region1"]
+@pytest.fixture
+def expected_region_names(
+    expected_region_values: list[dict[str, Any]],
+) -> list[str]:
+    names = []
+    for expected_region_value in expected_region_values:
+        names.append(expected_region_value["name"])
+    return names
+
+
+def test_get_expected_region_from_name(
+    sequence: VGScientaSequence, expected_region_names: list[str]
+) -> None:
+    for name in expected_region_names:
+        assert sequence.get_region_by_name(name) is not None
+    assert sequence.get_region_by_name("region name should not be in sequence") is None
+
+
+def test_sequence_get_expected_region_names(
+    sequence: VGScientaSequence, expected_region_names: list[str]
+) -> None:
+    assert sequence.get_region_names() == expected_region_names
 
 
 def test_sequence_get_expected_enabled_region_names(
@@ -112,7 +132,7 @@ def test_sequence_get_expected_excitation_energy_source(
     )
 
 
-def test_region_kinetic_and_binding_energy(sequence: VGScientaSequence):
+def test_region_kinetic_and_binding_energy(sequence: VGScientaSequence) -> None:
     for r in sequence.regions:
         is_binding_energy = r.energyMode == EnergyMode.BINDING
         is_kinetic_energy = r.energyMode == EnergyMode.KINETIC
@@ -125,5 +145,5 @@ def test_region_kinetic_and_binding_energy(sequence: VGScientaSequence):
 
 def test_sequence_file_loads_into_sequence_class(
     sequence: VGScientaSequence, expected_region_values: list[dict[str, Any]]
-):
+) -> None:
     check_region_model_list_to_expected_values(sequence.regions, expected_region_values)

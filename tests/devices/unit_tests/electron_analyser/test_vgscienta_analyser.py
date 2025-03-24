@@ -1,14 +1,10 @@
-import os
-
 import pytest
 from bluesky.plan_stubs import abs_set
 from bluesky.run_engine import RunEngine
 from ophyd_async.testing import (
     get_mock_put,
 )
-from tests.devices.unit_tests.electron_analyser.test_utils import TEST_DATA_PATH
 
-from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.electron_analyser.vgscienta_analyser import VGScientaAnalyser
 from dodal.devices.electron_analyser.vgscienta_region import (
     VGScientaRegion,
@@ -22,10 +18,13 @@ def RE() -> RunEngine:
 
 
 @pytest.fixture
-def region_list() -> list[VGScientaRegion]:
-    data_file = os.path.join(TEST_DATA_PATH, "vgscienta_sequence.seq")
-    sequence = load_json_file_to_class(VGScientaSequence, data_file)
-    return sequence.regions
+def sequence_file() -> str:
+    return "vgscienta_sequence.seq"
+
+
+@pytest.fixture
+def sequence_class() -> type[VGScientaSequence]:
+    return VGScientaSequence
 
 
 @pytest.fixture
@@ -38,7 +37,21 @@ def analyser_type() -> type[VGScientaAnalyser]:
     return VGScientaAnalyser
 
 
-@pytest.mark.parametrize("region", ["region_list"], indirect=True)
+@pytest.fixture
+def region(
+    request: pytest.FixtureRequest, sequence: VGScientaSequence
+) -> VGScientaRegion:
+    region = sequence.get_region_by_name(request.param)
+    if region is None:
+        raise ValueError("Region " + request.param + " is not found.")
+    return region
+
+
+def region_names():
+    return ["New_Region", "New_Region1"]
+
+
+@pytest.mark.parametrize("region", region_names(), indirect=["region"])
 def test_given_region_that_analyser_sets_modes_correctly(
     sim_analyser: VGScientaAnalyser,
     region: VGScientaRegion,
@@ -59,7 +72,7 @@ def test_given_region_that_analyser_sets_modes_correctly(
     get_mock_put(sim_analyser.image_mode).assert_called_once_with("Single", wait=True)
 
 
-@pytest.mark.parametrize("region", ["region_list"], indirect=True)
+@pytest.mark.parametrize("region", region_names(), indirect=["region"])
 def test_given_region_that__analyser_sets_energy_values_correctly(
     sim_analyser: VGScientaAnalyser,
     region: VGScientaRegion,
@@ -91,10 +104,10 @@ def test_given_region_that__analyser_sets_energy_values_correctly(
     )
 
 
-@pytest.mark.parametrize("region", ["region_list"], indirect=True)
+@pytest.mark.parametrize("region", region_names(), indirect=["region"])
 def test_given_region_that_analyser_sets_channel_correctly(
-    sim_analyser: VGScientaAnalyser,
     region: VGScientaRegion,
+    sim_analyser: VGScientaAnalyser,
     excitation_energy_eV: float,
     RE: RunEngine,
 ) -> None:
