@@ -304,7 +304,6 @@ def oav(
     """
     return OAVBeamCentrePV(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
-        name="oav",
         config=params or OAVConfig(ZOOM_PARAMS_FILE),
     )
 
@@ -320,7 +319,6 @@ def oav_full_screen(
     """
     return OAVBeamCentrePV(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
-        name="oav",
         config=params or OAVConfig(ZOOM_PARAMS_FILE),
         overlay_channel=3,
     )
