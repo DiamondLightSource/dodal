@@ -1,12 +1,13 @@
-from unittest.mock import ANY, patch, AsyncMock
+from unittest.mock import ANY, AsyncMock, patch
 
 import pytest
+from aiohttp.client import ClientConnectionError
 from bluesky.run_engine import RunEngine
 from ophyd_async.testing import set_mock_value
 
 from dodal.devices.hutch_shutter import (
-    ShutterState,
     ShutterDemand,
+    ShutterState,
 )
 from dodal.devices.i19.shutter import (
     AccessControlledShutter,
@@ -37,9 +38,11 @@ async def test_read_on_shutter_device_returns_correct_status(
 
 
 async def test_set_raises_error_if_post_not_successful(test_shutter):
-    with pytest.raises(Exception):
+    with pytest.raises(ClientConnectionError):
         with patch("dodal.devices.i19.shutter.ClientSession.post") as mock_post:
-            mock_post.return_value.__aenter__.return_value = (mock_response := AsyncMock())
+            mock_post.return_value.__aenter__.return_value = (
+                mock_response := AsyncMock()
+            )
             mock_response.ok = False
 
             await test_shutter.set(ShutterDemand.OPEN)
