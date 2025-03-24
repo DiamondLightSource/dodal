@@ -58,6 +58,9 @@ class AccessControlledShutter(StandardReadable, Movable):
 
     @AsyncStatus.wrap
     async def set(self, value: ShutterDemand):
+        # NOTE with newer version of decorator, "params" for request would be
+        # {"experiment_hutch": self.hutch_request.value,
+        # "access_device": "access_control", "shutter_demand": value}
         REQUEST_PARAMS = {
             "name": "operate_shutter_plan",
             "params": {"from_hutch": self.hutch_request.value, "shutter_demand": value},
