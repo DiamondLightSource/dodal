@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Device Standards &#8212; dodal 1.43.1.dev2+g536807b07 documentation</title>
+    <title>Device Standards &#8212; dodal 1.43.1.dev3+g63c65a76c documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=b137496a"></script>
+    <script src="../_static/documentation_options.js?v=4d966fd7"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -989,7 +989,7 @@ based on this and so this has the issues listed above. Instead you should make s
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">underlying_motor</span> <span class="o">=</span> <span class="n">Motor</span><span class="p">(</span><span class="s2">&quot;MOTOR&quot;</span><span class="p">)</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">in_out</span> <span class="o">=</span> <span class="n">create_hardware_backed_soft_signal</span><span class="p">(</span><span class="n">InOut</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_in_out_from_hardware</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">in_out</span> <span class="o">=</span> <span class="n">create_r_hardware_backed_soft_signal</span><span class="p">(</span><span class="n">InOut</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_in_out_from_hardware</span><span class="p">)</span>
 
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_get_in_out_from_hardware</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">current_position</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">underlying_motor</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>

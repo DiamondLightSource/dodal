@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.oav.oav_detector &#8212; dodal 1.43.1.dev2+g536807b07 documentation</title>
+    <title>dodal.devices.oav.oav_detector &#8212; dodal 1.43.1.dev3+g63c65a76c documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=b137496a"></script>
+    <script src="../../../../_static/documentation_options.js?v=4d966fd7"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -461,7 +461,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_rw</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.signal_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_hardware_backed_soft_signal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.signal_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_r_hardware_backed_soft_signal</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.areadetector.plugins.CAM</span><span class="w"> </span><span class="kn">import</span> <span class="n">Cam</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.oav.oav_parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_OAV_WINDOW</span><span class="p">,</span> <span class="n">OAVConfig</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.oav.snapshots.snapshot_with_beam_centre</span><span class="w"> </span><span class="kn">import</span> <span class="n">SnapshotWithBeamCentre</span>
@@ -523,18 +523,18 @@ window.addEventListener("load", () => mermaid.run());
 
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">grid_snapshot</span> <span class="o">=</span> <span class="n">SnapshotWithGrid</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">MJPG:&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">microns_per_pixel_x</span> <span class="o">=</span> <span class="n">create_hardware_backed_soft_signal</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">microns_per_pixel_x</span> <span class="o">=</span> <span class="n">create_r_hardware_backed_soft_signal</span><span class="p">(</span>
                 <span class="nb">float</span><span class="p">,</span>
                 <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_microns_per_pixel</span><span class="p">(</span><span class="n">Coords</span><span class="o">.</span><span class="n">X</span><span class="p">),</span>
             <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">microns_per_pixel_y</span> <span class="o">=</span> <span class="n">create_hardware_backed_soft_signal</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">microns_per_pixel_y</span> <span class="o">=</span> <span class="n">create_r_hardware_backed_soft_signal</span><span class="p">(</span>
                 <span class="nb">float</span><span class="p">,</span>
                 <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_microns_per_pixel</span><span class="p">(</span><span class="n">Coords</span><span class="o">.</span><span class="n">Y</span><span class="p">),</span>
             <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">beam_centre_i</span> <span class="o">=</span> <span class="n">create_hardware_backed_soft_signal</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">beam_centre_i</span> <span class="o">=</span> <span class="n">create_r_hardware_backed_soft_signal</span><span class="p">(</span>
                 <span class="nb">int</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_beam_position</span><span class="p">(</span><span class="n">Coords</span><span class="o">.</span><span class="n">X</span><span class="p">)</span>
             <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">beam_centre_j</span> <span class="o">=</span> <span class="n">create_hardware_backed_soft_signal</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">beam_centre_j</span> <span class="o">=</span> <span class="n">create_r_hardware_backed_soft_signal</span><span class="p">(</span>
                 <span class="nb">int</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_beam_position</span><span class="p">(</span><span class="n">Coords</span><span class="o">.</span><span class="n">Y</span><span class="p">)</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">snapshot</span> <span class="o">=</span> <span class="n">SnapshotWithBeamCentre</span><span class="p">(</span>

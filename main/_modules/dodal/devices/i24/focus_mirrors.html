@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.i24.focus_mirrors &#8212; dodal 1.43.1.dev2+g536807b07 documentation</title>
+    <title>dodal.devices.i24.focus_mirrors &#8212; dodal 1.43.1.dev3+g63c65a76c documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=b137496a"></script>
+    <script src="../../../../_static/documentation_options.js?v=4d966fd7"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -453,7 +453,7 @@ window.addEventListener("load", () => mermaid.run());
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">StandardReadable</span><span class="p">,</span> <span class="n">StrictEnum</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_rw</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.signal_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_hardware_backed_soft_signal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.signal_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_r_hardware_backed_soft_signal</span>
 
 
 <div class="viewcode-block" id="HFocusMode">
@@ -500,10 +500,10 @@ window.addEventListener("load", () => mermaid.run());
         <span class="bp">self</span><span class="o">.</span><span class="n">vertical</span> <span class="o">=</span> <span class="n">epics_signal_rw</span><span class="p">(</span><span class="n">VFocusMode</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;G0:TARGETAPPLY&quot;</span><span class="p">)</span>
 
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">beam_size_x</span> <span class="o">=</span> <span class="n">create_hardware_backed_soft_signal</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">beam_size_x</span> <span class="o">=</span> <span class="n">create_r_hardware_backed_soft_signal</span><span class="p">(</span>
                 <span class="nb">int</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_beam_size_x</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;um&quot;</span>
             <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">beam_size_y</span> <span class="o">=</span> <span class="n">create_hardware_backed_soft_signal</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">beam_size_y</span> <span class="o">=</span> <span class="n">create_r_hardware_backed_soft_signal</span><span class="p">(</span>
                 <span class="nb">int</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_beam_size_y</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;um&quot;</span>
             <span class="p">)</span>
 

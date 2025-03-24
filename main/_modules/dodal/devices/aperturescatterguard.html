@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.aperturescatterguard &#8212; dodal 1.43.1.dev2+g536807b07 documentation</title>
+    <title>dodal.devices.aperturescatterguard &#8212; dodal 1.43.1.dev3+g63c65a76c documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=b137496a"></script>
+    <script src="../../../_static/documentation_options.js?v=4d966fd7"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -464,7 +464,7 @@ window.addEventListener("load", () => mermaid.run());
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.beamlines.beamline_parameters</span><span class="w"> </span><span class="kn">import</span> <span class="n">GDABeamlineParameters</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.signal_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_hardware_backed_soft_signal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.common.signal_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_r_hardware_backed_soft_signal</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.aperture</span><span class="w"> </span><span class="kn">import</span> <span class="n">Aperture</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.scatterguard</span><span class="w"> </span><span class="kn">import</span> <span class="n">Scatterguard</span>
 
@@ -627,7 +627,7 @@ window.addEventListener("load", () => mermaid.run());
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">aperture</span> <span class="o">=</span> <span class="n">Aperture</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-MO-MAPT-01:&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scatterguard</span> <span class="o">=</span> <span class="n">Scatterguard</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;-MO-SCAT-01:&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">create_hardware_backed_soft_signal</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">create_r_hardware_backed_soft_signal</span><span class="p">(</span>
             <span class="nb">float</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_current_radius</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;µm&quot;</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_loaded_positions</span> <span class="o">=</span> <span class="n">loaded_positions</span>
@@ -644,7 +644,7 @@ window.addEventListener("load", () => mermaid.run());
         <span class="p">)</span>
 
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">HINTED_SIGNAL</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">selected_aperture</span> <span class="o">=</span> <span class="n">create_hardware_backed_soft_signal</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">selected_aperture</span> <span class="o">=</span> <span class="n">create_r_hardware_backed_soft_signal</span><span class="p">(</span>
                 <span class="n">ApertureValue</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_current_aperture_position</span>
             <span class="p">)</span>
 
