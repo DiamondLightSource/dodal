@@ -1,4 +1,4 @@
-from unittest.mock import ANY, patch
+from unittest.mock import ANY, patch, AsyncMock
 
 import pytest
 from bluesky.run_engine import RunEngine
@@ -6,6 +6,7 @@ from ophyd_async.testing import set_mock_value
 
 from dodal.devices.hutch_shutter import (
     ShutterState,
+    ShutterDemand,
 )
 from dodal.devices.i19.shutter import (
     AccessControlledShutter,
@@ -35,6 +36,18 @@ async def test_read_on_shutter_device_returns_correct_status(
     }
 
 
-def test_set_corrently_makes_rest_calls(test_shutter):
-    with patch("dodal.devices.i19.shutter.ClientSession.post"):  # as mock_session:
-        pass
+async def test_set_raises_error_if_post_not_successful(test_shutter):
+    with pytest.raises(Exception):
+        with patch("dodal.devices.i19.shutter.ClientSession.post") as mock_post:
+            mock_post.return_value.__aenter__.return_value = (mock_response := AsyncMock())
+            mock_response.ok = False
+
+            await test_shutter.set(ShutterDemand.OPEN)
+
+
+async def test_set_corrently_makes_rest_calls(test_shutter):
+    with patch("dodal.devices.i19.shutter.ClientSession") as mock_session:
+        mock_post = mock_session.post
+        mock_post.return_value.__aenter__.return_value = (mock_response := AsyncMock())
+        mock_response.ok = True
+        mock_response.json.return_value = {"task_id": 1}
