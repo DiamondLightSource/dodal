@@ -35,8 +35,6 @@ class HardwareBackedSoftSignalBackend(SoftSignalBackend[SignalDatatypeT]):
         if self.set_to_hardware_func:
             write_value = self.initial_value if value is None else value
             await self.set_to_hardware_func(write_value)
-        else:
-            return await super().put(value, wait)
 
 
 def create_rw_hardware_backed_soft_signal(
