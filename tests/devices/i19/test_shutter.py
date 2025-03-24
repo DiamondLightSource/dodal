@@ -1,4 +1,4 @@
-from unittest.mock import ANY
+from unittest.mock import ANY, patch
 
 import pytest
 from bluesky.run_engine import RunEngine
@@ -14,7 +14,7 @@ from dodal.devices.i19.shutter import (
 
 
 @pytest.fixture
-async def eh2_shutter(RE: RunEngine) -> AccessControlledShutter:
+async def test_shutter(RE: RunEngine) -> AccessControlledShutter:
     shutter = AccessControlledShutter("", HutchState.EH2, name="mock_shutter")
     await shutter.connect(mock=True)
 
@@ -24,9 +24,9 @@ async def eh2_shutter(RE: RunEngine) -> AccessControlledShutter:
 
 
 async def test_read_on_shutter_device_returns_correct_status(
-    eh2_shutter: AccessControlledShutter,
+    test_shutter: AccessControlledShutter,
 ):
-    reading = await eh2_shutter.read()
+    reading = await test_shutter.read()
     assert reading == {
         "shutter_status": {
             "timestamp": ANY,
@@ -35,5 +35,6 @@ async def test_read_on_shutter_device_returns_correct_status(
     }
 
 
-def test_set_corrently_makes_rest_calls():
-    pass
+def test_set_corrently_makes_rest_calls(test_shutter):
+    with patch("dodal.devices.i19.shutter.ClientSession.post"):  # as mock_session:
+        pass

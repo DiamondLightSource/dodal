@@ -78,9 +78,5 @@ class AccessControlledShutter(StandardReadable, Movable):
                     )
                     raise
             # Then I can set the task as active and run asap
-            async with session.put(
-                "/worker/tasks", data={"task_id": task_id}
-            ) as response:
-                LOGGER.debug(
-                    f"Run operate shutter plan, response status: {response.status}"
-                )
+            LOGGER.debug(f"Run operate shutter plan, task_id: {task_id}")
+            await session.put("/worker/tasks", data={"task_id": task_id})
