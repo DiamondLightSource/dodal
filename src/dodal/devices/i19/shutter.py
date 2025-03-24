@@ -86,7 +86,9 @@ class AccessControlledShutter(StandardReadable, Movable):
             ) as response:
                 if not response.ok:
                     LOGGER.warning(
-                        f"Session PUT responded with {response.status}: {response.reason}."
+                        f"""Unable to operate the shutter.
+                        Session PUT responded with {response.status}: {response.reason}.
+                        """
                     )
                     return
                 LOGGER.debug(f"Run operate shutter plan, task_id: {task_id}")
