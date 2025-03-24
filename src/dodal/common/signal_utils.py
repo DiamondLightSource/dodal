@@ -51,8 +51,7 @@ def create_rw_hardware_backed_soft_signal(
     and send something to the hardware.
 
     This will allow you to make soft signals derived from arbitrary hardware signals.
-    However, calling subscribe on this signal does not give you a sensible value and
-    the signal is currently read only. See https://github.com/bluesky/ophyd-async/issues/525
+    However, calling subscribe on this signal does not give you a sensible value. See https://github.com/bluesky/ophyd-async/issues/525
     for a more full solution.
     """
     return SignalRW(
