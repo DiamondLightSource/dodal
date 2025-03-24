@@ -29,7 +29,7 @@ def _get_correct_zoom_string(zoom: str) -> str:
     return zoom
 
 
-class ZoomController(StandardReadable, Movable):
+class ZoomController(StandardReadable, Movable[str]):
     """
     Device to control the zoom level. This should be set like
         o = OAV(name="oav")
