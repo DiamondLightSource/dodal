@@ -29,9 +29,8 @@ class VGScientaAnalyser(AbstractBaseAnalyser):
 
     @AsyncStatus.wrap
     async def set(
-        self, value: VGScientaRegion, excitation_energy_eV: float, *args, **kwargs
+        self, region: VGScientaRegion, excitation_energy_eV: float, *args, **kwargs
     ):
-        region = value
         centre_energy = region.to_kinetic_energy(region.fixEnergy, excitation_energy_eV)
         energy_step_eV = region.get_energy_step_eV()
 

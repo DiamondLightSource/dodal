@@ -21,9 +21,8 @@ class SpecsAnalyser(AbstractBaseAnalyser):
 
     @AsyncStatus.wrap
     async def set(
-        self, value: SpecsRegion, excitation_energy_eV: float, *args, **kwargs
+        self, region: SpecsRegion, excitation_energy_eV: float, *args, **kwargs
     ):
-        region = value
         # These units need to be converted depending on the region
         energy_step_eV = region.get_energy_step_eV()
 

@@ -47,8 +47,8 @@ class AbstractBaseAnalyser(StandardReadable, Movable, Generic[TAbstractBaseRegio
     @AsyncStatus.wrap
     async def set(
         self,
-        value: TAbstractBaseRegion,
-        excitation_energy_eV: float | None = None,
+        region: TAbstractBaseRegion,
+        excitation_energy_eV: float,
         *args,
         **kwargs,
     ):
@@ -56,10 +56,6 @@ class AbstractBaseAnalyser(StandardReadable, Movable, Generic[TAbstractBaseRegio
         This is intended to be used with bluesky plan
         bps.abs_set(analyser, region, excitation_energy)
         """
-
-        region = value
-        if excitation_energy_eV is None:
-            raise ValueError("excitation_energy_eV must be specified.")
 
         LOGGER.info(f'Configuring analyser with region "{region.name}"')
         low_energy = region.to_kinetic_energy(region.lowEnergy, excitation_energy_eV)
