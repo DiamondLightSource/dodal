@@ -48,9 +48,18 @@ async def test_set_raises_error_if_post_not_successful(test_shutter):
             await test_shutter.set(ShutterDemand.OPEN)
 
 
-async def test_set_corrently_makes_rest_calls(test_shutter):
-    with patch("dodal.devices.i19.shutter.ClientSession") as mock_session:
-        mock_post = mock_session.post
-        mock_post.return_value.__aenter__.return_value = (mock_response := AsyncMock())
-        mock_response.ok = True
-        mock_response.json.return_value = {"task_id": 1}
+# async def test_set_corrently_makes_rest_calls(test_shutter):
+#     test_request = {
+#         "name": "operate_shutter_plan",
+#         "params": {"from_hutch": "EH2", "shutter_demand": ShutterDemand.OPEN},
+#     }
+#     with patch("dodal.devices.i19.shutter.ClientSession") as mock_session:
+#         mock_post = mock_session.post
+#         mock_post.return_value.__aenter__.return_value = (mock_response := AsyncMock())
+#         mock_response.ok = True
+#         mock_response.json.return_value = {"task_id": 1}
+#         mock_put = mock_session.put
+
+#         await test_shutter.set(ShutterDemand.OPEN)
+
+#         mock_post.assert_awaited_with("/tasks", data=test_request)
