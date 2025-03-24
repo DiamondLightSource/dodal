@@ -13,7 +13,7 @@ from dodal.devices.electron_analyser.abstract_region import (
 from dodal.log import LOGGER
 
 
-class AbstractBaseAnalyser(Generic[TAbstractBaseRegion], StandardReadable, Movable):
+class AbstractBaseAnalyser(StandardReadable, Movable, Generic[TAbstractBaseRegion]):
     """
     Generic device to configure electron analyser with new region settings.
     Electron analysers should inherit from this class if they need further
