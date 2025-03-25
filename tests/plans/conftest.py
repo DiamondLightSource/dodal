@@ -4,7 +4,10 @@ from unittest.mock import patch
 import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import PathProvider, StandardDetector, init_devices
-from ophyd_async.sim import PatternDetector, SimMotor
+from ophyd_async.sim import (
+    SimBlobDetector,
+    SimMotor,
+)
 from tests.constants import UNDULATOR_ID_GAP_LOOKUP_TABLE_PATH
 
 from dodal.devices.dcm import DCM
@@ -35,7 +38,7 @@ def det(
     path_provider,
 ) -> StandardDetector:
     with init_devices(mock=True):
-        det = PatternDetector(tmp_path / "foo.h5")
+        det = SimBlobDetector(path_provider)
     return det
 
 

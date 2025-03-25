@@ -16,7 +16,7 @@ class MerlinController(ADBaseController):
     def __init__(
         self,
         driver: MerlinDriverIO,
-        good_states: frozenset[adcore.DetectorState] = adcore.DEFAULT_GOOD_STATES,
+        good_states: frozenset[adcore.ADState] = adcore.DEFAULT_GOOD_STATES,
     ) -> None:
         self.driver = driver
         self.good_states = good_states
