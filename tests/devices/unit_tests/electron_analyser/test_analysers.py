@@ -59,12 +59,6 @@ class TestAbstractBaseAnalyser(
             raise ValueError("Region " + request.param + " is not found.")
         return region
 
-    @abstractmethod
-    def test_analyser_pass_energy_type(
-        self, sim_analyser: TAbstractBaseAnalyser
-    ) -> None:
-        pass
-
     def test_analyser_to_kinetic_energy(
         self,
         sim_analyser: TAbstractBaseAnalyser,
@@ -111,6 +105,7 @@ class TestAbstractBaseAnalyser(
         expected_high_e = region.to_kinetic_energy(
             region.highEnergy, excitation_energy_eV
         )
+
         expected_pass_e = (sim_analyser.get_pass_energy_type())(region.passEnergy)
 
         get_mock_put(sim_analyser.low_energy).assert_called_once_with(
@@ -142,7 +137,7 @@ class TestAbstractBaseAnalyser(
         )
 
 
-@pytest.mark.parametrize("region", ["region", "region2"], indirect=["region"])
+@pytest.mark.parametrize("region", ["region", "region2"], indirect=True)
 class TestSpecsAnalyser(
     TestAbstractBaseAnalyser[SpecsAnalyser, SpecsSequence, SpecsRegion]
 ):
@@ -162,9 +157,6 @@ class TestSpecsAnalyser(
     def excitation_energy_eV(self) -> float:
         return 1000.0
 
-    def test_analyser_pass_energy_type(self, sim_analyser: SpecsAnalyser) -> None:
-        assert sim_analyser.get_pass_energy_type() is int
-
     def test_given_region_that_analyser_sets_energy_values_correctly(
         self,
         sim_analyser: SpecsAnalyser,
@@ -175,6 +167,8 @@ class TestSpecsAnalyser(
         super().test_given_region_that_analyser_sets_energy_values_correctly(
             sim_analyser, region, excitation_energy_eV, RE
         )
+        assert sim_analyser.get_pass_energy_type() is int
+
         expected_step_e = region.get_energy_step_eV()
         if region.acquisitionMode == "Fixed Energy":
             get_mock_put(sim_analyser.energy_step).assert_called_once_with(
@@ -205,7 +199,7 @@ class TestSpecsAnalyser(
         )
 
 
-@pytest.mark.parametrize("region", ["New_Region", "New_Region1"], indirect=["region"])
+@pytest.mark.parametrize("region", ["New_Region", "New_Region1"], indirect=True)
 class TestVGScientaAnalyser(
     TestAbstractBaseAnalyser[VGScientaAnalyser, VGScientaSequence, VGScientaRegion]
 ):
@@ -226,9 +220,6 @@ class TestVGScientaAnalyser(
     @pytest.fixture
     def analyser_type(self) -> type[VGScientaAnalyser]:
         return VGScientaAnalyser
-
-    def test_analyser_pass_energy_type(self, sim_analyser: VGScientaAnalyser) -> None:
-        assert sim_analyser.get_pass_energy_type() is str
 
     def test_given_region_that_analyser_sets_modes_correctly(
         self,
@@ -258,6 +249,8 @@ class TestVGScientaAnalyser(
         super().test_given_region_that_analyser_sets_energy_values_correctly(
             sim_analyser, region, excitation_energy_eV, RE
         )
+        assert sim_analyser.get_pass_energy_type() is str
+
         expected_centre_e = region.to_kinetic_energy(
             region.fixEnergy, excitation_energy_eV
         )
