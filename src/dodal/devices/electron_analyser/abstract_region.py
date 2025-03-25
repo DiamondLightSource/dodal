@@ -79,3 +79,6 @@ class BaseSequence(BaseModel, Generic[TAbstractBaseRegion]):
 
     def get_region_by_name(self, name: str) -> TAbstractBaseRegion | None:
         return next((region for region in self.regions if region.name == name), None)
+
+
+TBaseSequence = TypeVar("TBaseSequence", bound=BaseSequence)

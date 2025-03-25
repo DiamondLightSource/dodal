@@ -77,14 +77,16 @@ class VGScientaSequence(BaseSequence[VGScientaRegion]):
     def get_excitation_energy_source_by_region(
         self, region: VGScientaRegion
     ) -> VGScientaExcitationEnergySource:
-        filtered_excitation_energy_sources = [
-            e
-            for e in self.excitationEnergySources
-            if e.name == region.excitationEnergySource
-        ]
-        n_matches = len(filtered_excitation_energy_sources)
-        if not n_matches == 1:
-            raise Exception(
-                "Should have found 1 match, instead found " + str(n_matches)
+        value = next(
+            (
+                e
+                for e in self.excitationEnergySources
+                if region.excitationEnergySource == e.name
+            ),
+            None,
+        )
+        if value is None:
+            raise ValueError(
+                f'Unable to find excitation energy source using region "{region.name}"'
             )
-        return filtered_excitation_energy_sources[0]
+        return value
