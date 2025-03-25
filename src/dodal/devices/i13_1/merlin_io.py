@@ -13,5 +13,5 @@ class MerlinImageMode(StrictEnum):
 
 class MerlinDriverIO(adcore.ADBaseIO):
     def __init__(self, prefix: str, name: str = "") -> None:
-        super().__init__(prefix, name)
+        super().__init__(prefix, name=name)
         self.image_mode = epics_signal_rw_rbv(MerlinImageMode, prefix + "ImageMode")
