@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.i19.shutter &#8212; dodal 1.43.1.dev5+gf135ed47e documentation</title>
+    <title>dodal.devices.i19.shutter &#8212; dodal 1.43.1.dev6+g4b701bbc9 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=023c3845"></script>
+    <script src="../../../../_static/documentation_options.js?v=132b27af"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -494,6 +494,10 @@ window.addEventListener("load", () => mermaid.run());
         <span class="bp">self</span><span class="o">.</span><span class="n">shutter</span> <span class="o">=</span> <span class="n">HutchShutter</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
         <span class="n">bl_prefix</span> <span class="o">=</span> <span class="n">prefix</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hutch_state</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bl_prefix</span><span class="si">}</span><span class="s2">-OP-STAT-01:EHStatus.VALA&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">hutch</span> <span class="o">==</span> <span class="n">HutchState</span><span class="o">.</span><span class="n">INVALID</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">HutchInvalidError</span><span class="p">(</span>
+                <span class="s2">&quot;Cannot define experimental shutter for invalid hutch&quot;</span>
+            <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hutch_request</span> <span class="o">=</span> <span class="n">hutch</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
