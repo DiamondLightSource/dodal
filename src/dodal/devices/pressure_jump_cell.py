@@ -76,7 +76,7 @@ class AllValvesControlState:
     valve_6: FastValveControlRequest | None = None
 
 
-class AllValvesControl(StandardReadable, Movable):
+class AllValvesControl(StandardReadable, Movable[AllValvesControlState]):
     """
     valves 2, 4, 7, 8 are not controlled by the IOC,
     as they are under manual control.
@@ -151,7 +151,9 @@ class AllValvesControl(StandardReadable, Movable):
         )
 
 
-class ValveControl(StandardReadable, Movable):
+class ValveControl(
+    StandardReadable, Movable[ValveControlRequest | ValveOpenSeqRequest]
+):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
             self.close = epics_signal_rw(ValveControlRequest, prefix + ":CON")
@@ -170,7 +172,9 @@ class ValveControl(StandardReadable, Movable):
         return set_status
 
 
-class FastValveControl(StandardReadable, Movable):
+class FastValveControl(
+    StandardReadable, Movable[FastValveControlRequest | ValveOpenSeqRequest]
+):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
             self.close = epics_signal_rw(FastValveControlRequest, prefix + ":CON")

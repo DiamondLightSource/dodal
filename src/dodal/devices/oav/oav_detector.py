@@ -10,7 +10,7 @@ from ophyd_async.core import (
 )
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-from dodal.common.signal_utils import create_hardware_backed_soft_signal
+from dodal.common.signal_utils import create_r_hardware_backed_soft_signal
 from dodal.devices.areadetector.plugins.CAM import Cam
 from dodal.devices.oav.oav_parameters import (
     DEFAULT_OAV_WINDOW,
@@ -35,7 +35,7 @@ def _get_correct_zoom_string(zoom: str) -> str:
     return zoom
 
 
-class ZoomController(StandardReadable, Movable):
+class ZoomController(StandardReadable, Movable[str]):
     """
     Device to control the zoom level. This should be set like
         o = OAV(name="oav")
@@ -69,18 +69,18 @@ class OAV(StandardReadable):
 
         with self.add_children_as_readables():
             self.grid_snapshot = SnapshotWithGrid(f"{prefix}MJPG:", name)
-            self.microns_per_pixel_x = create_hardware_backed_soft_signal(
+            self.microns_per_pixel_x = create_r_hardware_backed_soft_signal(
                 float,
                 lambda: self._get_microns_per_pixel(Coords.X),
             )
-            self.microns_per_pixel_y = create_hardware_backed_soft_signal(
+            self.microns_per_pixel_y = create_r_hardware_backed_soft_signal(
                 float,
                 lambda: self._get_microns_per_pixel(Coords.Y),
             )
-            self.beam_centre_i = create_hardware_backed_soft_signal(
+            self.beam_centre_i = create_r_hardware_backed_soft_signal(
                 int, lambda: self._get_beam_position(Coords.X)
             )
-            self.beam_centre_j = create_hardware_backed_soft_signal(
+            self.beam_centre_j = create_r_hardware_backed_soft_signal(
                 int, lambda: self._get_beam_position(Coords.Y)
             )
             self.snapshot = SnapshotWithBeamCentre(

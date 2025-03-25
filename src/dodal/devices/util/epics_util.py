@@ -114,7 +114,7 @@ def call_func(func: Callable[[], StatusBase]) -> StatusBase:
     return func()
 
 
-class SetWhenEnabled(OphydAsyncDevice, Movable):
+class SetWhenEnabled(OphydAsyncDevice, Movable[int]):
     """A device that sets the proc field of a PV when it becomes enabled."""
 
     def __init__(self, name: str = "", prefix: str = ""):
