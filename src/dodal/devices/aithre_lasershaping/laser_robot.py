@@ -93,7 +93,7 @@ class LaserRobot(StandardReadable, Movable):
         # self.controller_error = ErrorStatus(prefix + "CNTL")
 
         self.reset = epics_signal_x(prefix + "RESET.PROC")
-        self.stop = epics_signal_x(prefix + "ABORT.PROC")
+        self.stop_signal = epics_signal_x(prefix + "ABORT.PROC")
         self.init = epics_signal_x(prefix + "INIT.PROC")
         self.soak = epics_signal_x(prefix + "SOAK.PROC")
         self.home = epics_signal_x(prefix + "GOHM.PROC")
@@ -107,6 +107,7 @@ class LaserRobot(StandardReadable, Movable):
         self.dewar_lid_temperature = epics_signal_rw(
             float, prefix + "DW_1_TEMP", prefix + "DW_1_SET_POINT"
         )
+        self.beamline_safe = epics_signal_rw(str, prefix + "IP_16_FORCE_OPTION")
         super().__init__(name=name)
 
     async def pin_mounted_or_no_pin_found(self):
@@ -143,9 +144,10 @@ class LaserRobot(StandardReadable, Movable):
             raise
 
     async def _load_pin_and_puck(self, sample_location: SampleLocation):
-        if await self.controller_error.code.get_value() == self.LIGHT_CURTAIN_TRIPPED:
-            LOGGER.info("Light curtain tripped, trying again")
-            await self.reset.trigger()
+        await self.reset.trigger()
+        # if await self.controller_error.code.get_value() == self.LIGHT_CURTAIN_TRIPPED:
+        #     print("Light curtain tripped, trying again")
+        #     await self.reset.trigger()
         LOGGER.info(f"Loading pin {sample_location}")
         if await self.program_running.get_value():
             LOGGER.info(
@@ -176,5 +178,5 @@ class LaserRobot(StandardReadable, Movable):
         except (asyncio.TimeoutError, TimeoutError) as e:
             # Will only need to catch asyncio.TimeoutError after https://github.com/bluesky/ophyd-async/issues/572
             await self.prog_error.raise_if_error(e)
-            await self.controller_error.raise_if_error(e)
+            # await self.controller_error.raise_if_error(e)
             raise RobotLoadFailed(0, "Robot timed out") from e
