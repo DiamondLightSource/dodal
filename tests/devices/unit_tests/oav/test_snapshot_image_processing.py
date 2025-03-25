@@ -4,7 +4,7 @@ import pytest
 from PIL import Image
 
 from dodal.devices.oav.snapshots.snapshot_image_processing import (
-    compute_beam_centre_pixel_xy_for_mm_position,
+    compute_beam_centre_pixel_xy_for_mm_2d_position,
     draw_crosshair,
 )
 
@@ -33,7 +33,7 @@ def test_compute_beam_centre(
     microns_per_pixel: tuple[float, float],
     expected_centre_px: tuple[int, int],
 ):
-    x_px, y_px = compute_beam_centre_pixel_xy_for_mm_position(
+    x_px, y_px = compute_beam_centre_pixel_xy_for_mm_2d_position(
         sample_pos_mm, beam_pos_at_origin_px, microns_per_pixel
     )
     assert (x_px, y_px) == expected_centre_px

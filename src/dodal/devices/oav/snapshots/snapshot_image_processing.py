@@ -46,7 +46,7 @@ def draw_crosshair(image: Image.Image, beam_x: int, beam_y: int):
     )
 
 
-def compute_beam_centre_pixel_xy_for_mm_position(
+def compute_beam_centre_pixel_xy_for_mm_2d_position(
     sample_pos_mm: tuple[float, float],
     beam_pos_at_origin_px: Pixel,
     microns_per_pixel: tuple[float, float],
