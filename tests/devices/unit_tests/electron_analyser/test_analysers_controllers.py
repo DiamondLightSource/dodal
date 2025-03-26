@@ -13,7 +13,7 @@ from dodal.devices.electron_analyser.abstract_analyser_controller import (
 )
 from dodal.devices.electron_analyser.abstract_region import (
     TAbstractBaseRegion,
-    TBaseSequence,
+    TAbstractBaseSequence,
 )
 from dodal.devices.electron_analyser.specs_analyser_controller import (
     SpecsAnalyserController,
@@ -34,7 +34,8 @@ def RE() -> RunEngine:
 
 
 class AbstractTestAnalyserController(
-    ABC, Generic[TAbstractAnalyserController, TBaseSequence, TAbstractBaseRegion]
+    ABC,
+    Generic[TAbstractAnalyserController, TAbstractBaseSequence, TAbstractBaseRegion],
 ):
     @pytest.fixture
     @abstractmethod
@@ -48,7 +49,7 @@ class AbstractTestAnalyserController(
 
     @pytest.fixture
     @abstractmethod
-    def sequence_class(self) -> type[TBaseSequence]:
+    def sequence_class(self) -> type[TAbstractBaseSequence]:
         pass
 
     @pytest.fixture
@@ -58,7 +59,7 @@ class AbstractTestAnalyserController(
 
     @pytest.fixture
     def region(
-        self, request: pytest.FixtureRequest, sequence: TBaseSequence
+        self, request: pytest.FixtureRequest, sequence: TAbstractBaseSequence
     ) -> TAbstractBaseRegion:
         region = sequence.get_region_by_name(request.param)
         if region is None:
@@ -111,8 +112,7 @@ class AbstractTestAnalyserController(
         expected_high_e = region.to_kinetic_energy(
             region.highEnergy, excitation_energy_eV
         )
-
-        expected_pass_e = (sim_analyser.get_pass_energy_type())(region.passEnergy)
+        expected_pass_e = region.passEnergy
 
         get_mock_put(sim_analyser.low_energy).assert_called_once_with(
             expected_low_e, wait=True

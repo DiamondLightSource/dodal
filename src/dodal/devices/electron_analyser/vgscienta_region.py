@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 
 from dodal.devices.electron_analyser.abstract_region import (
     AbstractBaseRegion,
-    BaseSequence,
+    AbstractBaseSequence,
 )
 
 
@@ -31,7 +31,7 @@ class AcquisitionMode(str, Enum):
 class VGScientaRegion(AbstractBaseRegion):
     # Override defaults of base region class
     lensMode: str = "Angular45"
-    passEnergy: int | float = 5
+    passEnergy: str = "5"
     acquisitionMode: str = AcquisitionMode.SWEPT
     lowEnergy: float = 8.0
     highEnergy: float = 10.0
@@ -67,7 +67,7 @@ class VGScientaExcitationEnergySource(BaseModel):
     value: float = 0
 
 
-class VGScientaSequence(BaseSequence[VGScientaRegion]):
+class VGScientaSequence(AbstractBaseSequence[VGScientaRegion]):
     elementSet: str = Field(default="Unknown")
     excitationEnergySources: list[VGScientaExcitationEnergySource] = Field(
         default_factory=lambda: []

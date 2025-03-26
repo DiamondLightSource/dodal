@@ -27,19 +27,12 @@ class AbstractAnalyserController(
             self.high_energy = epics_signal_rw(float, prefix + "HIGH_ENERGY")
             self.slices = epics_signal_rw(int, prefix + "SLICES")
             self.lens_mode = epics_signal_rw(str, prefix + "LENS_MODE")
-            self.pass_energy = epics_signal_rw(
-                self.get_pass_energy_type(), prefix + "PASS_ENERGY"
-            )
+            self.pass_energy = epics_signal_rw(str, prefix + "PASS_ENERGY")
             self.energy_step = epics_signal_rw(float, prefix + "STEP_SIZE")
             self.iterations = epics_signal_rw(int, prefix + "NumExposures")
             self.acquisition_mode = epics_signal_rw(str, prefix + "ACQ_MODE")
 
         super().__init__(name)
-
-    @abstractmethod
-    def get_pass_energy_type(self) -> type:
-        """Define the type that the pass energy signal should be cast to. This is
-        analyser specific"""
 
     def to_kinetic_energy(
         self, value: float, excitation_energy_eV: float, mode: EnergyMode
@@ -62,16 +55,13 @@ class AbstractAnalyserController(
         LOGGER.info(f'Configuring analyser with region "{region.name}"')
         low_energy = region.to_kinetic_energy(region.lowEnergy, excitation_energy_eV)
         high_energy = region.to_kinetic_energy(region.highEnergy, excitation_energy_eV)
-        # Cast pass energy to correct type for PV to take
-        pass_energy_type = self.get_pass_energy_type()
-        pass_energy = pass_energy_type(region.passEnergy)
         # Set detector settings, wait for them all to have completed
         await asyncio.gather(
             self.low_energy.set(low_energy),
             self.high_energy.set(high_energy),
             self.slices.set(region.slices),
             self.lens_mode.set(region.lensMode),
-            self.pass_energy.set(pass_energy),
+            self.pass_energy.set(region.passEnergy),
             self.iterations.set(region.iterations),
             self.acquisition_mode.set(region.acquisitionMode),
         )

@@ -13,7 +13,7 @@ class EnergyMode(str, Enum):
 class AbstractBaseRegion(ABC, BaseModel):
     """
     Generic region model that holds the data. Specialised region models should inherit
-    this to extend functionality.
+    this to extend functionality. All energy units are assumed to be in eV.
     """
 
     name: str = "New_region"
@@ -22,19 +22,13 @@ class AbstractBaseRegion(ABC, BaseModel):
     iterations: int = 1
     # These ones we need subclasses to provide default values
     lensMode: str
-    passEnergy: int | float
+    passEnergy: str
     acquisitionMode: str
     lowEnergy: float
     highEnergy: float
     stepTime: float
     energyStep: float  # in eV
     energyMode: EnergyMode = EnergyMode.KINETIC
-
-    @abstractmethod
-    def get_energy_step_eV(self) -> float:
-        """Get the energy step in eV. Some electron analysers can store this as a
-        different unit so this allows for standardisation for a generic
-        implementation."""
 
     def is_binding_energy(self) -> bool:
         return self.energyMode == EnergyMode.BINDING
@@ -62,7 +56,7 @@ class AbstractBaseRegion(ABC, BaseModel):
 TAbstractBaseRegion = TypeVar("TAbstractBaseRegion", bound=AbstractBaseRegion)
 
 
-class BaseSequence(ABC, BaseModel, Generic[TAbstractBaseRegion]):
+class AbstractBaseSequence(ABC, BaseModel, Generic[TAbstractBaseRegion]):
     """
     Generic sequence model that holds the list of region data. Specialised sequence
     models should inherit this to extend functionality and define type of region to
@@ -84,4 +78,4 @@ class BaseSequence(ABC, BaseModel, Generic[TAbstractBaseRegion]):
         return next((region for region in self.regions if region.name == name), None)
 
 
-TBaseSequence = TypeVar("TBaseSequence", bound=BaseSequence)
+TAbstractBaseSequence = TypeVar("TAbstractBaseSequence", bound=AbstractBaseSequence)

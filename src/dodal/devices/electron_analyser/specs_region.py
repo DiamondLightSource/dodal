@@ -2,14 +2,14 @@ from pydantic import Field
 
 from dodal.devices.electron_analyser.abstract_region import (
     AbstractBaseRegion,
-    BaseSequence,
+    AbstractBaseSequence,
 )
 
 
 class SpecsRegion(AbstractBaseRegion):
     # Override base class with defaults
     lensMode: str = "SmallArea"
-    passEnergy: int | float = 5.0
+    passEnergy: str = "5.0"
     acquisitionMode: str = "Fixed Transmission"
     lowEnergy: float = Field(default=800, alias="startEnergy")
     highEnergy: float = Field(default=850, alias="endEnergy")
@@ -26,5 +26,5 @@ class SpecsRegion(AbstractBaseRegion):
         return self.energyStep
 
 
-class SpecsSequence(BaseSequence[SpecsRegion]):
+class SpecsSequence(AbstractBaseSequence[SpecsRegion]):
     regions: list[SpecsRegion] = Field(default_factory=lambda: [])

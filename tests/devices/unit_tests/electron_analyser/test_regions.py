@@ -6,7 +6,7 @@ import pytest
 from dodal.devices.electron_analyser.abstract_region import (
     EnergyMode,
     TAbstractBaseRegion,
-    TBaseSequence,
+    TAbstractBaseSequence,
 )
 from dodal.devices.electron_analyser.specs_region import SpecsRegion, SpecsSequence
 from dodal.devices.electron_analyser.vgscienta_region import (
@@ -18,7 +18,9 @@ from dodal.devices.electron_analyser.vgscienta_region import (
 )
 
 
-class TestAbstractSequenceAndRegions(ABC, Generic[TBaseSequence, TAbstractBaseRegion]):
+class TestAbstractSequenceAndRegions(
+    ABC, Generic[TAbstractBaseSequence, TAbstractBaseRegion]
+):
     @pytest.fixture
     @abstractmethod
     def sequence_file(self) -> str:
@@ -26,7 +28,7 @@ class TestAbstractSequenceAndRegions(ABC, Generic[TBaseSequence, TAbstractBaseRe
 
     @pytest.fixture
     @abstractmethod
-    def sequence_class(self) -> type[TBaseSequence]:
+    def sequence_class(self) -> type[TAbstractBaseSequence]:
         pass
 
     @pytest.fixture
@@ -61,7 +63,7 @@ class TestAbstractSequenceAndRegions(ABC, Generic[TBaseSequence, TAbstractBaseRe
         return names
 
     def test_get_expected_region_from_name(
-        self, sequence: TBaseSequence, expected_region_names: list[str]
+        self, sequence: TAbstractBaseSequence, expected_region_names: list[str]
     ) -> None:
         for name in expected_region_names:
             assert sequence.get_region_by_name(name) is not None
@@ -70,7 +72,9 @@ class TestAbstractSequenceAndRegions(ABC, Generic[TBaseSequence, TAbstractBaseRe
         )
 
     def test_sequence_get_expected_region_type(
-        self, sequence: TBaseSequence, expected_region_class: type[TAbstractBaseRegion]
+        self,
+        sequence: TAbstractBaseSequence,
+        expected_region_class: type[TAbstractBaseRegion],
     ) -> None:
         regions = sequence.regions
         enabled_regions = sequence.get_enabled_regions()
@@ -82,16 +86,18 @@ class TestAbstractSequenceAndRegions(ABC, Generic[TBaseSequence, TAbstractBaseRe
         )
 
     def test_sequence_get_expected_region_names(
-        self, sequence: TBaseSequence, expected_region_names: list[str]
+        self, sequence: TAbstractBaseSequence, expected_region_names: list[str]
     ) -> None:
         assert sequence.get_region_names() == expected_region_names
 
     def test_sequence_get_expected_enabled_region_names(
-        self, sequence: TBaseSequence, expected_enabled_region_names: list[str]
+        self, sequence: TAbstractBaseSequence, expected_enabled_region_names: list[str]
     ) -> None:
         assert sequence.get_enabled_region_names() == expected_enabled_region_names
 
-    def test_region_kinetic_and_binding_energy(self, sequence: TBaseSequence) -> None:
+    def test_region_kinetic_and_binding_energy(
+        self, sequence: TAbstractBaseSequence
+    ) -> None:
         for r in sequence.regions:
             is_binding_energy = r.energyMode == EnergyMode.BINDING
             is_kinetic_energy = r.energyMode == EnergyMode.KINETIC
@@ -101,11 +107,15 @@ class TestAbstractSequenceAndRegions(ABC, Generic[TBaseSequence, TAbstractBaseRe
             assert r.is_kinetic_energy() != is_binding_energy
 
     def test_file_loads_into_class_with_expected_values(
-        self, sequence: TBaseSequence, expected_region_values: list[dict[str, Any]]
+        self,
+        sequence: TAbstractBaseSequence,
+        expected_region_values: list[dict[str, Any]],
     ) -> None:
         for i, r in enumerate(sequence.regions):
             for key in r.__dict__:
                 if key in expected_region_values[i]:
+                    print(r.__dict__[key], expected_region_values[i][key])
+                    print(type(r.__dict__[key]), type(expected_region_values[i][key]))
                     assert r.__dict__[key] == expected_region_values[i][key]
                 else:
                     raise KeyError('key "' + key + '" is not in the expected values.')
@@ -137,7 +147,7 @@ class TestSpecsSequenceAndRegions(
                 "lowEnergy": 800.0,
                 "highEnergy": 850.0,
                 "energyStep": 0.1,
-                "passEnergy": 5.0,
+                "passEnergy": "5.0",
                 "iterations": 1,
                 "stepTime": 1.0,
                 "enabled": False,
@@ -155,7 +165,7 @@ class TestSpecsSequenceAndRegions(
                 "lowEnergy": 599.866,
                 "highEnergy": 600.134,
                 "energyStep": 0.2680000000000291,
-                "passEnergy": 2.0,
+                "passEnergy": "2.0",
                 "iterations": 5,
                 "stepTime": 2.0,
                 "enabled": True,
@@ -191,7 +201,7 @@ class TestVGScientaSequenceAndRegions(
                 "enabled": True,
                 "regionId": "_aQOmgPsmEe6w2YUF3bV-LA",
                 "lensMode": "Angular56",
-                "passEnergy": 5,
+                "passEnergy": "5",
                 "slices": 1,
                 "iterations": 1,
                 "acquisitionMode": AcquisitionMode.SWEPT,
@@ -217,7 +227,7 @@ class TestVGScientaSequenceAndRegions(
                 "enabled": False,
                 "regionId": "_aQOmgPsmEe6w2YUF3GV-LL",
                 "lensMode": "Angular45",
-                "passEnergy": 10,
+                "passEnergy": "10",
                 "slices": 10,
                 "iterations": 5,
                 "acquisitionMode": AcquisitionMode.FIXED,
