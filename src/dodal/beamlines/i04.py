@@ -353,7 +353,7 @@ def oav_to_redis_forwarder() -> OAVToRedisForwarder:
         name="oav_to_redis_forwarder",
         redis_host=REDIS_HOST,
         redis_password=REDIS_PASSWORD,
-        redis_db=7,
+        db=7,
     )
 
 
