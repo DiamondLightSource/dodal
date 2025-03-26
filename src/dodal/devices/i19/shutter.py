@@ -23,7 +23,7 @@ class HutchState(str, Enum):
 
 
 # NOTE Will need to account for the invalid hutch at some point in the
-# plan/optics shutter. But this is an edge case.
+# decorator in i19-bluesky. Still an edge case.
 
 
 class AccessControlledShutter(StandardReadable, Movable):
