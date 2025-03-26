@@ -5,7 +5,7 @@ from ophyd_async.core import StandardReadable, StrictEnum
 from ophyd_async.epics.motor import Motor
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
-from dodal.common.signal_utils import create_hardware_backed_soft_signal
+from dodal.common.signal_utils import create_r_hardware_backed_soft_signal
 
 
 class BeamstopPositions(StrictEnum):
@@ -53,7 +53,7 @@ class Beamstop(StandardReadable):
             self.x_mm = Motor(prefix + "X")
             self.y_mm = Motor(prefix + "Y")
             self.z_mm = Motor(prefix + "Z")
-            self.selected_pos = create_hardware_backed_soft_signal(
+            self.selected_pos = create_r_hardware_backed_soft_signal(
                 BeamstopPositions, self._get_selected_position
             )
 
