@@ -5,8 +5,8 @@ from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
 from dodal.devices.i19.shutter import HutchConditionalShutter, HutchState
-from dodal.devices.oav.oav_detector import OAV
-from dodal.devices.oav.oav_parameters import OAVConfig
+from dodal.devices.oav.oav_detector import OAVBeamCentreFile
+from dodal.devices.oav.oav_parameters import OAVConfigBeamCentre
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
@@ -36,10 +36,10 @@ DISPLAY_CONFIG = "/dls_sw/i19-1/software/daq_configuration/domain/display.config
 
 
 @device_factory()
-def oav() -> OAV:
-    return OAV(
+def oav() -> OAVBeamCentreFile:
+    return OAVBeamCentreFile(
         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
-        config=OAVConfig(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+        config=OAVConfigBeamCentre(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
     )
 
 

@@ -1,3 +1,4 @@
+from abc import abstractmethod
 from enum import IntEnum
 
 from bluesky.protocols import Movable
@@ -7,11 +8,16 @@ from ophyd_async.core import (
     LazyMock,
     StandardReadable,
 )
-from ophyd_async.epics.core import epics_signal_rw
+from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.common.signal_utils import create_r_hardware_backed_soft_signal
 from dodal.devices.areadetector.plugins.CAM import Cam
-from dodal.devices.oav.oav_parameters import DEFAULT_OAV_WINDOW, OAVConfig
+from dodal.devices.oav.oav_parameters import (
+    DEFAULT_OAV_WINDOW,
+    OAVConfig,
+    OAVConfigBase,
+    OAVConfigBeamCentre,
+)
 from dodal.devices.oav.snapshots.snapshot_with_beam_centre import SnapshotWithBeamCentre
 from dodal.devices.oav.snapshots.snapshot_with_grid import SnapshotWithGrid
 
@@ -52,7 +58,7 @@ class ZoomController(StandardReadable, Movable[str]):
 
 
 class OAV(StandardReadable):
-    def __init__(self, prefix: str, config: OAVConfig, name: str = ""):
+    def __init__(self, prefix: str, config: OAVConfigBase, name: str = ""):
         self.oav_config = config
         self._prefix = prefix
         self._name = name
@@ -99,13 +105,10 @@ class OAV(StandardReadable):
         size = await self.sizes[coord].get_value()
         return value * DEFAULT_OAV_WINDOW[coord] / size
 
+    @abstractmethod
     async def _get_beam_position(self, coord: int) -> int:
         """Extracts the beam location in pixels `xCentre` `yCentre`, for a requested \
         zoom level. """
-        _zoom = await self._read_current_zoom()
-        value = self.parameters[_zoom].crosshair[coord]
-        size = await self.sizes[coord].get_value()
-        return int(value * size / DEFAULT_OAV_WINDOW[coord])
 
     async def connect(
         self,
@@ -116,3 +119,40 @@ class OAV(StandardReadable):
         self.parameters = self.oav_config.get_parameters()
 
         return await super().connect(mock, timeout, force_reconnect)
+
+
+class OAVBeamCentreFile(OAV):
+    """OAV device that reads its beam centre values from a file. The config parameter
+    must be a OAVConfigBeamCentre object, as this contains a filepath to where the beam
+    centre values are stored.
+    """
+
+    def __init__(self, prefix: str, config: OAVConfigBeamCentre, name: str = ""):
+        super().__init__(prefix, config, name)
+
+    async def _get_beam_position(self, coord: int) -> int:
+        """Extracts the beam location in pixels `xCentre` `yCentre`, for a requested \
+        zoom level. """
+        _zoom = await self._read_current_zoom()
+        value = self.parameters[_zoom].crosshair[coord]
+        size = await self.sizes[coord].get_value()
+        return int(value * size / DEFAULT_OAV_WINDOW[coord])
+
+
+class OAVBeamCentrePV(OAV):
+    """OAV device that reads its beam centre values from PVs."""
+
+    def __init__(
+        self, prefix: str, config: OAVConfig, name: str = "", overlay_channel: int = 1
+    ):
+        self.beam_centre_x = epics_signal_r(
+            int, prefix + f"OVER:{overlay_channel}:CenterX"
+        )
+        self.beam_centre_y = epics_signal_r(
+            int, prefix + f"OVER:{overlay_channel}:CenterY"
+        )
+        super().__init__(prefix, config, name)
+
+    async def _get_beam_position(self, coord: int) -> int:
+        """Extracts the beam location in pixels `xCentre` `yCentre`."""
+        return await (self.beam_centre_x, self.beam_centre_y)[coord].get_value()
