@@ -1,5 +1,5 @@
 import asyncio
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import Generic, TypeVar
 
 from bluesky.protocols import Movable

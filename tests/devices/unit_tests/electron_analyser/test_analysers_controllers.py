@@ -173,7 +173,6 @@ class TestSpecsAnalyserController(
         super().test_given_region_that_analyser_sets_energy_values_correctly(
             sim_analyser, region, excitation_energy_eV, RE
         )
-        assert sim_analyser.get_pass_energy_type() is int
 
         expected_step_e = region.get_energy_step_eV()
         if region.acquisitionMode == "Fixed Energy":
@@ -257,7 +256,6 @@ class TestVGScientaAnalyserController(
         super().test_given_region_that_analyser_sets_energy_values_correctly(
             sim_analyser, region, excitation_energy_eV, RE
         )
-        assert sim_analyser.get_pass_energy_type() is str
 
         expected_centre_e = region.to_kinetic_energy(
             region.fixEnergy, excitation_energy_eV
