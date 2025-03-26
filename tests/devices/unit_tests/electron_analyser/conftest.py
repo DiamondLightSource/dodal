@@ -4,7 +4,9 @@ import pytest
 from ophyd_async.core import init_devices
 
 from dodal.common.data_util import TBaseModel, load_json_file_to_class
-from dodal.devices.electron_analyser.abstract_analyser import TAbstractBaseAnalyser
+from dodal.devices.electron_analyser.abstract_analyser_controller import (
+    TAbstractAnalyserController,
+)
 
 TEST_DATA_PATH = "tests/test_data/electron_analyser/"
 
@@ -21,8 +23,8 @@ def sequence(sequence_class: type[TBaseModel], sequence_file_path: str) -> TBase
 
 @pytest.fixture
 async def sim_analyser(
-    analyser_type: type[TAbstractBaseAnalyser],
-) -> TAbstractBaseAnalyser:
+    analyser_type: type[TAbstractAnalyserController],
+) -> TAbstractAnalyserController:
     async with init_devices(mock=True):
         sim_analyser = analyser_type(
             prefix="sim_analyser",

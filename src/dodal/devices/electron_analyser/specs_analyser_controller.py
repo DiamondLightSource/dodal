@@ -3,11 +3,13 @@ import asyncio
 from ophyd_async.core import AsyncStatus
 from ophyd_async.epics.core import epics_signal_rw
 
-from dodal.devices.electron_analyser.abstract_analyser import AbstractBaseAnalyser
+from dodal.devices.electron_analyser.abstract_analyser_controller import (
+    AbstractAnalyserController,
+)
 from dodal.devices.electron_analyser.specs_region import SpecsRegion
 
 
-class SpecsAnalyser(AbstractBaseAnalyser):
+class SpecsAnalyserController(AbstractAnalyserController):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
             self.psu_mode = epics_signal_rw(str, prefix + "SCAN_RANGE")

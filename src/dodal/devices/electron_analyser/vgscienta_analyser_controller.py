@@ -3,14 +3,16 @@ import asyncio
 from ophyd_async.core import AsyncStatus
 from ophyd_async.epics.core import epics_signal_rw
 
-from dodal.devices.electron_analyser.abstract_analyser import AbstractBaseAnalyser
+from dodal.devices.electron_analyser.abstract_analyser_controller import (
+    AbstractAnalyserController,
+)
 from dodal.devices.electron_analyser.vgscienta_region import (
     DetectorMode,
     VGScientaRegion,
 )
 
 
-class VGScientaAnalyser(AbstractBaseAnalyser):
+class VGScientaAnalyserController(AbstractAnalyserController):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
             self.centre_energy = epics_signal_rw(float, prefix + "CENTRE_ENERGY")

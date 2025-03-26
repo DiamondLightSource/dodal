@@ -8,14 +8,18 @@ from ophyd_async.testing import (
     get_mock_put,
 )
 
-from dodal.devices.electron_analyser.abstract_analyser import TAbstractBaseAnalyser
+from dodal.devices.electron_analyser.abstract_analyser_controller import (
+    TAbstractAnalyserController,
+)
 from dodal.devices.electron_analyser.abstract_region import (
     TAbstractBaseRegion,
     TBaseSequence,
 )
-from dodal.devices.electron_analyser.specs_analyser import SpecsAnalyser
+from dodal.devices.electron_analyser.specs_analyser import SpecsAnalyserController
 from dodal.devices.electron_analyser.specs_region import SpecsRegion, SpecsSequence
-from dodal.devices.electron_analyser.vgscienta_analyser import VGScientaAnalyser
+from dodal.devices.electron_analyser.vgscienta_analyser import (
+    VGScientaAnalyserController,
+)
 from dodal.devices.electron_analyser.vgscienta_region import (
     VGScientaRegion,
     VGScientaSequence,
@@ -27,12 +31,12 @@ def RE() -> RunEngine:
     return RunEngine()
 
 
-class TestAbstractBaseAnalyser(
-    ABC, Generic[TAbstractBaseAnalyser, TBaseSequence, TAbstractBaseRegion]
+class AbstractTestAnalyserController(
+    ABC, Generic[TAbstractAnalyserController, TBaseSequence, TAbstractBaseRegion]
 ):
     @pytest.fixture
     @abstractmethod
-    def analyser_type(self) -> type[TAbstractBaseAnalyser]:
+    def analyser_type(self) -> type[TAbstractAnalyserController]:
         pass
 
     @pytest.fixture
@@ -61,7 +65,7 @@ class TestAbstractBaseAnalyser(
 
     def test_analyser_to_kinetic_energy(
         self,
-        sim_analyser: TAbstractBaseAnalyser,
+        sim_analyser: TAbstractAnalyserController,
         region: TAbstractBaseRegion,
         excitation_energy_eV: float,
     ) -> None:
@@ -76,7 +80,7 @@ class TestAbstractBaseAnalyser(
 
     def test_given_region_that_analyser_sets_modes_correctly(
         self,
-        sim_analyser: TAbstractBaseAnalyser,
+        sim_analyser: TAbstractAnalyserController,
         region: TAbstractBaseRegion,
         excitation_energy_eV: float,
         RE: RunEngine,
@@ -92,7 +96,7 @@ class TestAbstractBaseAnalyser(
 
     def test_given_region_that_analyser_sets_energy_values_correctly(
         self,
-        sim_analyser: TAbstractBaseAnalyser,
+        sim_analyser: TAbstractAnalyserController,
         region: TAbstractBaseRegion,
         excitation_energy_eV: float,
         RE: RunEngine,
@@ -120,7 +124,7 @@ class TestAbstractBaseAnalyser(
 
     def test_given_region_that_analyser_sets_channel_correctly(
         self,
-        sim_analyser: TAbstractBaseAnalyser,
+        sim_analyser: TAbstractAnalyserController,
         region: TAbstractBaseRegion,
         excitation_energy_eV: float,
         RE: RunEngine,
@@ -138,12 +142,12 @@ class TestAbstractBaseAnalyser(
 
 
 @pytest.mark.parametrize("region", ["region", "region2"], indirect=True)
-class TestSpecsAnalyser(
-    TestAbstractBaseAnalyser[SpecsAnalyser, SpecsSequence, SpecsRegion]
+class TestSpecsAnalyserController(
+    AbstractTestAnalyserController[SpecsAnalyserController, SpecsSequence, SpecsRegion]
 ):
     @pytest.fixture
-    def analyser_type(self) -> type[SpecsAnalyser]:
-        return SpecsAnalyser
+    def analyser_type(self) -> type[SpecsAnalyserController]:
+        return SpecsAnalyserController
 
     @pytest.fixture
     def sequence_file(self) -> str:
@@ -159,7 +163,7 @@ class TestSpecsAnalyser(
 
     def test_given_region_that_analyser_sets_energy_values_correctly(
         self,
-        sim_analyser: SpecsAnalyser,
+        sim_analyser: SpecsAnalyserController,
         region: SpecsRegion,
         excitation_energy_eV: float,
         RE: RunEngine,
@@ -186,7 +190,7 @@ class TestSpecsAnalyser(
 
     def test_given_region_that_analyser_sets_modes_correctly(
         self,
-        sim_analyser: SpecsAnalyser,
+        sim_analyser: SpecsAnalyserController,
         region: SpecsRegion,
         excitation_energy_eV: float,
         RE: RunEngine,
@@ -200,8 +204,10 @@ class TestSpecsAnalyser(
 
 
 @pytest.mark.parametrize("region", ["New_Region", "New_Region1"], indirect=True)
-class TestVGScientaAnalyser(
-    TestAbstractBaseAnalyser[VGScientaAnalyser, VGScientaSequence, VGScientaRegion]
+class TestVGScientaAnalyserController(
+    AbstractTestAnalyserController[
+        VGScientaAnalyserController, VGScientaSequence, VGScientaRegion
+    ]
 ):
     @pytest.fixture
     def sequence_file(self) -> str:
@@ -218,12 +224,12 @@ class TestVGScientaAnalyser(
         return sequence.get_excitation_energy_source_by_region(region).value
 
     @pytest.fixture
-    def analyser_type(self) -> type[VGScientaAnalyser]:
-        return VGScientaAnalyser
+    def analyser_type(self) -> type[VGScientaAnalyserController]:
+        return VGScientaAnalyserController
 
     def test_given_region_that_analyser_sets_modes_correctly(
         self,
-        sim_analyser: VGScientaAnalyser,
+        sim_analyser: VGScientaAnalyserController,
         region: VGScientaRegion,
         excitation_energy_eV: float,
         RE: RunEngine,
@@ -241,7 +247,7 @@ class TestVGScientaAnalyser(
 
     def test_given_region_that_analyser_sets_energy_values_correctly(
         self,
-        sim_analyser: VGScientaAnalyser,
+        sim_analyser: VGScientaAnalyserController,
         region: VGScientaRegion,
         excitation_energy_eV: float,
         RE: RunEngine,
@@ -265,7 +271,7 @@ class TestVGScientaAnalyser(
 
     def test_given_region_that_analyser_sets_channel_correctly(
         self,
-        sim_analyser: VGScientaAnalyser,
+        sim_analyser: VGScientaAnalyserController,
         region: VGScientaRegion,
         excitation_energy_eV: float,
         RE: RunEngine,

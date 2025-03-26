@@ -1,4 +1,4 @@
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Any, Generic, TypeVar
 
@@ -10,7 +10,7 @@ class EnergyMode(str, Enum):
     BINDING = "Binding"
 
 
-class AbstractBaseRegion(BaseModel):
+class AbstractBaseRegion(ABC, BaseModel):
     """
     Generic region model that holds the data. Specialised region models should inherit
     this to extend functionality.
@@ -32,7 +32,9 @@ class AbstractBaseRegion(BaseModel):
 
     @abstractmethod
     def get_energy_step_eV(self) -> float:
-        pass
+        """Get the energy step in eV. Some electron analysers can store this as a
+        different unit so this allows for standardisation for a generic
+        implementation."""
 
     def is_binding_energy(self) -> bool:
         return self.energyMode == EnergyMode.BINDING
@@ -60,10 +62,11 @@ class AbstractBaseRegion(BaseModel):
 TAbstractBaseRegion = TypeVar("TAbstractBaseRegion", bound=AbstractBaseRegion)
 
 
-class BaseSequence(BaseModel, Generic[TAbstractBaseRegion]):
+class BaseSequence(ABC, BaseModel, Generic[TAbstractBaseRegion]):
     """
-    Generic sequence model that holds the list of region data. Specialised sequence models
-    should inherit this to extend functionality.
+    Generic sequence model that holds the list of region data. Specialised sequence
+    models should inherit this to extend functionality and define type of region to
+    hold.
     """
 
     regions: list[TAbstractBaseRegion] = Field(default_factory=lambda: [])

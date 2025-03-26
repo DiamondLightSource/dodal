@@ -1,5 +1,5 @@
 import asyncio
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 
 from bluesky.protocols import Movable
@@ -13,11 +13,12 @@ from dodal.devices.electron_analyser.abstract_region import (
 from dodal.log import LOGGER
 
 
-class AbstractBaseAnalyser(StandardReadable, Movable, Generic[TAbstractBaseRegion]):
+class AbstractAnalyserController(
+    ABC, StandardReadable, Movable, Generic[TAbstractBaseRegion]
+):
     """
     Generic device to configure electron analyser with new region settings.
-    Electron analysers should inherit from this class if they need further
-    specialisation.
+    Electron analysers should inherit from this class for further specialisation.
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
@@ -37,7 +38,8 @@ class AbstractBaseAnalyser(StandardReadable, Movable, Generic[TAbstractBaseRegio
 
     @abstractmethod
     def get_pass_energy_type(self) -> type:
-        pass
+        """Define the type that the pass energy signal should be cast to. This is
+        analyser specific"""
 
     def to_kinetic_energy(
         self, value: float, excitation_energy_eV: float, mode: EnergyMode
@@ -75,4 +77,6 @@ class AbstractBaseAnalyser(StandardReadable, Movable, Generic[TAbstractBaseRegio
         )
 
 
-TAbstractBaseAnalyser = TypeVar("TAbstractBaseAnalyser", bound=AbstractBaseAnalyser)
+TAbstractAnalyserController = TypeVar(
+    "TAbstractAnalyserController", bound=AbstractAnalyserController
+)
