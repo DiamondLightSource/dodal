@@ -15,9 +15,11 @@ from dodal.devices.electron_analyser.abstract_region import (
     TAbstractBaseRegion,
     TBaseSequence,
 )
-from dodal.devices.electron_analyser.specs_analyser import SpecsAnalyserController
+from dodal.devices.electron_analyser.specs_analyser_controller import (
+    SpecsAnalyserController,
+)
 from dodal.devices.electron_analyser.specs_region import SpecsRegion, SpecsSequence
-from dodal.devices.electron_analyser.vgscienta_analyser import (
+from dodal.devices.electron_analyser.vgscienta_analyser_controller import (
     VGScientaAnalyserController,
 )
 from dodal.devices.electron_analyser.vgscienta_region import (
