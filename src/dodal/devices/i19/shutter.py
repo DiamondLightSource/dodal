@@ -12,18 +12,9 @@ from dodal.log import LOGGER
 OPTICS_BLUEAPI_URL = "https://i19-blueapi.diamond.ac.uk"
 
 
-class HutchInvalidError(Exception):
-    pass
-
-
 class HutchState(str, Enum):
     EH1 = "EH1"
     EH2 = "EH2"
-    INVALID = "INVALID"
-
-
-# NOTE Will need to account for the invalid hutch at some point in the
-# decorator in i19-bluesky. Still an edge case.
 
 
 class AccessControlledShutter(StandardReadable, Movable):
