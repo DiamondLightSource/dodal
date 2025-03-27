@@ -78,4 +78,4 @@ lockfiles/
 
 # custom CI setup 
 report.json
-tests/devices/unit_tests/electron_analyser/test_analysers_controllers.py
+Pipfile
