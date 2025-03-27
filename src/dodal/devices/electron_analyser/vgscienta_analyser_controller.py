@@ -26,9 +26,6 @@ class VGScientaAnalyserController(AbstractAnalyserController):
 
         super().__init__(prefix, name)
 
-    def get_pass_energy_type(self) -> type:
-        return str
-
     @AsyncStatus.wrap
     async def set(
         self, region: VGScientaRegion, excitation_energy_eV: float, *args, **kwargs

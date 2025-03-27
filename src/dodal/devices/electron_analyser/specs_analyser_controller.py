@@ -18,9 +18,6 @@ class SpecsAnalyserController(AbstractAnalyserController):
 
         super().__init__(prefix, name)
 
-    def get_pass_energy_type(self) -> type:
-        return float
-
     @AsyncStatus.wrap
     async def set(
         self, region: SpecsRegion, excitation_energy_eV: float, *args, **kwargs
