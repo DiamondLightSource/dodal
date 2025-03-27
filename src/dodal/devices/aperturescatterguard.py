@@ -8,6 +8,7 @@ from ophyd_async.core import (
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
+    derived_signal_r,
 )
 from pydantic import BaseModel, Field
 
@@ -181,11 +182,36 @@ class ApertureScatterguard(StandardReadable, Movable[ApertureValue], Preparable)
         )
 
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.selected_aperture = create_r_hardware_backed_soft_signal(
-                ApertureValue, self._get_current_aperture_position
+            # self.selected_aperture = create_r_hardware_backed_soft_signal(
+            #     ApertureValue, self._get_current_aperture_position
+            # )
+            self.selected_aperture = derived_signal_r(
+                self._get_current_aperture_position_new,
+                large=self.aperture.large,
+                medium=self.aperture.medium,
+                small=self.aperture.small,
+                current_ap_y=self.aperture.y.user_readback,
             )
 
         super().__init__(name)
+
+    def _is_out_of_beam_new(self, current_ap_y) -> bool:
+        out_ap_y = self._loaded_positions[ApertureValue.OUT_OF_BEAM].aperture_y
+        return current_ap_y <= out_ap_y + self._tolerances.aperture_y
+
+    def _get_current_aperture_position_new(
+        self, large: float, medium: float, small: float, current_ap_y: float
+    ) -> ApertureValue:
+        if large == 1:
+            return ApertureValue.LARGE
+        elif medium == 1:
+            return ApertureValue.MEDIUM
+        elif small == 1:
+            return ApertureValue.SMALL
+        elif self._is_out_of_beam_new(current_ap_y):
+            return ApertureValue.OUT_OF_BEAM
+
+        raise InvalidApertureMove("Current aperture/scatterguard state unrecognised")
 
     @AsyncStatus.wrap
     async def set(self, value: ApertureValue):
