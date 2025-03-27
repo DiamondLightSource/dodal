@@ -1,4 +1,5 @@
 import json
+import os
 import pickle
 from collections import OrderedDict
 from enum import Enum
@@ -12,14 +13,18 @@ from ophyd_async.core import (
     soft_signal_r_and_setter,
     soft_signal_rw,
 )
-from redis.asynio import StrictRedis
+from redis import StrictRedis
 
-from dodal.beamlines.i04 import MURKO_REDIS_DB, REDIS_HOST, REDIS_PASSWORD
+# from dodal.beamlines.i04 import MURKO_REDIS_DB, REDIS_HOST, REDIS_PASSWORD
 from dodal.devices.oav.oav_calculations import (
     calculate_beam_distance,
     camera_coordinates_to_xyz,
 )
 from dodal.log import LOGGER
+
+REDIS_HOST = os.environ.get("VALKEY_PROD_SVC_SERVICE_HOST", "test_redis")
+REDIS_PASSWORD = os.environ.get("VALKEY_PASSWORD", "test_redis_password")
+MURKO_REDIS_DB = 7
 
 MurkoResult = dict
 FullMurkoResults = dict[str, list[MurkoResult]]
@@ -60,15 +65,13 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         )
         self.pubsub = self.redis_client.pubsub()
         self._last_omega = 0
+        self._last_result = None
         self.sample_id = soft_signal_rw(str)  # Should get from redis
         self.coords = {"x": {}, "y": {}, "z": {}}
         self.search_angles = OrderedDict(
             [(90, ("x", "z")), (180, ("x", "y")), (270, ())]
         )
         self.angles_to_search = list(self.search_angles.keys())
-        self.current_x_y_z_um = soft_signal_rw(
-            tuple[float, float, float]
-        )  # Should get from redis
 
         with self.add_children_as_readables():
             # Diffs from current x/y/z
@@ -90,6 +93,9 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         # Unsubscribe
         await self.pubsub.unsubscribe()
 
+    def get_beam_centre(self) -> tuple[int, int]:
+        return (442, 363)
+
     def get_coords_if_at_angle(
         self,
         metadata: MurkoMetadata,
@@ -97,31 +103,36 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         omega: float,
         search_angle: float,
     ) -> np.ndarray | None:
+        print(omega)
+        print(search_angle)
         LOGGER.info(f"Compare {omega}, {search_angle}, {self._last_omega}")
-        if abs(omega - search_angle) > abs(self._last_omega - search_angle):
-            coords = result[
-                "most_likely_click"
-            ]  # As proportion from top, left of image
-            shape = result["original_shape"]  # Dimensions of image in pixels
-            centre_px = (coords[1] * shape[1], coords[0] * shape[0])
-            LOGGER.info(
-                f"Using image taken at {omega}, which found xtal at {centre_px}"
-            )
+        if abs(omega - search_angle) >= abs(self._last_omega - search_angle):
+            closest_result = self._last_result
+        elif omega - search_angle >= 0:
+            print("THIS SHOULD BE RUN", omega, search_angle)
+            closest_result = result
+        else:
+            return None
+        coords = closest_result[
+            "most_likely_click"
+        ]  # As proportion from top, left of image
+        shape = closest_result["original_shape"]  # Dimensions of image in pixels
+        centre_px = (coords[1] * shape[1], coords[0] * shape[0])
+        LOGGER.info(f"Using image taken at {omega}, which found xtal at {centre_px}")
 
-            beam_dist_px = calculate_beam_distance(
-                (442, 363),
-                centre_px[0],
-                centre_px[1],  # Not sure where this number comes from
-            )
+        beam_dist_px = calculate_beam_distance(
+            self.get_beam_centre(),  # beam centre
+            centre_px[0],
+            centre_px[1],
+        )
 
-            return camera_coordinates_to_xyz(
-                beam_dist_px[0],
-                beam_dist_px[1],
-                omega,
-                metadata["microns_per_x_pixel"],
-                metadata["microns_per_y_pixel"],
-            )
-        return None
+        return camera_coordinates_to_xyz(
+            beam_dist_px[0],
+            beam_dist_px[1],
+            omega,
+            metadata["microns_per_x_pixel"],
+            metadata["microns_per_y_pixel"],
+        )
 
     @AsyncStatus.wrap
     async def trigger(self):
@@ -129,46 +140,67 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         # Wait for results
         sample_id = await self.sample_id.get_value()
         next_angle = self.angles_to_search.pop(0)
+        final_message = None
         while next_angle:  # Goes round in a loop until 270 degrees is found
+            # waits here for next batch to be recieved (10 scans?). pickle deserialises data
             message = await self.pubsub.get_message(timeout=self.TIMEOUT_S)
-            if message and message["type"] == "message":
-                batch_results = pickle.loads(
-                    message["data"]
-                )  # waits here for next batch to be recieved (10 scans?). pickle deserialises results
-                for results in batch_results:
-                    print(f"Got {results} from redis")
-                    assert isinstance(results, dict)
-                    for uuid, result in results.items():
-                        metadata_str = await self.redis_client.hget(
-                            f"murko:{sample_id}:metadata", uuid
-                        )
-                        if metadata_str:
-                            next_angle = self.process_result(
-                                result, uuid, metadata_str, next_angle
-                            )
-        self._x_um_setter(np.mean(self.coords["x"].values()))
-        self._y_um_setter(np.mean(self.coords["y"].values()))
-        self._z_um_setter(np.mean(self.coords["z"].values()))
+            if message is None:  # No more messages to process
+                await self.process_batch(
+                    final_message, sample_id, next_angle
+                )  # Process final message again
+                break
+            next_angle = await self.process_batch(message, sample_id, next_angle)
+            final_message = message
+        x_values = list(self.coords["x"].values())
+        y_values = list(self.coords["y"].values())
+        z_values = list(self.coords["z"].values())
+        assert x_values, "No x values"
+        assert z_values, "No z values"
+        assert y_values, "No y values"
+        self._x_um_setter(np.mean(x_values))
+        self._y_um_setter(np.mean(y_values))
+        self._z_um_setter(np.mean(z_values))
 
-    def process_result(self, result: dict, uuid, metadata_str, angle):
+    def process_result(
+        self, result: dict, uuid: int, metadata_str: str, search_angle: float | None
+    ) -> float:
+        if search_angle is None:
+            return None
         metadata = MurkoMetadata(
             json.loads(metadata_str)
         )  # Metadata is JSON but data is pickle?
         omega_angle = metadata["omega_angle"]
+        assert search_angle, f"search_angle = {search_angle}"
         LOGGER.info(f"Got angle {omega_angle}")
         # Find closest to next search angle
         if (
             movement := self.get_coords_if_at_angle(
-                metadata, result, omega_angle, angle
+                metadata, result, omega_angle, search_angle
             )
         ) is not None:
             LOGGER.info(f"Using result {uuid}, {metadata_str}, {result}")
-            for coord in self.search_angles[angle]:
+            for coord in self.search_angles[search_angle]:
                 self.coords[coord][omega_angle] = movement[Coord[coord].value]
             if self.angles_to_search:
-                angle = self.angles_to_search.pop(0)
+                search_angle = self.angles_to_search.pop(0)
             else:
-                angle = None
-            LOGGER.info(f"Setting {angle} to {movement}")
+                search_angle = None
+            LOGGER.info(f"Setting {search_angle} to {movement}")
         self._last_omega = omega_angle
-        return angle
+        self._last_result = result
+        return search_angle
+
+    async def process_batch(self, message, sample_id, next_angle):
+        if message and message["type"] == "message":
+            batch_results = pickle.loads(message["data"])
+            for results in batch_results:
+                print(f"Got {results} from redis")
+                assert isinstance(results, dict)
+                for uuid, result in results.items():
+                    if metadata_str := await self.redis_client.hget(
+                        f"murko:{sample_id}:metadata", uuid
+                    ):
+                        next_angle = self.process_result(
+                            result, uuid, metadata_str, next_angle
+                        )
+        return next_angle
