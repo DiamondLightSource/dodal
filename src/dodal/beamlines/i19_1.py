@@ -5,8 +5,6 @@ from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
 from dodal.devices.i19.shutter import AccessControlledShutter, HutchState
-from dodal.devices.oav.oav_detector import OAV
-from dodal.devices.oav.oav_parameters import OAVConfig
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (
@@ -34,13 +32,13 @@ ZOOM_PARAMS_FILE = (
 )
 DISPLAY_CONFIG = "/dls_sw/i19-1/software/daq_configuration/domain/display.configuration"
 
-
-@device_factory()
-def oav() -> OAV:
-    return OAV(
-        prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
-        config=OAVConfig(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
-    )
+# See https://github.com/DiamondLightSource/dodal/issues/1145
+# @device_factory()
+# def oav() -> OAV:
+#     return OAV(
+#         prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
+#         config=OAVConfig(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
+#     )
 
 
 @device_factory()
