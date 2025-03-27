@@ -102,7 +102,11 @@ async def test_set_corrently_makes_rest_calls(
 ):
     test_request = {
         "name": "operate_shutter_plan",
-        "params": {"from_hutch": "EH2", "shutter_demand": shutter_demand},
+        "params": {
+            "experiment_hutch": "EH2",
+            "access_device": "access_control",
+            "shutter_demand": shutter_demand,
+        },
     }
     with (
         patch("dodal.devices.i19.shutter.ClientSession.post") as mock_post,

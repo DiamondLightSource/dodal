@@ -58,12 +58,13 @@ class AccessControlledShutter(StandardReadable, Movable):
 
     @AsyncStatus.wrap
     async def set(self, value: ShutterDemand):
-        # NOTE with newer version of decorator, "params" for request would be
-        # {"experiment_hutch": self.hutch_request.value,
-        # "access_device": "access_control", "shutter_demand": value}
         REQUEST_PARAMS = {
             "name": "operate_shutter_plan",
-            "params": {"from_hutch": self.hutch_request.value, "shutter_demand": value},
+            "params": {
+                "experiment_hutch": self.hutch_request.value,
+                "access_device": "access_control",  # Device name in i19-blueapi
+                "shutter_demand": value,
+            },
         }
         async with ClientSession(base_url=self.url, raise_for_status=True) as session:
             # First I need to submit the plan to the worker
