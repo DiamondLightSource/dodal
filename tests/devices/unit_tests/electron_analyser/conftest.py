@@ -3,10 +3,11 @@ import os
 import pytest
 from ophyd_async.core import init_devices
 
-from dodal.common.data_util import TBaseModel, load_json_file_to_class
+from dodal.common.data_util import load_json_file_to_class
 from dodal.devices.electron_analyser.abstract_analyser_controller import (
     TAbstractAnalyserController,
 )
+from dodal.devices.electron_analyser.abstract_region import TAbstractBaseSequence
 
 TEST_DATA_PATH = "tests/test_data/electron_analyser/"
 
@@ -17,7 +18,9 @@ def sequence_file_path(sequence_file: str) -> str:
 
 
 @pytest.fixture
-def sequence(sequence_class: type[TBaseModel], sequence_file_path: str) -> TBaseModel:
+def sequence(
+    sequence_class: type[TAbstractBaseSequence], sequence_file_path: str
+) -> TAbstractBaseSequence:
     return load_json_file_to_class(sequence_class, sequence_file_path)
 
 

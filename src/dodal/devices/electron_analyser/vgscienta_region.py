@@ -2,11 +2,12 @@ import uuid
 from enum import Enum
 
 from ophyd_async.core import StrictEnum
-from pydantic import BaseModel, Field
+from pydantic import Field
 
 from dodal.devices.electron_analyser.abstract_region import (
     AbstractBaseRegion,
     AbstractBaseSequence,
+    JavaToPythonModel,
 )
 
 
@@ -30,46 +31,46 @@ class AcquisitionMode(str, Enum):
 
 class VGScientaRegion(AbstractBaseRegion):
     # Override defaults of base region class
-    lensMode: str = "Angular45"
-    passEnergy: str = "5"
-    acquisitionMode: str = AcquisitionMode.SWEPT
-    lowEnergy: float = 8.0
-    highEnergy: float = 10.0
-    stepTime: float = 1.0
-    energyStep: float = Field(default=200.0)
+    lens_mode: str = "Angular45"
+    pass_energy: str = "5"
+    acquisition_mode: str = AcquisitionMode.SWEPT
+    low_energy: float = 8.0
+    high_energy: float = 10.0
+    step_time: float = 1.0
+    energy_step: float = Field(default=200.0)
     # Specific to this class
-    regionId: str = Field(default=str(uuid.uuid4()))
-    excitationEnergySource: str = "source1"
-    fixEnergy: float = 9.0
-    totalSteps: float = 13.0
-    totalTime: float = 13.0
-    exposureTime: float = 1.0
-    firstXChannel: int = 1
-    lastXChannel: int = 1000
-    firstYChannel: int = 101
-    lastYChannel: int = 800
-    detectorMode: DetectorMode = DetectorMode.ADC
+    id: str = Field(default=str(uuid.uuid4()), alias="region_id")
+    excitation_energy_source: str = "source1"
+    fix_energy: float = 9.0
+    total_steps: float = 13.0
+    total_time: float = 13.0
+    exposure_time: float = 1.0
+    first_x_channel: int = 1
+    last_x_channel: int = 1000
+    first_y_channel: int = 101
+    last_y_channel: int = 800
+    detector_mode: DetectorMode = DetectorMode.ADC
     status: Status = Status.READY
 
     def get_energy_step_eV(self) -> float:
-        return self.energyStep / 1000
+        return self.energy_step / 1000
 
     def x_channel_size(self) -> int:
-        return self.lastXChannel - self.firstXChannel + 1
+        return self.last_x_channel - self.first_x_channel + 1
 
     def y_channel_size(self) -> int:
-        return self.lastYChannel - self.firstYChannel + 1
+        return self.last_y_channel - self.first_y_channel + 1
 
 
-class VGScientaExcitationEnergySource(BaseModel):
+class VGScientaExcitationEnergySource(JavaToPythonModel):
     name: str = "source1"
-    scannableName: str = ""
+    device_name: str = Field(default="", alias="scannable_name")
     value: float = 0
 
 
 class VGScientaSequence(AbstractBaseSequence[VGScientaRegion]):
-    elementSet: str = Field(default="Unknown")
-    excitationEnergySources: list[VGScientaExcitationEnergySource] = Field(
+    element_set: str = Field(default="Unknown")
+    excitation_energy_sources: list[VGScientaExcitationEnergySource] = Field(
         default_factory=lambda: []
     )
     regions: list[VGScientaRegion] = Field(default_factory=lambda: [])
@@ -80,8 +81,8 @@ class VGScientaSequence(AbstractBaseSequence[VGScientaRegion]):
         value = next(
             (
                 e
-                for e in self.excitationEnergySources
-                if region.excitationEnergySource == e.name
+                for e in self.excitation_energy_sources
+                if region.excitation_energy_source == e.name
             ),
             None,
         )

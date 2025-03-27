@@ -72,9 +72,9 @@ class AbstractTestAnalyserController(
         region: TAbstractBaseRegion,
         excitation_energy_eV: float,
     ) -> None:
-        low_energy = region.lowEnergy
+        low_energy = region.low_energy
         ke = sim_analyser.to_kinetic_energy(
-            low_energy, excitation_energy_eV, region.energyMode
+            low_energy, excitation_energy_eV, region.energy_mode
         )
         if region.is_binding_energy():
             assert ke == (excitation_energy_eV - low_energy)
@@ -91,10 +91,10 @@ class AbstractTestAnalyserController(
         RE(abs_set(sim_analyser, region, excitation_energy_eV))
 
         get_mock_put(sim_analyser.acquisition_mode).assert_called_once_with(
-            region.acquisitionMode, wait=True
+            region.acquisition_mode, wait=True
         )
         get_mock_put(sim_analyser.lens_mode).assert_called_once_with(
-            region.lensMode, wait=True
+            region.lens_mode, wait=True
         )
 
     def test_given_region_that_analyser_sets_energy_values_correctly(
@@ -107,12 +107,12 @@ class AbstractTestAnalyserController(
         RE(abs_set(sim_analyser, region, excitation_energy_eV))
 
         expected_low_e = region.to_kinetic_energy(
-            region.lowEnergy, excitation_energy_eV
+            region.low_energy, excitation_energy_eV
         )
         expected_high_e = region.to_kinetic_energy(
-            region.highEnergy, excitation_energy_eV
+            region.high_energy, excitation_energy_eV
         )
-        expected_pass_e = region.passEnergy
+        expected_pass_e = region.pass_energy
 
         get_mock_put(sim_analyser.low_energy).assert_called_once_with(
             expected_low_e, wait=True
@@ -174,17 +174,16 @@ class TestSpecsAnalyserController(
             sim_analyser, region, excitation_energy_eV, RE
         )
 
-        expected_step_e = region.get_energy_step_eV()
-        if region.acquisitionMode == "Fixed Energy":
+        if region.acquisition_mode == "Fixed Energy":
             get_mock_put(sim_analyser.energy_step).assert_called_once_with(
-                expected_step_e, wait=True
+                region.energy_step, wait=True
             )
         else:
             get_mock_put(sim_analyser.energy_step).assert_not_called()
 
-        if region.acquisitionMode == "Fixed Transmission":
+        if region.acquisition_mode == "Fixed Transmission":
             get_mock_put(sim_analyser.centre_energy).assert_called_once_with(
-                region.centreEnergy, wait=True
+                region.centre_energy, wait=True
             )
         else:
             get_mock_put(sim_analyser.centre_energy).assert_not_called()
@@ -200,7 +199,7 @@ class TestSpecsAnalyserController(
             sim_analyser, region, excitation_energy_eV, RE
         )
         get_mock_put(sim_analyser.psu_mode).assert_called_once_with(
-            region.psuMode, wait=True
+            region.psu_mode, wait=True
         )
 
 
@@ -240,7 +239,7 @@ class TestVGScientaAnalyserController(
         )
 
         get_mock_put(sim_analyser.detector_mode).assert_called_once_with(
-            region.detectorMode, wait=True
+            region.detector_mode, wait=True
         )
         get_mock_put(sim_analyser.image_mode).assert_called_once_with(
             "Single", wait=True
@@ -258,7 +257,7 @@ class TestVGScientaAnalyserController(
         )
 
         expected_centre_e = region.to_kinetic_energy(
-            region.fixEnergy, excitation_energy_eV
+            region.fix_energy, excitation_energy_eV
         )
         expected_step_e = region.get_energy_step_eV()
 
@@ -280,7 +279,7 @@ class TestVGScientaAnalyserController(
             sim_analyser, region, excitation_energy_eV, RE
         )
 
-        expected_first_x = region.firstXChannel
+        expected_first_x = region.first_x_channel
         expected_size_x = region.x_channel_size()
         get_mock_put(sim_analyser.first_x_channel).assert_called_once_with(
             expected_first_x, wait=True
@@ -289,7 +288,7 @@ class TestVGScientaAnalyserController(
             expected_size_x, wait=True
         )
 
-        expected_first_y = region.firstYChannel
+        expected_first_y = region.first_y_channel
         expected_size_y = region.y_channel_size()
         get_mock_put(sim_analyser.first_y_channel).assert_called_once_with(
             expected_first_y, wait=True

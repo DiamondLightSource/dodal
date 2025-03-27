@@ -99,8 +99,8 @@ class TestAbstractSequenceAndRegions(
         self, sequence: TAbstractBaseSequence
     ) -> None:
         for r in sequence.regions:
-            is_binding_energy = r.energyMode == EnergyMode.BINDING
-            is_kinetic_energy = r.energyMode == EnergyMode.KINETIC
+            is_binding_energy = r.energy_mode == EnergyMode.BINDING
+            is_kinetic_energy = r.energy_mode == EnergyMode.KINETIC
             assert r.is_binding_energy() == is_binding_energy
             assert r.is_binding_energy() != is_kinetic_energy
             assert r.is_kinetic_energy() == is_kinetic_energy
@@ -114,8 +114,6 @@ class TestAbstractSequenceAndRegions(
         for i, r in enumerate(sequence.regions):
             for key in r.__dict__:
                 if key in expected_region_values[i]:
-                    print(r.__dict__[key], expected_region_values[i][key])
-                    print(type(r.__dict__[key]), type(expected_region_values[i][key]))
                     assert r.__dict__[key] == expected_region_values[i][key]
                 else:
                     raise KeyError('key "' + key + '" is not in the expected values.')
@@ -141,39 +139,39 @@ class TestSpecsSequenceAndRegions(
         return [
             {
                 "name": "region",
-                "acquisitionMode": "Fixed Transmission",
-                "psuMode": "3.5kV",
-                "lensMode": "SmallArea",
-                "lowEnergy": 800.0,
-                "highEnergy": 850.0,
-                "energyStep": 0.1,
-                "passEnergy": "5.0",
+                "acquisition_mode": "Fixed Transmission",
+                "psu_mode": "3.5kV",
+                "lens_mode": "SmallArea",
+                "low_energy": 800.0,
+                "high_energy": 850.0,
+                "energy_step": 0.1,
+                "pass_energy": "5.0",
                 "iterations": 1,
-                "stepTime": 1.0,
+                "step_time": 1.0,
                 "enabled": False,
-                "energyMode": EnergyMode.KINETIC,
+                "energy_mode": EnergyMode.KINETIC,
                 "values": 1,
                 "slices": 100,
-                "centreEnergy": 0.0,
-                "estimatedTimeInMs": 0,
+                "centre_energy": 0.0,
+                "estimated_time_in_ms": 0,
             },
             {
                 "name": "region2",
-                "acquisitionMode": "Snapshot",
-                "psuMode": "1.5kV",
-                "lensMode": "LargeArea",
-                "lowEnergy": 599.866,
-                "highEnergy": 600.134,
-                "energyStep": 0.2680000000000291,
-                "passEnergy": "2.0",
+                "acquisition_mode": "Snapshot",
+                "psu_mode": "1.5kV",
+                "lens_mode": "LargeArea",
+                "low_energy": 599.866,
+                "high_energy": 600.134,
+                "energy_step": 0.2680000000000291,
+                "pass_energy": "2.0",
                 "iterations": 5,
-                "stepTime": 2.0,
+                "step_time": 2.0,
                 "enabled": True,
-                "energyMode": EnergyMode.BINDING,
+                "energy_mode": EnergyMode.BINDING,
                 "values": 1,
                 "slices": 110,
-                "centreEnergy": 0.0,
-                "estimatedTimeInMs": 13718,
+                "centre_energy": 0.0,
+                "estimated_time_in_ms": 13718,
             },
         ]
 
@@ -199,53 +197,53 @@ class TestVGScientaSequenceAndRegions(
             {
                 "name": "New_Region",
                 "enabled": True,
-                "regionId": "_aQOmgPsmEe6w2YUF3bV-LA",
-                "lensMode": "Angular56",
-                "passEnergy": "5",
+                "id": "_aQOmgPsmEe6w2YUF3bV-LA",
+                "lens_mode": "Angular56",
+                "pass_energy": "5",
                 "slices": 1,
                 "iterations": 1,
-                "acquisitionMode": AcquisitionMode.SWEPT,
-                "excitationEnergySource": "source2",
-                "energyMode": EnergyMode.KINETIC,
-                "lowEnergy": 100.0,
-                "highEnergy": 101.0,
-                "fixEnergy": 9.0,
-                "stepTime": 1.0,
-                "totalSteps": 8.0,
-                "totalTime": 8.0,
-                "energyStep": 200.0,
-                "exposureTime": 1.0,
-                "firstXChannel": 1,
-                "lastXChannel": 1000,
-                "firstYChannel": 101,
-                "lastYChannel": 800,
-                "detectorMode": DetectorMode.ADC,
+                "acquisition_mode": AcquisitionMode.SWEPT,
+                "excitation_energy_source": "source2",
+                "energy_mode": EnergyMode.KINETIC,
+                "low_energy": 100.0,
+                "high_energy": 101.0,
+                "fix_energy": 9.0,
+                "step_time": 1.0,
+                "total_steps": 8.0,
+                "total_time": 8.0,
+                "energy_step": 200.0,
+                "exposure_time": 1.0,
+                "first_x_channel": 1,
+                "last_x_channel": 1000,
+                "first_y_channel": 101,
+                "last_y_channel": 800,
+                "detector_mode": DetectorMode.ADC,
                 "status": Status.READY,
             },
             {
                 "name": "New_Region1",
                 "enabled": False,
-                "regionId": "_aQOmgPsmEe6w2YUF3GV-LL",
-                "lensMode": "Angular45",
-                "passEnergy": "10",
+                "id": "_aQOmgPsmEe6w2YUF3GV-LL",
+                "lens_mode": "Angular45",
+                "pass_energy": "10",
                 "slices": 10,
                 "iterations": 5,
-                "acquisitionMode": AcquisitionMode.FIXED,
-                "excitationEnergySource": "source1",
-                "energyMode": EnergyMode.BINDING,
-                "lowEnergy": 4899.5615,
-                "highEnergy": 4900.4385,
-                "fixEnergy": 4900.0,
-                "stepTime": 0.882,
-                "totalSteps": 1.0,
-                "totalTime": 4.41,
-                "energyStep": 0.877,
-                "exposureTime": 1.0,
-                "firstXChannel": 4,
-                "lastXChannel": 990,
-                "firstYChannel": 110,
-                "lastYChannel": 795,
-                "detectorMode": DetectorMode.PULSE_COUNTING,
+                "acquisition_mode": AcquisitionMode.FIXED,
+                "excitation_energy_source": "source1",
+                "energy_mode": EnergyMode.BINDING,
+                "low_energy": 4899.5615,
+                "high_energy": 4900.4385,
+                "fix_energy": 4900.0,
+                "step_time": 0.882,
+                "total_steps": 1.0,
+                "total_time": 4.41,
+                "energy_step": 0.877,
+                "exposure_time": 1.0,
+                "first_x_channel": 4,
+                "last_x_channel": 990,
+                "first_y_channel": 110,
+                "last_y_channel": 795,
+                "detector_mode": DetectorMode.PULSE_COUNTING,
                 "status": Status.READY,
             },
         ]
@@ -256,13 +254,13 @@ class TestVGScientaSequenceAndRegions(
     ) -> None:
         assert (
             sequence.get_excitation_energy_source_by_region(sequence.regions[0])
-            == sequence.excitationEnergySources[1]
+            == sequence.excitation_energy_sources[1]
         )
         assert (
             sequence.get_excitation_energy_source_by_region(sequence.regions[1])
-            == sequence.excitationEnergySources[0]
+            == sequence.excitation_energy_sources[0]
         )
         with pytest.raises(ValueError):
             sequence.get_excitation_energy_source_by_region(
-                VGScientaRegion(excitationEnergySource="invalid_source")
+                VGScientaRegion(excitation_energy_source="invalid_source")
             )

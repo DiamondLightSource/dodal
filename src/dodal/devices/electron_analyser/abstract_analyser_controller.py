@@ -53,17 +53,17 @@ class AbstractAnalyserController(
         """
 
         LOGGER.info(f'Configuring analyser with region "{region.name}"')
-        low_energy = region.to_kinetic_energy(region.lowEnergy, excitation_energy_eV)
-        high_energy = region.to_kinetic_energy(region.highEnergy, excitation_energy_eV)
+        low_energy = region.to_kinetic_energy(region.low_energy, excitation_energy_eV)
+        high_energy = region.to_kinetic_energy(region.high_energy, excitation_energy_eV)
         # Set detector settings, wait for them all to have completed
         await asyncio.gather(
             self.low_energy.set(low_energy),
             self.high_energy.set(high_energy),
             self.slices.set(region.slices),
-            self.lens_mode.set(region.lensMode),
-            self.pass_energy.set(region.passEnergy),
+            self.lens_mode.set(region.lens_mode),
+            self.pass_energy.set(region.pass_energy),
             self.iterations.set(region.iterations),
-            self.acquisition_mode.set(region.acquisitionMode),
+            self.acquisition_mode.set(region.acquisition_mode),
         )
 
 

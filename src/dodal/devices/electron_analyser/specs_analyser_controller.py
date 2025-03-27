@@ -22,21 +22,18 @@ class SpecsAnalyserController(AbstractAnalyserController):
     async def set(
         self, region: SpecsRegion, excitation_energy_eV: float, *args, **kwargs
     ):
-        # These units need to be converted depending on the region
-        energy_step_eV = region.get_energy_step_eV()
-
         await asyncio.gather(
             super().set(region, excitation_energy_eV),
             self.values.set(region.values),
-            self.psu_mode.set(region.psuMode),
+            self.psu_mode.set(region.psu_mode),
             (
-                self.centre_energy.set(region.centreEnergy)
-                if region.acquisitionMode == "Fixed Transmission"
+                self.centre_energy.set(region.centre_energy)
+                if region.acquisition_mode == "Fixed Transmission"
                 else asyncio.sleep(0)
             ),
             (
-                self.energy_step.set(energy_step_eV)
-                if region.acquisitionMode == "Fixed Energy"
+                self.energy_step.set(region.energy_step)
+                if region.acquisition_mode == "Fixed Energy"
                 else asyncio.sleep(0)
             ),
         )

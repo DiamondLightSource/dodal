@@ -1,8 +1,48 @@
+import re
 from abc import ABC
+from collections.abc import Callable
 from enum import Enum
-from typing import Any, Generic, TypeVar
+from typing import Generic, TypeVar
 
 from pydantic import BaseModel, Field, model_validator
+
+
+def java_to_python_case(java_str: str) -> str:
+    """
+    Convert a camelCase Java-style string to a snake_case Python-style string.
+
+    :param java_str: The Java-style camelCase string.
+    :return: The Python-style snake_case string.
+    """
+    new_value = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", java_str)
+    new_value = re.sub("([a-z0-9])([A-Z])", r"\1_\2", new_value).lower()
+    return new_value
+
+
+def switch_case_validation(data: dict, f: Callable[[str], str]) -> dict:
+    new_data = {}
+    for key, values in data.items():
+        new_data[f(key)] = values
+    return new_data
+
+
+class JavaToPythonModel(BaseModel):
+    @model_validator(mode="before")
+    @classmethod
+    def before_validation(cls, data: dict) -> dict:
+        data = switch_case_validation(data, java_to_python_case)
+        return data
+
+
+def energy_mode_validation(data: dict) -> dict:
+    # Convert binding_energy to energy_mode to make base region more generic
+    if "binding_energy" in data:
+        is_binding_energy = data["binding_energy"]
+        del data["binding_energy"]
+        data["energy_mode"] = (
+            EnergyMode.BINDING if is_binding_energy else EnergyMode.KINETIC
+        )
+    return data
 
 
 class EnergyMode(str, Enum):
@@ -10,7 +50,7 @@ class EnergyMode(str, Enum):
     BINDING = "Binding"
 
 
-class AbstractBaseRegion(ABC, BaseModel):
+class AbstractBaseRegion(ABC, JavaToPythonModel):
     """
     Generic region model that holds the data. Specialised region models should inherit
     this to extend functionality. All energy units are assumed to be in eV.
@@ -21,48 +61,43 @@ class AbstractBaseRegion(ABC, BaseModel):
     slices: int = 1
     iterations: int = 1
     # These ones we need subclasses to provide default values
-    lensMode: str
-    passEnergy: str
-    acquisitionMode: str
-    lowEnergy: float
-    highEnergy: float
-    stepTime: float
-    energyStep: float  # in eV
-    energyMode: EnergyMode = EnergyMode.KINETIC
+    lens_mode: str
+    pass_energy: str
+    acquisition_mode: str
+    low_energy: float
+    high_energy: float
+    step_time: float
+    energy_step: float  # in eV
+    energy_mode: EnergyMode = EnergyMode.KINETIC
 
     def is_binding_energy(self) -> bool:
-        return self.energyMode == EnergyMode.BINDING
+        return self.energy_mode == EnergyMode.BINDING
 
     def is_kinetic_energy(self) -> bool:
-        return self.energyMode == EnergyMode.KINETIC
+        return self.energy_mode == EnergyMode.KINETIC
 
     def to_kinetic_energy(self, value: float, excitation_energy: float) -> float:
         return value if self.is_binding_energy() else excitation_energy - value
 
     @model_validator(mode="before")
     @classmethod
-    def check_energy_mode(cls, data: Any) -> Any:
-        if isinstance(data, dict):
-            # convert bindingEnergy to energyMode to make base region more generic
-            if "bindingEnergy" in data:
-                is_binding_energy = data["bindingEnergy"]
-                del data["bindingEnergy"]
-                data["energyMode"] = (
-                    EnergyMode.BINDING if is_binding_energy else EnergyMode.KINETIC
-                )
+    def before_validation(cls, data: dict) -> dict:
+        data = switch_case_validation(data, java_to_python_case)
+        data = energy_mode_validation(data)
         return data
 
 
 TAbstractBaseRegion = TypeVar("TAbstractBaseRegion", bound=AbstractBaseRegion)
 
 
-class AbstractBaseSequence(ABC, BaseModel, Generic[TAbstractBaseRegion]):
+class AbstractBaseSequence(ABC, JavaToPythonModel, Generic[TAbstractBaseRegion]):
     """
     Generic sequence model that holds the list of region data. Specialised sequence
     models should inherit this to extend functionality and define type of region to
     hold.
     """
 
+    version: float = 0.1  # If file format changes within prod, increment this number!
     regions: list[TAbstractBaseRegion] = Field(default_factory=lambda: [])
 
     def get_enabled_regions(self) -> list[TAbstractBaseRegion]:

@@ -8,22 +8,18 @@ from dodal.devices.electron_analyser.abstract_region import (
 
 class SpecsRegion(AbstractBaseRegion):
     # Override base class with defaults
-    lensMode: str = "SmallArea"
-    passEnergy: str = "5.0"
-    acquisitionMode: str = "Fixed Transmission"
-    lowEnergy: float = Field(default=800, alias="startEnergy")
-    highEnergy: float = Field(default=850, alias="endEnergy")
-    stepTime: float = Field(default=1.0, alias="exposureTime")
-    energyStep: float = Field(default=0.1, alias="stepEnergy")
+    lens_mode: str = "SmallArea"
+    pass_energy: str = "5.0"
+    acquisition_mode: str = "Fixed Transmission"
+    low_energy: float = Field(default=800, alias="start_energy")
+    high_energy: float = Field(default=850, alias="end_energy")
+    step_time: float = Field(default=1.0, alias="exposure_time")
+    energy_step: float = Field(default=0.1, alias="step_energy")
     # Specific to this class
     values: int = 1
-    centreEnergy: float = 0
-    psuMode: str = "1.5keV"
-    acquisitionMode: str = ""
-    estimatedTimeInMs: float = 0
-
-    def get_energy_step_eV(self) -> float:
-        return self.energyStep
+    centre_energy: float = 0
+    psu_mode: str = "1.5keV"
+    estimated_time_in_ms: float = 0
 
 
 class SpecsSequence(AbstractBaseSequence[SpecsRegion]):

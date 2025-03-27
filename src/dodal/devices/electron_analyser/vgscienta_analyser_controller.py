@@ -30,17 +30,19 @@ class VGScientaAnalyserController(AbstractAnalyserController):
     async def set(
         self, region: VGScientaRegion, excitation_energy_eV: float, *args, **kwargs
     ):
-        centre_energy = region.to_kinetic_energy(region.fixEnergy, excitation_energy_eV)
+        centre_energy = region.to_kinetic_energy(
+            region.fix_energy, excitation_energy_eV
+        )
         energy_step_eV = region.get_energy_step_eV()
 
         await asyncio.gather(
             super().set(region, excitation_energy_eV),
             self.centre_energy.set(centre_energy),
             self.energy_step.set(energy_step_eV),
-            self.first_x_channel.set(region.firstXChannel),
-            self.first_y_channel.set(region.firstYChannel),
+            self.first_x_channel.set(region.first_x_channel),
+            self.first_y_channel.set(region.first_y_channel),
             self.x_channel_size.set(region.x_channel_size()),
             self.y_channel_size.set(region.y_channel_size()),
-            self.detector_mode.set(region.detectorMode),
+            self.detector_mode.set(region.detector_mode),
             self.image_mode.set("Single"),
         )
