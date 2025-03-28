@@ -103,8 +103,6 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         omega: float,
         search_angle: float,
     ) -> np.ndarray | None:
-        print(omega)
-        print(search_angle)
         LOGGER.info(f"Compare {omega}, {search_angle}, {self._last_omega}")
         if (  # if last omega is closest
             abs(omega - search_angle) >= abs(self._last_omega - search_angle)

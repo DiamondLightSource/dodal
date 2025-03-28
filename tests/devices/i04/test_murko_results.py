@@ -14,6 +14,7 @@ from ophyd_async.testing import set_mock_value
 from pytest import approx
 
 from dodal.devices.i04.murko_results import MurkoResultsDevice
+from dodal.devices.oav.oav_calculations import camera_coordinates_to_xyz_mm
 
 
 @pytest.fixture
@@ -449,9 +450,14 @@ async def test_trigger_calls_get_message_and_hget(
     assert fake_murko_results.redis_client.hget.call_count == 30
 
 
+@patch(
+    "dodal.devices.i04.murko_results.camera_coordinates_to_xyz_mm",
+    wraps=camera_coordinates_to_xyz_mm,
+)
 @patch("dodal.devices.i04.murko_results.StrictRedis")
 async def test_trigger_stops_once_last_angle_found(
     fake_strict_redis,
+    fake_camera_coordinates,
     fake_murko_results,
 ):
     messages = iter(
@@ -485,3 +491,7 @@ async def test_trigger_stops_once_last_angle_found(
     assert fake_murko_results.pubsub.get_message.call_count == 4
     # 4 batches of 6 = 24
     assert fake_murko_results.redis_client.hget.call_count == 24
+    assert fake_camera_coordinates.call_count == 3  # Should be called for 90, 180, 270
+    assert fake_camera_coordinates.call_args_list[0][0][2] == 90
+    assert fake_camera_coordinates.call_args_list[1][0][2] == 180
+    assert fake_camera_coordinates.call_args_list[2][0][2] == 270
