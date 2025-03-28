@@ -19,7 +19,7 @@ def one_shot_trigger_info() -> TriggerInfo:
         frame_timeout=None,
         number_of_triggers=1,
         trigger=DetectorTrigger.INTERNAL,
-        deadtime=None,
+        deadtime=0.0,
         livetime=None,
     )
 
@@ -76,7 +76,6 @@ async def test_can_collect(
     assert stream_resource["uri"] == "file://localhost/foo/bar.hdf"
     assert stream_resource["parameters"] == {
         "dataset": "/entry/data/data",
-        "swmr": False,
         "multiplier": 1,
         "chunk_shape": (1, 20, 10),
     }
