@@ -2,7 +2,7 @@ from collections.abc import Callable, Coroutine
 from typing import Any
 
 from bluesky.protocols import Reading
-from ophyd_async.core import SignalDatatypeT, SignalR, SignalRW, SoftSignalBackend
+from ophyd_async.core import SignalDatatypeT, SignalRW, SoftSignalBackend
 
 SetHardwareType = Callable[[SignalDatatypeT], Coroutine[Any, Any, None]]
 
@@ -56,31 +56,6 @@ def create_rw_hardware_backed_soft_signal(
         backend=HardwareBackedSoftSignalBackend(
             get_from_hardware_func,
             set_to_hardware_func,
-            datatype,
-            units=units,
-            precision=precision,
-        )
-    )
-
-
-def create_r_hardware_backed_soft_signal(
-    datatype: type[SignalDatatypeT],
-    get_from_hardware_func: Callable[[], Coroutine[Any, Any, SignalDatatypeT]],
-    units: str | None = None,
-    precision: int | None = None,
-):
-    """Creates a soft signal that, when read will call the function passed into
-    `get_from_hardware_func` and return this.
-
-    This will allow you to make soft signals derived from arbitrary hardware signals.
-    However, calling subscribe on this signal does not give you a sensible value and
-    the signal is currently read only. See https://github.com/bluesky/ophyd-async/issues/525
-    for a more full solution.
-    """
-    return SignalR(
-        backend=HardwareBackedSoftSignalBackend(
-            get_from_hardware_func,
-            None,
             datatype,
             units=units,
             precision=precision,
