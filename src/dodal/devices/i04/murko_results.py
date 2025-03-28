@@ -106,10 +106,15 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         print(omega)
         print(search_angle)
         LOGGER.info(f"Compare {omega}, {search_angle}, {self._last_omega}")
-        if abs(omega - search_angle) >= abs(self._last_omega - search_angle):
+        if (  # if last omega is closest
+            abs(omega - search_angle) >= abs(self._last_omega - search_angle)
+            and self._last_result is not None
+        ):
             closest_result = self._last_result
-        elif omega - search_angle >= 0:
+            closest_omega = self._last_omega
+        elif omega - search_angle >= 0:  # if this omega is closest
             closest_result = result
+            closest_omega = omega
         else:
             return None
         coords = closest_result[
@@ -118,7 +123,9 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         shape = closest_result["original_shape"]  # Dimensions of image in pixels
         # Murko returns coords as y, x
         centre_px = (coords[1] * shape[1], coords[0] * shape[0])
-        LOGGER.info(f"Using image taken at {omega}, which found xtal at {centre_px}")
+        LOGGER.info(
+            f"Using image taken at {closest_omega}, which found xtal at {centre_px}"
+        )
 
         beam_dist_px = calculate_beam_distance(
             self.get_beam_centre(),  # beam centre
@@ -129,7 +136,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         return camera_coordinates_to_xyz_mm(
             beam_dist_px[0],
             beam_dist_px[1],
-            omega,
+            closest_omega,
             metadata["microns_per_x_pixel"],
             metadata["microns_per_y_pixel"],
         )
