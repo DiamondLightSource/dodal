@@ -103,10 +103,8 @@ class OAV(StandardReadable):
 
     def _get_microns_per_pixel(self, zoom_level: str, size: int, coord: int) -> float:
         """Extracts the microns per x pixel and y pixel for a given zoom level."""
-        print("--------------", coord)
         _zoom = self._read_current_zoom(zoom_level)
         value = self.parameters[_zoom].microns_per_pixel[coord]
-        print(_zoom, "----", value, "----------", coord)
         return value * DEFAULT_OAV_WINDOW[coord] / size
 
     def _get_beam_position(self, zoom_level: str, size: int, coord: int) -> int:
