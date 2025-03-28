@@ -57,7 +57,7 @@ def zebra() -> Zebra:
 
 @device_factory()
 def shutter() -> AccessControlledShutter:
-    """Get the i19-2 hutch shutter device, instantiate it if it hasn't already been.
+    """Get the i19-1 hutch shutter device, instantiate it if it hasn't already been.
     If this is called when already instantiated, it will return the existing object.
     """
     return AccessControlledShutter(
