@@ -15,7 +15,7 @@ description = "Ophyd devices and other utils that could be used across DLS beaml
 dependencies = [
     "click",
     "ophyd",
-    "ophyd-async>=0.10.0a1",
+    "ophyd-async>=0.10.0a2",
     "bluesky",
     "pyepics",
     "dataclasses-json",
@@ -179,6 +179,7 @@ lint.select = [
     "UP",     # pyupgrade - https://docs.astral.sh/ruff/rules/#pyupgrade-up
     "SLF",    # self - https://docs.astral.sh/ruff/settings/#lintflake8-self
     "RUF018", # walrus operators in asserts - https://docs.astral.sh/ruff/rules/assignment-in-assert/
+    "TID251", # banned api - https://docs.astral.sh/ruff/rules/banned-api/
 ]
 
 [tool.ruff.lint.per-file-ignores]
