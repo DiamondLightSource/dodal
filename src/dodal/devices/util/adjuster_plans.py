@@ -7,14 +7,13 @@ from collections.abc import Callable, Generator
 
 from bluesky import plan_stubs as bps
 from bluesky.utils import Msg
-from ophyd.epics_motor import EpicsMotor
 from ophyd_async.epics.motor import Motor
 
 from dodal.log import LOGGER
 
 
 def lookup_table_adjuster(
-    lookup_table: Callable[[float], float], output_device: EpicsMotor | Motor, input
+    lookup_table: Callable[[float], float], output_device: Motor, input
 ):
     """Returns a callable that adjusts a value according to a lookup table"""
 
