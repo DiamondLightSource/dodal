@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def camera_coordinates_to_xyz(
+def camera_coordinates_to_xyz_mm(
     horizontal: float,
     vertical: float,
     omega: float,
