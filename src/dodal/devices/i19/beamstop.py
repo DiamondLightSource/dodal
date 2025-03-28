@@ -5,7 +5,7 @@ from ophyd_async.epics.motor import Motor
 
 class HomeGroup(StrictEnum):
     NONE = "none"
-    ALL = "All"  # NOTE On eh1 device it's ALL. Sigh. Need to ask to fix it
+    ALL = "All"
     X = "X"
     Y = "Y"
     Z = "Z"
