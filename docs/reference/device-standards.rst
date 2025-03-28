@@ -150,10 +150,9 @@ based on this and so this has the issues listed above. Instead you should make s
         def __init__(self):
             self.underlying_motor = Motor("MOTOR")
             with self.add_children_as_readables():
-                self.in_out = create_r_hardware_backed_soft_signal(InOut, self._get_in_out_from_hardware)
+                self.in_out = derived_signal_r(self._get_in_out_from_hardware, current_position= self.underlying_motor)
                 
-        async def _get_in_out_from_hardware(self):
-            current_position = await self.underlying_motor.get_value()
+        def _get_in_out_from_hardware(self, current_position:float)->InOut:
             if isclose(current_position, 0):
                 return InOut.IN
             elif isclose(current_position, 100):
