@@ -13,7 +13,7 @@ from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.devices.areadetector.plugins.CAM import Cam
 from dodal.devices.oav.oav_parameters import DEFAULT_OAV_WINDOW, OAVConfig
-from dodal.devices.oav.snapshots.snapshot_with_beam_centre import SnapshotWithBeamCentre
+from dodal.devices.oav.snapshots.snapshot import Snapshot
 from dodal.devices.oav.snapshots.snapshot_with_grid import SnapshotWithGrid
 
 
@@ -91,10 +91,8 @@ class OAV(StandardReadable):
                 size=self.sizes[Coords.Y],
                 coord=soft_signal_rw(datatype=int, initial_value=Coords.Y.value),
             )
-            self.snapshot = SnapshotWithBeamCentre(
+            self.snapshot = Snapshot(
                 f"{self._prefix}MJPG:",
-                self.beam_centre_i,
-                self.beam_centre_j,
                 self._name,
             )
 

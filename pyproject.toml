@@ -15,8 +15,7 @@ description = "Ophyd devices and other utils that could be used across DLS beaml
 dependencies = [
     "click",
     "ophyd",
-    # Pinned due to https://github.com/DiamondLightSource/dodal/issues/1141
-    "ophyd-async == v0.10.0a1",
+    "ophyd-async>=0.10.0a1",
     "bluesky",
     "pyepics",
     "dataclasses-json",
@@ -25,9 +24,9 @@ dependencies = [
     "requests",
     "graypy",
     "pydantic>=2.0",
-    "opencv-python-headless",   # For pin-tip detection.
-    "aioca",                    # Required for CA support with ophyd-async.
-    "p4p",                      # Required for PVA support with ophyd-async.
+    "opencv-python-headless", # For pin-tip detection.
+    "aioca",                  # Required for CA support with ophyd-async.
+    "p4p",                    # Required for PVA support with ophyd-async.
     "numpy",
     "aiofiles",
     "aiohttp",
@@ -185,9 +184,12 @@ lint.select = [
 [tool.ruff.lint.per-file-ignores]
 # By default, private member access is allowed in tests
 # See https://github.com/DiamondLightSource/python-copier-template/issues/154
-# Remove this line to forbid private member access and walrus operators in asserts in tests 
-"tests/**/*" = ["SLF001", "RUF018"]
-"system_tests/**/*" = ["SLF001", "RUF018"]
+# Remove this line to forbid private member access, walrus operators, banned api in asserts in tests 
+"tests/**/*" = ["SLF001", "RUF018", "TID251"]
+"system_tests/**/*" = ["SLF001", "RUF018", "TID251"]
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"time.sleep".msg = "Use bps.sleep or asyncio.sleep instead. # noqa will disable this rule for that line. See https://github.com/DiamondLightSource/mx-bluesky/issues/925"
 
 [tool.importlinter]
 root_package = "dodal"
