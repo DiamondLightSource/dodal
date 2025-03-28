@@ -241,7 +241,7 @@ class ApertureScatterguard(StandardReadable, Movable[ApertureValue], Preparable)
     def _get_current_radius(self, current_aperture: ApertureValue) -> float:
         return self._loaded_positions[current_aperture].radius
 
-    def _is_out_of_beam(self, current_ap_y) -> bool:
+    def _is_out_of_beam(self, current_ap_y: float) -> bool:
         out_ap_y = self._loaded_positions[ApertureValue.OUT_OF_BEAM].aperture_y
         return current_ap_y <= out_ap_y + self._tolerances.aperture_y
 
