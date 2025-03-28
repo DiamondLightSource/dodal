@@ -1,16 +1,9 @@
-import asyncio
 import json
 import pickle
-from typing import Generator
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import numpy as np
 import pytest
-from ophyd_async.core import (
-    init_devices,
-    wait_for_value,
-)
-from ophyd_async.testing import set_mock_value
 from pytest import approx
 
 from dodal.devices.i04.murko_results import MurkoResultsDevice
