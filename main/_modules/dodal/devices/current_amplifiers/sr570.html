@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.current_amplifiers.sr570 &#8212; dodal 1.43.1.dev9+g5f715e99c documentation</title>
+    <title>dodal.devices.current_amplifiers.sr570 &#8212; dodal 1.43.1.dev10+g87b88a306 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=3b908211"></script>
+    <script src="../../../../_static/documentation_options.js?v=09ca1b58"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -647,7 +647,6 @@ window.addEventListener("load", () => mermaid.run());
         <span class="p">)</span>
         <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raise_timetable</span><span class="p">[</span><span class="n">coarse_gain</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 
-    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">increase_gain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">current_gain</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_gain</span><span class="p">())</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
         <span class="n">current_gain</span> <span class="o">+=</span> <span class="n">value</span>
@@ -658,7 +657,6 @@ window.addEventListener("load", () => mermaid.run());
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Gain at max value&quot;</span><span class="p">)</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gain_conversion_table</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;SEN_</span><span class="si">{</span><span class="n">current_gain</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">])</span>
 
-    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">decrease_gain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">current_gain</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_gain</span><span class="p">())</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
         <span class="n">current_gain</span> <span class="o">-=</span> <span class="n">value</span>
@@ -667,18 +665,15 @@ window.addEventListener("load", () => mermaid.run());
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Gain at min value&quot;</span><span class="p">)</span>
         <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gain_conversion_table</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;SEN_</span><span class="si">{</span><span class="n">current_gain</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">])</span>
 
-    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_gain</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Enum</span><span class="p">:</span>
         <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">coarse_gain</span><span class="o">.</span><span class="n">get_value</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">fine_gain</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">gain_conversion_table</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">combined_table</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
 
-    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_upperlimit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">upperlimit</span>
 
-    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_lowerlimit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lowerlimit</span></div>
 

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.current_amplifiers.current_amplifier &#8212; dodal 1.43.1.dev9+g5f715e99c documentation</title>
+    <title>dodal.devices.current_amplifiers.current_amplifier &#8212; dodal 1.43.1.dev10+g87b88a306 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=3b908211"></script>
+    <script src="../../../../_static/documentation_options.js?v=09ca1b58"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -479,7 +479,6 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="CurrentAmp.increase_gain">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.current_amplifiers.CurrentAmp.html#dodal.devices.current_amplifiers.CurrentAmp.increase_gain">[docs]</a>
     <span class="nd">@abstractmethod</span>
-    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">increase_gain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Increase gain, increment by 1 by default.</span>
 
@@ -490,7 +489,6 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="CurrentAmp.decrease_gain">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.current_amplifiers.CurrentAmp.html#dodal.devices.current_amplifiers.CurrentAmp.decrease_gain">[docs]</a>
-    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="nd">@abstractmethod</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">decrease_gain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Decrease gain, decrement by 1 by default.</span>
@@ -502,9 +500,8 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="CurrentAmp.get_gain">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.current_amplifiers.CurrentAmp.html#dodal.devices.current_amplifiers.CurrentAmp.get_gain">[docs]</a>
-    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="nd">@abstractmethod</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_gain</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">Enum</span><span class="p">]:</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_gain</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Enum</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the current gain setting</span>
 
 <span class="sd">        Returns:</span>
@@ -514,7 +511,6 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="CurrentAmp.get_upperlimit">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.current_amplifiers.CurrentAmp.html#dodal.devices.current_amplifiers.CurrentAmp.get_upperlimit">[docs]</a>
-    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="nd">@abstractmethod</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_upperlimit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the upper limit of the current amplifier&quot;&quot;&quot;</span></div>
@@ -522,7 +518,6 @@ window.addEventListener("load", () => mermaid.run());
 
 <div class="viewcode-block" id="CurrentAmp.get_lowerlimit">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.current_amplifiers.CurrentAmp.html#dodal.devices.current_amplifiers.CurrentAmp.get_lowerlimit">[docs]</a>
-    <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="nd">@abstractmethod</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_lowerlimit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the lower limit of the current amplifier&quot;&quot;&quot;</span></div>
