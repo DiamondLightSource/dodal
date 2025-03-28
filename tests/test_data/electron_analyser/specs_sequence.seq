@@ -1,7 +1,7 @@
 {
   "regions": [
     {
-      "name": "region",
+      "name": "New_Region",
       "acquisitionMode": "Fixed Transmission",
       "psuMode": "3.5kV",
       "lensMode": "SmallArea",
@@ -19,7 +19,7 @@
       "estimatedTimeInMs": 0
     },
     {
-      "name": "region2",
+      "name": "New_Region1",
       "acquisitionMode": "Snapshot",
       "psuMode": "1.5kV",
       "lensMode": "LargeArea",

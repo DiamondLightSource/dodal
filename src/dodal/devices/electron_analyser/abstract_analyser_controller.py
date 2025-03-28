@@ -1,21 +1,16 @@
-import asyncio
 from abc import ABC
 from typing import Generic, TypeVar
 
-from bluesky.protocols import Movable
-from ophyd_async.core import AsyncStatus, StandardReadable
+from ophyd_async.core import StandardReadable
 from ophyd_async.epics.core import epics_signal_rw
 
 from dodal.devices.electron_analyser.abstract_region import (
     EnergyMode,
     TAbstractBaseRegion,
 )
-from dodal.log import LOGGER
 
 
-class AbstractAnalyserController(
-    ABC, StandardReadable, Movable, Generic[TAbstractBaseRegion]
-):
+class AbstractAnalyserController(ABC, StandardReadable, Generic[TAbstractBaseRegion]):
     """
     Generic device to configure electron analyser with new region settings.
     Electron analysers should inherit from this class for further specialisation.
@@ -35,36 +30,9 @@ class AbstractAnalyserController(
         super().__init__(name)
 
     def to_kinetic_energy(
-        self, value: float, excitation_energy_eV: float, mode: EnergyMode
+        self, value: float, excitation_energy: float, mode: EnergyMode
     ) -> float:
-        return excitation_energy_eV - value if mode == EnergyMode.BINDING else value
-
-    @AsyncStatus.wrap
-    async def set(
-        self,
-        region: TAbstractBaseRegion,
-        excitation_energy_eV: float,
-        *args,
-        **kwargs,
-    ):
-        """
-        This is intended to be used with bluesky plan
-        bps.abs_set(analyser, region, excitation_energy)
-        """
-
-        LOGGER.info(f'Configuring analyser with region "{region.name}"')
-        low_energy = region.to_kinetic_energy(region.low_energy, excitation_energy_eV)
-        high_energy = region.to_kinetic_energy(region.high_energy, excitation_energy_eV)
-        # Set detector settings, wait for them all to have completed
-        await asyncio.gather(
-            self.low_energy.set(low_energy),
-            self.high_energy.set(high_energy),
-            self.slices.set(region.slices),
-            self.lens_mode.set(region.lens_mode),
-            self.pass_energy.set(region.pass_energy),
-            self.iterations.set(region.iterations),
-            self.acquisition_mode.set(region.acquisition_mode),
-        )
+        return excitation_energy - value if mode == EnergyMode.BINDING else value
 
 
 TAbstractAnalyserController = TypeVar(

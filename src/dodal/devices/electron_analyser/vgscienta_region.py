@@ -52,9 +52,6 @@ class VGScientaRegion(AbstractBaseRegion):
     detector_mode: DetectorMode = DetectorMode.ADC
     status: Status = Status.READY
 
-    def get_energy_step_eV(self) -> float:
-        return self.energy_step / 1000
-
     def x_channel_size(self) -> int:
         return self.last_x_channel - self.first_x_channel + 1
 
