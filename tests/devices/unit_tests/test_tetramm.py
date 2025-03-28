@@ -1,7 +1,7 @@
 import pytest
 from bluesky.run_engine import RunEngine
 from ophyd_async.core import DetectorTrigger, PathProvider, TriggerInfo, init_devices
-from ophyd_async.epics.adcore import FileWriteMode
+from ophyd_async.epics.adcore import ADFileWriteMode
 from ophyd_async.testing import set_mock_value
 
 from dodal.devices.tetramm import (
@@ -328,7 +328,7 @@ async def test_prepare_sets_up_writer(
     assert await tetramm.hdf.lazy_open.get_value()
     assert await tetramm.hdf.swmr_mode.get_value()
     assert (await tetramm.hdf.file_template.get_value()) == "%s%s.h5"
-    assert (await tetramm.hdf.file_write_mode.get_value()) == FileWriteMode.STREAM
+    assert (await tetramm.hdf.file_write_mode.get_value()) == ADFileWriteMode.STREAM
 
 
 async def test_stage_sets_up_accurate_describe_output(
