@@ -18,7 +18,7 @@ class HutchState(str, Enum):
     INVALID = "INVALID"
 
 
-class HutchConditionalShutter(StandardReadable, Movable):
+class HutchConditionalShutter(StandardReadable, Movable[ShutterDemand]):
     """ I19-specific device to operate the hutch shutter.
 
     This device evaluates the hutch state value to work out which of the two I19 \
@@ -37,6 +37,10 @@ class HutchConditionalShutter(StandardReadable, Movable):
         self.shutter = HutchShutter(prefix=prefix, name=name)
         bl_prefix = prefix.split("-")[0]
         self.hutch_state = epics_signal_r(str, f"{bl_prefix}-OP-STAT-01:EHStatus.VALA")
+        if hutch == HutchState.INVALID:
+            raise HutchInvalidError(
+                "Cannot define experimental shutter for invalid hutch"
+            )
         self.hutch_request = hutch
         super().__init__(name)
 

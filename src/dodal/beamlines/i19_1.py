@@ -47,7 +47,7 @@ def beamstop() -> BeamStop:
 @device_factory()
 def oav() -> OAV:
     return OAV(
-        prefix=f"{PREFIX.beamline_prefix}-DI-OAV-01:",
+        prefix=f"{PREFIX.beamline_prefix}-EA-OAV-01:",
         config=OAVConfig(ZOOM_PARAMS_FILE, DISPLAY_CONFIG),
     )
 
