@@ -1,11 +1,9 @@
-from asyncio import gather
 from math import isclose
 
-from ophyd_async.core import StandardReadable, StrictEnum
+from ophyd_async.core import StandardReadable, StrictEnum, derived_signal_r
 from ophyd_async.epics.motor import Motor
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
-from dodal.common.signal_utils import create_r_hardware_backed_soft_signal
 
 
 class BeamstopPositions(StrictEnum):
@@ -53,8 +51,8 @@ class Beamstop(StandardReadable):
             self.x_mm = Motor(prefix + "X")
             self.y_mm = Motor(prefix + "Y")
             self.z_mm = Motor(prefix + "Z")
-            self.selected_pos = create_r_hardware_backed_soft_signal(
-                BeamstopPositions, self._get_selected_position
+            self.selected_pos = derived_signal_r(
+                self._get_selected_position, x=self.x_mm, y=self.y_mm, z=self.z_mm
             )
 
         self._in_beam_xyz_mm = [
@@ -68,12 +66,8 @@ class Beamstop(StandardReadable):
 
         super().__init__(name)
 
-    async def _get_selected_position(self) -> BeamstopPositions:
-        current_pos = await gather(
-            self.x_mm.user_readback.get_value(),
-            self.y_mm.user_readback.get_value(),
-            self.z_mm.user_readback.get_value(),
-        )
+    def _get_selected_position(self, x: float, y: float, z: float) -> BeamstopPositions:
+        current_pos = [x, y, z]
         if all(
             isclose(axis_pos, axis_in_beam, abs_tol=axis_tolerance)
             for axis_pos, axis_in_beam, axis_tolerance in zip(
