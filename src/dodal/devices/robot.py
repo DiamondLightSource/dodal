@@ -11,7 +11,12 @@ from ophyd_async.core import (
     set_and_wait_for_value,
     wait_for_value,
 )
-from ophyd_async.epics.core import epics_signal_r, epics_signal_rw_rbv, epics_signal_x
+from ophyd_async.epics.core import (
+    epics_signal_r,
+    epics_signal_rw,
+    epics_signal_rw_rbv,
+    epics_signal_x,
+)
 
 from dodal.log import LOGGER
 
@@ -88,6 +93,20 @@ class BartRobot(StandardReadable, Movable[SampleLocation]):
         self.controller_error = ErrorStatus(prefix + "CNTL")
 
         self.reset = epics_signal_x(prefix + "RESET.PROC")
+        self.stop = epics_signal_x(prefix + "ABORT.PROC")
+        self.init = epics_signal_x(prefix + "INIT.PROC")
+        self.soak = epics_signal_x(prefix + "SOAK.PROC")
+        self.home = epics_signal_x(prefix + "GOHM.PROC")
+        self.unload = epics_signal_x(prefix + "UNLD.PROC")
+        self.dry = epics_signal_x(prefix + "DRY.PROC")
+        self.open = epics_signal_x(prefix + "COLO.PROC")
+        self.close = epics_signal_x(prefix + "COLC.PROC")
+        self.cryomode_rbv = epics_signal_r(float, prefix + "CRYO_MODE_RBV")
+        self.cryomode = epics_signal_rw(str, prefix + "CRYO_MODE_CTRL")
+        self.gripper_temp = epics_signal_r(float, prefix + "GRIPPER_TEMP")
+        self.dewar_lid_temperature = epics_signal_rw(
+            float, prefix + "DW_1_TEMP", prefix + "DW_1_SET_POINT"
+        )
         super().__init__(name=name)
 
     async def pin_mounted_or_no_pin_found(self):
