@@ -60,7 +60,6 @@ def test_analyser_to_kinetic_energy(
 ) -> None:
     low_energy = region.low_energy
     ke = to_kinetic_energy(low_energy, region.energy_mode, excitation_energy)
-
     if region.is_binding_energy():
         assert ke == (excitation_energy - low_energy)
     else:

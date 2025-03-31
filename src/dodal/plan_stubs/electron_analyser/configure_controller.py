@@ -27,17 +27,10 @@ def configure_analyser(
 ):
     LOGGER.info(f'Configuring analyser with region "{region.name}"')
     low_energy = to_kinetic_energy(
-<<<<<<< HEAD
         region.low_energy, region.energy_mode, excitation_energy
     )
     high_energy = to_kinetic_energy(
         region.high_energy, region.energy_mode, excitation_energy
-=======
-        region.low_energy, excitation_energy, region.energy_mode
-    )
-    high_energy = to_kinetic_energy(
-        region.high_energy, excitation_energy, region.energy_mode
->>>>>>> f67c492048 (Added generic data that can be read)
     )
     # Set detector settings, wait for them all to have completed
     # fmt: off

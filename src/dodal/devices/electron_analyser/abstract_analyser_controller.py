@@ -16,6 +16,7 @@ class AbstractAnalyserController(ABC, StandardReadable):
 
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
+            # Used for setting up region data acuqisition
             self.low_energy = epics_signal_rw(float, prefix + "LOW_ENERGY")
             self.high_energy = epics_signal_rw(float, prefix + "HIGH_ENERGY")
             self.slices = epics_signal_rw(int, prefix + "SLICES")
@@ -33,6 +34,10 @@ class AbstractAnalyserController(ABC, StandardReadable):
             self.total_steps = epics_signal_r(float, prefix + "TOTAL_POINTS_RBV")
 
         super().__init__(name)
+
+    async def total_intensity(self) -> float:
+        spectrum_data = await self.spectrum.get_value()
+        return np.sum(spectrum_data)
 
 
 TAbstractAnalyserController = TypeVar(
