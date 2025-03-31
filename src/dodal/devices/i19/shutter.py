@@ -50,7 +50,7 @@ class AccessControlledShutter(StandardReadable, Movable[ShutterDemand]):
             },
         }
         async with ClientSession(base_url=self.url, raise_for_status=True) as session:
-            # First I need to submit the plan to the worker
+            # First submit the plan to the worker
             async with session.post("/tasks", data=REQUEST_PARAMS) as response:
                 LOGGER.debug(
                     f"Task submitted to the worker, response status: {response.status}"
@@ -64,7 +64,7 @@ class AccessControlledShutter(StandardReadable, Movable[ShutterDemand]):
                         f"Failed to get task_id from {self.url}/tasks POST. ({e})"
                     )
                     raise
-            # Then I can set the task as active and run asap
+            # Then set the task as active and run asap
             async with session.put(
                 "/worker/tasks", data={"task_id": task_id}
             ) as response:
