@@ -13,7 +13,7 @@ from dodal.devices.undulator import (
     AccessError,
     Undulator,
     UndulatorGapAccess,
-    _get_closest_gap_for_energy,
+    _get_gap_for_energy,
 )
 from tests.constants import UNDULATOR_ID_GAP_LOOKUP_TABLE_PATH
 
@@ -124,9 +124,7 @@ def test_correct_closest_distance_to_energy_from_table(energy, expected_output):
     energy_to_distance_table = np.array(
         [[0, 10], [10, 100], [35, 250], [35, 50], [40, 300]]
     )
-    assert (
-        _get_closest_gap_for_energy(energy, energy_to_distance_table) == expected_output
-    )
+    assert _get_gap_for_energy(energy, energy_to_distance_table) == expected_output
 
 
 async def test_when_gap_access_is_disabled_set_energy_then_error_is_raised(
