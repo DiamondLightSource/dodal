@@ -13,7 +13,7 @@ from dodal.devices.electron_analyser.vgscienta_region import (
 class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
-            # Used for setting up region data acuqisition
+            # Used for setting up region data acquisition
             self.centre_energy = epics_signal_rw(float, prefix + "CENTRE_ENERGY")
             self.first_x_channel = epics_signal_rw(int, prefix + "MinX")
             self.first_y_channel = epics_signal_rw(int, prefix + "MinY")

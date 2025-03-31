@@ -21,7 +21,7 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable):
         self.adbase_cam = ADBaseIO(prefix, "adbase")
 
         with self.add_children_as_readables():
-            # Used for setting up region data acuqisition
+            # Used for setting up region data acquisition
             self.low_energy = epics_signal_rw(float, prefix + "LOW_ENERGY")
             self.high_energy = epics_signal_rw(float, prefix + "HIGH_ENERGY")
             self.slices = epics_signal_rw(int, prefix + "SLICES")
