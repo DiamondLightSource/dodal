@@ -4,6 +4,7 @@ from dodal.common.beamlines.beamline_utils import (
 from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
+from dodal.devices.i19.beamstop import BeamStop
 from dodal.devices.i19.shutter import HutchConditionalShutter, HutchState
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
@@ -28,6 +29,14 @@ I19_2_ZEBRA_MAPPING = ZebraMapping(
     outputs=ZebraTTLOutputs(),
     sources=ZebraSources(),
 )
+
+
+@device_factory()
+def beamstop() -> BeamStop:
+    """Get the i19-2 beamstop device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i19-2, it will return the existing object.
+    """
+    return BeamStop(prefix=f"{PREFIX.beamline_prefix}-OP-ABSB-02:")
 
 
 @device_factory()
