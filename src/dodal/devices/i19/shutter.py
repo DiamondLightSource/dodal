@@ -70,7 +70,7 @@ class AccessControlledShutter(StandardReadable, Movable[ShutterDemand]):
                 "/worker/tasks", data={"task_id": task_id}
             ) as response:
                 if not response.ok:
-                    LOGGER.warning(
+                    LOGGER.error(
                         f"""Unable to operate the shutter.
                         Session PUT responded with {response.status}: {response.reason}.
                         """

@@ -129,7 +129,7 @@ async def test_set_corrently_makes_rest_calls(
 
 
 @patch("dodal.devices.i19.shutter.LOGGER")
-async def test_if_put_fails_log_a_warning_and_return(
+async def test_if_put_fails_log_and_return(
     mock_logger: MagicMock, eh1_shutter: AccessControlledShutter
 ):
     with (
@@ -146,4 +146,4 @@ async def test_if_put_fails_log_a_warning_and_return(
 
         await eh1_shutter.set(ShutterDemand.OPEN)
 
-        mock_logger.warning.assert_called_once()
+        mock_logger.error.assert_called_once()
