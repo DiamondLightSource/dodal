@@ -14,7 +14,7 @@ class VGScientaAnalyserController(AbstractAnalyserController):
     def __init__(self, prefix: str, name: str = "") -> None:
         super().__init__(prefix, name)
         with self.add_children_as_readables():
-            # Used for setting up region data acuqisition
+            # Used for setting up region data acquisition
             self.centre_energy = epics_signal_rw(float, prefix + "CENTRE_ENERGY")
             self.first_x_channel = epics_signal_rw(int, prefix + "MinX")
             self.first_y_channel = epics_signal_rw(int, prefix + "MinY")
