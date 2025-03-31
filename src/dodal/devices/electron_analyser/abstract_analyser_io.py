@@ -21,6 +21,7 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable):
         self.adbase_cam = ADBaseIO(prefix, "adbase")
 
         with self.add_children_as_readables():
+            # Used for setting up region data acuqisition
             self.low_energy = epics_signal_rw(float, prefix + "LOW_ENERGY")
             self.high_energy = epics_signal_rw(float, prefix + "HIGH_ENERGY")
             self.slices = epics_signal_rw(int, prefix + "SLICES")
@@ -39,6 +40,7 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable):
                 float, self._calculate_total_intensity
             )
             self.step_time = epics_signal_r(float, self.adbase_cam.acquire_time.name)
+
             self.total_steps = epics_signal_r(float, prefix + "TOTAL_POINTS_RBV")
 
         super().__init__(name)
