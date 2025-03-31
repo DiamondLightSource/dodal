@@ -10,6 +10,7 @@ from dodal.devices.electron_analyser.specs_analyser_controller import (
     SpecsAnalyserController,
 )
 from dodal.devices.electron_analyser.specs_region import SpecsRegion
+from dodal.devices.electron_analyser.util import to_kinetic_energy
 from dodal.devices.electron_analyser.vgscienta_analyser_controller import (
     VGScientaAnalyserController,
 )
@@ -25,8 +26,12 @@ def configure_analyser(
     excitation_energy: float,
 ):
     LOGGER.info(f'Configuring analyser with region "{region.name}"')
-    low_energy = region.to_kinetic_energy(region.low_energy, excitation_energy)
-    high_energy = region.to_kinetic_energy(region.high_energy, excitation_energy)
+    low_energy = to_kinetic_energy(
+        region.low_energy, excitation_energy, region.energy_mode
+    )
+    high_energy = to_kinetic_energy(
+        region.high_energy, excitation_energy, region.energy_mode
+    )
     # Set detector settings, wait for them all to have completed
     # fmt: off
     yield from bps.mv(
@@ -62,7 +67,9 @@ def configure_vgscienta(
     analyser: VGScientaAnalyserController, region: VGScientaRegion, excitation_energy
 ):
     yield from configure_analyser(analyser, region, excitation_energy)
-    centre_energy = region.to_kinetic_energy(region.fix_energy, excitation_energy)
+    centre_energy = to_kinetic_energy(
+        region.fix_energy, excitation_energy, region.energy_mode
+    )
 
     # fmt: off
     yield from bps.mv(

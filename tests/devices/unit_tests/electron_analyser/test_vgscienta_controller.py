@@ -4,6 +4,7 @@ from ophyd_async.testing import (
     get_mock_put,
 )
 
+from dodal.devices.electron_analyser.util import to_kinetic_energy
 from dodal.devices.electron_analyser.vgscienta_analyser_controller import (
     VGScientaAnalyserController,
 )
@@ -57,7 +58,9 @@ def test_given_region_that_analyser_sets_energy_values_correctly(
 ) -> None:
     RE(configure_vgscienta(sim_analyser, region, excitation_energy))
 
-    expected_centre_e = region.to_kinetic_energy(region.fix_energy, excitation_energy)
+    expected_centre_e = to_kinetic_energy(
+        region.fix_energy, excitation_energy, region.energy_mode
+    )
     get_mock_put(sim_analyser.centre_energy).assert_called_once_with(
         expected_centre_e, wait=True
     )

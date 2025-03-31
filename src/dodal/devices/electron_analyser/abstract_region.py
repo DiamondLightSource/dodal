@@ -76,9 +76,6 @@ class AbstractBaseRegion(ABC, JavaToPythonModel):
     def is_kinetic_energy(self) -> bool:
         return self.energy_mode == EnergyMode.KINETIC
 
-    def to_kinetic_energy(self, value: float, excitation_energy: float) -> float:
-        return value if self.is_binding_energy() else excitation_energy - value
-
     @model_validator(mode="before")
     @classmethod
     def before_validation(cls, data: dict) -> dict:
