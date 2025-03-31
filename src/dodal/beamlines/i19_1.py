@@ -4,6 +4,7 @@ from dodal.common.beamlines.beamline_utils import (
 from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
+from dodal.devices.i19.beamstop import BeamStop
 from dodal.devices.i19.shutter import HutchConditionalShutter, HutchState
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.oav_parameters import OAVConfig
@@ -37,12 +38,12 @@ DISPLAY_CONFIG = "/dls_sw/i19-1/software/daq_configuration/domain/display.config
 
 # Needs to wait until enum is fixed on the beamline
 # See https://github.com/DiamondLightSource/dodal/issues/1150
-# @device_factory()
-# def beamstop() -> BeamStop:
-#     """Get the i19-1 beamstop device, instantiate it if it hasn't already been.
-#     If this is called when already instantiated in i19-1, it will return the existing object.
-#     """
-#     return BeamStop(prefix=f"{PREFIX.beamline_prefix}-RS-ABSB-01:")
+@device_factory(skip=True)
+def beamstop() -> BeamStop:
+    """Get the i19-1 beamstop device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i19-1, it will return the existing object.
+    """
+    return BeamStop(prefix=f"{PREFIX.beamline_prefix}-RS-ABSB-01:")
 
 
 @device_factory()
