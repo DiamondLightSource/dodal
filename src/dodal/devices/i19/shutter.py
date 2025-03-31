@@ -1,9 +1,8 @@
-import time
 from enum import Enum
 
 from aiohttp import ClientSession
-from bluesky.protocols import Movable, Reading
-from ophyd_async.core import AsyncStatus, StandardReadable
+from bluesky.protocols import Movable
+from ophyd_async.core import AsyncStatus, StandardReadable, StandardReadableFormat
 from ophyd_async.epics.core import epics_signal_r
 
 from dodal.devices.hutch_shutter import ShutterDemand, ShutterState
@@ -34,18 +33,11 @@ class AccessControlledShutter(StandardReadable, Movable[ShutterDemand]):
     """
 
     def __init__(self, prefix: str, hutch: HutchState, name: str = "") -> None:
-        self.shutter_status = epics_signal_r(ShutterState, f"{prefix}STA")
+        with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
+            self.shutter_status = epics_signal_r(ShutterState, f"{prefix}STA")
         self.hutch_request = hutch
         self.url = OPTICS_BLUEAPI_URL
         super().__init__(name)
-
-    async def read(self) -> dict[str, Reading]:
-        default_reading = await super().read()
-        status = await self.shutter_status.get_value()
-        return {
-            "shutter_status": Reading(value=status, timestamp=time.time()),
-            **default_reading,
-        }
 
     @AsyncStatus.wrap
     async def set(self, value: ShutterDemand):

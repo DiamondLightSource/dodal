@@ -45,9 +45,10 @@ async def test_read_on_eh1_shutter_device_returns_correct_status(
 ):
     reading = await eh1_shutter.read()
     assert reading == {
-        "shutter_status": {
+        "mock_shutter-shutter_status": {
+            "alarm_severity": 0,
             "timestamp": ANY,
-            "value": "Closed",
+            "value": ShutterState.CLOSED,
         }
     }
 
@@ -57,9 +58,10 @@ async def test_read_on_eh2_shutter_device_returns_correct_status(
 ):
     reading = await eh2_shutter.read()
     assert reading == {
-        "shutter_status": {
+        "mock_shutter-shutter_status": {
+            "alarm_severity": 0,
             "timestamp": ANY,
-            "value": "Closed",
+            "value": ShutterState.CLOSED,
         }
     }
 
