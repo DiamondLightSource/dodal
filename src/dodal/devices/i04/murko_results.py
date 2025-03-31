@@ -48,6 +48,14 @@ class Coord(Enum):
 
 
 class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
+    """Device that takes crystal centre coords from Murko and uses them to set the
+    x, y, z coordinate of the sample to be in line with the beam centre.
+    (x, z) coords can be read at 90°, and (x, y) at 180° (or the closest omega angle to
+    90° and 180°). The average of the x values at these angles is taken, and sin(omega)z
+    and cosine(omega)y are taken to account for the rotation. This value is used to
+    calculate a number of mm the sample needs to move to be in line with the beam centre.
+    """
+
     TIMEOUT_S = 2
 
     def __init__(
@@ -69,7 +77,11 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         self.sample_id = soft_signal_rw(str)  # Should get from redis
         self.coords = {"x": {}, "y": {}, "z": {}}
         self.search_angles = OrderedDict(
-            [(90, ("x", "z")), (180, ("x", "y")), (270, ())]
+            [  # Angles to search and dimensions to gather at each angle
+                (90, ("x", "z")),
+                (180, ("x", "y")),
+                (270, ()),  # Stop searching here
+            ]
         )
         self.angles_to_search = list(self.search_angles.keys())
 
@@ -186,9 +198,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
     ) -> float:
         if search_angle is None:
             return None
-        metadata = MurkoMetadata(
-            json.loads(metadata_str)
-        )  # Metadata is JSON but data is pickle?
+        metadata = MurkoMetadata(json.loads(metadata_str))
         omega_angle = metadata["omega_angle"]
         assert search_angle, f"search_angle = {search_angle}"
         LOGGER.info(f"Got angle {omega_angle}")
