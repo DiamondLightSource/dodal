@@ -168,6 +168,6 @@ based on this and so this has the issues listed above. Instead you should make s
             else:
                 await self.underlying_motor.set(0)
 
-This will be simplified by https://github.com/bluesky/ophyd-async/issues/525
+For detail on how to use derived signal see `ophyd-async how to guide. <https://blueskyproject.io/ophyd-async/main/how-to/derive-one-signal-from-others.html>`__
 
 .. _flowchart: https://blueskyproject.io/ophyd-async/main/how-to/choose-interfaces-for-devices.html
