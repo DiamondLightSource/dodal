@@ -2,7 +2,7 @@ import os
 
 import numpy as np
 from bluesky.protocols import Movable
-from numpy import argmin, ndarray
+from numpy import ndarray
 from ophyd_async.core import (
     AsyncStatus,
     StandardReadable,
@@ -41,9 +41,9 @@ class UndulatorGapAccess(StrictEnum):
 def _get_closest_gap_for_energy(
     dcm_energy_ev: float, energy_to_distance_table: ndarray
 ) -> float:
-    table = energy_to_distance_table.transpose()
-    idx = argmin(np.abs(table[0] - dcm_energy_ev))
-    return table[1][idx]
+    return np.interp(
+        dcm_energy_ev, energy_to_distance_table[:, 0], energy_to_distance_table[:, 1]
+    )
 
 
 class Undulator(StandardReadable, Movable[float]):
