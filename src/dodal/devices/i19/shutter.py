@@ -6,6 +6,7 @@ from ophyd_async.core import AsyncStatus, StandardReadable, StandardReadableForm
 from ophyd_async.epics.core import epics_signal_r
 
 from dodal.devices.hutch_shutter import ShutterDemand, ShutterState
+from dodal.devices.i19.hutch_access import ACCESS_DEVICE_NAME
 from dodal.log import LOGGER
 
 OPTICS_BLUEAPI_URL = "https://i19-blueapi.diamond.ac.uk"
@@ -45,7 +46,7 @@ class AccessControlledShutter(StandardReadable, Movable[ShutterDemand]):
             "name": "operate_shutter_plan",
             "params": {
                 "experiment_hutch": self.hutch_request.value,
-                "access_device": "access_control",  # Device name in i19-blueapi
+                "access_device": ACCESS_DEVICE_NAME,
                 "shutter_demand": value,
             },
         }
