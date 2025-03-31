@@ -17,7 +17,7 @@ class HutchState(str, Enum):
     EH2 = "EH2"
 
 
-class AccessControlledShutter(StandardReadable, Movable):
+class AccessControlledShutter(StandardReadable, Movable[ShutterDemand]):
     """ I19-specific device to operate the hutch shutter.
 
     This device will send a REST call to the blueapi instance controlling the optics \
