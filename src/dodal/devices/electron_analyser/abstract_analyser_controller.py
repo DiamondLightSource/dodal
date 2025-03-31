@@ -5,6 +5,8 @@ import numpy as np
 from ophyd_async.core import Array1D, StandardReadable
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
+from dodal.devices.electron_analyser.abstract_region import EnergyMode
+
 
 class AbstractAnalyserController(ABC, StandardReadable):
     """
@@ -14,7 +16,6 @@ class AbstractAnalyserController(ABC, StandardReadable):
 
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
-            # Used for setting up region data acquisition
             self.low_energy = epics_signal_rw(float, prefix + "LOW_ENERGY")
             self.high_energy = epics_signal_rw(float, prefix + "HIGH_ENERGY")
             self.slices = epics_signal_rw(int, prefix + "SLICES")
@@ -33,10 +34,10 @@ class AbstractAnalyserController(ABC, StandardReadable):
 
         super().__init__(name)
 
-    @property
-    async def total_intensity(self) -> float:
-        spectrum_data = await self.spectrum.get_value()
-        return np.sum(spectrum_data)
+    def to_kinetic_energy(
+        self, value: float, excitation_energy: float, mode: EnergyMode
+    ) -> float:
+        return excitation_energy - value if mode == EnergyMode.BINDING else value
 
 
 TAbstractAnalyserController = TypeVar(
