@@ -74,15 +74,15 @@ def expected_enabled_region_names(
 
 
 @pytest.fixture
-async def sim_analyser(
+async def sim_analyser_controller(
     analyser_type: type[TAbstractAnalyserController],
 ) -> TAbstractAnalyserController:
-    async with init_devices(mock=True):
-        sim_analyser = analyser_type(
-            prefix="sim_analyser",
-            name="analyser",
+    async with init_devices(mock=True, connect=True):
+        sim_analyser_controller = analyser_type(
+            prefix="sim_analyser_controller:",
+            name="analyser_controller",
         )
-    return sim_analyser
+    return sim_analyser_controller
 
 
 @pytest.fixture
