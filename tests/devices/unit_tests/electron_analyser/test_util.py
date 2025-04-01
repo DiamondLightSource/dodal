@@ -1,5 +1,7 @@
 from typing import Any
 
+from ophyd_async.core import StandardReadable
+
 from dodal.devices.electron_analyser.abstract_region import (
     AbstractBaseRegion,
     EnergyMode,
@@ -27,3 +29,13 @@ def assert_region_has_expected_values(
             assert r.__dict__[key] == expected_region_values[key]
         else:
             raise KeyError('key "' + key + '" is not in the expected values.')
+
+
+async def assert_reading_has_expected_value(
+    device: StandardReadable, key: str, expected_value
+) -> None:
+    reading = await device.read()
+    assert (
+        reading[device.name + device._child_name_separator + key]["value"]
+        == expected_value
+    )

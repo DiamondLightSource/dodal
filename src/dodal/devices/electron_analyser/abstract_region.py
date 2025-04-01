@@ -20,10 +20,7 @@ def java_to_python_case(java_str: str) -> str:
 
 
 def switch_case_validation(data: dict, f: Callable[[str], str]) -> dict:
-    new_data = {}
-    for key, values in data.items():
-        new_data[f(key)] = values
-    return new_data
+    return {f(key): value for key, value in data.items()}
 
 
 class JavaToPythonModel(BaseModel):
@@ -80,8 +77,7 @@ class AbstractBaseRegion(ABC, JavaToPythonModel):
     @classmethod
     def before_validation(cls, data: dict) -> dict:
         data = switch_case_validation(data, java_to_python_case)
-        data = energy_mode_validation(data)
-        return data
+        return energy_mode_validation(data)
 
 
 TAbstractBaseRegion = TypeVar("TAbstractBaseRegion", bound=AbstractBaseRegion)

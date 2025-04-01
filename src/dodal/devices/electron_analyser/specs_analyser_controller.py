@@ -7,7 +7,6 @@ from dodal.devices.electron_analyser.abstract_analyser_controller import (
 
 class SpecsAnalyserController(AbstractAnalyserController):
     def __init__(self, prefix: str, name: str = "") -> None:
-        super().__init__(prefix, name)
         with self.add_children_as_readables():
             # Used for setting up region data acquisition
             self.psu_mode = epics_signal_rw(str, prefix + "SCAN_RANGE")
@@ -20,6 +19,8 @@ class SpecsAnalyserController(AbstractAnalyserController):
             self.total_points_iteration = epics_signal_r(
                 float, prefix + "TOTAL_POINTS_ITERATIONS_RBV"
             )
+
+        super().__init__(prefix, name)
 
     @property
     async def angle_axis(self) -> list[float]:

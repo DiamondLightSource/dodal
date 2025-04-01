@@ -34,11 +34,6 @@ class AbstractAnalyserController(ABC, StandardReadable):
 
         super().__init__(name)
 
-    def to_kinetic_energy(
-        self, value: float, excitation_energy: float, mode: EnergyMode
-    ) -> float:
-        return excitation_energy - value if mode == EnergyMode.BINDING else value
-
 
 TAbstractAnalyserController = TypeVar(
     "TAbstractAnalyserController", bound=AbstractAnalyserController

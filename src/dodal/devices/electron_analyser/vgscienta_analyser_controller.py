@@ -12,7 +12,6 @@ from dodal.devices.electron_analyser.vgscienta_region import (
 
 class VGScientaAnalyserController(AbstractAnalyserController):
     def __init__(self, prefix: str, name: str = "") -> None:
-        super().__init__(prefix, name)
         with self.add_children_as_readables():
             # Used for setting up region data acquisition
             self.centre_energy = epics_signal_rw(float, prefix + "CENTRE_ENERGY")
@@ -21,7 +20,6 @@ class VGScientaAnalyserController(AbstractAnalyserController):
             self.x_channel_size = epics_signal_rw(int, prefix + "SizeX")
             self.y_channel_size = epics_signal_rw(int, prefix + "SizeY")
             self.detector_mode = epics_signal_rw(DetectorMode, prefix + "DETECTOR_MODE")
-            self.energy_step = epics_signal_rw(float, prefix + "STEP_SIZE")
             self.image_mode = epics_signal_rw(str, prefix + "ImageMode")
 
             # Used to read detector data after acqusition
@@ -32,3 +30,5 @@ class VGScientaAnalyserController(AbstractAnalyserController):
             self.angle_axis = epics_signal_r(
                 Array1D[np.float64], prefix + "Y_SCALE_RBV"
             )
+
+        super().__init__(prefix, name)
