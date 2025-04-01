@@ -1,0 +1,36 @@
+dodal.devices.i13\_1
+====================
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   dodal.devices.i13_1.merlin
+   dodal.devices.i13_1.merlin_controller
+
+
+
+
+
+
+
+
+.. automodule:: dodal.devices.i13_1
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

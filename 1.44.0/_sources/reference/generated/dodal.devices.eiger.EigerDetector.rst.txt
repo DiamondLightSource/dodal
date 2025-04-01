@@ -1,0 +1,165 @@
+dodal.devices.eiger.EigerDetector
+=================================
+
+.. currentmodule:: dodal.devices.eiger
+
+.. autoclass:: EigerDetector
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      ~EigerDetector.async_stage
+      
+      
+      ~EigerDetector.change_dev_shm
+      
+      
+      ~EigerDetector.change_roi_mode
+      
+      
+      
+      
+      
+      
+      
+      
+      ~EigerDetector.disable_roi_mode
+      
+      
+      ~EigerDetector.disarm_detector
+      
+      
+      ~EigerDetector.do_arming_chain
+      
+      
+      ~EigerDetector.enable_roi_mode
+      
+      
+      ~EigerDetector.forward_bit_depth_to_filewriter
+      
+      
+      
+      
+      
+      ~EigerDetector.is_armed
+      
+      
+      
+      
+      
+      
+      
+      ~EigerDetector.set_cam_pvs
+      
+      
+      ~EigerDetector.set_detector_parameters
+      
+      
+      ~EigerDetector.set_detector_threshold
+      
+      
+      ~EigerDetector.set_mx_settings_pvs
+      
+      
+      ~EigerDetector.set_num_triggers_and_captures
+      
+      
+      ~EigerDetector.set_odin_number_of_frame_chunks
+      
+      
+      ~EigerDetector.set_odin_pvs
+      
+      
+      ~EigerDetector.stage
+      
+      
+      ~EigerDetector.stop
+      
+      
+      ~EigerDetector.stop_odin_when_all_frames_collected
+      
+      
+      
+      
+      
+      ~EigerDetector.unstage
+      
+      
+      
+      
+      
+      ~EigerDetector.wait_on_arming_if_started
+      
+      
+      
+      
+      
+      
+      ~EigerDetector.with_params
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~EigerDetector.arming_status
+      
+      
+      
+      ~EigerDetector.bit_depth
+      
+      
+      ~EigerDetector.cam
+      
+      
+      ~EigerDetector.component_names
+      
+      
+      
+      
+      ~EigerDetector.detector_params
+      
+      
+      ~EigerDetector.disarming_status
+      
+      
+      ~EigerDetector.do_arm
+      
+      
+      
+      
+      
+      
+      
+      
+      ~EigerDetector.odin
+      
+      
+      
+      
+      
+      
+      
+      ~EigerDetector.stale_params
+      
+      
+      ~EigerDetector.subscriptions
+      
+      
+      
+      ~EigerDetector.filewriters_finished
+      
+   
+   

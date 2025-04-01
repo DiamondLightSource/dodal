@@ -1,0 +1,64 @@
+dodal.devices.electron\_analyser.vgscienta.vgscienta\_region.VGScientaExcitationEnergySource
+============================================================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.vgscienta.vgscienta_region
+
+.. autoclass:: VGScientaExcitationEnergySource
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~VGScientaExcitationEnergySource.model_config
+      
+      
+      
+      
+      
+      ~VGScientaExcitationEnergySource.name
+      
+      
+      ~VGScientaExcitationEnergySource.scannableName
+      
+      
+      ~VGScientaExcitationEnergySource.value
+      
+   
+   

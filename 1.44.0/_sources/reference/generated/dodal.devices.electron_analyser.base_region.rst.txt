@@ -1,0 +1,38 @@
+dodal.devices.electron\_analyser.base\_region
+=============================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.electron_analyser
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~base_region.BaseRegion
+   ~base_region.BaseSequence
+   ~base_region.EnergyMode
+
+
+
+
+.. automodule:: dodal.devices.electron_analyser.base_region
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

@@ -1,0 +1,70 @@
+dodal.devices.electron\_analyser.vgscienta.vgscienta\_region.VGScientaSequence
+==============================================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.vgscienta.vgscienta_region
+
+.. autoclass:: VGScientaSequence
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      ~VGScientaSequence.get_excitation_energy_source_by_region
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~VGScientaSequence.model_config
+      
+      
+      
+      
+      
+      ~VGScientaSequence.elementSet
+      
+      
+      ~VGScientaSequence.excitationEnergySources
+      
+      
+      ~VGScientaSequence.regions
+      
+   
+   

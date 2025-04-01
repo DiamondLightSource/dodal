@@ -1,0 +1,87 @@
+dodal.devices.electron\_analyser.vgscienta.vgscienta\_region.Status
+===================================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.vgscienta.vgscienta_region
+
+.. autoclass:: Status
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~Status.READY
+      
+      
+      ~Status.RUNNING
+      
+      
+      ~Status.COMPLETED
+      
+      
+      ~Status.INVALID
+      
+      
+      ~Status.ABORTED
+      
+   
+   

@@ -1,0 +1,40 @@
+dodal.devices.diamond\_filter.DiamondFilter
+===========================================
+
+.. currentmodule:: dodal.devices.diamond_filter
+
+.. autoclass:: DiamondFilter
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

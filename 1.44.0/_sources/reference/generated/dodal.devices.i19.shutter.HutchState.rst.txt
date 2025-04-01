@@ -1,0 +1,78 @@
+dodal.devices.i19.shutter.HutchState
+====================================
+
+.. currentmodule:: dodal.devices.i19.shutter
+
+.. autoclass:: HutchState
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      ~HutchState.EH1
+      
+      
+      ~HutchState.EH2
+      
+   
+   
