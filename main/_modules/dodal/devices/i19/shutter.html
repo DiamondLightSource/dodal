@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.i19.shutter &#8212; dodal 1.43.1.dev13+g50a69aeb9 documentation</title>
+    <title>dodal.devices.i19.shutter &#8212; dodal 1.43.1.dev14+gb481ffa8e documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=40bb9f1d"></script>
+    <script src="../../../../_static/documentation_options.js?v=b0cc680e"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -452,70 +452,88 @@ window.addEventListener("load", () => mermaid.run());
   <h1>Source code for dodal.devices.i19.shutter</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">aiohttp</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClientSession</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Movable</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncStatus</span><span class="p">,</span> <span class="n">StandardReadable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncStatus</span><span class="p">,</span> <span class="n">StandardReadable</span><span class="p">,</span> <span class="n">StandardReadableFormat</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">epics_signal_r</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.hutch_shutter</span><span class="w"> </span><span class="kn">import</span> <span class="n">HutchShutter</span><span class="p">,</span> <span class="n">ShutterDemand</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.hutch_shutter</span><span class="w"> </span><span class="kn">import</span> <span class="n">ShutterDemand</span><span class="p">,</span> <span class="n">ShutterState</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dodal.devices.i19.hutch_access</span><span class="w"> </span><span class="kn">import</span> <span class="n">ACCESS_DEVICE_NAME</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
 
-
-<span class="k">class</span><span class="w"> </span><span class="nc">HutchInvalidError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="k">pass</span>
+<span class="n">OPTICS_BLUEAPI_URL</span> <span class="o">=</span> <span class="s2">&quot;https://i19-blueapi.diamond.ac.uk&quot;</span>
 
 
 <div class="viewcode-block" id="HutchState">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i19.shutter.HutchState.html#dodal.devices.i19.shutter.HutchState">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">HutchState</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
     <span class="n">EH1</span> <span class="o">=</span> <span class="s2">&quot;EH1&quot;</span>
-    <span class="n">EH2</span> <span class="o">=</span> <span class="s2">&quot;EH2&quot;</span>
-    <span class="n">INVALID</span> <span class="o">=</span> <span class="s2">&quot;INVALID&quot;</span></div>
+    <span class="n">EH2</span> <span class="o">=</span> <span class="s2">&quot;EH2&quot;</span></div>
 
 
 
-<div class="viewcode-block" id="HutchConditionalShutter">
-<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i19.shutter.HutchConditionalShutter.html#dodal.devices.i19.shutter.HutchConditionalShutter">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">HutchConditionalShutter</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="n">ShutterDemand</span><span class="p">]):</span>
+<div class="viewcode-block" id="AccessControlledShutter">
+<a class="viewcode-back" href="../../../../reference/generated/dodal.devices.i19.shutter.AccessControlledShutter.html#dodal.devices.i19.shutter.AccessControlledShutter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AccessControlledShutter</span><span class="p">(</span><span class="n">StandardReadable</span><span class="p">,</span> <span class="n">Movable</span><span class="p">[</span><span class="n">ShutterDemand</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; I19-specific device to operate the hutch shutter.</span>
 
-<span class="sd">    This device evaluates the hutch state value to work out which of the two I19 \</span>
-<span class="sd">    hutches is in use and then implements the HutchShutter device to operate the \</span>
-<span class="sd">    experimental shutter.</span>
+<span class="sd">    This device will send a REST call to the blueapi instance controlling the optics \</span>
+<span class="sd">    hutch running on the I19 cluster, which will evaluate the current hutch in use vs \</span>
+<span class="sd">    the hutch sending the request and decide if the plan will be run or not.</span>
 <span class="sd">    As the two hutches are located in series, checking the hutch in use is necessary to \</span>
 <span class="sd">    avoid accidentally operating the shutter from one hutch while the other has beamtime.</span>
 
-<span class="sd">    The hutch name should be passed to the device upon instantiation. If this does not \</span>
-<span class="sd">    coincide with the current hutch in use, a warning will be logged and the shutter \</span>
-<span class="sd">    will not be operated. This is to allow for testing of plans.</span>
-<span class="sd">    An error will instead be raised if the hutch state reads as &quot;INVALID&quot;.</span>
+<span class="sd">    The name of the hutch that wants to operate the shutter should be passed to the \</span>
+<span class="sd">    device upon instantiation.</span>
+
+<span class="sd">    For details see the architecture described in \</span>
+<span class="sd">    https://github.com/DiamondLightSource/i19-bluesky/issues/30.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">hutch</span><span class="p">:</span> <span class="n">HutchState</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">shutter</span> <span class="o">=</span> <span class="n">HutchShutter</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
-        <span class="n">bl_prefix</span> <span class="o">=</span> <span class="n">prefix</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">hutch_state</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bl_prefix</span><span class="si">}</span><span class="s2">-OP-STAT-01:EHStatus.VALA&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">hutch</span> <span class="o">==</span> <span class="n">HutchState</span><span class="o">.</span><span class="n">INVALID</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">HutchInvalidError</span><span class="p">(</span>
-                <span class="s2">&quot;Cannot define experimental shutter for invalid hutch&quot;</span>
-            <span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_children_as_readables</span><span class="p">(</span><span class="n">StandardReadableFormat</span><span class="o">.</span><span class="n">HINTED_SIGNAL</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">shutter_status</span> <span class="o">=</span> <span class="n">epics_signal_r</span><span class="p">(</span><span class="n">ShutterState</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">STA&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hutch_request</span> <span class="o">=</span> <span class="n">hutch</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">OPTICS_BLUEAPI_URL</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
     <span class="nd">@AsyncStatus</span><span class="o">.</span><span class="n">wrap</span>
     <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">ShutterDemand</span><span class="p">):</span>
-        <span class="n">hutch_in_use</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">hutch_state</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
-        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Current hutch in use: </span><span class="si">{</span><span class="n">hutch_in_use</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">hutch_in_use</span> <span class="o">==</span> <span class="n">HutchState</span><span class="o">.</span><span class="n">INVALID</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">HutchInvalidError</span><span class="p">(</span>
-                <span class="s2">&quot;The hutch state is invalid. Contact the beamline staff.&quot;</span>
-            <span class="p">)</span>
-        <span class="k">if</span> <span class="n">hutch_in_use</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hutch_request</span><span class="p">:</span>
-            <span class="c1"># NOTE Warn but don&#39;t fail</span>
-            <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">hutch_request</span><span class="si">}</span><span class="s2"> is not the hutch in use. Shutter will not be operated.&quot;</span>
-            <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">shutter</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+        <span class="n">REQUEST_PARAMS</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;operate_shutter_plan&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;experiment_hutch&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">hutch_request</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="s2">&quot;access_device&quot;</span><span class="p">:</span> <span class="n">ACCESS_DEVICE_NAME</span><span class="p">,</span>
+                <span class="s2">&quot;shutter_demand&quot;</span><span class="p">:</span> <span class="n">value</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">}</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="n">ClientSession</span><span class="p">(</span><span class="n">base_url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">raise_for_status</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+            <span class="c1"># First submit the plan to the worker</span>
+            <span class="k">async</span> <span class="k">with</span> <span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/tasks&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">REQUEST_PARAMS</span><span class="p">)</span> <span class="k">as</span> <span class="n">response</span><span class="p">:</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Task submitted to the worker, response status: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+                    <span class="n">task_id</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;task_id&quot;</span><span class="p">]</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Failed to get task_id from </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2">/tasks POST. (</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">)&quot;</span>
+                    <span class="p">)</span>
+                    <span class="k">raise</span>
+            <span class="c1"># Then set the task as active and run asap</span>
+            <span class="k">async</span> <span class="k">with</span> <span class="n">session</span><span class="o">.</span><span class="n">put</span><span class="p">(</span>
+                <span class="s2">&quot;/worker/tasks&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;task_id&quot;</span><span class="p">:</span> <span class="n">task_id</span><span class="p">}</span>
+            <span class="p">)</span> <span class="k">as</span> <span class="n">response</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">response</span><span class="o">.</span><span class="n">ok</span><span class="p">:</span>
+                    <span class="n">LOGGER</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;&quot;&quot;Unable to operate the shutter.</span>
+<span class="s2">                        Session PUT responded with </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">reason</span><span class="si">}</span><span class="s2">.</span>
+<span class="s2">                        &quot;&quot;&quot;</span>
+                    <span class="p">)</span>
+                    <span class="k">return</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Run operate shutter plan, task_id: </span><span class="si">{</span><span class="n">task_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 </pre></div>
 

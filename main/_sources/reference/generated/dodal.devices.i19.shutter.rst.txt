@@ -14,7 +14,7 @@ dodal.devices.i19.shutter
    :toctree:
    :recursive:
 
-   ~shutter.HutchConditionalShutter
+   ~shutter.AccessControlledShutter
    ~shutter.HutchState
 
 
@@ -33,11 +33,5 @@ dodal.devices.i19.shutter
    
 
    
-   
-   .. rubric:: Exceptions
-
-   .. autosummary::
-   
-      HutchInvalidError
    
    

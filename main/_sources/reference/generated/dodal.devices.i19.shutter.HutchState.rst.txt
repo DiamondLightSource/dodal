@@ -74,8 +74,5 @@ dodal.devices.i19.shutter.HutchState
       
       ~HutchState.EH2
       
-      
-      ~HutchState.INVALID
-      
    
    
