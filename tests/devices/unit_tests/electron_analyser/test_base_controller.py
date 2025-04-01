@@ -58,7 +58,7 @@ def test_analyser_to_kinetic_energy(
     excitation_energy: float,
 ) -> None:
     low_energy = region.low_energy
-    ke = to_kinetic_energy(low_energy, excitation_energy, region.energy_mode)
+    ke = to_kinetic_energy(low_energy, region.energy_mode, excitation_energy)
     if region.is_binding_energy():
         assert ke == (excitation_energy - low_energy)
     else:
@@ -92,10 +92,10 @@ def test_given_region_that_analyser_sets_energy_values_correctly(
     RE(configure_analyser(sim_analyser, region, excitation_energy))
 
     expected_low_e = to_kinetic_energy(
-        region.low_energy, excitation_energy, region.energy_mode
+        region.low_energy, region.energy_mode, excitation_energy
     )
     expected_high_e = to_kinetic_energy(
-        region.high_energy, excitation_energy, region.energy_mode
+        region.high_energy, region.energy_mode, excitation_energy
     )
     expected_pass_e = region.pass_energy
 

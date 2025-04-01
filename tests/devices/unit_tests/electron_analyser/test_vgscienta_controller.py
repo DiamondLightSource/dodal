@@ -59,7 +59,7 @@ def test_given_region_that_analyser_sets_energy_values_correctly(
     RE(configure_vgscienta(sim_analyser, region, excitation_energy))
 
     expected_centre_e = to_kinetic_energy(
-        region.fix_energy, excitation_energy, region.energy_mode
+        region.fix_energy, region.energy_mode, excitation_energy
     )
     get_mock_put(sim_analyser.centre_energy).assert_called_once_with(
         expected_centre_e, wait=True

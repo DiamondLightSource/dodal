@@ -27,10 +27,10 @@ def configure_analyser(
 ):
     LOGGER.info(f'Configuring analyser with region "{region.name}"')
     low_energy = to_kinetic_energy(
-        region.low_energy, excitation_energy, region.energy_mode
+        region.low_energy, region.energy_mode, excitation_energy
     )
     high_energy = to_kinetic_energy(
-        region.high_energy, excitation_energy, region.energy_mode
+        region.high_energy, region.energy_mode, excitation_energy
     )
     # Set detector settings, wait for them all to have completed
     # fmt: off
@@ -68,7 +68,7 @@ def configure_vgscienta(
 ):
     yield from configure_analyser(analyser, region, excitation_energy)
     centre_energy = to_kinetic_energy(
-        region.fix_energy, excitation_energy, region.energy_mode
+        region.fix_energy, region.energy_mode, excitation_energy
     )
 
     # fmt: off
