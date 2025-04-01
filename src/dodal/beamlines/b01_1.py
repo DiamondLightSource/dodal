@@ -11,6 +11,7 @@ from dodal.common.beamlines.beamline_utils import (
 from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beamline
 from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
+from dodal.devices.motors import XYZPositioner
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix
@@ -59,4 +60,11 @@ def manta() -> AravisDetector:
         path_provider=get_path_provider(),
         drv_suffix=CAM_SUFFIX,
         fileio_suffix=HDF5_SUFFIX,
+    )
+
+
+@device_factory()
+def sample_stage() -> XYZPositioner:
+    return XYZPositioner(
+        f"{PREFIX.beamline_prefix}-MO-PPMAC-01:",
     )
