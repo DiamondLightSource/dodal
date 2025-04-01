@@ -12,6 +12,7 @@ from dodal.plan_stubs.electron_analyser.configure_controller import configure_sp
 from tests.devices.unit_tests.electron_analyser.test_util import (
     TEST_SEQUENCE_REGION_NAMES,
     TEST_SPECS_SEQUENCE,
+    assert_reading_has_expected_value,
 )
 
 
@@ -31,38 +32,47 @@ def sequence_class() -> type[SpecsSequence]:
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=["region"])
-def test_given_region_that_analyser_sets_energy_values_correctly(
-    sim_analyser: SpecsAnalyserController,
+async def test_given_region_that_analyser_sets_energy_values_correctly(
+    sim_analyser_controller: SpecsAnalyserController,
     region: SpecsRegion,
     excitation_energy: float,
     RE: RunEngine,
 ) -> None:
-    RE(configure_specs(sim_analyser, region, excitation_energy))
+    RE(configure_specs(sim_analyser_controller, region, excitation_energy))
 
     if region.acquisition_mode == "Fixed Energy":
-        get_mock_put(sim_analyser.energy_step).assert_called_once_with(
+        get_mock_put(sim_analyser_controller.energy_step).assert_called_once_with(
             region.energy_step, wait=True
         )
-    else:
-        get_mock_put(sim_analyser.energy_step).assert_not_called()
-
-    if region.acquisition_mode == "Fixed Transmission":
-        get_mock_put(sim_analyser.centre_energy).assert_called_once_with(
-            region.centre_energy, wait=True
+        await assert_reading_has_expected_value(
+            sim_analyser_controller, "energy_step", region.energy_step
         )
     else:
-        get_mock_put(sim_analyser.centre_energy).assert_not_called()
+        get_mock_put(sim_analyser_controller.energy_step).assert_not_called()
+
+    if region.acquisition_mode == "Fixed Transmission":
+        get_mock_put(sim_analyser_controller.centre_energy).assert_called_once_with(
+            region.centre_energy, wait=True
+        )
+        await assert_reading_has_expected_value(
+            sim_analyser_controller, "centre_energy", region.centre_energy
+        )
+    else:
+        get_mock_put(sim_analyser_controller.centre_energy).assert_not_called()
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=["region"])
-def test_given_region_that_analyser_sets_modes_correctly(
-    sim_analyser: SpecsAnalyserController,
+async def test_given_region_that_analyser_sets_modes_correctly(
+    sim_analyser_controller: SpecsAnalyserController,
     region: SpecsRegion,
     excitation_energy: float,
     RE: RunEngine,
 ) -> None:
-    RE(configure_specs(sim_analyser, region, excitation_energy))
+    RE(configure_specs(sim_analyser_controller, region, excitation_energy))
 
-    get_mock_put(sim_analyser.psu_mode).assert_called_once_with(
+    get_mock_put(sim_analyser_controller.psu_mode).assert_called_once_with(
         region.psu_mode, wait=True
+    )
+    await assert_reading_has_expected_value(
+        sim_analyser_controller, "psu_mode", region.psu_mode
     )
