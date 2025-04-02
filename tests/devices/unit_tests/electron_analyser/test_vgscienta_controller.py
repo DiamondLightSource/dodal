@@ -1,5 +1,6 @@
 import pytest
 from bluesky.run_engine import RunEngine
+from ophyd_async.epics.adcore._utils import ImageMode
 from ophyd_async.testing import (
     get_mock_put,
 )
@@ -50,11 +51,8 @@ async def test_given_region_that_analyser_sets_modes_correctly(
     await assert_reading_has_expected_value(
         sim_analyser_controller, "detector_mode", region.detector_mode
     )
-    get_mock_put(sim_analyser_controller.image_mode).assert_called_once_with(
-        "Single", wait=True
-    )
-    await assert_reading_has_expected_value(
-        sim_analyser_controller, "image_mode", "Single"
+    get_mock_put(sim_analyser_controller.adbase_cam.image_mode).assert_called_once_with(
+        ImageMode.SINGLE, wait=True
     )
 
 

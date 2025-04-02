@@ -1,4 +1,5 @@
 from bluesky import plan_stubs as bps
+from ophyd_async.epics.adcore._utils import ImageMode
 
 from dodal.common.types import MsgGenerator
 from dodal.devices.electron_analyser.abstract_analyser_controller import (
@@ -81,6 +82,6 @@ def configure_vgscienta(
         analyser.x_channel_size, region.x_channel_size(),
         analyser.y_channel_size, region.y_channel_size(),
         analyser.detector_mode, region.detector_mode,
-        analyser.image_mode, "Single",
+        analyser.adbase_cam.image_mode, ImageMode.SINGLE,
     )
     # fmt: on

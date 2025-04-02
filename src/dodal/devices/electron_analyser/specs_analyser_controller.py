@@ -26,6 +26,9 @@ class SpecsAnalyserController(AbstractAnalyserController):
         super().__init__(prefix, name)
 
     def _get_angle_axis_signal(self, prefix) -> SignalR:
+        """
+        Override abstract and return soft signal that calculates angle axis
+        """
         if hasattr(self, "angle_axis"):
             return self.angle_axis
         angle_axis = create_r_hardware_backed_soft_signal(
@@ -46,6 +49,9 @@ class SpecsAnalyserController(AbstractAnalyserController):
         return axis
 
     def _get_energy_axis_signal(self, prefix) -> SignalR:
+        """
+        Override abstract and return soft signal that calculates energy axis
+        """
         if hasattr(self, "energy_axis"):
             return self.energy_axis
         energy_axis = create_r_hardware_backed_soft_signal(

@@ -3,6 +3,7 @@ from typing import TypeVar
 
 import numpy as np
 from ophyd_async.core import Array1D, SignalR, StandardReadable
+from ophyd_async.epics.adcore import ADBaseIO
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.common.signal_utils import create_r_hardware_backed_soft_signal
@@ -17,6 +18,8 @@ class AbstractAnalyserController(ABC, StandardReadable):
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
+        self.adbase_cam = ADBaseIO(prefix, "adbase")
+
         with self.add_children_as_readables():
             # Used for setting up region data acquisition
             self.low_energy = epics_signal_rw(float, prefix + "LOW_ENERGY")
@@ -36,8 +39,7 @@ class AbstractAnalyserController(ABC, StandardReadable):
             self.total_intensity = create_r_hardware_backed_soft_signal(
                 float, self._calculate_total_intensity
             )
-
-            self.step_time = epics_signal_r(float, prefix + "AcquireTime_RBV")
+            self.step_time = epics_signal_r(float, self.adbase_cam.acquire_time.name)
             self.total_steps = epics_signal_r(float, prefix + "TOTAL_POINTS_RBV")
 
         super().__init__(name)
@@ -60,8 +62,7 @@ class AbstractAnalyserController(ABC, StandardReadable):
         )
 
     async def _calculate_total_intensity(self) -> float:
-        spectrum_data = await self.spectrum.get_value()
-        return np.sum(spectrum_data)
+        return np.sum(await self.spectrum.get_value())
 
 
 TAbstractAnalyserController = TypeVar(

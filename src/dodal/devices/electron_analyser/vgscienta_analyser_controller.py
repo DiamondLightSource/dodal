@@ -20,7 +20,6 @@ class VGScientaAnalyserController(AbstractAnalyserController):
             self.x_channel_size = epics_signal_rw(int, prefix + "SizeX")
             self.y_channel_size = epics_signal_rw(int, prefix + "SizeY")
             self.detector_mode = epics_signal_rw(DetectorMode, prefix + "DETECTOR_MODE")
-            self.image_mode = epics_signal_rw(str, prefix + "ImageMode")
 
             # Used to read detector data after acqusition
             self.external_io = epics_signal_r(Array1D[np.float64], prefix + "EXTIO")
@@ -28,11 +27,17 @@ class VGScientaAnalyserController(AbstractAnalyserController):
         super().__init__(prefix, name)
 
     def _get_energy_axis_signal(self, prefix) -> SignalR:
+        """
+        Override abstract and return epics signal
+        """
         if hasattr(self, "energy_axis"):
             return self.energy_axis
         return epics_signal_r(Array1D[np.float64], prefix + "X_SCALE_RBV")
 
     def _get_angle_axis_signal(self, prefix) -> SignalR:
+        """
+        Override abstract and return epics signal
+        """
         if hasattr(self, "angle_axis"):
             return self.angle_axis
         return epics_signal_r(Array1D[np.float64], prefix + "Y_SCALE_RBV")
