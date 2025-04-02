@@ -6,6 +6,8 @@ from dodal.common.signal_utils import create_r_hardware_backed_soft_signal
 from dodal.devices.electron_analyser.abstract_analyser_io import (
     AbstractAnalyserDriverIO,
 )
+from dodal.devices.electron_analyser.abstract_region import EnergyMode
+from dodal.devices.electron_analyser.util import to_binding_energy
 
 
 class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO):
@@ -67,3 +69,12 @@ class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO):
         step = (max_energy - min_energy) / total_points_iterations
         axis = np.array([min_energy + i * step for i in range(total_points_iterations)])
         return axis
+
+    async def binding_energy_axis(
+        self, excitation_energy: float
+    ) -> Array1D[np.float64]:
+        energy_axis_values = await self.energy_axis.get_value()
+        return np.array(
+            to_binding_energy(energy_value, EnergyMode.KINETIC, excitation_energy)
+            for energy_value in energy_axis_values
+        )
