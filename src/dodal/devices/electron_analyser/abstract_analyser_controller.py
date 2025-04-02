@@ -2,8 +2,12 @@ from abc import ABC, abstractmethod
 from typing import TypeVar
 
 import numpy as np
-from ophyd_async.core import Array1D, StandardReadable
+from ophyd_async.core import Array1D, SignalR, StandardReadable
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
+
+from dodal.common.signal_utils import create_r_hardware_backed_soft_signal
+from dodal.devices.electron_analyser.abstract_region import EnergyMode
+from dodal.devices.electron_analyser.util import to_binding_energy
 
 
 class AbstractAnalyserController(ABC, StandardReadable):
@@ -27,22 +31,37 @@ class AbstractAnalyserController(ABC, StandardReadable):
             # Used to read detector data after acqusition
             self.image = epics_signal_r(Array1D[np.float64], prefix + "IMAGE")
             self.spectrum = epics_signal_r(Array1D[np.float64], prefix + "INT_SPECTRUM")
+            self.energy_axis = self._get_energy_axis_signal(prefix)
+            self.angle_axis = self._get_angle_axis_signal(prefix)
+            self.total_intensity = create_r_hardware_backed_soft_signal(
+                float, self._calculate_total_intensity
+            )
 
             self.step_time = epics_signal_r(float, prefix + "AcquireTime_RBV")
             self.total_steps = epics_signal_r(float, prefix + "TOTAL_POINTS_RBV")
 
         super().__init__(name)
 
-    @property
-    async def total_intensity(self) -> float:
-        spectrum_data = await self.spectrum.get_value()
-        return np.sum(spectrum_data)
+    @abstractmethod
+    def _get_angle_axis_signal(self, prefix) -> SignalR:
+        pass
 
     @abstractmethod
-    async def binding_energy_axis(
+    def _get_energy_axis_signal(self, prefix) -> SignalR:
+        pass
+
+    async def binding_energy_axis_values(
         self, excitation_energy: float
     ) -> Array1D[np.float64]:
-        pass
+        energy_axis_values = await self.energy_axis.get_value()
+        return np.array(
+            to_binding_energy(energy_value, EnergyMode.KINETIC, excitation_energy)
+            for energy_value in energy_axis_values
+        )
+
+    async def _calculate_total_intensity(self) -> float:
+        spectrum_data = await self.spectrum.get_value()
+        return np.sum(spectrum_data)
 
 
 TAbstractAnalyserController = TypeVar(
