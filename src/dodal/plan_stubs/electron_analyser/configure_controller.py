@@ -1,5 +1,6 @@
 from bluesky import plan_stubs as bps
 
+from dodal.common.types import MsgGenerator
 from dodal.devices.electron_analyser.abstract_analyser_controller import (
     AbstractAnalyserController,
 )
@@ -24,7 +25,7 @@ def configure_analyser(
     analyser: AbstractAnalyserController,
     region: AbstractBaseRegion,
     excitation_energy: float,
-):
+) -> MsgGenerator:
     LOGGER.info(f'Configuring analyser with region "{region.name}"')
     low_energy = to_kinetic_energy(
         region.low_energy, region.energy_mode, excitation_energy
@@ -48,7 +49,7 @@ def configure_analyser(
 
 def configure_specs(
     analyser: SpecsAnalyserController, region: SpecsRegion, excitation_energy: float
-):
+) -> MsgGenerator:
     yield from configure_analyser(analyser, region, excitation_energy)
     # fmt: off
     yield from bps.mv(
@@ -65,7 +66,7 @@ def configure_specs(
 
 def configure_vgscienta(
     analyser: VGScientaAnalyserController, region: VGScientaRegion, excitation_energy
-):
+) -> MsgGenerator:
     yield from configure_analyser(analyser, region, excitation_energy)
     centre_energy = to_kinetic_energy(
         region.fix_energy, region.energy_mode, excitation_energy
