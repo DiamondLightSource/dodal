@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import TypeVar
 
 import numpy as np
@@ -37,6 +37,12 @@ class AbstractAnalyserController(ABC, StandardReadable):
     async def total_intensity(self) -> float:
         spectrum_data = await self.spectrum.get_value()
         return np.sum(spectrum_data)
+
+    @abstractmethod
+    async def binding_energy_axis(
+        self, excitation_energy: float
+    ) -> Array1D[np.float64]:
+        pass
 
 
 TAbstractAnalyserController = TypeVar(

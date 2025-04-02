@@ -1,8 +1,12 @@
+import numpy as np
+from ophyd_async.core import Array1D
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
 from dodal.devices.electron_analyser.abstract_analyser_controller import (
     AbstractAnalyserController,
 )
+from dodal.devices.electron_analyser.abstract_region import EnergyMode
+from dodal.devices.electron_analyser.util import to_binding_energy
 
 
 class SpecsAnalyserController(AbstractAnalyserController):
@@ -49,3 +53,12 @@ class SpecsAnalyserController(AbstractAnalyserController):
         for i in range(len(axis)):
             axis[i] = min_energy + i * step
         return axis
+
+    async def binding_energy_axis(
+        self, excitation_energy: float
+    ) -> Array1D[np.float64]:
+        energy_axis_values = await self.energy_axis
+        return np.array(
+            to_binding_energy(energy_value, EnergyMode.KINETIC, excitation_energy)
+            for energy_value in energy_axis_values
+        )
