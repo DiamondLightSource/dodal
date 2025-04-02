@@ -65,12 +65,6 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable):
     async def _calculate_total_intensity(self) -> float:
         return np.sum(await self.spectrum.get_value())
 
-    @abstractmethod
-    async def binding_energy_axis(
-        self, excitation_energy: float
-    ) -> Array1D[np.float64]:
-        pass
-
 
 TAbstractAnalyserDriverIO = TypeVar(
     "TAbstractAnalyserDriverIO", bound=AbstractAnalyserDriverIO
