@@ -12,6 +12,7 @@ from dodal.common.beamlines.beamline_utils import set_beamline as set_utils_beam
 from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
 from dodal.devices.motors import XYZPositioner
 from dodal.common.visit import LocalDirectoryServiceClient, StaticVisitPathProvider
+from dodal.devices.motors import XYZPositioner
 from dodal.devices.synchrotron import Synchrotron
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix
@@ -68,4 +69,3 @@ def sample_stage() -> XYZPositioner:
     return XYZPositioner(
         f"{PREFIX.beamline_prefix}-MO-PPMAC-01:",
     )
-
