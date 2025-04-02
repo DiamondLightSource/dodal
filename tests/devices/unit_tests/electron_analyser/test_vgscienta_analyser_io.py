@@ -5,6 +5,7 @@ from ophyd_async.testing import (
     get_mock_put,
 )
 
+from dodal.devices.electron_analyser.abstract_region import EnergyMode
 from dodal.devices.electron_analyser.util import to_kinetic_energy
 from dodal.devices.electron_analyser.vgscienta_analyser_io import (
     VGScientaAnalyserDriverIO,

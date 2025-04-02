@@ -40,7 +40,6 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable):
                 float, self._calculate_total_intensity
             )
             self.step_time = epics_signal_r(float, self.adbase_cam.acquire_time.name)
-
             self.total_steps = epics_signal_r(float, prefix + "TOTAL_POINTS_RBV")
 
         super().__init__(name)

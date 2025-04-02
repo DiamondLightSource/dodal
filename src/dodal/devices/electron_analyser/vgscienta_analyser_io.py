@@ -26,9 +26,6 @@ class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO):
             # Used to read detector data after acqusition
             self.external_io = epics_signal_r(Array1D[np.float64], prefix + "EXTIO")
 
-            # Used to read detector data after acqusition
-            self.external_io = epics_signal_r(Array1D[np.float64], prefix + "EXTIO")
-
         super().__init__(prefix, name)
 
     def _get_energy_axis_signal(self, prefix) -> SignalR:
