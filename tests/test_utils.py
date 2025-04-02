@@ -7,7 +7,7 @@ from unittest.mock import ANY, MagicMock, Mock, patch
 import pytest
 from bluesky.protocols import Readable
 from bluesky.run_engine import RunEngine
-from ophyd import EpicsMotor
+from ophyd_async.epics.motor import Motor
 
 from dodal.beamlines import i03, i23
 from dodal.devices.diamond_filter import DiamondFilter, I03Filters
@@ -310,7 +310,7 @@ def device_a() -> Readable:
     return MagicMock()
 
 
-def device_b() -> EpicsMotor:
+def device_b() -> Motor:
     return MagicMock()
 
 

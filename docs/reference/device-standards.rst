@@ -13,8 +13,8 @@ Where to put devices
 Dodal is written with the philosophy that Ophyd devices should be assumed to be as generic as possible. I.e. you 
 should think about where to place them in the following order:
 
-#. A device that could be used at any facility, e.g. a generic ``EpicsMotor`` or a commercial product with a 
-   standard IOC, should go in https://github.com/bluesky/ophyd-epics-devices
+#. A device that could be used at any facility, e.g. a generic ``Motor`` or a commercial product with a 
+   standard IOC, should go in https://github.com/bluesky/ophyd-async
 #. A device that may be on any beamline should go in the top level of the ``devices`` folder. If it is a quite 
    complex device (e.g. multiple files) it should have a folder of its own e.g. ``oav``
 #. A device that is very specific to a particular beamline should go in the ``devices/ixx`` folder
