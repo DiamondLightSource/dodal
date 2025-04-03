@@ -1,3 +1,4 @@
+import json
 from enum import Enum
 
 from aiohttp import ClientSession
@@ -10,6 +11,7 @@ from dodal.devices.i19.hutch_access import ACCESS_DEVICE_NAME
 from dodal.log import LOGGER
 
 OPTICS_BLUEAPI_URL = "https://i19-blueapi.diamond.ac.uk"
+HEADERS = {"Accept": "application/json", "Content-Type": "application/json"}
 
 
 class HutchState(str, Enum):
@@ -47,12 +49,14 @@ class AccessControlledShutter(StandardReadable, Movable[ShutterDemand]):
             "params": {
                 "experiment_hutch": self.hutch_request.value,
                 "access_device": ACCESS_DEVICE_NAME,
-                "shutter_demand": value,
+                "shutter_demand": value.value,
             },
         }
         async with ClientSession(base_url=self.url, raise_for_status=True) as session:
             # First submit the plan to the worker
-            async with session.post("/tasks", data=REQUEST_PARAMS) as response:
+            async with session.post(
+                "/tasks", data=json.dumps(REQUEST_PARAMS), headers=HEADERS
+            ) as response:
                 LOGGER.debug(
                     f"Task submitted to the worker, response status: {response.status}"
                 )
@@ -67,7 +71,7 @@ class AccessControlledShutter(StandardReadable, Movable[ShutterDemand]):
                     raise
             # Then set the task as active and run asap
             async with session.put(
-                "/worker/tasks", data={"task_id": task_id}
+                "/worker/task", data=json.dumps({"task_id": task_id}), headers=HEADERS
             ) as response:
                 if not response.ok:
                     LOGGER.error(
