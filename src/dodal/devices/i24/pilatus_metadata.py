@@ -5,7 +5,7 @@ import re
 from ophyd_async.core import StandardReadable
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-from dodal.common.signal_utils import create_hardware_backed_soft_signal
+from dodal.common.signal_utils import create_r_hardware_backed_soft_signal
 
 
 class PilatusMetadata(StandardReadable):
@@ -14,7 +14,7 @@ class PilatusMetadata(StandardReadable):
         self.template = epics_signal_r(str, prefix + "cam1:FileTemplate_RBV")
         self.filenumber = epics_signal_r(int, prefix + "cam1:FileNumber_RBV")
         with self.add_children_as_readables():
-            self.filename_template = create_hardware_backed_soft_signal(
+            self.filename_template = create_r_hardware_backed_soft_signal(
                 str, self._get_full_filename_template
             )
         super().__init__(name)
