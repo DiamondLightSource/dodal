@@ -1,25 +1,12 @@
-import json
-from enum import Enum
-
-from aiohttp import ClientSession
-from bluesky.protocols import Movable
-from ophyd_async.core import AsyncStatus, StandardReadable, StandardReadableFormat
+from ophyd_async.core import AsyncStatus, StandardReadableFormat
 from ophyd_async.epics.core import epics_signal_r
 
 from dodal.devices.hutch_shutter import ShutterDemand, ShutterState
+from dodal.devices.i19.blueapi_device import HutchState, OpticsBlueAPIDevice
 from dodal.devices.i19.hutch_access import ACCESS_DEVICE_NAME
-from dodal.log import LOGGER
-
-OPTICS_BLUEAPI_URL = "https://i19-blueapi.diamond.ac.uk"
-HEADERS = {"Accept": "application/json", "Content-Type": "application/json"}
 
 
-class HutchState(str, Enum):
-    EH1 = "EH1"
-    EH2 = "EH2"
-
-
-class AccessControlledShutter(StandardReadable, Movable[ShutterDemand]):
+class AccessControlledShutter(OpticsBlueAPIDevice):
     """ I19-specific device to operate the hutch shutter.
 
     This device will send a REST call to the blueapi instance controlling the optics \
@@ -39,7 +26,7 @@ class AccessControlledShutter(StandardReadable, Movable[ShutterDemand]):
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
             self.shutter_status = epics_signal_r(ShutterState, f"{prefix}STA")
         self.hutch_request = hutch
-        self.url = OPTICS_BLUEAPI_URL
+        # self.url = OPTICS_BLUEAPI_URL
         super().__init__(name)
 
     @AsyncStatus.wrap
@@ -52,32 +39,4 @@ class AccessControlledShutter(StandardReadable, Movable[ShutterDemand]):
                 "shutter_demand": value.value,
             },
         }
-        async with ClientSession(base_url=self.url, raise_for_status=True) as session:
-            # First submit the plan to the worker
-            async with session.post(
-                "/tasks", data=json.dumps(REQUEST_PARAMS), headers=HEADERS
-            ) as response:
-                LOGGER.debug(
-                    f"Task submitted to the worker, response status: {response.status}"
-                )
-
-                try:
-                    data = await response.json()
-                    task_id = data["task_id"]
-                except Exception as e:
-                    LOGGER.error(
-                        f"Failed to get task_id from {self.url}/tasks POST. ({e})"
-                    )
-                    raise
-            # Then set the task as active and run asap
-            async with session.put(
-                "/worker/task", data=json.dumps({"task_id": task_id}), headers=HEADERS
-            ) as response:
-                if not response.ok:
-                    LOGGER.error(
-                        f"""Unable to operate the shutter.
-                        Session PUT responded with {response.status}: {response.reason}.
-                        """
-                    )
-                    return
-                LOGGER.debug(f"Run operate shutter plan, task_id: {task_id}")
+        await super().set(REQUEST_PARAMS)
