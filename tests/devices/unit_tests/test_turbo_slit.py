@@ -9,20 +9,22 @@ from dodal.devices.turbo_slit import TurboSlit
 
 
 @pytest.fixture
-def slit() -> TurboSlit:
+def slit(RE) -> TurboSlit:
     with init_devices(mock=True):
         slit = TurboSlit(prefix="TEST-EA-TURBOSLIT:", name="turbo_slit")
     return slit
 
 
-async def test_turbo_slit_set(slit: TurboSlit, RE: RunEngine):
+async def test_turbo_slit_set(slit: TurboSlit):
     set_mock_value(slit.xfine.user_readback, 0.0)
     await slit.set(0.5)
-    assert slit.xfine.set.call_count == 1
-    assert slit.xfine.set.call_args == AsyncMock.call(0.5)
+    raise AssertionError("This test is not implemented yet")
+
+    # assert slit.xfine.set.call_count == 1
+    # assert slit.xfine.set.call_args == AsyncMock.call(0.5)
 
 
-async def test_turbo_slit_read(slit: TurboSlit):
+async def test_turbo_slit_read(slit: TurboSlit, RE: RunEngine):
     set_mock_value(slit.gap.user_readback, 0.5)
     set_mock_value(slit.arc.user_readback, 1.0)
     set_mock_value(slit.xfine.user_readback, 1.5)
