@@ -60,7 +60,7 @@ class OpticsBlueAPIDevice(StandardReadable, Movable[D]):
             async with session.post(
                 "/tasks", data=request_params, headers=HEADERS
             ) as response:
-                LOGGER.debug(
+                LOGGER.info(
                     f"Task submitted to the worker, response status: {response.status}"
                 )
 
@@ -78,9 +78,8 @@ class OpticsBlueAPIDevice(StandardReadable, Movable[D]):
             ) as response:
                 if not response.ok:
                     LOGGER.error(
-                        f"""Unable to run {value["name"]} with params {value["params"]}.
-                        Session PUT responded with {response.status}: {response.reason}.
-                        """
+                        f"""Session PUT responded with {response.status}: {response.reason}.
+                        Unable to run plan {value["name"]}."""  # type: ignore
                     )
                     return
-                LOGGER.debug(f"Running plan: {value['name']}, task_id: {task_id}")
+                LOGGER.debug(f"Running plan: {value['name']}, task_id: {task_id}")  # type: ignore
