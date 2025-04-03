@@ -16,12 +16,16 @@ def slit(RE) -> TurboSlit:
 
 
 async def test_turbo_slit_set(slit: TurboSlit):
-    set_mock_value(slit.xfine.user_readback, 0.0)
-    await slit.set(0.5)
-    raise AssertionError("This test is not implemented yet")
+    slit.xfine.set = AsyncMock()
 
-    # assert slit.xfine.set.call_count == 1
-    # assert slit.xfine.set.call_args == AsyncMock.call(0.5)
+    set_mock_value(slit.xfine.user_readback, 0.0)
+    # NOTE velocity needs to be set otherwise it's zero
+    # and the set method throws divide by zero error
+    set_mock_value(slit.xfine.velocity, 0.2)
+    await slit.set(0.5)
+
+    assert slit.xfine.set.call_count == 1
+    slit.xfine.set.assert_called_once_with(0.5)
 
 
 async def test_turbo_slit_read(slit: TurboSlit, RE: RunEngine):
