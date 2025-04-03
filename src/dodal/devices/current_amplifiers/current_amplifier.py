@@ -23,7 +23,6 @@ class CurrentAmp(ABC, StandardReadable, Movable):
         super().__init__(name)
 
     @abstractmethod
-    @AsyncStatus.wrap
     async def increase_gain(self, value: int = 1) -> None:
         """Increase gain, increment by 1 by default.
 
@@ -31,7 +30,6 @@ class CurrentAmp(ABC, StandardReadable, Movable):
             bool: True if success.
         """
 
-    @AsyncStatus.wrap
     @abstractmethod
     async def decrease_gain(self, value: int = 1) -> None:
         """Decrease gain, decrement by 1 by default.
@@ -40,21 +38,18 @@ class CurrentAmp(ABC, StandardReadable, Movable):
             bool: True if success.
         """
 
-    @AsyncStatus.wrap
     @abstractmethod
-    async def get_gain(self) -> type[Enum]:
+    async def get_gain(self) -> Enum:
         """Get the current gain setting
 
         Returns:
             Enum: The member name of the current gain setting in gain_conversion_table.
         """
 
-    @AsyncStatus.wrap
     @abstractmethod
     async def get_upperlimit(self) -> float:
         """Get the upper limit of the current amplifier"""
 
-    @AsyncStatus.wrap
     @abstractmethod
     async def get_lowerlimit(self) -> float:
         """Get the lower limit of the current amplifier"""
