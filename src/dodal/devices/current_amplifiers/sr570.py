@@ -178,7 +178,6 @@ class SR570(CurrentAmp):
         )
         await asyncio.sleep(self.raise_timetable[coarse_gain.name].value)
 
-    @AsyncStatus.wrap
     async def increase_gain(self, value=3) -> None:
         current_gain = int((await self.get_gain()).name.split("_")[-1])
         current_gain += value
@@ -189,7 +188,6 @@ class SR570(CurrentAmp):
             raise ValueError("Gain at max value")
         await self.set(self.gain_conversion_table[f"SEN_{current_gain}"])
 
-    @AsyncStatus.wrap
     async def decrease_gain(self, value=3) -> None:
         current_gain = int((await self.get_gain()).name.split("_")[-1])
         current_gain -= value
@@ -198,17 +196,14 @@ class SR570(CurrentAmp):
             raise ValueError("Gain at min value")
         await self.set(self.gain_conversion_table[f"SEN_{current_gain}"])
 
-    @AsyncStatus.wrap
     async def get_gain(self) -> Enum:
         result = await asyncio.gather(
             self.coarse_gain.get_value(), self.fine_gain.get_value()
         )
         return self.gain_conversion_table[self.combined_table(result).name]
 
-    @AsyncStatus.wrap
     async def get_upperlimit(self) -> float:
         return self.upperlimit
 
-    @AsyncStatus.wrap
     async def get_lowerlimit(self) -> float:
         return self.lowerlimit

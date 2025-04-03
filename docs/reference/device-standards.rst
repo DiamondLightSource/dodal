@@ -150,7 +150,7 @@ based on this and so this has the issues listed above. Instead you should make s
         def __init__(self):
             self.underlying_motor = Motor("MOTOR")
             with self.add_children_as_readables():
-                self.in_out = create_hardware_backed_soft_signal(InOut, self._get_in_out_from_hardware)
+                self.in_out = create_r_hardware_backed_soft_signal(InOut, self._get_in_out_from_hardware)
                 
         async def _get_in_out_from_hardware(self):
             current_position = await self.underlying_motor.get_value()

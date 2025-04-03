@@ -3,7 +3,6 @@ from ophyd_async.epics import adcore
 
 from dodal.common.beamlines.device_helpers import CAM_SUFFIX, HDF5_SUFFIX
 from dodal.devices.i13_1.merlin_controller import MerlinController
-from dodal.devices.i13_1.merlin_io import MerlinDriverIO
 
 
 class Merlin(StandardDetector):
@@ -18,7 +17,7 @@ class Merlin(StandardDetector):
         fileio_suffix=HDF5_SUFFIX,
         name: str = "",
     ):
-        self.drv = MerlinDriverIO(prefix + drv_suffix)
+        self.drv = adcore.ADBaseIO(prefix + drv_suffix)
         self.hdf = adcore.NDFileHDFIO(prefix + fileio_suffix)
 
         super().__init__(

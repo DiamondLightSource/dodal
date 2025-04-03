@@ -32,7 +32,7 @@ class DetectorParams(BaseModel):
     # Must use model_dump(by_alias=True) if serialising!
 
     expected_energy_ev: float | None = None
-    exposure_time: float
+    exposure_time_s: float
     directory: str  # : Path https://github.com/DiamondLightSource/dodal/issues/774
     prefix: str
     detector_distance: float

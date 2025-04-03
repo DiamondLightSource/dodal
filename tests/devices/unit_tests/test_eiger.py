@@ -39,7 +39,7 @@ class StatusException(Exception):
 def params(tmp_path: Path) -> DetectorParams:
     return DetectorParams(
         expected_energy_ev=TEST_EXPECTED_ENERGY,
-        exposure_time=TEST_EXPOSURE_TIME,
+        exposure_time_s=TEST_EXPOSURE_TIME,
         directory=str(tmp_path),
         prefix=TEST_PREFIX,
         run_number=TEST_RUN_NUMBER,

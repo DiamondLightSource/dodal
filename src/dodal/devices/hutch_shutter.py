@@ -55,7 +55,7 @@ class HutchInterlock(StandardReadable):
         return interlock_state == HUTCH_SAFE_FOR_OPERATIONS
 
 
-class HutchShutter(StandardReadable, Movable):
+class HutchShutter(StandardReadable, Movable[ShutterDemand]):
     """Device to operate the hutch shutter.
 
     When a demand is sent, the device should first check the hutch status \

@@ -15,8 +15,8 @@ description = "Ophyd devices and other utils that could be used across DLS beaml
 dependencies = [
     "click",
     "ophyd",
-    "ophyd-async >= 0.9.0a2",
-    "bluesky == 1.13.0",
+    "ophyd-async>=0.10.0a1",
+    "bluesky",
     "pyepics",
     "dataclasses-json",
     "pillow",
@@ -55,7 +55,7 @@ dev = [
     "pre-commit",
     "psutil",
     "pydata-sphinx-theme>=0.12",
-    "pyright==1.1.394",          # See https://github.com/DiamondLightSource/dodal/issues/1079
+    "pyright",
     "pytest",
     "pytest-asyncio",
     "pytest-cov",
@@ -170,22 +170,27 @@ lint.extend-ignore = [
     "F811", # support typing.overload decorator
 ]
 lint.select = [
-    "B",   # flake8-bugbear - https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
-    "C4",  # flake8-comprehensions - https://docs.astral.sh/ruff/rules/#flake8-comprehensions-c4
-    "E",   # pycodestyle errors - https://docs.astral.sh/ruff/rules/#error-e
-    "F",   # pyflakes rules - https://docs.astral.sh/ruff/rules/#pyflakes-f
-    "W",   # pycodestyle warnings - https://docs.astral.sh/ruff/rules/#warning-w
-    "I",   # isort - https://docs.astral.sh/ruff/rules/#isort-i
-    "UP",  # pyupgrade - https://docs.astral.sh/ruff/rules/#pyupgrade-up
-    "SLF", # self - https://docs.astral.sh/ruff/settings/#lintflake8-self
+    "B",      # flake8-bugbear - https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+    "C4",     # flake8-comprehensions - https://docs.astral.sh/ruff/rules/#flake8-comprehensions-c4
+    "E",      # pycodestyle errors - https://docs.astral.sh/ruff/rules/#error-e
+    "F",      # pyflakes rules - https://docs.astral.sh/ruff/rules/#pyflakes-f
+    "W",      # pycodestyle warnings - https://docs.astral.sh/ruff/rules/#warning-w
+    "I",      # isort - https://docs.astral.sh/ruff/rules/#isort-i
+    "UP",     # pyupgrade - https://docs.astral.sh/ruff/rules/#pyupgrade-up
+    "SLF",    # self - https://docs.astral.sh/ruff/settings/#lintflake8-self
+    "RUF018", # walrus operators in asserts - https://docs.astral.sh/ruff/rules/assignment-in-assert/
+    "TID251", # banned api - https://docs.astral.sh/ruff/rules/banned-api/
 ]
 
 [tool.ruff.lint.per-file-ignores]
 # By default, private member access is allowed in tests
 # See https://github.com/DiamondLightSource/python-copier-template/issues/154
-# Remove this line to forbid private member access in tests
-"tests/**/*" = ["SLF001"]
-"system_tests/**/*" = ["SLF001"]
+# Remove this line to forbid private member access, walrus operators, banned api in asserts in tests 
+"tests/**/*" = ["SLF001", "RUF018", "TID251"]
+"system_tests/**/*" = ["SLF001", "RUF018", "TID251"]
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"time.sleep".msg = "Use bps.sleep or asyncio.sleep instead. # noqa will disable this rule for that line. See https://github.com/DiamondLightSource/mx-bluesky/issues/925"
 
 [tool.importlinter]
 root_package = "dodal"

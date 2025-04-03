@@ -16,6 +16,7 @@ from dodal.devices.aperturescatterguard import (
 )
 from dodal.devices.attenuator.attenuator import BinaryFilterAttenuator
 from dodal.devices.backlight import Backlight
+from dodal.devices.baton import Baton
 from dodal.devices.cryostream import CryoStream
 from dodal.devices.dcm import DCM
 from dodal.devices.detector.detector_motion import DetectorMotion
@@ -436,3 +437,13 @@ def qbpm() -> QBPM:
         f"{PREFIX.beamline_prefix}-DI-QBPM-01:",
         "qbpm",
     )
+
+
+@device_factory(
+    skip=True
+)  # Skipping as not yet on the beamline, see https://jira.diamond.ac.uk/browse/I03-894
+def baton() -> Baton:
+    """Get the i03 baton device, instantiate it if it hasn't already been.
+    If this is called when already instantiated in i03, it will return the existing object.
+    """
+    return Baton(f"{PREFIX.beamline_prefix}:")

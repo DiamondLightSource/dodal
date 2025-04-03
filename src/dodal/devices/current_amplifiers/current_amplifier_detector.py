@@ -92,8 +92,8 @@ class CurrentAmpDet(StandardReadable, Preparable):
             self.current_amp().get_gain(),
             self.counter().get_voltage_per_sec(),
         )
-        correction_factor = current_gain.value
-        corrected_current = voltage_per_sec / correction_factor
+        assert isinstance(current_gain.value, float)
+        corrected_current = voltage_per_sec / current_gain.value
         return corrected_current
 
     @AsyncStatus.wrap

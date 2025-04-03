@@ -71,7 +71,7 @@ class PMACStringMove(Triggerable):
         await self.signal_ref().set(self.cmd_string, wait=True)
 
 
-class PMACStringLaser(Device, Movable):
+class PMACStringLaser(Device, Movable[LaserSettings]):
     """Set the pmac_string to control the laser."""
 
     def __init__(
@@ -90,7 +90,7 @@ class PMACStringLaser(Device, Movable):
         await self._signal_ref().set(value.value)
 
 
-class PMACStringEncReset(Device, Movable):
+class PMACStringEncReset(Device, Movable[EncReset]):
     """Set a pmac_string to control the encoder channels in the controller."""
 
     def __init__(

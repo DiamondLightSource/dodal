@@ -12,10 +12,7 @@ from dodal.devices.undulator import AccessError, Undulator, UndulatorGapAccess
 from dodal.devices.undulator_dcm import UndulatorDCM
 from dodal.devices.util.test_utils import patch_motor
 from dodal.log import LOGGER
-
-ID_GAP_LOOKUP_TABLE_PATH: str = (
-    "./tests/devices/unit_tests/test_beamline_undulator_to_gap_lookup_table.txt"
-)
+from tests.constants import UNDULATOR_ID_GAP_LOOKUP_TABLE_PATH
 
 
 @pytest.fixture(autouse=True)
@@ -35,7 +32,7 @@ async def fake_undulator_dcm() -> UndulatorDCM:
             "UND-01",
             name="undulator",
             poles=80,
-            id_gap_lookup_table_path=ID_GAP_LOOKUP_TABLE_PATH,
+            id_gap_lookup_table_path=UNDULATOR_ID_GAP_LOOKUP_TABLE_PATH,
             length=2.0,
         )
         dcm = DCM("DCM-01", name="dcm")
@@ -52,7 +49,7 @@ async def fake_undulator_dcm() -> UndulatorDCM:
 def test_lookup_table_paths_passed(fake_undulator_dcm: UndulatorDCM):
     assert (
         fake_undulator_dcm.undulator_ref().id_gap_lookup_table_path
-        == ID_GAP_LOOKUP_TABLE_PATH
+        == UNDULATOR_ID_GAP_LOOKUP_TABLE_PATH
     )
     assert (
         fake_undulator_dcm.pitch_energy_table_path
