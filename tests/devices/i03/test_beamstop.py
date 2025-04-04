@@ -8,7 +8,7 @@ from bluesky.run_engine import RunEngine
 from ophyd_async.testing import set_mock_value
 
 from dodal.common.beamlines.beamline_parameters import GDABeamlineParameters
-from dodal.devices.i03.beamstop import Beamstop, BeamstopPositions
+from dodal.devices.i03 import Beamstop, BeamstopPositions
 
 
 @pytest.fixture
