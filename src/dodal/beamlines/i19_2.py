@@ -5,7 +5,8 @@ from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
 from dodal.devices.i19.beamstop import BeamStop
-from dodal.devices.i19.shutter import AccessControlledShutter, HutchState
+from dodal.devices.i19.blueapi_device import HutchState
+from dodal.devices.i19.shutter import AccessControlledShutter
 from dodal.devices.synchrotron import Synchrotron
 from dodal.devices.zebra.zebra import Zebra
 from dodal.devices.zebra.zebra_constants_mapping import (

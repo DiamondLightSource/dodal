@@ -5,7 +5,8 @@ from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
 from dodal.devices.i19.beamstop import BeamStop
-from dodal.devices.i19.shutter import AccessControlledShutter, HutchState
+from dodal.devices.i19.blueapi_device import HutchState
+from dodal.devices.i19.shutter import AccessControlledShutter
 from dodal.devices.oav.oav_detector import OAV
 from dodal.devices.oav.oav_parameters import OAVConfig
 from dodal.devices.synchrotron import Synchrotron

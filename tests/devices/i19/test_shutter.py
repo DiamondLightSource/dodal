@@ -1,3 +1,4 @@
+import json
 from unittest.mock import ANY, AsyncMock, MagicMock, patch
 
 import pytest
@@ -9,9 +10,9 @@ from dodal.devices.hutch_shutter import (
     ShutterDemand,
     ShutterState,
 )
+from dodal.devices.i19.blueapi_device import HEADERS, HutchState
 from dodal.devices.i19.shutter import (
     AccessControlledShutter,
-    HutchState,
 )
 
 
@@ -70,22 +71,23 @@ async def test_set_raises_error_if_post_not_successful(
     eh2_shutter: AccessControlledShutter,
 ):
     with pytest.raises(ClientConnectionError):
-        with patch("dodal.devices.i19.shutter.ClientSession.post") as mock_post:
+        with patch("dodal.devices.i19.blueapi_device.ClientSession.post") as mock_post:
             mock_post.return_value.__aenter__.return_value = (
                 mock_response := AsyncMock()
             )
             mock_response.ok = False
+            mock_response.json.return_value = {"task_id": "nope"}
 
             await eh2_shutter.set(ShutterDemand.OPEN)
 
 
-@patch("dodal.devices.i19.shutter.LOGGER")
+@patch("dodal.devices.i19.blueapi_device.LOGGER")
 async def test_no_task_id_returned_from_post(
     mock_logger: MagicMock, eh1_shutter: AccessControlledShutter
 ):
     with pytest.raises(KeyError):
         with (
-            patch("dodal.devices.i19.shutter.ClientSession.post") as mock_post,
+            patch("dodal.devices.i19.blueapi_device.ClientSession.post") as mock_post,
         ):
             mock_post.return_value.__aenter__.return_value = (
                 mock_response := AsyncMock()
@@ -107,16 +109,17 @@ async def test_set_corrently_makes_rest_calls(
         "params": {
             "experiment_hutch": "EH2",
             "access_device": "access_control",
-            "shutter_demand": shutter_demand,
+            "shutter_demand": shutter_demand.value,
         },
     }
+    test_request_json = json.dumps(test_request)
     with (
-        patch("dodal.devices.i19.shutter.ClientSession.post") as mock_post,
-        patch("dodal.devices.i19.shutter.ClientSession.put") as mock_put,
+        patch("dodal.devices.i19.blueapi_device.ClientSession.post") as mock_post,
+        patch("dodal.devices.i19.blueapi_device.ClientSession.put") as mock_put,
     ):
         mock_post.return_value.__aenter__.return_value = (mock_response := AsyncMock())
         mock_response.ok = True
-        mock_response.json.return_value = {"task_id": 1}
+        mock_response.json.return_value = {"task_id": "1111"}
         mock_put.return_value.__aenter__.return_value = (
             mock_put_response := AsyncMock()
         )
@@ -124,21 +127,23 @@ async def test_set_corrently_makes_rest_calls(
 
         await eh2_shutter.set(shutter_demand)
 
-        mock_post.assert_called_with("/tasks", data=test_request)
-        mock_put.assert_called_with("/worker/tasks", data={"task_id": 1})
+        mock_post.assert_called_with("/tasks", data=test_request_json, headers=HEADERS)
+        mock_put.assert_called_with(
+            "/worker/task", data='{"task_id": "1111"}', headers=HEADERS
+        )
 
 
-@patch("dodal.devices.i19.shutter.LOGGER")
+@patch("dodal.devices.i19.blueapi_device.LOGGER")
 async def test_if_put_fails_log_and_return(
     mock_logger: MagicMock, eh1_shutter: AccessControlledShutter
 ):
     with (
-        patch("dodal.devices.i19.shutter.ClientSession.post") as mock_post,
-        patch("dodal.devices.i19.shutter.ClientSession.put") as mock_put,
+        patch("dodal.devices.i19.blueapi_device.ClientSession.post") as mock_post,
+        patch("dodal.devices.i19.blueapi_device.ClientSession.put") as mock_put,
     ):
         mock_post.return_value.__aenter__.return_value = (mock_response := AsyncMock())
         mock_response.ok = True
-        mock_response.json.return_value = {"task_id": 1}
+        mock_response.json.return_value = {"task_id": "0101"}
         mock_put.return_value.__aenter__.return_value = (
             mock_put_response := AsyncMock()
         )
