@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dodal.devices.util.adjuster_plans &#8212; dodal 1.44.1.dev1+g8513ec478 documentation</title>
+    <title>dodal.devices.util.adjuster_plans &#8212; dodal 1.44.1.dev2+g1c3c85c2d documentation</title>
   
   
   
@@ -40,7 +40,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=f9a278b8"></script>
+    <script src="../../../../_static/documentation_options.js?v=707382a3"></script>
     <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -459,7 +459,6 @@ window.addEventListener("load", () => mermaid.run());
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky</span><span class="w"> </span><span class="kn">import</span> <span class="n">plan_stubs</span> <span class="k">as</span> <span class="n">bps</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">Msg</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ophyd.epics_motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">EpicsMotor</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.epics.motor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Motor</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dodal.log</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOGGER</span>
@@ -468,7 +467,7 @@ window.addEventListener("load", () => mermaid.run());
 <div class="viewcode-block" id="lookup_table_adjuster">
 <a class="viewcode-back" href="../../../../reference/generated/dodal.devices.util.adjuster_plans.html#dodal.devices.util.adjuster_plans.lookup_table_adjuster">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">lookup_table_adjuster</span><span class="p">(</span>
-    <span class="n">lookup_table</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span> <span class="n">output_device</span><span class="p">:</span> <span class="n">EpicsMotor</span> <span class="o">|</span> <span class="n">Motor</span><span class="p">,</span> <span class="nb">input</span>
+    <span class="n">lookup_table</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span> <span class="n">output_device</span><span class="p">:</span> <span class="n">Motor</span><span class="p">,</span> <span class="nb">input</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a callable that adjusts a value according to a lookup table&quot;&quot;&quot;</span>
 

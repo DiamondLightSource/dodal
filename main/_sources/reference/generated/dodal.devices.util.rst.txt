@@ -12,7 +12,6 @@ dodal.devices.util
    dodal.devices.util.adjuster_plans
    dodal.devices.util.epics_util
    dodal.devices.util.lookup_tables
-   dodal.devices.util.motor_utils
    dodal.devices.util.test_utils
 
 

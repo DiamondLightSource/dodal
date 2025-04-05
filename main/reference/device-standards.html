@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Device Standards &#8212; dodal 1.44.1.dev1+g8513ec478 documentation</title>
+    <title>Device Standards &#8212; dodal 1.44.1.dev2+g1c3c85c2d documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=f9a278b8"></script>
+    <script src="../_static/documentation_options.js?v=707382a3"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -745,7 +745,6 @@
 <li class="toctree-l4"><a class="reference internal" href="generated/dodal.devices.util.adjuster_plans.html">dodal.devices.util.adjuster_plans</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/dodal.devices.util.epics_util.html">dodal.devices.util.epics_util</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/dodal.devices.util.lookup_tables.html">dodal.devices.util.lookup_tables</a></li>
-<li class="toctree-l4"><a class="reference internal" href="generated/dodal.devices.util.motor_utils.html">dodal.devices.util.motor_utils</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/dodal.devices.util.test_utils.html">dodal.devices.util.test_utils</a></li>
 </ul>
 </details></li>
@@ -878,8 +877,8 @@ conversion to <code class="docutils literal notranslate"><span class="pre">ophyd
 <p>Dodal is written with the philosophy that Ophyd devices should be assumed to be as generic as possible. I.e. you
 should think about where to place them in the following order:</p>
 <ol class="arabic simple">
-<li><p>A device that could be used at any facility, e.g. a generic <code class="docutils literal notranslate"><span class="pre">EpicsMotor</span></code> or a commercial product with a
-standard IOC, should go in <a class="github reference external" href="https://github.com/bluesky/ophyd-epics-devices">bluesky/ophyd-epics-devices</a></p></li>
+<li><p>A device that could be used at any facility, e.g. a generic <code class="docutils literal notranslate"><span class="pre">Motor</span></code> or a commercial product with a
+standard IOC, should go in <a class="github reference external" href="https://github.com/bluesky/ophyd-async">bluesky/ophyd-async</a></p></li>
 <li><p>A device that may be on any beamline should go in the top level of the <code class="docutils literal notranslate"><span class="pre">devices</span></code> folder. If it is a quite
 complex device (e.g. multiple files) it should have a folder of its own e.g. <code class="docutils literal notranslate"><span class="pre">oav</span></code></p></li>
 <li><p>A device that is very specific to a particular beamline should go in the <code class="docutils literal notranslate"><span class="pre">devices/ixx</span></code> folder</p></li>
