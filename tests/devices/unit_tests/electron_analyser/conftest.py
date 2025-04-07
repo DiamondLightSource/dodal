@@ -80,7 +80,7 @@ async def sim_analyser_driver(
     async with init_devices(mock=True, connect=True):
         sim_analyser_driver = analyser_type(
             prefix="sim_analyser_driver:",
-            name="analyser_controller",
+            name="analyser_driver",
         )
     return sim_analyser_driver
 

@@ -15,7 +15,7 @@ set_utils_beamline(BL)
 
 
 @device_factory()
-def analyser_controller() -> SpecsAnalyserDriverIO:
+def analyser_driver() -> SpecsAnalyserDriverIO:
     return SpecsAnalyserDriverIO(
-        name="analyser_controller", prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:"
+        name="analyser_driver", prefix=f"{PREFIX.beamline_prefix}-EA-DET-01:CAM:"
     )
