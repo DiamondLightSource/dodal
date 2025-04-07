@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.oav.pin_image_recognition.utils.MxSampleDetect &#8212; dodal 1.44.1.dev2+g1c3c85c2d documentation</title>
+    <title>dodal.devices.oav.pin_image_recognition.utils.MxSampleDetect &#8212; dodal 1.44.1.dev3+g237fe24d0 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=707382a3"></script>
+    <script src="../../_static/documentation_options.js?v=eb156ece"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -530,9 +530,12 @@
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.electron_analyser.html">dodal.devices.electron_analyser</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.electron_analyser.base_region.html">dodal.devices.electron_analyser.base_region</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.electron_analyser.specs.html">dodal.devices.electron_analyser.specs</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dodal.devices.electron_analyser.vgscienta.html">dodal.devices.electron_analyser.vgscienta</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.electron_analyser.abstract_analyser_controller.html">dodal.devices.electron_analyser.abstract_analyser_controller</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.electron_analyser.abstract_region.html">dodal.devices.electron_analyser.abstract_region</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.electron_analyser.specs_analyser_controller.html">dodal.devices.electron_analyser.specs_analyser_controller</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.electron_analyser.specs_region.html">dodal.devices.electron_analyser.specs_region</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.electron_analyser.vgscienta_analyser_controller.html">dodal.devices.electron_analyser.vgscienta_analyser_controller</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.electron_analyser.vgscienta_region.html">dodal.devices.electron_analyser.vgscienta_region</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.fast_grid_scan.html">dodal.devices.fast_grid_scan</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -793,6 +796,10 @@
 </ul>
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.plan_stubs.data_session.html">dodal.plan_stubs.data_session</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="dodal.plan_stubs.electron_analyser.html">dodal.plan_stubs.electron_analyser</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.plan_stubs.electron_analyser.configure_controller.html">dodal.plan_stubs.electron_analyser.configure_controller</a></li>
+</ul>
+</details></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.plan_stubs.motor_utils.html">dodal.plan_stubs.motor_utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="dodal.plan_stubs.wrapped.html">dodal.plan_stubs.wrapped</a></li>
 </ul>
@@ -888,7 +895,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>preprocess</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</span>, default: <code class="docutils literal notranslate"><span class="pre">&lt;function</span> <span class="pre">MxSampleDetect.&lt;lambda&gt;</span> <span class="pre">at</span> <span class="pre">0x7f96f09a4680&gt;</span></code>) – A preprocessing function applied to the array after conversion to grayscale.
+<li><p><strong>preprocess</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</span>, default: <code class="docutils literal notranslate"><span class="pre">&lt;function</span> <span class="pre">MxSampleDetect.&lt;lambda&gt;</span> <span class="pre">at</span> <span class="pre">0x7fc5f6da87c0&gt;</span></code>) – A preprocessing function applied to the array after conversion to grayscale.
 See implementations of common functions above for predefined conversions
 Defaults to a no-op (i.e. no preprocessing)</p></li>
 <li><p><strong>canny_upper</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">100</span></code>) – upper threshold for canny edge detection</p></li>

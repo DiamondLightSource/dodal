@@ -1,0 +1,49 @@
+dodal.devices.electron\_analyser.abstract\_region
+=================================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.electron_analyser
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~abstract_region.AbstractBaseRegion
+   ~abstract_region.AbstractBaseSequence
+   ~abstract_region.AbstractBaseSequence[SpecsRegion]
+   ~abstract_region.AbstractBaseSequence[VGScientaRegion]
+   ~abstract_region.EnergyMode
+   ~abstract_region.JavaToPythonModel
+
+
+
+
+.. automodule:: dodal.devices.electron_analyser.abstract_region
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      energy_mode_validation
+      java_to_python_case
+      switch_case_validation
+   
+   
+
+   
+   
+   

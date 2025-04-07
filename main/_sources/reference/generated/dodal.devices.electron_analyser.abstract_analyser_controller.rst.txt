@@ -1,0 +1,36 @@
+dodal.devices.electron\_analyser.abstract\_analyser\_controller
+===============================================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.electron_analyser
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~abstract_analyser_controller.AbstractAnalyserController
+
+
+
+
+.. automodule:: dodal.devices.electron_analyser.abstract_analyser_controller
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

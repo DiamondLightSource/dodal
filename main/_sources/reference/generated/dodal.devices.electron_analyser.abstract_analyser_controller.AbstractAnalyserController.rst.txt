@@ -1,0 +1,43 @@
+dodal.devices.electron\_analyser.abstract\_analyser\_controller.AbstractAnalyserController
+==========================================================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.abstract_analyser_controller
+
+.. autoclass:: AbstractAnalyserController
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~AbstractAnalyserController.to_kinetic_energy
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

@@ -1,0 +1,35 @@
+dodal.plan\_stubs.electron\_analyser.configure\_controller
+==========================================================
+
+
+
+
+
+
+
+
+
+
+.. automodule:: dodal.plan_stubs.electron_analyser.configure_controller
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      configure_analyser
+      configure_specs
+      configure_vgscienta
+   
+   
+
+   
+   
+   

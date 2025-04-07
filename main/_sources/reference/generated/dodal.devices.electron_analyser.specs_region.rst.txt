@@ -1,0 +1,37 @@
+dodal.devices.electron\_analyser.specs\_region
+==============================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.electron_analyser
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~specs_region.SpecsRegion
+   ~specs_region.SpecsSequence
+
+
+
+
+.. automodule:: dodal.devices.electron_analyser.specs_region
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

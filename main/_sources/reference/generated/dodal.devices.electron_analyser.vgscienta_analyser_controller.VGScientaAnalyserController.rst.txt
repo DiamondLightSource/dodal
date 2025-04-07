@@ -1,0 +1,41 @@
+dodal.devices.electron\_analyser.vgscienta\_analyser\_controller.VGScientaAnalyserController
+============================================================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.vgscienta_analyser_controller
+
+.. autoclass:: VGScientaAnalyserController
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      
+      
+   
+   

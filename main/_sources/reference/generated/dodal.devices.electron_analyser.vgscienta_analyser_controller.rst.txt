@@ -1,0 +1,36 @@
+dodal.devices.electron\_analyser.vgscienta\_analyser\_controller
+================================================================
+
+
+
+
+
+
+
+.. currentmodule:: dodal.devices.electron_analyser
+.. rubric:: Classes
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   ~vgscienta_analyser_controller.VGScientaAnalyserController
+
+
+
+
+.. automodule:: dodal.devices.electron_analyser.vgscienta_analyser_controller
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

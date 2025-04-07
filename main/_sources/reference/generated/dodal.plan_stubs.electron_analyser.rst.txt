@@ -1,0 +1,35 @@
+dodal.plan\_stubs.electron\_analyser
+====================================
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   dodal.plan_stubs.electron_analyser.configure_controller
+
+
+
+
+
+
+
+
+.. automodule:: dodal.plan_stubs.electron_analyser
+   :members:
+   :undoc-members:
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   

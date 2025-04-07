@@ -1,0 +1,137 @@
+dodal.devices.electron\_analyser.vgscienta\_region.VGScientaRegion
+==================================================================
+
+.. currentmodule:: dodal.devices.electron_analyser.vgscienta_region
+
+.. autoclass:: VGScientaRegion
+   :members:
+
+   
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ~VGScientaRegion.x_channel_size
+      
+      
+      ~VGScientaRegion.y_channel_size
+      
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      
+      
+      ~VGScientaRegion.model_config
+      
+      
+      
+      
+      
+      ~VGScientaRegion.lens_mode
+      
+      
+      ~VGScientaRegion.pass_energy
+      
+      
+      ~VGScientaRegion.acquisition_mode
+      
+      
+      ~VGScientaRegion.low_energy
+      
+      
+      ~VGScientaRegion.high_energy
+      
+      
+      ~VGScientaRegion.step_time
+      
+      
+      ~VGScientaRegion.energy_step
+      
+      
+      ~VGScientaRegion.id
+      
+      
+      ~VGScientaRegion.excitation_energy_source
+      
+      
+      ~VGScientaRegion.fix_energy
+      
+      
+      ~VGScientaRegion.total_steps
+      
+      
+      ~VGScientaRegion.total_time
+      
+      
+      ~VGScientaRegion.exposure_time
+      
+      
+      ~VGScientaRegion.first_x_channel
+      
+      
+      ~VGScientaRegion.last_x_channel
+      
+      
+      ~VGScientaRegion.first_y_channel
+      
+      
+      ~VGScientaRegion.last_y_channel
+      
+      
+      ~VGScientaRegion.detector_mode
+      
+      
+      ~VGScientaRegion.status
+      
+      
+      ~VGScientaRegion.name
+      
+      
+      ~VGScientaRegion.enabled
+      
+      
+      ~VGScientaRegion.slices
+      
+      
+      ~VGScientaRegion.iterations
+      
+      
+      ~VGScientaRegion.energy_mode
+      
+   
+   
