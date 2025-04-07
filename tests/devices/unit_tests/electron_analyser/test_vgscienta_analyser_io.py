@@ -1,9 +1,11 @@
 import pytest
 from bluesky.run_engine import RunEngine
+from ophyd_async.epics.adcore._utils import ADImageMode
 from ophyd_async.testing import (
     get_mock_put,
 )
 
+from dodal.devices.electron_analyser.util import to_kinetic_energy
 from dodal.devices.electron_analyser.vgscienta_analyser_io import (
     VGScientaAnalyserDriverIO,
 )
@@ -49,10 +51,9 @@ async def test_given_region_that_analyser_sets_modes_correctly(
     await assert_reading_has_expected_value(
         sim_analyser_driver, "detector_mode", region.detector_mode
     )
-    get_mock_put(sim_analyser_driver.image_mode).assert_called_once_with(
-        "Single", wait=True
+    get_mock_put(sim_analyser_driver.adbase_cam.image_mode).assert_called_once_with(
+        ADImageMode.SINGLE, wait=True
     )
-    await assert_reading_has_expected_value(sim_analyser_driver, "image_mode", "Single")
 
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=True)
@@ -64,7 +65,9 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
 ) -> None:
     RE(configure_vgscienta(sim_analyser_driver, region, excitation_energy))
 
-    expected_centre_e = region.to_kinetic_energy(region.fix_energy, excitation_energy)
+    expected_centre_e = to_kinetic_energy(
+        region.fix_energy, region.energy_mode, excitation_energy
+    )
     get_mock_put(sim_analyser_driver.centre_energy).assert_called_once_with(
         expected_centre_e, wait=True
     )

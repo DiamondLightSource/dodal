@@ -13,6 +13,7 @@ from dodal.devices.electron_analyser.specs_analyser_io import (
     SpecsAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.specs_region import SpecsSequence
+from dodal.devices.electron_analyser.util import to_kinetic_energy
 from dodal.devices.electron_analyser.vgscienta_analyser_io import (
     VGScientaAnalyserDriverIO,
 )
@@ -53,14 +54,11 @@ def analyser_type(
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=["region"])
 def test_analyser_to_kinetic_energy(
-    sim_analyser_driver: AbstractAnalyserDriverIO,
     region: AbstractBaseRegion,
     excitation_energy: float,
 ) -> None:
     low_energy = region.low_energy
-    ke = sim_analyser_driver.to_kinetic_energy(
-        low_energy, excitation_energy, region.energy_mode
-    )
+    ke = to_kinetic_energy(low_energy, region.energy_mode, excitation_energy)
     if region.is_binding_energy():
         assert ke == (excitation_energy - low_energy)
     else:
@@ -99,8 +97,12 @@ async def test_given_region_that_analyser_sets_energy_values_correctly(
 ) -> None:
     RE(configure_analyser(sim_analyser_driver, region, excitation_energy))
 
-    expected_low_e = region.to_kinetic_energy(region.low_energy, excitation_energy)
-    expected_high_e = region.to_kinetic_energy(region.high_energy, excitation_energy)
+    expected_low_e = to_kinetic_energy(
+        region.low_energy, region.energy_mode, excitation_energy
+    )
+    expected_high_e = to_kinetic_energy(
+        region.high_energy, region.energy_mode, excitation_energy
+    )
     expected_pass_e = region.pass_energy
 
     get_mock_put(sim_analyser_driver.low_energy).assert_called_once_with(
