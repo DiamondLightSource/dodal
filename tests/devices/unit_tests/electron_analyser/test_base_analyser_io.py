@@ -54,7 +54,6 @@ def analyser_type(
 
 @pytest.mark.parametrize("region", TEST_SEQUENCE_REGION_NAMES, indirect=["region"])
 def test_analyser_to_kinetic_energy(
-    sim_analyser_driver: AbstractAnalyserDriverIO,
     region: AbstractBaseRegion,
     excitation_energy: float,
 ) -> None:

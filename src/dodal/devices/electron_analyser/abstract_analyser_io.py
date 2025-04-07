@@ -18,7 +18,7 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable):
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        self.adbase_cam = ADBaseIO(prefix + "CAM:")
+        self.adbase_cam = ADBaseIO(prefix)
 
         with self.add_children_as_readables():
             # Used for setting up region data acquisition
@@ -39,7 +39,7 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable):
             self.total_intensity = create_r_hardware_backed_soft_signal(
                 float, self._calculate_total_intensity
             )
-            self.step_time = epics_signal_r(float, self.adbase_cam.acquire_time.name)
+            self.step_time = epics_signal_r(float, self.adbase_cam.acquire_time.source)
             self.total_steps = epics_signal_r(float, prefix + "TOTAL_POINTS_RBV")
 
         super().__init__(name)
