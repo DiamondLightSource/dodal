@@ -1,15 +1,15 @@
 from pathlib import Path
 
-from ophyd_async.core import AutoIncrementFilenameProvider, StaticPathProvider
 from ophyd_async.epics.adandor import Andor2Detector
 
 from dodal.common.beamlines.beamline_utils import (
     device_factory,
+    get_path_provider,
     set_beamline,
     set_path_provider,
 )
 from dodal.common.visit import (
-    RemoteDirectoryServiceClient,
+    LocalDirectoryServiceClient,
     StaticVisitPathProvider,
 )
 from dodal.devices.attenuator.filter import FilterMotor
@@ -50,14 +50,8 @@ set_path_provider(
     StaticVisitPathProvider(
         BL,
         Path("/dls/p99/data/2024/cm37284-2/processing/writenData"),
-        client=RemoteDirectoryServiceClient("http://p99-control:8088/api"),
+        client=LocalDirectoryServiceClient(),  # RemoteDirectoryServiceClient("http://p99-control:8088/api"),
     )
-)
-
-
-andor_data_path = StaticPathProvider(
-    filename_provider=AutoIncrementFilenameProvider(base_filename="andor2"),
-    directory_path=Path("/dls/p99/data/2024/cm37284-2/processing/writenData"),
 )
 
 
@@ -66,7 +60,7 @@ def andor2_det() -> Andor2Detector:
     """Andor model:DU897_BV."""
     return Andor2Detector(
         prefix=f"{PREFIX.beamline_prefix}-EA-DET-03:",
-        path_provider=andor_data_path,
+        path_provider=get_path_provider(),
         drv_suffix="CAM:",
         fileio_suffix="HDF5:",
     )
