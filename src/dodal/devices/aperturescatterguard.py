@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import asyncio
 
-from bluesky.protocols import Movable, Preparable
+from bluesky.protocols import Preparable
 from ophyd_async.core import (
     AsyncStatus,
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
-    derived_signal_r,
+    derived_signal_rw,
 )
 from pydantic import BaseModel, Field
 
@@ -123,21 +123,21 @@ def load_positions_from_beamline_parameters(
     }
 
 
-class ApertureScatterguard(StandardReadable, Movable[ApertureValue], Preparable):
+class ApertureScatterguard(StandardReadable, Preparable):
     """Move the aperture and scatterguard assembly in a safe way. There are two ways to
     interact with the device depending on if you want simplicity or move flexibility.
 
     Examples:
         The simple interface is using::
 
-            await aperture_scatterguard.set(ApertureValue.LARGE)
+            await aperture_scatterguard.selected_aperture.set(ApertureValue.LARGE)
 
         This will move the assembly so that the large aperture is in the beam, regardless
         of where the assembly currently is.
 
         We may also want to move the assembly out of the beam with::
 
-            await aperture_scatterguard.set(ApertureValue.OUT_OF_BEAM)
+            await aperture_scatterguard.selected_aperture.set(ApertureValue.OUT_OF_BEAM)
 
         Note, to make sure we do this as quickly as possible, the scatterguard will stay
         in the same position relative to the aperture.
@@ -149,7 +149,7 @@ class ApertureScatterguard(StandardReadable, Movable[ApertureValue], Preparable)
 
         Then, at a later time, move back into the beam::
 
-            await aperture_scatterguard.set(ApertureValue.LARGE)
+            await  aperture_scatterguard.selected_aperture.set(ApertureValue.LARGE)
 
         Given the prepare has been done this move will now be faster as only the y is
         left to move.
@@ -167,16 +167,18 @@ class ApertureScatterguard(StandardReadable, Movable[ApertureValue], Preparable)
         self._loaded_positions = loaded_positions
         self._tolerances = tolerances
         with self.add_children_as_readables(StandardReadableFormat.HINTED_SIGNAL):
-            self.selected_aperture = derived_signal_r(
+            self.selected_aperture = derived_signal_rw(
                 self._get_current_aperture_position,
+                self._set_current_aperture_position,
                 large=self.aperture.large,
                 medium=self.aperture.medium,
                 small=self.aperture.small,
                 current_ap_y=self.aperture.y.user_readback,
             )
 
-        self.radius = derived_signal_r(
+        self.radius = derived_signal_rw(
             self._get_current_radius,
+            self._set_current_radius,
             current_aperture=self.selected_aperture,
             derived_units="µm",
         )
@@ -194,10 +196,7 @@ class ApertureScatterguard(StandardReadable, Movable[ApertureValue], Preparable)
 
         super().__init__(name)
 
-    @AsyncStatus.wrap
-    async def set(self, value: ApertureValue):
-        """This set will move the aperture into the beam or move the whole assembly out"""
-
+    async def _set_current_aperture_position(self, value: ApertureValue) -> None:
         position = self._loaded_positions[value]
         await self._check_safe_to_move(position.aperture_z)
 
@@ -240,6 +239,9 @@ class ApertureScatterguard(StandardReadable, Movable[ApertureValue], Preparable)
 
     def _get_current_radius(self, current_aperture: ApertureValue) -> float:
         return self._loaded_positions[current_aperture].radius
+
+    async def _set_current_radius(self, value: float) -> None:
+        print(value)
 
     def _is_out_of_beam(self, current_ap_y: float) -> bool:
         out_ap_y = self._loaded_positions[ApertureValue.OUT_OF_BEAM].aperture_y
@@ -330,4 +332,4 @@ class ApertureScatterguard(StandardReadable, Movable[ApertureValue], Preparable)
                 self.scatterguard.y.set(scatterguard_y),
             )
         else:
-            await self.set(value)
+            await self.selected_aperture.set(value)
