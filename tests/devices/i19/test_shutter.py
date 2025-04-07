@@ -12,7 +12,6 @@ from dodal.devices.hutch_shutter import (
 )
 from dodal.devices.i19.blueapi_device import HEADERS, HutchState
 from dodal.devices.i19.shutter import (
-    HEADERS,
     AccessControlledShutter,
 )
 
