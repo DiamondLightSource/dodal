@@ -1,6 +1,6 @@
 from bluesky import plan_stubs as bps
 from bluesky.utils import MsgGenerator
-from ophyd_async.epics.adcore._utils import ImageMode
+from ophyd_async.epics.adcore._utils import ADImageMode
 
 from dodal.common.types import MsgGenerator
 from dodal.devices.electron_analyser.abstract_analyser_io import (
@@ -83,6 +83,6 @@ def configure_vgscienta(
         analyser.x_channel_size, region.x_channel_size(),
         analyser.y_channel_size, region.y_channel_size(),
         analyser.detector_mode, region.detector_mode,
-        analyser.adbase_cam.image_mode, ImageMode.SINGLE,
+        analyser.adbase_cam.image_mode, ADImageMode.SINGLE,
     )
     # fmt: on

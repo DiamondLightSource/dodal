@@ -1,11 +1,10 @@
 import pytest
 from bluesky.run_engine import RunEngine
-from ophyd_async.epics.adcore._utils import ImageMode
+from ophyd_async.epics.adcore._utils import ADImageMode
 from ophyd_async.testing import (
     get_mock_put,
 )
 
-from dodal.devices.electron_analyser.abstract_region import EnergyMode
 from dodal.devices.electron_analyser.util import to_kinetic_energy
 from dodal.devices.electron_analyser.vgscienta_analyser_io import (
     VGScientaAnalyserDriverIO,
@@ -53,7 +52,7 @@ async def test_given_region_that_analyser_sets_modes_correctly(
         sim_analyser_driver, "detector_mode", region.detector_mode
     )
     get_mock_put(sim_analyser_driver.adbase_cam.image_mode).assert_called_once_with(
-        ImageMode.SINGLE, wait=True
+        ADImageMode.SINGLE, wait=True
     )
 
 

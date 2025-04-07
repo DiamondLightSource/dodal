@@ -18,7 +18,7 @@ class AbstractAnalyserDriverIO(ABC, StandardReadable):
     """
 
     def __init__(self, prefix: str, name: str = "") -> None:
-        self.adbase_cam = ADBaseIO(prefix, "adbase")
+        self.adbase_cam = ADBaseIO(prefix + "CAM:")
 
         with self.add_children_as_readables():
             # Used for setting up region data acquisition
