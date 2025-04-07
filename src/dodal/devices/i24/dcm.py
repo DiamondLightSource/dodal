@@ -7,7 +7,7 @@ from dodal.devices.common_dcm import (
 )
 
 
-class DCM(BaseDCM[tuple[type[RollCrystal], type[PitchAndRollCrystal]]]):
+class DCM(BaseDCM[RollCrystal, PitchAndRollCrystal]):
     """
     A double crystal monocromator device, used to select the beam energy.
     """
@@ -30,6 +30,4 @@ class DCM(BaseDCM[tuple[type[RollCrystal], type[PitchAndRollCrystal]]]):
             self.b1_plate_temp = epics_signal_r(float, prefix + "-DI-DCM-01:PT100-7")
             self.gap_temp = epics_signal_r(float, prefix + "-DI-DCM-01:TC-1")
 
-        super().__init__(
-            prefix + "-MO-DCM-01:", (RollCrystal, PitchAndRollCrystal), name
-        )
+        super().__init__(prefix + "-MO-DCM-01:", RollCrystal, PitchAndRollCrystal, name)

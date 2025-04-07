@@ -1,7 +1,6 @@
 from typing import Generic, TypeVar
 
 from ophyd_async.core import (
-    DeviceVector,
     StandardReadable,
 )
 from ophyd_async.epics.core import epics_signal_r
@@ -28,10 +27,11 @@ class PitchAndRollCrystal(StationaryCrystal):
         super().__init__(prefix)
 
 
-Xtals = TypeVar("Xtals", bound=tuple[type[StationaryCrystal], type[StationaryCrystal]])
+Xtal_1 = TypeVar("Xtal_1", bound=StationaryCrystal)
+Xtal_2 = TypeVar("Xtal_2", bound=StationaryCrystal)
 
 
-class BaseDCM(StandardReadable, Generic[Xtals]):
+class BaseDCM(StandardReadable, Generic[Xtal_1, Xtal_2]):
     """
     Common device for the double crystal monochromator (DCM), used to select the energy of the beam.
 
@@ -44,10 +44,13 @@ class BaseDCM(StandardReadable, Generic[Xtals]):
     Bluesky plans using DCM's should be typed to specify which types of crystals are required
     """
 
-    def __init__(self, prefix: str, crystal_type: Xtals, name: str = "") -> None:
+    def __init__(
+        self, prefix: str, xtal_1: type[Xtal_1], xtal_2: type[Xtal_2], name: str = ""
+    ) -> None:
         with self.add_children_as_readables():
             # Virtual motor PV's which set the physical motors so that the DCM produces requested
             # wavelength/energy
+
             self.energy_in_kev = Motor(prefix + "ENERGY")
             self.wavelength_in_a = Motor(prefix + "WAVELENGTH")
 
@@ -60,20 +63,15 @@ class BaseDCM(StandardReadable, Generic[Xtals]):
                 float, prefix + "DSPACING:RBV"
             )
 
-            _device_vector_dict = self._make_device_vector_dict(prefix, crystal_type)
-            self.crystals: DeviceVector[StationaryCrystal] = DeviceVector(
-                _device_vector_dict
-            )
+            self._make_crystals(prefix, xtal_1, xtal_2)
+
         super().__init__(name)
 
     # Prefix convention is different depending on whether there are one or two controllable crystals
-    def _make_device_vector_dict(
-        self, prefix, crystal_types: Xtals
-    ) -> dict[int, StationaryCrystal]:
-        _device_vector_dict = {0: crystal_types[0](prefix)}
-        if StationaryCrystal not in crystal_types:
-            _device_vector_dict = {0: crystal_types[0](f"{prefix}XTAL1:")}
-            _device_vector_dict[1] = crystal_types[1](f"{prefix}XTAL2:")
+    def _make_crystals(self, prefix: str, xtal_1: type[Xtal_1], xtal_2: type[Xtal_2]):
+        if StationaryCrystal not in [xtal_1, xtal_2]:
+            self.xtal_1 = xtal_1(f"{prefix}XTAL1:")
+            self.xtal_2 = xtal_2(f"{prefix}XTAL2:")
         else:
-            _device_vector_dict = {0: crystal_types[0](f"{prefix}")}
-        return _device_vector_dict
+            self.xtal_1 = xtal_1(prefix)
+            self.xtal_2 = xtal_2(prefix)

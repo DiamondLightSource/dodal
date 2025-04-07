@@ -23,7 +23,7 @@ from dodal.devices.common_dcm import (
 _CONVERSION_CONSTANT = 12.3984
 
 
-class DCM(BaseDCM[tuple[type[RollCrystal], type[PitchAndRollCrystal]]]):
+class DCM(BaseDCM[RollCrystal, PitchAndRollCrystal]):
     """
     A double crystal monochromator (DCM), used to select the energy of the beam.
 
@@ -91,7 +91,7 @@ class DCM(BaseDCM[tuple[type[RollCrystal], type[PitchAndRollCrystal]]]):
                 units=crystal_2_metadata.d_spacing[1],
             )
 
-        super().__init__(prefix, (RollCrystal, PitchAndRollCrystal), name)
+        super().__init__(prefix, RollCrystal, PitchAndRollCrystal, name)
 
     async def describe(self) -> dict[str, DataKey]:
         default_describe = await super().describe()

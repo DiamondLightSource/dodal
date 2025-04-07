@@ -15,7 +15,7 @@ from dodal.devices.common_dcm import (
 )
 
 
-class DCM(BaseDCM[tuple[type[PitchAndRollCrystal], type[StationaryCrystal]]]):
+class DCM(BaseDCM[PitchAndRollCrystal, StationaryCrystal]):
     """
     A double crystal monochromator (DCM), used to select the energy of the beam.
 
@@ -57,4 +57,4 @@ class DCM(BaseDCM[tuple[type[PitchAndRollCrystal], type[StationaryCrystal]]]):
                 Array1D[np.uint64],
                 initial_value=reflection_array,
             )
-        super().__init__(prefix, (PitchAndRollCrystal, StationaryCrystal), name)
+        super().__init__(prefix, PitchAndRollCrystal, StationaryCrystal, name)
