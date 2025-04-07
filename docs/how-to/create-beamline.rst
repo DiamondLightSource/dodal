@@ -24,6 +24,7 @@ The following example creates a fictitious beamline ``w41``, with a simulated tw
 ``s41`` has a simulated clone of the AdAravisDetector, but not of the Synchrotron machine.
 
 .. code-block:: python
+
     from ophyd_async.epics.adaravis import AravisDetector
 
     from dodal.common.beamlines.beamline_utils import (

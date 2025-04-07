@@ -66,6 +66,7 @@ async def test_wavelength(
     assert reading["dcm-wavelength_in_a"]["value"] == wavelength
 
 
+@pytest.mark.skip("See https://github.com/bluesky/ophyd-async/issues/839")
 async def test_reading(dcm: DCM):
     await assert_reading(
         dcm,
