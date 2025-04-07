@@ -2,15 +2,15 @@ import numpy as np
 from ophyd_async.core import Array1D, SignalR
 from ophyd_async.epics.core import epics_signal_r, epics_signal_rw
 
-from dodal.devices.electron_analyser.abstract_analyser_controller import (
-    AbstractAnalyserController,
+from dodal.devices.electron_analyser.abstract_analyser_io import (
+    AbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.vgscienta_region import (
     DetectorMode,
 )
 
 
-class VGScientaAnalyserController(AbstractAnalyserController):
+class VGScientaAnalyserDriverIO(AbstractAnalyserDriverIO):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
             # Used for setting up region data acquisition

@@ -2,19 +2,19 @@ from bluesky import plan_stubs as bps
 from ophyd_async.epics.adcore._utils import ImageMode
 
 from dodal.common.types import MsgGenerator
-from dodal.devices.electron_analyser.abstract_analyser_controller import (
-    AbstractAnalyserController,
+from dodal.devices.electron_analyser.abstract_analyser_io import (
+    AbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.abstract_region import (
     AbstractBaseRegion,
 )
-from dodal.devices.electron_analyser.specs_analyser_controller import (
-    SpecsAnalyserController,
+from dodal.devices.electron_analyser.specs_analyser_io import (
+    SpecsAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.specs_region import SpecsRegion
 from dodal.devices.electron_analyser.util import to_kinetic_energy
-from dodal.devices.electron_analyser.vgscienta_analyser_controller import (
-    VGScientaAnalyserController,
+from dodal.devices.electron_analyser.vgscienta_analyser_io import (
+    VGScientaAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.vgscienta_region import (
     VGScientaRegion,
@@ -23,7 +23,7 @@ from dodal.log import LOGGER
 
 
 def configure_analyser(
-    analyser: AbstractAnalyserController,
+    analyser: AbstractAnalyserDriverIO,
     region: AbstractBaseRegion,
     excitation_energy: float,
 ) -> MsgGenerator:
@@ -49,7 +49,7 @@ def configure_analyser(
 
 
 def configure_specs(
-    analyser: SpecsAnalyserController, region: SpecsRegion, excitation_energy: float
+    analyser: SpecsAnalyserDriverIO, region: SpecsRegion, excitation_energy: float
 ) -> MsgGenerator:
     yield from configure_analyser(analyser, region, excitation_energy)
     # fmt: off
@@ -66,7 +66,7 @@ def configure_specs(
 
 
 def configure_vgscienta(
-    analyser: VGScientaAnalyserController, region: VGScientaRegion, excitation_energy
+    analyser: VGScientaAnalyserDriverIO, region: VGScientaRegion, excitation_energy
 ) -> MsgGenerator:
     yield from configure_analyser(analyser, region, excitation_energy)
     centre_energy = to_kinetic_energy(

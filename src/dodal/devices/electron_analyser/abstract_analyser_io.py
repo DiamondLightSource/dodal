@@ -11,7 +11,7 @@ from dodal.devices.electron_analyser.abstract_region import EnergyMode
 from dodal.devices.electron_analyser.util import to_binding_energy
 
 
-class AbstractAnalyserController(ABC, StandardReadable):
+class AbstractAnalyserDriverIO(ABC, StandardReadable):
     """
     Generic device to configure electron analyser with new region settings.
     Electron analysers should inherit from this class for further specialisation.
@@ -65,6 +65,6 @@ class AbstractAnalyserController(ABC, StandardReadable):
         return np.sum(await self.spectrum.get_value())
 
 
-TAbstractAnalyserController = TypeVar(
-    "TAbstractAnalyserController", bound=AbstractAnalyserController
+TAbstractAnalyserDriverIO = TypeVar(
+    "TAbstractAnalyserDriverIO", bound=AbstractAnalyserDriverIO
 )
