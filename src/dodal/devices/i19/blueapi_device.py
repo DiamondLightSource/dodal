@@ -1,4 +1,5 @@
 import json
+import time
 from enum import Enum
 from typing import TypeVar
 
@@ -82,4 +83,20 @@ class OpticsBlueAPIDevice(StandardReadable, Movable[D]):
                         Unable to run plan {value["name"]}."""  # type: ignore
                     )
                     return
-                LOGGER.debug(f"Running plan: {value['name']}, task_id: {task_id}")  # type: ignore
+                LOGGER.info(f"Running plan: {value['name']}, task_id: {task_id}")  # type: ignore
+
+            # Poll server at 2Hz until plan complete or errored
+            interval = 0.5
+            plan_complete = False
+
+            while not plan_complete:
+                async with session.get(f"/tasks/{task_id}") as res:
+                    plan_result = await res.json()
+                    plan_complete = plan_result["is_complete"]
+                    errors = plan_result["errors"]
+                    if len(errors) > 0:
+                        message = "\n".join(errors)
+                        LOGGER.error(f"Plan {value['name']} failed: {message}")  # type:ignore
+                        raise RuntimeError(f"Plan failed with error: {message}")
+                    time.sleep(interval)  # noqa
+            LOGGER.info(f"Plan {value['name']} done.")  # type: ignore
