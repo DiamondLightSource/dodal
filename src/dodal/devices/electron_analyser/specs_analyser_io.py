@@ -1,11 +1,11 @@
 from ophyd_async.epics.core import epics_signal_rw
 
-from dodal.devices.electron_analyser.abstract_analyser_controller import (
-    AbstractAnalyserController,
+from dodal.devices.electron_analyser.abstract_analyser_io import (
+    AbstractAnalyserDriverIO,
 )
 
 
-class SpecsAnalyserController(AbstractAnalyserController):
+class SpecsAnalyserDriverIO(AbstractAnalyserDriverIO):
     def __init__(self, prefix: str, name: str = "") -> None:
         with self.add_children_as_readables():
             self.psu_mode = epics_signal_rw(str, prefix + "SCAN_RANGE")

@@ -6,8 +6,8 @@ from bluesky.run_engine import RunEngine
 from ophyd_async.core import init_devices
 
 from dodal.common.data_util import load_json_file_to_class
-from dodal.devices.electron_analyser.abstract_analyser_controller import (
-    TAbstractAnalyserController,
+from dodal.devices.electron_analyser.abstract_analyser_io import (
+    TAbstractAnalyserDriverIO,
 )
 from dodal.devices.electron_analyser.abstract_region import (
     AbstractBaseRegion,
@@ -74,15 +74,15 @@ def expected_enabled_region_names(
 
 
 @pytest.fixture
-async def sim_analyser_controller(
-    analyser_type: type[TAbstractAnalyserController],
-) -> TAbstractAnalyserController:
+async def sim_analyser_driver(
+    analyser_type: type[TAbstractAnalyserDriverIO],
+) -> TAbstractAnalyserDriverIO:
     async with init_devices(mock=True, connect=True):
-        sim_analyser_controller = analyser_type(
-            prefix="sim_analyser_controller:",
+        sim_analyser_driver = analyser_type(
+            prefix="sim_analyser_driver:",
             name="analyser_controller",
         )
-    return sim_analyser_controller
+    return sim_analyser_driver
 
 
 @pytest.fixture
