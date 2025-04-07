@@ -8,6 +8,7 @@ from ophyd_async.core import (
     StandardReadable,
     StandardReadableFormat,
     StrictEnum,
+    derived_signal_r,
     derived_signal_rw,
 )
 from pydantic import BaseModel, Field
@@ -176,9 +177,8 @@ class ApertureScatterguard(StandardReadable, Preparable):
                 current_ap_y=self.aperture.y.user_readback,
             )
 
-        self.radius = derived_signal_rw(
+        self.radius = derived_signal_r(
             self._get_current_radius,
-            self._set_current_radius,
             current_aperture=self.selected_aperture,
             derived_units="µm",
         )
@@ -239,9 +239,6 @@ class ApertureScatterguard(StandardReadable, Preparable):
 
     def _get_current_radius(self, current_aperture: ApertureValue) -> float:
         return self._loaded_positions[current_aperture].radius
-
-    async def _set_current_radius(self, value: float) -> None:
-        print(value)
 
     def _is_out_of_beam(self, current_ap_y: float) -> bool:
         out_ap_y = self._loaded_positions[ApertureValue.OUT_OF_BEAM].aperture_y
