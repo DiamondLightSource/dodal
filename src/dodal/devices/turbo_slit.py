@@ -12,9 +12,9 @@ class TurboSlit(StandardReadable):
     The xfine motor can move the slit in x direction at high frequencies for different scans.
     These slits can be scanned continously or in step mode.
     The relationship between the three motors is as follows:
-        - arc - position of the middle of the gap (coarse/ macro) extension
+        - arc - position of the middle of the gap in degrees (coarse/ macro) extension
         - gap - width in mm, provides energy resolution
-        - xfine selects the energy as part of the high frequency scan
+        - xfine - main scanning axis in mm, selects the energy as part of the high frequency scan
     """
 
     def __init__(self, prefix: str, name: str = ""):
