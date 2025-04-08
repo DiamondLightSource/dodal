@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>dodal.devices.oav.pin_image_recognition.utils.MxSampleDetect &#8212; dodal 1.44.1.dev4+g216f4846b documentation</title>
+    <title>dodal.devices.oav.pin_image_recognition.utils.MxSampleDetect &#8212; dodal 1.44.1.dev5+ga6794a469 documentation</title>
   
   
   
@@ -41,7 +41,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=4b004117"></script>
+    <script src="../../_static/documentation_options.js?v=46a42211"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -619,6 +619,7 @@
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="dodal.devices.motors.html">dodal.devices.motors</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.SixAxisGonio.html">dodal.devices.motors.SixAxisGonio</a></li>
 <li class="toctree-l4"><a class="reference internal" href="dodal.devices.motors.XYZPositioner.html">dodal.devices.motors.XYZPositioner</a></li>
 </ul>
 </details></li>
@@ -895,7 +896,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>preprocess</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</span>, default: <code class="docutils literal notranslate"><span class="pre">&lt;function</span> <span class="pre">MxSampleDetect.&lt;lambda&gt;</span> <span class="pre">at</span> <span class="pre">0x7fd272dac7c0&gt;</span></code>) – A preprocessing function applied to the array after conversion to grayscale.
+<li><p><strong>preprocess</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</span>, default: <code class="docutils literal notranslate"><span class="pre">&lt;function</span> <span class="pre">MxSampleDetect.&lt;lambda&gt;</span> <span class="pre">at</span> <span class="pre">0x7fba141b49a0&gt;</span></code>) – A preprocessing function applied to the array after conversion to grayscale.
 See implementations of common functions above for predefined conversions
 Defaults to a no-op (i.e. no preprocessing)</p></li>
 <li><p><strong>canny_upper</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>, default: <code class="docutils literal notranslate"><span class="pre">100</span></code>) – upper threshold for canny edge detection</p></li>
