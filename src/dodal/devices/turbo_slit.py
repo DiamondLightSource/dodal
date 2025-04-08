@@ -27,5 +27,5 @@ class TurboSlit(StandardReadable, Movable[float]):
 
     @AsyncStatus.wrap
     async def set(self, value: float):
-        """this will move the default XFINE"""
+        """This will move the default XFINE"""
         await self.xfine.set(value)
