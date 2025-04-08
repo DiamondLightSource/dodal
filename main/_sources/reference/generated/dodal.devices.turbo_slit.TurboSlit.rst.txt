@@ -21,6 +21,9 @@ dodal.devices.turbo\_slit.TurboSlit
       
       
       
+      ~TurboSlit.set
+      
+      
       
       
    
