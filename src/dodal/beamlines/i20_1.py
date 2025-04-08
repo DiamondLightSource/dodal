@@ -32,7 +32,8 @@ set_path_provider(
 )
 
 
-@device_factory()
+# NOTE this is mock as we cannot move items on the beamline until we get sign-off to do so
+@device_factory(mock=True)
 def turbo_slit() -> TurboSlit:
     """
     turboslit for selecting energy from the polychromator
