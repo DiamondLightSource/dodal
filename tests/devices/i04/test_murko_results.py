@@ -11,10 +11,9 @@ from dodal.devices.oav.oav_calculations import camera_coordinates_to_xyz_mm
 
 
 @pytest.fixture
-# @patch("dodal.devices.i04.murko_results.soft_signal_rw")
 @patch("dodal.devices.i04.murko_results.StrictRedis")
 async def mock_murko_results(mock_strict_redis) -> MurkoResultsDevice:
-    murko_results = MurkoResultsDevice(prefix="", name="murko_results")
+    murko_results = MurkoResultsDevice(name="murko_results")
     return murko_results
 
 
@@ -101,13 +100,23 @@ def get_messages(
     return messages
 
 
-def json_metadata(n, start=90, step=1, microns_pxp=10, microns_pyp=10) -> dict:
+def json_metadata(
+    n,
+    start=90,
+    step=1,
+    microns_pxp=10,
+    microns_pyp=10,
+    beam_centre_i=50,
+    beam_centre_j=50,
+) -> dict:
     metadatas = {}
     for i in range(n):
         metadata = {
             "omega_angle": start + step * i,
             "microns_per_x_pixel": microns_pxp,
             "microns_per_y_pixel": microns_pyp,
+            "beam_centre_i": beam_centre_i,
+            "beam_centre_j": beam_centre_j,
         }
         metadatas[i] = json.dumps(metadata)
     return metadatas
@@ -119,12 +128,11 @@ async def test_no_movement_given_sample_centre_matches_beam_centre(
 ):
     mock_x_setter, mock_y_setter, mock_z_setter = mock_setters
     messages = iter(pickled_messages(get_messages()))  # 2 messages, both (0.5, 0.5)
-    metadata = json_metadata(2, start=90, step=90)  # at exactly 90, 180 degrees
+    metadata = json_metadata(
+        2, start=90, step=90, beam_centre_i=50, beam_centre_j=50
+    )  # at 90, 180 degrees
     mock_murko_results.pubsub.get_message, mock_murko_results.redis_client.hget = (
         mock_redis_calls(mock_strict_redis, messages, metadata)
-    )
-    mock_murko_results.get_beam_centre = mock_get_beam_centre(
-        mock_murko_results, 50, 50
     )
     await mock_murko_results.trigger()
     assert mock_x_setter.call_args[0][0] == 0
@@ -138,12 +146,9 @@ async def test_given_correct_movement_given_90_and_180_angles(  # Need a better 
 ):
     mock_x_setter, mock_y_setter, mock_z_setter = mock_setters
     messages = iter(pickled_messages(get_messages()))  # 2 messages, both (0.5, 0.5)
-    metadata = json_metadata(2, start=90, step=90)  # at exactly 90, 180 degrees
+    metadata = json_metadata(2, start=90, step=90, beam_centre_i=75, beam_centre_j=70)
     mock_murko_results.pubsub.get_message, mock_murko_results.redis_client.hget = (
         mock_redis_calls(mock_strict_redis, messages, metadata)
-    )
-    mock_murko_results.get_beam_centre = mock_get_beam_centre(
-        mock_murko_results, 75, 70
     )
     await mock_murko_results.trigger()
     # (sample_centre_x * shape[1] - beam_centre_x) * microns_pxp / 1000 -> (0.5 * 100 - 75) / 100
@@ -162,17 +167,14 @@ async def test_correct_movement_given_90_180_degrees(
     messages = iter(
         pickled_messages(get_messages(start_y=0.6, step_y=0.1))
     )  # 2 messages, (0.6, 0.5) and (0.7, 0.5) - (z, x), (y, x)
-    metadata = json_metadata(2, start=90, step=90)  # at 90, 180 degrees
+    metadata = json_metadata(2, start=90, step=90, beam_centre_i=90, beam_centre_j=40)
     mock_murko_results.pubsub.get_message, mock_murko_results.redis_client.hget = (
         mock_redis_calls(mock_strict_redis, messages, metadata)
     )
-    mock_murko_results.get_beam_centre = mock_get_beam_centre(
-        mock_murko_results, 90, 40
-    )
     await mock_murko_results.trigger()
-    assert mock_x_setter.call_args[0][0] == -0.4  # - (0.9 - 0.5)
-    assert mock_y_setter.call_args[0][0] == -0.3  # 0.4 - 0.7
-    assert mock_z_setter.call_args[0][0] == -0.2  # 0.4 - 0.6
+    assert mock_x_setter.call_args[0][0] == -0.4
+    assert mock_y_setter.call_args[0][0] == -0.3
+    assert mock_z_setter.call_args[0][0] == -0.2
 
 
 @patch("dodal.devices.i04.murko_results.StrictRedis")
@@ -181,12 +183,11 @@ async def test_correct_movement_given_45_and_135_angles(
 ):
     mock_x_setter, mock_y_setter, mock_z_setter = mock_setters
     messages = iter(pickled_messages(get_messages()))  # 2 messages, both (0.5, 0.5)
-    metadata = json_metadata(2, start=45, step=90)  # at 45, 135 degrees
+    metadata = json_metadata(
+        2, start=45, step=90, beam_centre_i=75, beam_centre_j=70
+    )  # at 45, 135 degrees
     mock_murko_results.pubsub.get_message, mock_murko_results.redis_client.hget = (
         mock_redis_calls(mock_strict_redis, messages, metadata)
-    )
-    mock_murko_results.get_beam_centre = mock_get_beam_centre(
-        mock_murko_results, 75, 70
     )
     await mock_murko_results.trigger()
     assert mock_x_setter.call_args[0][0] == -0.25
@@ -202,19 +203,16 @@ async def test_correct_movement_given_30_and_120_angles(
 ):
     mock_x_setter, mock_y_setter, mock_z_setter = mock_setters
     messages = iter(pickled_messages(get_messages()))  # 2 messages, both (0.5, 0.5)
-    metadata = json_metadata(2, start=30, step=90)  # at 30, 120 degrees
+    metadata = json_metadata(
+        2, start=30, step=90, beam_centre_i=75, beam_centre_j=70
+    )  # at 30, 120 degrees
     mock_murko_results.pubsub.get_message, mock_murko_results.redis_client.hget = (
         mock_redis_calls(mock_strict_redis, messages, metadata)
     )
-    mock_murko_results.get_beam_centre = mock_get_beam_centre(
-        mock_murko_results, 75, 70
-    )
     await mock_murko_results.trigger()
     assert mock_x_setter.call_args[0][0] == -0.25, "x value incorrect"
-    # (sample_centre_y * shape[1] - beam_centre_y) / microns_pyp -> (0.5 * 100 - 70) / 10
     expected_y = 0.2 * abs_cos(120)
     assert mock_y_setter.call_args[0][0] == approx(expected_y), "y value incorrect"
-    # (sample_centre_z * shape[1] - beam_centre_y) / microns_pyp -> (0.5 * 100 - 70) / 10
     expected_z = 0.2 * abs_sin(120)  # closer than 30
     assert mock_z_setter.call_args[0][0] == approx(expected_z), "z value incorrect"
 
@@ -225,12 +223,11 @@ async def test_correct_movement_given_30_and_150_angles(
 ):
     mock_x_setter, mock_y_setter, mock_z_setter = mock_setters
     messages = iter(pickled_messages(get_messages()))  # 2 messages, both (0.5, 0.5)
-    metadata = json_metadata(2, start=30, step=120)  # at 30, 120 degrees
+    metadata = json_metadata(
+        2, start=30, step=120, beam_centre_i=75, beam_centre_j=70
+    )  # at 30, 150 degrees
     mock_murko_results.pubsub.get_message, mock_murko_results.redis_client.hget = (
         mock_redis_calls(mock_strict_redis, messages, metadata)
-    )
-    mock_murko_results.get_beam_centre = mock_get_beam_centre(
-        mock_murko_results, 75, 70
     )
     await mock_murko_results.trigger()
     assert mock_x_setter.call_args[0][0] == -0.25, "x value incorrect"
@@ -250,12 +247,9 @@ async def test_correct_movement_given_multiple_angles(  # Need a better name
     messages = iter(
         pickled_messages(get_messages(batches=7))
     )  # 2 messages, both (0.5, 0.5)
-    metadata = json_metadata(7, start=20, step=30)  # Should find 80, 170 degrees
+    metadata = json_metadata(7, start=20, step=30, beam_centre_i=75, beam_centre_j=60)
     mock_murko_results.pubsub.get_message, mock_murko_results.redis_client.hget = (
         mock_redis_calls(mock_strict_redis, messages, metadata)
-    )
-    mock_murko_results.get_beam_centre = mock_get_beam_centre(
-        mock_murko_results, 75, 60
     )
     await mock_murko_results.trigger()
     assert mock_x_setter.call_args[0][0] == -0.25, "x value incorrect"
@@ -283,21 +277,16 @@ async def test_correct_movement_given_multiple_angles_and_shifting_coords(
                 step_y=0.02,
             )
         )
-    )  # 2 messages, both (0.5, 0.5)
-    metadata = json_metadata(12, start=75, step=10)  # Should find 85, 175 degrees
+    )
+    metadata = json_metadata(12, start=75, step=10, beam_centre_i=75, beam_centre_j=60)
     mock_murko_results.pubsub.get_message, mock_murko_results.redis_client.hget = (
         mock_redis_calls(mock_strict_redis, messages, metadata)
-    )
-    mock_murko_results.get_beam_centre = mock_get_beam_centre(
-        mock_murko_results, 75, 60
     )
     await mock_murko_results.trigger()
     # at 85, 175, x_coord = 0.51, 0.6. Average = 0.555. Beam_centre_x = 75. 0.75 - 0.555 = 0.195
     assert mock_x_setter.call_args[0][0] == -0.195, "x value incorrect"
-    # at 175, y_coord = 0.5. 0.6 - 0.5 = 0.1
     expected_y = 0.1 * abs_cos(175)  # 175 is closest angle to 180
     assert mock_y_setter.call_args[0][0] == approx(expected_y), "y value incorrect"
-    # at 85, y_coord = 0.32. 0.6 - 0.32 = 0.28.
     expected_z = 0.28 * abs_sin(85)  # 85 is closest angle to 90
     assert mock_z_setter.call_args[0][0] == approx(expected_z), "z value incorrect"
 
