@@ -151,13 +151,19 @@ async def test_given_correct_movement_given_90_and_180_angles(
         mock_redis_calls(mock_strict_redis, messages, metadata)
     )
     await mock_murko_results.trigger()
-    assert mock_x_setter.call_args[0][0] == -0.25
-    assert mock_y_setter.call_args[0][0] == 0.2
-    assert mock_z_setter.call_args[0][0] == 0.2
+
+    expected_x = -(75 - (0.5 * 100)) / 100  # -0.25
+    assert mock_x_setter.call_args[0][0] == expected_x
+
+    expected_y = (70 - (0.5 * 100)) / 100  # 0.2
+    assert mock_y_setter.call_args[0][0] == expected_y
+
+    expected_z = (70 - (0.5 * 100)) / 100  # 0.2
+    assert mock_z_setter.call_args[0][0] == expected_z
 
 
 @patch("dodal.devices.i04.murko_results.StrictRedis")
-async def test_correct_movement_given_90_180_degrees(
+async def test_correct_movement_given_90_180_degrees_with_moving_y(
     mock_strict_redis, mock_murko_results, mock_setters
 ):
     mock_x_setter, mock_y_setter, mock_z_setter = mock_setters
@@ -169,9 +175,15 @@ async def test_correct_movement_given_90_180_degrees(
         mock_redis_calls(mock_strict_redis, messages, metadata)
     )
     await mock_murko_results.trigger()
-    assert mock_x_setter.call_args[0][0] == -0.4
-    assert mock_y_setter.call_args[0][0] == -0.3
-    assert mock_z_setter.call_args[0][0] == -0.2
+
+    expected_x = -(90 - (0.5 * 100)) / 100  # -0.4
+    assert mock_x_setter.call_args[0][0] == expected_x
+
+    expected_y = (40 - (0.7 * 100)) / 100  # -0.3
+    assert mock_y_setter.call_args[0][0] == expected_y
+
+    expected_z = (40 - (0.6 * 100)) / 100  # -0.2
+    assert mock_z_setter.call_args[0][0] == expected_z
 
 
 @patch("dodal.devices.i04.murko_results.StrictRedis")
@@ -210,7 +222,7 @@ async def test_correct_movement_given_30_and_120_angles(
     assert mock_x_setter.call_args[0][0] == -0.25, "x value incorrect"
     expected_y = 0.2 * abs_cos(120)
     assert mock_y_setter.call_args[0][0] == approx(expected_y), "y value incorrect"
-    expected_z = 0.2 * abs_sin(120)  # closer than 30
+    expected_z = 0.2 * abs_sin(120)  # 120 is closer to 90 than 30
     assert mock_z_setter.call_args[0][0] == approx(expected_z), "z value incorrect"
 
 
@@ -248,7 +260,6 @@ async def test_correct_movement_given_multiple_angles(  # Need a better name
     )
     await mock_murko_results.trigger()
     assert mock_x_setter.call_args[0][0] == -0.25, "x value incorrect"
-    # (60 - 0.5 * 100) * 10 / 1000 = 0.1
     expected_y = 0.1 * abs_cos(170)  # 170 is closest angle to 180
     assert mock_y_setter.call_args[0][0] == approx(expected_y), "y value incorrect"
     expected_z = 0.1 * abs_sin(80)  # 80 is closest angle to 90
