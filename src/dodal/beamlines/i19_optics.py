@@ -5,7 +5,7 @@ from dodal.common.beamlines.beamline_utils import (
     set_beamline as set_utils_beamline,
 )
 from dodal.devices.hutch_shutter import HutchShutter
-from dodal.devices.i19.hutch_access import HutchAccessControl
+from dodal.devices.i19.hutch_access import ACCESS_DEVICE_NAME, HutchAccessControl
 from dodal.log import set_beamline as set_log_beamline
 from dodal.utils import BeamlinePrefix
 
@@ -31,4 +31,6 @@ def access_control() -> HutchAccessControl:
     """Get a device that checks the active hutch for i19, instantiate it if it hasn't already been.
     If this is called when already instantiated, it will return the existing object.
     """
-    return HutchAccessControl(f"{PREFIX.beamline_prefix}-OP-STAT-01:", "access_control")
+    return HutchAccessControl(
+        f"{PREFIX.beamline_prefix}-OP-STAT-01:", ACCESS_DEVICE_NAME
+    )
