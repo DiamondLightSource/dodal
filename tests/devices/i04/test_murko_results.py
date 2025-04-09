@@ -141,7 +141,7 @@ async def test_no_movement_given_sample_centre_matches_beam_centre(
 
 
 @patch("dodal.devices.i04.murko_results.StrictRedis")
-async def test_given_correct_movement_given_90_and_180_angles(  # Need a better name
+async def test_given_correct_movement_given_90_and_180_angles(
     mock_strict_redis, mock_murko_results, mock_setters
 ):
     mock_x_setter, mock_y_setter, mock_z_setter = mock_setters
@@ -151,11 +151,8 @@ async def test_given_correct_movement_given_90_and_180_angles(  # Need a better 
         mock_redis_calls(mock_strict_redis, messages, metadata)
     )
     await mock_murko_results.trigger()
-    # (sample_centre_x * shape[1] - beam_centre_x) * microns_pxp / 1000 -> (0.5 * 100 - 75) / 100
     assert mock_x_setter.call_args[0][0] == -0.25
-    # (sample_centre_y * shape[0] - beam_centre_y) * microns_pyp / 1000 -> (0.5 * 100 - 70) / 100
     assert mock_y_setter.call_args[0][0] == 0.2
-    # (sample_centre_z * shape[0] - beam_centre_y) * microns_pyp / 1000 -> (0.5 * 100 - 70) / 100
     assert mock_z_setter.call_args[0][0] == 0.2
 
 
@@ -231,10 +228,8 @@ async def test_correct_movement_given_30_and_150_angles(
     )
     await mock_murko_results.trigger()
     assert mock_x_setter.call_args[0][0] == -0.25, "x value incorrect"
-    # (sample_centre_y * shape[1] - beam_centre_y) / microns_pyp -> (0.5 * 100 - 70) / 10
     expected_y = 0.2 * abs_cos(150)
     assert mock_y_setter.call_args[0][0] == approx(expected_y), "y value incorrect"
-    # (sample_centre_z * shape[1] - beam_centre_y) / microns_pyp -> (0.5 * 100 - 70) / 10
     expected_z = 0.2 * abs_sin(30)
     assert mock_z_setter.call_args[0][0] == approx(expected_z), "z value incorrect"
 
@@ -283,7 +278,6 @@ async def test_correct_movement_given_multiple_angles_and_shifting_coords(
         mock_redis_calls(mock_strict_redis, messages, metadata)
     )
     await mock_murko_results.trigger()
-    # at 85, 175, x_coord = 0.51, 0.6. Average = 0.555. Beam_centre_x = 75. 0.75 - 0.555 = 0.195
     assert mock_x_setter.call_args[0][0] == -0.195, "x value incorrect"
     expected_y = 0.1 * abs_cos(175)  # 175 is closest angle to 180
     assert mock_y_setter.call_args[0][0] == approx(expected_y), "y value incorrect"
