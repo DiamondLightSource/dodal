@@ -90,24 +90,75 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
     @AsyncStatus.wrap
     async def stage(self):
         await self.pubsub.subscribe("murko-results")
-        self._x_mm_setter(None)
-        self._y_mm_setter(None)
-        self._z_mm_setter(None)
+        self._x_mm_setter(0)
+        self._y_mm_setter(0)
+        self._z_mm_setter(0)
 
     @AsyncStatus.wrap
     async def unstage(self):
         await self.pubsub.unsubscribe()
 
+    @AsyncStatus.wrap
+    async def trigger(self):
+        # Wait for results
+        sample_id = await self.sample_id.get_value()
+        final_message = None
+        while self.angles_to_search:
+            # waits here for next batch to be recieved
+            message = await self.pubsub.get_message(timeout=self.TIMEOUT_S)
+            if message is None:  # No more messages to process
+                await self.process_batch(
+                    final_message, sample_id
+                )  # Process final message again
+                break
+            await self.process_batch(message, sample_id)
+            final_message = message
+        x_values = list(self.coords["x"].values())
+        y_values = list(self.coords["y"].values())
+        z_values = list(self.coords["z"].values())
+        assert x_values, "No x values"
+        assert z_values, "No z values"
+        assert y_values, "No y values"
+        self._x_mm_setter(float(np.mean(x_values)))
+        self._y_mm_setter(float(np.mean(y_values)))
+        self._z_mm_setter(float(np.mean(z_values)))
+
+    async def process_batch(self, message: dict | None, sample_id: str):
+        if message and message["type"] == "message":
+            batch_results = pickle.loads(message["data"])
+            for results in batch_results:
+                LOGGER.info(f"Got {results} from redis")
+                for uuid, result in results.items():
+                    metadata_str = await self.redis_client.hget(
+                        f"murko:{sample_id}:metadata", uuid
+                    )
+                    if metadata_str and self.angles_to_search:
+                        self.process_result(result, uuid, metadata_str)
+
+    def process_result(
+        self, result: dict, uuid: int, metadata_str: str
+    ) -> float | None:
+        metadata = MurkoMetadata(json.loads(metadata_str))
+        omega_angle = metadata["omega_angle"]
+        LOGGER.info(f"Got angle {omega_angle}")
+        # Find closest to next search angle
+        movement = self.get_coords_if_at_angle(metadata, result, omega_angle)
+        if movement:
+            LOGGER.info(f"Using result {uuid}, {metadata_str}, {result}")
+            search_angle = self.angles_to_search.pop(0)
+            for coord in self.search_angles[search_angle]:
+                self.coords[coord][omega_angle] = movement[Coord[coord].value]
+                LOGGER.info(f"Found {coord} at {movement}, angle = {omega_angle}")
+        self._last_omega = omega_angle
+        self._last_result = result
+
     def get_coords_if_at_angle(
-        self,
-        metadata: MurkoMetadata,
-        result: MurkoResult,
-        omega: float,
-        search_angle: float,
+        self, metadata: MurkoMetadata, result: MurkoResult, omega: float
     ) -> np.ndarray | None:
         """Gets the 'most_likely_click' coordinates from Murko if omega or the last
         omega are the closest angle to the search angle. Otherwise returns None.
         """
+        search_angle = self.angles_to_search[0]
         LOGGER.info(f"Compare {omega}, {search_angle}, {self._last_omega}")
         if (  # if last omega is closest
             abs(omega - search_angle) >= abs(self._last_omega - search_angle)
@@ -143,73 +194,3 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
             metadata["microns_per_x_pixel"],
             metadata["microns_per_y_pixel"],
         )
-
-    @AsyncStatus.wrap
-    async def trigger(self):
-        # Wait for results
-        sample_id = await self.sample_id.get_value()
-        search_angle = self.angles_to_search.pop(0)
-        final_message = None
-        while search_angle:  # Goes round in a loop until 270 degrees is found or there's no more messages
-            # waits here for next batch to be recieved
-            message = await self.pubsub.get_message(timeout=self.TIMEOUT_S)
-            if message is None:  # No more messages to process
-                await self.process_batch(
-                    final_message, sample_id, search_angle
-                )  # Process final message again
-                break
-            search_angle = await self.process_batch(message, sample_id, search_angle)
-            final_message = message
-        x_values = list(self.coords["x"].values())
-        y_values = list(self.coords["y"].values())
-        z_values = list(self.coords["z"].values())
-        assert x_values, "No x values"
-        assert z_values, "No z values"
-        assert y_values, "No y values"
-        self._x_mm_setter(np.mean(x_values))
-        self._y_mm_setter(np.mean(y_values))
-        self._z_mm_setter(np.mean(z_values))
-
-    async def process_batch(
-        self, message: dict | None, sample_id: str, search_angle: float
-    ):
-        if message and message["type"] == "message":
-            batch_results = pickle.loads(message["data"])
-            for results in batch_results:
-                LOGGER.info(f"Got {results} from redis")
-                assert isinstance(results, dict)
-                for uuid, result in results.items():
-                    if metadata_str := await self.redis_client.hget(
-                        f"murko:{sample_id}:metadata", uuid
-                    ):
-                        search_angle = self.process_result(
-                            result, uuid, metadata_str, search_angle
-                        )
-        return search_angle
-
-    def process_result(
-        self, result: dict, uuid: int, metadata_str: str, search_angle: float | None
-    ) -> float | None:
-        if search_angle is None:
-            return None
-        metadata = MurkoMetadata(json.loads(metadata_str))
-        omega_angle = metadata["omega_angle"]
-        assert search_angle, f"search_angle = {search_angle}"
-        LOGGER.info(f"Got angle {omega_angle}")
-        # Find closest to next search angle
-        if (
-            movement := self.get_coords_if_at_angle(
-                metadata, result, omega_angle, search_angle
-            )
-        ) is not None:
-            LOGGER.info(f"Using result {uuid}, {metadata_str}, {result}")
-            for coord in self.search_angles[search_angle]:
-                self.coords[coord][omega_angle] = movement[Coord[coord].value]
-                LOGGER.info(f"Found {coord} at {movement}, angle = {omega_angle}")
-            if self.angles_to_search:
-                search_angle = self.angles_to_search.pop(0)
-            else:
-                search_angle = None
-        self._last_omega = omega_angle
-        self._last_result = result
-        return search_angle
