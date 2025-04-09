@@ -12,7 +12,7 @@ from ophyd_async.core import (
     soft_signal_r_and_setter,
     soft_signal_rw,
 )
-from redis import StrictRedis
+from redis.asyncio import StrictRedis
 
 from dodal.devices.flux import Flux
 from dodal.devices.i04.constants import RedisConstants
@@ -143,7 +143,7 @@ class MurkoResultsDevice(StandardReadable, Triggerable, Stageable):
         LOGGER.info(f"Got angle {omega_angle}")
         # Find closest to next search angle
         movement = self.get_coords_if_at_angle(metadata, result, omega_angle)
-        if movement:
+        if movement is not None:
             LOGGER.info(f"Using result {uuid}, {metadata_str}, {result}")
             search_angle = self.angles_to_search.pop(0)
             for coord in self.search_angles[search_angle]:
