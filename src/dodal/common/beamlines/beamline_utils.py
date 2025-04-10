@@ -169,3 +169,8 @@ def try_get_path_provider() -> PathProvider | None:
         return PATH_PROVIDER
     except NameError:
         return None
+
+
+def clear_path_provider():
+    global PATH_PROVIDER
+    del PATH_PROVIDER
