@@ -6,6 +6,7 @@ from ophyd_async.core import (
     LazyMock,
     StandardReadable,
     derived_signal_r,
+    soft_signal_rw,
 )
 
 from dodal.devices.areadetector.plugins.CAM import Cam
@@ -37,20 +38,27 @@ class OAV(StandardReadable):
 
         with self.add_children_as_readables():
             self.grid_snapshot = SnapshotWithGrid(f"{prefix}MJPG:", name)
+            self.sizes = [self.grid_snapshot.x_size, self.grid_snapshot.y_size]
             self.microns_per_pixel_x = derived_signal_r(
-                lambda: self._get_microns_per_pixel(axis=Coords.X)
+                self._get_microns_per_pixel,
+                size=self.sizes[Coords.X],
+                coord=soft_signal_rw(datatype=int, initial_value=Coords.X.value),
             )
             self.microns_per_pixel_x = derived_signal_r(
-                lambda: self._get_microns_per_pixel(axis=Coords.Y)
+                self._get_microns_per_pixel,
+                size=self.sizes[Coords.Y],
+                coord=soft_signal_rw(datatype=int, initial_value=Coords.Y.value),
             )
 
             self.beam_centre_i = derived_signal_r(
-                partial(self._get_beam_position, axis=Coords.X),
-                size=self.grid_snapshot.x_size,
+                self._get_beam_position,
+                size=self.sizes[Coords.X],
+                coord=soft_signal_rw(datatype=int, initial_value=Coords.X.value),
             )
             self.beam_centre_j = derived_signal_r(
-                partial(self._get_beam_position, axis=Coords.Y),
-                size=self.grid_snapshot.y_size,
+                self._get_beam_position,
+                size=self.sizes[Coords.Y],
+                coord=soft_signal_rw(datatype=int, initial_value=Coords.Y.value),
             )
 
             self.snapshot = Snapshot(
@@ -58,17 +66,16 @@ class OAV(StandardReadable):
                 self._name,
             )
 
-        self.sizes = [self.grid_snapshot.x_size, self.grid_snapshot.y_size]
-
         super().__init__(name)
 
-    def _get_beam_position(self, axis, size) -> int:
+    def _get_beam_position(self, size: int, coord: Coords) -> int:
         """Extracts the beam location in pixels `xCentre` `yCentre`"""
-        value = self.parameters["1.0"].crosshair[axis]
-        return int(value * size / DEFAULT_OAV_WINDOW[axis])
+        value = self.parameters["1.0"].crosshair[coord]
+        return int(value * size / DEFAULT_OAV_WINDOW[coord])
 
-    def _get_microns_per_pixel(self, axis: IntEnum) -> float:
-        return self.parameters["1.0"].microns_per_pixel[axis]
+    def _get_microns_per_pixel(self, size: int, coord: Coords) -> float:
+        value = self.parameters["1.0"].microns_per_pixel[coord]
+        return value * DEFAULT_OAV_WINDOW[coord] / size
 
     async def connect(
         self,
